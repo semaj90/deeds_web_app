@@ -280,13 +280,22 @@ function parseSqlText(text, tableName) {
         indexes.add(uniqueConstraintMatch[1].toLowerCase());
         continue;
       }
-      if (/^(primary key|foreign key|check|unique|exclude)\b/i.test(line)) continue;
+      // Table-level constraints and referential actions are not columns. The
+      // previous parser admitted `constraint` and `on delete/update` lines as
+      // identifiers, creating false static COLUMN_MISMATCH results for the
+      // workspace event/head sidecar.
+      if (/^(primary key|foreign key|check|unique|exclude|constraint)\b/i.test(line)) continue;
+      if (/^on\s+(delete|update)\b/i.test(line)) continue;
       if (/^(generated|case|when|then|else|end)\b/i.test(line)) continue;
-      const columnMatch = line.match(/^"?([A-Za-z0-9_]+)"?\s+[A-Za-z][A-Za-z0-9_\s\(\)\[\],"'`.-]*/);
+      // Drizzle-generated SQL commonly quotes identifiers (`"id" uuid`).
+      // Match the identifier and the required type separately so quoted SQL
+      // columns are not silently dropped from the manual contract.
+      const columnMatch = line.match(/^(?:"([A-Za-z0-9_]+)"|([A-Za-z0-9_]+))\s+[A-Za-z]/);
       if (columnMatch) {
-        columns.add(columnMatch[1].toLowerCase());
+        const columnName = columnMatch[1] ?? columnMatch[2];
+        columns.add(columnName.toLowerCase());
         if (/\bunique\b/i.test(line)) {
-          indexes.add(`${tableName}_${columnMatch[1].toLowerCase()}_key`);
+          indexes.add(`${tableName}_${columnName.toLowerCase()}_key`);
         }
       }
     }

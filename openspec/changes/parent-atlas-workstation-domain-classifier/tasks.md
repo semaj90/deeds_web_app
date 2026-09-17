@@ -360,6 +360,21 @@ Evidence: `docs/reports/uuidv5-parity-v1.json`.
   lightweight workspace head; focused workspace event/delta tests pass 7/7.
   Daily Graphify wiring, CAS binding application, durable event storage, and
   snapshot compaction remain open and are not claimed by this contract proof.
+- [ ] `GDA-COMPACT-10` remains gated for durable implementation. Added the
+  read-only `assessWorkspaceCompactionV1` evaluator plus the high-water-mark
+  `planWorkspaceHeadCompactionV1` planner. The planner captures an event cut,
+  validates sequence/predecessor continuity, derives a deterministic candidate
+  revision, and ignores later events without reading the worktree. Focused
+  compaction tests now pass 5/5, including replay from a previously compacted
+  nonzero sequence; durable snapshot construction, base-pointer
+  advancement, and readback still require explicit authorization.
+- [x] Added the read-only `atlas:workspace:head:compaction:plan` database
+  planner. It reads only the event/head sidecar, plans through a selected
+  high-water mark, reports sequence/predecessor validation and a deterministic
+  candidate checksum, and returns `BLOCKED_SIDECAR_NOT_APPLIED` when the
+  durable tables are absent. It never scans the worktree or performs writes;
+  current live proof is therefore explicit sidecar absence, not compaction
+  completion.
 - [x] Ran the read-only delta planner against the prior `ea92e7...` and current
   `f22cc6...` checkpoint artifacts: 24,714 unchanged, 651 changed, 303 added,
   and 0 deleted sources. This proves bounded delta planning can continue while
@@ -386,6 +401,40 @@ Evidence: `docs/reports/uuidv5-parity-v1.json`.
   workspace, packet digest, and chunk-lineage evidence; missing, ambiguous,
   stale, or mismatched rows become typed blockers rather than synthetic repair
   targets. The planner performs no packet/chunk writes.
+  The preflight now accepts the explicitly selected compatibility `--run-id`
+  for read-only join-funnel diagnostics without treating that run as canonical.
+  Current live result remains `BLOCKED_EXECUTION_RUN_BRIDGE`: the selected run
+  has zero matching `graphify_files` rows, although `23,743` source refs have
+  legacy evidence under six other run IDs. This is recorded as
+  `RUN_FILE_EVIDENCE_UNDER_OTHER_RUN`; it does not authorize cross-run joining
+  or make downstream packet/chunk counts promotion evidence. The bounded 52-
+  source diagnostic currently classifies `38 PACKET_MISSING`, `14
+  PACKET_REVISION_MISMATCH`, and `52 CHUNK_MISSING`.
+  A separate direct execution-membership audit over 128 rows confirms the
+  current source bindings themselves are internally aligned (`128/128` source,
+  revision, content, and workspace matches), but only `4/128` sources have
+  proven packet/chunk lineage and `0/128` have packet content matches. This is
+  partial diagnostic evidence only; it does not authorize promotion or a
+  cross-run repair. The corrected hash-grain audit now compares the source
+  digest to `codebase_chunk_index.file_content_hash` (not chunk-scoped
+  `content_hash`); the latest bounded 20-row run finds `1/20` exact
+  file-content matches and `0/20` packet-content matches. The same run finds
+  `5/20` source-level packet rows, `0/20` packet revision matches, and
+  `0/20` full packet identities.
+  The promotion preflight carries the same hash-grain rule into its candidate
+  decision: a source whole-file digest is compared only with
+  `codebase_chunk_index.file_content_hash`; chunk-scoped `content_hash` is not
+  used for source identity. A bounded 52-row rerun reports
+  `chunk_file_content_matches=0` and `firstFailingBoundary=RUN_FILE_MISSING`
+  because the requested compatibility run has no `graphify_files` rows. This
+  remains read-only diagnostic evidence and does not permit cross-run joining.
+  The planner now separates missing run evidence from missing run registration.
+  Read-only comparison found legacy run `48485685-e773-4433-a1f8-00f5524cca44`
+  has `23,758` file rows and `23,743` source-reference matches, including
+  `23,169` exact source-revision/content-digest matches, but has no qualifying
+  `graphify_runs` registry row for the admitted workspace revision (its
+  registered revision is different). Its typed result is therefore
+  `RUN_REGISTRY_MISSING`, not an implicit canonical-run substitution.
 
 Evidence: `sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts`,
 `sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.spec.ts`,
@@ -440,6 +489,16 @@ Evidence: `sveltekit-frontend/src/lib/server/atlas/pipeline/unified-context-pipe
   MsgPack transport artifacts, and the NES/CHROM97 packet-fabric canary.
   These contracts do not train, fan out, warm caches, write projections, or
   promote model output.
+- [x] Added the streaming `plan-neschrom97-packet-fabric-admission-v1.mjs`
+  ingress planner. The bounded 45-record corpus is valid and duplicate-free,
+  but all 45 records lack canonical workspace/source/content lineage, so the
+  planner emits `PACKET_FABRIC_ADMISSION_BLOCKED` with input checksum
+  `sha256:8819087b6b0e0554e243bce280dbdc7dee0c646d6a59e63418d68493c08edaf0`.
+  It performs no identity synthesis or datastore/projection writes.
+- [x] Added optional `--resolve-source-evidence` mode to the same planner. It
+  hashes readable referenced source bytes as unadmitted evidence only: the
+  latest bounded run resolved 43 records fully and 2 partially. These hashes
+  are never promoted to workspace/source revisions or packet identity.
 - [x] Wired the stage-contract registry into `AtlasExecutionPipelineV1`; every
   binding remains explicitly non-promotion-eligible and participates in the
   deterministic pipeline checksum.
@@ -459,6 +518,9 @@ Evidence: `sveltekit-frontend/src/lib/server/atlas/orchestration/atlas-pipeline-
   and ACE evidence without treating missing reports as success. It always
   emits `writesPerformed=false`, keeps projections non-canonical, and reports
   the first remaining gate; it does not authorize migration, packet repair,
+  or projection writes. The command is now exposed as
+  `npm run atlas:pipeline:promotion:plan` and live execution reports
+  `BLOCKED_DUPLICATE_OWNER` as the first gate.
   cache warming, vector projection, or model promotion.
 
 Evidence: `scripts/atlas/plan-atlas-pipeline-promotion-v1.mjs`,
@@ -502,6 +564,21 @@ This is classification evidence only (`safeToApply=false`,
 `writesPerformed=false`); it does not repair packet digests or authorize any
 downstream promotion.
 
+Follow-up bridge hardening (2026-09-16): the execution→run bridge planner now
+also verifies parser/extraction contract parity, completed `SOURCE_SELECTION`,
+manifest digest equality with the stage output checksum, and exact equality
+between the run manifest count and V2 execution membership count (25,542).
+The guarded apply requires a frozen planner checksum and uses the V1
+authorization flag; a rollback-canary path is available but was not invoked.
+The packet/chunk preflight now emits a read-only join funnel. Current live
+evidence is `execution_membership_rows=25,542`,
+`legacy_run_source_rows=0`, `source_ref_matches=0`,
+`source_revision_matches=0`, `content_digest_matches=0`,
+`packet_source_matches=17,398`, `packet_revision_matches=0`,
+`packet_digest_matches=0`, `chunk_source_matches=20,132`, and
+`chunk_revision_matches=0`, with verdict
+`BLOCKED_EXECUTION_RUN_BRIDGE`. No database or projection writes occurred.
+
 The next bounded packet-digest plan was also rerun against that canonical
 execution at the 128-row boundary. It produced `113 READY_INSERT`, `14
 LEGACY_LINEAGE_FIELDS_MISSING`, and `1 SOURCE_CONTENT_DIGEST_MISMATCH`; the
@@ -515,6 +592,181 @@ read-only run classified `221 MISSING_PACKET`, `255
 LEGACY_LINEAGE_FIELDS_MISSING`, `22 LEGACY_CONTENT_HASH_UNQUALIFIED`, and `2
 SOURCE_CONTENT_DIGEST_MISMATCH`; it produced no synthetic packet keys and no
 inserts, updates, or readback writes (`writesPerformed=false`).
+
+The planned durable event/head seam now also has a concrete Postgres adapter:
+`sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-head-postgres-adapter-v1.ts`.
+It uses the existing `pg` pool, locks the current head inside the transaction,
+round-trips event participants, preserves caller-owned event identity, and
+validates the event/head readback. This is implementation evidence only: the
+sidecar is still unapplied, the adapter has no active production caller, and
+the live durable readback gate remains open (`writesPerformed=false`).
+
+The read-only schema audit now separates implementation from live authority:
+`adapterImplemented=true`, `storageReady=false`, and `liveReadbackProven=false`.
+The current migration checksum is recorded by the audit and changes whenever
+the reviewed sidecar changes. The Drizzle mirror and sidecar now have a focused
+parity check for both foreign keys and delete semantics. A guarded transactional
+runner, `scripts/atlas/apply-workspace-event-head-sidecar-v1.mjs`, is available
+through `npm run atlas:workspace:event-head:sidecar:preflight`; its dry-run
+returned `READY_FOR_AUTHORIZATION` with `writesPerformed=false`. This keeps an
+explicit migration-owner authorization and a live readback canary as separate
+open gates, so an artifact-only implementation pass is not reported as durable
+authority.
+
+### Live Drizzle/PostgreSQL mirror audit (2026-09-17)
+
+- [x] Re-ran the root `audit:drizzle` mirror audit against the reachable
+  PostgreSQL instance. The report checked 11 tables; 6 static contracts are
+  aligned, 3 live tables are aligned, and 4 expected live tables are absent.
+  The audit completed with `liveUnavailable=0` and `writesPerformed=false`.
+- [x] Corrected the SQL parser to exclude table-level `CONSTRAINT` and
+  `ON DELETE/UPDATE` clauses from column discovery. The workspace event/head
+  sidecar now reports static SQL/Drizzle alignment rather than false column
+  drift; this changed the static-aligned count from 4 to 6 without changing
+  the live database.
+- [x] Corrected quoted SQL column extraction. The `feature_registry` result
+  now exposes its real historical column mismatch instead of silently treating
+  the manual contract as empty; it remains a review item, not an automatic
+  migration recommendation.
+- [ ] Schema/index promotion remains blocked. The current report identifies
+  static index drift for `kanban_tasks` and `nes_chrom_packets`; static column
+  drift for `feature_registry`, `atlas_workspace_event_participants`,
+  `atlas_workspace_heads`, `task_semantic_packets`, and `atlas_packets`; and
+  live column drift for `task_semantic_packets`, `atlas_packets`,
+  `parent_atlas_documents`, and `route_runtime_packets`.
+- [ ] The event/head sidecar is not live: `atlas_workspace_events`,
+  `atlas_workspace_event_participants`, and `atlas_workspace_heads` are all
+  absent from the live database. The read-only sidecar audit therefore remains
+  `NOT_APPLIED_PLANNED_SIDECAR`, and compaction remains
+  `BLOCKED_SIDECAR_NOT_APPLIED`.
+- [ ] Do not run DDL or alter existing rows from this audit. Each mismatch
+  requires an owner-level migration disposition, exact Drizzle/manual SQL
+  reconciliation, and post-apply readback before its gate can be promoted.
+
+Evidence: `docs/reports/postgres-contract-mirrors-report.json`,
+`docs/reports/postgres-contract-mirrors-report.md`,
+`docs/reports/workspace-event-head-schema-audit-v1.json`, and
+`docs/reports/workspace-head-compaction-plan-v1.json`.
+
+### Historical schema snapshot scope (2026-09-17)
+
+- [x] Ran the SvelteKit `schema:drift:check` read-only comparison. It reports
+  `SCHEMA_DRIFT_DETECTED` with 157 blocks, 241 warnings, and 175 notes while
+  comparing a 369-table historical snapshot with 552 live tables.
+- [ ] This broad result is inventory evidence, not migration authorization.
+  Many findings are missing historical tables or extra manual/sidecar tables;
+  they must be classified by owner before any DDL is proposed. The targeted
+  `audit:drizzle` mirror report remains the authority for the 11 scoped Parent
+  Atlas contracts.
+- [ ] Do not resolve the broad 157-block result by running a global migration,
+  `drizzle-kit push`, or creating duplicate tables. Reconcile only an explicitly
+  authorized owner-scoped contract and require post-apply readback.
+- [x] Extended `scripts/atlas/apply-workspace-event-head-sidecar-v1.mjs` with
+  an explicit `--rollback-canary` path. When separately authorized, it applies
+  the reviewed SQL inside one transaction, verifies tables/constraints/triggers,
+  records the readback, and rolls back; ordinary dry-run remains the default.
+  No canary was invoked in this pass.
+
+Evidence: `docs/reports/schema/expected-vs-live.diff.json` and
+`docs/reports/postgres-contract-mirrors-report.json`.
+
+### Migration-owner classification (2026-09-17)
+
+- [x] Ran the read-only `audit-atlas-migration-owners.mjs` against the
+  reachable PostgreSQL instance. It reports four live shape-aligned owners:
+  `graphify_source_inventory`, `callable_search_projection`,
+  `observation_feature_rows_active`, and `symbol_registry`.
+- [x] Classified `observation_feature_rows_superseded_candidate` as
+  `superseded_unapplied`; it is not an additional promotion owner.
+- [ ] `feature_registry` remains `MISSING_MANIFEST_REGISTRATION`: its live
+  table is absent and the proposal is not registered in the sidecar manifest.
+  This is an owner-review item, not permission to create a table.
+- [ ] `graphify_file_search_projection` remains `SIDECAR_UNAPPLIED`: its
+  planned sidecar is not live. It must not be treated as an available index
+  or used to authorize packet/search promotion.
+- [x] Confirmed the audit is live and read-only: `writes=false`, no DDL, no
+  row updates, and no projection/cache writes.
+
+Evidence: `docs/reports/atlas-migration-owner-audit-v1.json`.
+
+### Current owner/lineage recheck (2026-09-17)
+
+- [x] Re-ran the owner-resolution planner for the admitted execution cohort.
+  It still reports `DUPLICATE_EQUIVALENT_EXECUTIONS` with two candidates and
+  one evidence signature; the preferred execution remains
+  `74d50c86-8194-45ea-8c3d-61aab737ef83`. `safeToApply=false` and
+  `writesPerformed=false` remain explicit.
+- [x] Re-ran the execution→run bridge planner. It remains
+  `READY_FOR_EXPLICIT_BINDING` with one candidate compatibility run and
+  `25,542` execution-membership rows; no binding was applied.
+- [x] Re-ran the packet/chunk promotion preflight with the explicit selected
+  execution. It remains `BLOCKED_EXECUTION_RUN_BRIDGE` with zero eligible
+  candidates, so no packet/chunk promotion was attempted.
+- [x] Re-ran the compaction planner. It remains
+  `BLOCKED_SIDECAR_NOT_APPLIED`; no worktree scan or snapshot write occurred.
+
+Evidence: `docs/reports/current-graphify-execution-owner-resolution-v1.json`,
+`docs/reports/graphify-execution-run-bridge-v1.json`,
+`docs/reports/packet-chunk-lineage-promotion-preflight-v1.json`, and
+`docs/reports/workspace-head-compaction-plan-v1.json`.
+
+### Stage 13 workflow receipt boundary (2026-09-17)
+
+- [x] Removed the fabricated initial FSM observation from
+  `atlas-mastra-workflow.ts`. Until the real prior tool receipt is carried
+  into the FSM, the workflow now emits `PRIOR_TOOL_RECEIPT_REQUIRED` with
+  `lastToolSucceeded=false`, zero evidence, and `validationStatus=FAIL`.
+  It cannot advance on an unobserved tool call.
+- [x] Focused workflow tests pass 5/5 and OpenSpec strict validation passes.
+- [ ] Live Mastra/Go retrieval and independent validation receipt remain
+  unproven; the compatibility shim and missing receipt are still explicit
+  Stage 13 blockers.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/atlas-mastra-workflow.ts`
+and `sveltekit-frontend/src/lib/server/atlas/atlas-mastra-workflow.spec.ts`.
+
+- [x] Hardened the retrieval adapter’s FSM guard as well: it no longer marks
+  an unobserved discovery call as successful. The adapter now preserves the
+  explicit `PRIOR_TOOL_RECEIPT_REQUIRED` failure while discovery evidence is
+  unavailable; focused adapter/semantic/workflow tests pass 13/13.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/atlas-mastra-adapter.ts`.
+
+- [x] Replaced the retrieval adapter's remaining successful placeholder
+  observation with the same fail-closed `PRIOR_TOOL_RECEIPT_REQUIRED`
+  boundary. The adapter cannot pass the FSM gate using zero evidence.
+  Adapter, semantic-tool, and workflow tests pass 13/13.
+
+- [x] Removed wall-clock timestamp fallbacks from the shared runtime context.
+  Omitted workspace/packet revisions now remain explicitly unqualified, and
+  `isAtlasRuntimeRevisionQualified()` exposes the admission check. Focused
+  runtime/workflow/adapter tests pass 15/15.
+- [ ] Legacy callers that omit revisions remain diagnostic-only until they
+  provide caller-owned workspace and packet lineage.
+
+- [x] Runtime receipts are now validated with
+  `RuntimeToolReceiptV1Schema`, exported through `atlas-index.ts`, and
+  malformed receipt payloads are rejected before FSM projection. The workflow
+  accepts an optional caller-owned prior receipt and preserves workspace and
+  packet revisions in its request context; 18 focused tests pass.
+- [ ] The live Mastra/Go boundary still does not produce and thread a durable
+  receipt, so Stage 13 remains `LIVE_PROMOTION_BLOCKED`.
+
+- [x] Added `RuntimeToolReceiptV1` and the pure
+  `observationFromRuntimeToolReceiptV1()` adapter in
+  `atlas-runtime-context.ts`. A real receipt projects tool outcome, evidence,
+  validation, and failure facts into the FSM; a missing receipt remains
+  `PRIOR_TOOL_RECEIPT_REQUIRED` with `FAIL`, zero evidence, and no success.
+- [x] Changed semantic-tool observation defaults to fail closed when no prior
+  receipt is supplied. Added focused receipt projection tests; 12/12 related
+  workflow/runtime tests pass.
+- [ ] Live receipt propagation from the Mastra/Go execution boundary remains
+  open. The new type is a projection contract and does not claim live durable
+  retrieval or validation readback.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/atlas-runtime-context.ts`,
+`sveltekit-frontend/src/lib/server/atlas/atlas-runtime-receipt.spec.ts`, and
+`sveltekit-frontend/src/lib/server/atlas/atlas-semantic-tools.ts`.
 
 ## Reference
 

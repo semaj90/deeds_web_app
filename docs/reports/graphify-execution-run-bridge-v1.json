@@ -1,0 +1,74 @@
+{
+  "schema": "atlas.graphify-execution-run-bridge.v1",
+  "mode": "READ_ONLY_BRIDGE_PLAN",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "execution": {
+    "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "legacy_graphify_run_id": null,
+    "canonical_authority": true,
+    "status": "COMPLETED",
+    "parser_contract_version": "graphify.parser.v1",
+    "extraction_contract_version": "graphify.extraction.v1"
+  },
+  "candidateRun": {
+    "run_id": "01a8d8fc-2507-4f39-868e-039039237b98",
+    "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "source_manifest_digest": "841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+    "source_manifest_source_count": 25542,
+    "parser_contract_version": "graphify.parser.v1",
+    "extraction_contract_version": "graphify.extraction.v1",
+    "status": "COMPLETED",
+    "dry_run": false,
+    "completed_at": "2026-09-15T22:05:02.995Z"
+  },
+  "candidateRunCount": 1,
+  "candidateRunIds": [
+    "01a8d8fc-2507-4f39-868e-039039237b98"
+  ],
+  "checks": {
+    "executionFound": true,
+    "executionCanonical": true,
+    "executionCompleted": true,
+    "executionHasWorkspaceRevision": true,
+    "boundRunReadback": false,
+    "uniqueCompletedManifestRun": true,
+    "candidateWorkspaceRevisionMatch": true,
+    "candidateWorkspaceMatch": true,
+    "parserContractMatch": true,
+    "extractionContractMatch": true,
+    "sourceSelectionCompleted": true,
+    "manifestDigestMatchesSourceSelection": true,
+    "manifestCountMatchesExecutionMembership": true,
+    "expectedMembershipCount": true
+  },
+  "status": "READY_FOR_EXPLICIT_BINDING",
+  "sourceSelection": {
+    "status": "COMPLETED",
+    "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d"
+  },
+  "executionMembershipCount": 25542,
+  "authorizationRequired": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "generatedAt": "2026-09-17T05:08:09.397Z",
+  "runs": [
+    {
+      "run_id": "01a8d8fc-2507-4f39-868e-039039237b98",
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "source_manifest_digest": "841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+      "source_manifest_source_count": 25542,
+      "parser_contract_version": "graphify.parser.v1",
+      "extraction_contract_version": "graphify.extraction.v1",
+      "status": "COMPLETED",
+      "dry_run": false,
+      "completed_at": "2026-09-15T22:05:02.995Z"
+    }
+  ],
+  "databaseError": null,
+  "planChecksum": "sha256:417e15f729826e2d2a1b7f7e574c67976d4596d35fc295dc1a72df00b6b94a5c",
+  "reportPath": "docs/reports/graphify-execution-run-bridge-v1.json"
+}

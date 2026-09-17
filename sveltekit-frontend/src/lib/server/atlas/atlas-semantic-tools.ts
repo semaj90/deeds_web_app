@@ -113,12 +113,16 @@ const runtimeSchema = z
   .partial();
 
 const observationSchema = z.object({
-  lastTool: z.string().min(1).default('atlas.inspect_runtime'),
-  lastToolSucceeded: z.boolean().default(true),
+  // No receipt is a blocked observation, never a successful placeholder.
+  lastTool: z.string().min(1).default('none'),
+  lastToolSucceeded: z.boolean().default(false),
+  receiptId: z.string().min(1).optional(),
+  receiptChecksum: z.string().min(1).optional(),
   lastToolError: z.string().optional(),
-  retrievalConfidence: z.number().min(0).max(1).default(0.5),
+  // No receipt means no observed retrieval confidence.
+  retrievalConfidence: z.number().min(0).max(1).default(0),
   evidenceCount: z.number().int().nonnegative().default(0),
-  validationStatus: z.enum(['PASS', 'WARN', 'FAIL']).default('WARN'),
+  validationStatus: z.enum(['PASS', 'WARN', 'FAIL']).default('FAIL'),
   authFailure: z.boolean().default(false),
   revisionMismatch: z.boolean().default(false),
   tokenPressure: z.number().min(0).max(1).default(0),
@@ -307,6 +311,23 @@ function makeResult(
   };
 }
 
+function makeBlockedResult(
+  tool: AtlasSemanticToolName,
+  runtime: AtlasRuntimeContext,
+  reason: string,
+): AtlasSemanticToolResult {
+  return {
+    ok: false,
+    tool,
+    runtime,
+    state: AtlasState.RECOVER,
+    confidence: 0,
+    mock: false,
+    backend: 'fsm',
+    data: { error: reason, evidence: [], canonicalAuthority: false, writesPerformed: false },
+  };
+}
+
 async function inspectRuntime(runtime?: AtlasSemanticRuntimeInput, observation?: AtlasSemanticObservationInput) {
   const ctx = normalizeRuntimeContext(runtime);
   const obs = observationSchema.parse(observation ?? {});
@@ -361,6 +382,10 @@ async function retrieve(input: AtlasSemanticRetrieveInput) {
     loopEvidenceCoverage: 0,
     loopTokenPressure: 1 - runtime.tokenBudget.remainingInput / runtime.tokenBudget.maximumInput,
   });
+
+  if (params.mock && process.env.NODE_ENV !== 'test' && process.env.VITEST !== 'true') {
+    return makeBlockedResult('atlas.retrieve', runtime, 'MOCK_RETRIEVAL_TEST_ONLY');
+  }
 
   if (params.mock) {
     return makeResult('atlas.retrieve', runtime, AtlasState.RETRIEVE, runtime.confidence, 'mock', {

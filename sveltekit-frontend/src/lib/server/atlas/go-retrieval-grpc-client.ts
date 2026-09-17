@@ -5,8 +5,9 @@
  */
 
 import { Channel, ChannelCredentials, Metadata } from '@grpc/grpc-js';
-import { AtlasRuntimeContext } from './atlas-runtime-context';
+import { AtlasRuntimeContext, assertAtlasRuntimeRevisionQualified, type RuntimeToolReceiptV1 } from './atlas-runtime-context';
 import { pool } from '$lib/server/db/client.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // TODO: Generate from .proto with protoc
 // For now, mock the client interface
@@ -52,6 +53,7 @@ interface RetrieveResponse {
   retrievalId: string;
   workspaceRevision: string;
   evidence: EvidenceRef[];
+  receipt?: RuntimeToolReceiptV1;
 }
 
 interface BuildContextRequest {
@@ -65,6 +67,7 @@ interface ContextPacket {
   evidence: Record<string, unknown>[];
   metadata: Record<string, unknown>;
   tokenCount: number;
+  receipt?: RuntimeToolReceiptV1;
 }
 
 interface ValidatePacketRequest {
@@ -77,6 +80,7 @@ interface ValidationResult {
   valid: boolean;
   status: 'PASS' | 'WARN' | 'FAIL';
   errors: string[];
+  receipt?: RuntimeToolReceiptV1;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -120,6 +124,7 @@ export async function retrieveFromGo(
     lanes?: RetrievalLane[];
   }
 ): Promise<RetrieveResponse> {
+  assertAtlasRuntimeRevisionQualified(runtime);
   const client = await getRetrievalGrpcClient();
 
   const request: RetrieveRequest = {
@@ -150,6 +155,7 @@ export async function buildContextFromGo(
   packetKeys: string[],
   maxTokens?: number
 ): Promise<ContextPacket> {
+  assertAtlasRuntimeRevisionQualified(runtime);
   const client = await getRetrievalGrpcClient();
 
   const request: BuildContextRequest = {
@@ -171,6 +177,7 @@ export async function validatePacketFromGo(
   packetKey: string,
   proposedChange: Record<string, unknown>
 ): Promise<ValidationResult> {
+  assertAtlasRuntimeRevisionQualified(runtime);
   const client = await getRetrievalGrpcClient();
 
   const request: ValidatePacketRequest = {
@@ -224,7 +231,8 @@ async function retrieveFromGoHttp(
   // /search/codebase is the closest real match for a dense codebase-retrieval request; this
   // fallback calls it directly rather than a fictional /retrieval/retrieve endpoint that has
   // never existed on this service, and maps its real response shape into RetrieveResponse.
-  const base = process.env.GO_RETRIEVAL_HTTP_URL || 'http://localhost:8100';
+  const base = ENV.GO_RETRIEVAL_HTTP_URL;
+  if (!base) throw new Error('GO_RETRIEVAL_HTTP_UNAVAILABLE');
   const url = new URL('/search/codebase', base);
 
   const response = await fetch(url.toString(), {
@@ -237,6 +245,8 @@ async function retrieveFromGoHttp(
     body: JSON.stringify({
       query,
       limit: options?.topK ?? 12,
+      workspace_revision: runtime.workspaceRevision,
+      packet_revision: runtime.packetRevision,
     }),
   });
 
@@ -249,13 +259,22 @@ async function retrieveFromGoHttp(
   const body: GoCodebaseSearchResponseHttp = await response.json();
   const chunks = body.chunks ?? [];
 
+  // A transport chunk ID is a projection identifier, never a packet identity.
+  // Drop hits without an explicit canonical packet_key rather than inventing
+  // one from a chunk ID, file path, or transport position.
+  const qualifiedChunks = chunks.filter((c) => (
+    typeof c.packet_key === 'string' && c.packet_key.trim().length > 0 &&
+    typeof c.source_ref === 'string' && c.source_ref.trim().length > 0 &&
+    typeof c.content_hash === 'string' && c.content_hash.trim().length > 0
+  ));
+
   return {
     retrievalId: `go-http:${runtime.runId}:${Date.now()}`,
     workspaceRevision: runtime.workspaceRevision,
-    evidence: chunks.map((c): EvidenceRef => ({
-      packetKey: c.packet_key ?? c.chunk_id,
-      sourceRef: c.source_ref ?? c.file_path,
-      contentHash: c.content_hash ?? '',
+    evidence: qualifiedChunks.map((c): EvidenceRef => ({
+      packetKey: c.packet_key!,
+      sourceRef: c.source_ref!,
+      contentHash: c.content_hash!,
       denseScore: c.score,
     })),
   };

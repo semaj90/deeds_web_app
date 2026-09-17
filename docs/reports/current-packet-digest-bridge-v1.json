@@ -1,7 +1,7 @@
 {
   "schema": "parent-atlas.current-packet-digest-bridge.v1",
   "status": "PACKET_DIGEST_BRIDGE_BLOCKED",
-  "generatedAt": "2026-09-16T21:23:01.958Z",
+  "generatedAt": "2026-09-16T23:01:41.652Z",
   "inputs": {
     "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
     "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",

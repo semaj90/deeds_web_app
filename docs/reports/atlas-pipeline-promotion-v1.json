@@ -1,6 +1,6 @@
 {
   "schema": "atlas.pipeline-promotion-plan.v1",
-  "generatedAt": "2026-09-16T21:36:21.859Z",
+  "generatedAt": "2026-09-17T05:09:31.813Z",
   "mode": "READ_ONLY_DERIVED_GATE_PLAN",
   "promotionEligible": false,
   "writesPerformed": false,
@@ -13,19 +13,21 @@
       "blocking": false
     },
     "graphifyExecutionOwner": {
-      "status": "BLOCKED_DUPLICATE_OWNER",
-      "evidence": "DUPLICATE_EQUIVALENT_EXECUTIONS",
+      "status": "PROVEN_CANONICAL_OWNER_READBACK",
+      "evidence": "canonical execution 74d50c86-8194-45ea-8c3d-61aab737ef83 read back from graphify_executions.canonical_authority",
       "report": "current-graphify-execution-owner-resolution-v1.json",
-      "blocking": true
+      "blocking": false
     },
     "packetChunkLineage": {
       "status": "BLOCKED_PARTIAL_LINEAGE",
       "evidence": {
-        "bindingSources": 128,
-        "exactSources": 4,
-        "packetContentMatches": 0
+        "verdict": "BLOCKED_EXECUTION_RUN_BRIDGE",
+        "bindingSources": null,
+        "exactSources": 0,
+        "packetContentMatches": null,
+        "executionBridge": "EXECUTION_RUN_BRIDGE_MISSING"
       },
-      "report": "current-workspace-packet-chunk-join-v1.json",
+      "report": "packet-chunk-lineage-promotion-preflight-v1.json",
       "blocking": true
     },
     "eventHeadDurability": {
@@ -52,5 +54,5 @@
     "semanticLaneMaxVotes": 1,
     "missingEvidenceFailsClosed": true
   },
-  "nextGate": "graphifyExecutionOwner"
+  "nextGate": "packetChunkLineage"
 }

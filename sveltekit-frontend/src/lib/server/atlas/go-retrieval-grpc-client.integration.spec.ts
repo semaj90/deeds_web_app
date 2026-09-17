@@ -30,6 +30,9 @@
 
 import { describe, expect, it } from 'vitest';
 
+const FIXTURE_WORKSPACE_REVISION = 'sha256:fixture-workspace-revision';
+const FIXTURE_PACKET_REVISION = 'sha256:fixture-packet-revision';
+
 const RUN_LIVE_INTEGRATION = process.env.RUN_LIVE_INTEGRATION === '1';
 const RUN_DB_INTEGRATION = process.env.RUN_DB_INTEGRATION === '1';
 const describeIf = RUN_LIVE_INTEGRATION ? describe : describe.skip;
@@ -46,6 +49,8 @@ describeIf('retrieveFromGo (live Go retrieval service, HTTP fallback fixed 2026-
 			resourceId: 'runtime-proof-resource',
 			workspaceId: 'runtime-proof-workspace',
 			packetKey: 'runtime-proof-packet',
+			workspaceRevision: FIXTURE_WORKSPACE_REVISION,
+			packetRevision: FIXTURE_PACKET_REVISION,
 		});
 
 		const result = await retrieveFromGo(runtime, 'function', { topK: 3 });
@@ -79,6 +84,8 @@ describeDbIf('validatePacketFromGo / buildContextFromGo (Postgres-direct, fixed 
 			resourceId: 'runtime-proof-resource',
 			workspaceId: 'runtime-proof-workspace',
 			packetKey: real.packet_key,
+			workspaceRevision: FIXTURE_WORKSPACE_REVISION,
+			packetRevision: FIXTURE_PACKET_REVISION,
 		});
 
 		const okResult = await validatePacketFromGo(runtime, real.packet_key, {
@@ -110,6 +117,8 @@ describeDbIf('validatePacketFromGo / buildContextFromGo (Postgres-direct, fixed 
 			resourceId: 'runtime-proof-resource',
 			workspaceId: 'runtime-proof-workspace',
 			packetKey: packetKeys[0]!,
+			workspaceRevision: FIXTURE_WORKSPACE_REVISION,
+			packetRevision: FIXTURE_PACKET_REVISION,
 		});
 
 		const contextPacket = await buildContextFromGo(runtime, packetKeys, 2048);

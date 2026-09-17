@@ -18,7 +18,8 @@
 import { ENV } from '$lib/server/env.server.js';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
-import { bifrostKey, bifrostRetrievalCacheKeyV2 } from '$lib/server/cache-keys.js';
+import { bifrostKey } from '$lib/server/cache-keys.js';
+import { bifrostRetrievalCacheKeyV2 } from './cache-keys.js';
 import {
   writeAcePacket,
   readAcePacketBySourceRef,
@@ -89,10 +90,14 @@ interface QdrantHit {
   payload: Record<string, unknown>;
 }
 
-async function qdrantSearch(embedding: number[], limit = 10, collection = CANONICAL_SOURCE_COLLECTION): Promise<QdrantHit[]> {
+async function qdrantSearch(
+  embedding: number[],
+  limit = 10,
+  collection: string = CANONICAL_SOURCE_COLLECTION,
+): Promise<QdrantHit[]> {
   const qdrantUrl = ENV.QDRANT_URL ?? 'http://127.0.0.1:6333';
   try {
-    const res = await fetch(`${qdrantUrl}/collections/${collection}/points/query`, {
+    const res = await fetch(`${qdrantUrl}/collections/${encodeURIComponent(collection)}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

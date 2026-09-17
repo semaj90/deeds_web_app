@@ -150,6 +150,7 @@ export function workflowActionFromDagNode(input: {
   nodeId: string;
   sequence: number;
   actionId: string;
+  runId?: string;
   parentActionId?: string | null;
   attempt?: number;
   kind: WorkflowActionEventV1['kind'];
@@ -164,26 +165,33 @@ export function workflowActionFromDagNode(input: {
   // Construct via the canonical schema first (single source of truth for the
   // 'atlas.workflow-action.v1' identity), then project down to this file's DAG-execution-facing
   // local shape. This function never calls WorkflowActionEventV1Schema.parse() directly.
+  const localTransport = input.transport ?? (node.kind === 'MCP_TOOL_CALL' ? 'mcp' : 'local');
   const canonical = workflowActionEventSchema.parse({
     schema: 'atlas.workflow-action.v1',
     workflowId: dag.workflowId,
     workflowRevision: dag.workflowRevision,
+    runId: input.runId ?? `${dag.workflowId}:${dag.requestId}`,
     sequence: input.sequence,
     actionId: input.actionId,
     parentActionId: input.parentActionId ?? undefined,
     dagNodeId: node.nodeId,
     attempt: input.attempt ?? 1,
     lane: input.lane,
-    transport: input.transport ?? (node.kind === 'MCP_TOOL_CALL' ? 'mcp' : 'local'),
+    // The canonical contract intentionally has no `mcp` transport. Preserve
+    // that local compatibility label only in the adapter projection below.
+    transport: localTransport === 'mcp' ? undefined : localTransport,
     kind: input.kind,
-    canonicalIds: node.canonicalIds,
     evidenceRefs: [...new Set(input.evidenceRefs ?? [])].sort(),
-    toolName: node.toolName ?? undefined,
-    mutationRequested: node.kind === 'MCP_TOOL_CALL' && !node.readOnly,
-    validationRequired: node.requiresValidation,
     producerRevision: input.producerRevision,
   });
-  return fromCanonicalWorkflowActionEvent(canonical);
+  return fromCanonicalWorkflowActionEvent({
+    ...canonical,
+    transport: localTransport,
+    canonicalIds: node.canonicalIds,
+    toolName: node.toolName ?? null,
+    mutationRequested: node.kind === 'MCP_TOOL_CALL' && !node.readOnly,
+    validationRequired: node.requiresValidation,
+  });
 }
 
 // ── WORKFLOW-ACTION-SCHEMA-OWNER-01: canonical adapter ─────────────────────────
@@ -199,34 +207,52 @@ export function workflowActionFromDagNode(input: {
 // `workflowActionFromDagNode()`'s output needs to cross into the canonical identity.
 import type { WorkflowActionEventV1 as CanonicalWorkflowActionEventV1 } from '@deeds/parent-atlas/core/workflow-action-event';
 
-export function toCanonicalWorkflowActionEvent(local: WorkflowActionEventV1): CanonicalWorkflowActionEventV1 {
-  return {
+type DagBridgeFields = {
+  canonicalIds?: string[];
+  toolName?: string | null;
+  mutationRequested?: boolean;
+  validationRequired?: boolean;
+};
+
+type CanonicalDagBridgeEvent = Omit<CanonicalWorkflowActionEventV1, 'kind' | 'transport'> &
+  DagBridgeFields & {
+    // The inbound adapter accepts the complete canonical kind set so it can
+    // reject canonical-only kinds explicitly instead of widening them away.
+    kind: CanonicalWorkflowActionEventV1['kind'];
+    transport?: CanonicalWorkflowActionEventV1['transport'] | 'mcp';
+  };
+
+export function toCanonicalWorkflowActionEvent(local: WorkflowActionEventV1): CanonicalDagBridgeEvent {
+  const canonical = workflowActionEventSchema.parse({
     schema: 'atlas.workflow-action.v1',
     workflowId: local.workflowId,
     workflowRevision: local.workflowRevision,
+    runId: local.workflowId,
     sequence: local.sequence,
     actionId: local.actionId,
     parentActionId: local.parentActionId ?? undefined,
     dagNodeId: local.dagNodeId,
     attempt: local.attempt,
     lane: local.lane,
-    transport: local.transport ?? undefined,
+    transport: local.transport === 'mcp' ? undefined : local.transport ?? undefined,
     kind: local.kind,
     resourceRefs: [],
     evidenceRefs: local.evidenceRefs,
     artifactRefs: [],
     metadata: {},
     producerRevision: local.producerRevision,
-    inputRefs: [],
-    outputRefs: [],
+  });
+  return {
+    ...canonical,
+    transport: local.transport,
     canonicalIds: local.canonicalIds,
     toolName: local.toolName ?? undefined,
     mutationRequested: local.mutationRequested,
     validationRequired: local.validationRequired,
-  } as CanonicalWorkflowActionEventV1;
+  };
 }
 
-export function fromCanonicalWorkflowActionEvent(canonical: CanonicalWorkflowActionEventV1): WorkflowActionEventV1 {
+export function fromCanonicalWorkflowActionEvent(canonical: CanonicalDagBridgeEvent): WorkflowActionEventV1 {
   if (!WorkflowActionEventV1Schema.shape.kind.options.includes(canonical.kind as never)) {
     throw new Error(
       `WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_DAG_SHAPE: '${canonical.kind}' has no equivalent in this local WorkflowActionEventV1Schema's kind enum`,
@@ -237,6 +263,32 @@ export function fromCanonicalWorkflowActionEvent(canonical: CanonicalWorkflowAct
       `WORKFLOW_ACTION_EVENT_TRANSPORT_NOT_REPRESENTABLE_IN_DAG_SHAPE: '${canonical.transport}' has no equivalent in this local WorkflowActionEventV1Schema's transport enum`,
     );
   }
+  // Validate the canonical projection without adapter-only fields. `mcp` is
+  // retained solely for the local DAG view and is not sent to the canonical
+  // package schema.
+  workflowActionEventSchema.parse({
+    schema: 'atlas.workflow-action.v1',
+    workflowId: canonical.workflowId,
+    workflowRevision: canonical.workflowRevision,
+    runId: canonical.runId,
+    sequence: canonical.sequence,
+    actionId: canonical.actionId,
+    parentActionId: canonical.parentActionId,
+    dagNodeId: canonical.dagNodeId,
+    attempt: canonical.attempt,
+    lane: canonical.lane,
+    transport: canonical.transport === 'mcp' ? undefined : canonical.transport,
+    kind: canonical.kind,
+    resourceRefs: canonical.resourceRefs,
+    evidenceRefs: canonical.evidenceRefs,
+    artifactRefs: canonical.artifactRefs,
+    revisions: canonical.revisions,
+    startedAt: canonical.startedAt,
+    completedAt: canonical.completedAt,
+    errorCode: canonical.errorCode,
+    metadata: canonical.metadata,
+    producerRevision: canonical.producerRevision,
+  });
   return WorkflowActionEventV1Schema.parse({
     schema: 'atlas.workflow-action.v1',
     workflowId: canonical.workflowId,

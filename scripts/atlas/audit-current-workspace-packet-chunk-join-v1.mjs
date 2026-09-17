@@ -59,6 +59,7 @@ try {
         AND repository_id = 'repo:root'
         AND workspace_revision::text = lower($1::text)
         ${auditLimit == null ? '' : "AND lower(regexp_replace(regexp_replace(btrim(source_ref), '\\\\', '/', 'g'), '^\\./', '')) IN (SELECT source_ref FROM bindings)"}
+        ${auditLimit == null ? '' : 'LIMIT $3'}
     ), graphify_exact AS (
       SELECT b.source_ref, b.workspace_revision, b.source_revision, b.content_digest
       FROM bindings b
@@ -69,13 +70,17 @@ try {
        AND g.content_digest = b.content_digest
       GROUP BY b.source_ref, b.workspace_revision, b.source_revision, b.content_digest
       HAVING count(*) = 1
-    ), packet_matches AS (
-      SELECT DISTINCT g.source_ref, g.content_digest
+    ), packet_candidates AS (
+      SELECT DISTINCT g.source_ref, g.source_revision, g.workspace_revision,
+             g.content_digest, p.packet_key, p.source_revision AS packet_source_revision,
+             p.workspace_revision_key AS packet_workspace_revision,
+             p.content_hash AS packet_content_hash
       FROM graphify_exact g
-      JOIN public.atlas_packets p ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref
-        AND lower(btrim(p.content_hash)) = g.content_digest
+      LEFT JOIN public.atlas_packets p
+        ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref
     ), proven_lineage AS (
-      SELECT DISTINCT g.source_ref, l.packet_key, l.chunk_row_id
+      SELECT DISTINCT g.source_ref, g.content_digest, l.packet_key, l.chunk_row_id,
+             c.file_content_hash
       FROM graphify_exact g
       JOIN public.atlas_packet_chunk_lineage l
         ON lower(regexp_replace(regexp_replace(btrim(l.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref
@@ -89,8 +94,48 @@ try {
       (SELECT count(*) FROM graphify_exact)::integer AS graphify_exact_sources,
       (SELECT count(DISTINCT source_ref) FROM proven_lineage)::integer AS binding_proven_lineage_sources,
       (SELECT count(DISTINCT source_ref) FROM proven_lineage)::integer AS packet_chunk_exact_sources,
-      (SELECT count(DISTINCT p.source_ref) FROM graphify_exact g JOIN public.atlas_packets p ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref AND lower(btrim(p.content_hash)) = g.content_digest)::integer AS packet_content_matches
+      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL)::integer AS packet_source_rows,
+      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision)::integer AS packet_revision_matches,
+      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision AND lower(packet_content_hash) = content_digest AND packet_workspace_revision = workspace_revision)::integer AS packet_full_identity_matches,
+      (SELECT count(*) FROM (SELECT source_ref FROM packet_candidates WHERE packet_key IS NOT NULL GROUP BY source_ref HAVING count(DISTINCT packet_key) > 1) ambiguous)::integer AS packet_ambiguous_sources,
+      (SELECT count(DISTINCT p.source_ref) FROM graphify_exact g JOIN public.atlas_packets p ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref AND lower(btrim(p.content_hash)) = g.content_digest)::integer AS packet_content_matches,
+      (SELECT count(DISTINCT source_ref) FROM proven_lineage WHERE file_content_hash IS NOT NULL AND lower(btrim(file_content_hash)) = content_digest)::integer AS chunk_file_content_matches
   `, auditLimit == null ? [explicitWorkspaceRevision, explicitExecutionId] : [explicitWorkspaceRevision, explicitExecutionId, auditLimit]);
+  const lineageSamples = await client.query(`
+    WITH current_members AS (
+      SELECT lower(regexp_replace(regexp_replace(btrim(source_ref), '\\\\', '/', 'g'), '^\\./', '')) AS source_ref,
+             lower(code_source_revision::text) AS source_revision,
+             lower(content_hash::text) AS content_digest
+      FROM public.graphify_execution_file_membership_v2
+      WHERE execution_id = $2::uuid
+        AND repository_id = 'repo:root'
+        AND workspace_revision::text = lower($1::text)
+        ${auditLimit == null ? '' : 'LIMIT $3'}
+    )
+    SELECT DISTINCT
+      m.source_ref,
+      l.packet_key::text AS packet_key,
+      l.canonical_chunk_id::text AS canonical_chunk_id,
+      l.chunk_row_id::text AS chunk_row_id,
+      l.source_revision::text AS lineage_source_revision,
+      l.revision_status,
+      p.content_hash AS packet_content_hash,
+      c.file_content_hash AS chunk_file_content_hash,
+      m.content_digest AS source_content_digest,
+      (p.content_hash IS NOT NULL AND lower(btrim(p.content_hash)) = m.content_digest) AS packet_content_match,
+      (c.file_content_hash IS NOT NULL AND lower(btrim(c.file_content_hash)) = m.content_digest) AS chunk_file_content_match
+    FROM current_members m
+    JOIN public.atlas_packet_chunk_lineage l
+      ON lower(regexp_replace(regexp_replace(btrim(l.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = m.source_ref
+     AND lower(btrim(l.source_revision::text)) = m.source_revision
+     AND l.revision_status = 'PROVEN'
+    JOIN public.codebase_chunk_index c ON c.id = l.chunk_row_id
+    LEFT JOIN public.atlas_packets p ON p.packet_key = l.packet_key
+    ORDER BY m.source_ref, l.packet_key::text, l.canonical_chunk_id::text
+    LIMIT 128
+  `, auditLimit == null
+    ? [explicitWorkspaceRevision, explicitExecutionId]
+    : [explicitWorkspaceRevision, explicitExecutionId, auditLimit]);
   const inventory = await client.query(`
     SELECT
       count(*)::integer AS chunk_rows,
@@ -207,6 +252,7 @@ try {
     sampleLimit: auditLimit,
     workspaceRevisions: revisionResult.rows.map((row) => row.workspace_revision),
     counts: result.rows[0],
+    lineageSamples: lineageSamples.rows,
     chunkInventory: inventory.rows[0],
     pathCoverage: pathCoverage.rows[0],
     mismatchDiagnostics: mismatchDiagnostics.rows[0],

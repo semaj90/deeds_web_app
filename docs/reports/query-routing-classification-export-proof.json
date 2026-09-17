@@ -1,6 +1,6 @@
 {
   "schema": "atlas.query-routing.classification-export.proof.v1",
-  "generatedAt": "2026-09-11T05:32:54.098Z",
+  "generatedAt": "2026-09-17T04:22:25.235Z",
   "status": "FIXTURE_PROVEN_LIVE_PRODUCER_NOT_WIRED",
   "rows": 1,
   "trainingReadyRows": 0,

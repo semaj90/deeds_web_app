@@ -10,6 +10,21 @@
   "columns": [],
   "immutableTriggers": [],
   "migrationFile": "sveltekit-frontend/drizzle/manual/20260916_workspace_event_head_v1.sql",
+  "migrationChecksum": "sha256:40d24f68fb0a6cf1a5678ef417f84362b5f6b2718c69782c0251bdb5307d7cb2",
+  "adapterFile": "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-head-postgres-adapter-v1.ts",
+  "adapterImplemented": true,
+  "drizzleMirror": {
+    "file": "sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts",
+    "parityChecks": {
+      "participantForeignKey": true,
+      "participantCascadeParity": true,
+      "headForeignKey": true,
+      "headRestrictParity": true
+    },
+    "parityProven": true
+  },
+  "storageReady": false,
+  "liveReadbackProven": false,
   "canonicalAuthority": false,
   "writesPerformed": false,
   "note": "This audit never applies DDL and never mutates the database."

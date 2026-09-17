@@ -2,8 +2,14 @@
  * Atlas Runtime Exports — Unified entry point for orchestration, FSM, and data plane.
  */
 
-export { AtlasState, createAtlasRuntimeContext } from './atlas-runtime-context';
-export type { AtlasRuntimeContext, RuntimeObservation, HMMInference } from './atlas-runtime-context';
+export {
+  AtlasState,
+  createAtlasRuntimeContext,
+  RuntimeToolReceiptV1Schema,
+  extractRuntimeToolReceiptV1,
+  observationFromRuntimeToolReceiptV1,
+} from './atlas-runtime-context';
+export type { AtlasRuntimeContext, RuntimeObservation, RuntimeToolReceiptV1, HMMInference } from './atlas-runtime-context';
 
 export { estimateExecutionState, isTransitionAllowed } from './atlas-fsm-policy';
 export { buildRuntimeRegistryRecommendationDrafts } from './runtime-registry';

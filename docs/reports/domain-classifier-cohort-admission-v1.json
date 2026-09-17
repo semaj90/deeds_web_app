@@ -1,6 +1,6 @@
 {
   "schema": "atlas.domain-classifier-cohort-admission.v1",
-  "generatedAt": "2026-09-16T21:43:06.758Z",
+  "generatedAt": "2026-09-17T04:07:01.439Z",
   "readOnly": true,
   "writesPerformed": false,
   "labelsFile": "docs/reports/domain-classifier-weak-label-bundle-v1.json",
@@ -13,7 +13,7 @@
     "canonicalIdentity": false,
     "source": "database packet_key returned by the canonical packet query"
   },
-  "rowLimit": 100,
+  "rowLimit": 35,
   "rowCount": 35,
   "counts": {
     "PACKET_MISSING": 13,

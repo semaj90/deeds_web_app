@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-16T21:42:18.996Z",
+  "generatedAt": "2026-09-17T04:29:27.746Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
@@ -657,7 +657,6 @@
           "community_id",
           "community_source",
           "confidence",
-          "constraint",
           "created_at",
           "deleted",
           "domain_class",
@@ -808,7 +807,6 @@
           "community_id",
           "community_source",
           "confidence",
-          "constraint",
           "created_at",
           "deleted",
           "domain_class",
@@ -937,7 +935,6 @@
           "onlyInA": [],
           "onlyInB": [
             "cluster_score",
-            "constraint",
             "error_message",
             "fusion_score",
             "qdrant_score",
@@ -1027,7 +1024,6 @@
             "community_confidence",
             "community_id",
             "community_source",
-            "constraint",
             "domain_class",
             "kmeans_cluster",
             "ledger_type",

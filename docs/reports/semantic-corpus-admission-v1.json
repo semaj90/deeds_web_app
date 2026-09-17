@@ -1,32 +1,32 @@
 {
   "schema": "atlas.semantic-corpus-admission.v1",
-  "generatedAt": "2026-09-15T20:37:51.921Z",
+  "generatedAt": "2026-09-16T23:53:28.600Z",
   "mode": "READ_ONLY_AUDIT",
   "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
   "owner": {
     "collection": "codebase_chunks_768",
-    "pointsCountLive": 312718,
-    "pointsScrolled": 313227,
-    "pointsCountMatchesScroll": false,
-    "candidateCount": 313227,
-    "canonicalIdCount": 214446,
+    "pointsCountLive": 328348,
+    "pointsScrolled": 328348,
+    "pointsCountMatchesScroll": true,
+    "candidateCount": 328348,
+    "canonicalIdCount": 229567,
     "canonicalIdFieldBreakdown": {
       "canonical_source_ref": 105745,
       "canonical_id": 576,
-      "packet_key": 206906
+      "packet_key": 222027
     },
     "missingCanonicalId": 0,
     "duplicateCanonicalIds": 5730,
-    "missingSourceRevision": 313197,
-    "missingWorkspaceRevision": 313197,
+    "missingSourceRevision": 328318,
+    "missingWorkspaceRevision": 328318,
     "invalidWorkspaceRevisionFormat": 0,
     "mixedWorkspaceRevision": 30,
     "missingRepresentationRevision": 109097,
     "representationRevisionAgreement": 16,
     "representationRevision": null,
     "mixedRepresentationRevision": 16,
-    "admittedCohortChecksum": "sha256:b4a617664b520d21e394a6e819cb1dc4e018640d219dec100e909a2023d1ba1d",
-    "admittedCohortCount": 208716
+    "admittedCohortChecksum": "sha256:ac94ccdb25cdab2ff3685673a34b15dcf9cd2b57a2342efca6f03bdf759120a1",
+    "admittedCohortCount": 223837
   },
   "challenger": {
     "collection": "codebase_chunks_768_v2",
@@ -54,7 +54,7 @@
     "note": "Reported for visibility only. NEVER summed with, merged into, or compared as equivalent to the owner collection above -- codebase_chunks_768 and codebase_chunks_768_v2 are two distinct collections per this repo's Embedding Dimensions Policy hard rule."
   },
   "postgres": {
-    "codebaseChunkIndexCount": 259772,
+    "codebaseChunkIndexCount": 274465,
     "workspaceSourceBindingsForAdmittedRevision": 24456,
     "workspaceSourceBindingsByRevision": [
       {
@@ -81,7 +81,7 @@
       "receiptRefs": [
         "docs/reports/semantic-corpus-admission-v1.json"
       ],
-      "explanation": "5730 canonical IDs resolve to more than one point in codebase_chunks_768 (out of 214446 distinct IDs across 313227 points)."
+      "explanation": "5730 canonical IDs resolve to more than one point in codebase_chunks_768 (out of 229567 distinct IDs across 328348 points)."
     },
     {
       "code": "SEMANTIC_CORPUS_MISSING_SOURCE_REVISION",
@@ -90,7 +90,7 @@
       "receiptRefs": [
         "docs/reports/semantic-corpus-admission-v1.json"
       ],
-      "explanation": "313197/313227 points in codebase_chunks_768 have no source_revision payload field."
+      "explanation": "328318/328348 points in codebase_chunks_768 have no source_revision payload field."
     },
     {
       "code": "SEMANTIC_CORPUS_MIXED_WORKSPACE_REVISION",
@@ -99,7 +99,7 @@
       "receiptRefs": [
         "docs/reports/semantic-corpus-admission-v1.json"
       ],
-      "explanation": "30/313227 points in codebase_chunks_768 carry a workspace_revision that is either absent, malformed, or does not match the admitted revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc (missing entirely: 313197, invalid format: 0)."
+      "explanation": "30/328348 points in codebase_chunks_768 carry a workspace_revision that is either absent, malformed, or does not match the admitted revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc (missing entirely: 328318, invalid format: 0)."
     },
     {
       "code": "SEMANTIC_CORPUS_MIXED_REPRESENTATION_REVISION",

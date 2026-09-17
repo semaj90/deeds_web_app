@@ -52,7 +52,7 @@ export const atlasWorkspaceEventParticipants = pgTable('atlas_workspace_event_pa
     columns: [table.eventId],
     foreignColumns: [atlasWorkspaceEvents.eventId],
     name: 'atlas_workspace_event_participants_event_id_fkey',
-  }).onDelete('cascade'),
+  }),
   canonicalIdx: index('atlas_workspace_event_participants_canonical_idx').on(
     table.canonicalId,
     table.role,

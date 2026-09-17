@@ -1,0 +1,10 @@
+{
+  "schema": "atlas.workspace-snapshot-compaction-report.v1",
+  "status": "ELIGIBILITY_IMPLEMENTED",
+  "evaluator": "assessWorkspaceCompactionV1",
+  "focusedTests": { "file": "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-snapshot-compaction-v1.spec.ts", "passed": 3, "failed": 0 },
+  "canonicalAuthority": false,
+  "promotionEligible": false,
+  "writesPerformed": false,
+  "remaining": ["durable Postgres event/head readback", "explicit snapshot builder and rollback receipt", "head-scoped Graphify owner admission", "source-packet-chunk lineage closure"]
+}

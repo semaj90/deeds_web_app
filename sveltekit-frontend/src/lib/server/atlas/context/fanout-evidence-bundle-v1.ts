@@ -23,6 +23,9 @@ export const FanoutEvidenceCandidateV1Schema = z.object({
   evidence: z.array(FanoutEvidenceItemV1Schema),
 }).strict();
 
+export type FanoutEvidenceItemV1 = z.infer<typeof FanoutEvidenceItemV1Schema>;
+export type FanoutEvidenceCandidateV1 = z.infer<typeof FanoutEvidenceCandidateV1Schema>;
+
 export const FanoutEvidenceBundleV1Schema = z.object({
   schema: z.literal('atlas.fanout-evidence-bundle.v1'),
   workspaceRevision: z.string().startsWith('sha256:'),

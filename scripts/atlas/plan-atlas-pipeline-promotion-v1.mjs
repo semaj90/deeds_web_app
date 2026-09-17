@@ -33,7 +33,12 @@ function gate(status, evidence, report, blocking = true) {
 }
 
 const owner = readReport('current-graphify-execution-owner-resolution-v1.json');
-const packetChunk = readReport('current-workspace-packet-chunk-join-v1.json');
+// Prefer the execution-bound preflight. The older join report is retained as
+// historical evidence but must not drive the current promotion gate.
+const packetChunkPreflight = readReport('packet-chunk-lineage-promotion-preflight-v1.json');
+const packetChunk = packetChunkPreflight.value
+  ? packetChunkPreflight
+  : readReport('current-workspace-packet-chunk-join-v1.json');
 const eventHead = readReport('workspace-event-head-schema-audit-v1.json');
 const classifier = readReport('domain-classifier-cohort-admission-v1.json');
 const ace = readReport('ace-live-dry-input-readiness-v2.json');
@@ -44,6 +49,8 @@ const packetCounts = packetValue.counts ?? {};
 const eventValue = eventHead.value ?? {};
 const classifierValue = classifier.value ?? {};
 const aceValue = ace.value ?? {};
+const canonicalOwnerReadback = ownerValue.existingCanonicalOwner?.executionId
+  && ownerValue.recommendation?.requiresExplicitAuthorityDecision === false;
 
 const gates = {
   workspaceSnapshot: gate(
@@ -53,19 +60,27 @@ const gates = {
     false,
   ),
   graphifyExecutionOwner: gate(
-    ownerValue.status === 'DUPLICATE_EQUIVALENT_EXECUTIONS' ? 'BLOCKED_DUPLICATE_OWNER' : 'BLOCKED_OWNER_NOT_PROVEN',
-    ownerValue.status ?? owner.status,
+    canonicalOwnerReadback
+      ? 'PROVEN_CANONICAL_OWNER_READBACK'
+      : ownerValue.status === 'DUPLICATE_EQUIVALENT_EXECUTIONS'
+        ? 'BLOCKED_DUPLICATE_OWNER'
+        : 'BLOCKED_OWNER_NOT_PROVEN',
+    canonicalOwnerReadback
+      ? `canonical execution ${ownerValue.existingCanonicalOwner.executionId} read back from graphify_executions.canonical_authority`
+      : ownerValue.status ?? owner.status,
     owner.fileName,
+    !canonicalOwnerReadback,
   ),
   packetChunkLineage: gate(
-    Number(packetCounts.packet_chunk_exact_sources ?? 0) > 0 &&
-      Number(packetCounts.packet_chunk_exact_sources) === Number(packetCounts.binding_sources)
+    packetValue.verdict === 'LINEAGE_READBACK_PROVEN'
       ? 'PROVEN'
       : 'BLOCKED_PARTIAL_LINEAGE',
     {
-      bindingSources: packetCounts.binding_sources ?? null,
-      exactSources: packetCounts.packet_chunk_exact_sources ?? null,
+      verdict: packetValue.verdict ?? null,
+      bindingSources: packetCounts.binding_sources ?? packetValue.sourceMemberCount ?? null,
+      exactSources: packetCounts.packet_chunk_exact_sources ?? packetValue.eligibleCandidateCount ?? null,
       packetContentMatches: packetCounts.packet_content_matches ?? null,
+      executionBridge: packetValue.executionBridge?.status ?? null,
     },
     packetChunk.fileName,
   ),
@@ -107,7 +122,9 @@ const report = {
 };
 
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const temporaryOutputPath = `${outputPath}.${process.pid}.tmp`;
+fs.writeFileSync(temporaryOutputPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+fs.renameSync(temporaryOutputPath, outputPath);
 console.log(JSON.stringify({
   schema: report.schema,
   promotionEligible: report.promotionEligible,

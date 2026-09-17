@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.workspace-head-compaction-plan.v1",
+  "workspaceId": null,
+  "policyRevision": "atlas.workspace-head-compaction-policy.v1",
+  "canonicalAuthority": false,
+  "promotionEligible": false,
+  "writesPerformed": false,
+  "status": "BLOCKED_SIDECAR_NOT_APPLIED",
+  "due": false,
+  "cut": null,
+  "eventRange": {
+    "firstSequence": "0",
+    "lastSequence": "0",
+    "eventCount": 0,
+    "eventChainChecksum": null
+  },
+  "candidate": {
+    "headStateRootChecksum": null,
+    "candidateSnapshotRevision": null
+  },
+  "validation": {
+    "sequenceContinuous": false,
+    "predecessorChainValid": false,
+    "replayDeterministic": false,
+    "laterEventsIgnored": false
+  },
+  "tables": {
+    "heads": false,
+    "events": false,
+    "participants": false
+  },
+  "planChecksum": "sha256:fd0475ad1aa8547708ee7171844c9a088bc2e23ad2acbd9d8e1fc6d60ada4e2c",
+  "generatedAt": "2026-09-17T04:30:37.201Z"
+}

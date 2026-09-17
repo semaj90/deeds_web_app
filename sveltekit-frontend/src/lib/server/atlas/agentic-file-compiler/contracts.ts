@@ -159,7 +159,21 @@ export type WorkflowActionEventV1 = z.infer<typeof WorkflowActionEventSchema>;
 // adapter boundary, per design.md Decision 2.
 import type { WorkflowActionEventV1 as CanonicalWorkflowActionEventV1 } from '@deeds/parent-atlas/core/workflow-action-event';
 
-export function toCanonicalWorkflowActionEvent(local: WorkflowActionEventV1): CanonicalWorkflowActionEventV1 {
+type CompilerBridgeFields = {
+	executor?: WorkflowActionEventV1['executor'];
+	inputRefs?: string[];
+	outputRefs?: string[];
+	errorRef?: string | null;
+	checksum?: string;
+};
+
+// The package contract intentionally owns the narrower runtime kind set. The
+// compiler adapter also carries its legacy lifecycle kinds during migration;
+// those fields are bridge data and are never parsed as canonical persistence.
+type CanonicalCompilerBridgeEvent = Omit<CanonicalWorkflowActionEventV1, 'kind'> &
+	CompilerBridgeFields & { kind: WorkflowActionEventV1['kind'] };
+
+export function toCanonicalWorkflowActionEvent(local: WorkflowActionEventV1): CanonicalCompilerBridgeEvent {
 	return {
 		schema: 'atlas.workflow-action.v1',
 		workflowId: local.workflowId,
@@ -178,46 +192,47 @@ export function toCanonicalWorkflowActionEvent(local: WorkflowActionEventV1): Ca
 		metadata: {},
 		producerRevision: local.producerRevision,
 		runId: local.runId,
-		executor: local.executor ?? undefined,
 		revisions: local.revisions,
+		executor: local.executor ?? undefined,
 		inputRefs: local.inputRefs,
 		outputRefs: local.outputRefs,
 		errorRef: local.errorRef ?? undefined,
 		checksum: local.checksum,
-	} as CanonicalWorkflowActionEventV1;
+	};
 }
 
 export function fromCanonicalWorkflowActionEvent(
-	canonical: CanonicalWorkflowActionEventV1,
+	canonical: CanonicalCompilerBridgeEvent,
 	extras: { runId: string; revisions: WorkflowActionEventV1['revisions']; emittedAt: string; checksum: string },
 ): WorkflowActionEventV1 {
-	if (!WorkflowActionEventSchema.shape.kind.options.includes(canonical.kind as never)) {
+	const bridge = canonical as CanonicalCompilerBridgeEvent;
+	if (!WorkflowActionEventSchema.shape.kind.options.includes(bridge.kind as never)) {
 		throw new Error(
-			`WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_COMPILER_SHAPE: '${canonical.kind}' has no equivalent in this local WorkflowActionEventSchema's kind enum`,
+		`WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_COMPILER_SHAPE: '${bridge.kind}' has no equivalent in this local WorkflowActionEventSchema's kind enum`,
 		);
 	}
 	return WorkflowActionEventSchema.parse({
 		schema: ATLAS_WORKFLOW_ACTION_SCHEMA,
-		workflowId: canonical.workflowId,
-		workflowRevision: canonical.workflowRevision,
-		runId: canonical.runId ?? extras.runId,
-		sequence: canonical.sequence,
-		actionId: canonical.actionId,
-		parentActionId: canonical.parentActionId ?? null,
-		dagNodeId: canonical.dagNodeId,
-		attempt: canonical.attempt,
-		lane: canonical.lane,
-		transport: canonical.transport ?? null,
-		executor: canonical.executor ?? null,
-		kind: canonical.kind,
-		revisions: canonical.revisions ?? extras.revisions,
-		inputRefs: canonical.inputRefs ?? [],
-		outputRefs: canonical.outputRefs ?? [],
-		evidenceRefs: canonical.evidenceRefs,
-		errorRef: canonical.errorRef ?? null,
+		workflowId: bridge.workflowId,
+		workflowRevision: bridge.workflowRevision,
+		runId: bridge.runId ?? extras.runId,
+		sequence: bridge.sequence,
+		actionId: bridge.actionId,
+		parentActionId: bridge.parentActionId ?? null,
+		dagNodeId: bridge.dagNodeId,
+		attempt: bridge.attempt,
+		lane: bridge.lane,
+		transport: bridge.transport ?? null,
+		executor: bridge.executor ?? null,
+		kind: bridge.kind,
+		revisions: bridge.revisions ?? extras.revisions,
+		inputRefs: bridge.inputRefs ?? [],
+		outputRefs: bridge.outputRefs ?? [],
+		evidenceRefs: bridge.evidenceRefs,
+		errorRef: bridge.errorRef ?? null,
 		emittedAt: extras.emittedAt,
-		producerRevision: canonical.producerRevision,
-		checksum: canonical.checksum ?? extras.checksum,
+		producerRevision: bridge.producerRevision,
+		checksum: bridge.checksum ?? extras.checksum,
 	});
 }
 

@@ -28,13 +28,15 @@ CREATE TABLE IF NOT EXISTS public.atlas_workspace_events (
 );
 
 CREATE TABLE IF NOT EXISTS public.atlas_workspace_event_participants (
-  event_id uuid NOT NULL REFERENCES public.atlas_workspace_events(event_id),
+  event_id uuid NOT NULL,
   participant_ordinal integer NOT NULL CHECK (participant_ordinal >= 0),
   role text NOT NULL CHECK (role IN ('WORKSPACE', 'SOURCE', 'PACKET', 'CHUNK', 'REPRESENTATION', 'GRAPH_NODE', 'FEATURE', 'MODEL')),
   canonical_id text NOT NULL,
   revision text,
   relation text NOT NULL CHECK (relation IN ('SUBJECT', 'INPUT', 'OUTPUT', 'INVALIDATES', 'DERIVES', 'DEPENDS_ON')),
-  PRIMARY KEY (event_id, participant_ordinal)
+  PRIMARY KEY (event_id, participant_ordinal),
+  CONSTRAINT atlas_workspace_event_participants_event_id_fkey
+    FOREIGN KEY (event_id) REFERENCES public.atlas_workspace_events(event_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.atlas_workspace_heads (
@@ -48,6 +50,9 @@ CREATE TABLE IF NOT EXISTS public.atlas_workspace_heads (
   changed_source_count integer NOT NULL DEFAULT 0 CHECK (changed_source_count >= 0),
   workspace_head_revision text NOT NULL,
   updated_at timestamptz NOT NULL DEFAULT now()
+  ,CONSTRAINT atlas_workspace_heads_last_event_id_fkey
+    FOREIGN KEY (last_event_id) REFERENCES public.atlas_workspace_events(event_id)
+    ON DELETE RESTRICT
 );
 
 CREATE INDEX IF NOT EXISTS atlas_workspace_events_workspace_sequence_idx

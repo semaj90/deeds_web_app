@@ -1,7 +1,7 @@
 {
   "schema": "atlas.sem768-admission-dry-02.report",
   "gate": "SEM768-ADMISSION-DRY-02",
-  "generatedAt": "2026-09-02T19:47:44.126Z",
+  "generatedAt": "2026-09-16T22:38:11.418Z",
   "databaseWrites": false,
   "embeddingRequests": 0,
   "sampleSize": 128,
@@ -10,8 +10,8 @@
   "notResolvedThisPass": "atlas_chunk_packet_identity_links EXACT-confidence rows are deliberately NOT treated as canonical here, matching that table's own canonical_writes_allowed=false gate found in the owner audit (18/128 rows had EXACT confidence but zero had canonical_writes_allowed=true).",
   "classificationCounts": {
     "VECTOR_INVALID": 0,
-    "INPUT_CHECKSUM_UNPROVEN": 13,
-    "CANONICAL_CHUNK_UNPROVEN": 115,
+    "INPUT_CHECKSUM_UNPROVEN": 14,
+    "CANONICAL_CHUNK_UNPROVEN": 114,
     "PACKET_BINDING_UNPROVEN": 0,
     "SOURCE_REVISION_UNPROVEN": 0,
     "WORKSPACE_REVISION_UNPROVEN": 0,
@@ -833,11 +833,11 @@
     },
     {
       "id": "007414fa-396f-46e3-bd38-d6c8ac13d4ef",
-      "classification": "CANONICAL_CHUNK_UNPROVEN",
-      "canonicalChunkId": null,
-      "packetKey": null,
-      "sourceRevision": null,
-      "membershipStatus": null
+      "classification": "INPUT_CHECKSUM_UNPROVEN",
+      "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/examples/DURABLE-WORKFLOW-EXAMPLE.md:7",
+      "packetKey": "packet:d2a0b2ad6490",
+      "sourceRevision": "sha256:069bb4a5641e00afda243385fdc1f962c666eee6462a1bcf145b1de926612f4b",
+      "membershipStatus": "EXACT_MULTI_MEMBER"
     },
     {
       "id": "0074157a-9340-4768-bb97-52bdc86bbfcd",

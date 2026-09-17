@@ -86,7 +86,11 @@ export const atlasRetrieveTool = createTool({
     if (runtime) {
       if (!isTransitionAllowed(runtime.state, AtlasState.RETRIEVE, {
         lastTool: 'init',
-        lastToolSucceeded: true,
+        // This guard has no prior tool receipt. Do not manufacture one just
+        // to satisfy the FSM; retrieval must remain blocked until discovery
+        // supplies actual evidence.
+        lastToolSucceeded: false,
+        lastToolError: 'PRIOR_TOOL_RECEIPT_REQUIRED',
         retrievalConfidence: 0,
         evidenceCount: 0,
         validationStatus: 'WARN',
@@ -261,6 +265,8 @@ export async function createAtlasRequestContext(init: {
   resourceId: string;
   workspaceId: string;
   packetKey: string;
+  workspaceRevision?: string;
+  packetRevision?: string;
 }) {
   const runtime = createAtlasRuntimeContext({
     runId: init.runId,
@@ -268,6 +274,8 @@ export async function createAtlasRequestContext(init: {
     resourceId: init.resourceId,
     workspaceId: init.workspaceId,
     packetKey: init.packetKey,
+    workspaceRevision: init.workspaceRevision,
+    packetRevision: init.packetRevision,
     initialState: AtlasState.DISCOVER,
     tokenBudget: 8192,
   });

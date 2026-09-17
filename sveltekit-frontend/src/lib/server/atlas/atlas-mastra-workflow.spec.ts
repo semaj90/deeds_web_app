@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { blockAtlasWorkflowV1, verifyRetrievedPacketsV1 } from './atlas-mastra-workflow.js';
+import { blockAtlasWorkflowV1, executeAtlasRetrieval, requireRuntimeToolReceiptForResultV1, verifyRetrievedPacketsV1 } from './atlas-mastra-workflow.js';
 
 describe('Atlas packet verification boundary', () => {
   it('blocks unavailable discovery and unreceipted validation', () => {
@@ -41,5 +41,37 @@ describe('Atlas packet verification boundary', () => {
     const validate = vi.fn(async () => ({ valid: true }));
     await expect(verifyRetrievedPacketsV1([{ packetKey: 'packet:1' }], validate))
       .resolves.toEqual({ valid: true, packetCount: 1 });
+  });
+
+  it('rejects a prior receipt that belongs to another revision cohort', async () => {
+    await expect(executeAtlasRetrieval({
+      workspaceId: 'workspace-1',
+      query: 'query',
+      packetKey: 'packet-1',
+      workspaceRevision: 'workspace-r2',
+      packetRevision: 'packet-r1',
+      maxIterations: 1,
+      priorToolReceipt: {
+        schema: 'atlas.runtime-tool-receipt.v1',
+        receiptId: 'receipt-1',
+        receiptChecksum: 'sha256:' + 'a'.repeat(64),
+        tool: 'atlas.discover',
+        workspaceRevision: 'workspace-r1',
+        packetRevision: 'packet-r1',
+        succeeded: true,
+        retrievalConfidence: 0.8,
+        evidenceCount: 1,
+        validationStatus: 'PASS',
+        authFailure: false,
+        revisionMismatch: false,
+        writesPerformed: false,
+        canonicalAuthority: false,
+      },
+    })).rejects.toThrow('RUNTIME_RECEIPT_REVISION_MISMATCH');
+  });
+
+  it('does not treat a backend payload as evidence without an explicit receipt', () => {
+    expect(() => requireRuntimeToolReceiptForResultV1({ evidence: [] }))
+      .toThrow('RUNTIME_TOOL_RECEIPT_REQUIRED');
   });
 });

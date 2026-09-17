@@ -1,6 +1,6 @@
 # BitFrost / ACE / Karpathy Redis Cache Audit
 
-Generated: 2026-09-03T02:04:15.292Z
+Generated: 2026-09-17T04:10:44.233Z
 Status: PASS_WITH_DRIFT
 Redis Container: legal-ai-valkey
 
@@ -8,26 +8,26 @@ Redis Container: legal-ai-valkey
 
 | Ownership | Families | Total keys |
 |---|---:|---:|
-| ACTIVE | 8 | 10130 |
+| ACTIVE | 8 | 20 |
 | ASPIRATIONAL | 13 | 0 |
-| LEGACY | 2 | 1 |
+| LEGACY | 2 | 26 |
 | WARMED_PENDING | 4 | 0 |
-| NAMING_DRIFT_CHECK | 1 | 46 |
+| NAMING_DRIFT_CHECK | 1 | 0 |
 
 ## Families
 
 | Key pattern | Ownership | Count | Sample | Drift flag |
 |---|---|---:|---|---|
-| `bitfrost:summary:packet:v1:*` | ACTIVE | 4826 | bitfrost:summary:packet:v1:packet:071520fc354f, bitfrost:summary:packet:v1:packet:0575b5e4ae5c, bitfrost:summary:packet:v1:packet:07353c860b36, bitfrost:summary:packet:v1:packet:cf817dc6a6e9, bitfrost:summary:packet:v1:packet:29c2aa326d74 |  |
-| `gpu:som:packet:*` | ACTIVE | 5000 | gpu:som:packet:1441, gpu:som:packet:128, gpu:som:packet:4841, gpu:som:packet:2016, gpu:som:packet:633 |  |
-| `gpu:som:cell:*` | ACTIVE | 296 | gpu:som:cell:18:3, gpu:som:cell:2:18, gpu:som:cell:14:8, gpu:som:cell:1:8, gpu:som:cell:12:0 |  |
+| `bitfrost:summary:packet:v1:*` | ACTIVE | 0 | none | UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed. |
+| `gpu:som:packet:*` | ACTIVE | 0 | none | UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed. |
+| `gpu:som:cell:*` | ACTIVE | 0 | none | UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed. |
 | `gpu:autoencoder:latent_64:*` | ACTIVE | 0 | none | UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed. |
-| `gpu:karpathy:scores` | ACTIVE | 1 | gpu:karpathy:scores |  |
-| `gpu:karpathy:summary` | ACTIVE | 1 | gpu:karpathy:summary |  |
+| `gpu:karpathy:scores` | ACTIVE | 0 | none | UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed. |
+| `gpu:karpathy:summary` | ACTIVE | 0 | none | UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed. |
 | `gpu:karpathy:encoded` | ASPIRATIONAL | 0 | none |  |
-| `embed:v2:embeddinggemma:latest:*` | ACTIVE | 4 | embed:v2:embeddinggemma:latest:ddc1ba0424a7319cd51df5572f2abb6b502cf4141789cf165c7552a4d406585a, embed:v2:embeddinggemma:latest:6bd35c5d44ccb95707b7d54f7f530a05579dcda94994c1f55fc1e0fbe2e03eed, embed:v2:embeddinggemma:latest:8e6565b4d5aed79ca0dff3fad3b2ce706e3b152494a629e4e1a9fe4dcb7e3525, embed:v2:embeddinggemma:latest:edf32a02ab001aa2b7e13927d5f0d5a8862efa786a669265b80ac0b1f280a558 |  |
-| `embed:embeddinggemma:latest:*` | LEGACY | 1 | embed:embeddinggemma:latest:edf32a02ab001aa2 |  |
-| `ace:*` | ACTIVE | 2 | ace:path:cluster:1, ace:cluster:members:unclassified:community-26562 |  |
+| `embed:v2:embeddinggemma:latest:*` | ACTIVE | 8 | embed:v2:embeddinggemma:latest:a34ee5577eaee625a11272319c333abec71d453a9cc6e56e548b7ddfa7f2a1da, embed:v2:embeddinggemma:latest:7fdbf2f7e97fe77abfa3b1191e40719930e715779c65caa3453f7c349ac525b7, embed:v2:embeddinggemma:latest:dcc2a68711ebefcb5a0eff9b5ca94f214e246fe480bbefb5e0bbd2afc293130b, embed:v2:embeddinggemma:latest:94d192b3a326be1f019b71ef13ea5a367ffe939c5e9a88f1b270e53753d9569a, embed:v2:embeddinggemma:latest:fbe762cea7a72c261c78c14a199f613e7049ffb1d7a807469a392af3f3f95d6c |  |
+| `embed:embeddinggemma:latest:*` | LEGACY | 26 | embed:embeddinggemma:latest:2350cbfc386da93e6a372f8f3d4506c9, embed:embeddinggemma:latest:94d192b3a326be1f019b71ef13ea5a36, embed:embeddinggemma:latest:94d192b3a326be1f, embed:embeddinggemma:latest:db49d3005848d273c108473450f42289, embed:embeddinggemma:latest:71be871eb89d057b5c4b2bb413c743a8 |  |
+| `ace:*` | ACTIVE | 12 | ace:chunk:hits:sveltekit-frontend/src/lib/server/db/migrate-test-rag.ts, ace:chunk:hits:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/routes/api/cases/__tests__/cases-schemas.test.ts, ace:chunk:hits:C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\data\phase82-route-consolidation.json, ace:chunk:hits:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/routes/api/rag/search/__tests__/rag-search-schema.test.ts, ace:chunk:hits:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/__tests__/cache.test.ts |  |
 | `bitfrost:candidate:v1:*` | WARMED_PENDING | 0 | none |  |
 | `bitfrost:retrieval:v2:*` | WARMED_PENDING | 0 | none |  |
 | `bitfrost:retrieval:*` | LEGACY | 0 | none |  |
@@ -45,13 +45,17 @@ Redis Container: legal-ai-valkey
 | `ace:ontology:*` | ASPIRATIONAL | 0 | none |  |
 | `ace:memory:*` | ASPIRATIONAL | 0 | none |  |
 | `reward:zset` | ASPIRATIONAL | 0 | none |  |
-| `bifrost:*` | NAMING_DRIFT_CHECK | 46 | bifrost:sem:packet:1703d9c005252a62, bifrost:sem:packet:packet:0004b466d863, bifrost:sem:feature:simd-bridge.LLMS, bifrost:sem:packet:packet:0009951ee430, bifrost:sem:packet:packet:000b1b923bf4 | UNEXPECTED_POPULATED: was documented as NAMING_DRIFT_CHECK with 0 live rows; now has 46. Verify whether a writer was added and update this script's classification. |
+| `bifrost:*` | NAMING_DRIFT_CHECK | 0 | none |  |
 
 ## Drift flags requiring attention
 
+- **bitfrost:summary:packet:v1:***: UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed.
+- **gpu:som:packet:***: UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed.
+- **gpu:som:cell:***: UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed.
 - **gpu:autoencoder:latent_64:***: UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed.
-- **bifrost:***: UNEXPECTED_POPULATED: was documented as NAMING_DRIFT_CHECK with 0 live rows; now has 46. Verify whether a writer was added and update this script's classification.
+- **gpu:karpathy:scores**: UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed.
+- **gpu:karpathy:summary**: UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed.
 
 ## Next Safe Action
 
-2 ownership-class drift flag(s) found -- see the "Drift flags requiring attention" section before trusting this audit's classification.
+6 ownership-class drift flag(s) found -- see the "Drift flags requiring attention" section before trusting this audit's classification.

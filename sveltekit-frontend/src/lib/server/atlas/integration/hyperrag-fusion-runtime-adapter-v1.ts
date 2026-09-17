@@ -7,7 +7,6 @@ import {
   type HyperRagFirstStageHitV1,
   type QueryEvidenceExpectationV1,
 } from '@deeds/parent-atlas';
-import { runHypergraphPersonalizedPageRank } from '@deeds/parent-atlas';
 
 export type HyperRagFusionRuntimePacketV1 = {
   packet_key?: string | null;
@@ -118,10 +117,6 @@ export async function runHyperRagFusionRuntimeV1(
       maximum_hop_count: input.maximumHopCount ?? 2,
       fanout_limit: input.fanoutLimit ?? 20,
       semantic_executors: ['existing-search-runtime'],
-      ppr_executor: (pprInput) => runHypergraphPersonalizedPageRank({
-        ...pprInput,
-        config: { alpha: 0.85, maximum_iterations: 100, tolerance: 1e-5 },
-      }),
     });
     return {
       status: 'ENRICHED',

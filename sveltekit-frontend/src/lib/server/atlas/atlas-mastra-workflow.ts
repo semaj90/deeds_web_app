@@ -15,7 +15,10 @@ import {
   AtlasRuntimeContext,
   AtlasState,
   RuntimeObservation,
+  RuntimeToolReceiptV1,
   createAtlasRuntimeContext,
+  extractRuntimeToolReceiptV1,
+  observationFromRuntimeToolReceiptV1,
 } from './atlas-runtime-context';
 import {
   estimateExecutionState,
@@ -39,6 +42,11 @@ import {
 import { LLM_MODEL_ID } from '../llm/runtime-contract.js';
 
 export type AtlasPacketValidationResultV1 = { valid: boolean };
+
+/** Require an explicitly returned backend receipt before treating a result as evidence. */
+export function requireRuntimeToolReceiptForResultV1(result: unknown): RuntimeToolReceiptV1 {
+  return extractRuntimeToolReceiptV1(result);
+}
 
 export type AtlasWorkflowBlockedReasonV1 =
   | 'DISCOVERY_ADAPTER_UNAVAILABLE'
@@ -157,6 +165,8 @@ export async function executeAtlasRetrieval(init: {
   packetKey: string;
   workspaceRevision: string;
   packetRevision: string;
+  /** Caller-owned receipt from the preceding tool invocation, if any. */
+  priorToolReceipt?: RuntimeToolReceiptV1 | null;
   maxIterations?: number;
   tokenBudget?: number;
 }) {
@@ -184,6 +194,8 @@ export async function executeAtlasRetrieval(init: {
     resourceId: runtime.resourceId,
     workspaceId: runtime.workspaceId,
     packetKey: runtime.packetKey,
+    workspaceRevision: runtime.workspaceRevision,
+    packetRevision: runtime.packetRevision,
   });
 
   // Execute workflow with FSM state management
@@ -201,6 +213,7 @@ export async function executeAtlasRetrieval(init: {
   };
 
   let iterationNumber = 0;
+  let priorToolReceipt = init.priorToolReceipt ?? null;
   const maxIterations = init.maxIterations ?? 10;
 
   while (
@@ -209,19 +222,15 @@ export async function executeAtlasRetrieval(init: {
   ) {
     iterationNumber++;
 
-    // TODO PA STAGE 13: carry the actual prior tool receipt into the FSM.
-    // Until then this observation is intentionally non-promotional.
-    const observation: RuntimeObservation = {
-      lastTool: 'previous',
-      lastToolSucceeded: true,
-      retrievalConfidence: 0,
-      evidenceCount: 0,
-      validationStatus: 'WARN',
-      authFailure: false,
-      revisionMismatch: false,
-      tokenPressure: runtime.tokenBudget.remainingInput / runtime.tokenBudget.maximumInput,
+    // A caller-owned receipt is the only admissible prior-tool evidence.
+    // Until a live tool result is converted and threaded here, the adapter
+    // deliberately returns an explicit fail-closed observation.
+    const observation: RuntimeObservation = observationFromRuntimeToolReceiptV1(
+      priorToolReceipt,
       iterationNumber,
-    };
+      runtime.tokenBudget.remainingInput / runtime.tokenBudget.maximumInput,
+      runtime,
+    );
 
     // Estimate next state using FSM
     const inference = estimateExecutionState(runtime.state, observation);
@@ -248,6 +257,7 @@ export async function executeAtlasRetrieval(init: {
             topK: 12,
             lanes: ['DENSE', 'SPARSE', 'GRAPH'],
           });
+          priorToolReceipt = requireRuntimeToolReceiptForResultV1(retrieveResult);
           results.packets = retrieveResult.evidence;
           runtime.state = AtlasState.VERIFY;
         } catch (err) {
@@ -263,7 +273,11 @@ export async function executeAtlasRetrieval(init: {
         try {
           const verification = await verifyRetrievedPacketsV1(
             results.packets,
-            (packetKey) => validatePacketFromGo(runtime, packetKey, {}),
+            async (packetKey) => {
+              const validation = await validatePacketFromGo(runtime, packetKey, {});
+              priorToolReceipt = requireRuntimeToolReceiptForResultV1(validation);
+              return { valid: validation.valid };
+            },
           );
           if (!verification.valid) throw new Error(verification.reason);
           runtime.state = AtlasState.SYNTHESIZE;
@@ -281,6 +295,7 @@ export async function executeAtlasRetrieval(init: {
             results.packets.map((p) => p.packetKey),
             runtime.tokenBudget.remainingInput
           );
+          priorToolReceipt = requireRuntimeToolReceiptForResultV1(contextPacket);
           results.summary = contextPacket.prompt;
           runtime.state = AtlasState.VALIDATE;
         } catch (err) {

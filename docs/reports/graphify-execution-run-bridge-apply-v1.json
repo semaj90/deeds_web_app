@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.graphify-execution-run-bridge-apply.v1",
+  "mode": "READ_ONLY_APPLY_PREFLIGHT",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "runId": "01a8d8fc-2507-4f39-868e-039039237b98",
+  "execution": {
+    "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "legacy_graphify_run_id": null,
+    "canonical_authority": true,
+    "status": "COMPLETED",
+    "parser_contract_version": "graphify.parser.v1",
+    "extraction_contract_version": "graphify.extraction.v1",
+    "sourceSelection": {
+      "status": "COMPLETED",
+      "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d"
+    },
+    "membershipCount": 25542
+  },
+  "run": {
+    "run_id": "01a8d8fc-2507-4f39-868e-039039237b98",
+    "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "source_manifest_digest": "841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+    "source_manifest_source_count": 25542,
+    "status": "COMPLETED",
+    "dry_run": false,
+    "parser_contract_version": "graphify.parser.v1",
+    "extraction_contract_version": "graphify.extraction.v1"
+  },
+  "checks": {
+    "executionFound": true,
+    "runFound": true,
+    "executionCanonical": true,
+    "executionCompleted": true,
+    "runCompleted": true,
+    "workspaceMatch": true,
+    "revisionMatch": true,
+    "parserContractMatch": true,
+    "extractionContractMatch": true,
+    "sourceSelectionCompleted": true,
+    "manifestDigestMatchesSourceSelection": true,
+    "manifestCountMatchesExecutionMembership": true,
+    "expectedMembershipCount": true,
+    "frozenPlanChecksumMatches": true,
+    "manifestBound": true,
+    "alreadyBoundToRequestedRun": false,
+    "conflictingExistingRun": false
+  },
+  "safeToApply": true,
+  "authorization": {
+    "required": true,
+    "supplied": false,
+    "envFlag": "ATLAS_AUTHORIZE_GRAPHIFY_EXECUTION_RUN_BRIDGE_V1"
+  },
+  "planChecksum": null,
+  "rollbackCanary": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "status": "READY_FOR_AUTHORIZATION",
+  "receiptChecksum": "sha256:13ff41affc0be631f2483f70494c78ee393151867800c6e1dd1f5f641862e650",
+  "generatedAt": "2026-09-17T05:08:56.981Z"
+}
