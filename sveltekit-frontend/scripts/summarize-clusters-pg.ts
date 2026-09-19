@@ -31,7 +31,7 @@ import crypto from 'node:crypto';
 const CONFIG = {
   ollamaUrl:     process.env.OLLAMA_URL        ?? 'http://localhost:11434',
   turboUrl:      process.env.TURBOQUANT_URL    ?? 'http://127.0.0.1:8090',
-  model:         process.env.OLLAMA_MODEL      ?? 'gemma4-rotorquant:latest',
+  model:         process.env.OLLAMA_MODEL      ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
   embedModel:    process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest',
   pgUrl:         process.env.DATABASE_URL      ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
   redisUrl:      process.env.REDIS_URL         ?? 'redis://localhost:6379',
@@ -229,9 +229,7 @@ async function callWithTools(
   const localMessages = [...messages];
 
   for (let round = 0; round < 4; round++) {
-    const response = await (turboAvailable
-      ? callTurbo(localMessages)
-      : callOllama(localMessages));
+    const response = await callTurbo(localMessages);
 
     // No tool calls → we have the final answer
     if (!response.tool_calls?.length) {
@@ -251,7 +249,7 @@ async function callWithTools(
   }
 
   // Exhausted rounds — ask for final answer without tools
-  const final = await (turboAvailable ? callTurbo(localMessages) : callOllama(localMessages));
+  const final = await callTurbo(localMessages);
   return final.content ?? '';
 }
 
@@ -265,7 +263,7 @@ async function callTurbo(messages: ChatMessage[]): Promise<{ content?: string; t
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
+        model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
         messages,
         tools: TOOLS,
         tool_choice: 'auto',
@@ -286,25 +284,6 @@ async function callTurbo(messages: ChatMessage[]): Promise<{ content?: string; t
   } finally {
     clearTimeout(timeout);
   }
-}
-
-async function callOllama(messages: ChatMessage[]): Promise<{ content?: string; tool_calls?: ToolCall[] }> {
-  const res = await fetch(`${CONFIG.ollamaUrl}/api/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: CONFIG.model,
-      messages,
-      tools: TOOLS,
-      stream: false,
-      cache_prompt: true,
-      options: { temperature: 0.2, num_predict: 1024 },
-    }),
-    signal: AbortSignal.timeout(120_000),
-  });
-  if (!res.ok) throw new Error(`Ollama ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data = await res.json() as { message?: { content?: string; tool_calls?: ToolCall[] } };
-  return data.message ?? {};
 }
 
 async function embedText(text: string): Promise<number[] | null> {

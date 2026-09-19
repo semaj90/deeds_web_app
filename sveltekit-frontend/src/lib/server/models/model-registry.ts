@@ -15,6 +15,7 @@ export type ModelRole = 'embedding' | 'rerank' | 'reasoning' | 'vision' | 'audio
 export type ModelBackend =
 	| 'grpc'
 	| 'turboquant'
+	| 'llama-server'
 	| 'ollama'
 	| 'onnx'
 	| 'webgpu'
@@ -43,21 +44,21 @@ export const MODEL_REGISTRY = {
 		enabled: true,
 		notes: 'Canonical retrieval-vector lane for Qdrant, TurboVec, clustering, and ACE recall.',
 	},
-	gemma4_legal_reasoning: {
+	ornith_legal_reasoning: {
 		key: SERVER_CHAT_MODEL,
 		role: 'reasoning',
-		backend: 'ollama',
+		backend: 'llama-server',
 		contextLength: 131072,
 		enabled: true,
-		notes: 'Primary legal reasoning and synthesis lane for server-side workflows.',
+		notes: 'Primary Ornith 1.5 legal reasoning and synthesis lane via llama-server :8090.',
 	},
-	gemma4_dense_reasoning: {
+	legacy_gemma4_dense_reasoning: {
 		key: SERVER_GEMMA4_MODEL,
 		role: 'reasoning',
 		backend: 'ollama',
 		contextLength: 131072,
-		enabled: true,
-		notes: 'General Gemma4 dense reasoning lane for drafting, analysis, and tool use.',
+		enabled: false,
+		notes: 'Legacy compatibility entry; not an active chat owner.',
 	},
 	gemma4_vlm_reasoning: {
 		key: SERVER_VLM_MODEL,
@@ -121,7 +122,7 @@ export function getEmbeddingModelId(): string {
 }
 
 export function getReasoningModelId(kind: 'legal' | 'general' = 'legal'): string {
-	if (kind === 'general') return SERVER_GEMMA4_MODEL;
+	if (kind === 'general') return SERVER_CHAT_MODEL;
 	return SERVER_CHAT_MODEL;
 }
 

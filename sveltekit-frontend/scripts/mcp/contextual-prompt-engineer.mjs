@@ -7,6 +7,7 @@ import { execSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import { llamaChat } from '../../../scripts/atlas/lib/llama-inference.mjs';
 
 // Svelte docs URLs
 const DOCS_URLS = {
@@ -190,22 +191,12 @@ async function queryOllamaWithContext(userQuery, keywords = []) {
     console.log(`⏳ Querying Ollama (gemma3-legal)...\n`);
 
     try {
-        const response = await fetch('http://localhost:11434/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: 'gemma3-legal:latest',
-                prompt: prompt,
-                stream: false,
-                options: {
-                    temperature: 0.7,
-                    num_predict: 2048
-                }
-            })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
+        const t0 = Date.now();
+        // Chat/generation goes to llama-server (Ornith 1.5); Ollama is embeddings-only.
+        const data = { response: await llamaChat(prompt, { maxTokens: 2048, temperature: 0.7, timeoutMs: 180_000 }) };
+        data.total_duration = (Date.now() - t0) * 1e6;
+        data.eval_count = 'n/a';
+        if (data.response != null) {
 
             console.log(`✅ Response:\n`);
             console.log(`${'━'.repeat(70)}`);
@@ -224,7 +215,7 @@ async function queryOllamaWithContext(userQuery, keywords = []) {
 
             return data.response;
         } else {
-            throw new Error(`Ollama error: ${response.status}`);
+            throw new Error(`Ollama error: no response`);
         }
     } catch (error) {
         console.error(`❌ Error: ${error.message}`);

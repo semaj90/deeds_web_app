@@ -336,11 +336,41 @@ Evidence: `docs/reports/packet-write-revision-contract-v1.json`,
 - [x] Re-ran the canonical-owner revision migration safety audit; the proposed
   change remains additive-only, unapplied, `promotionAllowed=false`, and
   `writesPerformed=false`.
-- [ ] Review each SQL file against live schema, current source/revision
-  evidence, and migration history before assigning a disposition.
+- [x] Review each SQL file against live schema, current source/revision
+  evidence, and migration history before assigning a disposition (2026-09-19,
+  read-only; see MMR1.9a). Dispositions below are proposals; none is recorded
+  in the report and all seven remain `UNRESOLVED` pending operator sign-off.
 
 Status: `PRIORITY_1_LINEAGE_MIGRATIONS_UNRESOLVED`; migration authority closed;
 no registration or schema mutation performed.
+
+#### MMR1.9a - Priority-1 per-file review (2026-09-19, read-only)
+
+None of the seven is in `drizzle/meta/_journal.json`.
+
+| File | Live target | Idempotent | Proposed |
+|---|---|---|---|
+| `manual/20260909_atlas_packets_source_revision.sql` | column present, 0/61,718 populated | yes | `DECLARED_SIDECAR` |
+| `manual/atlas_packet_identity_aliases.sql` | table present | yes | `DECLARED_SIDECAR` |
+| `manual/0045_adaptive_schema_repair.generated.sql` | both indexes present | yes | `ACCEPTED_HISTORICAL` |
+| `manual/20260912_error_embedding_latent_columns.sql` | columns and HNSW indexes present | yes | `DECLARED_SIDECAR` (header says proposed-only, yet applied live) |
+| `0105_latent64_vectors.sql` | present; `latent_64` has 1,703 rows | yes | `ACCEPTED_HISTORICAL` |
+| `0101_encoder_provenance_gate2.sql` | present | NO: 5 `CREATE INDEX` lack `IF NOT EXISTS` | `ACCEPTED_HISTORICAL`; never re-apply |
+| `manual/0050_add_summary_quality_score.sql` | **absent live**: no `summary_quality_score` column, no 2 indexes | yes | `DEFERRED` or `SUPERSEDED`; needs owner decision, not silent apply |
+
+`0050` was never applied or was later dropped. Consumer check (2026-09-19,
+read-only): five `scripts/atlas/` scripts still read or write
+`summary_quality_score` (all last committed 2026-06-24): `collect-phase1-metrics`,
+`stage2-gpu-rerank-summaries` and `-v2` (a duplicate pair; only referenced from
+`GPU-USAGE-AUDIT.md`), `stage1-2-worker-pool` (wired to 9 npm scripts:
+`workers:summary:pool:*`, `stage1:2:queue:*`) and `summarize-rank-embed-centroids`
+(wired to 6 `atlas:summarize-rank-embed-centroids*` npm scripts, the `--apply`
+ones UPDATE the column). Those apply paths would fail against the live schema,
+so `SUPERSEDED` is not supported without first retiring or rewiring them;
+`DEFERRED` is the evidence-consistent disposition. Not verified: whether those
+scripts were run after 2026-06-24 or hit this error in practice. Related unfiled finding: `toolIdentityRecover` accepts
+`source_ref`/`feature_id` but never uses them (see
+`docs/reports/packet-write-revision-contract-v1.json`).
 
 Evidence: `docs/reports/critical-lineage-migration-dispositions-v1.json`,
 `docs/reports/canonical-owner-revision-migration-safety-v1.json`.

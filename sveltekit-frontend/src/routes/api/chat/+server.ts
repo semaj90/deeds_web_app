@@ -3,8 +3,6 @@ import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { trackTokenUsage, extractOllamaTokens } from '$lib/server/ai/token-tracker.js';
 import { rgTool } from '$lib/server/ai/tools/rg-tool.js';
 import { langExtractTool } from '$lib/server/ai/tools/langextract-tool.js';
@@ -106,11 +104,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         )}`
       : '';
 
-    const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+    // Chat is exclusively owned by the OpenAI-compatible llama-server on :8090.
+    // Ollama :11434 is reserved for EmbeddingGemma and is never a chat fallback.
+    const chatBaseUrl = (ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
+    const res = await fetch(`${chatBaseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: LLM_MODEL_ID,
+        model: ENV.LLAMA_SERVER_MODEL ?? LLM_MODEL_ID,
         messages: [
           {
             role: 'system',
@@ -121,7 +122,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           ...(body.messages || [{ role: 'user', content: userContent }]),
         ],
         stream: false,
-        options: { temperature: body.temperature ?? 0.7 },
+        temperature: body.temperature ?? 0.7,
       }),
       signal: AbortSignal.timeout(30_000),
     });
@@ -131,7 +132,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     const data = await res.json();
-    const responseText = data.message?.content || '';
+    const responseText = data.choices?.[0]?.message?.content || '';
     const durationMs = Math.round(performance.now() - startMs);
 
     // Track token usage (fire-and-forget)
@@ -139,7 +140,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     trackTokenUsage({
       userId: locals.user?.id,
       endpoint: '/api/chat',
-      model: data.model || LLM_MODEL_ID,
+      model: data.model || ENV.LLAMA_SERVER_MODEL || LLM_MODEL_ID,
       metadata: {
         modelPath: ROTORQUANT_MODEL_PATH,
       },
@@ -160,7 +161,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           sessionId: 'api-chat',
           message: responseText.slice(0, 5000),
           role: 'assistant',
-          metadata: { model: data.model || LLM_MODEL_ID, modelPath: ROTORQUANT_MODEL_PATH },
+          metadata: { model: data.model || ENV.LLAMA_SERVER_MODEL || LLM_MODEL_ID, modelPath: ROTORQUANT_MODEL_PATH },
         });
       })
       .catch(() => {});
@@ -168,7 +169,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({
       message: responseText,
       response: responseText,
-      model: data.model || LLM_MODEL_ID,
+      model: data.model || ENV.LLAMA_SERVER_MODEL || LLM_MODEL_ID,
       modelPath: ROTORQUANT_MODEL_PATH,
       tokensUsed: tokens.promptTokens + tokens.completionTokens,
       gpuLease: lease ? { backend: lease.backend, expiresAt: lease.expiresAt } : null,

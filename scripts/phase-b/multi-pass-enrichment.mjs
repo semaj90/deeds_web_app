@@ -29,6 +29,7 @@
  */
 
 import 'dotenv/config';
+import { llamaChat } from '../atlas/lib/llama-inference.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -147,28 +148,13 @@ async function runPass1(packets) {
       }
 
       // Call Gemma4 (TurboQuant cache-enabled)
-      const res = await fetch(`${OLLAMA_URL}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gemma4-rotorquant:latest',
-          messages: [
+      const _out1 = await llamaChat([
             {
               role: 'user',
               content: `Summarize in 5-10 tokens:\n${text.substring(0, 500)}`,
             },
-          ],
-          stream: false,
-          cache_prompt: true,
-          options: { num_predict: 15 },
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      const data = await res.json();
+          ], { maxTokens: 15 }); // llama-server (Ornith 1.5); Ollama is embeddings-only
+      const data = { message: { content: _out1 } };
       const summary = data.message?.content?.trim() || '';
       const elapsed = Date.now() - startTime;
 
@@ -219,27 +205,13 @@ async function runPass2(packets) {
       }
 
       // Extract entities
-      const res = await fetch(`${OLLAMA_URL}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gemma4-rotorquant:latest',
-          messages: [
+      const _out2 = await llamaChat([
             {
               role: 'user',
               content: `Extract entities (JSON): ${text.substring(0, 300)}`,
             },
-          ],
-          stream: false,
-          options: { num_predict: 200 },
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      const data = await res.json();
+          ], { maxTokens: 200 }); // llama-server (Ornith 1.5); Ollama is embeddings-only
+      const data = { message: { content: _out2 } };
       const entities = data.message?.content || '{}';
       const elapsed = Date.now() - startTime;
 

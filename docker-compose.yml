@@ -658,9 +658,10 @@ services:
     environment:
       # VLM ownership is the host llama.cpp Ornith server; Ollama remains
       # available only to the separate embedding fallback path.
-      LLAMA_SERVER_URL: ${LLAMA_SERVER_URL:-http://host.docker.internal:8090}
+      # Container-specific: the host .env LLAMA_SERVER_URL is 127.0.0.1, unreachable from inside a container.
+      LLAMA_SERVER_URL: ${DOCLING_LLAMA_SERVER_URL:-http://host.docker.internal:8090}
       VLM_MODEL: ${VLM_MODEL:-ornith-1.5-9b}
-      ORNITH_MMPROJ_PATH: ${ORNITH_MMPROJ_PATH:-models/ornith-1_5-9b-ad-q5_k-q4_k/mmproj-Ornith-1.5-9B-BF16.gguf}
+      ORNITH_MMPROJ_PATH: ${ORNITH_MMPROJ_PATH:-models/mmproj-Ornith-1.5-9B-BF16.gguf}
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
@@ -1081,7 +1082,7 @@ services:
       context: ./docker/langgraph-synthesis
       dockerfile: Dockerfile
     container_name: legal-ai-langgraph
-    runtime: nvidia
+    # CPU orchestration boundary; GPU execution belongs to dedicated sidecars.
     profiles: ["gpu"]
     deploy:
       resources:
@@ -1089,37 +1090,33 @@ services:
           memory: 6G
         reservations:
           memory: 2G
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     environment:
-      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
-      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
       - OLLAMA_URL=http://host.docker.internal:11434
-      - LLAMA_SERVER_URL=${LLAMA_SERVER_URL:-http://host.docker.internal:8090}
+      # Container-side default must reach the workstation host, not the
+      # container itself. Override only with LANGGRAPH_LLAMA_SERVER_URL.
+      - LLAMA_SERVER_URL=${LANGGRAPH_LLAMA_SERVER_URL:-http://host.docker.internal:8090/v1}
+      - LLAMA_SERVER_MODEL=${LLAMA_SERVER_MODEL:-ornith-1.5-9b}
       - QDRANT_URL=http://qdrant:6333
       - NEO4J_URI=bolt://neo4j:7687
       - NEO4J_USER=${NEO4J_USER:-neo4j}
       - NEO4J_PASSWORD=${NEO4J_PASSWORD:-password}
       - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
       - REDIS_URL=redis://:redis@valkey:6379/1
-      - LLM_MODEL=${LLM_MODEL:-gemma4-legal-vlm:latest}
+      # Durable LangGraph state is opt-in. Schema setup is a separate explicit gate.
+      - LANGGRAPH_CHECKPOINT_ENABLED=${LANGGRAPH_CHECKPOINT_ENABLED:-false}
+      - LANGGRAPH_CHECKPOINT_SETUP=${LANGGRAPH_CHECKPOINT_SETUP:-false}
+      # Synthesis auth is optional in local development and required in production.
+      - LANGGRAPH_INTERNAL_API_KEY=${LANGGRAPH_INTERNAL_API_KEY:-}
+      # LangGraph uses the OpenAI-compatible llama-server chat owner on :8090.
+      # Ollama :11434 remains the EmbeddingGemma-only lane.
+      - LLM_MODEL=${LLM_MODEL:-ornith-1.5-9b}
       - EMBED_MODEL=${EMBED_MODEL:-embeddinggemma:latest}
       - LANGFUSE_HOST=http://langfuse-web:3000
       - CONFIDENCE_THRESHOLD=${CONFIDENCE_THRESHOLD:-0.65}
-      # torch.compile() persistent kernel cache — avoids 10-30 min recompile on restart
-      - TORCHINDUCTOR_CACHE_DIR=/app/.cache/torchinductor
-      - TRITON_CACHE_DIR=/app/.cache/triton
-      - TORCHINDUCTOR_COMPILE_THREADS=4
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
       - "${LANGGRAPH_PORT:-8091}:8091"
-    volumes:
-      - torchinductor_cache:/app/.cache/torchinductor
-      - triton_cache:/app/.cache/triton
     depends_on:
       - valkey
       - qdrant

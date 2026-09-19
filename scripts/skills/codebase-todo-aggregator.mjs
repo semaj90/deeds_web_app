@@ -387,7 +387,7 @@ const recommendations = recommendationSeed.map((rec) => {
 async function reankWithGemma4(topRecs, contextRules) {
   try {
     const LLAMA_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-    const MODEL = process.env.LLAMA_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
+    const MODEL = process.env.LLAMA_MODEL || (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
     // Build reranking prompt with AGENTS.md context
     const agentContext = contextRules

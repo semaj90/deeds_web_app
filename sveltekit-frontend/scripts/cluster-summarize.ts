@@ -6,6 +6,7 @@
  */
 
 import { couchdb, aceLLM } from '../src/lib/services/couchdb-client.js';
+import { llamaChat } from '../../scripts/atlas/lib/llama-inference.mjs';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
@@ -66,24 +67,12 @@ Provide a 2-3 sentence summary describing:
 Summary:`;
 
   try {
-    const response = await fetch(`${OLLAMA_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma3-legal:latest',
-        prompt,
-        stream: false,
-        options: { temperature: 0.3, num_predict: 200 }
-      })
-    });
-
-    if (!response.ok) {
+    const text = await llamaChat(prompt, { maxTokens: 200, temperature: 0.3 });
+    if (!text || !text.trim()) {
       // Fallback summary
       return `Collection "${collectionName}" contains ${samples.length}+ entries. Data includes: ${Object.keys(samples[0]?.payload || {}).join(', ')}`;
     }
-
-    const data = await response.json() as { response: string };
-    return data.response.trim();
+    return text.trim();
   } catch (error) {
     return `Collection "${collectionName}" - LLM unavailable. Contains ${samples.length}+ entries with keys: ${Object.keys(samples[0]?.payload || {}).join(', ')}`;
   }

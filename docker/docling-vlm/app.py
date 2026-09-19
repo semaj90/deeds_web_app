@@ -2,7 +2,11 @@
 Docling + VLM FastAPI Service
 Exposes HTTP endpoints for document analysis, audio transcription, and vision tasks.
 
-Pipeline: YOLO detection → Ornith llama.cpp VLM OCR → Granite Docling chunking → Qdrant embedding
+Pipeline: YOLO detection → Ornith llama.cpp VLM OCR (:8090, mmproj) → extracted text.
+PDFs are parsed with docling-parse.
+
+This service does NOT embed and does NOT write to any vector store. Embedding is owned
+by the central EmbeddingGemma path (semantic_768 → Postgres pgvector → Qdrant projection).
 """
 
 import asyncio

@@ -12,6 +12,7 @@
  *   node scripts/cache-warmup.mjs
  */
 
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 
 /**
@@ -186,7 +187,7 @@ export async function warmUpCache(options: {
 	const {
 		batchSize = 5,
 		delayMs = 1000,
-		model = 'gemma4-rotorquant:latest',
+		model = SERVER_CHAT_MODEL,
 		dryRun = false,
 	} = options;
 

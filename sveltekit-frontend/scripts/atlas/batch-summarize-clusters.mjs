@@ -23,6 +23,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { llamaChat } from '../../../scripts/atlas/lib/llama-inference.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -134,34 +135,16 @@ ${context}
 Summary (1-2 sentences only):`;
 
   try {
-    // Use bifrostChat if available (has cache layer), fall back to direct Ollama
-    const response = await fetch('http://127.0.0.1:11434/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        messages: [{ role: 'user', content: prompt }],
-        stream: false,
-        temperature,
-        options: { num_predict: maxTokens },
-      }),
-      signal: AbortSignal.timeout(30000), // 30s timeout
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const summary = (data.message?.content || '').trim();
+    // llama-server (Ornith 1.5) via the shared helper; Ollama is embeddings-only.
+    const summary = (await llamaChat([{ role: 'user', content: prompt }], { maxTokens, temperature, timeoutMs: 30000 })).trim();
 
     if (!summary) {
-      throw new Error('Empty response from Gemma4');
+      throw new Error('Empty response from llama-server');
     }
 
     return summary;
   } catch (err) {
-    console.error(`  ❌ Gemma4 error: ${err.message}`);
+    console.error(`  ❌ llama-server error: ${err.message}`);
     throw err;
   }
 }

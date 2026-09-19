@@ -1,5 +1,6 @@
 <!-- RAG + KAG + DAG Pipeline Orchestrator — 3-step evidence retrieval + answer generation -->
 <script lang="ts">
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 	interface Props {
 		caseId?: string;
 		initialQuery?: string;
@@ -188,7 +189,7 @@
 			answerCitations = data.citations ?? [];
 			answerActionItems = data.action_items ?? [];
 			answerConfidence = data.answer_confidence ?? 0;
-			answerModel = data.model ?? 'gemma4-legal';
+			answerModel = data.model ?? SERVER_CHAT_MODEL;
 			generationTimeMs = data.generation_time_ms ?? 0;
 
 			pipelineStep = 'complete';
@@ -228,7 +229,7 @@
 	const pipelineSteps = [
 		{ id: 'searching', label: 'RAG Search', desc: 'Embed → Dual Search → Rerank', icon: 'search' },
 		{ id: 'validating', label: 'Source Validation', desc: 'Approve/reject retrieved chunks', icon: 'circle-check' },
-		{ id: 'generating', label: 'LLM Generation', desc: 'gemma4-legal with citations', icon: 'brain' }
+		{ id: 'generating', label: 'LLM Generation', desc: 'Ornith 1.5 with citations', icon: 'brain' }
 	] as const;
 
 	function getStepStatus(stepId: string): 'pending' | 'active' | 'done' | 'error' {

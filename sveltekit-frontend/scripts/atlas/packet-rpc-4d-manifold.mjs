@@ -22,6 +22,7 @@
 
 import fetch from 'node-fetch';
 import fs from 'fs';
+import { llamaChat } from '../../../scripts/atlas/lib/llama-inference.mjs';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const NEO4J_URL = process.env.NEO4J_URL || 'http://localhost:7474';
@@ -259,17 +260,7 @@ Provide:
 4. Next hops`;
 
     try {
-      const genRes = await fetch(`${OLLAMA_URL}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gemma4-rotorquant:latest',
-          prompt,
-          stream: false,
-        }),
-      });
-
-      const { response } = await genRes.json();
+      const response = await llamaChat(prompt, { maxTokens: 512 }); // llama-server (Ornith 1.5); Ollama is embeddings-only
 
       results.push({
         batch: batchNum,

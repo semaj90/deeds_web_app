@@ -45,7 +45,7 @@ const pool = new Pool({
 });
 
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 // Counter for timeout exit
 let processedCount = 0;

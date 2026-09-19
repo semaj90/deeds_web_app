@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 	import { tick } from 'svelte';
 	import { browser } from '$app/environment';
 	import Button from '$lib/components/ui/Button.svelte';
@@ -314,7 +315,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					message,
-					model: 'gemma4-legal:latest',
+					model: SERVER_CHAT_MODEL,
 					conversationId
 				}),
 				signal: controller.signal

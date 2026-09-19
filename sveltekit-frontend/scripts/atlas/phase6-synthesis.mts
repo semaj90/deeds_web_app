@@ -80,7 +80,7 @@ const SynthesisAuditSchema = z.object({
 // ============================================================================
 
 const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090/v1';
-const GEMMA4_MODEL = process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
+const GEMMA4_MODEL = process.env.GEMMA4_MODEL || (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 // ============================================================================
 // Main Pipeline

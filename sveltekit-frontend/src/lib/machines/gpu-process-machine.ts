@@ -9,6 +9,7 @@
  *
  * Integrates with GPU Arbiter for VRAM lease management.
  */
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { assign, setup, fromPromise } from 'xstate';
 
 // ── Types ────────────────────────────────────────────────────────────────
@@ -118,7 +119,7 @@ function getEndpointForTask(task: GpuTask): { url: string; body: Record<string, 
 		case 'chat':
 			return {
 				url: '/api/chat',
-				body: { message: task.payload.message, model: task.payload.model ?? 'gemma4-rotorquant:latest' }
+				body: { message: task.payload.message, model: task.payload.model ?? SERVER_CHAT_MODEL }
 			};
 		case 'embedding':
 			return {

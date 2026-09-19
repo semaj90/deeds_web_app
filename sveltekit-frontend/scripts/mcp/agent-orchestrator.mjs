@@ -232,20 +232,34 @@ class AgentOrchestrator {
      */
     async _callOllama(messages) {
         try {
-            const model = process.env.OLLAMA_MODEL || 'gemma4-rotorquant:latest';
-            const response = await fetch(`${this.ollamaUrl}/api/chat`, {
+            // Chat + tool calling goes to llama-server (Ornith 1.5, OpenAI-compatible); Ollama is embeddings-only.
+            const model = process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b';
+            const base = (process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090/v1').replace(/\/+$/, '');
+            const response = await fetch(`${base}/chat/completions`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 model,
-                messages: messages,
+                messages: messages.map((m) => m.tool_calls
+                  ? { ...m, tool_calls: m.tool_calls.map((c, i) => ({
+                      id: c.id || `call_${i}`,
+                      type: 'function',
+                      function: {
+                        name: c.function?.name,
+                        arguments: typeof c.function?.arguments === 'string' ? c.function.arguments : JSON.stringify(c.function?.arguments ?? {}),
+                      },
+                    })) }
+                  : m),
                 tools: this.tools,
                 stream: false,
               }),
+              signal: AbortSignal.timeout(180_000),
             });
 
             if (response.ok) {
-                return await response.json();
+                const body = await response.json();
+                const msg = body.choices?.[0]?.message ?? {};
+                return { message: { content: msg.content || '', tool_calls: msg.tool_calls || [] } };
             } else {
                 console.error(`Ollama call failed: ${response.status}`);
                 return {

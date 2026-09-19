@@ -25,6 +25,7 @@ import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { autoTagDocument } from '$lib/server/ace/auto-tagger.js';
 import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
 import { resolve } from 'path';
 import { createLocalLlamaChatModel } from './local-llama-chat-model.js';
@@ -1157,7 +1158,7 @@ export class AutonomousAgent {
             const queryHash = createHash('sha256').update(query).digest('hex').slice(0, 16);
             const cacheKey = buildContextCacheKey({
               queryHash,
-              modelName: 'gemma4-rotorquant:latest',
+              modelName: SERVER_CHAT_MODEL,
               modelQuant: 'iq4_xs',
               kvQuant: 'q8_0/q8_0',
               draftModel: false,
@@ -1193,7 +1194,7 @@ export class AutonomousAgent {
               query,
               userId: 'agent',
               caseId: 'auto',
-              modelName: 'gemma4-rotorquant:latest',
+              modelName: SERVER_CHAT_MODEL,
               modelQuant: 'iq4_xs',
               kvQuant: 'q8_0/q8_0',
               draftModel: false,

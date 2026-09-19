@@ -28,7 +28,7 @@ const PG_PASSWORD = process.env.POSTGRES_PASSWORD || '123456';
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 const LLAMA_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const TEMPERATURE = 0.3;
 
 const pgPool = new Pool({

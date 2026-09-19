@@ -27,6 +27,7 @@ import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from '
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { llamaChat } from '../../scripts/atlas/lib/llama-inference.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT      = resolve(__dirname, '..');
@@ -147,20 +148,8 @@ async function generateSummary(node) {
   const ctrl = new AbortController();
   const tid  = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
   try {
-    const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model:  MODEL,
-        prompt: buildPrompt(node),
-        stream: false,
-        options: { temperature: 0.2, num_predict: 120 },
-      }),
-      signal: ctrl.signal,
-    });
-    if (!res.ok) throw new Error(`Ollama HTTP ${res.status}`);
-    const body = await res.json();
-    return (body.response ?? '').trim();
+    const text = await llamaChat(buildPrompt(node), { maxTokens: 120, temperature: 0.2, timeoutMs: TIMEOUT_MS });
+    return (text ?? '').trim();
   } finally {
     clearTimeout(tid);
   }

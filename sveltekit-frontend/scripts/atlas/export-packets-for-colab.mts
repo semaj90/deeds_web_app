@@ -114,7 +114,7 @@ Limit: ${LIMIT}
   const config = {
     export_timestamp: new Date().toISOString(),
     total_packets: packets.length,
-    model: "gemma4-rotorquant:latest",
+    model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
     processing: {
       batch_size: 10,
       temperature: 0.3,

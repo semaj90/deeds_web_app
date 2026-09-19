@@ -32,7 +32,7 @@ const PG_USER = process.env.POSTGRES_USER || 'legal_admin';
 const PG_PASSWORD = process.env.POSTGRES_PASSWORD || '123456';
 
 const LLAMA_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-const MODEL = process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
+const MODEL = process.env.GEMMA4_MODEL || (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const TEMPERATURE = parseFloat(process.env.GEMMA4_TEMP || '0.3');
 const MAX_TOKENS = parseInt(process.env.GEMMA4_MAX_TOKENS || '256');
 

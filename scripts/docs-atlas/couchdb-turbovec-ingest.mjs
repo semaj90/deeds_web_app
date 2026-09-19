@@ -8,6 +8,7 @@
  * Enforces VRAM hygiene, incremental delta checks, and 768-dimensional vector parity.
  */
 
+import { llamaChat } from '../atlas/lib/llama-inference.mjs';
 import 'dotenv/config';
 import { createRequire } from 'node:module';
 import { resolve, join, dirname } from 'node:path';
@@ -187,23 +188,9 @@ Summary:`;
 
   // 2. Try Ollama (gemma4-rotorquant:latest)
   try {
-    console.log(`💬 Summarizing Cluster ${clusterId} via Ollama fallback (gemma4-rotorquant:latest)...`);
-    const res = await fetch(`${OLLAMA_URL}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        messages: [{ role: 'user', content: prompt }],
-        options: { num_predict: 400 },
-        stream: false
-      }),
-      signal: AbortSignal.timeout(20000)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const content = data.message?.content || data.message?.thinking;
-      if (content) return content.trim();
-    }
+    console.log(`💬 Summarizing Cluster ${clusterId} via llama-server (Ornith 1.5)...`);
+    const content = await llamaChat([{ role: 'user', content: prompt }], { maxTokens: 400, timeoutMs: 20000 });
+    if (content) return content.trim();
   } catch (err) {
     console.error(`❌ Both summarization backends failed: ${err.message}`);
   }

@@ -93,11 +93,7 @@ export async function switchVlmMode(targetMode: VlmMode): Promise<{ success: boo
 
     console.info(`[vlm-lifecycle] Switching mode: ${currentMode} -> ${targetMode}`);
 
-    const ollamaModel =
-      process.env.ROTORQUANT_CHAT_MODEL ??
-      process.env.OLLAMA_MODEL ??
-      process.env.GEMMA4_MODEL ??
-      'gemma4:e4b-it-q4_K_M';
+    const loadedChatModel = ENV.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b';
 
     if (targetMode === VlmMode.OFF || targetMode === VlmMode.GPU_WORK) {
       // Unload both services completely to free up 100% VRAM / GPU resources
@@ -105,7 +101,7 @@ export async function switchVlmMode(targetMode: VlmMode): Promise<{ success: boo
       if (tqProcess) {
         stopTurboQuant(tqProcess.pid);
       }
-      await unloadLlamaServerModel(ollamaModel);
+      await unloadLlamaServerModel(loadedChatModel);
       await new Promise(r => setTimeout(r, RESTART_DELAY_MS));
     } else if (targetMode === VlmMode.VISION) {
       // Transitioning to Vision mode (runs TurboQuant with mmproj)
@@ -114,7 +110,7 @@ export async function switchVlmMode(targetMode: VlmMode): Promise<{ success: boo
         stopTurboQuant(tqProcess.pid);
         await new Promise(r => setTimeout(r, RESTART_DELAY_MS));
       }
-      await unloadLlamaServerModel(ollamaModel);
+      await unloadLlamaServerModel(loadedChatModel);
 
       const modelPath = TURBOQUANT_GGUF;
       const mmprojPath = TURBOQUANT_MMPROJ;
@@ -129,7 +125,7 @@ export async function switchVlmMode(targetMode: VlmMode): Promise<{ success: boo
         stopTurboQuant(tqProcess.pid);
         await new Promise(r => setTimeout(r, RESTART_DELAY_MS));
       }
-      await unloadLlamaServerModel(ollamaModel);
+      await unloadLlamaServerModel(loadedChatModel);
 
       const modelPath = TURBOQUANT_GGUF;
       if (modelPath) {

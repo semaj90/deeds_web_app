@@ -13,6 +13,7 @@
  * When LANGFUSE_ENABLED=false (default), all trace functions are no-ops — zero overhead.
  */
 import { ENV } from '../env.server.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 // Lazy singleton — only created when LANGFUSE_ENABLED=true
 let _langfuse: any = null;
@@ -97,12 +98,12 @@ export async function traceLLM<T>(
 	const trace = langfuse.trace({
     name,
     metadata,
-    tags: [(metadata.backend as string) ?? 'llm', (metadata.model as string) ?? 'gemma4-rotorquant:latest'],
+    tags: [(metadata.backend as string) ?? 'llm', (metadata.model as string) ?? SERVER_CHAT_MODEL],
   });
 
 	const generation = trace.generation({
 		name: `${name}-generation`,
-		model: (metadata.model as string) ?? 'gemma4-rotorquant:latest',
+		model: (metadata.model as string) ?? SERVER_CHAT_MODEL,
 		input: metadata.prompt ?? metadata.messages ?? undefined,
 		metadata,
 	});

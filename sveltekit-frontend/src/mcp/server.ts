@@ -1,3 +1,4 @@
+import { SERVER_CHAT_MODEL } from '../lib/ai/model-ids.js';
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -3389,7 +3390,7 @@ export function setupToolHandlers() {
           const { routeInference } = await import('../lib/server/inference/inference-router.js');
           const result = await routeInference({
             prompt,
-            model: model ?? 'gemma4-rotorquant:latest',
+            model: model ?? SERVER_CHAT_MODEL,
             maxTokens: maxTokens ?? 2048,
             temperature: temperature ?? 0.3,
             stream: stream ?? false,

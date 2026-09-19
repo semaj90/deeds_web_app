@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 	import { fade } from 'svelte/transition';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
@@ -37,9 +38,9 @@
 
 	let availableModels = $state<LLMModel[]>([
 		{
-			id: 'gemma4-legal',
-			name: 'gemma4-legal:latest',
-			displayName: 'Gemma4 Legal Specialist',
+			id: 'ornith-1.5',
+			name: SERVER_CHAT_MODEL,
+			displayName: 'Ornith 1.5 9B',
 			provider: 'ollama',
 			size: '7.3GB',
 			specialization: 'legal',

@@ -31,7 +31,7 @@ loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 // Config
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 const LLAMA_SERVER_URL = 'http://127.0.0.1:8090';
-const LLAMA_MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const LLAMA_MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 

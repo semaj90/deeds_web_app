@@ -25,6 +25,7 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import neo4j, { type Driver } from 'neo4j-driver';
 import { createRequire } from 'node:module';
+import { llamaChat } from '../../scripts/atlas/lib/llama-inference.mjs';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -403,15 +404,8 @@ async function summarizeEdge(memberPaths: string[], _centroid: number[], cluster
   const prompt = `Summarize the architectural role of these ${memberPaths.length} related source files in one sentence:\n${paths}`;
 
   try {
-    const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: false, cache_prompt: true }),
-      signal: AbortSignal.timeout(30_000),
-    });
-    if (res.ok) {
-      const data = (await res.json()) as { response?: string };
-      const summary = (data.response ?? '').trim().slice(0, 300);
+    {
+      const summary = ((await llamaChat(prompt, { maxTokens: 200, temperature: 0.2, timeoutMs: 30_000 })) ?? '').trim().slice(0, 300);
       await redis.setex(`hg:sum:${hash}`, HG_EDGE_TTL, summary).catch(() => {});
       return summary;
     }

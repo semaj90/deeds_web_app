@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 
@@ -56,7 +57,7 @@
 				gpuStatus = {
 					available: data.ollama || data.tensorrt || false,
 					utilization: 0,
-					model: data.models?.[0] ?? 'gemma4-legal:latest',
+					model: data.models?.[0] ?? SERVER_CHAT_MODEL,
 					backend: data.tensorrt ? 'tensorrt' : data.ollama ? 'ollama' : 'none',
 				};
 			}
@@ -154,7 +155,7 @@
 			const res = await fetch('/api/ai/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message: query, model: 'gemma4-legal:latest' }),
+				body: JSON.stringify({ message: query, model: SERVER_CHAT_MODEL }),
 			});
 			if (!res.ok) throw new Error(`${res.status}`);
 			const data = await res.json();

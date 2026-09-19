@@ -3,6 +3,7 @@
 // Detects legacy code patterns and injects relevant context from deep storage
 // Now with MCP tool integration and HTTP API fallback
 
+import { llamaChat } from './atlas/lib/llama-inference.mjs';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { fetchDeepContext, getCachedResult, cacheResult } from './phase76-storage-layer.mjs';
 import dotenv from 'dotenv';
@@ -149,22 +150,8 @@ async function buildContextualPrompt(userTask, previousContext = '') {
 async function generateResponse(enhancedPrompt) {
   console.log('🤖 [Agent] Generating LLM response...');
 
-  const response = await fetch('http://localhost:11434/api/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'gemma3-legal:latest',
-      prompt: enhancedPrompt,
-      stream: false
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`LLM failed: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  return data.response;
+  // llama-server (Ornith 1.5) via the shared helper; Ollama is embeddings-only.
+  return await llamaChat(enhancedPrompt, { maxTokens: 2048 });
 }
 
 /**

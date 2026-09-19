@@ -20,6 +20,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { llamaChat } from '../../../scripts/atlas/lib/llama-inference.mjs';
 import { sanitizeGemma4Summary } from '../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
 
 const { Pool } = pg;
@@ -178,38 +179,10 @@ async function summarizeWithGemma4(summaryType, card) {
   if (!template) throw new Error(`Unknown summary type: ${summaryType}`);
 
   const prompt = template.prompt(card);
-  const OLLAMA_HOST = (process.env.OLLAMA_HOST || 'http://127.0.0.1:11434').replace(/0\.0\.0\.0/, '127.0.0.1');
-
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60_000);
-
-    const res = await fetch(`${OLLAMA_HOST}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        prompt,
-        stream: false,
-        think: false, // Suppress reasoning block for faster inference
-        options: {
-          temperature: 0.3,
-          num_predict: template.maxTokens,
-        },
-      }),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!res.ok) {
-      if (verbose) console.warn(`[gemma4] HTTP ${res.status} for ${summaryType}/${card.feature_id}`);
-      return null;
-    }
-
-    const body = await res.json();
-    const sanitized = sanitizeGemma4Summary(body.response?.trim() || '');
-    return sanitized.safe ? sanitized.summary : null;
+    // llama-server (Ornith 1.5) via the shared helper (it sanitizes the output). Ollama is embeddings-only.
+    const text = await llamaChat(prompt, { maxTokens: template.maxTokens, temperature: 0.3, timeoutMs: 60_000 });
+    return text || null;
   } catch (err) {
     if (err.name === 'AbortError') {
       console.warn(`[gemma4] ⏱️  60s timeout on ${summaryType}/${card.feature_id || card.file_path} — skipping`);

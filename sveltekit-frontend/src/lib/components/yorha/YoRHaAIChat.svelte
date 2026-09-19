@@ -88,18 +88,8 @@
     }
 
     try {
-      // Logic for Contextual Chat via Ollama or RAG
-      const ollamaUrl = getOllamaEndpoint();
-      const payload = {
-        model: 'gemma4-legal:latest', // Per project convention
-        messages: messages.map(m => ({
-          role: m.role === 'assistant' ? 'assistant' : 'user',
-          content: m.content
-        })),
-        stream: false
-      };
-
-      // Try RAG first, fallback to Ollama chat
+      // Contextual chat goes through the RAG service (llama-server). Ollama is embeddings-only,
+      // so there is deliberately no direct Ollama chat fallback.
       let responseText = '';
 
       const ragResponse = await fetch(`${RAG_SERVICE_URL}/api/chat`, {
@@ -113,19 +103,7 @@ message: trimmed, history: messages })
         const result = await ragResponse.json();
         responseText = result.response;
       } else {
-        // FALLBACK: Direct Ollama Contextual Chat
-        const ollamaResponse = await fetch(`${ollamaUrl}/api/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify(payload)
-        });
-
-        if (ollamaResponse.ok) {
-          const result = await ollamaResponse.json();
-          responseText = result.message.content;
-        } else {
-          throw new Error('All AI services unresponsive.');
-        }
+        throw new Error('All AI services unresponsive.');
       }
 
       const assistantMsg = {

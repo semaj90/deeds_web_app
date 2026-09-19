@@ -1,3 +1,4 @@
+import { llamaChat } from './atlas/lib/llama-inference.mjs';
 import fs from 'fs';
 import path from 'path';
 import pg from 'pg';
@@ -13,18 +14,9 @@ dotenv.config();
 async function gemmaClient(prompt) {
   const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
   try {
-    const res = await fetch(`${ollamaUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf',
-        prompt: prompt,
-        stream: false,
-        format: 'json'
-      })
-    });
-    if (res.ok) {
-      const data = await res.json();
+    // llama-server (Ornith 1.5) via the shared helper; Ollama is embeddings-only.
+    const data = { response: await llamaChat(prompt, { maxTokens: 1024, temperature: 0.2 }) };
+    if (data.response) {
       try {
         return JSON.parse(data.response);
       } catch {

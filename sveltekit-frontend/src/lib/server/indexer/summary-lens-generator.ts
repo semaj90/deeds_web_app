@@ -1,4 +1,5 @@
 import { bifrostChat } from '$lib/server/ollama.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
 import { db } from '$lib/server/db/client';
@@ -38,7 +39,7 @@ export async function generateSummaryLenses(params: {
           sourceHash: 'T2_SUMMARY', // Tier 2 summary marker
           summaryType: lensType,
           summaryText: lensText,
-          model: 'gemma4-rotorquant:latest',
+          model: SERVER_CHAT_MODEL,
           embeddingModel: 'embeddinggemma',
           qdrantCollection: 'summary_lenses_768',
           somBmuRow: params.somBmuRow,
@@ -103,7 +104,7 @@ async function generateLensText(content: string, lensType: string, targetType: s
 	const response = await bifrostChat([
 		{ role: 'system', content: 'You are a technical architect specializing in SvelteKit and agentic retrieval. Provide concise, high-density summaries.' },
 		{ role: 'user', content: `${prompt}\n\nContent:\n${content.slice(0, 4000)}` }
-	], 'gemma4-rotorquant:latest');
+	], SERVER_CHAT_MODEL);
 
 	return response.trim();
 }

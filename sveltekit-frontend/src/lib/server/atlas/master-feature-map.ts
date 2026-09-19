@@ -1,3 +1,4 @@
+import { SERVER_CHAT_MODEL } from '../../ai/model-ids.js';
 /**
  * src/lib/server/atlas/master-feature-map.ts
  * 
@@ -271,7 +272,7 @@ export const MASTER_FEATURE_MAP: Record<string, MasterFeatureEntry> = {
     stores: ['Neo4j', 'Postgres'],
     clusters: [47],
     status: 'active',
-    params: { model: 'gemma4-rotorquant:latest' },
+    params: { model: SERVER_CHAT_MODEL },
     pathMapping: ['src/lib/server/ai', 'src/lib/server/kag'],
     evidence: {
       files: ['src/lib/server/ai/gemma4-agent.ts']

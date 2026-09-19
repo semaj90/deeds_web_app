@@ -1147,3 +1147,36 @@ and the live EmbeddingGemma output, then resolve canonical writer ownership.
       performed.
 
 Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
+
+### SEMANTIC-768-TRUNCATION-AND-384-CENSUS — 2026-09-19 (read-only)
+
+**Truncation contract.** EmbeddingGemma MRL truncations are 768 (canonical), 512, 256, 128 only.
+384 is not a valid size. Derived lanes are produced only from an indexed, validated 768 source.
+
+| Lane | Location (live) | Rows/points | Note |
+|---|---|---|---|
+| 768 canonical | PG `codebase_chunk_index.content_embedding` halfvec(768) + HNSW m16/ef200 | 55,169 | Qdrant `codebase_chunks_768` = 328,348 pts (docs said 109,776; unexplained growth) |
+| 512 | Qdrant `codebase_chunks_512` only | 53,380 | no PG column |
+| 256 / 128 | PG `latent_256`/`latent_128` halfvec + HNSW | 55,169 | autoencoder/slice-derived, NOT MRL of 768 |
+| MRL 512/256/128 error lanes | Qdrant `error_embedding_mrl_*` | 20 each | smoke scale |
+
+**384 census (retired lane, data still present).**
+`atlas_packets.content_embedding_384` 58,109/61,718 rows, written 2026-07-21..09-08 by
+`scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs` (model alias `embeddinggemma-384` on :8081,
+`VECTOR_DIM=384`; alias meaning unverified). `packet_vector_bundles.content_vector` 4,047/15,652,
+first-384-dims slice of 768 (`populate-packet-vector-bundles.mjs`), renormalization unverified.
+`codebase_chunk_index.summary_embedding_384` 10/274,465. All other 384 columns hold 0 rows.
+`atlas_packets.embedding` (768) is populated on 61,659 rows but stores no model name
+(`embedding_version` is a hash / NULL), so EmbeddingGemma provenance is not provable from the table.
+
+- [x] Freeze the writer set with a guard test:
+      `sveltekit-frontend/src/lib/server/atlas/embedding-384-writers.guard.spec.ts` (5 known writers).
+- [x] `hnsw.iterative_scan=relaxed_order` already set on the app pool (`db/client.ts:100`);
+      `adminPool` and standalone scripts do not set it.
+- [ ] Prove `atlas_packets.embedding` was produced by EmbeddingGemma (writer read or sample re-embed).
+- [ ] Decide per writer: migrate or archive `phase-17`, `populate-packet-vector-bundles`,
+      `rebuild-gemma4-summaries-384`, `restore-qdrant-384-from-postgres`, `backfill-content-embedding-384`.
+- [ ] Archive (with manifest) the 0-row 384 columns; decide the 58,109-row column separately.
+
+No column, index, embedding, or Qdrant write was performed. Do not overwrite `atlas_packets.embedding`
+from any retargeted 384 writer.

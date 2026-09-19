@@ -45,7 +45,7 @@ const QDRANT_COLLECTION = 'codebase_chunks_768';
 const SUMMARY_EMBEDDING_DIMENSION = 768;
 const SUMMARY_EMBEDDING_ENDPOINT  = 'http://127.0.0.1:11434';
 const SUMMARY_EMBEDDING_MODEL     = 'embeddinggemma:latest';
-const SUMMARY_GENERATION_MODEL    = 'gemma4-legal-iq4xs-direct.gguf';
+const SUMMARY_GENERATION_MODEL    = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const SUMMARY_PROMPT_VERSION      = 'v1';
 
 // Quality gate: reject summaries outside this character range
@@ -115,7 +115,7 @@ ${content.slice(0, 2000)}`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 200,
         temperature: 0.3,

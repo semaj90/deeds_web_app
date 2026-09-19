@@ -46,7 +46,7 @@ const LIMIT     = parseInt(process.argv.find(a => a.startsWith('--limit='))?.spl
 const OUTPUT_DIR = process.argv.find(a => a.startsWith('--output-dir='))?.split('=')[1] || '.tmp';
 
 const LLAMA_URL  = (process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090').replace(/\/+$/, '');
-const GEMMA4_MODEL = process.env.LANGEXTRACT_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
+const GEMMA4_MODEL = process.env.LANGEXTRACT_MODEL || (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const DATABASE_URL = resolveDatabaseUrl(loadRepoEnv(process.env));
 
 fs.mkdirSync(path.resolve(ROOT, OUTPUT_DIR), { recursive: true });

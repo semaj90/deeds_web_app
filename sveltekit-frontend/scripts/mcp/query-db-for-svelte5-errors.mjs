@@ -4,6 +4,7 @@
  */
 
 import pg from 'pg';
+import { llamaChat } from '../../../scripts/atlas/lib/llama-inference.mjs';
 const { Client } = pg;
 
 async function querySvelte5ErrorsAndSolutions() {
@@ -81,22 +82,11 @@ Be concise and practical.`;
             console.log(`⏳ Querying Ollama for solution...\n`);
 
             try {
-                const response = await fetch('http://localhost:11434/api/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: 'gemma3-legal:latest',
-                        prompt: prompt,
-                        stream: false,
-                        options: {
-                            temperature: 0.7,
-                            num_predict: 1024
-                        }
-                    })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
+                const t0 = Date.now();
+                const data = { response: await llamaChat(prompt, { maxTokens: 1024, temperature: 0.7, timeoutMs: 180_000 }) };
+                data.total_duration = (Date.now() - t0) * 1e6;
+                data.eval_count = 'n/a';
+                if (data.response != null) {
 
                     console.log(`✅ Solution:\n`);
                     console.log(data.response);
@@ -129,7 +119,7 @@ Generated: ${new Date().toISOString()}
                     console.log(`💾 Saved to ${filename}\n`);
 
                 } else {
-                    console.error(`❌ Ollama error: ${response.status}\n`);
+                    console.error(`❌ Ollama error: no response\n`);
                 }
 
             } catch (err) {

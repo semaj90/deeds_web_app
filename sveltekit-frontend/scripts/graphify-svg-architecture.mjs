@@ -72,7 +72,7 @@ Do not include markdown blocks, only raw JSON.`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-rotorquant:latest', // VLM / Code model
+          model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'), // VLM / Code model
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: `SVG Data:\n\n${svgContent.slice(0, 8000)}` }
@@ -141,7 +141,7 @@ Do not include markdown blocks, only raw JSON.`;
         layers: parsedData.layers,
         visual_role: parsedData.visual_role
       },
-      model: 'gemma4-rotorquant:latest',
+      model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
       embeddingModel: 'ple-embedding',
       qdrantCollection: 'svg_architectures',
       tags,

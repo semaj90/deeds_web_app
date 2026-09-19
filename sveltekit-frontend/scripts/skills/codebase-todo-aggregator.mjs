@@ -57,7 +57,7 @@ const QUERY     = (() => {
 
 const REDIS_URL  = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-const LLM_MODEL = process.env.LLM_MODEL ?? 'gemma4-rotorquant:latest';
+const LLM_MODEL = process.env.LLM_MODEL ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 // Inference cascade per CLAUDE.md "Inference Cascade" section:
 //   TurboQuant llama-server :8090  (KV cache, cache_prompt:true, primary)
 //   Bifrost :3040                  (L2 semantic cache wrapper)
@@ -306,33 +306,9 @@ async function gemma4Rerank(top, agentsRules, timelineMd) {
     } catch { return null; }
   }
 
-  // Tier 2: Ollama /api/chat (fallback — competes with TurboQuant for VRAM
-  // but doesn't always need the same KV state).
-  async function callOllama() {
-    try {
-      const res = await fetch(`${OLLAMA_URL}/api/chat`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model:    LLM_MODEL,
-          messages: [{ role: 'user', content: prompt }],
-          stream:   false,
-          options:  { temperature: 0.3, num_predict: 600 },
-        }),
-        signal: AbortSignal.timeout(30_000),
-      });
-      if (!res.ok) return null;
-      const j = await res.json();
-      const out = (j.message?.content ?? j.response ?? '').trim();
-      return out || null;
-    } catch { return null; }
-  }
-
   const tq = await callTurboQuant();
   if (tq) return tq;
-  if (!STDOUT) console.warn('   ⚠ TurboQuant rerank empty — falling back to Ollama');
-  const ol = await callOllama();
-  if (ol) return ol;
+  // Ollama chat fallback removed: Ollama is embeddings-only.
   return null;
 }
 

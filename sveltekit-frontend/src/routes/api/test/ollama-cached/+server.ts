@@ -5,6 +5,7 @@
  * NO AUTH REQUIRED - for testing only
  */
 
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { json } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
@@ -13,7 +14,7 @@ import { z } from 'zod';
 
 const ollamaCachedSchema = z.object({
   query: z.string().max(1000).default('Test query'),
-  model: z.string().max(100).default('gemma4-rotorquant:latest-fast'),
+  model: z.string().max(100).default(SERVER_CHAT_MODEL),
   temperature: z.number().min(0).max(2).default(0.3),
   maxTokens: z.number().int().min(1).max(4096).default(200),
 });

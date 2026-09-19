@@ -31,11 +31,11 @@ export const MCP_CONFIG = {
 // AI SERVICES CONFIGURATION
 // ============================================================================
 export const AI_CONFIG = {
-	// Primary: Ollama with Gemma models
+	// Embeddings only: Ollama :11434. Chat/synthesis is owned by llama-server :8090.
 	ollama: {
 	baseUrl: getOllamaEndpoint(),
 		models: {
-	legal: process.env.GEMMA_LEGAL_MODEL || 'gemma4-rotorquant:latest',
+		legal: process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b',
 			embedding: process.env.GEMMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
 			fallback: process.env.EMBEDDING_FALLBACK_MODEL || 'embeddinggemma:latest'
 		},

@@ -124,7 +124,7 @@ async function probeFastJsonParsePath() {
       score: 0.9 - i * 0.05,
       payload: {
         response: JSON.stringify({ choices: [{ message: { content: `cached answer ${i}` } }] }),
-        model: 'gemma4-rotorquant:latest',
+        model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
         cache_key: 'global',
       },
     })),

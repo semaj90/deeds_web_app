@@ -144,7 +144,7 @@ async function evaluateJobsNeeded() {
         priority: 45,
         payload: {
           limit: 2000,
-          model: 'gemma4-rotorquant:latest',
+          model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
         },
         reason: `${missingSummaries[0].count} packets need summaries`,
       });

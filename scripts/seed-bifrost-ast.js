@@ -39,7 +39,7 @@ async function seed() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer dummy-key' },
                     body: JSON.stringify({
-                        model: 'gemma4-rotorquant:latest',
+                        model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
                         messages: [
                             { role: 'user', content: prompt }
                         ],

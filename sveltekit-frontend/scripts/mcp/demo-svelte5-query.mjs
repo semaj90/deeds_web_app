@@ -1,3 +1,4 @@
+import { llamaChat } from '../../../scripts/atlas/lib/llama-inference.mjs';
 /**
  * Working Demo: Query Svelte 5 Migration Patterns
  * Uses direct Ollama calls (bypasses tool calling issues)
@@ -48,22 +49,11 @@ Include:
         console.log(`⏳ Querying Ollama (gemma3-legal)...\n`);
 
         try {
-            const response = await fetch('http://localhost:11434/api/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'gemma3-legal:latest',
-                    prompt: q.prompt,
-                    stream: false,
-                    options: {
-                        temperature: 0.7,
-                        num_predict: 1024
-                    }
-                })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
+            const t0 = Date.now();
+            const data = { response: await llamaChat(q.prompt, { maxTokens: 1024, temperature: 0.7, timeoutMs: 180_000 }) };
+            data.total_duration = (Date.now() - t0) * 1e6;
+            data.eval_count = 'n/a';
+            if (data.response != null) {
 
                 console.log(`✅ Response:\n`);
                 console.log(data.response);
@@ -76,7 +66,7 @@ Include:
                 console.log(`💾 Saved to ${outputFile}`);
 
             } else {
-                console.error(`❌ Error: ${response.status}`);
+                console.error(`❌ Error: no response`);
             }
 
         } catch (error) {

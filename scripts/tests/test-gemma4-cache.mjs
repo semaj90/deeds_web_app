@@ -12,7 +12,7 @@ async function test() {
   const run1 = await fetch('http://localhost:5173/api/test/cache-demo', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ query, runs: 1, model: 'gemma4-rotorquant:latest-fast' })
+    body: JSON.stringify({ query, runs: 1, model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b') })
   }).then(r => r.json());
   const elapsed1 = Date.now() - start;
   console.log(`✓ ${elapsed1}ms - ${run1.error || 'OK'}`);
@@ -27,7 +27,7 @@ async function test() {
   const run2 = await fetch('http://localhost:5173/api/test/cache-demo', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ query, runs: 1, model: 'gemma4-rotorquant:latest-fast' })
+    body: JSON.stringify({ query, runs: 1, model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b') })
   }).then(r => r.json());
   const elapsed2 = Date.now() - start;
   console.log(`✓ ${elapsed2}ms - ${run2.error || 'OK'}`);
@@ -37,7 +37,7 @@ async function test() {
   const run3 = await fetch('http://localhost:5173/api/test/cache-demo', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ query, runs: 1, model: 'gemma4-rotorquant:latest-fast' })
+    body: JSON.stringify({ query, runs: 1, model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b') })
   }).then(r => r.json());
   const elapsed3 = Date.now() - start;
   console.log(`✓ ${elapsed3}ms - ${run3.error || 'OK'}`);

@@ -273,7 +273,7 @@ async function runGraphifyGsdSemantic(options: {
       packetCount: packetEnd - packetStart,
       batchSize: 100,
       inference: {
-        model: 'gemma4-rotorquant:latest',
+        model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
         temperature: 0.3,
         maxTokens: 200,
       },

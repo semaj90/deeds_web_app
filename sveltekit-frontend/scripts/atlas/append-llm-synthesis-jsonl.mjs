@@ -81,7 +81,7 @@ const params = {
   sourceRefs: arg('sourceRefs') ? JSON.parse(arg('sourceRefs')) : [],
   cacheKeys: arg('cacheKeys') ? JSON.parse(arg('cacheKeys')) : {},
   trustTier: arg('trustTier') ?? 'local_code_plus_official_docs',
-  model: arg('model') ?? 'gemma4-rotorquant:latest',
+  model: arg('model') ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
   validation: arg('validation') ? JSON.parse(arg('validation')) : {},
 };
 
