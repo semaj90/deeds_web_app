@@ -47,10 +47,19 @@ export const eventFabricTypeSchema = z.enum([
   'checkpoint.commit',
   'artifact.materialized',
   'artifact.failed',
+  'authority.audit.completed',
 ]);
 
 export type EventFabricType = z.infer<typeof eventFabricTypeSchema>;
 
+/**
+ * Shared lineage/correlation envelope.
+ *
+ * The revision-qualified fields are optional here because legacy event producers
+ * predate Parent Atlas workspace authority. New authority-bearing producers
+ * should populate producerId + workspaceId + workspaceRevision and use payload
+ * validation to fail closed when those fields are required for a capability.
+ */
 export const eventFabricEnvelopeSchema = z.object({
   eventId: z.string().uuid(),
   eventType: eventFabricTypeSchema,
@@ -58,11 +67,19 @@ export const eventFabricEnvelopeSchema = z.object({
   traceId: z.string().optional(),
   requestId: z.string().optional(),
   taskId: z.string().optional(),
+  runId: z.string().optional(),
+  executionId: z.string().optional(),
+  producerId: z.string().min(1).optional(),
+  repositoryId: z.string().min(1).optional(),
+  workspaceId: z.string().min(1).optional(),
+  workspaceRevision: z.string().min(1).optional(),
   sourceRef: z.string().optional(),
   sourceRevision: z.string().optional(),
+  representationRevision: z.string().optional(),
   correlationId: z.string().optional(),
   causationId: z.string().optional(),
   schemaRevision: z.string().optional(),
+  evidenceRefs: z.array(z.string().min(1)).optional(),
 });
 
 export type EventFabricEnvelope = z.infer<typeof eventFabricEnvelopeSchema>;
@@ -225,6 +242,40 @@ export const artifactFailedEventSchema = eventFabricEnvelopeSchema.extend({
 
 export type ArtifactFailedEventV1 = z.infer<typeof artifactFailedEventSchema>;
 
+export const authorityAuditStatusSchema = z.enum(['PROVEN', 'BLOCKED', 'PARTIAL', 'NO_CHANGE']);
+export type AuthorityAuditStatus = z.infer<typeof authorityAuditStatusSchema>;
+
+export const authorityAuditCompletedPayloadSchema = z.object({
+  gate: z.string().min(1),
+  status: authorityAuditStatusSchema,
+  blocker: z.string().min(1).optional(),
+  canonicalAuthority: z.boolean(),
+  mutationAuthorized: z.boolean().default(false),
+  subjectType: z.enum(['workspace', 'graphify_run', 'source', 'packet', 'representation', 'graph', 'task']),
+  subjectId: z.string().min(1),
+  nextGate: z.string().min(1).optional(),
+  counts: z.record(z.string(), z.number()).default({}),
+  sourceEvidenceRefs: z.array(z.string().min(1)).default([]),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type AuthorityAuditCompletedPayloadV1 = z.infer<typeof authorityAuditCompletedPayloadSchema>;
+
+/**
+ * Read-only authority/lineage receipt projected into the event fabric.
+ * This event describes an already-computed deterministic audit. It never
+ * authorizes a mutation merely by being emitted.
+ */
+export const authorityAuditCompletedEventSchema = eventFabricEnvelopeSchema.extend({
+  eventType: z.literal('authority.audit.completed'),
+  producerId: z.string().min(1),
+  workspaceId: z.string().min(1),
+  workspaceRevision: z.string().min(1),
+  payload: authorityAuditCompletedPayloadSchema,
+});
+
+export type AuthorityAuditCompletedEventV1 = z.infer<typeof authorityAuditCompletedEventSchema>;
+
 export const eventFabricEventSchema = z.discriminatedUnion('eventType', [
   codeEvidencePersistedEventSchema,
   failureObservationEventSchema,
@@ -234,6 +285,7 @@ export const eventFabricEventSchema = z.discriminatedUnion('eventType', [
   checkpointCommitEventSchema,
   artifactMaterializedEventSchema,
   artifactFailedEventSchema,
+  authorityAuditCompletedEventSchema,
 ]);
 
 export type EventFabricEventV1 = z.infer<typeof eventFabricEventSchema>;
@@ -256,6 +308,7 @@ export function createDefaultEventFabricHandlers(): EventFabricHandlerRegistry {
     'checkpoint.commit': async () => {},
     'artifact.materialized': async () => {},
     'artifact.failed': async () => {},
+    'authority.audit.completed': async () => {},
   };
 }
 
