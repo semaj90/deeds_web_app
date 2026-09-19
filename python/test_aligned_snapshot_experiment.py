@@ -19,6 +19,44 @@ except Exception:
 
 @unittest.skipUnless(AVAILABLE, "PyTorch/NumPy required")
 class AlignedSnapshotExperimentTests(unittest.TestCase):
+    def test_production_mode_requires_admitted_population_freeze(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec = root / "experiment.json"
+            spec.write_text(json.dumps({"production_mode": True, "enable_som": True}) + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "PRODUCTION_REQUIRES_CANDIDATE_POPULATION_FREEZE"):
+                run_aligned_snapshot_experiment_v2(
+                    semantic_manifest_path=root / "missing-manifest.json",
+                    experiment_spec_path=spec,
+                    output_path=root / "receipt.json",
+                )
+
+    def test_production_mode_requires_explicit_20x20_som(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            freeze = root / "freeze.json"
+            freeze.write_text(json.dumps({
+                "status": "CANDIDATE_POPULATION_FREEZE_READY_FOR_EXPLICIT_REVIEW",
+                "downstreamAllowed": True,
+                "canonicalAuthority": False,
+                "writesPerformed": False,
+                "freezeChecksum": "sha256:" + "a" * 64,
+            }) + "\n", encoding="utf-8")
+            spec = root / "experiment.json"
+            spec.write_text(json.dumps({
+                "production_mode": True,
+                "candidate_population_freeze_path": str(freeze),
+                "enable_som": True,
+                "som_grid_rows": 8,
+                "som_grid_columns": 8,
+            }) + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "PRODUCTION_SOM_REQUIRES_EXPLICIT_20X20_GRID"):
+                run_aligned_snapshot_experiment_v2(
+                    semantic_manifest_path=root / "missing-manifest.json",
+                    experiment_spec_path=spec,
+                    output_path=root / "receipt.json",
+                )
+
     def test_cpu_vertical_alignment_with_explicit_context_order(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

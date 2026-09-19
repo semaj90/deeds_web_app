@@ -44,6 +44,41 @@
       against the new admission and confirm `frameAuthoritative: true`, `authorityConflict:
       false`, zero blockers — the same bar Gate 1 already proved for the prior admission.
 
+### 2026-09-18 — fresh snapshot readback recheck (read-only)
+
+- Re-ran `scripts/atlas/reseal-current-workspace-snapshot-v1.mts` against the existing fresh
+  manifest `sha256:e2fba635004f4b18396037fc1e1262adcfaf7f1d1e93c991e7a44be1a97523d9`.
+- Result: `RESEAL_READBACK_BLOCKED`; 25,525 / 25,637 exact matches and 112
+  `SOURCE_BYTES_CHANGED` violations. `writesPerformed: false`.
+- Gate 2.1 remains open: no new admission was written. Do not treat the fresh manifest as
+  current authority until the snapshot is stable and the operator supplies the exact
+  `AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1` confirmation.
+
+### 2026-09-18 — stable snapshot reseal after checksum repair (read-only)
+
+- Fixed the snapshot capture receipt checksum bug: `captureAttempts` and
+  `transientDriftObserved` are now included using the same normalized body that
+  `validateSnapshot()` verifies.
+- Re-captured the moving worktree as snapshot
+  `sha256:fb841747bf03aa6f83cc5c214080863a0fd6f04e62336e71fe909f8587045b3d` with 25,775
+  sources and no capture violations.
+- Reseal readback is now `RESEAL_READBACK_PROVEN`: 25,775 / 25,775 exact matches,
+  zero violations, `writesPerformed: false`.
+- This proves snapshot integrity only. It does not admit the workspace or authorize
+  packet/chunk writes; Gate 2.1 remains open for the exact operator confirmation.
+
+### 2026-09-18 — admission-chain receipts refreshed (read-only)
+
+- Against the stable snapshot, source hygiene is `SOURCE_INVENTORY_HYGIENE_PASS`:
+  25,775 candidate paths, 25,580 canonical sources, no known junk matches, and
+  `writesPerformed: false`.
+- Revision derivation is `WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION`; the
+  current candidate is recorded in `docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json`.
+- Tournament source authority is `CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION`;
+  `authority: false` and no admission or projection write occurred.
+- The current admission receipt remains stale relative to this candidate. Gate 2.1
+  still requires the exact operator confirmation before any new admission receipt is written.
+
 ## 3. Single-owner cross-check on the fresh chain
 
 - [ ] 3.1 Re-run `audit-canonical-source-inventory-hygiene-v1.mts` against the fresh snapshot and

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildAtlasExecutionPipelineV1,
+  assertAtlasExecutionPipelineIdentityReadyV1,
   ATLAS_PIPELINE_CONTRACT_BINDINGS_V1,
   validateAtlasDomainClassifierResponseV1,
 } from './atlas-execution-pipeline-v1.js';
@@ -8,6 +9,7 @@ import {
 const sha = (value: string) => value.padStart(64, '0').slice(-64);
 const stage = (stageId: any, executor: any, dependsOn: any[] = [], logicalLane = 'NONE', voteGroup = 'NONE') => ({
   stageId, executor, executorRevision: `${String(executor).toLowerCase()}:v1`, dependsOn,
+  identity: { workspaceRevision: null, packetRevision: null, representationRevision: null },
   inputSchemaRevision: 'schema:v1', outputSchemaRevision: 'schema:v1',
   inputChecksum: null, outputChecksum: null,
   stream: { format: 'JSONL', ordering: 'SOURCE_ORDER', chunkBytes: 65536, maxBatchRows: 256, maxInFlight: 2 },
@@ -19,7 +21,7 @@ function input(overrides: Record<string, unknown> = {}) {
     requestId: 'req:pipeline-1', pipelineRevision: 'atlas-execution-pipeline:v1',
     identity: {
       workspaceId: 'repo:root', workspaceRevision: 'sha256:' + sha('1'), snapshotRevision: 'sha256:' + sha('2'),
-      canonicalExecutionId: '74d50c86-8194-45ea-8c3d-61aab737ef83', packetAdmissionReceiptChecksum: sha('3'), packetChunkClosureReceiptChecksum: sha('4'),
+      canonicalExecutionId: '74d50c86-8194-45ea-8c3d-61aab737ef83', packetRevision: null, packetAdmissionReceiptChecksum: sha('3'), packetChunkClosureReceiptChecksum: sha('4'),
       representationRevision: 'semantic_768:r1', featureRevision: 'features:v1',
     },
     context: {
@@ -79,6 +81,49 @@ describe('AtlasExecutionPipelineV1', () => {
         ? { ...value, inputChecksum: sha('b') }
         : value);
     expect(() => buildAtlasExecutionPipelineV1(input({ stages }))).toThrow('PIPELINE_CHECKSUM_CHAIN_MISMATCH');
+  });
+
+  it('keeps planning DAGs valid but rejects executable DAGs with missing identity checksums', () => {
+    const planned = buildAtlasExecutionPipelineV1(input());
+    expect(() => assertAtlasExecutionPipelineIdentityReadyV1(planned)).toThrow('PIPELINE_STAGE_WORKSPACE_REVISION_REQUIRED:DECODE_STREAM');
+  });
+
+  it('accepts an executable checksum chain only when every stage is bound', () => {
+    const outputs = new Map<string, string>();
+    const stageIdentity = { workspaceRevision: 'sha256:' + sha('1'), packetRevision: 'sha256:' + sha('7'), representationRevision: 'semantic_768:r1' };
+    const stages = input().stages.map((value: any, index: number) => {
+      const outputChecksum = sha(String(index + 20));
+      const inputChecksum = value.dependsOn.length ? outputs.get(value.dependsOn[0]) ?? null : null;
+      outputs.set(value.stageId, outputChecksum);
+      return { ...value, identity: stageIdentity, inputChecksum, outputChecksum };
+    });
+    const pipeline = buildAtlasExecutionPipelineV1(input({ identity: { ...input().identity, packetRevision: stageIdentity.packetRevision }, stages }));
+    expect(() => assertAtlasExecutionPipelineIdentityReadyV1(pipeline)).not.toThrow();
+  });
+
+  it('requires workspace, packet, and representation revisions on every executable stage', () => {
+    const outputs = new Map<string, string>();
+    const stages = input().stages.map((value: any, index: number) => {
+      const outputChecksum = sha(String(index + 40));
+      const inputChecksum = value.dependsOn.length ? outputs.get(value.dependsOn[0]) ?? null : null;
+      outputs.set(value.stageId, outputChecksum);
+      return { ...value, inputChecksum, outputChecksum };
+    });
+    const pipeline = buildAtlasExecutionPipelineV1(input({ stages }));
+    expect(() => assertAtlasExecutionPipelineIdentityReadyV1(pipeline)).toThrow('PIPELINE_STAGE_WORKSPACE_REVISION_REQUIRED:DECODE_STREAM');
+  });
+
+  it('rejects a stage whose revision identity diverges from the pipeline', () => {
+    const outputs = new Map<string, string>();
+    const identity = { workspaceRevision: 'sha256:' + sha('1'), packetRevision: 'sha256:' + sha('7'), representationRevision: 'semantic_768:r1' };
+    const stages = input().stages.map((value: any, index: number) => {
+      const outputChecksum = sha(String(index + 60));
+      const inputChecksum = value.dependsOn.length ? outputs.get(value.dependsOn[0]) ?? null : null;
+      outputs.set(value.stageId, outputChecksum);
+      return { ...value, identity: value.stageId === 'RETRIEVAL' ? { ...identity, representationRevision: 'semantic_768:other' } : identity, inputChecksum, outputChecksum };
+    });
+    const pipeline = buildAtlasExecutionPipelineV1(input({ identity: { ...input().identity, packetRevision: identity.packetRevision }, stages }));
+    expect(() => assertAtlasExecutionPipelineIdentityReadyV1(pipeline)).toThrow('PIPELINE_STAGE_REPRESENTATION_REVISION_MISMATCH:RETRIEVAL');
   });
 
   it('requires exactly one contract binding per runtime stage', () => {

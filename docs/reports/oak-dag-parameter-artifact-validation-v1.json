@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.oak-dag-parameter-artifact-validation.v1",
+  "generatedAt": "2026-09-18T18:01:38.000Z",
+  "status": "PARAMETER_ARTIFACT_VALIDATION_PROVEN",
+  "owner": "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-parameter-artifact-validator-v1.ts",
+  "parameterReferences": {
+    "topK": "param:top-k",
+    "tokenBudget": "param:token-budget"
+  },
+  "bounds": {
+    "topK": "integer 1..100",
+    "tokenBudget": "positive integer; downstream context owner applies model-specific ceiling"
+  },
+  "tests": {
+    "command": "npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/policy/oak-dag-parameter-artifact-validator-v1.spec.ts src/lib/server/atlas/policy/oak-dag-execution-adapter-v1.spec.ts",
+    "testFiles": 2,
+    "testsPassed": 5,
+    "testsFailed": 0
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "execution": "validation-only",
+  "nextGate": "DAG-03_REVISION_BINDING_AND_LIVE_LINEAGE"
+}

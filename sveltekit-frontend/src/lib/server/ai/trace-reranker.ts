@@ -3,6 +3,7 @@ import { db } from '$lib/server/db/client.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { getActiveSemanticVectorLane } from '$lib/server/vector/lane-registry.js';
 import { SEMANTIC_REPRESENTATION_ID, SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
+import { CANONICAL_SEMANTIC_REPRESENTATION_REVISION } from '$lib/server/embedding/semantic-lineage.js';
 import { executeTraceSemanticV1, type TraceSemanticCohortRowV1, type TraceSemanticHitV1 } from './trace-semantic-executor-v1.js';
 import { createAtlasRapidsSemantic768Client } from '$lib/server/atlas/retrieval/atlas-rapids-semantic768-client.js';
 
@@ -42,6 +43,8 @@ export async function traceRerank(params: {
 	intentOverride?: string[];
 	/** Explicit admitted revision required before a cuVS fallback may run. */
 	admittedWorkspaceRevision?: string;
+	/** Explicit semantic representation revision forwarded to every executor. */
+	semanticRepresentationRevision?: string;
 }): Promise<TraceRerankResult[]> {
 	const qdrant = getQdrantManager();
 	const limit = params.limit ?? 10;
@@ -52,6 +55,7 @@ export async function traceRerank(params: {
 	// 2. Retrieve Chunks (Codebase level)
 	const chunkExecution = await executeTraceSemanticV1({
 		admittedWorkspaceRevision: params.admittedWorkspaceRevision ?? '',
+		semanticRepresentationRevision: params.semanticRepresentationRevision ?? String(CANONICAL_SEMANTIC_REPRESENTATION_REVISION),
 		queryVector: params.queryEmbedding,
 		topK: limit * 3,
 		qdrantSearch: async () => {

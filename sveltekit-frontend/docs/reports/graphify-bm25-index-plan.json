@@ -2,10 +2,26 @@
   "schemaVersion": "atlas.graphify-bm25-index-plan.v1",
   "readOnly": true,
   "canonicalWriteAttempted": false,
-  "generatedAt": "2026-09-15T19:28:29.343Z",
+  "generatedAt": "2026-09-18T16:20:11.893Z",
   "limit": 10,
   "status": "BM25_INDEX_PLAN_READY",
   "candidates": [
+    {
+      "graphifyRunId": "01a8d8fc-2507-4f39-868e-039039237b98",
+      "workflowId": "graphify-default",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "sourceManifestDigest": "841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+      "sourceManifestSourceCount": 25542,
+      "repositoryRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+      "parameters": {
+        "bridge": "GRAPHIFY-SNAPSHOT-NATIVE-RUN-BRIDGE-01",
+        "writerRevision": "atlas.graphify-run-open.v1",
+        "sourceExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      },
+      "graphifyCompletedAt": "2026-09-15T22:05:02.995Z",
+      "idempotencyKey": "graphify-default:postgres_tsvector_english:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
+    },
     {
       "graphifyRunId": "e9b9c13d-8acb-4e9f-801f-58a78a5f5441",
       "workflowId": "graphify-default",
@@ -157,21 +173,6 @@
       },
       "graphifyCompletedAt": "2026-09-03T20:32:47.150Z",
       "idempotencyKey": "graphify-default:postgres_tsvector_english:46e4830a6f5c510c02b7dd0b7a1d8ea2c97916f0b7dcf8c6d2b62d0fb800ca8e",
-      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
-    },
-    {
-      "graphifyRunId": "862b952b-7623-434e-818e-407c1531abaf",
-      "workflowId": "graphify-default",
-      "workspaceRevision": "sha256:b55e7e34618f693e459cb226607dba2df700c44d7ba3185e40417ddaaa78461e",
-      "sourceManifestDigest": "b55e7e34618f693e459cb226607dba2df700c44d7ba3185e40417ddaaa78461e",
-      "sourceManifestSourceCount": 25301,
-      "repositoryRevision": "85e6f3d509856c75d77e175fc823623c2cd4e18c",
-      "parameters": {
-        "wrapper": "scripts/startup/run-graphify-daily-startup.mjs",
-        "writerRevision": "atlas.graphify-run-open.v1"
-      },
-      "graphifyCompletedAt": "2026-09-03T04:54:16.296Z",
-      "idempotencyKey": "graphify-default:postgres_tsvector_english:b55e7e34618f693e459cb226607dba2df700c44d7ba3185e40417ddaaa78461e",
       "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
     }
   ],

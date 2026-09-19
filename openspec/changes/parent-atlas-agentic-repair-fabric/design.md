@@ -22,7 +22,8 @@ rank, GEPA prompt candidate, or LLM tool suggestion — may become canonical pac
 
 **Non-Goals (this pass):**
 - No DAG runtime, no ParameterResolver, no CandidateFeatureMatrix wiring, no Tang challenger, no
-  DSPy/GEPA harness, no bitencoded capability mask, no Go Retrieval adapter, no repair-loop fixture.
+  Go Retrieval adapter, no repair-loop fixture. AR-05 and AR-11/12 are pure derived/offline
+  contracts and proofs only; they are not runtime DAGs, online learning, or authority owners.
   All of these remain real, scoped, pending tasks — this design explicitly does not claim they
   exist.
 - No new ontology service (reuses OAK `:8095` + the existing TS resolver), no new retrieval-fusion

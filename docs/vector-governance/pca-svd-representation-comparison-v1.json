@@ -1,91 +1,91 @@
 {
   "schema": "atlas.pca-svd-representation-baseline.v1",
-  "generatedAt": "2026-09-12T22:19:32.331842+00:00",
+  "generatedAt": "2026-09-19T01:40:10.717649+00:00",
   "mode": "READ_ONLY_EVALUATION",
   "readOnlyInvariants": {
     "writesPerformed": false,
     "postgresModified": false,
     "qdrantModified": false
   },
-  "sampleSize": 1703,
+  "sampleSize": 20,
   "referenceDimensions": 768,
   "svdImplementation": "sklearn.decomposition.TruncatedSVD",
   "comparison": {
     "schema": "atlas.representation-comparison-receipt.v1",
     "reference_dimensions": 768,
-    "row_count": 1703,
-    "k": 10,
-    "reference_checksum": "584140101982de53f80dcf6e8a792893e9d65b5c605496c5085911189705d294",
+    "row_count": 20,
+    "k": 5,
+    "reference_checksum": "68121e86ddefcf854cde79b6f9bd91ee88977babb1ebe0bd3c7b48ee1c663cfd",
     "representations": [
       {
         "name": "pca_svd_512",
-        "dimensions": 512,
-        "mean_neighbor_overlap_at_k": 0.9864944216089254,
-        "mean_distance_correlation": 0.9999177013654909,
-        "latent_checksum": "963bc3166ff8c02e89887a4bcdb69d119db5c450c29c7b898b4743461e97de63"
+        "dimensions": 20,
+        "mean_neighbor_overlap_at_k": 1.0,
+        "mean_distance_correlation": 0.9999999999983273,
+        "latent_checksum": "5f4692fff36fa841974ae0fd089b3c778035533f4a88844b74ba5eebe32334db"
       },
       {
         "name": "pca_svd_256",
-        "dimensions": 256,
-        "mean_neighbor_overlap_at_k": 0.9155020551967118,
-        "mean_distance_correlation": 0.9930828793516264,
-        "latent_checksum": "69a66c47463316d42a1bf78760edb76beb4a5f0647dff753e302d0a35cf8dc8d"
+        "dimensions": 20,
+        "mean_neighbor_overlap_at_k": 1.0,
+        "mean_distance_correlation": 0.9999999999983228,
+        "latent_checksum": "47edda156db5449d753e56d0e9476eed1543f4550ed473bd824b5b6b64597c96"
+      },
+      {
+        "name": "pca_svd_64",
+        "dimensions": 20,
+        "mean_neighbor_overlap_at_k": 1.0,
+        "mean_distance_correlation": 0.9999999999982249,
+        "latent_checksum": "50b88622e41e1b2976e710f91548087fd362a085004f4abad947dc1bf37b1caf"
+      },
+      {
+        "name": "pca_svd_128",
+        "dimensions": 20,
+        "mean_neighbor_overlap_at_k": 1.0,
+        "mean_distance_correlation": 0.9999999999972914,
+        "latent_checksum": "45b24f6565447830a518376b6bc933b152794daab44c32e39380e3ef4432df27"
       },
       {
         "name": "mrl_512",
         "dimensions": 512,
-        "mean_neighbor_overlap_at_k": 0.8653552554315914,
-        "mean_distance_correlation": 0.972583807892193,
-        "latent_checksum": "734dab0f9e41ea69f3b8969b58eeab655cada366096c126cc9bc6e20f5edf37e"
-      },
-      {
-        "name": "autoencoder_latent_256",
-        "dimensions": 256,
-        "mean_neighbor_overlap_at_k": 0.8363476218438052,
-        "mean_distance_correlation": 0.9662135275381757,
-        "latent_checksum": "33d4f2327eb1b6ec8c99d25fc4f1dfcd9d2cbe8591e469e6858746393cd406ff"
-      },
-      {
-        "name": "pca_svd_128",
-        "dimensions": 128,
-        "mean_neighbor_overlap_at_k": 0.8007046388725779,
-        "mean_distance_correlation": 0.9503711062053853,
-        "latent_checksum": "2e4025f303412493b187204349df71c657103995b4eb459f2cbcb9152d7b103d"
-      },
-      {
-        "name": "autoencoder_latent_128",
-        "dimensions": 128,
-        "mean_neighbor_overlap_at_k": 0.7978273634762186,
-        "mean_distance_correlation": 0.9451321129668626,
-        "latent_checksum": "76a09f1804dc121c466b0b14909ab08eadba81d06042b45e9bd5af110f4e2d0a"
+        "mean_neighbor_overlap_at_k": 0.9,
+        "mean_distance_correlation": 0.9782319679533433,
+        "latent_checksum": "d14d0864706921a4bd4a689d19d74655f1a9c51f988a6c97a20ba2cde088acf2"
       },
       {
         "name": "mrl_256",
         "dimensions": 256,
-        "mean_neighbor_overlap_at_k": 0.7611274221961245,
-        "mean_distance_correlation": 0.9190446696172807,
-        "latent_checksum": "fa1900c3157f0695d62fd9d67b3724221400f32fb6658a13c154cef243bc252c"
+        "mean_neighbor_overlap_at_k": 0.86,
+        "mean_distance_correlation": 0.9266313422045988,
+        "latent_checksum": "d3d89085374783b524238080e869d4d45b4cc6977447e5da426197da199ac472"
+      },
+      {
+        "name": "autoencoder_latent_256",
+        "dimensions": 256,
+        "mean_neighbor_overlap_at_k": 0.8400000000000001,
+        "mean_distance_correlation": 0.9679083928317684,
+        "latent_checksum": "f68a2f868973a1f23f33414eb3fa7c9bf8327b3ff253b00745cdc06e3e34baa3"
+      },
+      {
+        "name": "autoencoder_latent_128",
+        "dimensions": 128,
+        "mean_neighbor_overlap_at_k": 0.8300000000000001,
+        "mean_distance_correlation": 0.9431045776210562,
+        "latent_checksum": "71f59508bf8323b6376169ce27c6ee44dd7a8f718ec5faffd6db43d781d7d65e"
       },
       {
         "name": "autoencoder_latent_64",
         "dimensions": 64,
-        "mean_neighbor_overlap_at_k": 0.7357604227833235,
-        "mean_distance_correlation": 0.9229619626657152,
-        "latent_checksum": "39c2a7acbf6f6e1637d014a1049f8bd422570561b2d3f469a1c26c5e3ba7d554"
-      },
-      {
-        "name": "pca_svd_64",
-        "dimensions": 64,
-        "mean_neighbor_overlap_at_k": 0.6874926600117441,
-        "mean_distance_correlation": 0.8723457234133015,
-        "latent_checksum": "3faf9b1b2cd65d4e25b53fa3855676717e27c38d753b04cac28bbdbf335a823d"
+        "mean_neighbor_overlap_at_k": 0.8200000000000001,
+        "mean_distance_correlation": 0.9304588899686435,
+        "latent_checksum": "2c9d8dcedfdb8ef9a7a898743ef2d52057876e3acd1320ce8894311d437ab53c"
       },
       {
         "name": "mrl_128",
         "dimensions": 128,
-        "mean_neighbor_overlap_at_k": 0.6475631238990018,
-        "mean_distance_correlation": 0.8281860493752704,
-        "latent_checksum": "f3fabb41b16da03998f1764d27ab22d2771ac001ac7f493cfa78212e11a36739"
+        "mean_neighbor_overlap_at_k": 0.74,
+        "mean_distance_correlation": 0.8403462636059086,
+        "latent_checksum": "c00be76f200bc0f22cde6c75d594a334fc32a18ae4329c47e14f8ae6328ea382"
       }
     ],
     "recommended_representation": "pca_svd_512",

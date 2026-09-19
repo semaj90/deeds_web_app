@@ -39,6 +39,12 @@ service RetrievalService {
   // Unary: AST neighbor expansion
   rpc ExpandAstNeighbors(AstExpansionRequest) returns (AstExpansionResponse);
 
+  // Unary: revision-qualified semantic AST packet retrieval (read-only)
+  rpc GetSemanticAstPackets(SemanticAstPacketRequest) returns (SemanticAstPacketResponse);
+
+  // Unary: canonical packet and projection registry lookup (read-only)
+  rpc GetPacketRegistry(PacketRegistryRequest) returns (PacketRegistryResponse);
+
   // Unary: SOM/Topology neighborhood expansion
   rpc GetTopologyContext(TopologyRequest) returns (TopologyResponse);
 
@@ -67,6 +73,7 @@ message EvidenceSearchRequest {
   repeated float query_embedding = 8 [packed = true];
 
   bool include_debug = 9;
+  yorha.shared.AtlasRequestContextV2 atlas_context = 11;
 }
 
 message EvidenceSearchResponse {
@@ -75,6 +82,7 @@ message EvidenceSearchResponse {
   SearchTiming timing = 3;
   string cache_source = 4;            // "memory", "redis", or ""
   string debug_json = 5;
+  yorha.shared.AtlasToolReceiptV2 receipt = 6;
 }
 
 message EvidenceBundleEvent {
@@ -180,6 +188,7 @@ message CodebaseSearchRequest {
   // LATENT256-QUERY-ENCODER-01) returns an explicit error/fallback signal in
   // CodebaseSearchResponse rather than silently substituting semantic_768.
   string representation_id = 10;
+  yorha.shared.AtlasRequestContextV2 atlas_context = 11;
 }
 
 message CodebaseSearchResponse {
@@ -193,6 +202,7 @@ message CodebaseSearchResponse {
   // query-side encoder is not live). representation_used then names the fallback actually
   // served -- never silent.
   string representation_fallback_reason = 5;
+  yorha.shared.AtlasToolReceiptV2 receipt = 6;
 }
 
 message CodebaseChunkEvent {
@@ -375,6 +385,81 @@ message AstEdge {
   string source_id = 1;
   string target_id = 2;
   string edge_type = 3;             // "calls", "imports", "extends"
+}
+
+message SemanticAstPacketRequest {
+  yorha.shared.AtlasRequestContextV2 atlas_context = 1;
+  string source_ref = 2;
+  string packet_key = 3;
+  int32 limit = 4;
+}
+
+message SemanticAstPacketResponse {
+  repeated SemanticAstPacket packets = 1;
+  yorha.shared.AtlasToolReceiptV2 receipt = 2;
+}
+
+message SemanticAstPacket {
+  string workspace_id = 1;
+  string workspace_revision = 2;
+  string packet_key = 3;
+  string packet_revision = 4;
+  string source_ref = 5;
+  string source_revision = 6;
+  string content_hash = 7;
+  string chunk_id = 8;
+  string tree_node_id = 9;
+  string node_kind = 10;
+  string qualified_symbol = 11;
+  string parent_tree_node_id = 12;
+  int64 byte_start = 13;
+  int64 byte_end = 14;
+  string parser_name = 15;
+  string parser_revision = 16;
+  string grammar_revision = 17;
+  string ast_content_hash = 18;
+}
+
+message PacketRegistryRequest {
+  yorha.shared.AtlasRequestContextV2 atlas_context = 1;
+  string source_ref = 2;
+  string packet_key = 3;
+  int32 limit = 4;
+}
+
+message PacketRegistryResponse {
+  repeated PacketRegistryEntry entries = 1;
+  yorha.shared.AtlasToolReceiptV2 receipt = 2;
+}
+
+message PacketRegistryEntry {
+  string schema = 1;
+  string workspace_id = 2;
+  string workspace_revision = 3;
+  string packet_key = 4;
+  string packet_revision = 5;
+  string source_ref = 6;
+  string source_revision = 7;
+  string content_hash = 8;
+  repeated PacketRegistryLane lanes = 9;
+  string registry_revision = 10;
+}
+
+message PacketRegistryLane {
+  string lane_id = 1;
+  string kind = 2;
+  string owner = 3;
+  string status = 4;
+  string representation_id = 5;
+  string representation_revision = 6;
+  string model_revision = 7;
+  string collection = 8;
+  string vector_name = 9;
+  repeated string tags = 10;
+  string index_algorithm = 11;
+  string index_revision = 12;
+  string projection_checksum = 13;
+  string write_policy = 14;
 }
 
 message TopologyRequest {

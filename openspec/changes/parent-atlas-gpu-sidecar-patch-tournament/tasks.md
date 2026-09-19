@@ -124,6 +124,16 @@ Remaining before this is a *complete* record (not blocking, just not yet done):
   unresolved (GS1.45–1.47). Keep using synthetic revision-qualified fixtures until that's
   fixed.
 
+**Runtime split recheck (read-only, 2026-09-19):** the WSL2 Conda environment
+`atlas-rapids-cu13` is the proven PyTorch/cuVS/cuGraph lane (`torch 2.13.0+cu130`,
+CUDA 13.0, RTX 3060 Ti SM86, cuVS/cuGraph 26.06); `cuda.tile` and
+TensorRT-RTX are not installed there. The separately running Docker
+`atlas-gpu-8098` image is intentionally RAPIDS-only and has no PyTorch, so its
+PyTorch exact-scan route is unavailable even though CUDA/cuVS/cuGraph are
+available. Its Docker healthcheck was corrected to validate cupy/CUDA plus the
+RAPIDS libraries it actually owns. The two environments must not be conflated,
+and no package installation, rebuild, or runtime mutation was performed here.
+
 **Index-type decision (recorded 2026-08-03, still in force — the CAGRA endpoint above does
 not override this until an operator explicitly says so)**: `brute_force` only, as an exact
 correctness oracle — never CAGRA (explicitly excluded, "do not promote CAGRA") or

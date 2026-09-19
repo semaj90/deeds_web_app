@@ -30,6 +30,14 @@ export const ATLAS_PASS_CHECKPOINT_STOP_REASONS = [
 ] as const;
 export type AtlasPassCheckpointStopReason = (typeof ATLAS_PASS_CHECKPOINT_STOP_REASONS)[number];
 
+export const ATLAS_PASS_CHECKPOINT_BOUNDARIES = [
+  'PASS_START',
+  'SAFE_RESUME',
+  'PHASE_COMPLETE',
+  'PASS_COMPLETE',
+] as const;
+export type AtlasPassCheckpointBoundary = (typeof ATLAS_PASS_CHECKPOINT_BOUNDARIES)[number];
+
 export const AtlasPassConvergenceMetricSchema = z
   .object({
     previous: z.number(),
@@ -46,6 +54,7 @@ export const AtlasPassCheckpointV1Schema = z
     algorithmRevision: z.string().min(1),
     inputSnapshotChecksum: z.string().min(1),
     seed: z.number().int().optional(),
+    boundary: z.enum(ATLAS_PASS_CHECKPOINT_BOUNDARIES),
     iteration: z.number().int().nonnegative(),
     maxIterations: z.number().int().positive(),
     convergenceMetric: AtlasPassConvergenceMetricSchema.optional(),
@@ -75,6 +84,7 @@ export function createAtlasPassCheckpointV1(input: {
   algorithmRevision: string;
   inputSnapshotChecksum: string;
   seed?: number;
+  boundary: AtlasPassCheckpointBoundary;
   iteration: number;
   maxIterations: number;
   convergenceMetric?: AtlasPassConvergenceMetric;
@@ -89,6 +99,7 @@ export function createAtlasPassCheckpointV1(input: {
     algorithmRevision: input.algorithmRevision,
     inputSnapshotChecksum: input.inputSnapshotChecksum,
     seed: input.seed,
+    boundary: input.boundary,
     iteration: input.iteration,
     maxIterations: input.maxIterations,
     convergenceMetric: input.convergenceMetric,

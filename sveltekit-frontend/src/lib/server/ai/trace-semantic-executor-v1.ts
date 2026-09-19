@@ -32,12 +32,13 @@ export type TraceSemanticExecutionResultV1 = {
 
 export type TraceSemanticExecutorInputV1 = {
   admittedWorkspaceRevision: string;
+  semanticRepresentationRevision: string;
   queryVector: number[];
   topK: number;
   qdrantSearch: () => Promise<TraceSemanticHitV1[]>;
   loadCohort: (workspaceRevision: string) => Promise<TraceSemanticCohortRowV1[]>;
   cuvsExact: (input: {
-    query: { vector: number[]; representationId: 'semantic_768' };
+    query: { vector: number[]; representationId: 'semantic_768'; representationRevision: string };
     corpus: Array<{
       packetKey: string;
       sourceRevision: string;
@@ -123,7 +124,11 @@ export async function executeTraceSemanticV1(
     if (validationError) return blocked(`CUVS_FALLBACK_${validationError}`);
 
     const receipt = await input.cuvsExact({
-      query: { vector: input.queryVector, representationId: 'semantic_768' },
+      query: {
+        vector: input.queryVector,
+        representationId: 'semantic_768',
+        representationRevision: input.semanticRepresentationRevision,
+      },
       corpus: cohort.map((row) => ({
         packetKey: row.packetKey,
         sourceRevision: row.sourceRevision,

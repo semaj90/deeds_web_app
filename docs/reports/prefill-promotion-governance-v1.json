@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.prefill-promotion-governance.v1",
+  "status": "GOVERNANCE_RULES_PROVEN_PROMOTION_BLOCKED",
+  "proofScope": "GOVERNANCE_CONTRACT_ONLY",
+  "maturityModel": [
+    "WRITTEN",
+    "WIRED",
+    "PROVEN",
+    "PROMOTED"
+  ],
+  "semantics": {
+    "writtenMeansArtifactOrCodeExistsOnly": true,
+    "wiredRequiresRuntimeCallPath": true,
+    "provenRequiresReplayAndReceipt": true,
+    "promotedRequiresExplicitDecision": true
+  },
+  "currentState": {
+    "written": true,
+    "wired": false,
+    "proven": false,
+    "promoted": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false,
+    "lineageStatus": "UNAVAILABLE",
+    "lineageRequiredForPromotion": true
+  },
+  "safety": {
+    "executorPromotionBlockedUntilLineage": true,
+    "canonicalVectorCacheDatabaseWritesBlocked": true,
+    "deterministicCpuReferenceFallbackRequired": true,
+    "rollback": "Disable challenger and retain receipts/history; do not delete evidence."
+  },
+  "evidence": [
+    "sveltekit-frontend/src/lib/server/atlas/prefill/prefill-contracts-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
+    "sveltekit-frontend/src/lib/server/atlas/orchestration/atlas-execution-pipeline-v1.ts",
+    "docs/reports/current-lineage-closure-v1.json",
+    "docs/reports/prefill-dag-fixture-v1.json",
+    "docs/reports/gpu-executor-capability-v1.json"
+  ],
+  "missingEvidence": [],
+  "evidenceChecksum": "sha256:fc0ce65708a483f49ef8509e9c0d4caaf9285ba53cf2296408363f8d3da76447",
+  "nextGate": "CURRENT_SOURCE_AUTHORITY_AND_LIVE_EXECUTOR_READBACK"
+}

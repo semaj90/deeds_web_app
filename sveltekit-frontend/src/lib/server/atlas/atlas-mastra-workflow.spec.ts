@@ -55,19 +55,23 @@ describe('Atlas packet verification boundary', () => {
         schema: 'atlas.runtime-tool-receipt.v1',
         receiptId: 'receipt-1',
         receiptChecksum: 'sha256:' + 'a'.repeat(64),
-        tool: 'atlas.discover',
+        toolCallId: 'tool-call-1',
+        toolName: 'atlas.discover',
+        runId: 'different-run',
+        workspaceId: 'workspace-1',
+        packetKey: 'packet-1',
         workspaceRevision: 'workspace-r1',
         packetRevision: 'packet-r1',
         succeeded: true,
+        errorCode: null,
         retrievalConfidence: 0.8,
         evidenceCount: 1,
         validationStatus: 'PASS',
-        authFailure: false,
-        revisionMismatch: false,
+        outputChecksum: null,
         writesPerformed: false,
         canonicalAuthority: false,
       },
-    })).rejects.toThrow('RUNTIME_RECEIPT_REVISION_MISMATCH');
+    })).rejects.toThrow('ATLAS_TOOL_RECEIPT_IDENTITY_MISMATCH');
   });
 
   it('does not treat a backend payload as evidence without an explicit receipt', () => {

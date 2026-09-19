@@ -829,3 +829,6 @@ applied by the coordinating session afterward, not by the fork itself).
 - [ ] A subsequent read-only status poll reports Docker Desktop `Status=starting`
       with session `9241213b-434c-4270-a8e4-ee656c56374f`; the engine is not yet
       terminally failed, but live store verification must wait for `running`.
+
+## Run Receipts
+- wf-mcp-bitfrost-ace-optimization-fork-20260905/MCP_BITFROST_ACE_OPTIMIZATION_FORK#1: MCP/BitFrost/ACE synthesis optimization fork (state=succeeded)

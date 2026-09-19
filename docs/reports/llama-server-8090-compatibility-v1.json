@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.llama-server-8090-compatibility.v1",
+  "endpoint": "http://127.0.0.1:8090",
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok"
+    }
+  },
+  "model": {
+    "id": "ornith-1.5-9b",
+    "digest": "sha256:a9a8d6d859b540502f57c53ef78a4a608df818061b180022a32b9af46698d5c6",
+    "format": null,
+    "contextTrain": 262144
+  },
+  "props": {
+    "modelAlias": "ornith-1.5-9b",
+    "modelPath": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\ornith-1_5-9b-ad-q5_k-q4_k\\hforf.gguf",
+    "contextLength": 65536,
+    "totalSlots": 1,
+    "buildInfo": "b8757-a29e4c0b7"
+  },
+  "legacyHealth8080": {
+    "status": 400,
+    "error": null
+  },
+  "modelChecksumStatus": "PRESENT_LOCAL_MODEL_HASH",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

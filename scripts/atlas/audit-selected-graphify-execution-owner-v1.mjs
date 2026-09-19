@@ -9,7 +9,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { REPO_ROOT } from './connection-config.mjs';
+import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
 const root = REPO_ROOT;
 const planPath = path.join(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
@@ -29,10 +30,31 @@ const candidate = Array.isArray(plan.candidates)
 const equivalent = plan.status === 'DUPLICATE_EQUIVALENT_EXECUTIONS'
   && plan.equivalence?.allEquivalent === true
   && candidate?.sourceMembershipExact === true;
+let liveOwner = null;
+if (equivalent) {
+  const pool = new pg.Pool({
+    connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)),
+    max: 1,
+    statement_timeout: 10_000,
+    application_name: 'audit-selected-graphify-execution-owner-v1',
+  });
+  try {
+    const result = await pool.query(
+      `select execution_id::text, canonical_authority, workspace_revision::text
+         from public.graphify_executions
+        where execution_id = $1::uuid`,
+      [executionId],
+    );
+    liveOwner = result.rows[0] ?? null;
+  } finally {
+    await pool.end();
+  }
+}
+const appliedAndReadBack = equivalent && liveOwner?.canonical_authority === true;
 const report = {
   schema: 'atlas.selected-graphify-execution-owner.v1',
   gate: 'GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02',
-  mode: 'READ_ONLY_OWNER_DECISION_PREFLIGHT',
+  mode: 'READ_ONLY_OWNER_DECISION_AUDIT',
   selectedExecutionId: executionId,
   sourcePlan: path.relative(root, planPath).replaceAll('\\', '/'),
   ownerPlanChecksum,
@@ -44,16 +66,17 @@ const report = {
     sourceMembershipExact: candidate.sourceMembershipExact,
     signature: candidate.signature ?? null,
   } : null,
-  status: equivalent ? 'OWNER_SELECTION_VALIDATED_NOT_APPLIED' : 'OWNER_SELECTION_REJECTED',
+  liveOwner,
+  status: appliedAndReadBack ? 'OWNER_SELECTION_APPLIED_READBACK_VERIFIED' : equivalent ? 'OWNER_SELECTION_VALIDATED_NOT_APPLIED' : 'OWNER_SELECTION_REJECTED',
   rejectionReason: equivalent ? null : !candidate ? 'EXECUTION_NOT_IN_PROVEN_PLAN' : 'EXECUTION_NOT_PROVEN_EQUIVALENT',
-  requiresExplicitAuthorityDecision: true,
-  canonicalAuthority: false,
+  requiresExplicitAuthorityDecision: !appliedAndReadBack,
+  canonicalAuthority: appliedAndReadBack,
   safeToApply: false,
   writesPerformed: false,
   decisionChecksum: `sha256:${crypto.createHash('sha256').update(JSON.stringify({
     executionId, equivalent, ownerPlanChecksum, planStatus: plan.status, planEquivalence: plan.equivalence,
   }), 'utf8').digest('hex')}`,
-  nextGate: equivalent ? 'EXPLICIT_AUTHORITY_DECISION_AND_OWNER_READBACK' : 'GRAPHIFY_EXECUTION_OWNER_RESOLUTION',
+  nextGate: appliedAndReadBack ? 'CURRENT_SOURCE_COHORT_RECONCILIATION' : equivalent ? 'EXPLICIT_AUTHORITY_DECISION_AND_OWNER_READBACK' : 'GRAPHIFY_EXECUTION_OWNER_RESOLUTION',
   reportPath: path.relative(root, reportPath).replaceAll('\\', '/'),
 };
 await fs.mkdir(path.dirname(reportPath), { recursive: true });

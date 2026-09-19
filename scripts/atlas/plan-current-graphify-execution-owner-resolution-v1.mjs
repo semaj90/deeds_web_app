@@ -187,7 +187,10 @@ const report = {
         candidateExecutionIds: ordered.map((candidate) => candidate.execution_id),
         preferredExecutionId: existingCanonicalOwner,
         policy: 'NO_IMPLICIT_TIMESTAMP_OR_ID_SELECTION',
-        requiresExplicitAuthorityDecision: !existingCanonicalOwner,
+        // A database flag is an observed candidate attribute, not an applied
+        // owner decision. Duplicate equivalent executions remain gated until
+        // the explicit owner-decision/apply protocol has completed.
+        requiresExplicitAuthorityDecision: true,
       }
     : null,
   status: readError
@@ -200,13 +203,13 @@ const report = {
         ? 'NO_TERMINAL_EXECUTION_FOR_ADMITTED_REVISION'
         : 'EXECUTION_EVIDENCE_NOT_EQUIVALENT',
   safeToApply: false,
-  canonicalAuthority: Boolean(existingCanonicalOwner),
+  // This is a planning receipt. Never promote authority from an observed
+  // canonical_authority flag while the apply gate is still closed.
+  canonicalAuthority: false,
   writesPerformed: false,
   nextGate: readError
     ? 'RETRY_READ_ONLY_GRAPHIFY_EXECUTION_OWNER_AUDIT'
-    : existingCanonicalOwner
-      ? 'CURRENT_SOURCE_PACKET_CHUNK_LINEAGE'
-      : equivalent ? 'EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION' : 'CURRENT_GRAPHIFY_EXECUTION_RECONCILIATION',
+    : equivalent ? 'EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION' : 'CURRENT_GRAPHIFY_EXECUTION_RECONCILIATION',
 };
 await fs.mkdir(path.dirname(reportPath), { recursive: true });
 const tempPath = `${reportPath}.${process.pid}.tmp`;

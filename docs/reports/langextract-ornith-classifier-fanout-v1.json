@@ -1,6 +1,6 @@
 {
   "schema": "atlas.langextract-ornith-classifier-fanout.v1",
-  "generatedAt": "2026-09-10T20:31:01.981Z",
+  "generatedAt": "2026-09-19T05:37:39.971Z",
   "mode": "READ_ONLY",
   "status": "BOUNDARY_REACHABLE_LINEAGE_BLOCKED",
   "proofLevel": "PARTIAL_PROVEN",
@@ -45,9 +45,9 @@
       "schema": "atlas.oak.health.v1",
       "available": true,
       "oaklibVersion": "0.7.4",
-      "adapterConfigured": false,
-      "adapterType": null,
-      "adapterFingerprint": null,
+      "adapterConfigured": true,
+      "adapterType": "atlas-postgres",
+      "adapterFingerprint": "9dd48646ee21f7614fbb39afad4a87c9fdac7750b7651e8273be41b502dd58b6",
       "mode": "READ_ONLY_SHADOW",
       "canonicalAuthority": false,
       "paper": {

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.query-router-v2-readiness-audit.v1",
-  "generatedAt": "2026-08-22T08:40:16.836Z",
+  "generatedAt": "2026-09-19T01:29:21.537Z",
   "mode": "READ_ONLY_NO_TRAINING_NO_RETRIEVAL_WRITES",
   "status": "READY_FOR_FROZEN_CORPUS_EVAL",
   "contractsPresent": true,
@@ -10,7 +10,7 @@
     {
       "relativePath": "src/lib/server/atlas/classification/query-router-dataset-v2.ts",
       "exists": true,
-      "sha256": "8f41a16e5f1ea53593cc1fa0b598ee9c373f758d1127610e204735e13ee6a284"
+      "sha256": "2886fdc008dc2b465febb337ec5f0d653add934f3373b9601ecadfedc02aeaa9"
     },
     {
       "relativePath": "src/lib/server/atlas/classification/retrieval-router-tensor-manifest-v2.ts",
@@ -20,17 +20,17 @@
     {
       "relativePath": "src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
       "exists": true,
-      "sha256": "342d59d6dba62807adeea0028799f397080a538ecae434561ce5b41ab39e4c23"
+      "sha256": "d2ec103f60c5e5583f7d6eb2bc670dde9a9dc13f489d040d0dc463ec17943948"
     },
     {
       "relativePath": "src/lib/server/atlas/classification/query-router-v2-integration.spec.ts",
       "exists": true,
-      "sha256": "2984e0e1f4d09e7e946a422d891feb5774c654751b20cd8b8bd52dd266af68c9"
+      "sha256": "71118dd65ed6d8eb71247fbff76dfb03c32647a884542f4f1549f0d7efcd9dd4"
     },
     {
       "relativePath": "scripts/atlas/build-query-router-dataset-v2.mts",
       "exists": true,
-      "sha256": "90ed61e76db8ab5adf3be47bd9f1ea41ede8a1eb3112836026a71de4876c375b"
+      "sha256": "73ac92fee88930ec0ff1da16cea98811ec73235f27f136fab06923b4ffa7f457"
     },
     {
       "relativePath": "scripts/atlas/train-query-router-pytorch-v2.py",

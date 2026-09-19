@@ -1,10 +1,10 @@
 {
   "schema": "atlas.current-graphify-source-revision.v1",
-  "generatedAt": "2026-09-16T00:07:26.399Z",
+  "generatedAt": "2026-09-19T04:55:38.084Z",
   "mode": "READ_ONLY_SOURCE_BYTES_AUDIT",
-  "runId": null,
-  "runSelection": "EXPLICIT_RUN_ID_REQUIRED",
-  "databaseError": "EXPLICIT_GRAPHIFY_RUN_ID_REQUIRED",
+  "runId": "01a8d8fc-2507-4f39-868e-039039237b98",
+  "runSelection": "EXPLICIT_RUN_ID",
+  "databaseError": null,
   "writes": {
     "postgres": false,
     "qdrant": false,
@@ -16,5 +16,5 @@
   "counts": {},
   "sourceRevisionPresent": 0,
   "rows": [],
-  "status": "AUDIT_FAILED"
+  "status": "SOURCE_AUTHORITY_UNAVAILABLE"
 }

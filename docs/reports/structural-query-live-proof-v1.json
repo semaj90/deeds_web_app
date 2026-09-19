@@ -4,26 +4,24 @@
   "sidecar": {
     "url": "http://127.0.0.1:8095",
     "endpoint": "/ast/chunk",
-    "language": "javascript"
+    "language": "typescript"
   },
-  "sourceRef": "crates/atlas_packet_parser/wrapper.js",
-  "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
-  "sourceDigest": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
-  "query": "which function calls parse?",
-  "observationCount": 2,
-  "matchCount": 1,
+  "sourceRef": "docs/ai-os/atlas-retry-index.json",
+  "sourceRevision": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
+  "sourceDigest": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
+  "query": "which function calls CandidateOrdinal?",
+  "observationCount": 0,
+  "matchCount": 0,
   "candidateMap": {
     "rowCount": 15,
     "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297"
   },
   "identity": {
-    "resolvedCount": 1,
+    "resolvedCount": 0,
     "rejectedCount": 0,
-    "statuses": [
-      "RESOLVED_EXACT"
-    ]
+    "statuses": []
   },
-  "resultChecksum": "d9008b8e322a03aee7bf80d459aeaaf90f6b8b77e5208025381e5568b392f67c",
+  "resultChecksum": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
   "canonicalAuthority": false,
   "promotionEligible": false,
   "executable": false,
@@ -33,6 +31,6 @@
     "neo4j": false,
     "valkey": false
   },
-  "status": "STRUCTURAL_QUERY_IDENTITY_BRIDGE_PROVEN_BOUNDED",
-  "nextGate": "STRUCT-12_STRUCTURAL_RESULT_ENVELOPE"
+  "status": "STRUCTURAL_QUERY_IDENTITY_BRIDGE_BLOCKED",
+  "nextGate": "STRUCT-11_SOURCE_OR_REVISION_RECONCILIATION"
 }

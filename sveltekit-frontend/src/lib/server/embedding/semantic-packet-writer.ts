@@ -13,6 +13,7 @@ import {
 	semanticPacketWriteAdmissionV1Schema,
 	type SemanticPacketWriteAdmissionV1,
 } from './semantic-packet-write-admission-v1.js';
+import { derivePacketRevisionV1 } from '$lib/server/atlas/identity/packet-revision-v1.js';
 
 export interface PersistCanonicalSemanticPacketEmbeddingInput {
 	packetId?: string;
@@ -226,6 +227,13 @@ export async function persistAdmittedSemanticPacketEmbedding(
 	database: AtlasPacketWriter = db,
 ): Promise<PersistCanonicalSemanticPacketEmbeddingResult> {
 	const admission = semanticPacketWriteAdmissionV1Schema.parse(input.admission);
+	const packetRevision = derivePacketRevisionV1({
+		packetKey: admission.packetKey,
+		sourceRef: admission.sourceRef,
+		sourceRevision: admission.sourceRevision,
+		contentDigest: admission.contentDigest,
+		packetSchemaRevision: 'atlas-packet-schema-v1',
+	});
 	const metadata = {
 		...(input.metadata ?? {}),
 		canonical_packet_admission: {
@@ -233,6 +241,7 @@ export async function persistAdmittedSemanticPacketEmbedding(
 			workspaceRevision: admission.workspaceRevision,
 			bindingChecksum: admission.bindingChecksum,
 			authorityScope: admission.authorityScope,
+			packetRevision: packetRevision.packetRevision,
 		},
 	};
 

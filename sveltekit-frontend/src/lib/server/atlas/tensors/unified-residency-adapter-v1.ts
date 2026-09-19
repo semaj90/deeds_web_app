@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { assertGpuExecutionWithinBudgetV1 } from '$lib/server/atlas/gpu/gpu-residency-budget.js';
 
 export const UNIFIED_RESIDENCY_SCHEMA = 'atlas.unified-residency.v1' as const;
 export const GPU_CEILING_BYTES = 6_000_000_000;
@@ -143,7 +144,11 @@ export function transitionResidency(state: ResidencyState, next: ResidencyState)
 
 export function admitResidency(d: UnifiedResidencyDescriptor, availableBytes: number, reservedHeadroomBytes = DEFAULT_RESERVED_HEADROOM_BYTES): void {
   validateUnifiedDescriptor(d);
-  if (d.byteLength > Math.max(0, Math.min(GPU_CEILING_BYTES, availableBytes) - reservedHeadroomBytes)) throw new Error('GPU_RESIDENCY_BUDGET_EXCEEDED');
+  assertGpuExecutionWithinBudgetV1({
+    requestedBytes: d.byteLength,
+    availableBytes: Math.min(GPU_CEILING_BYTES, availableBytes),
+    activeReservedBytes: reservedHeadroomBytes,
+  });
 }
 
 export interface ResidencyAdapterEntry { descriptor: UnifiedResidencyDescriptor; lastUsedAt: number; leaseUntil?: number; }

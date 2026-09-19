@@ -103,7 +103,12 @@ try {
       observation.status = 'SOURCE_MEMBERSHIP_DIGEST_MISSING'; bump(observation.status); observations.push(observation); continue;
     }
     if (byteDigest !== expected || byteDigest !== row.membership_content_digest) {
-      observation.status = 'SOURCE_CONTENT_DIGEST_MISMATCH'; bump(observation.status); observations.push(observation); continue;
+      observation.status = 'ADMITTED_SNAPSHOT_BYTES_DIFFER_FROM_CURRENT_WORKTREE';
+      observation.expectedDigest = expected;
+      observation.membershipDigest = row.membership_content_digest;
+      observation.currentWorktreeDigest = byteDigest;
+      observation.promotionEligible = false;
+      bump(observation.status); observations.push(observation); continue;
     }
     observation.contentDigest = byteDigest;
 
@@ -226,7 +231,9 @@ try {
     executionId, workspaceRevision, limit, mode: apply ? 'CANARY_ROLLBACK' : 'READ_ONLY_PLAN',
     counts, observations, mutation, writesPerformed: false,
     promotion: 'BLOCKED_UNTIL_READBACK_AND_PACKET_CHUNK_LINEAGE_GATE' };
-  fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-  fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+const reportTempPath = `${reportPath}.${process.pid}.${Date.now()}.tmp`;
+fs.writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+fs.renameSync(reportTempPath, reportPath);
   console.log(JSON.stringify({ status: apply ? 'CANARY_ROLLBACK_READBACK_PROVEN' : 'PACKET_DIGEST_PRODUCER_PLAN_READY', counts, mutation, writesPerformed: false, reportPath: path.relative(REPO_ROOT, reportPath) }, null, 2));
 } finally { client.release(); await pool.end(); }

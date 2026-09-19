@@ -348,7 +348,44 @@ export async function runEmbedding(text: string): Promise<number[] | null> {
 		}
 		return Array.from(validateSemantic768OutputV1(data));
 	} catch (err) {
-		console.warn('[ONNX-Server] Local embedding failed; caller may use network fallback:', (err as Error).message);
+		console.warn('[ONNX-Server] Local embedding failed; trying Ollama fallback:', (err as Error).message);
+		return _tryOllamaFallback(text);
+	}
+}
+
+/**
+ * Bounded Ollama HTTP fallback — called only when the ONNX session (DirectML
+ * or CPU) fails completely. Uses the same embeddinggemma model Ollama manages.
+ * Returns null (never throws) so the /api/embed caller can continue its own cascade.
+ */
+async function _tryOllamaFallback(text: string): Promise<number[] | null> {
+	const ollamaBase = (process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434').replace(/\/+$/, '');
+	const model = process.env.DOMAIN_CLASSIFIER_EMBED_MODEL ?? 'embeddinggemma:latest';
+	try {
+		const res = await fetch(`${ollamaBase}/api/embeddings`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ model, prompt: text }),
+			signal: AbortSignal.timeout(15_000),
+		});
+		if (!res.ok) {
+			console.warn(`[ONNX-Server] Ollama fallback HTTP ${res.status} — giving up`);
+			return null;
+		}
+		const body = (await res.json()) as { embedding?: number[] };
+		const vec = body.embedding;
+		if (!Array.isArray(vec) || vec.length !== EMBEDDING_DIMENSIONS) {
+			console.warn(`[ONNX-Server] Ollama fallback returned wrong dims: ${vec?.length ?? 'none'}`);
+			return null;
+		}
+		if (vec.some((v) => !Number.isFinite(v))) {
+			console.warn('[ONNX-Server] Ollama fallback vector contains non-finite values');
+			return null;
+		}
+		console.info('[ONNX-Server] Ollama fallback succeeded');
+		return vec;
+	} catch (err) {
+		console.warn('[ONNX-Server] Ollama fallback also failed:', (err as Error).message);
 		return null;
 	}
 }

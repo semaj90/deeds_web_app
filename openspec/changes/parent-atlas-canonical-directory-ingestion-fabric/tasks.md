@@ -68,6 +68,8 @@ Graph revision owner audit (2026-09-04): `scripts/atlas/audit-graph-revision-own
 Dimension/owner recheck (2026-09-05): `scripts/atlas/audit-embedding-dimensions.mjs` initially reported five false 768 mismatches because unnamed Qdrant vector configurations were interpreted as named-vector maps. The audit was corrected to normalize `{size,distance}` configs and now passes: 132 Postgres vector columns, 45 Qdrant collections, zero dimension violations. This does not create a `symbol_768` lane; `semantic_768` remains the canonical dense representation and 384 references remain classified individually.
 - [ ] **DIR-INDEX-04E** Add lexical fixtures for exact path, heading, symbol, body, tag/concept, and typo/substring cases with canonical candidate identity readback.
 
+DIR-INDEX-04 current read-only recheck (2026-09-19): `scripts/atlas/audit-postgres-fts-rejection-reasons-v1.mjs` reports `263` `UNRESOLVED_BRIDGE`, `52` `MISSING_PACKET_SOURCE_REF`, `136` `HASH_SCOPE_MISMATCH`, `10` exact-bound, and `1` ambiguous bridge rows. `scripts/atlas/replay-postgres-fts-identity-v1.mjs` fails closed as `BLOCKED_NO_SOURCE_REVISION` with zero replay rows. The existing tsvector/GIN owner remains intact; DIR-INDEX-04E and FTS promotion remain open until canonical source-revision coverage exists. No database writes occurred.
+
 ## DIR-INDEX-05 — semantic_768 materialization
 
 - [ ] **DIR-INDEX-05A** Reuse the frozen canonical `semantic_768` contract and existing representation owner. `semantic_mrl_512/256/128` are explicit EmbeddingGemma-derived views; `latent_256/128/64` are explicit learned autoencoder views. Neither family may be inferred from raw vector length or promoted as canonical semantic identity. Retired `384` remains compatibility/audit-only.
@@ -152,6 +154,15 @@ Ownership guard: existing numeric/tensor artifact contracts overlap. No new `Gpu
 - [ ] **DIR-INDEX-14C** Keep raw CUDA IPC/VMM handles ephemeral; durable packets carry artifact/lease/execution-receipt references only.
 - [ ] **DIR-INDEX-14D** Replay one deterministic GEMM/vector-ranking fixture across the current approved environment and record whether toolkit/library/context changes alter the execution identity or numerical result.
 - [ ] **DIR-INDEX-14E** Keep cuVS brute force as the exact GPU oracle; run CAGRA/IVF-PQ against the same `CandidateOrdinalMapV1` with Recall@K/MRR/latency/VRAM receipts before promotion.
+
+GPU fixture capability recheck (read-only, 2026-09-19):
+`python/atlas_cuda_cutile_simt_gemm_probe_v1.py` now emits a structured
+`CUTILE_SIMT_UNAVAILABLE` receipt when the current Python environment cannot
+import `cuda.tile`, rather than aborting before report emission. The bounded
+256x256 FP16 GEMM parity proof therefore remains unproven; the receipt records
+`canonicalAuthority=false` and `writes=false`. No CUDA, RAPIDS, cuVS, model,
+or source-data changes were made. DIR-INDEX-14D remains open until an approved
+environment can run the cuTile-versus-PyTorch SIMT comparison.
 
 ## DIR-INDEX-15 — gRPC/A2A projection
 

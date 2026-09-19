@@ -278,3 +278,15 @@ export function jacobianJvpExecution(input: KnownExecutionContext & { representa
     transport: transport('LOCAL_CALL', null, 'NONE', 'NONE'), model: noModel, evidenceRefs: [], canonicalWrites: false, exactPromotionRequired: false,
   });
 }
+
+export function jacobianVjpExecution(input: KnownExecutionContext & { representationRevision: string; dimensions: number; implementationRevision: string }): AlgorithmExecutionManifestV1 {
+  return AlgorithmExecutionManifestV1Schema.parse({
+    ...base(input),
+    logicalLane: 'none',
+    representations: [{ representationId: 'projection-input', representationRevision: input.representationRevision, dimensions: input.dimensions, canonical: false, derivedFromRepresentationId: null }],
+    geometry: { kind: 'JACOBIAN_SENSITIVITY', role: 'DIAGNOSTIC', dimensions: input.dimensions, metric: 'NONE', relationshipDegree: null, notes: ['Directional VJP diagnostic; full Jacobian is not materialized by default.'] },
+    algorithm: { algorithmId: 'JACOBIAN_VJP', family: 'DERIVATIVE_DIAGNOSTIC', exactness: 'DIAGNOSTIC_ONLY', metric: 'NONE', topK: null, maxHops: null, parameterRevision: input.implementationRevision, parameterChecksumSha256: null },
+    backend: { backend: 'PYTORCH_EAGER', implementationId: 'parent_atlas_policy.geometry_diagnostics.directional_cotangent', implementationRevision: input.implementationRevision, libraryVersion: null, device: 'CPU', computeCapability: null, compiled: false, deterministicClaim: 'BEST_EFFORT' },
+    transport: transport('LOCAL_CALL', null, 'NONE', 'NONE'), model: noModel, evidenceRefs: [], canonicalWrites: false, exactPromotionRequired: false,
+  });
+}

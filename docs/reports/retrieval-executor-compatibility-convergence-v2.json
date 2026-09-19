@@ -1,0 +1,152 @@
+{
+  "schema": "atlas.retrieval-executor-compatibility-convergence.v2",
+  "status": "BOUNDED_READ_ONLY_TRANCHE_COMPLETE",
+  "change": "parent-atlas-retrieval-executor-compatibility-convergence",
+  "tasks": {
+    "completed": 38,
+    "open": 8,
+    "total": 46
+  },
+  "implemented": [
+    "analyze-this deterministic coordinator",
+    "worktree diagnostic provenance",
+    "ACE ContextManifest and PromptPlan adapter",
+    "revision-sensitive ACE/BitFrost cache identity",
+    "llama-server :8090 chat ownership",
+    "Ollama :11434 embedding-only boundary",
+    "Bifrost/Valkey generated-response caching disabled",
+    "Python runtime receipt",
+    "TurboVec runtime receipt",
+    "derived executor challenger-role receipt",
+    "centroid family readback receipt"
+  ],
+  "verification": {
+    "focusedVitest": { "files": 4, "tests": 12, "status": "PASSED" },
+    "openspecStrict": "PASSED",
+    "pythonCompile": "PASSED",
+    "receiptReview": { "reviewed": 72, "violations": 0 },
+    "llamaModelChecksum": "PRESENT_LOCAL_MODEL_HASH",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "requiredStatuses": {
+    "ACE_PACKET_CONTRACT": "PROVEN",
+    "MODEL_KV_PERSISTENCE": "NOT_USED",
+    "BITFROST_METADATA_CACHE": "PROVEN",
+    "WORKTREE_ANALYSIS": "DIAGNOSTIC_ONLY",
+    "POSTGRES_FTS": "BLOCKED_WITH_RECEIPT",
+    "PGVECTOR_EXACT": "ORACLE",
+    "HNSW_ACCELERATION": "CHALLENGER_UNTIL_PARITY",
+    "TURBOVEC": "INSTALLED_STATUS_PROVEN",
+    "PYTHON_FREE_THREADING": "EXPLICIT_RUNTIME_RECEIPT",
+    "LLAMA_CHAT_OWNER": ":8090",
+    "OLLAMA_EMBED_OWNER": ":11434",
+    "TENSORRT_RTX": "ISOLATED_CHALLENGER",
+    "CANONICAL_LIVE_LINEAGE": "BLOCKED_UNTIL_SOURCE_AUTHORITY"
+  },
+  "blockers": [
+    {
+      "status": "EXECUTION_SOURCE_AUTHORITY",
+      "owner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "workspaceSourceRows": 52,
+      "packetQualifiedRows": 0,
+      "packetChunkQualifiedRows": 4,
+      "astQualifiedRows": 48,
+      "spanQualifiedRows": 0,
+      "candidateOrdinalEligibleRows": 0,
+      "writesPerformed": false
+    },
+    {
+      "status": "POSTGRES_FTS_BLOCKED_NO_SOURCE_REVISION",
+      "reason": "live source-revision qualification is unavailable"
+    },
+    {
+      "status": "HNSW_CHALLENGER_UNTIL_FILTER_PARITY",
+      "reason": "bounded replay passed recall but did not prove revision-filtered parity"
+    },
+    {
+      "status": "TENSORRT_RTX_NOT_INSTALLED_OR_PROVEN",
+      "reason": "isolated challenger package and compatibility proof are unavailable"
+    }
+  ],
+  "lineagePreflight": {
+    "packetRevisionOwner": "DERIVATION_OWNER_PROVEN",
+    "writerAdoption": false,
+    "workspaceSourceRows": 52,
+    "packetQualifiedRows": 0,
+    "packetChunkQualifiedRows": 4,
+    "astQualifiedRows": 48,
+    "spanQualifiedRows": 0,
+    "candidateOrdinalEligibleRows": 0,
+    "writesPerformed": false,
+    "currentSourceCohortStatus": "WORKSPACE_REVISION_SOURCE_MISMATCH",
+    "currentWorkspaceMatches": 0,
+    "sourceRevisionQualified": 52,
+    "executionOwner": "LIFECYCLE_OWNER_UNPROVEN"
+  },
+  "executionOwnerPreflight": {
+    "status": "OWNER_SELECTION_APPLIED_READBACK_VERIFIED",
+    "selectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "equivalentCandidateCount": 2,
+    "canonicalAuthority": true,
+    "writesPerformed": false,
+    "nextGate": "CURRENT_SOURCE_COHORT_RECONCILIATION"
+  },
+  "executionOwnerDryRun": {
+    "mode": "APPLY",
+    "chosenExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "writesPerformed": true,
+    "readbackVerified": true
+  },
+  "packetDigestReconciliation": {
+    "status": "PACKET_DIGEST_BRIDGE_BLOCKED",
+    "bindingSources": 24456,
+    "packetRefMatches": 16554,
+    "canonicalContentDigestMatches": 0,
+    "legacyDigestOnlyMatches": 3230,
+    "missingPacketRows": 7902,
+    "packetContentDigestMissing": 16454,
+    "packetDigestMismatches": 20,
+    "writesPerformed": false,
+    "sampledMembershipRows": 128,
+    "sampleMissingPacketRows": 70,
+    "samplePacketContentDigestMissing": 58,
+    "nextGate": "PACKET-DIGEST-BRIDGE-AUTHORIZATION-AND-READBACK-01"
+  },
+  "packetDigestCanary": {
+    "status": "CANARY_ROLLBACK_READBACK_PROVEN",
+    "sampleLimit": 128,
+    "missingPacket": 113,
+    "legacyLineageFieldsMissing": 14,
+    "sourceContentDigestMismatch": 0,
+    "admittedSnapshotBytesDiffer": 1,
+    "attemptedUpdates": 14,
+    "readback": "PASS",
+    "rolledBack": true,
+    "writesPerformed": false,
+    "mismatchInvestigation": {
+      "sourceRef": "claude.md",
+      "boundDigest": "sha256:89fdc51cde5f811cfa06f95db195baf957acd77408b763270e5f34023cd6d23f",
+      "worktreeDigest": "sha256:1959e5fec24fd9d59566ecf07e3bee1c7c98cb79345dc211606d72f79cc26071",
+      "worktreeDirty": false,
+      "classification": "ADMITTED_SNAPSHOT_BYTES_DIFFER_FROM_CURRENT_WORKTREE"
+    }
+  },
+  "deferredMutations": [
+    "PostgreSQL DDL",
+    "packet backfill",
+    "Qdrant mutation",
+    "Valkey canonical promotion",
+    "Graphify refresh",
+    "CUDA/RAPIDS upgrade",
+    "model KV, recurrent state, or hidden-state persistence"
+  ],
+  "reportPaths": [
+    "docs/reports/retrieval-executor-compatibility-workboard-v1.json",
+    "docs/reports/analyze-this-adapters-v1.json",
+    "docs/reports/centroid-cache-families-v1.json",
+    "docs/reports/python-runtime-capability-v1.json",
+    "docs/reports/turbovec-runtime-v1.json",
+    "docs/reports/derived-executor-roles-v1.json"
+  ]
+}

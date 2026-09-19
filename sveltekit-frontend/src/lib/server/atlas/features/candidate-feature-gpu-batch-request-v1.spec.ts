@@ -26,7 +26,7 @@ function pack() {
   return {
     schema: 'atlas.candidate-feature-gpu-pack.v1' as const,
     candidateSnapshotRevision: 'candidate:r1', ordinalMapChecksum: H('ordinal-map'), featureSnapshotChecksum: H('feature-snapshot'),
-    workspaceRevision: 'workspace:r1', featureRevision: 'feature:r1', columnarChecksum: H('columnar'),
+    workspaceRevision: 'workspace:r1', featureRevision: 'feature:r1', sourceRevisions: ['source:a:r1', 'source:b:r1', 'source:c:r1'], columnarChecksum: H('columnar'),
     logicalRows: 3, physicalRows: R, paddingRows: R - 3, rowAlignment: 32, featureCount: F as 12,
     featureNames: ['semanticRelevance','lexicalRelevance','astAffinity','graphAuthority','personalizedPageRank','communityAffinity','manifold4OrientationSimilarity','crossEncoderRawScore','crossEncoderCalibratedScore','domainAffinity','executionUtility','memoryUtility'] as const,
     featureValues: Array(R * F).fill(0), featurePresence: Array(R * F).fill(0),

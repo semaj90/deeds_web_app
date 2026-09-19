@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.current-semantic-candidate-snapshot.v1",
+  "status": "BLOCKED_CURRENT_LINEAGE",
+  "firstFailureBoundary": "EXECUTION_SOURCE_AUTHORITY",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "candidateMapPath": "docs/reports/candidate-ordinal-corpus-v1.json",
+  "candidateMapWorkspaceRevision": "workspace-active-v1",
+  "candidateMapRowCount": 4951,
+  "candidateOrdinalEligibleRows": 0,
+  "snapshotPath": null,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "databaseWrites": false,
+  "qdrantWrites": false,
+  "nextGate": "CURRENT_PACKET_CHUNK_AST_LINEAGE_ADMISSION"
+}

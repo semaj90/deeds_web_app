@@ -5,7 +5,7 @@
  */
 
 import { Channel, ChannelCredentials, Metadata } from '@grpc/grpc-js';
-import { AtlasRuntimeContext, assertAtlasRuntimeRevisionQualified, type RuntimeToolReceiptV1 } from './atlas-runtime-context';
+import { AtlasRuntimeContext, assertAtlasRuntimeRevisionQualified, RuntimeToolReceiptV1Schema, type RuntimeToolReceiptV1 } from './atlas-runtime-context';
 import { pool } from '$lib/server/db/client.js';
 import { ENV } from '$lib/server/env.server.js';
 
@@ -217,6 +217,53 @@ interface GoCodebaseChunkHttp {
 interface GoCodebaseSearchResponseHttp {
   chunks?: GoCodebaseChunkHttp[];
   total_ms?: number;
+  receipt?: GoToolReceiptV2Http;
+}
+
+interface GoToolReceiptV2Http {
+  schema?: string;
+  tool_call_id?: string;
+  tool_name?: string;
+  run_id?: string;
+  workspace_id?: string;
+  workspace_revision?: string;
+  packet_key?: string;
+  packet_revision?: string;
+  succeeded?: boolean;
+  retrieval_confidence?: number;
+  evidence_count?: number;
+  validation_status?: string;
+  output_checksum?: string;
+  error_code?: string;
+  canonical_authority?: boolean;
+  writes_performed?: boolean;
+  receipt_id?: string;
+  receipt_checksum?: string;
+}
+
+function mapGoReceiptV2(receipt: GoToolReceiptV2Http | undefined): RuntimeToolReceiptV1 | undefined {
+  if (!receipt) return undefined;
+  const parsed = RuntimeToolReceiptV1Schema.safeParse({
+    schema: 'atlas.runtime-tool-receipt.v1',
+    receiptId: receipt.receipt_id,
+    receiptChecksum: receipt.receipt_checksum,
+    toolCallId: receipt.tool_call_id,
+    toolName: receipt.tool_name,
+    runId: receipt.run_id,
+    workspaceId: receipt.workspace_id,
+    packetKey: receipt.packet_key,
+    workspaceRevision: receipt.workspace_revision,
+    packetRevision: receipt.packet_revision,
+    succeeded: receipt.succeeded,
+    errorCode: receipt.error_code ?? null,
+    retrievalConfidence: receipt.retrieval_confidence ?? null,
+    evidenceCount: receipt.evidence_count,
+    validationStatus: receipt.validation_status,
+    outputChecksum: receipt.output_checksum ?? null,
+    writesPerformed: receipt.writes_performed,
+    canonicalAuthority: receipt.canonical_authority,
+  });
+  return parsed.success ? parsed.data : undefined;
 }
 
 async function retrieveFromGoHttp(
@@ -245,6 +292,14 @@ async function retrieveFromGoHttp(
     body: JSON.stringify({
       query,
       limit: options?.topK ?? 12,
+      atlas_context: {
+        tool_call_id: runtime.correlationId ?? '',
+        run_id: runtime.runId,
+        workspace_id: runtime.workspaceId,
+        workspace_revision: runtime.workspaceRevision,
+        packet_key: runtime.packetKey,
+        packet_revision: runtime.packetRevision,
+      },
       workspace_revision: runtime.workspaceRevision,
       packet_revision: runtime.packetRevision,
     }),
@@ -277,6 +332,7 @@ async function retrieveFromGoHttp(
       contentHash: c.content_hash!,
       denseScore: c.score,
     })),
+    receipt: mapGoReceiptV2(body.receipt),
   };
 }
 

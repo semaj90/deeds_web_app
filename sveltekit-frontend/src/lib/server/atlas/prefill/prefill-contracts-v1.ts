@@ -69,6 +69,60 @@ export const PrefillReceiptV1Schema = z.object({
 
 export type PrefillReceiptV1 = z.infer<typeof PrefillReceiptV1Schema>;
 
+export const PrefillDecodePhaseReceiptV1Schema = z.object({
+  schema: z.literal('atlas.prefill-decode-phase-receipt.v1'),
+  requestId: z.string().min(1),
+  phase: z.enum(['PREFILL', 'DECODE']),
+  contentIdentityChecksum: sha256HexSchema,
+  modelRevision: revision,
+  outputChecksum: sha256HexSchema,
+  stateOwnership: z.literal('MODEL_EPHEMERAL'),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  producerRevision: revision,
+  checksumSha256: sha256HexSchema,
+}).strict();
+
+export type PrefillDecodePhaseReceiptV1 = z.infer<typeof PrefillDecodePhaseReceiptV1Schema>;
+
+export const PrefillDerivedFeatureReceiptV1Schema = z.object({
+  schema: z.literal('atlas.prefill-derived-feature-receipt.v1'),
+  requestId: z.string().min(1),
+  dagNodeId: z.string().min(1),
+  inputChecksum: sha256HexSchema,
+  outputChecksum: sha256HexSchema,
+  featureKind: z.enum(['PCA', 'SVD', 'LATENT_128', 'LATENT_64', 'KMEANS', 'SOM20X20', 'HAMMING', 'HILBERT', 'TOPOLOGY4']),
+  featureRevision: revision,
+  sourceRevision: revision,
+  representationRevision: revision,
+  dimensions: z.array(z.number().int().positive()),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  producerRevision: revision,
+  checksumSha256: sha256HexSchema,
+}).strict();
+
+export type PrefillDerivedFeatureReceiptV1 = z.infer<typeof PrefillDerivedFeatureReceiptV1Schema>;
+
+export const PrefillDagExecutionReceiptV1Schema = z.object({
+  schema: z.literal('atlas.prefill-dag-execution-receipt.v1'),
+  requestId: z.string().min(1),
+  pipelineChecksum: sha256HexSchema,
+  nodes: z.array(z.object({
+    dagNodeId: z.string().min(1),
+    inputChecksum: sha256HexSchema,
+    outputChecksum: sha256HexSchema,
+    nodeRevision: revision,
+  }).strict()).min(1),
+  status: z.enum(['PLANNED', 'EXECUTED_UNPROMOTED', 'BLOCKED_LINEAGE']),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  producerRevision: revision,
+  checksumSha256: sha256HexSchema,
+}).strict();
+
+export type PrefillDagExecutionReceiptV1 = z.infer<typeof PrefillDagExecutionReceiptV1Schema>;
+
 function hashPayload(payload: unknown): string {
   return createHash('sha256').update(canonicalEncodeV1(payload), 'utf8').digest('hex');
 }
@@ -79,6 +133,23 @@ export function buildPrefillContentIdentityV1(input: Omit<PrefillContentIdentity
     ...input,
   };
   return PrefillContentIdentityV1Schema.parse({ ...payload, checksumSha256: hashPayload(payload) });
+}
+
+export function buildPrefillDerivedFeatureReceiptV1(
+  input: Omit<PrefillDerivedFeatureReceiptV1, 'schema' | 'checksumSha256'>,
+): PrefillDerivedFeatureReceiptV1 {
+  const payload = { schema: 'atlas.prefill-derived-feature-receipt.v1' as const, ...input };
+  return PrefillDerivedFeatureReceiptV1Schema.parse({ ...payload, checksumSha256: hashPayload(payload) });
+}
+
+export function buildPrefillDagExecutionReceiptV1(
+  input: Omit<PrefillDagExecutionReceiptV1, 'schema' | 'checksumSha256'>,
+): PrefillDagExecutionReceiptV1 {
+  const nodes = [...input.nodes];
+  const nodeIds = new Set(nodes.map((node) => node.dagNodeId));
+  if (nodeIds.size !== nodes.length) throw new Error('PREFILL_DAG_RECEIPT_DUPLICATE_NODE');
+  const payload = { schema: 'atlas.prefill-dag-execution-receipt.v1' as const, ...input, nodes };
+  return PrefillDagExecutionReceiptV1Schema.parse({ ...payload, checksumSha256: hashPayload(payload) });
 }
 
 /**
@@ -143,4 +214,11 @@ export function buildPrefillReceiptV1(input: Omit<PrefillReceiptV1, 'schema' | '
     evidenceRefs: [...new Set(input.evidenceRefs)].sort(),
   };
   return PrefillReceiptV1Schema.parse({ ...payload, checksumSha256: hashPayload(payload) });
+}
+
+export function buildPrefillDecodePhaseReceiptV1(
+  input: Omit<PrefillDecodePhaseReceiptV1, 'schema' | 'checksumSha256'>,
+): PrefillDecodePhaseReceiptV1 {
+  const payload = { schema: 'atlas.prefill-decode-phase-receipt.v1' as const, ...input };
+  return PrefillDecodePhaseReceiptV1Schema.parse({ ...payload, checksumSha256: hashPayload(payload) });
 }

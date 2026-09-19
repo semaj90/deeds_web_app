@@ -34,12 +34,16 @@ const ownerPlanForChecksum = { ...ownerPlan };
 delete ownerPlanForChecksum.generatedAt;
 delete ownerPlanForChecksum.reportPath;
 const currentOwnerPlanChecksum = `sha256:${crypto.createHash('sha256').update(JSON.stringify(ownerPlanForChecksum), 'utf8').digest('hex')}`;
-if (ownerPreflight.status !== 'OWNER_SELECTION_VALIDATED_NOT_APPLIED'
-  || ownerPreflight.selectedExecutionId !== executionId
-  || ownerPreflight.ownerPlanChecksum !== currentOwnerPlanChecksum
-  || ownerPreflight.canonicalAuthority !== false
-  || ownerPreflight.safeToApply !== false
-  || ownerPreflight.writesPerformed !== false) {
+const ownerDecisionValid = (ownerPreflight.status === 'OWNER_SELECTION_VALIDATED_NOT_APPLIED'
+  || ownerPreflight.status === 'OWNER_SELECTION_APPLIED_READBACK_VERIFIED')
+  && ownerPreflight.selectedExecutionId === executionId
+  && ownerPreflight.ownerPlanChecksum === currentOwnerPlanChecksum
+  && (ownerPreflight.status === 'OWNER_SELECTION_APPLIED_READBACK_VERIFIED'
+    ? ownerPreflight.canonicalAuthority === true
+    : ownerPreflight.canonicalAuthority === false)
+  && ownerPreflight.safeToApply === false
+  && ownerPreflight.writesPerformed === false;
+if (!ownerDecisionValid) {
   throw new Error('GRAPHIFY_EXECUTION_OWNER_PREFLIGHT_MISMATCH');
 }
 

@@ -49,6 +49,107 @@ export interface GpuResidencyBudgetV1 {
   reason: string;
 }
 
+export type GpuResidencyExecutorV1 =
+  | 'pytorch_cuda'
+  | 'cuvs'
+  | 'tensorrt_rtx'
+  | 'directml'
+  | 'webgpu'
+  | 'llm_runtime';
+
+export interface GpuExecutionLeaseV1 {
+  schema: 'atlas.gpu-execution-lease.v1';
+  leaseId: string;
+  leaseEpoch: number;
+  budgetRevision: string;
+  executor: GpuResidencyExecutorV1;
+  requestedBytes: number;
+  activeReservedBytes: number;
+  availableBytes: number;
+  admission: 'ALLOW' | 'GPU_RESIDENCY_BUDGET_EXCEEDED' | 'GPU_RESIDENCY_TELEMETRY_UNAVAILABLE';
+  reason: string;
+  canonicalAuthority: false;
+  writesPerformed: false;
+}
+
+export function assertGpuExecutionWithinBudgetV1(input: {
+  requestedBytes: number;
+  availableBytes: number;
+  activeReservedBytes?: number;
+}): void {
+  if (!Number.isFinite(input.requestedBytes) || input.requestedBytes < 0) {
+    throw new Error('GPU_RESIDENCY_REQUEST_BYTES_INVALID');
+  }
+  const activeReservedBytes = Number.isFinite(input.activeReservedBytes)
+    ? Math.max(0, Math.trunc(input.activeReservedBytes as number))
+    : 0;
+  const availableBytes = Math.max(0, Math.trunc(input.availableBytes));
+  if (Math.trunc(input.requestedBytes) > Math.max(0, availableBytes - activeReservedBytes)) {
+    throw new Error('GPU_RESIDENCY_BUDGET_EXCEEDED');
+  }
+}
+
+export function admitGpuExecutionLeaseV1(input: {
+  budget: GpuResidencyBudgetV1;
+  budgetRevision: string;
+  leaseId: string;
+  leaseEpoch: number;
+  executor: GpuResidencyExecutorV1;
+  requestedBytes: number;
+  activeReservedBytes?: number;
+}): GpuExecutionLeaseV1 {
+  if (!input.leaseId.trim() || !input.budgetRevision.trim()) {
+    throw new Error('GPU_RESIDENCY_LEASE_IDENTITY_UNQUALIFIED');
+  }
+  if (!Number.isInteger(input.leaseEpoch) || input.leaseEpoch < 1) {
+    throw new Error('GPU_RESIDENCY_LEASE_EPOCH_INVALID');
+  }
+  if (!Number.isFinite(input.requestedBytes) || input.requestedBytes < 0) {
+    throw new Error('GPU_RESIDENCY_REQUEST_BYTES_INVALID');
+  }
+  const activeReservedBytes = Number.isFinite(input.activeReservedBytes)
+    ? Math.max(0, Math.trunc(input.activeReservedBytes as number))
+    : 0;
+  const availableBytes = Math.max(0, budgetLeaseableBytes(input.budget) - activeReservedBytes);
+  const telemetryUnavailable = input.budget.telemetry === null || input.budget.telemetry.source === 'unavailable';
+  let overBudget = false;
+  if (!telemetryUnavailable) {
+    try {
+      assertGpuExecutionWithinBudgetV1({ requestedBytes: input.requestedBytes, availableBytes });
+    } catch (error) {
+      if (error instanceof Error && error.message === 'GPU_RESIDENCY_BUDGET_EXCEEDED') overBudget = true;
+      else throw error;
+    }
+  }
+  const admission = telemetryUnavailable
+    ? 'GPU_RESIDENCY_TELEMETRY_UNAVAILABLE'
+    : overBudget
+      ? 'GPU_RESIDENCY_BUDGET_EXCEEDED'
+      : 'ALLOW';
+  return {
+    schema: 'atlas.gpu-execution-lease.v1',
+    leaseId: input.leaseId,
+    leaseEpoch: input.leaseEpoch,
+    budgetRevision: input.budgetRevision,
+    executor: input.executor,
+    requestedBytes: Math.trunc(input.requestedBytes),
+    activeReservedBytes,
+    availableBytes,
+    admission,
+    reason: admission === 'ALLOW'
+      ? 'GPU residency budget admits the requested lease.'
+      : admission === 'GPU_RESIDENCY_BUDGET_EXCEEDED'
+        ? 'Requested GPU residency exceeds the shared available budget.'
+        : 'GPU telemetry is unavailable; no GPU lease may be admitted.',
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
+}
+
+function budgetLeaseableBytes(budget: GpuResidencyBudgetV1): number {
+  return Math.max(0, Math.trunc(budget.leaseableBytes));
+}
+
 /**
  * Conservative RTX 3060 Ti defaults. The bucket thresholds intentionally include
  * cuVS/cuGraph/RMM/CUDA allocator headroom, not just the tiny candidate matrix.

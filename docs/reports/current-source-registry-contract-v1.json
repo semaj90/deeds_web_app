@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-registry-contract.v1",
-  "generatedAt": "2026-09-14T02:22:34.257Z",
+  "generatedAt": "2026-09-18T22:08:07.421Z",
   "mode": "READ_ONLY_CONTRACT_AUDIT",
   "readOnly": true,
   "writes": {
@@ -17,10 +17,10 @@
   "registry": {
     "table": "public.atlas_source_refs",
     "stats": {
-      "rows": 45856,
-      "distinct_source_ref_keys": 45856,
+      "rows": 46945,
+      "distinct_source_ref_keys": 46945,
       "null_source_ref_keys": 0,
-      "repo_rows": 45856,
+      "repo_rows": 46945,
       "repos": 1
     },
     "columns": [
@@ -362,7 +362,7 @@
   },
   "workspaceBindings": {
     "table": "public.atlas_workspace_source_bindings",
-    "rowCount": 23480,
+    "rowCount": 47936,
     "columns": [
       {
         "table_schema": "public",

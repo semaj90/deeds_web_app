@@ -233,7 +233,7 @@ export async function executeAtlasRetrieval(init: {
     );
 
     // Estimate next state using FSM
-    const inference = estimateExecutionState(runtime.state, observation);
+    const inference = estimateExecutionState(runtime.state, observation, runtime);
     runtime.state = inference.state;
     runtime.confidence = inference.confidence;
 

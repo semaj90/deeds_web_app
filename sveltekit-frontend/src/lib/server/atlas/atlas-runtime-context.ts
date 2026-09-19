@@ -81,16 +81,19 @@ export const RuntimeToolReceiptV1Schema = z.object({
   schema: z.literal('atlas.runtime-tool-receipt.v1'),
   receiptId: z.string().min(1),
   receiptChecksum: z.string().min(1),
-  tool: z.string().min(1),
+  toolCallId: z.string().min(1),
+  toolName: z.string().min(1),
+  runId: z.string().min(1),
+  workspaceId: z.string().min(1),
+  packetKey: z.string().min(1),
   workspaceRevision: z.string().min(1),
   packetRevision: z.string().min(1),
   succeeded: z.boolean(),
-  errorCode: z.string().min(1).optional(),
-  retrievalConfidence: z.number().min(0).max(1),
+  errorCode: z.string().min(1).nullable(),
+  retrievalConfidence: z.number().min(0).max(1).nullable(),
   evidenceCount: z.number().int().nonnegative(),
   validationStatus: z.enum(['PASS', 'WARN', 'FAIL']),
-  authFailure: z.boolean(),
-  revisionMismatch: z.boolean(),
+  outputChecksum: z.string().min(1).nullable(),
   writesPerformed: z.boolean(),
   canonicalAuthority: z.boolean(),
 }).strict();
@@ -118,7 +121,7 @@ export function observationFromRuntimeToolReceiptV1(
   receipt: RuntimeToolReceiptV1 | null | undefined,
   iterationNumber: number,
   tokenPressure: number,
-  expectedRevisions?: Pick<AtlasRuntimeContext, 'workspaceRevision' | 'packetRevision'>,
+  expectedIdentity?: Pick<AtlasRuntimeContext, 'runId' | 'workspaceId' | 'packetKey' | 'workspaceRevision' | 'packetRevision'>,
 ): RuntimeObservation {
   if (!receipt) {
     return {
@@ -136,21 +139,24 @@ export function observationFromRuntimeToolReceiptV1(
   }
 
   const parsed = RuntimeToolReceiptV1Schema.parse(receipt);
-  if (expectedRevisions && (
-    parsed.workspaceRevision !== expectedRevisions.workspaceRevision ||
-    parsed.packetRevision !== expectedRevisions.packetRevision
+  if (expectedIdentity && (
+    parsed.runId !== expectedIdentity.runId ||
+    parsed.workspaceId !== expectedIdentity.workspaceId ||
+    parsed.packetKey !== expectedIdentity.packetKey ||
+    parsed.workspaceRevision !== expectedIdentity.workspaceRevision ||
+    parsed.packetRevision !== expectedIdentity.packetRevision
   )) {
-    throw new Error('RUNTIME_RECEIPT_REVISION_MISMATCH');
+    throw new Error('ATLAS_TOOL_RECEIPT_IDENTITY_MISMATCH');
   }
   return {
-    lastTool: parsed.tool,
+    lastTool: parsed.toolName,
     lastToolSucceeded: parsed.succeeded,
     ...(parsed.errorCode ? { lastToolError: parsed.errorCode } : {}),
-    retrievalConfidence: parsed.retrievalConfidence,
+    retrievalConfidence: parsed.retrievalConfidence ?? 0,
     evidenceCount: parsed.evidenceCount,
     validationStatus: parsed.validationStatus,
-    authFailure: parsed.authFailure,
-    revisionMismatch: parsed.revisionMismatch,
+    authFailure: false,
+    revisionMismatch: false,
     tokenPressure,
     iterationNumber,
   };

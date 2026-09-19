@@ -40,7 +40,6 @@ from fastapi import FastAPI, HTTPException, Query
 from collections import Counter
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_ollama import ChatOllama
 from langgraph.graph import END, StateGraph
 from pydantic import BaseModel
 from qdrant_client import AsyncQdrantClient
@@ -51,6 +50,7 @@ log = logging.getLogger("langgraph-synthesis")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
 OLLAMA_URL         = os.environ.get("OLLAMA_URL",       "http://host.docker.internal:11434")
+LLAMA_SERVER_URL   = os.environ.get("LLAMA_SERVER_URL", "http://host.docker.internal:8090")
 QDRANT_URL         = os.environ.get("QDRANT_URL",       "http://qdrant:6333")
 BIFROST_URL        = os.environ.get("BIFROST_URL",      "http://host.docker.internal:3040")
 REDIS_URL          = os.environ.get("REDIS_URL",        "redis://valkey:6379/0")
@@ -67,6 +67,71 @@ REDIS_L1_TTL       = 3600  # 1 hour — matches TS redis-exact-match.ts
 REDIS_KAG_PREFIX   = "langgraph:kag:neighbors:"  # pre-warm cache written by Colab Cell 11
 REDIS_KAG_TTL      = 86_400  # 24 h — refreshed by nightly Colab run
 BIFROST_THRESHOLD  = float(os.environ.get("BIFROST_THRESHOLD", "0.80"))
+
+
+class LlamaServerChat:
+    """Minimal OpenAI-compatible chat adapter; Ollama is embeddings-only."""
+
+    def __init__(self, base_url: str, model: str, temperature: float, streaming: bool = False):
+        self.base_url = base_url.rstrip("/")
+        self.model = model
+        self.temperature = temperature
+        self.streaming = streaming
+
+    @staticmethod
+    def _messages(messages):
+        payload = []
+        for message in messages:
+            role = getattr(message, "type", None) or getattr(message, "role", None) or "user"
+            if role == "human":
+                role = "user"
+            elif role == "ai":
+                role = "assistant"
+            payload.append({"role": role, "content": getattr(message, "content", str(message))})
+        return payload
+
+    async def ainvoke(self, messages: list[dict[str, str]]):
+        async with httpx.AsyncClient(timeout=120) as client:
+            response = await client.post(
+                f"{self.base_url}/v1/chat/completions",
+                json={
+                    "model": self.model,
+                    "messages": self._messages(messages),
+                    "temperature": self.temperature,
+                    "stream": False,
+                },
+            )
+            response.raise_for_status()
+            body = response.json()
+        content = (((body.get("choices") or [{}])[0]).get("message") or {}).get("content") or ""
+        return type("LlamaMessage", (), {"content": content})()
+
+    async def astream(self, messages: list[dict[str, str]]):
+        async with httpx.AsyncClient(timeout=120) as client:
+            async with client.stream(
+                "POST",
+                f"{self.base_url}/v1/chat/completions",
+                json={
+                    "model": self.model,
+                    "messages": self._messages(messages),
+                    "temperature": self.temperature,
+                    "stream": True,
+                },
+            ) as response:
+                response.raise_for_status()
+                async for line in response.aiter_lines():
+                    if not line.startswith("data:"):
+                        continue
+                    payload = line[5:].strip()
+                    if payload == "[DONE]":
+                        break
+                    try:
+                        body = json.loads(payload)
+                    except json.JSONDecodeError:
+                        continue
+                    delta = (((body.get("choices") or [{}])[0]).get("delta") or {}).get("content") or ""
+                    if delta:
+                        yield type("LlamaMessage", (), {"content": delta})()
 
 # ── FastAPI ───────────────────────────────────────────────────────────────────
 
@@ -90,7 +155,10 @@ async def get_qdrant() -> AsyncQdrantClient:
     return _qdrant
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# L1: Redis exact-match cache  (matches TS redis-exact-match.ts key scheme)
+# L1: legacy response cache — intentionally disabled.
+#
+# BitFrost/Valkey is metadata/ACE-packet cache only. Generated chat output is
+# not durable model state and must not be served from this legacy key family.
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def _l1_key(model: str, messages: list[dict], temperature: float, max_tokens: int) -> str:
@@ -106,60 +174,19 @@ def _l1_key(model: str, messages: list[dict], temperature: float, max_tokens: in
     return f"{REDIS_L1_PREFIX}{digest}"
 
 async def l1_get(key: str) -> dict | None:
-    try:
-        redis = await get_redis()
-        raw = await redis.get(key)
-        if not raw:
-            return None
-        cached = json.loads(raw)
-        age = round((time.time() - time.mktime(
-            time.strptime(cached.get("cachedAt","1970-01-01T00:00:00"), "%Y-%m-%dT%H:%M:%S")
-        )))
-        log.info(f"[L1 HIT] key=...{key[-8:]} age={age}s")
-        return cached
-    except Exception as exc:
-        log.warning(f"[L1] GET error (non-fatal): {exc}")
-        return None
+    log.info("[L1 DISABLED] generated chat response cache is not an ACE/metadata cache")
+    return None
 
 async def l1_set(key: str, content: str, model: str, backend: str) -> None:
-    try:
-        redis = await get_redis()
-        payload = {
-            "content": content,
-            "model": model,
-            "backend": backend,
-            "cachedAt": time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()),
-        }
-        await redis.set(key, json.dumps(payload), ex=REDIS_L1_TTL)
-        log.info(f"[L1 SET] key=...{key[-8:]} model={model} backend={backend}")
-    except Exception as exc:
-        log.warning(f"[L1] SET error (non-fatal): {exc}")
+    log.info("[L1 DISABLED] refusing to persist generated chat output")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# L2: Bifrost semantic cache
+# L2: legacy Bifrost response cache — intentionally disabled.
 # ═══════════════════════════════════════════════════════════════════════════════
 
 async def l2_check(messages: list[dict], model: str, temperature: float) -> str | None:
-    """Try Bifrost semantic cache. Returns text on HIT, None on MISS."""
-    try:
-        async with httpx.AsyncClient(timeout=8) as client:
-            r = await client.post(
-                f"{BIFROST_URL}/v1/chat/completions",
-                json={"model": model, "messages": messages, "temperature": temperature, "max_tokens": 1024},
-                headers={
-                    "x-bf-cache-type": "semantic",
-                    "x-bf-cache-threshold": str(BIFROST_THRESHOLD),
-                },
-            )
-            if r.status_code == 200:
-                data = r.json()
-                text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-                source = r.headers.get("x-bf-cache-source", "")
-                if text and source in ("semantic", "exact"):
-                    log.info(f"[L2 HIT] source={source} model={model}")
-                    return text
-    except Exception as exc:
-        log.debug(f"[L2] Bifrost unavailable (non-fatal): {exc}")
+    """Fail closed: Bifrost cannot become a second chat/cache authority."""
+    log.info("[L2 DISABLED] Bifrost response caching is not enabled")
     return None
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -667,7 +694,7 @@ async def node_merge(state: SynthesisState) -> dict:
     return {"merged_context": state["ace_context"]}
 
 async def node_synthesize(state: SynthesisState) -> dict:
-    llm = ChatOllama(base_url=OLLAMA_URL, model=LLM_MODEL, temperature=0.3)
+    llm = LlamaServerChat(base_url=LLAMA_SERVER_URL, model=LLM_MODEL, temperature=0.3)
     context = state["merged_context"] or "No context retrieved."
     system = (
         "You are a legal AI assistant (ACE — Adaptive Context Engine). "
@@ -684,7 +711,7 @@ async def node_synthesize(state: SynthesisState) -> dict:
 async def node_self_eval(state: SynthesisState) -> dict:
     if state["confidence"] >= CONFIDENCE_THRESHOLD or state["retried"]:
         return {}
-    llm = ChatOllama(base_url=OLLAMA_URL, model=LLM_MODEL, temperature=0.5)
+    llm = LlamaServerChat(base_url=LLAMA_SERVER_URL, model=LLM_MODEL, temperature=0.5)
     retry = (
         f"Your previous answer may be incomplete. Provide a more thorough legal analysis.\n\n"
         f"Context:\n{state['merged_context']}\n\nQuestion: {state['query']}\n\n"
@@ -1050,7 +1077,7 @@ async def synthesize_stream(req: SynthesizeRequest) -> StreamingResponse:
         yield f"data: {json.dumps({'stage':'llm','status':'running'})}\n\n"
         system = ("You are ACE — a legal AI assistant. Answer using ONLY the provided context. "
                   "Cite sources by [N] index.")
-        llm = ChatOllama(base_url=OLLAMA_URL, model=LLM_MODEL, temperature=req.temperature, streaming=True)
+        llm = LlamaServerChat(base_url=LLAMA_SERVER_URL, model=LLM_MODEL, temperature=req.temperature, streaming=True)
         full_text = ""
         async for chunk in llm.astream([
             SystemMessage(content=system),

@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.analyze-this-adapters.v1",
+  "generatedAt": "2026-09-18T16:26:45.471Z",
+  "query": "packet",
+  "sourceMode": "WORKTREE_DIAGNOSTIC",
+  "inventory": {
+    "available": true,
+    "fileCount": 10944
+  },
+  "lexical": {
+    "available": false,
+    "matchLines": 0
+  },
+  "structural": {
+    "provider": "ast-grep",
+    "available": false,
+    "version": null
+  },
+  "provenance": {
+    "sourceRevision": null,
+    "parserRevision": null,
+    "canonicalAuthority": false
+  },
+  "writesPerformed": false,
+  "nextGate": "NORMALIZE_BOUNDED_EVIDENCE_IN_ANALYZE_THIS_COORDINATOR"
+}

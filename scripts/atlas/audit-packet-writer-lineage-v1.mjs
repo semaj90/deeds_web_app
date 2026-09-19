@@ -119,7 +119,10 @@ const report = {
   canonicalDigestNamespace: 'atlas_packets.content_hash',
   legacyDigestNamespaces: ['atlas_packets.sha256'],
   liveSchemaDependency: {
-    sourceRevisionColumn: 'UNPROVEN_LIVE_ABSENT_PER_PACKET_WRITE_REVISION_CONTRACT_AUDIT',
+    // The column is present in the live schema, but the revision-contract audit
+    // found no populated packet rows. Keep schema presence separate from
+    // evidence coverage so this report cannot misstate absence as the blocker.
+    sourceRevisionColumn: 'PRESENT_BUT_UNPOPULATED',
     workspaceRevision: 'PRESENT_BUT_HISTORICAL_DEFAULT_SHAPED',
     contentHash: 'PRESENT_BUT_SPARSE',
   },

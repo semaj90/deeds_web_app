@@ -4,6 +4,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import {
   compileQueryRouterDatasetRowV2,
+  assertUniformQueryRouterDatasetRevisionsV1,
   QueryRouterSourceRowV2Schema,
   QUERY_ROUTER_DATASET_REVISION_V2,
   QUERY_ROUTER_SPLIT_REVISION_V1,
@@ -44,16 +45,11 @@ if (!splitCounts.train || !splitCounts.validation || !splitCounts.test) {
   throw new Error(`QUERY_ROUTER_SPLIT_EMPTY ${JSON.stringify(splitCounts)}`);
 }
 
+const revisionSets = assertUniformQueryRouterDatasetRevisionsV1(compiled);
+
 const output = compiled.map((row) => JSON.stringify(row)).join('\n') + '\n';
 const datasetChecksum = createHash('sha256').update(output).digest('hex');
 const sourceChecksum = createHash('sha256').update(raw).digest('hex');
-const revisionSets = {
-  queryRevision: [...new Set(compiled.map((row) => row.queryRevision))].sort(),
-  labelRevision: [...new Set(compiled.map((row) => row.labelRevision))].sort(),
-  embeddingModelRevision: [...new Set(compiled.map((row) => row.embeddingModelRevision))].sort(),
-  embeddingPromptRevision: [...new Set(compiled.map((row) => row.embeddingPromptRevision))].sort(),
-  representationRevision: [...new Set(compiled.map((row) => row.representationRevision))].sort(),
-};
 
 await mkdir(dirname(outputPath), { recursive: true });
 await mkdir(dirname(receiptPath), { recursive: true });

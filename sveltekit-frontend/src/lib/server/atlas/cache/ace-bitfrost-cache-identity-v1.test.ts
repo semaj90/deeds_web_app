@@ -26,11 +26,25 @@ describe('AceBitfrostCacheIdentityV1', () => {
     expect(() => AceBitfrostCacheIdentityV1Schema.parse({ ...base, graphRevision: '' })).toThrow();
   });
 
-  it('changes identity when the candidate snapshot changes', () => {
+	it('changes identity when the candidate snapshot changes', () => {
     expect(aceBitfrostCacheIdentityChecksumV1(base)).not.toBe(
       aceBitfrostCacheIdentityChecksumV1({ ...base, candidateSnapshotRevision: 'candidate:r2' }),
     );
-  });
+	});
+
+	it('changes identity when model, source, or packet revision changes', () => {
+		const revisioned = {
+			...base,
+			modelRevision: 'model:r1',
+			adapterRevision: 'adapter:r1',
+			workspaceRevision: 'workspace:r1',
+			sourceRevision: 'source:r1',
+			packetRevision: 'packet:r1',
+		};
+		expect(buildAceBitfrostCacheKeyV1(revisioned)).not.toBe(
+			buildAceBitfrostCacheKeyV1({ ...revisioned, packetRevision: 'packet:r2' }),
+		);
+	});
 
   it('keeps representation families distinct at equal dimensions', () => {
     expect(buildAceBitfrostCacheKeyV1(base)).not.toBe(

@@ -1,19 +1,19 @@
 {
   "schema": "atlas.workspace-revision-admission-single-owner.v1",
-  "generatedAt": "2026-09-16T15:18:34.719Z",
+  "generatedAt": "2026-09-18T22:09:23.829Z",
   "mode": "READ_ONLY",
   "status": "WORKSPACE_REVISION_ADMISSION_SINGLE_OWNER_BLOCKED",
   "authority": false,
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
   "expected": {
-    "snapshotRevision": "sha256:d25810ade66736ca8bc7fa31c683d09972f10ef7d241b4ab8e64b2cdd7ef6122",
-    "workspaceRevisionCandidate": "sha256:178f26e15947cbb92acd5c7147c431c967eed96d865dc7a238d924438ee1289a",
+    "snapshotRevision": "sha256:74e0ce22a50d4f09446250579ae5415a418ce81268ed29f9add20fa086ed95db",
+    "workspaceRevisionCandidate": "sha256:e48603538ad1b8f5c6a2d9253d9aef60d6c0c80ad97add4b4ac11569f830f93b",
     "sourceInventoryRevision": "atlas.canonical-source-inventory-hygiene-policy.2026-09-13.v1",
-    "sourceInventoryChecksum": "sha256:adb6524b92a91dbcd0f798cf840877c58e241b9c416a12f8b985c3d00397af41",
-    "sourceSelectionChecksum": "sha256:5316d50a1c1055ea5f70d1b8ed08f40286979a8baf8c28e8db15a436cac20e69",
-    "sourceCount": 25449,
-    "snapshotSourceCount": 25644
+    "sourceInventoryChecksum": "sha256:8fca57f42895923d967b37ae323028280e931e5abd52dcc5c4084684b1a53eb7",
+    "sourceSelectionChecksum": "sha256:caa81121d20a7fa96448e5f1f84fec3d1ca114f3bc0481ec7523696786c0cc4c",
+    "sourceCount": 25580,
+    "snapshotSourceCount": 25775
   },
   "receiptsPresent": {
     "hygiene": true,
@@ -27,13 +27,13 @@
   "checks": {
     "hygienePass": true,
     "planReady": true,
-    "derivationReady": false,
-    "preflightReady": false,
+    "derivationReady": true,
+    "preflightReady": true,
     "planSnapshotMatches": false,
-    "derivationSnapshotMatches": false,
-    "preflightSnapshotMatches": false,
+    "derivationSnapshotMatches": true,
+    "preflightSnapshotMatches": true,
     "planCandidateMatchesDerivation": false,
-    "preflightCandidateMatchesDerivation": false,
+    "preflightCandidateMatchesDerivation": true,
     "planInventoryRevisionMatches": false,
     "planInventoryChecksumMatches": false,
     "planSelectionChecksumMatches": false,
@@ -70,13 +70,8 @@
     "canaryCanonicalWritesStillUnauthorized": true
   },
   "violations": [
-    "derivationReady",
-    "preflightReady",
     "planSnapshotMatches",
-    "derivationSnapshotMatches",
-    "preflightSnapshotMatches",
     "planCandidateMatchesDerivation",
-    "preflightCandidateMatchesDerivation",
     "planInventoryRevisionMatches",
     "planInventoryChecksumMatches",
     "planSelectionChecksumMatches",
@@ -105,6 +100,6 @@
     "canarySelectionChecksumMatches",
     "canarySourceCountMatches"
   ],
-  "firstBlockingInvariant": "derivationReady",
+  "firstBlockingInvariant": "planSnapshotMatches",
   "nextGate": "WORKSPACE-REVISION-ADMISSION-SINGLE-OWNER-01"
 }

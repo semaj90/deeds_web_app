@@ -331,7 +331,7 @@ function makeBlockedResult(
 async function inspectRuntime(runtime?: AtlasSemanticRuntimeInput, observation?: AtlasSemanticObservationInput) {
   const ctx = normalizeRuntimeContext(runtime);
   const obs = observationSchema.parse(observation ?? {});
-  const inference = estimateExecutionState(ctx.state, obs);
+  const inference = estimateExecutionState(ctx.state, obs, ctx);
   return makeResult('atlas.inspect_runtime', ctx, inference.state, inference.confidence, 'fsm', {
     allowedTools: inference.allowedTools,
     allowMutation: inference.allowMutation,
@@ -485,7 +485,7 @@ async function buildContext(input: AtlasSemanticBuildContextInput) {
 async function validateChange(input: AtlasSemanticValidateChangeInput) {
   const params = validateInputSchema.parse(input);
   const runtime = normalizeRuntimeContext(params.runtime);
-  const inference = estimateExecutionState(runtime.state, params.observation);
+  const inference = estimateExecutionState(runtime.state, params.observation, runtime);
 
   return makeResult('atlas.validate_change', runtime, inference.state, inference.confidence, 'fsm', {
     allowedTools: inference.allowedTools,

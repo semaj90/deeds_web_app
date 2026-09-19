@@ -1,0 +1,3604 @@
+{
+  "schema": "atlas.current-graphify-source-bridge-reconciliation.v1",
+  "generatedAt": "2026-09-19T05:01:56.646Z",
+  "mode": "READ_ONLY",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "workspaceRevisionSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "preferredExecutionFromPlan": null,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "stages": {
+    "sourceManifest": {
+      "source": "workspace-source-snapshot",
+      "available": true,
+      "rowCount": 24456,
+      "qualifiedCount": 24456,
+      "checksum": "sha256:0a084ba3b49cf70aa7d12496d8a1f5180a9985116cba216a01e752f0b3c55488"
+    },
+    "executionMembershipV2": {
+      "source": "graphify_execution_file_membership_v2",
+      "available": true,
+      "rowCount": 25542,
+      "rows": [
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": ".agent/rules/claude-mem-context.md",
+          "source_ref": "claude-mem/.agent/rules/claude-mem-context.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:690a3e47eccc58d0e4c5b7d88cf6f4df413f5b2f38199f4325a5a8821b674f47",
+          "content_hash": "690a3e47eccc58d0e4c5b7d88cf6f4df413f5b2f38199f4325a5a8821b674f47",
+          "byte_length": 217
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": ".agents/plugins/marketplace.json",
+          "source_ref": "claude-mem/.agents/plugins/marketplace.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:6b2784a710c74b581fb9fab2633ee41ce0e17d5c0dc4d3f03fbeb1d266c15f9b",
+          "content_hash": "6b2784a710c74b581fb9fab2633ee41ce0e17d5c0dc4d3f03fbeb1d266c15f9b",
+          "byte_length": 372
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "bunfig.toml",
+          "source_ref": "claude-mem/bunfig.toml",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:7ded5e7fea1b9e097e289508860007a1f42ccd9b320edcde2f104fdc84be2f00",
+          "content_hash": "7ded5e7fea1b9e097e289508860007a1f42ccd9b320edcde2f104fdc84be2f00",
+          "byte_length": 19
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "CHANGELOG.md",
+          "source_ref": "claude-mem/CHANGELOG.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:4715e29b0852f981768986e2717f3c7f5f14ed2281fc27302d8effa5303d68a6",
+          "content_hash": "4715e29b0852f981768986e2717f3c7f5f14ed2281fc27302d8effa5303d68a6",
+          "byte_length": 298191
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": ".claude/commands/anti-pattern-czar.md",
+          "source_ref": "claude-mem/.claude/commands/anti-pattern-czar.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:54c0f84e42ea7f474507e4113525dc22420e875df4bde68ab81a4d23815edcda",
+          "content_hash": "54c0f84e42ea7f474507e4113525dc22420e875df4bde68ab81a4d23815edcda",
+          "byte_length": 3825
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "CLAUDE.md",
+          "source_ref": "claude-mem/CLAUDE.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:a6f297acd12563651041db4c4bce4c64cdc1d061664be11e6efe7ec7ec65239b",
+          "content_hash": "a6f297acd12563651041db4c4bce4c64cdc1d061664be11e6efe7ec7ec65239b",
+          "byte_length": 6611
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": ".claude/plans/animated-installer.md",
+          "source_ref": "claude-mem/.claude/plans/animated-installer.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:8419326204e223cc32d27b1386712ae7945410a688107899d82798fc4df5aefd",
+          "content_hash": "8419326204e223cc32d27b1386712ae7945410a688107899d82798fc4df5aefd",
+          "byte_length": 15785
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": ".claude-plugin/marketplace.json",
+          "source_ref": "claude-mem/.claude-plugin/marketplace.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:943c1129de9a9ab4890cd214bad7fc01356eaac0df6d4a66bc6a39d88c83ac1e",
+          "content_hash": "943c1129de9a9ab4890cd214bad7fc01356eaac0df6d4a66bc6a39d88c83ac1e",
+          "byte_length": 426
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": ".claude-plugin/plugin.json",
+          "source_ref": "claude-mem/.claude-plugin/plugin.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:876e5201758e3c04d24c0466e21b5e03f5d498d4fc22607e14d5942d654d2808",
+          "content_hash": "876e5201758e3c04d24c0466e21b5e03f5d498d4fc22607e14d5942d654d2808",
+          "byte_length": 551
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": ".claude/reports/test-audit-2026-01-05.md",
+          "source_ref": "claude-mem/.claude/reports/test-audit-2026-01-05.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:04a2db5192f313e08831d79414675378bd42bfeb3eee788d702d20163682d17a",
+          "content_hash": "04a2db5192f313e08831d79414675378bd42bfeb3eee788d702d20163682d17a",
+          "byte_length": 15842
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": ".claude/settings.json",
+          "source_ref": "claude-mem/.claude/settings.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:f17ade64fc4ddaed84949e20afa21376dafe53a9b76ff5526b05330f52df2a26",
+          "content_hash": "f17ade64fc4ddaed84949e20afa21376dafe53a9b76ff5526b05330f52df2a26",
+          "byte_length": 154
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": ".codex-plugin/plugin.json",
+          "source_ref": "claude-mem/.codex-plugin/plugin.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:4cdc7cdb06dadcba6758d24066b867f80d178274dc133eac64fd336a5ed07232",
+          "content_hash": "4cdc7cdb06dadcba6758d24066b867f80d178274dc133eac64fd336a5ed07232",
+          "byte_length": 1563
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "cursor-hooks/CONTEXT-INJECTION.md",
+          "source_ref": "claude-mem/cursor-hooks/CONTEXT-INJECTION.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:2a6a751f4955095db98eac8d871bd85370b6ad0d05313cefb65e562d5eb6a7c4",
+          "content_hash": "2a6a751f4955095db98eac8d871bd85370b6ad0d05313cefb65e562d5eb6a7c4",
+          "byte_length": 5025
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "cursor-hooks/cursorrules-template.md",
+          "source_ref": "claude-mem/cursor-hooks/cursorrules-template.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:53c359268c88641f7c61bb5862e750acbb6be7b57dbced7554a91e02c64281dd",
+          "content_hash": "53c359268c88641f7c61bb5862e750acbb6be7b57dbced7554a91e02c64281dd",
+          "byte_length": 2392
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "cursor-hooks/hooks.json",
+          "source_ref": "claude-mem/cursor-hooks/hooks.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:73af13c9c573e3ff2fa24de4b67afe202ab491c75ef761c7786eac36626c880d",
+          "content_hash": "73af13c9c573e3ff2fa24de4b67afe202ab491c75ef761c7786eac36626c880d",
+          "byte_length": 617
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "cursor-hooks/INTEGRATION.md",
+          "source_ref": "claude-mem/cursor-hooks/INTEGRATION.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:38484c16e474a41318fa06757b3f7cff157677507a929fe70edddc1c0ef99ccb",
+          "content_hash": "38484c16e474a41318fa06757b3f7cff157677507a929fe70edddc1c0ef99ccb",
+          "byte_length": 8303
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "cursor-hooks/PARITY.md",
+          "source_ref": "claude-mem/cursor-hooks/PARITY.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:3ffe51c4b15eb9b338c2b00166fb142fc45b98f8e92522c2de054d3d03fb0145",
+          "content_hash": "3ffe51c4b15eb9b338c2b00166fb142fc45b98f8e92522c2de054d3d03fb0145",
+          "byte_length": 8137
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "cursor-hooks/QUICKSTART.md",
+          "source_ref": "claude-mem/cursor-hooks/QUICKSTART.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:2dece241c2e98336506921ba5b176b021d53dfcf8923de6dc30b5b14c165b238",
+          "content_hash": "2dece241c2e98336506921ba5b176b021d53dfcf8923de6dc30b5b14c165b238",
+          "byte_length": 3163
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "cursor-hooks/README.md",
+          "source_ref": "claude-mem/cursor-hooks/README.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:65f0d26ec31c69e46d65a4737e6e6fdc74b7bf05fc53e43fb76aa1cec6f53c19",
+          "content_hash": "65f0d26ec31c69e46d65a4737e6e6fdc74b7bf05fc53e43fb76aa1cec6f53c19",
+          "byte_length": 7662
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "cursor-hooks/REVIEW.md",
+          "source_ref": "claude-mem/cursor-hooks/REVIEW.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:999a01ca0962bc9267a98f31c9a384514b9f3e83f2fa060af855c4d41141beba",
+          "content_hash": "999a01ca0962bc9267a98f31c9a384514b9f3e83f2fa060af855c4d41141beba",
+          "byte_length": 10555
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "cursor-hooks/STANDALONE-SETUP.md",
+          "source_ref": "claude-mem/cursor-hooks/STANDALONE-SETUP.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:631f29fb5c18167ac37f4e6a32170dc5b3c25319f6bfc58c919e1854d308d34d",
+          "content_hash": "631f29fb5c18167ac37f4e6a32170dc5b3c25319f6bfc58c919e1854d308d34d",
+          "byte_length": 7612
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docker/claude-mem/build.sh",
+          "source_ref": "claude-mem/docker/claude-mem/build.sh",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:0451b09e35a5a14fe7151dd41c58041e1684701fdcf608192f2b8f2eb106b217",
+          "content_hash": "0451b09e35a5a14fe7151dd41c58041e1684701fdcf608192f2b8f2eb106b217",
+          "byte_length": 379
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docker/claude-mem/entrypoint.sh",
+          "source_ref": "claude-mem/docker/claude-mem/entrypoint.sh",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:7ed6935f3988fa02ca196f762788511ccd0754790ca4a599a392b8f94b51765f",
+          "content_hash": "7ed6935f3988fa02ca196f762788511ccd0754790ca4a599a392b8f94b51765f",
+          "byte_length": 2296
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docker/claude-mem/README.md",
+          "source_ref": "claude-mem/docker/claude-mem/README.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:3b13927672584af888d4add4ff100569b1f8972954ce7a6ed5cf931e0d6e5285",
+          "content_hash": "3b13927672584af888d4add4ff100569b1f8972954ce7a6ed5cf931e0d6e5285",
+          "byte_length": 4979
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docker/claude-mem/run.sh",
+          "source_ref": "claude-mem/docker/claude-mem/run.sh",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:224474185c26ef81ea6c0e9afcb0b61e03900597c3effca736406c9f19a81d2a",
+          "content_hash": "224474185c26ef81ea6c0e9afcb0b61e03900597c3effca736406c9f19a81d2a",
+          "byte_length": 1623
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docker-compose.e2e.yml",
+          "source_ref": "claude-mem/docker-compose.e2e.yml",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:30a7300d8107dab8111cf9f2070410705cedd8836d13d09fbc7b00a58100eeee",
+          "content_hash": "30a7300d8107dab8111cf9f2070410705cedd8836d13d09fbc7b00a58100eeee",
+          "byte_length": 716
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docker-compose.yml",
+          "source_ref": "claude-mem/docker-compose.yml",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:2bcbe9fffb1cffb5a3a274561ca9aa633393b703dea5cc2a994e65084331c144",
+          "content_hash": "2bcbe9fffb1cffb5a3a274561ca9aa633393b703dea5cc2a994e65084331c144",
+          "byte_length": 5477
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docker/e2e/server-beta-e2e.mjs",
+          "source_ref": "claude-mem/docker/e2e/server-beta-e2e.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:ae5ea79b9370ae98c6b8187f1db0cf8056538f3910e66babe0be21eaa9de1f0e",
+          "content_hash": "ae5ea79b9370ae98c6b8187f1db0cf8056538f3910e66babe0be21eaa9de1f0e",
+          "byte_length": 11395
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/adapters.md",
+          "source_ref": "claude-mem/docs/adapters.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:af3bc785fc963f528b9ab38f8a22148a98146f5ef1e981a027dac90643d0c400",
+          "content_hash": "af3bc785fc963f528b9ab38f8a22148a98146f5ef1e981a027dac90643d0c400",
+          "byte_length": 547
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/anti-pattern-cleanup-plan.md",
+          "source_ref": "claude-mem/docs/anti-pattern-cleanup-plan.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:91582ba535149f2b1382a2bb7883d169bf166bd6c982232188f1142197fa6d41",
+          "content_hash": "91582ba535149f2b1382a2bb7883d169bf166bd6c982232188f1142197fa6d41",
+          "byte_length": 1441
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/api.md",
+          "source_ref": "claude-mem/docs/api.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:129f497b0c39d1f382f3251e6ff846b5f9ece01a166218d14d1e5c85c83ba528",
+          "content_hash": "129f497b0c39d1f382f3251e6ff846b5f9ece01a166218d14d1e5c85c83ba528",
+          "byte_length": 1374
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/architecture-overview.md",
+          "source_ref": "claude-mem/docs/architecture-overview.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:fb683ae2e7cc5aec62a263bf1b03e400f76a93c2e362ccd031c8080d36861972",
+          "content_hash": "fb683ae2e7cc5aec62a263bf1b03e400f76a93c2e362ccd031c8080d36861972",
+          "byte_length": 6207
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/bug-fixes/windows-spaces-issue.md",
+          "source_ref": "claude-mem/docs/bug-fixes/windows-spaces-issue.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:b3555788f4e578182f8e757e34017927ffa5fc0e157151c60702cdf77125778f",
+          "content_hash": "b3555788f4e578182f8e757e34017927ffa5fc0e157151c60702cdf77125778f",
+          "byte_length": 2625
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/context/agent-sdk-v2-examples.ts",
+          "source_ref": "claude-mem/docs/context/agent-sdk-v2-examples.ts",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:b923ba10ffd4f0366e9166e4450ae2ee4be581436651ff08f88d611cd30d6a14",
+          "content_hash": "b923ba10ffd4f0366e9166e4450ae2ee4be581436651ff08f88d611cd30d6a14",
+          "byte_length": 3471
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/context/agent-sdk-v2-preview.md",
+          "source_ref": "claude-mem/docs/context/agent-sdk-v2-preview.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:24cfc5085461209eb8843ee588ed8901a188b4d7e5ac03977c9262bd51fa03aa",
+          "content_hash": "24cfc5085461209eb8843ee588ed8901a188b4d7e5ac03977c9262bd51fa03aa",
+          "byte_length": 10842
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/context/cursor-hooks-reference.md",
+          "source_ref": "claude-mem/docs/context/cursor-hooks-reference.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:17dcbfac98db93031ba446bf5cbb06c2d38d8c4ce770649e85fb77a7584099da",
+          "content_hash": "17dcbfac98db93031ba446bf5cbb06c2d38d8c4ce770649e85fb77a7584099da",
+          "byte_length": 18992
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/docker.md",
+          "source_ref": "claude-mem/docs/docker.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:ba2fc4698adc8a6e2085bdf18a6e941552b1be7ce40438a07fa07fa607621093",
+          "content_hash": "ba2fc4698adc8a6e2085bdf18a6e941552b1be7ce40438a07fa07fa607621093",
+          "byte_length": 475
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/pt.md",
+          "source_ref": "claude-mem/docs/i18n/pt.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:af1266367ddceeacf29bdac035ebd5cc8226a14063e94a7857c71fb7d1857717",
+          "content_hash": "af1266367ddceeacf29bdac035ebd5cc8226a14063e94a7857c71fb7d1857717",
+          "byte_length": 13815
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.ar.md",
+          "source_ref": "claude-mem/docs/i18n/README.ar.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:d253a93ad3e0fe19e9b65dcb1a627ee9cdcb8021221265e5d31116635310f628",
+          "content_hash": "d253a93ad3e0fe19e9b65dcb1a627ee9cdcb8021221265e5d31116635310f628",
+          "byte_length": 16159
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.bn.md",
+          "source_ref": "claude-mem/docs/i18n/README.bn.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:84b6467e6754adea99f47ff8fd8d223e5ecc586918340713f39384ea0335ccd2",
+          "content_hash": "84b6467e6754adea99f47ff8fd8d223e5ecc586918340713f39384ea0335ccd2",
+          "byte_length": 22121
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.cs.md",
+          "source_ref": "claude-mem/docs/i18n/README.cs.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:cfda28ceb2f06d0a4d2ff088a41724b4091815452d9f68862abd433772dac870",
+          "content_hash": "cfda28ceb2f06d0a4d2ff088a41724b4091815452d9f68862abd433772dac870",
+          "byte_length": 13572
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.da.md",
+          "source_ref": "claude-mem/docs/i18n/README.da.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:1fd96381ca7b7efadfc10ac66ea77fc219d159b34adcebbbbff806aa6134a83a",
+          "content_hash": "1fd96381ca7b7efadfc10ac66ea77fc219d159b34adcebbbbff806aa6134a83a",
+          "byte_length": 12960
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.de.md",
+          "source_ref": "claude-mem/docs/i18n/README.de.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:f766499e7e67679875e34a0113fcdf225ffb69703869c68f0ade97b5cef772e9",
+          "content_hash": "f766499e7e67679875e34a0113fcdf225ffb69703869c68f0ade97b5cef772e9",
+          "byte_length": 13524
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.el.md",
+          "source_ref": "claude-mem/docs/i18n/README.el.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:966699b2822d97c7e088689046f13a666e4673bd4c63c5d6f259e4cc18e23436",
+          "content_hash": "966699b2822d97c7e088689046f13a666e4673bd4c63c5d6f259e4cc18e23436",
+          "byte_length": 18258
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.es.md",
+          "source_ref": "claude-mem/docs/i18n/README.es.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:fdf7d03c4a4470d6bb421fb8a55def4198ea56edbc2fd2d02a51f63c8f46d26a",
+          "content_hash": "fdf7d03c4a4470d6bb421fb8a55def4198ea56edbc2fd2d02a51f63c8f46d26a",
+          "byte_length": 13874
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.fi.md",
+          "source_ref": "claude-mem/docs/i18n/README.fi.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:e27cf0d90966d7e2f55681ee2dc5191cb7d8aa666ba0954a1b2d9f767c5dbc93",
+          "content_hash": "e27cf0d90966d7e2f55681ee2dc5191cb7d8aa666ba0954a1b2d9f767c5dbc93",
+          "byte_length": 13242
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.fr.md",
+          "source_ref": "claude-mem/docs/i18n/README.fr.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:157c3d3ae616cde068dd142816fb9afa3b14b539ea4ae608e7ad1166fec0b5d2",
+          "content_hash": "157c3d3ae616cde068dd142816fb9afa3b14b539ea4ae608e7ad1166fec0b5d2",
+          "byte_length": 14439
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.he.md",
+          "source_ref": "claude-mem/docs/i18n/README.he.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:b7d1025d4ed320ee40d2c2fb36e88419c1a7e88bc53701528e825ceb762aba1f",
+          "content_hash": "b7d1025d4ed320ee40d2c2fb36e88419c1a7e88bc53701528e825ceb762aba1f",
+          "byte_length": 14560
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.hi.md",
+          "source_ref": "claude-mem/docs/i18n/README.hi.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:34499e5f68b5abf2e2b78f89e35640ce626648b9c52e7c7c05984d0a95fe4f5e",
+          "content_hash": "34499e5f68b5abf2e2b78f89e35640ce626648b9c52e7c7c05984d0a95fe4f5e",
+          "byte_length": 20677
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.hu.md",
+          "source_ref": "claude-mem/docs/i18n/README.hu.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:0fac16c8d98a38dcf67bc9456a046391cf89f27e7858d7fb89bead00ea75b259",
+          "content_hash": "0fac16c8d98a38dcf67bc9456a046391cf89f27e7858d7fb89bead00ea75b259",
+          "byte_length": 14132
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.id.md",
+          "source_ref": "claude-mem/docs/i18n/README.id.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:f6e726b1e58b6f98318955bbb3c660b90b52c365a011cbc99f98cfc54876743a",
+          "content_hash": "f6e726b1e58b6f98318955bbb3c660b90b52c365a011cbc99f98cfc54876743a",
+          "byte_length": 12917
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.it.md",
+          "source_ref": "claude-mem/docs/i18n/README.it.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:fef5fff8c3af84ddc72e61b4bd00a0f8b0c97af912219bfac3bdcc286f0483d4",
+          "content_hash": "fef5fff8c3af84ddc72e61b4bd00a0f8b0c97af912219bfac3bdcc286f0483d4",
+          "byte_length": 13701
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.ja.md",
+          "source_ref": "claude-mem/docs/i18n/README.ja.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:4a94d918d2c69ea8dc9265b232d61194c59ac3e2aa2ac7ebf542e8145725d9f3",
+          "content_hash": "4a94d918d2c69ea8dc9265b232d61194c59ac3e2aa2ac7ebf542e8145725d9f3",
+          "byte_length": 14814
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.ko.md",
+          "source_ref": "claude-mem/docs/i18n/README.ko.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:f684f1ca363bfa6ddcd96c70e1a6c2c067102c3eda4292c77107109fb88ab0bd",
+          "content_hash": "f684f1ca363bfa6ddcd96c70e1a6c2c067102c3eda4292c77107109fb88ab0bd",
+          "byte_length": 13471
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.nl.md",
+          "source_ref": "claude-mem/docs/i18n/README.nl.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:74e15cacbdb966eac3e6a7dfac45bfbee64a9dc39609bebb38a32e0ecba047ab",
+          "content_hash": "74e15cacbdb966eac3e6a7dfac45bfbee64a9dc39609bebb38a32e0ecba047ab",
+          "byte_length": 13042
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.no.md",
+          "source_ref": "claude-mem/docs/i18n/README.no.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:9e25ce0387e5be4fd5a4fe83fbd90d579cc34d6db2c8cee4551cd08dbe4c81d6",
+          "content_hash": "9e25ce0387e5be4fd5a4fe83fbd90d579cc34d6db2c8cee4551cd08dbe4c81d6",
+          "byte_length": 12871
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.pl.md",
+          "source_ref": "claude-mem/docs/i18n/README.pl.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:d11549e937a7d5e58115ae20ad99875786c785919879bbdf6ef64a2638d75ba7",
+          "content_hash": "d11549e937a7d5e58115ae20ad99875786c785919879bbdf6ef64a2638d75ba7",
+          "byte_length": 13730
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.pt-br.md",
+          "source_ref": "claude-mem/docs/i18n/README.pt-br.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:f4e8f95024e3b2e1812ce5f49b3f2c8c8c9c6911a2d14f3ec7f7c93e405b67d0",
+          "content_hash": "f4e8f95024e3b2e1812ce5f49b3f2c8c8c9c6911a2d14f3ec7f7c93e405b67d0",
+          "byte_length": 13695
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.ro.md",
+          "source_ref": "claude-mem/docs/i18n/README.ro.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:eb917c7bedbca5b51d196ec39977fb1d63462cd765aefda56433df2acf5e343b",
+          "content_hash": "eb917c7bedbca5b51d196ec39977fb1d63462cd765aefda56433df2acf5e343b",
+          "byte_length": 13658
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.ru.md",
+          "source_ref": "claude-mem/docs/i18n/README.ru.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:864e5285f557e128be224469bce1f67d057f8106d2f70bfae6284a80fc233505",
+          "content_hash": "864e5285f557e128be224469bce1f67d057f8106d2f70bfae6284a80fc233505",
+          "byte_length": 18408
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.sv.md",
+          "source_ref": "claude-mem/docs/i18n/README.sv.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:fd19738628a367a3125a95be2d4cda86cd3130b17add7148eb54db706eccd0e4",
+          "content_hash": "fd19738628a367a3125a95be2d4cda86cd3130b17add7148eb54db706eccd0e4",
+          "byte_length": 12973
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.th.md",
+          "source_ref": "claude-mem/docs/i18n/README.th.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:2b18a3d5315518a5f3f127700783a57a519189f2127b37821604790d8e16058a",
+          "content_hash": "2b18a3d5315518a5f3f127700783a57a519189f2127b37821604790d8e16058a",
+          "byte_length": 19537
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.tl.md",
+          "source_ref": "claude-mem/docs/i18n/README.tl.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:9db8fac0e5105a99002f7fe798ca59bffe187a1d55a7323797dc9876e4012baa",
+          "content_hash": "9db8fac0e5105a99002f7fe798ca59bffe187a1d55a7323797dc9876e4012baa",
+          "byte_length": 14245
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.tr.md",
+          "source_ref": "claude-mem/docs/i18n/README.tr.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:3fa43db058875bc0eb491e54688a06a63ea8de2b2455179400ff311f35f4fd37",
+          "content_hash": "3fa43db058875bc0eb491e54688a06a63ea8de2b2455179400ff311f35f4fd37",
+          "byte_length": 13650
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.uk.md",
+          "source_ref": "claude-mem/docs/i18n/README.uk.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:9caecac7eeab553940a519bbd120aa8fdc772420dd1dabef14d12952ecc4f8f9",
+          "content_hash": "9caecac7eeab553940a519bbd120aa8fdc772420dd1dabef14d12952ecc4f8f9",
+          "byte_length": 18128
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.ur.md",
+          "source_ref": "claude-mem/docs/i18n/README.ur.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:75e80b5ff9684815213167202af70e77c1ac4ab343d39676831d0b362ec382eb",
+          "content_hash": "75e80b5ff9684815213167202af70e77c1ac4ab343d39676831d0b362ec382eb",
+          "byte_length": 16453
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.vi.md",
+          "source_ref": "claude-mem/docs/i18n/README.vi.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:35ba95730838c576ebfed2138ef6bc026cd795c7096233af8145b8bf2ea1742f",
+          "content_hash": "35ba95730838c576ebfed2138ef6bc026cd795c7096233af8145b8bf2ea1742f",
+          "byte_length": 14486
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.zh.md",
+          "source_ref": "claude-mem/docs/i18n/README.zh.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:1a74811669812ad1dc5ab93871e72d715d5d69597595fe4014553f949d05619e",
+          "content_hash": "1a74811669812ad1dc5ab93871e72d715d5d69597595fe4014553f949d05619e",
+          "byte_length": 11927
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/README.zh-tw.md",
+          "source_ref": "claude-mem/docs/i18n/README.zh-tw.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:0ddbe918b55c1362406f109fc0841429751870a5da736aea2ffd2939f77cd127",
+          "content_hash": "0ddbe918b55c1362406f109fc0841429751870a5da736aea2ffd2939f77cd127",
+          "byte_length": 12207
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/i18n/.translation-cache.json",
+          "source_ref": "claude-mem/docs/i18n/.translation-cache.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:b7727290667c7d9fcb2e4c59e083a0edb08e2d216f09891301c95aa64e7f40fc",
+          "content_hash": "b7727290667c7d9fcb2e4c59e083a0edb08e2d216f09891301c95aa64e7f40fc",
+          "byte_length": 3901
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/ip-boundary.md",
+          "source_ref": "claude-mem/docs/ip-boundary.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:1d96ac211d0e03ee67abada3d5fc998a0f6131d25b41df19071dec0c724da46c",
+          "content_hash": "1d96ac211d0e03ee67abada3d5fc998a0f6131d25b41df19071dec0c724da46c",
+          "byte_length": 1016
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/license.md",
+          "source_ref": "claude-mem/docs/license.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:bdcd2f4a5ea68a4ec8689af743ea412df004308a6d05a316ae780a2f8968d160",
+          "content_hash": "bdcd2f4a5ea68a4ec8689af743ea412df004308a6d05a316ae780a2f8968d160",
+          "byte_length": 1087
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/migration-worker-to-server.md",
+          "source_ref": "claude-mem/docs/migration-worker-to-server.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:39b5e5a17f13ac253b0c00c68bca46a7830f7329af13c7cfa8368772fe971dd9",
+          "content_hash": "39b5e5a17f13ac253b0c00c68bca46a7830f7329af13c7cfa8368772fe971dd9",
+          "byte_length": 610
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/production-guide.md",
+          "source_ref": "claude-mem/docs/production-guide.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:eb26b0ba30d34c5653415540222c4bab920d3f3aa45e280a386c39a5645e116f",
+          "content_hash": "eb26b0ba30d34c5653415540222c4bab920d3f3aa45e280a386c39a5645e116f",
+          "byte_length": 4216
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/architecture/database.mdx",
+          "source_ref": "claude-mem/docs/public/architecture/database.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:b40c6de4a8d5bb93b8aa08ffb24a10d30aa3f908bc9a3f59db8652ed0cdfc566",
+          "content_hash": "b40c6de4a8d5bb93b8aa08ffb24a10d30aa3f908bc9a3f59db8652ed0cdfc566",
+          "byte_length": 8455
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/architecture-evolution.mdx",
+          "source_ref": "claude-mem/docs/public/architecture-evolution.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:cce0245579a4c55b43a632ec4b2cec6270174451e437069c9f5e7258640dba45",
+          "content_hash": "cce0245579a4c55b43a632ec4b2cec6270174451e437069c9f5e7258640dba45",
+          "byte_length": 32768
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/architecture/hooks.mdx",
+          "source_ref": "claude-mem/docs/public/architecture/hooks.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:8183f7b4981dd997ade2f4c68776270ab5dffcd2211625159b3741038ba9f4bc",
+          "content_hash": "8183f7b4981dd997ade2f4c68776270ab5dffcd2211625159b3741038ba9f4bc",
+          "byte_length": 29902
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/architecture/overview.mdx",
+          "source_ref": "claude-mem/docs/public/architecture/overview.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:8b5a111c3d282de77541b837a9472e814e76f0fcb5de482542b05666d20a6174",
+          "content_hash": "8b5a111c3d282de77541b837a9472e814e76f0fcb5de482542b05666d20a6174",
+          "byte_length": 12100
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/architecture/pm2-to-bun-migration.mdx",
+          "source_ref": "claude-mem/docs/public/architecture/pm2-to-bun-migration.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:ffe586b95539bac584c349a09359e42a6f76d8b8dded679aed0438b23ab31bbc",
+          "content_hash": "ffe586b95539bac584c349a09359e42a6f76d8b8dded679aed0438b23ab31bbc",
+          "byte_length": 17759
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/architecture/search-architecture.mdx",
+          "source_ref": "claude-mem/docs/public/architecture/search-architecture.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:d604dc39c1f693a8b3ad21b594b15ddb49bcf29caca56b4581597236a1edae24",
+          "content_hash": "d604dc39c1f693a8b3ad21b594b15ddb49bcf29caca56b4581597236a1edae24",
+          "byte_length": 13560
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/architecture/worker-service.mdx",
+          "source_ref": "claude-mem/docs/public/architecture/worker-service.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:bb5c799994e1b4266d7a8d8e7532382d8f5d2d1adae4ce4e347e73c824aa2474",
+          "content_hash": "bb5c799994e1b4266d7a8d8e7532382d8f5d2d1adae4ce4e347e73c824aa2474",
+          "byte_length": 15258
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/beta-features.mdx",
+          "source_ref": "claude-mem/docs/public/beta-features.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:2a574b9af25230e10d65c034856bfdfb341abac709e4b6ec886516c087c64c1c",
+          "content_hash": "2a574b9af25230e10d65c034856bfdfb341abac709e4b6ec886516c087c64c1c",
+          "byte_length": 5788
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/configuration/custom-anthropic-backends.mdx",
+          "source_ref": "claude-mem/docs/public/configuration/custom-anthropic-backends.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:046b967db7763eedc722439342d2b7b9e94ec7bf4ff849e92bccd10be261702a",
+          "content_hash": "046b967db7763eedc722439342d2b7b9e94ec7bf4ff849e92bccd10be261702a",
+          "byte_length": 5814
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/configuration/litellm-gateway.mdx",
+          "source_ref": "claude-mem/docs/public/configuration/litellm-gateway.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:f2004a9ffd252128a02f94a82e4900e0fe2533154aa369a526aff406b9a4edf4",
+          "content_hash": "f2004a9ffd252128a02f94a82e4900e0fe2533154aa369a526aff406b9a4edf4",
+          "byte_length": 11357
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/configuration.mdx",
+          "source_ref": "claude-mem/docs/public/configuration.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:3ceba7a5734a8de5913a6019e2655dfc96107d7f54a4850cbc3e8a3eb4bc2c48",
+          "content_hash": "3ceba7a5734a8de5913a6019e2655dfc96107d7f54a4850cbc3e8a3eb4bc2c48",
+          "byte_length": 18385
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/context-engineering.mdx",
+          "source_ref": "claude-mem/docs/public/context-engineering.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:8a2ee5e682d4ffff83a748c5786232ac23c73b58cfceb78c65e8cfa9d270f0e9",
+          "content_hash": "8a2ee5e682d4ffff83a748c5786232ac23c73b58cfceb78c65e8cfa9d270f0e9",
+          "byte_length": 7121
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/cursor/gemini-setup.mdx",
+          "source_ref": "claude-mem/docs/public/cursor/gemini-setup.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:37fc686889eb78c87d83308637a553d498a639f79304b534804585c8bf029008",
+          "content_hash": "37fc686889eb78c87d83308637a553d498a639f79304b534804585c8bf029008",
+          "byte_length": 4552
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/cursor/index.mdx",
+          "source_ref": "claude-mem/docs/public/cursor/index.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:4c68ec50f0f677a8739b423b307e1f131ee726463397a864a02f4b16a5a244b5",
+          "content_hash": "4c68ec50f0f677a8739b423b307e1f131ee726463397a864a02f4b16a5a244b5",
+          "byte_length": 5422
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/cursor/openrouter-setup.mdx",
+          "source_ref": "claude-mem/docs/public/cursor/openrouter-setup.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:a54c977ec22c4ab395b9fd26af7d13fbbc4db8f3884865df3011d94b69dca24a",
+          "content_hash": "a54c977ec22c4ab395b9fd26af7d13fbbc4db8f3884865df3011d94b69dca24a",
+          "byte_length": 4730
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/development.mdx",
+          "source_ref": "claude-mem/docs/public/development.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:6b52abd4e535e3c2832a80360e1aa91c84b982211c8dea93f7ee6a91c9ab285c",
+          "content_hash": "6b52abd4e535e3c2832a80360e1aa91c84b982211c8dea93f7ee6a91c9ab285c",
+          "byte_length": 16391
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/docs.json",
+          "source_ref": "claude-mem/docs/public/docs.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:be4d6fa71128666765947027fb8a1f81ed52d3465f3304494f0f37ba73afbb7b",
+          "content_hash": "be4d6fa71128666765947027fb8a1f81ed52d3465f3304494f0f37ba73afbb7b",
+          "byte_length": 3923
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/endless-mode.mdx",
+          "source_ref": "claude-mem/docs/public/endless-mode.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:974a3a86853f228b263c66542ca7719f6bc06feb32157a377bf68ba003e67cde",
+          "content_hash": "974a3a86853f228b263c66542ca7719f6bc06feb32157a377bf68ba003e67cde",
+          "byte_length": 3386
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/file-read-gate.mdx",
+          "source_ref": "claude-mem/docs/public/file-read-gate.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:8837e817b8ae3b361373e173fbc90313e69c80bec4de8f6ef783be19f1b7098c",
+          "content_hash": "8837e817b8ae3b361373e173fbc90313e69c80bec4de8f6ef783be19f1b7098c",
+          "byte_length": 6550
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/gemini-cli/setup.mdx",
+          "source_ref": "claude-mem/docs/public/gemini-cli/setup.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:298c19b688c7fc3024b1657dd7d0a73bd33b685f7b6f84fe338f9fa53a158107",
+          "content_hash": "298c19b688c7fc3024b1657dd7d0a73bd33b685f7b6f84fe338f9fa53a158107",
+          "byte_length": 5282
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/hooks-architecture.mdx",
+          "source_ref": "claude-mem/docs/public/hooks-architecture.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:875a8fd6514be0aabe107909c3a1672bed787d4c6756459f4f8034a5eedded76",
+          "content_hash": "875a8fd6514be0aabe107909c3a1672bed787d4c6756459f4f8034a5eedded76",
+          "byte_length": 24390
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/installation.mdx",
+          "source_ref": "claude-mem/docs/public/installation.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:166dd73830f715ec45655ac4a3aa5b8e7090e34cc4b21640b99fbdfeb6d4855e",
+          "content_hash": "166dd73830f715ec45655ac4a3aa5b8e7090e34cc4b21640b99fbdfeb6d4855e",
+          "byte_length": 4192
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/introduction.mdx",
+          "source_ref": "claude-mem/docs/public/introduction.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:4444b6455437f84153c92b437d92168545428e67af5f39e067557961b67decf0",
+          "content_hash": "4444b6455437f84153c92b437d92168545428e67af5f39e067557961b67decf0",
+          "byte_length": 5830
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/modes.mdx",
+          "source_ref": "claude-mem/docs/public/modes.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:627fdb53034882d4fe4f54748b07c800f814243528e71446d826d4a35790ea0a",
+          "content_hash": "627fdb53034882d4fe4f54748b07c800f814243528e71446d826d4a35790ea0a",
+          "byte_length": 4080
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/openclaw-integration.mdx",
+          "source_ref": "claude-mem/docs/public/openclaw-integration.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:9c3d884d22dc3aa494f42472fe144066f29cccaa6fc399b462cf5447a4b627aa",
+          "content_hash": "9c3d884d22dc3aa494f42472fe144066f29cccaa6fc399b462cf5447a4b627aa",
+          "byte_length": 14617
+        },
+        {
+          "repository_id": "repo:claude-mem",
+          "repository_relative_path": "docs/public/platform-integration.mdx",
+          "source_ref": "claude-mem/docs/public/platform-integration.mdx",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "code_source_revision": "sha256:af0286718e6ae8f4f7b85cfcb0e2e1055cdfd025c92b3af61381ac517ff34d03",
+          "content_hash": "af0286718e6ae8f4f7b85cfcb0e2e1055cdfd025c92b3af61381ac517ff34d03",
+          "byte_length": 37360
+        }
+      ]
+    },
+    "legacyExecutionFiles": {
+      "source": "graphify_execution_files",
+      "available": true,
+      "rowCount": 0,
+      "rows": []
+    },
+    "graphifyFiles": {
+      "source": "graphify_files",
+      "available": true,
+      "rowCount": 0,
+      "rows": []
+    },
+    "workspaceBindings": {
+      "source": "atlas_workspace_source_bindings",
+      "available": true,
+      "rowCount": 24456,
+      "rows": [
+        {
+          "source_ref": "2-CONTEXT.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:cb1332629b3c4a4fdfe657ef0deb73ff0ba98ebda13c5035601728aa806a22c0",
+          "content_digest": "cb1332629b3c4a4fdfe657ef0deb73ff0ba98ebda13c5035601728aa806a22c0",
+          "byte_length": 3848,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "724_agents.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:12f1094952ee8e746851ad0cab8ba554b72efbe780180d0c213f8f4f2d391db3",
+          "content_digest": "12f1094952ee8e746851ad0cab8ba554b72efbe780180d0c213f8f4f2d391db3",
+          "byte_length": 1957,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ACE-BITFROST-WORKER-INTEGRATION.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:e7f11e4963bb6375162861013792c58cbb8362a6e4977d253c3d4a7dbd64fe46",
+          "content_digest": "e7f11e4963bb6375162861013792c58cbb8362a6e4977d253c3d4a7dbd64fe46",
+          "byte_length": 14657,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:9a75bd39d28fc8637aa7157b4d82d080c753c89e2a839d6ac580b84fb62084bb",
+          "content_digest": "9a75bd39d28fc8637aa7157b4d82d080c753c89e2a839d6ac580b84fb62084bb",
+          "byte_length": 8615,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ace-pipeline-audit.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:5cc3b8a9898183caf6737e76db62e752825c61b4a9cf6787da790753f8b29aae",
+          "content_digest": "5cc3b8a9898183caf6737e76db62e752825c61b4a9cf6787da790753f8b29aae",
+          "byte_length": 7691,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ACE-QUICK-REFERENCE.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:e94bb0ee99ae96dd476ffffc0cee9d696a6de58dba4b00f804225faf5b597d09",
+          "content_digest": "e94bb0ee99ae96dd476ffffc0cee9d696a6de58dba4b00f804225faf5b597d09",
+          "byte_length": 9117,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ACE-SUMMARY-LATENCY-IMPACT.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:0d0844c5f5a88d5497eebcfd43dbd4e8b5863d3fe6172108fe18e37c12c70e12",
+          "content_digest": "0d0844c5f5a88d5497eebcfd43dbd4e8b5863d3fe6172108fe18e37c12c70e12",
+          "byte_length": 10542,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:c2e5915a56d0e6796e225287c273ce2f966081144fb7df01752b22bb0ebb8dd5",
+          "content_digest": "c2e5915a56d0e6796e225287c273ce2f966081144fb7df01752b22bb0ebb8dd5",
+          "byte_length": 13526,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:c576c133480c8176ef653133f6d31b754a08cb6a1394638e8b39880c1e8fda45",
+          "content_digest": "c576c133480c8176ef653133f6d31b754a08cb6a1394638e8b39880c1e8fda45",
+          "byte_length": 1866,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:c0fc88df8ae64ca10552f7ed9c7fe092b628d54094e9bb94b030c7099d4fe206",
+          "content_digest": "c0fc88df8ae64ca10552f7ed9c7fe092b628d54094e9bb94b030c7099d4fe206",
+          "byte_length": 1819,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:baf50b8d924093f5c49093bd0e80510fad09c4375c62d64940050c7b557d9a8b",
+          "content_digest": "baf50b8d924093f5c49093bd0e80510fad09c4375c62d64940050c7b557d9a8b",
+          "byte_length": 3392,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.test.ts",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:6a53014b0921708bef346d5ddf8e95e8a63625d65aa14fdcf7f2ddb0eecfb0b2",
+          "content_digest": "6a53014b0921708bef346d5ddf8e95e8a63625d65aa14fdcf7f2ddb0eecfb0b2",
+          "byte_length": 1163,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+          "content_digest": "740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+          "byte_length": 2523,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.test.ts",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:ecbd66496dd1beb37da66089bcebdc7eeb8b0f3e309b1e85a1f3b005baa1aab4",
+          "content_digest": "ecbd66496dd1beb37da66089bcebdc7eeb8b0f3e309b1e85a1f3b005baa1aab4",
+          "byte_length": 1369,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.ts",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:d7d78f61fc3996466f11830354b0037ae3a2b5c88edefe1a62efc76a3dcf95a7",
+          "content_digest": "d7d78f61fc3996466f11830354b0037ae3a2b5c88edefe1a62efc76a3dcf95a7",
+          "byte_length": 3289,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "AGENTIC-WORKFLOW-PLAN-SUMMARY.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:bf305a991489525ac3e1c2c18fef782e3a238d98429a1eeb23ac0aa8a61c284f",
+          "content_digest": "bf305a991489525ac3e1c2c18fef782e3a238d98429a1eeb23ac0aa8a61c284f",
+          "byte_length": 9517,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "AGENTS.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:548e69a882b09bd9bc2c9af11ff0e0792d80f27d2ccdd2bceb841e971f5da0fb",
+          "content_digest": "548e69a882b09bd9bc2c9af11ff0e0792d80f27d2ccdd2bceb841e971f5da0fb",
+          "byte_length": 15388,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "apply-parent-atlas-policy-bundle.ps1",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:3ab9b3e509c4b94678fe985a05d8f6780f8d365fe2f63871469f009b49eaa9fd",
+          "content_digest": "3ab9b3e509c4b94678fe985a05d8f6780f8d365fe2f63871469f009b49eaa9fd",
+          "byte_length": 1034,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ARCHITECTURAL-CORRECTION-PHASE-102.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:122b926002d15fff0193ee07ec3e4da7f8f3c4cd986cdcab1c90e59db822c783",
+          "content_digest": "122b926002d15fff0193ee07ec3e4da7f8f3c4cd986cdcab1c90e59db822c783",
+          "byte_length": 10213,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ARCHITECTURE-AUDIT-REFACTOR-COMPLETE.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:79c1cc2db1695c389689c5253468be2c313be2810e5f532e1af4aaf527db4297",
+          "content_digest": "79c1cc2db1695c389689c5253468be2c313be2810e5f532e1af4aaf527db4297",
+          "byte_length": 12627,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ARCHITECTURE_CHECKPOINT_2026_06_11.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:99e525f3023ab220c8eb9dfbe276b62835bc9e378abe041cc178b821e7915284",
+          "content_digest": "99e525f3023ab220c8eb9dfbe276b62835bc9e378abe041cc178b821e7915284",
+          "byte_length": 7222,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ARCHITECTURE-EVOLUTION-PHASES-8-10.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:33f858e5b8295749ec09a66a7e88e52bda6f89268f60a1f76e997888ae8dd1a3",
+          "content_digest": "33f858e5b8295749ec09a66a7e88e52bda6f89268f60a1f76e997888ae8dd1a3",
+          "byte_length": 15402,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ARCHITECTURE_SPEC.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:9b42b94919fdcb421efeea86606f24e842ce195e8b64c84dae72f7247069867c",
+          "content_digest": "9b42b94919fdcb421efeea86606f24e842ce195e8b64c84dae72f7247069867c",
+          "byte_length": 37012,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "atlas.config.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:96c915646938b4d75f76f08565c0a2b8e6ed6d9f6ab1e14501bf3e8775ec10ff",
+          "content_digest": "96c915646938b4d75f76f08565c0a2b8e6ed6d9f6ab1e14501bf3e8775ec10ff",
+          "byte_length": 3178,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ATLAS-FREEZE-DECISION.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:b068f7ae5e24ad2d6d8c8b3ac77ae9198fdd584178d29314a225a533c19d787d",
+          "content_digest": "b068f7ae5e24ad2d6d8c8b3ac77ae9198fdd584178d29314a225a533c19d787d",
+          "byte_length": 5340,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ATLAS-INFRASTRUCTURE-STATE-2026-07-08.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:612c5ef9532e399a39680a233502853fbe0231ca1799f4d80be3424663631b6d",
+          "content_digest": "612c5ef9532e399a39680a233502853fbe0231ca1799f4d80be3424663631b6d",
+          "byte_length": 6085,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ATLAS-LANES-DEPENDENCY-GRAPH.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:3eb06dfdc9bdb38192175019fc5d2bb9ba7d8153a3768b753c1a9477a80b4da5",
+          "content_digest": "3eb06dfdc9bdb38192175019fc5d2bb9ba7d8153a3768b753c1a9477a80b4da5",
+          "byte_length": 14330,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ATLAS_READY.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:13178deb61cab669e92bbe0997aad85af742958de2b63608ba1603158551e354",
+          "content_digest": "13178deb61cab669e92bbe0997aad85af742958de2b63608ba1603158551e354",
+          "byte_length": 4650,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ATLAS-STABLE-BASELINES.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:e22778662c84c700c015ec8986e215e661d5e3b5c3797d854fb472366aaa52ca",
+          "content_digest": "e22778662c84c700c015ec8986e215e661d5e3b5c3797d854fb472366aaa52ca",
+          "byte_length": 9811,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "ATLAS-STATUS-RECONCILIATION.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:ffcf5d2474b66dcf47e7195e9ce50635689fbac20d69e4894d148cde09eeba0b",
+          "content_digest": "ffcf5d2474b66dcf47e7195e9ce50635689fbac20d69e4894d148cde09eeba0b",
+          "byte_length": 12109,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "audit-4-layers.sh",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:ef2a72ac9faea715e5cce3f5ffeb9f1937a037a5f394214d66cc8b956b39e225",
+          "content_digest": "ef2a72ac9faea715e5cce3f5ffeb9f1937a037a5f394214d66cc8b956b39e225",
+          "byte_length": 4460,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "AUDIT-GRAPHIFY-READINESS-INFRASTRUCTURE.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:f2368151d3bbdc3abc848ba13f2527eae4feddb25c19095ffbb573d142624864",
+          "content_digest": "f2368151d3bbdc3abc848ba13f2527eae4feddb25c19095ffbb573d142624864",
+          "byte_length": 38517,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "audit-opencode-state.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:b5621bd3f78451b47d68f39520d806fe1ff9349c79d73d3dba35683e9a5c49d4",
+          "content_digest": "b5621bd3f78451b47d68f39520d806fe1ff9349c79d73d3dba35683e9a5c49d4",
+          "byte_length": 6150,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "audit/public-route-allowlist.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:e68d468b9f32a63a84cdfb122107f5196c29a1fc2e81f5a7ae0022fe09de9c23",
+          "content_digest": "e68d468b9f32a63a84cdfb122107f5196c29a1fc2e81f5a7ae0022fe09de9c23",
+          "byte_length": 273,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "backfill-neo4j-cell-id.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:8f9dd8a493a792b27c84e8a66b8cdcd73361303f69afd27ffc692f64653218e8",
+          "content_digest": "8f9dd8a493a792b27c84e8a66b8cdcd73361303f69afd27ffc692f64653218e8",
+          "byte_length": 4479,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "backfill-payload-metadata.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:9c8f8d9ee214b43b81ea980b594f8ebce4f15a241b18771679a595cd5c564fa4",
+          "content_digest": "9c8f8d9ee214b43b81ea980b594f8ebce4f15a241b18771679a595cd5c564fa4",
+          "byte_length": 2719,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "backfill-qdrant-by-packet-key.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:0cc22845fe9cf9c4102b627fba9857e8acbb9be752a46c786143d89e423fa616",
+          "content_digest": "0cc22845fe9cf9c4102b627fba9857e8acbb9be752a46c786143d89e423fa616",
+          "byte_length": 3893,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "backfill-qdrant-identity.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:5d46db20f7075afdd2e2f608cc54d2b9c057b1c694f78d99b93d62f17a3f1776",
+          "content_digest": "5d46db20f7075afdd2e2f608cc54d2b9c057b1c694f78d99b93d62f17a3f1776",
+          "byte_length": 3005,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "backfill-qdrant-via-patch.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:5af13db706355ee53d9521239a3d9b27df7c0a75eabb89917673e60bb58568c3",
+          "content_digest": "5af13db706355ee53d9521239a3d9b27df7c0a75eabb89917673e60bb58568c3",
+          "byte_length": 4033,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "BATCH-GPU-ACCELERATION-ANALYSIS.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:8792c2e96d3e00a6f54705317f113081f7aa917b57aa6016f7d9477fb3020bec",
+          "content_digest": "8792c2e96d3e00a6f54705317f113081f7aa917b57aa6016f7d9477fb3020bec",
+          "byte_length": 10062,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "BATCH-SUMMARIZATION-QUICK-START.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:b9778bb4e5c561cab33cb58fa240d501f77feeb34dfd484c235b7a5fcda8528a",
+          "content_digest": "b9778bb4e5c561cab33cb58fa240d501f77feeb34dfd484c235b7a5fcda8528a",
+          "byte_length": 8743,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "BATCH-SUMMARIZATION-READY.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:4b64174788aa2b987541fc77a2188d6a7576776024766b1f9ace9d1d6c761296",
+          "content_digest": "4b64174788aa2b987541fc77a2188d6a7576776024766b1f9ace9d1d6c761296",
+          "byte_length": 11340,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "big-tools-request.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:7afc1658d0f4310367a02c05df910dd4ecdb973c9cd8a5a421990ed33dd53f4d",
+          "content_digest": "7afc1658d0f4310367a02c05df910dd4ecdb973c9cd8a5a421990ed33dd53f4d",
+          "byte_length": 21526,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "CARD-1-QUICK-START.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:49ef06e9577ed74d5c7e439e6252562b097db7b155066f31ead5487929dc4008",
+          "content_digest": "49ef06e9577ed74d5c7e439e6252562b097db7b155066f31ead5487929dc4008",
+          "byte_length": 2986,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "Cargo.toml",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:c6b044f40c51b8218754539c3ec8d68e7715b8c2b6ac2047be1a8f821a611889",
+          "content_digest": "c6b044f40c51b8218754539c3ec8d68e7715b8c2b6ac2047be1a8f821a611889",
+          "byte_length": 463,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "check-neo4j.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:50e6e5be78623339cd0c854e4ac9703e14aad739674cb2c9592e2053ff682591",
+          "content_digest": "50e6e5be78623339cd0c854e4ac9703e14aad739674cb2c9592e2053ff682591",
+          "byte_length": 950,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "CHUNK-BACKFILL-EXECUTION-PLAN.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:34da5454a2f18eafc933d9ca1a06e5dfd61fb80eeaa92961a32e197b0e8a7702",
+          "content_digest": "34da5454a2f18eafc933d9ca1a06e5dfd61fb80eeaa92961a32e197b0e8a7702",
+          "byte_length": 13243,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "CHUNK-BACKFILL-EXECUTION-SUMMARY.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:342dd1ab9360757da164abed59a2ca5a27d6d3e5dd3c34e15ef64309e4aa7239",
+          "content_digest": "342dd1ab9360757da164abed59a2ca5a27d6d3e5dd3c34e15ef64309e4aa7239",
+          "byte_length": 10825,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "CHUNK-BACKFILL-QUICK-REFERENCE.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:40cfdabbe3eca216c0916ade33f40fb8266f190acdd2c5375a84104dabbdb926",
+          "content_digest": "40cfdabbe3eca216c0916ade33f40fb8266f190acdd2c5375a84104dabbdb926",
+          "byte_length": 5735,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".clarity/ff1-plan.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
+          "content_digest": "a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
+          "byte_length": 1722,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "CLASSIFIER-SIDECAR-INDEX.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:1641dedf5f0bfb90022f5d6e8f03a1b1c823f5a2a2f2633062f2bd44e0fa39eb",
+          "content_digest": "1641dedf5f0bfb90022f5d6e8f03a1b1c823f5a2a2f2633062f2bd44e0fa39eb",
+          "byte_length": 6844,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/AGENT_CONSTITUTION.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
+          "content_digest": "2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
+          "byte_length": 251,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/AGENT_RECOMMENDATIONS.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
+          "content_digest": "427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
+          "byte_length": 507,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/agents/drizzle-inspector.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:14f3954b456e2b64a82e7dacf5eeaf1c530a267fcddefe0af182ed8c47660bcd",
+          "content_digest": "14f3954b456e2b64a82e7dacf5eeaf1c530a267fcddefe0af182ed8c47660bcd",
+          "byte_length": 3538,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/agents/obsidian-cartographer.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:d2a56441921f791e79501c3bbd887c44fb548233883be1c95b5b798e8464020e",
+          "content_digest": "d2a56441921f791e79501c3bbd887c44fb548233883be1c95b5b798e8464020e",
+          "byte_length": 4090,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/agents/sveltekit-route-auditor.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:36476366b0a80a505b1067200cd8e29fc2850250686b05a01815023c2582fed2",
+          "content_digest": "36476366b0a80a505b1067200cd8e29fc2850250686b05a01815023c2582fed2",
+          "byte_length": 3386,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/agents/topology-medic.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:dd61cdc14cc3070059170cdb852e50863fdfe529aa207ee001564b3d2535e534",
+          "content_digest": "dd61cdc14cc3070059170cdb852e50863fdfe529aa207ee001564b3d2535e534",
+          "byte_length": 3789,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/ATLAS-ENGINEERING-PROMPT.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
+          "content_digest": "9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
+          "byte_length": 28338,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/CLAUDE.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+          "content_digest": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+          "byte_length": 111,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/audit-components.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:20da50cb9ca2142a0cd5416c15ec73f03e10592de19ff1e14960bfd8d0b5e9d0",
+          "content_digest": "20da50cb9ca2142a0cd5416c15ec73f03e10592de19ff1e14960bfd8d0b5e9d0",
+          "byte_length": 17844,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/audit-duplication.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:ffdbf1b07df2eb194c3c3289abc6bdb67144232c487945412d2bd90de1bde0b1",
+          "content_digest": "ffdbf1b07df2eb194c3c3289abc6bdb67144232c487945412d2bd90de1bde0b1",
+          "byte_length": 5787,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/deep-audit.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:8e05620ca9ab287727697fd9cae0b806308539c56eb25a8b84fe941336cedc59",
+          "content_digest": "8e05620ca9ab287727697fd9cae0b806308539c56eb25a8b84fe941336cedc59",
+          "byte_length": 11487,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/graphify.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:0ab93b91186a49f2517a09dc1132c924a230964c20eeb3ebebeaf44b31f8e0d3",
+          "content_digest": "0ab93b91186a49f2517a09dc1132c924a230964c20eeb3ebebeaf44b31f8e0d3",
+          "byte_length": 11693,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/nes-arch.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:552cebcc155ec1e8de1c60a033c50cdae7cebc01a7b9def961201c6ad4dafbf8",
+          "content_digest": "552cebcc155ec1e8de1c60a033c50cdae7cebc01a7b9def961201c6ad4dafbf8",
+          "byte_length": 6481,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/opsx/apply.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:89d7cee95f269936adfa3b38e19acca09dc1780d6b448968e3315fc87f5222f4",
+          "content_digest": "89d7cee95f269936adfa3b38e19acca09dc1780d6b448968e3315fc87f5222f4",
+          "byte_length": 5287,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/opsx/archive.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:fd18d7258de6002efbed97ab32e9ce61f2b7d899e3be6843dd64f6f2b5d88108",
+          "content_digest": "fd18d7258de6002efbed97ab32e9ce61f2b7d899e3be6843dd64f6f2b5d88108",
+          "byte_length": 5916,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/opsx/explore.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:8ed0cb6e9933a71f676ef94a5b865e5681155b04ceafbe0171160791673da156",
+          "content_digest": "8ed0cb6e9933a71f676ef94a5b865e5681155b04ceafbe0171160791673da156",
+          "byte_length": 7450,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/opsx/propose.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:b6f40402553e7348172fae8e154aa65284f49308a90d79209d2bdaae35059023",
+          "content_digest": "b6f40402553e7348172fae8e154aa65284f49308a90d79209d2bdaae35059023",
+          "byte_length": 5237,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/opsx/sync.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:df2c3ba5ad9bc4d6ecc8b35427285ad6355fc12fe1574cbca7bed165396075b1",
+          "content_digest": "df2c3ba5ad9bc4d6ecc8b35427285ad6355fc12fe1574cbca7bed165396075b1",
+          "byte_length": 5058,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/prune-codebase.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:47e6a73cd047b00416a19b212b8378d67220d377640c065c0a6e2074e4095a68",
+          "content_digest": "47e6a73cd047b00416a19b212b8378d67220d377640c065c0a6e2074e4095a68",
+          "byte_length": 26280,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/shallow-wiring-analysis.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:32c11e87a52d9b538ce8f8d980977822a1168fd9ca751425a99de6c48b8565d4",
+          "content_digest": "32c11e87a52d9b538ce8f8d980977822a1168fd9ca751425a99de6c48b8565d4",
+          "byte_length": 14019,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/commands/wire-modules.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:07ac2c997aebe19e2e6c52b06ff1aa11446e72fe7b870f744606ee6f8f0ff2f2",
+          "content_digest": "07ac2c997aebe19e2e6c52b06ff1aa11446e72fe7b870f744606ee6f8f0ff2f2",
+          "byte_length": 9213,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/DISTILLED_MEMORY.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
+          "content_digest": "e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
+          "byte_length": 508,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/FORBIDDEN.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:cb5b755463c0a137380ab259758f6631e073d983fa1a90b230c7b7880b640e74",
+          "content_digest": "cb5b755463c0a137380ab259758f6631e073d983fa1a90b230c7b7880b640e74",
+          "byte_length": 763,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/GPU_RULES.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:bc021939cc0f8c620e0121de3ce0be4eb5584d13b61d9a42eba7f51ab716f447",
+          "content_digest": "bc021939cc0f8c620e0121de3ce0be4eb5584d13b61d9a42eba7f51ab716f447",
+          "byte_length": 243,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/hooks/LLMS.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:2d1d24785db94024f0ddf5e42c13acbe64587d41b50db684333951261061f26d",
+          "content_digest": "2d1d24785db94024f0ddf5e42c13acbe64587d41b50db684333951261061f26d",
+          "byte_length": 1846,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/hooks/posttooluse-audit.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:4397bb89877c25b89203b3fa8e5999894202b331b9babc5c5dba0cfca44e839e",
+          "content_digest": "4397bb89877c25b89203b3fa8e5999894202b331b9babc5c5dba0cfca44e839e",
+          "byte_length": 2285,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/hooks/pretooluse-deny.mjs",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:09f8a67945e52bfa12c82a0b4a90016cfee4680863c9ffcd5ff0358b0bcd399c",
+          "content_digest": "09f8a67945e52bfa12c82a0b4a90016cfee4680863c9ffcd5ff0358b0bcd399c",
+          "byte_length": 6258,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/LLMS.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:341aee025916941e13d32882273243b1b6518a607e69951d3fb196c137c64a46",
+          "content_digest": "341aee025916941e13d32882273243b1b6518a607e69951d3fb196c137c64a46",
+          "byte_length": 1829,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/mcp.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:c6ea0532b66f20faf339ce8301d5f9db9f9da75415664ab45ede91fa9423c328",
+          "content_digest": "c6ea0532b66f20faf339ce8301d5f9db9f9da75415664ab45ede91fa9423c328",
+          "byte_length": 4418,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": "claude.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:89fdc51cde5f811cfa06f95db195baf957acd77408b763270e5f34023cd6d23f",
+          "content_digest": "89fdc51cde5f811cfa06f95db195baf957acd77408b763270e5f34023cd6d23f",
+          "byte_length": 324515,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/MEMORY_RULES.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:0d0fb14fc4c89664df72347e8ff8d6a92c060abbdf5db9b33f36f8a8b5a5fb66",
+          "content_digest": "0d0fb14fc4c89664df72347e8ff8d6a92c060abbdf5db9b33f36f8a8b5a5fb66",
+          "byte_length": 198,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/ONTOLOGY_RULES.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:e491ff80aa6f43d9606eafcbbb0a803e645036ed2f7f7f1be016460f23513b5c",
+          "content_digest": "e491ff80aa6f43d9606eafcbbb0a803e645036ed2f7f7f1be016460f23513b5c",
+          "byte_length": 415,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/PHASE-3-STEP-6-FIXTURES-COMPLETE.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:fc05beb3229dcdc2c80cff11bf80844048173b4fd649cc58367db2f54f8a12f1",
+          "content_digest": "fc05beb3229dcdc2c80cff11bf80844048173b4fd649cc58367db2f54f8a12f1",
+          "byte_length": 13194,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/PHASE-3-STEP-7-EVIDENCE-LEDGER-SCHEMA.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:25dd595543db60b1b47fdf7391b34b64bf9f25a11f77c03679bc127d40bae821",
+          "content_digest": "25dd595543db60b1b47fdf7391b34b64bf9f25a11f77c03679bc127d40bae821",
+          "byte_length": 7459,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/PHASE-3-STEP-8-DOMAIN-HIERARCHY-WIRED.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:10a5dcd2dd79ee6b7aed97f422564328dce03e45f2b87526d4bbf22a00cc4e4f",
+          "content_digest": "10a5dcd2dd79ee6b7aed97f422564328dce03e45f2b87526d4bbf22a00cc4e4f",
+          "byte_length": 9451,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/SESSION-155-LANGGRAPH-BRIDGE-ACTIVATED.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:be9bacb14c80dcda9e8b529493f692c638c0b99bb7bce20eb4cdcfdd6226196e",
+          "content_digest": "be9bacb14c80dcda9e8b529493f692c638c0b99bb7bce20eb4cdcfdd6226196e",
+          "byte_length": 8488,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/PROMPT_BLOCKS.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:8b71146dcac6d5cc5be43c639bb2951c89c7a0188d9a52b9f1fc64e47640d8b7",
+          "content_digest": "8b71146dcac6d5cc5be43c639bb2951c89c7a0188d9a52b9f1fc64e47640d8b7",
+          "byte_length": 442,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/REPLAY_PROOF_RULES.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:0b84d6e2c7de6121922960da1eac67bfc9c1b6a1ad7791c318a28f6c63a0712f",
+          "content_digest": "0b84d6e2c7de6121922960da1eac67bfc9c1b6a1ad7791c318a28f6c63a0712f",
+          "byte_length": 198,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/RETRIEVAL-20-STEP-TODO.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:d65b4571d985d49c5c5010a899b8d19f9b473b0a395e6a14b51407ba983d4833",
+          "content_digest": "d65b4571d985d49c5c5010a899b8d19f9b473b0a395e6a14b51407ba983d4833",
+          "byte_length": 4074,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/settings.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:1d9fa661054d0cdc20813737bc62778628ac7119a4188b1af12abd1306feedd5",
+          "content_digest": "1d9fa661054d0cdc20813737bc62778628ac7119a4188b1af12abd1306feedd5",
+          "byte_length": 9571,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/settings.local.json",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:32fed5fa33dd50cb46383382fb7ddd27ede23ccff49b4738df2d1ad0a9c11e2c",
+          "content_digest": "32fed5fa33dd50cb46383382fb7ddd27ede23ccff49b4738df2d1ad0a9c11e2c",
+          "byte_length": 46173,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/skills/atlas-tools-mcp/SKILL.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:671d6513d83a3cc915edd67cd8c85d5a8932a0a8bf7cab9d9b556cc13c2fbe11",
+          "content_digest": "671d6513d83a3cc915edd67cd8c85d5a8932a0a8bf7cab9d9b556cc13c2fbe11",
+          "byte_length": 6675,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/skills/bits-ui-svelte5/SKILL.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:e9dc4ab640ddf6924dbc525745f4df81b593ee308f6bae2faa8770b7cc2a2be6",
+          "content_digest": "e9dc4ab640ddf6924dbc525745f4df81b593ee308f6bae2faa8770b7cc2a2be6",
+          "byte_length": 3539,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:3224764997eb483b3784685fa8adc9379e46338b7b28e06badf3923c3dfcf392",
+          "content_digest": "3224764997eb483b3784685fa8adc9379e46338b7b28e06badf3923c3dfcf392",
+          "byte_length": 7529,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:23e34b2d4eb21332ec45df8f43b06aa4c0ebb8e4b9376fb762f13fbee4d621b1",
+          "content_digest": "23e34b2d4eb21332ec45df8f43b06aa4c0ebb8e4b9376fb762f13fbee4d621b1",
+          "byte_length": 13200,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/skills/codebase-todo-recommendations.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:5f851277425539c0d2faa0094c585dce30944dca8f7f0f5a8e5c5b26324ea4be",
+          "content_digest": "5f851277425539c0d2faa0094c585dce30944dca8f7f0f5a8e5c5b26324ea4be",
+          "byte_length": 7642,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/skills/drizzle-schema-review/SKILL.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:ace0002a04ae2ee4f43476c8d277202271e62f5f36a7bcedfe24b6f833fdf615",
+          "content_digest": "ace0002a04ae2ee4f43476c8d277202271e62f5f36a7bcedfe24b6f833fdf615",
+          "byte_length": 4103,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/skills/metadata-context-analysis/SKILL.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:19e7ba3b8bb880ce4f4b0c3ab9d876384a351062fd70050060dac7dd6d7aea80",
+          "content_digest": "19e7ba3b8bb880ce4f4b0c3ab9d876384a351062fd70050060dac7dd6d7aea80",
+          "byte_length": 2098,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        },
+        {
+          "source_ref": ".claude/skills/openspec-apply-change/SKILL.md",
+          "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "source_revision": "sha256:83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
+          "content_digest": "83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
+          "byte_length": 5465,
+          "producer_revision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+        }
+      ]
+    }
+  },
+  "counts": {
+    "manifestRows": 24456,
+    "manifestQualifiedRows": 24456,
+    "executionMembershipRows": 25542,
+    "executionRootMembershipRows": 24456,
+    "legacyExecutionFileRows": 0,
+    "graphifyFileRows": 0,
+    "workspaceBindingRows": 24456,
+    "executionWorkspaceRevisionMatches": 24456,
+    "executionSourceRevisionQualified": 24456,
+    "executionContentDigestQualified": 24456,
+    "executionExactManifestMatches": 24456,
+    "graphifyExactManifestMatches": 0,
+    "workspaceBindingExactManifestMatches": 24456
+  },
+  "mismatches": {
+    "membershipWorkspaceRevision": {},
+    "membershipMissingManifest": {},
+    "membershipSourceRevision": {},
+    "membershipContentDigest": {},
+    "graphifyMissingManifest": {},
+    "bindingMissingManifest": {}
+  },
+  "status": "CURRENT_SOURCE_BRIDGE_EXACT_READ_ONLY",
+  "execution": {
+    "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "status": "COMPLETED",
+    "canonical_authority": true,
+    "legacy_graphify_run_id": "01a8d8fc-2507-4f39-868e-039039237b98"
+  },
+  "sourceSelection": {
+    "status": "COMPLETED",
+    "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+    "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+  },
+  "comparisons": {
+    "executionMembershipV2": [
+      {
+        "sourceRef": "2-CONTEXT.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "724_agents.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ACE-BITFROST-WORKER-INTEGRATION.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-pipeline-audit.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ACE-QUICK-REFERENCE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ACE-SUMMARY-LATENCY-IMPACT.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.test.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.test.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "AGENTIC-WORKFLOW-PLAN-SUMMARY.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "AGENTS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "apply-parent-atlas-policy-bundle.ps1",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ARCHITECTURAL-CORRECTION-PHASE-102.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ARCHITECTURE-AUDIT-REFACTOR-COMPLETE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ARCHITECTURE_CHECKPOINT_2026_06_11.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ARCHITECTURE-EVOLUTION-PHASES-8-10.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ARCHITECTURE_SPEC.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "atlas.config.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS-FREEZE-DECISION.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS-INFRASTRUCTURE-STATE-2026-07-08.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS-LANES-DEPENDENCY-GRAPH.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS_READY.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS-STABLE-BASELINES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS-STATUS-RECONCILIATION.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "audit-4-layers.sh",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "AUDIT-GRAPHIFY-READINESS-INFRASTRUCTURE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "audit-opencode-state.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "audit/public-route-allowlist.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "backfill-neo4j-cell-id.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "backfill-payload-metadata.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "backfill-qdrant-by-packet-key.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "backfill-qdrant-identity.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "backfill-qdrant-via-patch.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "BATCH-GPU-ACCELERATION-ANALYSIS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "BATCH-SUMMARIZATION-QUICK-START.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "BATCH-SUMMARIZATION-READY.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "big-tools-request.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "CARD-1-QUICK-START.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "Cargo.toml",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "check-neo4j.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "CHUNK-BACKFILL-EXECUTION-PLAN.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "CHUNK-BACKFILL-EXECUTION-SUMMARY.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "CHUNK-BACKFILL-QUICK-REFERENCE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".clarity/ff1-plan.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "CLASSIFIER-SIDECAR-INDEX.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/AGENT_CONSTITUTION.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/AGENT_RECOMMENDATIONS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/agents/drizzle-inspector.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/agents/obsidian-cartographer.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/agents/sveltekit-route-auditor.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/agents/topology-medic.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/ATLAS-ENGINEERING-PROMPT.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/CLAUDE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/audit-components.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/audit-duplication.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/deep-audit.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/graphify.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/nes-arch.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/opsx/apply.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/opsx/archive.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/opsx/explore.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/opsx/propose.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/opsx/sync.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/prune-codebase.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/shallow-wiring-analysis.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/wire-modules.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/DISTILLED_MEMORY.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/FORBIDDEN.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/GPU_RULES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/hooks/LLMS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/hooks/posttooluse-audit.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/hooks/pretooluse-deny.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/LLMS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/mcp.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "claude.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/MEMORY_RULES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/ONTOLOGY_RULES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/PHASE-3-STEP-6-FIXTURES-COMPLETE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/PHASE-3-STEP-7-EVIDENCE-LEDGER-SCHEMA.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/PHASE-3-STEP-8-DOMAIN-HIERARCHY-WIRED.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/SESSION-155-LANGGRAPH-BRIDGE-ACTIVATED.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/PROMPT_BLOCKS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/REPLAY_PROOF_RULES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/RETRIEVAL-20-STEP-TODO.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/settings.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/settings.local.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/atlas-tools-mcp/SKILL.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/bits-ui-svelte5/SKILL.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/codebase-mapping-json-ingestion.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/codebase-todo-recommendations.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/drizzle-schema-review/SKILL.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/metadata-context-analysis/SKILL.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/openspec-apply-change/SKILL.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      }
+    ],
+    "graphifyFiles": [],
+    "workspaceBindings": [
+      {
+        "sourceRef": "2-CONTEXT.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "724_agents.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ACE-BITFROST-WORKER-INTEGRATION.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-pipeline-audit.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ACE-QUICK-REFERENCE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ACE-SUMMARY-LATENCY-IMPACT.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.test.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.test.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.ts",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "AGENTIC-WORKFLOW-PLAN-SUMMARY.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "AGENTS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "apply-parent-atlas-policy-bundle.ps1",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ARCHITECTURAL-CORRECTION-PHASE-102.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ARCHITECTURE-AUDIT-REFACTOR-COMPLETE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ARCHITECTURE_CHECKPOINT_2026_06_11.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ARCHITECTURE-EVOLUTION-PHASES-8-10.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ARCHITECTURE_SPEC.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "atlas.config.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS-FREEZE-DECISION.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS-INFRASTRUCTURE-STATE-2026-07-08.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS-LANES-DEPENDENCY-GRAPH.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS_READY.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS-STABLE-BASELINES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "ATLAS-STATUS-RECONCILIATION.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "audit-4-layers.sh",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "AUDIT-GRAPHIFY-READINESS-INFRASTRUCTURE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "audit-opencode-state.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "audit/public-route-allowlist.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "backfill-neo4j-cell-id.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "backfill-payload-metadata.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "backfill-qdrant-by-packet-key.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "backfill-qdrant-identity.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "backfill-qdrant-via-patch.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "BATCH-GPU-ACCELERATION-ANALYSIS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "BATCH-SUMMARIZATION-QUICK-START.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "BATCH-SUMMARIZATION-READY.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "big-tools-request.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "CARD-1-QUICK-START.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "Cargo.toml",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "check-neo4j.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "CHUNK-BACKFILL-EXECUTION-PLAN.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "CHUNK-BACKFILL-EXECUTION-SUMMARY.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "CHUNK-BACKFILL-QUICK-REFERENCE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".clarity/ff1-plan.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "CLASSIFIER-SIDECAR-INDEX.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/AGENT_CONSTITUTION.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/AGENT_RECOMMENDATIONS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/agents/drizzle-inspector.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/agents/obsidian-cartographer.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/agents/sveltekit-route-auditor.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/agents/topology-medic.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/ATLAS-ENGINEERING-PROMPT.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/CLAUDE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/audit-components.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/audit-duplication.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/deep-audit.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/graphify.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/nes-arch.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/opsx/apply.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/opsx/archive.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/opsx/explore.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/opsx/propose.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/opsx/sync.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/prune-codebase.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/shallow-wiring-analysis.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/commands/wire-modules.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/DISTILLED_MEMORY.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/FORBIDDEN.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/GPU_RULES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/hooks/LLMS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/hooks/posttooluse-audit.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/hooks/pretooluse-deny.mjs",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/LLMS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/mcp.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": "claude.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/MEMORY_RULES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/ONTOLOGY_RULES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/PHASE-3-STEP-6-FIXTURES-COMPLETE.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/PHASE-3-STEP-7-EVIDENCE-LEDGER-SCHEMA.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/PHASE-3-STEP-8-DOMAIN-HIERARCHY-WIRED.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/projects/c--Users-james-Videos-deeds-web-app/memory/SESSION-155-LANGGRAPH-BRIDGE-ACTIVATED.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/PROMPT_BLOCKS.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/REPLAY_PROOF_RULES.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/RETRIEVAL-20-STEP-TODO.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/settings.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/settings.local.json",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/atlas-tools-mcp/SKILL.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/bits-ui-svelte5/SKILL.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/codebase-mapping-json-ingestion.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/codebase-todo-recommendations.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/drizzle-schema-review/SKILL.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/metadata-context-analysis/SKILL.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      },
+      {
+        "sourceRef": ".claude/skills/openspec-apply-change/SKILL.md",
+        "existsInManifest": true,
+        "workspaceRevisionMatch": true,
+        "sourceRevisionMatch": true,
+        "contentDigestMatch": true,
+        "byteLengthMatch": true,
+        "qualified": true
+      }
+    ]
+  },
+  "identityChecks": {
+    "executionFound": true,
+    "executionRevisionMatchesAdmission": true,
+    "executionCompleted": true,
+    "executionCanonicalAuthority": true,
+    "sourceSelectionCompleted": true,
+    "membershipUsesCurrentRevision": true,
+    "manifestMembershipCountMatches": true,
+    "exactCurrentSourceBridge": true,
+    "bindingRowsAreCurrent": true
+  },
+  "nextGate": "INDEPENDENT_SOURCE_BINDING_READBACK_AND_PACKET_MATERIALIZATION_AUDIT",
+  "receiptChecksum": "sha256:136813919637d5ff79189635c7dd279912bab09a57a528392924ec965c8dafea"
+}

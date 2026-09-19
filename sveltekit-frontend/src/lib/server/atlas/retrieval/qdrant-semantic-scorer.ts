@@ -6,6 +6,7 @@ import {
   QDRANT_SEMANTIC_COLLECTION,
   QDRANT_SEMANTIC_VECTOR_NAME,
 } from './qdrant-semantic-projection.js';
+import { buildSemantic768IdentityManifestV1 } from './semantic768-identity-manifest-v1.js';
 
 export interface QdrantSemanticScoreV1 {
   packetKey: string;
@@ -42,6 +43,9 @@ export interface QdrantSemanticScoreReceiptV1 {
   embeddingExecMs: number;
   queryVector: number[];
   scores: QdrantSemanticScoreV1[];
+  identityManifestChecksum: string | null;
+  matrixChecksum: string | null;
+  manifestStatus: 'NOT_RUN' | 'PROVEN_FOR_RETURNED_PROJECTION' | 'BLOCKED_SOURCE_REVISION_AUTHORITY' | 'BLOCKED_MIXED_PROJECTION_REVISION';
 }
 
 function nullableString(value: unknown): string | null {
@@ -81,6 +85,9 @@ export async function scoreQdrantSemanticCandidatesV1(
       embeddingExecMs: 0,
       queryVector: [],
       scores: [],
+      identityManifestChecksum: null,
+      matrixChecksum: null,
+      manifestStatus: 'NOT_RUN',
     };
   }
 
@@ -143,6 +150,22 @@ export async function scoreQdrantSemanticCandidatesV1(
       : projectionRevisions.size === 0 && representationRevisions.size === 0
         ? 'unversioned-qdrant-projection'
         : 'mixed-projection-revisions';
+  const hasSourceRevisions = scores.length > 0 && scores.every((score) => Boolean(score.sourceRevision?.trim()));
+  const manifestStatus = !hasSourceRevisions
+    ? 'BLOCKED_SOURCE_REVISION_AUTHORITY'
+    : semanticRevision === 'mixed-projection-revisions'
+      ? 'BLOCKED_MIXED_PROJECTION_REVISION'
+      : 'PROVEN_FOR_RETURNED_PROJECTION';
+  const manifest = manifestStatus === 'PROVEN_FOR_RETURNED_PROJECTION'
+    ? buildSemantic768IdentityManifestV1({
+      representationRevision: semanticRevision,
+      rows: scores.map((score) => ({
+        packetKey: score.packetKey,
+        sourceRevision: score.sourceRevision!,
+        vector: score.vector,
+      })),
+    })
+    : null;
 
   return {
     schema: 'atlas.qdrant-semantic-score-receipt.v2',
@@ -158,5 +181,8 @@ export async function scoreQdrantSemanticCandidatesV1(
     embeddingExecMs: embedding.exec_ms,
     queryVector: Array.from(embedding.vector),
     scores,
+    identityManifestChecksum: manifest?.identityManifestChecksum ?? null,
+    matrixChecksum: manifest?.matrixChecksum ?? null,
+    manifestStatus,
   };
 }

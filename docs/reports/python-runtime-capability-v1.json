@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.python-runtime-receipt.v1",
+  "generatedAt": "2026-09-19T05:34:50.328Z",
+  "status": "RUNTIME_RECEIPT_PROVEN",
+  "pythonExecutable": "python",
+  "probe": {
+    "abi_flags": "",
+    "executable": "C:\\Python313\\python.exe",
+    "executor_hints": {
+      "neo4j_io": "ASYNCIO_OR_THREAD_POOL",
+      "networkx_cpu": "PROCESS_POOL",
+      "pytorch_cuda": "ISOLATED_GPU_WORKER",
+      "qdrant_io": "ASYNCIO_OR_THREAD_POOL",
+      "recommended_cpu_workers": "2",
+      "shared_cuda_context_across_python_threads": "DO_NOT_ASSUME_SAFE_OR_BENEFICIAL"
+    },
+    "free_thread_build": false,
+    "gil_enabled_after_imports": true,
+    "gil_enabled_before_imports": true,
+    "gil_reenabled_by_extension_import": false,
+    "host_memory_available_mb": 7307,
+    "host_memory_total_mb": 32649,
+    "implementation": "CPython",
+    "neo4j": {
+      "available": true,
+      "import_error": null,
+      "version": "6.0.3"
+    },
+    "networkx": {
+      "available": true,
+      "import_error": null,
+      "version": "3.3"
+    },
+    "python_version": "3.13.5",
+    "qdrant_client": {
+      "available": true,
+      "import_error": null,
+      "version": null
+    },
+    "schema": "atlas.python-runtime-capability.v1",
+    "torch": {
+      "available": true,
+      "import_error": null,
+      "version": "2.8.0+cu128"
+    },
+    "torch_cuda_available": true,
+    "torch_cuda_device_count": 1
+  },
+  "workerPolicy": {
+    "io": "ASYNCIO_OR_THREAD_POOL",
+    "cpu": "PROCESS_POOL",
+    "gpu": "ISOLATED_GPU_WORKER",
+    "maxConcurrentGpuOwners": 1
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "error": null
+}

@@ -10,6 +10,11 @@ export const AceBitfrostCacheIdentityV1Schema = z
     artifactKind: z.string().min(1),
     /** Request binding for route-scoped artifacts; absent on non-request caches. */
     requestHash: revision.optional(),
+    modelRevision: revision.optional(),
+    adapterRevision: revision.optional(),
+    workspaceRevision: revision.optional(),
+    sourceRevision: revision.optional(),
+    packetRevision: revision.optional(),
     representationId: z.string().min(1),
     representationRevision: revision,
     candidateSnapshotRevision: revision,
@@ -66,6 +71,11 @@ export function buildAceBitfrostCacheKeyV1(input: AceBitfrostCacheIdentityV1): s
     identity.representationId,
     identity.representationRevision,
     identity.candidateSnapshotRevision,
+    identity.modelRevision ?? 'model:unspecified',
+    identity.adapterRevision ?? 'adapter:unspecified',
+    identity.workspaceRevision ?? 'workspace:unspecified',
+    identity.sourceRevision ?? 'source:unspecified',
+    identity.packetRevision ?? 'packet:unspecified',
     checksum,
   ]
     .map((part) => encodeURIComponent(part))

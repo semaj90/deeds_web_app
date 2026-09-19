@@ -149,4 +149,20 @@ describe('canonical identity closes the multi-projection double-vote bug', () =>
     const expectedScore = 1 / (60 + 1);
     expect(result[0]!.combinedScore).toBeCloseTo(expectedScore, 10);
   });
+
+  it('treats Go Retrieval, Qdrant, and cuVS as one semantic vote', () => {
+    const lanes: ContextHit[][] = [
+      [{ id: 'qdrant-point', source: 'qdrant_vector', score: 0.95, metadata: { packet_key: 'pkt:shared' } }],
+      [{ id: 'go-point', source: 'go_retrieval_semantic', score: 0.90, metadata: { packet_key: 'pkt:shared' } }],
+      [{ id: 'cuvs-point', source: 'turbovec_ann', score: 0.85, metadata: { packet_key: 'pkt:shared' } }],
+    ];
+    const normalized = lanes.map((lane) => normalizeCanonicalIdentity(lane));
+    const result = combineViaRRF(normalized, ['qdrant_vector', 'go_retrieval_semantic', 'turbovec_ann']);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]!.id).toBe('pkt:shared');
+    expect(result[0]!.sources).toEqual(['qdrant_vector', 'go_retrieval_semantic', 'turbovec_ann']);
+    expect(result[0]!.breakdown).toHaveLength(3);
+    expect(result[0]!.combinedScore).toBeCloseTo(1 / 61, 10);
+  });
 });

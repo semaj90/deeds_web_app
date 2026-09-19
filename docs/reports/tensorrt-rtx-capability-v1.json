@@ -1,0 +1,20 @@
+{
+  "schema": "TensorRtRtxCapabilityReceiptV1",
+  "generatedAt": "2026-09-19T05:06:19.782Z",
+  "readOnly": true,
+  "status": "NOT_INSTALLED_OR_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "observedTensorRT": "10.13.3.9",
+  "tensorRtRtxVersion": null,
+  "cudaToolkit": "13.0",
+  "computeCapability": "8.6",
+  "compatibility": "UNRESOLVED",
+  "engineBuilt": false,
+  "runtimeCacheObserved": false,
+  "evidence": [
+    "atlas-gpu-inference-stack-readiness-v1.json",
+    "rapids-runtime-alignment-v1.json"
+  ],
+  "nextGate": "PIN_OFFICIAL_SUPPORT_MATRIX_THEN_RUN_ISOLATED_CAPABILITY_CHECK"
+}

@@ -9,6 +9,7 @@ const BASE = {
 	passId: 'kmeans-fixture-1',
 	algorithmRevision: 'kmeans-v1',
 	inputSnapshotChecksum: 'sha256:fixture-input-abc',
+	boundary: 'SAFE_RESUME' as const,
 	iteration: 3,
 	maxIterations: 50,
 	derivedArtifactChecksum: 'sha256:centroids-at-iter-3',
@@ -22,6 +23,11 @@ describe('AtlasPassCheckpointV1 contract', () => {
 		expect(cp.schema).toBe('atlas.pass-checkpoint.v1');
 		expect(cp.stopReason).toBeNull();
 		expect(cp.converged).toBe(false);
+		expect(cp.boundary).toBe('SAFE_RESUME');
+	});
+
+	it('requires an explicit meaningful pass boundary', () => {
+		expect(() => createAtlasPassCheckpointV1({ ...BASE, boundary: 'ITERATION' as never })).toThrow();
 	});
 
 	it('rejects iteration > maxIterations', () => {
@@ -188,6 +194,7 @@ describe('AtlasPassCheckpointV1 resume-from-boundary proof (task 7.3)', () => {
 			passId: 'kmeans-fixture-1',
 			algorithmRevision: 'kmeans-v1',
 			inputSnapshotChecksum,
+			boundary: 'SAFE_RESUME',
 			iteration: partial.iteration,
 			maxIterations: MAX_ITERATIONS,
 			derivedArtifactChecksum: checksumOf(partial.centroids),

@@ -1,17 +1,16 @@
 {
   "schema": "atlas.current-tree-bound-symbol-registry-input-plan.v1",
   "gate": "GRAPH-RESOLVE-06B.3",
-  "status": "REVIEW_ONLY_PLAN_READY",
+  "status": "CURRENT_WORKSPACE_REVISION_REQUIRED",
   "sourceResolutionPath": ".tmp/atlas/current-structural-symbol-resolution-v1.ndjson",
   "nominationsPath": ".tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl",
   "outputPath": ".tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson",
-  "currentWorkspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+  "currentWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
   "entryCount": 461,
   "counts": {
-    "NON_PROMOTABLE_KIND_REVIEW_ONLY": 338,
-    "REGISTER_NEW_EXACT_REVIEW_ONLY": 123
+    "STALE_WORKSPACE_REVISION_REVIEW_ONLY": 461
   },
-  "planChecksum": "sha256:de8c8349c8186e63b7983e8af56adf4a20c17565a9b60f5508e2691fd83ccc9b",
+  "planChecksum": "sha256:011a7d0b66f80f451b20ad7d8af1fd8e53f19c44b1c61b2c2b74b7f5bb88a3e2",
   "identityPolicy": "sourceRef + sourceRevision + kind + name + byte span; deterministic proposed IDs only",
   "canonicalWrites": 0,
   "databaseWrites": 0,
@@ -19,5 +18,5 @@
   "symbolVersionWrites": 0,
   "promotionAuthorized": false,
   "readOnly": true,
-  "nextGate": "REVIEW_CURRENT_REGISTRY_INPUT_BEFORE_ANY_PROMOTION"
+  "nextGate": "REGENERATE_SYMBOL_INPUT_FROM_CURRENT_WORKSPACE_OWNER"
 }

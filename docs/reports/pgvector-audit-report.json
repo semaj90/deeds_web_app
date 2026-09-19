@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T04:36:27.149Z",
+  "generatedAt": "2026-09-19T05:11:51.601Z",
   "embeddingDim": 768,
   "allowedDims": [
     768,
@@ -14,7 +14,7 @@
     {
       "check": "extension_in_migrations",
       "pass": true,
-      "message": "CREATE EXTENSION vector found in 13 migration file(s).",
+      "message": "CREATE EXTENSION vector found in 17 migration file(s).",
       "files": [
         "sveltekit-frontend\\drizzle\\manual\\0009_hybrid_graph_indexes.sql",
         "sveltekit-frontend\\drizzle\\manual\\0013_codeintel_indexes.sql",
@@ -27,6 +27,10 @@
         "sveltekit-frontend\\drizzle\\manual\\20260510_evidence_columns.sql",
         "sveltekit-frontend\\drizzle\\manual\\20260521_summary_cards.sql",
         "sveltekit-frontend\\drizzle\\manual\\20260606_round3_active_consumers.sql",
+        "sveltekit-frontend\\drizzle\\manual\\20260817_atlas_feature_intelligence_v1.sql",
+        "sveltekit-frontend\\drizzle\\manual\\20260819_atlas_observation_feature_rows_v1.sql",
+        "sveltekit-frontend\\drizzle\\manual\\20260826_restore_nes_chrom_packets_v1.sql",
+        "sveltekit-frontend\\drizzle\\manual\\20260904_external_doc_intelligence_v1.sql",
         "sveltekit-frontend\\drizzle\\manual\\rag_query_analytics.sql",
         "sveltekit-frontend\\drizzle\\manual\\screenshot_artifacts.sql"
       ],
@@ -49,45 +53,59 @@
     },
     {
       "check": "vector_dimensions",
-      "pass": true,
-      "message": "All vector columns use allowed dimensions (768/1536/384/512/128/64/32).",
-      "violations": [],
-      "suggestedFix": null
+      "pass": false,
+      "message": "Non-standard vector dimensions found: sveltekit-frontend\\src\\lib\\server\\db\\schema-postgres.ts:256",
+      "violations": [
+        {
+          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema-postgres.ts",
+          "dim": 256,
+          "expected": 768
+        }
+      ],
+      "suggestedFix": "Change vector dimensions to 768 (embeddinggemma:latest canonical output) or 64 (autoencoder compressed)."
     },
     {
       "check": "live_postgres",
       "reachable": true,
       "pass": true,
-      "vectorExtension": "v0.8.2",
+      "vectorExtension": "v0.8.3",
       "hnswIndexes": [
-        "agent_memory_observations.agent_memory_observations_embedding_hnsw",
-        "atlas_packets.idx_atlas_packets_embedding_hnsw",
-        "atlas_summary_layers.idx_summary_embedding",
+        "agent_observations.idx_agent_observations_hnsw",
+        "agent_observations.idx_agent_observations_hnsw_768",
+        "atlas_class_search_index_v1.atlas_class_search_index_v1_embedding_hnsw",
+        "atlas_embeddings_384.idx_ae384_content_hnsw",
+        "atlas_external_doc_chunks.aedc_embedding_hnsw",
+        "atlas_feature_embeddings.atlas_feature_embeddings_hnsw_cosine_idx",
+        "atlas_packet_registry.idx_packet_embedding_cosine",
+        "atlas_relationship_embeddings.atlas_relationship_embeddings_hnsw_cosine_idx",
         "cluster_summaries.cluster_summaries_embedding_hnsw",
         "code_retrieval_chunks.crc_embedding_hnsw",
-        "codebase_chunk_index.codebase_chunk_index_summary_hnsw",
+        "codebase_chunk_index.idx_codebase_chunk_latent_128_hnsw",
         "codebase_chunk_index.codebase_chunk_index_content_hnsw",
-        "codebase_embeddings.idx_codebase_embeddings_hnsw",
+        "codebase_chunk_index.codebase_chunk_index_summary_hnsw",
+        "codebase_chunk_index.idx_codebase_chunk_summary_embedding_384_hnsw",
+        "codebase_chunk_index.idx_codebase_chunk_latent64_hnsw",
+        "codebase_chunk_index.idx_codebase_chunk_content_embedding_768_hnsw",
+        "codebase_chunk_index.idx_codebase_chunk_latent_256_hnsw",
+        "codebase_chunk_index.idx_codebase_chunk_error_embedding_latent_128_hnsw",
+        "codebase_chunk_index.idx_codebase_chunk_index_error_embedding_hnsw",
+        "codebase_chunk_index.idx_codebase_chunk_error_embedding_latent_256_hnsw",
+        "codebase_chunk_index.idx_codebase_chunk_error_embedding_latent64_hnsw",
         "document_embeddings.document_embeddings_hnsw_idx",
         "embedded_summaries.idx_embedded_summaries_vector_hnsw",
         "embedding_cache.embedding_cache_hnsw_idx",
         "evidence_vectors.evidence_vectors_hnsw_idx",
-        "feature_registry_vectors.feature_registry_vectors_embedding_hnsw",
         "fixer_patterns.fp_embedding_hnsw_idx",
         "legal_documents.legal_documents_hnsw_idx",
         "nes_chrom_packets.nes_chrom_packets_embedding_hnsw",
-        "parent_atlas_rg_vectors.idx_parent_atlas_rg_vectors_embedding_768",
-        "parent_atlas_vectors.idx_parent_atlas_vectors_embedding_768",
         "rag_query_log.rag_query_log_embedding_hnsw",
         "research_summaries.rs_embedding_hnsw",
         "screenshot_artifacts.screenshot_artifacts_caption_embedding_hnsw_idx",
-        "semantic_cache.semantic_cache_embed_hnsw",
-        "summary_cards.idx_summary_cards_embedding_hnsw",
-        "vector_smoke.vector_smoke_hnsw_idx",
+        "tool_registry.tool_registry_embedding_hnsw",
         "warden_chunks.warden_chunks_hnsw_idx"
       ],
       "missingHnswOnExistingTables": [],
-      "message": "pgvector 0.8.2 installed. 25 HNSW index(es) found.",
+      "message": "pgvector 0.8.3 installed. 33 HNSW index(es) found.",
       "suggestedFix": null
     }
   ],

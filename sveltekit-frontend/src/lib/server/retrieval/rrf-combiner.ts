@@ -8,6 +8,7 @@
 export type RetrievalLaneName =
   | 'postgres_trigram'
   | 'qdrant_vector'
+  | 'go_retrieval_semantic'
   | 'turbovec_ann'
   | 'concept_overlap'
   | 'neo4j_graph'
@@ -47,6 +48,7 @@ export interface RRFScore {
 function toLogicalLaneName(laneName: RetrievalLaneName): string {
   switch (laneName) {
     case 'qdrant_vector':
+    case 'go_retrieval_semantic':
     case 'turbovec_ann':
       return 'semantic';
     default:

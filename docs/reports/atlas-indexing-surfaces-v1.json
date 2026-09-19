@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-09-16T22:57:10.733Z",
+  "generatedAt": "2026-09-18T15:32:38.978Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {

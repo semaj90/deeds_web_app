@@ -1,6 +1,6 @@
 {
   "schema": "atlas.packet-writer-lineage.v1",
-  "generatedAt": "2026-09-15T22:13:40.748Z",
+  "generatedAt": "2026-09-19T05:49:35.718Z",
   "mode": "READ_ONLY_SOURCE_CENSUS",
   "gate": "PACKET-WRITER-LINEAGE-01",
   "writesPerformed": false,
@@ -9,7 +9,7 @@
     "atlas_packets.sha256"
   ],
   "liveSchemaDependency": {
-    "sourceRevisionColumn": "UNPROVEN_LIVE_ABSENT_PER_PACKET_WRITE_REVISION_CONTRACT_AUDIT",
+    "sourceRevisionColumn": "PRESENT_BUT_UNPOPULATED",
     "workspaceRevision": "PRESENT_BUT_HISTORICAL_DEFAULT_SHAPED",
     "contentHash": "PRESENT_BUT_SPARSE"
   },
@@ -21,7 +21,7 @@
       "entrypoints": [
         "persistCanonicalSemanticPacketEmbedding"
       ],
-      "sourceChecksum": "sha256:6d323fd17d2bf8969a4acd000474c87a97b9283b33be63032666fb1da26a3c3d",
+      "sourceChecksum": "sha256:54d732834c51f48a87f275d2d87d3fc0f2738128687167c30674e7ebfc98fd3c",
       "referencedLineageFields": [
         "source_revision"
       ],
@@ -89,7 +89,7 @@
       "entrypoints": [
         "INSERT INTO atlas_packets"
       ],
-      "sourceChecksum": "sha256:6c711db448220a0b32c00335c9ade475c4035b409fc007d5cff2c5bcdc5c981e",
+      "sourceChecksum": "sha256:b9d8fa509704f67dcf0a9c725714800b033e6a5a7e19a1f95cb353d7dc4eb801",
       "referencedLineageFields": [
         "packet_key",
         "source_ref",

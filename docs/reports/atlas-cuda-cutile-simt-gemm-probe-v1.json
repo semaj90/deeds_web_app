@@ -1,0 +1,17 @@
+{
+  "availability": {
+    "importError": "cuda: No module named 'cuda'"
+  },
+  "canonicalAuthority": false,
+  "fixture": {
+    "repeats": 3,
+    "shape": [
+      256,
+      256,
+      256
+    ]
+  },
+  "schema": "atlas.cuda-cutile-simt-gemm-probe.v1",
+  "status": "CUTILE_SIMT_UNAVAILABLE",
+  "writes": false
+}

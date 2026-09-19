@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "description": "Isolated, read-only WebGPU capability proof for Parent Atlas semantic_768.",
+  "scripts": {
+    "prove:webgpu-only": "node prove-embeddinggemma-onnx-webgpu-only-v1.mjs"
+  },
   "engines": {
     "node": ">=22"
   },

@@ -17,16 +17,27 @@ describe('Atlas Mastra request context', () => {
     expect(context.atlasRuntime.packetRevision).toBe('packet-rev-1');
   });
 
-  it('does not invent revisions for legacy callers', async () => {
-    const context = await createAtlasRequestContext({
+  it('rejects missing workspace revisions', async () => {
+    await expect(createAtlasRequestContext({
       runId: 'run-2',
       threadId: 'thread-2',
       resourceId: 'resource-2',
       workspaceId: 'workspace-2',
       packetKey: 'packet-2',
-    });
+      workspaceRevision: '',
+      packetRevision: 'packet-rev-2',
+    })).rejects.toThrow('ADMITTED_WORKSPACE_REVISION_REQUIRED');
+  });
 
-    expect(context.atlasRuntime.workspaceRevision).toBe('');
-    expect(context.atlasRuntime.packetRevision).toBe('');
+  it('rejects missing packet revisions', async () => {
+    await expect(createAtlasRequestContext({
+      runId: 'run-3',
+      threadId: 'thread-3',
+      resourceId: 'resource-3',
+      workspaceId: 'workspace-3',
+      packetKey: 'packet-3',
+      workspaceRevision: 'workspace-rev-3',
+      packetRevision: '',
+    })).rejects.toThrow('PACKET_REVISION_REQUIRED');
   });
 });

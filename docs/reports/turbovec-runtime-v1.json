@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.turbovec-runtime-receipt.v1",
+  "generatedAt": "2026-09-18T16:25:38.919Z",
+  "status": "RUNTIME_OBSERVED_UNPROMOTED",
+  "endpoint": "http://127.0.0.1:8791",
+  "importProbe": {
+    "importable": true,
+    "origin": "C:\\Users\\james\\AppData\\Roaming\\Python\\Python313\\site-packages\\turbovec\\__init__.py"
+  },
+  "wheelPaths": [
+    {
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\vendor\\wheels\\turbovec-0.3.0-cp39-abi3-winamd64.whl",
+      "present": false
+    },
+    {
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\wheels\\turbovec-0.3.0-cp39-abi3-winamd64.whl",
+      "present": false
+    }
+  ],
+  "health": {
+    "status": 200,
+    "ok": true,
+    "body": {
+      "ok": true,
+      "indexed": 327820,
+      "dim": 64,
+      "bits": 4,
+      "turbovec": true,
+      "collection": "codebase_chunks_768"
+    }
+  },
+  "executor": "turbovec",
+  "role": "semantic_prefilter_challenger",
+  "additionalSemanticVote": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-stale-run-reconciliation.v1",
-  "generatedAt": "2026-09-14T03:07:08.960Z",
+  "generatedAt": "2026-09-18T22:12:58.213Z",
   "mode": "READ_ONLY_STALE_RUN_RECONCILIATION",
   "expectedWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
   "staleAfterMs": 21600000,
@@ -8,8 +8,8 @@
   "transaction": {
     "isolation_level": "repeatable read",
     "read_only": "on",
-    "snapshot": "6577938:6577938:",
-    "audit_pid": 15016
+    "snapshot": "6798236:6798236:",
+    "audit_pid": 3163
   },
   "graphifyRunColumns": [
     "run_id",
@@ -56,7 +56,7 @@
     "anyGraphifyRelationLockPresent": true,
     "runtimeOwnerEvidenceAbsent": false,
     "staleByAge": true,
-    "currentAgeMs": 1465545959,
+    "currentAgeMs": 1879895212,
     "exactRunBoundBackends": [],
     "exactRunBoundLocks": []
   },
@@ -64,15 +64,15 @@
     "graphRevision": null,
     "graphRevisionColumnPresent": false,
     "structuralRevisionMatches": false,
-    "resolutionRevisionMatches": true,
+    "resolutionRevisionMatches": false,
     "resolutionCoverage": {
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "totalUnresolvedEdges": 10506,
-      "syntaxOnlyTotal": 776,
-      "syntaxOnlyProcessed": 776,
-      "unresolvedTargetTotal": 9730,
-      "unresolvedTargetProcessed": 210,
-      "unresolvedTargetSampleIsPartial": true,
+      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
+      "totalUnresolvedEdges": 0,
+      "syntaxOnlyTotal": 0,
+      "syntaxOnlyProcessed": 0,
+      "unresolvedTargetTotal": 0,
+      "unresolvedTargetProcessed": 0,
+      "unresolvedTargetSampleIsPartial": false,
       "perEdgeResultsPersisted": false
     },
     "canonicalCompletionEligible": false,
@@ -92,6 +92,7 @@
     "GRAPH_REVISION_NOT_RECORDED_ON_RUN",
     "PER_EDGE_STRUCTURAL_OUTCOME_DETAIL_NOT_PERSISTED",
     "STRUCTURAL_ARTIFACT_REVISION_MISMATCH_OR_MISSING",
+    "STRUCTURAL_RESOLUTION_REVISION_MISMATCH_OR_MISSING",
     "RUNTIME_OWNER_BINDING_CONFLICTING_OR_UNPROVEN"
   ],
   "writes": {
@@ -129,7 +130,7 @@
     "activity": [],
     "locks": [
       {
-        "pid": 15016,
+        "pid": 3163,
         "mode": "AccessShareLock",
         "granted": true,
         "relname": "graphify_runs"
@@ -143,13 +144,13 @@
     "structuralPlanPresent": true,
     "structuralResolutionPresent": true,
     "resolutionCoverage": {
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "totalUnresolvedEdges": 10506,
-      "syntaxOnlyTotal": 776,
-      "syntaxOnlyProcessed": 776,
-      "unresolvedTargetTotal": 9730,
-      "unresolvedTargetProcessed": 210,
-      "unresolvedTargetSampleIsPartial": true,
+      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
+      "totalUnresolvedEdges": 0,
+      "syntaxOnlyTotal": 0,
+      "syntaxOnlyProcessed": 0,
+      "unresolvedTargetTotal": 0,
+      "unresolvedTargetProcessed": 0,
+      "unresolvedTargetSampleIsPartial": false,
       "perEdgeResultsPersisted": false
     }
   }

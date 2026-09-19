@@ -95,11 +95,11 @@
     ],
     "preferredExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
     "policy": "NO_IMPLICIT_TIMESTAMP_OR_ID_SELECTION",
-    "requiresExplicitAuthorityDecision": false
+    "requiresExplicitAuthorityDecision": true
   },
   "status": "DUPLICATE_EQUIVALENT_EXECUTIONS",
   "safeToApply": false,
-  "canonicalAuthority": true,
+  "canonicalAuthority": false,
   "writesPerformed": false,
-  "nextGate": "CURRENT_SOURCE_PACKET_CHUNK_LINEAGE"
+  "nextGate": "EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION"
 }

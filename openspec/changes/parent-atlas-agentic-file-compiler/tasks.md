@@ -16,21 +16,43 @@
 - [x] AFC-04B-06 Verify the compiled `PromptPlanV1.checksumSha256` against the existing Atlas canonical encoding before model discovery/generation; preserve `tokenizerRevision` and reject field tampering before any POST. Focused adapter, worker, and bounded-graph tests pass (8/8).
 - [x] AFC-04B-07 Repair the existing Kanban LangGraph builder's typed node-edge construction so the installed LangGraph runtime can typecheck through the exported index; behavior and datastore ownership are unchanged.
 - [x] AFC-04B-08 Separate the unused legacy block-reference planner from the canonical revisioned `atlas.prompt-plan.v1` wire contract; retain a deprecated builder alias, but emit `atlas.agentic-file-compiler.block-plan.v1` so unresolved block references cannot masquerade as executable PromptPlan evidence.
+
+LangGraph runtime recheck (read-only, 2026-09-19): the installed StateGraph replay matched the
+local adapter, and the failure/retry/cancellation/replay fixture passed with deterministic output.
+Receipts: `docs/reports/langgraph-readonly-adapter-replay-v1.json` and
+`docs/reports/langgraph-failure-retry-replay-v1.json`. These are process-local fixture proofs;
+they do not close AFC-04B's production worker/checkpoint gate or authorize durable state.
 - [x] AFC-05 Add DagNodePlanV1 and AtlasWorkflowSpecV1 contracts.
 - [x] AFC-06 Add WorkflowActionEventV1 persistence envelope.
 - [x] AFC-07 Add MastraWorkflowGraphV1 runtime-dialect contract.
 - [x] AFC-08 Add FileMutationPlan/ValidationObservation/Receipt/Failure contracts.
 - [x] AFC-09 Add GraphProjectionRequestV1 and SearchRuntimePolicyV1 contracts.
-- [ ] AFC-10 Wire query classifier to the live request front door.
+- [x] AFC-10 Wire query classifier to the live request front door. Evidence:
+  `sveltekit-frontend/src/routes/api/search/hyperrag/+server.ts` classifies every validated
+  request, compiles a retrieval plan only for revision-qualified requests, and applies its
+  bounded candidate budget to SearchRuntime; `server.route.test.ts` proves both the control
+  metadata and budget propagation. Exact promotion remains AFC-11.
 - [x] AFC-10-01 Wire deterministic `QueryClassificationV1` observation into `/api/search/hyperrag` after request validation; return it as control metadata while preserving SearchRuntime as the retrieval/fusion owner. Route proof asserts the stable classification contract; full classification-to-retrieval-plan execution remains open.
 - [x] AFC-10-02 Compile the existing `RetrievalPlanV1` only for revision-qualified HyperRAG requests, apply its bounded candidate budget to the SearchRuntime call, and return the plan as control metadata; unqualified requests remain plan-less rather than receiving a synthetic workspace revision.
 - [ ] AFC-11 Wire exact promotion to the live retrieval owner.
 - [ ] AFC-12 Extend existing context manifest persistence with revision/evidence refs through a migration only after compatibility proof.
-- [ ] AFC-13 Persist WorkflowActionEventV1 through the existing action/outbox writer.
+- [x] AFC-13 Persist WorkflowActionEventV1 through the existing action/outbox writer. The compiler now converts supported lifecycle events through `workflowEventToCanonicalActionWriterRequest` and delegates to `writeCanonicalWorkflowActionAtomically`; compiler-only kinds fail closed. Adapter proof passes 5/5 and existing action/outbox writer proof passes 11/11. No live database write/readback was run in this tranche.
 - [ ] AFC-14 Install/verify a real Mastra runtime before replacing the current passthrough shim.
 - [ ] AFC-15 Prove suspend/resume restart parity using Mastra snapshots.
 - [ ] AFC-16 Wire bounded filesystem mutation behind authorization and human-approval policy.
-- [ ] AFC-17 Prove Tree-sitter/typecheck/test validation barrier.
+- [ ] AFC-17 Prove Tree-sitter/typecheck/test validation barrier. The pure barrier contract now
+  has pass/fail, warning-admission, required-validator ordering, and deterministic replay tests
+  (`validation-barrier.spec.ts`, 4/4); live repository Tree-sitter/typecheck/test execution is
+  still required before this task can close.
+
+Live barrier recheck (read-only, 2026-09-19): the structured-value runtime probe is ready with
+`tree-sitter 0.25.1`, `tree-sitter-typescript 0.23.2`, `treesitter-chunker 4.0.0`, Python 3.13.5,
+and `pyarrow 21.0.0`; the four barrier tests pass. The repository has no `typecheck:native` script,
+so the actual SvelteKit check was used and remains blocked by 82 pre-existing errors and 291 warnings
+in 147 files. AFC-17 remains open; no compiler or runtime mutation was performed.
+The barrier contract was hardened to fail closed on duplicate validator observations; focused coverage
+now passes 5/5. The current native TypeScript run still reports unrelated repository-wide errors, so
+this task remains open pending a clean live Tree-sitter/typecheck/test receipt.
 - [ ] AFC-18 Wire incremental AST/semantic_768/graph refresh and cache invalidation.
 - [ ] AFC-19 Run CPU/GPU semantic executor parity and confirm one-vote-per-lane behavior.
 - [ ] AFC-20 Retire the fake Mastra `defineWorkflow` shim only after AFC-14/AFC-15 pass.

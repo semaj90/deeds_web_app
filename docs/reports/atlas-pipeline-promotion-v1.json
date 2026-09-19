@@ -1,6 +1,6 @@
 {
   "schema": "atlas.pipeline-promotion-plan.v1",
-  "generatedAt": "2026-09-17T05:09:31.813Z",
+  "generatedAt": "2026-09-17T17:27:36.448Z",
   "mode": "READ_ONLY_DERIVED_GATE_PLAN",
   "promotionEligible": false,
   "writesPerformed": false,
@@ -21,11 +21,11 @@
     "packetChunkLineage": {
       "status": "BLOCKED_PARTIAL_LINEAGE",
       "evidence": {
-        "verdict": "BLOCKED_EXECUTION_RUN_BRIDGE",
+        "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
         "bindingSources": null,
         "exactSources": 0,
         "packetContentMatches": null,
-        "executionBridge": "EXECUTION_RUN_BRIDGE_MISSING"
+        "executionBridge": "BRIDGE_AVAILABLE"
       },
       "report": "packet-chunk-lineage-promotion-preflight-v1.json",
       "blocking": true

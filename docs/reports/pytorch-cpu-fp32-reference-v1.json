@@ -1,0 +1,43 @@
+{
+  "canonicalAuthority": false,
+  "checkpointDir": "models\\gemma4_assistant_huggingface_7_3_26",
+  "checkpointMutated": false,
+  "checkpointOnlyTensorCount": 4,
+  "checkpointTensorCount": 50,
+  "component": "atlas_gemma_rank_v1_bounded_reference",
+  "derivedConfig": {
+    "hiddenSize": 256,
+    "numAttentionHeads": 4,
+    "numHiddenLayers": 4,
+    "numKeyValueHeads": 2
+  },
+  "device": "cpu",
+  "dtype": "float32",
+  "executor": "PYTORCH_CPU",
+  "finite": true,
+  "initializedDerivedTensorCount": 12,
+  "inputChecksum": "sha256:b3dedc261759f9e97ba83649350aaba4ea2a85b71fc6b9e2ec9782419b68e49f",
+  "loadedInheritedTensorCount": 46,
+  "modelRevision": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "observedAt": "2026-09-19T05:05:49.468771+00:00",
+  "outputChecksum": "sha256:28d126903bb3b83212ece8b37630311276b0b4bd75847856ad6f0cc01603d09c",
+  "outputShape": {
+    "hidden": [
+      1,
+      5,
+      256
+    ],
+    "score": [
+      1,
+      1
+    ]
+  },
+  "receiptChecksum": "sha256:e1517f0b00d5c0815c2182dbf1c173e49c84c8c6a4e6a7f59a96e930ba885783",
+  "referenceAuthority": true,
+  "repeatExact": true,
+  "schema": "atlas.pytorch-cpu-fp32-reference.v1",
+  "shapeMismatches": [],
+  "status": "PYTORCH_CPU_FP32_REFERENCE_PROVEN",
+  "trainingPerformed": false,
+  "writesPerformed": false
+}

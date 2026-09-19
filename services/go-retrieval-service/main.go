@@ -73,6 +73,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	pb "github.com/deeds-web-app/services/go-retrieval-service/proto/retrieval"
+	sharedpb "github.com/deeds-web-app/services/go-retrieval-service/proto/shared"
 )
 
 func init() {
@@ -101,6 +102,29 @@ type config struct {
 	HTTPPort                string
 	CacheTTL                time.Duration
 	GPUEmbedEnabled         bool
+}
+
+func resolveQdrantGrpcHostWithLookup(host string, lookup func(string) ([]net.IP, error)) string {
+	if net.ParseIP(host) != nil {
+		return host
+	}
+	ips, err := lookup(host)
+	if err != nil {
+		return host
+	}
+	for _, ip := range ips {
+		if ipv4 := ip.To4(); ipv4 != nil {
+			return ipv4.String()
+		}
+	}
+	if len(ips) > 0 && ips[0] != nil {
+		return ips[0].String()
+	}
+	return host
+}
+
+func resolveQdrantGrpcHost(host string) string {
+	return resolveQdrantGrpcHostWithLookup(host, net.LookupIP)
 }
 
 func loadConfig() config {
@@ -1877,6 +1901,115 @@ func (s *retrievalServer) StreamEvidence(req *pb.EvidenceSearchRequest, stream p
 
 // ── SearchCodebase ─────────────────────────────────────────────────────────
 
+func codebaseReceipt(ctx *sharedpb.AtlasRequestContextV2, succeeded bool, evidenceCount int, confidence float32, validationStatus string, errorCode string, outputChecksum string) *sharedpb.AtlasToolReceiptV2 {
+	if ctx == nil || strings.TrimSpace(ctx.GetToolCallId()) == "" || strings.TrimSpace(ctx.GetRunId()) == "" ||
+		strings.TrimSpace(ctx.GetWorkspaceId()) == "" || strings.TrimSpace(ctx.GetWorkspaceRevision()) == "" ||
+		strings.TrimSpace(ctx.GetPacketKey()) == "" || strings.TrimSpace(ctx.GetPacketRevision()) == "" {
+		return nil
+	}
+	receipt := &sharedpb.AtlasToolReceiptV2{
+		Schema: "atlas.tool-receipt.v2", ToolCallId: ctx.GetToolCallId(), ToolName: "atlas.retrieve",
+		RunId: ctx.GetRunId(), WorkspaceId: ctx.GetWorkspaceId(), WorkspaceRevision: ctx.GetWorkspaceRevision(),
+		PacketKey: ctx.GetPacketKey(), PacketRevision: ctx.GetPacketRevision(), Succeeded: succeeded,
+		EvidenceCount: int32(evidenceCount), ValidationStatus: validationStatus, CanonicalAuthority: false, WritesPerformed: false,
+	}
+	if confidence >= 0 && confidence <= 1 {
+		receipt.RetrievalConfidence = &confidence
+	}
+	if outputChecksum != "" {
+		receipt.OutputChecksum = &outputChecksum
+	}
+	if errorCode != "" {
+		receipt.ErrorCode = &errorCode
+	}
+	receipt.ReceiptId = fmt.Sprintf("receipt:%s:%s", ctx.GetRunId(), ctx.GetToolCallId())
+	checksumInput := strings.Join([]string{
+		receipt.Schema, receipt.ReceiptId, receipt.ToolCallId, receipt.ToolName, receipt.RunId,
+		receipt.WorkspaceId, receipt.WorkspaceRevision, receipt.PacketKey, receipt.PacketRevision,
+		strconv.FormatBool(receipt.Succeeded), strconv.Itoa(int(receipt.EvidenceCount)), receipt.ValidationStatus,
+		outputChecksum, errorCode,
+	}, "\x00")
+	checksum := sha256.Sum256([]byte(checksumInput))
+	receipt.ReceiptChecksum = fmt.Sprintf("sha256:%x", checksum)
+	return receipt
+}
+
+// unavailableAtlasReceipt records a bounded adapter result without asserting
+// canonical ownership. It intentionally preserves empty identity fields when
+// the caller did not supply them; adapters must not invent revisions or IDs.
+func unavailableAtlasReceipt(ctx *sharedpb.AtlasRequestContextV2, toolName, errorCode string) *sharedpb.AtlasToolReceiptV2 {
+	receipt := &sharedpb.AtlasToolReceiptV2{
+		Schema: "atlas.tool-receipt.v2", ToolName: toolName, Succeeded: false,
+		ValidationStatus: "UNAVAILABLE", CanonicalAuthority: false, WritesPerformed: false,
+		ErrorCode: &errorCode,
+	}
+	if ctx != nil {
+		receipt.ToolCallId = ctx.GetToolCallId()
+		receipt.RunId = ctx.GetRunId()
+		receipt.WorkspaceId = ctx.GetWorkspaceId()
+		receipt.WorkspaceRevision = ctx.GetWorkspaceRevision()
+		receipt.PacketKey = ctx.GetPacketKey()
+		receipt.PacketRevision = ctx.GetPacketRevision()
+	}
+	if receipt.RunId != "" || receipt.ToolCallId != "" {
+		receipt.ReceiptId = fmt.Sprintf("receipt:%s:%s", receipt.RunId, receipt.ToolCallId)
+	}
+	checksumInput := strings.Join([]string{
+		receipt.Schema, receipt.ReceiptId, receipt.ToolCallId, receipt.ToolName, receipt.RunId,
+		receipt.WorkspaceId, receipt.WorkspaceRevision, receipt.PacketKey, receipt.PacketRevision,
+		strconv.FormatBool(receipt.Succeeded), strconv.Itoa(int(receipt.EvidenceCount)),
+		receipt.ValidationStatus, errorCode,
+	}, "\x00")
+	checksum := sha256.Sum256([]byte(checksumInput))
+	receipt.ReceiptChecksum = fmt.Sprintf("sha256:%x", checksum)
+	return receipt
+}
+
+func completeAtlasRequestIdentity(ctx *sharedpb.AtlasRequestContextV2) bool {
+	return ctx != nil && strings.TrimSpace(ctx.GetToolCallId()) != "" &&
+		strings.TrimSpace(ctx.GetRunId()) != "" && strings.TrimSpace(ctx.GetWorkspaceId()) != "" &&
+		strings.TrimSpace(ctx.GetWorkspaceRevision()) != "" && strings.TrimSpace(ctx.GetPacketKey()) != "" &&
+		strings.TrimSpace(ctx.GetPacketRevision()) != ""
+}
+
+// GetSemanticAstPackets is intentionally fail-closed until a canonical packet
+// and AST join producer is admitted. The current service has no packet_revision
+// owner, so returning rows here would fabricate canonical identity.
+func (s *retrievalServer) GetSemanticAstPackets(ctx context.Context, req *pb.SemanticAstPacketRequest) (*pb.SemanticAstPacketResponse, error) {
+	var requestContext *sharedpb.AtlasRequestContextV2
+	if req != nil {
+		requestContext = req.GetAtlasContext()
+	}
+	if !completeAtlasRequestIdentity(requestContext) {
+		return &pb.SemanticAstPacketResponse{Receipt: unavailableAtlasReceipt(requestContext, "atlas.semantic-ast-packets", "ATLAS_RPC_IDENTITY_INCOMPLETE")}, nil
+	}
+	return &pb.SemanticAstPacketResponse{Receipt: unavailableAtlasReceipt(requestContext, "atlas.semantic-ast-packets", "ATLAS_SEMANTIC_AST_JOIN_UNAVAILABLE")}, nil
+}
+
+// GetPacketRegistry exposes the registry boundary without becoming a registry
+// writer. It remains unavailable until canonical packet revision and projection
+// lineage are supplied by an admitted producer.
+func (s *retrievalServer) GetPacketRegistry(ctx context.Context, req *pb.PacketRegistryRequest) (*pb.PacketRegistryResponse, error) {
+	var requestContext *sharedpb.AtlasRequestContextV2
+	if req != nil {
+		requestContext = req.GetAtlasContext()
+	}
+	if !completeAtlasRequestIdentity(requestContext) {
+		return &pb.PacketRegistryResponse{Receipt: unavailableAtlasReceipt(requestContext, "atlas.packet-registry", "ATLAS_RPC_IDENTITY_INCOMPLETE")}, nil
+	}
+	return &pb.PacketRegistryResponse{Receipt: unavailableAtlasReceipt(requestContext, "atlas.packet-registry", "ATLAS_PACKET_REGISTRY_UNAVAILABLE")}, nil
+}
+
+func codebaseOutputChecksum(chunks []qdrantChunk) string {
+	ids := make([]string, 0, len(chunks))
+	for _, chunk := range chunks {
+		ids = append(ids, chunk.ID)
+	}
+	sort.Strings(ids)
+	digest := sha256.Sum256([]byte(strings.Join(ids, "\n")))
+	return fmt.Sprintf("sha256:%x", digest)
+}
+
 func (s *retrievalServer) SearchCodebase(ctx context.Context, req *pb.CodebaseSearchRequest) (*pb.CodebaseSearchResponse, error) {
 	return s.searchCodebase(ctx, req, nil)
 }
@@ -1905,12 +2038,12 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 	vec, err := s.embed(ctx, req.Query)
 	if err != nil {
 		slog.Warn("[retrieval] codebase embed failed", "err", err)
-		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason}, nil
+		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, nil
 	}
 
 	if len(req.PacketKeys) > 0 {
 		if len(req.PacketKeys) > 768 {
-			return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason}, nil
+			return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, nil
 		}
 		extraFilters = append(extraFilters, qdrantclient.NewMatchKeywords("packet_key", req.PacketKeys...))
 	}
@@ -1918,7 +2051,7 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.Kinds, req.PathPrefixes, extraFilters, limit)
 	if err != nil {
 		slog.Warn("[retrieval] codebase search failed", "err", err)
-		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason}, nil
+		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason, Receipt: codebaseReceipt(req.GetAtlasContext(), false, 0, -1, "FAIL", "ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE", "")}, nil
 	}
 
 	// HTTP method filter
@@ -1961,11 +2094,21 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 		}
 	}
 
+	confidence := float32(0)
+	for _, chunk := range chunks {
+		if chunk.Score > confidence {
+			confidence = chunk.Score
+		}
+	}
+	if confidence > 1 {
+		confidence = 1
+	}
 	return &pb.CodebaseSearchResponse{
 		Chunks:                       protoChunks,
 		TotalMs:                      float32(time.Since(start).Milliseconds()),
 		RepresentationUsed:           representationUsed,
 		RepresentationFallbackReason: representationFallbackReason,
+		Receipt:                      codebaseReceipt(req.GetAtlasContext(), true, len(protoChunks), confidence, "PASS", "", codebaseOutputChecksum(chunks)),
 	}, nil
 }
 
@@ -2467,14 +2610,15 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	var body struct {
-		Query            string   `json:"query"`
-		Limit            int32    `json:"limit"`
-		Kinds            []string `json:"kinds"`
-		PathPrefixes     []string `json:"path_prefixes"`
-		HTTPMethod       string   `json:"http_method"`
-		PacketKeys       []string `json:"packet_keys"`
-		Tags             []string `json:"tags"`
-		RepresentationID string   `json:"representation_id"`
+		Query            string                          `json:"query"`
+		Limit            int32                           `json:"limit"`
+		Kinds            []string                        `json:"kinds"`
+		PathPrefixes     []string                        `json:"path_prefixes"`
+		HTTPMethod       string                          `json:"http_method"`
+		PacketKeys       []string                        `json:"packet_keys"`
+		Tags             []string                        `json:"tags"`
+		RepresentationID string                          `json:"representation_id"`
+		AtlasContext     *sharedpb.AtlasRequestContextV2 `json:"atlas_context"`
 	}
 	if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)
@@ -2493,6 +2637,7 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		HttpMethod:       body.HTTPMethod,
 		PacketKeys:       body.PacketKeys,
 		RepresentationId: body.RepresentationID,
+		AtlasContext:     body.AtlasContext,
 	}, tagFilters)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -2635,8 +2780,9 @@ func main() {
 	// Qdrant gRPC
 	var qdrant *qdrantclient.Client
 	qdrantConnected := false
+	qdrantHost := resolveQdrantGrpcHost(cfg.QdrantHost)
 	if qc, err := qdrantclient.NewClient(&qdrantclient.Config{
-		Host: cfg.QdrantHost,
+		Host: qdrantHost,
 		Port: cfg.QdrantPort,
 	}); err == nil {
 		verifyCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -2645,7 +2791,7 @@ func main() {
 		if listErr == nil {
 			qdrant = qc
 			qdrantConnected = true
-			slog.Info("[retrieval] Qdrant gRPC OK", "host", cfg.QdrantHost, "port", cfg.QdrantPort)
+			slog.Info("[retrieval] Qdrant gRPC OK", "host", qdrantHost, "port", cfg.QdrantPort)
 		} else {
 			slog.Warn("[retrieval] Qdrant gRPC degraded (verification failed)", "err", listErr)
 			qdrant = qc

@@ -1,0 +1,67 @@
+{
+  "schema": "ParentAtlasPrefillDagFixtureV1",
+  "generatedAt": "2026-09-18T01:28:55.841Z",
+  "status": "PREFILL_DAG_REPLAY_PROVEN",
+  "evidenceClass": "FIXTURE_ONLY",
+  "stages": [
+    "QueryRouterTensorV2",
+    "CompactQueryRouterTensorV1",
+    "PrefillRoutingDecisionV1",
+    "RetrievalPlan",
+    "CandidateOrdinalMap",
+    "CandidateFeatureMatrix",
+    "ContextManifestV2",
+    "PromptPlanV1"
+  ],
+  "candidateCount": 3,
+  "candidateOrdering": [
+    {
+      "ordinal": 0,
+      "packetKey": "packet:fixture:a",
+      "canonicalId": "candidate:fixture:a"
+    },
+    {
+      "ordinal": 1,
+      "packetKey": "packet:fixture:b",
+      "canonicalId": "candidate:fixture:b"
+    },
+    {
+      "ordinal": 2,
+      "packetKey": "packet:fixture:c",
+      "canonicalId": "candidate:fixture:c"
+    }
+  ],
+  "ordinalMap": {
+    "checksum": "105a8a9f3b1a37be751bbbc681a74780f26007eeb50000fe2fc54978677c4543",
+    "candidateSnapshotRevision": "fixture:candidate-snapshot-v1",
+    "rowCount": 3,
+    "selectedOrdinals": [
+      0,
+      1,
+      2
+    ],
+    "derivedByOrdinal": true
+  },
+  "manifestIdentityChecksum": "217c035fe6a20e6e98d2981fe3028413779d6888a6958c68fd5e6ef1e8f050e1",
+  "promptPlanChecksum": "5e43dd789459b57df0d35a60f02fe09e29a041b9c872649eba0a3df00df0a746",
+  "routingDecision": {
+    "checksum": "e0d286d294422ce9f5b7e4b568d6098f47a6a6c0eda090249b53330ce783e7d3",
+    "status": "BLOCKED_LINEAGE",
+    "tensorRevision": "atlas.retrieval-router-tensor.v2",
+    "candidateOrdinalMapChecksum": "105a8a9f3b1a37be751bbbc681a74780f26007eeb50000fe2fc54978677c4543",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "totalPromptTokens": 26,
+  "replay": {
+    "sameManifestChecksum": true,
+    "samePromptChecksum": true,
+    "sameSegmentOrdering": true
+  },
+  "canonicalAuthority": false,
+  "canonicalWritesAllowed": false,
+  "writesPerformed": false,
+  "liveRetrievalExecuted": false,
+  "modelPrefillExecuted": false,
+  "nextRequirement": "CURRENT_REVISION_QUALIFIED_CANDIDATE_FEATURES_AND_LIVE_LINEAGE_ADMISSION"
+}

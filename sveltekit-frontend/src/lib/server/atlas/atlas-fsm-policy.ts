@@ -64,7 +64,10 @@ const ATLAS_STATE_POLICY: StatePolicy = {
   // MUTATE: Apply changes (write Postgres, invalidate cache)
   [AtlasState.MUTATE]: {
     allowedTools: ['atlas.apply_change'],
-    preconditions: (obs) => obs.lastToolSucceeded, // Only mutate after validated change
+    preconditions: (obs) =>
+      obs.lastTool === 'atlas.validate_change' &&
+      obs.lastToolSucceeded &&
+      obs.validationStatus === 'PASS',
     nextStates: {
       [AtlasState.VALIDATE]: (obs) => true, // Always validate after mutation
       [AtlasState.RECOVER]: (obs) => obs.lastToolError !== undefined,
@@ -113,7 +116,8 @@ const ATLAS_STATE_POLICY: StatePolicy = {
  */
 export function estimateExecutionState(
   previous: AtlasState,
-  observation: RuntimeObservation
+  observation: RuntimeObservation,
+  runtime?: Pick<AtlasRuntimeContext, 'authority'>,
 ): HMMInference {
   const policy = ATLAS_STATE_POLICY[previous];
 
@@ -142,7 +146,12 @@ export function estimateExecutionState(
 
   const nextPolicy = ATLAS_STATE_POLICY[nextState];
   const allowMutation =
-    nextState === AtlasState.MUTATE && observation.lastToolSucceeded && !observation.authFailure;
+    nextState === AtlasState.MUTATE &&
+    observation.lastTool === 'atlas.validate_change' &&
+    observation.lastToolSucceeded &&
+    observation.validationStatus === 'PASS' &&
+    runtime?.authority.mutationAllowed === true &&
+    !observation.authFailure;
 
   return {
     state: nextState,

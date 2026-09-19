@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.packet-revision-owner-audit.v1",
+  "generatedAt": "2026-09-19T04:16:50.400Z",
+  "mode": "READ_ONLY_CONTRACT_AUDIT",
+  "owner": {
+    "kind": "DERIVED",
+    "function": "derivePacketRevisionV1",
+    "derivationRevision": "packet-revision-v1"
+  },
+  "requiredInputs": [
+    "packet_key",
+    "source_ref",
+    "source_revision",
+    "content_hash",
+    "packet_schema_revision"
+  ],
+  "excludedInputs": [
+    "workspaceRevision",
+    "representationRevision",
+    "embeddingDigest",
+    "executionId",
+    "graphRevision",
+    "featureRevision"
+  ],
+  "contract": {
+    "path": "sveltekit-frontend/src/lib/server/atlas/identity/packet-revision-v1.ts",
+    "sourceChecksum": "sha256:e81a1c49b3c79e4c90f051b819ad36cc80157ab3efcbfbf675ac45f3b81b2ef4",
+    "requiredMarkers": [
+      "derivePacketRevisionV1",
+      "packetRevisionInputV1Schema",
+      "PACKET_REVISION_DERIVATION_REVISION = 'packet-revision-v1'",
+      "canonicalAuthority: false",
+      "writesPerformed: false"
+    ],
+    "missingMarkers": []
+  },
+  "invariantTests": {
+    "path": "sveltekit-frontend/src/lib/server/atlas/identity/packet-revision-v1.spec.ts",
+    "requiredMarkers": [
+      "stable",
+      "changes when canonical input changes",
+      "fails closed for unqualified input"
+    ],
+    "missingMarkers": [],
+    "testCommand": "npx vitest run src/lib/server/atlas/identity/packet-revision-v1.spec.ts"
+  },
+  "status": "DERIVATION_OWNER_PROVEN",
+  "metadataIntegration": {
+    "status": "WIRED_READ_ONLY_METADATA",
+    "writerPath": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+    "independentReadback": false
+  },
+  "writerAdoption": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "nextGate": "PACKET_WRITER_EMISSION_AND_INDEPENDENT_READBACK"
+}

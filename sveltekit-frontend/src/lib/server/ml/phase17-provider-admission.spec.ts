@@ -58,4 +58,34 @@ describe('Phase 17 provider admission', () => {
     });
     expect(result).toMatchObject({ status: 'UNAVAILABLE', reason: 'PROVIDER_UNAVAILABLE' });
   });
+
+  it('admits the PyTorch CPU reference only with revision-qualified feature identity', () => {
+    const result = admitPhase17FeatureProviderV1({
+      provider: {
+        providerId: 'pytorch-cpu-reference-v1',
+        providerRevision: 'pytorch-cpu-reference:v1',
+        requiredInputs: ['packetKey', 'sourceRef', 'sourceRevision', 'workspaceRevision'],
+        producedFeatures: ['domainLabel', 'logicalNeeds'],
+        status: 'AVAILABLE',
+      },
+      featureInput,
+    });
+    expect(result.status).toBe('ADMITTED');
+    expect(result.input.sourceRevision).toBe('sha256:source');
+    expect(result.input.workspaceRevision).toBe('sha256:workspace');
+  });
+
+  it('blocks CPU reference admission when packet identity is absent', () => {
+    const result = admitPhase17FeatureProviderV1({
+      provider: {
+        providerId: 'pytorch-cpu-reference-v1',
+        providerRevision: 'pytorch-cpu-reference:v1',
+        requiredInputs: ['packetKey', 'sourceRef', 'sourceRevision', 'workspaceRevision'],
+        producedFeatures: ['domainLabel'],
+        status: 'AVAILABLE',
+      },
+      featureInput: { ...featureInput, packetKey: null },
+    });
+    expect(result).toMatchObject({ status: 'BLOCKED', reason: 'PACKET_KEY_REQUIRED' });
+  });
 });

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.registry-writer-ownership.v2",
-  "generatedAt": "2026-09-09T00:54:47.288Z",
+  "generatedAt": "2026-09-19T05:49:53.388Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "safeToBackfill": false,
@@ -26,11 +26,12 @@
       "exists": true,
       "classification": "UNRESOLVED",
       "reachableReferences": [
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs",
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
         "scripts/atlas/hyperrag-packet-materializer.test.mjs",
-        "scripts/atlas/phase108d-select-and-prove-packet.mts",
-        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+        "scripts/atlas/phase108d-select-and-prove-packet.mts"
       ],
       "entrypointReferences": [],
       "writeTargets": [
@@ -73,15 +74,18 @@
       "classification": "ACTIVE_SECONDARY_WRITER",
       "reachableReferences": [
         "sveltekit-frontend/package.json",
+        "scripts/atlas/audit-addressable-packet-materializers-v1.mjs",
+        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
+        "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
+        "scripts/atlas/backfill-gds-som-topology.mjs",
+        "scripts/atlas/backfill-ast-symbols.mjs",
         "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
         "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
         "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/proposal.md",
         "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
         "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-        "openspec/changes/parent-atlas-768-dim-migration/SPEC.md",
-        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
-        "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
-        "scripts/atlas/backfill-gds-som-topology.mjs"
+        "openspec/changes/parent-atlas-768-dim-migration/SPEC.md"
       ],
       "entrypointReferences": [
         "sveltekit-frontend/package.json",
@@ -121,13 +125,16 @@
       "reachableReferences": [
         "sveltekit-frontend/package.json",
         "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-        "openspec/changes/parent-atlas-768-dim-migration/SPEC.md",
         "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+        "openspec/changes/parent-atlas-768-dim-migration/SPEC.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
         "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
         "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/proposal.md",
         "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+        "scripts/atlas/audit-addressable-packet-materializers-v1.mjs",
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
+        "scripts/atlas/backfill-ast-symbols.mjs",
         "scripts/atlas/backfill-gds-som-topology.mjs"
       ],
       "entrypointReferences": [
@@ -160,6 +167,7 @@
       "classification": "MANUAL_MIGRATION_ONLY",
       "reachableReferences": [
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
+        "scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
         "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
       ],
@@ -244,11 +252,12 @@
       "writer": "scripts/atlas/hyperrag-packet-materializer.mjs",
       "callers": [],
       "referencesOnly": [
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs",
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
         "scripts/atlas/hyperrag-packet-materializer.test.mjs",
-        "scripts/atlas/phase108d-select-and-prove-packet.mts",
-        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+        "scripts/atlas/phase108d-select-and-prove-packet.mts"
       ],
       "targets": [
         "CREATE TABLE IF",
@@ -267,13 +276,16 @@
         "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/proposal.md"
       ],
       "referencesOnly": [
-        "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
-        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
-        "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-        "openspec/changes/parent-atlas-768-dim-migration/SPEC.md",
+        "scripts/atlas/audit-addressable-packet-materializers-v1.mjs",
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
-        "scripts/atlas/backfill-gds-som-topology.mjs"
+        "scripts/atlas/backfill-gds-som-topology.mjs",
+        "scripts/atlas/backfill-ast-symbols.mjs",
+        "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+        "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+        "openspec/changes/parent-atlas-768-dim-migration/SPEC.md"
       ],
       "targets": [],
       "sourcePopulation": "atlas_packets",
@@ -288,11 +300,14 @@
       ],
       "referencesOnly": [
         "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-        "openspec/changes/parent-atlas-768-dim-migration/SPEC.md",
         "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+        "openspec/changes/parent-atlas-768-dim-migration/SPEC.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
         "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+        "scripts/atlas/audit-addressable-packet-materializers-v1.mjs",
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
+        "scripts/atlas/backfill-ast-symbols.mjs",
         "scripts/atlas/backfill-gds-som-topology.mjs"
       ],
       "targets": [],
@@ -304,6 +319,7 @@
       "callers": [],
       "referencesOnly": [
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
+        "scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
         "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
       ],

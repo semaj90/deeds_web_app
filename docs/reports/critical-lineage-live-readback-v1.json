@@ -1,8 +1,8 @@
 {
   "schema": "atlas.critical-lineage-live-readback.v1",
-  "generatedAt": "2026-09-15T15:58:51.682Z",
+  "generatedAt": "2026-09-17T18:13:37.793Z",
   "mode": "READ_ONLY_REPEATABLE_READ",
-  "databaseSnapshot": "6578207:6578207:",
+  "databaseSnapshot": "6798115:6798115:",
   "tables": [
     {
       "table": "atlas_packet_chunk_lineage",
@@ -171,7 +171,10 @@
         "projection_dimension",
         "encoder_revision",
         "som_revision",
-        "source_revision"
+        "source_revision",
+        "workspace_revision_key",
+        "lineage_binding_checksum",
+        "lineage_producer_revision"
       ],
       "rowCount": 61718,
       "nonNullRevisionCounts": {
@@ -278,10 +281,18 @@
         "content_hash_scope",
         "content_hash_algorithm",
         "content_hash_length",
-        "content_hash_version"
+        "content_hash_version",
+        "workspace_revision",
+        "source_revision",
+        "representation_revision",
+        "lineage_binding_checksum",
+        "lineage_producer_revision"
       ],
-      "rowCount": 55853,
-      "nonNullRevisionCounts": {}
+      "rowCount": 274465,
+      "nonNullRevisionCounts": {
+        "source_revision": 0,
+        "workspace_revision": 0
+      }
     },
     {
       "table": "graphify_execution_files",

@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.semantic768-cuvs-exact-oracle-audit.v1",
+  "status": "CUVS_EXACT_ORACLE_PROVEN_BOUNDED_FIXTURE",
+  "checks": {
+    "liveFixtureProven": true,
+    "backendExact": true,
+    "representation": true,
+    "identityPreserved": true,
+    "clientEndpoint": true,
+    "clientRepresentationGuard": true,
+    "mutationFree": true
+  },
+  "liveFixture": {
+    "sourceReport": "docs/reports/gpu-knn-exact-runtime-proof.json",
+    "endpoint": "http://127.0.0.1:8098/v1/knn/exact",
+    "device": "NVIDIA GeForce RTX 3060 Ti",
+    "backend": "cuvs.brute_force",
+    "backendVersion": "26.06.00",
+    "representationId": "semantic_768",
+    "dimension": 768,
+    "corpusRows": 3,
+    "runs": 3
+  },
+  "currentEligibility": {
+    "lineageStatus": null,
+    "candidateFreezeStatus": "CANDIDATE_POPULATION_FREEZE_BLOCKED",
+    "liveCurrentCohortEligible": false,
+    "reason": "bounded oracle proof does not admit the current source cohort"
+  },
+  "cagra": {
+    "role": "CHALLENGER_ONLY",
+    "comparisonRun": "NOT_RUN"
+  },
+  "canonicalAuthority": false,
+  "downstreamAllowed": false,
+  "writesPerformed": false
+}

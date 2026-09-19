@@ -10,6 +10,7 @@ import {
   flattenQueryFeaturesV1,
   projectQueryFeaturesV1,
 } from './query-feature-projection-v1.js';
+import { RETRIEVAL_ROUTER_TENSOR_MANIFEST_V2 } from '../classification/retrieval-router-tensor-manifest-v2.js';
 import {
   compileRetrievalPlanV1,
   type RetrievalExecutorCapabilityV1,
@@ -106,6 +107,15 @@ describe('query routing v2', () => {
     const row = projectQueryFeaturesV1('compare HNSW versus DiskANN for semantic retrieval');
     expect(QUERY_FEATURE_ORDER_V1).toHaveLength(26);
     expect(flattenQueryFeaturesV1(row)).toHaveLength(26);
+    expect(RETRIEVAL_ROUTER_TENSOR_MANIFEST_V2.queryFeatureOrder).toEqual([...QUERY_FEATURE_ORDER_V1]);
+  });
+
+  it('treats measured absence as zero but rejects missing feature fields', () => {
+    const row = projectQueryFeaturesV1('hello');
+    expect(Array.from(flattenQueryFeaturesV1(row)).every(Number.isFinite)).toBe(true);
+    expect(row.retrievalTermDensity).toBe(0);
+    const incomplete = { ...row, hasUrl: undefined } as typeof row;
+    expect(() => flattenQueryFeaturesV1(incomplete)).toThrow();
   });
 
   it('selects miniCOIL for contextual exact-overlap needs and only one sparse executor', () => {

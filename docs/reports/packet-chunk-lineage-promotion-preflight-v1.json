@@ -1,15 +1,15 @@
 {
   "schema": "atlas.packet-chunk-lineage-promotion-preflight.v1",
   "mode": "READ_ONLY_PROMOTION_PREFLIGHT",
-  "limit": 5,
+  "limit": 10,
   "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
   "requestedRunId": null,
   "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
   "executionBridge": {
     "executionFound": true,
-    "legacyGraphifyRunId": null,
+    "legacyGraphifyRunId": "01a8d8fc-2507-4f39-868e-039039237b98",
     "canonicalAuthority": true,
-    "status": "EXECUTION_RUN_BRIDGE_MISSING"
+    "status": "BRIDGE_AVAILABLE"
   },
   "joinFunnel": {
     "execution_membership_rows": 25542,
@@ -154,12 +154,121 @@
         "PACKET_REVISION_MISMATCH",
         "CHUNK_MISSING"
       ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ACE-QUICK-REFERENCE.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ACE-SUMMARY-LATENCY-IMPACT.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [
+        {
+          "packet_key": "packet:f7fa242997fb",
+          "source_ref": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+          "source_revision": null,
+          "content_hash": null,
+          "workspace_revision": null,
+          "lineage_binding_checksum": null
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_REVISION_MISMATCH",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
     }
   ],
   "boundedCandidateBlockedReasonCounts": {
-    "PACKET_MISSING": 3,
-    "CHUNK_MISSING": 5,
-    "PACKET_REVISION_MISMATCH": 2
+    "PACKET_MISSING": 7,
+    "CHUNK_MISSING": 10,
+    "PACKET_REVISION_MISMATCH": 3
   },
   "eligibleCandidateCount": 0,
   "plannedWrites": {
@@ -169,12 +278,12 @@
     "graph": 0,
     "cache": 0
   },
-  "verdict": "BLOCKED_EXECUTION_RUN_BRIDGE",
-  "generatedAt": "2026-09-17T05:08:33.292Z",
+  "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
+  "generatedAt": "2026-09-17T21:39:41.422Z",
   "databaseError": null,
   "writesPerformed": false,
   "canonicalAuthority": false,
   "promotionAuthorized": false,
   "rollback": "Transaction rollback before commit; no transaction was opened by this preflight.",
-  "preflightChecksum": "sha256:b8c96bebd298c741c05b70425d22b5fd082cfff6be186af2e50cec1af24ad3ef"
+  "preflightChecksum": "sha256:bda3d447cf79f770adf8182de990ed3681a3c9053f07a3f9434f41a0282039ab"
 }

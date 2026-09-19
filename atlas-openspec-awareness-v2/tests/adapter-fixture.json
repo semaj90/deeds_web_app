@@ -1,0 +1,7 @@
+{
+  "tasks": [
+    {"taskId":"T1","changeId":"parent-atlas-retrieval-lineage-dag-convergence","title":"Audit canonical packet identity receipt","priority":"P10"},
+    {"taskId":"T2","changeId":"parent-atlas-prefill-routing-residency-convergence","title":"Implement BitFrost warm manifest writer","priority":"P40"},
+    {"taskId":"T3","changeId":"parent-atlas-graph-retrieval-proof","title":"Replay read-only AST span proof","priority":"P20"}
+  ]
+}

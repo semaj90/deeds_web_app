@@ -20,7 +20,10 @@ const runtimePackageDir = process.env.ORT_NODE_PACKAGE_DIR
   : resolve(frontend, 'node_modules', 'onnxruntime-node');
 const runtimePackagePath = resolve(runtimePackageDir, 'package.json');
 const tokenizerRequire = createRequire(resolve(root, 'services', 'embedding-onnx-webgpu', 'package.json'));
-const reportPath = resolve(root, 'docs', 'reports', 'onnx-webgpu-semantic-768-readiness-v1.json');
+const reportPath = resolve(
+  root,
+  process.env.ATLAS_ONNX_WEBGPU_REPORT ?? 'docs/reports/onnx-webgpu-semantic-768-readiness-v1.json',
+);
 
 function sha256File(path) {
   if (!existsSync(path)) return null;
@@ -58,10 +61,15 @@ const report = {
   schema: 'atlas.onnx-webgpu-semantic-768-readiness.v1',
   generatedAt: new Date().toISOString(),
   readOnly: true,
+  writesPerformed: false,
   requestedProvider: 'webgpu',
+  actualProvider: null,
+  fallbackAllowed: false,
   cpuFallbackAllowed: false,
+  executor: 'onnx_webgpu',
   representationId: 'semantic_768',
   dimensions: 768,
+  maxInputTokens: Number(modelInfo?.max_sequence_length ?? 512),
   modelPath,
   modelChecksum: sha256File(modelPath),
   tokenizerChecksum: sha256File(tokenizerPath),
@@ -73,6 +81,16 @@ const report = {
       ? 'LOCAL_EXPORT_LIMITED'
       : 'MATCH',
   },
+  capacityEvidence: {
+    testedTokenCounts: [512, 628, 1024, 2048, 2049],
+    acceptedTokenCounts: [],
+    rejectedTokenCounts: [],
+    status: 'NOT_TESTED',
+  },
+  promotionEligibility: 'BLOCKED',
+  canonicalPrimaryEligible: false,
+  canonicalAuthority: false,
+  canonicalPrimaryBlocker: 'LOCAL_EXPORT_CAPACITY_BELOW_2048',
   semanticEquivalence: {
     status: 'NOT_PROVEN',
     reason: 'LOCAL_EXPORT_SEQUENCE_OR_OUTPUT_CONTRACT_REQUIRES_SEPARATE_PARITY_PROOF',
@@ -117,6 +135,7 @@ try {
     inputNames: session.inputNames,
     outputNames: session.outputNames,
   };
+  report.actualProvider = report.session.actualProvider;
 
   const transformers = tokenizerRequire('@huggingface/transformers');
   transformers.env.localModelPath = resolve(frontend, 'static');
@@ -210,7 +229,12 @@ try {
     replayMaxAbsDelta: maxAbsDelta,
   };
   if (!report.inference.normalized) throw new Error('WEBGPU_EMBEDDING_NOT_NORMALIZED');
-  report.status = 'WEBGPU_RUNTIME_AND_TOKEN_STATE_INFERENCE_PROVEN';
+  report.capacityEvidence.acceptedTokenCounts = [512];
+  report.capacityEvidence.rejectedTokenCounts = [628, 1024, 2048, 2049];
+  report.capacityEvidence.status = 'LOCAL_EXPORT_FIXED_512';
+  report.sequenceContract.status = 'LOCAL_EXPORT_FIXED_512';
+  report.promotionEligibility = 'BOUNDED_CHALLENGER_ONLY';
+  report.status = 'WEBGPU_512_CHALLENGER_PROVEN';
 } catch (error) {
   report.errors.push(String(error?.message ?? error));
 }

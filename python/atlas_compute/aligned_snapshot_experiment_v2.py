@@ -73,6 +73,8 @@ class AlignedSnapshotExperimentV2Receipt:
     aligned_feature_columns: int
     output_checksum: str
     canonical_authority: bool
+    production_mode: bool
+    candidate_population_freeze_checksum: str | None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -129,8 +131,25 @@ def run_aligned_snapshot_experiment_v2(
     experiment_spec_path: str | Path,
     output_path: str | Path,
 ) -> AlignedSnapshotExperimentV2Receipt:
-    semantic, manifest = load_and_verify_frozen_snapshot(semantic_manifest_path)
     spec = json.loads(Path(experiment_spec_path).read_text(encoding="utf-8"))
+    production_mode = bool(spec.get("production_mode", False))
+    candidate_population_freeze_checksum: str | None = None
+    if production_mode:
+        freeze_path_value = str(spec.get("candidate_population_freeze_path") or "")
+        if not freeze_path_value:
+            raise ValueError("PRODUCTION_REQUIRES_CANDIDATE_POPULATION_FREEZE")
+        freeze_path = Path(freeze_path_value)
+        freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
+        if freeze.get("status") != "CANDIDATE_POPULATION_FREEZE_READY_FOR_EXPLICIT_REVIEW":
+            raise ValueError("CANDIDATE_POPULATION_FREEZE_NOT_READY")
+        if freeze.get("downstreamAllowed") is not True or freeze.get("canonicalAuthority") is True or freeze.get("writesPerformed") is True:
+            raise ValueError("CANDIDATE_POPULATION_FREEZE_POLICY_INVALID")
+        candidate_population_freeze_checksum = str(freeze.get("freezeChecksum") or "")
+        if not candidate_population_freeze_checksum.startswith("sha256:"):
+            raise ValueError("CANDIDATE_POPULATION_FREEZE_CHECKSUM_REQUIRED")
+        if spec.get("enable_som", True) and (spec.get("som_grid_rows") != 20 or spec.get("som_grid_columns") != 20):
+            raise ValueError("PRODUCTION_SOM_REQUIRES_EXPLICIT_20X20_GRID")
+    semantic, manifest = load_and_verify_frozen_snapshot(semantic_manifest_path)
     canonical_ids = _canonical_ids(manifest)
     row_index = {value: index for index, value in enumerate(canonical_ids)}
     revision = str(spec.get("experiment_revision") or "")
@@ -262,6 +281,8 @@ def run_aligned_snapshot_experiment_v2(
     if bool(spec.get("enable_som", True)):
         try:
             normalized_semantic = semantic / np.maximum(np.linalg.norm(semantic, axis=1, keepdims=True), 1e-12)
+            if production_mode and (spec.get("som_grid_rows") != 20 or spec.get("som_grid_columns") != 20):
+                raise ValueError("PRODUCTION_SOM_REQUIRES_EXPLICIT_20X20_GRID")
             grid_rows = int(spec.get("som_grid_rows") or max(2, round(len(canonical_ids) ** 0.25)))
             grid_cols = int(spec.get("som_grid_columns") or grid_rows)
             coords, _codebook, som = train_deterministic_som(
@@ -406,6 +427,8 @@ def run_aligned_snapshot_experiment_v2(
         "aligned_feature_row_identity_checksum": alignment.row_identity_checksum,
         "aligned_feature_columns": int(aligned.shape[1]),
         "canonical_authority": False,
+        "production_mode": production_mode,
+        "candidate_population_freeze_checksum": candidate_population_freeze_checksum,
     }
     checksum = _sha(_stable(payload))
     receipt = AlignedSnapshotExperimentV2Receipt(**payload, output_checksum=checksum)

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-owner-reconciliation.v1",
-  "generatedAt": "2026-09-14T20:24:10.043Z",
+  "generatedAt": "2026-09-19T05:40:50.300Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "databaseWrites": 0,
@@ -11,17 +11,17 @@
     "root": "C:\\Users\\james\\Videos\\deeds-web-app",
     "gitRoot": "C:/Users/james/Videos/deeds-web-app",
     "gitCommonDir": ".git",
-    "headCommit": "cb122d7415a9a3ed570b759495888bf0a8c71413",
-    "headTree": "661bdc18b29d19eba3049a3837051df2ea2a87c2",
+    "headCommit": "5de75715fb65f9aaae94aa6d2af4fdc68929d253",
+    "headTree": "55680c58ddb6584c50ae01c2a78f0202e58030c3",
     "hostname": "DESKTOP-Q18MPHM",
     "dirty": true,
-    "sourceCount": 24462,
-    "sourceRefChecksum": "sha256:32230d1f085eef42a4c48a6d48c1d8ec3a9a8f397189af62ece78e8d9b0f7d76",
+    "sourceCount": 24920,
+    "sourceRefChecksum": "sha256:6e733fd16014cae9cddbf21c624cd30757b5da9b63215d61a943cfec054a7740",
     "inventoryPolicy": {
       "command": "git ls-files --cached --others --exclude-standard -z",
-      "trackedAtHeadCount": 27950,
-      "candidateCount": 24501,
-      "admittedCount": 24462,
+      "trackedAtHeadCount": 28548,
+      "candidateCount": 24959,
+      "admittedCount": 24920,
       "skippedCount": 39,
       "maxSourceBytes": 5242880,
       "generatedPrefixesExcluded": [
@@ -76,6 +76,46 @@
     "status": "PROVEN"
   },
   "currentExecutionCandidates": [
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+      "completed_at": "2026-09-15T01:13:15.628Z",
+      "memberCount": 0,
+      "distinctSourceCount": 0,
+      "workspaceRevisionCount": 0,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+        "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+      },
+      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "selectionMembershipReadback": false,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "status": "COMPLETED",
+      "canonical_authority": true,
+      "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+      "completed_at": "2026-09-15T01:11:57.965Z",
+      "memberCount": 0,
+      "distinctSourceCount": 0,
+      "workspaceRevisionCount": 0,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+        "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+      },
+      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "selectionMembershipReadback": false,
+      "canonicalAuthority": false
+    },
     {
       "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
       "workspace_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
@@ -763,22 +803,80 @@
   ],
   "sourceAuthority": {
     "schema": "atlas.current-graphify-snapshot-authority.v1",
-    "status": "NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE",
+    "status": "AMBIGUOUS_QUALIFYING_EXECUTIONS",
     "sourceSnapshot": {
       "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
-      "sourceManifestDigest": "d80bc9c6f0cad5c70127b9edb47e88482d41ddc2445ce1810cfd7609260a6d26",
-      "sourceCount": 24416,
-      "sourceManifestChecksum": "493504c01b5262763b6267221790f1dbe641db1baad07f694cdc027dcc339961",
-      "workspaceRevisionRecordChecksum": "493504c01b5262763b6267221790f1dbe641db1baad07f694cdc027dcc339961",
-      "workspaceOriginRuntimeRevision": "atlas.workspace-revision-origin-runtime.2026-08-21.v1",
-      "observedAt": "2026-09-14T20:22:24.943Z"
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "sourceManifestDigest": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+      "sourceCount": 25542,
+      "sourceManifestChecksum": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+      "workspaceRevisionRecordChecksum": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+      "snapshotManifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+      "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+      "snapshotSourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+      "snapshotSourceContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+      "observedAt": "2026-09-19T04:55:08.914Z"
     },
-    "qualifyingExecutionIds": [],
-    "candidates": [],
+    "qualifyingExecutionIds": [
+      "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+      "74d50c86-8194-45ea-8c3d-61aab737ef83"
+    ],
+    "ownerSelection": null,
+    "candidates": [
+      {
+        "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+        "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+        "status": "COMPLETED",
+        "canonicalAuthority": false,
+        "triggerKind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+        "sourceSelectionStatus": "COMPLETED",
+        "selectionPolicyRevision": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+        "selectionPolicyIsNonCanary": true,
+        "sourceSelectionOutputChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+        "sourceRefSetChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+        "snapshotSourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+        "sourceIdentitySetChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+        "executionContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+        "snapshotContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+        "sourceCount": 25542,
+        "expectedSourceCount": 25542,
+        "workspaceRevisionMatches": true,
+        "sourceCountMatches": true,
+        "sourceBindingsMatch": true,
+        "sourceRefSetChecksumMatches": true,
+        "sourceIdentitySetChecksumMatches": true,
+        "snapshotContentChecksumMatches": true,
+        "eligible": true
+      },
+      {
+        "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+        "status": "COMPLETED",
+        "canonicalAuthority": true,
+        "triggerKind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+        "sourceSelectionStatus": "COMPLETED",
+        "selectionPolicyRevision": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+        "selectionPolicyIsNonCanary": true,
+        "sourceSelectionOutputChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+        "sourceRefSetChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+        "snapshotSourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+        "sourceIdentitySetChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+        "executionContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+        "snapshotContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+        "sourceCount": 25542,
+        "expectedSourceCount": 25542,
+        "workspaceRevisionMatches": true,
+        "sourceCountMatches": true,
+        "sourceBindingsMatch": true,
+        "sourceRefSetChecksumMatches": true,
+        "sourceIdentitySetChecksumMatches": true,
+        "snapshotContentChecksumMatches": true,
+        "eligible": true
+      }
+    ],
     "graphSnapshot": {
-      "status": "GRAPH_CANONICAL_AUTHORITY_UNPROVEN",
-      "canonicalAuthorityTrueExecutions": 0
+      "status": "GRAPH_CANONICAL_AUTHORITY_PROVEN",
+      "canonicalAuthorityTrueExecutions": 1
     },
     "canonicalAuthority": false,
     "readOnly": true,
@@ -802,5 +900,5 @@
       "625743d2-092b-4fa8-abe0-9dc094920c80"
     ]
   },
-  "checksum": "sha256:39b4983779e65fb2afa66637860591af9718d5da8150e63b779f0f0802a953cc"
+  "checksum": "sha256:90e653cdf67a27906c29585b1751ee3106ac05df7dc9293db247f4ae84bfc3fc"
 }

@@ -1,0 +1,802 @@
+{
+  "schema": "atlas.openspec-topic-clusters.v1",
+  "counts": {
+    "tasks": 2312,
+    "topics": 16,
+    "changes": 76,
+    "referencedFiles": 76
+  },
+  "topics": [
+    {
+      "topic": "GENERAL",
+      "count": 593,
+      "readOnly": 96,
+      "mutating": 497,
+      "llamaSlots": 1,
+      "changes": [
+        "atlas-feature-intelligence",
+        "codereview-semantic-dimension-regression-aug22",
+        "local-llm-offload-ownership",
+        "parent-atlas-adaptive-dag-fabric",
+        "parent-atlas-agentic-file-compiler",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-agentic-repair-fabric",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-branch-merge-consolidation-aug20",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-compiler-semantic-graph-resolution",
+        "parent-atlas-deep-research-ingestion",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-graph-vector-substrate",
+        "parent-atlas-gpu-runtime-abi-alignment",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-graph-analysis-contract",
+        "parent-atlas-graph-runtime-enhancement",
+        "parent-atlas-graph-runtime-python-consolidation",
+        "parent-atlas-graph-validation-fabric",
+        "parent-atlas-grounded-knowledge-fabric",
+        "parent-atlas-memory-architecture-freeze",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-nlp-sidecar-feature-compiler",
+        "parent-atlas-okf-knowledge-layers",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-ontology-oaklib-fanout-bitmap",
+        "parent-atlas-pass-fabric",
+        "parent-atlas-pca-svd-representation-baseline",
+        "parent-atlas-policy-routing-integration",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-repair-candidate-feature-matrix",
+        "parent-atlas-retrieval-executor-compatibility-convergence",
+        "parent-atlas-retrieval-lod-algorithm-taxonomy",
+        "parent-atlas-retrieval-logic-convergence",
+        "parent-atlas-search-classifier-sidecar",
+        "parent-atlas-semantic-512-canonicalization",
+        "parent-atlas-semantic-768-canonical-contract",
+        "parent-atlas-unordered-execution-contract",
+        "parent-atlas-versioned-doc-intelligence",
+        "parent-atlas-workstation-domain-classifier",
+        "route-import-infra-isolation"
+      ]
+    },
+    {
+      "topic": "PREFILL_CONTEXT",
+      "count": 392,
+      "readOnly": 93,
+      "mutating": 299,
+      "llamaSlots": 12,
+      "changes": [
+        "atlas-feature-intelligence",
+        "parent-atlas-ace-bitfrost-cache-correctness",
+        "parent-atlas-ace-rlm-bitfrost-integration",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-branch-merge-consolidation-aug20",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-neural-prefill-encoder",
+        "parent-atlas-prefill-routing-residency-convergence",
+        "parent-atlas-retrieval-logic-convergence",
+        "parent-atlas-transport-memory-boundaries"
+      ]
+    },
+    {
+      "topic": "IDENTITY_AUTHORITY",
+      "count": 264,
+      "readOnly": 79,
+      "mutating": 185,
+      "llamaSlots": 4,
+      "changes": [
+        "atlas-feature-intelligence",
+        "manual-migration-reconciliation",
+        "parent-atlas-ace-bitfrost-cache-correctness",
+        "parent-atlas-ace-rlm-bitfrost-integration",
+        "parent-atlas-adaptive-dag-fabric",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-canonical-directory-ingestion-fabric",
+        "parent-atlas-code-ingestion-pipeline",
+        "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+        "parent-atlas-document-governance-master-index",
+        "parent-atlas-gate2-chunk-lineage-convergence",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-graph-vector-substrate",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-graph-analysis-contract",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-memory-architecture-freeze",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-neural-prefill-encoder",
+        "parent-atlas-nlp-sidecar-feature-compiler",
+        "parent-atlas-observation-routing-fabric",
+        "parent-atlas-okf-knowledge-layers",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-ontology-oaklib-fanout-bitmap",
+        "parent-atlas-pass-fabric",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-repair-candidate-feature-matrix",
+        "parent-atlas-retrieval-executor-compatibility-convergence",
+        "parent-atlas-retrieval-fusion-reachability",
+        "parent-atlas-retrieval-lineage-dag-convergence",
+        "parent-atlas-retrieval-lod-algorithm-taxonomy",
+        "parent-atlas-retrieval-logic-convergence",
+        "parent-atlas-search-classifier-sidecar",
+        "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+        "parent-atlas-tensor-residency-integration",
+        "parent-atlas-topology-representation-admission",
+        "parent-atlas-transport-memory-boundaries"
+      ]
+    },
+    {
+      "topic": "ACE_BITFROST_CACHE",
+      "count": 238,
+      "readOnly": 73,
+      "mutating": 165,
+      "llamaSlots": 18,
+      "changes": [
+        "agent-branch-review-fanout-ace-centroid-aug22",
+        "deep-audit-code-gates-aug22",
+        "parent-atlas-ace-bitfrost-cache-correctness",
+        "parent-atlas-ace-rlm-bitfrost-integration",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-agentic-run-receipt-binding",
+        "parent-atlas-analysis-pass-ornith-adapter",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-branch-merge-consolidation-aug20",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-kv-cache-adaptation-research",
+        "parent-atlas-memory-architecture-freeze",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-observation-routing-fabric",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-opencode-replay-proof",
+        "parent-atlas-pass-fabric",
+        "parent-atlas-policy-routing-integration",
+        "parent-atlas-retrieval-executor-compatibility-convergence",
+        "parent-atlas-retrieval-lod-algorithm-taxonomy",
+        "parent-atlas-retrieval-logic-convergence",
+        "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+        "parent-atlas-tensor-residency-integration",
+        "parent-atlas-transport-memory-boundaries",
+        "parent-atlas-unordered-execution-contract",
+        "parent-atlas-versioned-doc-intelligence",
+        "parent-atlas-workstation-domain-classifier"
+      ]
+    },
+    {
+      "topic": "GOVERNANCE_PROOF",
+      "count": 192,
+      "readOnly": 92,
+      "mutating": 100,
+      "llamaSlots": 1,
+      "changes": [
+        "atlas-feature-intelligence",
+        "deep-audit-code-gates-aug22",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-agentic-run-receipt-binding",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-deep-research-ingestion",
+        "parent-atlas-document-governance-master-index",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-graph-vector-substrate",
+        "parent-atlas-gpu-runtime-abi-alignment",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-graph-validation-fabric",
+        "parent-atlas-grounded-knowledge-fabric",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-nlp-sidecar-feature-compiler",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-ontology-oaklib-fanout-bitmap",
+        "parent-atlas-opencode-replay-proof",
+        "parent-atlas-pass-fabric",
+        "parent-atlas-policy-routing-integration",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-retrieval-executor-compatibility-convergence",
+        "parent-atlas-retrieval-lod-algorithm-taxonomy",
+        "parent-atlas-retrieval-logic-convergence",
+        "parent-atlas-versioned-doc-intelligence",
+        "parent-atlas-workstation-domain-classifier",
+        "parent-atlas-xgboost-cuda-runtime-proof"
+      ]
+    },
+    {
+      "topic": "SEMANTIC_ANN",
+      "count": 147,
+      "readOnly": 39,
+      "mutating": 108,
+      "llamaSlots": 0,
+      "changes": [
+        "atlas-feature-intelligence",
+        "parent-atlas-ace-bitfrost-cache-correctness",
+        "parent-atlas-ace-rlm-bitfrost-integration",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-code-ingestion-pipeline",
+        "parent-atlas-error-embedding-768-migration",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-graph-vector-substrate",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-graph-validation-fabric",
+        "parent-atlas-graphify-recovery-proof-ladder",
+        "parent-atlas-memory-architecture-freeze",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-neural-prefill-encoder",
+        "parent-atlas-nlp-sidecar-feature-compiler",
+        "parent-atlas-observation-routing-fabric",
+        "parent-atlas-okf-knowledge-layers",
+        "parent-atlas-pass-fabric",
+        "parent-atlas-policy-routing-integration",
+        "parent-atlas-prefill-routing-residency-convergence",
+        "parent-atlas-qdrant-structural-payload-enrichment",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-retrieval-executor-compatibility-convergence",
+        "parent-atlas-retrieval-lod-algorithm-taxonomy",
+        "parent-atlas-retrieval-logic-convergence",
+        "parent-atlas-semantic-512-canonicalization",
+        "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+        "parent-atlas-tensor-residency-integration",
+        "parent-atlas-topology-representation-admission",
+        "parent-atlas-transport-memory-boundaries",
+        "parent-atlas-unordered-execution-contract",
+        "parent-atlas-versioned-doc-intelligence"
+      ]
+    },
+    {
+      "topic": "GRAPH_TOPOLOGY",
+      "count": 123,
+      "readOnly": 36,
+      "mutating": 87,
+      "llamaSlots": 0,
+      "changes": [
+        "ace-hyperrag-chr97-graphify-audit",
+        "atlas-feature-intelligence",
+        "deep-audit-code-gates-aug22",
+        "feature-label-semantic-derivation",
+        "parent-atlas-ace-rlm-bitfrost-integration",
+        "parent-atlas-adaptive-dag-fabric",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-branch-merge-consolidation-aug20",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-code-ingestion-pipeline",
+        "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-graph-vector-substrate",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-graph-analysis-contract",
+        "parent-atlas-graph-pagerank-okf-fanout-hardening",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-graph-runtime-enhancement",
+        "parent-atlas-graph-runtime-python-consolidation",
+        "parent-atlas-graph-validation-fabric",
+        "parent-atlas-graphify-recovery-proof-ladder",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-neural-prefill-encoder",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-prefill-routing-residency-convergence",
+        "parent-atlas-retrieval-logic-convergence",
+        "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+        "parent-atlas-tensor-residency-integration",
+        "parent-atlas-topology-representation-admission",
+        "parent-atlas-transport-memory-boundaries",
+        "parent-atlas-versioned-doc-intelligence"
+      ]
+    },
+    {
+      "topic": "DIRECTORY_INDEXING",
+      "count": 84,
+      "readOnly": 24,
+      "mutating": 60,
+      "llamaSlots": 8,
+      "changes": [
+        "deep-audit-code-gates-aug22",
+        "inference-wiring-deep-audit-aug22",
+        "parent-atlas-ace-bitfrost-cache-correctness",
+        "parent-atlas-ace-rlm-bitfrost-integration",
+        "parent-atlas-agentic-file-compiler",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-agentic-run-receipt-binding",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-branch-merge-consolidation-aug20",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-canonical-directory-ingestion-fabric",
+        "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+        "parent-atlas-document-governance-master-index",
+        "parent-atlas-error-embedding-768-migration",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-prellm-recommendation-v1",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-graph-runtime-python-consolidation",
+        "parent-atlas-kv-cache-adaptation-research",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-neural-prefill-encoder",
+        "parent-atlas-nlp-sidecar-feature-compiler",
+        "parent-atlas-okf-knowledge-layers",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-ontology-oaklib-fanout-bitmap",
+        "parent-atlas-retrieval-lod-algorithm-taxonomy",
+        "parent-atlas-retrieval-logic-convergence",
+        "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+        "parent-atlas-tensor-residency-integration",
+        "parent-atlas-transport-memory-boundaries",
+        "parent-atlas-xgboost-cuda-runtime-proof"
+      ]
+    },
+    {
+      "topic": "AST_SYMBOL",
+      "count": 71,
+      "readOnly": 20,
+      "mutating": 51,
+      "llamaSlots": 0,
+      "changes": [
+        "ace-hyperrag-chr97-graphify-audit",
+        "atlas-feature-intelligence",
+        "parent-atlas-ace-rlm-bitfrost-integration",
+        "parent-atlas-agentic-file-compiler",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-code-ingestion-pipeline",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-graph-analysis-contract",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-graph-validation-fabric",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-neural-prefill-encoder",
+        "parent-atlas-okf-knowledge-layers",
+        "parent-atlas-pass-fabric",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+        "parent-atlas-transport-memory-boundaries",
+        "parent-atlas-versioned-doc-intelligence",
+        "parent-atlas-workstation-domain-classifier"
+      ]
+    },
+    {
+      "topic": "MIGRATION_DATABASE",
+      "count": 67,
+      "readOnly": 16,
+      "mutating": 51,
+      "llamaSlots": 0,
+      "changes": [
+        "atlas-feature-intelligence",
+        "manual-migration-reconciliation",
+        "parent-atlas-agentic-repair-fabric",
+        "parent-atlas-agentic-run-receipt-binding",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-branch-merge-consolidation-aug20",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-document-governance-master-index",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-graph-analysis-contract",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-okf-knowledge-layers",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-ontology-oaklib-fanout-bitmap",
+        "parent-atlas-pass-fabric",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+        "parent-atlas-workstation-domain-classifier",
+        "parent-atlas-xgboost-cuda-runtime-proof"
+      ]
+    },
+    {
+      "topic": "AGENT_PROTOCOLS",
+      "count": 43,
+      "readOnly": 10,
+      "mutating": 33,
+      "llamaSlots": 0,
+      "changes": [
+        "deep-audit-code-gates-aug22",
+        "local-llm-offload-ownership",
+        "parent-atlas-agentic-run-receipt-binding",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-nlp-sidecar-feature-compiler",
+        "parent-atlas-observation-routing-fabric",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-retrieval-lod-algorithm-taxonomy",
+        "parent-atlas-retrieval-logic-convergence",
+        "parent-atlas-transport-memory-boundaries"
+      ]
+    },
+    {
+      "topic": "RETRIEVAL_FUSION",
+      "count": 30,
+      "readOnly": 7,
+      "mutating": 23,
+      "llamaSlots": 0,
+      "changes": [
+        "parent-atlas-ace-rlm-bitfrost-integration",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-gpu-graph-vector-substrate",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-prefill-routing-residency-convergence",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-retrieval-fusion-reachability",
+        "parent-atlas-retrieval-lod-algorithm-taxonomy",
+        "parent-atlas-retrieval-logic-convergence",
+        "parent-atlas-rrf-fusion-consolidation",
+        "parent-atlas-tensor-residency-integration",
+        "parent-atlas-transport-memory-boundaries",
+        "parent-atlas-unordered-execution-contract"
+      ]
+    },
+    {
+      "topic": "RESEARCH_CHALLENGER",
+      "count": 21,
+      "readOnly": 2,
+      "mutating": 19,
+      "llamaSlots": 0,
+      "changes": [
+        "atlas-feature-intelligence",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-graph-vector-substrate",
+        "parent-atlas-graph-analysis-contract",
+        "parent-atlas-policy-routing-integration",
+        "parent-atlas-semantic-512-canonicalization",
+        "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+        "parent-atlas-unordered-execution-contract",
+        "parent-atlas-versioned-doc-intelligence"
+      ]
+    },
+    {
+      "topic": "ADMIN_OBSERVABILITY",
+      "count": 17,
+      "readOnly": 10,
+      "mutating": 7,
+      "llamaSlots": 0,
+      "changes": [
+        "deep-audit-code-gates-aug22",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-document-governance-master-index",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-nlp-sidecar-feature-compiler",
+        "parent-atlas-okf-knowledge-layers",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-repair-candidate-feature-matrix",
+        "parent-atlas-retrieval-lod-algorithm-taxonomy",
+        "parent-atlas-xgboost-cuda-runtime-proof"
+      ]
+    },
+    {
+      "topic": "HITL_LEARNING",
+      "count": 15,
+      "readOnly": 7,
+      "mutating": 8,
+      "llamaSlots": 0,
+      "changes": [
+        "parent-atlas-agentic-file-compiler",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-memory-architecture-freeze",
+        "parent-atlas-nlp-sidecar-feature-compiler",
+        "parent-atlas-observation-routing-fabric",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-retrieval-executor-compatibility-convergence"
+      ]
+    },
+    {
+      "topic": "LEXICAL_SEARCH",
+      "count": 15,
+      "readOnly": 5,
+      "mutating": 10,
+      "llamaSlots": 0,
+      "changes": [
+        "parent-atlas-ace-rlm-bitfrost-integration",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-gpu-graph-vector-substrate",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-neural-prefill-encoder",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-pass-fabric",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-retrieval-logic-convergence"
+      ]
+    }
+  ],
+  "topChanges": [
+    {
+      "changeId": "parent-atlas-neural-prefill-encoder",
+      "count": 447
+    },
+    {
+      "changeId": "parent-atlas-best-fit-score-fabric",
+      "count": 173
+    },
+    {
+      "changeId": "parent-atlas-governed-compute-fabric",
+      "count": 143
+    },
+    {
+      "changeId": "parent-atlas-graph-retrieval-proof",
+      "count": 110
+    },
+    {
+      "changeId": "parent-atlas-ace-rlm-bitfrost-integration",
+      "count": 107
+    },
+    {
+      "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
+      "count": 88
+    },
+    {
+      "changeId": "parent-atlas-prefill-routing-residency-convergence",
+      "count": 73
+    },
+    {
+      "changeId": "parent-atlas-ontology-kernel",
+      "count": 53
+    },
+    {
+      "changeId": "parent-atlas-agentic-repair-bundle-integration",
+      "count": 52
+    },
+    {
+      "changeId": "parent-atlas-query-routing-classifier",
+      "count": 49
+    },
+    {
+      "changeId": "parent-atlas-transport-memory-boundaries",
+      "count": 49
+    },
+    {
+      "changeId": "parent-atlas-native-acceleration-cabi",
+      "count": 43
+    },
+    {
+      "changeId": "parent-atlas-canonical-directory-ingestion-fabric",
+      "count": 41
+    },
+    {
+      "changeId": "parent-atlas-pass-fabric",
+      "count": 41
+    },
+    {
+      "changeId": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "count": 41
+    },
+    {
+      "changeId": "parent-atlas-retrieval-logic-convergence",
+      "count": 40
+    },
+    {
+      "changeId": "parent-atlas-tensor-residency-integration",
+      "count": 40
+    },
+    {
+      "changeId": "parent-atlas-candidate-feature-execution-fabric",
+      "count": 39
+    },
+    {
+      "changeId": "atlas-feature-intelligence",
+      "count": 38
+    },
+    {
+      "changeId": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+      "count": 38
+    },
+    {
+      "changeId": "parent-atlas-document-governance-master-index",
+      "count": 38
+    },
+    {
+      "changeId": "parent-atlas-gpu-sidecar-patch-tournament",
+      "count": 36
+    },
+    {
+      "changeId": "parent-atlas-nlp-sidecar-feature-compiler",
+      "count": 33
+    },
+    {
+      "changeId": "parent-atlas-ace-bitfrost-cache-correctness",
+      "count": 26
+    },
+    {
+      "changeId": "manual-migration-reconciliation",
+      "count": 25
+    },
+    {
+      "changeId": "parent-atlas-gpu-graph-vector-substrate",
+      "count": 23
+    },
+    {
+      "changeId": "parent-atlas-kv-cache-adaptation-research",
+      "count": 22
+    },
+    {
+      "changeId": "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+      "count": 21
+    },
+    {
+      "changeId": "parent-atlas-graph-analysis-contract",
+      "count": 19
+    },
+    {
+      "changeId": "parent-atlas-graph-validation-fabric",
+      "count": 18
+    },
+    {
+      "changeId": "parent-atlas-branch-merge-consolidation-aug20",
+      "count": 17
+    },
+    {
+      "changeId": "parent-atlas-unordered-execution-contract",
+      "count": 16
+    },
+    {
+      "changeId": "parent-atlas-xgboost-cuda-runtime-proof",
+      "count": 16
+    },
+    {
+      "changeId": "parent-atlas-compiler-semantic-graph-resolution",
+      "count": 15
+    },
+    {
+      "changeId": "parent-atlas-okf-knowledge-layers",
+      "count": 15
+    },
+    {
+      "changeId": "parent-atlas-topology-representation-admission",
+      "count": 15
+    },
+    {
+      "changeId": "parent-atlas-versioned-doc-intelligence",
+      "count": 15
+    },
+    {
+      "changeId": "parent-atlas-gate2-chunk-lineage-convergence",
+      "count": 14
+    },
+    {
+      "changeId": "parent-atlas-workstation-domain-classifier",
+      "count": 14
+    },
+    {
+      "changeId": "parent-atlas-error-embedding-768-migration",
+      "count": 13
+    },
+    {
+      "changeId": "parent-atlas-opencode-replay-proof",
+      "count": 13
+    },
+    {
+      "changeId": "parent-atlas-policy-routing-integration",
+      "count": 13
+    },
+    {
+      "changeId": "deep-audit-code-gates-aug22",
+      "count": 12
+    },
+    {
+      "changeId": "parent-atlas-agentic-run-receipt-binding",
+      "count": 12
+    },
+    {
+      "changeId": "parent-atlas-memory-architecture-freeze",
+      "count": 12
+    },
+    {
+      "changeId": "parent-atlas-graph-runtime-python-consolidation",
+      "count": 10
+    },
+    {
+      "changeId": "parent-atlas-retrieval-fusion-reachability",
+      "count": 10
+    },
+    {
+      "changeId": "parent-atlas-agentic-file-compiler",
+      "count": 9
+    },
+    {
+      "changeId": "parent-atlas-graphify-recovery-proof-ladder",
+      "count": 7
+    },
+    {
+      "changeId": "parent-atlas-qdrant-structural-payload-enrichment",
+      "count": 7
+    }
+  ],
+  "referencedFiles": [
+    "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md",
+    "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md",
+    "openspec/changes/atlas-feature-intelligence/tasks.md",
+    "openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md",
+    "openspec/changes/deep-audit-code-gates-aug22/tasks.md",
+    "openspec/changes/feature-label-semantic-derivation/tasks.md",
+    "openspec/changes/inference-wiring-deep-audit-aug22/tasks.md",
+    "openspec/changes/local-llm-offload-ownership/tasks.md",
+    "openspec/changes/manual-migration-reconciliation/tasks.md",
+    "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
+    "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "openspec/changes/parent-atlas-adaptive-dag-fabric/tasks.md",
+    "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
+    "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md",
+    "openspec/changes/parent-atlas-agentic-repair-fabric/tasks.md",
+    "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md",
+    "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/tasks.md",
+    "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+    "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md",
+    "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+    "openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/tasks.md",
+    "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+    "openspec/changes/parent-atlas-compiler-semantic-graph-resolution/tasks.md",
+    "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md",
+    "openspec/changes/parent-atlas-deep-research-ingestion/tasks.md",
+    "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+    "openspec/changes/parent-atlas-error-embedding-768-migration/tasks.md",
+    "openspec/changes/parent-atlas-gate2-chunk-lineage-convergence/tasks.md",
+    "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md",
+    "openspec/changes/parent-atlas-gpu-graph-vector-substrate/tasks.md",
+    "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
+    "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md",
+    "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+    "openspec/changes/parent-atlas-graph-analysis-contract/tasks.md",
+    "openspec/changes/parent-atlas-graph-pagerank-okf-fanout-hardening/tasks.md",
+    "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+    "openspec/changes/parent-atlas-graph-runtime-enhancement/tasks.md",
+    "openspec/changes/parent-atlas-graph-runtime-python-consolidation/tasks.md",
+    "openspec/changes/parent-atlas-graph-validation-fabric/tasks.md",
+    "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
+    "openspec/changes/parent-atlas-grounded-knowledge-fabric/tasks.md",
+    "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md",
+    "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md",
+    "openspec/changes/parent-atlas-native-acceleration-cabi/tasks.md",
+    "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+    "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+    "openspec/changes/parent-atlas-observation-routing-fabric/tasks.md",
+    "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
+    "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+    "openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap/tasks.md",
+    "openspec/changes/parent-atlas-opencode-replay-proof/tasks.md",
+    "openspec/changes/parent-atlas-pass-fabric/tasks.md",
+    "openspec/changes/parent-atlas-pca-svd-representation-baseline/tasks.md",
+    "openspec/changes/parent-atlas-policy-routing-integration/tasks.md",
+    "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+    "openspec/changes/parent-atlas-qdrant-structural-payload-enrichment/tasks.md",
+    "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+    "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
+    "openspec/changes/parent-atlas-retrieval-executor-compatibility-convergence/tasks.md",
+    "openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+    "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+    "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+    "openspec/changes/parent-atlas-rrf-fusion-consolidation/tasks.md",
+    "openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md",
+    "openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md",
+    "openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md",
+    "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+    "openspec/changes/parent-atlas-topology-representation-admission/tasks.md",
+    "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+    "openspec/changes/parent-atlas-unordered-execution-contract/tasks.md",
+    "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md",
+    "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+    "openspec/changes/parent-atlas-xgboost-cuda-runtime-proof/tasks.md",
+    "openspec/changes/route-import-infra-isolation/tasks.md"
+  ],
+  "writesPerformed": false
+}

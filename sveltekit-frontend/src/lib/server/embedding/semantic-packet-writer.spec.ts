@@ -52,6 +52,8 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				bindingChecksum: 'd'.repeat(64),
 			},
 		});
+		const admissionMetadata = (row.metadata as Record<string, unknown>).canonical_packet_admission as Record<string, unknown>;
+		expect(admissionMetadata.packetRevision).toMatch(/^sha256:[a-f0-9]{64}$/);
 	});
 
 	it('rejects an admission with missing canonical content digest', async () => {

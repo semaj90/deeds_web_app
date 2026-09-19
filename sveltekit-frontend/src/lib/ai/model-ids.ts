@@ -302,7 +302,7 @@ export const VLM_BASE_URL =
 /** TurboQuant llama-server endpoint (OpenAI-compatible, runs alongside Ollama) */
 export const TURBOQUANT_BASE_URL = 
   (typeof process !== 'undefined' && process.env?.TURBOQUANT_BASE_URL) || 
-  `http://${['127', '0', '0', '1'].join('.')}:8080`;
+  `http://${['127', '0', '0', '1'].join('.')}:8090`;
 /** ornith-1.5-9b — currently loaded on llama-server :8090; see SERVER_CHAT_MODEL's drift note above. */
 export const TURBOQUANT_MODEL = 'ornith-1.5-9b';
 
@@ -325,7 +325,7 @@ export const BIFROST_BASE_URL_CLIENT = '/api/cache/bifrost';
 /** TurboQuant — client-side endpoint (for future direct browser calls if needed) */
 export const TURBOQUANT_BASE_URL_CLIENT = 
   (typeof process !== 'undefined' && process.env?.TURBOQUANT_BASE_URL) || 
-  `http://${['127', '0', '0', '1'].join('.')}:8080`;
+  `http://${['127', '0', '0', '1'].join('.')}:8090`;
 
 // ── Qdrant collection names ──────────────────────────────────────────────
 // These MUST match VECTOR_CONFIG.COLLECTIONS in src/lib/server/config/vector-config.ts

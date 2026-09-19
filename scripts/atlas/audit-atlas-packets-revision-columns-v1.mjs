@@ -1,6 +1,8 @@
 #!/usr/bin/env node
+import fs from 'node:fs';
+import path from 'node:path';
 import pg from 'pg';
-import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 const env = loadRepoEnv(process.env);
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env), statement_timeout: 15000 });
 const cols = await pool.query(`
@@ -17,5 +19,18 @@ const counts = await pool.query(`
   FROM atlas_packets
 `);
 const sample = await pool.query(`SELECT packet_key, source_ref, workspace_revision, source_revision, representation_revision FROM atlas_packets WHERE workspace_revision IS NOT NULL LIMIT 3`);
-console.log(JSON.stringify({ columns: cols.rows, counts: counts.rows[0], sample: sample.rows }, null, 2));
+const report = {
+  schema: 'atlas.atlas-packets-revision-columns.v1',
+  generatedAt: new Date().toISOString(),
+  mode: 'READ_ONLY_LIVE_SCHEMA_CENSUS',
+  table: 'public.atlas_packets',
+  columns: cols.rows,
+  counts: counts.rows[0],
+  sample: sample.rows,
+  writesPerformed: false,
+};
+const reportPath = path.join(REPO_ROOT, 'docs/reports/atlas-packets-revision-columns-v1.json');
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+console.log(JSON.stringify({ ...report, reportPath: 'docs/reports/atlas-packets-revision-columns-v1.json' }, null, 2));
 await pool.end();

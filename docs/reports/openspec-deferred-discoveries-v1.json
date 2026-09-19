@@ -1,0 +1,2657 @@
+{
+  "schema": "atlas.openspec-deferred-discoveries.v1",
+  "generatedAt": "2026-09-19T05:48:34.297Z",
+  "tasks": [
+    {
+      "taskKey": "atlas-feature-intelligence:133",
+      "change": "atlas-feature-intelligence",
+      "source": "openspec/changes/atlas-feature-intelligence/tasks.md",
+      "line": 133,
+      "text": "FI-31 Produce first complete feature-state snapshot and compare it with historical phase-completion claims.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-15T20:00:05.385Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:2850",
+      "change": "parent-atlas-ace-rlm-bitfrost-integration",
+      "source": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "line": 2850,
+      "text": "Keep historical KAG rows and the mxbai teacher fixture excluded from current production",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-14T20:53:52.983Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:2895",
+      "change": "parent-atlas-ace-rlm-bitfrost-integration",
+      "source": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "line": 2895,
+      "text": "Add owned-namespace pruning or archival of superseded centroid keys; never scan/delete",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-14T20:53:52.983Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3219",
+      "change": "parent-atlas-ace-rlm-bitfrost-integration",
+      "source": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "line": 3219,
+      "text": "Keep legacy writers disabled and do not add the seven obsolete columns",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-14T20:53:52.983Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7255",
+      "change": "parent-atlas-ace-rlm-bitfrost-integration",
+      "source": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "line": 7255,
+      "text": "Record explicit negative-transfer reasons; never delete historical traces",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-14T20:53:52.983Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9516",
+      "change": "parent-atlas-ace-rlm-bitfrost-integration",
+      "source": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "line": 9516,
+      "text": "**TRACE-CUVS-CAGRA-01** measure CAGRA only as a challenger against that exact",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-14T20:53:52.983Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-adaptive-dag-fabric:150",
+      "change": "parent-atlas-adaptive-dag-fabric",
+      "source": "openspec/changes/parent-atlas-adaptive-dag-fabric/tasks.md",
+      "line": 150,
+      "text": "DAG-CONTRACT-01 **Superseded in spirit by `research-kernel-contract-v1.ts`",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 60,
+      "lastUpdatedAt": "2026-09-04T00:43:46.417Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-agentic-repair-bundle-integration:275",
+      "change": "parent-atlas-agentic-repair-bundle-integration",
+      "source": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md",
+      "line": 275,
+      "text": "Fit Baum-Welch **offline, batch, against historical `RouteTrace` data only** — never online,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-08-09T04:46:16.571Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-best-fit-score-fabric:736",
+      "change": "parent-atlas-best-fit-score-fabric",
+      "source": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+      "line": 736,
+      "text": "AGMR-03B Run a separate FP16-versus-INT8 precision parity benchmark",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-16T01:13:53.546Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-best-fit-score-fabric:1121",
+      "change": "parent-atlas-best-fit-score-fabric",
+      "source": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+      "line": 1121,
+      "text": "Run a safe warm CPU benchmark separating initialization/checkpoint load",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-16T01:13:53.546Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-best-fit-score-fabric:1800",
+      "change": "parent-atlas-best-fit-score-fabric",
+      "source": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+      "line": 1800,
+      "text": "**PGVECTOR-EXECUTOR-PARITY-02** — If ANN performance work is authorized, benchmark the",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-16T01:13:53.546Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-best-fit-score-fabric:4155",
+      "change": "parent-atlas-best-fit-score-fabric",
+      "source": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+      "line": 4155,
+      "text": "The older `cbcd35c6…` execution remains valid only for its historical",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 70,
+      "lastUpdatedAt": "2026-09-16T01:13:53.546Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-best-fit-score-fabric:4302",
+      "change": "parent-atlas-best-fit-score-fabric",
+      "source": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+      "line": 4302,
+      "text": "Existing historical packet rows were not backfilled. The current cohort still requires",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 70,
+      "lastUpdatedAt": "2026-09-16T01:13:53.546Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-best-fit-score-fabric:4786",
+      "change": "parent-atlas-best-fit-score-fabric",
+      "source": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+      "line": 4786,
+      "text": "Keep this backfill historical/deferred until its selection is explicitly",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 70,
+      "lastUpdatedAt": "2026-09-16T01:13:53.546Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:105",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 105,
+      "text": "QUEUE-05 Replace remaining large vector/tensor RabbitMQ payloads (for example legacy `document.embed` / `vector.index`) with artifact references where profiling shows payload amplification. **OPEN / REPRESENTATIVE PROFILE COMPLETE, LIVE CAPTURE INSTRUMENTED, DISTRIBUTION UNMEASURED** — the read-only caller census found direct compatibility publishers in `rabbitmq-client.ts` (lines 128, 144) and manager-owned publishers in `rabbitmq-manager-fixed.ts` (lines 547, 616, 1091, 1101, 2261) carrying opaque text/vector data without the artifact-reference envelope; `dispatch-inline.ts` is an in-process fallback, not a RabbitMQ publisher. The deterministic representative profile measured the existing serializers and reference-only envelope: a 768-value raw vector was 15,097 bytes versus a 743-byte reference envelope (20.319×), and the 64 KiB document boundary exceeded the policy at 65,699 bytes. Actual serialization points now attach `payloadBytes` and `payloadEncoding=json-utf8` to existing queue traces in `rabbitmq-client.ts` and `rabbitmq-manager-fixed.ts`; this is observability only, not a migration. A read-only Langfuse query found 62 historical queue-publish traces but 0 traces with `payloadBytes`, so live publisher distribution and amplification ratios remain unmeasured; no publisher was redirected or removed. Reports: `docs/reports/queue-large-payload-census-v1.json`, `docs/reports/queue-large-payload-profile-v1.json`, `docs/reports/queue-large-payload-live-profile-v1.json`; harnesses: `scripts/atlas/profile-queue05-large-payloads-v1.mts`, `scripts/atlas/audit-queue05-live-publisher-profile-v1.mts`. Next gate: `QUEUE-05-LIVE-PUBLISHER-PROFILE-01`; requires current instrumented traffic and explicit migration authorization.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:169",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 169,
+      "text": "FEAT-03 Add CPU reference materializer and GPU gather/scatter/sort/compact challenger.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:266",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 266,
+      "text": "CE-04 Benchmark Qwen3-Reranker-0.6B, mxbai-rerank-base-v2 and BGE-reranker-v2-m3 on frozen Atlas queries.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:284",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 284,
+      "text": "ENC-04 Distill CrossEncoder teacher ordering into an EmbeddingGemma PEFT challenger.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:285",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 285,
+      "text": "ENC-05 Store challenger under a NEW representation/model revision and separate Qdrant collection.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:717",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 717,
+      "text": "ALIGN-OPT-01 Keep TensorRT-RTX, cuTile, TurboVec, and learned routing as benchmarked challengers only. Do not add them to the correctness gate until the corresponding baseline, held-out evaluation, and replay receipt exist.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-canonical-directory-ingestion-fabric:73",
+      "change": "parent-atlas-canonical-directory-ingestion-fabric",
+      "source": "openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/tasks.md",
+      "line": 73,
+      "text": "**DIR-INDEX-05A** Reuse the frozen canonical `semantic_768` contract and existing representation owner. `semantic_mrl_512/256/128` are explicit EmbeddingGemma-derived views; `latent_256/128/64` are explicit learned autoencoder views. Neither family may be inferred from raw vector length or promoted as canonical semantic identity. Retired `384` remains compatibility/audit-only.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 10,
+      "lastUpdatedAt": "2026-09-05T06:14:09.792Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-code-ingestion-pipeline:80",
+      "change": "parent-atlas-code-ingestion-pipeline",
+      "source": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+      "line": 80,
+      "text": "**GPH-05** Superseded import guard — fail the audit/CI when a `SUPERSEDED` artifact gains a new import.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 60,
+      "lastUpdatedAt": "2026-08-31T20:24:09.813Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-code-ingestion-pipeline:81",
+      "change": "parent-atlas-code-ingestion-pipeline",
+      "source": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+      "line": 81,
+      "text": "**GPH-06** Retire only after proof — transition `MIGRATION_CANDIDATE → SUPERSEDED → QUARANTINED/DELETED` only after all four promotion requirements are recorded in a receipt.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 50,
+      "lastUpdatedAt": "2026-08-31T20:24:09.813Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-code-ingestion-pipeline:95",
+      "change": "parent-atlas-code-ingestion-pipeline",
+      "source": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+      "line": 95,
+      "text": "**GPH-20** Mark legacy `SUPERSEDED` — blocked until every GPH-19 gate passes; legacy file remains retained.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 60,
+      "lastUpdatedAt": "2026-08-31T20:24:09.813Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-code-ingestion-pipeline:96",
+      "change": "parent-atlas-code-ingestion-pipeline",
+      "source": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+      "line": 96,
+      "text": "**GPH-21** Superseded import guard — reject new imports only after the registry state becomes `SUPERSEDED`.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 60,
+      "lastUpdatedAt": "2026-08-31T20:24:09.813Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-code-ingestion-pipeline:110",
+      "change": "parent-atlas-code-ingestion-pipeline",
+      "source": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+      "line": 110,
+      "text": "**GPH-35** Deferred cleanup window — keep `SUPERSEDED` distinct from `QUARANTINED` and `DELETED`; removal requires a later recovery-window decision, digest/reason evidence, and rollback instructions.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 60,
+      "lastUpdatedAt": "2026-08-31T20:24:09.813Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-compute-rank-cache-eval-dspy-gepa:30",
+      "change": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+      "source": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md",
+      "line": 30,
+      "text": "Adapt existing `scripts/crossencoder-benchmark.py` to consume the final fused candidate set rather than only legacy XGBoost-v2 rows.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-08-31T21:22:45.346Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-compute-rank-cache-eval-dspy-gepa:54",
+      "change": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+      "source": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md",
+      "line": 54,
+      "text": "Populate initial examples from verified historical repair receipts only.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 50,
+      "lastUpdatedAt": "2026-08-31T21:22:45.346Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:14",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 14,
+      "text": "2.2 Build `ClaudeInstructionSupersessionPlanV1` with current SHA-256, topic claims, explicit supersedes/supersededBy links, contradictions, and proposed disposition.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:16",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 16,
+      "text": "2.4 Add dry-run report listing `CANONICAL_CURRENT`, `SCOPED_SUPPORTING`, `SUPERSEDED_CANDIDATE`, and `CONFLICT` instruction files.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:17",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 17,
+      "text": "2.5 Add smoke test proving historical/original instruction files are not modified during discovery.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:40",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 40,
+      "text": "5.3 Add replacement-coverage validation: superseded document must have at least one validated `supersededBy` target.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:50",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 50,
+      "text": "6.2 Generate `docs/MASTER-TOC.md` with canonical topics, active OpenSpec changes, progress, ETA when available, superseded docs, archive-ready docs, experiments, and conflicts.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:59",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 59,
+      "text": "7.3 Add validation preventing an experimental/challenger record from becoming `CANONICAL_CURRENT` merely through document consolidation.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:68",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 68,
+      "text": "8.5 Add Bits UI `Tabs` for Current / OpenSpec / Superseded / Archive Ready / Conflicts.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:87",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 87,
+      "text": "10.2 Review every `CONFLICT` and `SUPERSEDED_CANDIDATE`; do not bulk-resolve through model judgment.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:88",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 88,
+      "text": "10.3 Select at most five clearly superseded non-instruction docs for archive canary.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:96",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 96,
+      "text": "**DOC-GOV-MASTER-TODO-03** Reconcile each still-open historical item to an existing OpenSpec change using exact source references and source revisions where available; do not copy or auto-close tasks.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:97",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 97,
+      "text": "**DOC-GOV-MASTER-TODO-04** Classify historical completion claims as `PROVEN`, `FIXTURE_ONLY`, `REFERENCE_ONLY`, or `UNPROVEN` from current receipts before any task is marked complete.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:98",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 98,
+      "text": "**DOC-GOV-MASTER-TODO-05** Generate a bounded crosswalk from historical TODO sections to OpenSpec task keys and include unresolved/ambiguous rows in the governance report.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-gpu-prellm-recommendation-v1:218",
+      "change": "parent-atlas-gpu-prellm-recommendation-v1",
+      "source": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
+      "line": 218,
+      "text": "7.3 The Ewin Tang citation (arXiv:1807.04271) was not independently checked against arXiv.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RESEARCH_CHALLENGER_EWIN_TANG",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T01:40:57.989Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-gpu-prellm-recommendation-v1:219",
+      "change": "parent-atlas-gpu-prellm-recommendation-v1",
+      "source": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
+      "line": 219,
+      "text": "7.4 Whether the V1 classification lineage should eventually be retired in favor of V2 is an",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-09-14T01:40:57.989Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament:35",
+      "change": "parent-atlas-gpu-sidecar-patch-tournament",
+      "source": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "line": 35,
+      "text": "GPU-25 JSON/HTTP, Arrow/mmap, ordinary H2D, and pinned non-blocking H2D benchmark.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-09T23:37:32.371Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament:62",
+      "change": "parent-atlas-gpu-sidecar-patch-tournament",
+      "source": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "line": 62,
+      "text": "SIMD-03: benchmark `iterate_many` with one parser per worker/thread.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-09T23:37:32.371Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament:151",
+      "change": "parent-atlas-gpu-sidecar-patch-tournament",
+      "source": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "line": 151,
+      "text": "NEW: `compute-pagerank-nodejs.mjs` — lowest-risk archive candidate, self-declared invalid/unused in its own header. `compute-pagerank-neo4j.mjs` — self-declared retired but still package-script-wired; needs operator decision before touching.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 60,
+      "lastUpdatedAt": "2026-09-09T23:37:32.371Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament:215",
+      "change": "parent-atlas-gpu-sidecar-patch-tournament",
+      "source": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "line": 215,
+      "text": "**ROUTE-06** Benchmark the routing tournament at 10K, 50K, and current semantic-card corpus sizes before considering production CAGRA or centroid warming.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-09T23:37:32.371Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament:275",
+      "change": "parent-atlas-gpu-sidecar-patch-tournament",
+      "source": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "line": 275,
+      "text": "**New bounded change needed**: `promote_recommendation`'s write path conflates two state vocabularies — recommendation status (`PROPOSED`/`APPROVED`) written into a table constrained by `semantic_lifecycle_events`'s lifecycle vocabulary (`ACTIVE`/`SUPERSEDED`/`RETRACTED`/`ARCHIVED`). Both `PROMOTE_RECOMMENDATION` and `RECOMMENDATION_SUPERSESSION` are individually `RUNTIME_SMOKE_PROVEN` via rolled-back transaction proofs, but the vocabulary conflict itself needs its own OpenSpec change — not folded into recommendation supersession or this GPU/tournament proposal.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-09T23:37:32.371Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:699",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 699,
+      "text": "**Not done**: did not identify which of the 18 scripts (see item 4 below) originally wrote the old 59,692-row `pageRankScore` data, nor whether that old computation was itself correct. Out of scope for this reconciliation — the property name is now aligned with production reads; provenance of historical data before this pass was not audited.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-09-09T01:02:53.461Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:740",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 740,
+      "text": "**Recommended next bounded step, not done this pass**: (a) resolve the `compute-pagerank-neo4j.mjs` self-declared-retired-but-still-wired discrepancy with an operator decision; (b) archive `compute-pagerank-nodejs.mjs` (self-declared dead by its own author — lowest-risk candidate); (c) read `promote-pagerank-authority-from-neo4j.mjs` in full to confirm or refute overlap with `promote-neo4j-pagerank-to-postgres.mts`; (d) decide whether `atlas_packets.page_rank_score` (Postgres) should be reconciled with `pageRankScore` (Neo4j) as part of the same identity chain, or intentionally kept as a separate downstream projection.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 10,
+      "lastUpdatedAt": "2026-09-09T01:02:53.461Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-runtime-python-consolidation:158",
+      "change": "parent-atlas-graph-runtime-python-consolidation",
+      "source": "openspec/changes/parent-atlas-graph-runtime-python-consolidation/tasks.md",
+      "line": 158,
+      "text": "`scripts/atlas/run_louvain_challenger_v1.py` — \"challenger\" naming suggests an A/B algorithm",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-08-31T21:53:33.048Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-native-acceleration-cabi:58",
+      "change": "parent-atlas-native-acceleration-cabi",
+      "source": "openspec/changes/parent-atlas-native-acceleration-cabi/tasks.md",
+      "line": 58,
+      "text": "P3.2 Benchmark lanes vs the exact oracle: Qdrant HNSW recall, CAGRA (`atlas_cagra_build/search`), TurboVec (optional backend) — recall@k, rank overlap, distortion, memory, build/search latency, filter correctness",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-14T01:44:50.689Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-native-acceleration-cabi:169",
+      "change": "parent-atlas-native-acceleration-cabi",
+      "source": "openspec/changes/parent-atlas-native-acceleration-cabi/tasks.md",
+      "line": 169,
+      "text": "CAGRA benchmark vs the same oracle, at 2k -> 10k -> 52,380 scale",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T01:44:50.689Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:926",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 926,
+      "text": "**RETRIEVAL-04 — Benchmark `pg_search` BM25 first.** Compare it with the",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:2876",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 2876,
+      "text": "NE-15 Implement the Python nested autoencoder challenger",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:2920",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 2920,
+      "text": "NE-25A Freeze the semantic trainer challenger boundary: audit the",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:2936",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 2936,
+      "text": "NE-25B2 Run offline challenger encode and compatibility tests before any",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:2955",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 2955,
+      "text": "NE-26B Add a 384-versus-768 migration benchmark covering dense recall,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:2962",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 2962,
+      "text": "NE-26D Benchmark `semantic_768` against `semantic_mrl_512`,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3175",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3175,
+      "text": "G-05 Retrieval benchmark inputs: identify one frozen query set,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3704",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3704,
+      "text": "Benchmark Recall@K, MRR, latency, and stale-revision rejection on a",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3722",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3722,
+      "text": "Treat a C++ Node-API/LibTorch/cuGraph addon as a challenger. The current",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:6106",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 6106,
+      "text": "Reconcile the two historical `graphify_files` owners before applying",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 70,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:6150",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 6150,
+      "text": "Retire or repoint the four historical registry writer scripts:",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 70,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:6846",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 6846,
+      "text": "Rename the runtime API fields from historical `bm25` names to explicit",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:6853",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 6853,
+      "text": "Benchmark true BM25 against PostgreSQL FTS, Qdrant dense, and hybrid",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:7000",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 7000,
+      "text": "`LEXICAL-02F` — benchmark `POSTGRES_FTS` vs `QDRANT_BM25` on the same frozen",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:7005",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 7005,
+      "text": "`LEXICAL-02G` — retain exactly one logical lexical vote regardless of benchmark outcome",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:7517",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 7517,
+      "text": "`MCP-FILE-TOPK-06` — TurboVec/cuVS-CAGRA challenger parity, same measurement methodology.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:8293",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 8293,
+      "text": "**Not yet done**: the `LEXICAL-02F` benchmark (`POSTGRES_FTS` vs this new `pg_search` index,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:9836",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 9836,
+      "text": "Treat free-threaded Python as a separate benchmark lane. A free-threaded",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:10357",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 10357,
+      "text": "Benchmark TurboVec 64-D prefilter against Qdrant 768-D retrieval on a",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:10952",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 10952,
+      "text": "Keep historical audit success criteria from being marked current until",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 70,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:10955",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 10955,
+      "text": "Do not promote the historical July route-hardening count (`116+`)",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 70,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:11508",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 11508,
+      "text": "Prove `FASTEMBED_CUDA` locally if it becomes a challenger; contract",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:15549",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 15549,
+      "text": "Do not promote retrieved historical claims or duplicate projection IDs;",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 70,
+      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-observation-routing-fabric:183",
+      "change": "parent-atlas-observation-routing-fabric",
+      "source": "openspec/changes/parent-atlas-observation-routing-fabric/tasks.md",
+      "line": 183,
+      "text": "ORF-3P — Qdrant payload-index benchmark: indexed selective fields vs unindexed/nested variants; record memory/storage cost and latency.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-08-31T20:24:09.889Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-ontology-kernel:2570",
+      "change": "parent-atlas-ontology-kernel",
+      "source": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+      "line": 2570,
+      "text": "**CONCEPT-10 — add PyTorch only as a challenger.** A learned encoder or",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-14T16:51:04.795Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-prefill-routing-residency-convergence:130",
+      "change": "parent-atlas-prefill-routing-residency-convergence",
+      "source": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+      "line": 130,
+      "text": "FEAT-08 Benchmark recall/overlap after each reduction challenger.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-18T21:20:13.836Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-prefill-routing-residency-convergence:224",
+      "change": "parent-atlas-prefill-routing-residency-convergence",
+      "source": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+      "line": 224,
+      "text": "GPU-PT-06 Keep activation checkpointing disabled for the tiny router absent measured training-memory pressure; distinguish this training concern from TensorRT-RTX benchmark selection.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-18T21:20:13.836Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-prefill-routing-residency-convergence:241",
+      "change": "parent-atlas-prefill-routing-residency-convergence",
+      "source": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+      "line": 241,
+      "text": "TRT-00 Select a heavier bounded neural benchmark component—reranker, prefill encoder, or decoder-side auxiliary network—and record its model/component revision, checksum, bounded shapes, workload rationale, and expected AOT/JIT/runtime-cache amortization.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-18T21:20:13.836Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-prefill-routing-residency-convergence:256",
+      "change": "parent-atlas-prefill-routing-residency-convergence",
+      "source": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+      "line": 256,
+      "text": "TRT-13 Benchmark against PyTorch CUDA and LibTorch CUDA.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-18T21:20:13.836Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-prefill-routing-residency-convergence:267",
+      "change": "parent-atlas-prefill-routing-residency-convergence",
+      "source": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+      "line": 267,
+      "text": "ANN-02 Keep CAGRA approximate and separately benchmarked.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-18T21:20:13.836Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-query-routing-classifier:129",
+      "change": "parent-atlas-query-routing-classifier",
+      "source": "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+      "line": 129,
+      "text": "`cuvs_cagra_768` remains an approximate executor challenger. It was not",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T01:40:58.004Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-query-routing-classifier:137",
+      "change": "parent-atlas-query-routing-classifier",
+      "source": "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+      "line": 137,
+      "text": "Treat Microsoft DiskANN3 as a separate SSD/disk ANN challenger.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T01:40:58.004Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-query-routing-classifier:138",
+      "change": "parent-atlas-query-routing-classifier",
+      "source": "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+      "line": 138,
+      "text": "Treat cuVS Vamana as a separate GPU/library implementation challenger.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T01:40:58.004Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-query-routing-classifier:140",
+      "change": "parent-atlas-query-routing-classifier",
+      "source": "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+      "line": 140,
+      "text": "Benchmark on the same immutable semantic_768 snapshot and exact oracle.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T01:40:58.004Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7045",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 7045,
+      "text": "Do NOT rewrite historical `graphify_runs` rows.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-09-18T19:56:17.466Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12067",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 12067,
+      "text": "Do not start Graphify, relabel an historical execution, or advance",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-09-18T19:56:17.466Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12325",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 12325,
+      "text": "Do not treat historical index claims as proof of current source",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-09-18T19:56:17.466Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13207",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 13207,
+      "text": "Keep this cohort historical; do not promote or use it to seed current",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-09-18T19:56:17.466Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13222",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 13222,
+      "text": "Do not combine this admitted historical revision with the newer",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-09-18T19:56:17.466Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lod-algorithm-taxonomy:193",
+      "change": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+      "line": 193,
+      "text": "**LOD-06** Benchmark Rust `simd-json` only for metadata/JSONL control paths such as snapshot manifests and receipts; never hex-encode or JSON-serialize the float32 vector bulk path.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-06T00:59:49.386Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lod-algorithm-taxonomy:235",
+      "change": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+      "line": 235,
+      "text": "**TV-LOD-06** Choose one TurboVec production execution owner: Python `:8791`, Rust N-API, or an isolated Rust service. Prefer the isolated Rust service only if process-level memory/crash isolation outweighs N-API call overhead; keep the existing gRPC bridge compatibility-only and CLI spawn deprecated until ownership is proven.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-06T00:59:49.386Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-logic-convergence:104",
+      "change": "parent-atlas-retrieval-logic-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+      "line": 104,
+      "text": "**SEARCH-REINTEGRATION-05 — Reconcile historical MCP mismatches against current code.**",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-14T01:45:28.007Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-logic-convergence:116",
+      "change": "parent-atlas-retrieval-logic-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+      "line": 116,
+      "text": "**DEFER-VIBRETI-01 — Keep HMM/Vibreti-style repair challenger-only.** No",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-14T01:45:28.007Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-logic-convergence:277",
+      "change": "parent-atlas-retrieval-logic-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+      "line": 277,
+      "text": "**RANK-PYTORCH-01 — Add/retain PyTorch/ATen learned ranker only as shadow challenger.**",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-14T01:45:28.007Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-tensor-residency-integration:991",
+      "change": "parent-atlas-tensor-residency-integration",
+      "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+      "line": 991,
+      "text": "**GPU-EXP-09** Characterize cuTile as a pure-kernel challenger against the",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-15T01:47:42.154Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-tensor-residency-integration:1032",
+      "change": "parent-atlas-tensor-residency-integration",
+      "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+      "line": 1032,
+      "text": "**GPU-EXP-19** Keep QLoRA/GEPA as offline challengers with immutable base,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-15T01:47:42.154Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-tensor-residency-integration:1346",
+      "change": "parent-atlas-tensor-residency-integration",
+      "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+      "line": 1346,
+      "text": "**`GPJSON-CHALLENGER-01` (design target, low priority)**: the review's positioning — GpJSON",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-15T01:47:42.154Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-tensor-residency-integration:2036",
+      "change": "parent-atlas-tensor-residency-integration",
+      "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+      "line": 2036,
+      "text": "**TRACE-CUVS-CAGRA-01** evaluate CAGRA only as an approximate challenger against the",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-15T01:47:42.154Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-tensor-residency-integration:2100",
+      "change": "parent-atlas-tensor-residency-integration",
+      "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+      "line": 2100,
+      "text": "**TRACE-CUVS-CAGRA-01** measure CAGRA as an approximate challenger against the cuVS",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-15T01:47:42.154Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-topology-representation-admission:105",
+      "change": "parent-atlas-topology-representation-admission",
+      "source": "openspec/changes/parent-atlas-topology-representation-admission/tasks.md",
+      "line": 105,
+      "text": "TOPO-14 Benchmark PostgreSQL AIO/bitmap scans, mmap, and GPU execution",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 80,
+      "lastUpdatedAt": "2026-09-14T01:44:50.719Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:25",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 25,
+      "text": "**CC-02** Benchmark contextual structural metadata against the current treesitter-chunker evidence on a fixed corpus; record symbol localization and repair-localization Recall@10/MRR without changing identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 10,
+      "lastUpdatedAt": "2026-09-14T01:44:50.721Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:33",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 33,
+      "text": "**MEM-05** Model temporal semantic relationships as provenance-owned `UPDATES`, `EXTENDS`, and `DERIVES` observations while preserving superseded history.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-09-14T01:44:50.721Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:35",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 35,
+      "text": "**SIMD-05** Benchmark simdjson only on metadata JSON/JSONL paths such as receipts, snapshots, and traces; retain Zod/Pydantic/TypeScript schemas as semantic authorities.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-14T01:44:50.721Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:362",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 362,
+      "text": "Do not append candidates yet. Historical snapshot pairing, source CRUD",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 70,
+      "lastUpdatedAt": "2026-09-14T01:44:50.721Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    }
+  ],
+  "writesPerformed": false
+}

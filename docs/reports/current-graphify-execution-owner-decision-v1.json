@@ -1,15 +1,15 @@
 {
   "schema": "atlas.current-graphify-execution-owner-decision.v1",
-  "generatedAt": "2026-09-16T23:00:58.328Z",
+  "generatedAt": "2026-09-18T22:12:42.596Z",
   "gate": "GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02",
-  "mode": "DRY_RUN",
+  "mode": "APPLY",
   "chosenExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
   "otherCandidateExecutionIds": [
     "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
   ],
-  "authorizedEnvVarPresent": false,
-  "applyFlagPresent": false,
-  "writesPerformed": false,
+  "authorizedEnvVarPresent": true,
+  "applyFlagPresent": true,
+  "writesPerformed": true,
   "before": [
     {
       "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
@@ -22,7 +22,18 @@
       "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
     }
   ],
-  "after": null,
-  "readbackVerified": false,
-  "reportChecksum": "1771986147ff4d761d4d5ef9eae768026a8899d69f22d0b30443e42122fb109c"
+  "after": [
+    {
+      "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+      "canonical_authority": false,
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+    },
+    {
+      "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "canonical_authority": true,
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+    }
+  ],
+  "readbackVerified": true,
+  "reportChecksum": "7deb0dc87c81ed2695b75a1c0bb9f1d7babd7a287cf5ecddd658711691b3b26c"
 }

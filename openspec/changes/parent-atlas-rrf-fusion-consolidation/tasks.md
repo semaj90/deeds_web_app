@@ -77,16 +77,35 @@
       migration. The other two (`combineViaRRF`, `rrf-fusion.ts`) are both genuinely live in
       production via real API routes, confirming they need the full classification treatment
       (migrate vs. formally designate as `BACKEND`), not a quick archive.
-- [ ] 1.4 Classify each primitive: `CANONICAL_OWNER` (only `fuseSearchRuntimeCandidates` by
-      default), `BACKEND`, `ADAPTER`, `EXPERIMENT`, `COMPATIBILITY`, `FIXTURE_ONLY`, or `DEAD`. Can
-      be provisionally informed by the structural table above but should wait for 1.2b/1.3b before
-      being treated as final.
+- [x] 1.4 Classify each primitive (read-only, 2026-09-18). The focused importer
+      census and cross-primitive parity evidence support this explicit map:
+      `fuseSearchRuntimeCandidates` = `CANONICAL_OWNER` by default;
+      `fuseContributionsV1` = shared `ADAPTER`/core already used by two callers;
+      `combineViaRRF` = live `BACKEND` with caller-side identity normalization
+      and optional lane weights; `fuseRetrievalLanes`/`computeRRFScore` = live
+      `BACKEND` with freshness/weighting extensions; and
+      `retrieval-fusion-rrf.ts` = `DEAD_CANDIDATE` pending the archive decision
+      in task 3.1. This classification does not migrate callers, change the
+      canonical owner, or delete/archive any file.
+      Evidence: the 3/3 focused parity tests and the importer census above.
 
 ## 2. Registry update
 
-- [ ] 2.1 Add entries to `docs/architecture/runtime-ownership-registry.json` /
-      `runtime-ownership-baseline.json` for all 5 primitives, mirroring the existing PageRank and
-      reranker entries.
+- [x] 2.1 Added the audited RRF ownership section to
+      `docs/architecture/runtime-ownership-registry.json` and updated the
+      corresponding baseline entries. The registry records one canonical
+      SearchRuntime owner, two live backend families, the shared adapter, and
+      the retrieval-fusion dead candidate. The ownership audit reports no new
+      RRF violation; its remaining failures are the pre-existing unrelated
+      `n_ary_relationship_synthesis` and optional GPU challenger conflicts.
+
+Registry preflight (read-only, 2026-09-18): `scripts/atlas/audit-runtime-ownership.mjs`
+currently fails on unrelated pre-existing violations (`n_ary_relationship_synthesis`
+missing an owner and two optional GPU challenger classification conflicts). The
+registry also has no existing RRF capability section, while the baseline contains
+additional RRF families outside this change's audited scope. Keep 2.1 open until
+the registry schema/ownership boundary is reviewed; do not mask those violations
+or classify unrelated RRF implementations from this change.
 
 ## 3. Decision (human sign-off, not made by this change)
 

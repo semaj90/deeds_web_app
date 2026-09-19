@@ -12,11 +12,14 @@
 - [x] 1.4 Unit-tested (mocked `fetch`) — reachable/resolved, unreachable/`RESOLUTION_UNAVAILABLE`,
       never-fabricates-on-error, `canonicalAuthority: false` always present.
 
-## 2. AR-02 — Action/Workflow registry owner census (NOT DONE)
+## 2. AR-02 — Action/Workflow registry owner census
 
-- [ ] 2.1 Decide whether the action registry becomes a Postgres-backed, BM25-searchable table
-      (per the operator's section 7) or stays code-defined. Not decided this pass — AR-03's
-      seed registry is deliberately code-only until this census happens.
+- [x] 2.1 Decided that the bounded 13-action registry remains code-defined for this change.
+      Evidence: `scripts/atlas/audit-agentic-action-registry-owner-v1.mjs` and
+      `docs/reports/agentic-action-registry-owner-v1.json`. PostgreSQL/BM25 is deferred until
+      operator-managed action discovery, durable independent audit history, or a materially
+      larger catalog is explicitly required. No migration, database write, or second owner was
+      introduced.
 
 ## 3. AR-03 — AgenticActionV1 contract + seed registry
 
@@ -34,12 +37,20 @@
 
 ## 4. AR-04 — HyperEdge action/member roles (NOT DONE)
 
-- [ ] 4.1 `AgenticHyperEdgeV1` needs a nullable `canonicalId` + `resolutionState` per member,
-      which the existing canonical `HyperedgeV1` (`.strict()`, `canonicalId: z.string().min(1)`
-      required) does not support. Decide: new distinct contract vs. a breaking change to
-      `HyperedgeV1` — not decided, not built.
+- [x] 4.1 `AgenticHyperEdgeV1` uses a distinct additive contract with nullable `canonicalId` and
+      per-member `resolutionState`; the existing canonical `HyperedgeV1` remains unchanged.
+      Evidence: `sveltekit-frontend/src/lib/server/atlas/agentic/contracts/agentic-hyperedge-v1.ts`
+      and focused tests prove unresolved members cannot claim canonical identity while resolved
+      members require explicit canonical IDs and evidence.
 
-## 5. AR-05 — bitencoded capability mask + CPU parity (NOT DONE)
+## 5. AR-05 — bitencoded capability mask + CPU parity
+
+- [x] 5.1 Added `agentic-capability-mask-v1.ts` with a deterministic 10-bit capability
+      vocabulary aligned to the existing `AgenticActionKindV1` values. Encoding, decoding,
+      membership, and invalid-input handling are pure and fail closed.
+- [x] 5.2 Added focused CPU parity tests in `agentic-capability-mask-v1.spec.ts`. The mask is
+      explicitly derived navigation metadata with `canonicalAuthority=false` and
+      `writesPerformed=false`; no runtime route, datastore, or task-state mutation was added.
 ## 6. AR-06 — Go Retrieval → canonical candidate adapter (SUPERSEDED_BY_EXISTING_OWNER — see
       section 18.3: `query-classifier.ts` + `retrieval-plan.ts`, live in `/api/search/hyperrag`,
       already do this)
@@ -59,11 +70,28 @@
 - [x] 7.2 Unit-tested (mocked `fetch`) — 5/5 passing: resolves distinct labels independently,
       deduplicates across domains/symbols/targetHints, respects `maxLabels`, one failure doesn't
       block others, zero-candidate classification short-circuits without any fetch call.
-- [ ] 7.3 **NOT DONE, deliberately**: wiring this into `/api/search/hyperrag/+server.ts` itself
-      (or any other live caller). That remains the open decision flagged in section 18.3/19 —
-      the adapter is ready to be called, but nothing calls it yet.
-## 8. AR-08 — HyperGraphRAG n-ary action expansion (NOT DONE)
-## 9. AR-09 — CandidateFeatureMatrix action features (NOT DONE)
+- [x] 7.3 Wire the adapter into `/api/search/hyperrag/+server.ts` as an additive, fail-closed
+      enrichment after synchronous classification. The route returns bounded `oakEvidence` while
+      preserving SearchRuntime as retrieval/fusion owner; sidecar failure degrades to unavailable
+      evidence and does not create canonical identity or writes. Focused adapter/client/route tests
+      pass 17/17 (2026-09-19). No datastore or source mutation occurred.
+## 8. AR-08 — HyperGraphRAG n-ary action expansion
+
+- [x] 8.1 Added the pure `expandAgenticHyperEdgeV1()` projection. It consumes the AR-04
+      action/member contract, uses only resolved canonical members, emits a bounded star fan-out,
+      preserves evidence references, and explicitly excludes unresolved members. It cannot create
+      canonical identity, add retrieval votes, or write graph state.
+- [x] 8.2 Added focused tests for unresolved-member exclusion, deterministic ordinal ordering,
+      bounded fan-out, and non-authoritative/read-only receipt flags.
+## 9. AR-09 — CandidateFeatureMatrix action features
+
+- [x] 9.1 Added `AgenticActionFeatureV1` as a derived sidecar keyed by the existing
+      `candidateOrdinal`/`canonicalId`. It exposes the deterministic capability mask, action
+      counts, approval count, feature revision, and evidence refs without creating a second
+      CandidateFeatureMatrix owner or retrieval vote.
+- [x] 9.2 Added focused tests for deterministic action ordering, capability-mask projection,
+      evidence deduplication, and empty-candidate behavior. The sidecar remains
+      `canonicalAuthority=false` and `writesPerformed=false`.
 ## 10. AR-10 — Tang low-rank recommendation challenger scaffold (CENSUS COMPLETE, REAL/LIVE —
       see also claude.md's "Correction: Ewin Tang recommendation" note)
 
@@ -122,13 +150,43 @@
       `recommendation-evidence-bundle-v1.ts` already depends on by the old names. **Real
       architecture decision (port forward vs. leave superseded) — flagged for the operator, not
       resolved here.**
-## 11. AR-11 — DSPy program/eval snapshot contract (NOT DONE)
-## 12. AR-12 — GEPA offline optimization harness scaffold (NOT DONE)
-## 13. AR-13 — Agentic DAG synthesis (PARTIALLY BUILT, DORMANT — see section 18.3:
-      `mastra-workflow-compiler.ts`/`workflow-spec-builder.ts` exist, zero live callers found)
-## 14. AR-14 — ParameterResolver wiring (NOT DONE)
-## 15. AR-15 — bounded repair-loop fixture (TS2345 deterministic fixture) (NOT DONE)
-## 16. AR-16 — ExecutionReceipt → HyperEdge projection (NOT DONE)
+## 11. AR-11 — DSPy program/eval snapshot contract
+
+- [x] 11.1 Added `OfflineProgramEvalSnapshotV1`, binding program/feature revisions, source
+      revisions, input/output checksums, and explicit train/held-out splits. Duplicate examples
+      fail closed; the snapshot is offline-only and non-authoritative.
+
+## 12. AR-12 — GEPA offline optimization harness scaffold
+
+- [x] 12.1 Added deterministic challenger ranking over held-out scores. The tournament is
+      evidence-only, records deltas against a baseline, and always emits
+      `promotionAuthorized=false` and `writesPerformed=false`; it does not perform online weight
+      updates or alter task execution state.
+## 13. AR-13 — Agentic DAG synthesis (PARTIAL; existing compiler remains owner)
+
+- [x] 13.1 Added `synthesizeAgenticDagV1()` as a receipt wrapper around the existing
+      `buildAtlasWorkflowSpec()`/`buildDagNode()` owner. It emits readiness metadata only and
+      preserves the existing mutation-validator fail-closed rule.
+- [x] 13.2 Added focused fixture tests. Live route wiring and execution remain separate gates.
+## 14. AR-14 — ParameterResolver wiring (PARTIAL)
+
+- [x] 14.1 Added a read-only `resolveParameterArtifactV1()` adapter over the existing
+      `ParameterArtifactLookupV1` owner. It resolves exactly one proven match, returns
+      `UNAVAILABLE` for no match, and fails closed with `AMBIGUOUS` for multiple matches. No
+      artifact registration, download, cache write, or runtime wiring is claimed.
+## 15. AR-15 — bounded repair-loop fixture (TS2345 deterministic fixture) (PARTIAL)
+
+- [x] 15.1 Added a deterministic four-step TS2345 fixture using the existing registry:
+      `RG_EXACT_SEARCH → OAK_RESOLVE → RUN_TYPECHECK → STOP_SUCCESS`.
+- [x] 15.2 Added tests proving the fixture is read-only, bounded, fixture-only, and does not
+      apply a source repair or claim canonical authority. Live tool execution remains separate.
+## 16. AR-16 — ExecutionReceipt → HyperEdge projection (PARTIAL)
+
+- [x] 16.1 Added a pure projection from the existing non-authoritative OAK execution receipt to
+      `AgenticHyperEdgeV1`. Execution IDs remain evidence/member IDs; canonical IDs stay null and
+      unresolved until an independent identity owner resolves them.
+- [x] 16.2 Added tests for evidence preservation and rejection of authoritative receipts at this
+      boundary. No graph, packet, source, or cache writes are performed.
 ## 17. AR-17 — ContextManifest/PromptPlan integration (PARTIALLY BUILT, DORMANT — see section
       18.3: `prompt-plan.ts` exists with zero live callers found outside its own directory)
 

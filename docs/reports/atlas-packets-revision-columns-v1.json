@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.atlas-packets-revision-columns.v1",
+  "generatedAt": "2026-09-19T05:49:39.515Z",
+  "mode": "READ_ONLY_LIVE_SCHEMA_CENSUS",
+  "table": "public.atlas_packets",
+  "columns": [
+    {
+      "column_name": "workspace_revision",
+      "data_type": "integer",
+      "is_generated": "NEVER",
+      "generation_expression": null
+    },
+    {
+      "column_name": "representation_revision",
+      "data_type": "integer",
+      "is_generated": "NEVER",
+      "generation_expression": null
+    },
+    {
+      "column_name": "source_revision",
+      "data_type": "text",
+      "is_generated": "NEVER",
+      "generation_expression": null
+    }
+  ],
+  "counts": {
+    "total": 61718,
+    "workspace_revision_nonnull": 61718,
+    "source_revision_nonnull": 0,
+    "representation_revision_nonnull": 61718
+  },
+  "sample": [
+    {
+      "packet_key": "packet:ac9a40baef84",
+      "source_ref": "neschrom97/cards/10027c78e9267a7c.json",
+      "workspace_revision": 0,
+      "source_revision": null,
+      "representation_revision": 0
+    },
+    {
+      "packet_key": "packet:ac9a7c54ae2b",
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-07T16-13-19/graph_edges.json",
+      "workspace_revision": 0,
+      "source_revision": null,
+      "representation_revision": 0
+    },
+    {
+      "packet_key": "packet:ac9e80acafb2",
+      "source_ref": "crates/turbovec-napi/target/release/.fingerprint/unicode-ident-843302bae674673a/dep-lib-unicode_ident",
+      "workspace_revision": 0,
+      "source_revision": null,
+      "representation_revision": 0
+    }
+  ],
+  "writesPerformed": false
+}

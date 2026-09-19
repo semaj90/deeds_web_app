@@ -1,0 +1,94 @@
+{
+  "schema": "ParentAtlasCurrentLineageFunnelV1",
+  "generatedAt": "2026-09-19T04:54:25.675Z",
+  "mode": "READ_ONLY_EVIDENCE_COMPOSITION",
+  "workspaceAuthority": {
+    "status": "ADMITTED",
+    "revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "cohortAligned": false,
+    "source": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT"
+  },
+  "executionAuthority": {
+    "status": "APPLIED_AND_READ_BACK",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "readbackVerified": true,
+    "lifecycleOwner": "NOT_PROVEN_BY_LIFECYCLE_AUDIT"
+  },
+  "packetRevisionOwner": {
+    "status": "DERIVATION_OWNER_PROVEN",
+    "ownerKind": "DERIVED",
+    "derivationRevision": "packet-revision-v1",
+    "writerAdoption": false,
+    "canonicalAuthority": false,
+    "writerVerdict": "PACKET_WRITER_CURRENT_LINEAGE_NOT_PROVEN",
+    "sourceRevisionColumn": "PRESENT_BUT_UNPOPULATED",
+    "nextGate": "PACKET-DIGEST-BRIDGE-ADMISSION-01"
+  },
+  "sourceProducerAuthority": {
+    "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
+    "ownerDecision": "LEGACY_ONLY_NO_CURRENT_OWNER",
+    "safeToPromote": false,
+    "writesPerformed": false,
+    "repairPlanStatus": "REPAIR_PLAN_PARTIAL_EXACT_BLOCKED",
+    "repairPlanWorkspaceRevision": "sha256:bbe6ade362a1256daf19ae144a052c7aa1e0801bf400ec8ac36e5d484d12b1bb",
+    "repairPlanExactCurrentBindingCount": 22890,
+    "repairPlanAuthorizationRequired": true
+  },
+  "independentEvidenceCounts": {
+    "historicalProvenPacketChunkRows": 4,
+    "revisionQualifiedAstRows": 48
+  },
+  "promotionFunnel": {
+    "workspaceSources": 52,
+    "packetIdentityQualified": 0,
+    "packetRevisionQualified": 0,
+    "packetChunkCurrentQualified": 4,
+    "packetAstCurrentQualified": 0,
+    "spanQualified": 0,
+    "candidateOrdinalEligible": 0
+  },
+  "admittedWorkspaceSources": 52,
+  "selectedExecutionExactSources": 128,
+  "packetRows": 40,
+  "packetSourceRevisionMatches": 0,
+  "packetContentDigestMatches": 0,
+  "packetRevisionQualified": 0,
+  "provenPacketChunkRows": 4,
+  "canonicalChunkMatches": 4,
+  "revisionQualifiedAstRows": 48,
+  "namespaceQualified": 0,
+  "spanQualified": 0,
+  "fullyQualified": 0,
+  "candidateOrdinalEligibleRows": 0,
+  "unresolvedByReason": {
+    "executionSourceAuthority": 1,
+    "workspaceRevisionMismatch": 52,
+    "packetRevisionOwner": 0,
+    "packetRevisionWriterAdoption": 1,
+    "packetIdentityIncomplete": 40,
+    "authoritativeNamespaceMissing": 1,
+    "evidenceSpanMissing": 1
+  },
+  "firstFailureBoundary": "EXECUTION_SOURCE_AUTHORITY",
+  "scope": {
+    "sourceCohortRows": 52,
+    "packetChunkJoinLimit": 128,
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "inputReceipts": {
+    "sourceCohort": "docs/reports/current-source-cohort-lineage-v1.json",
+    "executionOwner": "docs/reports/current-graphify-execution-owner-decision-v1.json",
+    "packetChunkJoin": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+    "packetWriter": "docs/reports/packet-writer-lineage-v1.json",
+    "packetRevisionOwner": "docs/reports/packet-revision-owner-v1.json",
+    "packetIdentityReconciliation": "docs/reports/current-packet-chunk-identity-reconciliation-v1.json",
+    "packetDigestBridge": "docs/reports/current-packet-digest-bridge-v1.json",
+    "sourceOwner": "docs/reports/current-source-owner-reconciliation-v1.json",
+    "sourceAuthorityRepairPlan": "docs/reports/current-source-authority-repair-plan-v1.json",
+    "sourceEvidence": "docs/reports/current-source-evidence-hydration-v1.json"
+  },
+  "reportChecksum": "1058ebd41b715504c78b41bd98de7016796fc6be56103c35a9849a2a52a3e430"
+}

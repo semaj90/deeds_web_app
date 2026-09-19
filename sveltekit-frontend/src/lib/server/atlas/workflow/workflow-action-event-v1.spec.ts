@@ -69,12 +69,38 @@ describe('WorkflowActionEventV1', () => {
   it('does not manufacture progress for an unmeasured running action', () => {
     expect(workflowProgressFraction(event({ state: 'running', progress: undefined }))).toBeNull();
   });
+
+  it('accepts optional run-receipt accounting metadata', () => {
+    const value = event({
+      tokensUsed: 42,
+      filesEdited: ['scripts/atlas/example.mjs'],
+      openspecChange: 'parent-atlas-agentic-run-receipt-binding',
+    });
+    expect(validateWorkflowActionEvent(value).ok).toBe(true);
+  });
+
+  it('rejects invalid run-receipt accounting metadata', () => {
+    const result = validateWorkflowActionEvent(event({
+      tokensUsed: 1.5,
+      filesEdited: [''],
+      openspecChange: '../unsafe',
+    }));
+    expect(result.ok).toBe(false);
+    expect(result.errors).toEqual(expect.arrayContaining([
+      'tokensUsed must be a non-negative integer',
+      'filesEdited entries must be non-empty strings',
+      'openspecChange must be a non-empty safe change name',
+    ]));
+  });
 });
 
 describe('WorkflowActionEventV1 -- canonical adapter round-trip (WORKFLOW-ACTION-SCHEMA-OWNER-01)', () => {
   it('round-trips every field the UI/Kanban layer actually reads', () => {
     const original = event({
       target: { canonicalId: 'candidate-42', resource: 'src/lib/foo.ts' },
+      tokensUsed: 42,
+      filesEdited: ['src/lib/foo.ts'],
+      openspecChange: 'parent-atlas-agentic-run-receipt-binding',
     });
 
     const canonical = toCanonicalWorkflowActionEvent(original, { producerRevision: 'rev-ui-1' });
@@ -85,6 +111,11 @@ describe('WorkflowActionEventV1 -- canonical adapter round-trip (WORKFLOW-ACTION
     expect(canonical.progress).toEqual(original.progress);
     expect(canonical.visual).toEqual(original.visual);
     expect(canonical.canonicalIds).toEqual(['candidate-42']);
+    expect(canonical.metadata).toMatchObject({
+      tokensUsed: 42,
+      filesEdited: ['src/lib/foo.ts'],
+      openspecChange: 'parent-atlas-agentic-run-receipt-binding',
+    });
 
     const roundTripped = fromCanonicalWorkflowActionEvent(canonical, { emittedAt: original.emittedAt });
     expect(roundTripped.workflowId).toBe(original.workflowId);
@@ -101,6 +132,9 @@ describe('WorkflowActionEventV1 -- canonical adapter round-trip (WORKFLOW-ACTION
     expect(roundTripped.progress).toEqual(original.progress);
     expect(roundTripped.target).toEqual(original.target);
     expect(roundTripped.visual).toEqual(original.visual);
+    expect(roundTripped.tokensUsed).toBe(original.tokensUsed);
+    expect(roundTripped.filesEdited).toEqual(original.filesEdited);
+    expect(roundTripped.openspecChange).toBe(original.openspecChange);
     expect(roundTripped.emittedAt).toBe(original.emittedAt);
   });
 

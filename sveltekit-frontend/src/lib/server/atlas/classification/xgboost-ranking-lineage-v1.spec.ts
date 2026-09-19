@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { candidateFeatureSnapshotChecksum } from '../features/candidate-feature-snapshot-v1.js';
 import {
   admitRerankerEvaluationV1,
+  buildXgboostHeldOutEvaluationReceiptV1,
   buildXgboostRankingCandidatesFromFeatureSnapshotV1,
   groupXgboostRankingCandidatesV1,
   rankingLineageChecksumV1,
@@ -44,6 +45,7 @@ describe('admitRerankerEvaluationV1', () => {
       ...checksums,
     });
     expect(result.status).toBe('BLOCKED_CORPUS');
+    expect(result.trainingAuthorized).toBe(false);
     expect(result.promotionAuthorized).toBe(false);
     expect(result.writesPerformed).toBe(false);
   });
@@ -55,6 +57,7 @@ describe('admitRerankerEvaluationV1', () => {
       ...checksums,
     });
     expect(result.status).toBe('BLOCKED_EVALUATION');
+    expect(result.trainingAuthorized).toBe(false);
     expect(result.reason).toBe('EVALUATION_MISSING');
   });
 
@@ -65,8 +68,37 @@ describe('admitRerankerEvaluationV1', () => {
       ...checksums,
     });
     expect(result.status).toBe('EVALUATION_READY');
+    expect(result.trainingAuthorized).toBe(false);
     expect(result.promotionAuthorized).toBe(false);
     expect(result.canonicalAuthority).toBe(false);
+  });
+});
+
+describe('XgboostHeldOutEvaluationReceiptV1', () => {
+  it('requires disjoint source-revision splits and explicit metrics', () => {
+    const receipt = buildXgboostHeldOutEvaluationReceiptV1({
+      modelRevision: 'sha256:model-v1',
+      datasetRevision: 'sha256:dataset-v1',
+      trainSourceRevisions: ['sha256:train-a', 'sha256:train-b'],
+      heldOutSourceRevisions: ['sha256:test-a'],
+      metrics: { ndcgAt10: 0.75, evaluatedRows: 12 },
+    });
+
+    expect(receipt.sourceRevisionSplitDisjoint).toBe(true);
+    expect(receipt.metrics).toEqual({ ndcgAt10: 0.75, evaluatedRows: 12 });
+    expect(receipt.promotionAuthorized).toBe(false);
+    expect(receipt.canonicalAuthority).toBe(false);
+    expect(receipt.writesPerformed).toBe(false);
+  });
+
+  it('rejects training and held-out source-revision overlap', () => {
+    expect(() => buildXgboostHeldOutEvaluationReceiptV1({
+      modelRevision: 'sha256:model-v1',
+      datasetRevision: 'sha256:dataset-v1',
+      trainSourceRevisions: ['sha256:shared'],
+      heldOutSourceRevisions: ['sha256:shared'],
+      metrics: { ndcgAt10: 0.75, evaluatedRows: 1 },
+    })).toThrow(/HELD_OUT_SOURCE_REVISION_OVERLAP/);
   });
 });
 

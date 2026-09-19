@@ -1,0 +1,36 @@
+{
+  "schema": "ParentAtlasQueryRouter154LiveEmbeddingV1",
+  "generatedAt": "2026-09-18T00:28:17.195Z",
+  "endpoint": "http://127.0.0.1:11434/api/embed",
+  "executor": "ollama_http_read_only",
+  "request": {
+    "query": "trace the current Graphify packet to chunk and AST lineage",
+    "formattedTextSha256": "ce4d328754a218a888f55fca9de14d4068872ff03ea7a8a4e4866f258af18db4",
+    "promptRevision": "embeddinggemma.task-prompts.google-v1",
+    "mode": "classification"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "fallbackUsed": false,
+  "promotionEligibility": "CHALLENGER_ONLY",
+  "status": "LIVE_CLASSIFICATION_MRL_128_TENSOR_PROVEN",
+  "model": "embeddinggemma:latest",
+  "nativeDimension": 768,
+  "nativeFinite": true,
+  "classificationMrl128": {
+    "dimensions": 128,
+    "l2Normalized": true,
+    "checksumSha256": "2fdb95b3abc2fd948220fa31e72e5c7239384e69c5de52ca57548a55679d45c5"
+  },
+  "deterministicFeatures": {
+    "dimensions": 26,
+    "featureRevision": "atlas.query-feature-projection.v1",
+    "checksumSha256": "214c6f8ecaa4188a347ac9bea01f8c11c36a2afc31b0bb53bf211eaeb11e13c6"
+  },
+  "tensor": {
+    "dimensions": 154,
+    "revision": "atlas.query-router-tensor.v1",
+    "checksumSha256": "07c2df4a5f5547e85bf150a374104dfa948660223c7dc7bb71b329d636c00a41"
+  },
+  "nextRequirement": "EXPLICIT_ROUTER_TENSOR_OWNER_RECONCILIATION_BEFORE_PROMOTION"
+}

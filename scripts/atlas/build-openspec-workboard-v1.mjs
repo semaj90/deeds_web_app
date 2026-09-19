@@ -22,6 +22,14 @@ const progressBar = (fraction) => {
 
 const pathOf = (file) => relative(root, file).split(sep).join('/');
 const classifyKind = (text) => (/no canonical identity or source data changes|no projection occurs while model, identity, or parity gates fail/i.test(text) ? 'INVARIANT' : 'WORK_ITEM');
+const classifyExecutionState = (text, state, kind) => {
+  if (state === 'DONE') return 'DONE';
+  if (kind === 'INVARIANT') return 'INVARIANT';
+  const value = text.toLowerCase();
+  if (/superseded|historical|obsolete|retired|compatibility-only/.test(value)) return 'SUPERSEDED_OR_HISTORICAL';
+  if (/promotion-0[12]|promote|freeze the shared candidate population|run som 20x20|only after|ann-03|current source authority|source authority.*not proven|candidate ordinal.*admission|qdrant.*identity.*promotion|current qdrant|exact packet\/chunk identity|candidateordinalmap\/semantic_768\/graph|graph-resolve-06b|graph-06d|registry reconciliation|lsp\/compiler producer|canonical admission|terminal graphify|partial_proven|empty-plan|blocked|not authorized|^do not |requires .* authorization|remains open|pending|unproven|^keep |cannot .* until|safe.?to.?apply\s*[=:]\s*false|before further lifecycle repair|live readback.*pending|readback.*pending/.test(value)) return 'WAITING_ON_DEPENDENCY';
+  return 'ACTIONABLE';
+};
 const extractDeclared = (text, names) => {
   const pattern = new RegExp('(?:' + names.join('|') + ')\\s*[:=]\\s*["\\\']?([^"\\\'\\s,;]+)', 'i');
   const match = text.match(pattern);
@@ -72,6 +80,7 @@ for (const file of taskFiles) {
       text,
       state: done ? 'DONE' : 'OPEN',
       kind: classifyKind(text),
+      executionState: classifyExecutionState(text, done ? 'DONE' : 'OPEN', classifyKind(text)),
       lane: classifyLane(`${change} ${text}`),
       declaredSourceRef: extractDeclared(text, ['source_ref', 'sourceRef']),
       declaredSourceRevision: extractDeclared(text, ['source_revision', 'sourceRevision']),
@@ -87,7 +96,16 @@ for (const file of taskFiles) {
 
 const openTasks = tasks.filter((task) => task.state === 'OPEN');
 const completedTasks = tasks.length - openTasks.length;
-const byPriority = [...openTasks].filter((task) => task.kind !== 'INVARIANT').sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
+const actionableTasks = openTasks.filter((task) => task.executionState === 'ACTIONABLE');
+const waitingTasks = openTasks.filter((task) => task.executionState === 'WAITING_ON_DEPENDENCY');
+const supersededTasks = openTasks.filter((task) => task.executionState === 'SUPERSEDED_OR_HISTORICAL');
+const byPriority = [...actionableTasks].sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
+const openByPriority = [...openTasks].sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
+const frontierTasks = [...byPriority.reduce((frontier, task) => {
+  if (!frontier.has(task.change)) frontier.set(task.change, task);
+  return frontier;
+}, new Map()).values()]
+  .sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
 const invariants = tasks.filter((task) => task.kind === 'INVARIANT').map((task) => ({ taskKey: task.taskKey, change: task.change, source: task.source, line: task.line, text: task.text, state: task.state, lastUpdatedAt: task.lastUpdatedAt, timestampMethod: task.timestampMethod, eta: task.eta }));
 const workPackages = [
   { id: 'P10-A', title: 'Migration ledger reconciliation', gates: ['migration baseline', 'owner manifest', 'pre-apply guard'], dependsOn: [], state: 'BLOCKED' },
@@ -99,8 +117,97 @@ const workPackages = [
 const changes = [...new Set(tasks.map((task) => task.change))].sort().map((change) => {
   const rows = tasks.filter((task) => task.change === change);
   const done = rows.filter((task) => task.state === 'DONE').length;
-  return { change, completed: done, total: rows.length, progressFraction: rows.length ? done / rows.length : null, progressBar: progressBar(rows.length ? done / rows.length : null), open: rows.length - done };
+  const openRows = rows.filter((task) => task.state === 'OPEN');
+  const actionable = openRows.filter((task) => task.executionState === 'ACTIONABLE').length;
+  const waiting = openRows.filter((task) => task.executionState === 'WAITING_ON_DEPENDENCY').length;
+  const superseded = openRows.filter((task) => task.executionState === 'SUPERSEDED_OR_HISTORICAL').length;
+  const executionState = openRows.length === 0
+    ? 'COMPLETE'
+    : actionable > 0 && waiting > 0
+      ? 'MIXED_ACTIONABLE_AND_WAITING'
+      : actionable > 0
+      ? 'ADVANCEABLE'
+      : waiting > 0 || superseded > 0
+        ? 'WAITING_OR_HISTORICAL'
+        : 'REVIEW_REQUIRED';
+  return {
+    change,
+    completed: done,
+    total: rows.length,
+    progressFraction: rows.length ? done / rows.length : null,
+    progressBar: progressBar(rows.length ? done / rows.length : null),
+    open: rows.length - done,
+    actionable,
+    waiting,
+    superseded,
+    executionState,
+  };
 });
+const changeExecutionSummary = {
+  complete: changes.filter((change) => change.executionState === 'COMPLETE').length,
+  advanceable: changes.filter((change) => change.executionState === 'ADVANCEABLE').length,
+  mixed: changes.filter((change) => change.executionState === 'MIXED_ACTIONABLE_AND_WAITING').length,
+  waitingOrHistorical: changes.filter((change) => change.executionState === 'WAITING_OR_HISTORICAL').length,
+  reviewRequired: changes.filter((change) => change.executionState === 'REVIEW_REQUIRED').length,
+};
+const changeProgress = new Map(changes.map((change) => [change.change, change]));
+const promotionCriticalRank = [
+  {
+    rank: 1,
+    change: 'parent-atlas-retrieval-lineage-dag-convergence',
+    dependsOn: [],
+    blocker: 'Execution/source producer authority and PacketRevisionOwnerV1 remain unresolved.',
+    gate: 'Admitted workspace/source/packet identity and canonical packet revision ownership',
+  },
+  {
+    rank: 2,
+    change: 'parent-atlas-gate2-chunk-lineage-convergence',
+    dependsOn: ['parent-atlas-retrieval-lineage-dag-convergence'],
+    blocker: 'Current workspace to packet to chunk qualification is not proven; historical bridge is not current authority.',
+    gate: 'Revision-qualified packet to chunk closure',
+  },
+  {
+    rank: 3,
+    change: 'parent-atlas-graph-retrieval-proof',
+    dependsOn: ['parent-atlas-retrieval-lineage-dag-convergence', 'parent-atlas-gate2-chunk-lineage-convergence'],
+    blocker: 'AST/tree identity and source-span ownership remain provisional.',
+    gate: 'Revision-qualified packet to AST/span closure',
+  },
+  {
+    rank: 4,
+    change: 'parent-atlas-prefill-routing-residency-convergence',
+    dependsOn: ['parent-atlas-retrieval-lineage-dag-convergence', 'parent-atlas-gate2-chunk-lineage-convergence', 'parent-atlas-graph-retrieval-proof'],
+    blocker: 'Prefill, routing, residency, Qdrant/cuVS, and GPU work are downstream consumers.',
+    gate: 'Planning and executor proofs over an admitted candidate cohort',
+  },
+  {
+    rank: 5,
+    change: 'parent-atlas-rpc-packet-registry-fabric',
+    dependsOn: ['parent-atlas-retrieval-lineage-dag-convergence', 'parent-atlas-gate2-chunk-lineage-convergence', 'parent-atlas-graph-retrieval-proof'],
+    blocker: 'Transport is complete but must remain fail-closed until lineage supplies qualified rows.',
+    gate: 'Downstream read surface; no new authority',
+  },
+].map((item) => ({
+  ...item,
+  ...(changeProgress.get(item.change) ?? { completed: 0, total: 0, progressFraction: null, progressBar: progressBar(null), open: 0 }),
+}));
+const criticalChangeNames = new Set(promotionCriticalRank.map((item) => item.change));
+const criticalFrontierPatterns = new Map([
+  ['parent-atlas-retrieval-lineage-dag-convergence', /PROMOTION-01|PKT-LINEAGE-08|PacketRevisionOwnerV1|CURRENT-SOURCE-COHORT-OWNER|current lineage closure/i],
+  ['parent-atlas-gate2-chunk-lineage-convergence', /packet.?chunk|chunk.*lineage|canonical.?chunk|current.*chunk/i],
+  ['parent-atlas-graph-retrieval-proof', /ast|tree.?sitter|span|parse_node|symbol.*version|graph identity/i],
+  ['parent-atlas-prefill-routing-residency-convergence', /ANN-03|candidateordinal|candidate population|semantic snapshot|prefill routing|residency/i],
+  ['parent-atlas-rpc-packet-registry-fabric', /rpc|packet registry|semantic ast packet/i],
+]);
+const criticalFrontierTasks = promotionCriticalRank.flatMap((rank) => {
+  const candidates = openByPriority.filter((task) => task.change === rank.change);
+  const pattern = criticalFrontierPatterns.get(rank.change);
+  const selected = (pattern ? candidates.find((task) => pattern.test(`${task.taskKey} ${task.text}`)) : null)
+    ?? candidates.find((task) => task.executionState === 'ACTIONABLE')
+    ?? candidates[0];
+  return selected ? [selected] : [];
+});
+const parallelFrontierTasks = frontierTasks.filter((task) => !criticalChangeNames.has(task.change));
 const executionSteps = [
   { id: 'STEP-01', title: 'Identity and source authority', priorities: [10], dependsOn: [], gate: 'Exact identity, source, symbol, and revision ownership' },
   { id: 'STEP-02', title: 'Eligibility and provenance', priorities: [20], dependsOn: ['STEP-01'], gate: 'Canonical eligibility, readback, and lineage proofs' },
@@ -113,7 +220,7 @@ const executionSteps = [
 ].map((step) => {
   const rows = tasks.filter((task) => step.priorities.includes(task.priority));
   const done = rows.filter((task) => task.state === 'DONE').length;
-  const openRows = rows.filter((task) => task.state !== 'DONE');
+  const openRows = rows.filter((task) => task.executionState === 'ACTIONABLE');
   return {
     ...step,
     total: rows.length,
@@ -266,8 +373,8 @@ const result = {
   schema: 'atlas.openspec.workboard.v1',
   generatedAt: new Date().toISOString(),
   source: 'openspec/changes/*/tasks.md',
-  summary: { completedTasks, openTasks: openTasks.length, totalTasks: tasks.length, progressFraction: tasks.length ? completedTasks / tasks.length : null, progressBar: progressBar(tasks.length ? completedTasks / tasks.length : null), eta: { status: 'UNKNOWN', method: 'NO_RECEIPT_LINKED_THROUGHPUT' } },
-  ordering: 'WORK_PACKAGES_THEN_WORK_ITEMS; PRIORITY_THEN_LAST_UPDATED_DESC; INVARIANTS_SEPARATE; ETA_SORT_WHEN_RECEIPT_THROUGHPUT_EXISTS; SOURCE_REF_AND_REVISION_INDEXED_WHEN_DECLARED',
+  summary: { completedTasks, openTasks: openTasks.length, actionableTasks: actionableTasks.length, waitingTasks: waitingTasks.length, supersededTasks: supersededTasks.length, totalTasks: tasks.length, progressFraction: tasks.length ? completedTasks / tasks.length : null, progressBar: progressBar(tasks.length ? completedTasks / tasks.length : null), eta: { status: 'UNKNOWN', method: 'NO_RECEIPT_LINKED_THROUGHPUT' } },
+  ordering: 'WORK_PACKAGES_THEN_CHANGE_FRONTIERS; WAITING_AND_SUPERSEDED_EXCLUDED_FROM_NEXT_TASKS; ONE_FRONTIER_PER_CHANGE; PRIORITY_THEN_LAST_UPDATED_DESC; INVARIANTS_SEPARATE; SOURCE_REF_AND_REVISION_INDEXED_WHEN_DECLARED',
   indexing: {
     sourceRef: buildIndex('declaredSourceRef'),
     sourceRevision: buildIndex('declaredSourceRevision'),
@@ -282,6 +389,7 @@ const result = {
   },
   lanes: laneSummary,
   laneDependencies,
+  promotionCriticalRank,
   dailyGraphifyKanban: kanbanSnapshot,
   historicalKanbanSnapshots,
   consolidationInput,
@@ -290,7 +398,13 @@ const result = {
   executionSteps,
   invariants,
   changes,
-  nextTasks: byPriority.slice(0, 100),
+  changeExecutionSummary,
+  taskInventory: tasks,
+  nextTasks: criticalFrontierTasks.slice(0, 20),
+  parallelFrontierTasks: parallelFrontierTasks.slice(0, 50),
+  actionableTasks: byPriority.slice(0, 200),
+  waitingTasks: waitingTasks.slice(0, 200),
+  supersededTasks: supersededTasks.slice(0, 200),
   writes: { taskLedgers: 0, sourceDocuments: 0 },
 };
 
@@ -304,9 +418,14 @@ const markdown = [
   '- The nested wire-agentic-workflows-e2e-test ledger is reference-only. WorkflowActionEventV1 and WorkflowExecutionCoordinatesV1 retain run/backend boundaries.',
   '- Planning reconciliation does not prove runtime convergence, authorize cache/datastore writes, or advance current source/cohort admission.', '',
   `Overall progress: ${result.summary.progressBar} ${completedTasks}/${tasks.length} tasks`,
+  `Execution states: ${actionableTasks.length} actionable; ${waitingTasks.length} waiting on dependencies; ${supersededTasks.length} superseded/historical; ${invariants.length} invariants.`,
+  `Change states: ${changeExecutionSummary.complete} complete; ${changeExecutionSummary.advanceable} advanceable; ${changeExecutionSummary.mixed} mixed actionable/waiting; ${changeExecutionSummary.waitingOrHistorical} waiting/historical; ${changeExecutionSummary.reviewRequired} review required.`,
   'ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.', '',
   '## P10 dependency work packages', '',
   ...workPackages.map((item) => `- **${item.id}** ${item.title} — ${item.state}; depends on ${item.dependsOn.join(', ') || 'none'}; gates: ${item.gates.join(', ')}`), '',
+  '## Promotion-critical dependency rank', '',
+  '- This rank identifies the authority gates that actually unblock promotion; task counts remain navigation metrics only.',
+  ...promotionCriticalRank.map((item) => `- **${item.rank}.** [${item.change}](openspec/changes/${item.change}/) ${item.progressBar} ${item.completed}/${item.total} complete; ${item.open} open — depends on ${item.dependsOn.join(', ') || 'none'}; gate: ${item.gate}; blocker: ${item.blocker}`), '',
   '## Dependency-ordered execution steps', '',
   ...executionSteps.map((item) => `- **${item.id}** ${item.progressBar} ${item.completed}/${item.total} complete; ${item.open} open — ${item.title}; depends on ${item.dependsOn.join(', ') || 'none'}; gate: ${item.gate}`), '',
   '### Next bounded tasks by step', '',
@@ -317,8 +436,13 @@ const markdown = [
   ]),
   '## Permanent acceptance invariants', '',
   ...invariants.map((item) => `- **INVARIANT** [${item.change}](${item.source}#L${item.line}) ${item.text} — last updated ${item.lastUpdatedAt} (${item.timestampMethod}); ETA N/A`), '',
-  '## Highest-priority open tasks', '',
-  ...byPriority.slice(0, 100).map((task) => `- [ ] **P${task.priority}** [${task.change}](${task.source}#L${task.line}) ${task.text} — lane ${task.lane}; last updated ${task.lastUpdatedAt} (${task.timestampMethod}); ETA UNKNOWN`), '',
+  '## Critical-path change frontiers', '',
+  '- One frontier item is shown per promotion-critical change. The full actionable inventory and parallel frontiers are in `openspec-workboard-v1.json`.',
+  ...criticalFrontierTasks.slice(0, 20).map((task) => `- [ ] **P${task.priority}** [${task.change}](${task.source}#L${task.line}) ${task.text} — lane ${task.lane}; last updated ${task.lastUpdatedAt} (${task.timestampMethod}); ETA UNKNOWN`), '',
+  '## Parallel proof frontiers', '',
+  ...parallelFrontierTasks.slice(0, 50).map((task) => `- [ ] **P${task.priority}** [${task.change}](${task.source}#L${task.line}) ${task.text} — lane ${task.lane}; last updated ${task.lastUpdatedAt} (${task.timestampMethod}); ETA UNKNOWN`), '',
+  '## Change execution states', '',
+  ...changes.map((change) => `- [${change.change}](openspec/changes/${change.change}/) — **${change.executionState}**; ${change.actionable} actionable, ${change.waiting} waiting, ${change.superseded} superseded/historical; raw progress ${change.progressBar} ${change.completed}/${change.total}`), '',
   '## Task indexing coverage', '',
   `- Declared source_ref: ${result.indexing.coverage.sourceRefDeclared}/${tasks.length}`,
   `- Declared source_revision: ${result.indexing.coverage.sourceRevisionDeclared}/${tasks.length}`,

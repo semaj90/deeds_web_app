@@ -33,8 +33,8 @@ export class PageRankPromotionGate {
           COUNT(*) AS row_count,
           SUM(ABS(pagerank_l1)) AS observed_l1_sum,
           COUNT(*) FILTER (
-            WHERE NOT isfinite(pagerank_raw)
-               OR NOT isfinite(pagerank_l1)
+            WHERE pagerank_raw IN ('NaN'::float8, 'Infinity'::float8, '-Infinity'::float8)
+               OR pagerank_l1 IN ('NaN'::float8, 'Infinity'::float8, '-Infinity'::float8)
           ) AS non_finite_count,
           COUNT(DISTINCT node_key) AS distinct_nodes
         FROM atlas_graph_authority_scores

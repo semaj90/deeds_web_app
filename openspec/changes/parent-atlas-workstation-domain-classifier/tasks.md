@@ -229,6 +229,28 @@ Evidence: focused Vitest output and `docs/reports/domain-classifier-lineage-v1.j
 
 Evidence: `docs/reports/domain-classifier-cohort-admission-v1.json`.
 
+## ACE/domain-taxonomy real-corpus parity recheck (2026-09-18)
+
+- [x] Added the read-only bounded parity harness
+  `scripts/atlas/prove-domain-classifier-parity-v1.mts` comparing the ACE
+  classifier in `sveltekit-frontend/src/lib/server/ace/features/domain-classifier.ts`
+  with the existing `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts`.
+- [x] The checked-in real-corpus fixture preserves `sourceRef`,
+  `sourceRevision`, and `contentDigest` for every comparison row. The latest
+  receipt reports `0` exact matches, `6` disagreements, and `6` missing-label
+  observations; disagreement and missing-label entries now also retain the
+  source revision, content digest, and both classifier confidences for review.
+  This is `PARITY_REVIEW_REQUIRED`, not a taxonomy promotion.
+- [x] Added an explicit training-readiness contract. The latest result is
+  `DOMAIN_CLASSIFIER_TRAINING_READY_FALSE` because no operator-approved
+  minimum corpus/class-coverage rule has been supplied. The current small
+  fixture must not establish that threshold.
+- [ ] Keep the ACE caller unchanged until disagreements are reviewed. Do not
+  replace the existing checkpoint, promote labels, or write a training set.
+
+Evidence: `docs/reports/domain-classifier-parity-v1.json`,
+`sveltekit-frontend/src/lib/server/ace/features/domain-classifier-parity-v1.ts`.
+
 - [x] Hardened the admission planner so it no longer derives an expected `packet_key` from
   `source_ref`. Packet identity must come from the canonical PostgreSQL packet row; UUIDv5
   namespace keys remain a separate projection/index concern and cannot participate in
@@ -767,6 +789,119 @@ Evidence: `sveltekit-frontend/src/lib/server/atlas/atlas-mastra-adapter.ts`.
 Evidence: `sveltekit-frontend/src/lib/server/atlas/atlas-runtime-context.ts`,
 `sveltekit-frontend/src/lib/server/atlas/atlas-runtime-receipt.spec.ts`, and
 `sveltekit-frontend/src/lib/server/atlas/atlas-semantic-tools.ts`.
+
+## Latest reconciliation (2026-09-17)
+
+- [x] Stage 13 request-context revisions are now split explicitly: the
+  caller-owned `workspaceRevision` and `packetRevision` are required by
+  `createAtlasRequestContext()` and are passed unchanged into the runtime.
+  Blank values fail closed with `ADMITTED_WORKSPACE_REVISION_REQUIRED` or
+  `PACKET_REVISION_REQUIRED`; focused request-context, receipt, and workflow
+  tests pass `15/15`.
+- [x] Runtime tool receipts now preserve the full run/workspace/packet identity
+  and reject mismatches with `ATLAS_TOOL_RECEIPT_IDENTITY_MISMATCH`. MUTATE
+  additionally requires a successful `atlas.validate_change` receipt with
+  `validationStatus=PASS` and caller-owned runtime mutation authority.
+- [ ] Live receipt propagation remains open: `proto/active/retrieval.proto`
+  currently exposes retrieval identity on chunks but no Stage 13 tool receipt,
+  and no live Mastra/Go receipt producer was added. Promotion and durable
+  writes remain blocked.
+- [ ] Future receipt integration requires an additive protocol contract first:
+  `CodebaseSearchRequest` currently has no run/workspace/packet revision
+  identity, and `CodebaseSearchResponse` has no receipt field. Do not derive a
+  receipt from Qdrant chunk metadata; update the proto, generated Go/TypeScript
+  bindings, request adapters, and Go producer together, then prove identity
+  preservation and unavailable-service failure receipts end to end.
+- [x] Audited the proposed root `ts-proto@2.12.4` dependency and removed it:
+  no Parent Atlas workstation script invokes it, and it is unrelated to the
+  WSL2 RAPIDS lane. `protoc` and Go remain available for generated Go bindings.
+- [x] Provisioned the existing protobufjs-compatible frontend generator as
+  `protobufjs-cli@1.1.3`; both `pbjs` and `pbts` execute locally. This restores
+  a reproducible path for the current `retrieval_pb.js/.d.ts` format, but does
+  not itself prove a new receipt contract.
+- [x] Defined the v2 wire contract: add a shared,
+  caller-owned request context containing `toolCallId`, `runId`, `workspaceId`,
+  `workspaceRevision`, `packetKey`, and `packetRevision`; return one
+  `atlas.tool-receipt.v1` with the same identity plus outcome, evidence count,
+  nullable confidence/checksum/error fields, validation status, authority, and
+  write facts. Unavailable paths must return explicit failed receipts and
+  identity mismatches must be rejected before FSM observation.
+- [x] Enhanced the draft to `AtlasRequestContextV2` and
+  `AtlasToolReceiptV2`, including deterministic `receipt_id` and
+  `receipt_checksum`; regenerated Go bindings and wired the real Go HTTP
+  fallback to send context and map valid v2 receipts into the internal FSM
+  projection. The producer remains non-canonical and write-free.
+- [x] Added focused Go receipt proofs for identity preservation, replay-stable
+  checksums, incomplete-identity fail-closed behavior, and explicit unavailable
+  retrieval failure. The focused service test command passes.
+- [x] Restored the stale Qdrant hostname test helper with numeric-host
+  preservation, IPv4 preference, and lookup-failure fallback; full
+  `go test ./...` now passes for the retrieval service.
+- [x] Regenerated the current protobufjs TypeScript artifacts with the pinned
+  frontend-only `protobufjs-cli@1.1.3`; the v2 messages and fields are present
+  in `retrieval_pb.js/.d.ts`. The generated files are current to the proto
+  source, while live gRPC service proof remains a separate gate.
+- [x] Rebuilt and recreated only `legal-ai-go-retrieval` with `--no-deps` after
+  the compose dependency name conflict. Live health is `READY_FULL`; a bounded
+  search returned one chunk and an `atlas.tool-receipt.v2` preserving the full
+  supplied identity with `PASS`, deterministic output/receipt checksums, and
+  `writes_performed=false`. Durable persistence and promotion remain separate
+  open gates.
+- [x] Compared both available protobufjs CLI paths against the prior
+  `retrieval_pb.js/.d.ts`: the nested `protobufjs@6.11.6` CLI emits a 738 KB
+  JavaScript artifact and `protobufjs-cli@1.1.3` emits about 823 KB, versus
+  the prior 429 KB artifact. Neither reproduces the old shape, so the current
+  proto source was regenerated explicitly and the resulting generated files
+  are tracked as an intentional compatibility update.
+- [x] Verified the live WSL2 lane without mutation using
+  `~/miniforge3/envs/atlas-rapids-cu13`: `torch 2.13.0+cu130`, `cudf
+  26.06.01`, `cugraph 26.06.00`, `cuvs 26.06.00`, and
+  `torch.cuda.is_available()=true`. The environment is pinned by
+  `scripts/atlas/environments/atlas-rapids-cu13.yml`; it has no Node or
+  protobuf-generator dependency coupling.
+- [x] Detached the legacy root `scripts/compile-protos.mjs`/`ts-proto`
+  generator from the normal frontend build. `build` now runs `vite build`
+  against checked-in artifacts; protobuf regeneration is explicit through
+  the frontend-only `compile:retrieval-proto` script.
+- [x] Preserved the optional Firecrawl boundary during build repair: its
+  loader now uses a dynamic package specifier, so the paid provider remains
+  fail-closed and does not become an unconditional runtime dependency.
+- [x] Corrected one stale SvelteKit build import in the semantic-contract
+  approval route: Neo4j now resolves through the canonical
+  `$lib/server/neo4j-driver.js` module rather than the nonexistent graph alias.
+- [x] Frontend build dependency audit added only the packages required by
+  existing imports: `nodemailer@10.0.10` for SMTP notifications,
+  `mammoth@1.12.3` for DOCX extraction, and `@babylonjs/loaders@9.23.0` to
+  match the existing Babylon core version. The build now reaches 4,663
+  modules; remaining failure is the pre-existing third-party
+  `svelte-tiptap` legacy `$$restProps`/`<slot>` incompatibility with Svelte 5
+  runes mode and is outside this protobuf/tooling change.
+
+- [x] The selected Graphify execution→run bridge was explicitly applied with
+  frozen planner checksum and independent readback:
+  `BRIDGE_APPLIED_READBACK_PROVEN`; `writesPerformed=true` for the bridge only.
+- [x] Snapshot authority and source selection were revalidated for workspace
+  revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`.
+- [x] Read-only packet/chunk and source-ref audits were rerun. Packet promotion
+  remains `BLOCKED_NO_QUALIFIED_CANDIDATE`; canonical packet digest matches remain
+  `0`, with `7,902` missing packet rows and `20` digest mismatches in the full
+  reconciliation scope.
+- [x] The bounded 500-row packet-digest plan produced no inserts or updates:
+  `221 MISSING_PACKET`, `255 LEGACY_LINEAGE_FIELDS_MISSING`, `22
+  LEGACY_CONTENT_HASH_UNQUALIFIED`, and `2 SOURCE_CONTENT_DIGEST_MISMATCH`.
+- [ ] Registry reconciliation remains read-only. The current plan has no clean
+  selectable missing-row subset, and the existing apply script is hardcoded to
+  an obsolete 111-row checksum; no registry insert was authorized or performed.
+- [ ] Structural lineage remains blocked: the selected cohort has `0` exact
+  packet matches, `0` exact chunk matches, and `0` exact structural matches;
+  file-hash matches remain diagnostic only.
+
+Evidence: `docs/reports/graphify-execution-run-bridge-apply-v1.json`,
+`docs/reports/current-source-selection-input-v1.json`,
+`docs/reports/packet-chunk-lineage-promotion-preflight-v1.json`,
+`docs/reports/current-packet-chunk-identity-reconciliation-v1.json`,
+`docs/reports/current-packet-digest-bridge-v1.json`, and
+`docs/reports/selected-graphify-structural-lineage-v1.json`.
 
 ## Reference
 

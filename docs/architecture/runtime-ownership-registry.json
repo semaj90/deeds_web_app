@@ -382,6 +382,44 @@
         }
       ]
     },
+    "rrf_fusion": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+        "export": "fuseSearchRuntimeCandidates",
+        "evidence": "Read-only importer census and focused cross-primitive parity evidence recorded in parent-atlas-rrf-fusion-consolidation/tasks.md; owns production cross-executor normalization and one-vote-per-logical-lane fusion."
+      },
+      "backends": [
+        {
+          "name": "combineViaRRF",
+          "classification": "BACKEND",
+          "path": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts",
+          "evidence": "Confirmed live through rrf-integration.ts and the search/rrf route; caller-side identity normalization and optional lane weights remain distinct behavior."
+        },
+        {
+          "name": "fuseRetrievalLanes",
+          "classification": "BACKEND",
+          "path": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+          "evidence": "Confirmed live through the retrieval RRF route and reranking/analytics callers; retains freshness and weighting extensions."
+        }
+      ],
+      "components": [
+        {
+          "name": "fuseContributionsV1",
+          "classification": "ADAPTER",
+          "path": "sveltekit-frontend/src/lib/server/retrieval/fusion-core-v1.ts",
+          "evidence": "Already shared by two real callers and pins the one-vote-per-lane core; not a second canonical cross-executor owner."
+        }
+      ],
+      "known_existing_duplication": [
+        {
+          "name": "retrieval-fusion-rrf.ts",
+          "classification": "DEAD",
+          "path": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+          "evidence": "No external source imports found in the current census; archive remains a separate human-signoff decision."
+        }
+      ]
+    },
     "hyperrag_rpc_packet": {
       "owner": {
         "classification": "CANONICAL_OWNER",

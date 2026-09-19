@@ -1,0 +1,171 @@
+{
+  "schema": "RoutingFeatureTile4x6V1",
+  "generatedAt": "2026-09-18T00:41:40.669Z",
+  "status": "DERIVED_TILE_PLUMBING_PROVEN",
+  "evidenceClass": "FIXTURE_ONLY",
+  "query": "trace the current Graphify packet to chunk and AST lineage",
+  "queryFeatureRevision": "atlas.query-feature-projection.v1",
+  "rows": [
+    "QUERY",
+    "TOKEN_OR_SPAN",
+    "CANDIDATE_OR_PACKET",
+    "EXECUTION_OR_CACHE"
+  ],
+  "columns": [
+    "LEXICAL",
+    "SEMANTIC",
+    "AST",
+    "GRAPH",
+    "DOMAIN",
+    "RUNTIME"
+  ],
+  "tile": [
+    {
+      "row": "QUERY",
+      "cells": {
+        "LEXICAL": {
+          "value": 0,
+          "featureRevision": "atlas.query-feature-projection.v1",
+          "missingness": "PRESENT"
+        },
+        "SEMANTIC": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CLASSIFICATION_EXECUTION",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "AST": {
+          "value": 0,
+          "featureRevision": "atlas.query-feature-projection.v1",
+          "missingness": "PRESENT"
+        },
+        "GRAPH": {
+          "value": 0,
+          "featureRevision": "atlas.query-feature-projection.v1",
+          "missingness": "PRESENT"
+        },
+        "DOMAIN": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_DOMAIN_AUTHORITY",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "RUNTIME": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_RUNTIME_RECEIPT",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        }
+      }
+    },
+    {
+      "row": "TOKEN_OR_SPAN",
+      "cells": {
+        "LEXICAL": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "SEMANTIC": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "AST": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "GRAPH": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "DOMAIN": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "RUNTIME": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        }
+      }
+    },
+    {
+      "row": "CANDIDATE_OR_PACKET",
+      "cells": {
+        "LEXICAL": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "SEMANTIC": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "AST": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "GRAPH": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "DOMAIN": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "RUNTIME": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        }
+      }
+    },
+    {
+      "row": "EXECUTION_OR_CACHE",
+      "cells": {
+        "LEXICAL": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "SEMANTIC": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "AST": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "GRAPH": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "DOMAIN": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        },
+        "RUNTIME": {
+          "value": null,
+          "featureRevision": "UNAVAILABLE_CANONICAL_PACKET_LINEAGE",
+          "missingness": "NOT_AVAILABLE_IN_FIXTURE"
+        }
+      }
+    }
+  ],
+  "tileChecksum": "e75f63197fbda6105de81faa8ac6954097e08160e942c3a6c4e474bb4eebf871",
+  "noSilentZeroFill": true,
+  "canonicalAuthority": false,
+  "canonicalWritesAllowed": false,
+  "writesPerformed": false,
+  "replacesPrimaryRouterTensor": false,
+  "nextRequirement": "REVISION_QUALIFIED_PACKET_SPAN_AND_EXECUTOR_FEATURE_PROVENANCE"
+}

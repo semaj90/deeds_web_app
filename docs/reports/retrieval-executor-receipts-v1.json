@@ -1,0 +1,386 @@
+{
+  "schema": "atlas.retrieval-executor-receipts.v1",
+  "generatedAt": "2026-09-19T05:36:59.111Z",
+  "status": "RECEIPTS_REVIEWED",
+  "reviewedCount": 75,
+  "reviewed": [
+    {
+      "file": "docs/reports/analyze-this-adapters-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/ast-sidecar-capability-proof.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/bitfrost-residency-policy-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/bitfrost-sim-01-residency-gate.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/candidate-feature-gpu-capability-live-20260912.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/candidate-feature-gpu-residency-live-20260911.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/candidate-feature-gpu-residency-proof-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/candidate-feature-gpu-residency-proof-v2.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/candidate-feature-gpu-residency-proof-v3.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/candidate-feature-gpu-residency-proof-v4.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/centroid-cache-families-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/concept-fabric-capability-alignment-v1.json",
+      "writesPerformed": 0,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/deterministic-capability-policy-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/embedding-actual-boundary-probe.llama_server_8081.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/embedding-actual-boundary-probe.ollama_11434.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/embedding-boundary-probe.llama_server.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/embedding-boundary-probe.ollama.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/embedding-runtime-probe.llama_server_8081.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/embedding-runtime-probe.ollama_11434.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/embeddinggemma-llama-runtime-proof.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/golden-review-corpus-compatibility-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/gpu-executor-capability-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/gpu-residency-budget-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/gpu-residency-cache-proof-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/gpu-residency-cutile-simt-readiness-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/langgraph-llama-context-capacity-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/lineage-pgvector-qdrant-parity-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/llama-server-8090-compatibility-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/llama-server-ornith-runtime-owner-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/mcp-compatibility-callers-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/ollama-webgpu-semantic-768-parity-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/ollama-webgpu-semantic-768-parity-v2.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/openspec-capability-progress-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/ornith-cache-capability-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/parent-atlas-capability-gap-audit-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/parent-atlas-oak-capability-audit-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/parent-atlas-workstation-residency-proof-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/parent-atlas-workstation-residency-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/pgvector-audit-report.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/pgvector-semantic-768-exact-hnsw-replay-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/postgres-fts-adapter-live-coverage-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/postgres-fts-canonical-coverage-v2.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/postgres-fts-configurations-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/postgres-fts-identity-coverage-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/postgres-fts-identity-replay-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/postgres-fts-rejection-reasons-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/postgres-fts-replay-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/postgres-fts-vs-pgsearch-bm25-comparison-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/postgres-pgvector-exact-hnsw-replay-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/python-runtime-capability-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/retrieval-executor-compatibility-convergence-v2.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/retrieval-executor-compatibility-workboard-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/runtime-capability-registry-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/task-semantic-packet-disposable-compatibility-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/tensor-residency-gate-t2-t3-proof-2026-08-23.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/tensor-residency-gate-t4-proof-2026-08-23.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/tensor-residency-gate-t6-proof-2026-08-23.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/tensorrt-rtx-benchmark-component-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/tensorrt-rtx-capability-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/tensorrt-rtx-prerequisites-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/trace-dense-capability-runtime-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/trace-dense-capability-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/turbovec-runtime-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/unified-residency-adapter-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/unified-residency-cutile-gemm-parity-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/unified-residency-cutile-simt-proof-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/unified-residency-feature-pack-lineage-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/unified-residency-host-staging-audit-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/unified-residency-parity-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/unified-residency-provider-handoff-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/unified-residency-pytorch-provider-proof-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/unified-residency-searchruntime-duckdb-wsl-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/unified-residency-stdio-handoff-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/unified-residency-vram-proof-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/workstation-live-capability-proof-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": false
+    }
+  ],
+  "violations": [],
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

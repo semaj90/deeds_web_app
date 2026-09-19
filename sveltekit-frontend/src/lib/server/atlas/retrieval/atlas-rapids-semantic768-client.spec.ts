@@ -34,7 +34,7 @@ describe('Atlas semantic_768 exact client', () => {
 
     const client = createAtlasRapidsSemantic768Client('http://127.0.0.1:8098');
     const receipt = await client.exactKnn({
-      query: { vector: unitVector(0), representationId: 'semantic_768' },
+      query: { vector: unitVector(0), representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
       corpus: [{ packetKey: 'packet-1', sourceRevision: 'rev-1', vector: unitVector(0) }],
       topK: 1,
     });
@@ -57,7 +57,7 @@ describe('Atlas semantic_768 exact client', () => {
 
     const client = createAtlasRapidsSemantic768Client('http://127.0.0.1:8098');
     const receipt = await client.exactKnn({
-      query: { vector: unitVector(0), representationId: 'semantic_768' },
+      query: { vector: unitVector(0), representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
       corpus: [{ packetKey: 'p1', sourceRevision: 'r1', vector: unitVector(0) }],
       topK: 1,
     });
@@ -75,7 +75,7 @@ describe('Atlas semantic_768 exact client', () => {
 
     const client = createAtlasRapidsSemantic768Client('http://127.0.0.1:8098');
     const receipt = await client.exactKnn({
-      query: { vector: unitVector(0), representationId: 'semantic_768' },
+      query: { vector: unitVector(0), representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
       corpus: [{ packetKey: 'p1', sourceRevision: 'r1', vector: unitVector(1) }],
       topK: 1,
     });
@@ -87,7 +87,7 @@ describe('Atlas semantic_768 exact client', () => {
     const unnormalized = Array(768).fill(0);
     unnormalized[0] = 5; // norm = 5, not 1
     await expect(client.exactKnn({
-      query: { vector: unnormalized, representationId: 'semantic_768' },
+      query: { vector: unnormalized, representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
       corpus: [{ packetKey: 'p1', sourceRevision: 'r1', vector: unitVector(0) }],
       topK: 1,
     })).rejects.toThrow(/ATLAS_SEMANTIC768_NOT_L2_NORMALIZED:query/);
@@ -98,7 +98,7 @@ describe('Atlas semantic_768 exact client', () => {
     const unnormalized = Array(768).fill(0);
     unnormalized[0] = 0.5; // norm = 0.5, not 1
     await expect(client.exactKnn({
-      query: { vector: unitVector(0), representationId: 'semantic_768' },
+      query: { vector: unitVector(0), representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
       corpus: [{ packetKey: 'p1', sourceRevision: 'r1', vector: unnormalized }],
       topK: 1,
     })).rejects.toThrow(/ATLAS_SEMANTIC768_NOT_L2_NORMALIZED:corpus\[0\]/);
@@ -107,7 +107,7 @@ describe('Atlas semantic_768 exact client', () => {
   it('rejects wrong-dimension vectors', async () => {
     const client = createAtlasRapidsSemantic768Client('http://127.0.0.1:8098');
     await expect(client.exactKnn({
-      query: { vector: Array(512).fill(0), representationId: 'semantic_768' },
+      query: { vector: Array(512).fill(0), representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
       corpus: [{ packetKey: 'p1', sourceRevision: 'r1', vector: unitVector(0) }],
       topK: 1,
     })).rejects.toThrow(/ATLAS_SEMANTIC768_QUERY_DIMENSION/);
@@ -116,7 +116,7 @@ describe('Atlas semantic_768 exact client', () => {
   it('rejects a corpus row missing sourceRevision — the sidecar requires it, never fabricated', async () => {
     const client = createAtlasRapidsSemantic768Client('http://127.0.0.1:8098');
     await expect(client.exactKnn({
-      query: { vector: unitVector(0), representationId: 'semantic_768' },
+      query: { vector: unitVector(0), representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
       corpus: [{ packetKey: 'p1', sourceRevision: '', vector: unitVector(0) }],
       topK: 1,
     })).rejects.toThrow(/ATLAS_SEMANTIC768_REVISION_IDENTITY/);
@@ -125,7 +125,7 @@ describe('Atlas semantic_768 exact client', () => {
   it('rejects duplicate (packetKey, sourceRevision) identity', async () => {
     const client = createAtlasRapidsSemantic768Client('http://127.0.0.1:8098');
     await expect(client.exactKnn({
-      query: { vector: unitVector(0), representationId: 'semantic_768' },
+      query: { vector: unitVector(0), representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
       corpus: [
         { packetKey: 'same', sourceRevision: 'r1', vector: unitVector(0) },
         { packetKey: 'same', sourceRevision: 'r1', vector: unitVector(1) },
@@ -137,7 +137,7 @@ describe('Atlas semantic_768 exact client', () => {
   it('rejects topK outside [1, corpus length]', async () => {
     const client = createAtlasRapidsSemantic768Client('http://127.0.0.1:8098');
     await expect(client.exactKnn({
-      query: { vector: unitVector(0), representationId: 'semantic_768' },
+      query: { vector: unitVector(0), representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
       corpus: [{ packetKey: 'p1', sourceRevision: 'r1', vector: unitVector(0) }],
       topK: 0,
     })).rejects.toThrow(/ATLAS_SEMANTIC768_TOPK/);
@@ -149,7 +149,7 @@ describe('Atlas semantic_768 exact client', () => {
 
     const client = createAtlasRapidsSemantic768Client('http://127.0.0.1:8098');
     await expect(client.exactKnn({
-      query: { vector: unitVector(0), representationId: 'semantic_768' },
+      query: { vector: unitVector(0), representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
       corpus: [{ packetKey: 'p1', sourceRevision: 'r1', vector: unitVector(0) }],
       topK: 1,
     })).rejects.toThrow(/ATLAS_SEMANTIC768_HTTP_503/);

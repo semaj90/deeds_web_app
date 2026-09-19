@@ -1,0 +1,213 @@
+{
+  "schema": "atlas.domain-classifier-parity.v1",
+  "status": "PARITY_REVIEW_REQUIRED",
+  "evidenceClass": "REAL_CORPUS_FIXTURE",
+  "parityRevision": "ace-domain-classifier-parity-v1",
+  "aceClassifierRevision": "ace-domain-classifier:rules-v1",
+  "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+  "fixture": {
+    "kind": "CHECKED_IN_SOURCE_FILES",
+    "rowCount": 6,
+    "sourceRefs": [
+      "src/lib/server/ace/features/domain-classifier.ts",
+      "src/lib/server/atlas/domain-taxonomy.ts",
+      "src/lib/server/search/qdrant-search.ts",
+      "src/lib/server/atlas/semantic-signal-routing.ts",
+      "src/lib/server/ace/ace-context-manifest.ts",
+      "src/routes/api/atlas/domain-taxonomy/classify/+server.ts"
+    ]
+  },
+  "exactMatches": 0,
+  "disagreements": [
+    {
+      "sourceRef": "src/lib/server/ace/features/domain-classifier.ts",
+      "sourceRevision": "sha256:271dec893e9b9b7e86ff39c160358a7f461fd53e637b935525d0ab6b046ca0e0",
+      "contentDigest": "sha256:271dec893e9b9b7e86ff39c160358a7f461fd53e637b935525d0ab6b046ca0e0",
+      "aceLabel": "auth",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.214
+    },
+    {
+      "sourceRef": "src/lib/server/atlas/domain-taxonomy.ts",
+      "sourceRevision": "sha256:63b87205b508704c84d464b15353509e984c28e8cf1303a69e35def686581a7d",
+      "contentDigest": "sha256:63b87205b508704c84d464b15353509e984c28e8cf1303a69e35def686581a7d",
+      "aceLabel": "database",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.139
+    },
+    {
+      "sourceRef": "src/lib/server/search/qdrant-search.ts",
+      "sourceRevision": "sha256:b46cf5084f9c1af33c85b45eb673615ee331f44f6987b32288d6e7825296e309",
+      "contentDigest": "sha256:b46cf5084f9c1af33c85b45eb673615ee331f44f6987b32288d6e7825296e309",
+      "aceLabel": "cache",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.407
+    },
+    {
+      "sourceRef": "src/lib/server/atlas/semantic-signal-routing.ts",
+      "sourceRevision": "sha256:45a452bd04bd406f83933f166c887f9754f41b4a4d486fd73de4acdb7a8c131a",
+      "contentDigest": "sha256:45a452bd04bd406f83933f166c887f9754f41b4a4d486fd73de4acdb7a8c131a",
+      "aceLabel": "database",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.228
+    },
+    {
+      "sourceRef": "src/lib/server/ace/ace-context-manifest.ts",
+      "sourceRevision": "sha256:66d8edd7c5d6819e92892c5ee177f78f922a3c7bdc3db2245af184620ec1073a",
+      "contentDigest": "sha256:66d8edd7c5d6819e92892c5ee177f78f922a3c7bdc3db2245af184620ec1073a",
+      "aceLabel": "database",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.211
+    },
+    {
+      "sourceRef": "src/routes/api/atlas/domain-taxonomy/classify/+server.ts",
+      "sourceRevision": "sha256:94411f8d531e1a55786e7e8616e98b66eb3b651bcdf695bb4f1ec70886988161",
+      "contentDigest": "sha256:94411f8d531e1a55786e7e8616e98b66eb3b651bcdf695bb4f1ec70886988161",
+      "aceLabel": "auth",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.327
+    }
+  ],
+  "missingLabels": [
+    {
+      "sourceRef": "src/lib/server/ace/features/domain-classifier.ts",
+      "sourceRevision": "sha256:271dec893e9b9b7e86ff39c160358a7f461fd53e637b935525d0ab6b046ca0e0",
+      "contentDigest": "sha256:271dec893e9b9b7e86ff39c160358a7f461fd53e637b935525d0ab6b046ca0e0",
+      "missingIn": "taxonomy",
+      "label": "general"
+    },
+    {
+      "sourceRef": "src/lib/server/atlas/domain-taxonomy.ts",
+      "sourceRevision": "sha256:63b87205b508704c84d464b15353509e984c28e8cf1303a69e35def686581a7d",
+      "contentDigest": "sha256:63b87205b508704c84d464b15353509e984c28e8cf1303a69e35def686581a7d",
+      "missingIn": "taxonomy",
+      "label": "general"
+    },
+    {
+      "sourceRef": "src/lib/server/search/qdrant-search.ts",
+      "sourceRevision": "sha256:b46cf5084f9c1af33c85b45eb673615ee331f44f6987b32288d6e7825296e309",
+      "contentDigest": "sha256:b46cf5084f9c1af33c85b45eb673615ee331f44f6987b32288d6e7825296e309",
+      "missingIn": "taxonomy",
+      "label": "general"
+    },
+    {
+      "sourceRef": "src/lib/server/atlas/semantic-signal-routing.ts",
+      "sourceRevision": "sha256:45a452bd04bd406f83933f166c887f9754f41b4a4d486fd73de4acdb7a8c131a",
+      "contentDigest": "sha256:45a452bd04bd406f83933f166c887f9754f41b4a4d486fd73de4acdb7a8c131a",
+      "missingIn": "taxonomy",
+      "label": "general"
+    },
+    {
+      "sourceRef": "src/lib/server/ace/ace-context-manifest.ts",
+      "sourceRevision": "sha256:66d8edd7c5d6819e92892c5ee177f78f922a3c7bdc3db2245af184620ec1073a",
+      "contentDigest": "sha256:66d8edd7c5d6819e92892c5ee177f78f922a3c7bdc3db2245af184620ec1073a",
+      "missingIn": "taxonomy",
+      "label": "general"
+    },
+    {
+      "sourceRef": "src/routes/api/atlas/domain-taxonomy/classify/+server.ts",
+      "sourceRevision": "sha256:94411f8d531e1a55786e7e8616e98b66eb3b651bcdf695bb4f1ec70886988161",
+      "contentDigest": "sha256:94411f8d531e1a55786e7e8616e98b66eb3b651bcdf695bb4f1ec70886988161",
+      "missingIn": "taxonomy",
+      "label": "general"
+    }
+  ],
+  "rows": [
+    {
+      "sourceRef": "src/lib/server/ace/features/domain-classifier.ts",
+      "sourceRevision": "sha256:271dec893e9b9b7e86ff39c160358a7f461fd53e637b935525d0ab6b046ca0e0",
+      "contentDigest": "sha256:271dec893e9b9b7e86ff39c160358a7f461fd53e637b935525d0ab6b046ca0e0",
+      "aceLabel": "auth",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.214,
+      "exactMatch": false,
+      "missingLabels": [
+        "taxonomy"
+      ]
+    },
+    {
+      "sourceRef": "src/lib/server/atlas/domain-taxonomy.ts",
+      "sourceRevision": "sha256:63b87205b508704c84d464b15353509e984c28e8cf1303a69e35def686581a7d",
+      "contentDigest": "sha256:63b87205b508704c84d464b15353509e984c28e8cf1303a69e35def686581a7d",
+      "aceLabel": "database",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.139,
+      "exactMatch": false,
+      "missingLabels": [
+        "taxonomy"
+      ]
+    },
+    {
+      "sourceRef": "src/lib/server/search/qdrant-search.ts",
+      "sourceRevision": "sha256:b46cf5084f9c1af33c85b45eb673615ee331f44f6987b32288d6e7825296e309",
+      "contentDigest": "sha256:b46cf5084f9c1af33c85b45eb673615ee331f44f6987b32288d6e7825296e309",
+      "aceLabel": "cache",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.407,
+      "exactMatch": false,
+      "missingLabels": [
+        "taxonomy"
+      ]
+    },
+    {
+      "sourceRef": "src/lib/server/atlas/semantic-signal-routing.ts",
+      "sourceRevision": "sha256:45a452bd04bd406f83933f166c887f9754f41b4a4d486fd73de4acdb7a8c131a",
+      "contentDigest": "sha256:45a452bd04bd406f83933f166c887f9754f41b4a4d486fd73de4acdb7a8c131a",
+      "aceLabel": "database",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.228,
+      "exactMatch": false,
+      "missingLabels": [
+        "taxonomy"
+      ]
+    },
+    {
+      "sourceRef": "src/lib/server/ace/ace-context-manifest.ts",
+      "sourceRevision": "sha256:66d8edd7c5d6819e92892c5ee177f78f922a3c7bdc3db2245af184620ec1073a",
+      "contentDigest": "sha256:66d8edd7c5d6819e92892c5ee177f78f922a3c7bdc3db2245af184620ec1073a",
+      "aceLabel": "database",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.211,
+      "exactMatch": false,
+      "missingLabels": [
+        "taxonomy"
+      ]
+    },
+    {
+      "sourceRef": "src/routes/api/atlas/domain-taxonomy/classify/+server.ts",
+      "sourceRevision": "sha256:94411f8d531e1a55786e7e8616e98b66eb3b651bcdf695bb4f1ec70886988161",
+      "contentDigest": "sha256:94411f8d531e1a55786e7e8616e98b66eb3b651bcdf695bb4f1ec70886988161",
+      "aceLabel": "auth",
+      "taxonomyLabel": "general",
+      "aceConfidence": 1,
+      "taxonomyConfidence": 0.327,
+      "exactMatch": false,
+      "missingLabels": [
+        "taxonomy"
+      ]
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "trainingReadiness": {
+    "schema": "atlas.domain-classifier-training-readiness.v1",
+    "status": "DOMAIN_CLASSIFIER_TRAINING_READY_FALSE",
+    "operatorApprovedRuleProvided": false,
+    "corpusRows": 6,
+    "observedClassCount": 0,
+    "reason": "OPERATOR_MINIMUM_CORPUS_AND_CLASS_COVERAGE_REQUIRED",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  }
+}

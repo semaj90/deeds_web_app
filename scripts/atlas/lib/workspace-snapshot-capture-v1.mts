@@ -133,7 +133,21 @@ export function captureStableSnapshot(
     const report = sealSnapshot(first, second);
     const drifted = report.violations.includes('WORKSPACE_CHANGED_BETWEEN_SCANS');
     if (!drifted || attempt === maxAttempts) {
-      return { ...report, captureAttempts: attempt, transientDriftObserved };
+      // Include capture metadata in the sealed checksum. Previously these
+      // fields were appended after sealSnapshot() computed snapshotRevision,
+      // making every stable capture fail readback with a false
+      // MANIFEST_CHECKSUM_MISMATCH.
+      const withCaptureMetadata = { ...report, captureAttempts: attempt, transientDriftObserved };
+      const {
+        schema,
+        snapshotRevision,
+        workspaceRevision,
+        status,
+        canonicalAuthority,
+        datastoreWritesPerformed,
+        ...checksumBody
+      } = withCaptureMetadata;
+      return { ...withCaptureMetadata, snapshotRevision: hash(checksumBody) };
     }
     transientDriftObserved = true;
     first = second;

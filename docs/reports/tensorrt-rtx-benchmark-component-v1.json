@@ -1,0 +1,45 @@
+{
+  "schema": "TensorRtRtxBenchmarkComponentSelectionV1",
+  "generatedAt": "2026-09-19T02:51:40.092Z",
+  "status": "HEAVIER_COMPONENT_BOUND_NOT_EXECUTED",
+  "selectedComponent": {
+    "role": "bounded_reranker_or_prefill_auxiliary_challenger",
+    "artifactPath": "models/gemma4_assistant_huggingface_7_3_26/model.safetensors",
+    "artifactPresent": true,
+    "artifactBytes": 159138208,
+    "artifactSha256": "12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+    "configPath": "models/gemma4_assistant_huggingface_7_3_26/config.json",
+    "configSha256": "13cdf5418e5a89cf951717a953cd11cef4e5c2743c4767e9e5dd72802954f822",
+    "componentRevision": "sha256:23d07418b2eee701de59c1ce1eb505f098f916a2cb6c3963f97e7c5f6696392d",
+    "boundedShape": {
+      "batch": 1,
+      "inputTokens": 512,
+      "hiddenSize": 256,
+      "dtype": "bfloat16",
+      "useCache": false,
+      "shapeStatus": "PLANNED_BOUNDED_EXPORT_CONTRACT"
+    },
+    "rationale": "Heavier bounded neural workload gives AOT/JIT/runtime-cache overhead a measurable chance to amortize.",
+    "expectedAmortization": "Compare one-time portable-AOT/device-JIT cost separately from steady-state execution over repeated batch-1, 512-token runs."
+  },
+  "excludedComponent": {
+    "component": "QueryRouterTensorV1[154] -> hidden -> heads",
+    "reason": "Correctness/reference plumbing only; too small for the TensorRT-RTX performance criterion."
+  },
+  "requiredLadder": [
+    "pytorch_cpu_fp32",
+    "pytorch_cuda_sm86",
+    "libtorch_node_api",
+    "onnx_runtime_gpu",
+    "tensorrt_rtx"
+  ],
+  "execution": {
+    "exported": false,
+    "engineBuilt": false,
+    "runtimeCacheObserved": false,
+    "benchmarked": false
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "nextGate": "PROVE_PYTORCH_REFERENCE_AND_EXPORT_BOUNDED_ONNX_AFTER_LINEAGE_AND_PARITY_GATES"
+}

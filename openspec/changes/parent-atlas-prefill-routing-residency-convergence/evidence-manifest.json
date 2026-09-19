@@ -1,0 +1,80 @@
+{
+  "schema": "ParentAtlasPrefillRoutingResidencyEvidenceManifestV1",
+  "checkedAt": "2026-09-18",
+  "authority": "official-primary-documentation",
+  "sources": [
+    {
+      "family": "TensorRT-RTX prerequisites and support matrix",
+      "urls": [
+        "https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/installing-tensorrt-rtx/prerequisites.html",
+        "https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/getting-started/support-matrix.html"
+      ],
+      "verified": true,
+      "finding": "Ampere SM 8.6 is supported; TensorRT-RTX packages target CUDA 12.9 Update 1 or CUDA 13.4."
+    },
+    {
+      "family": "TensorRT-RTX architecture, runtime, shapes, quantization, cache, CUDA graphs",
+      "urls": [
+        "https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/architecture/how-trt-rtx-works.html",
+        "https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/runtime-api.html",
+        "https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/dynamic-shapes-basics.html",
+        "https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/work-with-quantized-types.html",
+        "https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/work-with-runtime-cache.html",
+        "https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/work-with-cuda-graphs.html"
+      ],
+      "verified": true,
+      "finding": "AOT/JIT, shape specialization, runtime-cache identity, and Q/DQ precision evidence are separate proof gates."
+    },
+    {
+      "family": "CUDA runtime and programming guide",
+      "urls": ["https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html"],
+      "verified": true,
+      "finding": "Streams, asynchronous operations, memory pools, and CUDA Graphs remain runtime concerns, not identity authority."
+    },
+    {
+      "family": "PyTorch C++/ATen, activation checkpointing, custom operators",
+      "urls": [
+        "https://pytorch.org/cppdocs/",
+        "https://pytorch.org/docs/stable/checkpoint.html",
+        "https://pytorch.org/tutorials/advanced/cpp_custom_ops.html"
+      ],
+      "verified": true,
+      "finding": "PyTorch C++/ATen provide the CPU/GPU reference boundary; activation checkpointing is training-memory policy and custom operators require registered operator contracts. No native integration is authorized here."
+    },
+    {
+      "family": "Node-API and node-addon-api",
+      "urls": ["https://nodejs.org/api/n-api.html", "https://github.com/nodejs/node-addon-api"],
+      "verified": true,
+      "finding": "Node-API is ABI-stable and independent of V8; node-addon-api is the C++ binding. A future addon must use Node-API exclusively for ABI stability. No addon is built here."
+    },
+    {
+      "family": "cuVS brute force and CAGRA",
+      "urls": [
+        "https://docs.nvidia.com/cuvs/user-guide/api-guides/indexing-guide/brute-force",
+        "https://docs.rapids.ai/api/cuvs/stable/cpp_api/neighbors_cagra/"
+      ],
+      "verified": true,
+      "finding": "cuVS brute force is the exact bounded semantic reference; CAGRA is an approximate graph challenger and may interoperate with HNSW. Neither becomes identity or an extra vote."
+    },
+    {
+      "family": "ONNX Runtime execution providers, DirectML, WebGPU",
+      "urls": [
+        "https://onnxruntime.ai/docs/execution-providers/",
+        "https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html",
+        "https://onnxruntime.ai/docs/execution-providers/WebGPU-ExecutionProvider.html"
+      ],
+      "verified": true,
+      "finding": "Providers are independent executor surfaces; current DirectML metadata is not an execution receipt and WebGPU parity remains unadmitted."
+    }
+  ],
+  "localCompatibility": {
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "computeCapability": "8.6",
+    "driver": "580.88",
+    "observedCudaToolkits": ["13.0", "13.2", "13.3"],
+    "tensorRtRtxCompatibility": "UNRESOLVED",
+    "reason": "No current TensorRT-RTX SDK receipt establishes a supported package/toolkit pairing; do not upgrade active CUDA/RAPIDS.",
+    "engineBuildAllowed": false,
+    "writesPerformed": false
+  }
+}

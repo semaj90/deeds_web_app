@@ -220,11 +220,21 @@ export const atlasInspectRuntimeTool = createTool({
   }),
   outputSchema: z.object({
     runtime: z.record(z.string(), z.unknown()),
+    registryLanes: z.array(z.record(z.string(), z.unknown())).optional(),
+    writesPerformed: z.literal(false),
   }),
   execute: async (input, context) => {
     const runtime = (context as any).atlasRuntime as AtlasRuntimeContext | undefined;
+    const detail = (input as any)?.detail ?? 'summary';
+    let registryLanes: Record<string, unknown>[] | undefined;
+    if (detail === 'full') {
+      const { buildPacketRegistryLaneDescriptorsV1 } = await import('./contracts/rpc-packet-registry-lanes-v1.js');
+      registryLanes = buildPacketRegistryLaneDescriptorsV1() as unknown as Record<string, unknown>[];
+    }
     return {
-      runtime: runtime || {},
+      runtime: (runtime || {}) as Record<string, unknown>,
+      registryLanes,
+      writesPerformed: false as const,
     };
   },
 });
@@ -265,9 +275,17 @@ export async function createAtlasRequestContext(init: {
   resourceId: string;
   workspaceId: string;
   packetKey: string;
-  workspaceRevision?: string;
-  packetRevision?: string;
+  workspaceRevision: string;
+  packetRevision: string;
 }) {
+  if (!init.workspaceRevision.trim()) {
+    throw new Error('ADMITTED_WORKSPACE_REVISION_REQUIRED');
+  }
+
+  if (!init.packetRevision.trim()) {
+    throw new Error('PACKET_REVISION_REQUIRED');
+  }
+
   const runtime = createAtlasRuntimeContext({
     runId: init.runId,
     threadId: init.threadId,

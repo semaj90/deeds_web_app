@@ -12,6 +12,7 @@ describe('TRACE semantic executor', () => {
   it('keeps Qdrant as the first executor and one logical vote', async () => {
     const result = await executeTraceSemanticV1({
       admittedWorkspaceRevision: revision, queryVector: vector, topK: 1,
+      semanticRepresentationRevision: 'semantic-768-test-v1',
       qdrantSearch: async () => [{ id: 'q1', score: 0.9, payload: { packet_key: 'packet:one' } }],
       loadCohort: async () => { throw new Error('must not load fallback cohort'); },
       cuvsExact: async () => { throw new Error('must not call fallback'); },
@@ -23,12 +24,14 @@ describe('TRACE semantic executor', () => {
   it('uses identity-preserving cuVS only after Qdrant failure', async () => {
     const result = await executeTraceSemanticV1({
       admittedWorkspaceRevision: revision, queryVector: vector, topK: 1,
+      semanticRepresentationRevision: 'semantic-768-test-v1',
       qdrantSearch: async () => { throw new Error('qdrant unavailable'); },
       loadCohort: async (requested) => requested === revision ? cohort : [],
       cuvsExact: async (input) => ({
         schema: 'atlas.semantic768-exact-knn-receipt.v1', operation: 'knn.exact', backend: 'cuvs.brute_force',
         metric: 'sqeuclidean_rank_equivalent_to_cosine_for_l2_normalized_vectors', representationId: 'semantic_768',
-        dimension: 768, corpusRows: input.corpus.length, topK: 1, durationMs: 1, truncated: false,
+        representationRevision: 'semantic-768-test-v1', dimension: 768, corpusRows: input.corpus.length, topK: 1, durationMs: 1, truncated: false,
+        identityManifestChecksum: 'a'.repeat(64), matrixChecksum: 'b'.repeat(64),
         gpuMemoryBeforeMb: null, gpuMemoryAfterMb: null,
         results: [{ rank: 0, packetKey: 'packet:one', sourceRevision: cohort[0].sourceRevision, symbolVersionId: null, sqeuclideanDistance: 0, cosineSimilarity: 1 }],
       }),
@@ -40,6 +43,7 @@ describe('TRACE semantic executor', () => {
   it('blocks fallback when the cohort is not admitted to the requested revision', async () => {
     const result = await executeTraceSemanticV1({
       admittedWorkspaceRevision: revision, queryVector: vector, topK: 1,
+      semanticRepresentationRevision: 'semantic-768-test-v1',
       qdrantSearch: async () => { throw new Error('qdrant unavailable'); },
       loadCohort: async () => [{ ...cohort[0], workspaceRevision: 'sha256:' + 'c'.repeat(64) }],
       cuvsExact: async () => { throw new Error('must not execute'); },
@@ -50,6 +54,7 @@ describe('TRACE semantic executor', () => {
   it('blocks malformed fallback queries before loading a cohort', async () => {
     const result = await executeTraceSemanticV1({
       admittedWorkspaceRevision: revision, queryVector: [Number.NaN], topK: 1,
+      semanticRepresentationRevision: 'semantic-768-test-v1',
       qdrantSearch: async () => { throw new Error('qdrant unavailable'); },
       loadCohort: async () => { throw new Error('must not load'); },
       cuvsExact: async () => { throw new Error('must not execute'); },

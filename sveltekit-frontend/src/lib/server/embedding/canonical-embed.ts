@@ -130,7 +130,7 @@ export async function tryEmbedCanonical(
 
   try {
     const { tryEmbedOnnx, isOnnxEmbedAvailable } = await import('./onnx-embed.js');
-    if (isOnnxEmbedAvailable()) {
+    if (await isOnnxEmbedAvailable()) {
       const embedding = await tryEmbedOnnx(text);
       if (embedding) {
         return {

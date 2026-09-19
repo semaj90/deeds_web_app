@@ -38,6 +38,11 @@ export const AtlasPipelineStageV1Schema = z.object({
   stageId: AtlasPipelineStageIdSchema,
   executor: AtlasPipelineExecutorSchema,
   executorRevision: revision,
+  identity: z.object({
+    workspaceRevision: revision.nullable(),
+    packetRevision: revision.nullable(),
+    representationRevision: revision.nullable(),
+  }).strict(),
   dependsOn: z.array(AtlasPipelineStageIdSchema),
   inputSchemaRevision: revision,
   outputSchemaRevision: revision,
@@ -79,6 +84,7 @@ export const AtlasExecutionPipelineV1Schema = z.object({
     workspaceRevision: revision,
     snapshotRevision: revision,
     canonicalExecutionId: z.string().uuid(),
+    packetRevision: revision.nullable(),
     packetAdmissionReceiptChecksum: checksum,
     packetChunkClosureReceiptChecksum: checksum,
     representationRevision: revision.nullable(),
@@ -219,6 +225,46 @@ function validateChecksumChain(stages: readonly AtlasPipelineStageV1[]): void {
   }
 }
 
+/**
+ * Tightens the planning schema for an executable run without changing the
+ * planning representation. A planning DAG may carry null checksums while it
+ * is blocked; an executable DAG must carry a checksum for every stage output
+ * and for every dependent stage input, with exact upstream equality.
+ */
+export function assertAtlasExecutionPipelineIdentityReadyV1(
+  pipeline: AtlasExecutionPipelineV1,
+): void {
+  const parsed = AtlasExecutionPipelineV1Schema.parse(pipeline);
+  if (parsed.canonicalAuthority || parsed.writesPerformed) {
+    throw new Error('PIPELINE_EXECUTION_AUTHORITY_FORBIDDEN');
+  }
+  const byId = new Map(parsed.stages.map((stage) => [stage.stageId, stage]));
+  for (const stage of parsed.stages) {
+    const stageIdentity = stage.identity;
+    if (!stageIdentity.workspaceRevision) throw new Error(`PIPELINE_STAGE_WORKSPACE_REVISION_REQUIRED:${stage.stageId}`);
+    if (!stageIdentity.packetRevision) throw new Error(`PIPELINE_STAGE_PACKET_REVISION_REQUIRED:${stage.stageId}`);
+    if (!stageIdentity.representationRevision) throw new Error(`PIPELINE_STAGE_REPRESENTATION_REVISION_REQUIRED:${stage.stageId}`);
+    if (stageIdentity.workspaceRevision !== parsed.identity.workspaceRevision) {
+      throw new Error(`PIPELINE_STAGE_WORKSPACE_REVISION_MISMATCH:${stage.stageId}`);
+    }
+    if (stageIdentity.packetRevision !== parsed.identity.packetRevision) {
+      throw new Error(`PIPELINE_STAGE_PACKET_REVISION_MISMATCH:${stage.stageId}`);
+    }
+    if (stageIdentity.representationRevision !== parsed.identity.representationRevision) {
+      throw new Error(`PIPELINE_STAGE_REPRESENTATION_REVISION_MISMATCH:${stage.stageId}`);
+    }
+    if (!stage.outputChecksum) throw new Error(`PIPELINE_OUTPUT_CHECKSUM_REQUIRED:${stage.stageId}`);
+    for (const dependency of stage.dependsOn) {
+      if (!stage.inputChecksum) throw new Error(`PIPELINE_INPUT_CHECKSUM_REQUIRED:${stage.stageId}`);
+      const upstream = byId.get(dependency);
+      if (!upstream?.outputChecksum) throw new Error(`PIPELINE_UPSTREAM_CHECKSUM_REQUIRED:${dependency}`);
+      if (upstream.outputChecksum !== stage.inputChecksum) {
+        throw new Error(`PIPELINE_CHECKSUM_CHAIN_MISMATCH:${dependency}:${stage.stageId}`);
+      }
+    }
+  }
+}
+
 function validateContractBindings(
   stages: readonly AtlasPipelineStageV1[],
   bindings: readonly AtlasPipelineContractBindingV1[],
@@ -256,8 +302,8 @@ export function buildAtlasExecutionPipelineV1(
     identity: parsed.identity,
     context: parsed.context,
     contractBindings: parsed.contractBindings,
-    stages: parsed.stages.map(({ stageId, executor, executorRevision, dependsOn, inputSchemaRevision, outputSchemaRevision, logicalLane, voteGroup, stream }) => ({
-      stageId, executor, executorRevision, dependsOn, inputSchemaRevision, outputSchemaRevision, logicalLane, voteGroup, stream,
+    stages: parsed.stages.map(({ stageId, executor, executorRevision, identity, dependsOn, inputSchemaRevision, outputSchemaRevision, logicalLane, voteGroup, stream }) => ({
+      stageId, executor, executorRevision, identity, dependsOn, inputSchemaRevision, outputSchemaRevision, logicalLane, voteGroup, stream,
     })),
   });
   return AtlasExecutionPipelineV1Schema.parse({ ...parsed, pipelineChecksum });

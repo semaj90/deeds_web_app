@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-graphify-batch-plan.v1",
-  "generatedAt": "2026-09-14T18:32:56.612Z",
+  "generatedAt": "2026-09-17T17:30:10.558Z",
   "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
   "readOnly": true,
   "canonicalAuthority": false,
@@ -14,34 +14,46 @@
     "neo4j": false,
     "valkey": false
   },
-  "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
-  "snapshotRevision": "sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8",
-  "sourceSelectionChecksum": "sha256:52244f10f2087277bcff0e73c01ba0e790d82a7064ac7b1825301f974ff1c795",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "sourceSelectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
   "inputSource": "docs/reports/workspace-revision-tournament-admission-v1.json -> admitted snapshot manifest",
   "cohortReport": "docs/reports/current-source-projection-cohort-v1.json",
-  "cohortEligibleSources": 25291,
+  "cohortEligibleSources": 25542,
   "requestedLimit": 5,
   "selectedSourceCount": 5,
-  "selectionChecksum": "be6b49656f7df2dc370fa0b88ff0f726b01a1d59876a4ffa41cd1447e79e6c38",
+  "selectionChecksum": "b83b2616f6192a59dad0a5d658a4d96dfc72796d4cd7f114c29aac23e5099df9",
   "counts": {
     "currentGraphifyExact": 0,
-    "missingGraphifySource": 0,
+    "missingGraphifySource": 1,
     "missingWorkspaceObservation": 0,
     "ambiguousGraphifySource": 0,
-    "graphifyRevisionOrContentMismatch": 5
+    "graphifyRevisionOrContentMismatch": 4
   },
   "databaseError": null,
   "mismatchFieldCounts": {
-    "workspaceRevision": 5
+    "workspaceRevision": 4
   },
   "nextGate": "EXPLICIT_GRAPHIFY_BATCH_REVIEW",
   "records": [
+    {
+      "sourceRef": ".clarity/ff1-plan.md",
+      "sourceRevision": "sha256:a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
+      "contentDigest": "a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
+      "byteLength": 1722,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "bindingPresent": true,
+      "graphifyRows": 0,
+      "exactCurrentRows": 0,
+      "comparisons": [],
+      "classification": "MISSING_GRAPHIFY_SOURCE"
+    },
     {
       "sourceRef": ".claude/AGENT_CONSTITUTION.md",
       "sourceRevision": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
       "contentDigest": "2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
       "byteLength": 251,
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
@@ -74,7 +86,7 @@
       "sourceRevision": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
       "contentDigest": "427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
       "byteLength": 507,
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
@@ -107,7 +119,7 @@
       "sourceRevision": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
       "contentDigest": "9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
       "byteLength": 28338,
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
@@ -140,7 +152,7 @@
       "sourceRevision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
       "contentDigest": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
       "byteLength": 111,
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
@@ -152,39 +164,6 @@
             "sourceRevision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
             "contentDigest": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
             "byteLength": "111"
-          },
-          "matches": {
-            "sourceRef": true,
-            "workspaceRevision": false,
-            "sourceRevision": true,
-            "contentDigest": true,
-            "byteLength": true
-          },
-          "mismatchedFields": [
-            "workspaceRevision"
-          ],
-          "exact": false
-        }
-      ],
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": ".claude/DISTILLED_MEMORY.md",
-      "sourceRevision": "sha256:e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
-      "contentDigest": "e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
-      "byteLength": 508,
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "comparisons": [
-        {
-          "observed": {
-            "sourceRef": ".claude/DISTILLED_MEMORY.md",
-            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-            "sourceRevision": "sha256:e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
-            "contentDigest": "e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
-            "byteLength": "508"
           },
           "matches": {
             "sourceRef": true,

@@ -29,7 +29,10 @@ decision. This change freezes the corrected validation order before any further 
 
 - [ ] **1. Reload permissions.** `.claude/settings.local.json` env-read allow rules are JSON-valid
       (`jq -e` passed) but need `/hooks` or a session restart to take effect — not yet done.
-- [ ] **2. Inspect real env routing.** Once readable: `EMBEDDING_BACKEND`, `DEV_GPU_EMBED_SERVER`,
+- [x] **2. Inspect real env routing.** `sveltekit-frontend/.env` reports
+      `EMBEDDING_BACKEND=onnx_directml`; the server ONNX implementation is CPU-only and the
+      browser challenger is the separate WebGPU path. No `DEV_GPU_EMBED_SERVER` or
+      `ORT_NODE_PACKAGE_DIR` override was found in the targeted env/source audit.
       the ONNX model path var, `ORT_NODE_PACKAGE_DIR` (or equivalent) — confirm what
       `npm run dev:gpu` will actually select, don't assume.
 - [ ] **3. Inspect `onnx-embed.ts` before starting the app.** Verify: `isOnnxEmbedAvailable()`
@@ -37,21 +40,25 @@ decision. This change freezes the corrected validation order before any further 
       `batchEmbedOnnx()` uses the shared `EmbeddingContextPlanV1`/`semantic_768` validator;
       it reports the actual executor/provider used; it does not silently treat a WebGPU failure
       that fell back to WASM as a WebGPU success.
-- [ ] **4. Harden the standalone proof to fail closed.** Current
+- [x] **4. Harden the standalone proof to fail closed.** Added
+      `services/embedding-onnx-webgpu/prove-embeddinggemma-onnx-webgpu-only-v1.mjs` with
+      `requestedProvider: 'webgpu'`, `fallbackAllowed: false`, artifact/input/vector checksums,
+      actual provider receipt, output dimensions, finiteness, normalization, and repeatability.
+      The existing fallback-tolerant script remains separate.
       `prove-embeddinggemma-onnx-readonly.mjs` tries WebGPU, silently falls back to WASM on
       failure. Add a fail-closed variant: `requestedProvider: 'webgpu'`, `fallbackAllowed: false`,
       and check ORT package version, actual provider used, model checksum, tokenizer checksum,
       rendered-input checksum, token-tensor checksum, output dims == 768, all-finite, valid L2
       norm. Keep the existing fallback-tolerant script as a separate availability smoke test.
-- [ ] **5. Resolve the 512 vs 2048 token-capacity export gate before claiming parity.**
+- [x] **5. Resolve the 512 vs 2048 token-capacity export gate before claiming parity.**
       EmbeddingGemma's model card states 2048-token capacity; the local ONNX export's
       `model_info.json` reports `max_sequence_length: 512`. Inspect the selected model's real
       input metadata (`sequence` dim: dynamic-up-to-2048, or fixed-512). Prove: 512 tokens PASS,
       628 tokens PASS (a previously-identified failing case), 1024 PASS, 2048 PASS, 2049 rejected
       pre-inference. **Do not promote the 304MB QInt8 export merely because a short probe
       succeeds** if it's still the fixed-512 artifact.
-- [ ] **6. Run the standalone WebGPU proof independently of SvelteKit**, fail-closed mode:
-      `node services/embedding-onnx-webgpu/prove-embeddinggemma-onnx-readonly.mjs`. Acceptance:
+- [x] **6. Run the standalone WebGPU proof independently of SvelteKit**, fail-closed mode:
+      `node scripts/atlas/probe-onnx-webgpu-semantic-768-v1.mjs`. Acceptance:
       WebGPU-only load PASS, tokenization PASS, dims==768 PASS, all-finite PASS, normalization
       PASS, same-input-3x-repeatable PASS, writes==0.
 - [ ] **7. ONNX CPU vs ONNX WebGPU parity** — identical model/tokenizer/input_ids/attention_mask/
@@ -86,9 +93,104 @@ decision. This change freezes the corrected validation order before any further 
 
 ## Status
 
-Step 1 (settings edited, not yet reloaded) is the only step attempted so far. Steps 2-11 not
-started. The Tier-0 reorder in `embedding-client.ts` remains in place as code but is **not**
-validated — treat it as an unvalidated change, not a completed promotion.
+## Recheck 2026-09-17 — WebGPU execution proven; promotion gates remain open
+
+- Evidence: The fallback-tolerant standalone proof produced a real WebGPU receipt with `768`
+      dimensions, finite values, unit L2 norm, and `writes: false`.
+- Evidence: The independent runtime probe also reports `actualProvider: webgpu`, ORT `1.29.0`,
+      `input_ids`/`attention_mask`, `last_hidden_state`, 768 dimensions, normalized output,
+      and `status: WEBGPU_RUNTIME_AND_TOKEN_STATE_INFERENCE_PROVEN`. Receipt:
+      `docs/reports/onnx-webgpu-semantic-768-readiness-v1.json`.
+- Evidence: Added `services/embedding-onnx-webgpu/prove-embeddinggemma-onnx-webgpu-only-v1.mjs`,
+      which refuses WASM/CPU fallback and records model, tokenizer, rendered-input,
+      token-tensor, and vector checksums plus three-repeat repeatability.
+- Evidence / resolved negatively: The local artifact's ONNX graph accepts `512` tokens but
+      rejects `628`, `1024`, `2048`, and `2049`; its dynamic input shape does not prove 2048-token
+      support. The artifact is classified `LOCAL_EXPORT_FIXED_512`, with
+      `promotionEligibility: BOUNDED_CHALLENGER_ONLY` and `canonicalPrimaryEligible: false`.
+- Evidence: The exact-artifact strict ORT probe passes with `actualProvider: webgpu`,
+      `fallbackAllowed: false`, `writesPerformed: false`, 768 dimensions, finite normalized
+      output, and three-repeat stability. Receipt:
+      `docs/reports/onnx-webgpu-semantic-768-readiness-v1.json`.
+- Blocker: Same-artifact CPU↔WebGPU parity is not promotion-grade yet: observed cosine `0.9907539`,
+      mean absolute delta `0.0037427`, and maximum absolute delta `0.0396154`.
+- Evidence: A same-input CPU↔WebGPU probe now records both actual providers, identical
+      `last_hidden_state`/masked-mean/L2 contracts, cosine `0.9894528`, mean absolute delta
+      `0.0041073`, and maximum absolute delta `0.0204304`; status remains
+      `PARITY_OBSERVED_UNADMITTED`. Receipt: `docs/reports/onnx-cpu-webgpu-parity-v1.json`.
+- Blocker: The WebGPU proof emits a valid receipt but the native runtime reports a post-receipt
+      teardown code (`-1073740791`); keep the lifecycle defect open until independently fixed.
+
+Until these gates close, the Tier-0 reorder in `embedding-client.ts` remains unpromoted:
+Ollama owns canonical `semantic_768`, and ONNX WebGPU remains a challenger with no traffic.
+
+## Recheck 2026-09-17 — exact-artifact receipt output and parity replay
+
+The strict local ORT/WebGPU probe reached inference successfully but could not replace the
+existing v1 report file on Windows (`UNKNOWN` from `writeFileSync`). Added the optional
+`ATLAS_ONNX_WEBGPU_REPORT` output override and emitted a fresh receipt without deleting or
+overwriting prior evidence. The v2 receipt records `requestedProvider=webgpu`,
+`actualProvider=webgpu`, `fallbackAllowed=false`, ORT `1.29.0`, `last_hidden_state`, 768
+dimensions, finite normalized output, three-repeat stability, and
+`status=WEBGPU_512_CHALLENGER_PROVEN`. It remains bounded challenger-only with
+`canonicalPrimaryEligible=false` and `LOCAL_EXPORT_CAPACITY_BELOW_2048`.
+
+The same-artifact CPU/WebGPU parity replay was also run with the matching output override.
+Both providers used `last_hidden_state` with the same masked-mean/L2 contract and 768
+dimensions. Observed cosine is `0.9894528117`, mean absolute delta `0.0041073369`, and
+maximum absolute delta `0.0204303861`; status remains `PARITY_OBSERVED_UNADMITTED`.
+Task 7 remains open because this receipt is evidence, not an admitted parity threshold.
+No embedding, PostgreSQL, Qdrant, cache, projection, or source-data writes occurred.
+
+Receipts: `docs/reports/onnx-webgpu-semantic-768-readiness-v2.json` and
+`docs/reports/onnx-cpu-webgpu-parity-v2.json`.
+Implementation: `scripts/atlas/probe-onnx-webgpu-semantic-768-v1.mjs` and
+`scripts/atlas/probe-onnx-cpu-webgpu-parity-v1.mjs`.
+
+The server `sveltekit-frontend/src/lib/server/embedding/onnx-embed.ts` review confirms
+that this lane is deliberately `onnx-local-cpu`: it performs real session/tokenizer
+availability checks and validates 768-dimensional finite, L2-normalized output, but it
+does not instantiate WebGPU and its vector-only return type does not provide a WebGPU
+provider receipt. Consequently Task 3 remains an inspection result rather than a
+production WebGPU wiring proof, and the Tier-0 client reorder remains unpromoted.
+
+The raw local-artifact diagnostic was also run read-only. The ONNX session exposes only
+`last_hidden_state` with shape `1x10x768`; it does not expose `sentence_embedding`.
+The tensor is nonzero, nonconstant, finite, and therefore supports the existing
+`last_hidden_state → attention-mask mean pool → L2 normalization` contract. This resolves
+the local output-shape ambiguity without implying equivalence to the published
+Transformers.js sentence-embedding export or to Ollama. No report file or datastore was
+written by this diagnostic.
+
+Diagnostic: `scripts/atlas/diagnose-webgpu-onnx-raw-output-v1.mjs`.
+
+The parity probe was replayed with a third immutable output path. It reproduced the prior
+CPU/WebGPU provider receipts, output contract, vector checksums, cosine
+`0.9894528117`, mean absolute delta `0.0041073369`, and maximum absolute delta
+`0.0204303861`. This strengthens repeatability evidence but does not establish an
+admitted threshold or change Task 7 from `PARITY_OBSERVED_UNADMITTED`.
+
+Receipt: `docs/reports/onnx-cpu-webgpu-parity-v3.json`.
+
+## Recheck 2026-09-17 — Ollama comparison remains unadmitted
+
+The bounded 15-row Ollama↔local-ONNX-WebGPU comparison was executed with the
+same read-only harness and immutable report output. It measured
+`status=PARITY_MEASURED_NOT_PROMOTED` with no row errors, but the vectors were
+not representation-equivalent: minimum cosine `-0.0778050092`, mean cosine
+`-0.0300325352`, and maximum cosine `0.0740490710`. This is a negative parity
+result, not a failure of the harness. The local QInt8/512 artifact remains a
+shadow challenger and Ollama remains the canonical `semantic_768` owner.
+
+Task 8 remains open. Do not wire traffic, change the canonical owner, or infer
+that the result can be repaired by changing the pooling contract without first
+proving that the local export, tokenizer/prefix contract, model revision, and
+Ollama model are the same representation inputs.
+
+Receipt: `docs/reports/ollama-webgpu-semantic-768-parity-v2.json`.
+Harness: `scripts/atlas/prove-ollama-webgpu-semantic-768-parity-v1.mjs`.
+No embedding, PostgreSQL, Qdrant, cache, projection, or source-data writes
+occurred.
 
 ## Future browser cache integration: IndexedDB + WebGPU Transformers.js
 

@@ -481,10 +481,13 @@ need follow-up, either as a small task on this change or as their own change:
      beyond `src/lib/server`, or lower the deterministic classifier's confidence threshold for
      bundle-generation purposes only) is a prerequisite to a real retrain, not just re-running the
      same 35-row bundle through a real (non-dry-run) persist.
-3. **`ace/features/domain-classifier.ts` parity test — not written** (task 1.2's explicit
-   condition for any future redirect to `domain-taxonomy.ts`). Still has exactly one live call site
-   (`feature-extraction-orchestrator.ts:130`), still untouched, still needs a real-corpus comparison
-   before anyone attempts that consolidation.
+3. **`ace/features/domain-classifier.ts` parity test — written, review required** (task 1.2's
+   explicit condition for any future redirect to `domain-taxonomy.ts`). The bounded checked-in
+   real-corpus comparison is `sveltekit-frontend/src/lib/server/ace/features/domain-classifier-parity-v1.spec.ts`
+   and `scripts/atlas/prove-domain-classifier-parity-v1.mts`; receipt:
+   `docs/reports/domain-classifier-parity-v1.json`. It reports `PARITY_REVIEW_REQUIRED` with 0
+   exact matches, 6 disagreements, and 6 missing-label observations. The ACE caller remains
+   untouched; no redirect or canonical promotion is authorized.
 4. **The 4-file XGBoost feature-vector scaffold (task 1.1) is still parked, not owned.** Whether to
    wire it into a live feature-matrix builder or leave it parked belongs to whoever owns the
    XGBoost/reranker roadmap — flagged, not decided, by this change.
@@ -727,6 +730,21 @@ Status: `READY_WITH_GAPS`; authority=false; writesPerformed=false.
 First blocker: `CLASSIFIER_CURRENT_SOURCE_LINEAGE_AND_FEATURE_COVERAGE_UNPROVEN`.
 Next gate: snapshot-bound source lineage, then revision-qualified classifier
 and feature replay.
+
+## DOMAIN-CLASSIFIER-PARITY-AND-TRAINING-READINESS-2026-09-18
+
+- [x] Added a pure real-corpus parity comparison for
+      `ace/features/domain-classifier.ts` versus `domain-taxonomy.ts` over six
+      checked-in source files. Receipt:
+      `docs/reports/domain-classifier-parity-v1.json`.
+- [x] Added `atlas.domain-classifier-training-readiness.v1`; readiness requires
+      an operator-approved minimum corpus and class-coverage rule and otherwise
+      fails closed. No threshold was inferred from the current fixture.
+- [ ] Review the six observed label disagreements before any caller redirect,
+      checkpoint replacement, ontology promotion, or training admission.
+
+Status: `PARITY_REVIEW_REQUIRED`; `DOMAIN_CLASSIFIER_TRAINING_READY_FALSE`;
+authority=false; writesPerformed=false.
 
 ## LANGEXTRACT-ORNITH-CLASSIFIER-RECHECK-2026-09-11
 

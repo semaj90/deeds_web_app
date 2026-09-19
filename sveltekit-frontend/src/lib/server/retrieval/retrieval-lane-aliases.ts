@@ -47,6 +47,7 @@ const DENSE_LANE_ALIASES: readonly string[] = [
   'dense_768',
   'qdrant',
   'qdrant_vector',
+  'go_retrieval_semantic',
   'qdrant_768',
   'turbovec',
   'turbovec_ann',

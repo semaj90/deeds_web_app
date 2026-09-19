@@ -160,9 +160,11 @@ JS) found exactly 4 hits repo-wide: this change's own docs, one unrelated Python
       directly against the live DB (`docker exec -i legal-ai-postgres psql ... < 0099_*.sql`) —
       completed cleanly, every object already exists so it's a safe no-op (`NOTICE: relation ...
       already exists, skipping` for every statement, zero errors).
-- [ ] No other SQL in the repo currently uses `isfinite()` on a numeric column (confirmed via the
-      same grep) — this is a two-file problem, not a systemic one. No broader sweep needed unless
-      new SQL is written copying the old pattern.
+- [x] Repository-wide SQL compatibility sweep completed for PostgreSQL 18. The orphaned root
+      `src/lib/server/graph/pagerank-promotion-gate.ts` mirror was still emitting `isfinite(...)`;
+      it now uses the same explicit NaN/Infinity comparison as the frontend owner. Remaining
+      `isfinite` matches are application-language numeric checks or historical documentation,
+      not PostgreSQL SQL. No database writes occurred.
 
 ## T6 — Phase 6 (staged FeatureRow)
 

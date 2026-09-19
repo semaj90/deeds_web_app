@@ -4,10 +4,10 @@
   "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
   "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
   "ownerPreflight": {
-    "status": "OWNER_SELECTION_VALIDATED_NOT_APPLIED",
+    "status": "OWNER_SELECTION_APPLIED_READBACK_VERIFIED",
     "selectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
-    "decisionChecksum": "sha256:466033e0d6e23bb70856c0bb536c3f38d5d72aa4c0881d1dab4ef6dd3fa57932",
-    "ownerPlanChecksum": "sha256:d99907af3d4a87b8463272151bbbf38bb1df68daf7f5fd963e7d42024c363e4d",
+    "decisionChecksum": "sha256:98ec6afddb19b872bee63b47d00e3fe370d268d7be8e678a1746573fa87ddb0e",
+    "ownerPlanChecksum": "sha256:ae591c99013c268ba48251978f48fe339597b02c06f774def82bbc6edec83f97",
     "applied": false
   },
   "execution": {

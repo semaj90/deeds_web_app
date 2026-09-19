@@ -1,6 +1,6 @@
 {
   "schema": "atlas.packet-registry-writer-ownership.v1",
-  "generatedAt": "2026-09-14T02:19:23.356Z",
+  "generatedAt": "2026-09-18T21:29:22.912Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "candidateCount": 107,
@@ -589,7 +589,7 @@
       "hasDryRunGate": true,
       "hasTransactionMarkers": false,
       "packageJsonRefs": [],
-      "chainRefCount": 2,
+      "chainRefCount": 3,
       "runtimeImportRefs": [],
       "classification": "MIGRATION_ONLY"
     },
@@ -1019,7 +1019,7 @@
       "hasDryRunGate": true,
       "hasTransactionMarkers": false,
       "packageJsonRefs": [],
-      "chainRefCount": 3,
+      "chainRefCount": 4,
       "runtimeImportRefs": [],
       "classification": "MIGRATION_ONLY"
     },
@@ -1081,7 +1081,7 @@
       "hasDryRunGate": true,
       "hasTransactionMarkers": false,
       "packageJsonRefs": [],
-      "chainRefCount": 2,
+      "chainRefCount": 5,
       "runtimeImportRefs": [],
       "classification": "MIGRATION_ONLY"
     },
@@ -1657,10 +1657,10 @@
       "targetTable": "atlas_packets",
       "hasOnConflictUpdate": true,
       "mutatesIdentityColumns": true,
-      "hasDryRunGate": false,
+      "hasDryRunGate": true,
       "hasTransactionMarkers": false,
       "packageJsonRefs": [],
-      "chainRefCount": 5,
+      "chainRefCount": 6,
       "runtimeImportRefs": [],
       "classification": "PRODUCTION_CAPABLE_UNOWNED"
     },
@@ -1677,13 +1677,13 @@
       "packageJsonRefs": [],
       "chainRefCount": 3,
       "runtimeImportRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-taxonomy-shadow.spec.ts",
+        "sveltekit-frontend/src/lib/server/ace/packet-io.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/runtime-registry.ts",
         "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
         "sveltekit-frontend/src/lib/server/retrieval/search-runtime.spec.ts",
         "sveltekit-frontend/src/lib/server/retrieval/promote-results.spec.ts",
-        "sveltekit-frontend/src/lib/server/retrieval/promote-results-outbox.spec.ts",
-        "sveltekit-frontend/src/lib/server/ace/packet-io.spec.ts",
-        "sveltekit-frontend/src/lib/server/atlas/runtime-registry.ts",
-        "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-taxonomy-shadow.spec.ts"
+        "sveltekit-frontend/src/lib/server/retrieval/promote-results-outbox.spec.ts"
       ],
       "classification": "CANONICAL_WRITER_CANDIDATE"
     },
@@ -1700,8 +1700,8 @@
       "packageJsonRefs": [],
       "chainRefCount": 3,
       "runtimeImportRefs": [
-        "sveltekit-frontend/src/lib/server/atlas/runtime-registry.ts",
         "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-taxonomy-shadow.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/runtime-registry.ts",
         "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
         "sveltekit-frontend/src/lib/server/retrieval/search-runtime.spec.ts",
         "sveltekit-frontend/src/lib/server/retrieval/promote-results.ts",
@@ -1723,15 +1723,15 @@
       "chainRefCount": 4,
       "runtimeImportRefs": [
         "sveltekit-frontend/src/lib/server/workers/identity-worker.ts",
+        "sveltekit-frontend/src/routes/api/retrieval/go/+server.ts",
         "sveltekit-frontend/src/lib/server/topology/permission-manager.ts",
         "sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.spec.ts",
-        "sveltekit-frontend/src/routes/api/retrieval/go/+server.ts",
-        "sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts",
         "sveltekit-frontend/src/lib/server/dispatch/dynamic-dispatcher.ts",
         "sveltekit-frontend/src/lib/server/dispatch/dispatcher-integration.ts",
-        "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-coordinator.ts",
         "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-facade.ts",
-        "sveltekit-frontend/src/lib/server/retrieval/go-service-integration.ts"
+        "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-coordinator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/go-service-integration.ts",
+        "sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts"
       ],
       "classification": "CANONICAL_WRITER_CANDIDATE"
     },

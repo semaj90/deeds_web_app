@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planGpuResidencyV1, mibToBytes } from './gpu-residency-budget';
+import { admitGpuExecutionLeaseV1, planGpuResidencyV1, mibToBytes } from './gpu-residency-budget';
 
 function telemetry(freeMiB: number, totalMiB = 8192) {
   return {
@@ -41,5 +41,55 @@ describe('GpuResidencyBudgetV1', () => {
     const plan = planGpuResidencyV1(null, 128);
     expect(plan.executionTarget).toBe('qdrant');
     expect(plan.leaseableBytes).toBe(0);
+  });
+
+  it('uses the shared budget owner for explicit cross-executor lease decisions', () => {
+    const budget = planGpuResidencyV1(telemetry(2048), 128);
+    const lease = admitGpuExecutionLeaseV1({
+      budget,
+      budgetRevision: 'gpu-budget:r1',
+      leaseId: 'lease:shared:r1',
+      leaseEpoch: 1,
+      executor: 'pytorch_cuda',
+      requestedBytes: mibToBytes(512),
+      activeReservedBytes: mibToBytes(100),
+    });
+    expect(lease.admission).toBe('ALLOW');
+    expect(lease.canonicalAuthority).toBe(false);
+    expect(lease.writesPerformed).toBe(false);
+  });
+
+  it('fails closed before allocation when active reservations exceed the budget', () => {
+    const budget = planGpuResidencyV1(telemetry(900), 512);
+    const lease = admitGpuExecutionLeaseV1({
+      budget,
+      budgetRevision: 'gpu-budget:r1',
+      leaseId: 'lease:shared:over-budget',
+      leaseEpoch: 1,
+      executor: 'tensorrt_rtx',
+      requestedBytes: mibToBytes(256),
+      activeReservedBytes: budget.leaseableBytes,
+    });
+    expect(lease.admission).toBe('GPU_RESIDENCY_BUDGET_EXCEEDED');
+    expect(lease.availableBytes).toBe(0);
+  });
+
+  it('applies the same pre-allocation budget decision to every registered executor', () => {
+    const budget = planGpuResidencyV1(telemetry(900), 512);
+    const executors = ['pytorch_cuda', 'cuvs', 'tensorrt_rtx', 'directml', 'webgpu', 'llm_runtime'] as const;
+    const admissions = executors.map((executor) => admitGpuExecutionLeaseV1({
+      budget,
+      budgetRevision: 'gpu-budget:matrix-r1',
+      leaseId: `lease:matrix:${executor}`,
+      leaseEpoch: 1,
+      executor,
+      requestedBytes: mibToBytes(256),
+      activeReservedBytes: budget.leaseableBytes,
+    }));
+
+    expect(admissions.map((lease) => lease.admission)).toEqual(
+      executors.map(() => 'GPU_RESIDENCY_BUDGET_EXCEEDED'),
+    );
+    expect(admissions.every((lease) => lease.canonicalAuthority === false && lease.writesPerformed === false)).toBe(true);
   });
 });

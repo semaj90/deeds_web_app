@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-03T18:42:20.291Z",
+  "timestamp": "2026-09-17T22:07:43.070Z",
   "configPath": "C:\\Users\\james\\Videos\\deeds-web-app\\opencode.json",
   "totalMcpEntries": 3,
   "liveMcp": 1,
@@ -22,18 +22,18 @@
       "url": "http://127.0.0.1:8788/mcp",
       "enabledInConfig": true,
       "toolsListStatus": 200,
-      "toolsListMs": 79,
-      "toolCount": 173,
+      "toolsListMs": 185,
+      "toolCount": 177,
       "sampleTools": [
         "kb.organize_messy_text",
         "kb.extract_citations",
         "kb.trace_search",
         "atlas.query",
-        "kb.wiki_note_lookup"
+        "trace_search"
       ],
       "mcpHealthy": true,
       "healthEndpointStatus": 200,
-      "healthBody": "{\"ok\":true,\"degraded\":false,\"version\":\"1.0.0\",\"uptime\":8487.9908316,\"dependencies\":{\"mcp\":true,\"post",
+      "healthBody": "{\"ok\":true,\"degraded\":false,\"version\":\"1.0.0\",\"uptime\":6068.9617016,\"dependencies\":{\"mcp\":true,\"post",
       "classification": "live_mcp"
     },
     {

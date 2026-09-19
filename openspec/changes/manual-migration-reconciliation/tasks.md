@@ -4,8 +4,8 @@
 
 - [x] Read-only integrity audit completed: the Drizzle journal has 41 entries, the live Drizzle/public migration ledgers are empty, 66 root SQL files are outside the journal, and 41 journal hashes/live rows are unresolved.
 - [x] No safe automated baseline/reconciliation owner was found. The existing integrity script is diagnostic; `--fix-hashes`, migration-row registration, loose-SQL moves, and migration apply remain mutating actions.
-- [ ] Produce an explicit migration inventory and baseline decision (accepted history, applied-outside-Drizzle history, deferred proposals, and canonical owner) before changing either ledger or applying `feature_registry`.
-- [ ] Keep `public.feature_registry` absent and `feature-registry.ts` unapplied until the baseline decision and shape reconciliation are approved.
+- [x] Produce an explicit migration inventory and baseline decision (accepted history, applied-outside-Drizzle history, deferred proposals, and canonical owner) before changing either ledger or applying `feature_registry`. Read-only receipt: `docs/reports/migration-baseline-decision-v1.json`; unresolved owners remain apply-blocking.
+- [x] Keep `public.feature_registry` absent and `feature-registry.ts` unapplied until the baseline decision and shape reconciliation are approved. The baseline receipt records `feature_registry` as proposed-only and `writesPerformed=false`.
 - [x] Extended `scripts/atlas/audit-atlas-migration-owners.mjs` to include `feature_registry`; the refreshed audit correctly reports `MISSING_MANIFEST_REGISTRATION` instead of omitting this unresolved owner.
 - [x] Corrected that audit's repository-path resolution and quoted-table parser; `feature_registry` SQL now resolves to the real competing definitions and reports no missing expected columns, while remaining unapplied and unregistered.
 - [x] Re-ran live schema drift inspection: snapshot expects 369 tables, live PostgreSQL has 526, with 159 blocking differences. This confirms that global `drizzle-kit migrate`/ledger repair is unsafe; reconciliation must remain scoped and baseline-driven.

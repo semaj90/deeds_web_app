@@ -47,7 +47,7 @@
     },
     "codebase_chunk_index": {
       "present": true,
-      "hasSourceRevision": false,
+      "hasSourceRevision": true,
       "hasContent": true,
       "hasContentHash": true,
       "hasEvidenceSpan": false,
@@ -74,5 +74,5 @@
   "canonicalAuthority": false,
   "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED",
   "nextGate": "RESOLVE_REVISION_BOUND_CONTENT_AND_SOURCE_NAMESPACE_AUTHORITY",
-  "reportChecksum": "6b33382011961b185692786d7052ebd6d94181b56520dc0f869de7edc3d6150a"
+  "reportChecksum": "d513a2854ab7415868e02e54b409466e326ebf8fc112faa76c0b427702f88b11"
 }

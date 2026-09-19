@@ -29,6 +29,19 @@ describe('ast-grep extractor lineage', () => {
     expect(first[0]?.evidenceKey).toBe(second[0]?.evidenceKey);
   });
 
+  it('preserves exact parser spans and producer revisions for structural evidence', async () => {
+    const rows = await extractAstFeatures(code, 'ts', context);
+    const functionRow = rows.find((row) => row.type === 'ast_function');
+
+    expect(functionRow?.byteStart).toBe(code.indexOf('function'));
+    expect(functionRow?.byteEnd).toBe(code.trimEnd().length);
+    expect(code.slice(functionRow?.byteStart, functionRow?.byteEnd)).toContain('rankCandidates');
+    expect(functionRow?.sourceRevision).toBe(context.sourceRevision);
+    expect(functionRow?.providerRevision).toBe(context.providerRevision);
+    expect(functionRow?.producerRevision).toBe(context.producerRevision);
+    expect(functionRow?.evidenceKey).toMatch(/^astgrep:[a-f0-9]{64}$/);
+  });
+
   it('changes evidence identity when source revision changes', async () => {
     const first = await extractAstFeatures(code, 'ts', context);
     const second = await extractAstFeatures(code, 'ts', {

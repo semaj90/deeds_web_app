@@ -44,6 +44,7 @@ export const rerankerEvaluationAdmissionV1Schema = z.object({
   corpusChecksum: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
   modelArtifactChecksum: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
   heldOutReceiptChecksum: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
+  trainingAuthorized: z.literal(false),
   promotionAuthorized: z.literal(false),
   canonicalAuthority: z.literal(false),
   writesPerformed: z.literal(false),
@@ -86,11 +87,62 @@ export function admitRerankerEvaluationV1(input: {
     corpusChecksum: input.corpusChecksum ?? null,
     modelArtifactChecksum: input.modelArtifactChecksum ?? null,
     heldOutReceiptChecksum: input.heldOutReceiptChecksum ?? null,
+    trainingAuthorized: false,
     promotionAuthorized: false,
     canonicalAuthority: false,
     writesPerformed: false,
     reason,
   });
+}
+
+export const XgboostHeldOutEvaluationReceiptV1Schema = z.object({
+  schema: z.literal('atlas.xgboost-held-out-evaluation-receipt.v1'),
+  modelRevision: z.string().min(1),
+  datasetRevision: z.string().min(1),
+  trainSourceRevisions: z.array(z.string().min(1)).min(1),
+  heldOutSourceRevisions: z.array(z.string().min(1)).min(1),
+  metrics: z.object({
+    ndcgAt10: z.number().finite().min(0).max(1),
+    evaluatedRows: z.number().int().positive(),
+  }).strict(),
+  sourceRevisionSplitDisjoint: z.literal(true),
+  promotionAuthorized: z.literal(false),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  checksum: z.string().regex(/^[a-f0-9]{64}$/),
+}).strict().superRefine((receipt, ctx) => {
+  const train = new Set(receipt.trainSourceRevisions);
+  if (receipt.heldOutSourceRevisions.some((revision) => train.has(revision))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['heldOutSourceRevisions'],
+      message: 'HELD_OUT_SOURCE_REVISION_OVERLAP',
+    });
+  }
+});
+
+export type XgboostHeldOutEvaluationReceiptV1 = z.infer<typeof XgboostHeldOutEvaluationReceiptV1Schema>;
+
+export function buildXgboostHeldOutEvaluationReceiptV1(input: {
+  modelRevision: string;
+  datasetRevision: string;
+  trainSourceRevisions: readonly string[];
+  heldOutSourceRevisions: readonly string[];
+  metrics: { ndcgAt10: number; evaluatedRows: number };
+}): XgboostHeldOutEvaluationReceiptV1 {
+  const body = {
+    schema: 'atlas.xgboost-held-out-evaluation-receipt.v1' as const,
+    modelRevision: input.modelRevision,
+    datasetRevision: input.datasetRevision,
+    trainSourceRevisions: [...new Set(input.trainSourceRevisions)].sort(),
+    heldOutSourceRevisions: [...new Set(input.heldOutSourceRevisions)].sort(),
+    metrics: input.metrics,
+    sourceRevisionSplitDisjoint: true as const,
+    promotionAuthorized: false as const,
+    canonicalAuthority: false as const,
+    writesPerformed: false as const,
+  };
+  return XgboostHeldOutEvaluationReceiptV1Schema.parse({ ...body, checksum: digest(JSON.stringify(body)) });
 }
 
 export interface XgboostRankingGroupV1 {

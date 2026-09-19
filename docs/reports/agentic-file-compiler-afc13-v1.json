@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.agentic-file-compiler-afc13.v1",
+  "task": "AFC-13",
+  "status": "IMPLEMENTED_BOUNDARY_PROVEN",
+  "owner": "existing_action_outbox_writer",
+  "adapter": "workflowEventToCanonicalActionWriterRequest",
+  "writer": "writeCanonicalWorkflowActionAtomically",
+  "compilerAdapterTests": {
+    "passed": 5,
+    "total": 5
+  },
+  "existingWriterTests": {
+    "passed": 11,
+    "total": 11
+  },
+  "openSpecValidation": "PASS",
+  "compilerOnlyKindsFailClosed": true,
+  "liveDatabaseReadback": false,
+  "canonicalWritesPerformed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

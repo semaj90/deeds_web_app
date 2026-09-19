@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v4.25.1
-// source: proto/active/retrieval.proto
+// source: active/retrieval.proto
 
 package retrieval
 
@@ -34,15 +34,16 @@ type EvidenceSearchRequest struct {
 	Prefilter    *PrefilterPolicy `protobuf:"bytes,6,opt,name=prefilter,proto3" json:"prefilter,omitempty"`
 	Rank         *RankPolicy      `protobuf:"bytes,7,opt,name=rank,proto3" json:"rank,omitempty"`
 	// Pre-computed query embedding (768-dim embeddinggemma). Skip embed step if set.
-	QueryEmbedding []float32 `protobuf:"fixed32,8,rep,packed,name=query_embedding,json=queryEmbedding,proto3" json:"query_embedding,omitempty"`
-	IncludeDebug   bool      `protobuf:"varint,9,opt,name=include_debug,json=includeDebug,proto3" json:"include_debug,omitempty"`
+	QueryEmbedding []float32                     `protobuf:"fixed32,8,rep,packed,name=query_embedding,json=queryEmbedding,proto3" json:"query_embedding,omitempty"`
+	IncludeDebug   bool                          `protobuf:"varint,9,opt,name=include_debug,json=includeDebug,proto3" json:"include_debug,omitempty"`
+	AtlasContext   *shared.AtlasRequestContextV2 `protobuf:"bytes,11,opt,name=atlas_context,json=atlasContext,proto3" json:"atlas_context,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
 func (x *EvidenceSearchRequest) Reset() {
 	*x = EvidenceSearchRequest{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[0]
+	mi := &file_active_retrieval_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -54,7 +55,7 @@ func (x *EvidenceSearchRequest) String() string {
 func (*EvidenceSearchRequest) ProtoMessage() {}
 
 func (x *EvidenceSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[0]
+	mi := &file_active_retrieval_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -67,7 +68,7 @@ func (x *EvidenceSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EvidenceSearchRequest.ProtoReflect.Descriptor instead.
 func (*EvidenceSearchRequest) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{0}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *EvidenceSearchRequest) GetIds() *shared.RunIds {
@@ -140,20 +141,28 @@ func (x *EvidenceSearchRequest) GetIncludeDebug() bool {
 	return false
 }
 
+func (x *EvidenceSearchRequest) GetAtlasContext() *shared.AtlasRequestContextV2 {
+	if x != nil {
+		return x.AtlasContext
+	}
+	return nil
+}
+
 type EvidenceSearchResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Results       []*SearchResult        `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`
-	Bundles       []*ContextBundle       `protobuf:"bytes,2,rep,name=bundles,proto3" json:"bundles,omitempty"`
-	Timing        *SearchTiming          `protobuf:"bytes,3,opt,name=timing,proto3" json:"timing,omitempty"`
-	CacheSource   string                 `protobuf:"bytes,4,opt,name=cache_source,json=cacheSource,proto3" json:"cache_source,omitempty"` // "memory", "redis", or ""
-	DebugJson     string                 `protobuf:"bytes,5,opt,name=debug_json,json=debugJson,proto3" json:"debug_json,omitempty"`
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Results       []*SearchResult            `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`
+	Bundles       []*ContextBundle           `protobuf:"bytes,2,rep,name=bundles,proto3" json:"bundles,omitempty"`
+	Timing        *SearchTiming              `protobuf:"bytes,3,opt,name=timing,proto3" json:"timing,omitempty"`
+	CacheSource   string                     `protobuf:"bytes,4,opt,name=cache_source,json=cacheSource,proto3" json:"cache_source,omitempty"` // "memory", "redis", or ""
+	DebugJson     string                     `protobuf:"bytes,5,opt,name=debug_json,json=debugJson,proto3" json:"debug_json,omitempty"`
+	Receipt       *shared.AtlasToolReceiptV2 `protobuf:"bytes,6,opt,name=receipt,proto3" json:"receipt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *EvidenceSearchResponse) Reset() {
 	*x = EvidenceSearchResponse{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[1]
+	mi := &file_active_retrieval_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -165,7 +174,7 @@ func (x *EvidenceSearchResponse) String() string {
 func (*EvidenceSearchResponse) ProtoMessage() {}
 
 func (x *EvidenceSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[1]
+	mi := &file_active_retrieval_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -178,7 +187,7 @@ func (x *EvidenceSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EvidenceSearchResponse.ProtoReflect.Descriptor instead.
 func (*EvidenceSearchResponse) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{1}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *EvidenceSearchResponse) GetResults() []*SearchResult {
@@ -216,6 +225,13 @@ func (x *EvidenceSearchResponse) GetDebugJson() string {
 	return ""
 }
 
+func (x *EvidenceSearchResponse) GetReceipt() *shared.AtlasToolReceiptV2 {
+	if x != nil {
+		return x.Receipt
+	}
+	return nil
+}
+
 type EvidenceBundleEvent struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Event:
@@ -230,7 +246,7 @@ type EvidenceBundleEvent struct {
 
 func (x *EvidenceBundleEvent) Reset() {
 	*x = EvidenceBundleEvent{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[2]
+	mi := &file_active_retrieval_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -242,7 +258,7 @@ func (x *EvidenceBundleEvent) String() string {
 func (*EvidenceBundleEvent) ProtoMessage() {}
 
 func (x *EvidenceBundleEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[2]
+	mi := &file_active_retrieval_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -255,7 +271,7 @@ func (x *EvidenceBundleEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EvidenceBundleEvent.ProtoReflect.Descriptor instead.
 func (*EvidenceBundleEvent) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{2}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *EvidenceBundleEvent) GetEvent() isEvidenceBundleEvent_Event {
@@ -328,7 +344,7 @@ type SearchResult struct {
 
 func (x *SearchResult) Reset() {
 	*x = SearchResult{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[3]
+	mi := &file_active_retrieval_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -340,7 +356,7 @@ func (x *SearchResult) String() string {
 func (*SearchResult) ProtoMessage() {}
 
 func (x *SearchResult) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[3]
+	mi := &file_active_retrieval_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -353,7 +369,7 @@ func (x *SearchResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchResult.ProtoReflect.Descriptor instead.
 func (*SearchResult) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{3}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SearchResult) GetEvidenceId() string {
@@ -413,7 +429,7 @@ type ChunkMetadata struct {
 
 func (x *ChunkMetadata) Reset() {
 	*x = ChunkMetadata{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[4]
+	mi := &file_active_retrieval_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -425,7 +441,7 @@ func (x *ChunkMetadata) String() string {
 func (*ChunkMetadata) ProtoMessage() {}
 
 func (x *ChunkMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[4]
+	mi := &file_active_retrieval_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -438,7 +454,7 @@ func (x *ChunkMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChunkMetadata.ProtoReflect.Descriptor instead.
 func (*ChunkMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{4}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ChunkMetadata) GetSectionPath() []string {
@@ -503,7 +519,7 @@ type RerankExplain struct {
 
 func (x *RerankExplain) Reset() {
 	*x = RerankExplain{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[5]
+	mi := &file_active_retrieval_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -515,7 +531,7 @@ func (x *RerankExplain) String() string {
 func (*RerankExplain) ProtoMessage() {}
 
 func (x *RerankExplain) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[5]
+	mi := &file_active_retrieval_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -528,7 +544,7 @@ func (x *RerankExplain) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RerankExplain.ProtoReflect.Descriptor instead.
 func (*RerankExplain) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{5}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *RerankExplain) GetCosine() float32 {
@@ -583,7 +599,7 @@ type ContextBundle struct {
 
 func (x *ContextBundle) Reset() {
 	*x = ContextBundle{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[6]
+	mi := &file_active_retrieval_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -595,7 +611,7 @@ func (x *ContextBundle) String() string {
 func (*ContextBundle) ProtoMessage() {}
 
 func (x *ContextBundle) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[6]
+	mi := &file_active_retrieval_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -608,7 +624,7 @@ func (x *ContextBundle) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ContextBundle.ProtoReflect.Descriptor instead.
 func (*ContextBundle) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{6}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ContextBundle) GetHit() *SearchResult {
@@ -675,7 +691,7 @@ type GraphNeighbor struct {
 
 func (x *GraphNeighbor) Reset() {
 	*x = GraphNeighbor{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[7]
+	mi := &file_active_retrieval_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -687,7 +703,7 @@ func (x *GraphNeighbor) String() string {
 func (*GraphNeighbor) ProtoMessage() {}
 
 func (x *GraphNeighbor) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[7]
+	mi := &file_active_retrieval_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -700,7 +716,7 @@ func (x *GraphNeighbor) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GraphNeighbor.ProtoReflect.Descriptor instead.
 func (*GraphNeighbor) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{7}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GraphNeighbor) GetNodeId() string {
@@ -767,7 +783,7 @@ type DocumentContext struct {
 
 func (x *DocumentContext) Reset() {
 	*x = DocumentContext{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[8]
+	mi := &file_active_retrieval_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -779,7 +795,7 @@ func (x *DocumentContext) String() string {
 func (*DocumentContext) ProtoMessage() {}
 
 func (x *DocumentContext) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[8]
+	mi := &file_active_retrieval_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -792,7 +808,7 @@ func (x *DocumentContext) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DocumentContext.ProtoReflect.Descriptor instead.
 func (*DocumentContext) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{8}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DocumentContext) GetEvidenceId() string {
@@ -859,7 +875,7 @@ type SearchTiming struct {
 
 func (x *SearchTiming) Reset() {
 	*x = SearchTiming{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[9]
+	mi := &file_active_retrieval_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -871,7 +887,7 @@ func (x *SearchTiming) String() string {
 func (*SearchTiming) ProtoMessage() {}
 
 func (x *SearchTiming) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[9]
+	mi := &file_active_retrieval_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -884,7 +900,7 @@ func (x *SearchTiming) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchTiming.ProtoReflect.Descriptor instead.
 func (*SearchTiming) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{9}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *SearchTiming) GetEmbedMs() float32 {
@@ -956,14 +972,15 @@ type CodebaseSearchRequest struct {
 	// whose query-side encoder is not live yet (e.g. latent_256, blocked on
 	// LATENT256-QUERY-ENCODER-01) returns an explicit error/fallback signal in
 	// CodebaseSearchResponse rather than silently substituting semantic_768.
-	RepresentationId string `protobuf:"bytes,10,opt,name=representation_id,json=representationId,proto3" json:"representation_id,omitempty"`
+	RepresentationId string                        `protobuf:"bytes,10,opt,name=representation_id,json=representationId,proto3" json:"representation_id,omitempty"`
+	AtlasContext     *shared.AtlasRequestContextV2 `protobuf:"bytes,11,opt,name=atlas_context,json=atlasContext,proto3" json:"atlas_context,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
 
 func (x *CodebaseSearchRequest) Reset() {
 	*x = CodebaseSearchRequest{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[10]
+	mi := &file_active_retrieval_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -975,7 +992,7 @@ func (x *CodebaseSearchRequest) String() string {
 func (*CodebaseSearchRequest) ProtoMessage() {}
 
 func (x *CodebaseSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[10]
+	mi := &file_active_retrieval_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -988,7 +1005,7 @@ func (x *CodebaseSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CodebaseSearchRequest.ProtoReflect.Descriptor instead.
 func (*CodebaseSearchRequest) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{10}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *CodebaseSearchRequest) GetQuery() string {
@@ -1061,6 +1078,13 @@ func (x *CodebaseSearchRequest) GetRepresentationId() string {
 	return ""
 }
 
+func (x *CodebaseSearchRequest) GetAtlasContext() *shared.AtlasRequestContextV2 {
+	if x != nil {
+		return x.AtlasContext
+	}
+	return nil
+}
+
 type CodebaseSearchResponse struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	Chunks    []*CodebaseChunk       `protobuf:"bytes,1,rep,name=chunks,proto3" json:"chunks,omitempty"`
@@ -1072,14 +1096,15 @@ type CodebaseSearchResponse struct {
 	// Non-empty only when request.representation_id was set but could not be honored (e.g. its
 	// query-side encoder is not live). representation_used then names the fallback actually
 	// served -- never silent.
-	RepresentationFallbackReason string `protobuf:"bytes,5,opt,name=representation_fallback_reason,json=representationFallbackReason,proto3" json:"representation_fallback_reason,omitempty"`
+	RepresentationFallbackReason string                     `protobuf:"bytes,5,opt,name=representation_fallback_reason,json=representationFallbackReason,proto3" json:"representation_fallback_reason,omitempty"`
+	Receipt                      *shared.AtlasToolReceiptV2 `protobuf:"bytes,6,opt,name=receipt,proto3" json:"receipt,omitempty"`
 	unknownFields                protoimpl.UnknownFields
 	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *CodebaseSearchResponse) Reset() {
 	*x = CodebaseSearchResponse{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[11]
+	mi := &file_active_retrieval_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1091,7 +1116,7 @@ func (x *CodebaseSearchResponse) String() string {
 func (*CodebaseSearchResponse) ProtoMessage() {}
 
 func (x *CodebaseSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[11]
+	mi := &file_active_retrieval_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1104,7 +1129,7 @@ func (x *CodebaseSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CodebaseSearchResponse.ProtoReflect.Descriptor instead.
 func (*CodebaseSearchResponse) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{11}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *CodebaseSearchResponse) GetChunks() []*CodebaseChunk {
@@ -1142,6 +1167,13 @@ func (x *CodebaseSearchResponse) GetRepresentationFallbackReason() string {
 	return ""
 }
 
+func (x *CodebaseSearchResponse) GetReceipt() *shared.AtlasToolReceiptV2 {
+	if x != nil {
+		return x.Receipt
+	}
+	return nil
+}
+
 type CodebaseChunkEvent struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Event:
@@ -1156,7 +1188,7 @@ type CodebaseChunkEvent struct {
 
 func (x *CodebaseChunkEvent) Reset() {
 	*x = CodebaseChunkEvent{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[12]
+	mi := &file_active_retrieval_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1168,7 +1200,7 @@ func (x *CodebaseChunkEvent) String() string {
 func (*CodebaseChunkEvent) ProtoMessage() {}
 
 func (x *CodebaseChunkEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[12]
+	mi := &file_active_retrieval_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1181,7 +1213,7 @@ func (x *CodebaseChunkEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CodebaseChunkEvent.ProtoReflect.Descriptor instead.
 func (*CodebaseChunkEvent) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{12}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *CodebaseChunkEvent) GetEvent() isCodebaseChunkEvent_Event {
@@ -1272,7 +1304,7 @@ type CodebaseChunk struct {
 
 func (x *CodebaseChunk) Reset() {
 	*x = CodebaseChunk{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[13]
+	mi := &file_active_retrieval_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1284,7 +1316,7 @@ func (x *CodebaseChunk) String() string {
 func (*CodebaseChunk) ProtoMessage() {}
 
 func (x *CodebaseChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[13]
+	mi := &file_active_retrieval_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1297,7 +1329,7 @@ func (x *CodebaseChunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CodebaseChunk.ProtoReflect.Descriptor instead.
 func (*CodebaseChunk) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{13}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *CodebaseChunk) GetChunkId() string {
@@ -1458,7 +1490,7 @@ type GraphHopPolicy struct {
 
 func (x *GraphHopPolicy) Reset() {
 	*x = GraphHopPolicy{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[14]
+	mi := &file_active_retrieval_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1470,7 +1502,7 @@ func (x *GraphHopPolicy) String() string {
 func (*GraphHopPolicy) ProtoMessage() {}
 
 func (x *GraphHopPolicy) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[14]
+	mi := &file_active_retrieval_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1483,7 +1515,7 @@ func (x *GraphHopPolicy) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GraphHopPolicy.ProtoReflect.Descriptor instead.
 func (*GraphHopPolicy) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{14}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GraphHopPolicy) GetMode() int32 {
@@ -1519,7 +1551,7 @@ type PrefilterPolicy struct {
 
 func (x *PrefilterPolicy) Reset() {
 	*x = PrefilterPolicy{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[15]
+	mi := &file_active_retrieval_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1531,7 +1563,7 @@ func (x *PrefilterPolicy) String() string {
 func (*PrefilterPolicy) ProtoMessage() {}
 
 func (x *PrefilterPolicy) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[15]
+	mi := &file_active_retrieval_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1544,7 +1576,7 @@ func (x *PrefilterPolicy) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PrefilterPolicy.ProtoReflect.Descriptor instead.
 func (*PrefilterPolicy) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{15}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *PrefilterPolicy) GetEnableQdrant() bool {
@@ -1586,7 +1618,7 @@ type RankPolicy struct {
 
 func (x *RankPolicy) Reset() {
 	*x = RankPolicy{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[16]
+	mi := &file_active_retrieval_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1598,7 +1630,7 @@ func (x *RankPolicy) String() string {
 func (*RankPolicy) ProtoMessage() {}
 
 func (x *RankPolicy) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[16]
+	mi := &file_active_retrieval_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1611,7 +1643,7 @@ func (x *RankPolicy) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RankPolicy.ProtoReflect.Descriptor instead.
 func (*RankPolicy) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{16}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *RankPolicy) GetCosineWeight() float32 {
@@ -1647,7 +1679,7 @@ type RetrievalProgress struct {
 
 func (x *RetrievalProgress) Reset() {
 	*x = RetrievalProgress{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[17]
+	mi := &file_active_retrieval_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1659,7 +1691,7 @@ func (x *RetrievalProgress) String() string {
 func (*RetrievalProgress) ProtoMessage() {}
 
 func (x *RetrievalProgress) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[17]
+	mi := &file_active_retrieval_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1672,7 +1704,7 @@ func (x *RetrievalProgress) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RetrievalProgress.ProtoReflect.Descriptor instead.
 func (*RetrievalProgress) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{17}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *RetrievalProgress) GetStage() string {
@@ -1714,7 +1746,7 @@ type RetrievalError struct {
 
 func (x *RetrievalError) Reset() {
 	*x = RetrievalError{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[18]
+	mi := &file_active_retrieval_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1726,7 +1758,7 @@ func (x *RetrievalError) String() string {
 func (*RetrievalError) ProtoMessage() {}
 
 func (x *RetrievalError) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[18]
+	mi := &file_active_retrieval_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1739,7 +1771,7 @@ func (x *RetrievalError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RetrievalError.ProtoReflect.Descriptor instead.
 func (*RetrievalError) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{18}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *RetrievalError) GetCode() string {
@@ -1780,7 +1812,7 @@ type RetrievalSourceMetadata struct {
 
 func (x *RetrievalSourceMetadata) Reset() {
 	*x = RetrievalSourceMetadata{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[19]
+	mi := &file_active_retrieval_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1792,7 +1824,7 @@ func (x *RetrievalSourceMetadata) String() string {
 func (*RetrievalSourceMetadata) ProtoMessage() {}
 
 func (x *RetrievalSourceMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[19]
+	mi := &file_active_retrieval_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1805,7 +1837,7 @@ func (x *RetrievalSourceMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RetrievalSourceMetadata.ProtoReflect.Descriptor instead.
 func (*RetrievalSourceMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{19}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *RetrievalSourceMetadata) GetSource() string {
@@ -1883,7 +1915,7 @@ type RetrievalScoreMetadata struct {
 
 func (x *RetrievalScoreMetadata) Reset() {
 	*x = RetrievalScoreMetadata{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[20]
+	mi := &file_active_retrieval_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1895,7 +1927,7 @@ func (x *RetrievalScoreMetadata) String() string {
 func (*RetrievalScoreMetadata) ProtoMessage() {}
 
 func (x *RetrievalScoreMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[20]
+	mi := &file_active_retrieval_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1908,7 +1940,7 @@ func (x *RetrievalScoreMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RetrievalScoreMetadata.ProtoReflect.Descriptor instead.
 func (*RetrievalScoreMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{20}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *RetrievalScoreMetadata) GetScore() float32 {
@@ -1953,7 +1985,7 @@ type RetrievalClusterMetadata struct {
 
 func (x *RetrievalClusterMetadata) Reset() {
 	*x = RetrievalClusterMetadata{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[21]
+	mi := &file_active_retrieval_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1965,7 +1997,7 @@ func (x *RetrievalClusterMetadata) String() string {
 func (*RetrievalClusterMetadata) ProtoMessage() {}
 
 func (x *RetrievalClusterMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[21]
+	mi := &file_active_retrieval_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1978,7 +2010,7 @@ func (x *RetrievalClusterMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RetrievalClusterMetadata.ProtoReflect.Descriptor instead.
 func (*RetrievalClusterMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{21}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *RetrievalClusterMetadata) GetClusterId() string {
@@ -2034,7 +2066,7 @@ type TransportTimestamps struct {
 
 func (x *TransportTimestamps) Reset() {
 	*x = TransportTimestamps{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[22]
+	mi := &file_active_retrieval_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2046,7 +2078,7 @@ func (x *TransportTimestamps) String() string {
 func (*TransportTimestamps) ProtoMessage() {}
 
 func (x *TransportTimestamps) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[22]
+	mi := &file_active_retrieval_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2059,7 +2091,7 @@ func (x *TransportTimestamps) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TransportTimestamps.ProtoReflect.Descriptor instead.
 func (*TransportTimestamps) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{22}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *TransportTimestamps) GetCreatedAt() string {
@@ -2102,7 +2134,7 @@ type SearchChunksRequest struct {
 
 func (x *SearchChunksRequest) Reset() {
 	*x = SearchChunksRequest{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[23]
+	mi := &file_active_retrieval_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2114,7 +2146,7 @@ func (x *SearchChunksRequest) String() string {
 func (*SearchChunksRequest) ProtoMessage() {}
 
 func (x *SearchChunksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[23]
+	mi := &file_active_retrieval_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2127,7 +2159,7 @@ func (x *SearchChunksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchChunksRequest.ProtoReflect.Descriptor instead.
 func (*SearchChunksRequest) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{23}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *SearchChunksRequest) GetQuery() string {
@@ -2229,7 +2261,7 @@ type SearchChunkResult struct {
 
 func (x *SearchChunkResult) Reset() {
 	*x = SearchChunkResult{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[24]
+	mi := &file_active_retrieval_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2241,7 +2273,7 @@ func (x *SearchChunkResult) String() string {
 func (*SearchChunkResult) ProtoMessage() {}
 
 func (x *SearchChunkResult) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[24]
+	mi := &file_active_retrieval_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2254,7 +2286,7 @@ func (x *SearchChunkResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchChunkResult.ProtoReflect.Descriptor instead.
 func (*SearchChunkResult) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{24}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *SearchChunkResult) GetId() string {
@@ -2365,7 +2397,7 @@ type SearchChunksResponse struct {
 
 func (x *SearchChunksResponse) Reset() {
 	*x = SearchChunksResponse{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[25]
+	mi := &file_active_retrieval_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2377,7 +2409,7 @@ func (x *SearchChunksResponse) String() string {
 func (*SearchChunksResponse) ProtoMessage() {}
 
 func (x *SearchChunksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[25]
+	mi := &file_active_retrieval_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2390,7 +2422,7 @@ func (x *SearchChunksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchChunksResponse.ProtoReflect.Descriptor instead.
 func (*SearchChunksResponse) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{25}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *SearchChunksResponse) GetResults() []*SearchChunkResult {
@@ -2417,7 +2449,7 @@ type ClusterSummaryRequest struct {
 
 func (x *ClusterSummaryRequest) Reset() {
 	*x = ClusterSummaryRequest{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[26]
+	mi := &file_active_retrieval_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2429,7 +2461,7 @@ func (x *ClusterSummaryRequest) String() string {
 func (*ClusterSummaryRequest) ProtoMessage() {}
 
 func (x *ClusterSummaryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[26]
+	mi := &file_active_retrieval_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2442,7 +2474,7 @@ func (x *ClusterSummaryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClusterSummaryRequest.ProtoReflect.Descriptor instead.
 func (*ClusterSummaryRequest) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{26}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ClusterSummaryRequest) GetClusterId() int32 {
@@ -2472,7 +2504,7 @@ type ClusterSummaryResponse struct {
 
 func (x *ClusterSummaryResponse) Reset() {
 	*x = ClusterSummaryResponse{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[27]
+	mi := &file_active_retrieval_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2484,7 +2516,7 @@ func (x *ClusterSummaryResponse) String() string {
 func (*ClusterSummaryResponse) ProtoMessage() {}
 
 func (x *ClusterSummaryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[27]
+	mi := &file_active_retrieval_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2497,7 +2529,7 @@ func (x *ClusterSummaryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClusterSummaryResponse.ProtoReflect.Descriptor instead.
 func (*ClusterSummaryResponse) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{27}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ClusterSummaryResponse) GetClusterId() int32 {
@@ -2546,7 +2578,7 @@ type AstExpansionRequest struct {
 
 func (x *AstExpansionRequest) Reset() {
 	*x = AstExpansionRequest{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[28]
+	mi := &file_active_retrieval_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2558,7 +2590,7 @@ func (x *AstExpansionRequest) String() string {
 func (*AstExpansionRequest) ProtoMessage() {}
 
 func (x *AstExpansionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[28]
+	mi := &file_active_retrieval_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2571,7 +2603,7 @@ func (x *AstExpansionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AstExpansionRequest.ProtoReflect.Descriptor instead.
 func (*AstExpansionRequest) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{28}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *AstExpansionRequest) GetSymbol() string {
@@ -2605,7 +2637,7 @@ type AstExpansionResponse struct {
 
 func (x *AstExpansionResponse) Reset() {
 	*x = AstExpansionResponse{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[29]
+	mi := &file_active_retrieval_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2617,7 +2649,7 @@ func (x *AstExpansionResponse) String() string {
 func (*AstExpansionResponse) ProtoMessage() {}
 
 func (x *AstExpansionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[29]
+	mi := &file_active_retrieval_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2630,7 +2662,7 @@ func (x *AstExpansionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AstExpansionResponse.ProtoReflect.Descriptor instead.
 func (*AstExpansionResponse) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{29}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *AstExpansionResponse) GetNeighbors() []*AstNode {
@@ -2659,7 +2691,7 @@ type AstNode struct {
 
 func (x *AstNode) Reset() {
 	*x = AstNode{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[30]
+	mi := &file_active_retrieval_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2671,7 +2703,7 @@ func (x *AstNode) String() string {
 func (*AstNode) ProtoMessage() {}
 
 func (x *AstNode) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[30]
+	mi := &file_active_retrieval_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2684,7 +2716,7 @@ func (x *AstNode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AstNode.ProtoReflect.Descriptor instead.
 func (*AstNode) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{30}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *AstNode) GetId() string {
@@ -2726,7 +2758,7 @@ type AstEdge struct {
 
 func (x *AstEdge) Reset() {
 	*x = AstEdge{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[31]
+	mi := &file_active_retrieval_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2738,7 +2770,7 @@ func (x *AstEdge) String() string {
 func (*AstEdge) ProtoMessage() {}
 
 func (x *AstEdge) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[31]
+	mi := &file_active_retrieval_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2751,7 +2783,7 @@ func (x *AstEdge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AstEdge.ProtoReflect.Descriptor instead.
 func (*AstEdge) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{31}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *AstEdge) GetSourceId() string {
@@ -2775,6 +2807,690 @@ func (x *AstEdge) GetEdgeType() string {
 	return ""
 }
 
+type SemanticAstPacketRequest struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	AtlasContext  *shared.AtlasRequestContextV2 `protobuf:"bytes,1,opt,name=atlas_context,json=atlasContext,proto3" json:"atlas_context,omitempty"`
+	SourceRef     string                        `protobuf:"bytes,2,opt,name=source_ref,json=sourceRef,proto3" json:"source_ref,omitempty"`
+	PacketKey     string                        `protobuf:"bytes,3,opt,name=packet_key,json=packetKey,proto3" json:"packet_key,omitempty"`
+	Limit         int32                         `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SemanticAstPacketRequest) Reset() {
+	*x = SemanticAstPacketRequest{}
+	mi := &file_active_retrieval_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SemanticAstPacketRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SemanticAstPacketRequest) ProtoMessage() {}
+
+func (x *SemanticAstPacketRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_active_retrieval_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SemanticAstPacketRequest.ProtoReflect.Descriptor instead.
+func (*SemanticAstPacketRequest) Descriptor() ([]byte, []int) {
+	return file_active_retrieval_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *SemanticAstPacketRequest) GetAtlasContext() *shared.AtlasRequestContextV2 {
+	if x != nil {
+		return x.AtlasContext
+	}
+	return nil
+}
+
+func (x *SemanticAstPacketRequest) GetSourceRef() string {
+	if x != nil {
+		return x.SourceRef
+	}
+	return ""
+}
+
+func (x *SemanticAstPacketRequest) GetPacketKey() string {
+	if x != nil {
+		return x.PacketKey
+	}
+	return ""
+}
+
+func (x *SemanticAstPacketRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type SemanticAstPacketResponse struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Packets       []*SemanticAstPacket       `protobuf:"bytes,1,rep,name=packets,proto3" json:"packets,omitempty"`
+	Receipt       *shared.AtlasToolReceiptV2 `protobuf:"bytes,2,opt,name=receipt,proto3" json:"receipt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SemanticAstPacketResponse) Reset() {
+	*x = SemanticAstPacketResponse{}
+	mi := &file_active_retrieval_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SemanticAstPacketResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SemanticAstPacketResponse) ProtoMessage() {}
+
+func (x *SemanticAstPacketResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_active_retrieval_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SemanticAstPacketResponse.ProtoReflect.Descriptor instead.
+func (*SemanticAstPacketResponse) Descriptor() ([]byte, []int) {
+	return file_active_retrieval_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *SemanticAstPacketResponse) GetPackets() []*SemanticAstPacket {
+	if x != nil {
+		return x.Packets
+	}
+	return nil
+}
+
+func (x *SemanticAstPacketResponse) GetReceipt() *shared.AtlasToolReceiptV2 {
+	if x != nil {
+		return x.Receipt
+	}
+	return nil
+}
+
+type SemanticAstPacket struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	WorkspaceId       string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	WorkspaceRevision string                 `protobuf:"bytes,2,opt,name=workspace_revision,json=workspaceRevision,proto3" json:"workspace_revision,omitempty"`
+	PacketKey         string                 `protobuf:"bytes,3,opt,name=packet_key,json=packetKey,proto3" json:"packet_key,omitempty"`
+	PacketRevision    string                 `protobuf:"bytes,4,opt,name=packet_revision,json=packetRevision,proto3" json:"packet_revision,omitempty"`
+	SourceRef         string                 `protobuf:"bytes,5,opt,name=source_ref,json=sourceRef,proto3" json:"source_ref,omitempty"`
+	SourceRevision    string                 `protobuf:"bytes,6,opt,name=source_revision,json=sourceRevision,proto3" json:"source_revision,omitempty"`
+	ContentHash       string                 `protobuf:"bytes,7,opt,name=content_hash,json=contentHash,proto3" json:"content_hash,omitempty"`
+	ChunkId           string                 `protobuf:"bytes,8,opt,name=chunk_id,json=chunkId,proto3" json:"chunk_id,omitempty"`
+	TreeNodeId        string                 `protobuf:"bytes,9,opt,name=tree_node_id,json=treeNodeId,proto3" json:"tree_node_id,omitempty"`
+	NodeKind          string                 `protobuf:"bytes,10,opt,name=node_kind,json=nodeKind,proto3" json:"node_kind,omitempty"`
+	QualifiedSymbol   string                 `protobuf:"bytes,11,opt,name=qualified_symbol,json=qualifiedSymbol,proto3" json:"qualified_symbol,omitempty"`
+	ParentTreeNodeId  string                 `protobuf:"bytes,12,opt,name=parent_tree_node_id,json=parentTreeNodeId,proto3" json:"parent_tree_node_id,omitempty"`
+	ByteStart         int64                  `protobuf:"varint,13,opt,name=byte_start,json=byteStart,proto3" json:"byte_start,omitempty"`
+	ByteEnd           int64                  `protobuf:"varint,14,opt,name=byte_end,json=byteEnd,proto3" json:"byte_end,omitempty"`
+	ParserName        string                 `protobuf:"bytes,15,opt,name=parser_name,json=parserName,proto3" json:"parser_name,omitempty"`
+	ParserRevision    string                 `protobuf:"bytes,16,opt,name=parser_revision,json=parserRevision,proto3" json:"parser_revision,omitempty"`
+	GrammarRevision   string                 `protobuf:"bytes,17,opt,name=grammar_revision,json=grammarRevision,proto3" json:"grammar_revision,omitempty"`
+	AstContentHash    string                 `protobuf:"bytes,18,opt,name=ast_content_hash,json=astContentHash,proto3" json:"ast_content_hash,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *SemanticAstPacket) Reset() {
+	*x = SemanticAstPacket{}
+	mi := &file_active_retrieval_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SemanticAstPacket) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SemanticAstPacket) ProtoMessage() {}
+
+func (x *SemanticAstPacket) ProtoReflect() protoreflect.Message {
+	mi := &file_active_retrieval_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SemanticAstPacket.ProtoReflect.Descriptor instead.
+func (*SemanticAstPacket) Descriptor() ([]byte, []int) {
+	return file_active_retrieval_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *SemanticAstPacket) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetWorkspaceRevision() string {
+	if x != nil {
+		return x.WorkspaceRevision
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetPacketKey() string {
+	if x != nil {
+		return x.PacketKey
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetPacketRevision() string {
+	if x != nil {
+		return x.PacketRevision
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetSourceRef() string {
+	if x != nil {
+		return x.SourceRef
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetSourceRevision() string {
+	if x != nil {
+		return x.SourceRevision
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetContentHash() string {
+	if x != nil {
+		return x.ContentHash
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetChunkId() string {
+	if x != nil {
+		return x.ChunkId
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetTreeNodeId() string {
+	if x != nil {
+		return x.TreeNodeId
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetNodeKind() string {
+	if x != nil {
+		return x.NodeKind
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetQualifiedSymbol() string {
+	if x != nil {
+		return x.QualifiedSymbol
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetParentTreeNodeId() string {
+	if x != nil {
+		return x.ParentTreeNodeId
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetByteStart() int64 {
+	if x != nil {
+		return x.ByteStart
+	}
+	return 0
+}
+
+func (x *SemanticAstPacket) GetByteEnd() int64 {
+	if x != nil {
+		return x.ByteEnd
+	}
+	return 0
+}
+
+func (x *SemanticAstPacket) GetParserName() string {
+	if x != nil {
+		return x.ParserName
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetParserRevision() string {
+	if x != nil {
+		return x.ParserRevision
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetGrammarRevision() string {
+	if x != nil {
+		return x.GrammarRevision
+	}
+	return ""
+}
+
+func (x *SemanticAstPacket) GetAstContentHash() string {
+	if x != nil {
+		return x.AstContentHash
+	}
+	return ""
+}
+
+type PacketRegistryRequest struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	AtlasContext  *shared.AtlasRequestContextV2 `protobuf:"bytes,1,opt,name=atlas_context,json=atlasContext,proto3" json:"atlas_context,omitempty"`
+	SourceRef     string                        `protobuf:"bytes,2,opt,name=source_ref,json=sourceRef,proto3" json:"source_ref,omitempty"`
+	PacketKey     string                        `protobuf:"bytes,3,opt,name=packet_key,json=packetKey,proto3" json:"packet_key,omitempty"`
+	Limit         int32                         `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PacketRegistryRequest) Reset() {
+	*x = PacketRegistryRequest{}
+	mi := &file_active_retrieval_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PacketRegistryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PacketRegistryRequest) ProtoMessage() {}
+
+func (x *PacketRegistryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_active_retrieval_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PacketRegistryRequest.ProtoReflect.Descriptor instead.
+func (*PacketRegistryRequest) Descriptor() ([]byte, []int) {
+	return file_active_retrieval_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *PacketRegistryRequest) GetAtlasContext() *shared.AtlasRequestContextV2 {
+	if x != nil {
+		return x.AtlasContext
+	}
+	return nil
+}
+
+func (x *PacketRegistryRequest) GetSourceRef() string {
+	if x != nil {
+		return x.SourceRef
+	}
+	return ""
+}
+
+func (x *PacketRegistryRequest) GetPacketKey() string {
+	if x != nil {
+		return x.PacketKey
+	}
+	return ""
+}
+
+func (x *PacketRegistryRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type PacketRegistryResponse struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Entries       []*PacketRegistryEntry     `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
+	Receipt       *shared.AtlasToolReceiptV2 `protobuf:"bytes,2,opt,name=receipt,proto3" json:"receipt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PacketRegistryResponse) Reset() {
+	*x = PacketRegistryResponse{}
+	mi := &file_active_retrieval_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PacketRegistryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PacketRegistryResponse) ProtoMessage() {}
+
+func (x *PacketRegistryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_active_retrieval_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PacketRegistryResponse.ProtoReflect.Descriptor instead.
+func (*PacketRegistryResponse) Descriptor() ([]byte, []int) {
+	return file_active_retrieval_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *PacketRegistryResponse) GetEntries() []*PacketRegistryEntry {
+	if x != nil {
+		return x.Entries
+	}
+	return nil
+}
+
+func (x *PacketRegistryResponse) GetReceipt() *shared.AtlasToolReceiptV2 {
+	if x != nil {
+		return x.Receipt
+	}
+	return nil
+}
+
+type PacketRegistryEntry struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Schema            string                 `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
+	WorkspaceId       string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	WorkspaceRevision string                 `protobuf:"bytes,3,opt,name=workspace_revision,json=workspaceRevision,proto3" json:"workspace_revision,omitempty"`
+	PacketKey         string                 `protobuf:"bytes,4,opt,name=packet_key,json=packetKey,proto3" json:"packet_key,omitempty"`
+	PacketRevision    string                 `protobuf:"bytes,5,opt,name=packet_revision,json=packetRevision,proto3" json:"packet_revision,omitempty"`
+	SourceRef         string                 `protobuf:"bytes,6,opt,name=source_ref,json=sourceRef,proto3" json:"source_ref,omitempty"`
+	SourceRevision    string                 `protobuf:"bytes,7,opt,name=source_revision,json=sourceRevision,proto3" json:"source_revision,omitempty"`
+	ContentHash       string                 `protobuf:"bytes,8,opt,name=content_hash,json=contentHash,proto3" json:"content_hash,omitempty"`
+	Lanes             []*PacketRegistryLane  `protobuf:"bytes,9,rep,name=lanes,proto3" json:"lanes,omitempty"`
+	RegistryRevision  string                 `protobuf:"bytes,10,opt,name=registry_revision,json=registryRevision,proto3" json:"registry_revision,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *PacketRegistryEntry) Reset() {
+	*x = PacketRegistryEntry{}
+	mi := &file_active_retrieval_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PacketRegistryEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PacketRegistryEntry) ProtoMessage() {}
+
+func (x *PacketRegistryEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_active_retrieval_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PacketRegistryEntry.ProtoReflect.Descriptor instead.
+func (*PacketRegistryEntry) Descriptor() ([]byte, []int) {
+	return file_active_retrieval_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *PacketRegistryEntry) GetSchema() string {
+	if x != nil {
+		return x.Schema
+	}
+	return ""
+}
+
+func (x *PacketRegistryEntry) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
+}
+
+func (x *PacketRegistryEntry) GetWorkspaceRevision() string {
+	if x != nil {
+		return x.WorkspaceRevision
+	}
+	return ""
+}
+
+func (x *PacketRegistryEntry) GetPacketKey() string {
+	if x != nil {
+		return x.PacketKey
+	}
+	return ""
+}
+
+func (x *PacketRegistryEntry) GetPacketRevision() string {
+	if x != nil {
+		return x.PacketRevision
+	}
+	return ""
+}
+
+func (x *PacketRegistryEntry) GetSourceRef() string {
+	if x != nil {
+		return x.SourceRef
+	}
+	return ""
+}
+
+func (x *PacketRegistryEntry) GetSourceRevision() string {
+	if x != nil {
+		return x.SourceRevision
+	}
+	return ""
+}
+
+func (x *PacketRegistryEntry) GetContentHash() string {
+	if x != nil {
+		return x.ContentHash
+	}
+	return ""
+}
+
+func (x *PacketRegistryEntry) GetLanes() []*PacketRegistryLane {
+	if x != nil {
+		return x.Lanes
+	}
+	return nil
+}
+
+func (x *PacketRegistryEntry) GetRegistryRevision() string {
+	if x != nil {
+		return x.RegistryRevision
+	}
+	return ""
+}
+
+type PacketRegistryLane struct {
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	LaneId                 string                 `protobuf:"bytes,1,opt,name=lane_id,json=laneId,proto3" json:"lane_id,omitempty"`
+	Kind                   string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"`
+	Owner                  string                 `protobuf:"bytes,3,opt,name=owner,proto3" json:"owner,omitempty"`
+	Status                 string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	RepresentationId       string                 `protobuf:"bytes,5,opt,name=representation_id,json=representationId,proto3" json:"representation_id,omitempty"`
+	RepresentationRevision string                 `protobuf:"bytes,6,opt,name=representation_revision,json=representationRevision,proto3" json:"representation_revision,omitempty"`
+	ModelRevision          string                 `protobuf:"bytes,7,opt,name=model_revision,json=modelRevision,proto3" json:"model_revision,omitempty"`
+	Collection             string                 `protobuf:"bytes,8,opt,name=collection,proto3" json:"collection,omitempty"`
+	VectorName             string                 `protobuf:"bytes,9,opt,name=vector_name,json=vectorName,proto3" json:"vector_name,omitempty"`
+	Tags                   []string               `protobuf:"bytes,10,rep,name=tags,proto3" json:"tags,omitempty"`
+	IndexAlgorithm         string                 `protobuf:"bytes,11,opt,name=index_algorithm,json=indexAlgorithm,proto3" json:"index_algorithm,omitempty"`
+	IndexRevision          string                 `protobuf:"bytes,12,opt,name=index_revision,json=indexRevision,proto3" json:"index_revision,omitempty"`
+	ProjectionChecksum     string                 `protobuf:"bytes,13,opt,name=projection_checksum,json=projectionChecksum,proto3" json:"projection_checksum,omitempty"`
+	WritePolicy            string                 `protobuf:"bytes,14,opt,name=write_policy,json=writePolicy,proto3" json:"write_policy,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *PacketRegistryLane) Reset() {
+	*x = PacketRegistryLane{}
+	mi := &file_active_retrieval_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PacketRegistryLane) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PacketRegistryLane) ProtoMessage() {}
+
+func (x *PacketRegistryLane) ProtoReflect() protoreflect.Message {
+	mi := &file_active_retrieval_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PacketRegistryLane.ProtoReflect.Descriptor instead.
+func (*PacketRegistryLane) Descriptor() ([]byte, []int) {
+	return file_active_retrieval_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *PacketRegistryLane) GetLaneId() string {
+	if x != nil {
+		return x.LaneId
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetOwner() string {
+	if x != nil {
+		return x.Owner
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetRepresentationId() string {
+	if x != nil {
+		return x.RepresentationId
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetRepresentationRevision() string {
+	if x != nil {
+		return x.RepresentationRevision
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetModelRevision() string {
+	if x != nil {
+		return x.ModelRevision
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetCollection() string {
+	if x != nil {
+		return x.Collection
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetVectorName() string {
+	if x != nil {
+		return x.VectorName
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+func (x *PacketRegistryLane) GetIndexAlgorithm() string {
+	if x != nil {
+		return x.IndexAlgorithm
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetIndexRevision() string {
+	if x != nil {
+		return x.IndexRevision
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetProjectionChecksum() string {
+	if x != nil {
+		return x.ProjectionChecksum
+	}
+	return ""
+}
+
+func (x *PacketRegistryLane) GetWritePolicy() string {
+	if x != nil {
+		return x.WritePolicy
+	}
+	return ""
+}
+
 type TopologyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
@@ -2791,7 +3507,7 @@ type TopologyRequest struct {
 
 func (x *TopologyRequest) Reset() {
 	*x = TopologyRequest{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[32]
+	mi := &file_active_retrieval_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2803,7 +3519,7 @@ func (x *TopologyRequest) String() string {
 func (*TopologyRequest) ProtoMessage() {}
 
 func (x *TopologyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[32]
+	mi := &file_active_retrieval_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2816,7 +3532,7 @@ func (x *TopologyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TopologyRequest.ProtoReflect.Descriptor instead.
 func (*TopologyRequest) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{32}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *TopologyRequest) GetQuery() string {
@@ -2886,7 +3602,7 @@ type TopologyResponse struct {
 
 func (x *TopologyResponse) Reset() {
 	*x = TopologyResponse{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[33]
+	mi := &file_active_retrieval_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2898,7 +3614,7 @@ func (x *TopologyResponse) String() string {
 func (*TopologyResponse) ProtoMessage() {}
 
 func (x *TopologyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[33]
+	mi := &file_active_retrieval_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2911,7 +3627,7 @@ func (x *TopologyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TopologyResponse.ProtoReflect.Descriptor instead.
 func (*TopologyResponse) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{33}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *TopologyResponse) GetNeighbors() []*SearchChunkResult {
@@ -2954,7 +3670,7 @@ type ResearchContextRequest struct {
 
 func (x *ResearchContextRequest) Reset() {
 	*x = ResearchContextRequest{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[34]
+	mi := &file_active_retrieval_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2966,7 +3682,7 @@ func (x *ResearchContextRequest) String() string {
 func (*ResearchContextRequest) ProtoMessage() {}
 
 func (x *ResearchContextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[34]
+	mi := &file_active_retrieval_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2979,7 +3695,7 @@ func (x *ResearchContextRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResearchContextRequest.ProtoReflect.Descriptor instead.
 func (*ResearchContextRequest) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{34}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *ResearchContextRequest) GetQuery() string {
@@ -3080,7 +3796,7 @@ type ResearchContextChunk struct {
 
 func (x *ResearchContextChunk) Reset() {
 	*x = ResearchContextChunk{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[35]
+	mi := &file_active_retrieval_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3092,7 +3808,7 @@ func (x *ResearchContextChunk) String() string {
 func (*ResearchContextChunk) ProtoMessage() {}
 
 func (x *ResearchContextChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[35]
+	mi := &file_active_retrieval_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3105,7 +3821,7 @@ func (x *ResearchContextChunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResearchContextChunk.ProtoReflect.Descriptor instead.
 func (*ResearchContextChunk) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{35}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *ResearchContextChunk) GetId() string {
@@ -3209,7 +3925,7 @@ type ResearchContextResponse struct {
 
 func (x *ResearchContextResponse) Reset() {
 	*x = ResearchContextResponse{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[36]
+	mi := &file_active_retrieval_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3221,7 +3937,7 @@ func (x *ResearchContextResponse) String() string {
 func (*ResearchContextResponse) ProtoMessage() {}
 
 func (x *ResearchContextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[36]
+	mi := &file_active_retrieval_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3234,7 +3950,7 @@ func (x *ResearchContextResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResearchContextResponse.ProtoReflect.Descriptor instead.
 func (*ResearchContextResponse) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{36}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ResearchContextResponse) GetResearch() []*ResearchContextChunk {
@@ -3260,7 +3976,7 @@ type HealthRequest struct {
 
 func (x *HealthRequest) Reset() {
 	*x = HealthRequest{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[37]
+	mi := &file_active_retrieval_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3272,7 +3988,7 @@ func (x *HealthRequest) String() string {
 func (*HealthRequest) ProtoMessage() {}
 
 func (x *HealthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[37]
+	mi := &file_active_retrieval_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3285,7 +4001,7 @@ func (x *HealthRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HealthRequest.ProtoReflect.Descriptor instead.
 func (*HealthRequest) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{37}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *HealthRequest) GetService() string {
@@ -3309,7 +4025,7 @@ type HealthResponse struct {
 
 func (x *HealthResponse) Reset() {
 	*x = HealthResponse{}
-	mi := &file_proto_active_retrieval_proto_msgTypes[38]
+	mi := &file_active_retrieval_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3321,7 +4037,7 @@ func (x *HealthResponse) String() string {
 func (*HealthResponse) ProtoMessage() {}
 
 func (x *HealthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_active_retrieval_proto_msgTypes[38]
+	mi := &file_active_retrieval_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3334,7 +4050,7 @@ func (x *HealthResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HealthResponse.ProtoReflect.Descriptor instead.
 func (*HealthResponse) Descriptor() ([]byte, []int) {
-	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{38}
+	return file_active_retrieval_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *HealthResponse) GetStatus() string {
@@ -3379,11 +4095,11 @@ func (x *HealthResponse) GetTimestamp() int64 {
 	return 0
 }
 
-var File_proto_active_retrieval_proto protoreflect.FileDescriptor
+var File_active_retrieval_proto protoreflect.FileDescriptor
 
-const file_proto_active_retrieval_proto_rawDesc = "" +
+const file_active_retrieval_proto_rawDesc = "" +
 	"\n" +
-	"\x1cproto/active/retrieval.proto\x12\x0fyorha.retrieval\x1a\x10shared_ids.proto\"\x9e\x03\n" +
+	"\x16active/retrieval.proto\x12\x0fyorha.retrieval\x1a\x10shared_ids.proto\"\xe8\x03\n" +
 	"\x15EvidenceSearchRequest\x12&\n" +
 	"\x03ids\x18\n" +
 	" \x01(\v2\x14.yorha.shared.RunIdsR\x03ids\x12\x14\n" +
@@ -3395,14 +4111,16 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\tprefilter\x18\x06 \x01(\v2 .yorha.retrieval.PrefilterPolicyR\tprefilter\x12/\n" +
 	"\x04rank\x18\a \x01(\v2\x1b.yorha.retrieval.RankPolicyR\x04rank\x12+\n" +
 	"\x0fquery_embedding\x18\b \x03(\x02B\x02\x10\x01R\x0equeryEmbedding\x12#\n" +
-	"\rinclude_debug\x18\t \x01(\bR\fincludeDebug\"\x84\x02\n" +
+	"\rinclude_debug\x18\t \x01(\bR\fincludeDebug\x12H\n" +
+	"\ratlas_context\x18\v \x01(\v2#.yorha.shared.AtlasRequestContextV2R\fatlasContext\"\xc0\x02\n" +
 	"\x16EvidenceSearchResponse\x127\n" +
 	"\aresults\x18\x01 \x03(\v2\x1d.yorha.retrieval.SearchResultR\aresults\x128\n" +
 	"\abundles\x18\x02 \x03(\v2\x1e.yorha.retrieval.ContextBundleR\abundles\x125\n" +
 	"\x06timing\x18\x03 \x01(\v2\x1d.yorha.retrieval.SearchTimingR\x06timing\x12!\n" +
 	"\fcache_source\x18\x04 \x01(\tR\vcacheSource\x12\x1d\n" +
 	"\n" +
-	"debug_json\x18\x05 \x01(\tR\tdebugJson\"\xd3\x01\n" +
+	"debug_json\x18\x05 \x01(\tR\tdebugJson\x12:\n" +
+	"\areceipt\x18\x06 \x01(\v2 .yorha.shared.AtlasToolReceiptV2R\areceipt\"\xd3\x01\n" +
 	"\x13EvidenceBundleEvent\x128\n" +
 	"\x06bundle\x18\x01 \x01(\v2\x1e.yorha.retrieval.ContextBundleH\x00R\x06bundle\x12@\n" +
 	"\bprogress\x18\x02 \x01(\v2\".yorha.retrieval.RetrievalProgressH\x00R\bprogress\x127\n" +
@@ -3469,7 +4187,7 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\x06hop_ms\x18\x04 \x01(\x02R\x05hopMs\x12\x15\n" +
 	"\x06kag_ms\x18\x05 \x01(\x02R\x05kagMs\x12\x15\n" +
 	"\x06dag_ms\x18\x06 \x01(\x02R\x05dagMs\x12\x19\n" +
-	"\btotal_ms\x18\a \x01(\x02R\atotalMs\"\xe4\x02\n" +
+	"\btotal_ms\x18\a \x01(\x02R\atotalMs\"\xae\x03\n" +
 	"\x15CodebaseSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12%\n" +
@@ -3483,14 +4201,16 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\vpacket_keys\x18\t \x03(\tR\n" +
 	"packetKeys\x12+\n" +
 	"\x11representation_id\x18\n" +
-	" \x01(\tR\x10representationId\"\x81\x02\n" +
+	" \x01(\tR\x10representationId\x12H\n" +
+	"\ratlas_context\x18\v \x01(\v2#.yorha.shared.AtlasRequestContextV2R\fatlasContext\"\xbd\x02\n" +
 	"\x16CodebaseSearchResponse\x126\n" +
 	"\x06chunks\x18\x01 \x03(\v2\x1e.yorha.retrieval.CodebaseChunkR\x06chunks\x12\x19\n" +
 	"\btotal_ms\x18\x02 \x01(\x02R\atotalMs\x12\x1d\n" +
 	"\n" +
 	"debug_json\x18\x03 \x01(\tR\tdebugJson\x12/\n" +
 	"\x13representation_used\x18\x04 \x01(\tR\x12representationUsed\x12D\n" +
-	"\x1erepresentation_fallback_reason\x18\x05 \x01(\tR\x1crepresentationFallbackReason\"\xd0\x01\n" +
+	"\x1erepresentation_fallback_reason\x18\x05 \x01(\tR\x1crepresentationFallbackReason\x12:\n" +
+	"\areceipt\x18\x06 \x01(\v2 .yorha.shared.AtlasToolReceiptV2R\areceipt\"\xd0\x01\n" +
 	"\x12CodebaseChunkEvent\x126\n" +
 	"\x05chunk\x18\x01 \x01(\v2\x1e.yorha.retrieval.CodebaseChunkH\x00R\x05chunk\x12@\n" +
 	"\bprogress\x18\x02 \x01(\v2\".yorha.retrieval.RetrievalProgressH\x00R\bprogress\x127\n" +
@@ -3652,7 +4372,85 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\aAstEdge\x12\x1b\n" +
 	"\tsource_id\x18\x01 \x01(\tR\bsourceId\x12\x1b\n" +
 	"\ttarget_id\x18\x02 \x01(\tR\btargetId\x12\x1b\n" +
-	"\tedge_type\x18\x03 \x01(\tR\bedgeType\"\xe1\x01\n" +
+	"\tedge_type\x18\x03 \x01(\tR\bedgeType\"\xb8\x01\n" +
+	"\x18SemanticAstPacketRequest\x12H\n" +
+	"\ratlas_context\x18\x01 \x01(\v2#.yorha.shared.AtlasRequestContextV2R\fatlasContext\x12\x1d\n" +
+	"\n" +
+	"source_ref\x18\x02 \x01(\tR\tsourceRef\x12\x1d\n" +
+	"\n" +
+	"packet_key\x18\x03 \x01(\tR\tpacketKey\x12\x14\n" +
+	"\x05limit\x18\x04 \x01(\x05R\x05limit\"\x95\x01\n" +
+	"\x19SemanticAstPacketResponse\x12<\n" +
+	"\apackets\x18\x01 \x03(\v2\".yorha.retrieval.SemanticAstPacketR\apackets\x12:\n" +
+	"\areceipt\x18\x02 \x01(\v2 .yorha.shared.AtlasToolReceiptV2R\areceipt\"\xa5\x05\n" +
+	"\x11SemanticAstPacket\x12!\n" +
+	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\x12-\n" +
+	"\x12workspace_revision\x18\x02 \x01(\tR\x11workspaceRevision\x12\x1d\n" +
+	"\n" +
+	"packet_key\x18\x03 \x01(\tR\tpacketKey\x12'\n" +
+	"\x0fpacket_revision\x18\x04 \x01(\tR\x0epacketRevision\x12\x1d\n" +
+	"\n" +
+	"source_ref\x18\x05 \x01(\tR\tsourceRef\x12'\n" +
+	"\x0fsource_revision\x18\x06 \x01(\tR\x0esourceRevision\x12!\n" +
+	"\fcontent_hash\x18\a \x01(\tR\vcontentHash\x12\x19\n" +
+	"\bchunk_id\x18\b \x01(\tR\achunkId\x12 \n" +
+	"\ftree_node_id\x18\t \x01(\tR\n" +
+	"treeNodeId\x12\x1b\n" +
+	"\tnode_kind\x18\n" +
+	" \x01(\tR\bnodeKind\x12)\n" +
+	"\x10qualified_symbol\x18\v \x01(\tR\x0fqualifiedSymbol\x12-\n" +
+	"\x13parent_tree_node_id\x18\f \x01(\tR\x10parentTreeNodeId\x12\x1d\n" +
+	"\n" +
+	"byte_start\x18\r \x01(\x03R\tbyteStart\x12\x19\n" +
+	"\bbyte_end\x18\x0e \x01(\x03R\abyteEnd\x12\x1f\n" +
+	"\vparser_name\x18\x0f \x01(\tR\n" +
+	"parserName\x12'\n" +
+	"\x0fparser_revision\x18\x10 \x01(\tR\x0eparserRevision\x12)\n" +
+	"\x10grammar_revision\x18\x11 \x01(\tR\x0fgrammarRevision\x12(\n" +
+	"\x10ast_content_hash\x18\x12 \x01(\tR\x0eastContentHash\"\xb5\x01\n" +
+	"\x15PacketRegistryRequest\x12H\n" +
+	"\ratlas_context\x18\x01 \x01(\v2#.yorha.shared.AtlasRequestContextV2R\fatlasContext\x12\x1d\n" +
+	"\n" +
+	"source_ref\x18\x02 \x01(\tR\tsourceRef\x12\x1d\n" +
+	"\n" +
+	"packet_key\x18\x03 \x01(\tR\tpacketKey\x12\x14\n" +
+	"\x05limit\x18\x04 \x01(\x05R\x05limit\"\x94\x01\n" +
+	"\x16PacketRegistryResponse\x12>\n" +
+	"\aentries\x18\x01 \x03(\v2$.yorha.retrieval.PacketRegistryEntryR\aentries\x12:\n" +
+	"\areceipt\x18\x02 \x01(\v2 .yorha.shared.AtlasToolReceiptV2R\areceipt\"\x9a\x03\n" +
+	"\x13PacketRegistryEntry\x12\x16\n" +
+	"\x06schema\x18\x01 \x01(\tR\x06schema\x12!\n" +
+	"\fworkspace_id\x18\x02 \x01(\tR\vworkspaceId\x12-\n" +
+	"\x12workspace_revision\x18\x03 \x01(\tR\x11workspaceRevision\x12\x1d\n" +
+	"\n" +
+	"packet_key\x18\x04 \x01(\tR\tpacketKey\x12'\n" +
+	"\x0fpacket_revision\x18\x05 \x01(\tR\x0epacketRevision\x12\x1d\n" +
+	"\n" +
+	"source_ref\x18\x06 \x01(\tR\tsourceRef\x12'\n" +
+	"\x0fsource_revision\x18\a \x01(\tR\x0esourceRevision\x12!\n" +
+	"\fcontent_hash\x18\b \x01(\tR\vcontentHash\x129\n" +
+	"\x05lanes\x18\t \x03(\v2#.yorha.retrieval.PacketRegistryLaneR\x05lanes\x12+\n" +
+	"\x11registry_revision\x18\n" +
+	" \x01(\tR\x10registryRevision\"\xf5\x03\n" +
+	"\x12PacketRegistryLane\x12\x17\n" +
+	"\alane_id\x18\x01 \x01(\tR\x06laneId\x12\x12\n" +
+	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x14\n" +
+	"\x05owner\x18\x03 \x01(\tR\x05owner\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x12+\n" +
+	"\x11representation_id\x18\x05 \x01(\tR\x10representationId\x127\n" +
+	"\x17representation_revision\x18\x06 \x01(\tR\x16representationRevision\x12%\n" +
+	"\x0emodel_revision\x18\a \x01(\tR\rmodelRevision\x12\x1e\n" +
+	"\n" +
+	"collection\x18\b \x01(\tR\n" +
+	"collection\x12\x1f\n" +
+	"\vvector_name\x18\t \x01(\tR\n" +
+	"vectorName\x12\x12\n" +
+	"\x04tags\x18\n" +
+	" \x03(\tR\x04tags\x12'\n" +
+	"\x0findex_algorithm\x18\v \x01(\tR\x0eindexAlgorithm\x12%\n" +
+	"\x0eindex_revision\x18\f \x01(\tR\rindexRevision\x12/\n" +
+	"\x13projection_checksum\x18\r \x01(\tR\x12projectionChecksum\x12!\n" +
+	"\fwrite_policy\x18\x0e \x01(\tR\vwritePolicy\"\xe1\x01\n" +
 	"\x0fTopologyRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
 	"\abmu_row\x18\x02 \x01(\x05R\x06bmuRow\x12\x17\n" +
@@ -3708,7 +4506,7 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\x10qdrant_connected\x18\x03 \x01(\bR\x0fqdrantConnected\x12'\n" +
 	"\x0fredis_connected\x18\x04 \x01(\bR\x0eredisConnected\x120\n" +
 	"\x14embedding_service_up\x18\x05 \x01(\bR\x12embeddingServiceUp\x12\x1c\n" +
-	"\ttimestamp\x18\x06 \x01(\x03R\ttimestamp2\xd0\a\n" +
+	"\ttimestamp\x18\x06 \x01(\x03R\ttimestamp2\xa6\t\n" +
 	"\x10RetrievalService\x12a\n" +
 	"\x0eSearchEvidence\x12&.yorha.retrieval.EvidenceSearchRequest\x1a'.yorha.retrieval.EvidenceSearchResponse\x12`\n" +
 	"\x0eStreamEvidence\x12&.yorha.retrieval.EvidenceSearchRequest\x1a$.yorha.retrieval.EvidenceBundleEvent0\x01\x12a\n" +
@@ -3716,143 +4514,169 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\x0eStreamCodebase\x12&.yorha.retrieval.CodebaseSearchRequest\x1a#.yorha.retrieval.CodebaseChunkEvent0\x01\x12[\n" +
 	"\fSearchChunks\x12$.yorha.retrieval.SearchChunksRequest\x1a%.yorha.retrieval.SearchChunksResponse\x12d\n" +
 	"\x11GetClusterSummary\x12&.yorha.retrieval.ClusterSummaryRequest\x1a'.yorha.retrieval.ClusterSummaryResponse\x12a\n" +
-	"\x12ExpandAstNeighbors\x12$.yorha.retrieval.AstExpansionRequest\x1a%.yorha.retrieval.AstExpansionResponse\x12Y\n" +
+	"\x12ExpandAstNeighbors\x12$.yorha.retrieval.AstExpansionRequest\x1a%.yorha.retrieval.AstExpansionResponse\x12n\n" +
+	"\x15GetSemanticAstPackets\x12).yorha.retrieval.SemanticAstPacketRequest\x1a*.yorha.retrieval.SemanticAstPacketResponse\x12d\n" +
+	"\x11GetPacketRegistry\x12&.yorha.retrieval.PacketRegistryRequest\x1a'.yorha.retrieval.PacketRegistryResponse\x12Y\n" +
 	"\x12GetTopologyContext\x12 .yorha.retrieval.TopologyRequest\x1a!.yorha.retrieval.TopologyResponse\x12g\n" +
 	"\x12GetResearchContext\x12'.yorha.retrieval.ResearchContextRequest\x1a(.yorha.retrieval.ResearchContextResponse\x12I\n" +
 	"\x06Health\x12\x1e.yorha.retrieval.HealthRequest\x1a\x1f.yorha.retrieval.HealthResponseB*Z(github.com/deeds-web-app/proto/retrievalb\x06proto3"
 
 var (
-	file_proto_active_retrieval_proto_rawDescOnce sync.Once
-	file_proto_active_retrieval_proto_rawDescData []byte
+	file_active_retrieval_proto_rawDescOnce sync.Once
+	file_active_retrieval_proto_rawDescData []byte
 )
 
-func file_proto_active_retrieval_proto_rawDescGZIP() []byte {
-	file_proto_active_retrieval_proto_rawDescOnce.Do(func() {
-		file_proto_active_retrieval_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_active_retrieval_proto_rawDesc), len(file_proto_active_retrieval_proto_rawDesc)))
+func file_active_retrieval_proto_rawDescGZIP() []byte {
+	file_active_retrieval_proto_rawDescOnce.Do(func() {
+		file_active_retrieval_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_active_retrieval_proto_rawDesc), len(file_active_retrieval_proto_rawDesc)))
 	})
-	return file_proto_active_retrieval_proto_rawDescData
+	return file_active_retrieval_proto_rawDescData
 }
 
-var file_proto_active_retrieval_proto_msgTypes = make([]protoimpl.MessageInfo, 41)
-var file_proto_active_retrieval_proto_goTypes = []any{
-	(*EvidenceSearchRequest)(nil),    // 0: yorha.retrieval.EvidenceSearchRequest
-	(*EvidenceSearchResponse)(nil),   // 1: yorha.retrieval.EvidenceSearchResponse
-	(*EvidenceBundleEvent)(nil),      // 2: yorha.retrieval.EvidenceBundleEvent
-	(*SearchResult)(nil),             // 3: yorha.retrieval.SearchResult
-	(*ChunkMetadata)(nil),            // 4: yorha.retrieval.ChunkMetadata
-	(*RerankExplain)(nil),            // 5: yorha.retrieval.RerankExplain
-	(*ContextBundle)(nil),            // 6: yorha.retrieval.ContextBundle
-	(*GraphNeighbor)(nil),            // 7: yorha.retrieval.GraphNeighbor
-	(*DocumentContext)(nil),          // 8: yorha.retrieval.DocumentContext
-	(*SearchTiming)(nil),             // 9: yorha.retrieval.SearchTiming
-	(*CodebaseSearchRequest)(nil),    // 10: yorha.retrieval.CodebaseSearchRequest
-	(*CodebaseSearchResponse)(nil),   // 11: yorha.retrieval.CodebaseSearchResponse
-	(*CodebaseChunkEvent)(nil),       // 12: yorha.retrieval.CodebaseChunkEvent
-	(*CodebaseChunk)(nil),            // 13: yorha.retrieval.CodebaseChunk
-	(*GraphHopPolicy)(nil),           // 14: yorha.retrieval.GraphHopPolicy
-	(*PrefilterPolicy)(nil),          // 15: yorha.retrieval.PrefilterPolicy
-	(*RankPolicy)(nil),               // 16: yorha.retrieval.RankPolicy
-	(*RetrievalProgress)(nil),        // 17: yorha.retrieval.RetrievalProgress
-	(*RetrievalError)(nil),           // 18: yorha.retrieval.RetrievalError
-	(*RetrievalSourceMetadata)(nil),  // 19: yorha.retrieval.RetrievalSourceMetadata
-	(*RetrievalScoreMetadata)(nil),   // 20: yorha.retrieval.RetrievalScoreMetadata
-	(*RetrievalClusterMetadata)(nil), // 21: yorha.retrieval.RetrievalClusterMetadata
-	(*TransportTimestamps)(nil),      // 22: yorha.retrieval.TransportTimestamps
-	(*SearchChunksRequest)(nil),      // 23: yorha.retrieval.SearchChunksRequest
-	(*SearchChunkResult)(nil),        // 24: yorha.retrieval.SearchChunkResult
-	(*SearchChunksResponse)(nil),     // 25: yorha.retrieval.SearchChunksResponse
-	(*ClusterSummaryRequest)(nil),    // 26: yorha.retrieval.ClusterSummaryRequest
-	(*ClusterSummaryResponse)(nil),   // 27: yorha.retrieval.ClusterSummaryResponse
-	(*AstExpansionRequest)(nil),      // 28: yorha.retrieval.AstExpansionRequest
-	(*AstExpansionResponse)(nil),     // 29: yorha.retrieval.AstExpansionResponse
-	(*AstNode)(nil),                  // 30: yorha.retrieval.AstNode
-	(*AstEdge)(nil),                  // 31: yorha.retrieval.AstEdge
-	(*TopologyRequest)(nil),          // 32: yorha.retrieval.TopologyRequest
-	(*TopologyResponse)(nil),         // 33: yorha.retrieval.TopologyResponse
-	(*ResearchContextRequest)(nil),   // 34: yorha.retrieval.ResearchContextRequest
-	(*ResearchContextChunk)(nil),     // 35: yorha.retrieval.ResearchContextChunk
-	(*ResearchContextResponse)(nil),  // 36: yorha.retrieval.ResearchContextResponse
-	(*HealthRequest)(nil),            // 37: yorha.retrieval.HealthRequest
-	(*HealthResponse)(nil),           // 38: yorha.retrieval.HealthResponse
-	nil,                              // 39: yorha.retrieval.RetrievalSourceMetadata.MetadataEntry
-	nil,                              // 40: yorha.retrieval.ClusterSummaryResponse.MetadataEntry
-	(*shared.RunIds)(nil),            // 41: yorha.shared.RunIds
+var file_active_retrieval_proto_msgTypes = make([]protoimpl.MessageInfo, 48)
+var file_active_retrieval_proto_goTypes = []any{
+	(*EvidenceSearchRequest)(nil),        // 0: yorha.retrieval.EvidenceSearchRequest
+	(*EvidenceSearchResponse)(nil),       // 1: yorha.retrieval.EvidenceSearchResponse
+	(*EvidenceBundleEvent)(nil),          // 2: yorha.retrieval.EvidenceBundleEvent
+	(*SearchResult)(nil),                 // 3: yorha.retrieval.SearchResult
+	(*ChunkMetadata)(nil),                // 4: yorha.retrieval.ChunkMetadata
+	(*RerankExplain)(nil),                // 5: yorha.retrieval.RerankExplain
+	(*ContextBundle)(nil),                // 6: yorha.retrieval.ContextBundle
+	(*GraphNeighbor)(nil),                // 7: yorha.retrieval.GraphNeighbor
+	(*DocumentContext)(nil),              // 8: yorha.retrieval.DocumentContext
+	(*SearchTiming)(nil),                 // 9: yorha.retrieval.SearchTiming
+	(*CodebaseSearchRequest)(nil),        // 10: yorha.retrieval.CodebaseSearchRequest
+	(*CodebaseSearchResponse)(nil),       // 11: yorha.retrieval.CodebaseSearchResponse
+	(*CodebaseChunkEvent)(nil),           // 12: yorha.retrieval.CodebaseChunkEvent
+	(*CodebaseChunk)(nil),                // 13: yorha.retrieval.CodebaseChunk
+	(*GraphHopPolicy)(nil),               // 14: yorha.retrieval.GraphHopPolicy
+	(*PrefilterPolicy)(nil),              // 15: yorha.retrieval.PrefilterPolicy
+	(*RankPolicy)(nil),                   // 16: yorha.retrieval.RankPolicy
+	(*RetrievalProgress)(nil),            // 17: yorha.retrieval.RetrievalProgress
+	(*RetrievalError)(nil),               // 18: yorha.retrieval.RetrievalError
+	(*RetrievalSourceMetadata)(nil),      // 19: yorha.retrieval.RetrievalSourceMetadata
+	(*RetrievalScoreMetadata)(nil),       // 20: yorha.retrieval.RetrievalScoreMetadata
+	(*RetrievalClusterMetadata)(nil),     // 21: yorha.retrieval.RetrievalClusterMetadata
+	(*TransportTimestamps)(nil),          // 22: yorha.retrieval.TransportTimestamps
+	(*SearchChunksRequest)(nil),          // 23: yorha.retrieval.SearchChunksRequest
+	(*SearchChunkResult)(nil),            // 24: yorha.retrieval.SearchChunkResult
+	(*SearchChunksResponse)(nil),         // 25: yorha.retrieval.SearchChunksResponse
+	(*ClusterSummaryRequest)(nil),        // 26: yorha.retrieval.ClusterSummaryRequest
+	(*ClusterSummaryResponse)(nil),       // 27: yorha.retrieval.ClusterSummaryResponse
+	(*AstExpansionRequest)(nil),          // 28: yorha.retrieval.AstExpansionRequest
+	(*AstExpansionResponse)(nil),         // 29: yorha.retrieval.AstExpansionResponse
+	(*AstNode)(nil),                      // 30: yorha.retrieval.AstNode
+	(*AstEdge)(nil),                      // 31: yorha.retrieval.AstEdge
+	(*SemanticAstPacketRequest)(nil),     // 32: yorha.retrieval.SemanticAstPacketRequest
+	(*SemanticAstPacketResponse)(nil),    // 33: yorha.retrieval.SemanticAstPacketResponse
+	(*SemanticAstPacket)(nil),            // 34: yorha.retrieval.SemanticAstPacket
+	(*PacketRegistryRequest)(nil),        // 35: yorha.retrieval.PacketRegistryRequest
+	(*PacketRegistryResponse)(nil),       // 36: yorha.retrieval.PacketRegistryResponse
+	(*PacketRegistryEntry)(nil),          // 37: yorha.retrieval.PacketRegistryEntry
+	(*PacketRegistryLane)(nil),           // 38: yorha.retrieval.PacketRegistryLane
+	(*TopologyRequest)(nil),              // 39: yorha.retrieval.TopologyRequest
+	(*TopologyResponse)(nil),             // 40: yorha.retrieval.TopologyResponse
+	(*ResearchContextRequest)(nil),       // 41: yorha.retrieval.ResearchContextRequest
+	(*ResearchContextChunk)(nil),         // 42: yorha.retrieval.ResearchContextChunk
+	(*ResearchContextResponse)(nil),      // 43: yorha.retrieval.ResearchContextResponse
+	(*HealthRequest)(nil),                // 44: yorha.retrieval.HealthRequest
+	(*HealthResponse)(nil),               // 45: yorha.retrieval.HealthResponse
+	nil,                                  // 46: yorha.retrieval.RetrievalSourceMetadata.MetadataEntry
+	nil,                                  // 47: yorha.retrieval.ClusterSummaryResponse.MetadataEntry
+	(*shared.RunIds)(nil),                // 48: yorha.shared.RunIds
+	(*shared.AtlasRequestContextV2)(nil), // 49: yorha.shared.AtlasRequestContextV2
+	(*shared.AtlasToolReceiptV2)(nil),    // 50: yorha.shared.AtlasToolReceiptV2
 }
-var file_proto_active_retrieval_proto_depIdxs = []int32{
-	41, // 0: yorha.retrieval.EvidenceSearchRequest.ids:type_name -> yorha.shared.RunIds
+var file_active_retrieval_proto_depIdxs = []int32{
+	48, // 0: yorha.retrieval.EvidenceSearchRequest.ids:type_name -> yorha.shared.RunIds
 	14, // 1: yorha.retrieval.EvidenceSearchRequest.hop:type_name -> yorha.retrieval.GraphHopPolicy
 	15, // 2: yorha.retrieval.EvidenceSearchRequest.prefilter:type_name -> yorha.retrieval.PrefilterPolicy
 	16, // 3: yorha.retrieval.EvidenceSearchRequest.rank:type_name -> yorha.retrieval.RankPolicy
-	3,  // 4: yorha.retrieval.EvidenceSearchResponse.results:type_name -> yorha.retrieval.SearchResult
-	6,  // 5: yorha.retrieval.EvidenceSearchResponse.bundles:type_name -> yorha.retrieval.ContextBundle
-	9,  // 6: yorha.retrieval.EvidenceSearchResponse.timing:type_name -> yorha.retrieval.SearchTiming
-	6,  // 7: yorha.retrieval.EvidenceBundleEvent.bundle:type_name -> yorha.retrieval.ContextBundle
-	17, // 8: yorha.retrieval.EvidenceBundleEvent.progress:type_name -> yorha.retrieval.RetrievalProgress
-	18, // 9: yorha.retrieval.EvidenceBundleEvent.error:type_name -> yorha.retrieval.RetrievalError
-	4,  // 10: yorha.retrieval.SearchResult.metadata:type_name -> yorha.retrieval.ChunkMetadata
-	5,  // 11: yorha.retrieval.SearchResult.rerank:type_name -> yorha.retrieval.RerankExplain
-	3,  // 12: yorha.retrieval.ContextBundle.hit:type_name -> yorha.retrieval.SearchResult
-	3,  // 13: yorha.retrieval.ContextBundle.siblings:type_name -> yorha.retrieval.SearchResult
-	7,  // 14: yorha.retrieval.ContextBundle.graph_neighbors:type_name -> yorha.retrieval.GraphNeighbor
-	8,  // 15: yorha.retrieval.ContextBundle.document_context:type_name -> yorha.retrieval.DocumentContext
-	13, // 16: yorha.retrieval.CodebaseSearchResponse.chunks:type_name -> yorha.retrieval.CodebaseChunk
-	13, // 17: yorha.retrieval.CodebaseChunkEvent.chunk:type_name -> yorha.retrieval.CodebaseChunk
-	17, // 18: yorha.retrieval.CodebaseChunkEvent.progress:type_name -> yorha.retrieval.RetrievalProgress
-	18, // 19: yorha.retrieval.CodebaseChunkEvent.error:type_name -> yorha.retrieval.RetrievalError
-	39, // 20: yorha.retrieval.RetrievalSourceMetadata.metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata.MetadataEntry
-	19, // 21: yorha.retrieval.SearchChunkResult.source_metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata
-	20, // 22: yorha.retrieval.SearchChunkResult.score_metadata:type_name -> yorha.retrieval.RetrievalScoreMetadata
-	21, // 23: yorha.retrieval.SearchChunkResult.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
-	22, // 24: yorha.retrieval.SearchChunkResult.timestamps:type_name -> yorha.retrieval.TransportTimestamps
-	24, // 25: yorha.retrieval.SearchChunksResponse.results:type_name -> yorha.retrieval.SearchChunkResult
-	40, // 26: yorha.retrieval.ClusterSummaryResponse.metadata:type_name -> yorha.retrieval.ClusterSummaryResponse.MetadataEntry
-	30, // 27: yorha.retrieval.AstExpansionResponse.neighbors:type_name -> yorha.retrieval.AstNode
-	31, // 28: yorha.retrieval.AstExpansionResponse.edges:type_name -> yorha.retrieval.AstEdge
-	24, // 29: yorha.retrieval.TopologyResponse.neighbors:type_name -> yorha.retrieval.SearchChunkResult
-	21, // 30: yorha.retrieval.TopologyResponse.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
-	19, // 31: yorha.retrieval.ResearchContextChunk.source_metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata
-	20, // 32: yorha.retrieval.ResearchContextChunk.score_metadata:type_name -> yorha.retrieval.RetrievalScoreMetadata
-	21, // 33: yorha.retrieval.ResearchContextChunk.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
-	22, // 34: yorha.retrieval.ResearchContextChunk.timestamps:type_name -> yorha.retrieval.TransportTimestamps
-	35, // 35: yorha.retrieval.ResearchContextResponse.research:type_name -> yorha.retrieval.ResearchContextChunk
-	0,  // 36: yorha.retrieval.RetrievalService.SearchEvidence:input_type -> yorha.retrieval.EvidenceSearchRequest
-	0,  // 37: yorha.retrieval.RetrievalService.StreamEvidence:input_type -> yorha.retrieval.EvidenceSearchRequest
-	10, // 38: yorha.retrieval.RetrievalService.SearchCodebase:input_type -> yorha.retrieval.CodebaseSearchRequest
-	10, // 39: yorha.retrieval.RetrievalService.StreamCodebase:input_type -> yorha.retrieval.CodebaseSearchRequest
-	23, // 40: yorha.retrieval.RetrievalService.SearchChunks:input_type -> yorha.retrieval.SearchChunksRequest
-	26, // 41: yorha.retrieval.RetrievalService.GetClusterSummary:input_type -> yorha.retrieval.ClusterSummaryRequest
-	28, // 42: yorha.retrieval.RetrievalService.ExpandAstNeighbors:input_type -> yorha.retrieval.AstExpansionRequest
-	32, // 43: yorha.retrieval.RetrievalService.GetTopologyContext:input_type -> yorha.retrieval.TopologyRequest
-	34, // 44: yorha.retrieval.RetrievalService.GetResearchContext:input_type -> yorha.retrieval.ResearchContextRequest
-	37, // 45: yorha.retrieval.RetrievalService.Health:input_type -> yorha.retrieval.HealthRequest
-	1,  // 46: yorha.retrieval.RetrievalService.SearchEvidence:output_type -> yorha.retrieval.EvidenceSearchResponse
-	2,  // 47: yorha.retrieval.RetrievalService.StreamEvidence:output_type -> yorha.retrieval.EvidenceBundleEvent
-	11, // 48: yorha.retrieval.RetrievalService.SearchCodebase:output_type -> yorha.retrieval.CodebaseSearchResponse
-	12, // 49: yorha.retrieval.RetrievalService.StreamCodebase:output_type -> yorha.retrieval.CodebaseChunkEvent
-	25, // 50: yorha.retrieval.RetrievalService.SearchChunks:output_type -> yorha.retrieval.SearchChunksResponse
-	27, // 51: yorha.retrieval.RetrievalService.GetClusterSummary:output_type -> yorha.retrieval.ClusterSummaryResponse
-	29, // 52: yorha.retrieval.RetrievalService.ExpandAstNeighbors:output_type -> yorha.retrieval.AstExpansionResponse
-	33, // 53: yorha.retrieval.RetrievalService.GetTopologyContext:output_type -> yorha.retrieval.TopologyResponse
-	36, // 54: yorha.retrieval.RetrievalService.GetResearchContext:output_type -> yorha.retrieval.ResearchContextResponse
-	38, // 55: yorha.retrieval.RetrievalService.Health:output_type -> yorha.retrieval.HealthResponse
-	46, // [46:56] is the sub-list for method output_type
-	36, // [36:46] is the sub-list for method input_type
-	36, // [36:36] is the sub-list for extension type_name
-	36, // [36:36] is the sub-list for extension extendee
-	0,  // [0:36] is the sub-list for field type_name
+	49, // 4: yorha.retrieval.EvidenceSearchRequest.atlas_context:type_name -> yorha.shared.AtlasRequestContextV2
+	3,  // 5: yorha.retrieval.EvidenceSearchResponse.results:type_name -> yorha.retrieval.SearchResult
+	6,  // 6: yorha.retrieval.EvidenceSearchResponse.bundles:type_name -> yorha.retrieval.ContextBundle
+	9,  // 7: yorha.retrieval.EvidenceSearchResponse.timing:type_name -> yorha.retrieval.SearchTiming
+	50, // 8: yorha.retrieval.EvidenceSearchResponse.receipt:type_name -> yorha.shared.AtlasToolReceiptV2
+	6,  // 9: yorha.retrieval.EvidenceBundleEvent.bundle:type_name -> yorha.retrieval.ContextBundle
+	17, // 10: yorha.retrieval.EvidenceBundleEvent.progress:type_name -> yorha.retrieval.RetrievalProgress
+	18, // 11: yorha.retrieval.EvidenceBundleEvent.error:type_name -> yorha.retrieval.RetrievalError
+	4,  // 12: yorha.retrieval.SearchResult.metadata:type_name -> yorha.retrieval.ChunkMetadata
+	5,  // 13: yorha.retrieval.SearchResult.rerank:type_name -> yorha.retrieval.RerankExplain
+	3,  // 14: yorha.retrieval.ContextBundle.hit:type_name -> yorha.retrieval.SearchResult
+	3,  // 15: yorha.retrieval.ContextBundle.siblings:type_name -> yorha.retrieval.SearchResult
+	7,  // 16: yorha.retrieval.ContextBundle.graph_neighbors:type_name -> yorha.retrieval.GraphNeighbor
+	8,  // 17: yorha.retrieval.ContextBundle.document_context:type_name -> yorha.retrieval.DocumentContext
+	49, // 18: yorha.retrieval.CodebaseSearchRequest.atlas_context:type_name -> yorha.shared.AtlasRequestContextV2
+	13, // 19: yorha.retrieval.CodebaseSearchResponse.chunks:type_name -> yorha.retrieval.CodebaseChunk
+	50, // 20: yorha.retrieval.CodebaseSearchResponse.receipt:type_name -> yorha.shared.AtlasToolReceiptV2
+	13, // 21: yorha.retrieval.CodebaseChunkEvent.chunk:type_name -> yorha.retrieval.CodebaseChunk
+	17, // 22: yorha.retrieval.CodebaseChunkEvent.progress:type_name -> yorha.retrieval.RetrievalProgress
+	18, // 23: yorha.retrieval.CodebaseChunkEvent.error:type_name -> yorha.retrieval.RetrievalError
+	46, // 24: yorha.retrieval.RetrievalSourceMetadata.metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata.MetadataEntry
+	19, // 25: yorha.retrieval.SearchChunkResult.source_metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata
+	20, // 26: yorha.retrieval.SearchChunkResult.score_metadata:type_name -> yorha.retrieval.RetrievalScoreMetadata
+	21, // 27: yorha.retrieval.SearchChunkResult.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
+	22, // 28: yorha.retrieval.SearchChunkResult.timestamps:type_name -> yorha.retrieval.TransportTimestamps
+	24, // 29: yorha.retrieval.SearchChunksResponse.results:type_name -> yorha.retrieval.SearchChunkResult
+	47, // 30: yorha.retrieval.ClusterSummaryResponse.metadata:type_name -> yorha.retrieval.ClusterSummaryResponse.MetadataEntry
+	30, // 31: yorha.retrieval.AstExpansionResponse.neighbors:type_name -> yorha.retrieval.AstNode
+	31, // 32: yorha.retrieval.AstExpansionResponse.edges:type_name -> yorha.retrieval.AstEdge
+	49, // 33: yorha.retrieval.SemanticAstPacketRequest.atlas_context:type_name -> yorha.shared.AtlasRequestContextV2
+	34, // 34: yorha.retrieval.SemanticAstPacketResponse.packets:type_name -> yorha.retrieval.SemanticAstPacket
+	50, // 35: yorha.retrieval.SemanticAstPacketResponse.receipt:type_name -> yorha.shared.AtlasToolReceiptV2
+	49, // 36: yorha.retrieval.PacketRegistryRequest.atlas_context:type_name -> yorha.shared.AtlasRequestContextV2
+	37, // 37: yorha.retrieval.PacketRegistryResponse.entries:type_name -> yorha.retrieval.PacketRegistryEntry
+	50, // 38: yorha.retrieval.PacketRegistryResponse.receipt:type_name -> yorha.shared.AtlasToolReceiptV2
+	38, // 39: yorha.retrieval.PacketRegistryEntry.lanes:type_name -> yorha.retrieval.PacketRegistryLane
+	24, // 40: yorha.retrieval.TopologyResponse.neighbors:type_name -> yorha.retrieval.SearchChunkResult
+	21, // 41: yorha.retrieval.TopologyResponse.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
+	19, // 42: yorha.retrieval.ResearchContextChunk.source_metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata
+	20, // 43: yorha.retrieval.ResearchContextChunk.score_metadata:type_name -> yorha.retrieval.RetrievalScoreMetadata
+	21, // 44: yorha.retrieval.ResearchContextChunk.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
+	22, // 45: yorha.retrieval.ResearchContextChunk.timestamps:type_name -> yorha.retrieval.TransportTimestamps
+	42, // 46: yorha.retrieval.ResearchContextResponse.research:type_name -> yorha.retrieval.ResearchContextChunk
+	0,  // 47: yorha.retrieval.RetrievalService.SearchEvidence:input_type -> yorha.retrieval.EvidenceSearchRequest
+	0,  // 48: yorha.retrieval.RetrievalService.StreamEvidence:input_type -> yorha.retrieval.EvidenceSearchRequest
+	10, // 49: yorha.retrieval.RetrievalService.SearchCodebase:input_type -> yorha.retrieval.CodebaseSearchRequest
+	10, // 50: yorha.retrieval.RetrievalService.StreamCodebase:input_type -> yorha.retrieval.CodebaseSearchRequest
+	23, // 51: yorha.retrieval.RetrievalService.SearchChunks:input_type -> yorha.retrieval.SearchChunksRequest
+	26, // 52: yorha.retrieval.RetrievalService.GetClusterSummary:input_type -> yorha.retrieval.ClusterSummaryRequest
+	28, // 53: yorha.retrieval.RetrievalService.ExpandAstNeighbors:input_type -> yorha.retrieval.AstExpansionRequest
+	32, // 54: yorha.retrieval.RetrievalService.GetSemanticAstPackets:input_type -> yorha.retrieval.SemanticAstPacketRequest
+	35, // 55: yorha.retrieval.RetrievalService.GetPacketRegistry:input_type -> yorha.retrieval.PacketRegistryRequest
+	39, // 56: yorha.retrieval.RetrievalService.GetTopologyContext:input_type -> yorha.retrieval.TopologyRequest
+	41, // 57: yorha.retrieval.RetrievalService.GetResearchContext:input_type -> yorha.retrieval.ResearchContextRequest
+	44, // 58: yorha.retrieval.RetrievalService.Health:input_type -> yorha.retrieval.HealthRequest
+	1,  // 59: yorha.retrieval.RetrievalService.SearchEvidence:output_type -> yorha.retrieval.EvidenceSearchResponse
+	2,  // 60: yorha.retrieval.RetrievalService.StreamEvidence:output_type -> yorha.retrieval.EvidenceBundleEvent
+	11, // 61: yorha.retrieval.RetrievalService.SearchCodebase:output_type -> yorha.retrieval.CodebaseSearchResponse
+	12, // 62: yorha.retrieval.RetrievalService.StreamCodebase:output_type -> yorha.retrieval.CodebaseChunkEvent
+	25, // 63: yorha.retrieval.RetrievalService.SearchChunks:output_type -> yorha.retrieval.SearchChunksResponse
+	27, // 64: yorha.retrieval.RetrievalService.GetClusterSummary:output_type -> yorha.retrieval.ClusterSummaryResponse
+	29, // 65: yorha.retrieval.RetrievalService.ExpandAstNeighbors:output_type -> yorha.retrieval.AstExpansionResponse
+	33, // 66: yorha.retrieval.RetrievalService.GetSemanticAstPackets:output_type -> yorha.retrieval.SemanticAstPacketResponse
+	36, // 67: yorha.retrieval.RetrievalService.GetPacketRegistry:output_type -> yorha.retrieval.PacketRegistryResponse
+	40, // 68: yorha.retrieval.RetrievalService.GetTopologyContext:output_type -> yorha.retrieval.TopologyResponse
+	43, // 69: yorha.retrieval.RetrievalService.GetResearchContext:output_type -> yorha.retrieval.ResearchContextResponse
+	45, // 70: yorha.retrieval.RetrievalService.Health:output_type -> yorha.retrieval.HealthResponse
+	59, // [59:71] is the sub-list for method output_type
+	47, // [47:59] is the sub-list for method input_type
+	47, // [47:47] is the sub-list for extension type_name
+	47, // [47:47] is the sub-list for extension extendee
+	0,  // [0:47] is the sub-list for field type_name
 }
 
-func init() { file_proto_active_retrieval_proto_init() }
-func file_proto_active_retrieval_proto_init() {
-	if File_proto_active_retrieval_proto != nil {
+func init() { file_active_retrieval_proto_init() }
+func file_active_retrieval_proto_init() {
+	if File_active_retrieval_proto != nil {
 		return
 	}
-	file_proto_active_retrieval_proto_msgTypes[2].OneofWrappers = []any{
+	file_active_retrieval_proto_msgTypes[2].OneofWrappers = []any{
 		(*EvidenceBundleEvent_Bundle)(nil),
 		(*EvidenceBundleEvent_Progress)(nil),
 		(*EvidenceBundleEvent_Error)(nil),
 	}
-	file_proto_active_retrieval_proto_msgTypes[12].OneofWrappers = []any{
+	file_active_retrieval_proto_msgTypes[12].OneofWrappers = []any{
 		(*CodebaseChunkEvent_Chunk)(nil),
 		(*CodebaseChunkEvent_Progress)(nil),
 		(*CodebaseChunkEvent_Error)(nil),
@@ -3861,17 +4685,17 @@ func file_proto_active_retrieval_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_active_retrieval_proto_rawDesc), len(file_proto_active_retrieval_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_active_retrieval_proto_rawDesc), len(file_active_retrieval_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   41,
+			NumMessages:   48,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_active_retrieval_proto_goTypes,
-		DependencyIndexes: file_proto_active_retrieval_proto_depIdxs,
-		MessageInfos:      file_proto_active_retrieval_proto_msgTypes,
+		GoTypes:           file_active_retrieval_proto_goTypes,
+		DependencyIndexes: file_active_retrieval_proto_depIdxs,
+		MessageInfos:      file_active_retrieval_proto_msgTypes,
 	}.Build()
-	File_proto_active_retrieval_proto = out.File
-	file_proto_active_retrieval_proto_goTypes = nil
-	file_proto_active_retrieval_proto_depIdxs = nil
+	File_active_retrieval_proto = out.File
+	file_active_retrieval_proto_goTypes = nil
+	file_active_retrieval_proto_depIdxs = nil
 }

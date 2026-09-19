@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v4.25.1
-// source: proto/active/retrieval.proto
+// source: active/retrieval.proto
 
 package retrieval
 
@@ -19,16 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	RetrievalService_SearchEvidence_FullMethodName     = "/yorha.retrieval.RetrievalService/SearchEvidence"
-	RetrievalService_StreamEvidence_FullMethodName     = "/yorha.retrieval.RetrievalService/StreamEvidence"
-	RetrievalService_SearchCodebase_FullMethodName     = "/yorha.retrieval.RetrievalService/SearchCodebase"
-	RetrievalService_StreamCodebase_FullMethodName     = "/yorha.retrieval.RetrievalService/StreamCodebase"
-	RetrievalService_SearchChunks_FullMethodName       = "/yorha.retrieval.RetrievalService/SearchChunks"
-	RetrievalService_GetClusterSummary_FullMethodName  = "/yorha.retrieval.RetrievalService/GetClusterSummary"
-	RetrievalService_ExpandAstNeighbors_FullMethodName = "/yorha.retrieval.RetrievalService/ExpandAstNeighbors"
-	RetrievalService_GetTopologyContext_FullMethodName = "/yorha.retrieval.RetrievalService/GetTopologyContext"
-	RetrievalService_GetResearchContext_FullMethodName = "/yorha.retrieval.RetrievalService/GetResearchContext"
-	RetrievalService_Health_FullMethodName             = "/yorha.retrieval.RetrievalService/Health"
+	RetrievalService_SearchEvidence_FullMethodName        = "/yorha.retrieval.RetrievalService/SearchEvidence"
+	RetrievalService_StreamEvidence_FullMethodName        = "/yorha.retrieval.RetrievalService/StreamEvidence"
+	RetrievalService_SearchCodebase_FullMethodName        = "/yorha.retrieval.RetrievalService/SearchCodebase"
+	RetrievalService_StreamCodebase_FullMethodName        = "/yorha.retrieval.RetrievalService/StreamCodebase"
+	RetrievalService_SearchChunks_FullMethodName          = "/yorha.retrieval.RetrievalService/SearchChunks"
+	RetrievalService_GetClusterSummary_FullMethodName     = "/yorha.retrieval.RetrievalService/GetClusterSummary"
+	RetrievalService_ExpandAstNeighbors_FullMethodName    = "/yorha.retrieval.RetrievalService/ExpandAstNeighbors"
+	RetrievalService_GetSemanticAstPackets_FullMethodName = "/yorha.retrieval.RetrievalService/GetSemanticAstPackets"
+	RetrievalService_GetPacketRegistry_FullMethodName     = "/yorha.retrieval.RetrievalService/GetPacketRegistry"
+	RetrievalService_GetTopologyContext_FullMethodName    = "/yorha.retrieval.RetrievalService/GetTopologyContext"
+	RetrievalService_GetResearchContext_FullMethodName    = "/yorha.retrieval.RetrievalService/GetResearchContext"
+	RetrievalService_Health_FullMethodName                = "/yorha.retrieval.RetrievalService/Health"
 )
 
 // RetrievalServiceClient is the client API for RetrievalService service.
@@ -49,6 +51,10 @@ type RetrievalServiceClient interface {
 	GetClusterSummary(ctx context.Context, in *ClusterSummaryRequest, opts ...grpc.CallOption) (*ClusterSummaryResponse, error)
 	// Unary: AST neighbor expansion
 	ExpandAstNeighbors(ctx context.Context, in *AstExpansionRequest, opts ...grpc.CallOption) (*AstExpansionResponse, error)
+	// Unary: revision-qualified semantic AST packet retrieval (read-only)
+	GetSemanticAstPackets(ctx context.Context, in *SemanticAstPacketRequest, opts ...grpc.CallOption) (*SemanticAstPacketResponse, error)
+	// Unary: canonical packet and projection registry lookup (read-only)
+	GetPacketRegistry(ctx context.Context, in *PacketRegistryRequest, opts ...grpc.CallOption) (*PacketRegistryResponse, error)
 	// Unary: SOM/Topology neighborhood expansion
 	GetTopologyContext(ctx context.Context, in *TopologyRequest, opts ...grpc.CallOption) (*TopologyResponse, error)
 	// Unary: research-backed context retrieval (Lane 3, optional fallback)
@@ -153,6 +159,26 @@ func (c *retrievalServiceClient) ExpandAstNeighbors(ctx context.Context, in *Ast
 	return out, nil
 }
 
+func (c *retrievalServiceClient) GetSemanticAstPackets(ctx context.Context, in *SemanticAstPacketRequest, opts ...grpc.CallOption) (*SemanticAstPacketResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SemanticAstPacketResponse)
+	err := c.cc.Invoke(ctx, RetrievalService_GetSemanticAstPackets_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *retrievalServiceClient) GetPacketRegistry(ctx context.Context, in *PacketRegistryRequest, opts ...grpc.CallOption) (*PacketRegistryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PacketRegistryResponse)
+	err := c.cc.Invoke(ctx, RetrievalService_GetPacketRegistry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *retrievalServiceClient) GetTopologyContext(ctx context.Context, in *TopologyRequest, opts ...grpc.CallOption) (*TopologyResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TopologyResponse)
@@ -201,6 +227,10 @@ type RetrievalServiceServer interface {
 	GetClusterSummary(context.Context, *ClusterSummaryRequest) (*ClusterSummaryResponse, error)
 	// Unary: AST neighbor expansion
 	ExpandAstNeighbors(context.Context, *AstExpansionRequest) (*AstExpansionResponse, error)
+	// Unary: revision-qualified semantic AST packet retrieval (read-only)
+	GetSemanticAstPackets(context.Context, *SemanticAstPacketRequest) (*SemanticAstPacketResponse, error)
+	// Unary: canonical packet and projection registry lookup (read-only)
+	GetPacketRegistry(context.Context, *PacketRegistryRequest) (*PacketRegistryResponse, error)
 	// Unary: SOM/Topology neighborhood expansion
 	GetTopologyContext(context.Context, *TopologyRequest) (*TopologyResponse, error)
 	// Unary: research-backed context retrieval (Lane 3, optional fallback)
@@ -237,6 +267,12 @@ func (UnimplementedRetrievalServiceServer) GetClusterSummary(context.Context, *C
 }
 func (UnimplementedRetrievalServiceServer) ExpandAstNeighbors(context.Context, *AstExpansionRequest) (*AstExpansionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ExpandAstNeighbors not implemented")
+}
+func (UnimplementedRetrievalServiceServer) GetSemanticAstPackets(context.Context, *SemanticAstPacketRequest) (*SemanticAstPacketResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSemanticAstPackets not implemented")
+}
+func (UnimplementedRetrievalServiceServer) GetPacketRegistry(context.Context, *PacketRegistryRequest) (*PacketRegistryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPacketRegistry not implemented")
 }
 func (UnimplementedRetrievalServiceServer) GetTopologyContext(context.Context, *TopologyRequest) (*TopologyResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetTopologyContext not implemented")
@@ -380,6 +416,42 @@ func _RetrievalService_ExpandAstNeighbors_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RetrievalService_GetSemanticAstPackets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SemanticAstPacketRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RetrievalServiceServer).GetSemanticAstPackets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RetrievalService_GetSemanticAstPackets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RetrievalServiceServer).GetSemanticAstPackets(ctx, req.(*SemanticAstPacketRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RetrievalService_GetPacketRegistry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PacketRegistryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RetrievalServiceServer).GetPacketRegistry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RetrievalService_GetPacketRegistry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RetrievalServiceServer).GetPacketRegistry(ctx, req.(*PacketRegistryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _RetrievalService_GetTopologyContext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TopologyRequest)
 	if err := dec(in); err != nil {
@@ -462,6 +534,14 @@ var RetrievalService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _RetrievalService_ExpandAstNeighbors_Handler,
 		},
 		{
+			MethodName: "GetSemanticAstPackets",
+			Handler:    _RetrievalService_GetSemanticAstPackets_Handler,
+		},
+		{
+			MethodName: "GetPacketRegistry",
+			Handler:    _RetrievalService_GetPacketRegistry_Handler,
+		},
+		{
 			MethodName: "GetTopologyContext",
 			Handler:    _RetrievalService_GetTopologyContext_Handler,
 		},
@@ -486,5 +566,5 @@ var RetrievalService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "proto/active/retrieval.proto",
+	Metadata: "active/retrieval.proto",
 }

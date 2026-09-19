@@ -1,0 +1,33 @@
+{
+  "schema": "ParentAtlasLatentRepresentationReceiptsProofV1",
+  "status": "LATENT_RECEIPTS_REVISION_BOUND",
+  "evidenceClass": "FIXTURE_ONLY",
+  "representations": [
+    {
+      "representationId": "latent_128",
+      "dimensions": 128,
+      "representationRevision": "latent_128:fixture-v1",
+      "inputRepresentationId": "latent_256",
+      "inputRepresentationRevision": "latent_256:fixture-v1",
+      "artifactDigest": "sha256:9db2aa2354b3d11d38f71c3b7e218668f8e6b9c72ba407b9f70cbb88ec46f65c",
+      "outputPopulationChecksum": "sha256:1896b06251918bf7089709ae03d752fee6ac342dde7034927be00c773c2ee3e8"
+    },
+    {
+      "representationId": "latent_64",
+      "dimensions": 64,
+      "representationRevision": "latent_64:fixture-v1",
+      "inputRepresentationId": "latent_256",
+      "inputRepresentationRevision": "latent_256:fixture-v1",
+      "artifactDigest": "sha256:31e1ee25b175653c07886edb4f425ceb7c0236c9224a2a889bac1a20421f9603",
+      "outputPopulationChecksum": "sha256:1896b06251918bf7089709ae03d752fee6ac342dde7034927be00c773c2ee3e8"
+    }
+  ],
+  "familyRevisionBinding": true,
+  "independentArtifactReceipts": true,
+  "latent128Materialization": "VIRTUAL_DERIVED_VIEW",
+  "latent64Materialization": "PERSISTED_DERIVED_VIEW",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false,
+  "nextRequirement": "CURRENT_LINEAGE_QUALIFIED_ARTIFACT_READBACK"
+}

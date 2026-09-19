@@ -13,14 +13,30 @@ dotenv.config({ path: path.resolve(root, 'sveltekit-frontend/.env') });
 dotenv.config({ path: path.resolve(root, 'sveltekit-frontend/.env.local'), override: true });
 const resolutionPath = path.resolve(root, '.tmp/atlas/current-structural-symbol-resolution-v1.ndjson');
 const nominationsPath = path.resolve(root, '.tmp/atlas/current-graphify-symbol-nominations-v1.jsonl');
-const reportPath = path.resolve(root, 'docs/reports/tree-bound-symbol-registry-resolution-v1.json');
-const outputPath = path.resolve(root, '.tmp/atlas/tree-bound-symbol-registry-resolution-v1.ndjson');
+const planPath = path.resolve(root, '.tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson');
+const planReportPath = path.resolve(root, 'docs/reports/current-tree-bound-symbol-registry-input-v1.json');
+const reportPath = path.resolve(root, 'docs/reports/tree-bound-symbol-registry-resolution-v2.json');
+const outputPath = path.resolve(root, '.tmp/atlas/tree-bound-symbol-registry-resolution-v2.ndjson');
 const connectionString = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const hashText = (value) => createHash('sha256').update(value, 'utf8').digest('hex');
 const readJsonl = async (file) => (await fs.readFile(file, 'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse);
 const exactSource = (value) => String(value ?? '').replaceAll('\\', '/').replace(/^sveltekit-frontend\//, '');
 
-const [resolutions, nominations] = await Promise.all([readJsonl(resolutionPath), readJsonl(nominationsPath)]);
+const [resolutions, nominations, plannedRows, planReport] = await Promise.all([
+  readJsonl(resolutionPath),
+  readJsonl(nominationsPath),
+  readJsonl(planPath),
+  fs.readFile(planReportPath, 'utf8').then(JSON.parse),
+]);
+const planChecksum = `sha256:${hashText((await fs.readFile(planPath, 'utf8')))}`;
+if (planReport.planChecksum !== planChecksum) {
+  throw new Error(`INPUT_PLAN_CHECKSUM_MISMATCH: report=${planReport.planChecksum ?? 'missing'} actual=${planChecksum}`);
+}
+const plannedNominationIds = new Set(plannedRows.map((row) => row.nominationId));
+const resolutionNominationIds = new Set(resolutions.filter((row) => row.resolution?.startsWith('EXACT')).map((row) => row.nominationId));
+if (plannedRows.length !== resolutionNominationIds.size || [...plannedNominationIds].some((id) => !resolutionNominationIds.has(id))) {
+  throw new Error(`INPUT_PLAN_RESOLUTION_COHORT_MISMATCH: planRows=${plannedRows.length} resolutionRows=${resolutionNominationIds.size}`);
+}
 const nominationById = new Map(nominations.map((row) => [row.nomination_id, row]));
 const treeBound = resolutions.filter((row) => row.resolution?.startsWith('EXACT'));
 const pool = new pg.Pool({ connectionString });
@@ -128,9 +144,15 @@ for (const resolution of treeBound) {
 }
 const output = rows.map((row) => JSON.stringify(row)).join('\n') + (rows.length ? '\n' : '');
 const report = {
-  schema: 'atlas.tree-bound-symbol-registry-resolution-proof.v1',
+  schema: 'atlas.tree-bound-symbol-registry-resolution-proof.v2',
   gate: 'GRAPH-RESOLVE-06B.3',
   status: counts.registryAmbiguous === 0 && counts.symbolVersionAmbiguous === 0 ? 'READ_ONLY_PROVEN' : 'READ_ONLY_INCOMPLETE',
+  workspaceRevision: planReport.currentWorkspaceRevision ?? null,
+  inputPlanPath: path.relative(root, planPath).replaceAll('\\', '/'),
+  inputPlanChecksum: planChecksum,
+  inputRowCount: plannedRows.length,
+  promotableInputCount: plannedRows.filter((row) => row.classification === 'REGISTER_NEW_EXACT_REVIEW_ONLY').length,
+  nonPromotableInputCount: plannedRows.filter((row) => row.classification !== 'REGISTER_NEW_EXACT_REVIEW_ONLY').length,
   resolutionPath: path.relative(root, resolutionPath).replaceAll('\\', '/'),
   nominationsPath: path.relative(root, nominationsPath).replaceAll('\\', '/'),
   outputPath: path.relative(root, outputPath).replaceAll('\\', '/'),
@@ -140,6 +162,7 @@ const report = {
   lookupPolicy: ['exact canonical_key', 'exact source_ref/source_revision/byte span/declaration hash for symbol version', 'no fuzzy or name-only lookup'],
   canonicalWrites: 0,
   databaseWrites: 0,
+  promotionAuthorized: false,
   readOnly: true,
   nextGate: counts.symbolVersionBound > 0 ? 'GRAPH-RESOLVE-06B.4_LIVE_PRODUCER_REPLAY' : 'REGISTRY_NAMESPACE_RECONCILIATION_REQUIRED',
 };

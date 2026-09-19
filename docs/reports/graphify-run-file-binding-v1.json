@@ -1,17 +1,29 @@
 {
   "schema": "atlas.graphify-run-file-binding.v1",
-  "generatedAt": "2026-09-14T02:17:03.435Z",
+  "generatedAt": "2026-09-19T04:56:06.727Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "canonicalAuthority": false,
   "databaseError": null,
-  "runCount": 19,
+  "runCount": 20,
   "counts": {
+    "COMPLETED_UNBOUND": 9,
     "OTHER": 7,
-    "COMPLETED_UNBOUND": 8,
     "COMPLETED_BOUND": 4
   },
   "rows": [
+    {
+      "run_id": "01a8d8fc-2507-4f39-868e-039039237b98",
+      "status": "COMPLETED",
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "started_at": "2026-09-15T22:05:02.952Z",
+      "completed_at": "2026-09-15T22:05:02.995Z",
+      "file_row_count": 0,
+      "source_revision_count": 0,
+      "content_hash_count": 0,
+      "classification": "COMPLETED_UNBOUND"
+    },
     {
       "run_id": "6daa5fc9-6b76-4774-a376-013a1bb8190e",
       "status": "SUPERSEDED",

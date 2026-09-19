@@ -1,6 +1,6 @@
 {
   "schema": "atlas.canonical-owner-revision-migration-safety.v1",
-  "generatedAt": "2026-09-14T16:26:21.029Z",
+  "generatedAt": "2026-09-17T21:36:36.294Z",
   "mode": "READ_ONLY_MIGRATION_SAFETY_AUDIT",
   "migration": "manual/20260907_canonical_owner_revision_axes_v1.sql",
   "sqlChecks": {

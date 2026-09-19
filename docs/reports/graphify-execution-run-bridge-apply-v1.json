@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-execution-run-bridge-apply.v1",
-  "mode": "READ_ONLY_APPLY_PREFLIGHT",
+  "mode": "AUTHORIZED_APPLY_REQUEST",
   "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
   "runId": "01a8d8fc-2507-4f39-868e-039039237b98",
   "execution": {
@@ -48,17 +48,21 @@
     "alreadyBoundToRequestedRun": false,
     "conflictingExistingRun": false
   },
-  "safeToApply": true,
+  "safeToApply": false,
   "authorization": {
     "required": true,
-    "supplied": false,
+    "supplied": true,
     "envFlag": "ATLAS_AUTHORIZE_GRAPHIFY_EXECUTION_RUN_BRIDGE_V1"
   },
-  "planChecksum": null,
+  "planChecksum": "sha256:417e15f729826e2d2a1b7f7e574c67976d4596d35fc295dc1a72df00b6b94a5c",
   "rollbackCanary": false,
-  "writesPerformed": false,
+  "writesPerformed": true,
   "canonicalAuthority": false,
-  "status": "READY_FOR_AUTHORIZATION",
-  "receiptChecksum": "sha256:13ff41affc0be631f2483f70494c78ee393151867800c6e1dd1f5f641862e650",
-  "generatedAt": "2026-09-17T05:08:56.981Z"
+  "status": "BRIDGE_APPLIED_READBACK_PROVEN",
+  "readback": {
+    "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "legacy_graphify_run_id": "01a8d8fc-2507-4f39-868e-039039237b98"
+  },
+  "receiptChecksum": "sha256:8cfcbfa60ea3d6d778b40970c646d390f7fe81be69d1d57fbaf1c0b356d311cf",
+  "generatedAt": "2026-09-17T17:22:08.012Z"
 }

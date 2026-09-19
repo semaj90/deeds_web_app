@@ -87,6 +87,12 @@ export interface WorkflowActionEventV1 {
   };
   evidenceRefs?: string[];
   artifactRefs?: string[];
+  /** Optional accounting metadata for OpenSpec/agent run receipts. */
+  tokensUsed?: number;
+  /** Source files changed by the run; distinct from generated artifactRefs. */
+  filesEdited?: string[];
+  /** OpenSpec change that owns the run receipt, when applicable. */
+  openspecChange?: string;
   startedAt?: string;
   emittedAt: string;
   finishedAt?: string;
@@ -127,6 +133,17 @@ export function validateWorkflowActionEvent(event: WorkflowActionEventV1): Workf
   if (!event.dagNodeId.trim()) errors.push('dagNodeId is required');
   if (!Number.isInteger(event.attempt) || event.attempt < 0) errors.push('attempt must be a non-negative integer');
   if (!event.operation.trim()) errors.push('operation is required');
+  if (event.tokensUsed !== undefined && (!Number.isInteger(event.tokensUsed) || event.tokensUsed < 0)) {
+    errors.push('tokensUsed must be a non-negative integer');
+  }
+  if (event.filesEdited !== undefined) {
+    if (!Array.isArray(event.filesEdited) || event.filesEdited.some((value) => typeof value !== 'string' || !value.trim())) {
+      errors.push('filesEdited entries must be non-empty strings');
+    }
+  }
+  if (event.openspecChange !== undefined && (!event.openspecChange.trim() || event.openspecChange.includes('..'))) {
+    errors.push('openspecChange must be a non-empty safe change name');
+  }
 
   const progress = event.progress;
   if (progress) {
@@ -208,7 +225,11 @@ export function toCanonicalWorkflowActionEvent(
     artifactRefs: local.artifactRefs ?? [],
     startedAt: local.startedAt,
     completedAt: local.finishedAt,
-    metadata: {},
+    metadata: {
+      ...(local.tokensUsed === undefined ? {} : { tokensUsed: local.tokensUsed }),
+      ...(local.filesEdited === undefined ? {} : { filesEdited: local.filesEdited }),
+      ...(local.openspecChange === undefined ? {} : { openspecChange: local.openspecChange }),
+    },
     producerRevision: extras.producerRevision,
     inputRefs: [],
     outputRefs: [],
@@ -253,6 +274,9 @@ export function fromCanonicalWorkflowActionEvent(
     target: canonical.target,
     evidenceRefs: canonical.evidenceRefs,
     artifactRefs: canonical.artifactRefs,
+    tokensUsed: typeof canonical.metadata?.tokensUsed === 'number' ? canonical.metadata.tokensUsed : undefined,
+    filesEdited: Array.isArray(canonical.metadata?.filesEdited) ? canonical.metadata.filesEdited as string[] : undefined,
+    openspecChange: typeof canonical.metadata?.openspecChange === 'string' ? canonical.metadata.openspecChange : undefined,
     startedAt: canonical.startedAt,
     emittedAt: extras.emittedAt,
     finishedAt: canonical.completedAt,

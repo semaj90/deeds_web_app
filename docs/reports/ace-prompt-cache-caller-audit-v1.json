@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ace-prompt-cache-caller-audit.v1",
-  "generatedAt": "2026-09-17T04:11:25.975Z",
+  "generatedAt": "2026-09-19T03:58:40.558Z",
   "scope": "sveltekit-frontend/src/**/*.ts",
   "callerCount": 2,
   "strictV2HandoffCount": 0,

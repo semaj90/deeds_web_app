@@ -1,6 +1,6 @@
 {
   "schema": "atlas.critical-lineage-migration-dispositions.v1",
-  "generatedAt": "2026-09-14T16:26:10.908Z",
+  "generatedAt": "2026-09-18T02:29:55.345Z",
   "mode": "READ_ONLY",
   "sourceReport": "docs\\reports\\migration-inventory-classification-v1.json",
   "liveReadbackReport": "docs\\reports\\critical-lineage-live-readback-v1.json",
@@ -13,31 +13,31 @@
     "graphify_files"
   ],
   "counts": {
-    "criticalUnresolvedFiles": 58,
+    "criticalUnresolvedFiles": 60,
     "byDisposition": {
-      "MULTIPLE_OWNER_CANDIDATES_REVIEW_REQUIRED": 47,
+      "MULTIPLE_OWNER_CANDIDATES_REVIEW_REQUIRED": 49,
       "SINGLE_OWNER_CANDIDATE_REVIEW_REQUIRED": 11
     },
     "byDomain": {
       "FEATURE": 10,
       "LINEAGE": 7,
       "ONTOLOGY": 5,
-      "PROJECTION": 19,
+      "PROJECTION": 20,
       "SEMANTIC": 14,
-      "STRUCTURAL": 3
+      "STRUCTURAL": 4
     },
     "byPriority": {
       "1": 7,
-      "2": 3,
+      "2": 4,
       "3": 14,
       "4": 10,
       "5": 5,
-      "6": 19
+      "6": 20
     }
   },
   "passCriteria": {
-    "allCriticalFilesEnumerated": true,
-    "unresolvedCurrentOwners": 58,
+    "allCriticalFilesEnumerated": false,
+    "unresolvedCurrentOwners": 60,
     "ownerClassificationComplete": false,
     "liveReadbackComplete": true,
     "migrationAuthorized": false,
@@ -150,10 +150,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -324,7 +337,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -502,7 +518,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -681,7 +700,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -863,7 +885,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -1040,7 +1065,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -1216,7 +1244,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -1391,7 +1422,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -1568,7 +1602,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -1745,7 +1782,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -1872,10 +1912,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -2045,7 +2098,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -2222,7 +2278,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -2349,10 +2408,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -2526,7 +2598,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -2704,7 +2779,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -2882,7 +2960,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -3009,10 +3090,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -3180,7 +3274,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -3362,7 +3459,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -3540,7 +3640,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -3666,10 +3769,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -3790,10 +3906,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -3916,10 +4045,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -4090,7 +4232,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -4280,7 +4425,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -4457,7 +4605,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -4637,7 +4788,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -4815,7 +4969,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -4989,7 +5146,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -5163,7 +5323,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -5290,10 +5453,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -5461,7 +5637,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -5635,7 +5814,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -5763,10 +5945,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -5887,10 +6082,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -6009,10 +6217,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -6135,10 +6356,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -6257,10 +6491,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -6432,7 +6679,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -6609,7 +6859,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -6734,10 +6987,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -6909,7 +7175,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -7132,7 +7401,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -7256,10 +7528,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -7378,10 +7663,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -7499,10 +7797,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -7512,6 +7823,320 @@
       "ownerCandidates": [
         "parent-atlas-retrieval-lineage-dag-convergence",
         "parent-atlas-semantic-768-canonical-contract"
+      ],
+      "reason": "No journal entry or sidecar declaration was found.",
+      "blocking": true
+    },
+    {
+      "path": "manual/20260915_atlas_packets_summary_metadata_columns.sql",
+      "location": "MANUAL",
+      "classification": "UNRESOLVED",
+      "disposition": "MULTIPLE_OWNER_CANDIDATES_REVIEW_REQUIRED",
+      "ownerDomain": "PROJECTION",
+      "reviewPriority": 6,
+      "criticalLineageTables": [
+        "atlas_packets"
+      ],
+      "criticalLineageReadback": [
+        {
+          "table": "atlas_packets",
+          "status": "LIVE_SCHEMA_PRESENT",
+          "columns": [
+            "packet_id",
+            "artifact_id",
+            "packet_key",
+            "source_ref",
+            "source_ref_key",
+            "file_path",
+            "directory_path",
+            "feature_id",
+            "feature_label",
+            "community_id",
+            "concept_ids",
+            "cluster_id",
+            "embedding",
+            "payload",
+            "metadata",
+            "permissions",
+            "topology",
+            "vectors",
+            "summary",
+            "tags",
+            "byte_start",
+            "byte_end",
+            "sha256",
+            "source_kind",
+            "source_path",
+            "group_id",
+            "packet_universe",
+            "qdrant_point_id",
+            "qdrant_collection",
+            "qdrant_vector_dim",
+            "identity_lane",
+            "identity_confidence",
+            "som_cluster",
+            "som_row",
+            "som_col",
+            "som_index",
+            "kmeans_cluster",
+            "pagerank",
+            "betweenness",
+            "eigenvector",
+            "neo4j_node_id",
+            "redis_centroid_key",
+            "latent_64",
+            "reward_prior",
+            "created_at",
+            "updated_at",
+            "function_symbol",
+            "content_embedding_384",
+            "embedding_status",
+            "embedding_timestamp",
+            "extracted_entities",
+            "keywords",
+            "error_pattern",
+            "feature_group_id",
+            "domain_class",
+            "taxonomy_level",
+            "bm25_indexed_at",
+            "bm25_score",
+            "bm25_terms",
+            "packet_ulid",
+            "title_id",
+            "canonical_source_ref",
+            "page_rank_score",
+            "kmeans_cluster_id",
+            "tree_node_id",
+            "routing_hints",
+            "community_source",
+            "community_confidence",
+            "lineage_version",
+            "ledger_type",
+            "canonical",
+            "payload_backfilled_at",
+            "k_core",
+            "ngrams",
+            "trigrams",
+            "engrams",
+            "used_concepts",
+            "topolog_cluster",
+            "topolog_confidence",
+            "topolog_method",
+            "topolog_applied_at",
+            "repository_id",
+            "directory_id",
+            "file_id",
+            "module_id",
+            "symbol_id",
+            "chunk_id",
+            "recovery_lane",
+            "som_cluster_id",
+            "ontology",
+            "packet_type_test",
+            "packet_type",
+            "packet_ontology",
+            "parent_packet_key",
+            "related_packets",
+            "telemetry",
+            "embedding_eligible",
+            "summary_hash",
+            "embedding_version",
+            "embedding_claimed_at",
+            "embedding_claimed_by",
+            "feature_envelope",
+            "domain_confidence",
+            "title_generator_version",
+            "file_purpose",
+            "thoroughness",
+            "app_criticality",
+            "test_coverage_pct",
+            "file_understanding_computed_at",
+            "file_understanding_method",
+            "openspec_id",
+            "gsd_id",
+            "enrichment_updated_at",
+            "som_cell_x",
+            "som_cell_y",
+            "ast_score",
+            "community_boost",
+            "rerank_features",
+            "pagerank_score",
+            "som_distance",
+            "predicted_domain",
+            "classifier_kind",
+            "classifier_version",
+            "pagerank_raw",
+            "authority_score",
+            "workspace_id",
+            "semantic_anchor",
+            "ontology_version",
+            "content_hash",
+            "domain_memberships",
+            "primary_domain",
+            "workspace_revision",
+            "representation_revision",
+            "embedding_digest",
+            "source_representation_id",
+            "source_dimension",
+            "projection_representation_id",
+            "projection_dimension",
+            "encoder_revision",
+            "som_revision",
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
+          ],
+          "rowCount": 61718,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 61718
+          }
+        }
+      ],
+      "referencedTables": [
+        "atlas_packets"
+      ],
+      "liveEvidence": null,
+      "ownerCandidates": [
+        "parent-atlas-retrieval-lineage-dag-convergence",
+        "parent-atlas-candidate-feature-execution-fabric"
+      ],
+      "reason": "No journal entry or sidecar declaration was found.",
+      "blocking": true
+    },
+    {
+      "path": "manual/20260915_codebase_chunk_index_whole_file_hash.sql",
+      "location": "MANUAL",
+      "classification": "UNRESOLVED",
+      "disposition": "MULTIPLE_OWNER_CANDIDATES_REVIEW_REQUIRED",
+      "ownerDomain": "STRUCTURAL",
+      "reviewPriority": 2,
+      "criticalLineageTables": [
+        "codebase_chunk_index"
+      ],
+      "criticalLineageReadback": [
+        {
+          "table": "codebase_chunk_index",
+          "status": "LIVE_SCHEMA_PRESENT",
+          "columns": [
+            "id",
+            "qdrant_id",
+            "relative_path",
+            "symbol",
+            "kind",
+            "line_start",
+            "line_end",
+            "content_embedding",
+            "gpu_cluster",
+            "som_cluster",
+            "page_rank_score",
+            "community_id",
+            "tags",
+            "neo4j_meta",
+            "indexed_at",
+            "enriched_at",
+            "updated_at",
+            "content",
+            "cluster_summary",
+            "summary_embedding",
+            "signature_embedding",
+            "domain",
+            "language",
+            "extension",
+            "embedding_model",
+            "summary_model",
+            "summary",
+            "metadata",
+            "semantic_tags",
+            "som_bmu_row",
+            "som_bmu_col",
+            "manifold4",
+            "chunk_id",
+            "repo_id",
+            "content_hash",
+            "token_count",
+            "neo4j_gpu_cluster",
+            "output_meta",
+            "summary_embedding_384",
+            "embedding_dimension",
+            "embedding_normalized",
+            "error_embedding",
+            "source_ref",
+            "latent_64",
+            "latent64_model",
+            "latent64_meta",
+            "latent64_validated_at",
+            "latent64_msgpack",
+            "embedding_eligible",
+            "summary_hash",
+            "embedding_version",
+            "embedding_dtype",
+            "embedding_created_at",
+            "encoder_id",
+            "latent_embedding_valid",
+            "latent_embedding_validated_at",
+            "search_vector",
+            "ast_symbols",
+            "ast_imports",
+            "ast_exports",
+            "ast_facts_at",
+            "kmeans_cluster",
+            "centroid_distance",
+            "second_cluster_id",
+            "second_distance",
+            "cluster_margin",
+            "kmeans_model_version",
+            "kmeans_assigned_at",
+            "kmeans_vector_contract",
+            "kmeans384_cluster",
+            "kmeans384_distance",
+            "kmeans384_second_id",
+            "kmeans384_second_dist",
+            "kmeans384_margin",
+            "kmeans384_model_version",
+            "kmeans384_assigned_at",
+            "kmeans_distance",
+            "content_embedding_768",
+            "centroid_id",
+            "reconstruction_error",
+            "routing_tier",
+            "latent_256",
+            "latent_256_checkpoint_revision",
+            "error_embedding_latent_256",
+            "error_embedding_latent_256_checkpoint_revision",
+            "error_embedding_latent_64",
+            "error_embedding_latent64_model",
+            "error_embedding_latent_valid",
+            "error_embedding_latent_validated_at",
+            "latent_128",
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
+          ],
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
+        }
+      ],
+      "referencedTables": [
+        "codebase_chunk_index",
+        "pg_constraint"
+      ],
+      "liveEvidence": null,
+      "ownerCandidates": [
+        "parent-atlas-retrieval-lineage-dag-convergence",
+        "parent-atlas-graph-validation-fabric"
       ],
       "reason": "No journal entry or sidecar declaration was found.",
       "blocking": true
@@ -7671,7 +8296,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -7846,7 +8474,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -8026,7 +8657,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -8206,7 +8840,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -8281,9 +8918,9 @@
             "reused_graph_revision",
             "canonical_authority"
           ],
-          "rowCount": 34,
+          "rowCount": 36,
           "nonNullRevisionCounts": {
-            "workspace_revision": 34
+            "workspace_revision": 36
           }
         }
       ],
@@ -8464,10 +9101,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [
@@ -8636,7 +9286,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -8812,7 +9465,10 @@
             "projection_dimension",
             "encoder_revision",
             "som_revision",
-            "source_revision"
+            "source_revision",
+            "workspace_revision_key",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
           "rowCount": 61718,
           "nonNullRevisionCounts": {
@@ -8942,10 +9598,23 @@
             "error_embedding_latent_valid",
             "error_embedding_latent_validated_at",
             "latent_128",
-            "error_embedding_latent_128"
+            "error_embedding_latent_128",
+            "file_content_hash",
+            "content_hash_scope",
+            "content_hash_algorithm",
+            "content_hash_length",
+            "content_hash_version",
+            "workspace_revision",
+            "source_revision",
+            "representation_revision",
+            "lineage_binding_checksum",
+            "lineage_producer_revision"
           ],
-          "rowCount": 55853,
-          "nonNullRevisionCounts": {}
+          "rowCount": 274465,
+          "nonNullRevisionCounts": {
+            "source_revision": 0,
+            "workspace_revision": 0
+          }
         }
       ],
       "referencedTables": [

@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+/**
+ * Produces a proposed additive registry DDL/index plan. This command is
+ * intentionally a planner: it never connects to PostgreSQL and never applies
+ * the statements it emits.
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+const reportPath = path.join(repoRoot, 'docs', 'reports', 'atlas-rpc-packet-registry-migration-plan-v1.json');
+
+const report = {
+	schema: 'atlas.rpc-packet-registry-migration-plan.v1',
+	generatedAt: new Date().toISOString(),
+	readOnly: true,
+	writesPerformed: false,
+	canonicalOwner: 'postgresql',
+	status: 'PLAN_ONLY_NOT_APPLIED',
+	prerequisites: [
+		'Canonical packet_revision owner is approved and present in the live schema.',
+		'Workspace/source/packet join and projection lineage readbacks pass independently.',
+		'Additive Drizzle schema is reviewed against the live relation census.',
+	],
+	statements: [
+		'CREATE TABLE public.atlas_rpc_packet_registry (registry_id uuid PRIMARY KEY, workspace_id uuid NOT NULL REFERENCES public.workspaces(id), workspace_revision text NOT NULL, packet_key text NOT NULL REFERENCES public.atlas_packets(packet_key), packet_revision text NOT NULL, source_ref text NOT NULL, source_revision text NOT NULL, content_hash text NOT NULL, registry_revision text NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), UNIQUE (workspace_id, workspace_revision, packet_key, packet_revision))',
+		'CREATE TABLE public.atlas_rpc_packet_registry_lanes (registry_id uuid NOT NULL REFERENCES public.atlas_rpc_packet_registry(registry_id), lane_id text NOT NULL, lane_kind text NOT NULL, owner text NOT NULL, status text NOT NULL, representation_id text, representation_revision text, model_revision text, collection text, vector_name text, tags jsonb NOT NULL DEFAULT \'[]\'::jsonb, index_algorithm text NOT NULL, index_revision text, projection_checksum text, write_policy text NOT NULL, PRIMARY KEY (registry_id, lane_id))',
+		'CREATE INDEX atlas_rpc_packet_registry_workspace_source_idx ON public.atlas_rpc_packet_registry (workspace_id, workspace_revision, source_ref)',
+		'CREATE INDEX atlas_rpc_packet_registry_packet_key_idx ON public.atlas_rpc_packet_registry (packet_key, packet_revision)',
+		'CREATE INDEX atlas_rpc_packet_registry_lanes_tags_gin ON public.atlas_rpc_packet_registry_lanes USING gin (tags)',
+	],
+	prohibitedNow: ['DDL application', 'backfill', 'projection writes', 'packet_revision fabrication', 'global migration'],
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+console.log(JSON.stringify({ status: report.status, reportPath: path.relative(repoRoot, reportPath), statements: report.statements.length, writesPerformed: false }, null, 2));
+

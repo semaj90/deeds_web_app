@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.derived-executor-role-audit.v1",
+  "status": "CHALLENGER_ROLES_EXPLICIT",
+  "roles": [
+    {
+      "name": "turbovec",
+      "role": "semantic_prefilter_challenger",
+      "implementationObserved": false,
+      "canonicalIdentityOwner": false,
+      "additionalSemanticVote": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "networkx",
+      "role": "cpu_graph_reference",
+      "implementationObserved": false,
+      "canonicalIdentityOwner": false,
+      "additionalSemanticVote": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "cugraph",
+      "role": "gpu_graph_challenger",
+      "implementationObserved": false,
+      "canonicalIdentityOwner": false,
+      "additionalSemanticVote": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "kmeans",
+      "role": "derived_candidate_cluster",
+      "implementationObserved": false,
+      "canonicalIdentityOwner": false,
+      "additionalSemanticVote": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "som",
+      "role": "derived_topology_projection",
+      "implementationObserved": false,
+      "canonicalIdentityOwner": false,
+      "additionalSemanticVote": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "hamming",
+      "role": "candidate_prefilter",
+      "implementationObserved": false,
+      "canonicalIdentityOwner": false,
+      "additionalSemanticVote": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "hilbert",
+      "role": "physical_locality_order",
+      "implementationObserved": false,
+      "canonicalIdentityOwner": false,
+      "additionalSemanticVote": false,
+      "writesPerformed": false
+    }
+  ],
+  "policy": {
+    "postgresOwnsIdentity": true,
+    "candidateOrdinalOwner": "qualified-lineage-only",
+    "fusionOwner": "SearchRuntime",
+    "qdrantIsProjection": true,
+    "bitfrostIsMetadataCache": true
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

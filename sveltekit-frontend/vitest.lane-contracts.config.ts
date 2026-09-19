@@ -31,6 +31,8 @@ export default defineConfig({
       'tests/lane-contracts/**/*.spec.ts',
       'tests/hyperrag/**/*.spec.ts',
       'src/lib/server/atlas/**/*.spec.ts',
+      'src/lib/server/atlas/**/*.test.ts',
+      'src/lib/server/ace/**/*.spec.ts',
       'src/lib/server/retrieval/packet-bitmap-prefilter.spec.ts',
       'src/lib/server/retrieval/packet-dense-search.spec.ts',
       'src/lib/server/cache/ace-top-retrieval-cache.spec.ts',

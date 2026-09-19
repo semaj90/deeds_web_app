@@ -1,55 +1,55 @@
 {
   "schema": "atlas.current-workspace-source-binding-classification.v1",
-  "generatedAt": "2026-09-14T18:33:01.789Z",
+  "generatedAt": "2026-09-18T22:13:46.717Z",
   "mode": "READ_ONLY_CLASSIFICATION",
-  "admittedWorkspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
-  "planWorkspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "planWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
   "inputPlanRevisionMatches": true,
   "inputPlan": "docs/reports/current-source-graphify-batch-plan-v1.json",
-  "sourcePlanChecksum": "be6b49656f7df2dc370fa0b88ff0f726b01a1d59876a4ffa41cd1447e79e6c38",
+  "sourcePlanChecksum": "b83b2616f6192a59dad0a5d658a4d96dfc72796d4cd7f114c29aac23e5099df9",
   "candidateCount": 5,
   "counts": {
-    "REVISION_BOUND": 0,
+    "REVISION_BOUND": 1,
     "WORKSPACE_IDENTITY_ONLY": 0,
-    "WRONG_WORKSPACE_REVISION": 5,
+    "WRONG_WORKSPACE_REVISION": 0,
     "SOURCE_CONTENT_MISMATCH": 0,
-    "AMBIGUOUS": 0
+    "AMBIGUOUS": 4
   },
   "rows": [
+    {
+      "sourceRef": ".clarity/ff1-plan.md",
+      "sourceRevision": "sha256:a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
+      "contentDigest": "a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "classification": "REVISION_BOUND"
+    },
     {
       "sourceRef": ".claude/AGENT_CONSTITUTION.md",
       "sourceRevision": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
       "contentDigest": "2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
-      "classification": "WRONG_WORKSPACE_REVISION"
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "classification": "AMBIGUOUS"
     },
     {
       "sourceRef": ".claude/AGENT_RECOMMENDATIONS.md",
       "sourceRevision": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
       "contentDigest": "427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
-      "classification": "WRONG_WORKSPACE_REVISION"
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "classification": "AMBIGUOUS"
     },
     {
       "sourceRef": ".claude/ATLAS-ENGINEERING-PROMPT.md",
       "sourceRevision": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
       "contentDigest": "9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
-      "classification": "WRONG_WORKSPACE_REVISION"
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "classification": "AMBIGUOUS"
     },
     {
       "sourceRef": ".claude/CLAUDE.md",
       "sourceRevision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
       "contentDigest": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
-      "classification": "WRONG_WORKSPACE_REVISION"
-    },
-    {
-      "sourceRef": ".claude/DISTILLED_MEMORY.md",
-      "sourceRevision": "sha256:e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
-      "contentDigest": "e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
-      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
-      "classification": "WRONG_WORKSPACE_REVISION"
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "classification": "AMBIGUOUS"
     }
   ],
   "databaseError": null,
@@ -58,5 +58,5 @@
   "safeToApply": false,
   "writesPerformed": false,
   "nextGate": "RECONCILE_SOURCE_BINDINGS_BEFORE_PACKET_CHUNK_JOIN",
-  "reportChecksum": "7db048c380de210161afba1b391a8566f2db3984edb3cbed336a01c03dc0c8dc"
+  "reportChecksum": "60ba6a37e26b20f33f0428651032a8a40609f4702023c3f5f286b79eaf41355b"
 }

@@ -1,3 +1,238 @@
+## Current blocker model (rechecked 2026-09-17)
+
+The workspace authority is already admitted and MUST NOT be re-admitted solely
+to advance this change:
+
+- `workspaceAuthority`: `PROVEN`
+- `admittedWorkspaceRevision`: `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+- `admittedSource`: `WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT`
+- `selectorAuthorityConflict`: `false`
+
+The unresolved upstream gates are execution/source producer authority, current
+packet materialization (missing packet versus missing packet digest),
+`PacketRevisionOwnerV1`, packet→chunk current qualification, and packet→AST/span
+authority. The historical packet→chunk bridge is real but is not current
+promotion authority. The RPC packet registry remains a complete downstream,
+fail-closed consumer.
+
+The source-authority repair planner is diagnostic only and MUST NOT supersede
+the admitted workspace revision. Its latest partial plan proposes candidate
+revision `sha256:c4a55f792102019e2f41458e698a8640fe8f329c70d1d28c59984c81f136253b`
+and owner run `48485685-e773-4433-a1f8-00f5524cca44`, but reports
+`canonicalAuthority: false` and `authorizationRequired: true`. It finds
+`22,911` exact current-binding candidates and `833` content/source-revision
+mismatches. The authoritative frame receipt remains the admitted
+`sha256:e24bb971...` with `currentWorkspaceMatches: 0`; this is a source-owner
+conflict to resolve, not permission to re-admit or write.
+
+The immediate sequence is planning/read-only only:
+
+1. Reconcile the selected execution/source producer under the admitted workspace.
+2. Audit current packet existence and content-digest coverage separately.
+3. Prove or reject an immutable `PacketRevisionOwnerV1` from the existing writer contract.
+4. Run packet→chunk and packet→AST currentness funnels.
+5. Design additive DDL only after identity semantics are proven and separately authorized.
+
+Current packet-writer/schema recheck (read-only, 2026-09-19):
+`audit-packet-writer-lineage-v1.mjs` reports `PACKET_WRITER_CURRENT_LINEAGE_NOT_PROVEN`:
+5 writers were reviewed, with 1 revision-bound contract, 2 legacy SHA-256-only
+writers, and 2 unqualified or schema-drift-blocked writers. The live
+`atlas_packets` census confirms `source_revision` exists as text but is
+populated on `0/61,718` rows; `workspace_revision` and
+`representation_revision` remain legacy integer values populated on all rows.
+Registry parity is structurally complete at `61,718/61,718`, but writer
+ownership remains unresolved (`2` unresolved, `1` active secondary, `3`
+migration-only). No DDL, backfill, or other writes were performed. These
+receipts do not authorize a packet revision column, packet backfill, or
+promotion.
+
+**Derived packet-revision owner tranche (read-only, 2026-09-18):**
+
+- [x] **PACKET-REV-02** — Added `derivePacketRevisionV1` as a pure derived
+  owner over `packetKey`, `sourceRef`, `sourceRevision`, `contentDigest`, and
+  `packetSchemaRevision`. The digest excludes workspace, execution,
+  representation, executor, graph, feature, projection, cache, and timestamp
+  metadata. Fourteen invariant tests pass, including deterministic replay,
+  canonical-input sensitivity, excluded-envelope stability, and fail-closed
+  qualification.
+- [x] Added the read-only owner audit and receipt
+  `docs/reports/packet-revision-owner-v1.json` with
+  `status: DERIVATION_OWNER_PROVEN`.
+- [x] Wired the derived value into
+  `canonical_packet_admission.packetRevision` metadata in the admitted writer;
+  this is metadata-only and has no `atlas_packets.packet_revision` column
+  dependency.
+- [x] Updated the closure assembler to separate independent evidence counts
+  from the strict promotion funnel and to report packet-revision derivability
+  and unqualified digest reasons.
+- [ ] Keep writer adoption, independent database readback, packet materialization,
+  and canonical authority unresolved until the current packet cohort qualifies.
+
+This proves derivation semantics only. It does not add a `packet_revision`
+column, emit revisions from the canonical writer, backfill `atlas_packets`, or
+authorize packet/chunk/AST, vector, cache, or RPC promotion.
+
+**Packet writer/schema recheck (read-only, 2026-09-18):** the writer census still
+reports `PACKET_WRITER_CURRENT_LINEAGE_NOT_PROVEN` (5 writers: 1 revision-bound,
+2 legacy SHA-256-only, 2 unqualified/schema-drift). The live revision census
+confirms `source_revision` exists but is populated on `0/61,718` rows, while
+legacy integer workspace/representation revisions remain populated. The
+derived owner is therefore proven as a contract and metadata projection only;
+writer adoption, independent readback, packet materialization, and canonical
+authority remain open. Receipts: `docs/reports/packet-writer-lineage-v1.json`,
+`docs/reports/packet-write-revision-contract-v1.json`, and
+`docs/reports/atlas-packets-revision-columns-v1.json`.
+
+**Packet-digest bridge plan (read-only, 2026-09-18):** the bounded planner was
+run with the admitted workspace revision and selected execution over `128`
+members. It classified `70` as `MISSING_PACKET`, `58` as
+`PACKET_CONTENT_DIGEST_MISSING`, and `0` as canonical digest matches. The
+planner remains `safeToApply=false`; this is packet-materialization evidence,
+not authorization to invoke the producer. Receipt:
+`docs/reports/current-packet-digest-bridge-v1.json`.
+
+**Source-owner reconciliation (read-only, 2026-09-18):** the selected
+execution’s sealed snapshot and membership checks are internally consistent,
+but admission remains `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` with
+`ownerDecision: LEGACY_ONLY_NO_CURRENT_OWNER` and `safeToPromote=false`.
+Reasons include the dirty worktree and a static inventory different from the
+admitted workspace manifest. This does not authorize re-admission, Graphify
+refresh, packet production, or backfill. Receipt:
+`docs/reports/current-source-owner-reconciliation-v1.json`.
+
+**Current source-authority repair plan (read-only, 2026-09-18):** the current
+worktree materializes to revision `sha256:14f30a01...`, which differs from the
+admitted `sha256:e24bb971...`. Against selected owner run
+`48485685-e773-4433-a1f8-00f5524cca44`, the planner found `22,910` exact current
+binding rows, `834` content/source-revision mismatches, and `14` unavailable
+sources. Status is `REPAIR_PLAN_PARTIAL_EXACT_BLOCKED`, with
+`authorizationRequired=true` and `canonicalAuthority=false`. This remains a
+plan-only result; it does not authorize re-admission, Graphify refresh, packet
+production, or backfill. Receipt:
+`docs/reports/current-source-authority-repair-plan-v1.json`.
+
+**Current source repair census refresh (read-only, 2026-09-18):** the plan
+now observes worktree revision
+`sha256:0c6db859ddf106fbc66cdde7175ff677ee3a4318baa0f396d528379c1086d7f5`,
+which still differs from the admitted workspace revision. It found `22,904`
+exact current bindings, `840` current-binding mismatches, and `14` unavailable
+sources. Both mismatch counters are `CONTENT_DIGEST_MISMATCH=840` and
+`SOURCE_REVISION_MISMATCH=840`. Status remains
+`REPAIR_PLAN_PARTIAL_EXACT_BLOCKED`, with `canonicalAuthority=false` and
+`authorizationRequired=true`. The result is diagnostic only; no source
+admission, Graphify refresh, packet production, digest backfill, or projection
+write is authorized.
+
+Receipt: `docs/reports/current-source-authority-repair-plan-v1.json`.
+
+**Source-owner reconciliation refresh (read-only, 2026-09-18):** the live
+reconciliation still returns `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` with
+`ownerDecision: LEGACY_ONLY_NO_CURRENT_OWNER`. It now sees `24,734` source
+rows, `34` current-execution candidates, and `0` exact current owners. The
+explicit admission reasons remain `EXACT_CURRENT_COMPLETED_OWNER_COUNT_NOT_ONE`,
+`WORKTREE_DIRTY_REQUIRES_SNAPSHOT_POLICY`, and
+`STATIC_WORKTREE_INVENTORY_DIFFERS_FROM_WORKSPACE_REVISION_MANIFEST`.
+`safeToPromote=false` and `writesPerformed=false`. This is a source-snapshot
+policy gate; it does not justify re-admission, Graphify refresh, packet
+materialization, or digest backfill.
+
+Receipt: `docs/reports/current-source-owner-reconciliation-v1.json`.
+
+**Tournament admission boundary refresh (read-only, 2026-09-18):**
+`audit-graphify-tournament-admission-v1.mts` remains
+`TOURNAMENT_ADMISSION_AUDIT_BLOCKED` with
+`firstBlockingInvariant: TOURNAMENT_REQUIRES_BOUND_WORKSPACE_REVISION`.
+`workspaceRevision=null`, `tournamentCanAcceptPlan=false`,
+`authority=false`, and `writesPerformed=false`. This confirms the current
+worktree cannot be promoted by the tournament path without an explicit,
+operator-authorized snapshot decision.
+
+Receipt: `docs/reports/graphify-tournament-admission-v1.json`.
+
+**Source-selection alignment refresh (read-only, 2026-09-18):** the comparison
+audit reports `READY_FOR_REVIEW` for artifact shape only: batch rows `5`,
+registry rows `30`, projection rows `52`, and `sharedRefs=0`. Its decision is
+still `DO_NOT_APPLY`; no PostgreSQL, Graphify, Qdrant, Neo4j, Valkey, or source
+file writes occurred. The zero shared-reference intersection means these
+artifacts cannot establish a current source producer or authorize reconciliation.
+
+Receipt: `docs/reports/source-selection-authority-alignment-v1.json`.
+
+**Current cohort/projection alignment refresh (read-only, 2026-09-18):** the
+52-row cohort has exact projection and manifest bytes for all rows
+(`PROJECTION_EXACT_FILE_BYTES_ADMITTED=52`), with `writes=false`. However, the
+rows are labeled with workspace revision
+`sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb`,
+not the admitted authority `sha256:e24bb971...`. This proves projection-byte
+integrity only; it does not prove current workspace admission or authorize
+packet/AST/vector promotion.
+
+Receipt: `docs/reports/current-source-cohort-projection-alignment-v1.json`.
+
+Evidence: `docs/reports/current-workspace-frame-admission-v1.json`,
+`docs/reports/current-source-cohort-lineage-v1.json`,
+`docs/reports/current-workspace-packet-chunk-join-v1.json`, and
+`docs/reports/packet-registry-writer-ownership-v1.json`.
+
+**Latest producer-owner recheck (2026-09-17):** explicit selection of execution
+`74d50c86-8194-45ea-8c3d-61aab737ef83` finds the nominated candidate, but returns
+`OWNER_SELECTION_VALIDATED_NOT_APPLIED` with `safeToApply: false`. The same run
+passed explicitly to `audit-current-graphify-source-revision-v1.mjs` returns no
+source rows, while `audit-current-source-owner-reconciliation-v1.mjs` returns
+`CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` / `LEGACY_ONLY_NO_CURRENT_OWNER` with
+`34` current-execution candidates and `0` exact current owners. This keeps the
+execution/source producer gate open; no admission or write is implied.
+
+**Execution-owner planner recheck (2026-09-17):** the planner finds two equivalent
+execution candidates with one existing `canonical_authority` flag, selecting the
+same execution ID, but still emits `safeToApply: false`; this is a database flag,
+not a materialization authorization. The bounded workspace→packet→chunk join
+against the admitted workspace and selected execution finds `25` binding sources,
+`2` proven packet/chunk sources, `0` packet-revision matches, and `0` full-identity
+matches. Receipt: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+
+**Source-owner reconciliation recheck (read-only, 2026-09-17):**
+`audit-current-source-owner-reconciliation-v1.mjs` reports
+`CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` / `LEGACY_ONLY_NO_CURRENT_OWNER` across
+`24,722` source rows, with `34` current-execution candidates and `0` exact current+owners. `writesPerformed` is false. Receipt: `docs/reports/current-source-owner-reconciliation-v1.json`.
+
+**Explicit current-lineage recheck (read-only, 2026-09-17):** the same join was
+rerun with the admitted revision `sha256:e24bb971...` and execution
+`74d50c86-8194-45ea-8c3d-61aab737ef83`. The unrestricted query hit the PostgreSQL
+statement timeout and produced no new receipt; a bounded `--limit 1` replay
+completed with `CURRENT_PACKET_CHUNK_JOIN_MISSING`, `binding_rows: 1`,
+`graphify_exact_sources: 1`, `binding_proven_lineage_sources: 0`,
+`packet_chunk_exact_sources: 0`, `packet_source_rows: 0`,
+`packet_revision_matches: 0`, and `packet_full_identity_matches: 0`.
+PostgreSQL itself remains reachable on the configured host port and reports
+version `18.4`; the timeout is an audit-query breadth/performance issue, not
+evidence of database unavailability. The packet revision contract audit remains
+`PARTIAL_PROVEN` with `source_revision` structurally present but
+`PacketRevisionOwnerV1` and `packetKey` semantics unproven; `writesPerformed` is
+false. Receipts: `docs/reports/current-workspace-packet-chunk-join-v1.json` and
+`docs/reports/packet-write-revision-contract-v1.json`.
+
+**Current source-cohort lineage recheck (read-only, 2026-09-19):**
+`audit-current-source-cohort-lineage-v1.mjs` reports
+`WORKSPACE_REVISION_SOURCE_MISMATCH` for the admitted workspace revision
+`sha256:e24bb971...`. All `52` cohort rows match Graphify and source revision
+(`graphifyMatched=52`, `sourceRevisionQualified=52`), but
+`currentWorkspaceMatched=0`; `workspaceMismatchAfterSourceQualification=52`,
+with `missing=0` and `ambiguous=0`. The live binding census contains three
+workspace revisions, including the admitted value, but none of the 52 selected
+rows is currently projected into it. This is stale workspace projection/source
+admission evidence, not authorization to re-admit or write. Receipt:
+`docs/reports/current-source-cohort-lineage-v1.json`.
+
+**Workspace-frame admission recheck (read-only, 2026-09-18):** the admitted
+workspace revision remains `sha256:e24bb971...` with `admittedAuthority=true`,
+`selectorAuthorityConflict=false`, and no selector blockers. The frame audit
+confirms `exactSourceRevisionMatches=52`, `currentWorkspaceMatches=0`,
+`workspaceMismatches=52`, `staleProjectionCandidates=52`, and
+`conflictingSourceRows=0`; no execution is currently admitted in the frame
+receipt (`admittedExecutionId=null`). `writesPerformed=false`.
+Receipt: `docs/reports/current-workspace-frame-admission-v1.json`.
+
 ## Remaining task dependency map (updated 2026-09-05)
 
 **2026-09-10 snapshot-binding recheck:** the read-only binding audit independently
@@ -1312,6 +1547,9 @@ prerequisite. A prior status summary in this session stated `NESTED-TRAIN-02`/`N
 ## 4. Promotion safety
 
 - [ ] PROMOTION-01 — Keep source lineage, graph identity, feature layout,
+
+Current closure recheck (read-only, 2026-09-18): `scripts/atlas/audit-current-lineage-closure-v1.mjs` still returns `EXECUTION_SOURCE_AUTHORITY` with `workspaceSourceRows=52`, `packetQualifiedRows=0`, `packetChunkQualifiedRows=4`, `astQualifiedRows=48`, `spanQualifiedRows=0`, and `candidateOrdinalEligibleRows=0`. `writesPerformed=false`. This confirms the candidate-freeze and SOM gates remain downstream-blocked by current execution/source authority; the independent packet/chunk and AST counts are not a promotion funnel. Receipt: `docs/reports/current-lineage-closure-v1.json`.
+Explicit workspace/execution join recheck (read-only, 2026-09-18): admitted workspace `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc` plus execution `74d50c86-8194-45ea-8c3d-61aab737ef83` yielded `128` bindings, `4` proven lineage sources, `4` packet/chunk exact sources, `0` packet revision matches, and `0` full packet identity matches. This remains a source/packet authority failure, not a KNN/SOM executor failure; writes remained false.
   projection ownership, and migration baseline as independent blockers.
 - [ ] PROMOTION-02 — Permit writes only through an explicit target list,
   rollback plan, readback receipt, and human authorization.
@@ -1382,6 +1620,12 @@ lineage MEMBERSHIP, not 1:1 identity.
   Direct authority lookup confirms the three remaining files have chunk rows but no matching
   `graphify_files.workspace_id`/`code_source_revision` and no populated `atlas_source_refs`
   namespace or commit revision. This is an authority-coverage gap, not a packet-writer defect.
+  The batch embedding endpoint is now fail-closed at the caller boundary: it returns/caches
+  computed embeddings but does not invoke the nullable legacy packet writer without a
+  server-owned admitted execution/source binding. This prevents new unqualified packet
+  writes while leaving the strict admitted writer available for the eventual canonical
+  producer. Evidence: `sveltekit-frontend/src/routes/api/admin/batch-embeddings/embed/+server.ts`;
+  focused admission/writer tests pass 15/15. This guard does not close PKT-LINEAGE-08.
   A separate manifest check confirms all three are present with `canonicalAdmission: true` and
   stable content hashes, but the manifest carries no `sourceRevision`. Therefore the next repair
   is additive source-revision/workspace metadata enrichment for already-admitted files; do not
@@ -5017,13 +5261,16 @@ Implementation references and current gaps:
 - Candidate ordinal authority: `sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts` (`CandidateOrdinalMapV1`, `materializeCandidateOrdinalMap`). The map is schema-backed and checksum-bearing, but a production frozen population receipt for this tranche is not yet proven.
 - Exact KNN executor: `python/atlas_compute/cuvs_analytics.py` (`run_cuvs_exact_knn`, `run_cuvs_all_neighbors`). It already records `top_k`, metric, row/dimension counts, and neighbor/distance checksums; the missing gate is binding those results to the admitted candidate map and input population checksum.
 - KMeans executor: `python/atlas_compute/cluster_softmax.py` (`run_cuvs_soft_kmeans`). It records cluster parameters and replay data, but centroid membership/checksum admission is still open.
-- SOM executor: `python/atlas_compute/som.py` (`train_deterministic_som`). It supports deterministic 20x20 execution; `python/atlas_compute/aligned_snapshot_experiment_v2.py` currently derives `kmeans_clusters` and `som_grid_rows` from population size when omitted. Production execution MUST supply frozen values and reject implicit derivation for this gate.
+- SOM executor: `python/atlas_compute/som.py` (`train_deterministic_som`). It supports deterministic 20x20 execution; fixture mode may retain population-derived defaults, but `python/atlas_compute/aligned_snapshot_experiment_v2.py` now rejects omitted production values and requires explicit `som_grid_rows=20` and `som_grid_columns=20` alongside a ready candidate-freeze receipt.
 - Shared experiment coordinator: `python/atlas_compute/aligned_snapshot_experiment_v2.py`. It currently executes exact KNN, KMeans, and SOM over the same loaded semantic matrix, but does not yet prove the `CandidateOrdinalMapV1`/population receipt before downstream stages.
 - Required report: `docs/reports/som-ae-knn-kmeans-alignment-v1.json`; this is a read-only proof receipt, not an artifact writer.
 - Candidate-map admission audit: `scripts/atlas/audit-candidate-ordinal-admission-v1.mjs` → `docs/reports/candidate-ordinal-admission-v1.json`. The existing 4,951-row map is `CANDIDATE_ORDINAL_ADMISSION_READY` for diagnostic use (dense `0..4950`, zero missing/duplicates, checksum aligned); this does not authorize joining it to the separate 55,169-row semantic export or running downstream algorithms.
 - KNN parameter audit: `scripts/atlas/audit-knn-parameter-freeze-v1.mjs` → `docs/reports/knn-parameter-freeze-v1.json`. Reuse the existing experiment configuration, but require an explicit query population; an empty `query_canonical_ids` list must not silently become the first 32 candidates.
 - KNN query population freeze: `scripts/atlas/freeze-knn-query-population-v1.mjs` → `docs/reports/knn-query-population-freeze-v1.json`. The bounded proof population is explicitly recorded from admitted ordinals; it is not an implicit coordinator fallback.
 - KNN population join remains blocked until the frozen query IDs join the semantic vector snapshot used by the executor. Current audit evidence records 4,951 admitted candidates versus 55,169 semantic snapshot keys with zero intersection; do not execute KNN across mismatched universes.
+- A pure `CandidatePopulationFreezeV1` contract now exists at `sveltekit-frontend/src/lib/server/atlas/retrieval/candidate-population-freeze-v1.ts`. It binds the existing ordinal-map checksum, semantic snapshot/tensor/row-identity checksums, admitted workspace revision, and an explicit source-authority receipt checksum. Its focused tests pass `3/3`, but it intentionally rejects the current unqualified cohort; this does not close the freeze task or authorize KNN/KMeans/SOM.
+- `scripts/atlas/audit-candidate-population-freeze-v1.mjs` now composes the three live receipts without querying or mutating a store. The current result is `CANDIDATE_POPULATION_FREEZE_BLOCKED` with `0` eligible lineage rows, an unaligned workspace cohort, unproven source-producer authority, disabled ordinal downstream admission, and a blocked semantic snapshot. Receipt: `docs/reports/candidate-population-freeze-v1.json`.
+- `python/atlas_compute/aligned_snapshot_experiment_v2.py` now requires `production_mode` callers to provide a ready candidate-freeze receipt, rejects mutation/authority-enabled receipts, and requires explicit `som_grid_rows=20` plus `som_grid_columns=20`. The existing fixture remains non-production; regression tests pass `3/3`. This hardens the downstream gate without claiming a live SOM run.
 - The current semantic export is keyed by `codebase_chunk_index.id`, while the existing candidate map contains `proto:*`/`packet:*` identities. A direct canonical-ID join is therefore invalid; resolve the semantic candidate-population owner before generating any KNN receipt.
 - Semantic cohort audit: `scripts/atlas/audit-semantic-candidate-cohort-v1.mjs` → `docs/reports/semantic-candidate-cohort-v1.json`. The 55,169-row semantic snapshot resolves in `codebase_chunk_index` and has 55,169 `chunk_id`/`content_hash` values, but only 52,380 `source_ref` values and zero exact authoritative workspace-source bindings. `atlas_source_refs` is diagnostic coverage only (32,239 reference matches, 2,067 content-hash matches, 0 populated `commit_sha` values); it must not substitute for an authoritative revision binding.
 - Result: `SEMANTIC_CANDIDATE_COHORT_BLOCKED`; do not materialize a semantic ordinal map or run KNN/KMeans/SOM/AE against this snapshot until the canonical source-snapshot/revision-set owner covers the same population. No database, vector-store, graph, cache, or latent-row writes were performed.
@@ -5394,6 +5641,12 @@ outputs against current observations or mark them `SUPERSEDED` solely by timesta
   `workspaceRevision` remains a deterministic source-manifest identity and may be reused when
   bytes are unchanged; `runId`, `startedAt`, `completedAt`, and environment metadata identify one
   execution attempt and must be fresh per attempt.
+Implementation note: retired the legacy durable apply path in `sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts`.
+  Its read-only planning mode remains available, but `--apply` now fails closed because its
+  logical-snapshot upsert can reuse a prior `run_id`. Durable execution ownership remains the
+  newer `graphify-daily-coordinator-v1.ts`, which creates a fresh execution identity per attempt.
+  The bounded dry-run still passes with `canonicalWriteAttempted=false` and
+  `graphMayConsumeWorkspaceRevision=false`; this does not admit the current source cohort.
 - [x] Read-only code audit found `sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts`
   uses `ON CONFLICT (workspace_id, workspace_revision, parser_contract_version) DO UPDATE`,
   which can reuse a logical snapshot row instead of creating a new execution receipt. The schema
@@ -15010,3 +15263,545 @@ the three blocked rows remain excluded rather than repaired by inference.
 Receipt: `docs/reports/packet-chunk-lineage-promotion-preflight-v1.json`;
 preflight checksum: `sha256:7434f3ba9539d4818996439fae5d9e7fe173075c489731ac9698f9ea115b1dd6`.
 Focused packet identity tests pass 5/5 and OpenSpec strict validation passes.
+
+### 2026-09-17 — source-authority selector proof and live replay rechecked
+
+Re-ran the pure source-authority selector proof: all `27/27` fixture cases passed,
+including exact-current selection, stale workspace-revision rejection, workspace-id
+mismatch rejection, duplicate-current ambiguity rejection, empty-population rejection,
+and malformed or mismatched digest rejection. This proves the selector policy, not a
+canonical owner.
+
+Re-ran the live replay against PostgreSQL twice. Both executions agreed on
+`NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`, with `selectedRunId=null`,
+`canonicalAuthority=false`, and `writesPerformed=false`; the replay receipt is
+`LIVE_REPLAY_PROVEN`. The live selector still finds no completed Graphify run whose
+workspace/source binding is accepted as current authority. This does not supersede the
+admitted workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+and does not authorize a new revision, execution, packet writer, or backfill.
+
+Receipts: `docs/reports/current-source-evidence-authority-selector-proof-v1.json` and
+`docs/reports/current-source-evidence-authority-live-replay-proof-v1.json`.
+No database, DDL, packet, projection, cache, or source-data writes occurred.
+
+### 2026-09-17 — live selector receipt refreshed
+
+The direct live selector replay was run again against the current PostgreSQL state.
+It found `20` Graphify runs (`13` completed), but no completed run accepted as a
+current source owner: `status=NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`,
+`selectedRunId=null`, `ambiguityCount=0`, `canonicalAuthority=false`, and
+`writesPerformed=false`. The current workspace identity was freshly materialized as
+workspace `625743d2-092b-4fa8-abe0-9dc094920c80` with a dirty-worktree revision and
+`24,665` source rows; completed candidates were rejected for stale workspace/source
+manifest identity or because they were never source-bound. This is a current
+fail-closed observation, not a replacement for the separately admitted workspace
+revision and not authorization to admit a new revision or execution.
+
+Receipt: `docs/reports/current-source-evidence-authority-v1.json`.
+
+### 2026-09-17 — source-owner reconciliation confirms snapshot-policy gate
+
+The live source-owner reconciliation was refreshed after the selector run. It reports
+`CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` / `LEGACY_ONLY_NO_CURRENT_OWNER`: `24,711`
+indexable tracked sources, `25,542` sources in the workspace-revision manifest,
+`34` current-execution candidates, and `0` exact current owners. The admission reasons
+are explicit: the exact-current completed-owner count is not one, the worktree is dirty
+and requires snapshot policy, and the tracked inventory differs from the workspace
+revision manifest. Four completed legacy candidates remain diagnostic only. The receipt
+has `writesPerformed=false` and does not authorize re-admission, execution selection,
+packet materialization, or revision migration.
+
+Receipt: `docs/reports/current-source-owner-reconciliation-v1.json`;
+summary: `docs/reports/current-source-owner-reconciliation-v1.md`.
+
+### 2026-09-17 — workspace-frame admission recheck
+
+The read-only Gate 1 admission audit was refreshed. The admitted workspace revision
+`sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc` remains
+authoritative with no selector conflict or blockers. The sampled cohort remains
+`STALE_WORKSPACE_PROJECTION`: `52/52` exact source-revision matches but `0/52`
+current-workspace matches, with all `52` classified as stale projection candidates and
+`0` conflicting source rows. `admittedExecutionId` remains null, so execution authority
+is still a separate unresolved gate. No datastore writes occurred.
+
+Receipt: `docs/reports/current-workspace-frame-admission-v1.json`.
+
+### 2026-09-17 — execution-owner planner authority semantics hardened
+
+The live execution-owner planner found two equivalent completed executions with one
+observed database `canonical_authority` flag (`74d50c86-8194-45ea-8c3d-61aab737ef83`),
+but the decision remains unapplied. The planner previously surfaced that observed flag
+as `canonicalAuthority=true` while also returning `safeToApply=false`. That ambiguity
+was corrected: the planning receipt now requires an explicit owner decision, emits
+`canonicalAuthority=false`, keeps `safeToApply=false` and `writesPerformed=false`, and
+routes to `EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION`. The database flag remains
+diagnostic evidence only; no execution owner was admitted and no data was changed.
+
+Receipt: `docs/reports/current-graphify-execution-owner-resolution-v1.json`.
+Implementation: `scripts/atlas/plan-current-graphify-execution-owner-resolution-v1.mjs`.
+Validation: `node --check`, live planner replay, and strict OpenSpec validation passed.
+
+### 2026-09-17 — selected execution owner decision dry run
+
+Ran the owner-decision tool for the explicitly identified candidate
+`74d50c86-8194-45ea-8c3d-61aab737ef83` without `--apply` and without the dedicated
+authorization environment variable. The tool validated that the candidate belongs to
+the previously proven equivalent set, listed the other candidate
+`0dba1c0d-2cf7-4f35-a61b-c77956f60d3d`, and returned `mode=DRY_RUN`,
+`writesPerformed=false`, `after=null`, and `readbackVerified=false`. This confirms the
+apply boundary is explicit and inert by default. Execution ownership remains
+unadmitted; no database state changed.
+
+Receipt: `docs/reports/current-graphify-execution-owner-decision-v1.json`.
+
+### 2026-09-17 — explicit current packet/chunk identity census
+
+Ran the packet/chunk identity reconciliation with the already-admitted workspace
+revision and the explicitly selected execution. The read-only census reports
+`PACKET_DIGEST_BRIDGE_MISSING`: `24,456` bound sources, `16,554` packet-reference
+matches, `7,902` missing packet rows, `16,454` packet rows missing canonical
+`content_hash`, `3,230` legacy-only digest matches, and `20` digest mismatches. The
+existing packet-lineage bridge has `627` reference matches, with `0` missing lineage
+rows and `0` packet-lineage join gaps. Legacy digest matches remain diagnostic only;
+the owner preflight is still `OWNER_SELECTION_VALIDATED_NOT_APPLIED`, so no packet
+backfill, digest fill, execution admission, or projection promotion is authorized.
+
+Receipt: `docs/reports/current-packet-chunk-identity-reconciliation-v1.json`.
+
+### 2026-09-18 — execution/source bridge reconciliation (read-only)
+
+The new `audit-current-graphify-source-bridge-reconciliation-v1.mjs` compares the
+admitted workspace snapshot, selected execution membership, legacy Graphify files,
+and `atlas_workspace_source_bindings` in one repeatable read-only transaction. For
+execution `74d50c86-8194-45ea-8c3d-61aab737ef83` and admitted workspace revision
+`sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`, the
+execution membership contains `24,456` repo-root rows and all `24,456` exactly match
+the sealed snapshot's source revision, content digest, byte length, and workspace
+revision. The same `24,456` rows are present in the workspace-binding ledger. The
+legacy `graphify_files` query returns `0` rows for the admitted revision, so that
+legacy table is not the current source bridge. This is an exact read-only bridge
+receipt, not packet materialization or promotion authority; packet digest/current
+packet gates remain open. No database writes occurred.
+
+Receipt: `docs/reports/current-graphify-source-bridge-reconciliation-v1.json`.
+
+### 2026-09-18 — bounded current packet-digest bridge recheck
+
+The explicit read-only packet-digest planner was replayed against admitted
+workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+and selected execution `74d50c86-8194-45ea-8c3d-61aab737ef83` over a bounded
+`128`-row membership sample. It returned `PACKET_DIGEST_BRIDGE_BLOCKED` with
+`0` canonical content-digest matches, `70` `MISSING_PACKET` rows, `58`
+`PACKET_CONTENT_DIGEST_MISSING` rows, and `0` digest mismatches. The candidate
+checksum is `sha256:47dfcc4d3be5c2558a76e8e178e116f1fe0f1f411b8f051a834dd32d34685c82`.
+This is planning evidence only: `safeToApply=false`, `canonicalAuthority=false`,
+and `writesPerformed=false`. It confirms the next gate is packet materialization
+and canonical content-digest ownership, not ANN/Qdrant/cuVS execution.
+
+Receipt: `docs/reports/current-packet-digest-bridge-v1.json`.
+
+### 2026-09-18 — P0 lineage and downstream proof refresh
+
+The explicit admitted-workspace/execution census was rerun read-only with
+workspace revision
+`sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+and execution `74d50c86-8194-45ea-8c3d-61aab737ef83`. The unified funnel remains
+`EXECUTION_SOURCE_AUTHORITY`: `workspaceSourceRows=52`,
+`packetQualifiedRows=0`, `packetChunkQualifiedRows=4`, `astQualifiedRows=48`,
+`spanQualifiedRows=0`, and `candidateOrdinalEligibleRows=0`.
+
+The packet writer recheck remains `PACKET_WRITER_CURRENT_LINEAGE_NOT_PROVEN`
+(5 writers; 1 revision-bound, 2 legacy SHA-256-only, 2 unqualified/schema
+drift). The revision contract remains `PARTIAL_PROVEN`; `packetKey` identity
+semantics are still unproven. No packet, digest, DDL, projection, or source
+writes were performed.
+
+The parallel capability proof remains read-only:
+WSL2/RAPIDS capability is proven, Windows CUDA parity is open, WebGPU parity is
+observed but unadmitted, DirectML is unproven, and TensorRT-RTX is not
+installed/proven. Shared candidate-feature residency is bounded/proven.
+The prefill fixture remains `PREFILL_DAG_REPLAY_PROVEN` with
+`canonicalAuthority=false` and `writesPerformed=false`.
+
+Receipts: `docs/reports/current-lineage-closure-v1.json`,
+`docs/reports/parent-atlas-current-lineage-funnel-v1.json`,
+`docs/reports/packet-writer-lineage-v1.json`,
+`docs/reports/packet-write-revision-contract-v1.json`,
+`docs/reports/gpu-executor-capability-v1.json`, and
+`docs/reports/prefill-dag-fixture-v1.json`.
+
+### 2026-09-18 — packet writer ownership and revision contract recheck
+
+The read-only writer census confirms registry parity (`61,718` packet rows and
+`61,718` registry rows; no missing, orphaned, or duplicate registry keys), but
+does not establish a canonical current producer. Two paths remain `UNRESOLVED`,
+one is an `ACTIVE_SECONDARY_WRITER`, and three are migration-only. The packet
+writer lineage audit finds `1/5` revision-bound writers, `2` legacy-SHA256-only
+writers, and `2` unqualified/schema-drift writers. The revision-contract audit
+confirms that `source_revision` exists live but packet-key identity semantics
+remain unproven. `safeToBackfill=false` and all audits report
+`writesPerformed=false`; do not execute a writer, backfill, or projection.
+
+Receipts: `docs/reports/atlas-registry-writer-ownership-v2.json`,
+`docs/reports/packet-writer-lineage-v1.json`, and
+`docs/reports/packet-write-revision-contract-v1.json`.
+
+### 2026-09-18 — source-evidence hydration recheck
+
+The independent source-evidence census remains blocked: `24,181` input rows,
+`23,397` exact revision matches, and `19,906` content-hydrated rows, but
+`0` authoritative namespaces, `0` evidence-span-ready rows, and `0`
+classifier-ready rows. Missingness remains separated into `4,275`
+`CANONICAL_CHUNK_OWNER_MISSING` rows and `19,906`
+`CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION` rows. This is a downstream
+namespace/span ownership gate and does not establish packet currentness or
+authorize AST, classifier, vector, or graph promotion. Writes: `0`.
+
+Receipt: `docs/reports/current-source-evidence-hydration-v1.json`.
+
+### 2026-09-18 — current source repair-plan recheck
+
+The read-only repair planner remains `REPAIR_PLAN_PARTIAL_EXACT_BLOCKED`.
+The current worktree revision is now
+`sha256:6dc8a977f912370cad095cdae375d01d96c0dbf561fad81c77a04c99d0398718`,
+while the admitted workspace revision remains the previously sealed
+`sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`.
+The repair census is stable at `22,904` exact current bindings, `840`
+content/source-revision mismatches, and `14` unavailable sources. The worktree
+is therefore not eligible to replace the admitted source snapshot; operator
+snapshot policy and authorization remain required. `canonicalAuthority=false`,
+`writesPerformed=false`.
+
+Receipt: `docs/reports/current-source-authority-repair-plan-v1.json`.
+
+### 2026-09-18 — Graphify lifecycle-owner recheck
+
+The lifecycle audit still reports `LIFECYCLE_OWNER_UNPROVEN`: `0` running
+runs, `0` current runs, and `19` stale runs. The blockers are
+`LIFECYCLE_OWNER_UNPROVEN`, `CURRENT_RUN_NOT_ESTABLISHED`, and
+`REPOSITORY_REVISION_NOT_CURRENT`. The selected execution remains useful as a
+diagnostic candidate, but it is not current-source authority and cannot
+authorize packet materialization or projection promotion. Writes: `false`.
+
+Receipts: `docs/reports/graphify-lifecycle-owner-v1.json`,
+`docs/reports/graphify-current-run-eligibility-v1.json`.
+
+### 2026-09-18 — explicit current-lineage recheck
+
+The bounded census was rerun with the admitted workspace revision
+`sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+and selected execution `74d50c86-8194-45ea-8c3d-61aab737ef83`. The 128-row
+sample has 128 normalized source/revision/content/workspace matches, but only
+4 proven packet→chunk rows, 0 packet revision matches, and 0 packet content
+matches. The path-coverage query timed out; this is not promotion evidence.
+
+The derived owner remains `[x] DERIVATION_OWNER_PROVEN` with read-only writer
+metadata integration, `writerAdoption=false`, `canonicalAuthority=false`, and
+`writesPerformed=false`. The digest bridge plan remains blocked with 70 missing
+packets and 58 packets missing canonical content digests in the sample.
+
+Receipts: `docs/reports/current-workspace-packet-chunk-join-v1.json`,
+`docs/reports/packet-revision-owner-v1.json`, and
+`docs/reports/current-packet-digest-bridge-v1.json`.
+
+### 2026-09-18 — current source repair census recheck
+
+The read-only repair planner observed runtime worktree revision
+`sha256:905ca585358884e3d1749e76f3c4ebae59cd3f9634e10844bcd141d42442ebf1`,
+which remains distinct from the admitted workspace revision and is not an
+admission decision. Against owner run
+`48485685-e773-4433-a1f8-00f5524cca44`, the planner reports `22,908` exact
+current bindings, `836` current-binding mismatches, and `14` unavailable
+sources. Status remains `REPAIR_PLAN_PARTIAL_EXACT_BLOCKED`,
+`authorizationRequired=true`, `canonicalAuthority=false`, and no PostgreSQL,
+Qdrant, Neo4j, or Valkey writes. Filesystem output is limited to the
+diagnostic receipt itself.
+
+Receipt: `docs/reports/current-source-authority-repair-plan-v1.json`.
+
+### 2026-09-18 — current source repair planner latest recheck
+
+The latest read-only planner remains `REPAIR_PLAN_PARTIAL_EXACT_BLOCKED` and
+reports runtime worktree revision
+`sha256:bbe6ade362a1256daf19ae144a052c7aa1e0801bf00ec8ac36e5d484d12b1bb`,
+`23,758` source rows, `22,890` exact current bindings, `854` content/source-
+revision mismatches, and `14` unavailable sources. Both mismatch dimensions are
+present (`CONTENT_DIGEST_MISMATCH=854`, `SOURCE_REVISION_MISMATCH=854`). The
+planner requires authorization and does not establish canonical authority;
+`canonicalAuthority=false` and no database, packet, projection, or cache writes
+were performed.
+
+Receipt: `docs/reports/current-source-authority-repair-plan-v1.json`.
+
+### 2026-09-18 — source-selection authority alignment recheck
+
+The read-only alignment audit is `READY_FOR_REVIEW` only, with an explicit
+`DO_NOT_APPLY` decision: 5 batch rows, 30 registry rows, 52 projection rows,
+and `sharedRefs=0`. This is not a current-source admission or repair target;
+the absence of shared references means no source-selection handoff is safe.
+Receipt: `docs/reports/source-selection-authority-alignment-v1.json`.
+
+### 2026-09-17 — packet writer authority recheck
+
+The packet-writer audit remains `PACKET_WRITER_CURRENT_LINEAGE_NOT_PROVEN`:
+five writers were found, with one revision-bound contract, two legacy
+SHA-256-only writers, and two unqualified or schema-drifted writers. The
+revision-contract audit independently confirms that the live `source_revision`
+column exists, while `packetKeyIdentitySemantics` remains `UNPROVEN` and the
+overall verdict is `PARTIAL_PROVEN`. Both audits performed no writes; no writer
+is authorized to repair the current packet cohort.
+
+Receipts: `docs/reports/packet-writer-lineage-v1.json` and
+`docs/reports/packet-write-revision-contract-v1.json`.
+
+### 2026-09-17 — packet revision-column coverage recheck
+
+The live census confirms `atlas_packets` has integer `workspace_revision` and
+`representation_revision` columns plus text `source_revision`. All `61,718`
+rows contain the legacy integer values, while `source_revision` is populated on
+`0` rows. The schema exists, but no usable packet source-revision coverage or
+`PacketRevisionOwnerV1` is thereby established. This remains evidence for a
+plan-only additive migration review; no DDL or row updates were performed.
+
+Receipt: `docs/reports/atlas-packets-revision-columns-v1.json`.
+
+### 2026-09-17 — registry writer ownership recheck
+
+The registry census remains structurally aligned: `61,718` packet rows and
+`61,718` registry rows, with `0` missing, orphaned, or duplicate registry keys
+and `61,718` complete packet rows. Ownership classification remains `2`
+`UNRESOLVED`, `1` `ACTIVE_SECONDARY_WRITER`, and `3`
+`MANUAL_MIGRATION_ONLY`. The audit performed no writes, and parity does not
+establish current-corpus lineage or authorize backfill.
+
+Receipt: `docs/reports/atlas-registry-writer-ownership-v2.json`.
+
+### 2026-09-17 — workspace-linked Graphify run-owner readback
+
+The read-only run-owner audit confirms `GRAPHIFY_RUN_OWNER_COMPLETE` for the
+admitted workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`:
+one completed workspace-linked owner and one workspace row are present. The
+coordinator surface still contains two completed executions, each with three
+completed stages, including the selected execution
+`74d50c86-8194-45ea-8c3d-61aab737ef83`. This validates the workspace-linked run
+readback but does not close the separate lifecycle-owner, workspace-cohort, or
+packet-digest gates. The audit is read-only.
+
+Receipt: `docs/reports/current-graphify-run-owner-v1.json`.
+
+### 2026-09-17 — explicit current workspace packet/chunk join
+
+The bounded join was rerun with workspace revision
+`sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`,
+execution `74d50c86-8194-45ea-8c3d-61aab737ef83`, and limit `128`. It found
+`128` binding rows and exact Graphify sources, but only `4` proven lineage
+sources and `4` packet/chunk exact-source matches. `packet_revision_matches`,
+`packet_full_identity_matches`, and `packet_content_matches` remain `0`;
+`packet_source_rows=40` and `chunk_file_content_matches=4`. The result is
+`CURRENT_PACKET_CHUNK_JOIN_PARTIAL`; no promotion or write authorization is
+issued from this sample.
+
+Receipt: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+
+### 2026-09-17 — current lineage closure funnel
+
+Added the read-only closure assembler
+`scripts/atlas/audit-current-lineage-closure-v1.mjs`, which composes the
+already-owned source-cohort, execution-owner, packet/chunk, packet-writer, and
+source-evidence receipts without inventing identity or authority. The current
+receipt reports `workspaceSourceRows=52`, `packetQualifiedRows=0` in the bounded
+packet-join scope, `packetChunkQualifiedRows=4`, `astQualifiedRows=48`,
+`spanQualifiedRows=0`, and `candidateOrdinalEligibleRows=0`. The first failure
+boundary is `PACKET_REVISION_OWNER`; workspace authority is admitted and
+execution authority is applied/read back, but lifecycle ownership and current
+packet identity remain unresolved. `canonicalAuthority=false` and
+`writesPerformed=false`.
+
+Implementation: `scripts/atlas/audit-current-lineage-closure-v1.mjs`.
+Receipt: `docs/reports/current-lineage-closure-v1.json`.
+
+### 2026-09-17 — unified current-lineage funnel receipt
+
+Enhanced the read-only closure assembler to emit the requested
+`ParentAtlasCurrentLineageFunnelV1` receipt at
+`docs/reports/parent-atlas-current-lineage-funnel-v1.json`. The current
+attrition is explicit: `admittedWorkspaceSources=52`,
+`selectedExecutionExactSources=128` (bounded join scope), `packetRows=40`,
+`packetSourceRevisionMatches=0`, `packetContentDigestMatches=0`,
+`packetRevisionQualified=0`, `provenPacketChunkRows=4`,
+`canonicalChunkMatches=4`, `revisionQualifiedAstRows=48`,
+`namespaceQualified=0`, `spanQualified=0`, `fullyQualified=0`, and
+`candidateOrdinalEligibleRows=0`. The first failure remains
+`PACKET_REVISION_OWNER`; `canonicalAuthority=false` and
+`writesPerformed=false`. The existing closure receipt remains available.
+
+Implementation: `scripts/atlas/audit-current-lineage-closure-v1.mjs`.
+Receipts: `docs/reports/parent-atlas-current-lineage-funnel-v1.json` and
+`docs/reports/current-lineage-closure-v1.json`.
+
+### 2026-09-17 — bounded funnel refresh after query timeout
+
+The source-owner and packet-join inputs were refreshed read-only. The broad
+packet join exceeded its PostgreSQL statement timeout, so it was not treated as
+complete-corpus evidence. A `--limit 1` replay completed and refreshed the
+funnel with `selectedExecutionExactSources=1`, `packetRows=0`,
+`packetRevisionQualified=0`, `provenPacketChunkRows=0`,
+`canonicalChunkMatches=0`, `revisionQualifiedAstRows=48`,
+`namespaceQualified=0`, `spanQualified=0`, and `fullyQualified=0`.
+The prior bounded-128 receipt remains historical evidence, but the current
+funnel must be read as a one-row diagnostic until the broad query is made
+bounded/performant. `writesPerformed=false` and `canonicalAuthority=false`.
+
+**Packet/chunk identity reconciliation (read-only, 2026-09-17):** with the
+admitted workspace revision and selected execution supplied explicitly, the
+current bridge reports `binding_sources=24,456`, `packet_ref_matches=16,554`,
+`packet_digest_matches=0`, `packet_legacy_sha256_matches=3,230`,
+`packet_any_digest_matches=3,230`, `lineage_ref_matches=627`,
+`packet_lineage_matches=627`, `missing_packet_rows=7,902`,
+`packet_content_digest_missing=16,454`, `packet_digest_mismatches=20`, and
+`lineage_packet_join_gaps=0`. The first actionable packet boundary is therefore
+missing packet materialization/content digest coverage, while the existing
+legacy digest and packet→chunk bridge remain noncanonical. Receipt:
+`docs/reports/current-packet-chunk-identity-reconciliation-v1.json`.
+
+**Packet-writer lineage recheck (read-only, 2026-09-17):** the writer census
+reports `PACKET_WRITER_CURRENT_LINEAGE_NOT_PROVEN`: five writers found, one
+revision-bound contract present, two legacy SHA-256-only writers, and two
+unqualified/schema-drift writers. The canonical semantic writer is only
+promotion-eligible by source inspection; its caller inputs, live schema values,
+and current-cohort authority are not independently proven. The two legacy
+writers remain quarantined. `writesPerformed=false`. Receipt:
+`docs/reports/packet-writer-lineage-v1.json`.
+
+**Packet revision-column census (read-only, 2026-09-17):** live
+`atlas_packets` contains `61,718` rows. The legacy integer
+`workspace_revision` and `representation_revision` columns are non-null on all
+rows and remain value `0` in the sample; text `source_revision` exists but is
+non-null on `0` rows. These fields do not establish `PacketRevisionOwnerV1` or
+current packet identity. No DDL or row updates were performed. Receipt:
+`docs/reports/atlas-packets-revision-columns-v1.json`.
+
+### 2026-09-17 — packet writer lineage census refreshed
+
+The writer audit remains `PACKET_WRITER_CURRENT_LINEAGE_NOT_PROVEN`. Of five discovered
+writers, one semantic writer has a revision-bound source contract in code, two legacy
+writers are SHA-256-only, and two writers are blocked by unqualified identity or schema
+drift. The live dependency audit still marks `atlas_packets.source_revision` as
+unproven/absent for the writer contract and `content_hash` as sparse. Before any apply,
+the audit requires a writer accepting the admitted workspace revision and independently
+proven source digest, a live-schema contract, quarantine of legacy writers, and bounded
+write/readback against the selected execution. No writer was invoked and no data changed.
+
+Receipt: `docs/reports/packet-writer-lineage-v1.json`.
+
+### 2026-09-17 — corrected live schema presence versus coverage wording
+
+The packet-writer census had a stale label describing `source_revision` as unproven or
+absent. The independent revision-contract audit confirms the live column exists; the
+separate column census shows it is populated on `0/61,718` packet rows. The census now
+reports `sourceRevisionColumn=PRESENT_BUT_UNPOPULATED`, while retaining the real gate:
+`packetKeyIdentitySemantics=UNPROVEN`, sparse canonical `content_hash`, and no writer
+with proven admitted current-corpus coverage. Syntax checks, both read-only audits, and
+strict OpenSpec validation pass. No data or schema state changed.
+
+Implementation: `scripts/atlas/audit-packet-writer-lineage-v1.mjs`.
+Receipts: `docs/reports/packet-writer-lineage-v1.json` and
+`docs/reports/packet-write-revision-contract-v1.json`.
+
+### 2026-09-17 — registry writer census refreshed
+
+The registry ownership audit confirms structural parity but not canonical writer
+authority: `61,718` packet rows and `61,718` registry rows have zero missing, orphaned,
+or duplicate registry keys. Writer classification remains `2 UNRESOLVED`,
+`1 ACTIVE_SECONDARY_WRITER`, and `3 MANUAL_MIGRATION_ONLY`; `safeToBackfill=false` and
+`writesPerformed=false`. The next gate is review of the unresolved/secondary callers
+and conflict semantics. Existing parity must not be interpreted as current lineage
+qualification or permission to backfill.
+
+Receipt: `docs/reports/atlas-registry-writer-ownership-v2.json`.
+
+### 2026-09-17 — source-evidence hydration recheck
+
+The source-evidence hydration census remains blocked despite substantial revision
+matches: `24,181` input rows, `23,397` exact revision matches, and `19,906` rows with
+content. However, authoritative namespaces, evidence-span-ready rows, and classifier-
+ready rows remain `0`. Missingness is separated into `4,275`
+`CANONICAL_CHUNK_OWNER_MISSING` rows and `19,906`
+`CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION` rows. The audit performed `0` writes;
+packet/chunk identity and source namespace ownership remain upstream gates for AST/RPC
+promotion.
+
+Receipt: `docs/reports/current-source-evidence-hydration-v1.json`.
+
+### 2026-09-17 — current source-cohort lineage recheck
+
+The current cohort lineage audit was refreshed against the admitted workspace revision.
+It remains `WORKSPACE_REVISION_SOURCE_MISMATCH`: `52/52` rows match their source
+revisions, but `0/52` match the admitted workspace revision. The live binding set has
+three workspace-revision values; after source qualification, all `52` rows remain
+workspace mismatches. Missing, mismatched, and ambiguous source counts are each `0`.
+This isolates the unresolved gate to workspace-binding alignment rather than source
+content identity. No writes occurred.
+
+Receipt: `docs/reports/current-source-cohort-lineage-v1.json`.
+
+### 2026-09-17 — live packet revision-column census
+
+The live `atlas_packets` column census confirms the schema shape but not usable
+revision authority: `workspace_revision` and `representation_revision` are integer
+columns populated on all `61,718` rows with value `0` in the sampled legacy shape,
+while text `source_revision` exists but is populated on `0/61,718` rows. This supports
+an additive migration proposal only; it does not prove `PacketRevisionOwnerV1`, current
+workspace qualification, or permission to backfill existing packets. No DDL or row
+updates occurred.
+
+Receipt: `docs/reports/atlas-packets-revision-columns-v1.json`.
+
+### 2026-09-17 — lifecycle-owner conflict reconciliation
+
+The read-only lifecycle audits expose two different contracts and must not be
+collapsed into one completion claim. `audit-current-graphify-run-owner-v1.mjs`
+finds one completed workspace-linked owner for the admitted revision and two
+completed coordinator executions. The broader lifecycle-owner audit still
+reports `LIFECYCLE_OWNER_UNPROVEN`, `CURRENT_RUN_NOT_ESTABLISHED`, and
+`REPOSITORY_REVISION_NOT_CURRENT`, with `19` stale runs and no running/current
+run. The execution-owner planner reconciles the duplicate completed candidates
+as `DUPLICATE_EQUIVALENT_EXECUTIONS` with one evidence signature, prefers
+`74d50c86-8194-45ea-8c3d-61aab737ef83` diagnostically, but keeps
+`safeToApply=false` and `writesPerformed=false`. This proves a candidate
+selection, not canonical execution authority or permission to apply it.
+
+Receipts: `docs/reports/graphify-lifecycle-owner-v1.json`,
+`docs/reports/current-graphify-run-owner-v1.json`, and
+`docs/reports/current-graphify-execution-owner-resolution-v1.json`.
+
+### 2026-09-17 — explicit Graphify execution owner applied
+
+The operator selected `74d50c86-8194-45ea-8c3d-61aab737ef83` from the proven
+equivalent candidate set. The guarded transactional apply demoted the other
+candidate, set `canonical_authority=true` only for the selected execution, and
+verified the post-write readback. This is an execution-owner decision only; it
+does not create packet revisions, repair workspace bindings, backfill packet
+digests, or authorize projections. The follow-up lifecycle audit still reports
+`LIFECYCLE_OWNER_UNPROVEN`, `CURRENT_RUN_NOT_ESTABLISHED`, and
+`REPOSITORY_REVISION_NOT_CURRENT`, so current-corpus lineage remains blocked.
+
+Apply receipt: `docs/reports/current-graphify-execution-owner-decision-v1.json`.
+Post-apply readback: `docs/reports/current-graphify-run-owner-v1.json`.
+`writesPerformed=true` is limited to the two execution authority flags in the
+proven candidate set; no packet, source, vector, cache, or projection writes
+were performed.
+
+### 2026-09-17 — post-owner packet/chunk reconciliation
+
+With execution `74d50c86-8194-45ea-8c3d-61aab737ef83` selected, the current
+packet/chunk identity census remains `PACKET_DIGEST_BRIDGE_MISSING`:
+`24,456` bound sources, `16,554` packet-reference matches, `0` canonical digest
+matches, `3,230` legacy SHA-256 matches, `627` packet-lineage matches, `7,902`
+missing packet rows, `16,454` packets without canonical content digests, and
+`20` digest mismatches. The existing lineage bridge has no missing lineage rows
+or packet-lineage join gaps, but it is not current-cohort authority. Execution
+selection therefore did not authorize packet materialization, digest backfill,
+or projection promotion.
+
+Receipt: `docs/reports/current-packet-chunk-identity-reconciliation-v1.json`.
