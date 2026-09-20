@@ -5461,3 +5461,199 @@ Manifests must record the UUID algorithm, frozen namespace, name input, and
 YAML/JQ, DuckDB, Redis/BitFrost, Qdrant, centroids, and GPU IDs remain derived layers.
 
 RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.
+
+---
+
+## 🔥 Parent Atlas Query Fanout + BitFrost Warm-Bucket Contract (2026-09-20 — DIRECTION + CURRENT PROOF BOUNDARIES)
+
+This section freezes the intended ownership boundaries for query recognition, taxonomy fanout,
+ACE/context construction, BitFrost/Valkey residency, workboard DAG synthesis, and local Ornith
+synthesis. It is an architecture/validation contract, **not a claim that every link is live**.
+Do not promote a link from CREATED/WIRED/TEST-PROVEN to live/persistent without its own receipt.
+
+### Local LLM offload identity
+
+- Canonical MCP capability: `local-llm-offload`.
+- `gemma4-offload` and `gemma4_*` remain compatibility aliases until caller census reaches zero.
+- Primary llama-server endpoint: `:8090`; current observed model is Ornith 1.5 9B.
+- Prefer an explicit assertion `LLAMA_PRIMARY_MODEL=ornith-1.5-9b` so `/v1/models` is verification,
+  not model selection. Do not create a second `ornith-offload` MCP owner.
+- Ornith performs bounded synthesis/classification over supplied evidence. It does **not** own DAG
+  orchestration, source identity, retrieval authority, cache identity, or promotion.
+
+### Query recognition and taxonomy fanout
+
+The logical path is:
+
+```text
+user query
+  -> QueryClassificationV1
+       domain + calibrated confidence
+       topic ids
+       concept ids
+       keyword/intent evidence
+       classifier/model + corpus revision
+  -> .okf vocabulary/schema validation
+  -> TRACE capability fanout
+  -> bounded candidate set
+  -> CandidateOrdinalMap / CandidateFeatureMatrix
+  -> deterministic ranking + challengers
+  -> ContextManifest / ACE packet
+  -> BitFrost residency decision
+  -> Ornith synthesis
+```
+
+Domain/topic/concept outputs are **evidence observations**, not canonical identity. They may guide
+fanout and cache residency only when their producer/classifier revision and evidence references are
+present. Missing taxonomy evidence stays missing; do not default it to neutral/zero.
+
+Reuse the existing `.okf` catalog/ingestion owners. Do not add a second topic/concept vocabulary.
+
+### Retrieval / topology separation
+
+Keep these mechanisms distinct:
+
+- **Top-K / kNN**: retrieval over a frozen semantic snapshot; exact reference before ANN promotion.
+- **KMeans 64/128/256**: centroid-routing/topology experiment on versioned derived vectors.
+- **SOM 20x20**: separate 400-cell locality/cache-hint topology experiment; it is **not KMeans**.
+- **PageRank/PPR/community**: graph-derived features, never identity.
+- Cluster/centroid/SOM cell ids may influence prefetch, diversity, or routing but never replace
+  `packetKey`, `symbolVersionId`, `treeNodeId`, source/workspace revisions, or evidence spans.
+
+### BitFrost / Valkey warm-bucket policy
+
+BitFrost remains a bounded cache-aside/residency tier, not a retrieval index and not an authority
+store. A warm-plan entry must be reconstructible from canonical stores when absent.
+
+The currently test-proven residency policy is:
+
+```text
+COLD  TTL = 1 day
+WARM  TTL = 7 days
+HOT   TTL = 30 days
+```
+
+The seven-day value is therefore the **WARM TTL**, not an instruction to assume global Redis LRU
+eviction. Redis/Valkey maxmemory eviction is a separate live runtime setting and must be observed
+before documentation or mutation. The existing BitFrost module uses deterministic residency scores
+plus bounded heat ZSETs; do not relabel that as Redis's global LRU/LFU policy.
+
+Warm-bucket candidates may be partitioned by qualified domain/topic/concept hints, but cache
+identity must remain revision/checksum qualified. Prefer keys/identities carrying the relevant
+subset of:
+
+```text
+workspaceRevision
+sourceRevision / packetRevision
+representationId + representationRevision
+candidateSnapshotRevision
+ordinalMapChecksum
+graphRevision
+featureRevision
+producerRevision
+normalizationPolicyRevision
+artifactChecksum
+domain/topic/concept evidence revision
+```
+
+A cache hit accelerates reconstruction/prefill. It never grants canonical authority or a retrieval
+vote. Do not "warm everything"; preserve the bounded top-N/bucket plan.
+
+### Prefill progress: 0-100 is workflow progress, not model confidence
+
+If the Studio shows a 0-100% progress bar, derive it from completed deterministic stages/receipts,
+not a neural score:
+
+```text
+  0-10  request accepted + identity/checksum
+ 10-20  domain/topic/concept classification
+ 20-30  .okf validation / capability plan
+ 30-50  lexical + AST + semantic + graph fanout
+ 50-60  CandidateOrdinalMap / dedup / snapshot freeze
+ 60-70  derived topology (centroid/SOM/graph) when available
+ 70-85  deterministic rank + shadow challengers + exact promotion
+ 85-95  ContextManifest / ACE packet + residency/cache-aside result
+ 95-100 Ornith synthesis + validators / final execution receipt
+```
+
+A skipped optional stage can be marked N/A and renormalized. A blocked required gate stops progress;
+it must not be converted into a fabricated percentage.
+
+### PostgreSQL 18 read model and JSONB indexes
+
+Use PostgreSQL as durable facts/read-model authority, not request-scoped Top-K storage.
+
+- B-tree: equality/range lookup on scalar identity columns or stable extracted/expression values
+  such as `domain_id`, `topic_id`, `language_id`, revisions, timestamps, and task ids.
+- GIN: JSONB containment/key/jsonpath and array/tag membership where the query shape justifies it.
+- pg_trgm: fuzzy title/alias lookup where measured useful.
+- pgvector: semantic vectors; keep semantic executor identity separate from logical semantic lane.
+- Do not create indexes from theory alone. Prove with `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` and,
+  for PG18 AIO claims, corroborate with the relevant I/O observations.
+
+### TRACE MCP and context packets
+
+Agents request logical capabilities through TRACE rather than talking directly to Postgres, Qdrant,
+Valkey, or graph stores when an MCP tool exists. Typical read path:
+
+```text
+domain_classify / taxonomy.* / concept tagging
+trace.kag_search / lexical-source evidence
+graph.expand_neighborhood / graph.pagerank_top / topology.*
+db_schema_overview / db_table_inspect when registered live
+context_build_ace_packet / context_build_kv_packet
+local-llm-offload.repo_summarize or repo_chat
+```
+
+Tool presence is determined by the live MCP handshake/census, not by this document alone.
+
+ACE/context JSON packets should bind request/task identity, revisions, candidate/ordinal checksums,
+evidence refs, ranking checksum, and cache identity. Cache residency metadata is additive and
+non-authoritative.
+
+### DAG synthesis and agentic repair ownership
+
+Use the existing owners rather than adding another orchestration framework:
+
+- **LangGraph**: process traversal, checkpoint/resume, fanout, retry boundaries, and human approval.
+- **PostgreSQL / graph executors**: task dependency traversal, recursive CTE/CYCLE proof, indexed
+  facts, graph algorithms.
+- **LangExtract**: grounded structured extraction inside the NLP/evidence lane; not the DAG engine.
+- **Pydantic/Zod**: boundary/schema validation.
+- **NLP sidecar**: Tree-sitter/ast-grep/LangExtract/POS/domain evidence execution.
+- **Ornith**: synthesis/judging/classification over bounded supplied evidence; not scheduler.
+- **Mastra / LangChain Deep Agents**: do not introduce as peer orchestration owners unless a
+  separately proven capability gap remains after the current LangGraph owner is exercised.
+
+For agentic error fixing:
+
+```text
+error/task
+ -> logicalTaskKey + taskRevision
+ -> domain/topic/concept classification
+ -> TRACE evidence fanout
+ -> ACE repair packet
+ -> BitFrost cache-aside/residency
+ -> LangGraph repair DAG
+ -> deterministic baseline + low-rank/XGBoost shadow challengers
+ -> compile/test/typecheck/OpenSpec validators
+ -> human interrupt/approval
+ -> idempotent authorized mutation
+ -> ExecutionReceipt
+```
+
+Low-rank, XGBoost, cuVS, nvForest, SOM, KMeans, PageRank and neural rankers remain challengers or
+derived executors until their explicit parity/promotion gates pass.
+
+### Current proof boundary
+
+- BitFrost residency policy: **WIRED_POLICY_ADAPTER_PROVEN_TESTS_ONLY**; live Valkey apply/readback
+  remains a separate proof.
+- WARM=7d / HOT=30d / COLD=1d are policy values; global Valkey/Redis eviction remains runtime
+  configuration, not inferred here.
+- Workboard low-rank/dependency scheduling remains advisory/shadow until its identity, coverage,
+  cycle and admission gates pass.
+- `SOM 20x20` and KMeans centroid routing are derived topology/cache hints, not identity.
+- Further AST bulk writes remain governed by the AST hash/source-authority gates; nothing in this
+  section authorizes them.
+
