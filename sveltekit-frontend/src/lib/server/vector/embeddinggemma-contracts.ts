@@ -23,12 +23,12 @@ export interface EmbeddingGemmaProjectionContract extends VectorContract {
   modelRevision: string;
   sourceDimension: number;
   outputDimension: number;
-  truncation: 'none' | 'mrl_prefix' | 'legacy_direct_slice' | 'pad';
+  truncation: 'none' | 'mrl_prefix' | 'legacy_direct_slice' | 'pad' | 'latent_encoder' | 'latent_slice_first_n';
   projectionKind: 'none' | 'mrl_prefix' | 'direct_slice' | 'learned_autoencoder';
   encoderFamily: 'embeddinggemma';
   queryEncoderRole: 'QUERY';
   candidateEncoderRole: 'DOCUMENT';
-  representationFamily: 'semantic_768' | 'semantic_mrl' | 'legacy_384';
+  representationFamily: 'semantic_768' | 'semantic_mrl' | 'legacy_384' | 'latent_autoencoder';
   renormalizeAfterProjection: boolean;
   queryCompatible: boolean;
   canonical: boolean;
@@ -85,6 +85,51 @@ function createMrlContract(outputDimension: EmbeddingGemmaMrlDimension): Embeddi
 export const EMBEDDINGGEMMA_MRL512_CONTRACT = createMrlContract(512);
 export const EMBEDDINGGEMMA_MRL256_CONTRACT = createMrlContract(256);
 export const EMBEDDINGGEMMA_MRL128_CONTRACT = createMrlContract(128);
+
+/**
+ * Autoencoder latent lanes (256 / 128 / 64). These are NOT EmbeddingGemma projections and NOT MRL
+ * truncations: they come from a trained encoder (NestedSemanticAutoencoder, owner:
+ * `python/atlas_compute/latent_autoencoder.py`, served by the neural-decoder service, artifacts
+ * described by `atlas/tensors/representation-artifact-v1.ts`). This file only DESCRIBES them so the
+ * seven lanes (768, MRL 512/256/128, latent 256/128/64) share one vocabulary; it does not encode.
+ *   - latent_256 / latent_64: encoded from semantic_768 by the autoencoder.
+ *   - latent_128: deterministic SLICE_FIRST_N + L2 renormalize of latent_256 (NOT a new training run,
+ *     NOT an MRL truncation of the 768 vector).
+ * All three are derived routing/challenger lanes: never canonical, never query-compatible without
+ * encoding the query through the same encoder revision, never an independent retrieval vote.
+ */
+export const EMBEDDINGGEMMA_LATENT_DIMENSIONS = [256, 128, 64] as const;
+export type EmbeddingGemmaLatentDimension = (typeof EMBEDDINGGEMMA_LATENT_DIMENSIONS)[number];
+
+function createLatentContract(outputDimension: EmbeddingGemmaLatentDimension): EmbeddingGemmaProjectionContract {
+  const derivedFromLatent256 = outputDimension === 128;
+  const representation = `latent_${outputDimension}`;
+  return {
+    modelId: representation,
+    modelVersion: '2026-09-20',
+    modelRevision: 'nested-semantic-autoencoder',
+    sourceDimension: derivedFromLatent256 ? 256 : SEMANTIC_DIMENSION,
+    outputDimension,
+    dimension: outputDimension,
+    normalization: 'l2',
+    metric: 'cosine',
+    vectorPurpose: 'content-semantic',
+    truncation: derivedFromLatent256 ? 'latent_slice_first_n' : 'latent_encoder',
+    projectionKind: 'learned_autoencoder',
+    encoderFamily: 'embeddinggemma',
+    queryEncoderRole: 'QUERY',
+    candidateEncoderRole: 'DOCUMENT',
+    representationFamily: 'latent_autoencoder',
+    renormalizeAfterProjection: derivedFromLatent256,
+    queryCompatible: false,
+    canonical: false,
+    lifecycle: 'REFERENCE_ONLY',
+  };
+}
+
+export const EMBEDDINGGEMMA_LATENT256_CONTRACT = createLatentContract(256);
+export const EMBEDDINGGEMMA_LATENT128_CONTRACT = createLatentContract(128);
+export const EMBEDDINGGEMMA_LATENT64_CONTRACT = createLatentContract(64);
 
 /**
  * Historical Atlas 768->384 direct slice. This is not EmbeddingGemma MRL.
@@ -154,6 +199,11 @@ export function projectEmbeddingForContract(
 
   if (contract.lifecycle === 'LEGACY_MIGRATION_ONLY' || contract.truncation === 'legacy_direct_slice') {
     throw new Error('LEGACY_384_PROJECTION_REQUIRES_EXPLICIT_MIGRATION_HELPER');
+  }
+
+  // Latent lanes need the trained encoder; never fall through to the 768 pass-through below.
+  if (contract.representationFamily === 'latent_autoencoder' || contract.projectionKind === 'learned_autoencoder') {
+    throw new Error(`LATENT_LANE_REQUIRES_NESTED_AUTOENCODER_SERVICE: ${contract.modelId}`);
   }
 
   if (contract.truncation === 'none') return Array.from(vector);

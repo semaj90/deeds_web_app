@@ -21,7 +21,6 @@ const WRITE_RE =
 
 // Writers that exist today (found 2026-09-19). Migrate to semantic_768 or archive, then delete here.
 const KNOWN_LEGACY_WRITERS: string[] = [
-	'scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs', // atlas_packets.content_embedding_384 via :8081 model 'embeddinggemma-384'
 	'scripts/atlas/populate-packet-vector-bundles.mjs', // packet_vector_bundles: first-384-dims slice of 768 vectors
 	'scripts/atlas/rebuild-gemma4-summaries-384.mjs',
 	'scripts/atlas/restore-qdrant-384-from-postgres.mjs',

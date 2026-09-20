@@ -8,6 +8,9 @@ import {
   EMBEDDINGGEMMA_MRL512_CONTRACT,
   EMBEDDINGGEMMA_MRL256_CONTRACT,
   EMBEDDINGGEMMA_MRL128_CONTRACT,
+  EMBEDDINGGEMMA_LATENT256_CONTRACT,
+  EMBEDDINGGEMMA_LATENT128_CONTRACT,
+  EMBEDDINGGEMMA_LATENT64_CONTRACT,
   projectEmbeddingForContract,
   projectLegacyDirectSlice384ForMigration,
 } from './embeddinggemma-contracts.js';
@@ -65,6 +68,29 @@ describe('vector-index-registry', () => {
     expect(norm).toBeCloseTo(1, 6);
     expect(projected[0]).toBeCloseTo(0.6, 6);
     expect(projected[1]).toBeCloseTo(0.8, 6);
+  });
+
+  it('describes latent 256/128/64 as derived non-canonical lanes and never projects them locally', () => {
+    for (const [contract, dimension] of [
+      [EMBEDDINGGEMMA_LATENT256_CONTRACT, 256],
+      [EMBEDDINGGEMMA_LATENT128_CONTRACT, 128],
+      [EMBEDDINGGEMMA_LATENT64_CONTRACT, 64],
+    ] as const) {
+      expect(contract.outputDimension).toBe(dimension);
+      expect(contract.representationFamily).toBe('latent_autoencoder');
+      expect(contract.projectionKind).toBe('learned_autoencoder');
+      expect(contract.canonical).toBe(false);
+      expect(contract.queryCompatible).toBe(false);
+      expect(contract.lifecycle).toBe('REFERENCE_ONLY');
+      expect(() => projectEmbeddingForContract(new Array(768).fill(0.1), contract)).toThrow(
+        /LATENT_LANE_REQUIRES_NESTED_AUTOENCODER_SERVICE/,
+      );
+    }
+    // latent_128 is a slice of latent_256, not of the 768 vector
+    expect(EMBEDDINGGEMMA_LATENT128_CONTRACT.sourceDimension).toBe(256);
+    expect(EMBEDDINGGEMMA_LATENT128_CONTRACT.truncation).toBe('latent_slice_first_n');
+    expect(EMBEDDINGGEMMA_LATENT256_CONTRACT.sourceDimension).toBe(768);
+    expect(EMBEDDINGGEMMA_LATENT64_CONTRACT.sourceDimension).toBe(768);
   });
 
   it('rejects 384 from the normal runtime projector but preserves explicit migration replay', () => {

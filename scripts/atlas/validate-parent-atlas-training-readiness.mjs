@@ -69,7 +69,7 @@ async function loadDatabaseCoverage() {
         COUNT(*) FILTER (WHERE domain_class IS NOT NULL AND LENGTH(TRIM(domain_class)) > 0)::int AS domain_class,
         COUNT(*) FILTER (WHERE summary IS NOT NULL AND LENGTH(TRIM(summary)) > 0)::int AS summary,
         COUNT(*) FILTER (WHERE qdrant_point_id IS NOT NULL AND LENGTH(TRIM(qdrant_point_id)) > 0)::int AS qdrant_point_id,
-        COUNT(*) FILTER (WHERE embedding IS NOT NULL OR content_embedding_384 IS NOT NULL)::int AS embedding,
+        COUNT(*) FILTER (WHERE embedding IS NOT NULL)::int AS embedding, -- 768 only; legacy 384 no longer counted (DIM-01a)
         COUNT(*) FILTER (WHERE latent_64 IS NOT NULL)::int AS latent_64,
         COUNT(*) FILTER (WHERE som_row BETWEEN 0 AND 19 AND som_col BETWEEN 0 AND 19)::int AS som_20x20
       FROM atlas_packets
