@@ -103,14 +103,15 @@ describe('WorkflowActionEventV1 -- canonical adapter round-trip (WORKFLOW-ACTION
       openspecChange: 'parent-atlas-agentic-run-receipt-binding',
     });
 
-    const canonical = toCanonicalWorkflowActionEvent(original, { producerRevision: 'rev-ui-1' });
+    const canonical = toCanonicalWorkflowActionEvent(original, { producerRevision: 'rev-ui-1', runId: 'run-1' });
     expect(canonical.schema).toBe('atlas.workflow-action.v1');
     expect(canonical.producerRevision).toBe('rev-ui-1');
-    expect(canonical.state).toBe(original.state);
-    expect(canonical.operation).toBe(original.operation);
-    expect(canonical.progress).toEqual(original.progress);
-    expect(canonical.visual).toEqual(original.visual);
-    expect(canonical.canonicalIds).toEqual(['candidate-42']);
+    expect(canonical.runId).toBe('run-1');
+    expect(canonical.metadata.state).toBe(original.state);
+    expect(canonical.metadata.operation).toBe(original.operation);
+    expect(canonical.metadata.progress).toEqual(original.progress);
+    expect(canonical.metadata.visual).toEqual(original.visual);
+    expect(canonical.metadata.canonicalIds).toEqual(['candidate-42']);
     expect(canonical.metadata).toMatchObject({
       tokensUsed: 42,
       filesEdited: ['src/lib/foo.ts'],
@@ -139,14 +140,14 @@ describe('WorkflowActionEventV1 -- canonical adapter round-trip (WORKFLOW-ACTION
   });
 
   it('throws rather than silently drop a canonical-only kind this local shape cannot represent', () => {
-    const canonical = toCanonicalWorkflowActionEvent(event(), { producerRevision: 'rev-ui-1' });
+    const canonical = toCanonicalWorkflowActionEvent(event(), { producerRevision: 'rev-ui-1', runId: 'run-1' });
     const unrepresentable = { ...canonical, kind: 'suspended' as const };
     expect(() => fromCanonicalWorkflowActionEvent(unrepresentable, { emittedAt: '2026-09-14T00:00:00.000Z' }))
       .toThrow(/WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_UI_SHAPE/);
   });
 
   it('throws rather than silently drop a canonical-only transport (mcp) this local shape cannot represent', () => {
-    const canonical = toCanonicalWorkflowActionEvent(event(), { producerRevision: 'rev-ui-1' });
+    const canonical = toCanonicalWorkflowActionEvent(event(), { producerRevision: 'rev-ui-1', runId: 'run-1' });
     const unrepresentable = { ...canonical, transport: 'mcp' as const };
     expect(() => fromCanonicalWorkflowActionEvent(unrepresentable, { emittedAt: '2026-09-14T00:00:00.000Z' }))
       .toThrow(/WORKFLOW_ACTION_EVENT_TRANSPORT_NOT_REPRESENTABLE_IN_UI_SHAPE/);

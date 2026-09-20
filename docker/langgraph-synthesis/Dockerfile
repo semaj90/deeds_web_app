@@ -1,4 +1,7 @@
-FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04@sha256:24c8e3581ea6330038b0d374920721983312627f8adbfcf390bdb4b399d280ed
+# CPU orchestration image. LangGraph calls the external embedding service and
+# llama-server; it does not own CUDA, PyTorch, cuVS, cuTile, or TensorRT-RTX.
+# GPU execution remains in the dedicated provider sidecars.
+FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e
 
 # ── System deps (use system Python 3.12 — no deadsnakes PPA) ─────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -16,25 +19,14 @@ RUN apt-get update && apt-get remove -y python3-jwt python3-cryptography 2>/dev/
 
 WORKDIR /app
 
-# ── Layer 1: PyTorch CUDA wheels (~10 GB, cached unless version changes) ──────
-# Split from requirements.txt so changing langchain/fastapi versions
-# doesn't trigger a 10 GB re-download of torch.
-# Uses --index-url (not --extra) to avoid probing pypi.nvidia.com which times out.
-RUN pip install --break-system-packages --timeout 300 \
-    --index-url https://download.pytorch.org/whl/cu128 \
-    torch==2.7.0+cu128 \
-    torchvision==0.22.0+cu128 \
-    torchaudio==2.7.0+cu128
-
-# ── Layer 2: cryptography + PyJWT + ripgrep (replaces removed system packages) ─
+# ── Layer 1: cryptography + PyJWT + ripgrep ───────────────────────────────────
 RUN pip install --break-system-packages cryptography PyJWT
 RUN apt-get update && apt-get install -y --no-install-recommends ripgrep && \
     rm -rf /var/lib/apt/lists/*
 
-# ── Layer 3: Everything else (busts cache on requirements.txt change) ─────────
+# ── Layer 2: orchestration dependencies (no CUDA/PyTorch index) ───────────────
 COPY requirements.txt .
 RUN pip install --no-cache-dir --break-system-packages \
-    --extra-index-url https://download.pytorch.org/whl/cu128 \
     -r requirements.txt
 
 # ── App ───────────────────────────────────────────────────────────────────────

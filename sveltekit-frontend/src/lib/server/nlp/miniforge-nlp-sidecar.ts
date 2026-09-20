@@ -133,6 +133,10 @@ export interface NlpAnalyzeRequest {
   extractionMode?: NlpExtractionMode;
   documentId?: string;
   sourceRef?: string;
+  sourceRevision?: string;
+  workspaceRevision?: string;
+  sourceNamespace?: string;
+  treeNodeId?: string;
   packetKey?: string;
   language?: string;
   modelId?: string;
@@ -159,7 +163,9 @@ export interface NlpAnalyzeResponse {
     treesitter_chunker?: boolean;
     ast_grep: boolean;
     torch: boolean;
+    classification_helper?: boolean;
   };
+  classification_proposal?: Record<string, unknown> | null;
   pass_results?: AnalysisPassResult[];
   control5?: Control5 | null;
   experiment_feature_matrix?: ExperimentFeatureMatrix | null;
@@ -267,6 +273,10 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           extraction_mode: req.extractionMode ?? 'full',
           document_id: req.documentId ?? req.packetKey ?? `doc-${Date.now()}`,
           source_ref: req.sourceRef,
+          source_revision: req.sourceRevision,
+          workspace_revision: req.workspaceRevision,
+          source_namespace: req.sourceNamespace,
+          tree_node_id: req.treeNodeId,
           packet_key: req.packetKey,
           language: req.language,
           model_id: req.modelId,
@@ -305,7 +315,9 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           treesitter_chunker: Boolean(raw.capabilities?.treesitter_chunker),
           ast_grep: Boolean(raw.capabilities?.ast_grep),
           torch: Boolean(raw.capabilities?.torch),
+          classification_helper: Boolean(raw.capabilities?.classification_helper),
         },
+        classification_proposal: (raw.classification_proposal ?? null) as Record<string, unknown> | null,
         pass_results: Array.isArray(raw.pass_results) ? raw.pass_results : [],
         control5: (raw.control5 ?? null) as Control5 | null,
         experiment_feature_matrix: (raw.experiment_feature_matrix ?? null) as ExperimentFeatureMatrix | null,

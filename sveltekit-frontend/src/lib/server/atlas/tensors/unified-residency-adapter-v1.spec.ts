@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  UnifiedResidencyAdapter, admitResidency, assertNoPersistedGpuState, descriptorCacheKey,
+  UnifiedResidencyAdapter, admitResidency, admitWithSharedGpuResidencyLeaseV1, assertNoPersistedGpuState, descriptorCacheKey,
   domainRoutingCacheKey, packFloat32Tile, requireProvider, routeDomainWithLut, serializeResidencyControl, transitionResidency, unpackFloat32Tile, validateUnifiedDescriptor, type UnifiedResidencyDescriptor
 } from './unified-residency-adapter-v1';
 
@@ -57,5 +57,49 @@ describe('unified residency adapter v1', () => {
       kind: 'FEATURE_TILE',
       async load() { return null; }
     })).rejects.toThrow('RESIDENCY_BUFFER_LENGTH_MISMATCH');
+  });
+
+  it('routes executor admission through the shared budget owner before residency', () => {
+    const adapter = new UnifiedResidencyAdapter(500000);
+    const budget = {
+      schema: 'atlas.gpu-residency-budget.v1' as const,
+      telemetry: { schema: 'atlas.gpu-memory-telemetry.v1' as const, source: 'nvml' as const, capturedAt: '2026-09-20T00:00:00.000Z', totalVramBytes: 8_000_000_000, freeVramBytes: 4_000_000_000, usedVramBytes: 4_000_000_000 },
+      policy: {} as never,
+      requestedCandidateCount: 1,
+      requestedCandidateBucket: 32,
+      totalReservedBytes: 0,
+      leaseableBytes: 400000,
+      semanticCacheBudgetBytes: 0,
+      maxResidentVectors: 1,
+      maxCandidateBucket: 32,
+      executionTarget: 'gpu' as const,
+      degraded: false,
+      reason: 'test',
+    };
+    const lease = admitWithSharedGpuResidencyLeaseV1({ adapter, descriptor: base, budget, budgetRevision: 'budget-1', leaseId: 'lease:test:shared', leaseEpoch: 1, executor: 'pytorch_cuda' });
+    expect(lease.admission).toBe('ALLOW');
+    expect(adapter.usedBytes()).toBe(base.byteLength);
+    expect(lease.writesPerformed).toBe(false);
+  });
+
+  it('rejects the executor before mutating residency when the shared budget is exceeded', () => {
+    const adapter = new UnifiedResidencyAdapter(500000);
+    const budget = {
+      schema: 'atlas.gpu-residency-budget.v1' as const,
+      telemetry: { schema: 'atlas.gpu-memory-telemetry.v1' as const, source: 'nvml' as const, capturedAt: '2026-09-20T00:00:00.000Z', totalVramBytes: 8_000_000_000, freeVramBytes: 4_000_000_000, usedVramBytes: 4_000_000_000 },
+      policy: {} as never,
+      requestedCandidateCount: 1,
+      requestedCandidateBucket: 32,
+      totalReservedBytes: 0,
+      leaseableBytes: 1,
+      semanticCacheBudgetBytes: 0,
+      maxResidentVectors: 1,
+      maxCandidateBucket: 32,
+      executionTarget: 'gpu' as const,
+      degraded: false,
+      reason: 'test',
+    };
+    expect(() => admitWithSharedGpuResidencyLeaseV1({ adapter, descriptor: base, budget, budgetRevision: 'budget-1', leaseId: 'lease:test:reject', leaseEpoch: 1, executor: 'tensorrt_rtx' })).toThrow('GPU_EXECUTOR_RESIDENCY_ADMISSION_GPU_RESIDENCY_BUDGET_EXCEEDED');
+    expect(adapter.usedBytes()).toBe(0);
   });
 });

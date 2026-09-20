@@ -24,7 +24,7 @@ import re
 
 # Configuration
 LLAMA_SERVER_URL = os.environ.get("LLAMA_SERVER_URL", "http://127.0.0.1:8090")
-LLAMA_MODEL = os.environ.get("LLAMA_MODEL", "gemma4-legal-iq4xs-direct.gguf")
+LLAMA_MODEL = os.environ.get("LLAMA_MODEL", os.environ.get("LLAMA_SERVER_MODEL", "ornith-1.5-9b"))
 TIMEOUT_SECONDS = int(os.environ.get("LANGEXTRACT_TIMEOUT", "120"))
 
 # Legal extraction schema for Gemma4

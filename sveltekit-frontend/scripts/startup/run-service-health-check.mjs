@@ -7,9 +7,9 @@
  *   Service Health Check -> Valkey Semantic Index -> Seed OpenCode Rules
  *     -> Semantic Valkey Smoke -> Auto-Map Codebase / Parent Atlas
  *
- * LLM warm strategy (TurboQuant-first):
- *   1. Try TurboQuant :8090  <- what we want to keep hot
- *   2. Fall back to Ollama :11434
+ * LLM warm strategy:
+ *   1. Check and warm llama-server :8090 (Ornith)
+ *   2. Check Ollama :11434 separately for EmbeddingGemma
  *   3. Use cached atlas:summary:exact:v1: lod1Summary as prompt prefix
  *   4. Skip if slot is busy
  */
@@ -30,7 +30,7 @@ const REDIS_PORT = VALKEY.port;
 // Patch 3: default password is 'redis', never empty — matches docker-compose.yml
 const REDIS_PASS = process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? 'redis';
 
-const TURBOQUANT_URL = process.env.TURBOQUANT_URL ?? process.env.TURBO_URL ?? 'http://127.0.0.1:8090';
+const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL ?? process.env.TURBOQUANT_URL ?? process.env.TURBO_URL ?? 'http://127.0.0.1:8090';
 const GO_RETRIEVAL_URL = process.env.GO_RETRIEVAL_HTTP_URL ?? process.env.GO_RETRIEVAL_URL ?? 'http://127.0.0.1:8100';
 const GO_RETRIEVAL_HEALTH_PATH = process.env.GO_RETRIEVAL_HEALTH_PATH ?? '/health';
 const TRACE_URL    = process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
@@ -58,10 +58,10 @@ function redisOpts(connectTimeout = 2000) {
 const services = [
   { name: 'Valkey',          kind: 'redis' },
   { name: 'Qdrant',          url: process.env.QDRANT_URL ?? 'http://127.0.0.1:6333/collections' },
-  { name: 'Ollama',          url: `${OLLAMA_URL}/api/tags`, soft: true },
+  { name: 'Ollama Embeddings', url: `${OLLAMA_URL}/api/tags`, soft: true },
   { name: 'Postgres',        kind: 'postgres' },
   { name: 'Bifrost',         url: process.env.BIFROST_URL ?? 'http://127.0.0.1:3040/health' },
-  { name: 'TurboQuant',      url: `${TURBOQUANT_URL}/health` },
+  { name: 'llama-server (Ornith)', url: `${LLAMA_SERVER_URL}/health` },
   { name: 'Go Retrieval',    url: `${GO_RETRIEVAL_URL}${GO_RETRIEVAL_HEALTH_PATH}`, kind: 'goRetrieval' },
   { name: 'Topology Search', url: process.env.TOPOLOGY_SEARCH_URL ?? 'http://127.0.0.1:8101/health', soft: true },
   { name: 'RabbitMQ API',    kind: 'rabbitmq' },
@@ -73,7 +73,7 @@ const services = [
 let pass = 0;
 let fail = 0;
 const state = {
-  bifrost: 'red', retrievalGo: 'red', turboquant: 'red',
+  bifrost: 'red', retrievalGo: 'red', turboquant: 'red', chatHealthy: 'red', embeddingHealthy: 'red',
   topologySearch: 'red', traceMcp: 'red', turbovecMcp: 'red',
   karpathyScores: 'red', authorityTop: 'red',
   sveltekit: 'yellow',
@@ -296,7 +296,7 @@ async function isLlamaServerIdle() {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 1500);
   try {
-    const res = await fetch(`${TURBOQUANT_URL}/slots`, { signal: controller.signal });
+    const res = await fetch(`${LLAMA_SERVER_URL}/slots`, { signal: controller.signal });
     clearTimeout(timer);
     if (!res.ok) return null;
     const slots = await res.json();
@@ -308,21 +308,21 @@ async function isLlamaServerIdle() {
   }
 }
 
-// ── LLM warm — Patch 6: TurboQuant first, Ollama fallback ────────────────────
+// ── LLM warm — llama-server/Ornith only ──────────────────────────────────────
 async function warmLlm(promptPrefix) {
   const prompt = promptPrefix
     ? `Continue from: ${promptPrefix.slice(0, 200)}`
     : 'System ready.';
 
-  // TurboQuant (llama-server) — stream:true required for Gemma4
+  // llama-server — stream:true keeps the probe on the active Ornith owner.
   const turboController = new AbortController();
   const turboTimer = setTimeout(() => turboController.abort(), 25000);
   try {
-    const res = await fetch(`${TURBOQUANT_URL}/v1/chat/completions`, {
+    const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
+        model: process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 1,
         temperature: 0,
@@ -334,35 +334,13 @@ async function warmLlm(promptPrefix) {
     clearTimeout(turboTimer);
     if (res.ok) {
       await res.body?.cancel();
-      return { warmed: true, via: 'TurboQuant :8090' };
+      return { warmed: true, via: 'llama-server :8090 (Ornith)' };
     }
   } catch {
     clearTimeout(turboTimer);
   }
 
-  // Ollama fallback
-  const ollamaController = new AbortController();
-  const ollamaTimer = setTimeout(() => ollamaController.abort(), 20000);
-  try {
-    const res = await fetch(`${OLLAMA_URL}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        messages: [{ role: 'user', content: prompt }],
-        stream: false,
-        think: false,
-        keep_alive: 0,
-        options: { temperature: 0, num_predict: 1 },
-      }),
-      signal: ollamaController.signal,
-    });
-    clearTimeout(ollamaTimer);
-    return { warmed: res.ok, via: 'Ollama :11434' };
-  } catch {
-    clearTimeout(ollamaTimer);
-    return { warmed: false, via: 'none' };
-  }
+  return { warmed: false, via: 'llama-server unavailable' };
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -422,13 +400,15 @@ for (const service of services) {
     console.log(`OK ${service.name}`);
     pass += 1;
     if (service.name === 'Bifrost')         state.bifrost = 'green';
-    if (service.name === 'TurboQuant')      state.turboquant = 'green';
+    if (service.name === 'llama-server (Ornith)') { state.turboquant = 'green'; state.chatHealthy = 'green'; }
+    if (service.name === 'Ollama Embeddings') state.embeddingHealthy = 'green';
     if (service.name === 'Topology Search') state.topologySearch = 'green';
   } catch (err) {
     console.log(`FAIL ${service.name}: ${err?.message ?? err}`);
     fail += 1;
     if (service.name === 'Bifrost')    state.bifrost = 'yellow';
-    if (service.name === 'TurboQuant') state.turboquant = 'red';
+    if (service.name === 'llama-server (Ornith)') { state.turboquant = 'red'; state.chatHealthy = 'red'; }
+    if (service.name === 'Ollama Embeddings') state.embeddingHealthy = 'red';
   }
 }
 
@@ -474,13 +454,15 @@ if (atlasKeys.authorityLen > 0) {
   state.authorityTop = 'yellow';
 }
 
-// -- LLM warm (TurboQuant-first) ----------------------------------------------
+// -- LLM warm (llama-server/Ornith only) --------------------------------------
 console.log('-- LLM warm check --');
-  const turboUp  = (await testHttp('TurboQuant', `${TURBOQUANT_URL}/health`, 2)).status === 0;
-  const ollamaUp = (await testHttp('Ollama', `${OLLAMA_URL}/api/tags`, 2)).status === 0;
+  const llamaUp  = (await testHttp('llama-server (Ornith)', `${LLAMA_SERVER_URL}/health`, 2)).status === 0;
+  const embeddingUp = (await testHttp('Ollama Embeddings', `${OLLAMA_URL}/api/tags`, 2)).status === 0;
 
-if (!turboUp && !ollamaUp) {
-  console.log('SKIP TurboQuant + Ollama both down -- skipping LLM warm');
+if (!llamaUp && !embeddingUp) {
+  console.log('SKIP llama-server + Ollama embeddings both down -- skipping LLM warm');
+} else if (!llamaUp) {
+  console.log('SKIP llama-server down -- Ollama health does not authorize chat warm');
 } else {
   const cachedPrompt = await fetchCachedSummaryPrompt();
   if (cachedPrompt) {

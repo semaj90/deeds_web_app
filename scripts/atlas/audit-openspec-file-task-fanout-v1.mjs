@@ -8,7 +8,13 @@ import { classifyText } from './lib/taxonomy.mjs';
 const reportsDir = path.resolve(process.argv[2] ?? 'docs/reports');
 const outputPath = path.resolve(process.argv[3] ?? path.join(reportsDir, 'openspec-file-task-fanout-v1.json'));
 const repoRoot = path.resolve(process.argv[4] ?? '.');
-const read = (name) => JSON.parse(fs.readFileSync(path.join(reportsDir, name), 'utf8'));
+const fallbackReportsDir = path.basename(reportsDir).toLowerCase() === 'staging' ? path.dirname(reportsDir) : path.join(reportsDir, 'staging');
+const read = (name) => {
+  for (const dir of [reportsDir, fallbackReportsDir]) {
+    try { return JSON.parse(fs.readFileSync(path.join(dir, name), 'utf8')); } catch {}
+  }
+  throw new Error(`Missing report ${name} in ${reportsDir} or ${fallbackReportsDir}`);
+};
 const normalize = (value) => String(value ?? '').replaceAll('\\', '/').replace(/^\.\//, '');
 
 const directory = read('openspec-directory-graph-v1.json');
@@ -28,6 +34,16 @@ for (const file of repositoryFiles) {
   repositoryBasenameIndex.set(base, matches);
 }
 const fallbackLabels = new Map();
+// Archived workspace snapshots and orphaned trees are useful evidence, but they
+// must not win a basename-only navigation lookup over a live worktree file.
+// Explicit path references still resolve exactly; this rule only narrows an
+// otherwise ambiguous fallback and never creates canonical authority.
+const isHistoricalSnapshotPath = (candidate) => /(^|\/)(?:deeds_labs\/archive|archive|orphaned-root-src-tree)(\/|$)/i.test(candidate)
+  || /(^|\/)workspace-source-snapshot-[^/]+(\/|$)/i.test(candidate);
+const preferLiveCandidates = (candidates) => {
+  const live = candidates.filter((candidate) => !isHistoricalSnapshotPath(candidate));
+  return live.length ? live : candidates;
+};
 const basenameIndex = new Map();
 for (const file of labels.keys()) {
   const base = path.posix.basename(file);
@@ -55,10 +71,12 @@ function resolveFile(reference) {
   if (labels.has(normalized)) return normalized;
   const suffixMatches = [...labels.keys()].filter((candidate) => candidate.endsWith(`/${normalized}`) || normalized.endsWith(`/${candidate}`));
   if (suffixMatches.length === 1) return suffixMatches[0];
-  const basenameMatches = basenameIndex.get(path.posix.basename(normalized)) ?? [];
+  const basenameMatches = preferLiveCandidates(basenameIndex.get(path.posix.basename(normalized)) ?? []);
   if (basenameMatches.length === 1) return basenameMatches[0];
   if (repositoryFiles.has(normalized)) return normalized;
-  const repositoryBasenameMatches = [...repositoryFiles].filter((candidate) => path.posix.basename(candidate) === path.posix.basename(normalized));
+  const repositoryBasenameMatches = preferLiveCandidates(
+    [...repositoryFiles].filter((candidate) => path.posix.basename(candidate) === path.posix.basename(normalized)),
+  );
   return repositoryBasenameMatches.length === 1 ? repositoryBasenameMatches[0] : null;
 }
 
@@ -79,7 +97,7 @@ for (const link of taskLinks) {
       inventoryExcluded.set(existingCandidate, (inventoryExcluded.get(existingCandidate) ?? 0) + 1);
     } else {
       const normalized = candidate.replace(/^.*?deeds-web-app\//i, '');
-      const basenameMatches = repositoryBasenameIndex.get(path.posix.basename(normalized)) ?? [];
+      const basenameMatches = preferLiveCandidates(repositoryBasenameIndex.get(path.posix.basename(normalized)) ?? []);
       if (basenameMatches.length > 1) {
         recordUnresolved(candidate, 'AMBIGUOUS_REPOSITORY_BASENAME', { candidates: basenameMatches.slice(0, 12) });
       } else {
@@ -150,6 +168,7 @@ const report = {
   })).sort((a, b) => b.taskCount - a.taskCount || a.file.localeCompare(b.file)),
   policy: {
     authority: 'NAVIGATION_ONLY',
+    basenameFallbackPolicy: 'PREFER_LIVE_WORKTREE_OVER_ARCHIVED_SNAPSHOTS',
     canonicalAuthority: false,
     writesPerformed: false,
     unresolvedDoesNotProveRepositoryAbsence: true,
@@ -160,5 +179,15 @@ const report = {
 };
 report.semanticChecksum = semanticChecksum(report);
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-fs.writeFileSync(outputPath, JSON.stringify(report, null, 2) + '\n');
-console.log(JSON.stringify({ outputPath, summary: report.summary, semanticChecksum: report.semanticChecksum }, null, 2));
+const serialized = JSON.stringify(report, null, 2) + '\n';
+let reportPath = outputPath;
+let primaryWriteError = null;
+try {
+  fs.writeFileSync(outputPath, serialized);
+} catch (error) {
+  primaryWriteError = { name: error?.name ?? 'Error', code: error?.code ?? null, message: error?.message ?? String(error) };
+  reportPath = path.join(path.dirname(outputPath), 'staging', path.basename(outputPath));
+  fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  fs.writeFileSync(reportPath, serialized);
+}
+console.log(JSON.stringify({ outputPath: reportPath, primaryOutputPath: outputPath, primaryWriteError, summary: report.summary, semanticChecksum: report.semanticChecksum }, null, 2));

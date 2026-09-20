@@ -22,6 +22,13 @@ local adapter, and the failure/retry/cancellation/replay fixture passed with det
 Receipts: `docs/reports/langgraph-readonly-adapter-replay-v1.json` and
 `docs/reports/langgraph-failure-retry-replay-v1.json`. These are process-local fixture proofs;
 they do not close AFC-04B's production worker/checkpoint gate or authorize durable state.
+
+Production wiring recheck (read-only, 2026-09-19):
+`node scripts/tests/test-langgraph-wiring.mjs --langgraph http://127.0.0.1:8091`
+confirmed the SvelteKit JSON synthesis proxy is reachable, but the direct LangGraph
+service on `:8091` is unavailable and the SSE proxy run emitted no `complete` event
+(`3` events, `0` chunks). AFC-04B remains open; no container was started and no
+datastore/model state was changed.
 - [x] AFC-05 Add DagNodePlanV1 and AtlasWorkflowSpecV1 contracts.
 - [x] AFC-06 Add WorkflowActionEventV1 persistence envelope.
 - [x] AFC-07 Add MastraWorkflowGraphV1 runtime-dialect contract.
@@ -37,7 +44,7 @@ they do not close AFC-04B's production worker/checkpoint gate or authorize durab
 - [ ] AFC-11 Wire exact promotion to the live retrieval owner.
 - [ ] AFC-12 Extend existing context manifest persistence with revision/evidence refs through a migration only after compatibility proof.
 - [x] AFC-13 Persist WorkflowActionEventV1 through the existing action/outbox writer. The compiler now converts supported lifecycle events through `workflowEventToCanonicalActionWriterRequest` and delegates to `writeCanonicalWorkflowActionAtomically`; compiler-only kinds fail closed. Adapter proof passes 5/5 and existing action/outbox writer proof passes 11/11. No live database write/readback was run in this tranche.
-- [ ] AFC-14 Install/verify a real Mastra runtime before replacing the current passthrough shim.
+- [ ] AFC-14 Install/verify a real Mastra runtime before replacing the current passthrough shim. Read-only recheck: the isolated `@deeds/atlas-orchestrator` workspace resolves `@mastra/core@0.1.26`, but importing it fails with `MODULE_NOT_FOUND: @prisma-app/client`; Prisma is not an approved Parent Atlas persistence owner, so the frontend shim remains active and this task is not complete.
 - [ ] AFC-15 Prove suspend/resume restart parity using Mastra snapshots.
 - [ ] AFC-16 Wire bounded filesystem mutation behind authorization and human-approval policy.
 - [ ] AFC-17 Prove Tree-sitter/typecheck/test validation barrier. The pure barrier contract now
@@ -47,9 +54,9 @@ they do not close AFC-04B's production worker/checkpoint gate or authorize durab
 
 Live barrier recheck (read-only, 2026-09-19): the structured-value runtime probe is ready with
 `tree-sitter 0.25.1`, `tree-sitter-typescript 0.23.2`, `treesitter-chunker 4.0.0`, Python 3.13.5,
-and `pyarrow 21.0.0`; the four barrier tests pass. The repository has no `typecheck:native` script,
-so the actual SvelteKit check was used and remains blocked by 82 pre-existing errors and 291 warnings
-in 147 files. AFC-17 remains open; no compiler or runtime mutation was performed.
+and `pyarrow 21.0.0`; the four barrier tests pass. The SvelteKit `typecheck:native` check is present
+and currently exits with 62 TypeScript errors after one active workflow union-narrowing error was repaired, so the live barrier remains blocked. AFC-17 remains open;
+no compiler or runtime mutation was performed.
 The barrier contract was hardened to fail closed on duplicate validator observations; focused coverage
 now passes 5/5. The current native TypeScript run still reports unrelated repository-wide errors, so
 this task remains open pending a clean live Tree-sitter/typecheck/test receipt.

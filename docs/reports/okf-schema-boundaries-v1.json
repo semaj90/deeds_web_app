@@ -1,0 +1,60 @@
+{
+  "schema": "atlas.okf-schema-boundaries.v1",
+  "status": "OKF_SCHEMA_BOUNDARIES_PROVEN",
+  "gan": {
+    "created": true,
+    "wired": true,
+    "proven": true,
+    "done": true,
+    "promotionAuthorized": false
+  },
+  "fixtures": [
+    {
+      "name": "document-domain-classification",
+      "status": "PROVEN",
+      "checksum": "sha256:e5e6ae373a143d9f4f4c82b8795e30ba0b5576fe2efb4770d735791ad4edca8b"
+    },
+    {
+      "name": "feature-matrix-4x6",
+      "status": "PROVEN",
+      "checksum": "sha256:aaa6d2245c7b51f3aa1f791e2a44f189e44241f93b10a0958ac06cf765c87654"
+    },
+    {
+      "name": "document-file-derivation-graph",
+      "status": "PROVEN",
+      "checksum": "sha256:1834e6ed6daacb403f8c284af0ba42edede79cbceb59e77a9e00ea5e9c724b20"
+    },
+    {
+      "name": "ontology-tuple",
+      "status": "PROVEN",
+      "checksum": "sha256:190624bf215ffe0550af7591db5f15667cdee68fae463dfc64bb7925e3f8f31b"
+    },
+    {
+      "name": "recommendation",
+      "status": "PROVEN",
+      "checksum": "sha256:c4fdfa14362e9372c4c80db3202ff67d98b60ce3fba7a40de901020de7c88988"
+    }
+  ],
+  "clusterFixture": {
+    "clusterId": "cluster:one",
+    "memberRefs": [
+      "file:one",
+      "symbol:one"
+    ],
+    "featureRevision": "features:r1",
+    "evidenceRefs": [
+      "report:kmeans:r1"
+    ],
+    "authority": "CHALLENGER_NAVIGATION_ONLY",
+    "status": "PROVEN",
+    "checksum": "sha256:106d9d16515880f2b1ba8ef5f3a77eb87a2ebe5ac57cdd3511d020316be59627"
+  },
+  "invariants": {
+    "deterministicReplay": true,
+    "revisionChangeAccepted": true,
+    "missingEvidenceRejected": true,
+    "supersessionAccepted": true
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

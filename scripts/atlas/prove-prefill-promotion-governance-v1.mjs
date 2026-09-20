@@ -16,12 +16,27 @@ const evidence = [
 const present = evidence.filter((file) => existsSync(join(root, file)));
 const missing = evidence.filter((file) => !present.includes(file));
 const lineageReportPath = join(root, 'docs', 'reports', 'current-lineage-closure-v1.json');
+const fixtureReportPath = join(root, 'docs', 'reports', 'prefill-dag-fixture-v1.json');
 let lineage = null;
+let fixture = null;
 try {
   lineage = JSON.parse(readFileSync(lineageReportPath, 'utf8'));
 } catch {
   lineage = null;
 }
+try {
+  fixture = JSON.parse(readFileSync(fixtureReportPath, 'utf8'));
+} catch {
+  fixture = null;
+}
+
+const fixtureReplayProven = fixture?.status === 'PREFILL_DAG_REPLAY_PROVEN'
+  && fixture?.evidenceClass === 'FIXTURE_ONLY'
+  && fixture?.replay?.sameManifestChecksum === true
+  && fixture?.replay?.samePromptChecksum === true
+  && fixture?.replay?.sameSegmentOrdering === true
+  && fixture?.canonicalAuthority === false
+  && fixture?.writesPerformed === false;
 
 const receipt = {
   schema: 'atlas.prefill-promotion-governance.v1',
@@ -37,7 +52,7 @@ const receipt = {
   currentState: {
     written: present.length > 0,
     wired: false,
-    proven: false,
+    proven: fixtureReplayProven,
     promoted: false,
     canonicalAuthority: false,
     writesPerformed: false,
@@ -52,6 +67,13 @@ const receipt = {
     rollback: 'Disable challenger and retain receipts/history; do not delete evidence.',
   },
   evidence: present,
+  fixtureReplay: {
+    report: 'docs/reports/prefill-dag-fixture-v1.json',
+    status: fixture?.status ?? 'UNAVAILABLE',
+    proven: fixtureReplayProven,
+    liveRetrievalExecuted: fixture?.liveRetrievalExecuted ?? false,
+    modelPrefillExecuted: fixture?.modelPrefillExecuted ?? false,
+  },
   missingEvidence: missing,
   evidenceChecksum: `sha256:${createHash('sha256').update(JSON.stringify(present)).digest('hex')}`,
   nextGate: 'CURRENT_SOURCE_AUTHORITY_AND_LIVE_EXECUTOR_READBACK',

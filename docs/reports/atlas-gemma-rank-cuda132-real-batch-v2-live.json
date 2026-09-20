@@ -1,0 +1,73 @@
+{
+  "canonicalAuthority": false,
+  "checkpointDir": "models/gemma4_assistant_huggingface_7_3_26",
+  "checkpointMutated": false,
+  "cudaPeakMiB": 158.791,
+  "fixture": {
+    "batchSize": 3,
+    "cpuFinite": true,
+    "cpuRepeatExact": true,
+    "cpuScores": [
+      [
+        -0.07470703125
+      ],
+      [
+        -2.578125
+      ],
+      [
+        10.125
+      ]
+    ],
+    "gpuFinite": true,
+    "gpuRepeatExact": true,
+    "gpuScores": [
+      [
+        -0.515625
+      ],
+      [
+        -2.234375
+      ],
+      [
+        10.25
+      ]
+    ],
+    "maxAbsoluteDelta": 0.44091796875,
+    "maxLength": 128,
+    "maxRelativeDelta": 5.901960849761963,
+    "paddedTokenCount": 35,
+    "rankingOrderAgreement": true,
+    "tokenCounts": [
+      14,
+      35,
+      9
+    ]
+  },
+  "hardware": {
+    "computeCapability": [
+      8,
+      6
+    ],
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "torch": "2.14.0+cu132",
+    "torchCuda": "13.2"
+  },
+  "rankingQualityProven": false,
+  "schema": "atlas.gemma-rank-cuda-real-batch-probe.v1",
+  "status": "CUDA_REAL_BATCH_FORWARD_ORDER_PROVEN_PARITY_OPEN",
+  "timing": {
+    "cpuMeanMs": 53.36179033232232,
+    "cpuMs": [
+      105.00404999766033,
+      25.513468001008732,
+      29.567852998297894
+    ],
+    "gpuMeanMs": 9.791269333315237,
+    "gpuMs": [
+      12.113947999750962,
+      8.684037999046268,
+      8.575822001148481
+    ],
+    "repeats": 3
+  },
+  "trainingPerformed": false
+}

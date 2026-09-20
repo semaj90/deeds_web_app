@@ -1,0 +1,200 @@
+{
+  "schema": "atlas.runtime-readiness.v1",
+  "generatedAt": "2026-09-20T08:40:23.457Z",
+  "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "reportsDir": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\staging",
+  "summary": {
+    "PROVEN": 4,
+    "READY": 0,
+    "PARTIAL": 1,
+    "WAITING": 5,
+    "UNPROVEN": 4,
+    "NOT_APPLICABLE": 0,
+    "packetReady": false,
+    "prefillReady": false,
+    "livePromotionReady": false
+  },
+  "contracts": {
+    "agentAdapters": false,
+    "transport": false,
+    "contextManifest": true,
+    "taskState": false,
+    "workflowStore": false
+  },
+  "gates": [
+    {
+      "key": "CANONICAL_LINEAGE_READY",
+      "state": "WAITING",
+      "evidence": [
+        "report:openspec-execution-controller-v1.json"
+      ],
+      "blockers": [
+        "CURRENT_SOURCE_AUTHORITY_OR_AUTHORIZATION"
+      ],
+      "details": {}
+    },
+    {
+      "key": "QDRANT_COLLECTION_SCHEMA_PROVEN",
+      "state": "PROVEN",
+      "evidence": [
+        "report:pytorch-qdrant-redis-som-index-2026-06-01.json",
+        "report:qdrant-collection-roles-v1.json",
+        "report:qdrant-packet-payload-enrich-apply.json",
+        "report:qdrant-packet-payload-enrich-dry-run.json",
+        "report:qdrant-payload-coverage-audit.json",
+        "report:qdrant-payload-coverage-canary-v1.json",
+        "report:qdrant-payload-coverage-codebase-768-bounded-v1.json",
+        "report:qdrant-payload-coverage-codebase-768-expanded-v1.json",
+        "report:qdrant-payload-coverage-codebase-768-v2-bounded-v1.json",
+        "report:qdrant-payload-coverage-codebase-768-v2-expanded-v1.json",
+        "report:qdrant-payload-coverage-sparse-idf-v1.json",
+        "report:qdrant-payload-coverage-sparse-legacy-v1.json",
+        "report:semantic768-qdrant-cuvs-identity-v2.json"
+      ],
+      "blockers": [],
+      "details": {}
+    },
+    {
+      "key": "QDRANT_LINEAGE_TAGS_PROVEN",
+      "state": "WAITING",
+      "evidence": [
+        "report:emb3a-qdrant-lineage-audit.json"
+      ],
+      "blockers": [
+        "CURRENT_LINEAGE_NOT_AUTHORITATIVE"
+      ],
+      "details": {}
+    },
+    {
+      "key": "ANN03_LIVE_PARITY_PROVEN",
+      "state": "WAITING",
+      "evidence": [
+        "report:semantic768-qdrant-cuvs-identity-v2.json"
+      ],
+      "blockers": [
+        "CANDIDATE_POPULATION_FREEZE",
+        "CURRENT_LINEAGE_NOT_AUTHORITATIVE"
+      ],
+      "details": {}
+    },
+    {
+      "key": "VALKEY_CENTROID_CACHE_PROVEN",
+      "state": "UNPROVEN",
+      "evidence": [],
+      "blockers": [
+        "VALKEY_CENTROID_RECEIPT_MISSING"
+      ],
+      "details": {}
+    },
+    {
+      "key": "BITFROST_BUCKET_WARMING_PROVEN",
+      "state": "UNPROVEN",
+      "evidence": [],
+      "blockers": [
+        "BITFROST_WARMING_RECEIPT_MISSING"
+      ],
+      "details": {}
+    },
+    {
+      "key": "ACE_PACKET_READINESS_PROVEN",
+      "state": "WAITING",
+      "evidence": [
+        "report:ace-feature-source-owner-live-audit-v1.json",
+        "report:ace-feature-source-owner-live-proof-v1.json",
+        "report:ace-packet-completeness-structural-boundary-audit-v1.json",
+        "report:current-workspace-packet-chunk-join-v1.json"
+      ],
+      "blockers": [
+        "CANONICAL_LINEAGE_NOT_READY"
+      ],
+      "details": {}
+    },
+    {
+      "key": "CONTEXT_MANIFEST_CONTRACT_PRESENT",
+      "state": "PROVEN",
+      "evidence": [
+        "file:sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts"
+      ],
+      "blockers": [],
+      "details": {}
+    },
+    {
+      "key": "PREFILL_SYNTHESIS_READY",
+      "state": "WAITING",
+      "evidence": [
+        "file:sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts"
+      ],
+      "blockers": [
+        "CANDIDATE_POPULATION_FREEZE",
+        "CURRENT_LINEAGE_NOT_AUTHORITATIVE",
+        "PREFILL_RECEIPT_MISSING"
+      ],
+      "details": {}
+    },
+    {
+      "key": "ACP_ADAPTER_PROVEN",
+      "state": "PARTIAL",
+      "evidence": [
+        "advisory:acp-transport-audit-not-runtime-proof"
+      ],
+      "blockers": [
+        "ACP_RUNTIME_PROOF_MISSING"
+      ],
+      "details": {
+        "configuredInContract": false,
+        "advisoryEvidence": [
+          "report:acp-packet-transport-audit.json"
+        ]
+      }
+    },
+    {
+      "key": "A2A_ADAPTER_PROVEN",
+      "state": "UNPROVEN",
+      "evidence": [],
+      "blockers": [
+        "A2A_RUNTIME_PROOF_MISSING"
+      ],
+      "details": {
+        "configuredInContract": false,
+        "advisoryEvidence": []
+      }
+    },
+    {
+      "key": "HUMAN_DECISION_RECEIPTS_PROVEN",
+      "state": "UNPROVEN",
+      "evidence": [],
+      "blockers": [
+        "HUMAN_FEEDBACK_RECEIPT_MISSING"
+      ],
+      "details": {}
+    },
+    {
+      "key": "PYTORCH_LEARNING_LANE_PROVEN",
+      "state": "PROVEN",
+      "evidence": [
+        "report:pytorch-training-pipeline.json"
+      ],
+      "blockers": [],
+      "details": {
+        "authority": "SHADOW_ONLY_UNTIL_PROMOTED"
+      }
+    },
+    {
+      "key": "DIRECTORY_GRAPH_AUDIT_PRESENT",
+      "state": "PROVEN",
+      "evidence": [
+        "report:openspec-directory-graph-v1.json"
+      ],
+      "blockers": [],
+      "details": {}
+    }
+  ],
+  "invariants": [
+    "Presence of code/config is PARTIAL evidence only; live/runtime claims require receipts.",
+    "ACP/A2A protocol names do not prove protocol compliance; runtime proof is separate.",
+    "Human feedback is an evidence stream; PyTorch/RL outputs are shadow challengers until eval and promotion receipts exist.",
+    "Cache warmth never establishes canonical identity or promotion authority."
+  ],
+  "writesPerformed": false,
+  "semanticChecksum": "86b2f59e0f262a004617bd052bdbeda92dec6883564bfc975ef5d596c9e3e293"
+}

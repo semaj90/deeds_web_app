@@ -37,7 +37,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 			});
 		}
 
-		const results = await qdrant.client.search('user_searches', {
+		const results = await qdrant.search('user_searches', {
 			vector: embedding,
 			limit,
 			with_payload: true,

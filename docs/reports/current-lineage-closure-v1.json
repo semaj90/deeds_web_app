@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-lineage-closure.v1",
-  "generatedAt": "2026-09-19T04:54:25.675Z",
+  "generatedAt": "2026-09-19T09:32:18.773Z",
   "mode": "READ_ONLY_EVIDENCE_COMPOSITION",
   "scope": {
     "sourceCohortRows": 52,
@@ -107,5 +107,5 @@
     "CONTENT_DIGEST_MISSING": 16454,
     "CONTENT_DIGEST_MISMATCH": 20
   },
-  "reportChecksum": "d9ee2a5f460d53aa62f32731f31a9c047392b9b590d428cecef7f3e37f7905f3"
+  "reportChecksum": "314a8e1159e87708092489ad246363b1f767dfa066074dfeb5945e07af9b99ee"
 }

@@ -660,7 +660,7 @@ export function buildAceRevisionedExactAnswerCacheKeyV1(input: {
 }): string {
   const admission = assessAceExactAnswerCacheAdmissionV1(input);
   if (!admission.admitted) {
-    throw new Error(`ACE_EXACT_CACHE_NOT_ADMISSIBLE:${admission.reason}`);
+    throw new Error(`ACE_EXACT_CACHE_NOT_ADMISSIBLE:${'reason' in admission ? admission.reason : 'UNKNOWN'}`);
   }
   return `ace:completion:v2:${canonicalSha256V1({
     schema: 'atlas.ace-revisioned-exact-answer-key.v1',

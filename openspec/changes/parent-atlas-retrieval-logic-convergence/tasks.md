@@ -85,38 +85,38 @@ and query-NLP-sidecar endpoint expansion are **DEFERRED_NON_BLOCKING** while the
 core retrieval logic below is incomplete. Existing proven TRACE-MCP evidence is
 retained. `Vibreti` is not treated as a current implementation or owner.
 
-- [ ] **SEARCH-REINTEGRATION-01 — Inventory disabled/deprecated/quarantined search tools read-only.**
+- [x] **SEARCH-REINTEGRATION-01 — Inventory disabled/deprecated/quarantined search tools read-only.**
   Enumerate the current tool registry, actual handler, list exposure, callers,
   ontology registration, runtime owner, input/output contracts, and canonical
   identity/revision requirements for every search-related tool. Emit a receipt;
   do not enable or disable anything.
-- [ ] **SEARCH-REINTEGRATION-02 — Classify each audited tool.** Assign exactly
+- [x] **SEARCH-REINTEGRATION-02 — Classify each audited tool.** Assign exactly
   one disposition: `RESTORE`, `ADAPTER_ONLY`, `SUPERSEDED`, `KEEP_DISABLED`, or
   `REMOVE_AFTER_CALLER_ZERO`. A historical count is not sufficient evidence for
   a current disposition.
-- [ ] **SEARCH-REINTEGRATION-03 — Require reintegration preconditions.** A tool
+- [x] **SEARCH-REINTEGRATION-03 — Require reintegration preconditions.** A tool
   may move toward `RESTORE` only after deterministic tests, canonical identity
   and revision propagation, one SearchRuntime ownership boundary, lane/executor
   semantics, caller migration evidence, and quality evaluation exist.
-- [ ] **SEARCH-REINTEGRATION-04 — Keep nondeterministic/stubbed search surfaces disabled.**
+- [x] **SEARCH-REINTEGRATION-04 — Keep nondeterministic/stubbed search surfaces disabled.**
   The randomized reranker and `atlas.search`/patch stubs remain disabled until
   deterministic implementation, caller proof, and QRELS evaluation exist.
-- [ ] **SEARCH-REINTEGRATION-05 — Reconcile historical MCP mismatches against current code.**
+- [x] **SEARCH-REINTEGRATION-05 — Reconcile historical MCP mismatches against current code.**
   Re-audit the previously reported handler/list mismatches, duplicate names,
   and ontology-unknown tools. Do not blindly carry old counts forward.
-- [ ] **SEARCH-REINTEGRATION-06 — Preserve non-authorizing audit semantics.**
+- [x] **SEARCH-REINTEGRATION-06 — Preserve non-authorizing audit semantics.**
   Receipt must state `runtimeEnablementChanged=false`, `writesPerformed=false`,
   and `canonicalAuthorityChanged=false`.
 
 ### Explicitly parked surfaces
 
-- [ ] **DEFER-TRACE-MCP-01 — Park further TRACE-MCP expansion.** Existing trace
+- [x] **DEFER-TRACE-MCP-01 — Park further TRACE-MCP expansion.** Existing trace
   and provenance receipts remain evidence; do not add more trace-tool surface
   until retrieval profile/ranking/pagination ownership below is closed.
-- [ ] **DEFER-VIBRETI-01 — Keep HMM/Vibreti-style repair challenger-only.** No
+- [x] **DEFER-VIBRETI-01 — Keep HMM/Vibreti-style repair challenger-only.** No
   current repository implementation is admitted. Do not introduce routing or
   ranking authority from the historical note.
-- [ ] **DEFER-QUERY-NLP-01 — Freeze query-sidecar expansion.** Consume existing
+- [x] **DEFER-QUERY-NLP-01 — Freeze query-sidecar expansion.** Consume existing
   grounded query/chunk features where useful, but do not add new query NLP
   endpoints in this change. The sidecar remains a feature/evidence producer,
   never an identity, search-runtime, or Qdrant writer.
@@ -125,9 +125,13 @@ retained. `Vibreti` is not treated as a current implementation or owner.
 
 ### Hard ownership invariants
 
-- [ ] **RETRIEVAL-OWNERSHIP-01 — Enforce one canonical document identity.**
+- [x] **RETRIEVAL-OWNERSHIP-01 — Enforce one canonical document identity.**
   PostgreSQL packet/chunk/source/workspace lineage remains canonical. Derived
-  algorithms may not mint a replacement document identity.
+  algorithms may not mint a replacement document identity. The read-only
+  ownership receipt proves `POSTGRES_PACKET_SOURCE_IDENTITY` as the canonical
+  owner and separates Qdrant point IDs, candidate ordinals, graph ordinals,
+  and cache keys as projection-local coordinates; live source-lineage closure
+  and promotion remain separate gates.
 - [x] **RETRIEVAL-OWNERSHIP-02 — Enforce one semantic logical lane.**
   `semantic_768` is one evidence lane. Qdrant HNSW, PostgreSQL exact pgvector,
   cuVS exact, CAGRA, and TurboVec are executors/challengers over that lane and
@@ -191,15 +195,18 @@ retained. `Vibreti` is not treated as a current implementation or owner.
   ChunkRetrievalProfileV2/FileRetrievalProfileV1 suite (`11/11`). Live profile
   readback, replay, and file aggregation remain separately gated below because
   the selected execution currently lacks qualified feature revisions.
-- [ ] **DIRECTORY-PROFILE-01 — Freeze `DirectoryProfileV1`.** Directory identity
+- [x] **DIRECTORY-PROFILE-01 — Freeze `DirectoryProfileV1`.** Directory identity
   must be deterministic from repository identity + normalized path + workspace
   revision (UUIDv5 or equivalently deterministic content-addressed scheme).
   Include bounded aggregates such as file/chunk counts, keywords, domains,
   concept IDs, import counts, graph communities/PageRank summaries, and
-  KMeans/SOM histograms.
-- [ ] **DIRECTORY-PROFILE-02 — Keep directory evidence a weak prior.** Directory
+  KMeans/SOM histograms. The pure aggregate contract and focused identity
+  tests are present; live sealed-snapshot coverage remains a separate gate.
+- [x] **DIRECTORY-PROFILE-02 — Keep directory evidence a weak prior.** Directory
   or domain metadata may adjust ranking but may not form an independent voting
-  lane and may not outrank exact symbol/identifier evidence solely by path.
+  lane and may not outrank exact symbol/identifier evidence solely by path. A
+  bounded pure prior helper proves those invariants without changing SearchRuntime
+  or adding a retrieval lane.
 - [ ] **DIRECTORY-PROFILE-03 — Prove the aggregate corpus against the sealed snapshot.**
   Count files/directories from the materialized admitted snapshot, preserve
   repository qualification for nested repositories, and reject excluded
@@ -208,13 +215,16 @@ retained. `Vibreti` is not treated as a current implementation or owner.
 
 ### Semantic representation normalization
 
-- [ ] **RETRIEVAL-TEXT-01 — Freeze `retrieval_text_v1`.** Build one revisioned
+- [x] **RETRIEVAL-TEXT-01 — Freeze `retrieval_text_v1`.** Build one revisioned
   semantic text representation from bounded fields such as path, symbol, kind,
   grounded summary, keywords, concepts, structural relations, and bounded
-  source text. Record template revision and checksum.
+  source text. Record template revision and checksum. The pure builder and
+  deterministic tests are proven; vector generation remains shadow-only.
 - [ ] **RETRIEVAL-TEXT-02 — Produce `semantic_768` from `retrieval_text_v1` in shadow.**
   Preserve EmbeddingGemma model/representation revision and source evidence;
-  do not overwrite current vectors.
+  do not overwrite current vectors. The shadow receipt adapter and fail-closed
+  tests are present; completion still requires a real EmbeddingGemma execution
+  receipt bound to this retrieval-text revision.
 - [ ] **RETRIEVAL-TEXT-03 — A/B current named-vector behavior before deletion.**
   Compare current content/signature/error-style representations against the
   single normalized semantic representation using the same revision-bound QRELS.
@@ -257,23 +267,33 @@ retained. `Vibreti` is not treated as a current implementation or owner.
 
 ### Candidate universe, feature matrix, and ranking
 
-- [ ] **CANDIDATE-MANIFEST-01 — Freeze `CandidateManifestV1`.** Required fields:
+- [x] **CANDIDATE-MANIFEST-01 — Freeze `CandidateManifestV1`.** Required fields:
   `requestId`, `workspaceRevision`, `candidateSetChecksum`, `rankingRevision`,
   and ordered canonical candidate IDs. This manifest freezes the ranked
   universe used by pagination and ContextManifest handoff.
-- [ ] **CANDIDATE-MANIFEST-02 — Keep manifest residency ephemeral.** ACE/Valkey
+- [x] **CANDIDATE-MANIFEST-02 — Keep manifest residency ephemeral.** ACE/Valkey
   may cache the manifest, candidate IDs, scores, and checksums with bounded TTL;
-  PostgreSQL/Qdrant do not need a persistent Top-K table for it.
-- [ ] **RANK-FEATURES-01 — Map normalized profiles into the existing CandidateFeatureMatrix.**
+  PostgreSQL/Qdrant do not need a persistent Top-K table for it. The current
+  contract is request-scope in-memory and any later cache entry must bind the
+  candidate, workspace, and ranking checksums.
+- [x] **RANK-FEATURES-01 — Map normalized profiles into the existing CandidateFeatureMatrix.**
   Preserve feature presence masks, feature revision, executor provenance, and
-  canonical identity. Do not create a second feature-matrix owner.
-- [ ] **RANK-BASELINE-01 — Implement/evaluate one deterministic grouped baseline.**
+  canonical identity. Do not create a second feature-matrix owner. Proven by a
+  read-only adapter wrapping the existing `[C,25]` matrix owner; unavailable
+  evidence remains masked rather than silently zero-filled.
+- [x] **RANK-BASELINE-01 — Implement/evaluate one deterministic grouped baseline.**
   Initial evaluation grouping may begin around semantic 50%, lexical 20%,
   structural 15%, ontology/graph 10%, and directory/domain/topology prior 5%.
   These are experiment weights, not promotion thresholds or immutable policy.
-- [ ] **RANK-BASELINE-02 — Keep semantic executor parity out of evidence weighting.**
+  Proven as a read-only profile by `grouped-ranking-baseline-v1.ts`; missing
+  groups are explicit and reweighted only within the experiment. Live QREL
+  evaluation and promotion remain separate gates.
+- [x] **RANK-BASELINE-02 — Keep semantic executor parity out of evidence weighting.**
   Qdrant vs pgvector vs cuVS vs CAGRA execution differences become provenance,
   latency, recall, and parity metrics; they do not multiply semantic evidence.
+  The grouped baseline consumes normalized signal values only; executor identity
+  is intentionally absent from its scoring input and remains a separate proof
+  dimension.
 - [ ] **RANK-PYTORCH-01 — Add/retain PyTorch/ATen learned ranker only as shadow challenger.**
   Consume the same CandidateFeatureMatrix and compare against the deterministic
   baseline. Promotion remains blocked by existing revision-qualified QRELS.
@@ -284,11 +304,11 @@ retained. `Vibreti` is not treated as a current implementation or owner.
 
 ### Stable pagination and runtime adoption
 
-- [ ] **PAGINATION-01 — Implement stable cursor pagination after reranking.**
+- [x] **PAGINATION-01 — Implement stable cursor pagination after reranking.**
   Cursor must bind `candidateSetChecksum`, last score/order coordinate, and
   `lastCanonicalChunkId`. Do not use mutable OFFSET pagination across a ranking
   universe that can change between pages.
-- [ ] **PAGINATION-02 — Prove page replay.** Page 2+ must resolve against the
+- [x] **PAGINATION-02 — Prove page replay.** Page 2+ must resolve against the
   same CandidateManifest/checksum as page 1 or fail closed as stale.
 - [ ] **RETRIEVAL-CALLER-ADOPTION-01 — Census live callers against one SearchRuntime boundary.**
   Classify remaining search/fusion/runtime callers and migrate through adapters
@@ -428,3 +448,11 @@ fails closed with `ACTIVE_COMPETING_768_CONSUMER_REFERENCES` instead of
 silently treating all callers as aligned. Its receipt also records the exact
 runtime caller classifications, separating active candidates from legacy,
 advisory, test, and ambiguous multi-collection references.
+
+## SEARCH-REINTEGRATION-05 receipt + trace MCP note (2026-09-20)
+
+- [x] Receipt exists: `docs/reports/mcp-current-code-reconciliation-v1.json` (generator `scripts/atlas/audit-mcp-current-code-reconciliation-v1.mjs`, read-only). Status `CURRENT_CODE_RECONCILED_HISTORICAL_MISMATCHES_CLASSIFIED`; `runtimeEnablementChanged=false`, `canonicalAuthorityChanged=false`, `writesPerformed=false`, `promotionAuthorized=false` (satisfies -06 semantics). Next gate named by the receipt: `SEARCH-REINTEGRATION-06_NON_AUTHORIZING_AUDIT_SEMANTICS`.
+- Current code: 164 `registerTool` declarations / 163 unique names under `sveltekit-frontend/src/mcp`; 9 search tools audited (7 `OPTIONAL_OR_DISABLED`, 2 `NOT_IN_CURRENT_RECEIPT_SCOPE`); ontology-unknown tools 63 historical vs 51 current.
+- [ ] SEARCH-REINTEGRATION-05a **Duplicate owner, flagged not fixed:** `context.prefetch_feature_context` is registered in both `src/mcp/new_tools.ts` and `src/mcp/trace-mcp-server.ts` (only duplicate name). Classify canonical vs duplicate before any change (Duplication Prevention rule).
+- [ ] TRACE-MCP-JSONRPC-01 Trace MCP JSON-RPC 2.0 work is governed by `DEFER-TRACE-MCP-01` above (no new trace-tool surface until retrieval profile/ranking/pagination ownership closes). `parent-atlas-rpc-packet-registry-fabric` is 27/27 complete, so no open RPC tasks exist there; JSON-RPC framing itself is handled by the MCP SDK transport. Any protocol change must be recorded here first.
+- Related (not this change): workboard challenger tournament status is recorded under `RECOMMENDATION-TOURNAMENT-01` in `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`.

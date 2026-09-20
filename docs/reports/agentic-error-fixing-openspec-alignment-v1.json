@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.agentic-error-fixing-openspec-alignment.v1",
+  "status": "PROVEN",
+  "scope": "plan-and-smoke-only",
+  "controller": {
+    "source": "docs/reports/openspec-execution-controller-v1.json",
+    "population": "allTasks",
+    "summary": {
+      "totalTasks": 9143,
+      "proven": 5816,
+      "actionable": 2309,
+      "waiting": 912,
+      "deferred": 106,
+      "writesPerformed": false
+    },
+    "selectionRule": "ACTIONABLE-only plus authority-text revalidation",
+    "selectedExample": "parent-atlas-ace-bitfrost-cache-correctness:370",
+    "selectionSmokeProfile": "controller-report"
+  },
+  "gan": {
+    "created": true,
+    "wired": true,
+    "proven": true,
+    "done": false,
+    "proofRefs": [
+      "sveltekit-frontend/src/lib/server/ai/error-agent/openspec-controller.ts",
+      "sveltekit-frontend/src/lib/server/ai/error-agent/openspec-controller.spec.ts",
+      "sveltekit-frontend/src/routes/api/ai/error-agent/+server.ts",
+      "focused-vitest:15-pass"
+    ],
+    "promotionAuthorized": false
+  },
+  "safety": {
+    "checkboxesChanged": false,
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "graphifyRefresh": false,
+    "arbitrarySmokeCommandsAccepted": false,
+    "planOnly": true
+  },
+  "validation": {
+    "focusedVitest": "15 passed, 3 todo",
+    "controllerAudit": "passed; writesPerformed=false",
+    "openspecStrict": "passed",
+    "gitDiffCheck": "existing repository whitespace warnings; no new functional failure",
+    "frontendTypeCheck": "inconclusive; svelte-check and tsc produced no output and were stopped after hanging"
+  },
+  "nextGate": "INDEPENDENT_CONTROLLER_RECONCILIATION_OR_OPERATOR_ACCEPTANCE",
+  "generatedAt": "2026-09-19"
+}

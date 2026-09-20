@@ -1,0 +1,4 @@
+{
+  "atlas:docs:capability-census": "node scripts/atlas/audit-parent-atlas-capability-census-v1.mjs . docs/reports docs/reports/parent-atlas-capability-census-v1.json",
+  "atlas:test:capability-census": "node tests/test-capability-census-v1.mjs"
+}

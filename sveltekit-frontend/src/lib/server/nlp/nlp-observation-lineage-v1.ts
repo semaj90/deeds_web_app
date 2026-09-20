@@ -56,7 +56,16 @@ export function qualifyNlpFeatureV1(
   feature: NlpFeature,
   context?: NlpObservationContextV1,
 ): NormalizedNlpFeatureV1 {
-  if (!context) return { ...feature, lineageQualified: false };
+  if (!context) {
+    // Legacy observations must not retain partial lineage fields that could
+    // be mistaken for a qualified source binding.
+    const { sourceRef, sourceRevision, providerRevision, evidenceKey, ...legacy } = feature;
+    void sourceRef;
+    void sourceRevision;
+    void providerRevision;
+    void evidenceKey;
+    return { ...legacy, lineageQualified: false };
+  }
 
   for (const [key, value] of Object.entries(context)) {
     if (!nonEmpty(value)) throw new Error(`NLP_OBSERVATION_CONTEXT_REQUIRED:${key}`);

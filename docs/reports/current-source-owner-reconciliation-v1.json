@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-owner-reconciliation.v1",
-  "generatedAt": "2026-09-19T05:40:50.300Z",
+  "generatedAt": "2026-09-20T08:38:24.087Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "databaseWrites": 0,
@@ -11,17 +11,17 @@
     "root": "C:\\Users\\james\\Videos\\deeds-web-app",
     "gitRoot": "C:/Users/james/Videos/deeds-web-app",
     "gitCommonDir": ".git",
-    "headCommit": "5de75715fb65f9aaae94aa6d2af4fdc68929d253",
-    "headTree": "55680c58ddb6584c50ae01c2a78f0202e58030c3",
+    "headCommit": "11263b5391f731fa39daa66f59ac20c33e07702d",
+    "headTree": "4e1004d1be5184a2222a79629b6e9f1c19b35124",
     "hostname": "DESKTOP-Q18MPHM",
     "dirty": true,
-    "sourceCount": 24920,
-    "sourceRefChecksum": "sha256:6e733fd16014cae9cddbf21c624cd30757b5da9b63215d61a943cfec054a7740",
+    "sourceCount": 25048,
+    "sourceRefChecksum": "sha256:a86cdab8aaa99fb3be60529325c22baa5e4c85b1af1ea11812ba8bf956f57fcb",
     "inventoryPolicy": {
       "command": "git ls-files --cached --others --exclude-standard -z",
-      "trackedAtHeadCount": 28548,
-      "candidateCount": 24959,
-      "admittedCount": 24920,
+      "trackedAtHeadCount": 28876,
+      "candidateCount": 25087,
+      "admittedCount": 25048,
       "skippedCount": 39,
       "maxSourceBytes": 5242880,
       "generatedPrefixesExcluded": [
@@ -84,16 +84,17 @@
       "canonical_authority": false,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-15T01:13:15.628Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25542,
+      "distinctSourceCount": 25542,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
         "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -104,16 +105,17 @@
       "canonical_authority": true,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-15T01:11:57.965Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25542,
+      "distinctSourceCount": 25542,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
         "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -124,16 +126,17 @@
       "canonical_authority": false,
       "trigger_kind": "BOUNDED_COMMITTED_CANARY",
       "completed_at": "2026-09-13T01:40:49.787Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 1,
+      "distinctSourceCount": 1,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:609eb801e691e1c48184910501f9a55a12729e05251d4c4bf1ff1031b9ce0e98",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9112393e48e6e926fdce33b2be1df7cabccca8b80b62890028b2fe1a69934b22",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -144,16 +147,17 @@
       "canonical_authority": false,
       "trigger_kind": "BOUNDED_COMMITTED_CANARY",
       "completed_at": "2026-09-13T01:40:07.535Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 1,
+      "distinctSourceCount": 1,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:609eb801e691e1c48184910501f9a55a12729e05251d4c4bf1ff1031b9ce0e98",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9112393e48e6e926fdce33b2be1df7cabccca8b80b62890028b2fe1a69934b22",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -164,16 +168,17 @@
       "canonical_authority": false,
       "trigger_kind": "BOUNDED_COMMITTED_CANARY",
       "completed_at": "2026-09-13T01:39:34.179Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 1,
+      "distinctSourceCount": 1,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:609eb801e691e1c48184910501f9a55a12729e05251d4c4bf1ff1031b9ce0e98",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9112393e48e6e926fdce33b2be1df7cabccca8b80b62890028b2fe1a69934b22",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -184,16 +189,17 @@
       "canonical_authority": false,
       "trigger_kind": "BOUNDED_COMMITTED_CANARY",
       "completed_at": "2026-09-13T01:08:02.795Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:6b356954650330b3e17abbd19533a89ce5db3904ea35840f9117d4ca315c2bd5",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:c21bb5a366c1dcdb44fceb84a966763f2cf2cc88680faad2680324fcb605ae73",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -204,16 +210,17 @@
       "canonical_authority": false,
       "trigger_kind": "BOUNDED_COMMITTED_CANARY",
       "completed_at": "2026-09-13T01:04:14.357Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:dd7ef6419773d004445845b19bb1e280aa35c717284fa0b5795ae6b8432237d2",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9a27e2d43d28913ef1c97256a5fe2e374ff3ceea4e4d0d24401bfa086f5001ae",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -224,16 +231,17 @@
       "canonical_authority": false,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-11T15:44:01.520Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25291,
+      "distinctSourceCount": 25291,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:d7eaf600123b6d55bb8be3193e154e9f24acf217e8e79bc2b3c383a99c2d1869",
         "receipt_ref": "sealed-snapshot:sha256:06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:15bca318677e8624a2bf4e44a03a91a5d02636516973b120e61e26c21e1e00a5",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -244,16 +252,17 @@
       "canonical_authority": false,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-10T22:46:18.679Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25271,
+      "distinctSourceCount": 25271,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:889d6a1457a73e5c42b6d650bbd012e214d1ea7d6838a453558b612ed4df22de",
         "receipt_ref": "sealed-snapshot:sha256:9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:e3c9e8ddd4f96516825e658a82d01c0e6553aaf5c5f8ed1cc26337ea4dccab02",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -264,16 +273,17 @@
       "canonical_authority": false,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-10T03:17:24.206Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25266,
+      "distinctSourceCount": 25266,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
         "receipt_ref": "graphify-current-workspace-source-selection:v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -284,16 +294,17 @@
       "canonical_authority": false,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-10T03:15:00.376Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25266,
+      "distinctSourceCount": 25266,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
         "receipt_ref": "graphify-current-workspace-source-selection:v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -304,16 +315,17 @@
       "canonical_authority": false,
       "trigger_kind": "BOUNDED_COMMITTED_CANARY",
       "completed_at": "2026-09-10T03:13:04.218Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -324,16 +336,17 @@
       "canonical_authority": false,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-10T01:51:09.991Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25266,
+      "distinctSourceCount": 25266,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
         "receipt_ref": "graphify-current-workspace-source-selection:v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -344,16 +357,17 @@
       "canonical_authority": false,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-10T01:47:48.343Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25266,
+      "distinctSourceCount": 25266,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
         "receipt_ref": "graphify-current-workspace-source-selection:v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -364,16 +378,17 @@
       "canonical_authority": false,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-10T01:44:15.257Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25266,
+      "distinctSourceCount": 25266,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
         "receipt_ref": "graphify-current-workspace-source-selection:v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -384,16 +399,17 @@
       "canonical_authority": false,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-10T01:36:37.458Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25266,
+      "distinctSourceCount": 25266,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
         "receipt_ref": "graphify-current-workspace-source-selection:v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -404,16 +420,17 @@
       "canonical_authority": false,
       "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
       "completed_at": "2026-09-10T01:33:01.264Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 25266,
+      "distinctSourceCount": 25266,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
         "receipt_ref": "graphify-current-workspace-source-selection:v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -424,16 +441,17 @@
       "canonical_authority": false,
       "trigger_kind": "BOUNDED_COMMITTED_CANARY",
       "completed_at": "2026-09-10T01:29:33.761Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 50,
+      "distinctSourceCount": 50,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:f0f64e3d6831fe2ea1e3e2c29fb70f37b2b18fb287dedf26f24bf63cc88f1bd1",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:3a0f9c2425e73280ec0e2cd5629c1b0135990667b8f667a2ae949604a696cda3",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -444,16 +462,17 @@
       "canonical_authority": false,
       "trigger_kind": "BOUNDED_COMMITTED_CANARY",
       "completed_at": "2026-09-10T01:28:48.283Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -464,16 +483,17 @@
       "canonical_authority": false,
       "trigger_kind": "BOUNDED_COMMITTED_CANARY",
       "completed_at": "2026-09-10T01:19:52.474Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -484,16 +504,17 @@
       "canonical_authority": false,
       "trigger_kind": "BOUNDED_COMMITTED_CANARY",
       "completed_at": "2026-09-10T01:18:59.683Z",
-      "memberCount": 0,
-      "distinctSourceCount": 0,
-      "workspaceRevisionCount": 0,
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
       "sourceSelection": {
         "status": "COMPLETED",
         "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
-      "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "selectionMembershipReadback": false,
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+      "selectionMembershipReadback": true,
       "canonicalAuthority": false
     },
     {
@@ -512,6 +533,7 @@
         "output_checksum": "sha256:5fa4a0ef539ced4a7481b523e049cb1adf2c62435a664b900dd70593cbc153dd",
         "receipt_ref": "graphify-current-workspace-source-selection:v1"
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:5fa4a0ef539ced4a7481b523e049cb1adf2c62435a664b900dd70593cbc153dd",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -532,6 +554,7 @@
         "output_checksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
         "receipt_ref": "graphify-current-workspace-source-selection:v1"
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -552,6 +575,7 @@
         "output_checksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
         "receipt_ref": "graphify-current-workspace-source-selection:v1"
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -572,6 +596,7 @@
         "output_checksum": "sha256:97482736f84a82982481ac22daabd08d8ccde258ea3c66d2b1d2f9c3168b8e50",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:97482736f84a82982481ac22daabd08d8ccde258ea3c66d2b1d2f9c3168b8e50",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -592,6 +617,7 @@
         "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -612,6 +638,7 @@
         "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -632,6 +659,7 @@
         "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -652,6 +680,7 @@
         "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -672,6 +701,7 @@
         "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
         "receipt_ref": "committed-canary-fresh-materialization-v1"
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -692,6 +722,7 @@
         "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
         "receipt_ref": null
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -712,6 +743,7 @@
         "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
         "receipt_ref": null
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -732,6 +764,7 @@
         "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
         "receipt_ref": null
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -752,6 +785,7 @@
         "output_checksum": "sha256:91af4e42a1f1ec186c104f981e8264a333e16100351a1b7c671bfe8b196cae43",
         "receipt_ref": null
       },
+      "membershipSource": "GRAPHIFY_EXECUTION_FILES",
       "sourceRefChecksum": "sha256:91af4e42a1f1ec186c104f981e8264a333e16100351a1b7c671bfe8b196cae43",
       "selectionMembershipReadback": true,
       "canonicalAuthority": false
@@ -803,7 +837,7 @@
   ],
   "sourceAuthority": {
     "schema": "atlas.current-graphify-snapshot-authority.v1",
-    "status": "AMBIGUOUS_QUALIFYING_EXECUTIONS",
+    "status": "CURRENT_SNAPSHOT_PROVEN",
     "sourceSnapshot": {
       "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
       "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
@@ -815,13 +849,19 @@
       "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
       "snapshotSourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
       "snapshotSourceContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
-      "observedAt": "2026-09-19T04:55:08.914Z"
+      "observedAt": "2026-09-19T23:47:28.603Z"
     },
     "qualifyingExecutionIds": [
       "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
       "74d50c86-8194-45ea-8c3d-61aab737ef83"
     ],
-    "ownerSelection": null,
+    "ownerSelection": {
+      "requestedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "preflightStatus": "OWNER_SELECTION_APPLIED_READBACK_VERIFIED",
+      "ownerPlanChecksum": "sha256:ae591c99013c268ba48251978f48fe339597b02c06f774def82bbc6edec83f97",
+      "validated": true,
+      "reason": null
+    },
     "candidates": [
       {
         "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
@@ -883,12 +923,11 @@
     "writesPerformed": false,
     "producerRevision": "atlas.current-graphify-snapshot-authority.v1"
   },
-  "ownerDecision": "LEGACY_ONLY_NO_CURRENT_OWNER",
+  "ownerDecision": "CURRENT_EXECUTION_OWNER_CANDIDATE",
   "admission": {
     "canonicalAuthority": false,
     "safeToPromote": false,
     "reasons": [
-      "EXACT_CURRENT_COMPLETED_OWNER_COUNT_NOT_ONE",
       "WORKTREE_DIRTY_REQUIRES_SNAPSHOT_POLICY",
       "STATIC_WORKTREE_INVENTORY_DIFFERS_FROM_WORKSPACE_REVISION_MANIFEST"
     ],
@@ -900,5 +939,5 @@
       "625743d2-092b-4fa8-abe0-9dc094920c80"
     ]
   },
-  "checksum": "sha256:90e653cdf67a27906c29585b1751ee3106ac05df7dc9293db247f4ae84bfc3fc"
+  "checksum": "sha256:b26f96e14fc12f503e1e126f2c7210cde7d3067ac7a99b0ce4511ed363e95056"
 }

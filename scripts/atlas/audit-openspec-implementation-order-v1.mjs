@@ -10,7 +10,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const reportPath = path.join(root, 'docs/reports/openspec-implementation-order-v1.json');
+const reportDir = process.env.ATLAS_OPENSPEC_REPORTS_DIR
+  ? path.resolve(root, process.env.ATLAS_OPENSPEC_REPORTS_DIR)
+  : path.join(root, 'docs/reports');
+const reportPath = path.join(reportDir, 'openspec-implementation-order-v1.json');
 
 function readJson(relativePath, fallback = {}) {
   const absolutePath = path.join(root, relativePath);
@@ -44,6 +47,15 @@ const report = {
     controllerActionableTasks: Number(executionController.summary?.actionable ?? 0),
     controllerWaitingTasks: Number(executionController.summary?.waiting ?? 0),
     controllerDeferredTasks: Number(executionController.summary?.deferred ?? 0),
+    controllerNonProvenTasks: Number(executionController.summary?.actionable ?? 0)
+      + Number(executionController.summary?.waiting ?? 0)
+      + Number(executionController.summary?.deferred ?? 0),
+    rawLedgerOpenTaskDelta: Number(workboard.summary?.openTasks ?? workboard.openTasks ?? 0)
+      - (Number(executionController.summary?.actionable ?? 0)
+        + Number(executionController.summary?.waiting ?? 0)
+        + Number(executionController.summary?.deferred ?? 0)),
+    rawLedgerRole: 'CENSUS_ONLY',
+    controllerRole: 'SELECTION_AUTHORITY',
     writesPerformed: false,
   },
   decision: 'ORGANIZE_PARALLEL_IMPLEMENTATION_WITH_AUTHORITY_GATES',
@@ -142,6 +154,7 @@ const report = {
   },
 };
 
+fs.mkdirSync(reportDir, { recursive: true });
 fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify({
   status: 'IMPLEMENTATION_ORDER_AUDITED',

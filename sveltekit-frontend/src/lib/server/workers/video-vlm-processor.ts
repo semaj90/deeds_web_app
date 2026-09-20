@@ -11,7 +11,8 @@ import { randomUUID } from 'crypto';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server';
-import { getOllamaEndpoint, bifrostChat, VLM_MODELS } from '$lib/server/ollama.js';
+import { bifrostChat, VLM_MODELS } from '$lib/server/ollama.js';
+import { getLlamaServerUrl } from '$lib/server/config/llama-server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 interface VideoVLMJob {
@@ -237,7 +238,7 @@ export class VideoVLMProcessor {
 
 			// Call llama-server VLM endpoint using OpenAI-style image_url content parts.
 			// Ollama is embeddings-only in this workspace.
-			const response = await fetch(`${getOllamaEndpoint()}/v1/chat/completions`, {
+			const response = await fetch(`${getLlamaServerUrl('/v1')}/chat/completions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

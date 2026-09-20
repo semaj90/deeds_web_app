@@ -42,6 +42,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 try:
+    from atlas_nlp_classification_helper_v1 import ClassificationRequestV1, classify_request
+    CLASSIFICATION_HELPER_AVAILABLE = True
+except Exception:
+    ClassificationRequestV1 = None  # type: ignore[assignment]
+    classify_request = None  # type: ignore[assignment]
+    CLASSIFICATION_HELPER_AVAILABLE = False
+
+try:
     import uvicorn
 except ImportError as exc:  # pragma: no cover - launcher/runtime only
     raise RuntimeError("uvicorn is required to run the NLP sidecar") from exc
@@ -203,12 +211,18 @@ class AnalyzeRequest(BaseModel):
     extraction_mode: EXTRACTION_MODES = "full"
     document_id: Optional[str] = None
     source_ref: Optional[str] = None
+    source_revision: Optional[str] = Field(default=None, alias="sourceRevision")
+    workspace_revision: Optional[str] = Field(default=None, alias="workspaceRevision")
+    source_namespace: Optional[str] = Field(default=None, alias="sourceNamespace")
+    tree_node_id: Optional[str] = Field(default=None, alias="treeNodeId")
     packet_key: Optional[str] = None
     language: Optional[str] = None
     model_id: Optional[str] = None
     max_chars: int = Field(default=50_000, ge=1, le=200_000)
     passes: list[Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded", "classify"]] = Field(default_factory=list)
     grounded_extraction_required: bool = False
+
+    model_config = {"populate_by_name": True}
 
 
 class AstChunkRequest(BaseModel):
@@ -482,6 +496,7 @@ class AnalyzeResponse(BaseModel):
     experiment_feature_matrix: Optional[ExperimentFeatureMatrix] = None
     event_hypergraph: Optional[EventHypergraphPayload] = None
     entity_graph_metrics: dict[str, Any] = Field(default_factory=dict)
+    classification_proposal: Optional[dict[str, Any]] = None
     processing_time_ms: int
 
 
@@ -552,6 +567,7 @@ def _capabilities() -> dict[str, bool]:
         "cugraph": CUGRAPH_AVAILABLE,
         "cuvs": CUVS_AVAILABLE,
         "cupy": CUPY_AVAILABLE,
+        "classification_helper": CLASSIFICATION_HELPER_AVAILABLE,
     }
 
 
@@ -2496,6 +2512,28 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
 
     entity_graph_metrics = _compute_entity_graph_metrics(relationships[:100])
 
+    classification_proposal: Optional[dict[str, Any]] = None
+    if CLASSIFICATION_HELPER_AVAILABLE and req.source_ref and req.source_revision:
+        try:
+            classification_proposal = classify_request(  # type: ignore[misc]
+                ClassificationRequestV1(
+                    text=text,
+                    sourceRef=req.source_ref,
+                    sourceRevision=req.source_revision,
+                    workspaceRevision=req.workspace_revision,
+                    packetKey=req.packet_key,
+                    sourceNamespace=req.source_namespace,
+                    treeNodeId=req.tree_node_id,
+                    language=language,
+                    title=req.document_id or "",
+                    modelCheckpoint=os.getenv("DOMAIN_CLASSIFIER_CHECKPOINT_PATH"),
+                )
+            )
+        except Exception as exc:
+            # The proposal lane is advisory. A malformed or unqualified source
+            # must not make the structural/linguistic analysis appear canonical.
+            metadata["classification_proposal_error"] = f"{type(exc).__name__}:{str(exc)[:180]}"
+
     return AnalyzeResponse(
         document_id=document_id,
         provider_revision=_provider_revision(),
@@ -2513,6 +2551,7 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         experiment_feature_matrix=experiment_feature_matrix,
         event_hypergraph=event_hypergraph,
         entity_graph_metrics=entity_graph_metrics,
+        classification_proposal=classification_proposal,
         processing_time_ms=int((time.perf_counter() - started) * 1000),
     )
 
@@ -2835,6 +2874,34 @@ def capabilities() -> dict[str, Any]:
 @app.post("/ast/chunk", response_model=AstEvidenceResponse)
 def ast_chunk(req: AstChunkRequest) -> AstEvidenceResponse:
     return _ast_evidence(req)
+
+
+@app.post("/classify")
+def classify(req: ClassificationRequestV1) -> dict[str, Any]:
+    if not CLASSIFICATION_HELPER_AVAILABLE or classify_request is None:
+        raise HTTPException(503, "NLP_CLASSIFICATION_HELPER_UNAVAILABLE")
+    result = classify_request(req)
+    if req.run_model_challenger:
+        backend, features_map, artifacts, warnings = _classify_domain_pass(req.text)
+        result["trainedClassifier"] = {
+            "status": "SHADOW_ONLY" if backend != "unavailable" else "UNAVAILABLE",
+            "backend": backend,
+            "features": features_map,
+            "artifacts": artifacts,
+            "warnings": warnings,
+            "promotionAuthorized": False,
+            "canonicalAuthority": False,
+            "writesPerformed": False,
+        }
+    else:
+        result["trainedClassifier"] = {
+            "status": "NOT_REQUESTED",
+            "backend": None,
+            "promotionAuthorized": False,
+            "canonicalAuthority": False,
+            "writesPerformed": False,
+        }
+    return result
 
 
 @app.post("/analyze", response_model=AnalyzeResponse)

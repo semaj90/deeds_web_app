@@ -285,7 +285,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   try {
     const t = performance.now();
     const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-    const qdrantPromise = qdrant.client.search(CODEBASE_COLLECTION, {
+    const qdrantPromise = qdrant.search(CODEBASE_COLLECTION, {
       vector: { name: 'content', vector: embedding },
       limit: 8,
       with_payload: true,
@@ -397,7 +397,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const t = performance.now();
     try {
       const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-      const wikiHits: QHit[] = await qdrant.client.search(WIKI_COLLECTION, {
+      const wikiHits: QHit[] = await qdrant.search(WIKI_COLLECTION, {
         vector: embedding,
         limit: 6,
         with_payload: true,

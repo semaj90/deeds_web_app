@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.domain-classifier-training-readiness.v1",
+  "status": "DOMAIN_CLASSIFIER_TRAINING_READY_FALSE",
+  "input": {
+    "bundlePath": "docs/reports/domain-classifier-weak-label-bundle-v1.json",
+    "bundleSchema": "atlas.domain-classifier-training-labels.v1",
+    "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+    "bundleFileSetChecksum": "sha256:7712d13299b2468a40279b353cf8f47fc4e1a56996a199297eaee8acc5d87cfa",
+    "bundleLabelSetChecksum": "sha256:e11e0028c75dd9d82d1392a5c9fb129fac2ebacdb8d0b314b365b7bd8d64ff0f"
+  },
+  "coverage": {
+    "rowCount": 13,
+    "labels": [
+      "agent",
+      "cache",
+      "ui"
+    ],
+    "labelCount": 3,
+    "revisionQualifiedRows": 0,
+    "contentQualifiedRows": 13,
+    "currentAdmittedRows": 0
+  },
+  "sourceSnapshot": {
+    "path": ".tmp/knowledge-source-snapshot-live-v1.json",
+    "status": "BLOCKED",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "sourceRegistryParity": true,
+    "worktreeFingerprintParity": false,
+    "exactRegistryMatches": 24456,
+    "sourceCount": 24456,
+    "issueCount": 647,
+    "error": null
+  },
+  "gateReasons": [
+    "SOURCE_REVISION_MISSING_OR_INVALID",
+    "SOURCE_AUTHORITY_NOT_CURRENT_ADMITTED",
+    "CURRENT_WORKTREE_SNAPSHOT_NOT_ADMITTED",
+    "OPERATOR_MINIMUM_COVERAGE_UNSPECIFIED"
+  ],
+  "checkpoint": {
+    "path": "models/domain-classifier/checkpoint.joblib",
+    "present": true,
+    "writeAuthorized": false
+  },
+  "operatorApproval": {
+    "minimumClassCount": null,
+    "minimumRowsPerClass": null,
+    "approved": false
+  },
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false,
+  "reportChecksum": "sha256:85d3f761a341ff9cae21c1bc54e30712877009a3f40f71739cb269d998b96f44"
+}

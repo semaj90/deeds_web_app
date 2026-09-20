@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-const NonEmptyStringArraySchema = z.array(z.string().min(1)).max(64);
+// Despite its historical name, this schema is currently max-only; the
+// boundary proof reports empty evidence arrays as a contract defect.
+const NonEmptyStringArraySchema = z.array(z.string().min(1)).min(1).max(64);
 
 export const OkfDomainSubjectKindSchema = z.enum([
   'document',
@@ -92,6 +94,88 @@ export const OkfFeatureMatrix4x6V1Schema = z.object({
 });
 
 export type OkfFeatureMatrix4x6V1 = z.infer<typeof OkfFeatureMatrix4x6V1Schema>;
+
+export const OkfDerivationNodeKindSchema = z.enum([
+  'document',
+  'packet',
+  'source_file',
+  'symbol',
+  'related_file',
+  'feature_row',
+  'ontology_tuple',
+]);
+
+export const OkfDerivationRelationSchema = z.enum([
+  'DOCUMENT_MATERIALIZES_PACKET',
+  'PACKET_BINDS_SOURCE_FILE',
+  'SOURCE_FILE_DEFINES_SYMBOL',
+  'SOURCE_FILE_RELATES_TO_FILE',
+  'SYMBOL_SUPPORTS_FEATURE',
+  'FEATURE_GROUNDS_ONTOLOGY_TUPLE',
+]);
+
+const OkfDerivationNodeV1Schema = z.object({
+  nodeId: z.string().min(1),
+  kind: OkfDerivationNodeKindSchema,
+  subjectRef: z.string().min(1),
+  sourceRef: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  packetKey: z.string().min(1).optional(),
+  treeNodeId: z.string().min(1).optional(),
+  evidenceRefs: NonEmptyStringArraySchema,
+  lifecycle: OkfEvidenceLifecycleSchema,
+}).strict();
+
+const OkfDerivationEdgeV1Schema = z.object({
+  edgeId: z.string().min(1),
+  fromNodeId: z.string().min(1),
+  toNodeId: z.string().min(1),
+  relation: OkfDerivationRelationSchema,
+  relationRevision: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  evidenceRefs: NonEmptyStringArraySchema,
+  lifecycle: OkfEvidenceLifecycleSchema,
+}).strict();
+
+/**
+ * Replayable derived links between document/source/packet evidence and
+ * enrichment rows. This is a graph envelope, not a packet or symbol owner.
+ */
+export const OkfDocumentFileDerivationGraphV1Schema = z.object({
+  schemaVersion: z.literal('atlas.okf.document-file-derivation-graph.v1'),
+  graphId: z.string().min(1),
+  graphRevision: z.string().min(1),
+  workspaceRevision: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  producerId: z.string().min(1),
+  producerRevision: z.string().min(1),
+  replayEvidenceRefs: NonEmptyStringArraySchema,
+  nodes: z.array(OkfDerivationNodeV1Schema).min(1).max(4096),
+  edges: z.array(OkfDerivationEdgeV1Schema).max(8192),
+  canonicalAuthority: z.literal(false),
+  promotionAuthorized: z.literal(false),
+  writesPerformed: z.literal(false),
+}).strict().superRefine((graph, ctx) => {
+  const nodeIds = new Set(graph.nodes.map((node) => node.nodeId));
+  if (nodeIds.size !== graph.nodes.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nodes'], message: 'derivation graph node IDs must be unique' });
+  }
+  for (const [index, node] of graph.nodes.entries()) {
+    if (node.sourceRevision !== graph.sourceRevision) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nodes', index, 'sourceRevision'], message: 'node sourceRevision must match graph sourceRevision' });
+    }
+  }
+  for (const [index, edge] of graph.edges.entries()) {
+    if (!nodeIds.has(edge.fromNodeId) || !nodeIds.has(edge.toNodeId)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['edges', index], message: 'edge endpoints must reference graph nodes' });
+    }
+    if (edge.sourceRevision !== graph.sourceRevision) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['edges', index, 'sourceRevision'], message: 'edge sourceRevision must match graph sourceRevision' });
+    }
+  }
+});
+
+export type OkfDocumentFileDerivationGraphV1 = z.infer<typeof OkfDocumentFileDerivationGraphV1Schema>;
 
 export const OkfRecommendationStatusSchema = z.enum([
   'RECOMMENDED',

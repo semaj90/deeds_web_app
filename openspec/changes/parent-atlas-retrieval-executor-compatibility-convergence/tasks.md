@@ -69,6 +69,7 @@
 - [x] 10.2 Add a negative persistence test proving hidden reasoning, raw tensors, model KV state, and recurrent state are not serialized into ACE/BitFrost payloads. Recursive sanitizer test passed.
 - [x] 10.3 Produce a read-only centroid/cluster warming reconciliation receipt covering `centroid:*`, `ace:cluster:*`, `som:*`, and `gpu:autoencoder:*` key families. Receipt: `docs/reports/centroid-cache-families-v1.json`; no keys were promoted or written.
 - [x] 10.4 Reconcile LangGraph synthesis ownership with llama-server `:8090`; Ollama `:11434` remains embedding-only and chat fallback fails closed. LangGraph now uses the OpenAI-compatible llama-server adapter for chat.
+- [x] 10.5 Add an opt-in LangGraph PostgreSQL checkpointer for stable `thread_id` replay, keeping RedisCache as node-output cache, disabling automatic schema setup by default, and exposing checkpoint readiness without changing canonical packet/source authority. Focused CPU-container smoke proof passed; no database setup or writes were performed.
 
 ## 11. Python/TurboVec runtime alignment
 

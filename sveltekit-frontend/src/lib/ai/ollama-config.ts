@@ -1,6 +1,7 @@
 /**
  * Ollama Configuration shared module
- * Used by ClientGemmaDemo.svelte and other components
+ * Used by embedding clients and compatibility components.
+ * Chat/generation is owned by llama-server :8090, never Ollama :11434.
  */
 
 import {
@@ -17,9 +18,9 @@ export function getOllamaEndpoint(): string {
 export function getOllamaModel(): string {
     try {
         // @ts-ignore
-        return import.meta.env?.VITE_OLLAMA_MODEL || process.env?.OLLAMA_MODEL || 'gemma4-rotorquant:latest';
+        return import.meta.env?.VITE_OLLAMA_MODEL || process.env?.OLLAMA_MODEL || 'embeddinggemma:latest';
     } catch {
-        return process.env?.OLLAMA_MODEL || 'gemma4-rotorquant:latest';
+        return process.env?.OLLAMA_MODEL || 'embeddinggemma:latest';
     }
 }
 

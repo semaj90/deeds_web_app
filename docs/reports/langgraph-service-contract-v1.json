@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.langgraph-service-contract-audit.v1",
+  "generatedAt": "2026-09-20T07:47:45.665Z",
+  "inputChecksum": "sha256:970456c3486f133016be7126fbcc765b1202ab265e5994bc7df1cea610867ade",
+  "service": {
+    "port": 8091,
+    "chatOwner": "llama-server",
+    "chatEndpoint": "http://host.docker.internal:8090/v1",
+    "chatModel": "ornith-1.5-9b",
+    "embeddingOwner": "ollama",
+    "embeddingEndpoint": "http://host.docker.internal:11434",
+    "checkpointSetup": "explicit opt-in",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "checks": [
+    {
+      "id": "HEALTH_SINGLE_AUTHORITATIVE",
+      "status": "PASS",
+      "detail": "exactly one detailed /health route plus one explicitly named /health/summary route"
+    },
+    {
+      "id": "HEALTHCHECK_TARGET",
+      "status": "PASS",
+      "detail": "container and compose healthchecks target the detailed /health endpoint"
+    },
+    {
+      "id": "THREAD_ID_BOUND",
+      "status": "PASS",
+      "detail": "thread_id is bounded and remains workflow identity, not packet identity"
+    },
+    {
+      "id": "CHECKPOINT_SETUP_EXPLICIT",
+      "status": "PASS",
+      "detail": "PostgreSQL checkpointer setup requires the explicit setup flag"
+    },
+    {
+      "id": "CHECKPOINT_THREAD_REQUIRED",
+      "status": "PASS",
+      "detail": "enabled checkpointing rejects requests without thread_id"
+    },
+    {
+      "id": "INTERNAL_AUTH_BOUNDARY",
+      "status": "PASS",
+      "detail": "all non-health routes have an explicit internal-auth boundary with production fail-closed behavior"
+    },
+    {
+      "id": "CHAT_OWNER_ORNITH_ENDPOINT",
+      "status": "PASS",
+      "detail": "compose defaults chat to llama-server :8090 and ornith-1.5-9b"
+    },
+    {
+      "id": "EMBEDDING_OWNER_OLLAMA",
+      "status": "PASS",
+      "detail": "compose keeps Ollama :11434 in the EmbeddingGemma lane"
+    },
+    {
+      "id": "ORCHESTRATOR_CPU_ONLY",
+      "status": "PASS",
+      "detail": "LangGraph image does not duplicate the GPU executor stack"
+    },
+    {
+      "id": "CPU_HEALTH_SEMANTICS",
+      "status": "PASS",
+      "detail": "CPU-only gpu=false is descriptive and does not degrade dependency readiness"
+    },
+    {
+      "id": "NO_DIRECT_CANONICAL_WRITE_MARKER",
+      "status": "PASS",
+      "detail": "service source contains explicit authority/write boundary documentation"
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "passed": 11,
+    "failed": 0,
+    "status": "CONTRACT_PROVEN"
+  },
+  "runtimeSmoke": {
+    "status": "NOT_RUN",
+    "reason": "container not started by static audit"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

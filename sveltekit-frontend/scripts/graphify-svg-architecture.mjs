@@ -2,7 +2,7 @@
  * scripts/graphify-svg-architecture.mjs
  * 
  * Extracts architecture and component mappings from codebase SVGs.
- * Uses a Vision/Code LLM (Gemma4/270m fallback) to read SVG XML/Images,
+ * Uses the active Ornith llama-server vision/code lane to read SVG XML/Images,
  * parses outputs via simdjson, autoencodes to 64d for DAG Redis Bifrost hits,
  * and saves 1-to-many mappings into the embedded_summaries jsonb schema.
  */
@@ -52,7 +52,7 @@ async function runSvgGraphifyPipeline() {
     }
 
     // 2. LLM Orchestration: Read SVG and summarize architecture
-    console.log(`🧠 Synthesizing architecture mapping using Gemma4 (fallback to Gemma270m)...`);
+    console.log(`🧠 Synthesizing architecture mapping using Ornith via llama-server :8090...`);
     
     const systemPrompt = `You are an expert UI/UX and Architecture mapper. 
 Analyze the following SVG code. Map its structure, layers, and intended UI component into a 1-to-many JSON schema.
@@ -66,41 +66,26 @@ Return EXACTLY a JSON object with this schema:
 }
 Do not include markdown blocks, only raw JSON.`;
 
-    let synthesisOutput = '';
-    try {
-      const response = await fetch(`${ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434'}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'), // VLM / Code model
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: `SVG Data:\n\n${svgContent.slice(0, 8000)}` }
-          ],
-          stream: false,
-          options: { temperature: 0.1 }
-        })
-      });
-
-      if (!response.ok) throw new Error('Primary model failed');
-      const rawJson = await response.json();
-      synthesisOutput = rawJson.message.content;
-    } catch (err) {
-      console.warn(`⚠️ Gemma4 failed, falling back to gemma270m. Error: ${err.message}`);
-      const fallbackResponse = await fetch(`${ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434'}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gemma270m:latest',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: `SVG Data:\n\n${svgContent.slice(0, 4000)}` }
-          ],
-          stream: false
-        })
-      });
-      const rawJson = await fallbackResponse.json();
-      synthesisOutput = rawJson.message.content;
+    const llamaServerUrl = (process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
+    const response = await fetch(`${llamaServerUrl}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `SVG Data:\n\n${svgContent.slice(0, 8000)}` }
+        ],
+        stream: false,
+        temperature: 0.1,
+        max_tokens: 512,
+      })
+    });
+    if (!response.ok) throw new Error(`llama-server synthesis failed: ${response.status}`);
+    const rawJson = await response.json();
+    const synthesisOutput = rawJson?.choices?.[0]?.message?.content;
+    if (typeof synthesisOutput !== 'string' || !synthesisOutput.trim()) {
+      throw new Error('llama-server returned no assistant content');
     }
 
     // 3. simdjson parsing
@@ -146,7 +131,6 @@ Do not include markdown blocks, only raw JSON.`;
       qdrantCollection: 'svg_architectures',
       tags,
       manifold4, // topological grounding
-      }
     });
     
     // 5b. Save to enhanced_graph_mappings

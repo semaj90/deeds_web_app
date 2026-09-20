@@ -7,6 +7,7 @@ import { gate, auditState } from './lib/audit-state.mjs';
 const repoRoot = path.resolve(process.argv[2] ?? process.cwd());
 const reportsDir = path.resolve(process.argv[3] ?? path.join(repoRoot, 'docs/reports'));
 const outputPath = path.resolve(process.argv[4] ?? path.join(reportsDir, 'atlas-runtime-readiness-v1.json'));
+const fallbackReportsDir = path.basename(reportsDir).toLowerCase() === 'staging' ? path.dirname(reportsDir) : path.join(reportsDir, 'staging');
 
 function resolveRepoFile(rel) {
   const direct = path.join(repoRoot, rel);
@@ -16,10 +17,10 @@ function resolveRepoFile(rel) {
   return fs.existsSync(wrapped) ? wrapped : direct;
 }
 function exists(rel) { try { return fs.statSync(resolveRepoFile(rel)).isFile(); } catch { return false; } }
-function readJson(name) { try { return JSON.parse(fs.readFileSync(path.join(reportsDir, name), 'utf8')); } catch { return null; } }
+function readJson(name) { for (const dir of [reportsDir, fallbackReportsDir]) { try { return JSON.parse(fs.readFileSync(path.join(dir, name), 'utf8')); } catch {} } return null; }
 function text(name) { try { return fs.readFileSync(resolveRepoFile(name), 'utf8'); } catch { return ''; } }
-function reportExists(name) { return fs.existsSync(path.join(reportsDir, name)); }
-function anyReport(re) { try { return fs.readdirSync(reportsDir).filter((x) => re.test(x)).sort(); } catch { return []; } }
+function reportExists(name) { return [reportsDir, fallbackReportsDir].some((dir) => fs.existsSync(path.join(dir, name))); }
+function anyReport(re) { return [...new Set([reportsDir, fallbackReportsDir].flatMap((dir) => { try { return fs.readdirSync(dir).filter((x) => re.test(x)); } catch { return []; } }))].sort(); }
 function deepHas(value, regex, depth=0) {
   if (depth > 8 || value == null) return false;
   if (typeof value === 'string') return regex.test(value);

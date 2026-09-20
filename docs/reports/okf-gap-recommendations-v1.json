@@ -1,0 +1,265 @@
+{
+  "schema": "atlas.okf-gap-recommendations.v1",
+  "status": "OKF_GAP_RECOMMENDATIONS_DERIVED",
+  "generatedAt": "2026-09-20T06:03:22.523Z",
+  "source": {
+    "directory": ".okf/concepts",
+    "conceptCount": 6
+  },
+  "records": [
+    {
+      "issue": {
+        "issueId": "okf-issue:cluster-run-lineage-gap",
+        "gapId": "cluster-run-lineage-gap",
+        "title": "cluster_run_id missing from atlas_topology_index",
+        "status": "REVIEW_ONLY",
+        "owner": "parent-atlas-okf-knowledge-layers",
+        "sourceConcept": ".okf/concepts/cluster-run-lineage-gap.yaml",
+        "evidenceRefs": [
+          "postgres:atlas_topology_index"
+        ],
+        "sourceStatus": "NOT_PROVEN",
+        "writesPerformed": false
+      },
+      "recommendation": {
+        "recommendationId": "okf-recommendation:cluster-run-lineage-gap",
+        "issueId": "okf-issue:cluster-run-lineage-gap",
+        "category": "OKF_GROUNDED_KNOWLEDGE_GAP",
+        "action": "REVIEW_AND_DEFINE_OWNER_CONTRACT",
+        "acceptanceGates": [
+          "EVIDENCE_OWNER_RECONCILED",
+          "REVISION_BOUND_READBACK",
+          "OPERATOR_APPROVAL_REQUIRED"
+        ],
+        "prohibitedMutations": [
+          "canonical_postgres_rows",
+          "qdrant_projection",
+          "valkey_cache",
+          "graphify_state",
+          "source_data"
+        ],
+        "evidenceRefs": [
+          "postgres:atlas_topology_index"
+        ],
+        "confidence": 1,
+        "canonicalAuthority": false,
+        "promotionAuthorized": false,
+        "writesPerformed": false
+      },
+      "recordChecksum": "sha256:e8c59bb0f22e6d0c05e35327cfdc918058ee2c172b0c8f04b7e621dad590313a"
+    },
+    {
+      "issue": {
+        "issueId": "okf-issue:concept-edge-ledger-gap",
+        "gapId": "concept-edge-ledger-gap",
+        "title": "No canonical concept edge ledger",
+        "status": "REVIEW_ONLY",
+        "owner": "parent-atlas-okf-knowledge-layers",
+        "sourceConcept": ".okf/concepts/concept-edge-ledger-gap.yaml",
+        "evidenceRefs": [
+          "postgres:concept_records"
+        ],
+        "sourceStatus": "NOT_PROVEN",
+        "writesPerformed": false
+      },
+      "recommendation": {
+        "recommendationId": "okf-recommendation:concept-edge-ledger-gap",
+        "issueId": "okf-issue:concept-edge-ledger-gap",
+        "category": "OKF_GROUNDED_KNOWLEDGE_GAP",
+        "action": "REVIEW_AND_DEFINE_OWNER_CONTRACT",
+        "acceptanceGates": [
+          "EVIDENCE_OWNER_RECONCILED",
+          "REVISION_BOUND_READBACK",
+          "OPERATOR_APPROVAL_REQUIRED"
+        ],
+        "prohibitedMutations": [
+          "canonical_postgres_rows",
+          "qdrant_projection",
+          "valkey_cache",
+          "graphify_state",
+          "source_data"
+        ],
+        "evidenceRefs": [
+          "postgres:concept_records"
+        ],
+        "confidence": 1,
+        "canonicalAuthority": false,
+        "promotionAuthorized": false,
+        "writesPerformed": false
+      },
+      "recordChecksum": "sha256:e26d734fb528903d778e449bcc4a5916580b2e5e7374c12557f1b989c6cf988b"
+    },
+    {
+      "issue": {
+        "issueId": "okf-issue:domain-lineage-gap",
+        "gapId": "domain-lineage-gap",
+        "title": "No domain-prediction lineage table",
+        "status": "REVIEW_ONLY",
+        "owner": "parent-atlas-okf-knowledge-layers",
+        "sourceConcept": ".okf/concepts/domain-lineage-gap.yaml",
+        "evidenceRefs": [
+          "postgres:atlas_packets.domain_class"
+        ],
+        "sourceStatus": "NOT_PROVEN",
+        "writesPerformed": false
+      },
+      "recommendation": {
+        "recommendationId": "okf-recommendation:domain-lineage-gap",
+        "issueId": "okf-issue:domain-lineage-gap",
+        "category": "OKF_GROUNDED_KNOWLEDGE_GAP",
+        "action": "REVIEW_AND_DEFINE_OWNER_CONTRACT",
+        "acceptanceGates": [
+          "EVIDENCE_OWNER_RECONCILED",
+          "REVISION_BOUND_READBACK",
+          "OPERATOR_APPROVAL_REQUIRED"
+        ],
+        "prohibitedMutations": [
+          "canonical_postgres_rows",
+          "qdrant_projection",
+          "valkey_cache",
+          "graphify_state",
+          "source_data"
+        ],
+        "evidenceRefs": [
+          "postgres:atlas_packets.domain_class"
+        ],
+        "confidence": 1,
+        "canonicalAuthority": false,
+        "promotionAuthorized": false,
+        "writesPerformed": false
+      },
+      "recordChecksum": "sha256:29d1a753e02a26b7f24f2d2e1a4b91022e235dd3260c9f02f0018eea0d73d2fd"
+    },
+    {
+      "issue": {
+        "issueId": "okf-issue:representation-fragmentation-gap",
+        "gapId": "representation-fragmentation-gap",
+        "title": "Representation records fragmented across tables/storage types",
+        "status": "REVIEW_ONLY",
+        "owner": "parent-atlas-okf-knowledge-layers",
+        "sourceConcept": ".okf/concepts/representation-fragmentation-gap.yaml",
+        "evidenceRefs": [
+          "docs:root-CLAUDE.md#embedding-dimensions-policy"
+        ],
+        "sourceStatus": "NOT_PROVEN",
+        "writesPerformed": false
+      },
+      "recommendation": {
+        "recommendationId": "okf-recommendation:representation-fragmentation-gap",
+        "issueId": "okf-issue:representation-fragmentation-gap",
+        "category": "OKF_GROUNDED_KNOWLEDGE_GAP",
+        "action": "REVIEW_AND_DEFINE_OWNER_CONTRACT",
+        "acceptanceGates": [
+          "EVIDENCE_OWNER_RECONCILED",
+          "REVISION_BOUND_READBACK",
+          "OPERATOR_APPROVAL_REQUIRED"
+        ],
+        "prohibitedMutations": [
+          "canonical_postgres_rows",
+          "qdrant_projection",
+          "valkey_cache",
+          "graphify_state",
+          "source_data"
+        ],
+        "evidenceRefs": [
+          "docs:root-CLAUDE.md#embedding-dimensions-policy"
+        ],
+        "confidence": 1,
+        "canonicalAuthority": false,
+        "promotionAuthorized": false,
+        "writesPerformed": false
+      },
+      "recordChecksum": "sha256:ea7688931d3921dbf5f514795d14fe39f368e57b8b7dc8f7ededf10e893c53f3"
+    },
+    {
+      "issue": {
+        "issueId": "okf-issue:som-run-lineage-gap",
+        "gapId": "som-run-lineage-gap",
+        "title": "som_run_id missing from atlas_topology_index",
+        "status": "REVIEW_ONLY",
+        "owner": "parent-atlas-okf-knowledge-layers",
+        "sourceConcept": ".okf/concepts/som-run-lineage-gap.yaml",
+        "evidenceRefs": [
+          "postgres:atlas_topology_index"
+        ],
+        "sourceStatus": "NOT_PROVEN",
+        "writesPerformed": false
+      },
+      "recommendation": {
+        "recommendationId": "okf-recommendation:som-run-lineage-gap",
+        "issueId": "okf-issue:som-run-lineage-gap",
+        "category": "OKF_GROUNDED_KNOWLEDGE_GAP",
+        "action": "REVIEW_AND_DEFINE_OWNER_CONTRACT",
+        "acceptanceGates": [
+          "EVIDENCE_OWNER_RECONCILED",
+          "REVISION_BOUND_READBACK",
+          "OPERATOR_APPROVAL_REQUIRED"
+        ],
+        "prohibitedMutations": [
+          "canonical_postgres_rows",
+          "qdrant_projection",
+          "valkey_cache",
+          "graphify_state",
+          "source_data"
+        ],
+        "evidenceRefs": [
+          "postgres:atlas_topology_index"
+        ],
+        "confidence": 1,
+        "canonicalAuthority": false,
+        "promotionAuthorized": false,
+        "writesPerformed": false
+      },
+      "recordChecksum": "sha256:c7b3160703f469379e1c94dcf04cd8bc339cf4ff7a5caaa22d048f307a43d08e"
+    },
+    {
+      "issue": {
+        "issueId": "okf-issue:topology-schema-drift-gap",
+        "gapId": "topology-schema-drift-gap",
+        "title": "atlas_topology_index is live only outside Drizzle",
+        "status": "REVIEW_ONLY",
+        "owner": "parent-atlas-okf-knowledge-layers",
+        "sourceConcept": ".okf/concepts/topology-schema-drift-gap.yaml",
+        "evidenceRefs": [
+          "postgres:atlas_topology_index"
+        ],
+        "sourceStatus": "NOT_PROVEN",
+        "writesPerformed": false
+      },
+      "recommendation": {
+        "recommendationId": "okf-recommendation:topology-schema-drift-gap",
+        "issueId": "okf-issue:topology-schema-drift-gap",
+        "category": "OKF_GROUNDED_KNOWLEDGE_GAP",
+        "action": "REVIEW_AND_DEFINE_OWNER_CONTRACT",
+        "acceptanceGates": [
+          "EVIDENCE_OWNER_RECONCILED",
+          "REVISION_BOUND_READBACK",
+          "OPERATOR_APPROVAL_REQUIRED"
+        ],
+        "prohibitedMutations": [
+          "canonical_postgres_rows",
+          "qdrant_projection",
+          "valkey_cache",
+          "graphify_state",
+          "source_data"
+        ],
+        "evidenceRefs": [
+          "postgres:atlas_topology_index"
+        ],
+        "confidence": 1,
+        "canonicalAuthority": false,
+        "promotionAuthorized": false,
+        "writesPerformed": false
+      },
+      "recordChecksum": "sha256:f641502b375341e36e65adbc8fa5b120d86f23b1a2a6361fc23b2083409573b3"
+    }
+  ],
+  "delivery": {
+    "createdKanbanTasks": false,
+    "createdRecommendations": false,
+    "operatorReviewRequired": true
+  },
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false
+}

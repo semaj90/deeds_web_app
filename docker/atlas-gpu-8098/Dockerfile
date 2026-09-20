@@ -10,6 +10,7 @@ RUN python -m pip install --no-cache-dir \
     -r /tmp/atlas-gpu-8098-requirements.txt
 
 COPY services/atlas-gpu-8098/app.py /app/services/atlas-gpu-8098/app.py
+COPY services/atlas-gpu-8098/shared_residency.py /app/services/atlas-gpu-8098/shared_residency.py
 COPY python/atlas_rapids_graph_runtime.py /app/python/atlas_rapids_graph_runtime.py
 
 RUN mkdir -p /app/services/atlas-gpu-8098 /app/python \

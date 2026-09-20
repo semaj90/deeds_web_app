@@ -10,6 +10,8 @@ import {
   type CandidateFeatureRowV1,
 } from './candidate-feature-row-v1.js';
 
+export type { CandidateFeatureRowV1 } from './candidate-feature-row-v1.js';
+
 export const CANDIDATE_FEATURE_SNAPSHOT_SCHEMA = 'atlas.candidate-feature-snapshot.v1' as const;
 
 const revision = z.string().min(1);

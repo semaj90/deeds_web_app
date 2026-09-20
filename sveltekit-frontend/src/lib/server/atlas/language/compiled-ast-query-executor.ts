@@ -167,7 +167,8 @@ function ancestorNames(node: SgNode): string[] {
     // Only inspect declaration ancestors. Calling nodeName() on a block or
     // the program root searches arbitrary descendants and can leak a name
     // from a sibling declaration into the relation filter.
-    if (!namedKinds.has(ancestor.kind())) continue;
+    const ancestorKind = String(ancestor.kind());
+    if (!namedKinds.has(ancestorKind)) continue;
     const name = nodeName(ancestor);
     if (name) names.push(name);
   }

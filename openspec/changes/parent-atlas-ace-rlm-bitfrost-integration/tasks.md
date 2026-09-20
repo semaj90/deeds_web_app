@@ -1407,6 +1407,10 @@ open exactly as items 1/2/4 above describe.
   predates the source change.
 - [ ] Implement `GO-LEXICAL-SCORER-CENSUS-01` before labeling any Go result `BM25`; prove term
   statistics, document frequency, document-length normalization, and frozen corpus statistics.
+  Static source census (`scripts/atlas/audit-go-lexical-scorer-census-v1.mjs`, read-only
+  2026-09-19) confirms the Go route is PostgreSQL `PG_TS_RANK_CD`, not Okapi BM25, and
+  records `trueBm25=false`; the corpus-statistics and deployed-binary readback gates remain
+  open. Report: `docs/reports/go-lexical-scorer-census-v1.json`.
 - [x] Read-only source-authority audit confirms acquisition owns raw-byte `contentDigest` and
   `storageUri` in `atlas_source_revisions`, while `codebase_chunk_index.content_hash` is a derived
   per-chunk hash and `atlas_packets` has no proven source-revision link to acquisition.

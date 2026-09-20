@@ -16,7 +16,7 @@
 import { createHash } from 'node:crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { analyzeEvidenceImage } from '$lib/server/analysis/vlm-evidence-analyzer.js';
-import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { qdrant, type QdrantSearchOptionsV1 } from '$lib/server/vector/qdrant-manager.js';
 import { getRedis } from '$lib/server/redis.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -175,23 +175,24 @@ export async function searchByImage(opts: ImageSearchOpts): Promise<ImageSearchR
   let qdrantHits: Array<{ id: string | number; score: number; payload: Record<string, unknown> }> =
     [];
   try {
-    const res = await qdrant.client.search(collection, {
-      vector: { name: 'content', vector } as Parameters<typeof qdrant.client.search>[1]['vector'],
+    const namedOptions: QdrantSearchOptionsV1 = {
+      vector: { name: 'content', vector },
       limit: limit * 2, // over-fetch for tag reranking
       score_threshold: threshold,
       with_payload: true,
       ...(filter ? { filter } : {}),
-    } as Parameters<typeof qdrant.client.search>[1]);
+    };
+    const res = await qdrant.search(collection, namedOptions);
     qdrantHits = res as typeof qdrantHits;
   } catch {
     // Fallback: unnamed vector (older collections)
-    const res = await qdrant.client.search(collection, {
-      vector: vector as Parameters<typeof qdrant.client.search>[1]['vector'],
+    const res = await qdrant.search(collection, {
+      vector,
       limit: limit * 2,
       score_threshold: threshold,
       with_payload: true,
       ...(filter ? { filter } : {}),
-    } as Parameters<typeof qdrant.client.search>[1]);
+    });
     qdrantHits = res as typeof qdrantHits;
   }
 

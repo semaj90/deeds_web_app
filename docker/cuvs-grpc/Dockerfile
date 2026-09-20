@@ -1,3 +1,7 @@
+# LEGACY COMPATIBILITY LANE.
+# This standalone gRPC image is retained for older cuVS experiments. The
+# current RAPIDS/cuVS/cuGraph owner is docker/atlas-gpu-8098; this image is not
+# the TensorRT-RTX lane and must not be used as the CUDA 13.4 alignment target.
 FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04@sha256:402700b179eb764da6d60d99fe106aa16c36874f7d7fb3e122251ff6aea8b2f7
 
 WORKDIR /app

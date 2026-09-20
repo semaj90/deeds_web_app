@@ -41,5 +41,21 @@ const report = {
 };
 
 await mkdir(dirname(reportPath), { recursive: true });
-await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-console.log(JSON.stringify({ reportPath, status: report.compatibility.status, installedCuda: report.compatibility.installedCudaDetected }));
+let writtenReportPath = reportPath;
+let reportWriteError = null;
+try {
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+} catch (error) {
+  reportWriteError = { name: error?.name ?? null, code: error?.code ?? null, message: String(error?.message ?? error) };
+  const stagingPath = resolve(repoRoot, 'docs/reports/staging/tensorrt-rtx-prerequisites-v1.json');
+  try {
+    writtenReportPath = stagingPath;
+    await mkdir(dirname(writtenReportPath), { recursive: true });
+    await writeFile(writtenReportPath, `${JSON.stringify({ ...report, reportWriteError }, null, 2)}\n`, 'utf8');
+  } catch (stagingError) {
+    writtenReportPath = resolve(repoRoot, '.tmp', 'tensorrt-rtx-prerequisites-v1.json');
+    await mkdir(dirname(writtenReportPath), { recursive: true });
+    await writeFile(writtenReportPath, `${JSON.stringify({ ...report, reportWriteError, stagingWriteError: { name: stagingError?.name ?? null, code: stagingError?.code ?? null, message: String(stagingError?.message ?? stagingError) } }, null, 2)}\n`, 'utf8');
+  }
+}
+console.log(JSON.stringify({ reportPath: writtenReportPath, primaryReportPath: reportPath, reportWriteError, status: report.compatibility.status, installedCuda: report.compatibility.installedCudaDetected }));

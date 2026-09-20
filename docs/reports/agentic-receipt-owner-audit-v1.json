@@ -1,0 +1,74 @@
+{
+  "schema": "atlas.agentic-receipt-owner-audit.v1",
+  "generatedAt": "2026-09-20T08:40:23.777Z",
+  "purpose": "Reconcile the existing agent-work receipt owner with the governed error-agent and LangGraph boundaries.",
+  "authority": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "migrationApplied": false,
+    "tournamentSchemaCreated": false,
+    "langgraphCheckpointSchemaCreated": false
+  },
+  "ownership": {
+    "durableReceiptOwner": "outcome_ledger via agent-work-receipt-store-v1.ts",
+    "workflowCheckpointOwner": "LangGraph checkpoint configuration, opt-in and thread-scoped",
+    "tournamentReceiptOwner": "NOT_CREATED; reuse agent-work receipt contract after operator acceptance"
+  },
+  "checks": [
+    {
+      "id": "RECEIPT_SCHEMA",
+      "status": "PROVEN_PURE_CONTRACT",
+      "path": "sveltekit-frontend/src/lib/server/observability/agent-work-receipt-v1.ts",
+      "evidence": "Zod schema, completion checksum, and validation are present."
+    },
+    {
+      "id": "ERROR_AGENT_ADAPTER",
+      "status": "PROVEN_PURE_ADAPTER",
+      "path": "sveltekit-frontend/src/lib/server/ai/error-agent/execution-receipt-agent-work-adapter.ts",
+      "evidence": "Error-agent execution receipts map to the existing agent-work receipt schema without persistence side effects."
+    },
+    {
+      "id": "DRIZZLE_STORE_OWNER",
+      "status": "PRESENT_DRIZZLE_POSTGRES_OWNER",
+      "path": "sveltekit-frontend/src/lib/server/observability/agent-work-receipt-store-v1.ts",
+      "evidence": "Existing Postgres-first idempotent receipt boundary writes outcome_ledger and checks receipt checksum conflicts."
+    },
+    {
+      "id": "OUTCOME_LEDGER_SCHEMA",
+      "status": "PRESENT_ADDITIVE_SCHEMA",
+      "path": "sveltekit-frontend/drizzle/manual/20260903_outcome_receipt_identity_additive_v1.sql",
+      "evidence": "Existing additive receipt identity migration is the schema owner; no tournament-specific table is introduced."
+    },
+    {
+      "id": "PERSISTENCE_TEST",
+      "status": "PROVEN_INJECTED_STORE_REPLAY_CONFLICT",
+      "path": "sveltekit-frontend/src/lib/server/ai/error-agent/execution-receipt-agent-work-persistence.integration.spec.ts",
+      "evidence": "Focused test proves insert acknowledgement, identical replay, and checksum conflict with an injected store."
+    },
+    {
+      "id": "LANGGRAPH_CHECKPOINT_SEPARATION",
+      "status": "CONTRACT_SEPARATED_OPT_IN",
+      "path": "docker/langgraph-synthesis/app.py",
+      "evidence": "LangGraph thread/checkpoint state is separate from SvelteKit agent-work receipt persistence."
+    },
+    {
+      "id": "LIVE_POSTGRES_READBACK",
+      "status": "DEFERRED_OPERATOR_RUNTIME_GATE",
+      "path": "docs/reports/agentic-receipt-owner-audit-v1.json",
+      "evidence": "This audit is repository-only; live insert/readback requires an explicitly authorized runtime proof."
+    }
+  ],
+  "summary": {
+    "status": "PURE_CONTRACT_AND_INJECTED_PERSISTENCE_PROVEN_LIVE_READBACK_DEFERRED",
+    "provenContractChecks": 3,
+    "remainingRuntimeGates": [
+      "LIVE_POSTGRES_READBACK",
+      "OPERATOR_ACCEPTED_TOURNAMENT_RECEIPT_POLICY"
+    ],
+    "openspecChange": "parent-atlas-agentic-completion",
+    "openspecTask": "AGENT-10",
+    "writesPerformed": false
+  },
+  "retryPolicy": "Do not add a new receipt table or retry live persistence until the existing owner is accepted and a bounded runtime readback is authorized.",
+  "checksum": "sha256:38b74efc1984cd54e09e143a3253257237856365cf8549610bbf52d82df24533"
+}

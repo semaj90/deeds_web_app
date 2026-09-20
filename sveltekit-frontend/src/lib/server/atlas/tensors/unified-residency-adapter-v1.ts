@@ -1,5 +1,11 @@
 import { createHash } from 'node:crypto';
-import { assertGpuExecutionWithinBudgetV1 } from '$lib/server/atlas/gpu/gpu-residency-budget.js';
+import {
+  admitGpuExecutionLeaseV1,
+  assertGpuExecutionWithinBudgetV1,
+  type GpuExecutionLeaseV1,
+  type GpuResidencyBudgetV1,
+  type GpuResidencyExecutorV1,
+} from '$lib/server/atlas/gpu/gpu-residency-budget.js';
 
 export const UNIFIED_RESIDENCY_SCHEMA = 'atlas.unified-residency.v1' as const;
 export const GPU_CEILING_BYTES = 6_000_000_000;
@@ -149,6 +155,39 @@ export function admitResidency(d: UnifiedResidencyDescriptor, availableBytes: nu
     availableBytes: Math.min(GPU_CEILING_BYTES, availableBytes),
     activeReservedBytes: reservedHeadroomBytes,
   });
+}
+
+/**
+ * The single executor-facing admission seam. Callers identify the executor,
+ * but the budget owner makes the decision before the descriptor can become
+ * resident. This is a pure in-process boundary: it does not acquire a device
+ * pointer, persist a cache entry, or grant canonical authority.
+ */
+export function admitWithSharedGpuResidencyLeaseV1(input: {
+  adapter: UnifiedResidencyAdapter;
+  descriptor: UnifiedResidencyDescriptor;
+  budget: GpuResidencyBudgetV1;
+  budgetRevision: string;
+  leaseId: string;
+  leaseEpoch: number;
+  executor: GpuResidencyExecutorV1;
+  activeReservedBytes?: number;
+}): GpuExecutionLeaseV1 {
+  validateUnifiedDescriptor(input.descriptor);
+  const lease = admitGpuExecutionLeaseV1({
+    budget: input.budget,
+    budgetRevision: input.budgetRevision,
+    leaseId: input.leaseId,
+    leaseEpoch: input.leaseEpoch,
+    executor: input.executor,
+    requestedBytes: input.descriptor.byteLength,
+    activeReservedBytes: input.activeReservedBytes,
+  });
+  if (lease.admission !== 'ALLOW') {
+    throw new Error(`GPU_EXECUTOR_RESIDENCY_ADMISSION_${lease.admission}`);
+  }
+  input.adapter.admit(input.descriptor);
+  return lease;
 }
 
 export interface ResidencyAdapterEntry { descriptor: UnifiedResidencyDescriptor; lastUsedAt: number; leaseUntil?: number; }

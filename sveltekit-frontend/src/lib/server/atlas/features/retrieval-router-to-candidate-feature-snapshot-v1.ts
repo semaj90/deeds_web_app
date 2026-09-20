@@ -67,6 +67,7 @@ export function materializeCandidateFeatureSnapshotFromRetrievalRowsV1(input: {
       candidateOrdinal: row.candidateOrdinal,
       canonicalId: row.canonicalId,
       packetKey: row.packetKey,
+      sourceRef: candidate.sourceRef,
       treeNodeId: candidate.treeNodeId,
       symbolVersionId: candidate.symbolVersionId,
       workspaceRevision: candidate.workspaceRevision,

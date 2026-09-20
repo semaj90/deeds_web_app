@@ -1,18 +1,18 @@
 {
   "schema": "atlas.openspec-directory-graph.v1",
   "root": "C:\\Users\\james\\Videos\\deeds-web-app",
-  "generatedAt": "2026-09-19T05:30:22.795Z",
+  "generatedAt": "2026-09-20T08:39:46.789Z",
   "summary": {
     "files": 5000,
-    "directories": 675,
+    "directories": 672,
     "importEdges": 82,
     "crossDirectoryEdges": 9,
-    "treeNodeEvidenceFiles": 45,
-    "graphifyEvidenceFiles": 189,
-    "graphifyArtifacts": 209,
+    "treeNodeEvidenceFiles": 47,
+    "graphifyEvidenceFiles": 195,
+    "graphifyArtifacts": 210,
     "graphifyArtifactsSkipped": 0,
     "graphifyRelationEdges": 0,
-    "openspecEvidenceFiles": 70
+    "openspecEvidenceFiles": 76
   },
   "taxonomy": [
     {
@@ -182,15 +182,15 @@
   "topicCounts": [
     {
       "topic": "other",
-      "count": 2140
+      "count": 2129
     },
     {
       "topic": "chunk-ast-symbol",
-      "count": 878
+      "count": 877
     },
     {
       "topic": "identity-lineage",
-      "count": 714
+      "count": 722
     },
     {
       "topic": "agent-protocols",
@@ -198,11 +198,11 @@
     },
     {
       "topic": "semantic-ann",
-      "count": 229
+      "count": 230
     },
     {
       "topic": "agent-workflow",
-      "count": 153
+      "count": 154
     },
     {
       "topic": "ui-admin",
@@ -218,7 +218,7 @@
     },
     {
       "topic": "data-postgres",
-      "count": 62
+      "count": 63
     },
     {
       "topic": "residency-cache",
@@ -234,20 +234,20 @@
     },
     {
       "topic": "human-feedback-rl",
-      "count": 23
+      "count": 24
     }
   ],
   "directories": [
     {
       "directory": "",
-      "files": 459,
-      "bytes": 6047148,
+      "files": 460,
+      "bytes": 6064789,
       "inboundEdges": 0,
       "outboundEdges": 0,
       "topics": [
         {
           "topic": "identity-lineage",
-          "count": 299
+          "count": 300
         },
         {
           "topic": "semantic-ann",
@@ -301,22 +301,22 @@
     },
     {
       "directory": ".tmp",
-      "files": 398,
-      "bytes": 451106411,
+      "files": 412,
+      "bytes": 451632268,
       "inboundEdges": 0,
       "outboundEdges": 0,
       "topics": [
         {
           "topic": "identity-lineage",
-          "count": 112
+          "count": 122
         },
         {
           "topic": "other",
-          "count": 90
+          "count": 91
         },
         {
           "topic": "semantic-ann",
-          "count": 80
+          "count": 81
         },
         {
           "topic": "chunk-ast-symbol",
@@ -335,16 +335,16 @@
           "count": 12
         },
         {
+          "topic": "data-postgres",
+          "count": 9
+        },
+        {
           "topic": "fusion-context-prefill",
           "count": 9
         },
         {
-          "topic": "data-postgres",
-          "count": 8
-        },
-        {
           "topic": "human-feedback-rl",
-          "count": 7
+          "count": 8
         },
         {
           "topic": "clustering-taxonomy",
@@ -1538,6 +1538,35 @@
       ]
     },
     {
+      "directory": ".tmp/atlas",
+      "files": 19,
+      "bytes": 10725436,
+      "inboundEdges": 0,
+      "outboundEdges": 0,
+      "topics": [
+        {
+          "topic": "identity-lineage",
+          "count": 15
+        },
+        {
+          "topic": "agent-workflow",
+          "count": 1
+        },
+        {
+          "topic": "chunk-ast-symbol",
+          "count": 1
+        },
+        {
+          "topic": "other",
+          "count": 1
+        },
+        {
+          "topic": "semantic-ann",
+          "count": 1
+        }
+      ]
+    },
+    {
       "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/langextract",
       "files": 19,
       "bytes": 189721,
@@ -1784,27 +1813,6 @@
         },
         {
           "topic": "data-postgres",
-          "count": 1
-        }
-      ]
-    },
-    {
-      "directory": ".tmp/atlas",
-      "files": 16,
-      "bytes": 205126,
-      "inboundEdges": 0,
-      "outboundEdges": 0,
-      "topics": [
-        {
-          "topic": "identity-lineage",
-          "count": 14
-        },
-        {
-          "topic": "chunk-ast-symbol",
-          "count": 1
-        },
-        {
-          "topic": "semantic-ann",
           "count": 1
         }
       ]
@@ -2533,27 +2541,6 @@
         },
         {
           "topic": "semantic-ann",
-          "count": 1
-        }
-      ]
-    },
-    {
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "files": 11,
-      "bytes": 54813,
-      "inboundEdges": 0,
-      "outboundEdges": 0,
-      "topics": [
-        {
-          "topic": "other",
-          "count": 8
-        },
-        {
-          "topic": "identity-lineage",
-          "count": 2
-        },
-        {
-          "topic": "chunk-ast-symbol",
           "count": 1
         }
       ]
@@ -6976,40 +6963,6 @@
       ]
     },
     {
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing",
-      "files": 3,
-      "bytes": 9314,
-      "inboundEdges": 0,
-      "outboundEdges": 0,
-      "topics": [
-        {
-          "topic": "other",
-          "count": 2
-        },
-        {
-          "topic": "governance-promotion",
-          "count": 1
-        }
-      ]
-    },
-    {
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/_private",
-      "files": 3,
-      "bytes": 112046,
-      "inboundEdges": 0,
-      "outboundEdges": 0,
-      "topics": [
-        {
-          "topic": "other",
-          "count": 2
-        },
-        {
-          "topic": "identity-lineage",
-          "count": 1
-        }
-      ]
-    },
-    {
       "directory": ".cache/cards",
       "files": 2,
       "bytes": 970,
@@ -7839,23 +7792,6 @@
       ]
     },
     {
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/tests",
-      "files": 2,
-      "bytes": 83788,
-      "inboundEdges": 0,
-      "outboundEdges": 0,
-      "topics": [
-        {
-          "topic": "identity-lineage",
-          "count": 1
-        },
-        {
-          "topic": "other",
-          "count": 1
-        }
-      ]
-    },
-    {
       "directory": "__tests__",
       "files": 1,
       "bytes": 4781,
@@ -8170,7 +8106,7 @@
     {
       "directory": ".codex/skills/parent-atlas-openspec-progress",
       "files": 1,
-      "bytes": 4009,
+      "bytes": 4168,
       "inboundEdges": 0,
       "outboundEdges": 0,
       "topics": [
@@ -11416,6 +11352,19 @@
           "count": 1
         }
       ]
+    },
+    {
+      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing",
+      "files": 1,
+      "bytes": 6493,
+      "inboundEdges": 0,
+      "outboundEdges": 0,
+      "topics": [
+        {
+          "topic": "governance-promotion",
+          "count": 1
+        }
+      ]
     }
   ],
   "graphify": {
@@ -11520,6 +11469,7 @@
       "docs/reports/graphify-downstream-chain-2026-09-17.json",
       "docs/reports/graphify-downstream-chain-2026-09-18.json",
       "docs/reports/graphify-downstream-chain-2026-09-19.json",
+      "docs/reports/graphify-downstream-chain-2026-09-20.json",
       "docs/reports/graphify-embedding-qdrant-content-projection-v1.json",
       "docs/reports/graphify-embedding-qdrant-projection-v1.json",
       "docs/reports/graphify-embedding-qdrant-signature-projection-v1.json",
@@ -15343,7 +15293,7 @@
       "path": ".codex/skills/parent-atlas-openspec-progress/SKILL.md",
       "directory": ".codex/skills/parent-atlas-openspec-progress",
       "extension": ".md",
-      "bytes": 4009,
+      "bytes": 4168,
       "primaryTopic": "identity-lineage",
       "secondaryTopics": [
         "chunk-ast-symbol",
@@ -76388,6 +76338,149 @@
       "graphifyEvidence": false
     },
     {
+      "path": ".tmp/atlas-nlp-agentic-error-readiness-v1.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 5445,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "chunk-ast-symbol",
+        "semantic-ann",
+        "graph-topology",
+        "clustering-taxonomy",
+        "fusion-context-prefill",
+        "residency-cache",
+        "human-feedback-rl",
+        "agent-workflow",
+        "governance-promotion",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "chunk",
+        "AST",
+        "CST",
+        "tree_node",
+        "Tree-sitter",
+        "AST-grep",
+        "symbol",
+        "span",
+        "semantic_768",
+        "embedding",
+        "Qdrant",
+        "cuVS",
+        "CAGRA",
+        "KNN"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": true,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": true,
+      "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/atlas-nlp-analysis-smoke-v1.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 12538,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "chunk-ast-symbol",
+        "semantic-ann",
+        "graph-topology",
+        "clustering-taxonomy",
+        "residency-cache",
+        "agent-protocols",
+        "agent-workflow",
+        "governance-promotion",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "chunk",
+        "AST",
+        "CST",
+        "tree_node",
+        "Tree-sitter",
+        "AST-grep",
+        "symbol",
+        "span",
+        "semantic_768",
+        "embedding",
+        "Qdrant",
+        "cuVS",
+        "CAGRA",
+        "KNN"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/atlas-nlp-classification-fastapi-smoke-v1.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 6939,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "semantic-ann",
+        "graph-topology",
+        "clustering-taxonomy",
+        "human-feedback-rl",
+        "agent-workflow",
+        "governance-promotion",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "semantic_768",
+        "embedding",
+        "Qdrant",
+        "cuVS",
+        "CAGRA",
+        "KNN",
+        "reranker",
+        "Graphify",
+        "file relation",
+        "import graph",
+        "PageRank",
+        "PPR",
+        "Neo4j",
+        "cuGraph"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": true,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
       "path": ".tmp/atlas-packets-report.json",
       "directory": ".tmp",
       "extension": ".json",
@@ -76744,6 +76837,87 @@
       "graphifyEvidence": false
     },
     {
+      "path": ".tmp/atlas/ast-canary-rows-pre-rekey-v1.rehearsal.json",
+      "directory": ".tmp/atlas",
+      "extension": ".json",
+      "bytes": 56909,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "chunk-ast-symbol",
+        "agent-workflow",
+        "ui-admin"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "chunk",
+        "AST",
+        "CST",
+        "tree_node",
+        "Tree-sitter",
+        "AST-grep",
+        "symbol",
+        "span",
+        "scheduler",
+        "ranker",
+        "retry",
+        "blocker",
+        "receipt",
+        "error repair"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/atlas/canary-supersession-plan-v1.json",
+      "directory": ".tmp/atlas",
+      "extension": ".json",
+      "bytes": 10320,
+      "primaryTopic": "agent-workflow",
+      "secondaryTopics": [
+        "ui-admin",
+        "data-postgres"
+      ],
+      "concepts": [
+        "scheduler",
+        "ranker",
+        "retry",
+        "blocker",
+        "receipt",
+        "error repair",
+        "workflow",
+        "SvelteKit",
+        "SSR",
+        "SSE",
+        "Bits UI",
+        "Studio",
+        "admin",
+        "PostgreSQL 18",
+        "Drizzle ORM",
+        "pgvector",
+        "schema",
+        "materialized read model"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
       "path": ".tmp/atlas/candidate-feature-columnar-feat04-v1.json",
       "directory": ".tmp/atlas",
       "extension": ".json",
@@ -77042,6 +77216,23 @@
       "graphifyTreeNodeCount": 0,
       "openspecEvidence": false,
       "graphifyEvidence": true
+    },
+    {
+      "path": ".tmp/atlas/feature-ontology-tuples-t0-pre-resolution-v1.rehearsal.json",
+      "directory": ".tmp/atlas",
+      "extension": ".json",
+      "bytes": 10453081,
+      "primaryTopic": "other",
+      "secondaryTopics": [],
+      "concepts": [],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
     },
     {
       "path": ".tmp/atlas/graphify-768-backfill-dry-run-v2.json",
@@ -82818,6 +83009,210 @@
       "graphifyTreeNodeCount": 0,
       "openspecEvidence": false,
       "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/knowledge-source-drift-disposition-v1.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 125784,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "chunk-ast-symbol",
+        "semantic-ann",
+        "graph-topology",
+        "clustering-taxonomy",
+        "fusion-context-prefill",
+        "residency-cache",
+        "agent-protocols",
+        "human-feedback-rl",
+        "agent-workflow",
+        "governance-promotion",
+        "ui-admin",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "chunk",
+        "AST",
+        "CST",
+        "tree_node",
+        "Tree-sitter",
+        "AST-grep",
+        "symbol",
+        "span",
+        "semantic_768",
+        "embedding",
+        "Qdrant",
+        "cuVS",
+        "CAGRA",
+        "KNN"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": true,
+      "graphifyEvidence": true
+    },
+    {
+      "path": ".tmp/knowledge-source-snapshot-live-v1-replay.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 68497,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "chunk-ast-symbol",
+        "semantic-ann",
+        "graph-topology",
+        "clustering-taxonomy",
+        "fusion-context-prefill",
+        "residency-cache",
+        "agent-protocols",
+        "human-feedback-rl",
+        "agent-workflow",
+        "governance-promotion",
+        "ui-admin",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "chunk",
+        "AST",
+        "CST",
+        "tree_node",
+        "Tree-sitter",
+        "AST-grep",
+        "symbol",
+        "span",
+        "semantic_768",
+        "embedding",
+        "Qdrant",
+        "cuVS",
+        "CAGRA",
+        "KNN"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": true,
+      "graphifyEvidence": true
+    },
+    {
+      "path": ".tmp/knowledge-source-snapshot-live-v1.before-refresh.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 145895,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "chunk-ast-symbol",
+        "semantic-ann",
+        "graph-topology",
+        "clustering-taxonomy",
+        "fusion-context-prefill",
+        "residency-cache",
+        "agent-protocols",
+        "human-feedback-rl",
+        "agent-workflow",
+        "governance-promotion",
+        "ui-admin",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "chunk",
+        "AST",
+        "CST",
+        "tree_node",
+        "Tree-sitter",
+        "AST-grep",
+        "symbol",
+        "span",
+        "semantic_768",
+        "embedding",
+        "Qdrant",
+        "cuVS",
+        "CAGRA",
+        "KNN"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": true,
+      "graphifyEvidence": true
+    },
+    {
+      "path": ".tmp/knowledge-source-snapshot-live-v1.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 145895,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "chunk-ast-symbol",
+        "semantic-ann",
+        "graph-topology",
+        "clustering-taxonomy",
+        "fusion-context-prefill",
+        "residency-cache",
+        "agent-protocols",
+        "human-feedback-rl",
+        "agent-workflow",
+        "governance-promotion",
+        "ui-admin",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "chunk",
+        "AST",
+        "CST",
+        "tree_node",
+        "Tree-sitter",
+        "AST-grep",
+        "symbol",
+        "span",
+        "semantic_768",
+        "embedding",
+        "Qdrant",
+        "cuVS",
+        "CAGRA",
+        "KNN"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": true,
+      "graphifyEvidence": true
     },
     {
       "path": ".tmp/langextract-1.6-probe/Lib/site-packages/_yaml/__init__.py",
@@ -120408,98 +120803,6 @@
       "graphifyEvidence": false
     },
     {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/__init__.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing",
-      "extension": ".py",
-      "bytes": 603,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/_private/__init__.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/_private",
-      "extension": ".py",
-      "bytes": 0,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/_private/extbuild.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/_private",
-      "extension": ".py",
-      "bytes": 7757,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/_private/utils.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/_private",
-      "extension": ".py",
-      "bytes": 104289,
-      "primaryTopic": "identity-lineage",
-      "secondaryTopics": [],
-      "concepts": [
-        "canonical identity",
-        "packet revision",
-        "workspace revision",
-        "source revision",
-        "registry",
-        "provenance"
-      ],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/overrides.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing",
-      "extension": ".py",
-      "bytes": 2218,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
       "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/print_coercion_tables.py",
       "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing",
       "extension": ".py",
@@ -120513,265 +120816,6 @@
         "authority",
         "promotion",
         "invariant"
-      ],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/tests/__init__.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/tests",
-      "extension": ".py",
-      "bytes": 0,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/tests/test_utils.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/tests",
-      "extension": ".py",
-      "bytes": 83788,
-      "primaryTopic": "identity-lineage",
-      "secondaryTopics": [],
-      "concepts": [
-        "canonical identity",
-        "packet revision",
-        "workspace revision",
-        "source revision",
-        "registry",
-        "provenance"
-      ],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test__all__.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 232,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test_configtool.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 1863,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test_ctypeslib.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 13950,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test_lazyloading.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 1164,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test_matlib.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 1913,
-      "primaryTopic": "identity-lineage",
-      "secondaryTopics": [],
-      "concepts": [
-        "canonical identity",
-        "packet revision",
-        "workspace revision",
-        "source revision",
-        "registry",
-        "provenance"
-      ],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test_numpy_config.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 1364,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test_numpy_version.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 1798,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test_public_api.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 25761,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test_reloading.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 2622,
-      "primaryTopic": "identity-lineage",
-      "secondaryTopics": [
-        "agent-protocols"
-      ],
-      "concepts": [
-        "canonical identity",
-        "packet revision",
-        "workspace revision",
-        "source revision",
-        "registry",
-        "provenance",
-        "ACP",
-        "A2A",
-        "MCP",
-        "gRPC",
-        "RabbitMQ",
-        "transport adapter"
-      ],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test_scripts.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 1519,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests/test_warnings.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/tests",
-      "extension": ".py",
-      "bytes": 2627,
-      "primaryTopic": "chunk-ast-symbol",
-      "secondaryTopics": [],
-      "concepts": [
-        "chunk",
-        "AST",
-        "CST",
-        "tree_node",
-        "Tree-sitter",
-        "AST-grep",
-        "symbol",
-        "span"
       ],
       "graph": {
         "inboundImports": 0,
@@ -121628,6 +121672,63 @@
         "centroid",
         "domain class",
         "topic"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/okf-beautifulsoup-fixture.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 505,
+      "primaryTopic": "other",
+      "secondaryTopics": [],
+      "concepts": [],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/okf-claim-freshness-v1.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 3848,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "chunk-ast-symbol",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "chunk",
+        "AST",
+        "CST",
+        "tree_node",
+        "Tree-sitter",
+        "AST-grep",
+        "symbol",
+        "span",
+        "PostgreSQL 18",
+        "Drizzle ORM",
+        "pgvector",
+        "schema",
+        "materialized read model"
       ],
       "graph": {
         "inboundImports": 0,
@@ -122660,6 +122761,49 @@
       "treeNodeEvidence": false,
       "graphifyTreeNodeCount": 0,
       "openspecEvidence": true,
+      "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/patch-tournament-replay-v1.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 871,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "fusion-context-prefill",
+        "residency-cache",
+        "governance-promotion",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "RRF",
+        "candidate cohort",
+        "ContextManifest",
+        "PromptPlan",
+        "prefill",
+        "synthesis",
+        "ACE",
+        "BitFrost",
+        "Redis",
+        "Valkey",
+        "KV cache",
+        "bucket warming",
+        "llama-server",
+        "OpenSpec"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
       "graphifyEvidence": false
     },
     {
@@ -124494,6 +124638,73 @@
         "pgvector",
         "schema",
         "materialized read model"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/query-router-v2-readiness-audit.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 4926,
+      "primaryTopic": "semantic-ann",
+      "secondaryTopics": [
+        "human-feedback-rl",
+        "agent-workflow",
+        "ui-admin",
+        "data-postgres"
+      ],
+      "concepts": [
+        "semantic_768",
+        "embedding",
+        "Qdrant",
+        "cuVS",
+        "CAGRA",
+        "KNN",
+        "reranker",
+        "human in the loop",
+        "approval",
+        "feedback receipt",
+        "preference",
+        "reinforcement learning",
+        "PyTorch",
+        "scheduler",
+        "ranker",
+        "retry",
+        "blocker",
+        "receipt",
+        "error repair",
+        "workflow"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/query-router-v2-readiness-audit.md",
+      "directory": ".tmp",
+      "extension": ".md",
+      "bytes": 560,
+      "primaryTopic": "human-feedback-rl",
+      "secondaryTopics": [],
+      "concepts": [
+        "human in the loop",
+        "approval",
+        "feedback receipt",
+        "preference",
+        "reinforcement learning",
+        "PyTorch"
       ],
       "graph": {
         "inboundImports": 0,
@@ -126594,6 +126805,29 @@
       "graphifyEvidence": true
     },
     {
+      "path": ".tmp/tensorrt-rtx-prerequisites-v1.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 2474,
+      "primaryTopic": "data-postgres",
+      "secondaryTopics": [],
+      "concepts": [
+        "PostgreSQL 18",
+        "Drizzle ORM",
+        "pgvector",
+        "schema",
+        "materialized read model"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
       "path": ".tmp/test_cagra_small.py",
       "directory": ".tmp",
       "extension": ".py",
@@ -127779,6 +128013,48 @@
         "cuVS",
         "CAGRA",
         "KNN"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": true
+    },
+    {
+      "path": ".tmp/workspace-revision-tournament-source-authority-v1.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 1680,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "graph-topology",
+        "governance-promotion",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "Graphify",
+        "file relation",
+        "import graph",
+        "PageRank",
+        "PPR",
+        "Neo4j",
+        "cuGraph",
+        "hypergraph",
+        "OpenSpec",
+        "completion envelope",
+        "authorization",
+        "authority",
+        "promotion",
+        "invariant"
       ],
       "graph": {
         "inboundImports": 0,
@@ -130901,7 +131177,7 @@
       "path": "docker-compose.yml",
       "directory": "",
       "extension": ".yml",
-      "bytes": 44463,
+      "bytes": 45067,
       "primaryTopic": "identity-lineage",
       "secondaryTopics": [
         "semantic-ann",
@@ -130912,6 +131188,7 @@
         "agent-protocols",
         "human-feedback-rl",
         "agent-workflow",
+        "governance-promotion",
         "ui-admin",
         "data-postgres"
       ],
@@ -133370,6 +133647,56 @@
       "graphifyEvidence": false
     },
     {
+      "path": "master_agents_toc.md",
+      "directory": "",
+      "extension": ".md",
+      "bytes": 10685,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "chunk-ast-symbol",
+        "semantic-ann",
+        "graph-topology",
+        "clustering-taxonomy",
+        "fusion-context-prefill",
+        "residency-cache",
+        "human-feedback-rl",
+        "agent-workflow",
+        "governance-promotion",
+        "ui-admin",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "chunk",
+        "AST",
+        "CST",
+        "tree_node",
+        "Tree-sitter",
+        "AST-grep",
+        "symbol",
+        "span",
+        "semantic_768",
+        "embedding",
+        "Qdrant",
+        "cuVS",
+        "CAGRA",
+        "KNN"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": true,
+      "graphifyEvidence": true
+    },
+    {
       "path": "MASTER-EXECUTION-INDEX-SESSION-123-130.md",
       "directory": "",
       "extension": ".md",
@@ -134617,7 +134944,7 @@
       "path": "package.json",
       "directory": "",
       "extension": ".json",
-      "bytes": 32182,
+      "bytes": 38534,
       "primaryTopic": "identity-lineage",
       "secondaryTopics": [
         "chunk-ast-symbol",
@@ -148901,5 +149228,5 @@
     "Taxonomy labels are deterministic navigation metadata and do not alter OpenSpec execution state."
   ],
   "writesPerformed": false,
-  "semanticChecksum": "78e238d671ce734572d0da85bfdb5c221faa99892e71c61b394b44dafe6a2f6b"
+  "semanticChecksum": "c96fcffec4d96147bbfa9dec9d4969294af9050203806dc772ddc0dbb9b0b34e"
 }

@@ -1,0 +1,95 @@
+{
+  "canonicalAuthority": false,
+  "checkpointDir": "models/gemma4_assistant_huggingface_7_3_26",
+  "checkpointMutated": false,
+  "cudaPeakMiB": 158.791,
+  "fixture": {
+    "argmaxAgreement": true,
+    "batchSize": 3,
+    "cosineSimilarity": 0.9985185265541077,
+    "cpuArgmax": 2,
+    "cpuFinite": true,
+    "cpuOutputChecksum": "sha256:22d2f980a3a97ef9e809d751cf2623e4c80462d21d241b3dc78644ea33359145",
+    "cpuOutputDtype": "torch.bfloat16",
+    "cpuOutputShape": [
+      3,
+      1
+    ],
+    "cpuRepeatExact": true,
+    "cpuScores": [
+      [
+        -0.07470703125
+      ],
+      [
+        -2.578125
+      ],
+      [
+        10.125
+      ]
+    ],
+    "gpuArgmax": 2,
+    "gpuFinite": true,
+    "gpuOutputChecksum": "sha256:78b2fdb760cce6bb29b54459376b403127aa28a7d21314e4292dde25d1c516f4",
+    "gpuOutputDtype": "torch.bfloat16",
+    "gpuOutputShape": [
+      3,
+      1
+    ],
+    "gpuRepeatExact": true,
+    "gpuScores": [
+      [
+        -0.515625
+      ],
+      [
+        -2.234375
+      ],
+      [
+        10.25
+      ]
+    ],
+    "inputChecksum": "sha256:6ae469ff4253b21c80ffa130f931687d94aa3c6810eb45a8289b7f5cf886850f",
+    "inputDtype": "torch.int64",
+    "inputShape": [
+      3,
+      35
+    ],
+    "maxAbsoluteDelta": 0.44091796875,
+    "maxLength": 128,
+    "maxRelativeDelta": 5.901960849761963,
+    "paddedTokenCount": 35,
+    "rankingOrderAgreement": true,
+    "tokenCounts": [
+      14,
+      35,
+      9
+    ]
+  },
+  "hardware": {
+    "computeCapability": [
+      8,
+      6
+    ],
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "torch": "2.14.0+cu132",
+    "torchCuda": "13.2"
+  },
+  "rankingQualityProven": false,
+  "schema": "atlas.gemma-rank-cuda-real-batch-probe.v1",
+  "status": "CUDA_REAL_BATCH_FORWARD_ORDER_PROVEN_PARITY_OPEN",
+  "timing": {
+    "cpuMeanMs": 60.270794999572296,
+    "cpuMs": [
+      114.84782499974244,
+      37.81495499788434,
+      28.149605001090094
+    ],
+    "gpuMeanMs": 33.9801453325587,
+    "gpuMs": [
+      41.855781000776915,
+      31.19666199927451,
+      28.88799299762468
+    ],
+    "repeats": 3
+  },
+  "trainingPerformed": false
+}

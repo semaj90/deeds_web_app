@@ -42,10 +42,18 @@ export function aceEnvelopeToFanoutCandidate(
   candidateOrdinal: number,
 ): FanoutEvidenceCandidateV1 {
   const values: Array<[FanoutEvidenceItemV1['kind'], string]> = [
-    ...(row.lexical_nouns ?? []).map((value) => ['LEXICAL' as const, value]),
-    ...(row.lexical_verbs ?? []).map((value) => ['LEXICAL' as const, value]),
-    ...(row.lexical_adverbs_ly ?? []).map((value) => ['LEXICAL' as const, value]),
-    ...(row.used_concepts ?? []).map((value) => ['CONCEPT_HINT' as const, value]),
+    ...(row.lexical_nouns ?? []).map(
+      (value): [FanoutEvidenceItemV1['kind'], string] => ['LEXICAL', value],
+    ),
+    ...(row.lexical_verbs ?? []).map(
+      (value): [FanoutEvidenceItemV1['kind'], string] => ['LEXICAL', value],
+    ),
+    ...(row.lexical_adverbs_ly ?? []).map(
+      (value): [FanoutEvidenceItemV1['kind'], string] => ['LEXICAL', value],
+    ),
+    ...(row.used_concepts ?? []).map(
+      (value): [FanoutEvidenceItemV1['kind'], string] => ['CONCEPT_HINT', value],
+    ),
   ];
   const evidence = values
     .filter(([, value]) => value.trim().length > 0)

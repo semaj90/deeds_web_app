@@ -1,0 +1,805 @@
+{
+  "schema": "atlas.okf-claim-freshness-audit.v1",
+  "sourceRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\okf",
+  "generatedAt": "2026-09-20T05:10:26.136Z",
+  "summary": {
+    "totalClaims": 34,
+    "validClaims": 0,
+    "staleClaims": 0,
+    "unresolvedClaims": 34,
+    "statusCounts": {
+      "UNRESOLVED_MISSING_FIELDS": 34
+    }
+  },
+  "claims": [
+    {
+      "path": "library-module-sources.json",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_REFS",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:library-module-sources.json",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [],
+      "claimChecksum": "sha256:9f5e2c81a689e27d8f0095ee1f54ffc820c44ba1898012d2f472aacfa19cb869",
+      "contentChecksum": "sha256:101a3b960ee20caa1839048dd95dad40c155c1e74d2e51a0c48d27a9564095d2",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/agent-runtime.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/agent-runtime.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/design.md"
+      ],
+      "claimChecksum": "sha256:2acb9852eff9a68f32cd4829cf51c37d5c5a86192c773fcd0b19a1a3eda14402",
+      "contentChecksum": "sha256:817c15938879fc29dcff27ca42df6edf7a08532812be5feea83a73f286ac6e09",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/architecture/canonical-authority.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/architecture/canonical-authority.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md",
+        "openspec/changes/parent-atlas-okf-knowledge-layers/design.md"
+      ],
+      "claimChecksum": "sha256:cda7bd5828c604dbd00e33d53248b660ebd6a0ad944772beaa8f100846e88d9f",
+      "contentChecksum": "sha256:2eb141b56a4fa31c5e394a7aad909fb7d865896a01c898a40bf8b9a928c6dc29",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/concepts-and-ontology.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/concepts-and-ontology.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:9d6b4fc87f57c4a9dc6c9843891455e5174183d2d22ae5e500bdbd9a5af41fcf",
+      "contentChecksum": "sha256:8431abaf6401eb47f80a3c23c2c81a28e016a3a2018507a0d66f22a00211cc3a",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/domains-identity.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/domains-identity.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md"
+      ],
+      "claimChecksum": "sha256:d5eb6c304950b944fad25d3c4a3fc983da756b153054b810df0e2f20344f8e89",
+      "contentChecksum": "sha256:7e5cab99916d2764e6af3a2f39c93c502ce3d599d957e2f490f99b99ecc29bfa",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/event-pipeline.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/event-pipeline.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md"
+      ],
+      "claimChecksum": "sha256:f45bfe16c2a9779513f64f130808980a67e8448a0fa52a3509ab0ecd9ae9a968",
+      "contentChecksum": "sha256:964831d5694c3b4499333d1a2a9ed6b1e026a42f227cdf3400ce3b4c6bb1aebc",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/gaps/agentic-error-fixing.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/gaps/agentic-error-fixing.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/specs/agentic-patch-tournament/spec.md"
+      ],
+      "claimChecksum": "sha256:f955981bc2eb9209fb88ac0ce6b15f4f19102a2018de3562bd2b44451b79c2c8",
+      "contentChecksum": "sha256:227df4089f90c8045c974dd1434a06ac46545eb32be6ea88356a5b59f28cbd5c",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/gaps/fragmented-representations.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/gaps/fragmented-representations.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:8d7f62914a1fc5a2048df1b405773d818ee9864fbf6ba4059945a50feffdfa10",
+      "contentChecksum": "sha256:20bcbb169bb4afb12a13d220c07e82b1b10c34aad58b64400bbbc91959a1c016",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/gaps/missing-cluster-run-lineage.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/gaps/missing-cluster-run-lineage.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:05c2fbbcd24d3ba970bcaaf6627f87a80b0032b5148a172f2a9d77d253d6c9b1",
+      "contentChecksum": "sha256:36f7be04322750c1327379f996b2fdcfaa880287c99b0108da6e8b300a031d2b",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/gaps/missing-concept-edge-ledger.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/gaps/missing-concept-edge-ledger.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:1e6590dddaa2aa2e70c3b85ec62e57621f31e901dcc9f8f73c74cf95d82434da",
+      "contentChecksum": "sha256:d3e11aac4443bf9377498c6aaf158812bffc39493e16f2a4d08dbc307126f39c",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/gaps/missing-domain-lineage.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/gaps/missing-domain-lineage.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:2ff54544e67e63850812bb22da9a090a7a8da9a567abd3abf93a67968bba48b5",
+      "contentChecksum": "sha256:5f8d8fb9b4dcf7502a42a736b1c25e449d6226913b175d243a77aef710df528e",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/gaps/missing-library-review.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/gaps/missing-library-review.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md"
+      ],
+      "claimChecksum": "sha256:a368255fbc8a7a1bf465795414e65457999bd7ef9bce123e6632a1d50dfef235",
+      "contentChecksum": "sha256:6606c7edb4217ab0b54ee5a6ae2d8ef73235c8634077dd39d58cac28ab7f484e",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/gaps/missing-som-run-lineage.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/gaps/missing-som-run-lineage.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:09d387e3e37fb897e92b12040c73f19b34e932771fd7229daf258340b74d6853",
+      "contentChecksum": "sha256:0cf77e649fd4cd55fe1bfa07f55734684a6d1f6b4fdf7c04406b87143ea59e44",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/gaps/mock-stub-resolution.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/gaps/mock-stub-resolution.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md"
+      ],
+      "claimChecksum": "sha256:4d0968d9c56e5ff5117abe0b023582a10113f48a97834c73d0c6446b90d97de3",
+      "contentChecksum": "sha256:b2b16529bcd10a3bfdb001a43c8094dbd0842ab3bcb8bdef9bbfbf41c03157cf",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/gaps/topology-schema-drift.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/gaps/topology-schema-drift.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:98a39dee76c1cfe5d8fe93012f00107877c33c9c842214841dac3073c02cebfb",
+      "contentChecksum": "sha256:94f5857805455cf6fdc3ca36a312b10dcf639326a4ffe316f306a89b1668cfcf",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/graph-analytics.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/graph-analytics.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md"
+      ],
+      "claimChecksum": "sha256:ed15318c98e42fa441d361191a17442b0c288d703267b5c6e9b9cc651471e9e3",
+      "contentChecksum": "sha256:e42cc33852982287c1bdec360ab2301291884b6b0d36ff9355a10d90ddd88b9f",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/index.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/index.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md",
+        "openspec/changes/parent-atlas-okf-knowledge-layers/design.md"
+      ],
+      "claimChecksum": "sha256:dc670a95c27e043e9a2f1298c9c42f7c005080d4bffff744302dc89bb901d704",
+      "contentChecksum": "sha256:79ffbf212c4286f52274f718e0b977fdd8507fbd9cb25dfdd7bb14d55cebfee6",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/integrations/kafka-debezium.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/integrations/kafka-debezium.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/design.md"
+      ],
+      "claimChecksum": "sha256:7a3f3cc48eaf78551dc5acde927bbbdc5c21823db8e5afbc434566d89e47ad1c",
+      "contentChecksum": "sha256:25d65feb64413a183d7af2694102d7830a46b9a2e34243a033a077f3466418f7",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/integrations/langfuse.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/integrations/langfuse.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:95ff63ae82b3df5eb63888ecb42dcfd7310ef34e7fb1d7498fce6e5678a600d9",
+      "contentChecksum": "sha256:7db5a64f43b3f069335f0cc595cc1f7a3feda1c7a6a3468e756545a41412388c",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/integrations/neo4j.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/integrations/neo4j.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md"
+      ],
+      "claimChecksum": "sha256:77ed98e54a8bdc6a075093bc089aa17563370005180d78d38684035cf3bec87b",
+      "contentChecksum": "sha256:ec9d5cef63e3761ef7c51001d4d2ea0e6b6e4ab299ffd811ca9cecf5eb1ce1a2",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/integrations/opentelemetry.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/integrations/opentelemetry.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md"
+      ],
+      "claimChecksum": "sha256:972c6a82a854ee942b23a01e7082278140947952136d20222df8bec4c49a5303",
+      "contentChecksum": "sha256:b452f449337c0b5a0c90c6c32ee06ffc90d3a11915a06c6ab44ea77bf34d6c36",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/integrations/postgres.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/integrations/postgres.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/design.md"
+      ],
+      "claimChecksum": "sha256:092cc876eed822d6d868ff204f523be76d9a9cb0d755583c7af060b197299d47",
+      "contentChecksum": "sha256:47a5e10000a288ddfc408748dadd9b30ca9166217183509c29c8dbf0166d860b",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/integrations/qdrant.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/integrations/qdrant.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md"
+      ],
+      "claimChecksum": "sha256:bcc0930d479715e3afd3ac3132b066823915a118db9bbb002c1d4312977fcf6f",
+      "contentChecksum": "sha256:c53c6b3a395b4f4d1ace8c49d5fad03ca063096327daf5a77a9770c5dbf75b4b",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/integrations/redis-bitfrost.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/integrations/redis-bitfrost.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:7b32291456c398887c459295892c20c96c15598e2f678dd5b6863289aef1f307",
+      "contentChecksum": "sha256:7be1cb8e373ecdd8fd5e4f99e7f1972157410f15a6ff3de7da3205b7450699ec",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/integrations/trace-mcp.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/integrations/trace-mcp.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md"
+      ],
+      "claimChecksum": "sha256:b36b6b0e13026219747896bf50d592365b560312eeb89296780f9f8783c56b55",
+      "contentChecksum": "sha256:af39babb1ef017fdc74fb433ff299ad75a69cbea0de7f690213936403d114779",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/log.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/log.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md"
+      ],
+      "claimChecksum": "sha256:34b93c549518f4aebb261aab59eb9a4240f71b28dc7cfbdd0de98c8523d23cab",
+      "contentChecksum": "sha256:e05ffe682ed2868f2f7494423576664d3e515063bb9e421c554c9398d980346c",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/observability.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/observability.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md"
+      ],
+      "claimChecksum": "sha256:af3ef8add4bdb17d547b69f4b05917916c2a352883daed99594ff368106dd8f1",
+      "contentChecksum": "sha256:a3bb2f94cb611462285a6d1d4901e621c58d44cd873b266bf1a2839687ab0eb7",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/parser-and-symbols.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/parser-and-symbols.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md"
+      ],
+      "claimChecksum": "sha256:574b3ab00f7502a3de8e110fcb7d193f1168dd85cc1e5493b07ee18c1085f4b0",
+      "contentChecksum": "sha256:612980d398367a5d77b87e39f287065ad115ebdfca8741c6cf721feb06ab451d",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/representations.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/representations.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:7bd5b72922d3314bbd8498dd0fff0cc704fc417d9e31edbee35ebae2cdbdc805",
+      "contentChecksum": "sha256:98820ddebbf2f91b249b68f3c60955933fdb4f55cec018aa003255c46d251b22",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/retrieval-lanes.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/retrieval-lanes.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md"
+      ],
+      "claimChecksum": "sha256:4a1ddfc686dd2e8918932f9ed0af1fb37a791beb52329e276280efad33e862e0",
+      "contentChecksum": "sha256:0580f954dd0e32559e66a1323c290fc899d0f3c7e8c190ce42bce4f61fc0d6c4",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/topology.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/topology.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md"
+      ],
+      "claimChecksum": "sha256:1486da5116fd9940bc6bd973bacf0cfa22f6e3511d44d87630346bfe6653ea53",
+      "contentChecksum": "sha256:f4415da605fcc3fb1d67a379a7342c1419ff3730b9b5790857f9dda3f9b4e945",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/workflows/openwiki-crawl-index.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/workflows/openwiki-crawl-index.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "docs/.okf/schema.yaml",
+        "docs/.okf/dev/manifest.json",
+        "docs/.okf/dev/index.md",
+        "docs/.okf/dev/rtx-louvain-parity.md"
+      ],
+      "claimChecksum": "sha256:c0225e37c5f72609a73b72f6dadc5dd268e890c4bdb878eaf117ba7e06f1e3e7",
+      "contentChecksum": "sha256:7d596cf33ff701eec0423b1a4e972e0c529c569665c2e50bb971bc6aabb6fbb9",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/workflows/repository-audit.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/workflows/repository-audit.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md"
+      ],
+      "claimChecksum": "sha256:661c6702e4f69a209b598fed1bdb30cfb963135a0fe499ce2ab9546252c785d9",
+      "contentChecksum": "sha256:829c4d0e9348f4543fdcc6f50a3489ac0c3d618f9589774865dfca1b655b2825",
+      "writesPerformed": false
+    },
+    {
+      "path": "parent-atlas/workflows/wsl2-rapids-source-ref-agentic-workflows.md",
+      "status": "UNRESOLVED_MISSING_FIELDS",
+      "missing": [
+        "CLAIM_REVISION",
+        "SOURCE_REF",
+        "SOURCE_REVISION",
+        "WORKSPACE_REVISION",
+        "EVIDENCE_REFS",
+        "EVIDENCE_CHECKSUM",
+        "PRODUCER_REVISION"
+      ],
+      "claimId": "okf:parent-atlas/workflows/wsl2-rapids-source-ref-agentic-workflows.md",
+      "claimIdSource": "DERIVED_PATH",
+      "canonicalAuthority": false,
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "evidenceRefs": [],
+      "claimChecksum": "sha256:0b0487c991239fb9ec9a81464c74c7e2a2c4faf3c1a3e045bf4143321ddb502e",
+      "contentChecksum": "sha256:b7bc048cc65ef7258f78e49b3027ee6f21c06dba5279f5369d6e67ec13374f93",
+      "writesPerformed": false
+    }
+  ],
+  "indexChecksum": "sha256:2e6c7b91c37a0a488eb1e13b71218027503f66390383d7cd71a9f1eea9e05d42",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false
+}

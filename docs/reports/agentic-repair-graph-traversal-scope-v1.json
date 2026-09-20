@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.agentic-repair-graph-traversal-scope.v1",
+  "task": "T18-72",
+  "status": "SCOPED_EXISTING_OWNERS_IDENTITY_BLOCKED",
+  "authority": "NAVIGATION_ONLY",
+  "writesPerformed": false,
+  "graphifyRefreshed": false,
+  "canonicalPromotionAuthorized": false,
+  "decision": {
+    "louvainLeiden": "existing challenger/proof lane; no new owner",
+    "personalizedPageRank": "existing graph feature family; remains derived",
+    "weightedDijkstra": "future traversal baseline under graph identity owner",
+    "semanticBestFirst": "future retrieval policy under SearchRuntime owner",
+    "taxonomyAwareBfs": "future graph traversal policy; no canonical taxonomy writes"
+  },
+  "blockingDependency": "parent-atlas-graph-retrieval-proof identity split",
+  "owners": [
+    { "path": "python/graph_snapshot_parity_cugraph_oracle.py", "lineCount": 247, "sha256": "38c9d1e3a75d787d6515df47481b39c55061784c42a85d9b4f5baab5aeaec1c0", "role": "cuGraph PageRank/components/Louvain challenger" },
+    { "path": "python/graph_snapshot_parity_networkx_oracle.py", "lineCount": 195, "sha256": "a0c2d6234d94a79a6cb50411fa35619b8f4c699ed31c8d19a6d49e971f7c2d0d", "role": "NetworkX CPU oracle and parity harness" },
+    { "path": "python/parent_atlas_networkx_pagerank.py", "lineCount": 142, "sha256": "cbc555ec2373c7ecc3fe0e8a7d453e9de4dfa56c024635202f8effbac7b686e9", "role": "derived PageRank reference" },
+    { "path": "packages/parent-atlas/test/hypergraph-ppr.test.mjs", "lineCount": 58, "sha256": "a2223458fad49631599a8b3670bdbbabac7d67c783acb4cf44a12aec1dede761", "role": "hypergraph incidence PPR fixture" },
+    { "path": "packages/atlas-core/src/classification/graph-lane.ts", "lineCount": 208, "sha256": "c520f8df55518fc8b6a68d1a3df5e0c9948f775cbd177ad1d6a1d075c1249b7c", "role": "graph-domain classification features" },
+    { "path": "scripts/atlas/audit-context-forest-readiness-v1.mjs", "lineCount": 97, "sha256": "0fd414e49ba845de9f99fa61257574371eea15f7ba985dacd949087d82d47a5d", "role": "readiness gate; keeps Leiden and cuGraph unproven without receipts" }
+  ],
+  "nextGate": "Resolve graph identity split, freeze a revision-qualified relationship snapshot, then compare CPU/GPU traversal on the same ordinal map.",
+  "notes": [
+    "No Louvain/Leiden community taxonomy record was created.",
+    "Existing graph algorithms remain derived features or challengers and cannot create packet/source identity or RRF votes."
+  ]
+}

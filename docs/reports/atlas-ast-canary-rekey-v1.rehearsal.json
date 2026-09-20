@@ -1,0 +1,80 @@
+{
+  "schema": "atlas.ast-canary-rekey.v1",
+  "generatedAt": "2026-09-20T08:26:28.141Z",
+  "mode": "REHEARSAL_ROLLBACK",
+  "option": "A_IN_PLACE_REKEY",
+  "steps": {
+    "scope": {
+      "plannedRekeys": 50,
+      "liveAstGrepRows": 50
+    },
+    "dependents": {
+      "class_index": 0,
+      "features": 0,
+      "knowledge_objects": 0,
+      "outside_children": 0,
+      "superseded_refs": 0
+    },
+    "archive": {
+      "path": ".tmp/atlas/ast-canary-rows-pre-rekey-v1.rehearsal.json",
+      "sha256": "sha256:82795ba2ffdec4a806952fe565e09ce650f004f17662eabdf1200ef2397b3773",
+      "rows": 50,
+      "manifestEntryWritten": false
+    },
+    "fileRows": {
+      "needed": 10,
+      "alreadyPresent": 0,
+      "toInsert": 10,
+      "inserted": 10
+    },
+    "rekey": {
+      "planned": 50,
+      "updated": 50
+    },
+    "constraintCheck": "PASS (SET CONSTRAINTS ALL IMMEDIATE)",
+    "readback": {
+      "rowsAtNewIds": 50,
+      "oldIdsRemaining": 0,
+      "problems": [],
+      "parentKindMatrix": [
+        {
+          "child": "class",
+          "parent": "file",
+          "n": 1
+        },
+        {
+          "child": "function",
+          "parent": "file",
+          "n": 10
+        },
+        {
+          "child": "interface",
+          "parent": "file",
+          "n": 26
+        },
+        {
+          "child": "method",
+          "parent": "class",
+          "n": 8
+        },
+        {
+          "child": "type",
+          "parent": "file",
+          "n": 5
+        }
+      ],
+      "badParentKinds": [],
+      "rowsInTableInsideTxn": 11283,
+      "expectedRows": 11283
+    },
+    "after": {
+      "rowsInTable": 11273,
+      "expectedRowsInTable": 11273,
+      "persisted": false,
+      "oldIdsPresentAfterTxn": 50,
+      "expectedOldIdsPresent": 50
+    }
+  },
+  "errors": [],
+  "status": "REHEARSAL_PROVEN"
+}

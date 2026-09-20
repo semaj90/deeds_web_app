@@ -22,12 +22,91 @@ function goalRank(raw){const d=num(raw.goalRank)??num(raw.promotionRank);if(d!=n
 const laneOrder=['IDENTITY_AUTHORITY','DIRECTORY_INDEXING','AST_SYMBOL','LEXICAL_SEARCH','SEMANTIC_ANN','GRAPH_TOPOLOGY','RETRIEVAL_FUSION','PREFILL_CONTEXT','ACE_BITFROST_CACHE','AGENT_PROTOCOLS','HITL_LEARNING','MIGRATION_DATABASE','ADMIN_OBSERVABILITY','RESEARCH_CHALLENGER','GOVERNANCE_PROOF','GENERAL'];
 function laneRank(lane){const i=laneOrder.indexOf(lane);return i<0?laneOrder.length:i;}
 
+// WFU-09: WorkboardFeatureVectorV1. Every feature carries a presence mask and a basis; a feature with no
+// real observation is { present:false, value:0 } and is NEVER filled with a default. The legacy scalar
+// fields on each task (which still carry adapter defaults such as estimatedMinutes=15) are unchanged for
+// existing consumers, but must not be read as observations by a tournament — read featureVector instead.
+// basis: OBSERVED (a source field read as-is) | DERIVED (deterministic function of observed fields) |
+//        PROXY (indirect stand-in, e.g. file mtime for task freshness) | HEURISTIC (text-derived guess).
+// A feature is "qualified" for a tournament only when basis is OBSERVED or DERIVED.
+const FEATURE_VECTOR_SCHEMA = 'atlas.workboard-feature-vector.v1';
+const ABSENT = { present: false, value: 0, basis: 'ABSENT' };
+function present(value, basis, extra) { return { present: true, value, basis, ...(extra ?? {}) }; }
+function observedNumber(v) { const n = num(v); return n == null ? ABSENT : present(n, 'OBSERVED'); }
+function derivedNumber(v, from) { const n = num(v); return n == null ? ABSENT : present(n, 'DERIVED', { from }); }
+function observedCount(v) { return Array.isArray(v) ? present(v.length, 'OBSERVED') : ABSENT; }
+function observedGoalRank(raw) {
+  const direct = num(raw.goalRank) ?? num(raw.promotionRank);
+  if (direct != null) return present(direct, 'OBSERVED', { usedByDeterministicRank: true });
+  const m = /P?(\d+)/i.exec(String(raw.priority ?? raw.priorityClass ?? ''));
+  return m ? present(Number(m[1]), 'DERIVED', { from: 'priority', usedByDeterministicRank: true }) : ABSENT;
+}
+function sourceAgeSeconds(raw, generatedAt) {
+  const updated = Date.parse(raw.lastUpdatedAt ?? '');
+  const generated = Date.parse(generatedAt ?? '');
+  if (!Number.isFinite(updated) || !Number.isFinite(generated)) return ABSENT;
+  // Deterministic: age is relative to the controller's own generatedAt, never wall-clock now().
+  const basis = raw.timestampMethod === 'FILESYSTEM_MTIME' ? 'PROXY' : 'OBSERVED';
+  return present(Math.max(0, Math.round((generated - updated) / 1000)), basis, { from: 'lastUpdatedAt', timestampMethod: raw.timestampMethod ?? null });
+}
+function buildFeatureVector(raw, ctx) {
+  const mutation = typeof raw.readOnly === 'boolean'
+    ? present(raw.readOnly ? 0 : 1, 'OBSERVED')
+    : Array.isArray(raw.writeSet)
+      ? present(raw.writeSet.length > 0 ? 1 : 0, 'DERIVED', { from: 'declared-writes' })
+      : present(ctx.readOnly ? 0 : 1, 'HEURISTIC', { from: 'title-text' });
+  return {
+    schema: FEATURE_VECTOR_SCHEMA,
+    features: {
+      goalRank: observedGoalRank(raw),
+      selectionEligible: ctx.hasAuthorityReview ? present(ctx.selectionEligible ? 1 : 0, 'DERIVED', { from: 'authority-text-review' }) : ABSENT,
+      sourceAgeSeconds: sourceAgeSeconds(raw, ctx.generatedAt),
+      mutationRisk: mutation,
+      prerequisiteCount: observedCount(raw.dependsOnTaskIds ?? raw.depends_on_task_ids ?? raw.dependsOn),
+      evidenceReceiptCount: observedCount(raw.requiresReceipts ?? raw.requires_receipts),
+      affectedFileCount: (Array.isArray(raw.readSet) || Array.isArray(raw.writeSet)) ? present(arr(raw.readSet).length + arr(raw.writeSet).length, 'OBSERVED') : ABSENT,
+      // remainingRequiredGates / unblocksGateCount are computed by the ledger from declared depends= edges (DERIVED);
+      // estimatedMinutes is the declared est= value (OBSERVED as declared, an author estimate — not measured throughput).
+      remainingRequiredGates: derivedNumber(raw.remainingRequiredGates, 'declared-dependencies'),
+      unblocksGateCount: derivedNumber(raw.unblocksGateCount, 'declared-dependencies'),
+      estimatedMinutes: observedNumber(raw.estimatedMinutes),
+      risk: observedNumber(raw.risk),
+      evidenceReuse: observedNumber(raw.evidenceReuse),
+      goalClosure: observedNumber(raw.goalClosure),
+      cacheAffinity: observedNumber(raw.cacheAffinity)
+    }
+  };
+}
+function featureCoverage(tasks) {
+  const out = {};
+  for (const t of tasks) {
+    for (const [name, f] of Object.entries(t.featureVector?.features ?? {})) {
+      const c = out[name] ??= { present: 0, absent: 0, basis: {}, distinctValues: new Set() };
+      if (f.present) { c.present++; c.basis[f.basis] = (c.basis[f.basis] ?? 0) + 1; c.distinctValues.add(f.value); }
+      else c.absent++;
+    }
+  }
+  return Object.fromEntries(Object.entries(out).map(([name, c]) => [name, {
+    present: c.present, absent: c.absent, basis: c.basis, distinctValues: c.distinctValues.size,
+    qualifiedVarying: c.distinctValues.size > 1 && Object.keys(c.basis).some((b) => b === 'OBSERVED' || b === 'DERIVED')
+  }]));
+}
+
+
 let authorityReview = new Map();
+const authorityReviewByStable = new Map();
+const authorityReviewByLogical = new Map();
 let authorityReviewLoaded = false;
 try {
   const review = JSON.parse(fs.readFileSync(authorityReviewPath, 'utf8'));
   authorityReviewLoaded = review?.schema === 'atlas.openspec-authority-text-review.v1';
-  for (const task of arr(review.tasks)) authorityReview.set(String(task.taskKey), task);
+  // NS-8a: join by stableKey (survives line drift). A `change:line` key is only trusted for legacy review rows
+  // that carry no stableKey, because a drifted line key can point at a different task.
+  for (const task of arr(review.tasks)) {
+    if (task.logicalTaskKey) authorityReviewByLogical.set(String(task.logicalTaskKey), task);
+    if (task.stableKey) authorityReviewByStable.set(String(task.stableKey), task);
+    else authorityReview.set(String(task.taskKey), task);
+  }
 } catch {
   // Selection fails closed until the advisory review is refreshed.
 }
@@ -47,8 +126,12 @@ for(const r of raw){
   const id=str(r.taskKey??r.taskId??r.task_id??r.id)??`derived:${hash({changeId,title}).slice(0,20)}`;
   if(seen.has(id))continue;seen.add(id);
   const lanes=classifyLaneV2({...r,change:changeId,taskKey:id,text:title});
-  const advisoryReview = authorityReview.get(id);
-  const selectionEligible = authorityReviewLoaded && advisoryReview?.recommendedDisposition !== 'REVIEW_BEFORE_SELECTION';
+  // NS-8B: logical key -> migration key -> legacy line key. A review applies only while the task revision it reviewed
+  // (blockHash) is still current; otherwise it is REVIEW_STALE and selection fails closed (never fail-open).
+  const advisoryReviewRaw = authorityReviewByLogical.get(str(r.logicalTaskKey) ?? '') ?? authorityReviewByStable.get(str(r.stableKey) ?? '') ?? authorityReview.get(id);
+  const reviewStale = Boolean(advisoryReviewRaw?.reviewedTaskRevision && r.blockHash && advisoryReviewRaw.reviewedTaskRevision !== r.blockHash);
+  const advisoryReview = reviewStale ? undefined : advisoryReviewRaw;
+  const selectionEligible = authorityReviewLoaded && !reviewStale && advisoryReview?.recommendedDisposition !== 'REVIEW_BEFORE_SELECTION';
   const readOnly=typeof r.readOnly==='boolean'?r.readOnly:evidenceOnly(title);
   const writeSet=readOnly?[]:uniq(r.writeSet);
   tasks.push({
@@ -72,6 +155,9 @@ for(const r of raw){
     failureFingerprint:str(r.failureFingerprint),retryEvidenceChanged:r.retryEvidenceChanged===true,
     lowRankScore:num(r.lowRankScore)??0.5,cacheAffinity:num(r.cacheAffinity)??0,
     readOnly,readSet:uniq(r.readSet),writeSet,
+    reviewState: reviewStale ? 'REVIEW_STALE' : (advisoryReview ? 'REVIEWED_CURRENT' : 'NO_REVIEW_ROW'),
+    taskIdentity: r.taskIdentity ?? null,
+    featureVector:buildFeatureVector(r,{readOnly,selectionEligible,hasAuthorityReview:authorityReviewLoaded&&Boolean(advisoryReview),generatedAt:input?.generatedAt}),
     resources:{cpu:num(r.resources?.cpu)??1,gpu:num(r.resources?.gpu)??0,llamaSlots:num(r.resources?.llamaSlots)??(/\b(llama|ornith|synthesis|prompt)\b/i.test(title)?1:0),dbWriters:num(r.resources?.dbWriters)??(readOnly?0:1)},
     warmHints:{bucketKeys:uniq([lanes.primary,changeId,...arr(r.warmHints?.bucketKeys)]),evidenceRefs:uniq(r.evidenceRefs??r.warmHints?.evidenceRefs),promptPrefixKey:str(r.warmHints?.promptPrefixKey)??`PARENT_ATLAS:${lanes.primary}:${changeId}`}
   });
@@ -91,7 +177,7 @@ tasks.sort((a,b) =>
   a.id.localeCompare(b.id)
 );
 for (let i=0;i<tasks.length;i++) tasks[i].rank=i+1;
-const output={schema:'atlas.actionable-workboard.v3',source,policy:{authority:'UPSTREAM_EXECUTION_CONTROLLER',laneAuthority:false,advisoryAuthorityTextReview:true,authorityReviewLoaded,selectionRequiresReviewClearance:true,defaultMutationScope:'GLOBAL_SERIALIZATION_WHEN_UNSCOPED'},config:{maxWorkers:4,cpuCapacity:4,gpuCapacity:1,llamaSlotCapacity:2,dbWriterCapacity:1,warmAheadWaves:1,warmTopK:4},currentReceipts:[],tasks};
+const output={schema:'atlas.actionable-workboard.v3',source,featureVectorSchema:FEATURE_VECTOR_SCHEMA,featureCoverage:featureCoverage(tasks),policy:{authority:'UPSTREAM_EXECUTION_CONTROLLER',laneAuthority:false,advisoryAuthorityTextReview:true,authorityReviewLoaded,selectionRequiresReviewClearance:true,defaultMutationScope:'GLOBAL_SERIALIZATION_WHEN_UNSCOPED'},config:{maxWorkers:4,cpuCapacity:4,gpuCapacity:1,llamaSlotCapacity:2,dbWriterCapacity:1,warmAheadWaves:1,warmTopK:4},currentReceipts:[],tasks};
 output.semanticChecksum=hash({...output});
 fs.writeFileSync(outputPath,JSON.stringify(output,null,2)+'\n');
 console.log(JSON.stringify({outputPath,source,tasks:tasks.length,laneCounts:tasks.reduce((a,t)=>(a[t.lane]=(a[t.lane]??0)+1,a),{}),semanticChecksum:output.semanticChecksum},null,2));

@@ -8,7 +8,7 @@ Do not make compressed vectors the only source of truth.
 ```
 Use:
 ```text
-768d embeddinggemma vectors = canonical truth
+768d embeddinggemma vectors = canonical truth this needs hnsw/pgvector
 TurboVec 2-bit/4-bit packed vectors = fast traversal / prefilter
 4D manifold / SOM / autoencoder = topology routing
 Redis = hot cartridge/cache layer
@@ -393,7 +393,7 @@ ools, turbovec, next_steps
 Γ£à Fast index complete in 204.5s
    Files: 33753  Dirs: 1221  Routes: 1067  Components: 5341  API handlers: 5523  TODOs: 7700
    G4 auth: 811Γ£à 11Γ¥î  G5 zod: 566Γ£à 1Γ¥î  G15 ssr-unsafe: 0  G20 cyclic: 1
-   KV cache: 11811 hit / 21942 miss (35.0% hit rate)  
+   KV cache: 11811 hit / 21942 miss (35.0% hit rate)
    Redis wiki:note:dir: 1221 written
    Outputs: docs/graph/codebase-graph.json  docs/graph/codebase-map.md
 
@@ -531,7 +531,7 @@ Results: 6 passed  (6 total)
 === Done ===
 🗺️ graphify:daily complete
 
- *  Executing task in folder sveltekit-frontend: npx tsx scripts/agent-worker.ts 
+ *  Executing task in folder sveltekit-frontend: npx tsx scripts/agent-worker.ts
 
 📡 [DB] Canonical target: localhost:5434/legal_ai_db
 Starting LangGraph NATS Worker...
@@ -626,7 +626,7 @@ llama-server.exe (8090)
 → RotorQuant GGUF
 → OpenAI-compatible API
 Separate from:
-Redis → Bifrost → Ollama → Gemma4
+Redis → Bifrost → Ollama → ornith 1.5 llama-server 8090
 These are parallel lanes, not unified yet.
 📂 File Evidence (from your upload)
 The fix and explanation came from:
@@ -642,7 +642,7 @@ curl http://127.0.0.1:8090/health
 🧠 Big Picture Insight
 You now have:
 Local inference lane (llama-server + GGUF) ✅
-Ollama inference lane (Gemma4) ✅
+Ollama inference lane (embeddinggemma) ✅
 Bifrost gateway ❌ (still unstable)
 Cache layering (Redis + semantic) ⚠️ partial
 If you want next step, I can:

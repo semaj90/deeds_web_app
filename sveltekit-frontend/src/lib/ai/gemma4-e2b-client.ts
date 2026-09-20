@@ -156,7 +156,14 @@ async function _initE2BInternal(): Promise<void> {
 	const transformers = await import('@huggingface/transformers');
 
 	// Load processor (handles tokenization + chat template)
-	_processor = await transformers.AutoProcessor.from_pretrained(CLIENT_E2B_MODEL_ID);
+	// Transformers.js 4.2 does not declare AutoProcessor in its public type
+	// surface, although the model family may expose it at runtime. Keep this
+	// optional and fail closed when the installed build cannot provide it.
+	const AutoProcessor = (transformers as typeof transformers & {
+		AutoProcessor?: { from_pretrained: (modelId: string) => Promise<unknown> };
+	}).AutoProcessor;
+	if (!AutoProcessor) throw new Error('E2B_AUTOPROCESSOR_UNAVAILABLE');
+	_processor = await AutoProcessor.from_pretrained(CLIENT_E2B_MODEL_ID);
 
 	// Load tokenizer separately for decode operations
 	_tokenizer = await transformers.AutoTokenizer.from_pretrained(CLIENT_E2B_MODEL_ID);

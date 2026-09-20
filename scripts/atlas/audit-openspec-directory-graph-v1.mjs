@@ -9,7 +9,9 @@ import { readGraphifyEvidence } from './lib/graphify-evidence.mjs';
 
 const root = path.resolve(process.argv[2] ?? process.cwd());
 const outputPath = path.resolve(process.argv[3] ?? path.join(root, 'docs/reports/openspec-directory-graph-v1.json'));
-const maxFiles = Number(process.env.ATLAS_AUDIT_MAX_FILES ?? 150000);
+// Keep direct invocations aligned with the awareness runner's bounded default.
+// Callers may still opt into a larger read-only census explicitly.
+const maxFiles = Number(process.env.ATLAS_AUDIT_MAX_FILES ?? 5000);
 
 const files = walkFiles(root, { maxFiles });
 const { edges, externalImports } = buildImportGraph(files);

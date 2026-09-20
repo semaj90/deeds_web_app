@@ -1,7 +1,7 @@
 {
   "schema": "atlas.openspec-topic-clusters.v1",
   "counts": {
-    "tasks": 2312,
+    "tasks": 2309,
     "topics": 16,
     "changes": 76,
     "referencedFiles": 76
@@ -9,9 +9,9 @@
   "topics": [
     {
       "topic": "GENERAL",
-      "count": 593,
+      "count": 592,
       "readOnly": 96,
-      "mutating": 497,
+      "mutating": 496,
       "llamaSlots": 1,
       "changes": [
         "atlas-feature-intelligence",
@@ -130,9 +130,9 @@
     },
     {
       "topic": "ACE_BITFROST_CACHE",
-      "count": 238,
+      "count": 237,
       "readOnly": 73,
-      "mutating": 165,
+      "mutating": 164,
       "llamaSlots": 18,
       "changes": [
         "agent-branch-review-fanout-ace-centroid-aug22",
@@ -251,9 +251,9 @@
     },
     {
       "topic": "GRAPH_TOPOLOGY",
-      "count": 123,
+      "count": 122,
       "readOnly": 36,
-      "mutating": 87,
+      "mutating": 86,
       "llamaSlots": 0,
       "changes": [
         "ace-hyperrag-chr97-graphify-audit",
@@ -525,7 +525,7 @@
     },
     {
       "changeId": "parent-atlas-best-fit-score-fabric",
-      "count": 173
+      "count": 172
     },
     {
       "changeId": "parent-atlas-governed-compute-fabric",
@@ -533,7 +533,7 @@
     },
     {
       "changeId": "parent-atlas-graph-retrieval-proof",
-      "count": 110
+      "count": 109
     },
     {
       "changeId": "parent-atlas-ace-rlm-bitfrost-integration",
@@ -612,11 +612,11 @@
       "count": 33
     },
     {
-      "changeId": "parent-atlas-ace-bitfrost-cache-correctness",
-      "count": 26
+      "changeId": "manual-migration-reconciliation",
+      "count": 25
     },
     {
-      "changeId": "manual-migration-reconciliation",
+      "changeId": "parent-atlas-ace-bitfrost-cache-correctness",
       "count": 25
     },
     {

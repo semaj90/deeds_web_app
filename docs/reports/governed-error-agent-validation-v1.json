@@ -1,0 +1,103 @@
+{
+  "schema": "atlas.governed-error-agent-validation.v1",
+  "generatedAt": "2026-09-19T22:17:00Z",
+  "scope": "plan-and-smoke-only",
+  "overallStatus": "PROVEN_READ_ONLY_TRANCHE",
+  "promotionAuthorized": false,
+  "writesPerformed": false,
+  "openSpecProgress": {
+    "change": "parent-atlas-agentic-completion",
+    "complete": 8,
+    "total": 11,
+    "remaining": 3
+  },
+  "gan": {
+    "created": true,
+    "wired": true,
+    "proven": true,
+    "done": false,
+    "proofRefs": [
+      "sveltekit-frontend/src/lib/server/ai/error-agent/openspec-controller.ts",
+      "sveltekit-frontend/src/lib/server/ai/error-agent/openspec-controller.integration.test.ts",
+      "scripts/atlas/audit-langgraph-service-contract-v1.mjs"
+    ],
+    "doneBlockers": [
+      "WORKER_QUEUE_BOUNDARY_DEFERRED",
+      "TOURNAMENT_EXECUTION_DEFERRED",
+      "CANONICAL_LINEAGE_AUTHORITY_WAITING"
+    ]
+  },
+  "validation": {
+    "controllerSelection": "PROVEN",
+    "authentication": "PROVEN",
+    "completionEnvelope": "PROVEN",
+    "smokeAllowlist": "PROVEN",
+    "retryFingerprint": "PROVEN",
+    "okfClaimFreshness": "PROVEN_DERIVED_AUDIT",
+    "errorAgentModelIdentity": {
+      "chatOwner": "llama-server:8090",
+      "model": "ornith-1.5-9b",
+      "legacyGemma4Fallback": false,
+      "status": "PROVEN_BY_FOCUSED_TEST"
+    },
+    "repairRequestEnvelope": {
+      "schema": "atlas.error-agent-repair-request.v1",
+      "status": "WIRED_PROVEN_CONTROLLER_SELECTION",
+      "productionRouteWired": true,
+      "workerQueuePublished": false,
+      "canonicalWritesAllowed": false,
+      "promotionAuthorized": false
+    },
+    "langgraphDirectSmoke": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 1,
+      "status": "PROVEN"
+    },
+    "sveltekitProxySmoke": {
+      "passed": 3,
+      "failed": 0,
+      "path": "LangGraph",
+      "status": "PROVEN"
+    },
+    "focusedVitest": {
+      "filesPassed": 6,
+      "testsPassed": 20,
+      "todo": 3,
+      "status": "PROVEN"
+    },
+    "serviceContract": {
+      "passed": 11,
+      "failed": 0,
+      "status": "CONTRACT_PROVEN",
+      "runtimeSmoke": "PROVEN_SEPARATELY"
+    }
+  },
+  "runtimeBoundary": {
+    "chatOwner": "llama-server:8090",
+    "chatModel": "ornith-1.5-9b",
+    "embeddingOwner": "ollama:11434",
+    "embeddingModel": "embeddinggemma:latest",
+    "pythonService": "langgraph-synthesis:8091",
+    "checkpointing": "DISABLED_BY_DEFAULT",
+    "qdrantNamedVectors": {
+      "legal_documents": "content",
+      "evidence_items": "content",
+      "chat_messages": "message"
+    }
+  },
+  "openspec": {
+    "agenticCompletion": "VALID",
+    "groundedKnowledge": "VALID",
+    "retrievalExecutorCompatibility": "VALID",
+    "graphRetrievalProof": "VALID",
+    "openspecTasksAuditFabric": "VALID"
+  },
+  "remainingGates": [
+    "SOURCE_AUTHORITY_NOT_ADMITTED",
+    "CURRENT_PACKET_LINEAGE_NOT_QUALIFIED",
+    "WORKER_QUEUE_BOUNDARY_NOT_IMPLEMENTED",
+    "TOURNAMENT_READ_ONLY_PLANNER_ONLY",
+    "DURABLE_RECEIPT_SCHEMA_DEFERRED"
+  ]
+}

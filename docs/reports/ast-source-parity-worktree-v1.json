@@ -1,0 +1,189 @@
+{
+  "schema": "atlas.ast-source-parity-worktree.v1",
+  "generatedAt": "2026-09-20T08:17:11.972Z",
+  "input": {
+    "sourceParityReceipt": "docs/reports/ast-source-parity-disposition-v1.json",
+    "sourceSnapshot": ".tmp/knowledge-source-snapshot-live-v1.json",
+    "mismatchCount": 645,
+    "mismatchReferenceChecksum": "e5d0b8190f14c6838448eb714539230017bd3992d664dd09e6c0bc656d1e77c0",
+    "gitModifiedCount": 200,
+    "gitStagedCount": 0,
+    "gitUntrackedCount": 228,
+    "gitDeletedCount": 0
+  },
+  "byDisposition": {
+    "NOT_VISIBLE_IN_GIT_STATUS": 528,
+    "WORKTREE_MODIFIED": 117
+  },
+  "samples": {
+    "NOT_VISIBLE_IN_GIT_STATUS": [
+      {
+        "sourceRef": ".okf/index.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "claude.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "codex.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docker/clickhouse-mirror/clickhouse-mirror.py",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docker/docling-vlm/app.py",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docker/image-synthesis/app.py",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/.okf/schema.yaml",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/architecture/runtime-ownership-baseline.json",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/architecture/runtime-ownership-registry.json",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/graph/contract-error-map.json",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/parent-atlas-workstation-todo.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/vector-governance/pca-svd-representation-comparison-v1.json",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "memory/exports/mcp-health-probe.json",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/atlas-feature-intelligence/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/local-llm-offload-ownership/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/manual-migration-reconciliation/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      }
+    ],
+    "WORKTREE_MODIFIED": [
+      {
+        "sourceRef": "docker-compose.yml",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "docker/docker-compose.gpu.yml",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "docker/langgraph-synthesis/app.py",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "docs/OPENSPEC-WORKBOARD.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-grounded-knowledge-fabric/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-okf-knowledge-layers/README.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-okf-knowledge-layers/design.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "package.json",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "packages/atlas-orchestrator/src/steps/compute-pagerank-gds.ts",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/src/core/domain-classification-v1.spec.ts",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/src/core/domain-classification-v1.ts",
+        "disposition": "WORKTREE_MODIFIED"
+      }
+    ]
+  },
+  "status": "MISMATCH_COHORT_RECONCILED",
+  "authority": "DIAGNOSTIC_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "checksum": "bf0b749c3bd468535e0be2678d68cd35805c33adcff554c3f43d54487d4a062c"
+}

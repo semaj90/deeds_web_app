@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.domain-feature-contract.v1",
+  "change": "parent-atlas-retrieval-logic-convergence",
+  "task": "DOMAIN-FEATURES-01",
+  "status": "RULES_NORMALIZATION_PROVEN_LEARNED_PROVENANCE_PENDING",
+  "owner": {
+    "taxonomy": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts",
+    "adapter": "sveltekit-frontend/src/lib/server/atlas/domain-classification-adapter-v1.ts",
+    "sharedContract": "packages/parent-atlas/src/core/domain-classification-v1.ts"
+  },
+  "proven": {
+    "primaryDomain": true,
+    "probabilities": true,
+    "confidence": true,
+    "classifierRevision": true,
+    "trainingSnapshotRevisionForLearnedFamilies": true,
+    "modelChecksumForLearnedFamilies": true,
+    "featureProducerOnly": true,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "rulesFamily": {
+    "classifierFamily": "RULES",
+    "modelChecksum": null,
+    "trainingSnapshotRevision": null,
+    "reason": "Deterministic taxonomy has no trained model artifact or corpus snapshot."
+  },
+  "remainingGate": "LEARNED_CLASSIFIER_ADAPTER_AND_LIVE_TRAINING_RECEIPT",
+  "tests": {
+    "packageTypecheck": "PASS",
+    "frontendAdapterTests": "PASS_3"
+  },
+  "nextGate": "DOMAIN_CLASSIFIER_TRAINING_READY",
+  "promotionAuthorized": false
+}

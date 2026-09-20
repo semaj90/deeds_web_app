@@ -1,6 +1,6 @@
 {
   "schema": "atlas.query-router-v2-readiness-audit.v1",
-  "generatedAt": "2026-09-19T01:29:21.537Z",
+  "generatedAt": "2026-09-19T06:56:38.683Z",
   "mode": "READ_ONLY_NO_TRAINING_NO_RETRIEVAL_WRITES",
   "status": "READY_FOR_FROZEN_CORPUS_EVAL",
   "contractsPresent": true,

@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.native-batch-cosine-rerank.v1",
+  "status": "FIXTURE_NATIVE_BRIDGE_PARITY_PROVEN",
+  "fixture": {
+    "seed": "0x9e3779b9",
+    "rowCount": 200,
+    "dimensions": 768,
+    "metric": "cosine"
+  },
+  "executor": "native_libtorch_bridge",
+  "reference": "javascript_float32_cpu_cosine",
+  "inputChecksum": "sha256:9c3ad0bfc51b3ea5cdccedbffe251f24f5df8731da427061de0f55581a818640",
+  "nativeOutputChecksum": "sha256:6e1124d3d0d149de92e4c4075c328bf2528389f971f2a1d494cb851f688e703d",
+  "metrics": {
+    "maxAbsDelta": 1.4901161193847656e-8,
+    "meanAbsDelta": 3.873210516758263e-9,
+    "scoreCosine": 0.9999999999999941,
+    "topK": 10,
+    "topKOverlap": 1,
+    "cpuMs": 5,
+    "gpuMs": 316
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "tensorsPersisted": false,
+  "liveCorpus": false,
+  "promotionAuthorized": false
+}

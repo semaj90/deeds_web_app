@@ -166,7 +166,7 @@ Summary:"""
         async with self.semaphore:
             try:
                 payload = {
-                    "model": "gemma4-legal-iq4xs-direct.gguf",
+                    "model": os.environ.get("LLAMA_SERVER_MODEL", "ornith-1.5-9b"),
                     "prompt": prompt,
                     "max_tokens": self.max_tokens,
                     "temperature": self.temperature,
@@ -191,7 +191,7 @@ Summary:"""
                             "status": "success",
                             "confidence": 0.95,
                             "pass_run_id": self.pass_run_id,
-                            "model": "gemma4-legal-iq4xs-direct.gguf",
+                            "model": os.environ.get("LLAMA_SERVER_MODEL", "ornith-1.5-9b"),
                             "temperature": self.temperature,
                             "timestamp": datetime.utcnow().isoformat() + "Z",
                             "provenance": {

@@ -1,0 +1,94 @@
+{
+  "schema": "atlas.search-nondeterministic-surfaces.v1",
+  "gate": "SEARCH-REINTEGRATION-04",
+  "generatedAt": "2026-09-19T16:44:35.003Z",
+  "mode": "READ_ONLY",
+  "status": "NONDETERMINISTIC_AND_STUB_SURFACES_REMAIN_DISABLED",
+  "summary": {
+    "surfaces": 4,
+    "evidenceComplete": 4,
+    "keepDisabled": 4,
+    "restoreEligible": 0
+  },
+  "surfaces": [
+    {
+      "surface": "mla-low-rank-reranker",
+      "path": "sveltekit-frontend/src/lib/server/search/mla-kv-compress.ts",
+      "markers": [
+        "Math.random()",
+        "random rotation"
+      ],
+      "disposition": "KEEP_DISABLED",
+      "reason": "Randomized projection is not deterministic evidence for a canonical reranker without a sealed seed/matrix receipt.",
+      "filePresent": true,
+      "observedMarkers": [
+        "Math.random()",
+        "random rotation"
+      ],
+      "evidenceComplete": true,
+      "runtimeEnablementChanged": false,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "surface": "rg-qdrant-reranking",
+      "path": "sveltekit-frontend/src/lib/server/search/rg-search-orchestrator.ts",
+      "markers": [
+        "TODO: Wire Qdrant reranking"
+      ],
+      "disposition": "KEEP_DISABLED",
+      "reason": "The integration is an explicit stub and cannot be treated as an active executor.",
+      "filePresent": true,
+      "observedMarkers": [
+        "TODO: Wire Qdrant reranking"
+      ],
+      "evidenceComplete": true,
+      "runtimeEnablementChanged": false,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "surface": "atlas.search-protocol-reference",
+      "path": "scripts/atlas/audit-acp-packet-transport.mjs",
+      "markers": [
+        "atlas.search"
+      ],
+      "disposition": "KEEP_DISABLED",
+      "reason": "Observed only in transport audit cases; no live registered owner was admitted by this audit.",
+      "filePresent": true,
+      "observedMarkers": [
+        "atlas.search"
+      ],
+      "evidenceComplete": true,
+      "runtimeEnablementChanged": false,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "surface": "ops.patch-preview",
+      "path": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+      "markers": [
+        "ops.propose_patch",
+        "READ-ONLY PREVIEW"
+      ],
+      "disposition": "KEEP_DISABLED",
+      "reason": "Patch proposal is operator-gated and preview-only; it is not a search reintegration path.",
+      "filePresent": true,
+      "observedMarkers": [
+        "ops.propose_patch",
+        "READ-ONLY PREVIEW"
+      ],
+      "evidenceComplete": true,
+      "runtimeEnablementChanged": false,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    }
+  ],
+  "authority": {
+    "runtimeEnablementChanged": false,
+    "canonicalAuthorityChanged": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false
+  },
+  "nextGate": "SEARCH-REINTEGRATION-05_MCP_MISMATCH_RECONCILIATION"
+}

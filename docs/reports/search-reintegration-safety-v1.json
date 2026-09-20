@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.search-reintegration-safety.v1",
+  "gate": "SEARCH-REINTEGRATION-06",
+  "generatedAt": "2026-09-19T16:47:50.714Z",
+  "mode": "READ_ONLY",
+  "inputs": [
+    "docs/reports/search-tool-inventory-v1.json",
+    "docs/reports/search-tool-reintegration-preconditions-v1.json",
+    "docs/reports/search-nondeterministic-surfaces-v1.json",
+    "docs/reports/mcp-current-code-reconciliation-v1.json"
+  ],
+  "status": "NON_AUTHORIZING_AUDIT_SEMANTICS_PROVEN",
+  "violations": [],
+  "authority": {
+    "runtimeEnablementChanged": false,
+    "canonicalAuthorityChanged": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false
+  },
+  "nextGate": "RETRIEVAL_OWNERSHIP_OR_DEFERRED_SURFACE_REVIEW"
+}

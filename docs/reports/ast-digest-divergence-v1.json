@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.ast-digest-divergence.v1",
+  "generatedAt": "2026-09-20T07:58:15.589Z",
+  "sourceReceipt": "docs/reports/ast-declaration-candidates-current-v1.json",
+  "admittedSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "sourceCount": 2,
+  "byClassification": {
+    "KNOW09_DRIFT_ALREADY_DECLARED": 2
+  },
+  "sources": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-residency-v1.ts",
+      "snapshotDigest": "25a979508c943986928ac76b8eb7166e64c054fd36f4619a1a72e734dbb83fbd",
+      "currentRawDigest": "a753fdd84e116cb78348a45024ab5faff1c22c7261648d697b6faaf37396a7d7",
+      "inKnow09DriftList": true,
+      "bytes": 17072,
+      "snapshotBytes": 15119,
+      "classification": "KNOW09_DRIFT_ALREADY_DECLARED",
+      "originalReceiptDeclaredDrift": false,
+      "gitStatus": "M sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-residency-v1.ts",
+      "declaredInKnow09": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/unified-residency-adapter-v1.spec.ts",
+      "snapshotDigest": "ee1225038946fdcca1116c034a8c7c7c4bdd9abd9ce948f1295679f4c7381779",
+      "currentRawDigest": "3ac3a35585ba5a64a04a7a44b703278f4310c5028a02c7c358641f807184acec",
+      "inKnow09DriftList": true,
+      "bytes": 6516,
+      "snapshotBytes": 4234,
+      "classification": "KNOW09_DRIFT_ALREADY_DECLARED",
+      "originalReceiptDeclaredDrift": false,
+      "gitStatus": "M sveltekit-frontend/src/lib/server/atlas/tensors/unified-residency-adapter-v1.spec.ts",
+      "declaredInKnow09": true
+    }
+  ],
+  "checksum": "f3ce6c6ed9aad4cf27e129a6d144c13c5f7a09749d4aebdb394f9de425afcbf7",
+  "policy": {
+    "changedSinceAdmission": "EXCLUDE_FROM_CANARY",
+    "know09Drift": "RETAIN_AS_DECLARED_DRIFT; DO_NOT_STAMP",
+    "cleanButDivergent": "REVIEW_REQUIRED",
+    "canonicalWritesAllowed": false
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

@@ -1,5 +1,5 @@
 /**
- * Direct test without tool calling - just query Ollama about Svelte 5
+ * Direct test without tool calling - query llama-server/Ornith about Svelte 5
  */
 
 async function testDirectOllama() {
@@ -15,13 +15,14 @@ async function testDirectOllama() {
 Provide a concise answer with code examples.`;
 
     try {
-        const response = await fetch('http://localhost:11434/api/generate', {
+        const response = await fetch(`${process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/chat/completions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: 'gemma3-legal:latest',
-                prompt: query,
-                stream: false
+                model: process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
+                messages: [{ role: 'user', content: query }],
+                stream: false,
+                max_tokens: 512,
             })
         });
 
@@ -29,7 +30,7 @@ Provide a concise answer with code examples.`;
             const data = await response.json();
             console.log(`✅ Ollama Response:\n`);
             console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-            console.log(data.response);
+            console.log(data.choices?.[0]?.message?.content ?? 'NO CONTENT');
             console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
 
             console.log(`📊 Stats:`);

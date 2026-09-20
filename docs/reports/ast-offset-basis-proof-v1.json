@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.ast-offset-basis-proof.v1",
+  "generatedAt": "2026-09-20T07:51:59.913Z",
+  "sourceTextEncodingRevision": "SOURCE-TEXT-ENCODING-01",
+  "offsetBasis": "UTF8_PARSER_BUFFER_V1",
+  "lineBasis": "ONE_BASED_STORAGE",
+  "candidatesArtifact": ".tmp/atlas/ast-declaration-candidates-current-v1.jsonl",
+  "candidateRows": 54,
+  "bomFiles": 4,
+  "shiftedRoundTrip": "54/54",
+  "unshiftedWouldDiffer": "54/54",
+  "mismatches": [],
+  "inputChecksum": "7b060983e5c4ff93c0c4d4a216443320b1d066b1351b95912cb8b9aeb745bd77",
+  "status": "BOM_OFFSET_BASIS_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

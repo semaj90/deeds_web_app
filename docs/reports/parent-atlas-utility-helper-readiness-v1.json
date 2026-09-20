@@ -1,0 +1,273 @@
+{
+  "schema": "atlas.parent-atlas-utility-helper-readiness.v1",
+  "status": "UTILITY_HELPERS_PARTIAL_WITH_GATES",
+  "helpers": [
+    {
+      "id": "TOPIC_IDENTITY",
+      "owner": "topic-identity-v1",
+      "state": "DERIVED_TOPIC_IDENTITIES_PROVEN",
+      "evidence": "topic-identity-readiness-v1.json",
+      "details": {
+        "topicCount": 16,
+        "uniqueTopicIds": 16,
+        "uniqueTitleIds": 16,
+        "duplicateTopicIds": 0,
+        "duplicateTitleIds": 0
+      }
+    },
+    {
+      "id": "OKF_CLAIM_FRESHNESS",
+      "owner": "parent-atlas-okf-knowledge-layers",
+      "state": "REVIEW_REQUIRED",
+      "evidence": "okf-claim-freshness-v1.json",
+      "details": {
+        "totalClaims": 34,
+        "validClaims": 0,
+        "staleClaims": 0,
+        "unresolvedClaims": 34,
+        "statusCounts": {
+          "UNRESOLVED_MISSING_FIELDS": 34
+        }
+      }
+    },
+    {
+      "id": "OKF_AST_CONTEXT_CLASSIFICATION",
+      "owner": "parent-atlas-okf-knowledge-layers",
+      "state": "READ_ONLY_AST_CONTEXT_AUDIT",
+      "evidence": "okf-ast-context-classification-v1.json",
+      "details": {
+        "filesScanned": 7202,
+        "findings": 2439,
+        "dispositionCounts": {
+          "DEMO_FLAG_GATED_REVIEW": 10,
+          "PRODUCTION_REVIEW_REQUIRED": 714,
+          "TEST_FIXTURE_ACCEPTABLE": 532,
+          "THROWING_STUB_REVIEW": 103,
+          "UNLABELED_SYNTHETIC_PRODUCTION_REVIEW": 1066,
+          "UNREFERENCED_OR_SYNTHETIC_STUB_REVIEW": 14
+        }
+      }
+    },
+    {
+      "id": "OKF_SCHEMA_PROOF",
+      "owner": "parent-atlas-okf-knowledge-layers",
+      "state": "OKF_SCHEMA_BOUNDARIES_PROVEN",
+      "evidence": "okf-schema-boundaries-v1.json",
+      "gan": {
+        "created": true,
+        "wired": true,
+        "proven": true,
+        "done": true,
+        "promotionAuthorized": false
+      },
+      "invariants": {
+        "deterministicReplay": true,
+        "revisionChangeAccepted": true,
+        "missingEvidenceRejected": true,
+        "supersessionAccepted": true
+      }
+    },
+    {
+      "id": "OKF_V02_BUNDLE_PROFILE",
+      "owner": "parent-atlas-okf-knowledge-layers",
+      "state": "OKF_V02_REVIEW_REQUIRED",
+      "evidence": "okf-v02-bundle-audit-v1.json",
+      "filesScanned": 25,
+      "validFiles": 0,
+      "manifestDrift": {
+        "declaredDomains": [
+          "cache.yaml",
+          "database.yaml",
+          "feature-intelligence.yaml",
+          "parent-atlas-execution.yaml",
+          "retrieval.yaml"
+        ],
+        "actualDomains": [
+          "feature-intelligence.yaml",
+          "parent-atlas-execution.yaml",
+          "structured-value.yaml"
+        ],
+        "missingDeclaredDomains": [
+          "cache.yaml",
+          "database.yaml",
+          "retrieval.yaml"
+        ],
+        "undeclaredDomains": [
+          "structured-value.yaml"
+        ]
+      }
+    },
+    {
+      "id": "OPENWIKI_INPUT_BOUNDARY",
+      "owner": "parent-atlas-okf-knowledge-layers",
+      "state": "OPENWIKI_INPUT_BOUNDARY_PROVEN",
+      "evidence": "openwiki-review-input-boundary-v1.json",
+      "eligibleCount": 31,
+      "excludedCount": 0,
+      "runtimeInvoked": false
+    },
+    {
+      "id": "OKF_WORK_ITEM_FIXTURE",
+      "owner": "parent-atlas-okf-knowledge-layers",
+      "state": "OKF_WORK_ITEM_FIXTURE_PROVEN",
+      "evidence": "okf-work-item-fixture-v1.json",
+      "persistence": "IN_MEMORY_ONLY",
+      "checks": {
+        "workItemShape": true,
+        "evidenceShape": true,
+        "foreignKeyRoundTrip": true,
+        "revisionBinding": true,
+        "deterministicSerialization": true
+      }
+    },
+    {
+      "id": "OKF_GAP_RECOMMENDATIONS",
+      "owner": "parent-atlas-okf-knowledge-layers",
+      "state": "OKF_GAP_RECOMMENDATIONS_DERIVED",
+      "evidence": "okf-gap-recommendations-v1.json",
+      "records": 6,
+      "createdKanbanTasks": false
+    },
+    {
+      "id": "NLP_ANALYSIS_PIPELINE",
+      "owner": "python/miniforge_nlp_sidecar_v2.py",
+      "state": "NLP_HELPERS_CONTRACT_PROVEN",
+      "evidence": ".tmp/atlas-nlp-analysis-smoke-v1.json",
+      "checks": {
+        "pythonSidecarTests": true,
+        "ontologyAdmission": true,
+        "okfPydanticFixture": "VALIDATED",
+        "hmmAgenticError": "TRANSITION_FIXTURE_PROVEN_FEATURE_GATES_PARTIAL",
+        "hmmTestSignal": "FIXTURE_RECOVERY_PROVEN"
+      }
+    },
+    {
+      "id": "TOPIC_CONCEPT_DOMAIN_TAXONOMY",
+      "owner": "V5 capability census",
+      "state": "PROVEN",
+      "criticality": "UTILITY_REQUIRED"
+    },
+    {
+      "id": "GRAPHIFY_RELATIONS",
+      "owner": "V5 capability census",
+      "state": "PROVEN",
+      "criticality": "UTILITY_REQUIRED"
+    },
+    {
+      "id": "ACE_PACKET_V1",
+      "owner": "V5 capability census",
+      "state": "WAITING",
+      "criticality": "UTILITY_REQUIRED"
+    },
+    {
+      "id": "VALKEY_CENTROID_CACHE",
+      "owner": "V5 capability census",
+      "state": "UNPROVEN",
+      "criticality": "UTILITY_REQUIRED"
+    },
+    {
+      "id": "BITFROST_BUCKET_WARMING",
+      "owner": "V5 capability census",
+      "state": "UNPROVEN",
+      "criticality": "UTILITY_REQUIRED"
+    },
+    {
+      "id": "ACE_CENTROID_ALIGNMENT",
+      "owner": "ace-bitfrost-centroid-alignment-v1",
+      "state": "AUDIT_COMPLETE_GAPS_REMAIN",
+      "evidence": "ace-bitfrost-centroid-alignment-v1.json",
+      "nextGate": "ACE-PACKET-IDENTITY-01 plus CENTROID-ALIGNMENT-01, using a disposable or explicitly approved test namespace only."
+    },
+    {
+      "id": "TOURNAMENT_HELPER",
+      "owner": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",
+      "state": "THREE_CANDIDATE_SLOTS_PLANNED_EXECUTION_DEFERRED",
+      "evidence": "patch-tournament-worktree-seam-v1.json",
+      "replayStatus": "TOURNAMENT_REPLAY_PROVEN_FIXTURE_ONLY",
+      "nextGate": "AUTHORIZED_ISOLATED_CANDIDATE_EXECUTION"
+    },
+    {
+      "id": "AST_CANARY_READINESS",
+      "owner": "parent-atlas-nlp-sidecar-feature-compiler",
+      "state": "PERSISTENT_CANARY_BLOCKED",
+      "evidence": "ast-canary-readiness-v1.json",
+      "blockers": [
+        "CURRENT_WORKTREE_PARITY",
+        "STRUCTURAL_CONFLICTS_CLOSED"
+      ],
+      "nextGate": {
+        "kind": "EXTERNAL_SOURCE_AUTHORITY_DECISION",
+        "status": "WAITING_ON_SOURCE_ADMISSION",
+        "options": [
+          "ADMIT_CURRENT_WORKTREE_AS_NEW_SOURCE_SNAPSHOT",
+          "RESTORE_OR_REGENERATE_FROM_ADMITTED_SNAPSHOT"
+        ],
+        "retryWhen": [
+          "workspaceRevisionChanges",
+          "sourceSnapshotRevisionChanges",
+          "structuralConflictDispositionChanges"
+        ],
+        "noAutomaticChoice": true
+      },
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "id": "ONTOLOGY_POPULATION_DECISION",
+      "owner": "parent-atlas-nlp-sidecar-feature-compiler",
+      "state": "UNPROVEN",
+      "evidence": "ontology-population-decision-v1.json",
+      "conceptRows": 0,
+      "relationRows": 0,
+      "unresolvedTuples": null,
+      "nextGate": "KNOW-09_SOURCE_AUTHORITY_RECONCILIATION_BEFORE_TUPLE_PROMOTION",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "id": "PACKET_SOURCE_SCOPE",
+      "owner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "state": "OPERATOR_FOLDER_DISPOSITION_REQUIRED",
+      "evidence": "packet-source-scope-v1.json",
+      "folderCount": 0,
+      "packetRows": 61718,
+      "exactAdmittedBindingMatches": 16543,
+      "operatorDispositionRequired": false,
+      "noAutomaticFolderPromotion": true,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "id": "RUNTIME_READINESS",
+      "owner": "atlas-runtime-readiness-v1",
+      "state": "WAITING",
+      "evidence": "atlas-runtime-readiness-v1.json",
+      "summary": {
+        "PROVEN": 4,
+        "READY": 0,
+        "PARTIAL": 1,
+        "WAITING": 5,
+        "UNPROVEN": 4,
+        "NOT_APPLICABLE": 0,
+        "packetReady": false,
+        "prefillReady": false,
+        "livePromotionReady": false
+      }
+    }
+  ],
+  "invariants": [
+    "TOPIC_UUID_AND_TITLE_ID_REMAIN_DISTINCT",
+    "OKF_IS_DERIVED_DOCUMENTATION_NOT_CANONICAL_IDENTITY",
+    "OKF_AST_CONTEXT_IS_ADVISORY_ONLY",
+    "AST_GRAPHIFY_AND_CLUSTERS_ARE_NAVIGATION_OR_PROJECTION_EVIDENCE",
+    "AST_CANARY_REQUIRES_CURRENT_SOURCE_AUTHORITY_AND_CONFLICT_DISPOSITION",
+    "ONTOLOGY_POPULATION_REQUIRES_SOURCE_AUTHORITY_AND_CANONICAL_VOCABULARY",
+    "PACKET_FOLDER_SCOPE_REQUIRES_OPERATOR_DISPOSITION",
+    "ACE_BITFROST_VALKEY_REQUIRE_REVISIONED_READBACK",
+    "TOURNAMENT_REQUIRES_ISOLATED_EXECUTION_AND_HUMAN_APPROVAL",
+    "NO_HELPER_RECEIPT_AUTHORIZES_CANONICAL_WRITES"
+  ],
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false
+}

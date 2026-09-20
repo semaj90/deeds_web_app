@@ -28,6 +28,10 @@ describe('miniforge-nlp-sidecar', () => {
         const body = JSON.parse(String(init?.body ?? '{}'));
         expect(body.passes).toEqual(['structural', 'semantic', 'sequence']);
         expect(body.grounded_extraction_required).toBe(true);
+        expect(body.source_revision).toBe('sha256:source-rev-1');
+        expect(body.workspace_revision).toBe('sha256:workspace-rev-1');
+        expect(body.source_namespace).toBe('src');
+        expect(body.tree_node_id).toBe('tree:hello');
         return new Response(JSON.stringify({
           document_id: 'doc-1',
           provider_revision: 'parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.44.0',
@@ -39,7 +43,15 @@ describe('miniforge-nlp-sidecar', () => {
           chunks: [],
           features: [],
           metadata: {},
-          capabilities: { spacy: true, langextract: true, tree_sitter: true, ast_grep: true, torch: false },
+          capabilities: { spacy: true, langextract: true, tree_sitter: true, ast_grep: true, torch: false, classification_helper: true },
+          classification_proposal: {
+            schema: 'atlas.nlp-classification-proposal.v1',
+            sourceRef: 'src/example.ts',
+            sourceRevision: 'sha256:source-rev-1',
+            workspaceRevision: 'sha256:workspace-rev-1',
+            canonicalAuthority: false,
+            writesPerformed: false,
+          },
           pass_results: [],
           control5: null,
           experiment_feature_matrix: null,
@@ -67,6 +79,11 @@ describe('miniforge-nlp-sidecar', () => {
       sourceType: 'codebase',
       extractionMode: 'full',
       documentId: 'doc-1',
+      sourceRef: 'src/example.ts',
+      sourceRevision: 'sha256:source-rev-1',
+      workspaceRevision: 'sha256:workspace-rev-1',
+      sourceNamespace: 'src',
+      treeNodeId: 'tree:hello',
       passes: ['structural', 'semantic', 'sequence'],
       groundedExtractionRequired: true,
     });
@@ -76,6 +93,9 @@ describe('miniforge-nlp-sidecar', () => {
     expect(Array.isArray(analysis.entities)).toBe(true);
     expect(analysis.event_hypergraph?.events).toEqual([]);
     expect(analysis.event_hypergraph?.recommendation_feature_rows).toEqual([]);
+    expect(analysis.capabilities.classification_helper).toBe(true);
+    expect(analysis.classification_proposal?.sourceRevision).toBe('sha256:source-rev-1');
+    expect(analysis.classification_proposal?.canonicalAuthority).toBe(false);
     expect(fetchSpy).toHaveBeenCalled();
   });
 

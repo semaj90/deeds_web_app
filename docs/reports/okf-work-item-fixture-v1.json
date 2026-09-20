@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.okf-work-item-fixture.v1",
+  "status": "OKF_WORK_ITEM_FIXTURE_PROVEN",
+  "gan": {
+    "created": true,
+    "wired": true,
+    "proven": true,
+    "done": true,
+    "promotionAuthorized": false
+  },
+  "checks": {
+    "workItemShape": true,
+    "evidenceShape": true,
+    "foreignKeyRoundTrip": true,
+    "revisionBinding": true,
+    "deterministicSerialization": true
+  },
+  "rows": {
+    "workItem": {
+      "workItemId": "00000000-0000-4000-8000-000000000001",
+      "gapId": "gap:source-lineage",
+      "title": "Resolve current source revision authority",
+      "status": "recommended",
+      "owner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "sourceRevision": "source:r1",
+      "workspaceRevision": "workspace:r1",
+      "completionEnvelopeRevision": "envelope:r1",
+      "createdAt": "2026-09-20T00:00:00.000Z",
+      "updatedAt": "2026-09-20T00:00:00.000Z"
+    },
+    "evidence": {
+      "evidenceId": "00000000-0000-4000-8000-000000000002",
+      "workItemId": "00000000-0000-4000-8000-000000000001",
+      "evidenceKind": "receipt",
+      "evidenceRef": "docs/reports/current-source-evidence-hydration-v1.json",
+      "evidenceChecksum": "sha256:623778c5e6710e3b56998080461ff41f862918306fb24f21022312676da15a08",
+      "sourceRevision": "source:r1",
+      "status": "observed",
+      "createdAt": "2026-09-20T00:00:00.000Z"
+    }
+  },
+  "persistence": "IN_MEMORY_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

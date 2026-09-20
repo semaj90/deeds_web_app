@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.openspec-awareness-v2-run.v1",
+  "status": "AWARENESS_AUDIT_PROVEN_NAVIGATION_ONLY",
+  "authority": "ADVISORY_NAVIGATION_ONLY",
+  "writesPerformed": false,
+  "canonicalPromotionAuthorized": false,
+  "tests": {
+    "awarenessV2": "12/12 PASS",
+    "capabilityCensus": "31/31 PASS"
+  },
+  "stagingOutputs": [
+    { "path": "docs/reports/staging/openspec-directory-graph-v1.json", "bytes": 3896412, "sha256": "6e356ad5ae245b8bab2e44a38de45f27cff5d5e969217583a7bf1d62f6d404ad", "files": 5000, "directories": 675, "importEdges": 82, "crossDirectoryEdges": 9, "graphifyArtifacts": 209 },
+    { "path": "docs/reports/staging/openspec-file-kmeans-v1.json", "bytes": 815040, "sha256": "9230ef671e1f9855e51e65b155b4fd6133bc79912c18edc09cf85fc28034009c", "clusters": 12, "seed": 1337 },
+    { "path": "docs/reports/staging/openspec-file-labels-v1.json", "bytes": 2941623, "sha256": "d293dbafdc1bba723fd5885dd89f4bcf5762d07d197a8575342fe7b9c67ad0bd0", "files": 5000, "labels": 26, "taxonomyTopics": 14, "missingAssignments": 0, "status": "FILE_LABELS_PROVEN_NAVIGATION_ONLY" },
+    { "path": "docs/reports/staging/openspec-progress-audit-v2.json", "bytes": 4087343, "sha256": "cb89179d9aabae586f153ec3b72e27a9b1b76b95dfa2b18c9330d9845fa9d7b0", "totalTasks": 9143, "directoryFiles": 5000, "labeledFiles": 5000, "kmeansClusters": 12 }
+  ],
+  "notes": [
+    "The audit intentionally writes staging reports only; it does not replace current authority reports.",
+    "Lexical imports, Graphify observations, taxonomy labels, and KMeans clusters are advisory and cannot promote task, source, packet, vector, or cache authority.",
+    "The directory audit is capped at 5000 files for this run."
+  ]
+}

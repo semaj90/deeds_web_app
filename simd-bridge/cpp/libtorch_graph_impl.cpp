@@ -74,14 +74,32 @@ extern "C" int graphSimilarityHalf(const float* embeddings, int n, int dim, floa
 // Pinned (page-locked) host memory is allocated once per call via
 // torch::from_blob on a pinned tensor — enabling async DMA (H2D/D2H overlap).
 // Normalisation is done on-device before GEMM to avoid a second pass.
-// Falls back to scalar CPU loop when CUDA unavailable.
+// Uses LibTorch CPU tensors when CUDA is unavailable and LibTorch is linked;
+// falls back to a scalar loop only when the addon was built without LibTorch.
 extern "C" int batchCosineSimilarity(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len) {
   if (!query || !corpus || !scores) return -1;
   if (scores_len < n) return -2;
   if (n <= 0 || dim <= 0) return -3;
 
   if (!torch::cuda::is_available()) {
-    // CPU scalar fallback (kept for correctness; matches original behaviour)
+#if SIMD_HAVE_LIBTORCH
+    try {
+      torch::NoGradGuard ng;
+      const auto opts = torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCPU);
+      auto q_cpu = torch::from_blob(const_cast<float*>(query), {1, dim}, opts).clone();
+      auto c_cpu = torch::from_blob(const_cast<float*>(corpus), {n, dim}, opts).clone();
+      auto q_norm = torch::nn::functional::normalize(
+        q_cpu, torch::nn::functional::NormalizeFuncOptions().p(2).dim(1));
+      auto c_norm = torch::nn::functional::normalize(
+        c_cpu, torch::nn::functional::NormalizeFuncOptions().p(2).dim(1));
+      auto result = torch::mm(q_norm, c_norm.t()).squeeze(0).contiguous();
+      std::memcpy(scores, result.data_ptr<float>(), static_cast<size_t>(n) * sizeof(float));
+      return 0;
+    } catch (const c10::Error&) {
+      // Continue to the scalar correctness fallback below.
+    }
+#endif
+    // CPU scalar fallback (used when LibTorch is absent or unavailable).
     for (int i = 0; i < n; ++i) {
       const float* c = corpus + (size_t)i * dim;
       float dot = 0.0f, na = 0.0f, nb = 0.0f;

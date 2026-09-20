@@ -150,9 +150,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           evidence_id: (packet as any).evidence_id ?? null,
           score: (packet as any).blended_score ?? (packet as any).retrieval_score ?? null,
           workspace_revision: packet.workspace_revision ?? null,
-          identity_status: packet.identityStatus,
+          identity_status: (packet as any).identityStatus,
         })),
-        repository: createFeatureIntelligenceRepository(pool),
+        repository: createFeatureIntelligenceRepository(
+          pool as unknown as Parameters<typeof createFeatureIntelligenceRepository>[0],
+        ),
       });
     }
 

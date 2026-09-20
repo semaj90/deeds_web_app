@@ -10,7 +10,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const reportsDir = path.join(root, 'docs', 'reports');
+const reportsDir = process.env.ATLAS_OPENSPEC_REPORTS_DIR
+  ? path.resolve(root, process.env.ATLAS_OPENSPEC_REPORTS_DIR)
+  : path.join(root, 'docs', 'reports');
 const workboardPath = path.join(reportsDir, 'openspec-workboard-v1.json');
 
 const readJson = (file, fallback = {}) => {
@@ -24,7 +26,44 @@ const canonicalize = (value) => {
 };
 const stableJson = (value) => JSON.stringify(canonicalize(value));
 const checksum = (value) => `sha256:${crypto.createHash('sha256').update(stableJson(value)).digest('hex')}`;
-const writeReport = (name, value) => fs.writeFileSync(path.join(reportsDir, name), `${JSON.stringify(value, null, 2)}\n`);
+const reportWriteFailures = [];
+const writeReport = (name, value) => {
+  const body = `${JSON.stringify(value, null, 2)}\n`;
+  const target = path.join(reportsDir, name);
+  try {
+    fs.writeFileSync(target, body);
+    return target;
+  } catch (error) {
+    const stagingDir = path.join(reportsDir, 'staging');
+    const fallback = path.join(stagingDir, name);
+    fs.mkdirSync(stagingDir, { recursive: true });
+    let fallbackError = null;
+    try {
+      fs.writeFileSync(fallback, body);
+    } catch (fallbackFailure) {
+      fallbackError = describeWriteError(fallbackFailure);
+    }
+    reportWriteFailures.push({
+      name,
+      target,
+      fallback,
+      error: describeWriteError(error),
+      fallbackError,
+    });
+    return fallback;
+  }
+};
+
+function describeWriteError(error) {
+  if (error && typeof error === 'object') {
+    return {
+      name: typeof error.name === 'string' ? error.name : null,
+      code: typeof error.code === 'string' ? error.code : null,
+      message: typeof error.message === 'string' ? error.message : String(error),
+    };
+  }
+  return { name: null, code: null, message: String(error) };
+}
 
 const workboard = readJson('docs/reports/openspec-workboard-v1.json');
 const tasks = Array.isArray(workboard.taskInventory) ? workboard.taskInventory : [];
@@ -182,13 +221,28 @@ const goals = [
       { gateId: 'PROMOTION_AUTHORIZATION', status: 'WAITING_ON_AUTHORITY', receipt: 'parent-atlas-retrieval-lineage-dag-convergence:PROMOTION-01' },
     ],
     explicitlyNotRequired: ['TensorRT-RTX promotion', 'SOM execution before candidate freeze', 'Qdrant/Valkey writes', 'Graphify refresh solely to change task state'],
+    allowedChanges: ['parent-atlas-prefill-routing-residency-convergence'],
+    allowedFallbacks: [],
+    scopeBudget: {
+      maxNewBlockersPerAttempt: 0,
+      maxNewOwners: 0,
+      architectureExpansionAllowed: false,
+    },
   },
 ];
 for (const goal of goals) {
   goal.unprovenRequiredGates = goal.requiredGates.filter((gate) => gate.status !== 'PROVEN_CURRENT');
   goal.state = goal.unprovenRequiredGates.length === 0 ? 'COMPLETE' : 'WAITING';
   goal.closeoutMode = goal.unprovenRequiredGates.length <= 2;
-  goal.checksum = checksum({ goalId: goal.goalId, revision: goal.revision, requiredGates: goal.requiredGates, explicitlyNotRequired: goal.explicitlyNotRequired });
+  goal.checksum = checksum({
+    goalId: goal.goalId,
+    revision: goal.revision,
+    requiredGates: goal.requiredGates,
+    explicitlyNotRequired: goal.explicitlyNotRequired,
+    allowedChanges: goal.allowedChanges,
+    allowedFallbacks: goal.allowedFallbacks,
+    scopeBudget: goal.scopeBudget,
+  });
 }
 
 const report = {
@@ -245,4 +299,4 @@ writeReport('openspec-blocker-audit-v1.json', {
   writesPerformed: false,
 });
 
-console.log(JSON.stringify({ schema: report.schema, state: goals[0].state, summary: report.summary, blockerGroups: waitingGroups.map((group) => ({ blockerKey: group.blockerKey, taskCount: group.taskCount, evidenceHash: group.evidenceHash })), writesPerformed: false }, null, 2));
+console.log(JSON.stringify({ schema: report.schema, state: goals[0].state, summary: report.summary, blockerGroups: waitingGroups.map((group) => ({ blockerKey: group.blockerKey, taskCount: group.taskCount, evidenceHash: group.evidenceHash })), reportWriteFailures, writesPerformed: false }, null, 2));

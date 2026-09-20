@@ -35,13 +35,16 @@ function structuralKey(normalizedPath, nodeKind, qualifiedSymbol) {
 export async function writeAtlasAstNodes(client, input) {
   const np = normalizePath(input.sourceRef);
   const treeNodeIds = new Array(input.nodes.length).fill(null);
+  // `treeNodeIds` is the COMPUTED id for every node; `insertedFlags[i]` is true only if the INSERT really happened
+  // (ON CONFLICT DO NOTHING silently skips rows colliding with UNIQUE(repo_id, relative_path, node_kind, qualified_symbol, normalized_node_hash)).
+  const insertedFlags = new Array(input.nodes.length).fill(false);
   let inserted = 0;
 
   for (let i = 0; i < input.nodes.length; i += 1) {
     const node = input.nodes[i];
-    const parentTreeNodeId = node.parentIndex !== null && node.parentIndex !== undefined
-      ? treeNodeIds[node.parentIndex]
-      : null;
+    // `parentTreeNodeId` (explicit, e.g. a file row that already exists in the table) wins over an in-batch `parentIndex`.
+    const parentTreeNodeId = node.parentTreeNodeId
+      ?? (node.parentIndex !== null && node.parentIndex !== undefined ? treeNodeIds[node.parentIndex] : null);
     const tid = treeNodeId(np, input.parserLanguage, node.kind, node.qualifiedSymbol, parentTreeNodeId ?? 'ROOT', '');
     treeNodeIds[i] = tid;
     const sk = structuralKey(np, node.kind, node.qualifiedSymbol);
@@ -63,13 +66,13 @@ export async function writeAtlasAstNodes(client, input) {
         node.kind, node.qualifiedSymbol, input.parserLanguage,
         parentTreeNodeId, node.startByte, node.endByte, node.startLine, node.endLine,
         createHash('sha256').update(sk).digest('hex'), node.contentHash,
-        input.parserName, 'source-text-encoding-01',
+        input.parserName, input.parserVersion ?? 'source-text-encoding-01',
         `${np}#${node.kind}:${node.qualifiedSymbol}`,
         input.workspaceId ?? null, input.sourceRevision ?? null,
       ],
     );
-    if ((result.rowCount ?? 0) > 0) inserted += 1;
+    if ((result.rowCount ?? 0) > 0) { inserted += 1; insertedFlags[i] = true; }
   }
 
-  return { inserted, treeNodeIds };
+  return { inserted, treeNodeIds, insertedFlags };
 }

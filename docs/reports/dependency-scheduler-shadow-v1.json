@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.dependency-scheduler-shadow.v1",
+  "stage": "NS-7A_DECLARED_DEPENDENCY_SHADOW",
+  "generatedFrom": {
+    "controllerGeneratedAt": "2026-09-20T06:09:43.703Z",
+    "controllerRows": 9275
+  },
+  "behaviorChanged": false,
+  "controllerAuthorityUnchanged": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "rule": "depends=none is an observed empty set; a task with no wfu comment is missingMetadata and stays on the incumbent controller rules.",
+  "openConsidered": 3183,
+  "actionableConsidered": 2267,
+  "counts": {
+    "sameDecision": 4,
+    "incumbentReadyOnly": 0,
+    "dependencyReadyOnly": 0,
+    "unresolvedDependency": 0,
+    "ambiguousDependency": 0,
+    "cycleDetected": 0,
+    "missingMetadata": 3179
+  },
+  "examples": {
+    "missingMetadata": [
+      "ace-hyperrag-chr97-graphify-audit#41fcec773bdde4dd",
+      "ace-hyperrag-chr97-graphify-audit#ce451de09dcf3d36",
+      "agent-branch-review-fanout-ace-centroid-aug22:3.3",
+      "agent-branch-review-fanout-ace-centroid-aug22:3.4",
+      "agent-branch-review-fanout-ace-centroid-aug22:4.3"
+    ],
+    "sameDecision": [
+      "parent-atlas-workboard-feature-utility-fabric:NS-3",
+      "parent-atlas-workboard-feature-utility-fabric:NS-4",
+      "parent-atlas-workboard-feature-utility-fabric:NS-5",
+      "parent-atlas-workboard-feature-utility-fabric:NS-6"
+    ]
+  },
+  "criteria": {
+    "dependencyMetadataCoverageOfActionable": {
+      "value": 0.0009,
+      "required": 0.95,
+      "met": false
+    },
+    "ambiguousEdges": {
+      "value": 0,
+      "required": 0,
+      "met": true
+    },
+    "unresolvedRequiredEdges": {
+      "value": 0,
+      "required": 0,
+      "met": true
+    },
+    "cycles": {
+      "value": 0,
+      "required": 0,
+      "met": true
+    },
+    "logicalTaskIdentityStable": {
+      "value": true,
+      "required": true,
+      "met": true
+    },
+    "logicalKeyCoverageOfActionable": {
+      "value": 0.4363,
+      "required": 0.95,
+      "met": false
+    },
+    "noRegressionOfRequiredGates": {
+      "value": 0,
+      "required": 0,
+      "met": true
+    }
+  },
+  "admissionEligible": false,
+  "openTaskIdentityBasis": {
+    "MIGRATION_TITLE_HASH": 2026,
+    "DECLARED_ID": 1162,
+    "DECLARED_ID_SECTION_QUALIFIED": 78,
+    "AMBIGUOUS_DECLARED_ID": 22
+  },
+  "nextGate": "NOT_ELIGIBLE: unmet criteria remain; stay on incumbent controller rules",
+  "semanticChecksum": "0342644cf8b5119543bdd6f503157c3244c92db82e93f0fa02d8275628f9f03d"
+}

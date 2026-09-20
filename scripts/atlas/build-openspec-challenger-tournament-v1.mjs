@@ -5,13 +5,16 @@ import { semanticChecksum } from './lib/stable-json.mjs';
 
 const reportsDir = path.resolve(process.argv[2] ?? 'docs/reports');
 const outputPath = path.resolve(process.argv[3] ?? path.join(reportsDir, 'openspec-challenger-tournament-v1.json'));
-function read(name){ try{return JSON.parse(fs.readFileSync(path.join(reportsDir,name),'utf8'));}catch{return null;} }
+const fallbackReportsDir = path.basename(reportsDir).toLowerCase() === 'staging' ? path.dirname(reportsDir) : path.join(reportsDir, 'staging');
+function read(name){ for (const dir of [reportsDir, fallbackReportsDir]) { try{return JSON.parse(fs.readFileSync(path.join(dir,name),'utf8'));}catch{} } return null; }
 function tasksOf(v){ return Array.isArray(v?.tasks)?v.tasks:Array.isArray(v?.ranked)?v.ranked:Array.isArray(v?.results)?v.results:[]; }
 function idOf(t){ return String(t?.id ?? t?.taskId ?? t?.task_id ?? ''); }
 function scoreOf(t){ for(const k of ['score','rankScore','lowRankScore','recommendationScore']){const n=Number(t?.[k]); if(Number.isFinite(n))return n;} return null; }
 
 const deterministic=read('openspec-next-actions-v2.json') ?? read('actionable-workboard-v3.json');
-const lowrank=read('low-rank-task-recommendation-v2.json');
+const lowrankRaw=read('low-rank-task-recommendation-v2.json');
+const lowrankDegenerate=Boolean(lowrankRaw)&&String(lowrankRaw.status??'OK').startsWith('DEGENERATE');
+const lowrank=lowrankDegenerate?null:lowrankRaw;
 const det=tasksOf(deterministic), lr=tasksOf(lowrank);
 const detRank=new Map(det.map((t,i)=>[idOf(t),i+1]).filter(([id])=>id));
 const lrRank=new Map(lr.map((t,i)=>[idOf(t),i+1]).filter(([id])=>id));
@@ -27,7 +30,7 @@ const report={
   schema:'atlas.openspec-challenger-tournament.v1',
   generatedAt:new Date().toISOString(),
   participants:{deterministic:Boolean(deterministic),lowRank:Boolean(lowrank),humanFeedback:false},
-  comparisonStatus: lowrank ? 'COMPARISON_AVAILABLE' : (deterministic ? 'LOW_RANK_CHALLENGER_REPORT_MISSING' : 'RANKING_INPUTS_MISSING'),
+  comparisonStatus: lowrankDegenerate ? 'LOW_RANK_CHALLENGER_DEGENERATE_INSUFFICIENT_FEATURE_VARIANCE' : lowrank ? 'COMPARISON_AVAILABLE' : (deterministic ? 'LOW_RANK_CHALLENGER_REPORT_MISSING' : 'RANKING_INPUTS_MISSING'),
   deterministicSource: read('openspec-next-actions-v2.json') ? 'openspec-next-actions-v2.json' : (deterministic ? 'actionable-workboard-v3.json' : null),
   lowRankSource: lowrank ? 'low-rank-task-recommendation-v2.json' : null,
   comparisons:rows,

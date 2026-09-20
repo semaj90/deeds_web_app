@@ -5,8 +5,9 @@ import { semanticChecksum, object, array, string } from './lib/stable-json.mjs';
 
 const reportsDir = path.resolve(process.argv[2] ?? 'docs/reports');
 const outputPath = path.resolve(process.argv[3] ?? path.join(reportsDir, 'openspec-progress-audit-v2.json'));
-function read(name){ try{return JSON.parse(fs.readFileSync(path.join(reportsDir,name),'utf8'));}catch{return null;} }
-function has(name){ return fs.existsSync(path.join(reportsDir,name)); }
+const fallbackReportsDir = path.basename(reportsDir).toLowerCase() === 'staging' ? path.dirname(reportsDir) : path.join(reportsDir, 'staging');
+function read(name){ for (const dir of [reportsDir, fallbackReportsDir]) { try{return JSON.parse(fs.readFileSync(path.join(dir,name),'utf8'));}catch{} } return null; }
+function has(name){ return [reportsDir, fallbackReportsDir].some((dir) => fs.existsSync(path.join(dir,name))); }
 function findSummary(v,depth=0){ if(depth>5)return null; const o=object(v); if(!o)return null; if(('total'in o||'totalTasks'in o)&&('actionable'in o||'proven'in o||'waiting'in o)) return { total:o.total??o.totalTasks, proven:o.proven??o.completedTasks??o.done, actionable:o.actionable, waiting:o.waiting, deferred:o.deferred }; for(const k of ['summary','counts','result','controller']){const x=findSummary(o[k],depth+1);if(x)return x;} return null; }
 function collect(v,out=[],depth=0){ if(depth>8||v==null)return out; if(Array.isArray(v)){for(const x of v)collect(x,out,depth+1);return out;} const o=object(v); if(!o)return out; if(string(o.taskId??o.task_id??o.taskKey??o.id) && (string(o.changeId??o.change_id??o.change) || string(o.title??o.text??o.task))) out.push(o); for(const [k,x] of Object.entries(o)) if(/tasks|items|entries|members|actionable|waiting|deferred|results|ranked/i.test(k)) collect(x,out,depth+1); return out; }
 

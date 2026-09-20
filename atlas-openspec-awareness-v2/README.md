@@ -41,6 +41,12 @@ Graphify artifacts are size-capped by `ATLAS_GRAPHIFY_MAX_BYTES` (default 256 Mi
 
 **Important:** lexical imports, Graphify observations, and KMeans clusters are navigation/routing evidence. They do not establish canonical ownership.
 
+Fanout resolution uses an explicit-path-first policy. For basename-only task
+references, live worktree candidates are preferred over archived workspace
+snapshots and orphaned trees; multiple remaining live candidates stay
+`AMBIGUOUS_REPOSITORY_BASENAME` and are not guessed. This reduces navigation
+noise without changing task authority or source lineage.
+
 ### Deterministic taxonomy + KMeans challenger
 
 Baseline topics now include:

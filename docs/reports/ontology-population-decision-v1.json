@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.ontology-population-decision.v1",
+  "generatedAt": "2026-09-20T08:41:27.273Z",
+  "gate": "14.3b_ONTOLOGY_POPULATION_DECISION",
+  "readback": {
+    "ontologyConceptRows": 0,
+    "ontologyRelationRows": 0,
+    "domainOntologyRows": 17,
+    "featureOntologyTupleRows": 539124,
+    "unresolvedTupleRows": 539124,
+    "unresolvedDomainTupleRows": 123434,
+    "unresolvedLexicalConceptTagRows": 353973,
+    "predicates": [
+      {
+        "predicate": "BELONGS_TO_DOMAIN",
+        "object_type": "domain",
+        "count": 61717
+      },
+      {
+        "predicate": "CLASSIFIED_AS",
+        "object_type": "domain",
+        "count": 61717
+      },
+      {
+        "predicate": "IMPLEMENTS_FEATURE",
+        "object_type": "feature",
+        "count": 61717
+      },
+      {
+        "predicate": "USES_CONCEPT",
+        "object_type": "concept",
+        "count": 353973
+      }
+    ],
+    "resolutionStates": [
+      {
+        "resolution_state": "UNRESOLVED",
+        "count": 539124
+      }
+    ]
+  },
+  "decisions": {
+    "conceptPopulation": "DEFERRED_NO_CANONICAL_CONCEPT_VOCABULARY",
+    "relationPopulation": "DEFERRED_NO_CANONICAL_CONCEPT_EDGES",
+    "lexicalUsesConcept": "LEXICAL_TAG_EVIDENCE_ONLY",
+    "exactDomainResolution": "REHEARSAL_ONLY_LINEAGE_GATE_REQUIRED"
+  },
+  "reasons": [
+    "USES_CONCEPT rows are extractor-produced lexical/path tokens and cannot be promoted by renaming them into ontology concepts.",
+    "No canonical concept vocabulary or relation edge set currently exists to populate atlas_ontology_concepts or atlas_ontology_relations.",
+    "Current source/workspace authority remains blocked, so tuple resolution cannot become canonical even where an exact domain join is mechanically possible.",
+    "OAK remains a derived resolver/projection and must not invent packet, source, symbol, or ontology identity."
+  ],
+  "lineage": {
+    "source": ".tmp/knowledge-source-snapshot-live-v1.json",
+    "status": "BLOCKED",
+    "worktreeFingerprintParity": false,
+    "blocked": true
+  },
+  "nextGate": "KNOW-09_SOURCE_AUTHORITY_RECONCILIATION_BEFORE_TUPLE_PROMOTION",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "checksum": "7b17857c764db67d74305e58aa7d330c7011c1c49ee3c3ecbbf47dc9745b596b"
+}

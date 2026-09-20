@@ -1,11 +1,9 @@
 import { db } from '$lib/server/db/client';
 import { adminAiSkills, adminAiSubagentRuns } from '$lib/server/db/schema.js';
 import { traceMcpClient } from '$lib/server/mcp-client.js';
-import { ENV } from '$lib/server/env.server.js';
 import { eq } from 'drizzle-orm';
 import { appendOutcomeLedger } from '$lib/server/observability/outcome-ledger.js';
-
-const MODEL_URL = ENV.TURBOQUANT_BASE_URL;
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 export interface SubagentMission {
   skillName: string;
@@ -44,6 +42,7 @@ export class SubagentOrchestrator {
     let status = 'running';
     let result = '';
     let tokensUsed = 0;
+    const chatTarget = await resolveLlamaInferenceTarget();
 
     // 3. Execution Loop (Max 5 steps for safety)
     for (let step = 0; step < 5; step++) {
@@ -65,11 +64,11 @@ export class SubagentOrchestrator {
         }
       `;
 
-      const res = await fetch(`${MODEL_URL}/v1/chat/completions`, {
+      const res = await fetch(`${chatTarget.baseUrl}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: ENV.GEMMA4_MODEL ?? 'gemma4',
+          model: chatTarget.model,
           messages: [{ role: 'system', content: prompt }],
           response_format: { type: 'json_object' }
         })

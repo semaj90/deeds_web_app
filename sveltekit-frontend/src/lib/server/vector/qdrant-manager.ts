@@ -60,6 +60,21 @@ export interface QdrantSearchResult {
 }
 
 /**
+ * Compatibility shape for older callers. Qdrant JS 1.19 exposes `query()`;
+ * callers should use this manager method instead of reaching into the raw
+ * client and assuming the removed `search()` method still exists.
+ */
+export interface QdrantSearchOptionsV1 {
+  vector: number[] | { name: string; vector: number[] };
+  limit?: number;
+  offset?: number;
+  score_threshold?: number;
+  with_payload?: boolean;
+  with_vector?: boolean;
+  filter?: Record<string, unknown>;
+}
+
+/**
  * Generate a deterministic integer point ID from a string key.
  * Ported from Python qdrant_gpu_client.py — MD5 hash → first 4 bytes → int % 2^31.
  * Ensures idempotent upserts: same chunk_id always maps to the same Qdrant point ID.
@@ -270,6 +285,22 @@ export class QdrantManager {
     } catch {
       return null;
     }
+  }
+
+  /** Read-only legacy search facade backed by Qdrant's current query API. */
+  public async search(collectionName: string, options: QdrantSearchOptionsV1) {
+    const named = !Array.isArray(options.vector) ? options.vector : undefined;
+    const response = await this.client.query(collectionName, {
+      query: named?.vector ?? options.vector,
+      ...(named ? { using: named.name } : {}),
+      limit: options.limit,
+      offset: options.offset,
+      score_threshold: options.score_threshold,
+      with_payload: options.with_payload,
+      with_vector: options.with_vector,
+      filter: options.filter as never,
+    });
+    return response.points;
   }
 
   /**

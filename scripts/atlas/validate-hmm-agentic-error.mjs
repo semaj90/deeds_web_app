@@ -72,6 +72,45 @@ const HMM_VALIDATION_GATES = {
   },
 };
 
+/**
+ * Validate the HMM hand-off contract without invoking the write-capable
+ * MapReduce runner. This is deliberately a fixture proof: it proves the
+ * envelope/state ordering and mutation boundary, not live readiness.
+ */
+function validateHMMTransitionFixture() {
+  const signalId = 'hmm-fixture-signal-v1';
+  const transitions = [
+    { from: 'S0_INIT', to: 'S1_SIGNAL_INGESTED', event: 'ERROR_SIGNAL_INGESTED' },
+    { from: 'S1_SIGNAL_INGESTED', to: 'S2_CLASSIFIED', event: 'ERROR_DOMAIN_CLASSIFIED' },
+    { from: 'S2_CLASSIFIED', to: 'S3_RECOVERED', event: 'RECOVERY_PACKETS_SELECTED' },
+    { from: 'S3_RECOVERED', to: 'S4_RANKED', event: 'RECOVERY_PACKETS_RANKED' },
+    { from: 'S4_RANKED', to: 'ACE_EMIT', event: 'ACE_CONTEXT_EMIT_READY' },
+  ];
+
+  const stateOrder = ['S0_INIT', 'S1_SIGNAL_INGESTED', 'S2_CLASSIFIED', 'S3_RECOVERED', 'S4_RANKED', 'ACE_EMIT'];
+  const valid = transitions.every((transition, index) => (
+    transition.from === stateOrder[index]
+    && transition.to === stateOrder[index + 1]
+    && typeof transition.event === 'string'
+  ));
+
+  return {
+    schema: 'atlas.hmm-agentic-transition-fixture.v1',
+    status: valid ? 'HMM_TRANSITION_FIXTURE_PROVEN' : 'HMM_TRANSITION_FIXTURE_FAILED',
+    signalId,
+    stateOrder,
+    transitions,
+    envelope: {
+      inputSignalId: signalId,
+      outputContextKind: 'ACE_CONTEXT_CANDIDATE',
+      canonicalAuthority: false,
+      promotionAuthorized: false,
+      writesPerformed: false,
+    },
+    liveReadiness: 'BLOCKED_BY_FEATURE_AND_SOURCE_LINEAGE_GATES',
+  };
+}
+
 console.log('╔════════════════════════════════════════════════════════════════╗');
 console.log('║  HMM Agentic Error Classification Validation                  ║');
 console.log('║  Validate error-domain-recovery packet pipeline               ║');
@@ -191,15 +230,16 @@ async function validateHMMAgenticError() {
       console.log();
     }
 
-    // Gate 4: HMM State Transitions (simulated)
+    // Gate 4: HMM State Transitions (read-only fixture contract)
     console.log('🔍 Gate 4: HMM State Machine Transitions');
-    console.log('   HMM States:');
-    console.log('     S0: INIT → S1 (error signal ingested)');
-    console.log('     S1: CLASSIFY → S2 (error-domain mapping via ontology)');
-    console.log('     S2: RETRIEVE → S3 (recovery packets from topology)');
-    console.log('     S3: RANK → S4 (xgboost ranking by page_rank/community)');
-    console.log('     S4: EMIT → ACE (packet dispatch to retrieval context)');
-    console.log('   Status: ⏳ PENDING (implementation in progress)\n');
+    const transitionFixture = validateHMMTransitionFixture();
+    console.log(`   State order: ${transitionFixture.stateOrder.join(' → ')}`);
+    console.log(`   Transitions: ${transitionFixture.transitions.length}`);
+    console.log(`   Canonical authority: ${transitionFixture.envelope.canonicalAuthority}`);
+    console.log(`   Writes performed: ${transitionFixture.envelope.writesPerformed}`);
+    console.log(`   Status: ${transitionFixture.status === 'HMM_TRANSITION_FIXTURE_PROVEN' ? '✅' : '❌'} ${transitionFixture.status}`);
+    console.log(`   Live readiness: ${transitionFixture.liveReadiness}\n`);
+    const gate4Pass = transitionFixture.status === 'HMM_TRANSITION_FIXTURE_PROVEN';
 
     // Gate 5: End-to-End Signal → Recovery (simulated)
     console.log('🔍 Gate 5: End-to-End Error Signal → Recovery Packet');
@@ -250,8 +290,8 @@ async function validateHMMAgenticError() {
     console.log('║  SUMMARY                                                       ║');
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
-    const passCount = [gate1Pass, gate2Pass, gate3Pass].filter(x => x).length;
-    const totalGates = 3;
+    const passCount = [gate1Pass, gate2Pass, gate3Pass, gate4Pass].filter(x => x).length;
+    const totalGates = 4;
 
     console.log(`Gates Passed: ${passCount}/${totalGates}`);
     console.log(`Status: ${passCount === totalGates ? '✅ HMM READY FOR INTEGRATION' : '⚠️ DEPENDENCIES BLOCKING'}\n`);
@@ -278,11 +318,14 @@ async function validateHMMAgenticError() {
     console.log('Next Steps:');
     console.log('  1. ⏳ Produce grounded concept/domain labels from the approved LangExtract/ontology lane');
     console.log('  2. ⏳ Re-run feature coverage and recovery selection with the same read-only snapshot');
-    console.log('  3. ⏳ Implement HMM state machine + confidence scoring');
-    console.log('  4. ⏳ Integrate with MapReduce error signal grouping');
-    console.log('  5. ⏳ Wire ACE recovery packet dispatch');
+    console.log('  3. ✅ Keep the transition fixture as a read-only contract proof');
+    console.log('  4. ⏳ Implement live HMM confidence scoring after feature coverage closes');
+    console.log('  5. ⏳ Integrate with MapReduce error signal grouping');
+    console.log('  6. ⏳ Wire ACE recovery packet dispatch');
 
-    process.exit(passCount >= 2 ? 0 : 1);
+    // A partial taxonomy/fixture result must not look like HMM readiness.
+    // The broader NLP smoke intentionally records this lane independently.
+    process.exit(passCount === totalGates ? 0 : 1);
 
   } catch (err) {
     console.error('❌ Error:', err.message);

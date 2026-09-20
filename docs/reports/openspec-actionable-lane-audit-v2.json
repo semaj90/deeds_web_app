@@ -1,6 +1,6 @@
 {
   "schema": "atlas.openspec-actionable-lane-audit.v2",
-  "generatedAt": "2026-09-19T04:42:51.291Z",
+  "generatedAt": "2026-09-19T06:37:00.699Z",
   "source": {
     "actionable": "openspec-actionable-work-v1.json",
     "controller": "openspec-execution-controller-v1.json",
@@ -8,9 +8,9 @@
   },
   "policy": "READ_ONLY_LANE_AND_DEPENDENCY_INTEGRITY_AUDIT",
   "summary": {
-    "controllerActionable": 2312,
+    "controllerActionable": 2309,
     "exportedActionableTasks": 200,
-    "controllerActionableObjectsFound": 2312,
+    "controllerActionableObjectsFound": 2309,
     "exportTruncationDetected": true,
     "machineDependencyDeclared": 0,
     "noMachineDependencyDeclared": 200,
@@ -47,7 +47,7 @@
     "releaseEvents": 0
   },
   "warnings": [
-    "ACTIONABLE_EXPORT_TRUNCATED:200/2312",
+    "ACTIONABLE_EXPORT_TRUNCATED:200/2309",
     "EXPECTED_LEDGER_OPEN_WITH_EXECUTION_ACTIONABLE:KEEP_FIELDS_SEPARATE"
   ],
   "suspiciousActionable": [
@@ -4472,7 +4472,7 @@
       "owner": "declared OpenSpec dependency owner",
       "releaseEvent": "owning dependency receipt changes and satisfies the prerequisite",
       "retryPolicy": "do not retry until the dependency receipt checksum changes",
-      "count": 570
+      "count": 561
     },
     {
       "blockerKey": "CANONICAL_AUTHORIZATION",
@@ -4483,12 +4483,20 @@
       "count": 208
     },
     {
+      "blockerKey": "PACKET_MATERIALIZATION",
+      "state": "WAITING_ON_DEPENDENCY",
+      "owner": "canonical packet materialization and digest owner",
+      "releaseEvent": "packet materialization and independent digest readback become current for the admitted source cohort",
+      "retryPolicy": "do not retry until the packet identity/digest receipt checksum changes",
+      "count": 16
+    },
+    {
       "blockerKey": "CURRENT_SOURCE_AUTHORITY",
       "state": "WAITING_ON_AUTHORITY",
       "owner": "workspace/source/execution authority owner",
       "releaseEvent": "current workspace/source/execution authority receipt changes to admitted and current",
       "retryPolicy": "do not retry until the relevant authority receipt or revision changes",
-      "count": 101
+      "count": 97
     },
     {
       "blockerKey": "CANDIDATE_POPULATION_FREEZE",
@@ -4506,5 +4514,5 @@
     "text heuristics only emit warnings; they never demote or promote tasks.",
     "the ranker should consume the full ACTIONABLE set or an explicitly paged stream, not an implicit top-200 sample."
   ],
-  "semanticChecksum": "3ef7883e780249f1d3f42afab366219de2a8d8df122b55acbbc8dfb3b49259ef"
+  "semanticChecksum": "1bd00b1d15e72f6d4ee8b2485cdef83fff271dd8d3ea7c440e78b596a9fba74a"
 }

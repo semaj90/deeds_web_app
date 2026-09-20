@@ -5,7 +5,7 @@
  * 1. Parallel queries to Qdrant/Postgres/Neo4j/Redis
  * 2. RRF fusion with 7 lanes
  * 3. Top-100 candidates → GPU reranker
- * 4. Top-20 → Gemma4 answer synthesis
+ * 4. Top-20 → Ornith answer synthesis via llama-server :8090
  * 5. Preserve all 8 canonical IDs through full pipeline
  * 6. Track retrieval confidence for agentic error recovery
  *
@@ -16,10 +16,11 @@ import type { CanonicalIDHierarchy } from '../topology/canonical-id-hierarchy.js
 import type { PermissionManager } from '../topology/permission-manager.js';
 
 import { ENV } from '$lib/server/env.server.js';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 interface RetrievalRequest {
   query: string;
   query_embedding: number[]; // 768-dim canonical dense lane from EmbeddingGemma
-  top_k: number; // Default: 100 for RRF, 20 for Gemma4
+  top_k: number; // Default: 100 for RRF, 20 for Ornith synthesis
   file_id?: string; // Optional filtering
   feature_id?: string; // Optional filtering
   user_id?: string; // For permission checking
@@ -177,13 +178,13 @@ export async function gpuReranker(
 }
 
 /**
- * Gemma4 Answer Synthesis — Final LLM pass
+ * Ornith Answer Synthesis — Final llama-server :8090 pass
  * Input: Top-20 candidates (from GPU reranker)
  * Output: Structured answer with sources
  *
  * GPU is for inference only, not ranking logic
  */
-export async function gemma4AnswerSynthesis(
+export async function ornithAnswerSynthesis(
   candidates: RetrievalCandidate[],
   query: string,
   llmUrl: string = ENV.LLAMA_SERVER_URL ?? 'http://localhost:8090'
@@ -209,11 +210,15 @@ export async function gemma4AnswerSynthesis(
   const startTime = Date.now();
 
   try {
+    const loaded = await resolveLoadedLlamaModel(
+      llmUrl,
+      ENV.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b'
+    );
     const response = await fetch(`${llmUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs',
+        model: loaded.resolvedModel,
         messages: [
           {
             role: 'system',
@@ -232,7 +237,7 @@ export async function gemma4AnswerSynthesis(
     });
 
     if (!response.ok) {
-      throw new Error(`Gemma4 ${response.status}: ${await response.text()}`);
+      throw new Error(`Ornith ${response.status}: ${await response.text()}`);
     }
 
     const { choices } = await response.json();
@@ -247,7 +252,7 @@ export async function gemma4AnswerSynthesis(
       execution_time_ms: Date.now() - startTime
     };
   } catch (err) {
-    console.error(`Gemma4 failed: ${err.message}`);
+    console.error(`Ornith synthesis failed: ${err.message}`);
     return {
       answer: `Error synthesizing answer: ${err.message}`,
       sources: candidates
@@ -259,19 +264,22 @@ export async function gemma4AnswerSynthesis(
   }
 }
 
+/** @deprecated Compatibility export; synthesis is owned by Ornith on llama-server :8090. */
+export const gemma4AnswerSynthesis = ornithAnswerSynthesis;
+
 /**
  * End-to-End Retrieval Pipeline
  * 1. Query embedding (EmbeddingGemma)
  * 2. Go service parallel retrieval (top 100, RRF)
  * 3. GPU reranker (top 100 → top 20)
- * 4. Gemma4 synthesis (answer generation)
+ * 4. Ornith synthesis (answer generation via llama-server :8090)
  */
 export async function endToEndRetrieval(
   query: string,
   queryEmbedding: number[],
   goServiceUrl: string = ENV.GO_RETRIEVAL_HTTP_URL ?? 'http://localhost:8100',
   tensorrtUrl: string = ENV.TENSORRT_URL ?? 'http://127.0.0.1:8765',
-  gemma4Url: string = ENV.LLAMA_SERVER_URL ?? 'http://localhost:8090'
+  ornithUrl: string = ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'
 ): Promise<{
   answer: GemmaAnswer;
   candidates: RetrievalCandidate[];
@@ -298,9 +306,9 @@ export async function endToEndRetrieval(
   const reranked = await gpuReranker(candidates, queryEmbedding, tensorrtUrl);
   const rerankTime = Date.now() - startRerank;
 
-  // 3. Gemma4 synthesis
+  // 3. Ornith synthesis via llama-server; Ollama is embedding-only.
   const startGemma = Date.now();
-  const answer = await gemma4AnswerSynthesis(reranked, query, gemma4Url);
+  const answer = await ornithAnswerSynthesis(reranked, query, ornithUrl);
   const gemmaTime = Date.now() - startGemma;
 
   return {

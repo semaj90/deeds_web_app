@@ -1105,6 +1105,10 @@ services:
       # Durable LangGraph state is opt-in. Schema setup is a separate explicit gate.
       - LANGGRAPH_CHECKPOINT_ENABLED=${LANGGRAPH_CHECKPOINT_ENABLED:-false}
       - LANGGRAPH_CHECKPOINT_SETUP=${LANGGRAPH_CHECKPOINT_SETUP:-false}
+      # Strict checkpoint deserialization; Python checkpoint state is isolated
+      # from the canonical PostgreSQL schema and remains opt-in.
+      - LANGGRAPH_STRICT_MSGPACK=${LANGGRAPH_STRICT_MSGPACK:-true}
+      - LANGGRAPH_CHECKPOINT_SCHEMA=${LANGGRAPH_CHECKPOINT_SCHEMA:-langgraph_py}
       # Synthesis auth is optional in local development and required in production.
       - LANGGRAPH_INTERNAL_API_KEY=${LANGGRAPH_INTERNAL_API_KEY:-}
       # LangGraph uses the OpenAI-compatible llama-server chat owner on :8090.

@@ -24,7 +24,10 @@ const REPORTS = [
   'atlas-runtime-readiness-v1.json',
   'openspec-challenger-tournament-v1.json',
   'openspec-progress-audit-v2.json',
-  'atlas-shadow-preference-eval-v1.json'
+  'atlas-shadow-preference-eval-v1.json',
+  'topic-identity-readiness-v1.json',
+  'okf-claim-freshness-v1.json',
+  'parent-atlas-utility-helper-readiness-v1.json'
 ] as const;
 
 function stable(value: unknown): unknown {
@@ -67,15 +70,32 @@ export async function resolveOpenSpecReportDirectory(): Promise<string> {
   for (const candidate of candidates) {
     try {
       const stat = await fs.stat(candidate);
-      if (stat.isDirectory()) return candidate;
+      if (!stat.isDirectory()) continue;
+      const hasBoardReport = await Promise.any([
+        fs.access(path.join(candidate, 'openspec-execution-controller-v1.json')),
+        fs.access(path.join(candidate, 'atlas-runtime-readiness-v1.json'))
+      ]).then(() => true).catch(() => false);
+      if (hasBoardReport) return candidate;
     } catch { /* next */ }
   }
   throw new Error(`Parent Atlas reports directory not found. Checked: ${candidates.join(', ')}`);
 }
 
 async function readReport(reportDirectory: string, name: string) {
-  const filePath = path.join(reportDirectory, name);
+  const candidates = [
+    path.join(reportDirectory, name),
+    path.join(reportDirectory, 'staging', name)
+  ];
   try {
+    const existing: Array<{ filePath: string; mtimeMs: number }> = [];
+    for (const filePath of candidates) {
+      try {
+        const stat = await fs.stat(filePath);
+        if (stat.isFile()) existing.push({ filePath, mtimeMs: stat.mtimeMs });
+      } catch { /* try the next report location */ }
+    }
+    if (!existing.length) throw Object.assign(new Error('report not found'), { code: 'ENOENT' });
+    const { filePath } = existing.sort((a, b) => b.mtimeMs - a.mtimeMs)[0];
     const [content, stat] = await Promise.all([fs.readFile(filePath, 'utf8'), fs.stat(filePath)]);
     const parsed = JSON.parse(content) as unknown;
     const meta: OpenSpecReportFileV1 = {
@@ -91,7 +111,7 @@ async function readReport(reportDirectory: string, name: string) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       return {
         parsed: null,
-        meta: { name, path: filePath, exists: false, size: 0, mtimeMs: 0, sha256: null } satisfies OpenSpecReportFileV1
+        meta: { name, path: candidates[0], exists: false, size: 0, mtimeMs: 0, sha256: null } satisfies OpenSpecReportFileV1
       };
     }
     throw error;
@@ -103,7 +123,7 @@ function findSummary(value: unknown, depth = 0): Record<string, unknown> | null 
   const o = object(value);
   if (!o) return null;
   const keys = new Set(Object.keys(o).map((x) => x.toLowerCase()));
-  if (keys.has('total') && (keys.has('actionable') || keys.has('waiting') || keys.has('proven'))) return o;
+  if ((keys.has('total') || keys.has('totaltasks')) && (keys.has('actionable') || keys.has('waiting') || keys.has('proven'))) return o;
   for (const key of ['summary', 'counts', 'controller', 'result']) {
     if (o[key]) {
       const found = findSummary(o[key], depth + 1);

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 from pathlib import Path
 import time
@@ -13,6 +14,12 @@ from transformers import PreTrainedTokenizerFast
 
 from atlas_gemma_rank_breadth_50_v1 import QUERIES
 from atlas_gemma_rank_cuda_forward_probe_v1 import build_model, file_checksum
+
+
+def tensor_checksum(value: torch.Tensor) -> str:
+    """Checksum a detached, contiguous float32 view without persisting model state."""
+    data = value.detach().to(device="cpu", dtype=torch.float32).contiguous().numpy().tobytes()
+    return f"sha256:{hashlib.sha256(data).hexdigest()}"
 
 
 def run(checkpoint_dir: Path, *, batch_size: int, max_length: int, repeats: int) -> dict[str, object]:
@@ -71,6 +78,9 @@ def run(checkpoint_dir: Path, *, batch_size: int, max_length: int, repeats: int)
     relative = delta / cpu_float.abs().clamp_min(1e-6)
     cpu_order = torch.argsort(cpu_float.flatten(), descending=True)
     gpu_order = torch.argsort(gpu_float.flatten(), descending=True)
+    cosine = torch.nn.functional.cosine_similarity(cpu_float.flatten(), gpu_float.flatten(), dim=0)
+    cpu_argmax = int(torch.argmax(cpu_float).item())
+    gpu_argmax = int(torch.argmax(gpu_float).item())
     before_after_same = before == file_checksum(checkpoint_dir / "model.safetensors")
     result: dict[str, object] = {
         "schema": "atlas.gemma-rank-cuda-real-batch-probe.v1",
@@ -97,15 +107,28 @@ def run(checkpoint_dir: Path, *, batch_size: int, max_length: int, repeats: int)
             "maxLength": max_length,
             "paddedTokenCount": padded_length,
             "tokenCounts": [len(row) for row in encoded],
+            "inputShape": list(input_ids.shape),
+            "inputDtype": str(input_ids.dtype),
+            "inputChecksum": tensor_checksum(input_ids),
+            "cpuOutputShape": list(cpu_output.shape),
+            "gpuOutputShape": list(gpu_output.shape),
+            "cpuOutputDtype": str(cpu_output.dtype),
+            "gpuOutputDtype": str(gpu_output.dtype),
+            "cpuOutputChecksum": tensor_checksum(cpu_output),
+            "gpuOutputChecksum": tensor_checksum(gpu_output),
             "cpuFinite": bool(torch.isfinite(cpu_output).all().item()),
             "gpuFinite": bool(torch.isfinite(gpu_output).all().item()),
             "cpuRepeatExact": bool(torch.equal(cpu_output, cpu_repeat)),
             "gpuRepeatExact": bool(torch.equal(gpu_output, gpu_repeat)),
             "rankingOrderAgreement": bool(torch.equal(cpu_order, gpu_order)),
+            "argmaxAgreement": cpu_argmax == gpu_argmax,
+            "cpuArgmax": cpu_argmax,
+            "gpuArgmax": gpu_argmax,
             "cpuScores": cpu_float.tolist(),
             "gpuScores": gpu_float.tolist(),
             "maxAbsoluteDelta": float(delta.max().item()),
             "maxRelativeDelta": float(relative.max().item()),
+            "cosineSimilarity": float(cosine.item()),
         },
         "timing": {
             "repeats": repeats,

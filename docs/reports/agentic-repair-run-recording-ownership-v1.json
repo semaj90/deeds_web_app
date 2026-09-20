@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.agentic-repair-run-recording-ownership.v1",
+  "task": "T17-74",
+  "status": "NO_SECOND_REPAIR_EPISODE_TOOL_FOUND",
+  "decision": "DO_NOT_UNIFY_ABSENT_IMPLEMENTATION",
+  "authority": "READ_ONLY_REPOSITORY_CENSUS",
+  "writesPerformed": false,
+  "runtimePromotionAuthorized": false,
+  "observations": {
+    "kagRecordAgentRun": {
+      "owner": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+      "toolName": "kag.record_agent_run",
+      "writerCapable": true,
+      "description": "Records an autonomous agent run artifact to memory and queues JSONL for ingest"
+    },
+    "repairEpisodeTool": {
+      "searchPattern": "record-repair-episode|repair-episode",
+      "matches": 0,
+      "present": false
+    },
+    "relatedRepairRuntime": {
+      "path": "sveltekit-frontend/scripts/phase79-agentic-repair.mts",
+      "role": "repair workflow/runtime reference, not a second run-recording tool"
+    }
+  },
+  "artifacts": [
+    { "path": "sveltekit-frontend/src/mcp/trace-mcp-server.ts", "lineCount": 10811, "sha256": "8d4ec9fcf10f94d3677970a16cc9d5829c5a2b578a560c5b157feaf090d7e28e" },
+    { "path": "sveltekit-frontend/src/lib/server/features/ai/ai/gemma4-agent.ts", "lineCount": 2629, "sha256": "1d7510512a965d1cccae3810d5fa56bc6d1beb5ce8d475c033ce73d86f1b9a5f" },
+    { "path": "sveltekit-frontend/scripts/phase79-agentic-repair.mts", "lineCount": 1348, "sha256": "4298f7b7ff36005d7e81019b8f9bae50a9dcd8a9542d5e9621038cd36959129c" }
+  ],
+  "recommendation": "Keep kag.record_agent_run as the existing run-artifact owner. If a repair-episode API is later introduced, define it as an adapter that emits the same canonical receipt envelope instead of a competing writer. No adapter is needed for this task because the proposed second tool is absent."
+}

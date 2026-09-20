@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.postgresql18-runtime-readiness.v1",
+  "generatedAt": "2026-09-19T09:57:24.218Z",
+  "authority": "POSTGRESQL_RUNTIME_OBSERVATION_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "mutationPolicy": {
+    "ddl": false,
+    "migrations": false,
+    "rowWrites": false,
+    "cacheWrites": false
+  },
+  "status": "POSTGRESQL_18_RUNTIME_PROVEN",
+  "serverVersion": "PostgreSQL 18.4 (Debian 18.4-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit",
+  "serverVersionNum": "180004",
+  "serverMajor": 1800,
+  "aio": [
+    {
+      "name": "effective_io_concurrency",
+      "setting": "16",
+      "unit": null,
+      "context": "user",
+      "source": "default"
+    },
+    {
+      "name": "io_max_concurrency",
+      "setting": "64",
+      "unit": null,
+      "context": "postmaster",
+      "source": "default"
+    },
+    {
+      "name": "io_method",
+      "setting": "worker",
+      "unit": null,
+      "context": "postmaster",
+      "source": "command line"
+    },
+    {
+      "name": "io_workers",
+      "setting": "3",
+      "unit": null,
+      "context": "sighup",
+      "source": "default"
+    },
+    {
+      "name": "maintenance_io_concurrency",
+      "setting": "16",
+      "unit": null,
+      "context": "user",
+      "source": "default"
+    }
+  ],
+  "workload": {
+    "atlas_packets": "61718",
+    "codebase_chunks": "274465",
+    "embedded_chunks": "219998"
+  },
+  "evidence": {
+    "serverVersionQuery": "SELECT version(), current_setting(server_version_num)",
+    "settingsQuery": "pg_settings:io_method/io_workers/io_max_concurrency/effective_io_concurrency/maintenance_io_concurrency",
+    "workloadQuery": "atlas_packets/codebase_chunk_index/content_embedding_768 counts"
+  }
+}

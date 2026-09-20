@@ -80,7 +80,7 @@ NEO4J_PASS  = os.getenv("NEO4J_PASSWORD", "neo4j123")
 
 EMBED_MODEL = os.getenv("EMBED_MODEL", "embeddinggemma:latest")
 CHAT_BASE_URL = os.getenv("CHAT_BASE_URL", os.getenv("TURBOQUANT_BASE_URL", "http://127.0.0.1:8090")).rstrip("/")
-CHAT_MODEL  = os.getenv("CHAT_MODEL", os.getenv("LLM_MODEL", "gemma4-legal-iq4xs-direct.gguf"))
+CHAT_MODEL  = os.getenv("CHAT_MODEL", os.getenv("LLM_MODEL", os.environ.get("LLAMA_SERVER_MODEL", "ornith-1.5-9b")))
 SUMMARY_MODEL = os.getenv("SUMMARY_MODEL", os.getenv("SVELTE5_MODEL", CHAT_MODEL))
 
 BIFROST_ENABLED = env_bool("BIFROST_ENABLED", True)

@@ -144,10 +144,19 @@ try {
      LIMIT 100
   `);
   for (const execution of currentRevisions) {
-    const members = await q(client, `
+    let members = await q(client, `
       SELECT source_ref, workspace_revision, code_source_revision, content_hash, byte_length
         FROM public.graphify_execution_files WHERE execution_id = $1 ORDER BY source_ref
     `, [execution.execution_id]);
+    let membershipSource = 'GRAPHIFY_EXECUTION_FILES';
+    if (members.length === 0) {
+      members = await q(client, `
+        SELECT source_ref, workspace_revision, code_source_revision, content_hash, byte_length
+          FROM public.graphify_execution_file_membership_v2
+         WHERE execution_id = $1 ORDER BY source_ref
+      `, [execution.execution_id]);
+      membershipSource = 'GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2';
+    }
     const stage = (await q(client, `
       SELECT status, output_checksum, receipt_ref FROM public.graphify_execution_stages
        WHERE execution_id = $1 AND stage = 'SOURCE_SELECTION'
@@ -159,6 +168,7 @@ try {
       distinctSourceCount: new Set(refs).size,
       workspaceRevisionCount: new Set(members.map((m) => String(m.workspace_revision))).size,
       sourceSelection: stage,
+      membershipSource,
       sourceRefChecksum: digest([...refs].sort().join('')),
       selectionMembershipReadback: members.length > 0,
       canonicalAuthority: false,
@@ -182,9 +192,13 @@ const current = report.currentExecutionCandidates.filter((candidate) => candidat
 const authorityExecutionIds = new Set(report.sourceAuthority?.qualifyingExecutionIds ?? []);
 const authoritySourceCount = Number(report.sourceAuthority?.sourceSnapshot?.sourceCount ?? 0);
 const authorityStatus = report.sourceAuthority?.status;
+const selectedExecutionId = report.sourceAuthority?.ownerSelection?.validated
+  ? String(report.sourceAuthority.ownerSelection.requestedExecutionId)
+  : null;
 const exactCurrent = current.filter((candidate) => (
   authorityStatus === 'CURRENT_SNAPSHOT_PROVEN'
   && authorityExecutionIds.has(candidate.execution_id)
+  && (!selectedExecutionId || candidate.execution_id === selectedExecutionId)
   && candidate.memberCount === authoritySourceCount
   && candidate.workspaceRevisionCount === 1
   && candidate.sourceSelection?.status === 'COMPLETED'

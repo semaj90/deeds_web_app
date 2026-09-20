@@ -1,6 +1,6 @@
 {
   "schema": "atlas.python-runtime-receipt.v1",
-  "generatedAt": "2026-09-19T05:34:50.328Z",
+  "generatedAt": "2026-09-19T07:37:33.018Z",
   "status": "RUNTIME_RECEIPT_PROVEN",
   "pythonExecutable": "python",
   "probe": {
@@ -11,14 +11,14 @@
       "networkx_cpu": "PROCESS_POOL",
       "pytorch_cuda": "ISOLATED_GPU_WORKER",
       "qdrant_io": "ASYNCIO_OR_THREAD_POOL",
-      "recommended_cpu_workers": "2",
+      "recommended_cpu_workers": "1",
       "shared_cuda_context_across_python_threads": "DO_NOT_ASSUME_SAFE_OR_BENEFICIAL"
     },
     "free_thread_build": false,
     "gil_enabled_after_imports": true,
     "gil_enabled_before_imports": true,
     "gil_reenabled_by_extension_import": false,
-    "host_memory_available_mb": 7307,
+    "host_memory_available_mb": 1305,
     "host_memory_total_mb": 32649,
     "implementation": "CPython",
     "neo4j": {

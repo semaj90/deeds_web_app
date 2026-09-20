@@ -279,7 +279,9 @@ export async function executeAtlasRetrieval(init: {
               return { valid: validation.valid };
             },
           );
-          if (!verification.valid) throw new Error(verification.reason);
+          if (verification.valid !== true) {
+            throw new Error('reason' in verification ? verification.reason : 'PACKET_VERIFICATION_FAILED');
+          }
           runtime.state = AtlasState.SYNTHESIZE;
         } catch (err) {
           console.warn('Atlas packet verification blocked:', err);

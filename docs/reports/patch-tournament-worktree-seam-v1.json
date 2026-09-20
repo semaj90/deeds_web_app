@@ -1,0 +1,90 @@
+{
+  "schema": "atlas.patch-tournament-worktree-seam.v1",
+  "generatedAt": "2026-09-20T08:40:23.728Z",
+  "status": "THREE_CANDIDATE_SLOTS_PLANNED_EXECUTION_DEFERRED",
+  "owner": {
+    "planner": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",
+    "schemaRegistry": "sveltekit-frontend/src/lib/server/ace/atlas-tool-registry.ts",
+    "executionWorker": null,
+    "worktreeLeaseOwner": "sveltekit-frontend/src/lib/server/workflows/worktree-lease-adapter.ts"
+  },
+  "request": {
+    "objective": "fixture compile-error tournament preflight",
+    "compileError": "fixture compile error",
+    "workspaceId": "fixture-workspace",
+    "workspaceRevision": "fixture-workspace-revision",
+    "baseBranch": "main",
+    "seamDigest": "sha256:7f71a7be821f49f763c47dd13b7daecda10fdf7d0f24178ccc67917a9f094909"
+  },
+  "candidateCount": 3,
+  "candidateSlots": [
+    {
+      "candidateId": "candidate-1",
+      "strategy": "minimal-scope",
+      "description": "Smallest change set addressing the exact compile error.",
+      "runId": "pending:7f71a7be821f49f7:candidate-1",
+      "sourceRevision": "fixture-workspace-revision",
+      "patchDigest": null,
+      "branchName": "pending/7f71a7be821f49f7/candidate-1",
+      "worktreePath": null,
+      "compileError": "fixture compile error",
+      "executionStatus": "NOT_CREATED",
+      "staticChecks": [],
+      "focusedTests": [],
+      "evidenceRefs": [],
+      "eligibleForRanking": false
+    },
+    {
+      "candidateId": "candidate-2",
+      "strategy": "owner-reuse",
+      "description": "Reuse the existing owner/adapter boundary before adding new code.",
+      "runId": "pending:7f71a7be821f49f7:candidate-2",
+      "sourceRevision": "fixture-workspace-revision",
+      "patchDigest": null,
+      "branchName": "pending/7f71a7be821f49f7/candidate-2",
+      "worktreePath": null,
+      "compileError": "fixture compile error",
+      "executionStatus": "NOT_CREATED",
+      "staticChecks": [],
+      "focusedTests": [],
+      "evidenceRefs": [],
+      "eligibleForRanking": false
+    },
+    {
+      "candidateId": "candidate-3",
+      "strategy": "compatibility-preserving",
+      "description": "Preserve legacy callers while adding the narrowest compatible seam.",
+      "runId": "pending:7f71a7be821f49f7:candidate-3",
+      "sourceRevision": "fixture-workspace-revision",
+      "patchDigest": null,
+      "branchName": "pending/7f71a7be821f49f7/candidate-3",
+      "worktreePath": null,
+      "compileError": "fixture compile error",
+      "executionStatus": "NOT_CREATED",
+      "staticChecks": [],
+      "focusedTests": [],
+      "evidenceRefs": [],
+      "eligibleForRanking": false
+    }
+  ],
+  "requiredBeforePlannerInvocation": [
+    "candidate patch content and patchDigest for each slot",
+    "immutable source revision readback for each candidate",
+    "isolated worktree path and branch readback for each candidate",
+    "static checks and focused tests for each surviving candidate",
+    "manual approval boundary remains separate from apply"
+  ],
+  "authority": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "worktreesCreated": false,
+    "leasesAcquired": false,
+    "candidatesExecuted": false,
+    "rankingPerformed": false,
+    "acePacketEmitted": false,
+    "autoApply": false,
+    "training": false
+  },
+  "nextGate": "AUTHORIZED_ISOLATED_CANDIDATE_EXECUTION",
+  "checksum": "sha256:67d4ccb6657ea93a302845dc2096db2b6f9c0a7e9fc4a979ab71f9244a97b121"
+}

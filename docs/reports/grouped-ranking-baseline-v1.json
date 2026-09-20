@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.grouped-ranking-baseline-receipt.v1",
+  "status": "GROUPED_BASELINE_CONTRACT_PROVEN",
+  "profile": "atlas.grouped-ranking-baseline.v1",
+  "weights": {
+    "semantic": 0.5,
+    "lexical": 0.2,
+    "structural": 0.15,
+    "ontologyGraph": 0.1,
+    "directoryDomainTopology": 0.05
+  },
+  "missingnessPolicy": "omit-missing-groups-and-renormalize-active-group-weights",
+  "executorIdentityAffectsScore": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false,
+  "liveQrelsEvaluated": false,
+  "evidence": [
+    "sveltekit-frontend/src/lib/server/retrieval/grouped-ranking-baseline-v1.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/grouped-ranking-baseline-v1.spec.ts"
+  ]
+}

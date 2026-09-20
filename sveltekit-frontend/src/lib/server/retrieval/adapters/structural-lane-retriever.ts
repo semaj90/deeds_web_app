@@ -9,9 +9,9 @@ export type StructuralLaneHit = {
   compilerSemanticGraphRevision?: string | null;
   byteStart: number;
   byteEnd: number;
-  candidateOrdinal: number | null;
-  canonicalId: string | null;
-  packetKey: string | null;
+  candidateOrdinal?: number | null;
+  canonicalId?: string | null;
+  packetKey?: string | null;
   identityStatus: 'RESOLVED_EXACT' | 'UNRESOLVED_SOURCE' | 'SOURCE_REVISION_MISMATCH' | 'AMBIGUOUS_SOURCE' | 'MIXED_WORKSPACE';
   structuralRank: number;
   confidence: number;

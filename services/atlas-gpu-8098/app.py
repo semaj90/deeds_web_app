@@ -32,10 +32,12 @@ if str(RUNTIME_ROOT) not in sys.path:
     sys.path.insert(0, str(RUNTIME_ROOT))
 
 from atlas_rapids_graph_runtime import install_graph_routes  # noqa: E402
+from shared_residency import SharedGpuResidencyLease, validate_shared_residency_lease  # noqa: E402
 
 
 ARTIFACT_ROOT = Path(os.getenv("ATLAS_GPU_ARTIFACT_ROOT", "/mnt/c/Users/james/Videos/deeds-web-app")).resolve()
 PORT = int(os.getenv("ATLAS_GPU_8098_PORT", "8098"))
+REQUIRE_SHARED_RESIDENCY_LEASE = os.getenv("ATLAS_GPU_REQUIRE_SHARED_RESIDENCY_LEASE", "0").lower() in {"1", "true", "yes"}
 
 
 class ArtifactRequest(BaseModel):
@@ -45,6 +47,7 @@ class ArtifactRequest(BaseModel):
 class ExactScanRequest(ArtifactRequest):
     query: list[float] = Field(min_length=768, max_length=768)
     limit: int = Field(default=10, ge=1, le=128)
+    residencyLease: SharedGpuResidencyLease | None = None
 
 
 class EnrichmentRequest(ArtifactRequest):
@@ -94,6 +97,17 @@ def load_table(path: Path) -> tuple[Any, str]:
     if missing:
         raise HTTPException(status_code=400, detail=f"ARROW_TILE_COLUMNS_MISSING:{sorted(missing)}")
     return table, checksum
+
+
+def require_residency(request: ExactScanRequest, expected_executor: str) -> dict[str, object]:
+    try:
+        return validate_shared_residency_lease(
+            request.residencyLease,
+            expected_executor=expected_executor,
+            required=REQUIRE_SHARED_RESIDENCY_LEASE,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=428, detail=str(exc)) from exc
 
 
 def vectors_on_cuda(table: Any) -> torch.Tensor:
@@ -179,6 +193,7 @@ def enrich_artifact(request: EnrichmentRequest) -> dict[str, Any]:
 
 @app.post("/v1/tile-artifact/exact-scan")
 def exact_scan(request: ExactScanRequest) -> dict[str, Any]:
+    residency = require_residency(request, "pytorch_cuda")
     path = resolve_artifact(request.artifactPath)
     table, checksum = load_table(path)
     vectors = vectors_on_cuda(table)
@@ -200,6 +215,7 @@ def exact_scan(request: ExactScanRequest) -> dict[str, Any]:
         "rows": rows,
         "canonicalAuthority": False,
         "logicalLaneVote": "NONE",
+        "residency": residency,
         "writes": {"postgres": False, "qdrant": False, "valkey": False},
     }
 
@@ -207,6 +223,7 @@ def exact_scan(request: ExactScanRequest) -> dict[str, Any]:
 @app.post("/v1/tile-artifact/cuvs-exact-scan")
 def cuvs_exact_scan(request: ExactScanRequest) -> dict[str, Any]:
     """Run cuVS brute-force search; this is one semantic executor result."""
+    residency = require_residency(request, "cuvs")
     try:
         from cuvs.neighbors import brute_force
     except Exception as exc:  # pragma: no cover - depends on WSL RAPIDS image
@@ -242,6 +259,7 @@ def cuvs_exact_scan(request: ExactScanRequest) -> dict[str, Any]:
         "rows": rows,
         "canonicalAuthority": False,
         "logicalLaneVote": "NONE",
+        "residency": residency,
         "writes": {"postgres": False, "qdrant": False, "valkey": False},
     }
 

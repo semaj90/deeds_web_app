@@ -1,6 +1,6 @@
 {
   "schema": "TensorRtRtxCapabilityReceiptV1",
-  "generatedAt": "2026-09-19T05:06:19.782Z",
+  "generatedAt": "2026-09-19T20:15:35.520Z",
   "readOnly": true,
   "status": "NOT_INSTALLED_OR_PROVEN",
   "canonicalAuthority": false,
@@ -8,6 +8,15 @@
   "observedTensorRT": "10.13.3.9",
   "tensorRtRtxVersion": null,
   "cudaToolkit": "13.0",
+  "environment": {
+    "os": "win32-10.0.19045",
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "driver": "580.88",
+    "computeCapability": "8.6",
+    "observedTensorRT": "10.13.3.9",
+    "torch": "2.8.0+cu128",
+    "torchCudaRuntime": "12.8"
+  },
   "computeCapability": "8.6",
   "compatibility": "UNRESOLVED",
   "engineBuilt": false,

@@ -5,16 +5,15 @@
 
 import { z } from 'zod';
 
-// @mastra/core is NOT installed in this repo (confirmed via package.json audit,
-// 2026-08-01/02 — no `mastra` or `@mastra/core` dependency exists). The
-// unconditional `import { createTool } from '@mastra/core'` this file used to
-// have crashed at module-load time on every request to /api/atlas/mastra-agent
-// with "Failed to resolve entry for package @mastra/core" (reproduced live).
-// This local shim preserves the exact call shape (id/description/inputSchema/
-// outputSchema/execute) so the 7 tool definitions below still type-check and
-// export real, callable objects — it does NOT provide Mastra's actual agent
-// runtime (tool selection, step orchestration, model loop). If/when the real
-// @mastra/core package is installed, delete this shim and restore the import.
+// The frontend deliberately keeps this local tool seam until a real Mastra
+// runtime is proven compatible with the PostgreSQL/Drizzle ownership model.
+// The isolated @deeds/atlas-orchestrator workspace declares @mastra/core, but
+// the currently resolved 0.1.x runtime eagerly imports @prisma-app/client.
+// Adding Prisma here would create an unauthorized second persistence owner.
+// This shim preserves the call shape (id/description/inputSchema/outputSchema/
+// execute) so the seven tool definitions remain callable, while making no
+// claim that Mastra's agent loop, workflow runtime, or snapshot persistence is
+// live. AFC-14/AFC-15 must remain open until a compatible runtime is proven.
 interface LocalToolShim<TInput, TOutput> {
   id: string;
   description: string;

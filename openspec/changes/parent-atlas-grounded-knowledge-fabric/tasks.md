@@ -10,7 +10,7 @@ Source design review: OpenWiki durability/reconciliation mechanisms, adapted to 
 - [x] **KNOW-06 — Atomic claim mutations.** Resolve all evidence before constructing a next claim set; zero store writes.
 - [x] **KNOW-07 — Claim preflight.** Deterministic source/symbol/ontology/version/checksum drift classification.
 - [x] **KNOW-08 — Sparse reconciliation.** Issue-free claims survive; stale/unresolved claims require explicit update/retraction.
-- [ ] **KNOW-09 — Source snapshot/fingerprint.** Contract implemented; workstation adapter/proof against the live lineage owner remains open.
+- [ ] **KNOW-09 — Source snapshot/fingerprint.** Contract implemented; read-only adapter now proves the selected admitted source registry (`24,456/24,456` usable entries) and emits `.tmp/knowledge-source-snapshot-live-v1.json`. It remains `BLOCKED` only on current-worktree parity (`492` content mismatches, `8` missing files); no re-admission or canonical write is performed.
 - [x] **KNOW-10 — PageJobV1 → OaK DAG binding.** Delegates to KernelBoundDagPlannerV1; read-only/propose-only only.
 - [ ] **KNOW-11 — Page snapshot/rollback.** Exact pre-submit rollback controller exists. Durable snapshot artifact persistence + process-loss filesystem proof remain open.
 - [ ] **KNOW-12 — Resumable generation run.** Lifecycle now requires `INSPECT` before `SUBMIT`; COMPLETE transitions require a verified typed `KnowledgePageCompletionReceiptV1`; opaque checksum-only completion is forbidden. Focused build/replay is still pending.

@@ -209,6 +209,17 @@ Evidence: `docs/reports/domain-classifier-lineage-v1.json`.
 
 Evidence: focused Vitest output and `docs/reports/domain-classifier-lineage-v1.json`.
 
+## Admitted snapshot gate recheck (2026-09-19)
+
+- [x] Read-only source snapshot adapter proves the selected admitted registry
+      matches `24,456/24,456` usable snapshot entries.
+- [ ] Keep classifier training/export closed while the current worktree is
+      not byte-identical to that admitted snapshot (`492` content mismatches,
+      `8` missing files).
+
+Evidence: `.tmp/knowledge-source-snapshot-live-v1.json`,
+`docs/reports/domain-classifier-training-readiness-v1.json`.
+
 ## Current-cohort checkpoint admission recheck (2026-09-16)
 
 - [x] Added the read-only `scripts/atlas/plan-domain-classifier-cohort-admission-v1.mjs`
@@ -245,8 +256,12 @@ Evidence: `docs/reports/domain-classifier-cohort-admission-v1.json`.
   `DOMAIN_CLASSIFIER_TRAINING_READY_FALSE` because no operator-approved
   minimum corpus/class-coverage rule has been supplied. The current small
   fixture must not establish that threshold.
-- [ ] Keep the ACE caller unchanged until disagreements are reviewed. Do not
+- [x] Keep the ACE caller unchanged until disagreements are reviewed. Do not
   replace the existing checkpoint, promote labels, or write a training set.
+
+  Evidence: `docs/reports/domain-classifier-parity-review-v1.json`; all six
+  disagreements were reviewed, retained as non-promotional, and no caller,
+  checkpoint, or training dataset was changed.
 
 Evidence: `docs/reports/domain-classifier-parity-v1.json`,
 `sveltekit-frontend/src/lib/server/ace/features/domain-classifier-parity-v1.ts`.

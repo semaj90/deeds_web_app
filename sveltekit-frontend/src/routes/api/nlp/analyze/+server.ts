@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         passResults: analysis.pass_results ?? [],
         control5: analysis.control5 ?? null,
         experimentFeatureMatrix: analysis.experiment_feature_matrix ?? null,
-      });
+      }) as unknown as typeof eventHypergraph;
     } catch (error) {
       if (error instanceof HypergraphLineageUnavailableError) {
         return json({
@@ -83,7 +83,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       pass_results: analysis.pass_results ?? [],
       control5: analysis.control5 ?? null,
       experiment_feature_matrix: analysis.experiment_feature_matrix ?? null,
-      event_hypergraph: eventHypergraph,
+      event_hypergraph: eventHypergraph as unknown as Record<string, unknown>,
     },
   });
 };

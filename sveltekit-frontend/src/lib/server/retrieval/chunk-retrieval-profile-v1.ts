@@ -84,6 +84,40 @@ export interface DirectoryProfileV1 {
   featureRevision: string;
 }
 
+export interface DirectoryWeakPriorInputV1 {
+  baseScore: number;
+  directoryMatch: boolean;
+  domainMatch?: boolean;
+  exactSymbolOrIdentifierMatch?: boolean;
+}
+
+export interface DirectoryWeakPriorV1 {
+  adjustedScore: number;
+  adjustment: number;
+  independentLane: false;
+  bounded: true;
+  exactEvidenceProtected: boolean;
+}
+
+/**
+ * Applies directory/domain metadata as a bounded ranking hint only.
+ * It cannot create a lane, replace identity, or outrank exact evidence.
+ */
+export function applyDirectoryWeakPriorV1(input: DirectoryWeakPriorInputV1): DirectoryWeakPriorV1 {
+  if (!Number.isFinite(input.baseScore)) throw new Error('DirectoryWeakPriorV1 requires a finite base score');
+  const exactEvidenceProtected = input.exactSymbolOrIdentifierMatch === true;
+  const rawAdjustment = input.directoryMatch ? 0.02 : 0;
+  const domainAdjustment = input.domainMatch ? 0.01 : 0;
+  const adjustment = exactEvidenceProtected ? 0 : Math.min(0.03, rawAdjustment + domainAdjustment);
+  return {
+    adjustedScore: input.baseScore + adjustment,
+    adjustment,
+    independentLane: false,
+    bounded: true,
+    exactEvidenceProtected,
+  };
+}
+
 const DIRECTORY_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 function uuidV5(namespace: string, name: string): string {
   const namespaceBytes = Buffer.from(namespace.replaceAll('-', ''), 'hex');

@@ -1,0 +1,83 @@
+{
+  "schema": "atlas.ast-canary-readiness.v1",
+  "generatedAt": "2026-09-20T08:41:26.449Z",
+  "inputChecksums": {
+    "know09": "sha256:626b55c3fcc36ab0367a1a18f528bb74594ad94fb66314399e465f0dfbb2591c",
+    "sourceParity": "sha256:e9759191cf75cd2c847e30de957ad485ae5c498684eeae0dbf1f720704c724de",
+    "sourceWorktree": "sha256:dc91584b700bcccc220939f3980a477381560f099cab6a94b908f018d83a68c1",
+    "rehearsal": "sha256:e6b10b87a253ffb2c064bd9d44fb0b3108297d2b69d77b276fde1301734b8d12",
+    "offset": "sha256:1337568ec336bb52f9361c07a26d4405209bdc2f18e5eb1441f48f00d179454d",
+    "digest": "sha256:6317182828aa257fa63b82c108812e921dcc72bcc0bd1e17fe8f55d3c74b37d6",
+    "conflicts": "sha256:36c19268e3681d0314a9a9931cca730706e7d205ef94dd4e09f490101c7357bf",
+    "rekey": "sha256:5171f75ff5c337b5f8f0ae62dbaf5fa71ce92f45f9059f4a82dc521e4c2b7943"
+  },
+  "checks": [
+    {
+      "id": "ROLLBACK_REHEARSAL",
+      "passed": true,
+      "detail": "status=REHEARSAL_PROVEN; persistentRowsAdded=0"
+    },
+    {
+      "id": "BOM_OFFSET_BASIS",
+      "passed": true,
+      "detail": "BOM_OFFSET_BASIS_PROVEN"
+    },
+    {
+      "id": "CURRENT_WORKTREE_PARITY",
+      "passed": false,
+      "detail": "status=WAITING_ON_CURRENT_WORKTREE_PARITY; mismatches=645; missing=8; issueSampleOnly=true; dirty=117; notDirty=528"
+    },
+    {
+      "id": "DIGEST_DIVERGENCE_DISPOSITIONED",
+      "passed": true,
+      "detail": "divergentSources=2; disposition=DECLARED_AND_EXCLUDED"
+    },
+    {
+      "id": "STRUCTURAL_CONFLICTS_CLOSED",
+      "passed": false,
+      "detail": "structuralKeyConflicts=122"
+    },
+    {
+      "id": "REKEY_REHEARSAL",
+      "passed": true,
+      "detail": "status=REHEARSAL_PROVEN; planned=50; updated=50; persisted=false"
+    }
+  ],
+  "blockers": [
+    "CURRENT_WORKTREE_PARITY",
+    "STRUCTURAL_CONFLICTS_CLOSED"
+  ],
+  "retry": {
+    "blockerFingerprint": "sha256:2b2294da668fa86683b99a5c131f44e6d4eb183e62313c8da0d30d322f502792",
+    "allowed": false,
+    "reason": "UNCHANGED_BLOCKER_EVIDENCE_REQUIRES_STATE_CHANGE",
+    "retryWhen": [
+      "workspaceRevisionChanges",
+      "sourceSnapshotRevisionChanges",
+      "structuralConflictDispositionChanges"
+    ]
+  },
+  "status": "PERSISTENT_CANARY_BLOCKED",
+  "authorization": {
+    "persistentApplyAuthorized": false,
+    "operatorApprovalRequired": true,
+    "sourceAuthorityDecisionRequired": true,
+    "supersessionProposals": 0
+  },
+  "nextGate": {
+    "kind": "EXTERNAL_SOURCE_AUTHORITY_DECISION",
+    "status": "WAITING_ON_SOURCE_ADMISSION",
+    "options": [
+      "ADMIT_CURRENT_WORKTREE_AS_NEW_SOURCE_SNAPSHOT",
+      "RESTORE_OR_REGENERATE_FROM_ADMITTED_SNAPSHOT"
+    ],
+    "retryWhen": [
+      "workspaceRevisionChanges",
+      "sourceSnapshotRevisionChanges",
+      "structuralConflictDispositionChanges"
+    ],
+    "noAutomaticChoice": true
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

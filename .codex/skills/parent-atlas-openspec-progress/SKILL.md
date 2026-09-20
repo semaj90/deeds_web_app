@@ -35,6 +35,8 @@ The actionable audit is authoritative for queue shape, not for task authority:
 - treat `declaredSourceRef` and `declaredSourceRevision` as lineage metadata, not scheduling dependencies;
 - use `dependsOnTaskIds`, `requiresReceipts`, `blockerKey`, and `releaseEvent` for readiness;
 - treat lane labels and ranker/learned recommendations as navigation only.
+- for basename-only file fanout, prefer live worktree paths over archived or
+  orphaned snapshots; keep multiple live matches unresolved rather than guessing.
 
 On Windows, path arguments in test harnesses must use `fileURLToPath(import.meta.url)`; do not pass a raw URL pathname to Node as a filesystem path.
 

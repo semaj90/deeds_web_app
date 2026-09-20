@@ -107,13 +107,16 @@ if (requestedExecutionId) {
     writesPerformed?: boolean;
     canonicalAuthority?: boolean;
   };
+  const appliedReadback = preflight.status === 'OWNER_SELECTION_APPLIED_READBACK_VERIFIED'
+    && preflight.writesPerformed === false
+    && preflight.canonicalAuthority === true;
   const validated = preflight.selectedExecutionId === requestedExecutionId
-    && preflight.status === 'OWNER_SELECTION_VALIDATED_NOT_APPLIED'
+    && ['OWNER_SELECTION_VALIDATED_NOT_APPLIED', 'OWNER_SELECTION_APPLIED_READBACK_VERIFIED'].includes(preflight.status ?? '')
     && preflight.ownerPlanChecksum === currentOwnerPlanChecksum
     && preflight.candidateFound === true
     && preflight.candidate?.sourceMembershipExact === true
     && preflight.writesPerformed === false
-    && preflight.canonicalAuthority === false;
+    && (preflight.canonicalAuthority === false || appliedReadback);
   ownerSelection = {
     requestedExecutionId,
     preflightStatus: preflight.status ?? 'UNKNOWN',

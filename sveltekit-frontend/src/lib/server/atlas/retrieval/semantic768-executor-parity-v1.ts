@@ -99,7 +99,10 @@ export function assertSemantic768ExecutorParityV1(
     }
     requireChecksum(envelope.identityManifestChecksum, 'IDENTITY_MANIFEST_CHECKSUM');
     requireChecksum(envelope.matrixChecksum, 'MATRIX_CHECKSUM');
-    if (envelope.canonicalAuthority === true || envelope.writesPerformed === true) {
+    // Keep the runtime guard even though the static contract only permits
+    // false/undefined; receipts can arrive from untyped JSON boundaries.
+    const policy = envelope as { canonicalAuthority?: boolean; writesPerformed?: boolean };
+    if (policy.canonicalAuthority === true || policy.writesPerformed === true) {
       throw new Error(`SEMANTIC768_PARITY_MUTATION_POLICY:${envelope.executor}`);
     }
   }

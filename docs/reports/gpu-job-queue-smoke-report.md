@@ -1,7 +1,7 @@
 # Workstation GPU Job Mutex Queue Smoke Report
 
 ## Execution Summary
-- **Timestamp**: 2026-05-17T02:04:48.411Z
+- **Timestamp**: 2026-09-19T06:13:18.937Z
 - **Overall Result**: **PASS**
 
 ## Verification Checklist
@@ -17,9 +17,9 @@
 - **Job 1**: Started at 0ms, ran for 200ms.
 - **Job 2**: Attempted concurrent enqueue at 20ms.
 - **Result**: Queue held Job 2 until Job 1 released the lock. 
-  - Job 1 End: **1778983488626 ms**
-  - Job 2 Start: **1778983488627 ms**
-  - Delta: **1 ms** (Strictly non-overlapping).
+  - Job 1 End: **1789798399153 ms**
+  - Job 2 Start: **1789798399153 ms**
+  - Delta: **0 ms** (Strictly non-overlapping).
 
 ### 2. Final Queue Metrics
 - **Active Jobs**: 0

@@ -35,19 +35,30 @@ from typing import Any, AsyncGenerator, TypedDict
 import httpx
 import numpy as np
 import redis.asyncio as aioredis
-import torch
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query
 from collections import Counter
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from qdrant_client import AsyncQdrantClient
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
 log = logging.getLogger("langgraph-synthesis")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+
+
+def _gpu_status() -> dict[str, Any]:
+    """The orchestration container is intentionally CPU-only."""
+    return {"gpu": False, "gpu_name": None, "vram_free_mb": None}
+
+
+def _cosine_score(left: list[float], right: list[float]) -> float:
+    a = np.asarray(left, dtype=np.float32)
+    b = np.asarray(right, dtype=np.float32)
+    denominator = float(np.linalg.norm(a) * np.linalg.norm(b))
+    return float(np.dot(a, b) / denominator) if denominator else 0.0
 
 OLLAMA_URL         = os.environ.get("OLLAMA_URL",       "http://host.docker.internal:11434")
 LLAMA_SERVER_URL   = os.environ.get("LLAMA_SERVER_URL", "http://host.docker.internal:8090")
@@ -58,7 +69,7 @@ NEO4J_URI          = os.environ.get("NEO4J_URI",        "bolt://neo4j:7687")
 NEO4J_USER         = os.environ.get("NEO4J_USER",       "neo4j")
 NEO4J_PASSWORD     = os.environ.get("NEO4J_PASSWORD",   "password")
 SEARXNG_URL        = os.environ.get("SEARXNG_URL",      "http://searxng:8080")
-LLM_MODEL          = os.environ.get("LLM_MODEL",        "gemma4-legal-vlm:latest")
+LLM_MODEL          = os.environ.get("LLAMA_SERVER_MODEL", os.environ.get("LLM_MODEL", "ornith-1.5-9b"))
 EMBED_MODEL        = os.environ.get("EMBED_MODEL",      "embeddinggemma:latest")
 REPO_ROOT          = os.environ.get("REPO_ROOT",        "/workspace/repo")
 CONFIDENCE_THRESHOLD = float(os.environ.get("CONFIDENCE_THRESHOLD", "0.65"))
@@ -67,6 +78,20 @@ REDIS_L1_TTL       = 3600  # 1 hour — matches TS redis-exact-match.ts
 REDIS_KAG_PREFIX   = "langgraph:kag:neighbors:"  # pre-warm cache written by Colab Cell 11
 REDIS_KAG_TTL      = 86_400  # 24 h — refreshed by nightly Colab run
 BIFROST_THRESHOLD  = float(os.environ.get("BIFROST_THRESHOLD", "0.80"))
+# Read-only projection mapping. Named-vector Qdrant collections reject an
+# unnamed query; this adapter mapping does not establish collection authority.
+RAG_COLLECTION_VECTORS = {
+    "legal_documents": "content",
+    "evidence_items": "content",
+    "chat_messages": "message",
+}
+LANGGRAPH_CHECKPOINT_ENABLED = os.environ.get("LANGGRAPH_CHECKPOINT_ENABLED", "false").lower() == "true"
+LANGGRAPH_CHECKPOINT_SETUP = os.environ.get("LANGGRAPH_CHECKPOINT_SETUP", "false").lower() == "true"
+LANGGRAPH_STRICT_MSGPACK = os.environ.get("LANGGRAPH_STRICT_MSGPACK", "true").lower() == "true"
+LANGGRAPH_CHECKPOINT_SCHEMA = os.environ.get("LANGGRAPH_CHECKPOINT_SCHEMA", "langgraph_py")
+DATABASE_URL       = os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/deeds")
+LANGGRAPH_ENV       = os.environ.get("NODE_ENV", os.environ.get("ENVIRONMENT", "development")).lower()
+LANGGRAPH_INTERNAL_API_KEY = os.environ.get("LANGGRAPH_INTERNAL_API_KEY", "").strip()
 
 
 class LlamaServerChat:
@@ -93,7 +118,7 @@ class LlamaServerChat:
     async def ainvoke(self, messages: list[dict[str, str]]):
         async with httpx.AsyncClient(timeout=120) as client:
             response = await client.post(
-                f"{self.base_url}/v1/chat/completions",
+                f"{self.base_url if self.base_url.endswith('/v1') else self.base_url + '/v1'}/chat/completions",
                 json={
                     "model": self.model,
                     "messages": self._messages(messages),
@@ -110,7 +135,7 @@ class LlamaServerChat:
         async with httpx.AsyncClient(timeout=120) as client:
             async with client.stream(
                 "POST",
-                f"{self.base_url}/v1/chat/completions",
+                f"{self.base_url if self.base_url.endswith('/v1') else self.base_url + '/v1'}/chat/completions",
                 json={
                     "model": self.model,
                     "messages": self._messages(messages),
@@ -136,6 +161,22 @@ class LlamaServerChat:
 # ── FastAPI ───────────────────────────────────────────────────────────────────
 
 app = FastAPI(title="LangGraph Synthesis", version="2.0.0")
+
+
+def _require_internal_auth(
+    authorization: str | None,
+    x_api_key: str | None,
+) -> None:
+    """Protect synthesis while keeping health endpoints probeable."""
+    if not LANGGRAPH_INTERNAL_API_KEY:
+        if LANGGRAPH_ENV == "production":
+            raise HTTPException(status_code=503, detail="LangGraph internal authentication is not configured")
+        return
+    supplied = x_api_key or ""
+    if authorization and authorization.lower().startswith("bearer "):
+        supplied = authorization[7:].strip()
+    if supplied != LANGGRAPH_INTERNAL_API_KEY:
+        raise HTTPException(status_code=401, detail="LangGraph internal authentication required")
 
 # ── Lazy singletons ───────────────────────────────────────────────────────────
 
@@ -612,10 +653,14 @@ async def node_retrieve_rag(state: SynthesisState) -> dict:
     qdrant = await get_qdrant()
     embedding = await embed_query(state["query"])
     hits: list[dict] = []
-    for collection in ("legal_documents", "evidence_items", "chat_messages"):
+    for collection, vector_name in RAG_COLLECTION_VECTORS.items():
         try:
             results = await qdrant.query_points(
-                collection_name=collection, query=embedding, limit=5, with_payload=True,
+                collection_name=collection,
+                query=embedding,
+                using=vector_name,
+                limit=5,
+                with_payload=True,
             )
             for pt in results.points:
                 p = pt.payload or {}
@@ -627,7 +672,7 @@ async def node_retrieve_rag(state: SynthesisState) -> dict:
                     "source": collection,
                 })
         except Exception as exc:
-            log.debug(f"[rag] {collection}: {exc}")
+            log.warning("[rag] collection=%s vector=%s unavailable: %s", collection, vector_name, exc)
     hits.sort(key=lambda h: h["score"], reverse=True)
     return {"rag_hits": hits[:10]}
 
@@ -731,7 +776,7 @@ def _should_retry(state: SynthesisState) -> str:
 # Build graph
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def _build_graph(lg_cache: Any | None = None) -> Any:
+def _build_graph(lg_cache: Any | None = None, checkpointer: Any | None = None) -> Any:
     """
     Build and compile the LangGraph synthesis DAG.
 
@@ -771,9 +816,11 @@ def _build_graph(lg_cache: Any | None = None) -> Any:
     g.add_edge("retrieve_rag",  "web_search")
     g.add_edge("retrieve_rag",  "rg_search")
     g.add_edge("retrieve_kag",  "tag_chunks")
-    g.add_edge("tag_chunks",    "assemble_ace")
-    g.add_edge("web_search",    "assemble_ace")
-    g.add_edge("rg_search",     "assemble_ace")
+    # Explicit fan-in barrier: assemble only after the tagged RAG, web, and
+    # local-code branches have all completed.  Independent edges here allow
+    # multiple assemble/synthesize executions in one LangGraph step, which
+    # violates LastValue ownership for llm_response.
+    g.add_edge(["tag_chunks", "web_search", "rg_search"], "assemble_ace")
     g.add_edge("assemble_ace",  "merge")
     g.add_edge("merge",         "synthesize")
     g.add_edge("synthesize",    "self_eval")
@@ -782,12 +829,88 @@ def _build_graph(lg_cache: Any | None = None) -> Any:
     compile_kwargs: dict = {}
     if lg_cache is not None:
         compile_kwargs["cache"] = lg_cache
+    if checkpointer is not None:
+        compile_kwargs["checkpointer"] = checkpointer
     return g.compile(**compile_kwargs)
 
 
 # ── Lazy graph singleton — wired with RedisCache in startup handler ───────────
 
 _graph: Any | None = None
+_checkpoint_pool: Any | None = None
+_checkpoint_status: dict[str, Any] = {
+    "enabled": LANGGRAPH_CHECKPOINT_ENABLED,
+    "status": "disabled" if not LANGGRAPH_CHECKPOINT_ENABLED else "not_initialized",
+    "schema": LANGGRAPH_CHECKPOINT_SCHEMA,
+    "setup_performed": False,
+}
+
+
+async def _build_optional_checkpointer() -> Any | None:
+    """Create durable thread state only when explicitly enabled.
+
+    RedisCache remains an ephemeral node-output cache. This checkpointer is a
+    separate, opt-in capability and never becomes source/packet authority.
+    Automatic schema setup is disabled unless LANGGRAPH_CHECKPOINT_SETUP=true.
+    """
+    global _checkpoint_pool, _checkpoint_status
+    if not LANGGRAPH_CHECKPOINT_ENABLED:
+        return None
+    try:
+        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", LANGGRAPH_CHECKPOINT_SCHEMA):
+            _checkpoint_status["status"] = "invalid_schema"
+            _checkpoint_status["error"] = "LANGGRAPH_CHECKPOINT_SCHEMA_INVALID"
+            return None
+        from psycopg import AsyncConnection
+        from psycopg.rows import dict_row
+        from psycopg_pool import AsyncConnectionPool
+        from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+
+        probe = await AsyncConnection.connect(
+            DATABASE_URL,
+            autocommit=True,
+            row_factory=dict_row,
+            options=f"-c search_path={LANGGRAPH_CHECKPOINT_SCHEMA}",
+            connect_timeout=3,
+        )
+        await probe.close()
+        _checkpoint_pool = AsyncConnectionPool(
+            conninfo=DATABASE_URL,
+            min_size=1,
+            max_size=5,
+            open=False,
+            timeout=3.0,
+            reconnect_timeout=3.0,
+            kwargs={"autocommit": True, "prepare_threshold": 0, "row_factory": dict_row, "options": f"-c search_path={LANGGRAPH_CHECKPOINT_SCHEMA}"},
+        )
+        await _checkpoint_pool.open()
+        # langgraph-checkpoint-postgres 3.0.x owns its table names in the
+        # connection's default schema; do not pretend this is Drizzle/shim
+        # schema ownership.
+        checkpointer = AsyncPostgresSaver(_checkpoint_pool)
+        if LANGGRAPH_CHECKPOINT_SETUP:
+            await checkpointer.setup()
+            _checkpoint_status["setup_performed"] = True
+            _checkpoint_status["status"] = "ready"
+        else:
+            try:
+                await checkpointer.aget_tuple({"configurable": {"thread_id": "__atlas_checkpoint_readiness__"}})
+                _checkpoint_status["status"] = "ready_existing"
+            except Exception as exc:
+                _checkpoint_status["status"] = "setup_required"
+                _checkpoint_status["error"] = str(exc)
+                await _checkpoint_pool.close()
+                _checkpoint_pool = None
+                return None
+        return checkpointer
+    except Exception as exc:
+        _checkpoint_status["status"] = "unavailable"
+        _checkpoint_status["error"] = str(exc)
+        log.error("[startup] LangGraph Postgres checkpointer unavailable: %s", exc)
+        if _checkpoint_pool is not None:
+            await _checkpoint_pool.close()
+            _checkpoint_pool = None
+        return None
 
 
 async def _hmm_adapt_startup() -> None:
@@ -896,10 +1019,36 @@ async def _startup_graph() -> None:
         log.info("[startup] LangGraph compiled with RedisCache (prefix=langgraph:cache:)")
     except Exception as exc:
         log.warning(f"[startup] LangGraph RedisCache unavailable — compiling without KV cache: {exc}")
+    checkpointer = await _build_optional_checkpointer()
     _graph, _ = await asyncio.gather(
-        asyncio.to_thread(_build_graph, lg_cache),
+        asyncio.to_thread(_build_graph, lg_cache, checkpointer),
         _hmm_adapt_startup(),
     )
+
+
+@app.on_event("shutdown")
+async def _shutdown_graph() -> None:
+    global _checkpoint_pool
+    if _checkpoint_pool is not None:
+        await _checkpoint_pool.close()
+        _checkpoint_pool = None
+
+
+@app.get("/health/summary")
+async def health_summary() -> dict:
+    return {
+        "status": "ok",
+        "service": "langgraph-synthesis",
+        "chat_owner": "llama-server",
+        "chat_url": LLAMA_SERVER_URL,
+        "chat_model": LLM_MODEL,
+        "embedding_owner": "ollama",
+        "embedding_url": OLLAMA_URL,
+        "langgraph_strict_msgpack": LANGGRAPH_STRICT_MSGPACK,
+        "internal_auth": "configured" if LANGGRAPH_INTERNAL_API_KEY else ("required_missing" if LANGGRAPH_ENV == "production" else "development_optional"),
+        "gpu": _gpu_status(),
+        "langgraph_checkpoint": dict(_checkpoint_status),
+    }
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Request/Response models
@@ -908,6 +1057,7 @@ async def _startup_graph() -> None:
 class SynthesizeRequest(BaseModel):
     query: str
     case_id: str | None = None
+    thread_id: str | None = Field(default=None, max_length=255)
     temperature: float = 0.3
     max_tokens: int = 1024
     skip_cache: bool = False
@@ -917,9 +1067,19 @@ class SynthesizeRequest(BaseModel):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @app.post("/synthesize")
-async def synthesize(req: SynthesizeRequest) -> dict:
+async def synthesize(
+    req: SynthesizeRequest,
+    authorization: str | None = Header(default=None),
+    x_api_key: str | None = Header(default=None),
+) -> dict:
+    _require_internal_auth(authorization, x_api_key)
     trace_id = str(uuid.uuid4())
     t0 = time.perf_counter()
+    if LANGGRAPH_CHECKPOINT_ENABLED and _checkpoint_status["status"] not in {"ready", "ready_existing"}:
+        raise HTTPException(status_code=503, detail="LangGraph checkpointing is enabled but not ready")
+    if LANGGRAPH_CHECKPOINT_ENABLED and not req.thread_id:
+        raise HTTPException(status_code=400, detail="thread_id is required when LangGraph checkpointing is enabled")
+    thread_id = req.thread_id or f"ephemeral:{trace_id}"
 
     messages = [{"role": "user", "content": req.query}]
     cache_key = _l1_key(LLM_MODEL, messages, req.temperature, req.max_tokens)
@@ -960,8 +1120,9 @@ async def synthesize(req: SynthesizeRequest) -> dict:
     }
 
     try:
-        result = await graph.ainvoke(initial)
+        result = await graph.ainvoke(initial, config={"configurable": {"thread_id": thread_id}})
     except Exception as exc:
+        log.exception("[synthesize] graph execution failed")
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     answer = result["llm_response"]
@@ -971,16 +1132,13 @@ async def synthesize(req: SynthesizeRequest) -> dict:
 
     citations = build_citations(result["rag_hits"])
 
-    # GRPO reward: PyTorch cosine similarity between query and answer embeddings.
+    # Reward diagnostic: CPU NumPy cosine similarity between query and answer embeddings.
     # Provides a scalar reward ∈ [-1, 1] for GRPO fine-tuning of the synthesis model.
     grpo_reward_score: float | None = None
     try:
-        import torch.nn.functional as F
         q_emb = await embed_query(req.query)
         a_emb = await embed_query(answer[:512])
-        q_t = torch.tensor(q_emb, dtype=torch.float32).unsqueeze(0)
-        a_t = torch.tensor(a_emb, dtype=torch.float32).unsqueeze(0)
-        grpo_reward_score = float(F.cosine_similarity(q_t, a_t).item())
+        grpo_reward_score = _cosine_score(q_emb, a_emb)
     except Exception as exc:
         log.debug(f"[grpo] reward compute skipped: {exc}")
 
@@ -1002,13 +1160,20 @@ async def synthesize(req: SynthesizeRequest) -> dict:
         "citations": citations,
         "latency_ms": round((time.perf_counter() - t0) * 1000),
         "trace_id": trace_id,
-        "gpu": torch.cuda.is_available(),
+        "thread_id": thread_id,
+        "checkpoint": _checkpoint_status["status"],
+        "gpu": False,
     }
 
 
 @app.post("/synthesize/stream")
-async def synthesize_stream(req: SynthesizeRequest) -> StreamingResponse:
+async def synthesize_stream(
+    req: SynthesizeRequest,
+    authorization: str | None = Header(default=None),
+    x_api_key: str | None = Header(default=None),
+) -> StreamingResponse:
     """SSE streaming: emits stage events then streamed LLM tokens."""
+    _require_internal_auth(authorization, x_api_key)
 
     async def generate() -> AsyncGenerator[str, None]:
         trace_id = str(uuid.uuid4())
@@ -1041,13 +1206,20 @@ async def synthesize_stream(req: SynthesizeRequest) -> StreamingResponse:
         rag_hits: list[dict] = []
         for col in ("legal_documents", "evidence_items"):
             try:
-                res = await qdrant.query_points(col, query=embedding, limit=5, with_payload=True)
+                res = await qdrant.query_points(
+                    collection_name=col,
+                    query=embedding,
+                    using=RAG_COLLECTION_VECTORS[col],
+                    limit=5,
+                    with_payload=True,
+                )
                 for pt in res.points:
                     p = pt.payload or {}
                     rag_hits.append({"score": pt.score, "text": p.get("chunk_text","")[:400],
                                      "title": p.get("title",""), "id": str(pt.id)})
-            except Exception:
-                pass
+            except Exception as exc:
+                yield f"data: {json.dumps({'stage':'rag','status':'degraded','collection':col,'reason':'projection_unavailable'})}\n\n"
+                log.warning("[stream-rag] collection=%s vector=%s unavailable: %s", col, RAG_COLLECTION_VECTORS[col], exc)
         rag_hits.sort(key=lambda h: h["score"], reverse=True)
         # Tag chunks inline (pure numpy, <1ms per chunk — safe in streaming path)
         rag_hits = [{**h, **_hmm.tag_chunk(h.get("text", ""))} for h in rag_hits]
@@ -1092,12 +1264,9 @@ async def synthesize_stream(req: SynthesizeRequest) -> StreamingResponse:
         citations = build_citations(rag_hits)
         grpo_reward_score: float | None = None
         try:
-            import torch.nn.functional as F
             q_emb = await embed_query(req.query)
             a_emb = await embed_query(full_text[:512])
-            q_t = torch.tensor(q_emb, dtype=torch.float32).unsqueeze(0)
-            a_t = torch.tensor(a_emb, dtype=torch.float32).unsqueeze(0)
-            grpo_reward_score = float(F.cosine_similarity(q_t, a_t).item())
+            grpo_reward_score = _cosine_score(q_emb, a_emb)
         except Exception:
             pass
         yield f"data: {json.dumps({'stage':'done','confidence':confidence,'trace_id':trace_id,'cache':'L3-langgraph','kag_source':kag_source,'citations':citations,'grpo_reward_score':grpo_reward_score})}\n\n"
@@ -1106,7 +1275,11 @@ async def synthesize_stream(req: SynthesizeRequest) -> StreamingResponse:
 
 
 @app.get("/cache/stats")
-async def cache_stats() -> dict:
+async def cache_stats(
+    authorization: str | None = Header(default=None),
+    x_api_key: str | None = Header(default=None),
+) -> dict:
+    _require_internal_auth(authorization, x_api_key)
     try:
         redis = await get_redis()
         keys: list[str] = []
@@ -1128,7 +1301,12 @@ async def cache_stats() -> dict:
 
 
 @app.delete("/cache/key")
-async def cache_delete(key: str = Query(..., description="Full Redis key to delete")) -> dict:
+async def cache_delete(
+    key: str = Query(..., description="Full Redis key to delete"),
+    authorization: str | None = Header(default=None),
+    x_api_key: str | None = Header(default=None),
+) -> dict:
+    _require_internal_auth(authorization, x_api_key)
     try:
         redis = await get_redis()
         deleted = await redis.delete(key)
@@ -1142,9 +1320,7 @@ async def health() -> dict:
     checks: dict[str, Any] = {
         "service": "langgraph-synthesis",
         "version": "2.0.0",
-        "gpu": torch.cuda.is_available(),
-        "gpu_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
-        "vram_free_mb": round(torch.cuda.mem_get_info()[0] / 1024**2) if torch.cuda.is_available() else None,
+        **_gpu_status(),
     }
 
     async def ping(name: str, coro: Any) -> None:
@@ -1185,9 +1361,11 @@ async def health() -> dict:
         checks["rg_available"] = subprocess.run(["rg", "--version"], capture_output=True).returncode == 0
     except FileNotFoundError:
         checks["rg_available"] = False
+    # This container is intentionally CPU-only.  `gpu: false` describes the
+    # executor boundary and must not turn an otherwise healthy dependency
+    # service into a degraded readiness result.
     checks["status"] = "ok" if all(
-        v in ("ok", True) for k, v in checks.items()
-        if k in ("qdrant", "redis", "ollama", "gpu")
+        checks.get(k) in ("ok", True) for k in ("qdrant", "redis", "ollama")
     ) else "degraded"
     return checks
 
@@ -1197,7 +1375,11 @@ async def health() -> dict:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/hmm/stats")
-async def hmm_stats() -> dict:
+async def hmm_stats(
+    authorization: str | None = Header(default=None),
+    x_api_key: str | None = Header(default=None),
+) -> dict:
+    _require_internal_auth(authorization, x_api_key)
     """
     Return current HMM emission state for debugging and QLoRA context audit.
     Shows which words have been up-weighted by corpus adaptation vs. the hard prior.
@@ -1222,7 +1404,11 @@ async def hmm_stats() -> dict:
 
 
 @app.post("/hmm/adapt")
-async def hmm_adapt_endpoint() -> dict:
+async def hmm_adapt_endpoint(
+    authorization: str | None = Header(default=None),
+    x_api_key: str | None = Header(default=None),
+) -> dict:
+    _require_internal_auth(authorization, x_api_key)
     """
     Manual trigger: run full 2-source adaptation (Qdrant + PostgreSQL) and persist.
     Equivalent to a fresh startup adaptation — use after ingesting new documents.

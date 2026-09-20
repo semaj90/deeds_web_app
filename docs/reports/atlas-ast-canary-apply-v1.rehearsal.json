@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.ast-canary-apply.v1",
+  "generatedAt": "2026-09-20T08:15:52.337Z",
+  "mode": "REHEARSAL_ROLLBACK",
+  "limit": 50,
+  "bindings": {
+    "parserName": "ast-grep-napi",
+    "grammarVersion": null,
+    "sourceTextEncodingRevision": "SOURCE-TEXT-ENCODING-01",
+    "offsetBasis": "UTF8_PARSER_BUFFER_V1",
+    "lineBasis": "ONE_BASED_STORAGE",
+    "identityConvention": "file(ROOT)->declaration(parent=file)->method(parent=class)"
+  },
+  "steps": {
+    "proof": {
+      "candidatesInput": ".tmp\\atlas\\ast-declaration-candidates-current-v1.jsonl",
+      "gates": {
+        "AST_BF_11_PATH_POLICY": "PASS",
+        "AST_BF_12_COLLISION": "PASS_WITH_EXCLUSIONS",
+        "AST_BF_13_SCOPE": "PASS",
+        "AST_BF_14_PARENT_PLAN": "PASS_WITH_DEFERRED",
+        "AST_BF_15_LINEAGE": "PASS_PARTIAL",
+        "AST_BF_16_REPLAY": "PASS"
+      },
+      "canaryEligibleRows": 21530
+    },
+    "selection": {
+      "eligibleRows": 21530,
+      "usableRows": 21412,
+      "droppedUnresolvableParent": 118,
+      "externalParentsExisting": 716,
+      "filesPicked": 14,
+      "rowsPicked": 50,
+      "includesTwoPhaseFile": true,
+      "twoPhaseFile": "src/lib/ai/base64-fp32-quantizer.ts"
+    },
+    "writeTimeDigestCheck": {
+      "filesChecked": 14,
+      "skippedDiverged": [],
+      "skippedMissing": [],
+      "skippedNoRawRef": [],
+      "filesRemaining": 14
+    },
+    "before": {
+      "existingRows": 11273
+    },
+    "write": {
+      "inserted": 50,
+      "expectedRows": 50,
+      "writerVsProofIdMismatch": 0
+    },
+    "readback": {
+      "parity": {
+        "treeNodeId": "50/50",
+        "note": "per-field mismatches listed in sampleMismatches"
+      },
+      "persistentRowsAdded": 0,
+      "rowsRead": 50,
+      "fieldMismatches": 0,
+      "sampleMismatches": [],
+      "orphanParents": 0,
+      "rowsInTableInsideTxn": 11323
+    },
+    "constraintCheck": "PASS (SET CONSTRAINTS ALL IMMEDIATE)",
+    "after": {
+      "rowsInTable": 11273,
+      "persisted": false,
+      "expectedRowsInTable": 11273
+    }
+  },
+  "errors": [],
+  "status": "REHEARSAL_PROVEN"
+}

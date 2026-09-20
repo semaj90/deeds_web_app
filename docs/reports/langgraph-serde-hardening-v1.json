@@ -1,0 +1,86 @@
+{
+  "schema": "atlas.langgraph-serde-hardening-audit.v1",
+  "generatedAt": "2026-09-20T07:47:45.255Z",
+  "inputChecksum": "sha256:dcee34b919dcd1928916aa5a719946c0f1482a53e3b2198f635186c39058cbca",
+  "packagePins": {
+    "langchain": "1.2.11",
+    "langgraph": "1.2.11",
+    "checkpoint": "4.2.0",
+    "checkpointPostgres": "3.1.2"
+  },
+  "checks": [
+    {
+      "id": "LANGGRAPH_VERSION_FLOOR",
+      "status": "PASS",
+      "detail": "langgraph=1.2.11; minimum security floor=1.0.10"
+    },
+    {
+      "id": "LANGCHAIN_GRAPH_COMPATIBILITY",
+      "status": "PASS",
+      "detail": "langchain=1.2.11 requires a compatible langgraph 1.1.x–1.2.x range; langgraph=1.2.11"
+    },
+    {
+      "id": "CHECKPOINT_VERSION_FLOOR",
+      "status": "PASS",
+      "detail": "langgraph-checkpoint=4.2.0; minimum security floor=4.1.1"
+    },
+    {
+      "id": "CHECKPOINT_POSTGRES_PINNED",
+      "status": "PASS",
+      "detail": "langgraph-checkpoint-postgres=3.1.2"
+    },
+    {
+      "id": "STRICT_MSGPACK_DEFAULT",
+      "status": "PASS",
+      "detail": "strict msgpack is enabled by default in the service source"
+    },
+    {
+      "id": "STRICT_MSGPACK_COMPOSED",
+      "status": "PASS",
+      "detail": "compose preserves strict msgpack unless an operator explicitly overrides it"
+    },
+    {
+      "id": "CHECKPOINT_NAMESPACE_ISOLATED",
+      "status": "PASS",
+      "detail": "Python checkpoint state defaults to the separate langgraph_py namespace"
+    },
+    {
+      "id": "CHECKPOINT_SETUP_OPT_IN",
+      "status": "PASS",
+      "detail": "checkpoint schema setup remains an explicit operator-controlled action"
+    },
+    {
+      "id": "THREAD_ID_REQUIRED",
+      "status": "PASS",
+      "detail": "enabled checkpointing requires thread_id for workflow identity"
+    },
+    {
+      "id": "NO_PICKLE_FALLBACK_OPT_IN",
+      "status": "PASS",
+      "detail": "service source does not enable permissive pickle or module allowlists"
+    },
+    {
+      "id": "CPU_ORCHESTRATOR_IMAGE",
+      "status": "PASS",
+      "detail": "LangGraph remains a CPU orchestration image; GPU executors stay in sidecars"
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "passed": 11,
+    "failed": 0,
+    "status": "STATIC_HARDENING_PROVEN"
+  },
+  "runtimeSmoke": {
+    "status": "NOT_RUN",
+    "reason": "Static audit does not install packages or start the container."
+  },
+  "checkpoint": {
+    "namespace": "langgraph_py",
+    "setup": "explicit opt-in",
+    "threadIdRequiredWhenEnabled": true,
+    "canonicalAuthority": false
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

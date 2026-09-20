@@ -104,6 +104,146 @@ class AtlasComputeReferenceTests(unittest.TestCase):
         # Rows 1 and 2 are symmetric after selecting 0 and 3; ordinal 1 wins.
         self.assertEqual(first[2], 1)
 
+    @staticmethod
+    def _feature_task(index: int, **features: tuple) -> dict:
+        """Build a workboard task with a presence-masked featureVector: name=(value, basis) or None (absent)."""
+        cells = {}
+        for name, spec in features.items():
+            cells[name] = (
+                {"present": False, "value": 0, "basis": "ABSENT"}
+                if spec is None
+                else {"present": True, "value": spec[0], "basis": spec[1]}
+            )
+        return {"id": f"t{index}", "featureVector": {"schema": "atlas.workboard-feature-vector.v1", "features": cells}}
+
+    def _run_task_recommendation(self, tasks: list[dict], *extra_args: str) -> dict:
+        import json
+        import subprocess
+        import sys
+        import tempfile
+        from pathlib import Path
+
+        script = Path(__file__).resolve().parent / "build_low_rank_task_recommendation_v2.py"
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "workboard.json"
+            output = Path(tmp) / "out.json"
+            source.write_text(json.dumps({"semanticChecksum": "test", "tasks": tasks}), encoding="utf-8")
+            completed = subprocess.run(
+                [sys.executable, str(script), "--input", str(source), "--output", str(output), *extra_args],
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            return json.loads(output.read_text(encoding="utf-8"))
+
+    def test_task_recommendation_is_deterministic_and_non_authoritative(self) -> None:
+        tasks = [
+            self._feature_task(
+                i,
+                goalRank=((i % 5) * 10, "DERIVED"),
+                selectionEligible=(i % 2, "DERIVED"),
+                estimatedMinutes=(10 + (i * 7) % 40, "OBSERVED"),
+                unblocksGateCount=((i * 5) % 6, "OBSERVED"),
+            )
+            for i in range(40)
+        ]
+        first = self._run_task_recommendation(tasks)
+        second = self._run_task_recommendation(tasks)
+        self.assertEqual(first["status"], "OK")
+        self.assertEqual(first["outputChecksum"], second["outputChecksum"])
+        self.assertFalse(first["canonicalAuthority"])
+        self.assertFalse(first["eligibleForAuthority"])
+        self.assertEqual(sorted(item["id"] for item in first["tasks"]), sorted(task["id"] for task in tasks))
+        self.assertEqual([item["rank"] for item in first["tasks"]], list(range(1, 41)))
+        self.assertEqual(first["featuresUsedByDeterministicRank"], ["goalRank"])
+
+    def test_task_recommendation_refuses_single_varying_feature(self) -> None:
+        tasks = [
+            self._feature_task(i, goalRank=((i % 3) * 10, "DERIVED"), estimatedMinutes=(15, "OBSERVED"), risk=None)
+            for i in range(12)
+        ]
+        report = self._run_task_recommendation(tasks)
+        self.assertEqual(report["status"], "DEGENERATE_INSUFFICIENT_FEATURE_VARIANCE")
+        self.assertEqual(report["tasks"], [])
+        reasons = {f["name"]: f["reason"] for f in report["featuresRejected"]}
+        self.assertEqual(reasons["estimatedMinutes"], "NO_VARIANCE")
+        self.assertEqual(reasons["risk"], "ABSENT_EVERYWHERE")
+
+    def test_task_recommendation_ignores_legacy_scalar_defaults(self) -> None:
+        # Legacy scalar fields (adapter defaults) must never be read as observations.
+        tasks = [
+            {"id": f"t{i}", "goalRank": i % 5, "estimatedMinutes": 10 + (i * 7) % 40, "risk": (i * 3) % 4}
+            for i in range(30)
+        ]
+        report = self._run_task_recommendation(tasks)
+        self.assertEqual(report["status"], "DEGENERATE_INSUFFICIENT_FEATURE_VARIANCE")
+        self.assertEqual(report["featuresUsed"], [])
+
+    def test_task_recommendation_excludes_weak_basis_unless_opted_in(self) -> None:
+        tasks = [
+            self._feature_task(
+                i,
+                goalRank=((i % 5) * 10, "DERIVED"),
+                sourceAgeSeconds=((i * 37) % 1000, "PROXY"),
+                mutationRisk=(i % 2, "HEURISTIC"),
+            )
+            for i in range(40)
+        ]
+        default = self._run_task_recommendation(tasks)
+        self.assertEqual(default["status"], "DEGENERATE_INSUFFICIENT_FEATURE_VARIANCE")
+        weak = {f["name"]: f["reason"] for f in default["featuresRejected"] if f["reason"].startswith("UNQUALIFIED")}
+        self.assertEqual(set(weak), {"sourceAgeSeconds", "mutationRisk"})
+        opted = self._run_task_recommendation(tasks, "--include-weak-basis")
+        self.assertEqual(opted["status"], "OK")
+        self.assertEqual(set(opted["featuresUsed"]), {"goalRank", "sourceAgeSeconds", "mutationRisk"})
+
+    def test_task_recommendation_rejects_sparse_features(self) -> None:
+        tasks = [
+            self._feature_task(
+                i,
+                goalRank=((i % 5) * 10, "DERIVED"),
+                selectionEligible=(i % 2, "DERIVED"),
+                affectedFileCount=((i, "OBSERVED") if i < 5 else None),
+            )
+            for i in range(40)
+        ]
+        report = self._run_task_recommendation(tasks)
+        sparse = {f["name"]: f["reason"] for f in report["featuresRejected"] if f["name"] == "affectedFileCount"}
+        self.assertEqual(sparse["affectedFileCount"], "PRESENT_ON_TOO_FEW_TASKS")
+        self.assertEqual(report["status"], "OK")
+
+    def test_task_recommendation_rejects_near_constant_feature(self) -> None:
+        # 3 outliers among 1,000 tasks: many distinct values is not the same as informative.
+        tasks = [
+            self._feature_task(
+                i,
+                goalRank=((i % 5) * 10, "DERIVED"),
+                selectionEligible=(i % 2, "DERIVED"),
+                prerequisiteCount=((1 if i < 3 else 0), "TEXT_DERIVED"),
+            )
+            for i in range(1000)
+        ]
+        report = self._run_task_recommendation(tasks, "--include-weak-basis")
+        reasons = {f["name"]: f["reason"] for f in report["featuresRejected"] if f["present"]}
+        self.assertEqual(reasons["prerequisiteCount"], "NEAR_CONSTANT")
+        self.assertNotIn("prerequisiteCount", report["featuresUsed"])
+
+    def test_task_recommendation_text_derived_needs_opt_in(self) -> None:
+        tasks = [
+            self._feature_task(
+                i,
+                goalRank=((i % 5) * 10, "DERIVED"),
+                selectionEligible=(i % 2, "DERIVED"),
+                specLineCount=(1 + (i * 13) % 50, "TEXT_DERIVED"),
+            )
+            for i in range(60)
+        ]
+        default = self._run_task_recommendation(tasks)
+        self.assertNotIn("specLineCount", default["featuresUsed"])
+        rejected = {f["name"]: f["reason"] for f in default["featuresRejected"] if f["present"]}
+        self.assertEqual(rejected["specLineCount"], "UNQUALIFIED_BASIS:TEXT_DERIVED")
+        opted = self._run_task_recommendation(tasks, "--include-weak-basis")
+        self.assertIn("specLineCount", opted["featuresUsed"])
+
 
 if __name__ == "__main__":
     unittest.main()

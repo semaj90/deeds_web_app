@@ -4516,6 +4516,13 @@ Postgres, Qdrant, Redis, or Neo4j.
 
 ## AST-ID-06: active-repository scope and path policy (2026-08-25)
 
+**2026-09-20 — `DECISIONS_FROZEN_FOR_DRY_RUN` (operator decision relayed in-session; authorizes a bounded read-only dry-run ONLY, NOT a database apply).**
+`path_policy=ACTIVE_APP_RELATIVE_V1` (canonical `src/...`; original raw path preserved as provenance, never identity; binding lookups use the revisioned `sveltekit-frontend/` alias) ·
+`lookup_case_policy=LOWERCASE_DERIVED_KEY` + `case_collision_policy=FAIL_CLOSED` (original `source_ref` kept; no bulk repair, live table has 0 collisions) ·
+`extraction_scope`: file/class INCLUDE, method/function INCLUDE_SECOND_PASS, `parent_binding=TWO_PHASE` (Phase A deterministic ids, Phase B parent resolution; production must not write NULL parents for class children — AST_BF_08) ·
+`active_scope`: current `src/...` ADMIT; vendored + legacy tree EXCLUDE (archival/reference only); foreign absolute-path cohort (3,498 `treesitter-chunker` rows) QUARANTINE_SUPERSEDED, never re-keyed or deleted.
+Next gates (dry-run, AST_BF_11..16): path policy, collision, scope, parent plan, lineage, replay checksum. Apply stays blocked until all pass and the operator approves a canary.
+
 - [x] Added opt-in prefix exclusions to
   `scripts/atlas/audit-graphify-ast-scope.mjs`; the default scope remains
   unchanged. The explicit active-repository dry-run excludes the legacy root

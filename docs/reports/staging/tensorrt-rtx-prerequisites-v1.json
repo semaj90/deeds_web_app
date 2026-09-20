@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.tensorrt-rtx-prerequisites.v1",
+  "capturedAt": "2026-09-20T07:14:54.868Z",
+  "gpu": {
+    "available": true,
+    "output": "NVIDIA GeForce RTX 3060 Ti, 8.6, 580.88, 8192 MiB"
+  },
+  "cuda": {
+    "available": true,
+    "output": "nvcc: NVIDIA (R) Cuda compiler driver\r\nCopyright (c) 2005-2025 NVIDIA Corporation\r\nBuilt on Wed_Jul_16_20:06:48_Pacific_Daylight_Time_2025\r\nCuda compilation tools, release 13.0, V13.0.48\r\nBuild cuda_13.0.r13.0/compiler.36260728_0"
+  },
+  "python": {
+    "available": true,
+    "output": "Python 3.13.5"
+  },
+  "packages": {
+    "tensorrt": {
+      "available": true,
+      "output": "10.13.3.9"
+    },
+    "tensorrtRtx": {
+      "available": false,
+      "output": "Traceback (most recent call last):\r\n  File \"C:\\Python313\\Lib\\importlib\\metadata\\__init__.py\", line 407, in from_name\r\n    return next(iter(cls.discover(name=name)))\r\nStopIteration\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"<string>\", line 1, in <module>\r\n    import importlib.metadata as m; print(m.version('tensorrt-rtx'))\r\n                                          ~~~~~~~~~^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python313\\Lib\\importlib\\metadata\\__init__.py\", line 987, in version\r\n    return distribution(distribution_name).version\r\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python313\\Lib\\importlib\\metadata\\__init__.py\", line 960, in distribution\r\n    return Distribution.from_name(distribution_name)\r\n           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python313\\Lib\\importlib\\metadata\\__init__.py\", line 409, in from_name\r\n    raise PackageNotFoundError(name)\r\nimportlib.metadata.PackageNotFoundError: No package metadata was found for tensorrt-rtx"
+    }
+  },
+  "trtexec": {
+    "available": false,
+    "output": "spawnSync trtexec ENOENT"
+  },
+  "compatibility": {
+    "target": "TensorRT-RTX-1.6",
+    "requiredCudaLines": [
+      "13.4",
+      "12.9 Update 1"
+    ],
+    "installedCudaDetected": "13.0",
+    "status": "TENSORRT_RTX_NOT_INSTALLED_OR_PROVEN",
+    "existingEnvironmentChanged": false,
+    "writesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "reportWriteError": {
+    "name": "Error",
+    "code": "UNKNOWN",
+    "message": "UNKNOWN: unknown error, open 'C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\tensorrt-rtx-prerequisites-v1.json'"
+  }
+}

@@ -29,9 +29,10 @@ export function createOakDagContextManifestHandlerV1(): OakDagActionHandlerV1 {
     run: async ({ binding }: { binding: KernelDagExecutionBindingV1 }) => {
       const input = oakContextManifestInputV1Schema.parse(binding.boundArguments);
       if (!isAssembledAceContext(input.context)) throw new Error('OAK_CONTEXT_ACE_INPUT_INVALID');
+      const { now, ...options } = input.options;
       return buildContextManifestFromACE(input.context, {
-        ...input.options,
-        ...(input.options.now ? { now: new Date(input.options.now) } : {}),
+        ...options,
+        ...(now ? { now: new Date(now) } : {}),
       });
     },
   };

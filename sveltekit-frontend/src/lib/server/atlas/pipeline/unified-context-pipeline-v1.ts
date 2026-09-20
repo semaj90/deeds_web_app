@@ -146,7 +146,12 @@ const REQUIRED_CURRENT_FIELDS = [
   'featureRevision',
 ] as const;
 
-function descriptorStatus(input: z.input<typeof UnifiedContextPipelineDescriptorV1Schema>) {
+type UnifiedContextPipelineInputV1 = Omit<
+  z.input<typeof UnifiedContextPipelineDescriptorV1Schema>,
+  'schema' | 'status' | 'descriptorChecksum' | 'canonicalAuthority' | 'writesPerformed'
+>;
+
+function descriptorStatus(input: UnifiedContextPipelineInputV1) {
   const missing = REQUIRED_CURRENT_FIELDS.filter((field) => input[field] == null);
   if (missing.length > 0) return 'BLOCKED' as const;
   if (input.cache.admission === 'DEGRADED') return 'DEGRADED' as const;
@@ -155,7 +160,7 @@ function descriptorStatus(input: z.input<typeof UnifiedContextPipelineDescriptor
 
 /** Build a deterministic descriptor without parsing, persistence, or cache writes. */
 export function buildUnifiedContextPipelineDescriptorV1(
-  input: Omit<z.input<typeof UnifiedContextPipelineDescriptorV1Schema>, 'schema' | 'status' | 'descriptorChecksum' | 'canonicalAuthority' | 'writesPerformed'>,
+  input: UnifiedContextPipelineInputV1,
 ): UnifiedContextPipelineDescriptorV1 {
   const status = descriptorStatus(input);
   const body = {

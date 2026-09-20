@@ -8,6 +8,7 @@
  */
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
+import { blockHash, parseWfu, resolveDeclarations, sectionSlug, sha256, stripWfuComment, summarizeDeclared, taskBlock } from './lib/wfu-metadata.mjs';
 
 const root = process.cwd();
 const changesRoot = join(root, 'openspec', 'changes');
@@ -54,6 +55,9 @@ const priorityFor = (text) => {
   return 70;
 };
 
+// NS-1/NS-2: optional declared per-task metadata (`wfu:` comment) + task block hashes; see lib/wfu-metadata.mjs.
+const sourceFileHashes = {};
+
 const taskFiles = [];
 if (existsSync(changesRoot)) {
   for (const change of readdirSync(changesRoot, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
@@ -66,12 +70,19 @@ if (existsSync(changesRoot)) {
 const tasks = [];
 for (const file of taskFiles) {
   const change = relative(changesRoot, file).split(sep)[0];
-  const lines = readFileSync(file, 'utf8').split(/\r?\n/);
+  const fileText = readFileSync(file, 'utf8');
+  sourceFileHashes[pathOf(file)] = sha256(fileText);
+  const lines = fileText.split(/\r?\n/);
+  let currentSection = '';
   lines.forEach((line, index) => {
+    const heading = /^#{1,6}\s+(.*)$/.exec(line);
+    if (heading) currentSection = sectionSlug(heading[1]);
     const match = line.match(/^\s*-\s*\[([ xX])\]\s+(.*)$/);
     if (!match) return;
     const done = match[1].toLowerCase() === 'x';
-    const text = match[2].trim();
+    const block = taskBlock(lines, index);
+    const wfu = parseWfu(block.join('\n'));
+    const text = stripWfuComment(match[2].trim());
     tasks.push({
       taskKey: `${change}:${index + 1}`,
       change,
@@ -87,12 +98,18 @@ for (const file of taskFiles) {
       priority: priorityFor(`${change} ${text}`),
       lastUpdatedAt: statSync(file).mtime.toISOString(),
       timestampMethod: 'FILESYSTEM_MTIME',
+      blockHash: blockHash(block),
+      sectionSlug: currentSection,
+      ...(wfu ? { declared: wfu } : {}),
       eta: classifyKind(text) === 'INVARIANT'
         ? { status: 'NOT_APPLICABLE', method: 'PERMANENT_ACCEPTANCE_INVARIANT' }
         : { status: 'UNKNOWN', method: 'NO_RECEIPT_LINKED_THROUGHPUT' },
     });
   });
 }
+
+resolveDeclarations(tasks);
+const declaredMetadata = summarizeDeclared(tasks);
 
 const openTasks = tasks.filter((task) => task.state === 'OPEN');
 const completedTasks = tasks.length - openTasks.length;
@@ -400,6 +417,8 @@ const result = {
   changes,
   changeExecutionSummary,
   taskInventory: tasks,
+  sourceFileHashes,
+  declaredMetadata,
   nextTasks: criticalFrontierTasks.slice(0, 20),
   parallelFrontierTasks: parallelFrontierTasks.slice(0, 50),
   actionableTasks: byPriority.slice(0, 200),

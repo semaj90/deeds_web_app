@@ -11,7 +11,11 @@
 # Build: docker build -t omni-worker-dev docker/omni-worker/
 # Run:   docker compose -f docker/omni-worker/docker-compose.omni.yml up
 
-# ── Stage 1: Conda base with CUDA 12.1 ────────────────────────────────
+# ── Stage 1: LEGACY conda compatibility base with CUDA 12.1 ──────────
+# Retained for the experimental Node/Rust bridge. This is not the current
+# RTX/cuTile/SIMT reference lane and is not TensorRT-RTX compatible proof.
+# Do not upgrade this image in place; create a separately pinned capability
+# lane for TensorRT-RTX CUDA 13.4 instead.
 FROM continuumio/miniconda3@sha256:08e13ed38d9807f7bf2093ed0ba6403343bce05e83df6b6866d9223060bd4e6f AS conda-base
 
 # CUDA toolkit from conda-forge (avoids NVIDIA base image restrictions)

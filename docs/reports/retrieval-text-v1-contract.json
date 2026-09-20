@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.retrieval-text-contract-proof.v1",
+  "status": "RETRIEVAL_TEXT_CONTRACT_PROVEN_SHADOW_ONLY",
+  "change": "parent-atlas-retrieval-logic-convergence",
+  "task": "RETRIEVAL-TEXT-01",
+  "implementation": "sveltekit-frontend/src/lib/server/retrieval/retrieval-text-v1.ts",
+  "tests": {
+    "files": [
+      "sveltekit-frontend/src/lib/server/retrieval/retrieval-text-v1.spec.ts",
+      "sveltekit-frontend/src/lib/server/retrieval/chunk-retrieval-profile-v1.spec.ts"
+    ],
+    "testFilesPassed": 2,
+    "testsPassed": 14
+  },
+  "contract": {
+    "templateRevision": "atlas.retrieval-text.v1",
+    "sourceTextMaxChars": 4000,
+    "deterministicChecksum": true,
+    "identityRequired": true,
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "vectorGeneration": "NOT_PERFORMED"
+  },
+  "nextGate": "SHADOW_SEMANTIC_768_GENERATION_WITH_EMBEDDINGGEMMA_RECEIPT"
+}

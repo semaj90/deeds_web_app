@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.candidate-feature-matrix-adapter-receipt.v1",
+  "status": "CANDIDATE_FEATURE_MATRIX_ADAPTER_PROVEN",
+  "owner": "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts",
+  "adapter": "sveltekit-frontend/src/lib/server/retrieval/candidate-feature-matrix-adapter-v1.ts",
+  "preserves": [
+    "presence_mask",
+    "feature_revision",
+    "executor_provenance",
+    "canonical_packet_key",
+    "source_ref",
+    "source_revision",
+    "workspace_revision"
+  ],
+  "createsSecondMatrixOwner": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "rankingPromotion": false,
+  "liveCorpusEvaluated": false
+}

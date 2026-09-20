@@ -1,7 +1,7 @@
 {
   "schema": "parent-atlas.query-lexical-stats.v1",
   "status": "QUERY_LEXICAL_STATS_READ_ONLY_PROVEN",
-  "generatedAt": "2026-09-06T03:36:01.490Z",
+  "generatedAt": "2026-09-19T09:13:58.433Z",
   "readOnly": true,
   "writesPerformed": false,
   "source": "public.codebase_chunk_index.search_vector",
@@ -24,44 +24,44 @@
       "workspace"
     ],
     "corpus": {
-      "row_count": 55853,
-      "search_vector_count": 55853,
-      "source_ref_count": 53461,
-      "source_ref_distinct_count": 4598
+      "row_count": 274465,
+      "search_vector_count": 274465,
+      "source_ref_count": 272073,
+      "source_ref_distinct_count": 28069
     },
     "termStats": [
       {
         "word": "qdrant",
-        "document_frequency": 6603,
-        "corpus_frequency": 11752
+        "document_frequency": 27415,
+        "corpus_frequency": 51237
       },
       {
         "word": "retrieval",
-        "document_frequency": 267,
-        "corpus_frequency": 540
+        "document_frequency": 3022,
+        "corpus_frequency": 5286
       },
       {
         "word": "runtime",
-        "document_frequency": 234,
-        "corpus_frequency": 234
+        "document_frequency": 773,
+        "corpus_frequency": 909
       },
       {
         "word": "search",
-        "document_frequency": 9099,
-        "corpus_frequency": 18751
+        "document_frequency": 25377,
+        "corpus_frequency": 44836
       },
       {
         "word": "semantic",
-        "document_frequency": 331,
-        "corpus_frequency": 334
+        "document_frequency": 1435,
+        "corpus_frequency": 1972
       },
       {
         "word": "workspace",
-        "document_frequency": 45,
-        "corpus_frequency": 90
+        "document_frequency": 295,
+        "corpus_frequency": 525
       }
     ],
-    "snapshotChecksum": "c5e21f419737a441542fbbfbea307c4cbe9d9e97b75fe014d3c479326d656416"
+    "snapshotChecksum": "6f4ffc6f3f81791f57e45b45871a1ebe911612ec818c42254fbffb7f032ee7f7"
   },
   "replaySnapshot": {
     "terms": [
@@ -73,47 +73,47 @@
       "workspace"
     ],
     "corpus": {
-      "row_count": 55853,
-      "search_vector_count": 55853,
-      "source_ref_count": 53461,
-      "source_ref_distinct_count": 4598
+      "row_count": 274465,
+      "search_vector_count": 274465,
+      "source_ref_count": 272073,
+      "source_ref_distinct_count": 28069
     },
     "termStats": [
       {
         "word": "qdrant",
-        "document_frequency": 6603,
-        "corpus_frequency": 11752
+        "document_frequency": 27415,
+        "corpus_frequency": 51237
       },
       {
         "word": "retrieval",
-        "document_frequency": 267,
-        "corpus_frequency": 540
+        "document_frequency": 3022,
+        "corpus_frequency": 5286
       },
       {
         "word": "runtime",
-        "document_frequency": 234,
-        "corpus_frequency": 234
+        "document_frequency": 773,
+        "corpus_frequency": 909
       },
       {
         "word": "search",
-        "document_frequency": 9099,
-        "corpus_frequency": 18751
+        "document_frequency": 25377,
+        "corpus_frequency": 44836
       },
       {
         "word": "semantic",
-        "document_frequency": 331,
-        "corpus_frequency": 334
+        "document_frequency": 1435,
+        "corpus_frequency": 1972
       },
       {
         "word": "workspace",
-        "document_frequency": 45,
-        "corpus_frequency": 90
+        "document_frequency": 295,
+        "corpus_frequency": 525
       }
     ],
-    "snapshotChecksum": "c5e21f419737a441542fbbfbea307c4cbe9d9e97b75fe014d3c479326d656416"
+    "snapshotChecksum": "6f4ffc6f3f81791f57e45b45871a1ebe911612ec818c42254fbffb7f032ee7f7"
   },
   "replayStable": true,
-  "corpusSnapshotChecksum": "c5e21f419737a441542fbbfbea307c4cbe9d9e97b75fe014d3c479326d656416",
+  "corpusSnapshotChecksum": "6f4ffc6f3f81791f57e45b45871a1ebe911612ec818c42254fbffb7f032ee7f7",
   "evidenceRefs": [
     "sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts",
     "sveltekit-frontend/drizzle/0019_bm25_search_vector.sql",

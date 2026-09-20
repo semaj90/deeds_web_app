@@ -47,6 +47,9 @@ const reviews = suspicious.map((task) => {
   const recommendedBlockers = classify(task.text);
   return {
     taskKey: task.taskKey,
+    stableKey: task.stableKey ?? null,
+    logicalTaskKey: task.logicalTaskKey ?? null,
+    reviewedTaskRevision: task.blockHash ?? null,
     change: task.change,
     text: task.text,
     observedExecutionState: task.executionState,

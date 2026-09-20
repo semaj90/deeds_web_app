@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 const root = process.cwd();
@@ -152,13 +153,25 @@ const receipt = {
 };
 
 fs.mkdirSync(reportDir, { recursive: true });
-fs.writeFileSync(
-  path.join(reportDir, 'gpu-executor-capability-v1.json'),
-  `${JSON.stringify(receipt, null, 2)}\n`,
-);
-fs.writeFileSync(
-  path.join(reportDir, 'tensorrt-rtx-capability-v1.json'),
-  `${JSON.stringify({
+const stagingDir = path.join(reportDir, 'staging');
+const writtenReports = [];
+function writeReport(name, value) {
+  const body = `${JSON.stringify(value, null, 2)}\n`;
+  const target = path.join(reportDir, name);
+  try {
+    fs.writeFileSync(target, body);
+    writtenReports.push(path.relative(root, target));
+  } catch (error) {
+    fs.mkdirSync(stagingDir, { recursive: true });
+    const staged = path.join(stagingDir, name);
+    fs.writeFileSync(staged, body);
+    writtenReports.push(path.relative(root, staged));
+    console.warn(`report write staged: ${name}: ${error.code ?? error.message}`);
+  }
+}
+
+writeReport('gpu-executor-capability-v1.json', receipt);
+writeReport('tensorrt-rtx-capability-v1.json', {
     schema: 'TensorRtRtxCapabilityReceiptV1',
     generatedAt: now,
     readOnly: true,
@@ -168,22 +181,27 @@ fs.writeFileSync(
     observedTensorRT: stack?.windows?.tensorrt ?? null,
     tensorRtRtxVersion: null,
     cudaToolkit: stack?.windows?.cudaPath ?? null,
+    environment: {
+      os: `${process.platform}-${os.release()}`,
+      gpu: stack?.hardware?.gpu ?? null,
+      driver: stack?.hardware?.driver ?? null,
+      computeCapability: stack?.hardware?.computeCapability ?? null,
+      observedTensorRT: stack?.windows?.tensorrt ?? null,
+      torch: stack?.windows?.torch ?? null,
+      torchCudaRuntime: stack?.windows?.torchCudaRuntime ?? null,
+    },
     computeCapability: stack?.hardware?.computeCapability ?? null,
     compatibility: 'UNRESOLVED',
     engineBuilt: false,
     runtimeCacheObserved: false,
     evidence: [evidenceFiles.stackReadiness, evidenceFiles.rapidsRuntime],
     nextGate: 'PIN_OFFICIAL_SUPPORT_MATRIX_THEN_RUN_ISOLATED_CAPABILITY_CHECK',
-  }, null, 2)}\n`,
-);
+});
 
 console.log(JSON.stringify({
   status: receipt.status,
   executors: receipt.executors.map(({ executor, status }) => ({ executor, status })),
   residency: receipt.residency.status,
   writesPerformed: false,
-  reports: [
-    'docs/reports/gpu-executor-capability-v1.json',
-    'docs/reports/tensorrt-rtx-capability-v1.json',
-  ],
+  reports: writtenReports,
 }, null, 2));

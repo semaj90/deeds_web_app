@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildCandidateFeatureGpuReleaseReceipt,
   buildCandidateFeatureGpuResidencyLease,
+  buildCandidateFeatureGpuResidencyLeaseWithSharedBudget,
   verifyGpuResidentArtifactLease,
 } from './candidate-feature-gpu-residency-v1.js';
 import { CANDIDATE_SCALAR_FEATURES } from './candidate-feature-columnar-v1.js';
@@ -161,5 +162,51 @@ describe('CandidateFeature GPU residency lifecycle', () => {
     expect(release.leaseChecksum).toBe(lease.leaseChecksum);
     expect(release.bufferIds).toHaveLength(5);
     expect(lease.state).toBe('ACTIVE');
+  });
+
+  it('requires the shared GPU budget owner before candidate-feature admission', () => {
+    const budget = {
+      schema: 'atlas.gpu-residency-budget.v1' as const,
+      telemetry: { schema: 'atlas.gpu-memory-telemetry.v1' as const, source: 'nvml' as const, capturedAt: '2026-08-22T03:00:00.000Z', totalVramBytes: 8_000_000_000, freeVramBytes: 4_000_000_000, usedVramBytes: 4_000_000_000 },
+      policy: {} as never,
+      requestedCandidateCount: 2,
+      requestedCandidateBucket: 32,
+      totalReservedBytes: 0,
+      leaseableBytes: 10000,
+      semanticCacheBudgetBytes: 0,
+      maxResidentVectors: 2,
+      maxCandidateBucket: 32,
+      executionTarget: 'gpu' as const,
+      degraded: false,
+      reason: 'test',
+    };
+    const result = buildCandidateFeatureGpuResidencyLeaseWithSharedBudget({
+      pack: pack(), observation: observation(), producerRevision: 'bridge:shared-budget:test:v1',
+      budget, budgetRevision: 'budget:test:v1', executor: 'pytorch_cuda',
+    });
+    expect(result.sharedLease.admission).toBe('ALLOW');
+    expect(result.candidateLease.identityAuthority).toBe(false);
+    expect(result.writesPerformed).toBe(false);
+  });
+
+  it('fails before shared admission when the observed buffers exceed the budget', () => {
+    const budget = {
+      schema: 'atlas.gpu-residency-budget.v1' as const,
+      telemetry: { schema: 'atlas.gpu-memory-telemetry.v1' as const, source: 'nvml' as const, capturedAt: '2026-08-22T03:00:00.000Z', totalVramBytes: 8_000_000_000, freeVramBytes: 4_000_000_000, usedVramBytes: 4_000_000_000 },
+      policy: {} as never,
+      requestedCandidateCount: 2,
+      requestedCandidateBucket: 32,
+      totalReservedBytes: 0,
+      leaseableBytes: 1,
+      semanticCacheBudgetBytes: 0,
+      maxResidentVectors: 2,
+      maxCandidateBucket: 32,
+      executionTarget: 'gpu' as const,
+      degraded: false,
+      reason: 'test',
+    };
+    expect(() => buildCandidateFeatureGpuResidencyLeaseWithSharedBudget({
+      pack: pack(), observation: observation(), producerRevision: 'bridge:shared-budget:reject:v1', budget, budgetRevision: 'budget:test:v1',
+    })).toThrow('GPU_EXECUTOR_RESIDENCY_ADMISSION_GPU_RESIDENCY_BUDGET_EXCEEDED');
   });
 });

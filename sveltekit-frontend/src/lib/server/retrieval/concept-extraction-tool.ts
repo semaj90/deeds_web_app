@@ -1,23 +1,23 @@
 /**
  * Concept Extraction Tool
  *
- * Extracts 3-5 semantic concepts from a query using Gemma4
+ * Extracts 3-5 semantic concepts from a query using Ornith via llama-server :8090.
  * and matches them against a postgres.concepts registry.
  *
  * Flow:
- *   1. Stream query to Gemma4 with structured prompt
+ *   1. Stream query to Ornith via llama-server :8090 with a structured prompt
  *   2. Parse streaming JSON response for concept array
  *   3. Filter by confidence threshold (default 0.7)
  *   4. Look up each concept in postgres.concepts table
  *   5. Return matched concept IDs + raw extraction data
  *
- * Graceful degradation: On any error (Gemma4 timeout, DB miss, parse fail),
+ * Graceful degradation: On any error (Ornith timeout, DB miss, parse fail),
  * returns empty conceptIds array and empty extracted array.
  */
 
 import { z } from 'zod';
 import { pool } from '$lib/server/db/client.js';
-import { bifrostChat } from '$lib/server/ollama.js';
+import { bifrostChat, VLM_MODELS } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 
 // ── Types & Schemas ──────────────────────────────────────────────────────────
@@ -163,7 +163,7 @@ function deriveHeuristicConcepts(query: string): ExtractedConcept[] {
 
 // ── Main Function ────────────────────────────────────────────────────────────
 
-export async function extractQueryConceptsViaGemma(
+export async function extractQueryConceptsViaOrnith(
   request: ConceptExtractionRequest
 ): Promise<ConceptExtractionResponse> {
   const startMs = Date.now();
@@ -172,8 +172,8 @@ export async function extractQueryConceptsViaGemma(
     // Validate input
     const validated = ConceptExtractionRequestSchema.parse(request);
 
-    // Stream Gemma4 for concept extraction
-    const extracted = await streamConceptsFromGemma(validated);
+    // Stream Ornith through the llama-server-backed Bifrost boundary.
+    const extracted = await streamConceptsFromOrnith(validated);
 
     // Filter by confidence
     const filtered = extracted.filter((c) => c.confidence >= validated.minConfidence);
@@ -203,9 +203,12 @@ export async function extractQueryConceptsViaGemma(
   }
 }
 
+/** @deprecated Compatibility export; concept extraction is served by Ornith on llama-server :8090. */
+export const extractQueryConceptsViaGemma = extractQueryConceptsViaOrnith;
+
 // ── Streaming Concept Extraction ─────────────────────────────────────────────
 
-async function streamConceptsFromGemma(
+async function streamConceptsFromOrnith(
   request: ConceptExtractionRequest
 ): Promise<ExtractedConcept[]> {
   const heuristicFallback = deriveHeuristicConcepts(request.query);
@@ -221,7 +224,7 @@ async function streamConceptsFromGemma(
     const response = await Promise.race([
       bifrostChat(
         [{ role: 'user', content: prompt }],
-        ENV.GEMMA4_MODEL || 'gemma3-legal:latest',
+        VLM_MODELS.legal,
         {
           temperature: 0.3,
           maxTokens: 500,

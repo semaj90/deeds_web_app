@@ -198,6 +198,13 @@ import type {
 
 export interface ToCanonicalExtrasV1 {
   producerRevision: string;
+  /** Runtime-owned identity; never derive this from workflowId or actionId. */
+  runId: string;
+  /** Required by the canonical schema for completed events. */
+  receiptId?: string;
+  /** Required by the canonical schema for failed events. */
+  errorCode?: string;
+  toolId?: string;
 }
 
 export interface FromCanonicalExtrasV1 {
@@ -208,10 +215,18 @@ export function toCanonicalWorkflowActionEvent(
   local: WorkflowActionEventV1,
   extras: ToCanonicalExtrasV1,
 ): CanonicalWorkflowActionEventV1 {
+  if (local.kind === 'completed' && !extras.receiptId) {
+    throw new Error('WORKFLOW_CANONICAL_RECEIPT_REQUIRED');
+  }
+  if (local.kind === 'failed' && !extras.errorCode) {
+    throw new Error('WORKFLOW_CANONICAL_ERROR_CODE_REQUIRED');
+  }
+
   return {
     schema: 'atlas.workflow-action.v1',
     workflowId: local.workflowId,
     workflowRevision: local.workflowRevision,
+    runId: extras.runId,
     sequence: local.sequence,
     actionId: local.actionId,
     parentActionId: local.parentActionId,
@@ -225,22 +240,34 @@ export function toCanonicalWorkflowActionEvent(
     artifactRefs: local.artifactRefs ?? [],
     startedAt: local.startedAt,
     completedAt: local.finishedAt,
+    receiptId: extras.receiptId,
+    errorCode: extras.errorCode,
+    toolId: extras.toolId,
     metadata: {
+      state: local.state,
+      operation: local.operation,
+      ...(local.progress === undefined ? {} : { progress: local.progress }),
+      ...(local.target === undefined ? {} : { target: local.target }),
+      ...(local.visual === undefined ? {} : { visual: local.visual }),
+      ...(local.target?.canonicalId === undefined ? {} : { canonicalIds: [local.target.canonicalId] }),
       ...(local.tokensUsed === undefined ? {} : { tokensUsed: local.tokensUsed }),
       ...(local.filesEdited === undefined ? {} : { filesEdited: local.filesEdited }),
       ...(local.openspecChange === undefined ? {} : { openspecChange: local.openspecChange }),
     },
     producerRevision: extras.producerRevision,
-    inputRefs: [],
-    outputRefs: [],
-    state: local.state,
-    operation: local.operation,
-    progress: local.progress,
-    target: local.target,
-    visual: local.visual,
-    canonicalIds: local.target?.canonicalId ? [local.target.canonicalId] : [],
-  } as CanonicalWorkflowActionEventV1;
+  };
 }
+
+type CanonicalUiMetadataV1 = {
+  state?: WorkflowActionState;
+  operation?: string;
+  progress?: WorkflowProgressV1;
+  target?: WorkflowActionEventV1['target'];
+  visual?: WorkflowActionEventV1['visual'];
+  tokensUsed?: number;
+  filesEdited?: string[];
+  openspecChange?: string;
+};
 
 export function fromCanonicalWorkflowActionEvent(
   canonical: CanonicalWorkflowActionEventV1,
@@ -256,6 +283,7 @@ export function fromCanonicalWorkflowActionEvent(
       `WORKFLOW_ACTION_EVENT_TRANSPORT_NOT_REPRESENTABLE_IN_UI_SHAPE: '${canonical.transport}' has no equivalent in this local WorkflowActionEventV1's WORKFLOW_TRANSPORTS (e.g. 'mcp' is canonical-only)`,
     );
   }
+  const metadata = canonical.metadata as CanonicalUiMetadataV1;
   return {
     schema: 'atlas.workflow-action.v1',
     workflowId: canonical.workflowId,
@@ -268,19 +296,19 @@ export function fromCanonicalWorkflowActionEvent(
     lane: canonical.lane,
     transport: canonical.transport as WorkflowTransport | undefined,
     kind: canonical.kind as WorkflowEventKind,
-    state: canonical.state ?? 'running',
-    operation: canonical.operation ?? '',
-    progress: canonical.progress,
-    target: canonical.target,
+    state: metadata.state ?? 'running',
+    operation: metadata.operation ?? '',
+    progress: metadata.progress,
+    target: metadata.target,
     evidenceRefs: canonical.evidenceRefs,
     artifactRefs: canonical.artifactRefs,
-    tokensUsed: typeof canonical.metadata?.tokensUsed === 'number' ? canonical.metadata.tokensUsed : undefined,
-    filesEdited: Array.isArray(canonical.metadata?.filesEdited) ? canonical.metadata.filesEdited as string[] : undefined,
-    openspecChange: typeof canonical.metadata?.openspecChange === 'string' ? canonical.metadata.openspecChange : undefined,
+    tokensUsed: typeof metadata.tokensUsed === 'number' ? metadata.tokensUsed : undefined,
+    filesEdited: Array.isArray(metadata.filesEdited) ? metadata.filesEdited : undefined,
+    openspecChange: typeof metadata.openspecChange === 'string' ? metadata.openspecChange : undefined,
     startedAt: canonical.startedAt,
     emittedAt: extras.emittedAt,
     finishedAt: canonical.completedAt,
-    visual: canonical.visual,
+    visual: metadata.visual,
   };
 }
 

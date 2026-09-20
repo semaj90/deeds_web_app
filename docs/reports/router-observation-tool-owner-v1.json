@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.router-observation-tool-owner-audit.v1",
+  "status": "LOCAL_PHASE1_REGISTRY_OWNER_PROVEN",
+  "generatedAt": "2026-09-19T09:19:18.713Z",
+  "owner": {
+    "kind": "STATIC_ROUTE_REGISTRY",
+    "symbol": "MOCK_TOOL_REGISTRY",
+    "sourceRef": "sveltekit-frontend/src/routes/api/agent/route/+server.ts",
+    "availableToolsConstruction": "new Map(MOCK_TOOL_REGISTRY.map(([tool.name, tool]))",
+    "mapAssignment": "RouterObservation.availableTools = toolMap",
+    "rankInput": "rankTools(MOCK_TOOL_REGISTRY, observation)"
+  },
+  "observations": {
+    "registryDeclarationLine": 28,
+    "observationTypeLine": 71,
+    "availableToolsAssignmentLine": 115,
+    "staticToolCount": 5,
+    "usesMcpDiscovery": false,
+    "usesQdrantDiscovery": true,
+    "usesNeo4jDiscovery": true,
+    "usesAgentRegistry": false
+  },
+  "decision": {
+    "replaceOwnerNow": false,
+    "reason": "The route is explicitly Phase 1 and uses a static registry; replacement requires a separate owner/admission decision.",
+    "downstreamConsumers": [
+      "rankTools",
+      "selectTopTools",
+      "RouterObservation.availableTools"
+    ]
+  },
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "sourceChecksum": "sha256:c10df8e2b5e3f8d59b1e2116961e4a197ed6791dd05450c9be741ba0304382ed",
+  "reportChecksum": "sha256:7defbf1ce972e2b7c1c872915a165ade59314c4d51a41904a90de6896d5e9d8e"
+}

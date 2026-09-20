@@ -1,0 +1,137 @@
+{
+  "schema": "atlas.domain-tuple-resolution-t0.v1",
+  "generatedAt": "2026-09-20T08:21:11.394Z",
+  "mode": "REHEARSAL_ROLLBACK",
+  "resolver": {
+    "id": "atlas-domain-ontology-exact-ci",
+    "version": "v1"
+  },
+  "steps": {
+    "before": {
+      "ontologyDomains": 17,
+      "distinctUnresolvedDomainKeys": 41,
+      "byState": [
+        {
+          "resolution_state": "UNRESOLVED",
+          "n": 539124
+        }
+      ]
+    },
+    "plan": {
+      "resolvableKeys": 11,
+      "resolvableTuples": 63352,
+      "ambiguousKeys": [],
+      "unmatchedKeys": 30,
+      "unmatchedTuples": 60082,
+      "keys": [
+        {
+          "key": "Graph",
+          "groupId": "graph",
+          "matchedOn": "group_id",
+          "expected": 15432
+        },
+        {
+          "key": "test",
+          "groupId": "test",
+          "matchedOn": "group_id",
+          "expected": 8456
+        },
+        {
+          "key": "gpu",
+          "groupId": "gpu",
+          "matchedOn": "group_id",
+          "expected": 7752
+        },
+        {
+          "key": "compiler",
+          "groupId": "compiler",
+          "matchedOn": "group_id",
+          "expected": 7532
+        },
+        {
+          "key": "frontend",
+          "groupId": "frontend",
+          "matchedOn": "group_id",
+          "expected": 6380
+        },
+        {
+          "key": "database",
+          "groupId": "database",
+          "matchedOn": "group_id",
+          "expected": 5030
+        },
+        {
+          "key": "graph",
+          "groupId": "graph",
+          "matchedOn": "group_id",
+          "expected": 4700
+        },
+        {
+          "key": "retrieval",
+          "groupId": "retrieval",
+          "matchedOn": "group_id",
+          "expected": 4612
+        },
+        {
+          "key": "cache",
+          "groupId": "cache",
+          "matchedOn": "group_id",
+          "expected": 2770
+        },
+        {
+          "key": "Database",
+          "groupId": "database",
+          "matchedOn": "group_id",
+          "expected": 360
+        },
+        {
+          "key": "API",
+          "groupId": "api",
+          "matchedOn": "group_id",
+          "expected": 328
+        }
+      ]
+    },
+    "archive": {
+      "path": ".tmp/atlas/feature-ontology-tuples-t0-pre-resolution-v1.rehearsal.json",
+      "sha256": "sha256:d3f359223019656b0ab4255353942d4e50a02efbe0dc1a31358d86b10fcb981d",
+      "rows": 63352,
+      "manifestEntryWritten": false
+    },
+    "update": {
+      "updated": 63352,
+      "expectedTotal": 63352,
+      "perKeyMismatches": []
+    },
+    "verify": {
+      "byStateAfter": [
+        {
+          "resolution_state": "RESOLVED",
+          "n": 63352
+        },
+        {
+          "resolution_state": "UNRESOLVED",
+          "n": 475772
+        }
+      ],
+      "resolvedOutsideDomainTuples": 0,
+      "resolvedRowsMissingEvidenceKeys": 0,
+      "resolvedValuesNotInOntology": 0,
+      "nonDomainTuplesTouched": 0,
+      "remainingUnresolvedTargetsAfterUpdate": 0
+    },
+    "after": {
+      "byState": [
+        {
+          "resolution_state": "UNRESOLVED",
+          "n": 539124
+        }
+      ],
+      "persisted": false,
+      "expectedResolved": 0,
+      "gotResolved": 0
+    }
+  },
+  "errors": [],
+  "status": "REHEARSAL_PROVEN"
+}

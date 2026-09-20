@@ -1,0 +1,82 @@
+{
+  "schema": "atlas.agentic-receipt-live-schema-audit.v1",
+  "generatedAt": "2026-09-20T08:40:23.876Z",
+  "status": "LIVE_RECEIPT_SCHEMA_AND_EXISTING_ROWS_OBSERVED_NEW_WRITE_DEFERRED",
+  "table": "public.outcome_ledger",
+  "requiredColumns": [
+    "id",
+    "outcome_type",
+    "metadata",
+    "receipt_id",
+    "run_id",
+    "receipt_schema",
+    "receipt_status",
+    "writes_performed",
+    "completion_checksum"
+  ],
+  "observedColumns": [
+    "id",
+    "task_id",
+    "trace_id",
+    "tool_call_id",
+    "outcome_type",
+    "score",
+    "reward",
+    "feedback",
+    "metadata",
+    "recorded_at",
+    "receipt_id",
+    "run_id",
+    "receipt_schema",
+    "receipt_status",
+    "writes_performed",
+    "completion_checksum",
+    "previous_state",
+    "next_state",
+    "tool_name",
+    "execution_id",
+    "result_class",
+    "recovery_attempted",
+    "final_state",
+    "final_outcome",
+    "total_duration_ms",
+    "created_at"
+  ],
+  "missingColumns": [],
+  "receiptIdUniqueIndex": true,
+  "rowCount": 3,
+  "existingReadback": {
+    "agentWorkReceiptRows": 3,
+    "rowsWithReceiptId": 3,
+    "rowsWithCompletionChecksum": 3,
+    "latest": {
+      "id": "4812677c-01a6-4d77-a6f2-d3840d400d11",
+      "receipt_id": "live-receipt-20260903-01",
+      "run_id": "live-run-20260903-01",
+      "receipt_schema": "atlas.agent-work-receipt.v1",
+      "receipt_status": "SUCCEEDED",
+      "writes_performed": false,
+      "completion_checksum": "sha256:6383885a80a5e4b46c99b85d58384688b6ad8deff20e51e596308f8c92a4ecb0"
+    }
+  },
+  "databaseConnection": {
+    "source": "DATABASE_URL",
+    "fingerprint": {
+      "schema": "atlas.database-connection-fingerprint.v1",
+      "databaseName": null,
+      "currentUser": null,
+      "sessionUser": null,
+      "currentSchema": null,
+      "configuredSearchPath": null,
+      "effectiveSearchPath": null,
+      "serverVersion": null,
+      "serverAddress": null,
+      "serverPort": null,
+      "relations": [],
+      "fingerprintSha256": "6286ae95c3c52c60356251c89b815e94df9911a2e98769adda5a9337ca292b1d"
+    },
+    "status": "READ_ONLY_OK"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

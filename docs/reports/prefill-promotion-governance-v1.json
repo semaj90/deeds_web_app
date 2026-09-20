@@ -17,7 +17,7 @@
   "currentState": {
     "written": true,
     "wired": false,
-    "proven": false,
+    "proven": true,
     "promoted": false,
     "canonicalAuthority": false,
     "writesPerformed": false,
@@ -39,6 +39,13 @@
     "docs/reports/prefill-dag-fixture-v1.json",
     "docs/reports/gpu-executor-capability-v1.json"
   ],
+  "fixtureReplay": {
+    "report": "docs/reports/prefill-dag-fixture-v1.json",
+    "status": "PREFILL_DAG_REPLAY_PROVEN",
+    "proven": true,
+    "liveRetrievalExecuted": false,
+    "modelPrefillExecuted": false
+  },
   "missingEvidence": [],
   "evidenceChecksum": "sha256:fc0ce65708a483f49ef8509e9c0d4caaf9285ba53cf2296408363f8d3da76447",
   "nextGate": "CURRENT_SOURCE_AUTHORITY_AND_LIVE_EXECUTOR_READBACK"

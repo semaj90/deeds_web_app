@@ -2,8 +2,8 @@
 import { createClient } from 'redis';
 
 const QDRANT = 'http://localhost:6333';
-const OLLAMA = 'http://127.0.0.1:11434';
-const MODEL  = process.env.ROTORQUANT_CHAT_MODEL ?? process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-rotorquant:latest';
+const LLAMA_SERVER = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
+const MODEL  = process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b';
 const CLUSTER_ID = 4;
 
 const res = await fetch(`${QDRANT}/collections/codebase_chunks_768/points/scroll`, {
@@ -37,19 +37,20 @@ Write a single 2-sentence technical summary of what this cluster of files is abo
 Focus on the functional role and relationships, not individual files.
 Be specific and concise. No bullet points.`;
 
-const llmRes = await fetch(`${OLLAMA}/api/chat`, {
+const llmRes = await fetch(`${LLAMA_SERVER}/v1/chat/completions`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     model: MODEL,
     messages: [{ role: 'user', content: prompt }],
     stream: false,
-    options: { temperature: 0.2, num_predict: 512 },
+    temperature: 0.2,
+    max_tokens: 512,
   }),
 });
 if (!llmRes.ok) throw new Error(`Ollama ${llmRes.status}: ${await llmRes.text()}`);
 const body = await llmRes.json();
-const summary = (body.message?.content ?? body.response ?? '').trim();
+const summary = (body.choices?.[0]?.message?.content ?? '').trim();
 console.log(`summary (${summary.length} chars): ${summary.slice(0, 120)}`);
 if (summary.length < 40) throw new Error(`Too short: "${summary}"`);
 

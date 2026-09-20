@@ -194,7 +194,8 @@ matches. Receipt: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
 **Source-owner reconciliation recheck (read-only, 2026-09-17):**
 `audit-current-source-owner-reconciliation-v1.mjs` reports
 `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` / `LEGACY_ONLY_NO_CURRENT_OWNER` across
-`24,722` source rows, with `34` current-execution candidates and `0` exact current+owners. `writesPerformed` is false. Receipt: `docs/reports/current-source-owner-reconciliation-v1.json`.
+`24,722` source rows, with `34` current-execution candidates and `0` exact current
++owners. `writesPerformed` is false. Receipt: `docs/reports/current-source-owner-reconciliation-v1.json`.
 
 **Explicit current-lineage recheck (read-only, 2026-09-17):** the same join was
 rerun with the admitted revision `sha256:e24bb971...` and execution
@@ -15805,3 +15806,24 @@ selection therefore did not authorize packet materialization, digest backfill,
 or projection promotion.
 
 Receipt: `docs/reports/current-packet-chunk-identity-reconciliation-v1.json`.
+
+### RECOMMENDATION-TOURNAMENT-01 — workboard challenger tournament status (2026-09-20)
+
+Read-only audit + minimal implementation. Deterministic policy stays `ACTIVE`; no challenger reorders any task.
+
+| Piece | Status | Evidence |
+|---|---|---|
+| Tournament comparator (`scripts/atlas/build-openspec-challenger-tournament-v1.mjs`) | PRESENT, WIRED | writes `docs/reports/openspec-challenger-tournament-v1.json`, `eligibleForAuthority:false`, `writesPerformed:false`; now also reports `LOW_RANK_CHALLENGER_DEGENERATE_INSUFFICIENT_FEATURE_VARIANCE` instead of a false comparison |
+| Low-rank challenger producer (`python/build_low_rank_task_recommendation_v2.py`) | CREATED, FIXTURE_PROVEN | reuses `atlas_compute.low_rank.shortlist_candidate_ordinals` (no second low-rank owner); 2 new tests in `python/test_atlas_compute.py` pass (determinism, non-authoritative, degenerate refusal) |
+| Real challenger comparison | **NOT_PROVEN — blocked upstream** | on the live workboard only 1 of 14 ranking features varies across 2,309 tasks (`goalRank`, 8 distinct values); the producer correctly emits `DEGENERATE_INSUFFICIENT_FEATURE_VARIANCE` with an empty ordering |
+| Existing `lowRankScore` field | PLACEHOLDER | constant `0.5` on all 2,309 tasks (adapter default), not a computed score — do not cite it as a low-rank result |
+
+Root cause: `openspec-execution-controller-v1.json` `actionableTasks` (200 rows) carry none of `remainingRequiredGates`, `unblocksGateCount`,
+`evidenceReuse`, `evidenceFreshness`, `estimatedMinutes`, `risk`, `goalClosure`, `cacheAffinity` (0/200 present);
+`scripts/atlas/adapt-openspec-controller-to-ranker-v3.mjs` fills constant defaults (999 / 0 / 15 / 1 ...). Available real
+signals in the controller rows (`priority`, `kind`, `eta`, `lastUpdatedAt`, `dependencyGraph`, `blockerGroups`) are not mapped to them.
+
+- [ ] TOURNAMENT-FEATURES-01 Define and populate real ranking features upstream (controller or adapter) from the signals above — a controller-contract change, so it needs its own decision; do not synthesize features inside the challenger.
+- [ ] TOURNAMENT-FEATURES-02 Re-run `python/build_low_rank_task_recommendation_v2.py` + the tournament script once ≥2 features vary; only then evaluate rank agreement / top-k overlap against the deterministic order.
+- [ ] TOURNAMENT-PROMOTION-01 Any promotion beyond `SHADOW` still requires `RecommendationTournamentV1`/`RecommendationReceiptV1` per gate 8.
+- [x] TOURNAMENT-FEATURES-01 attempt (2026-09-20): derived features from tasks.md text — dependency/cost NOT derivable (12 prerequisite edges over 2,298 tasks; no estimates); text-derived flags exist but are weak/unvalidated; 12-feature challenger Spearman 0.30 vs deterministic and 0.10 vs the 2-feature challenger. Results + next steps NS-1..NS-6: `parent-atlas-workboard-feature-utility-fabric/tasks.md` (TOURNAMENT-FEATURES-01). Challenger stays advisory/`SHADOW`.

@@ -34,6 +34,14 @@ Planning/convergence change. No canonical writes are authorized until upstream l
 
 Capability inventory evidence (read-only, 2026-09-17): `scripts/atlas/audit-gpu-executor-capability-v1.mjs` composes existing WSL2/RAPIDS, residency, Windows CUDA, ONNX/WebGPU, and TensorRT metadata into `GpuExecutorCapabilityV1`. WSL2/RAPIDS execution is proven as a projection executor; candidate-feature residency reuse is bounded/proven; WebGPU parity is observed but unadmitted; DirectML has metadata only; TensorRT-RTX is not installed/proven. The pure shared budget decision owner is now proven, while cross-executor runtime registration/enforcement remains open; the active CUDA/RAPIDS stack is unchanged.
 
+2026-09-18 refresh: `node scripts/atlas/audit-gpu-executor-capability-v1.mjs` emitted
+`docs/reports/gpu-executor-capability-v1.json` with `writesPerformed=false` and
+`canonicalAuthority=false`. The WSL2 PyTorch/cuVS/cuGraph capability remains
+proven, while Windows PyTorch parity, DirectML, and TensorRT-RTX remain open.
+The isolated cuTile proof is recorded separately in
+`docs/reports/atlas-cuda132-cutile-simt-gemm-probe-v2-live.json`; it does not
+upgrade the TensorRT-RTX or Atlas ranker parity gates.
+
 ## 2 — Query routing contract convergence
 
 - [x] ROUTE-01 Reuse the current V2 control-plane tensor through a pure
@@ -163,7 +171,7 @@ Receipt contract evidence (read-only, 2026-09-17): `prefill-contracts-v1.ts` now
 
 Routing-plan owner evidence (read-only, 2026-09-17): `scripts/atlas/audit-prefill-routing-plan-owners-v1.mjs` proves `query-router-control-plane-v2.ts` imports and calls the `query-classification-v2.ts` `RetrievalPlanV1` compiler. It also identifies separate same-named contracts in `neural-routing/retrieval-executor-policy-v1.ts`, `agentic-file-compiler/retrieval-plan.ts`, and the semantic-signal transport layer. The tensor census records widths 154 (`neural-routing/encoder-manifest.ts`), 224 (`classification/retrieval-router-tensor-manifest-v1.ts`), and 234 (`classification/retrieval-router-tensor-manifest-v2.ts`), producing the explicit status `CURRENT_CONTROL_PLANE_OWNER_IDENTIFIED_TENSOR_WIDTH_CONFLICT`. `PrefillRoutingDecisionV1` remains `NOT_DEFINED` until these owners are reconciled; no duplicate routing owner or live mutation was introduced.
 
-Routing owner verification (read-only, 2026-09-17): the current classification and neural-routing focused suites pass 10/10. They prove deterministic classification/plan behavior, 26-feature ordering, normalized classifier-vector validation, and executor-policy selection, but did not then resolve the repository's 154/224/234 tensor-width conflict or missingness-policy ownership. The later direct-Ollama live probe closes ROUTE-02; the explicit projection receipt below subsequently closes ROUTE-01, while ROUTE-03 remains open.
+Routing owner verification (read-only, 2026-09-17): the current classification and neural-routing focused suites pass 10/10. They prove deterministic classification/plan behavior, 26-feature ordering, normalized classifier-vector validation, and executor-policy selection, but did not then resolve the repository's 154/224/234 tensor-width conflict. The later direct-Ollama live probe closes ROUTE-02; the explicit projection receipt below closes ROUTE-01, and `query-router-feature-missingness-v1.json` closes ROUTE-03 with the manifest-owned missingness policy.
 
 Prefill decision reconciliation (read-only, 2026-09-18):
 `prefill-routing-decision-v1.ts` now provides the single pure decision envelope
@@ -181,9 +189,11 @@ CandidateOrdinal checksum, deterministic decision checksum, and
 `writesPerformed=false`. Fixture replay remains proven; live canonical prefill
 remains blocked upstream.
 
-Live classification probe evidence (read-only, 2026-09-17): the initial configured endpoint attempt failed closed with `fetch failed` and no fabricated vector or tensor. The probe was then bound to the reachable direct Ollama `/api/embed` endpoint, avoiding the Go wrapper's Valkey cache-writing route. It now produces `LIVE_CLASSIFICATION_MRL_128_TENSOR_PROVEN` with `canonicalAuthority=false`, `writesPerformed=false`, and `fallbackUsed=false`; ROUTE-02 is closed by the resulting receipt, ROUTE-01 is now closed by the explicit projection receipt below, and ROUTE-03 remains open for missingness-policy freeze.
+Live classification probe evidence (read-only, 2026-09-17): the initial configured endpoint attempt failed closed with `fetch failed` and no fabricated vector or tensor. The probe was then bound to the reachable direct Ollama `/api/embed` endpoint, avoiding the Go wrapper's Valkey cache-writing route. It now produces `LIVE_CLASSIFICATION_MRL_128_TENSOR_PROVEN` with `canonicalAuthority=false`, `writesPerformed=false`, and `fallbackUsed=false`; ROUTE-02 is closed by the resulting receipt, ROUTE-01 is closed by the explicit projection receipt, and ROUTE-03 is closed by the manifest-owned feature-order/missingness receipt.
 
 Tensor import census (read-only, 2026-09-17): non-test references show the 234-wide v2 manifest is consumed by `query-router-dataset-v2.ts` and `xgboost-query-router-v2-contract.ts`; no non-test consumer was found for the 224-wide v1 manifest, while the 154-wide `encoder-manifest.ts` remains a legacy/challenger training contract. This narrows the issue to an explicit version/owner migration decision; it does not authorize changing the existing v2 contract to the requested 154-wide shape.
+
+Training/lineage recheck (read-only, 2026-09-19): `scripts/atlas/audit-domain-classifier-lineage-v1.mjs` reports `3,352` classifier rows, `148` revision-qualified joins, `0` authoritative source namespaces, and `3,204` missing Graphify joins, so the current classifier corpus remains `CLASSIFIER_LINEAGE_BLOCKED`. `scripts/atlas/prove-domain-classifier-parity-v1.mts` reports `0` exact matches, `6` disagreements, and `6` missing labels with `DOMAIN_CLASSIFIER_TRAINING_READY_FALSE`; ROUTE-04/05 remain open and no writes were performed.
 
 ## 7 — Checkpoint taxonomy
 
@@ -228,14 +238,27 @@ remain open.
 ## 9 — PyTorch RTX reference ladder
 
 - [x] GPU-PT-01 Freeze PyTorch CPU FP32 as numerical reference. Evidence: `python/prove-atlas-pytorch-cpu-fp32-reference-v1.py` emits `docs/reports/pytorch-cpu-fp32-reference-v1.json` for the bounded Atlas ranker component with CPU/FP32 executor identity, input/output checksums, finite outputs, exact repeat replay, unchanged source checkpoint checksum, `referenceAuthority=true`, `canonicalAuthority=false`, and `writesPerformed=false`. This is a numerical reference receipt only; CUDA, LibTorch/Node-API, TensorRT-RTX, ranking quality, and production promotion remain separate gates.
-- [ ] GPU-PT-02 Run the same component on CUDA sm_86.
-- [ ] GPU-PT-03 Record shape, dtype, checksum, error, cosine, argmax, and rank parity as applicable.
-- [ ] GPU-PT-04 Record warm and cold latency.
-- [ ] GPU-PT-05 Record peak allocated/reserved VRAM.
+- [x] GPU-PT-02 Run the same component on CUDA sm_86. Evidence: `docs/reports/atlas-gemma-rank-cuda132-real-batch-v3-live.json` runs the selected Atlas ranker component on NVIDIA RTX 3060 Ti compute capability `8.6` with PyTorch `2.14.0+cu132`; the checkpoint is unchanged and `canonicalAuthority=false`/`trainingPerformed=false`.
+- [x] GPU-PT-03 Record shape, dtype, checksum, error, cosine, argmax, and rank parity as applicable. Evidence: the same receipt records input shape `[3,35]`, output shape `[3,1]`, input/output dtypes and checksums, finite outputs, cosine similarity `0.9985185265541077`, max absolute delta `0.44091796875`, argmax agreement, and ranking-order agreement. This is measurement evidence; `rankingQualityProven=false` remains explicit.
+- [x] GPU-PT-04 Record warm and cold latency. Evidence: the same receipt records three CPU/GPU timing samples and separate means (`cpuMeanMs=60.270794999572296`, `gpuMeanMs=33.9801453325587`); first-run and repeated samples remain visible rather than being collapsed into one claim.
+- [x] GPU-PT-05 Record peak allocated/reserved VRAM. Evidence: the same receipt records `cudaPeakMiB=158.791`; no residency or canonical cache write was performed.
 - [x] GPU-PT-06 Keep activation checkpointing disabled for the tiny router absent measured training-memory pressure; distinguish this training concern from TensorRT-RTX benchmark selection. Evidence: `sveltekit-frontend/src/lib/server/atlas/contracts/gpu-runtime-abi-v1.spec.ts` fixes `checkpointing.enabled=false` and `policy=OFF`, while `pass-checkpoint-v1.ts` explicitly keeps ML activation checkpoints outside `AtlasPassCheckpointV1`; the focused contract matrix includes both boundaries.
-- [ ] GPU-PT-07 Evaluate `torch.compile` only after eager correctness.
-- 2026-09-19 bounded CPU probe: eager FP32 cosine/top-k executed successfully for 256×768 with deterministic output metadata, but `torch.compile(backend="inductor")` failed closed because the Windows environment lacks the required `clang-cl` toolchain. Receipt: `docs/reports/torch-compile-inductor-probe-v1.json`; keep GPU-PT-07 open; no CUDA or model changes.
+- [x] GPU-PT-07 Evaluate `torch.compile` only after eager correctness. Evidence: `docs/reports/torch-compile-inductor-probe-wsl2-v1.json` records a bounded WSL2 CUDA replay on RTX 3060 Ti/sm_86 with PyTorch `2.14.0+cu132`, CUDA `13.2`, and Inductor parity/index parity true (`maxAbsError=2.9802322387695312e-08`). Triton `weighted_row_dot_v1` parity also passed. This is challenger/reference evidence only; grouped-MoE execution, canonical promotion, model mutation, and writes remain false.
+- Historical Windows probe: eager FP32 cosine/top-k executed successfully for 256×768, but `torch.compile(backend="inductor")` failed closed because that environment lacks the required `clang-cl` toolchain. Receipt: `docs/reports/torch-compile-inductor-probe-v1.json`. The WSL2 CUDA replay above is the qualifying GPU-PT-07 result; no CUDA installation or model changes were made.
 - [x] GPU-PT-08 Keep custom CUDA/Triton operators deferred unless built-ins are insufficient. Evidence: the current bounded PyTorch reference and executor lanes use built-in operators, and the existing GPU primitive policy defers custom CUDA/cuTile work until a measured built-in insufficiency is recorded. No such insufficiency is present in the current receipts; no custom operator was added, compiled, or promoted.
+
+2026-09-19 environment reconciliation: the isolated WSL2 environment
+`/home/james/.venvs/atlas-cutile-cu132` is the only current cuTile+PyTorch
+lane. It runs Python 3.14.6, PyTorch `2.14.0+cu132`, CUDA `13.2`, and the
+RTX 3060 Ti (`sm_86`). The bounded cuTile-versus-PyTorch SIMT FP16 GEMM
+replay passed with zero maximum absolute and relative delta; receipt:
+`docs/reports/atlas-cuda132-cutile-simt-gemm-probe-v2-live.json`. This is
+challenger-kernel parity only and does not close GPU-PT-02..05, because the
+selected Atlas ranker checkpoint is not available in that environment.
+The Miniforge `atlas-rapids-cu13` environment remains the RAPIDS/cuVS/cuGraph
+lane and has no `cuda.tile`; `atlas-gpu-8098` remains RAPIDS-only, while
+`atlas-neural-decoder` remains the separate PyTorch service. No environment,
+container, model, or canonical state was changed.
 
 ## 10 — LibTorch / Node-API boundary
 
@@ -248,6 +271,8 @@ remain open.
 - [x] NAPI-07 Record ABI/runtime/CUDA/PyTorch metadata. Evidence: the boundary and `NativeInferenceReceiptV1` require Node-API, node-addon-api, LibTorch, PyTorch-reference, and optional CUDA runtime revisions; no native capability is claimed.
 - [x] NAPI-08 Do not create a second canonical model owner in the addon. Evidence: both boundary and inference receipt require `canonicalModelOwner=false`, `canonicalAuthority=false`, and `writesPerformed=false`.
 
+NAPI parity support tranche (read-only, 2026-09-19): `scripts/gpu/proof-batch-cosine-rerank.mjs` now uses the query-vs-corpus `batchCosineSimilarity` ABI and emits deterministic CPU/native fixture metrics; `scripts/gpu/probe-native-concurrency-v1.mjs` exercises two concurrent `gpu-worker.mjs` jobs with independent input/output checksums. Receipt: `docs/reports/native-concurrency-proof-v1.json` records `NAPI_WORKER_CONCURRENCY_FIXTURE_PROVEN`, both jobs complete, maximum CPU/native delta below `2.3e-8`, `canonicalAuthority=false`, `writesPerformed=false`, and `tensorsPersisted=false`. This supports the worker/transport boundary only; it does not close NAPI-05 or NAPI-06 because the reference is not yet a PyTorch/LibTorch CPU-versus-CUDA parity proof.
+
 ## 11 — TensorRT-RTX isolated challenger
 
 - [x] TRT-00 Selection decision recorded: use the heavier reranker/prefill-auxiliary challenger and
@@ -256,7 +281,7 @@ remain open.
 - [x] TRT-00 Select a heavier bounded neural benchmark component—reranker, prefill encoder, or decoder-side auxiliary network—and record its model/component revision, checksum, bounded shapes, workload rationale, and expected AOT/JIT/runtime-cache amortization. Evidence: `scripts/atlas/plan-tensorrt-rtx-benchmark-component-v1.mjs` binds the local Gemma4 assistant safetensors artifact and config checksums into a deterministic component revision, records a batch-1/512-token/bfloat16 bounded export contract, and separates portable-AOT/device-JIT cost from steady-state measurement. No export, engine build, runtime-cache write, or canonical promotion is claimed; TRT-01 onward remain open.
 - [x] TRT-00A Record that the `QueryRouterTensorV1[154]` → hidden → heads router is correctness/reference plumbing only and is excluded as the TensorRT-RTX performance or success criterion. Evidence: `openspec/changes/parent-atlas-prefill-routing-residency-convergence/design.md` and `docs/reports/tensorrt-rtx-benchmark-component-v1.json`.
 - [ ] TRT-01 Prove installation/capability without changing active RAPIDS.
-- [ ] TRT-02 Record SDK, CUDA, driver, compute capability, and OS.
+- [x] TRT-02 Record SDK, CUDA, driver, compute capability, and OS. Evidence: `docs/reports/atlas-gpu-inference-stack-readiness-v1.json` records the Windows CUDA/toolkit and observed TensorRT metadata plus RTX 3060 Ti/SM86/driver; `docs/reports/wsl2-rapids-sidecar-readiness-2026-08-28.json` records the WSL2 Ubuntu runtime, GPU, driver, compute capability, and CUDA-side packages. `docs/reports/tensorrt-rtx-capability-v1.json` remains `NOT_INSTALLED_OR_PROVEN`, so this closes environment inventory only and does not claim TensorRT-RTX compatibility or engine execution.
 - [ ] TRT-03 Export/freeze one bounded ONNX model from the proven PyTorch component.
 - [ ] TRT-04 Bind ONNX checksum to engine-build receipt.
 - [ ] TRT-05 Build a portable AOT engine.
@@ -278,7 +303,7 @@ remain open.
 ## 12 — cuVS / ANN integration boundary
 
 - [x] ANN-01 Keep cuVS brute-force as GPU exact semantic oracle. Evidence: `scripts/atlas/audit-semantic768-cuvs-exact-oracle-v1.mjs` reconciles the bounded live receipt `docs/reports/gpu-knn-exact-runtime-proof.json` with `atlas-rapids-semantic768-client.ts`; cuVS brute-force on the RTX 3060 Ti is proven for `semantic_768`/768 dimensions across three deterministic runs with `packetKey+sourceRevision` identity preserved and no mutations. Current-corpus eligibility remains separate and blocked by candidate freeze; CAGRA remains challenger-only.
-- [ ] ANN-02 Keep CAGRA approximate and separately benchmarked.
+- [x] ANN-02 Keep CAGRA approximate and separately benchmarked. Evidence: `docs/reports/gpu-knn-cagra-runtime-proof.json` runs cuVS CAGRA separately from the exact oracle on a bounded 3-row `semantic_768` fixture, records exact-vs-CAGRA ordering, Recall@3 `1.0`, latency, `packetKey+sourceRevision` identity parity, unchanged one-semantic-lane voting, and `PRODUCTION_PROMOTION=BLOCKED_PENDING_LARGER_CORPUS_AND_OPERATOR_APPROVAL` with all mutation flags false.
 - [ ] ANN-03 Require the same semantic_768 matrix and identity manifest across Qdrant/cuVS.
 - [ ] ANN-04 Record Recall@K, overlap, latency, build/load cost, and VRAM.
 - [x] ANN-05 Preserve one semantic logical vote regardless of executor count. Evidence: `dense-executor-candidate-ordinal-v1.ts` deduplicates executor hits by `CandidateOrdinal`, while `search-runtime-policy.ts` assigns the shared `semantic` vote key; focused executor and policy tests cover CAGRA/Qdrant/cuVS separation without vote inflation.

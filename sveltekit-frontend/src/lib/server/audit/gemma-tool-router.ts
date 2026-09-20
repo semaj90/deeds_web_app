@@ -18,7 +18,8 @@
 
 import { z } from 'zod';
 import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
-import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint, ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
 
 // ── Tool Definitions (OpenAI-compatible format for llama-server) ─────
 

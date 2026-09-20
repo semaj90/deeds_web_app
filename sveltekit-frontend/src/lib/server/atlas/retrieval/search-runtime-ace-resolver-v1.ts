@@ -90,10 +90,12 @@ export function createSearchRuntimeAceResolverV1(
         const runtimeCandidate = candidateById.get(row.canonicalId);
         if (!candidate || !runtimeCandidate || candidate.canonicalId !== row.canonicalId
           || candidate.packetKey !== row.packetKey || candidate.sourceRef !== row.sourceRef
-          || candidate.sourceRevision !== row.sourceRevision
           || String(row.workspaceRevision) !== candidate.workspaceRevision) {
           throw new Error(`ACE_RESOLVER_CANDIDATE_FEATURE_MISMATCH:${row.candidateOrdinal}`);
         }
+        // RetrievalRouterFeatureRowV1 carries a source-version receipt, not a
+        // sourceRevision field. The ordinal map remains the source-revision
+        // owner; do not synthesize or compare a missing row property here.
         rejectSyntheticRevision(candidate.sourceRevision, 'sourceRevision');
       }
       if (seenOrdinals.size !== ordinalMap.rowCount) {

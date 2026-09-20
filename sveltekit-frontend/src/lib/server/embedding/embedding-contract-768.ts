@@ -30,6 +30,12 @@ import { createHash } from 'node:crypto';
 
 export const SEMANTIC_REPRESENTATION_ID = 'semantic_768' as const;
 export const SEMANTIC_DIMENSION = 768 as const;
+
+/** Derived topology representations; never canonical semantic identities. */
+export const TOPOLOGY_REPRESENTATIONS = {
+  latent_128: 128,
+  latent_64: 64,
+} as const;
 export const CANONICAL_QDRANT_COLLECTION = 'codebase_chunks_768' as const;
 export const EMBEDDINGGEMMA_MRL_DIMENSIONS = [768, 512, 256, 128] as const;
 

@@ -1,0 +1,101 @@
+{
+  "schema": "atlas.patch-tournament-owner-audit.v1",
+  "generatedAt": "2026-09-20T08:40:23.674Z",
+  "purpose": "Inventory existing tournament, repair, worktree, review, and receipt owners before implementing the existing seam.",
+  "authority": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "taskLedgerMutation": false,
+    "worktreeCreation": false,
+    "candidateExecution": false,
+    "automaticMerge": false,
+    "training": false
+  },
+  "owners": [
+    {
+      "id": "PATCH_TOURNAMENT_PLANNER",
+      "status": "PROVEN_FIXTURE_CONTRACT",
+      "ownerPath": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",
+      "evidence": "Existing deterministic three-candidate planner with identity guards, ranking, ACE packet, and no-auto-apply flags.",
+      "nextGate": "PATCH_TOURNAMENT_CANDIDATE_EXECUTION"
+    },
+    {
+      "id": "PATCH_TOURNAMENT_SCHEMA_REGISTRY",
+      "status": "PROVEN_SCHEMA",
+      "ownerPath": "sveltekit-frontend/src/lib/server/ace/atlas-tool-registry.ts",
+      "evidence": "Existing allowlisted tool schema requires exactly three unique candidates and revision-qualified identity.",
+      "nextGate": "PATCH_TOURNAMENT_RUNTIME_CALLER"
+    },
+    {
+      "id": "PATCH_TOURNAMENT_FIXTURE_REPLAY",
+      "status": "PROVEN_FIXTURE_ONLY",
+      "ownerPath": "scripts/atlas/run-patch-tournament-replay-v1.mts",
+      "evidence": "Fixture replay proves deterministic ranking and replay equality; it does not create or execute worktrees.",
+      "nextGate": "ISOLATED_WORKTREE_EXECUTION"
+    },
+    {
+      "id": "WORKTREE_LEASE_OWNER",
+      "status": "PRESENT_MUTATION_CAPABLE_DEFERRED",
+      "ownerPath": "sveltekit-frontend/src/lib/server/workflows/worktree-lease-adapter.ts",
+      "evidence": "Drizzle-backed lease adapter exists, but it is a durable mutation boundary and is not called by this read-only tranche.",
+      "nextGate": "AUTHORIZED_WORKTREE_WORKER"
+    },
+    {
+      "id": "CANDIDATE_GENERATION",
+      "status": "MISSING_OR_NOT_WIRED",
+      "ownerPath": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",
+      "evidence": "Planner consumes injected candidates; no current owner was found that generates exactly three isolated repair candidates for one live compile error.",
+      "nextGate": "CANDIDATE_GENERATION_OWNER"
+    },
+    {
+      "id": "STATIC_AND_FOCUSED_EXECUTION",
+      "status": "MISSING_OR_NOT_WIRED",
+      "ownerPath": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",
+      "evidence": "Candidate check fields are part of the contract, but no tournament worker path currently populates them from isolated worktree execution.",
+      "nextGate": "AUTHORIZED_WORKTREE_WORKER"
+    },
+    {
+      "id": "HUMAN_REVIEW_BOUNDARY",
+      "status": "PRESENT_REVIEW_OWNER",
+      "ownerPath": "sveltekit-frontend/src/lib/server/agent/execution-review.ts",
+      "evidence": "Existing execution-review boundary can evaluate proposed and actual tool events; it is not automatic approval or merge.",
+      "nextGate": "HUMAN_APPROVAL_RECEIPT"
+    },
+    {
+      "id": "ACE_COMPARISON_PACKET",
+      "status": "PROVEN_PLANNER_PACKET",
+      "ownerPath": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",
+      "evidence": "Planner emits an ACE comparison packet, but a live worker-produced packet is not proven.",
+      "nextGate": "ISOLATED_WORKTREE_EXECUTION"
+    },
+    {
+      "id": "DURABLE_TOURNAMENT_RECEIPTS",
+      "status": "DEFERRED_NO_NEW_SCHEMA",
+      "ownerPath": "sveltekit-frontend/src/lib/server/observability/agent-work-receipt-store-v1.ts",
+      "evidence": "Existing agent-work receipt ownership is separate from LangGraph checkpoints; tournament-specific durable history is not introduced here.",
+      "nextGate": "OPERATOR_ACCEPTED_RECEIPT_SCHEMA"
+    }
+  ],
+  "summary": {
+    "ownerCount": 9,
+    "provenOwnerCount": 4,
+    "unresolvedOwnerCount": 5,
+    "nextGate": "PATCH_TOURNAMENT_CANDIDATE_EXECUTION",
+    "status": "PLANNER_AND_FIXTURE_PROVEN_LIVE_TOURNAMENT_DEFERRED"
+  },
+  "openSpecAlignment": {
+    "change": "parent-atlas-agentic-completion",
+    "task": "AGENT-09",
+    "status": "OPEN",
+    "ownerChange": "parent-atlas-graph-retrieval-proof",
+    "relatedTaskEvidence": [
+      "- [ ] **Exact next bounded seam** (the spec's own §25, and the correct entry point for a fresh session): \"Implement a three candidate tournament for one existing compile error using isolated Git worktrees, exact symbol/revision guards, static and focused tests, deterministic ranking, an ACE comparison packet, and a Kanban result card. Do not apply the winner automatically and do not begin QLoRA training.\"",
+      "## GS1.41 - Patch tournament seam: bounded generate-test-select loop (2026-08-03)",
+      "Operator supplied a large consolidated \"Parent Atlas Workstation TODO\" (21 sections: representation contract, workstation validation gaps, graph freshness, canonical GDS architecture, snapshot materialization, named projection, BFS traversal, NetworkX/GDS parity, PageRank persistence, retrieval registry, reduce/synthesis/ranking pipelines, RTX acceleration plan, Qdrant mirror drift, MCP proof suite) plus corrections (RAPIDS proven, PageRank aligned+251,613 nodes, recommendation lifecycle fixed+new vocabulary bug found, RRF provenance fix, patch tournament GS1.41 accepted) plus a Kafka/SpecKit/GSD repository-layout proposal. Per operator's explicit choice, this pass was documentation-only — no new code.",
+      "- [ ] NOT done (out of scope for this pass, per operator's \"documentation-only\" choice): RAPIDS-4..8 exact-KNN implementation, GS1.41 seam expansion, the new recommendation-lifecycle-vocabulary OpenSpec change itself, any Spec Kit/GSD scaffolding for the Kafka initiative, relaunching `graphify:daily`."
+    ],
+    "disposition": "Reuse the existing PatchTournament planner and add only the missing isolated worker seam after authority and approval prerequisites are explicit."
+  },
+  "retryPolicy": "Do not retry live tournament execution until candidate generation, isolated worktree execution, and human approval receipts change from their current states.",
+  "checksum": "sha256:6493cba81ccc48ba1e76cb557bd7decb0153d854b9c558038a28a2c3f699f060"
+}

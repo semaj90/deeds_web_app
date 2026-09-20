@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { randomUUID } from 'node:crypto';
 import { getOllamaEndpoint, ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
+import { getLlamaServerUrl } from '$lib/server/config/llama-server.js';
 import { qdrant } from '$lib/server/db/unified-client.js';
 import { db } from '$lib/server/db/client.js';
 import { evidenceFrames } from '$lib/server/db/schema/index.js';
@@ -81,7 +82,7 @@ export class VisionService {
     const base64 = frameBuffer.toString('base64');
 
     try {
-      const res = await fetch(`${getOllamaEndpoint()}/v1/chat/completions`, {
+      const res = await fetch(`${getLlamaServerUrl('/v1')}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

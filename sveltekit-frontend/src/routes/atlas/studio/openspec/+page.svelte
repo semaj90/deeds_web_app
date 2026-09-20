@@ -4,6 +4,7 @@
   import { Progress, Tabs } from 'bits-ui';
   import type { PageData } from './$types';
   import OpenSpecAwarenessPanel from '$lib/components/atlas/OpenSpecAwarenessPanel.svelte';
+  import CapabilityCensusPanel from '$lib/components/atlas/CapabilityCensusPanel.svelte';
 
   let { data }: { data: PageData } = $props();
   let streamState = $state<'connecting' | 'live' | 'reconnecting'>('connecting');
@@ -86,6 +87,13 @@
   </section>
 
   <OpenSpecAwarenessPanel awareness={data.awareness} />
+  <section class="notice" aria-label="Utility helper readiness">
+    <strong>Utility helpers: {data.awareness.utilityHelpers.status}</strong>
+    <span>{data.awareness.utilityHelpers.helperCount} audited · {data.awareness.utilityHelpers.waiting} gated · canonical writes disabled.</span>
+  </section>
+  {#if data.capabilityCensus}
+    <CapabilityCensusPanel census={data.capabilityCensus} />
+  {/if}
 
   {#if missingReports.length}
     <section class="notice warn">
@@ -126,6 +134,7 @@
 
     <Tabs.Content value="topics" class="panel tab-panel">
       <div class="panel-head"><div><p class="eyebrow">DETERMINISTIC ONTOLOGY CLUSTERING</p><h2>Topics & concepts</h2></div><span class="machine">advisory navigation only</span></div>
+      <div class="contract"><strong>Topic identity readiness</strong><p>{data.awareness.topicIdentities.status} · {data.awareness.topicIdentities.uniqueTopicIds} topic UUIDs · {data.awareness.topicIdentities.uniqueTitleIds} compatibility title IDs.</p><small>Derived report only; canonical authority: {data.awareness.topicIdentities.canonicalAuthority ? 'enabled' : 'disabled'}; writes: {data.awareness.topicIdentities.writesPerformed ? 'enabled' : 'disabled'}.</small></div>
       <div class="topic-grid">
         {#each data.clusters as cluster (cluster.id)}
           <article>

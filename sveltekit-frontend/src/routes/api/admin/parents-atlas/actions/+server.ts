@@ -88,7 +88,7 @@ export const POST: RequestHandler = async ({ request, locals}) => {
 			// Parallel search all 4 variants (embed 2-4 on-the-fly)
 			const searchPromises = variants.map(async (v, i) => {
 				const vec = i === 0 ? primaryEmbed : await generateSingleEmbedding(v);
-				const results = await qdrant.client.search(LLM_WIKI_COLLECTION, {
+				const results = await qdrant.search(LLM_WIKI_COLLECTION, {
 					vector: vec,
 					limit: 5,
 					with_payload: true,
@@ -156,7 +156,7 @@ export const POST: RequestHandler = async ({ request, locals}) => {
 
 			let results: Array<{ id: string | number; score: number; payload?: Record<string, unknown> | null }> = [];
 			try {
-				results = await qdrant.client.search(LLM_WIKI_COLLECTION, {
+				results = await qdrant.search(LLM_WIKI_COLLECTION, {
 					vector: embedding,
 					limit: 8,
 					with_payload: true,
@@ -223,7 +223,7 @@ export const POST: RequestHandler = async ({ request, locals}) => {
 			let pathResults: Array<{ id: string | number; score: number; payload?: Record<string, unknown> | null }> = [];
 			if (embedding.length) {
 				try {
-					pathResults = await qdrant.client.search(LLM_WIKI_COLLECTION, {
+					pathResults = await qdrant.search(LLM_WIKI_COLLECTION, {
 						vector: embedding,
 						limit: 4,
 						with_payload: true,

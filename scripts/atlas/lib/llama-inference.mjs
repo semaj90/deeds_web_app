@@ -5,7 +5,7 @@
  * Replaces all Ollama /api/generate and /api/chat calls for generation tasks.
  * Embeddings (embeddinggemma via /api/embed) are NOT affected — those stay on Ollama.
  *
- * Server: llama-server at :8090 (gemma4-legal-iq4xs-direct.gguf)
+ * Server: llama-server at :8090 (Ornith 1.5 9B, ornith-1.5-9b; llama-server ignores unrecognized model ids)
  * Protocol: OpenAI-compat POST /v1/chat/completions, stream: false
  *
  * Usage:
@@ -19,7 +19,7 @@ export const LLAMA_URL =
   (process.env.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090/v1')
     .replace(/\/+$/, '') + '/chat/completions';
 
-export const LLAMA_MODEL = process.env.LOCAL_GEMMA_MODEL ?? 'llama-server/hforf.gguf';
+export const LLAMA_MODEL = process.env.LOCAL_GEMMA_MODEL ?? process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b';
 
 const STOP_TOKENS = [
   '<end_of_turn>', '<start_of_turn>', '<|channel>thought',

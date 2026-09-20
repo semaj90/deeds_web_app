@@ -155,6 +155,9 @@ const PatchTournamentCheckSchema = z.object({
 
 const PatchTournamentCandidateSchema = z.object({
   candidateId: z.string().min(1),
+  runId: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  patchDigest: z.string().regex(/^sha256:[a-f0-9]{64}$/i),
   branchName: z.string().min(1),
   worktreePath: z.string().min(1),
   patchSummary: z.string().min(1),
@@ -177,7 +180,11 @@ const PatchTournamentInputSchema = z.object({
     PatchTournamentCandidateSchema,
     PatchTournamentCandidateSchema,
     PatchTournamentCandidateSchema,
-  ]),
+  ]).superRefine((candidates, context) => {
+    if (new Set(candidates.map((candidate) => candidate.candidateId)).size !== 3) {
+      context.addIssue({ code: z.ZodIssueCode.custom, message: 'candidateId values must be unique' });
+    }
+  }),
 });
 export type PatchTournamentInput = z.infer<typeof PatchTournamentInputSchema>;
 
@@ -190,6 +197,9 @@ const PatchTournamentOutputSchema = z.object({
   compileError: z.string(),
   rankedCandidates: z.array(z.object({
     candidateId: z.string(),
+    runId: z.string(),
+    sourceRevision: z.string(),
+    patchDigest: z.string(),
     branchName: z.string(),
     worktreePath: z.string(),
     patchSummary: z.string(),

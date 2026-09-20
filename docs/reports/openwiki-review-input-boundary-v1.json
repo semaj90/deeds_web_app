@@ -1,0 +1,193 @@
+{
+  "schema": "atlas.openwiki-review-input-boundary.v1",
+  "status": "OPENWIKI_INPUT_BOUNDARY_PROVEN",
+  "generatedAt": "2026-09-20T05:59:40.384Z",
+  "outputBoundary": {
+    "generatedDirectory": "openwiki-generated",
+    "reviewPage": "openwiki-generated/parent-atlas-okf-review-v1.md",
+    "canonicalDocsDirectory": "docs/okf/parent-atlas"
+  },
+  "policy": {
+    "allowedRoots": [
+      ".okf",
+      "openspec/changes/parent-atlas-okf-knowledge-layers",
+      "docs/architecture/okf-v02-validation-profile-v1.md",
+      "docs/reports/okf-*.json"
+    ],
+    "maxBytes": 524288,
+    "forbiddenRules": [
+      "SECRETS",
+      "MODEL_BINARY",
+      "RAW_VECTOR_OR_ARROW",
+      "UNBOUNDED_LOG"
+    ],
+    "scansSecrets": false,
+    "scansRawVectors": false,
+    "scansUnboundedLogs": false
+  },
+  "candidateCount": 31,
+  "eligibleCount": 31,
+  "excludedCount": 0,
+  "eligible": [
+    {
+      "path": ".okf/concepts/cluster-run-lineage-gap.yaml",
+      "bytes": 608,
+      "contentChecksum": "sha256:9ddb43d71efc1a91b76fe558137a703ae88d6dc955ae58f7d866d1231bb105ad"
+    },
+    {
+      "path": ".okf/concepts/concept-edge-ledger-gap.yaml",
+      "bytes": 576,
+      "contentChecksum": "sha256:40dbd8b77fda97dccd6dfb9c56faa6d77d353a867a9cf6f94827fc85680ddf39"
+    },
+    {
+      "path": ".okf/concepts/domain-lineage-gap.yaml",
+      "bytes": 547,
+      "contentChecksum": "sha256:23eda6e778e0867f13df45657bea313dced6e3056b15e8cca7835b925272eac9"
+    },
+    {
+      "path": ".okf/concepts/representation-fragmentation-gap.yaml",
+      "bytes": 805,
+      "contentChecksum": "sha256:e27097b4debd0ccf34a143923cdbc6787bd6edba69bcb802c69a5cf65449d107"
+    },
+    {
+      "path": ".okf/concepts/som-run-lineage-gap.yaml",
+      "bytes": 562,
+      "contentChecksum": "sha256:7b354f0ac0da445f6a01452eee268a9eef6169a78e1dba570666f751f9770de6"
+    },
+    {
+      "path": ".okf/concepts/topology-schema-drift-gap.yaml",
+      "bytes": 639,
+      "contentChecksum": "sha256:cbdda2d548d0c657217c5df79a31c12eafb7ec20b3104dd8d9a6c5f40503c23b"
+    },
+    {
+      "path": ".okf/domains/feature-intelligence.yaml",
+      "bytes": 3357,
+      "contentChecksum": "sha256:e851fb9263f2ce513a578a870643c032283d70e3be7fa915aaffa0f2c67d9164"
+    },
+    {
+      "path": ".okf/domains/parent-atlas-execution.yaml",
+      "bytes": 5167,
+      "contentChecksum": "sha256:91f3921558921db151ecd456bb6d00022265cd5ec3a69bc7aff10979758703ec"
+    },
+    {
+      "path": ".okf/domains/structured-value.yaml",
+      "bytes": 4516,
+      "contentChecksum": "sha256:46f481bb2774088a87f0fdac1c986c2a8f7cdd39ae4c22ed8e2c898705817d01"
+    },
+    {
+      "path": ".okf/index.md",
+      "bytes": 2367,
+      "contentChecksum": "sha256:ad12db61a8bd2ac659043d898f23bcb17209b0367b091bd61365f0ccca1ca858"
+    },
+    {
+      "path": ".okf/indexes/code-exploration.yaml",
+      "bytes": 2012,
+      "contentChecksum": "sha256:8256cb4674b9b2e5fd2493ee5ea6cf4329fd18591fcb98cff9c3aead7caea53c"
+    },
+    {
+      "path": ".okf/indexes/feature-intelligence.yaml",
+      "bytes": 10199,
+      "contentChecksum": "sha256:f5e74a352ffcf0015a004864af3bd6552488169a82a0ccc962c626ec2a74d684"
+    },
+    {
+      "path": ".okf/indexes/parent-atlas-code-explore.yaml",
+      "bytes": 2909,
+      "contentChecksum": "sha256:233fac574a9d9e60fbaa97456d0bbb16d4d4a2a46150e29e8256a8928a24eab3"
+    },
+    {
+      "path": ".okf/languages/typescript.yaml",
+      "bytes": 5398,
+      "contentChecksum": "sha256:1e9d12307da1d4fe9a2c7d32ff89aea0e3e693de3f63c629f3f8fec452cea25a"
+    },
+    {
+      "path": ".okf/manifest.yaml",
+      "bytes": 6962,
+      "contentChecksum": "sha256:e60d8d4cea5595a05feecf40525f236226c9046b6e4b52a40e67d9da03879156"
+    },
+    {
+      "path": ".okf/pipelines/ast-entity-prefill.yaml",
+      "bytes": 1082,
+      "contentChecksum": "sha256:f1bd8576efce58ba479cb8ec2429248c3682af49a7f7ffe6aed062786227a16f"
+    },
+    {
+      "path": ".okf/pipelines/retrieval-ranking-synthesis.md",
+      "bytes": 9357,
+      "contentChecksum": "sha256:e516d3a943d9862898dc062bc96b1d13678fcb25a146ea8470c93d387ea4a8ad"
+    },
+    {
+      "path": ".okf/pipelines/sveltekit-vitest-validation.md",
+      "bytes": 2021,
+      "contentChecksum": "sha256:ab41f85cb214f64ef0506f67582e11695eeeaab5a71fcb14d9521b67eaa80866"
+    },
+    {
+      "path": ".okf/pipelines/web-sources.md",
+      "bytes": 3296,
+      "contentChecksum": "sha256:a28a55a71f0ee1c506974676fbb0d8aed4eb7bcf3b24f11cf20cdbe453a41315"
+    },
+    {
+      "path": ".okf/predicates/feature-relationships.yaml",
+      "bytes": 2855,
+      "contentChecksum": "sha256:1d552621fd67aaa39d9032f6747c513863a721bfe2aaba8e2b79f13041861370"
+    },
+    {
+      "path": ".okf/runbooks/admin-dashboard-setup.md",
+      "bytes": 10948,
+      "contentChecksum": "sha256:ed185303365fcdafbdb1f118d53c0ecc4c60276d349ed08123223c9050b604e2"
+    },
+    {
+      "path": ".okf/systems/deep-research.md",
+      "bytes": 10589,
+      "contentChecksum": "sha256:77d46ae9c275ae0f8e4495ec9ed0dc498eeb0c0655682f67919f047f13f12f5a"
+    },
+    {
+      "path": ".okf/systems/hyperrag.md",
+      "bytes": 6521,
+      "contentChecksum": "sha256:3996a6d01c424510089975e5d8ac04b4e7fb8d5198c67690f1deea80e68a2460"
+    },
+    {
+      "path": ".okf/tools/gemma4-synthesis.md",
+      "bytes": 7682,
+      "contentChecksum": "sha256:80fcd672f85b31efd5306b687f91038d25e30bafecc19ca17c2e0b7f5345f9b9"
+    },
+    {
+      "path": ".okf/tools/ml-ranking-sidecar.md",
+      "bytes": 9219,
+      "contentChecksum": "sha256:eeefbff4f906ce8073d9d535be0c1767162211d96d03b9219220350443220606"
+    },
+    {
+      "path": "docs/architecture/okf-v02-validation-profile-v1.md",
+      "bytes": 615,
+      "contentChecksum": "sha256:4e1015b3ca1cc014370073ebb921c418e020b6b9ccac4e70c429b0b49248011a"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-okf-knowledge-layers/README.md",
+      "bytes": 2487,
+      "contentChecksum": "sha256:bdcec0ee3f36c755804708a6a7efe2d223f0a0400fe7c04ac8ffa1aba1ca5cd3"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-okf-knowledge-layers/design.md",
+      "bytes": 4701,
+      "contentChecksum": "sha256:484b3ae5675275e37293130b24b4d80cdca8f5df482cc7b8abe4d35246c80936"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-okf-knowledge-layers/proposal.md",
+      "bytes": 5300,
+      "contentChecksum": "sha256:b83ce4f7014ee9ff4b9a1b5638209d1d9cb92698bbe7d9d43fcdd2e2b347ea7a"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-okf-knowledge-layers/specs/okf-knowledge-layers/spec.md",
+      "bytes": 803,
+      "contentChecksum": "sha256:ab73800084a6051a5f2faf8cd2528b2afb5371af0fdd5ea0770f2116eed66da5"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
+      "bytes": 25710,
+      "contentChecksum": "sha256:4afbf233a2621a7b9fbb442132d331238cde4d8dff72b139bf3f96b278b61769"
+    }
+  ],
+  "excluded": [],
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false,
+  "openwikiRuntimeInvoked": false
+}

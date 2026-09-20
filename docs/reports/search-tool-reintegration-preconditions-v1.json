@@ -1,0 +1,234 @@
+{
+  "schema": "atlas.search-tool-reintegration-preconditions.v1",
+  "gate": "SEARCH-REINTEGRATION-03",
+  "generatedAt": "2026-09-19T16:42:55.876Z",
+  "mode": "READ_ONLY",
+  "inputReport": "docs/reports/search-tool-inventory-v1.json",
+  "ownership": {
+    "searchRuntimeBoundary": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+    "deterministicTestFiles": [
+      "sveltekit-frontend/src/lib/server/retrieval/analyze-this-coordinator.spec.ts",
+      "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.spec.ts"
+    ],
+    "qualityEvidenceFiles": []
+  },
+  "summary": {
+    "tools": 9,
+    "restoreEligible": 0,
+    "blockedFromRestore": 9,
+    "missingByCondition": {
+      "callerMigrationEvidence": 9,
+      "canonicalIdentityAndRevisionPropagation": 6,
+      "deterministicTests": 7,
+      "laneExecutorSemantics": 3,
+      "qualityEvaluation": 9
+    }
+  },
+  "tools": [
+    {
+      "name": "kb.trace_search",
+      "disposition": "ADAPTER_ONLY",
+      "conditions": {
+        "deterministicTests": true,
+        "canonicalIdentityAndRevisionPropagation": false,
+        "oneSearchRuntimeOwnershipBoundary": true,
+        "laneExecutorSemantics": true,
+        "callerMigrationEvidence": false,
+        "qualityEvaluation": false
+      },
+      "missingConditions": [
+        "canonicalIdentityAndRevisionPropagation",
+        "callerMigrationEvidence",
+        "qualityEvaluation"
+      ],
+      "restoreEligible": false,
+      "releaseEvidence": "SEARCH_TOOL_REINTEGRATION_PRECONDITIONS_INCOMPLETE",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "name": "trace.kag_search",
+      "disposition": "ADAPTER_ONLY",
+      "conditions": {
+        "deterministicTests": true,
+        "canonicalIdentityAndRevisionPropagation": true,
+        "oneSearchRuntimeOwnershipBoundary": true,
+        "laneExecutorSemantics": true,
+        "callerMigrationEvidence": false,
+        "qualityEvaluation": false
+      },
+      "missingConditions": [
+        "callerMigrationEvidence",
+        "qualityEvaluation"
+      ],
+      "restoreEligible": false,
+      "releaseEvidence": "SEARCH_TOOL_REINTEGRATION_PRECONDITIONS_INCOMPLETE",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "name": "codebase.rg_search",
+      "disposition": "ADAPTER_ONLY",
+      "conditions": {
+        "deterministicTests": false,
+        "canonicalIdentityAndRevisionPropagation": false,
+        "oneSearchRuntimeOwnershipBoundary": true,
+        "laneExecutorSemantics": false,
+        "callerMigrationEvidence": false,
+        "qualityEvaluation": false
+      },
+      "missingConditions": [
+        "deterministicTests",
+        "canonicalIdentityAndRevisionPropagation",
+        "laneExecutorSemantics",
+        "callerMigrationEvidence",
+        "qualityEvaluation"
+      ],
+      "restoreEligible": false,
+      "releaseEvidence": "SEARCH_TOOL_REINTEGRATION_PRECONDITIONS_INCOMPLETE",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "name": "codebase.awk_analyze",
+      "disposition": "KEEP_DISABLED",
+      "conditions": {
+        "deterministicTests": false,
+        "canonicalIdentityAndRevisionPropagation": false,
+        "oneSearchRuntimeOwnershipBoundary": true,
+        "laneExecutorSemantics": false,
+        "callerMigrationEvidence": false,
+        "qualityEvaluation": false
+      },
+      "missingConditions": [
+        "deterministicTests",
+        "canonicalIdentityAndRevisionPropagation",
+        "laneExecutorSemantics",
+        "callerMigrationEvidence",
+        "qualityEvaluation"
+      ],
+      "restoreEligible": false,
+      "releaseEvidence": "SEARCH_TOOL_REINTEGRATION_PRECONDITIONS_INCOMPLETE",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "name": "research.web_search",
+      "disposition": "ADAPTER_ONLY",
+      "conditions": {
+        "deterministicTests": false,
+        "canonicalIdentityAndRevisionPropagation": true,
+        "oneSearchRuntimeOwnershipBoundary": true,
+        "laneExecutorSemantics": true,
+        "callerMigrationEvidence": false,
+        "qualityEvaluation": false
+      },
+      "missingConditions": [
+        "deterministicTests",
+        "callerMigrationEvidence",
+        "qualityEvaluation"
+      ],
+      "restoreEligible": false,
+      "releaseEvidence": "SEARCH_TOOL_REINTEGRATION_PRECONDITIONS_INCOMPLETE",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "name": "research.synthesize",
+      "disposition": "ADAPTER_ONLY",
+      "conditions": {
+        "deterministicTests": false,
+        "canonicalIdentityAndRevisionPropagation": true,
+        "oneSearchRuntimeOwnershipBoundary": true,
+        "laneExecutorSemantics": false,
+        "callerMigrationEvidence": false,
+        "qualityEvaluation": false
+      },
+      "missingConditions": [
+        "deterministicTests",
+        "laneExecutorSemantics",
+        "callerMigrationEvidence",
+        "qualityEvaluation"
+      ],
+      "restoreEligible": false,
+      "releaseEvidence": "SEARCH_TOOL_REINTEGRATION_PRECONDITIONS_INCOMPLETE",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "name": "research.deep_analyze",
+      "disposition": "ADAPTER_ONLY",
+      "conditions": {
+        "deterministicTests": false,
+        "canonicalIdentityAndRevisionPropagation": false,
+        "oneSearchRuntimeOwnershipBoundary": true,
+        "laneExecutorSemantics": true,
+        "callerMigrationEvidence": false,
+        "qualityEvaluation": false
+      },
+      "missingConditions": [
+        "deterministicTests",
+        "canonicalIdentityAndRevisionPropagation",
+        "callerMigrationEvidence",
+        "qualityEvaluation"
+      ],
+      "restoreEligible": false,
+      "releaseEvidence": "SEARCH_TOOL_REINTEGRATION_PRECONDITIONS_INCOMPLETE",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "name": "trace.bifrost_dispatch",
+      "disposition": "ADAPTER_ONLY",
+      "conditions": {
+        "deterministicTests": false,
+        "canonicalIdentityAndRevisionPropagation": false,
+        "oneSearchRuntimeOwnershipBoundary": true,
+        "laneExecutorSemantics": true,
+        "callerMigrationEvidence": false,
+        "qualityEvaluation": false
+      },
+      "missingConditions": [
+        "deterministicTests",
+        "canonicalIdentityAndRevisionPropagation",
+        "callerMigrationEvidence",
+        "qualityEvaluation"
+      ],
+      "restoreEligible": false,
+      "releaseEvidence": "SEARCH_TOOL_REINTEGRATION_PRECONDITIONS_INCOMPLETE",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "name": "kb.rg_atlas_search",
+      "disposition": "ADAPTER_ONLY",
+      "conditions": {
+        "deterministicTests": false,
+        "canonicalIdentityAndRevisionPropagation": false,
+        "oneSearchRuntimeOwnershipBoundary": true,
+        "laneExecutorSemantics": true,
+        "callerMigrationEvidence": false,
+        "qualityEvaluation": false
+      },
+      "missingConditions": [
+        "deterministicTests",
+        "canonicalIdentityAndRevisionPropagation",
+        "callerMigrationEvidence",
+        "qualityEvaluation"
+      ],
+      "restoreEligible": false,
+      "releaseEvidence": "SEARCH_TOOL_REINTEGRATION_PRECONDITIONS_INCOMPLETE",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    }
+  ],
+  "authority": {
+    "runtimeEnablementChanged": false,
+    "canonicalAuthorityChanged": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false,
+    "restoreAttempted": false
+  },
+  "status": "RESTORE_CLOSED_PRECONDITIONS_INCOMPLETE",
+  "nextGate": "SEARCH-REINTEGRATION-04_NONDETERMINISTIC_SURFACE_AUDIT"
+}

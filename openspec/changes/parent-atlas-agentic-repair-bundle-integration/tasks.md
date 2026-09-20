@@ -296,7 +296,10 @@ JS) found exactly 4 hits repo-wide: this change's own docs, one unrelated Python
       (`docs/reports/proto-registry-audit.json`, 2026-07-04: 13 proto files, 12 services, 61 RPC
       methods, 61 rows written to Postgres + Qdrant + Redis each). The report's `- [ ]` on these
       three lines is wrong; only the two retrieval-wiring checkboxes below are genuinely open.
-- [ ] Verify what currently populates `RouterObservation.availableTools` before replacing it.
+- [x] Verify what currently populates `RouterObservation.availableTools` before replacing it. Evidence:
+  `scripts/atlas/audit-router-observation-tool-owner-v1.mjs` and
+  `docs/reports/router-observation-tool-owner-v1.json` confirm the Phase 1 route owns it through
+  the static `MOCK_TOOL_REGISTRY`; no MCP/Qdrant/Neo4j discovery replacement was made.
 - [ ] Wire a Qdrant top-K query over the 61 packetized RPC-method manifests
       (`domain_class=mcp_agents`) ranked by embedding similarity to the current query, as the new
       `availableTools` source — this is the "Gemma4 gets top-K tools, not flat 300+" goal the
@@ -322,14 +325,17 @@ JS) found exactly 4 hits repo-wide: this change's own docs, one unrelated Python
       types + tests), `cartridge/glyph-tile-engine.ts` + `glyph-mappers.ts`, `engram-bigram.ts` /
       `engram-memory.ts` (confirmed compiled into the production build), and a fully-generated
       `docs/okf/parent-atlas/` bundle with a real `gaps/` directory.
-- [ ] File a correction against `parent-atlas-okf-knowledge-layers` — its README says
+- [x] File a correction against `parent-atlas-okf-knowledge-layers` — its README says
       `PARENT_ATLAS_KNOWLEDGE_GAP_AUDIT_V1` is "design/audit only, not yet implemented," but
       `docs/okf/parent-atlas/index.md` already exists with `status: PARTIAL_PROVEN` and 9 real gap
-      writeups. One of the two documents is stale; reconcile in that change, not here.
-- [ ] Before designing any new 4D-manifold, hypergraph, token-remap, glyph-cache, or Engram
+      writeups. One of the two documents is stale; reconcile in that change, not here. Evidence:
+      `docs/reports/agentic-repair-okf-reconciliation-v1.json`; the README now records partial
+      materialization while leaving runtime validation and promotion incomplete.
+- [x] Before designing any new 4D-manifold, hypergraph, token-remap, glyph-cache, or Engram
       mechanism anywhere in this change (especially Phase 15's HMM work, which already touches
       `manifold4` via `quaternion-manifold.ts::hmmAxisMultiplier()`), read the files listed above
-      first — do not duplicate them.
+      first — do not duplicate them. Evidence: `docs/reports/agentic-repair-owner-census-v1.json`;
+      existing owners were inventoried read-only and no new mechanism was introduced.
 - [x] Confirmed still genuinely absent, no correction needed: Kafka CDC (zero `kafka` hits in
       `sveltekit-frontend/src/`), softcap/Ewin-Tang ℓ2-sampling (zero hits), and
       "isoquant"/"quanterion" as distinct concepts (likely conflation with the real, documented
@@ -347,18 +353,20 @@ JS) found exactly 4 hits repo-wide: this change's own docs, one unrelated Python
 - [x] Confirmed the brief's "next 10 actions" list matches this document's Phase 1/2/4/6/10/11/12/14
       ordering for items 1–9. Item 10 (OpenWiki/module-crawler work) is genuinely out of scope for
       this change — flagged for `parent-atlas-okf-knowledge-layers` or a new sibling instead.
-- [ ] New graph-traversal sub-scope surfaced by the brief, not previously itemized here: Louvain/
+- [x] New graph-traversal sub-scope surfaced by the brief, not previously itemized here: Louvain/
       Leiden community detection, canonical community-taxonomy records, taxonomy-aware BFS,
       personalized PageRank, weighted-Dijkstra baseline, semantic best-first search. All belong
       under Phase 2/3's existing scope (graph traversal + structural features) — do not design
       these until `parent-atlas-graph-retrieval-proof`'s identity split unblocks Phase 2/3 (same
       blocker already recorded for the rest of that phase).
-- [ ] Quaternion/similarity-learning-before-Qdrant, TurboQuant-after-frozen-embedding sequencing
+- [x] Quaternion/similarity-learning-before-Qdrant, TurboQuant-after-frozen-embedding sequencing
       note captured in proposal.md — cross-check against `parent-atlas-semantic-768-canonical-
       contract` before any future embedding-specialization work, don't quantize a moving target.
-- [ ] Check whether `kag record_agent_run` (from the brief) and Phase 14's
+- [x] Check whether `kag record_agent_run` (from the brief) and Phase 14's
       `record-repair-episode.mts` (once the bundle exists) should be unified into one tool instead
-      of two overlapping learning-flywheel entry points.
+      of two overlapping learning-flywheel entry points. Evidence:
+      `docs/reports/agentic-repair-run-recording-ownership-v1.json`; only
+      `kag.record_agent_run` exists in this checkout, so no second writer is introduced.
 - [ ] **G4 (fresh Graphify revision)** — promoted from a proposal.md note to an actual task since
       it's been independently flagged three times this session: the brief's gate checklist twice,
       and this session's own `[Graph stale]` hook warnings showing `codebase-graph.json` at
