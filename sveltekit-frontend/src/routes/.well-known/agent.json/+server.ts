@@ -79,6 +79,20 @@ export const GET: RequestHandler = ({ url }) => {
         inputModes: ['text/plain'],
         outputModes: ['application/json'],
       },
+      {
+        id: 'openspec-workboard',
+        name: 'OpenSpec Workboard',
+        description:
+          'Read-only view of the OpenSpec workboard: board summary, report freshness and top ' +
+          'ACTIONABLE tasks. Advisory only; same handler as the ACP tool openspec:workboard_recommend. ' +
+          'Select with task metadata { skill: "openspec-workboard", limit?, change_id? }.',
+        tags: ['openspec', 'workboard', 'recommendations', 'advisory'],
+        examples: [
+          'What OpenSpec tasks are ready?',
+        ],
+        inputModes: ['text/plain', 'application/json'],
+        outputModes: ['application/json'],
+      },
     ],
   } satisfies AgentCard, {
     headers: {

@@ -193,6 +193,22 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
 
   recordSearchQuery({ query, pipeline: pipeline as HitPipeline, cacheHit: false, userId });
 
+  // A2A skill "openspec-workboard": same read-only handler as the ACP tool
+  // openspec:workboard_recommend (WORKBOARD-03). No LLM round, no writes.
+  if (task.metadata?.skill === 'openspec-workboard') {
+    const { executeACPTool } = await import('$lib/server/services/knowledge-search/ACPToolRegistry.js');
+    const res = await executeACPTool('openspec:workboard_recommend', {
+      limit: task.metadata?.limit,
+      change_id: task.metadata?.change_id,
+    });
+    return json({
+      id: task.id,
+      status: { state: res.success ? 'completed' : 'failed' },
+      artifacts: [{ name: 'workboard', parts: [{ data: res.success ? res.data : { error: res.error } }] }],
+      metadata: { skill: 'openspec-workboard', userId },
+    });
+  }
+
   // Streaming A2A (tasks/sendSubscribe) — client sends Accept: text/event-stream
   const wantsStream = request.headers.get('accept')?.includes('text/event-stream');
 

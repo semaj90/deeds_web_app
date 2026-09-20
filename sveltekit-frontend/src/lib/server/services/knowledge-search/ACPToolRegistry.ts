@@ -921,6 +921,72 @@ const handlers: Record<string, HandlerFn> = {
     }
   },
 
+  // Read-only OpenSpec workboard view (WORKBOARD-02 in parent-atlas-retrieval-staging-planes).
+  // Wraps the existing board snapshot reader; no second implementation, no writes, advisory only.
+  async openspecWorkboardRecommend(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    const limit = Math.min(50, Math.max(1, Number(args?.limit) || 10));
+    const changeId = typeof args?.change_id === 'string' && args.change_id.trim() ? args.change_id.trim() : null;
+
+    if (options?.dryRun) {
+      return planResult([
+        { action: 'analyze', target: 'openspec-board', detail: `readOpenSpecBoardSnapshot() — top ${limit} ACTIONABLE${changeId ? ` for ${changeId}` : ''}` },
+      ], startTime);
+    }
+
+    try {
+      const { readOpenSpecBoardSnapshot } = await import('$lib/server/atlas/openspec-board/report-reader');
+      const snapshot = await readOpenSpecBoardSnapshot();
+      // WORKBOARD-04: heuristic blocker class from task text (not authoritative; subagent audit
+      // 2026-09-20 found ~half of "ACTIONABLE" tasks are identity/source-revision gated).
+      const classify = (text: string, key: string | null): string => {
+        const s = `${text} ${key ?? ''}`.toLowerCase();
+        if (/source[- _]?revision|source authority|identity|packet[- _]?key|lineage|admission/.test(s)) return 'IDENTITY_SOURCE_REVISION_GATED';
+        if (/migration|backfill|\bwrite\b|upsert|promot|apply\b|drop /.test(s)) return 'NEEDS_DB_OR_CACHE_WRITE';
+        if (/docker|runtime|live |gpu|cuda|:80\d\d|neo4j|qdrant/.test(s)) return 'NEEDS_RUNTIME_SERVICE';
+        if (/operator|decision|owner|approve/.test(s)) return 'NEEDS_OPERATOR_DECISION';
+        return 'UNCLASSIFIED_POSSIBLY_READY';
+      };
+      const candidates = snapshot.tasks
+        .filter((t) => t.state === 'ACTIONABLE' && (!changeId || t.changeId === changeId))
+        .map((t) => ({ t, blockerClass: classify(t.title, t.blockerKey) }));
+      const blockerCounts: Record<string, number> = {};
+      for (const c of candidates) blockerCounts[c.blockerClass] = (blockerCounts[c.blockerClass] ?? 0) + 1;
+      const ready = candidates
+        .filter((c) => c.blockerClass === 'UNCLASSIFIED_POSSIBLY_READY')
+        .slice(0, limit)
+        .map(({ t, blockerClass }) => ({
+          id: t.id,
+          changeId: t.changeId,
+          title: t.title,
+          topic: t.topic,
+          priority: t.priority,
+          blockerKey: t.blockerKey,
+          blockerClass,
+          fileRefs: t.fileRefs.slice(0, 5),
+        }));
+      return {
+        success: true,
+        kind: 'result',
+        data: {
+          schema: 'atlas.openspec-workboard-recommend.v1',
+          semanticChecksum: snapshot.semanticChecksum,
+          summary: snapshot.summary,
+          freshness: snapshot.freshness,
+          ready,
+          actionableByBlockerClass: blockerCounts,
+          blockerClassMethod: 'KEYWORD_HEURISTIC_NOT_AUTHORITATIVE',
+          advisoryOnly: true,
+          canonicalAuthority: false,
+          writesPerformed: false,
+        },
+        duration: Date.now() - startTime,
+      };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
+  },
+
   async nlpAstChunk(args: any, options?: ACPToolOptions): Promise<ToolResult> {
     const startTime = Date.now();
     const { source, language, filePath, sourceRevision } = args ?? {};
@@ -1447,6 +1513,28 @@ export const TOOLS: Record<string, ACPTool> = {
       }
     ],
     handler: handlers.nlpClassifyDomain
+  },
+  'openspec:workboard_recommend': {
+    name: 'openspec:workboard_recommend',
+    description: 'Read-only OpenSpec workboard view: current board summary, report freshness and the top ACTIONABLE tasks from the existing board snapshot reader. Advisory only (canonicalAuthority false); never edits tasks.md. Note: ACTIONABLE is not yet blocker-aware (WORKBOARD-04), so many listed tasks may still be identity/source-revision gated.',
+    category: 'search',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        limit: { type: 'number', description: 'Max tasks to return (1-50, default 10)', minimum: 1, maximum: 50 },
+        change_id: { type: 'string', description: 'Optional OpenSpec change id to filter to', maxLength: 200 }
+      },
+      additionalProperties: false
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { limit: 5 },
+        output: { schema: 'atlas.openspec-workboard-recommend.v1', ready: [], advisoryOnly: true, canonicalAuthority: false, writesPerformed: false },
+        description: 'Top 5 ready tasks with board freshness'
+      }
+    ],
+    handler: handlers.openspecWorkboardRecommend
   },
   'nlp:ast-chunk': {
     name: 'nlp:ast-chunk',

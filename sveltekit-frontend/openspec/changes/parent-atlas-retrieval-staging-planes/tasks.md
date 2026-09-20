@@ -282,6 +282,83 @@ swallowing it — flagged, not done, given context budget).
       quality measurements from the original task description were not executed — they are moot
       until an extractor exists that can produce non-empty output on this corpus.
 
+## Pipeline build-state audit — registry → packet builders → Go retrieval → offline (2026-09-20)
+
+Read-only audit (3 subagents; static grep + SELECT/catalog/plain EXPLAIN + health GETs; no writes).
+Per the root CLAUDE.md status convention no percentage is claimed; 0 stages are APPLY_PROVEN end to end.
+Stage counts: DRY_RUN_PROVEN 2, WIRED 8, PARTIAL_PROVEN 1, CREATED 6, NOT_PROVEN 6.
+
+| Stage | Status | Evidence |
+|---|---|---|
+| Postgres packet registry (`atlas_packets` 61,718; `atlas_packet_registry` 58,304) | CREATED | counts differ by 3,414 — lineage reconcile not done |
+| `domain_class` / `title_id` separation | WIRED | 61,718 / 61,660 populated; `title_id`==`feature_id` on 1 row |
+| `primary_domain`, `domain_taxonomy_v1` | NOT_PROVEN | 0 rows each; `predicted_domain` only 4,412 rows |
+| Drizzle vs live `atlas_packets` | PARTIAL_PROVEN | schema is `db/schema/atlas-packets.ts`; not a full column diff; live still has `content_embedding_384` |
+| PG18 bitmap path | DRY_RUN_PROVEN (plan only) | `domain_class`+`tags` chose btree bitmap + tags filter, no BitAnd with tags GIN; no timing |
+| pgvector 768 alignment | DRY_RUN_PROVEN | 61,659 rows all `vector_dims`=768 |
+| TRACE `context.build_ace_packet` | WIRED | live canary built + cached 3 `ace:packet:*` (TTL ~7d, `from_cache:true` on repeat); call exceeded 300s once |
+| TRACE `context.build_kv_packet`, `atlas.build_taxonomy_topology_packet`, `atlas.compact_context` | WIRED | registered; no live agent caller found |
+| ACP `/api/acp/*`, A2A `agent.json`, agent packet-injection hooks | NOT_PROVEN | no packet-build exposure found; `.opencode` hooks unread |
+| msgpack codec / HyperRAG packet pipeline | WIRED / CREATED | imported by `packet-io`, `ace-packet-swap`; no runtime proof |
+| `AcePacket`, `ContextManifest`, `PromptPlanV1` | WIRED / CREATED / CREATED | `PromptPlanV1` has TWO owners (`atlas/prefill/prompt-plan-v1.ts`, `atlas/agentic-file-compiler/prompt-plan.ts`) |
+| Go retrieval → ACE injection | WIRED (static) | `/search/codebase` live health OK; `search-unified` passes `includeAcePacket`; `go-search-bridge` not imported by `search-unified`; no live query receipt; `/search/bm25` is `ts_rank_cd` not BM25 |
+| Go result identity | NOT_PROVEN | one hit had a chunk UUID as `packet_key`; `representation_revision` missing on hits |
+| DuckDB offline | CREATED / WIRED | 906 MB snapshot (Aug 2) has no receipt; not on retrieval path |
+| CouchDB MapReduce | CREATED | container healthy; views/design docs not inspected; last ingest receipt May 16 |
+| NDJSON MapReduce | NOT_PROVEN (stale) | `ndjson:mapreduce` script not found; `.opencode/ndjson/` from Aug 29, candidates file empty |
+
+Open follow-ups (unchecked; each needs its own live evidence before ticking):
+- [ ] AUDIT-01 Reconcile `atlas_packets` (61,718) vs `atlas_packet_registry` (58,304) by `packet_key`.
+- [ ] AUDIT-02 Populate/decide owner for `domain_taxonomy_v1` and `primary_domain` (needs operator decision; writes).
+- [ ] AUDIT-03 One live `/search/codebase` → `search-unified` → ACE packet round trip with a receipt.
+- [ ] AUDIT-04 Reconcile the two `PromptPlanV1` definitions into one owner.
+- [ ] AUDIT-05 Investigate why `context.build_ace_packet` / `ace.compact_search` exceed 300s (rerank :8099 and topology :8101 down).
+- [ ] AUDIT-06 Normalize Windows-backslash `source_ref` values emitted in built packets.
+- [ ] AUDIT-07 Locate or recreate the `ndjson:mapreduce` script and refresh `.opencode/ndjson/`.
+
+### Embedding-dimension gate for every follow-up above (operator direction 2026-09-20)
+
+Applies to AUDIT-01..07 and to any BitFrost/ACE packet warming, Go/TurboVec/NLP-sidecar parity work
+and registry backfill under this change. Source of truth is root CLAUDE.md "Embedding Dimensions Policy".
+
+| Lane | Allowed role | Rule |
+|---|---|---|
+| `semantic_768` (embeddinggemma, native) | PRIMARY, the only authoritative vector | Postgres `atlas_packets.embedding` / `codebase_chunk_index.content_embedding` and Qdrant `content` vector must be 768 |
+| 512 / 256 / 128 MRL prefix truncation (L2-renormalized) | DERIVED, optional | may only be produced from an already-indexed, validated 768 source; never primary, never a separate RRF vote |
+| `latent_256` / `latent_128` / `latent_64` (autoencoder) | DERIVED routing/challenger | separate mechanism from MRL truncation; not identity, not retrieval authority; Postgres-only for 64/128 (no Qdrant collections); TurboVec 64-dim is this class |
+| 384 | RETIRED | do not reintroduce |
+
+Live state observed this session: `atlas_packets.embedding` is 768 on 61,659 rows (verified `vector_dims`);
+`latent_64` has 1,703 populated rows per CLAUDE.md (not re-measured here); `content_embedding_384` still exists
+on a table the CLAUDE.md says had it dropped (unconfirmed which table).
+
+- [ ] DIM-01 Add a read-only check that any packet/cache warm batch rejects vectors whose `vector_dims` is not 768 (or an admitted derived lane tagged with its source-768 revision).
+- [ ] DIM-02 Confirm which table still carries `content_embedding_384`; record it. Any drop is a schema change and needs operator approval, so do not run it under this change.
+- [ ] DIM-03 Verify Go `/search/codebase` hits and TurboVec results state their representation (`semantic_768` vs `latent_64`) and never mix them in one fused score.
+- [ ] DIM-04 Ensure ACE packet cache identity includes `representationRevision`, so a latent/truncated lane cannot be served as a 768 hit.
+- [ ] ACEPKT-01 Define `AceContextPacketV1` as the cached context product (evidence packet + bounded Ornith summary), extending the existing `AcePacket` (`cache/ace-packet-cache.ts:14`) rather than adding a parallel type. Required fields: `packetId`, `logicalTaskKey`, `taskRevision`, `workspaceRevision`, `evidenceRefs[]`, `evidenceChecksum`, `facts[]`, `unresolved[]`, `summary{text, modelRevision, promptRevision}`, `tokenCounts{input, summary, saved}`, `cache{cacheIdentity, hit, ttlClass}`, `canonicalAuthority:false`. Observed gap: packets built by the 2026-09-20 canary (`context.build_ace_packet`) return `packet_id`, `query_hash`, `source_refs`, `feature_ids` and a prompt preview, but carry no model/prompt revision, evidence checksum or token counts.
+- [ ] ACEPKT-02 Cache key must include `packetKey`, `workspaceRevision`, `sourceRevision`, `representationRevision`, `summaryModelRevision`, `promptTemplateRevision`, `evidenceChecksum`; SOM cell, KMeans cluster, domain, TTL class and HOT/WARM/COLD are routing/residency signals and must stay OUT of the identity key. Ornith compresses facts; deterministic validators verify them; the controller (not the LLM) decides task state.
+
+### Dynamic OpenSpec workboard + recommendations — ACP / A2A alignment (2026-09-20 audit)
+
+Duplication-prevention finding: a dynamic board already exists. Do NOT build a second workboard or ranker.
+
+| Piece | Status | Evidence |
+|---|---|---|
+| Board snapshot reader | WIRED | `src/lib/server/atlas/openspec-board/report-reader.ts` `readOpenSpecBoardSnapshot()` + `computeOpenSpecReportFingerprint()`; consumed by `routes/atlas/studio/openspec/+page.server.ts` and its `events/+server.ts` (SSE) |
+| Report generators | CREATED | `npm run atlas:docs:workboard` (`build-openspec-workboard-v1.mjs`), `atlas:docs:ranker:adapt` (v3), `audit-openspec-execution-controller-v1.mjs` |
+| Recommendation ranker | CREATED, advisory | `docs/reports/low-rank-task-recommendation-v2.json` (2026-09-19): `TANG_INSPIRED_LOW_RANK_SHORTLIST`, `advisoryOnly:true`, `canonicalAuthority:false`; stays a shadow challenger per the Tang-lane rules |
+| ACP exposure (`ACPToolRegistry.ts`) | NOT_PROVEN | no workboard/openspec tool registered; `/api/acp/tools` cannot discover it |
+| A2A exposure (`/.well-known/agent.json`) | NOT_PROVEN | no workboard skill advertised |
+| Blocker-aware ready-set | NOT_PROVEN | all 200 `openspec-actionable-work-v1.json` tasks carry `executionState: ACTIONABLE`; ~98 are actually identity/source-revision gated (subagent classification, approximate) |
+
+- [x] WORKBOARD-01 Regenerate the reports (`atlas:docs:workboard`, `atlas:docs:ranker:adapt`) so the board reflects current tasks.md files; record the fingerprint. DONE 2026-09-20: `OPENSPEC_WORKBOARD_BUILT changes=88 tasks=9296 open=3303`; ranker adapter `semanticChecksum 3522f874b51748d59ae2e11cd613c07cc6671d565483f6cfbe17a6e5f6d3b0b5`. Board snapshot read after regeneration: total 9,275, proven 5,989, actionable 2,267, waiting 916, deferred 103 (`freshness.stale:true` — newest report is `openspec-progress-audit-v2.json`, older than the 15 min window; the execution-controller/actionable reports were not re-run here).
+- [x] WORKBOARD-02 Register ONE read-only ACP tool (e.g. `openspec:workboard_recommend`) in `ACPToolRegistry.ts` that wraps `readOpenSpecBoardSnapshot()` and returns ready-set + advisory recommendations; must not write, must carry `canonicalAuthority:false`. CREATED + WIRED: `openspec:workboard_recommend` (handler `openspecWorkboardRecommend`), dynamic import of the existing reader, `limit` 1-50 and `change_id` filter, dry-run plan supported. Proven: `tsgo --noEmit` reports no errors in the file; the reader itself was run live (numbers above). NOT_PROVEN: an actual `POST /api/acp/execute` round trip with the dev server up (SvelteKit was down at the time).
+- [x] WORKBOARD-03 Advertise it as an A2A skill in `/.well-known/agent.json` and route it through `/api/ai/agent`, reusing the same handler (no second implementation). CREATED + WIRED 2026-09-20: skill `openspec-workboard` on the card; `/api/ai/agent` A2A branch on `metadata.skill === 'openspec-workboard'` calls `executeACPTool('openspec:workboard_recommend')`; `tsgo --noEmit` clean for all three files. NOT_PROVEN: live A2A `tasks/send` round trip (dev server down).
+- [x] WORKBOARD-04 Make the ready-set blocker-aware: emit `blockerClass` (identity/source-revision, DB-or-cache-write, runtime-service, operator-decision) so IDENTITY-gated tasks stop showing as ACTIONABLE. CREATED 2026-09-20 as a KEYWORD HEURISTIC (`blockerClassMethod: KEYWORD_HEURISTIC_NOT_AUTHORITATIVE`); `ready` now returns only `UNCLASSIFIED_POSSIBLY_READY`. Live split over the board's 308 task-list ACTIONABLE rows: identity/source-revision 142, possibly ready 96, runtime service 28, operator decision 22, DB/cache write 20. Note: the board's controller summary reports 2,267 actionable while the task-report list holds 308 — the two counts disagree and are not reconciled here. A real classifier from `TaskAttemptReceiptV1` receipts is still WORKBOARD-05.
+- [~] WORKBOARD-05 Emit a `TaskAttemptReceiptV1` (`logicalTaskKey`, `taskRevision`, `missingPreconditions`, `result`, `blockerClass`) per attempt and feed it back into the next ready-set. PARTIAL 2026-09-20: contract CREATED at `src/lib/server/atlas/contracts/task-attempt-receipt-v1.ts` (+ `shouldRetryTask()`), spec 7/7 pass via vitest. `COMPLETED` requires a passing validation and no missing preconditions; `canonicalAuthority` locked false. NOT DONE: nothing writes receipts yet and `openspec:workboard_recommend` does not read them, so the feedback loop is not wired.
+- [ ] WORKBOARD-06 Any tool added here inherits the DIM gate above (768-only or tagged derived lane) and the G4/G5 deferral: register auth/Zod with the tool, but the production-hardening pass stays deferred while `DEV_BYPASS_AUTH` is active.
+
 ## Explicitly out of scope for this change (see design.md sections 7, 9, 10, 11)
 
 Do not attempt these under this proposal — each needs its own follow-on OpenSpec change once the
