@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graphify-run-owner.v1",
-  "generatedAt": "2026-09-19T04:55:37.936Z",
+  "generatedAt": "2026-09-21T20:06:31.543Z",
   "mode": "READ_ONLY_RUN_OWNER_AUDIT",
   "readOnly": true,
   "writes": {
@@ -54,6 +54,26 @@
       "completed_stage_count": 3
     }
   ],
+  "authorityShadow": {
+    "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+    "error": null,
+    "observations": [
+      {
+        "schema": "atlas.graphify-authority-shadow-observation.v1",
+        "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "authorityState": "LEGACY_IMPORTED",
+        "parityStatus": "PARITY_PROVEN",
+        "readParityProven": true,
+        "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+        "shadowAuthorityObserved": true,
+        "mutationAuthorized": false
+      }
+    ]
+  },
   "ownerAssessment": {
     "runExists": true,
     "runCompleted": true,

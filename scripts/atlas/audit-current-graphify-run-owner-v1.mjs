@@ -6,6 +6,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const REPORT = resolve(ROOT, 'docs/reports/current-graphify-run-owner-v1.json');
@@ -53,6 +54,9 @@ let databaseError = null;
 let runs = [];
 let workspaceRows = [];
 let coordinatorExecutions = [];
+// Shadow observation of graphify_execution_authority per (workspace, revision); never affects the assessment below.
+let authorityShadow = [];
+let authorityShadowError = null;
 try {
   const result = await pool.query(`
     SELECT r.run_id, r.workspace_id, r.repository_revision, r.workspace_revision,
@@ -87,6 +91,13 @@ try {
       ORDER BY e.completed_at DESC NULLS LAST, e.execution_id
     `, [workspaceRevision]);
     coordinatorExecutions = executionResult.rows;
+    try {
+      const { loadAuthorityShadowV1 } = await loadAuthorityShadowModuleV1();
+      const scopes = new Map(coordinatorExecutions.map((e) => [`${e.workspace_id}|${e.workspace_revision}`, { workspaceId: String(e.workspace_id), workspaceRevision: String(e.workspace_revision) }]));
+      for (const scope of scopes.values()) authorityShadow.push(await loadAuthorityShadowV1(pool, scope));
+    } catch (error) {
+      authorityShadowError = error instanceof Error ? error.message : String(error);
+    }
   }
 } catch (error) {
   databaseError = error instanceof Error ? error.message : String(error);
@@ -112,6 +123,7 @@ const report = {
   workspaceRowCount: workspaceRows.length,
   coordinatorExecutionCount: coordinatorExecutions.length,
   coordinatorExecutions,
+  authorityShadow: { runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY', error: authorityShadowError, observations: authorityShadow },
   ownerAssessment: {
     runExists: Boolean(current),
     runCompleted: Boolean(current?.status === 'COMPLETED' && current?.completed_at),
