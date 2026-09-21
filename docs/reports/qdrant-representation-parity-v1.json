@@ -1,0 +1,133 @@
+{
+  "schema": "atlas.qdrant-representation-parity.v1",
+  "canonicalAuthority": false,
+  "mode": "READ_ONLY",
+  "sampleRequested": 300,
+  "threshold": 0.995,
+  "collections": {
+    "codebase_chunks_768": {
+      "pointsCount": 328348,
+      "sampled": 300,
+      "matchedToPostgresByUuid": 141,
+      "unmatchedOrStale": 159,
+      "hashVerifiedMatches": 109,
+      "evaluated": 109,
+      "classificationHistogram": {
+        "raw": 40,
+        "UNKNOWN": 69
+      },
+      "rawRecipeByContentLength": {
+        "<=2000 chars": {
+          "n": 106,
+          "matchesRaw": 40,
+          "avgRawCosine": 0.9451
+        },
+        ">2000 chars": {
+          "n": 3,
+          "matchesRaw": 0,
+          "avgRawCosine": 0.9704
+        }
+      },
+      "freshRecipeCosine": {
+        "raw": {
+          "n": 109,
+          "min": 0.7229,
+          "avg": 0.9458,
+          "ge_threshold": 40
+        },
+        "title_none": {
+          "n": 109,
+          "min": 0.7077,
+          "avg": 0.9251,
+          "ge_threshold": 0
+        },
+        "title_relative_path": {
+          "n": 109,
+          "min": 0.7542,
+          "avg": 0.9434,
+          "ge_threshold": 0
+        }
+      },
+      "storedColumnCosine": {
+        "content_embedding": {
+          "n": 109,
+          "min": 0.7542,
+          "avg": 0.9394,
+          "ge_threshold": 0
+        },
+        "content_embedding_768": {
+          "n": 2,
+          "min": 0.8401,
+          "avg": 0.8991,
+          "ge_threshold": 0
+        }
+      },
+      "payloadRepresentationLabels": [],
+      "verdict": "QDRANT_REPRESENTATION_MIXED_OR_UNKNOWN"
+    },
+    "codebase_chunks_768_v2": {
+      "pointsCount": 52816,
+      "sampled": 300,
+      "matchedToPostgresByUuid": 298,
+      "unmatchedOrStale": 2,
+      "hashVerifiedMatches": 266,
+      "evaluated": 266,
+      "classificationHistogram": {
+        "UNKNOWN": 183,
+        "raw": 83
+      },
+      "rawRecipeByContentLength": {
+        "<=2000 chars": {
+          "n": 266,
+          "matchesRaw": 83,
+          "avgRawCosine": 0.9408
+        },
+        ">2000 chars": {
+          "n": 0,
+          "matchesRaw": 0,
+          "avgRawCosine": null
+        }
+      },
+      "freshRecipeCosine": {
+        "raw": {
+          "n": 266,
+          "min": 0.7078,
+          "avg": 0.9408,
+          "ge_threshold": 83
+        },
+        "title_none": {
+          "n": 266,
+          "min": 0.7105,
+          "avg": 0.92,
+          "ge_threshold": 0
+        },
+        "title_relative_path": {
+          "n": 266,
+          "min": 0.7592,
+          "avg": 0.9448,
+          "ge_threshold": 0
+        }
+      },
+      "storedColumnCosine": {
+        "content_embedding": {
+          "n": 266,
+          "min": 0.7452,
+          "avg": 0.9408,
+          "ge_threshold": 0
+        },
+        "content_embedding_768": {
+          "n": 5,
+          "min": 0.7963,
+          "avg": 0.8536,
+          "ge_threshold": 0
+        }
+      },
+      "payloadRepresentationLabels": [
+        "semantic_768"
+      ],
+      "verdict": "QDRANT_REPRESENTATION_MIXED_OR_UNKNOWN"
+    }
+  },
+  "databaseWrites": false,
+  "qdrantWrites": false
+}
