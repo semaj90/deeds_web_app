@@ -643,6 +643,10 @@ async function main(): Promise<void> {
       console.log(`judgment coverage ${id}: ${c.judged}/${c.total} of top-10 unique files judged (${pct}%); queries with <10 unique files: ${c.shortQueries}/${c.queries}`);
     }
     const incomplete = [...coverage.values()].some((c) => c.judged < c.total || c.shortQueries > 0);
+    console.log('frozen invariants: evaluationUnit=SOURCE_FILE metricDefinition=JUDGED_IDEAL_V2 canonicalEvaluator=phase2f-evaluation-runner.mts qrels=frozen judged file executor(recipe selection)=pgvector_exact productionWrites=false');
+    if (incomplete && allowUnjudged) {
+      console.log('DIAGNOSTIC_ONLY: --allow-unjudged-as-irrelevant runs are NOT eligible to produce a promotion receipt; expand the judged pool with the missing files and rerun to reach 100 percent coverage.');
+    }
     if (incomplete && !allowUnjudged) {
       console.log('INCOMPLETE_JUDGMENT_COVERAGE: unjudged or missing top-10 files present; metrics above are provisional. Grade the missing files or pass --allow-unjudged-as-irrelevant to accept the TREC-style policy explicitly.');
       process.exitCode = 2;
