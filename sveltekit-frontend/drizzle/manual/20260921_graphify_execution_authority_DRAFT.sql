@@ -1,4 +1,4 @@
--- GRAPHIFY-EXECUTION-IDENTITY-MODEL-02A (2026-09-21, revised after operator review). SCHEMA ONLY. DRAFT: NOT APPLIED.
+-- GRAPHIFY-EXECUTION-IDENTITY-MODEL-02A (2026-09-21, revised after operator review). SCHEMA ONLY. APPLIED 2026-09-21 (operator 'apply' in reply to 'apply 02A'; single transaction, readback verified; see the lineage ledger entry GRAPHIFY-EXECUTION-IDENTITY-MODEL-02A APPLIED).
 -- Requires explicit operator sign-off (Drizzle Safety Rule) before anything here runs. Additive and idempotent: every statement is
 -- IF NOT EXISTS, a guarded ADD, or a default change; nothing rewrites or removes existing rows or objects. No row is inserted here:
 -- importing the legacy canonical selection is a separate gate (02B: 20260921b_graphify_execution_authority_legacy_import_DRAFT.sql).
