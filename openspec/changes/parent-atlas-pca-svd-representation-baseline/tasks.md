@@ -98,6 +98,71 @@
 - [ ] 3.1 Register the new representation with `dimension_method: 'LINEAR_PROJECTION'` in whichever
       registry wins `SYMBOL-REPRESENTATION-REGISTRY-RECONCILIATION-01` — blocked on that decision,
       not made here.
+
+      **Findings 2026-09-21 (read-only audit; no code/DB/schema changed).** 3.1's "blocked" text is
+      stale: it conflates two registries that `SYMBOL-REPRESENTATION-REGISTRY-RECONCILIATION-01`
+      (`parent-atlas-ace-rlm-bitfrost-integration/tasks.md` L8058-8260) already split and decided.
+      - **Representation half (this task's actual target) is decided AND applied**: `atlas_representations`
+        is canonical; migration 0152 applied 2026-09-12; 5 seed rows live (`semantic_768/512/384`,
+        `topology_128`, `latent_64`, all CANDIDATE/UNVERIFIED). `LINEAR_PROJECTION` is already an allowed
+        value of `atlas_representations_dimension_method_check`. `pca_svd_64/128/256` are NOT registered
+        (needs a DB INSERT = write gate). The pca-svd Sequencing note below is therefore outdated.
+      - **Symbol half is a different capability** (identity, not embeddings): decided
+        `atlas_symbol_registry` + `atlas_symbol_versions` canonical (FINAL ARCHITECTURE DECISION, L8160).
+        It does not block 3.1.
+      - **Symbol identity formula (as coded, `packages/parent-atlas/src/core/`):**
+        `symbol_key` = `upstream-symbol:{upstream_symbol_id}` if present, else
+        `symbol-key:` + sha256(JSON[lang.lower, source_ref (\->/, NFC), kind, qualified_name NFC])[0:40]
+        (`structural-symbol.ts deriveUpstreamSymbolNominationKey`);
+        `stable_symbol_id` = `symbol:` + sha256(JSON[lang.lower, kind, symbol_key])[0:40];
+        `symbol_version_id` = `symbol-version:` + sha256(JSON[stable_symbol_id, source_revision,
+        upstream_node_id, declaration_hash])[0:40] (`symbol-registry-repository.ts L32-47`).
+        Design weaknesses found: (a) `source_ref` is inside `symbol_key`, so a file move/rename mints a
+        NEW stable id unless an alias reconciles it; (b) `kind` is inside the id, so a class<->interface
+        change is a new identity; (c) when an upstream (treesitter-chunker) id exists it becomes the key,
+        tying "stable" identity to an upstream id whose cross-revision stability is unproven.
+      - **Live counts (2026-09-21):** `atlas_symbol_registry` 10,504 and `atlas_symbol_versions` 479 (were
+        10,310 / 285 on 2026-09-12 — rows grew, writer/source not identified here); `graphify_symbols` 194;
+        `atlas_ast_nodes` 11,273; `feature_ontology_tuples` 539,124 (UNRESOLVED); `atlas_ontology_linked_tuples` 0.
+      - **ast-grep is not a symbol extractor as configured**: `scripts/atlas/lib/ast-grep-symbol-extraction.mjs`
+        is TS/JS only, 7 hard-coded patterns (function decl, arrow const, typed const, class, interface,
+        type alias, import), one child process per pattern; no methods, enums, namespaces, exports,
+        class fields, Svelte, Python, Go, SQL. It emits kind+name only — no `qualified_name` rule, so the
+        method-symbol convention (`Class.method`) is undefined and `symbol_key` cannot be formed for methods.
+      - **POS pipeline gaps**: sidecar `:8095` is up (`spacy`, `spacy_pos` true; `torch:false`, no GPU
+        libs) and `/pos` returns real tags on prose. Gaps: (1) output is flat word lists with no
+        character offsets/spans, so it cannot populate `atlas_ontology_linked_tuples`, whose
+        `evidence_span` needs `UTF8_PARSER_BUFFER_V1` spans; (2) a prose-trained tagger mis-tags code
+        vocabulary (live: "token" tagged verb) and there is no verified identifier splitter
+        (camelCase/snake_case) or code-comment/docstring scoping before tagging; (3) nothing turns POS
+        output into resolved tuples: `feature_ontology_tuples` is 539,124 rows all UNRESOLVED and the
+        linked-tuples table has 0 rows; (4) no PyTorch model in this sidecar, so a "spaCy/PyTorch"
+        end-to-end lane does not exist; (5) no chain from symbol registry -> POS/concept tags -> registry
+        representations. End-to-end status: `NOT_PROVEN` (parts exist, no wired path).
+
+- [ ] 3.1a **Correct the stale blocker text** in 3.1 and the Sequencing note: split "symbol registry" (decided,
+      not blocking) from "representation registry" (decided + applied). Doc-only.
+- [ ] 3.1b **Register `pca_svd_64/128/256`** as `atlas_representations` rows (`dimension_method='LINEAR_PROJECTION'`,
+      `native_dimensions=768`, `output_dimensions` 64/128/256, CANDIDATE/UNVERIFIED, `artifact_digest` from the
+      fitted basis in `pca-svd-representation-comparison-v1.json`). DB write: dry-run SQL first, needs explicit
+      operator approval; do not fill unknown provenance with invented values.
+- [ ] 3.1c **Define the symbol-identity contract in one place** (OpenSpec/spec, no code): confirm or amend the three
+      formulas above; decide whether `source_ref` and `kind` belong in `symbol_key`; require alias-on-move
+      proof. Operator decision.
+- [ ] 3.1d **Define `qualified_name` + method convention** (`Class.method`, nested, overloads, Svelte components) so
+      `symbol_key` is formable; reuse the pending method-symbol decision, do not invent a parallel one.
+- [ ] 3.1e **Extend ast-grep extraction as a nominator only** (no identity authority): add rules for methods, enums,
+      exports, class fields; keep TS/JS scope explicit; emit byte spans; feed `StructuralSymbolNominationV1`
+      via the existing unwired `canonicalizeStructuralEvidence()` + `createSymbolRegistryRepository()`.
+- [ ] 3.1f **Give the POS lane spans**: extend `/pos` (or a v2 route) to return token offsets and sentence spans;
+      add identifier splitting and code-vs-prose scoping before tagging; measure tag accuracy on a small
+      reviewed identifier sample before trusting it.
+- [ ] 3.1g **Prove one entity end-to-end** (ONE_ENTITY trace): one real symbol from source bytes -> ast-grep
+      nomination -> `atlas_symbol_registry`/`_versions` (dry-run) -> POS/concept tuple with span -> linked
+      tuple -> optional `atlas_representations` binding. Record the result per stage; do not report a percentage.
+- [ ] 3.1h **Identify who grew** `atlas_symbol_registry` (10,310 -> 10,504) and `atlas_symbol_versions`
+      (285 -> 479) since 2026-09-12 and which `workspace_revision` those rows bind to; the existing rows were
+      bound to non-admitted `sha256:55edaaad...`. Read-only.
 - [x] 3.2 **Done 2026-09-12.** Archived `scripts/atlas/pca-baseline-768-to-384.mjs` to
       `deeds_labs/archive/2026-09-12/pca-baseline-768-to-384.mjs.broken` (moved, not deleted, per
       this repo's convention) now that a real, verified replacement exists (2.1-2.4 above).

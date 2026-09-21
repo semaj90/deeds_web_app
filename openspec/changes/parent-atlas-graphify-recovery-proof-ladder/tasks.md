@@ -524,12 +524,42 @@ receipt, and tighten the acceptance gates.
 - [ ] Verify the existing Qdrant projection contract still owns `packetKey`, `sourceRef`,
       `featureId`, `communityId`, `pageRank`, and `graphRevision`, and does not derive
       identity from Neo4j or Qdrant node IDs.
+      **Checked 2026-09-21 (static read of `src/lib/server/atlas/qdrant-collection-contracts.ts`; claim does NOT hold as
+      written, left open):** `packet_key` and `source_ref` are payload-indexed keywords (L21-22); `graph_revision` is an
+      indexed keyword (L77); `community_id` (L294) and `page_rank` (L298) exist only as optional TS interface fields,
+      not payload indexes; `feature_id` and `projection_revision` do not appear in the file at all. So the contract owns
+      packet/source identity plus graph revision, and does not yet carry feature identity or projection revision.
+      Decide whether to add them or narrow this task's field list.
 - [ ] Confirm `graph-projection-manifest.ts` remains the canonical place for
       `projectionRevision` / `graphRevision` metadata, and reuse it rather than introducing a
       new projection-manifest type.
-- [ ] Inventory the live fan-out scripts above and classify each as `created`, `wired`, or
+      **Checked 2026-09-21 (left open — two files share this name, distinct contracts):**
+      (a) `src/lib/server/atlas/graph/graph-projection-manifest.ts` (78 lines) — `GraphProjectionManifestV1`
+      (`atlas.graph-projection-manifest.v1`: workspace/source/graph/projection revisions, layout COO/CSR/CSC, executor,
+      counts, producerRevision; used by `alt-*` precompute files);
+      (b) `src/lib/server/graph/graph-projection-manifest.ts` (280 lines) — `GraphProjectionManifest` for Neo4j GDS
+      relationship projections with `assertGraphProjectionFreshness` (rejects stale graphRevision/projectionRevision),
+      used by the analysis runner and betweenness/kcore adapters.
+      Both carry `graphRevision` + `projectionRevision`; neither is a Qdrant/Neo4j fan-out receipt. Same filename,
+      different schemas = collision risk. Needs a canonical-owner decision (layer them explicitly or rename one)
+      before reusing either for the fan-out receipt.
+- [x] Inventory the live fan-out scripts above and classify each as `created`, `wired`, or
       `proof-only`; do not add a new fan-out service if the existing scripts already cover the
       path.
+      **Done 2026-09-21 (static evidence only — no script was run):**
+
+      | Script | Lines | Dry/apply flags | Readback refs | npm alias | Other importers | Class |
+      |---|---|---|---|---|---|---|
+      | `project-neo4j-graphrag.mjs` | 168 | 1 | 0 | none | none | `created` (orphan) |
+      | `project-feature-matrix-neo4j.mjs` | 199 | 2 | 3 | none | 2 scripts mention it | `created` |
+      | `sync-atlas-feature-map-from-qdrant.mjs` | 281 | 3 | 1 | `atlas:qdrant:feature-map-sync` | 2 (`packet-materializer-lib`, `reingest-parent-atlas`) | `wired` |
+      | `neo4j-cluster-fanout.mjs` | 225 | 2 | 4 | `atlas:neo4j:cluster-fanout` | none | `wired` |
+      | `validate-qdrant-bridge.mjs` | 115 | 0 | 0 | `atlas:index:registry:init` | none | `proof-only` (alias name says init) |
+      | `validate-qdrant-bridge-v2.mjs` | 129 | 0 | 0 | `atlas:index:qdrant:build` | none | `proof-only` (alias name says build) |
+
+      No new fan-out service is needed. Naming mismatch: two `validate-*` scripts are aliased as init/build
+      commands with no dry-run gate — review before anyone runs those aliases. Tasks below (dry-run, apply,
+      idempotence) remain open and write to Neo4j/Qdrant, so they need explicit approval.
 - [ ] Add or reuse a `GraphProjectionReceipt`-shaped report for the fan-out run, including
       `graphRevision`, `projectionRevision`, `sourceRef`, `packetKey`, `featureId`,
       `communityId`, `pageRank`, and row counts.
