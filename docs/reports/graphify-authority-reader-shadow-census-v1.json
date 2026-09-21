@@ -1,0 +1,260 @@
+{
+  "schema": "atlas.graphify-authority-reader-shadow-census.v1",
+  "generatedAt": "2026-09-21T22:54:34.082Z",
+  "expectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "status": "GRAPHIFY_AUTHORITY_READER_SHADOW_02_PROVEN",
+  "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+  "readerCutover": false,
+  "mutationAuthorized": false,
+  "databaseWrites": 0,
+  "persistentWrites": 0,
+  "sharedShadowImplementationCount": 1,
+  "evidenceClassCounts": {
+    "LIVE_READER_RUN": 7,
+    "BUILDER_WITH_LIVE_HELPER": 1
+  },
+  "limitations": [
+    "admission-panel: loader not runnable outside SvelteKit; evidence is its unit suite plus a live observation from the same shared helper, not a live loader run."
+  ],
+  "criteria": {
+    "readerCount8": true,
+    "allReadersObserved": true,
+    "allLegacyEqualsAuthorityEqualsExpected": true,
+    "authorityStateLegacyImportedAll": true,
+    "parityProven8": true,
+    "mismatchCountZero": true,
+    "runtimeOwnerLegacyAll": true,
+    "mutationAuthorizedFalseAll": true,
+    "readerCutoverFalse": true,
+    "noReaderReportedWrites": true,
+    "databaseFingerprintUnchanged": true,
+    "historicalApplyRecordsUnchanged": true,
+    "noReaderFailures": true
+  },
+  "readerCount": 8,
+  "parityProven": 8,
+  "readers": [
+    {
+      "readerId": "binding-audit",
+      "readerPath": "scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts",
+      "invocationClass": "tsx",
+      "args": [],
+      "exitCode": 0,
+      "observationCount": 21,
+      "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+      "mutationAuthorized": false,
+      "readerCutover": false,
+      "writesPerformed": false,
+      "evidenceClass": "LIVE_READER_RUN",
+      "decisionStatus": "GRAPHIFY_SNAPSHOT_BINDING_PROVEN",
+      "priorDecisionStatus": "GRAPHIFY_SNAPSHOT_BINDING_PROVEN",
+      "failures": [],
+      "pass": true
+    },
+    {
+      "readerId": "repair-planner",
+      "readerPath": "scripts/atlas/plan-current-source-authority-repair-v1.mts",
+      "invocationClass": "tsx",
+      "args": [],
+      "exitCode": 0,
+      "observationCount": 1,
+      "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+      "mutationAuthorized": false,
+      "readerCutover": false,
+      "writesPerformed": false,
+      "evidenceClass": "LIVE_READER_RUN",
+      "decisionStatus": "REPAIR_PLAN_PARTIAL_EXACT_BLOCKED",
+      "priorDecisionStatus": "REPAIR_PLAN_PARTIAL_EXACT_BLOCKED",
+      "failures": [],
+      "pass": true
+    },
+    {
+      "readerId": "run-owner",
+      "readerPath": "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
+      "invocationClass": "node",
+      "args": [],
+      "exitCode": 0,
+      "observationCount": 1,
+      "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+      "mutationAuthorized": false,
+      "readerCutover": false,
+      "writesPerformed": false,
+      "evidenceClass": "LIVE_READER_RUN",
+      "decisionStatus": "GRAPHIFY_RUN_OWNER_COMPLETE",
+      "priorDecisionStatus": "GRAPHIFY_RUN_OWNER_COMPLETE",
+      "failures": [],
+      "pass": true
+    },
+    {
+      "readerId": "snapshot-authority",
+      "readerPath": "scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts",
+      "invocationClass": "tsx",
+      "args": [
+        "--execution-id",
+        "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      ],
+      "exitCode": 0,
+      "observationCount": 1,
+      "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+      "mutationAuthorized": false,
+      "readerCutover": false,
+      "writesPerformed": false,
+      "evidenceClass": "LIVE_READER_RUN",
+      "decisionStatus": "CURRENT_SNAPSHOT_PROVEN",
+      "priorDecisionStatus": "CURRENT_SNAPSHOT_PROVEN",
+      "failures": [],
+      "pass": true
+    },
+    {
+      "readerId": "source-bridge-reconciliation",
+      "readerPath": "scripts/atlas/audit-current-graphify-source-bridge-reconciliation-v1.mjs",
+      "invocationClass": "node",
+      "args": [
+        "--execution-id",
+        "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      ],
+      "exitCode": 0,
+      "observationCount": 1,
+      "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+      "mutationAuthorized": false,
+      "readerCutover": false,
+      "writesPerformed": false,
+      "evidenceClass": "LIVE_READER_RUN",
+      "decisionStatus": "CURRENT_SOURCE_BRIDGE_EXACT_READ_ONLY",
+      "priorDecisionStatus": "CURRENT_SOURCE_BRIDGE_EXACT_READ_ONLY",
+      "failures": [],
+      "pass": true
+    },
+    {
+      "readerId": "admission-panel",
+      "readerPath": "sveltekit-frontend/src/lib/server/atlas/admission/workspace-admission-panel-v1.ts",
+      "invocationClass": "BUILDER_WITH_LIVE_HELPER (panel unit suite + live shared-helper observation; the panel loader needs the SvelteKit runtime for its $lib DB import and cannot run standalone)",
+      "args": [],
+      "exitCode": 0,
+      "observationCount": 1,
+      "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+      "mutationAuthorized": false,
+      "readerCutover": false,
+      "writesPerformed": "NOT_REPORTED",
+      "evidenceClass": "BUILDER_WITH_LIVE_HELPER",
+      "decisionStatus": null,
+      "priorDecisionStatus": null,
+      "failures": [],
+      "pass": true
+    },
+    {
+      "readerId": "source-owner-reconciliation",
+      "readerPath": "scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs",
+      "invocationClass": "node",
+      "args": [],
+      "exitCode": 0,
+      "observationCount": 21,
+      "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+      "mutationAuthorized": false,
+      "readerCutover": false,
+      "writesPerformed": false,
+      "evidenceClass": "LIVE_READER_RUN",
+      "decisionStatus": null,
+      "priorDecisionStatus": null,
+      "failures": [],
+      "pass": true
+    },
+    {
+      "readerId": "run-bridge-preflight",
+      "readerPath": "scripts/atlas/apply-graphify-execution-run-bridge-v1.mjs",
+      "invocationClass": "node (preflight, no --apply)",
+      "args": [
+        "--execution-id=74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "--run-id=01a8d8fc-2507-4f39-868e-039039237b98"
+      ],
+      "exitCode": 0,
+      "observationCount": 1,
+      "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+      "mutationAuthorized": false,
+      "readerCutover": false,
+      "writesPerformed": false,
+      "evidenceClass": "LIVE_READER_RUN",
+      "decisionStatus": "BRIDGE_ALREADY_PROVEN",
+      "priorDecisionStatus": "BRIDGE_ALREADY_PROVEN",
+      "failures": [],
+      "pass": true
+    }
+  ],
+  "integrity": {
+    "before": {
+      "db": {
+        "authorityRows": {
+          "n": 1,
+          "h": "ea4432a38f3b0e65d18851c1f9138c7d"
+        },
+        "legacyCanonicalRows": {
+          "n": 1,
+          "h": "38d28b32da3302ef1b6fdd47a61f0fc8"
+        },
+        "executions": 36
+      },
+      "applyRecords": {
+        "docs/reports/current-graphify-execution-owner-decision-v1.json": "sha256:ab0a40baa97fd453365245480da099bfa95f9daa9c6c18f0ea331a89da080673",
+        "docs/reports/graphify-execution-run-bridge-apply-v1.json": "sha256:c7f877484f78d8eea135fdf816b97966c5264cc57a2d50c2b4c3e095754c7f67"
+      }
+    },
+    "after": {
+      "db": {
+        "authorityRows": {
+          "n": 1,
+          "h": "ea4432a38f3b0e65d18851c1f9138c7d"
+        },
+        "legacyCanonicalRows": {
+          "n": 1,
+          "h": "38d28b32da3302ef1b6fdd47a61f0fc8"
+        },
+        "executions": 36
+      },
+      "applyRecords": {
+        "docs/reports/current-graphify-execution-owner-decision-v1.json": "sha256:ab0a40baa97fd453365245480da099bfa95f9daa9c6c18f0ea331a89da080673",
+        "docs/reports/graphify-execution-run-bridge-apply-v1.json": "sha256:c7f877484f78d8eea135fdf816b97966c5264cc57a2d50c2b4c3e095754c7f67"
+      }
+    }
+  },
+  "receiptChecksum": "sha256:81b75fb03f3c41386d4db0c5d72c1529a9a32438e0f9f84017cf0583d1178d5e"
+}
