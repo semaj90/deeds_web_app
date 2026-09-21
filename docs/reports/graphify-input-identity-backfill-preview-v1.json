@@ -1,0 +1,519 @@
+{
+  "schema": "atlas.graphify-input-identity-backfill-preview.v1",
+  "generatedAt": "2026-09-21T18:55:16.018Z",
+  "mode": "READ_ONLY_PREVIEW",
+  "recipeSchema": "atlas.graphify-input-identity.v1",
+  "databaseError": null,
+  "executionsExamined": 36,
+  "recipeInputsComplete": 36,
+  "incompleteExecutionIds": [],
+  "distinctInputIdentities": 21,
+  "duplicateGroups": 7,
+  "conflictingCanonicalSerializations": 0,
+  "groups": [
+    {
+      "inputIdentity": "sha256:464d1fa421e72166d54cb4bd8b5f4caa871c25632b76abf529d43bd49c684973",
+      "count": 6,
+      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "5013de19-7bed-4703-bd6b-1684b19e2aaf",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "c531a1b0-c932-482f-8a21-5d067f504a13",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "24c421a1-28b1-431d-ac09-2793ed807ca6",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "3ded0ce6-cd8c-419f-96c9-49984824c956",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "b337f94c-850b-44b5-99a7-ba6a6cfaeedf",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": "MEMBERSHIP_DIFFERS"
+    },
+    {
+      "inputIdentity": "sha256:30a6e0096e2d86c6195172dd66bba01ea6062eb74e9932d5f2264208690f848f",
+      "count": 5,
+      "workspaceRevision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "bfc5739f-554a-44c9-86f6-d239cb9b842a",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "6e64486f-c195-4b31-9b9e-7fe8f194523b",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "9fb02c30-5f7d-4c36-bb9f-24663a53e7a9",
+          "status": "ABANDONED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "9873c46e-9f13-4183-81f8-82cf74c06d81",
+          "status": "ABANDONED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "f9115616-7747-4879-a98f-fc0e189f71d8",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
+    },
+    {
+      "inputIdentity": "sha256:9ba8fe3389388aa1e33aecbeb8f3c8bbb0cda117ecc23704f394ba3be7df809e",
+      "count": 3,
+      "workspaceRevision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "de58de64-0b29-4dea-b1bc-88949458793a",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "9524dd40-b9d4-4c13-9c7f-ccdbf0387af4",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "255ca44b-947a-4a25-9e6c-a8890ea7555a",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": "MEMBERSHIP_DIFFERS"
+    },
+    {
+      "inputIdentity": "sha256:2d44855d8baf8e9014dde9c93e45ce83b1edd26ddbf2dc4bc2835e3ea0a0d568",
+      "count": 2,
+      "workspaceRevision": "sha256:c57775da8eb8320fbeae542e7e9ee608f35db56f19d76ed00363ed8c759fe1f0",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "747d0c3d-f9a6-4376-8314-387ecdef9923",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "24b32bc1-beca-4451-ad97-d71e7abe1af4",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
+    },
+    {
+      "inputIdentity": "sha256:1dcd8e7ffc5afb3eee5097b7256aebeeeeeffab3fcab0ac1f2845098def314dc",
+      "count": 2,
+      "workspaceRevision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "de2b1e77-9849-4449-98ca-96a729491f2e",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "8c6891d3-27fe-4913-9f46-bd8f6cb129cf",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": "MEMBERSHIP_DIFFERS"
+    },
+    {
+      "inputIdentity": "sha256:5feff6ce0f88b33ace877928e87fa97cc2d38cc2ae84b3daba8fb5d49318d172",
+      "count": 2,
+      "workspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "c418970d-b6d1-4258-a262-2ba3fb06f213",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "49681845-d45e-4e00-851a-31a28fb993ab",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": "MEMBERSHIP_DIFFERS"
+    },
+    {
+      "inputIdentity": "sha256:5f77151f49f7be5efcfa1933cde084761b0ba111903f8bb623aff4fa6b4fc817",
+      "count": 2,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+          "status": "COMPLETED",
+          "canonicalAuthority": true
+        },
+        {
+          "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 1,
+      "canonicalExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
+    },
+    {
+      "inputIdentity": "sha256:a6c3bf4e45d2fa1941ab50c54a6905c3d32ffeab694215b3a67836c2d68c9c1f",
+      "count": 1,
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "5dc82676-d8a5-470e-a3b9-e06a98fb3de5",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:28e6f80324e979855ac07adaab4c3c272349a4f6255623a61ddc56df4b50ce46",
+      "count": 1,
+      "workspaceRevision": "sha256:c17c40c28da9c0ec831c4a5beb7390fb73a581c6b147cae95c8da79d3fcfb4d2",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "fe3dcfa6-da34-4a30-9281-e56d752f77ec",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:b20f1a73b10dd04b95e979f8aa929ccf5170c399a96aa16512aad59b473ca5e3",
+      "count": 1,
+      "workspaceRevision": "sha256:817549d78646b52a0f34f8af96970ae95256b87e59125d1542611f8f386d69bb",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "680906bc-2bfd-48d5-b96e-5b9b4a4198d1",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:44b2d86ce6d568c748554cadd83a8d7fb818c3ce75642f8bb85d1d2097338c52",
+      "count": 1,
+      "workspaceRevision": "sha256:bc74ddc7e74af1e6fa9681182e2bc97fa4b2dc49d59c40c251fb505d22bf3ba1",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "5b219159-d033-4d09-8174-6f602789e89b",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:f668fb839c0415398add7fd62f719779d2ba75490a288adb43f4f73001164f01",
+      "count": 1,
+      "workspaceRevision": "sha256:ec2cc83d87c6f88c7fea4980f3d6d50db8a5d8686f6f4899d87645f0b5cd6507",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "709e5232-879a-46a8-963d-71c45e2658f0",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:3863850572134569af2135e31dcded4bc03b8c4409dd39aa75536240a6c92f12",
+      "count": 1,
+      "workspaceRevision": "sha256:c44511cb21e26ca33b97ae6a7f3878827883dd11680db7aeefd60c477711be70",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "8894000e-d7cc-4298-8201-3f3ad6a0ce57",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:86a0d745a15479fc6abcc819da6c8e71654cfb79bdcd4c94dba41674eb5f3f7c",
+      "count": 1,
+      "workspaceRevision": "sha256:5d4ee74f53ea47ba80d4835494856fd0cfbc9ae532cabf8db1a17277d937510f",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "45938370-7d17-4b25-a118-363997035e40",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:6fd4cdfb987bd2666ae3687f32b235e86955c6f7bd3d25b120a969bb5dc7fef5",
+      "count": 1,
+      "workspaceRevision": "sha256:5db2bc428d4dcf07c2a11096039aad18c916b50aa17e849b2325a782d981dcdc",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "ccb615ba-99da-4801-bcf7-0e8a63e7376a",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:fe412a32f4f0ad0f2fd6c0366e3ce97feaec22d307e8e97427f506c5449460d8",
+      "count": 1,
+      "workspaceRevision": "sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "24719bbd-3d33-4daf-bdec-f65277c6b149",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:682e649f4e3ee93f6556c321cba9a3c3a5156ae01518819829d064576c117879",
+      "count": 1,
+      "workspaceRevision": "sha256:0b5cb14bd9014009ea8debc779df62cb3f6e669f8de94c79ad98ca8b88ff5e24",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "8bd073a7-a8a9-43b7-b53a-778d33e3b524",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:5014efed9ec12d642315c07af6d22ecdbce36b651d1e1cb696a2b6cd9ddb8e54",
+      "count": 1,
+      "workspaceRevision": "sha256:578fc2602ee7ad6c29afea852f011cbff297b42ec0d4e8509e083e74f3d85500",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "956f03c2-d396-4e9e-9b68-69a8fb38cdb4",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:98fa74488aa220dab340146c7675f7bc87ce255e306f001c7b075cd04c12d7e5",
+      "count": 1,
+      "workspaceRevision": "sha256:8ebe1fdd07b6e2c0c78d55e42c7fc9bf73ee21a6f87d31dbf2ca4032eb624669",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "945b3d60-784a-4669-a08a-82405bbb8133",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:d23ab2ce7c3f94892d5141e025bddbb7582eda4c2d11bfee3c15c8e83a69e922",
+      "count": 1,
+      "workspaceRevision": "sha256:bf3acebd9e4140b8d77ee4fd8839a888b57c3401d26a74e06aeca7e4ae2579e2",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "98c5f3a0-290c-4ae6-a76a-a48d565b91b7",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:2846513386cc393891e769ef63720b6b807f0c28e7c60ed4f4edcd892bf0fb46",
+      "count": 1,
+      "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "14667026-459c-4a99-b3c2-c20b739a6e0d",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    }
+  ],
+  "writesPerformed": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "filesystem": true
+  },
+  "backfillApplied": false,
+  "status": "PREVIEW_READY_NO_WRITES"
+}
