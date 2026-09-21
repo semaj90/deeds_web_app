@@ -28,6 +28,15 @@ export interface ExecutionRow {
   completedAt: string | null;
 }
 
+import { loadAuthorityShadowV1, type AuthorityShadowObservationV1 } from './graphify-authority-shadow-read-v1';
+
+/** Shadow observation of the new authority table; diagnostic only, never used by the panel's own decisions. */
+export interface AuthorityShadowPanelBlock {
+  runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY';
+  error: string | null;
+  observations: AuthorityShadowObservationV1[];
+}
+
 export interface AdmissionPanelInputs {
   derive: ReceiptRead;
   preflight: ReceiptRead;
@@ -35,6 +44,8 @@ export interface AdmissionPanelInputs {
   /** stat() of the candidate snapshot artifact (never parsed: it is ~15 MB). */
   candidateArtifact: { exists: boolean; bytes: number | null };
   executions: { ok: boolean; rows: ExecutionRow[]; error: string | null };
+  /** Optional shadow observations (loader supplies them; absent in pure tests). */
+  authorityShadow?: { observations: AuthorityShadowObservationV1[]; error: string | null };
   now?: Date;
 }
 
@@ -46,6 +57,7 @@ export interface ConsistencyCheck {
 
 export interface WorkspaceAdmissionPanelV1 {
   schema: 'atlas.workspace-admission-panel.v1';
+  authorityShadow: AuthorityShadowPanelBlock;
   generatedAt: string;
   candidate: {
     badge: PanelBadge;
@@ -244,6 +256,7 @@ export function buildWorkspaceAdmissionPanelV1(inputs: AdmissionPanelInputs): Wo
     },
     degraded: unavailableInputs.length > 0 || !consistent,
     unavailableInputs,
+    authorityShadow: { runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY', error: inputs.authorityShadow?.error ?? null, observations: inputs.authorityShadow?.observations ?? [] },
     invariants: {
       authorityDataMayFallback: false,
       sampleAuthorityDataAllowed: false,
@@ -333,7 +346,7 @@ export async function loadWorkspaceAdmissionPanelV1(): Promise<WorkspaceAdmissio
     try {
       const { pool } = await import('$lib/server/db/client');
       const result = await pool.query(
-        `SELECT execution_id::text AS execution_id, status, workspace_revision, canonical_authority,
+        `SELECT execution_id::text AS execution_id, workspace_id::text AS workspace_id, status, workspace_revision, canonical_authority,
                 started_at, completed_at
            FROM public.graphify_executions
           WHERE workspace_revision = ANY($1::text[])
@@ -357,5 +370,18 @@ export async function loadWorkspaceAdmissionPanelV1(): Promise<WorkspaceAdmissio
     }
   }
 
-  return buildWorkspaceAdmissionPanelV1({ derive, preflight, binding, candidateArtifact, executions });
+  let authorityShadow: { observations: AuthorityShadowObservationV1[]; error: string | null } = { observations: [], error: null };
+  if (revisions.length > 0 && executions.ok) {
+    try {
+      const { pool } = await import('$lib/server/db/client');
+      const workspaceIds = (await pool.query(`SELECT DISTINCT workspace_id::text AS workspace_id, workspace_revision FROM public.graphify_executions WHERE workspace_revision = ANY($1::text[])`, [revisions])).rows;
+      for (const scope of workspaceIds) {
+        authorityShadow.observations.push(await loadAuthorityShadowV1(pool as any, { workspaceId: String(scope.workspace_id), workspaceRevision: String(scope.workspace_revision) }));
+      }
+    } catch (error) {
+      authorityShadow = { observations: [], error: error instanceof Error ? error.message : String(error) };
+    }
+  }
+
+  return buildWorkspaceAdmissionPanelV1({ derive, preflight, binding, candidateArtifact, executions, authorityShadow });
 }

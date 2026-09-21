@@ -247,3 +247,32 @@ describe('read-only guarantee (source guard)', () => {
     expect(source).not.toMatch(/\b(INSERT\s+INTO|UPDATE\s+public|DELETE\s+FROM|TRUNCATE|DROP\s+TABLE|ALTER\s+TABLE)\b/i);
   });
 });
+
+describe('admission panel authority shadow (diagnostic only)', () => {
+  const obs = {
+    schema: 'atlas.graphify-authority-shadow-observation.v1', workspaceId: 'w', workspaceRevision: `sha256:${'a'.repeat(64)}`,
+    legacyExecutionId: 'X', authorityExecutionId: 'X', authorityState: 'LEGACY_IMPORTED', parityStatus: 'PARITY_PROVEN', readParityProven: true,
+    runtimeSelection: 'X', runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY', shadowAuthorityObserved: true, mutationAuthorized: false,
+  } as const;
+
+  it('defaults to an empty legacy-owned block when no shadow is supplied', () => {
+    const p = buildWorkspaceAdmissionPanelV1(inputs());
+    expect(p.authorityShadow).toEqual({ runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY', error: null, observations: [] });
+  });
+  it('passes observations through without changing any decision field', () => {
+    const without = buildWorkspaceAdmissionPanelV1(inputs());
+    const withShadow = buildWorkspaceAdmissionPanelV1({ ...inputs(), authorityShadow: { observations: [obs], error: null } });
+    const { authorityShadow: _a, ...restWithout } = without as any;
+    const { authorityShadow: _b, ...restWith } = withShadow as any;
+    expect(restWith).toEqual(restWithout);
+    expect(withShadow.authorityShadow.observations[0].runtimeSelection).toBe('X');
+  });
+  it('a disagreeing or failed shadow never flips readiness or canonicalState', () => {
+    const mismatch = { ...obs, authorityExecutionId: 'Y', parityStatus: 'SELECTION_MISMATCH', readParityProven: false } as const;
+    const base = buildWorkspaceAdmissionPanelV1(inputs());
+    const bad = buildWorkspaceAdmissionPanelV1({ ...inputs(), authorityShadow: { observations: [mismatch], error: 'boom' } });
+    expect(bad.admitted.canonicalState).toBe(base.admitted.canonicalState);
+    expect(bad.degraded).toBe(base.degraded);
+    expect(bad.authorityShadow.error).toBe('boom');
+  });
+});
