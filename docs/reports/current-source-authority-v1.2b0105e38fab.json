@@ -153,6 +153,5 @@
     "cagraPromotion": false,
     "transaction": "REPEATABLE READ READ ONLY, ROLLBACK"
   },
-  "receiptChecksum": "sha256:2b0105e38fabec3f38b51f0dbadc7771c640c6a95aebf3ff96f32b6d2577ab73",
-  "versionedReceipt": "docs/reports/current-source-authority-v1.2b0105e38fab.json"
+  "receiptChecksum": "sha256:2b0105e38fabec3f38b51f0dbadc7771c640c6a95aebf3ff96f32b6d2577ab73"
 }

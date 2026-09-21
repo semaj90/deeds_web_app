@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-authority.v1",
-  "status": "CURRENT_SOURCE_AUTHORITY_PROVEN",
+  "status": "CURRENT_SOURCE_AUTHORITY_BLOCKED",
   "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
   "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
   "sourceCount": 25542,
@@ -15,7 +15,7 @@
     "notInAdmittedCohort": 0
   },
   "proof": {
-    "workspaceAuthorityProven": true,
+    "workspaceAuthorityProven": false,
     "exactMembershipProven": true,
     "sourceIdentityProven": true,
     "sourceRevisionProven": true,
@@ -27,8 +27,10 @@
     "mismatch": 0
   },
   "stableFileIdentityClaimed": false,
-  "generatedAt": "2026-09-21T23:13:20.291Z",
-  "blockers": [],
+  "generatedAt": "2026-09-21T23:10:31.000Z",
+  "blockers": [
+    "PROOF_FLAG_FALSE:workspaceAuthorityProven"
+  ],
   "owners": {
     "admissionReceipt": {
       "file": "docs/reports/workspace-revision-tournament-admission-v1.json",
@@ -42,17 +44,8 @@
       "digest": "sha256:4b2455785d5827a2991626316c4000eb024f7642fe4d2b56a60349d138d517e8",
       "status": "CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK",
       "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
-      "selfDigestValid": true,
-      "workspaceRevisionClaimedBySnapshot": null,
       "violations": 0
     },
-    "admissionPreflight": {
-      "file": "docs/reports/workspace-revision-tournament-source-authority-recheck-v4.json",
-      "status": "CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION",
-      "workspaceRevisionCandidate": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-      "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
-    },
-    "workspaceRevisionDerivationRecomputed": false,
     "graphifyExecution": {
       "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
       "ownerAgreesWithAuthorityShadow": true,
@@ -153,6 +146,5 @@
     "cagraPromotion": false,
     "transaction": "REPEATABLE READ READ ONLY, ROLLBACK"
   },
-  "receiptChecksum": "sha256:2b0105e38fabec3f38b51f0dbadc7771c640c6a95aebf3ff96f32b6d2577ab73",
-  "versionedReceipt": "docs/reports/current-source-authority-v1.2b0105e38fab.json"
+  "receiptChecksum": "sha256:40503f823ff224cb52aef0b270c9ca40452feb9f832414c7bf6dab38cd3f36fe"
 }
