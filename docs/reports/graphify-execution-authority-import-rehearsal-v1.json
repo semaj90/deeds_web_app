@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.graphify-execution-authority-import-rehearsal.v1",
+  "generatedAt": "2026-09-21T19:44:51.656Z",
+  "mode": "REHEARSAL_ROLLED_BACK",
+  "sqlFile": "sveltekit-frontend\\drizzle\\manual\\20260921b_graphify_execution_authority_legacy_import_DRAFT.sql",
+  "sqlSha256": "sha256:636fcc23552cd9cf490e08644ebfbe2ee23969dc4d8124f30fb64dc96c9e85fc",
+  "preState": {
+    "legacy": [
+      {
+        "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+        "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "status": "COMPLETED"
+      }
+    ],
+    "authority": []
+  },
+  "blockers": [],
+  "inTransaction": [
+    {
+      "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authority_state": "LEGACY_IMPORTED",
+      "selected_at": null,
+      "selected_by": null,
+      "selection_receipt": null,
+      "imported_at": "2026-09-21T19:44:51.628Z",
+      "import_receipt": "REHEARSAL-NOT-A-RECEIPT"
+    }
+  ],
+  "afterRollbackAuthorityRows": 0,
+  "rehearsalOk": true,
+  "writesPerformed": false
+}
