@@ -1,31 +1,33 @@
 {
   "schema": "atlas.graphify-authority-read-parity.v1",
-  "generatedAt": "2026-09-21T19:41:05.257Z",
+  "generatedAt": "2026-09-21T19:48:39.662Z",
   "mode": "READ_ONLY_LIVE_LOADER_READBACK",
   "transaction": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY; ... ROLLBACK",
   "databaseError": null,
   "booleanCanonicalRows": 1,
-  "authorityRows": 0,
-  "status": "LEGACY_PRESENT_AUTHORITY_MISSING",
-  "readParityProven": false,
+  "authorityRows": 1,
+  "status": "PARITY_PROVEN",
+  "readParityProven": true,
   "counts": {
     "MULTIPLE_LEGACY_CANONICAL_ROWS": 0,
     "MULTIPLE_AUTHORITY_ROWS": 0,
     "SELECTION_MISMATCH": 0,
     "AUTHORITY_PRESENT_LEGACY_MISSING": 0,
-    "LEGACY_PRESENT_AUTHORITY_MISSING": 1,
+    "LEGACY_PRESENT_AUTHORITY_MISSING": 0,
     "NO_SELECTION": 0,
-    "PARITY_PROVEN": 0
+    "PARITY_PROVEN": 1
   },
   "revisions": [
     {
       "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
       "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-      "state": "LEGACY_PRESENT_AUTHORITY_MISSING",
+      "state": "PARITY_PROVEN",
       "legacyExecutionIds": [
         "74d50c86-8194-45ea-8c3d-61aab737ef83"
       ],
-      "authorityExecutionIds": []
+      "authorityExecutionIds": [
+        "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      ]
     }
   ],
   "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",

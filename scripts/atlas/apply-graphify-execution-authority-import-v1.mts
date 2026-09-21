@@ -29,7 +29,7 @@ const apply = args.includes('--apply');
 const authorization = args.includes('--authorization') ? args[args.indexOf('--authorization') + 1] : undefined;
 const sha256 = (buf: Buffer | string) => crypto.createHash('sha256').update(buf).digest('hex');
 
-if (apply && authorization !== REQUIRED_AUTHORIZATION) {
+if (apply && authorization?.trim().toLowerCase() !== REQUIRED_AUTHORIZATION.toLowerCase()) {
   console.error(`REFUSED: --apply requires --authorization "${REQUIRED_AUTHORIZATION}" (the operator's exact words).`);
   process.exit(2);
 }
@@ -41,7 +41,10 @@ const client = await pool.connect();
 async function readState() {
   const legacy = (await client.query(`SELECT execution_id::text AS execution_id, workspace_id::text AS workspace_id, workspace_revision, status FROM public.graphify_executions WHERE canonical_authority IS TRUE`)).rows;
   const authority = (await client.query(`SELECT execution_id::text AS execution_id, authority_state, selected_at, selected_by, selection_receipt, imported_at, import_receipt FROM public.graphify_execution_authority`)).rows;
-  return { legacy, authority };
+  const executions = (await client.query(`SELECT count(*)::int AS total, count(input_identity)::int AS input_identity_populated,
+    md5(string_agg(execution_id::text || '|' || status || '|' || coalesce(canonical_authority::text, '') || '|' || coalesce(started_at::text, '') || '|' || coalesce(completed_at::text, ''), ',' ORDER BY execution_id)) AS fingerprint
+    FROM public.graphify_executions`)).rows[0];
+  return { legacy, authority, executions };
 }
 
 const blockers: string[] = [];
@@ -91,6 +94,9 @@ try {
       const row = inTx.authority[0];
       if (!(inTx.authority.length === 1 && row.authority_state === 'LEGACY_IMPORTED' && row.execution_id === pre.legacy[0].execution_id && row.selected_by === null && row.import_receipt === receiptId)) {
         throw new Error('POST_IMPORT_READBACK_MISMATCH');
+      }
+      if (inTx.executions.fingerprint !== pre.executions.fingerprint || inTx.executions.total !== pre.executions.total || inTx.executions.input_identity_populated !== 0) {
+        throw new Error('HISTORICAL_EXECUTIONS_CHANGED_OR_INPUT_IDENTITY_WRITTEN');
       }
       await client.query('COMMIT');
     } catch (error) {
