@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graphify-source-bridge-reconciliation.v1",
-  "generatedAt": "2026-09-19T05:01:56.646Z",
+  "generatedAt": "2026-09-21T20:15:07.148Z",
   "mode": "READ_ONLY",
   "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
   "workspaceRevisionSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
@@ -3588,6 +3588,24 @@
       }
     ]
   },
+  "authorityShadow": {
+    "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+    "error": null,
+    "observation": {
+      "schema": "atlas.graphify-authority-shadow-observation.v1",
+      "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "readParityProven": true,
+      "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+      "shadowAuthorityObserved": true,
+      "mutationAuthorized": false
+    }
+  },
   "identityChecks": {
     "executionFound": true,
     "executionRevisionMatchesAdmission": true,
@@ -3600,5 +3618,5 @@
     "bindingRowsAreCurrent": true
   },
   "nextGate": "INDEPENDENT_SOURCE_BINDING_READBACK_AND_PACKET_MATERIALIZATION_AUDIT",
-  "receiptChecksum": "sha256:136813919637d5ff79189635c7dd279912bab09a57a528392924ec965c8dafea"
+  "receiptChecksum": "sha256:432c5e234f29f4b856a07b4c76b5ab860c2a303048aef741e69196cb6b18fc87"
 }
