@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.acp-nlp-sidecar-http-live-proof.v1",
+  "generatedAt": "2026-09-21T00:42:34.964Z",
+  "baseUrl": "http://127.0.0.1:5173",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false,
+  "routeProof": {
+    "tools": {
+      "status": 200,
+      "expected": [
+        "nlp:capabilities",
+        "nlp:analyze",
+        "nlp:ast-chunk"
+      ],
+      "present": [
+        "nlp:capabilities",
+        "nlp:analyze",
+        "nlp:ast-chunk"
+      ]
+    },
+    "agentCard": {
+      "status": 200,
+      "nlpSkillPresent": true
+    },
+    "executions": [
+      {
+        "tool": "nlp:capabilities",
+        "status": 200,
+        "success": true,
+        "schema": null,
+        "responseBytes": 1586
+      },
+      {
+        "tool": "nlp:analyze",
+        "status": 200,
+        "success": true,
+        "schema": null,
+        "responseBytes": 3966
+      },
+      {
+        "tool": "nlp:ast-chunk",
+        "status": 200,
+        "success": true,
+        "schema": "atlas.ast.evidence.v1",
+        "responseBytes": 3191
+      }
+    ]
+  },
+  "status": "ACP_NLP_HTTP_LIVE_PROVEN"
+}

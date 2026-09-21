@@ -1,0 +1,75 @@
+{
+  "schema": "atlas.doc-15-same-query-fanout.v1",
+  "gate": "DOC-15",
+  "status": "DOC_15_FANOUT_CONTRACT_PROVEN_VERSION_FILTER_LIVE_OPEN",
+  "owner": "sveltekit-frontend/src/lib/server/search/hybrid-search.ts",
+  "query": {
+    "normalized": "cuTile kernel fails on sm_86",
+    "requestedDocumentation": {
+      "product": "cuda_tile",
+      "version": "13.2",
+      "architecture": "ampere"
+    }
+  },
+  "checks": [
+    {
+      "name": "existing_hybrid_owner",
+      "passed": true,
+      "detail": "hybrid-search.ts exports the existing retrieval owner"
+    },
+    {
+      "name": "same_query_parallel_fanout",
+      "passed": true,
+      "detail": "one normalized query invokes Postgres and Qdrant branches in the same Promise.all"
+    },
+    {
+      "name": "stable_key_fusion",
+      "passed": true,
+      "detail": "fusion deduplicates on stable_key before ranking"
+    },
+    {
+      "name": "semantic_lane_single_vote",
+      "passed": true,
+      "detail": "Qdrant is merged into the existing semantic lane, not exposed as a second logical lane"
+    },
+    {
+      "name": "documentation_version_filter_specified",
+      "passed": true,
+      "detail": "design requires product/version/architecture filtering before semantic ranking"
+    },
+    {
+      "name": "documentation_authority_boundary",
+      "passed": true,
+      "detail": "documentation promotion remains subordinate to canonical Postgres evidence"
+    },
+    {
+      "name": "fixture_version_filter",
+      "passed": true,
+      "detail": "bounded fixture excludes a different documentation version before fusion"
+    },
+    {
+      "name": "fixture_semantic_dedup",
+      "passed": true,
+      "detail": "bounded fixture has one semantic-lane contribution after stable-key deduplication"
+    }
+  ],
+  "fixture": {
+    "rows": 3,
+    "admittedRows": 2,
+    "dedupedStableKeys": [
+      "doc:cuda:13.2:ampere:install"
+    ]
+  },
+  "inputChecksum": "e465737c1ce32ad9a383e3c393ef011d69c4fd7904e8a905e37d858757d1b72f",
+  "policy": {
+    "sameQueryFanout": true,
+    "stableKeyDeduplication": true,
+    "semanticLaneSingleVote": true,
+    "canonicalAuthority": false,
+    "liveFanoutProven": false,
+    "liveDocumentationVersionFilterProven": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false
+  },
+  "nextGate": "DOC_15_LIVE_DOCUMENTATION_FANOUT_WITH_VERSION_AUTHORITY_FILTER"
+}

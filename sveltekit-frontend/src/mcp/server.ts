@@ -880,8 +880,12 @@ export function setupToolHandlers() {
               description: 'Sampling temperature (0.0-1.0)',
               default: 0.3,
             },
+            grounded_extraction_required: {
+              type: 'boolean',
+              description: 'Required explicit authorization for source-grounded extraction',
+            },
           },
-          required: ['text'],
+          required: ['text', 'grounded_extraction_required'],
         },
       },
       {
@@ -905,8 +909,12 @@ export function setupToolHandlers() {
               description: 'Sampling temperature (0.0-1.0)',
               default: 0.3,
             },
+            grounded_extraction_required: {
+              type: 'boolean',
+              description: 'Required explicit authorization for source-grounded extraction',
+            },
           },
-          required: ['text'],
+          required: ['text', 'grounded_extraction_required'],
         },
       },
       {
@@ -928,8 +936,12 @@ export function setupToolHandlers() {
               description: 'Passes for long documents (1-5)',
               default: 2,
             },
+            grounded_extraction_required: {
+              type: 'boolean',
+              description: 'Required explicit authorization for source-grounded extraction',
+            },
           },
-          required: ['file_path'],
+          required: ['file_path', 'grounded_extraction_required'],
         },
       },
       {
@@ -951,8 +963,12 @@ export function setupToolHandlers() {
               description: 'Few-shot examples in LangExtract format',
             },
             extraction_passes: { type: 'number', description: 'Extraction passes', default: 1 },
+            grounded_extraction_required: {
+              type: 'boolean',
+              description: 'Required explicit authorization for source-grounded extraction',
+            },
           },
-          required: ['text', 'prompt'],
+          required: ['text', 'prompt', 'grounded_extraction_required'],
         },
       },
       // ─────────────────────────────────────────────────────────────────────
@@ -3737,11 +3753,13 @@ export function setupToolHandlers() {
       // LangExtract Handlers — Call Python service on port 8095
       // ─────────────────────────────────────────────────────────────────────
       case 'langextract:legal': {
-        const { text, extraction_passes, temperature } = args as {
+        const { text, extraction_passes, temperature, grounded_extraction_required } = args as {
           text: string;
           extraction_passes?: number;
           temperature?: number;
+          grounded_extraction_required?: boolean;
         };
+        if (grounded_extraction_required !== true) throw new Error('grounded_extraction_required must be true');
         const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
         const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
@@ -3764,11 +3782,13 @@ export function setupToolHandlers() {
       }
 
       case 'langextract:evidence': {
-        const { text, extraction_passes, temperature } = args as {
+        const { text, extraction_passes, temperature, grounded_extraction_required } = args as {
           text: string;
           extraction_passes?: number;
           temperature?: number;
+          grounded_extraction_required?: boolean;
         };
+        if (grounded_extraction_required !== true) throw new Error('grounded_extraction_required must be true');
         const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
         const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
@@ -3791,11 +3811,13 @@ export function setupToolHandlers() {
       }
 
       case 'langextract:file': {
-        const { file_path, extraction_type, extraction_passes } = args as {
+        const { file_path, extraction_type, extraction_passes, grounded_extraction_required } = args as {
           file_path: string;
           extraction_type?: string;
           extraction_passes?: number;
+          grounded_extraction_required?: boolean;
         };
+        if (grounded_extraction_required !== true) throw new Error('grounded_extraction_required must be true');
         const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
         const response = await fetch(`${LANGEXTRACT_URL}/extract/file`, {
@@ -3817,12 +3839,14 @@ export function setupToolHandlers() {
       }
 
       case 'langextract:custom': {
-        const { text, prompt, examples, extraction_passes } = args as {
+        const { text, prompt, examples, extraction_passes, grounded_extraction_required } = args as {
           text: string;
           prompt: string;
           examples?: any[];
           extraction_passes?: number;
+          grounded_extraction_required?: boolean;
         };
+        if (grounded_extraction_required !== true) throw new Error('grounded_extraction_required must be true');
         const LANGEXTRACT_URL = ENV.LANGEXTRACT_URL;
 
         const response = await fetch(`${LANGEXTRACT_URL}/extract`, {

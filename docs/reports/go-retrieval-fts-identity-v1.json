@@ -1,0 +1,151 @@
+{
+  "schema": "atlas.go-retrieval-fts-identity.v1",
+  "generatedAt": "2026-09-21T03:01:45.717Z",
+  "mode": "LIVE_READ_ONLY",
+  "baseUrl": "http://127.0.0.1:8100",
+  "query": "PostgreSQL source revision",
+  "limit": 3,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false,
+  "healthStatus": 200,
+  "health": {
+    "dependencies": {
+      "embedding_service": {
+        "connected": true,
+        "required": true
+      },
+      "postgres": {
+        "connected": true,
+        "required": true
+      },
+      "qdrant": {
+        "connected": true,
+        "required": true
+      },
+      "redis": {
+        "connected": true,
+        "required": false
+      }
+    },
+    "embeddingServiceUp": true,
+    "pgvectorConnected": true,
+    "qdrantConnected": true,
+    "readiness_state": "READY_FULL",
+    "redisConnected": true,
+    "status": "healthy",
+    "timestamp": 1789959705745
+  },
+  "searchStatus": 200,
+  "search": {
+    "candidate_count": 3,
+    "capability": {
+      "canonicalAuthority": false,
+      "capabilityId": "go-retrieval:postgres-fts:v1",
+      "executor": "GO_RETRIEVAL",
+      "identityStatus": "REVIEW_REQUIRED",
+      "operation": "POSTGRES_FTS_SEARCH",
+      "proofState": "PROVEN",
+      "schema": "atlas.indexed-rpc-capability.v1",
+      "scoreType": "PG_TS_RANK_CD",
+      "trueBm25": false
+    },
+    "identity_pass_count": 0,
+    "identity_reason": "ATLAS_FTS_REVISION_INCOMPLETE",
+    "identity_status": "REVIEW_REQUIRED",
+    "lane": "postgres_fts",
+    "legacy_lane": "bm25",
+    "query_checksum": "sha256:863c3e8f5f129093fce30c94f95bdcde3b83efeda364943b4eb5d088e26f61a7",
+    "read_only": true,
+    "results": [
+      {
+        "candidate_count": 3,
+        "content_hash": "6ea383b5f8f95d71e2b2665752af1fb50636265a1b8899f40f8c4915907562c0",
+        "file_path": "sveltekit-frontend/drizzle/manual/20260818_atlas_schema_object_registry_v1.sql",
+        "id": "3aaf329e-eab9-4dd4-ba91-1427e227c22d",
+        "identity_reason": "ATLAS_FTS_REVISION_INCOMPLETE",
+        "identity_status": "REVIEW_REQUIRED",
+        "lineage_binding_checksum": "",
+        "lineage_producer_revision": "",
+        "rank": 1,
+        "representation_revision": "",
+        "score": 0.027777778,
+        "score_type": "PG_TS_RANK_CD",
+        "scorer_revision": "postgres-18-ts-rank-cd-v1",
+        "snippet": "<b>source</b>_<b>revision</b>);\r\n\r\nCOMMENT ON COLUMN atlas_schema_object_versions.catalog_oid IS\r\n  '<b>PostgreSQL</b> object OID at this schema <b>revision</b> only; never canonical Atlas identity. Columns use NULL here.';\r\nCOMMENT ON COLUMN atlas_schema_object_versions.catalog_locator",
+        "source_ref": "fullrepo:sveltekit-frontend/drizzle/manual/20260818_atlas_schema_object_registry_v1.sql:5",
+        "source_revision": "",
+        "summary": "",
+        "text_search_config": "english",
+        "workspace_revision": ""
+      },
+      {
+        "candidate_count": 3,
+        "content_hash": "7c296b8ce6477df9165059729b1a564bdeb91648d4df1e87b85055fd728f1d38",
+        "file_path": "sveltekit-frontend/src/lib/server/db/schema/atlas-structural-intelligence.ts",
+        "id": "2a4d99ca-5c72-4781-ab10-6efa69c1a610",
+        "identity_reason": "ATLAS_FTS_REVISION_INCOMPLETE",
+        "identity_status": "REVIEW_REQUIRED",
+        "lineage_binding_checksum": "",
+        "lineage_producer_revision": "",
+        "rank": 2,
+        "representation_revision": "",
+        "score": 0.011878121,
+        "score_type": "PG_TS_RANK_CD",
+        "scorer_revision": "postgres-18-ts-rank-cd-v1",
+        "snippet": "resolution_<b>source</b>').on(t.sourceStableSymbolId),\r\n  targetIdx: index('idx_atlas_reference_resolution_target').on(t.targetStableSymbolId),\r\n}));\r\n\r\n/**\r\n * Canonical schema-object registry. <b>PostgreSQL</b> catalog OIDs and column\r\n * subobject locators are stored only on <b>revision</b>-qualified",
+        "source_ref": "fullrepo:sveltekit-frontend/src/lib/server/db/schema/atlas-structural-intelligence.ts:12",
+        "source_revision": "",
+        "summary": "",
+        "text_search_config": "english",
+        "workspace_revision": ""
+      },
+      {
+        "candidate_count": 3,
+        "content_hash": "91f9ec0d98db8950463fa66664e8402f46d84ee9d7bce7de96e38cdcc3bb43e8",
+        "file_path": "packages/parent-atlas/src/core/postgres-schema-introspector.ts",
+        "id": "b3d5fe7f-5d61-419a-9ba8-122032f98fc2",
+        "identity_reason": "ATLAS_FTS_REVISION_INCOMPLETE",
+        "identity_status": "REVIEW_REQUIRED",
+        "lineage_binding_checksum": "",
+        "lineage_producer_revision": "",
+        "rank": 3,
+        "representation_revision": "",
+        "score": 0.011627907,
+        "score_type": "PG_TS_RANK_CD",
+        "scorer_revision": "postgres-18-ts-rank-cd-v1",
+        "snippet": "input.source_ref,\r\n    <b>source</b>_<b>revision</b>: input.source_<b>revision</b>,\r\n    schema_<b>revision</b>: input.schema_<b>revision</b>,\r\n    catalog_oid: normalizeCatalogOid(row.catalog_oid),\r\n    catalog_locator: normalizeCatalogLocator(row),\r\n    extractor_<b>revision</b>: input.producer_<b>revision</b>,\r\n    definition: row.definition,\r\n  }));\r\n}\r\n\r\n/**\r\n * <b>PostgreSQL</b> 18 catalog introspector",
+        "source_ref": "fullrepo:packages/parent-atlas/src/core/postgres-schema-introspector.ts:8",
+        "source_revision": "",
+        "summary": "",
+        "text_search_config": "english",
+        "workspace_revision": ""
+      }
+    ],
+    "score_type": "PG_TS_RANK_CD",
+    "scorer_revision": "postgres-18-ts-rank-cd-v1",
+    "text_search_config": "english",
+    "total_ms": 40
+  },
+  "checks": {
+    "health": "PASS",
+    "boundedSearch": "PASS",
+    "identityFieldsPresent": "PASS",
+    "failClosedStatus": "PASS",
+    "responseIdentityStatus": "REVIEW_REQUIRED"
+  },
+  "fieldCoverage": {
+    "id": 3,
+    "source_ref": 3,
+    "content_hash": 3,
+    "workspace_revision": 3,
+    "source_revision": 3,
+    "representation_revision": 3,
+    "lineage_binding_checksum": 3,
+    "lineage_producer_revision": 3,
+    "identity_status": 3,
+    "identity_reason": 3
+  },
+  "resultCount": 3,
+  "status": "GO_RETRIEVAL_FTS_IDENTITY_PROVEN"
+}

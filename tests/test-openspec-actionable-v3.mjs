@@ -18,8 +18,8 @@ if (controllerActionable.length !== controller.summary.actionable) {
 if (audit.summary.controllerActionableObjectsFound !== controller.summary.actionable) {
   throw new Error('readiness audit did not consume the full controller actionable population');
 }
-if (!audit.summary.exportTruncationDetected) {
-  throw new Error('readiness audit failed to identify the capped navigation export');
+if (audit.summary.exportTruncationDetected) {
+  throw new Error('readiness audit still reports a truncated actionable export');
 }
 if (ranker.tasks.length !== controller.summary.actionable) {
   throw new Error(`ranker task count mismatch: ${ranker.tasks.length}/${controller.summary.actionable}`);

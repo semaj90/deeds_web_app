@@ -74,7 +74,7 @@ try {
   for (const t of toInsert) {
     const f = eligible.get(t);
     const res = await writeAtlasAstNodes(client, { sourceRef: f.canonical_path, parserLanguage: f.parser_language, parserName: f.parser_name, parserVersion: f.parser_version, sourceRevision: f.source_revision, workspaceId: f.workspace_id,
-      nodes: [{ kind: 'file', qualifiedSymbol: f.qualified_symbol, startByte: f.start_byte, endByte: f.end_byte, startLine: f.line_start, endLine: f.line_end, contentHash: f.source_content_digest, parentIndex: null }] });
+      nodes: [{ kind: 'file', qualifiedSymbol: f.qualified_symbol, startByte: f.start_byte, endByte: f.end_byte, startLine: f.line_start, endLine: f.line_end, sourceContentDigest: f.source_content_digest, parentIndex: null }] });
     if (res.treeNodeIds[0] !== t) throw new Error(`FILE_ID_MISMATCH:${t.slice(0, 12)}`);
     fileInserted += res.inserted;
   }

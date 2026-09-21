@@ -6,6 +6,12 @@
  *   - codebase_chunk_index rows with symbol + kind → one AST node per row
  *   - ast_symbols JSONB column → additional child nodes per chunk
  *
+ * Contract:
+ *   atlas_ast_nodes.source_content_hash is the whole-file raw-byte digest.
+ *   This producer requires codebase_chunk_index.file_content_hash and never
+ *   falls back to a path, symbol, or chunk hash. Missing file digests are
+ *   reported in dry-run mode and fail closed before any apply write.
+ *
  * tree_node_id = sha256(repo_id_str \x00 normalized_path \x00 parser_language \x00
  *                        node_kind \x00 qualified_symbol \x00 structural_parent_key \x00
  *                        normalized_signature)
@@ -364,6 +370,7 @@ async function main() {
         line_start,
         line_end,
         content_hash,
+        file_content_hash,
         repo_id::text AS repo_id_str
       FROM codebase_chunk_index
       WHERE symbol IS NOT NULL AND symbol != ''
@@ -375,14 +382,40 @@ async function main() {
 
     console.log(`  Found ${chunks.length} eligible chunks`);
 
+    const missingFileContentHashRows = chunks.filter((row) => {
+      const digest = String(row.file_content_hash || '').trim().toLowerCase();
+      return !/^[a-f0-9]{64}$/.test(digest);
+    });
+    if (missingFileContentHashRows.length) {
+      console.warn(`  Missing/invalid whole-file digests: ${missingFileContentHashRows.length}`);
+      if (!isDryRun) {
+        throw new Error(`WHOLE_FILE_CONTENT_HASH_REQUIRED:${missingFileContentHashRows.length}`);
+      }
+    }
+    const eligibleChunks = chunks.filter((row) => {
+      const digest = String(row.file_content_hash || '').trim().toLowerCase();
+      return /^[a-f0-9]{64}$/.test(digest);
+    });
+    console.log(`  Whole-file digest eligible chunks: ${eligibleChunks.length}`);
+
     // Build file-level parent nodes first (so child nodes can reference them)
     const fileParents = new Map(); // normalizedPath → tree_node_id
-    for (const row of chunks) {
+    for (const row of eligibleChunks) {
       const np = normalizePath(row.relative_path);
       if (!fileParents.has(np)) {
         const lang = detectLanguage(row.relative_path);
         const tid  = treeNodeId(REPO_ID, np, lang, 'file', path.basename(np), 'ROOT', '');
-        fileParents.set(np, { tree_node_id: tid, lang });
+        fileParents.set(np, {
+          tree_node_id: tid,
+          lang,
+          source_content_hash: String(row.file_content_hash).trim().toLowerCase(),
+        });
+      } else {
+        const existing = fileParents.get(np).source_content_hash;
+        const current = String(row.file_content_hash).trim().toLowerCase();
+        if (existing !== current) {
+          throw new Error(`WHOLE_FILE_CONTENT_HASH_CONFLICT:${np}`);
+        }
       }
     }
 
@@ -391,7 +424,7 @@ async function main() {
     // ── Upsert file-level nodes ──────────────────────────────────────────────
     const fileNodes = [];
     for (const [np, info] of fileParents) {
-      const { tree_node_id: tid, lang } = info;
+      const { tree_node_id: tid, lang, source_content_hash: sourceContentHash } = info;
       const sk = structuralKey(REPO_ID, np, 'file', path.basename(np));
       fileNodes.push({
         tree_node_id:         tid,
@@ -404,7 +437,7 @@ async function main() {
         normalized_signature: '',
         parent_tree_node_id:  null,
         normalized_node_hash: crypto.createHash('sha256').update(sk).digest('hex'),
-        source_content_hash:  crypto.createHash('sha256').update(np).digest('hex'),
+        source_content_hash:  sourceContentHash,
         parser_name:          'tree-sitter',
         source_ref_key:       `${np}#file:${path.basename(np)}`,
       });
@@ -414,7 +447,7 @@ async function main() {
     const symbolNodes = [];
     const seen = new Set();
 
-    for (const row of chunks) {
+    for (const row of eligibleChunks) {
       const rawKind = row.kind.toLowerCase();
       const mappedKind = KIND_MAP[rawKind];
       if (!mappedKind || !VALID_KINDS.has(mappedKind)) continue;
@@ -430,8 +463,7 @@ async function main() {
       seen.add(tid);
 
       const sk = structuralKey(REPO_ID, np, mappedKind, symbol);
-      const contentHash = row.content_hash
-        || crypto.createHash('sha256').update(`${np}#${symbol}`).digest('hex');
+      const sourceContentHash = String(row.file_content_hash).trim().toLowerCase();
 
       symbolNodes.push({
         tree_node_id:         tid,
@@ -446,7 +478,7 @@ async function main() {
         line_start:           row.line_start ?? 0,
         line_end:             row.line_end   ?? 0,
         normalized_node_hash: crypto.createHash('sha256').update(sk).digest('hex'),
-        source_content_hash:  contentHash,
+        source_content_hash:  sourceContentHash,
         parser_name:          'tree-sitter',
         source_ref_key:       buildAstSourceRefKey(row.source_ref, mappedKind, symbol),
       });

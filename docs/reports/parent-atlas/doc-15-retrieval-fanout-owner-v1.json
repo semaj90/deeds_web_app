@@ -21,7 +21,7 @@
       "owner": "qdrantSearch",
       "path": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
       "present": true,
-      "size": 16094
+      "size": 16814
     },
     {
       "owner": "postgresFts",

@@ -33,6 +33,11 @@ const RECOGNIZED_SCHEMA_VERSIONS = new Set(['atlas.runtime-ownership.v1']);
 const CLASSIFICATIONS = new Set([
   'CANONICAL_OWNER', 'BACKEND', 'ADAPTER', 'EXPERIMENT', 'COMPATIBILITY', 'FIXTURE_ONLY', 'DEAD',
 ]);
+const OPTIONAL_CHALLENGER_CLASSIFICATIONS = new Set([
+  'OPTIONAL_CHALLENGER',
+  'OPTIONAL_CHALLENGER_NOT_INSTALLED',
+  'OPTIONAL_CHALLENGER_NOT_WIRED',
+]);
 
 function loadJson(p, label) {
   if (!existsSync(p)) {
@@ -70,20 +75,43 @@ function main() {
   let capabilitiesChecked = 0;
   for (const [capabilityId, capability] of Object.entries(registry.capabilities ?? {})) {
     capabilitiesChecked++;
-    const owner = capability.owner ?? capability.canonical_data_contract;
+    const owners = Array.isArray(capability.owners)
+      ? capability.owners
+      : [capability.owner ?? capability.canonical_data_contract].filter(Boolean);
 
-    if (!owner) {
+    if (owners.length === 0) {
       violations.push({ class: 'MISSING_CANONICAL_OWNER', detail: capabilityId });
       continue;
     }
 
-    if (owner.unproven || owner.classification === 'UNKNOWN') {
+    const canonicalOwners = owners.filter((owner) => owner.classification === 'CANONICAL_OWNER');
+    const deferredChallengers = owners.filter((owner) => OPTIONAL_CHALLENGER_CLASSIFICATIONS.has(owner.classification));
+    const unresolvedOwners = owners.filter((owner) => owner.unproven || owner.classification === 'UNKNOWN');
+
+    if (unresolvedOwners.length > 0) {
       notProven.push({ capability: capabilityId, detail: 'owner not independently confirmed live — recorded as UNKNOWN/unproven, not guessed' });
-      continue;
+    }
+    if (deferredChallengers.length > 0) {
+      notProven.push({ capability: capabilityId, detail: `optional challenger deferred: ${deferredChallengers.map((owner) => owner.classification).join(', ')}` });
     }
 
-    if (owner.classification && owner.classification !== 'CANONICAL_OWNER') {
-      violations.push({ class: 'CANONICAL_OWNER_CLASSIFICATION_CONFLICT', detail: `${capabilityId}: owner entry has classification '${owner.classification}', expected 'CANONICAL_OWNER'` });
+    if (canonicalOwners.length === 0 && unresolvedOwners.length === 0 && deferredChallengers.length === 0) {
+      violations.push({ class: 'MISSING_CANONICAL_OWNER', detail: `${capabilityId}: no CANONICAL_OWNER entry` });
+    }
+
+    if (canonicalOwners.length > 1) {
+      const domains = canonicalOwners.map((owner) => owner.domain).filter(Boolean);
+      const hasDistinctDomains = domains.length === canonicalOwners.length && new Set(domains).size === domains.length;
+      const isDomainScoped = typeof capability.note === 'string' && capability.note.length > 0 && hasDistinctDomains;
+      if (!isDomainScoped) {
+        violations.push({ class: 'MULTIPLE_CANONICAL_OWNERS', detail: `${capabilityId}: ${canonicalOwners.length} canonical owners without a documented distinct domain scope` });
+      }
+    }
+
+    for (const owner of owners) {
+      if (owner.classification && owner.classification !== 'CANONICAL_OWNER' && !OPTIONAL_CHALLENGER_CLASSIFICATIONS.has(owner.classification) && owner.classification !== 'UNKNOWN' && !owner.unproven) {
+        violations.push({ class: 'CANONICAL_OWNER_CLASSIFICATION_CONFLICT', detail: `${capabilityId}: owner entry has classification '${owner.classification}', expected CANONICAL_OWNER or deferred optional challenger` });
+      }
     }
 
     // Check every backend/known_existing_duplication entry has a recognized classification,
@@ -106,6 +134,10 @@ function main() {
         } else {
           violations.push({ class: 'NEW_UNCLASSIFIED_IMPLEMENTATION', detail: `${capabilityId}: ${itemLabel}` });
         }
+        continue;
+      }
+      if (OPTIONAL_CHALLENGER_CLASSIFICATIONS.has(cls)) {
+        notProven.push({ capability: capabilityId, detail: `optional challenger entry deferred: ${cls}` });
         continue;
       }
       if (!CLASSIFICATIONS.has(cls)) {

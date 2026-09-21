@@ -18,6 +18,9 @@ ARG PIP_VERSION=26.2.1
 ARG SETUPTOOLS_VERSION=81.0.0
 ARG WHEEL_VERSION=0.48.0
 
+# The spaCy CLI compatibility index does not resolve this model reliably on
+# Python 3.13/spaCy 3.8.16. Install the pinned official wheel directly so
+# the image fails closed if the model artifact is unavailable.
 RUN python -m pip install --upgrade \
     pip==${PIP_VERSION} \
     setuptools==${SETUPTOOLS_VERSION} \
@@ -42,7 +45,8 @@ RUN python -m pip install --upgrade \
     scikit-learn==1.7.2 \
     joblib==1.5.2 \
   && python -m pip check \
-  && python -m spacy download en_core_web_sm==3.8.0
+  && python -m pip install --no-cache-dir --no-deps \
+    https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 # Found live 2026-09-13: spacy the PACKAGE was installed but no language model ever was --
 # `spacy.load('en_core_web_sm')` failed with E050, silently falling back to `spacy.blank('en')`
 # (a tokenizer with zero pipeline components: no tagger, no parser, no NER). This sidecar's own

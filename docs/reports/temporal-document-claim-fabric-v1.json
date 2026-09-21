@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.temporal-document-claim-fabric-proof.v1",
+  "generated_at": "2026-09-21T03:15:18.614Z",
+  "read_only": true,
+  "canonical_authority": false,
+  "writes_performed": false,
+  "promotion_authorized": false,
+  "contracts": [
+    "SourceArtifactV1",
+    "SourceCoordinateMapV1",
+    "DocumentObservationV1",
+    "KnowledgeClaimV1",
+    "RunManifestV1",
+    "TemporalDocumentIndexV1"
+  ],
+  "checks": [
+    {
+      "command": "node.exe C:\\Users\\james\\Videos\\deeds-web-app\\node_modules\\typescript\\bin\\tsc -p tsconfig.json",
+      "cwd": "C:\\Users\\james\\Videos\\deeds-web-app\\packages\\parent-atlas",
+      "status": 0,
+      "ok": true,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    {
+      "command": "node.exe --test ./test/temporal-indexing-fabric.test.mjs",
+      "cwd": "C:\\Users\\james\\Videos\\deeds-web-app\\packages\\parent-atlas",
+      "status": 0,
+      "ok": true,
+      "stdout_tail": "TAP version 13\n# Subtest: unchanged sources are reused without semantic or graph churn\nok 1 - unchanged sources are reused without semantic or graph churn\n  ---\n  duration_ms: 18.378\n  type: 'test'\n  ...\n# Subtest: modified ranges use incremental Tree-sitter parse but rebuild CAGRA generation\nok 2 - modified ranges use incremental Tree-sitter parse but rebuild CAGRA generation\n  ---\n  duration_ms: 1.2554\n  type: 'test'\n  ...\n# Subtest: pure additions may extend CAGRA\nok 3 - pure additions may extend CAGRA\n  ---\n  duration_ms: 0.5453\n  type: 'test'\n  ...\n# Subtest: deleted source tombstones structure and deletes semantic projection\nok 4 - deleted source tombstones structure and deletes semantic projection\n  ---\n  duration_ms: 0.3768\n  type: 'test'\n  ...\n# Subtest: compression policy rejects direct Huffman as Atlas storage contract\nok 5 - compression policy rejects direct Huffman as Atlas storage contract\n  ---\n  duration_ms: 1.508\n  type: 'test'\n  ...\n# Subtest: visual observations are source and model revision grounded\nok 6 - visual observations are source and model revision grounded\n  ---\n  duration_ms: 1.4859\n  type: 'test'\n  ...\n# Subtest: daily structural validation is revision scoped and requires complete coverage\nok 7 - daily structural validation is revision scoped and requires complete coverage\n  ---\n  duration_ms: 1.3554\n  type: 'test'\n  ...\n# Subtest: invalid source delta invariants fail closed\nok 8 - invalid source delta invariants fail closed\n  ---\n  duration_ms: 0.3691\n  type: 'test'\n  ...\n# Subtest: source artifacts are revision-qualified and reject canonical promotion\nok 9 - source artifacts are revision-qualified and reject canonical promotion\n  ---\n  duration_ms: 1.9603\n  type: 'test'\n  ...\n# Subtest: coordinate maps make UTF-8 byte offsets authoritative\nok 10 - coordinate maps make UTF-8 byte offsets authoritative\n  ---\n  duration_ms: 1.6639\n  type: 'test'\n  ...\n# Subtest: observations and claims require evidence references\nok 11 - observations and claims require evidence references\n  ---\n  duration_ms: 2.61\n  type: 'test'\n  ...\n# Subtest: claim freshness becomes stale only when supporting evidence changed\nok 12 - claim freshness becomes stale only when supporting evidence changed\n  ---\n  duration_ms: 0.6051\n  type: 'test'\n  ...\n# Subtest: run manifests and temporal indexes are deterministic noncanonical envelopes\nok 13 - run manifests and temporal indexes are deterministic noncanonical envelopes\n  ---\n  duration_ms: 3.5189\n  type: 'test'\n  ...\n1..13\n# tests 13\n# suites 0\n# pass 13\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 246.5133\n",
+      "stderr_tail": ""
+    }
+  ],
+  "status": "TEMPORAL_DOCUMENT_CLAIM_FABRIC_PROVEN",
+  "limitations": [
+    "This proves the shared contract and deterministic freshness/checksum behavior only.",
+    "No source snapshot was admitted and no canonical claim, graph, vector, cache, or database row was written.",
+    "DOC-13 through DOC-26 remain separately gated by their existing live/readback requirements."
+  ]
+}

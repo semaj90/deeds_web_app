@@ -554,9 +554,25 @@ MAX_TEXT_CHARS = int(os.getenv("NLP_SIDEcar_MAX_CHARS", "50000"))
 _spacy_nlp = None
 
 
+def _spacy_model_installed() -> bool:
+    """Report trained-model availability separately from the spaCy import."""
+    if not SPACY_AVAILABLE or spacy is None:
+        return False
+    try:
+        if bool(spacy.util.is_package(SPACY_MODEL)):  # type: ignore[union-attr]
+            return True
+    except Exception:
+        pass
+    try:
+        return Path(SPACY_MODEL).exists()
+    except Exception:
+        return False
+
+
 def _capabilities() -> dict[str, bool]:
     return {
         "spacy": SPACY_AVAILABLE,
+        "spacy_pos": SPACY_AVAILABLE and _spacy_model_installed(),
         "langextract": LANGEXTRACT_AVAILABLE,
         "tree_sitter": TREE_SITTER_AVAILABLE,
         "treesitter_chunker": TREESITTER_CHUNKER_AVAILABLE,
@@ -585,6 +601,12 @@ def _capability_report() -> dict[str, Any]:
         "graph": {"networkx": NETWORKX_AVAILABLE, "cugraph": CUGRAPH_AVAILABLE, "nx_cugraph": NX_CUGRAPH_AVAILABLE},
         "vector": {"cuvs": CUVS_AVAILABLE, "cagra": CUVS_AVAILABLE},
         "capabilityDetails": {
+            "spacy_model": {
+                "package": SPACY_MODEL,
+                "installed": _spacy_model_installed(),
+                "loaded": _spacy_nlp is not None,
+                "pos_ready": bool(_spacy_nlp is not None and getattr(_spacy_nlp, "pipe_names", [])),
+            },
             "networkx": {
                 "installed": NETWORKX_AVAILABLE,
                 "active": NETWORKX_AVAILABLE,
@@ -813,6 +835,19 @@ def _spacy_pos_tags(text: str) -> PosTagResponse:
             lemmas=[], noun_phrases=[], source="unavailable",
         )
     doc = nlp(text)
+    # A package import (or the blank-English fallback used by _lazy_spacy)
+    # does not provide statistical POS annotations.  Do not label that result
+    # as spaCy output: an empty annotation set is an unavailable-model state,
+    # not a successful linguistic proof.
+    try:
+        has_pos_annotations = bool(doc.has_annotation("POS"))
+    except Exception:
+        has_pos_annotations = False
+    if not has_pos_annotations:
+        return PosTagResponse(
+            nouns=[], proper_nouns=[], verbs=[], adjectives=[], adverbs=[],
+            lemmas=[], noun_phrases=[], source="unavailable",
+        )
     nouns = sorted({tok.text for tok in doc if tok.pos_ == "NOUN"})
     proper_nouns = sorted({tok.text for tok in doc if tok.pos_ == "PROPN"})
     verbs = sorted({tok.text for tok in doc if tok.pos_ == "VERB"})
@@ -861,6 +896,72 @@ def _regex_entities(text: str) -> list[Entity]:
                 )
             )
     return sorted(results, key=lambda item: (item.start or 0, item.end or 0))
+
+
+def _linguistic_input(text: str, *, code_mode: bool) -> str:
+    """Keep comments/docstrings/query-like strings while masking code syntax.
+
+    The linguistic pass is not a source-symbol extractor. For code input,
+    preserve offsets but replace identifiers/operators/keywords with spaces so
+    spaCy and the fallback entity regex cannot treat source declarations as
+    linguistic evidence. Comments, quoted text, and template text remain
+    available as bounded natural-language input.
+    """
+    if not code_mode:
+        return text
+
+    chars = list(text)
+    state = "code"
+    quote = ""
+    index = 0
+    while index < len(chars):
+        current = chars[index]
+        next_char = chars[index + 1] if index + 1 < len(chars) else ""
+
+        if state == "code":
+            if current == "/" and next_char == "/":
+                state = "line_comment"
+                index += 2
+                continue
+            if current == "/" and next_char == "*":
+                state = "block_comment"
+                index += 2
+                continue
+            if current in {"'", '"', "`"}:
+                quote = current
+                state = "string"
+                index += 1
+                continue
+            if current not in {"\n", "\r", "\t"}:
+                chars[index] = " "
+            index += 1
+            continue
+
+        if state == "line_comment":
+            if current in {"\n", "\r"}:
+                state = "code"
+            index += 1
+            continue
+
+        if state == "block_comment":
+            if current == "*" and next_char == "/":
+                index += 2
+                state = "code"
+            else:
+                index += 1
+            continue
+
+        # Quoted strings are the bounded natural-language/query lane. Keep
+        # their contents and only leave the enclosing quote untouched.
+        if current == "\\":
+            index += 2
+            continue
+        if current == quote:
+            state = "code"
+            quote = ""
+        index += 1
+
+    return "".join(chars)
 
 
 def _spacy_entities(text: str) -> list[Entity]:
@@ -1485,7 +1586,7 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
     chunker_revision = _package_version("treesitter-chunker", "tree-sitter-chunker", "chunker") or "unknown"
     structural_revision = f"{chunker}-boundary-v1"
     source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
+    source_revision = req.source_revision or "unknown"
 
     for idx, chunk in enumerate(chunks[:50]):
         symbol = chunk.symbol or f"chunk_{idx}"
@@ -1571,7 +1672,7 @@ def _build_semantic_cards(
     lexical_facts = [feature.name for feature in features[:10]]
     linguistic_facts = [entity.text for entity in entities[:10]]
     source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
+    source_revision = req.source_revision or "unknown"
 
     for idx, unit in enumerate(ast_units[:20]):
         excerpt = text[unit.byte_start : unit.byte_end].strip()[:5000] or unit.node_kind
@@ -1619,7 +1720,7 @@ def _build_hmm_observations(
 ) -> list[HMMObservation]:
     observations: list[HMMObservation] = []
     source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
+    source_revision = req.source_revision or "unknown"
     now = datetime.utcnow().isoformat() + "Z"
 
     tokens: list[tuple[str, float, str]] = []
@@ -1697,7 +1798,7 @@ def _build_experiment_feature_matrix(
         return None
 
     source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
+    source_revision = req.source_revision or "unknown"
     candidate_id = req.packet_key or req.document_id or source_ref
     features = {}
     for result in pass_results:
@@ -1752,7 +1853,7 @@ def _build_event_hypergraph(
     experiment_feature_matrix: Optional[ExperimentFeatureMatrix],
 ) -> EventHypergraphPayload:
     source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
+    source_revision = req.source_revision or "unknown"
     workspace_revision = req.model_id or req.document_id or "unknown"
     observed_at = datetime.utcnow().isoformat() + "Z"
     packet_key = req.packet_key or req.document_id or source_ref
@@ -2198,7 +2299,7 @@ def _build_pass_results(
         return [], [], [], [], None, None
 
     source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
+    source_revision = req.source_revision or "unknown"
     now = datetime.utcnow().isoformat() + "Z"
     ast_units = _build_ast_units(req, text, chunks, req.language or "unknown") if "structural" in requested else []
     semantic_cards = _build_semantic_cards(req, text, ast_units, entities, features) if "semantic" in requested else []
@@ -2273,7 +2374,8 @@ def _build_pass_results(
         )
 
     if "linguistic" in requested:
-        linguistic_entities = _spacy_entities(text)
+        linguistic_text = _linguistic_input(text, code_mode=_is_code(req.source_type, text))
+        linguistic_entities = _spacy_entities(linguistic_text)
         add_pass(
             "linguistic",
             "spacy_entities",
@@ -2283,7 +2385,11 @@ def _build_pass_results(
             {
                 "linguistic_confidence": 0.7 if linguistic_entities else 0.2,
             },
-            {"entities": [entity.model_dump() for entity in linguistic_entities]},
+            {
+                "entities": [entity.model_dump() for entity in linguistic_entities],
+                "input_scope": "comments_docstrings_strings_query_text" if _is_code(req.source_type, text) else "full_text",
+                "input_hash": hashlib.sha256(linguistic_text.encode("utf-8")).hexdigest(),
+            },
         )
 
     if "semantic" in requested:

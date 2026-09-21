@@ -3,9 +3,11 @@ import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { assertResourceHeadroom } from './lib/resource-headroom.mjs';
 
 const repoRoot=path.resolve(process.argv[2]??process.cwd());
 const reportsDir=path.resolve(process.argv[3]??path.join(repoRoot,'docs/reports'));
+assertResourceHeadroom(repoRoot, process.env);
 // Keep this read-only projection isolated from reports opened by watchers or
 // the SSR board. The board reader already considers staging reports.
 const outputDir=path.join(reportsDir,'staging');

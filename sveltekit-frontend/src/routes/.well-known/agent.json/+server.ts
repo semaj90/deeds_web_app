@@ -93,6 +93,21 @@ export const GET: RequestHandler = ({ url }) => {
         inputModes: ['text/plain', 'application/json'],
         outputModes: ['application/json'],
       },
+      {
+        id: 'nlp-sidecar-analysis',
+        name: 'NLP Sidecar Analysis',
+        description:
+          'Run bounded, read-only structural and linguistic analysis through the authenticated ACP '
+          + 'tool surface. The sidecar remains an evidence executor; it does not own source identity, '
+          + 'ontology promotion, or canonical writes.',
+        tags: ['nlp', 'ast', 'tree-sitter', 'ast-grep', 'evidence', 'read-only'],
+        examples: [
+          'Analyze a bounded source fixture for structural evidence',
+          'Inspect the available NLP sidecar capabilities',
+        ],
+        inputModes: ['application/json'],
+        outputModes: ['application/json'],
+      },
     ],
   } satisfies AgentCard, {
     headers: {

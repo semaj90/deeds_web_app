@@ -1,6 +1,6 @@
 {
   "schema": "atlas.agentic-receipt-owner-audit.v1",
-  "generatedAt": "2026-09-20T08:40:23.777Z",
+  "generatedAt": "2026-09-20T19:00:50.333Z",
   "purpose": "Reconcile the existing agent-work receipt owner with the governed error-agent and LangGraph boundaries.",
   "authority": {
     "canonicalAuthority": false,

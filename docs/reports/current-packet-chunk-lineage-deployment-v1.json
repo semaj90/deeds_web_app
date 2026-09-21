@@ -1,0 +1,181 @@
+{
+  "schema": "atlas.current-packet-chunk-lineage-deployment.v1",
+  "gate": "CURRENT-PACKET-CHUNK-LINEAGE-DEPLOYMENT-01",
+  "generatedAt": "2026-09-20T23:54:48.762Z",
+  "status": "LINEAGE_DEPLOYMENT_PRESENT",
+  "firstBlocker": null,
+  "nextGate": "CURRENT-PACKET-CHUNK-LINEAGE-BRIDGE-01",
+  "readOnly": true,
+  "writesPerformed": false,
+  "migration": {
+    "path": "sveltekit-frontend/drizzle/manual/20260901_atlas_packet_chunk_lineage.sql",
+    "sqlPresent": true,
+    "classifiedInMigrationInventory": true,
+    "inventoryMentionsUnresolvedOrDeferred": true
+  },
+  "liveRelation": {
+    "present": true,
+    "rowCount": 7421,
+    "provenRowCount": 7421,
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "uuid",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "packet_key",
+        "data_type": "text",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "canonical_chunk_id",
+        "data_type": "text",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "chunk_row_id",
+        "data_type": "uuid",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "source_ref",
+        "data_type": "text",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "source_namespace",
+        "data_type": "text",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "source_revision",
+        "data_type": "text",
+        "is_nullable": "YES"
+      },
+      {
+        "column_name": "membership_status",
+        "data_type": "text",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "revision_status",
+        "data_type": "text",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "chunk_ordinal",
+        "data_type": "integer",
+        "is_nullable": "YES"
+      },
+      {
+        "column_name": "lineage_producer_revision",
+        "data_type": "text",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "evidence_refs",
+        "data_type": "ARRAY",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "NO"
+      }
+    ],
+    "constraints": [
+      {
+        "conname": "atlas_packet_chunk_lineage_canonical_chunk_id_not_null",
+        "contype": "n",
+        "definition": "NOT NULL canonical_chunk_id"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_chunk_row_id_not_null",
+        "contype": "n",
+        "definition": "NOT NULL chunk_row_id"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_created_at_not_null",
+        "contype": "n",
+        "definition": "NOT NULL created_at"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_evidence_refs_not_null",
+        "contype": "n",
+        "definition": "NOT NULL evidence_refs"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_id_not_null",
+        "contype": "n",
+        "definition": "NOT NULL id"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_lineage_producer_revision_not_null",
+        "contype": "n",
+        "definition": "NOT NULL lineage_producer_revision"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_membership_status_not_null",
+        "contype": "n",
+        "definition": "NOT NULL membership_status"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_packet_key_not_null",
+        "contype": "n",
+        "definition": "NOT NULL packet_key"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_revision_status_not_null",
+        "contype": "n",
+        "definition": "NOT NULL revision_status"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_source_namespace_not_null",
+        "contype": "n",
+        "definition": "NOT NULL source_namespace"
+      },
+      {
+        "conname": "atlas_packet_chunk_lineage_source_ref_not_null",
+        "contype": "n",
+        "definition": "NOT NULL source_ref"
+      },
+      {
+        "conname": "atlas_pcl_membership_status_check",
+        "contype": "c",
+        "definition": "CHECK ((membership_status = ANY (ARRAY['EXACT_SINGLE_MEMBER'::text, 'EXACT_MULTI_MEMBER'::text])))"
+      },
+      {
+        "conname": "atlas_pcl_membership_unique",
+        "contype": "u",
+        "definition": "UNIQUE (packet_key, canonical_chunk_id)"
+      },
+      {
+        "conname": "atlas_pcl_revision_consistency_check",
+        "contype": "c",
+        "definition": "CHECK ((((revision_status = 'PROVEN'::text) AND (source_revision IS NOT NULL)) OR ((revision_status = 'UNPROVEN'::text) AND (source_revision IS NULL))))"
+      },
+      {
+        "conname": "atlas_pcl_revision_status_check",
+        "contype": "c",
+        "definition": "CHECK ((revision_status = ANY (ARRAY['PROVEN'::text, 'UNPROVEN'::text])))"
+      }
+    ]
+  },
+  "priorEvidence": {
+    "liveLineageAuditPresent": true,
+    "liveAuditSaysAbsent": true,
+    "migrationInventoryPresent": true
+  },
+  "policy": {
+    "migrationApplyAuthorized": false,
+    "lineageBackfillAuthorized": false,
+    "inferredLineageAuthorized": false
+  },
+  "databaseError": null
+}

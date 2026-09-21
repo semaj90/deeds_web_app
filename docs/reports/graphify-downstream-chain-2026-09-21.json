@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-09-21T00:55:57.890Z",
+  "mode": "dry-run",
+  "dryRun": true,
+  "stages": {
+    "graphify_readiness_check": {
+      "status": "skipped",
+      "reason": "not requested"
+    },
+    "pagerank": {
+      "status": "pass"
+    },
+    "kanban_emit": {
+      "status": "pass"
+    },
+    "turbovec": {
+      "status": "pass"
+    },
+    "kanban_db_write": {
+      "status": "pass",
+      "tasks_found": 4,
+      "note": "dry-run mode, no writes"
+    }
+  },
+  "errors": [],
+  "summary": {
+    "success": true,
+    "message": "Pipeline complete",
+    "elapsed_ms": 15925
+  }
+}

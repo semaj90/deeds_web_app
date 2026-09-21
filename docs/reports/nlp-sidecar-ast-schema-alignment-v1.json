@@ -1,0 +1,135 @@
+{
+  "schema": "atlas.nlp-sidecar-ast-schema-alignment.v1",
+  "generatedAt": "2026-09-20T23:39:48.372Z",
+  "endpoint": "http://127.0.0.1:8095/analyze",
+  "table": "public.atlas_ast_nodes",
+  "sourceRef": "scripts/atlas/audit-pgvector-schema.mjs",
+  "sourceRevision": "sha256:ea54b36305cd06319a42753575b77052cbd388c1fa7cea5c2d4db4ef907c9fd0",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false,
+  "schemaColumns": [
+    "tree_node_id",
+    "structural_key",
+    "repo_id",
+    "relative_path",
+    "node_kind",
+    "qualified_symbol",
+    "start_byte",
+    "end_byte",
+    "line_start",
+    "line_end",
+    "normalized_node_hash",
+    "source_content_hash",
+    "parser_name",
+    "parser_version",
+    "created_at",
+    "superseded_by",
+    "parser_language",
+    "normalized_signature",
+    "parent_tree_node_id",
+    "source_ref_key",
+    "updated_at",
+    "workspace_id",
+    "source_revision",
+    "grammar_version"
+  ],
+  "schemaRead": true,
+  "checks": [
+    {
+      "id": "http",
+      "status": "PASS",
+      "statusCode": 200
+    },
+    {
+      "id": "structural-unit-present",
+      "status": "PASS"
+    },
+    {
+      "id": "mapped-evidence-fields-present",
+      "status": "PASS",
+      "mappedFields": [
+        "tree_node_id",
+        "relative_path",
+        "node_kind",
+        "qualified_symbol",
+        "parser_language",
+        "start_byte",
+        "end_byte",
+        "line_start",
+        "line_end",
+        "source_revision",
+        "parser_name",
+        "parser_version",
+        "grammar_version"
+      ],
+      "missingEvidenceFields": []
+    },
+    {
+      "id": "all-table-fields-mapped-or-classified",
+      "status": "PASS",
+      "unclassifiedTableFields": [],
+      "classifiedTableFields": {
+        "structural_key": "canonical_writer_derived_identity",
+        "repo_id": "source_authority_lineage",
+        "normalized_node_hash": "canonical_writer_node_content_hash",
+        "source_content_hash": "source_envelope_raw_file_digest",
+        "created_at": "database_bookkeeping",
+        "superseded_by": "canonical_archive_relationship",
+        "normalized_signature": "optional_structural_identity_evidence",
+        "parent_tree_node_id": "canonical_parent_identity_resolution",
+        "source_ref_key": "source_authority_lineage",
+        "updated_at": "database_bookkeeping",
+        "workspace_id": "source_authority_lineage"
+      }
+    },
+    {
+      "id": "source-revision-preserved",
+      "status": "PASS"
+    },
+    {
+      "id": "promotion-closed",
+      "status": "PASS",
+      "canonicalAuthority": false
+    }
+  ],
+  "observed": {
+    "astUnitCount": 50,
+    "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0",
+    "sourceRef": "scripts/atlas/audit-pgvector-schema.mjs",
+    "sourceRevision": "sha256:ea54b36305cd06319a42753575b77052cbd388c1fa7cea5c2d4db4ef907c9fd0",
+    "unclassifiedTableFields": [],
+    "classifiedTableFields": {
+      "structural_key": "canonical_writer_derived_identity",
+      "repo_id": "source_authority_lineage",
+      "normalized_node_hash": "canonical_writer_node_content_hash",
+      "source_content_hash": "source_envelope_raw_file_digest",
+      "created_at": "database_bookkeeping",
+      "superseded_by": "canonical_archive_relationship",
+      "normalized_signature": "optional_structural_identity_evidence",
+      "parent_tree_node_id": "canonical_parent_identity_resolution",
+      "source_ref_key": "source_authority_lineage",
+      "updated_at": "database_bookkeeping",
+      "workspace_id": "source_authority_lineage"
+    },
+    "missingEvidenceFields": [],
+    "mappedFields": [
+      "tree_node_id",
+      "relative_path",
+      "node_kind",
+      "qualified_symbol",
+      "parser_language",
+      "start_byte",
+      "end_byte",
+      "line_start",
+      "line_end",
+      "source_revision",
+      "parser_name",
+      "parser_version",
+      "grammar_version"
+    ],
+    "sidecarIsCanonicalWriter": false
+  },
+  "status": "AST_UNIT_SCHEMA_ALIGNMENT_PROVEN",
+  "reviewRequired": 0
+}

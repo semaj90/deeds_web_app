@@ -1,6 +1,6 @@
 {
   "schema": "ParentAtlasCurrentLineageFunnelV1",
-  "generatedAt": "2026-09-19T09:32:18.773Z",
+  "generatedAt": "2026-09-20T23:38:08.659Z",
   "mode": "READ_ONLY_EVIDENCE_COMPOSITION",
   "workspaceAuthority": {
     "status": "ADMITTED",
@@ -26,13 +26,20 @@
   },
   "sourceProducerAuthority": {
     "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
-    "ownerDecision": "LEGACY_ONLY_NO_CURRENT_OWNER",
+    "ownerDecision": "CURRENT_EXECUTION_OWNER_CANDIDATE",
     "safeToPromote": false,
     "writesPerformed": false,
     "repairPlanStatus": "REPAIR_PLAN_PARTIAL_EXACT_BLOCKED",
-    "repairPlanWorkspaceRevision": "sha256:bbe6ade362a1256daf19ae144a052c7aa1e0801bf400ec8ac36e5d484d12b1bb",
-    "repairPlanExactCurrentBindingCount": 22890,
-    "repairPlanAuthorizationRequired": true
+    "repairPlanWorkspaceRevision": "sha256:6f25dd8c9b3b24a4af64a492c81a729624c00c78da061f05f540d95adb670839",
+    "repairPlanExactCurrentBindingCount": 22685,
+    "repairPlanAuthorizationRequired": true,
+    "worktreeSnapshotDelta": {
+      "requiresSnapshotRefresh": true,
+      "currentOnlyCount": 659,
+      "admittedOnlyCount": 1094,
+      "sharedDigestMismatchCount": 670,
+      "deltaChecksum": "sha256:b9ccee8031f5e7f83da3662a8823c2c60a0240886f28c472992038196404a38d"
+    }
   },
   "independentEvidenceCounts": {
     "historicalProvenPacketChunkRows": 4,
@@ -90,5 +97,5 @@
     "sourceAuthorityRepairPlan": "docs/reports/current-source-authority-repair-plan-v1.json",
     "sourceEvidence": "docs/reports/current-source-evidence-hydration-v1.json"
   },
-  "reportChecksum": "10d4c80b9596c3f00af8ead213783b6347ed5a71a12655feefa11b46e8d29c23"
+  "reportChecksum": "d92a089118add2f01d92a426034a345a4d1edfe77ab241f07c7d7a1d4423168b"
 }

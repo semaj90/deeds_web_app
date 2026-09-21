@@ -190,6 +190,38 @@
 ## 17. AR-17 — ContextManifest/PromptPlan integration (PARTIALLY BUILT, DORMANT — see section
       18.3: `prompt-plan.ts` exists with zero live callers found outside its own directory)
 
+### V2 bounded integration proof — 2026-09-21
+
+- [x] Replayed the existing OAK evidence client/enrichment, HyperGraphRAG action
+      expansion, derived action features, DAG synthesis, ParameterResolver,
+      TS2345 repair fixture, and ExecutionReceipt→HyperEdge projection together
+      through one focused read-only command. `npm run atlas:docs:agentic-repair:v2`
+      passed 8 test files / 25 tests.
+- [x] Receipt: `docs/reports/agentic-repair-fabric-v2-proof.json`.
+      It records `canonicalAuthority=false`, `writesPerformed=false`,
+      `promotionAuthorized=false`, `toolsExecuted=false`, and no source, database,
+      cache, or graph writes.
+- [ ] Live repair execution, live Go Retrieval adoption, live OAK availability,
+      and ContextManifest/PromptPlan route adoption remain separate gates. The
+      fixture proof must not be promoted to a production repair claim.
+
+### Live boundary reconciliation — 2026-09-21
+
+- **OAK runtime:** live `:8095/health` and `/oak/health` are reachable. The OAK
+  response reports `oaklib 0.7.4`, `adapterType=atlas-postgres`,
+  `mode=READ_ONLY_SHADOW`, and `canonicalAuthority=false`. A bounded
+  `/oak/search` for `TypeScript error` returned zero matches, so the remaining
+  blocker is ontology population/fixture coverage, not client transport.
+- **Go Retrieval runtime:** `/health` reports `READY_FULL`, and the bounded
+  `/search/codebase` call succeeds. The current three-row identity audit reports
+  packet/source/content-hash fields present, but `chunk_id` missing on `3/3`,
+  `source_revision` missing on `3/3`, and one `semantic_768` row without
+  `representation_revision`. These fields cannot be synthesized; Go Retrieval
+  remains a read-only executor until the canonical source/chunk join supplies
+  them. Receipt: `docs/reports/go-retrieval-identity-envelope-v1.json`.
+- **Go implementation health:** `go test ./...` passes. The remaining issue is
+  identity/lineage completeness in live results, not a Go service crash.
+
 Items 5-17 above are recorded as explicit gates from the operator's own specification, not
 attempted this pass. Each requires its own bounded design/implementation session — building them
 without their prerequisite gates (especially AR-02's registry-owner decision and AR-04's

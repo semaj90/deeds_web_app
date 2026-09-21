@@ -10,7 +10,12 @@ import { spawnSync } from 'node:child_process';
 const root = process.cwd();
 const controller = path.join(root, 'scripts/atlas/audit-openspec-execution-controller-v1.mjs');
 const reportsDir = path.join(root, 'docs/reports');
-const stagingDir = path.join(reportsDir, 'staging');
+// Use a run-scoped directory. The shared `docs/reports/staging` directory is
+// read by the SSR awareness projection and can be held open by a watcher while
+// this process is refreshing the controller receipt. A unique staging root
+// preserves atomic promotion without turning a transient sharing violation
+// into a stale-controller result.
+const stagingDir = path.join(reportsDir, 'staging', `.execution-controller-${process.pid}-${Date.now()}`);
 const reportNames = [
   'openspec-execution-controller-v1.json',
   'openspec-actionable-work-v1.json',

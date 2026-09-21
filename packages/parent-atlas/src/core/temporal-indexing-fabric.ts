@@ -4,6 +4,132 @@ import { z } from 'zod';
 const id = z.string().min(1);
 const revision = z.string().min(1);
 const checksum = z.string().regex(/^[a-f0-9]{64}$/);
+const isoTimestamp = z.string().datetime({ offset: true });
+const utf8Span = z.object({
+  start_byte: z.number().int().nonnegative(),
+  end_byte: z.number().int().nonnegative(),
+}).strict().superRefine((value, ctx) => {
+  if (value.end_byte < value.start_byte) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['end_byte'], message: 'end_byte must be >= start_byte' });
+  }
+});
+
+/** Stable file identity and its exact admitted bytes. Derived consumers must retain this envelope. */
+export const sourceArtifactSchema = z.object({
+  schema: z.literal('atlas.source-artifact.v1').default('atlas.source-artifact.v1'),
+  file_id: id,
+  repo_id: id,
+  workspace_revision: revision,
+  canonical_source_ref: z.string().min(1),
+  source_revision: revision,
+  content_digest: checksum,
+  byte_length: z.number().int().nonnegative(),
+  mime_type: z.string().min(1),
+  language: z.string().min(1),
+  predecessor_source_revision: revision.nullable().default(null),
+  supersedes_source_revision: revision.nullable().default(null),
+  observed_at: isoTimestamp,
+  admitted_at: isoTimestamp.nullable().default(null),
+  retired_at: isoTimestamp.nullable().default(null),
+  producer_id: id,
+  producer_revision: revision,
+  canonical_authority: z.literal(false).default(false),
+}).strict().superRefine((value, ctx) => {
+  if (value.retired_at !== null && value.admitted_at !== null && value.retired_at < value.admitted_at) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['retired_at'], message: 'retired_at cannot precede admitted_at' });
+  }
+});
+export type SourceArtifactV1 = z.infer<typeof sourceArtifactSchema>;
+
+/** UTF-8 bytes are authoritative; editor UTF-16 positions are an optional projection only. */
+export const sourceCoordinateMapSchema = z.object({
+  schema: z.literal('atlas.source-coordinate-map.v1').default('atlas.source-coordinate-map.v1'),
+  source_revision: revision,
+  content_digest: checksum,
+  offset_basis: z.literal('UTF8_SOURCE_BYTES_V1').default('UTF8_SOURCE_BYTES_V1'),
+  line_starts_byte: z.array(z.number().int().nonnegative()).min(1),
+  utf16_projection_revision: revision.nullable().default(null),
+  coordinate_checksum: checksum,
+  canonical_authority: z.literal(false).default(false),
+}).strict();
+export type SourceCoordinateMapV1 = z.infer<typeof sourceCoordinateMapSchema>;
+
+export const documentObservationSchema = z.object({
+  schema: z.literal('atlas.document-observation.v1').default('atlas.document-observation.v1'),
+  observation_id: id,
+  observation_kind: z.enum(['SECTION', 'HEADING', 'PARAGRAPH', 'AST_NODE', 'DIAGNOSTIC', 'CLAIM', 'LINK', 'TABLE', 'LOG_EVENT']),
+  source_ref: z.string().min(1),
+  source_revision: revision,
+  workspace_revision: revision,
+  span: utf8Span,
+  utf16_projection: z.object({
+    start_line: z.number().int().nonnegative(),
+    start_character: z.number().int().nonnegative(),
+    end_line: z.number().int().nonnegative(),
+    end_character: z.number().int().nonnegative(),
+  }).strict().nullable().default(null),
+  text_checksum: checksum,
+  producer_id: id,
+  producer_revision: revision,
+  evidence_refs: z.array(id).min(1),
+  representation_revision: revision.nullable().default(null),
+  canonical_authority: z.literal(false).default(false),
+  observation_checksum: checksum,
+}).strict();
+export type DocumentObservationV1 = z.infer<typeof documentObservationSchema>;
+
+export const knowledgeClaimSchema = z.object({
+  schema: z.literal('atlas.knowledge-claim.v1').default('atlas.knowledge-claim.v1'),
+  claim_id: id,
+  claim_kind: z.enum(['FACT', 'OWNERSHIP', 'BEHAVIOR', 'CONTRACT', 'CHANGE', 'RECOMMENDATION', 'DIAGNOSTIC']),
+  statement: z.string().min(1),
+  evidence_refs: z.array(id).min(1),
+  source_revision_set: z.array(revision).min(1),
+  producer_id: id,
+  producer_revision: revision,
+  confidence: z.number().finite().min(0).max(1),
+  authority_class: z.enum(['OBSERVATION', 'PROVISIONAL', 'REVIEWED', 'CANONICAL']),
+  first_observed_revision: revision,
+  last_confirmed_revision: revision,
+  status: z.enum(['CURRENT', 'STALE_EVIDENCE', 'CONTRADICTED', 'SUPERSEDED', 'UNVERIFIED']),
+  checksum,
+  canonical_authority: z.literal(false).default(false),
+}).strict();
+export type KnowledgeClaimV1 = z.infer<typeof knowledgeClaimSchema>;
+
+export const runManifestSchema = z.object({
+  schema: z.literal('atlas.run-manifest.v1').default('atlas.run-manifest.v1'),
+  run_id: id,
+  request_id: id,
+  workspace_revision: revision,
+  producer_id: id,
+  producer_revision: revision,
+  input_refs: z.array(id).min(1),
+  output_refs: z.array(id).default([]),
+  started_at: isoTimestamp,
+  completed_at: isoTimestamp.nullable().default(null),
+  status: z.enum(['RUNNING', 'SUCCEEDED', 'FAILED', 'BLOCKED']),
+  manifest_checksum: checksum,
+  canonical_authority: z.literal(false).default(false),
+}).strict();
+export type RunManifestV1 = z.infer<typeof runManifestSchema>;
+
+export const temporalDocumentIndexSchema = z.object({
+  schema: z.literal('atlas.temporal-document-index.v1').default('atlas.temporal-document-index.v1'),
+  index_id: id,
+  workspace_revision: revision,
+  source_snapshot_revision: revision,
+  artifact_refs: z.array(id),
+  observation_refs: z.array(id),
+  claim_refs: z.array(id),
+  delta_refs: z.array(id),
+  source_revision_set_checksum: checksum,
+  index_checksum: checksum,
+  status: z.enum(['DRAFT', 'VALID', 'BLOCKED']),
+  canonical_authority: z.literal(false).default(false),
+  producer_revision: revision,
+}).strict();
+export type TemporalDocumentIndexV1 = z.infer<typeof temporalDocumentIndexSchema>;
 
 export const sourceChangedRangeSchema = z.object({
   start_byte: z.number().int().nonnegative(),
@@ -191,6 +317,31 @@ function stable(value: unknown): string {
 
 export function temporalIndexChecksum(value: unknown): string {
   return createHash('sha256').update(stable(value), 'utf8').digest('hex');
+}
+
+export function classifyKnowledgeClaimFreshness(
+  claim: KnowledgeClaimV1,
+  changedSourceRevisions: readonly string[],
+): KnowledgeClaimV1['status'] {
+  if (claim.status === 'SUPERSEDED' || claim.status === 'CONTRADICTED') return claim.status;
+  const changed = new Set(changedSourceRevisions);
+  return claim.source_revision_set.some((sourceRevision) => changed.has(sourceRevision))
+    ? 'STALE_EVIDENCE'
+    : claim.status;
+}
+
+export function buildKnowledgeClaimChecksum(input: Omit<KnowledgeClaimV1, 'schema' | 'checksum' | 'canonical_authority'>): string {
+  return temporalIndexChecksum({ schema: 'atlas.knowledge-claim.v1', ...input, canonical_authority: false });
+}
+
+export function buildRunManifest(input: Omit<RunManifestV1, 'schema' | 'manifest_checksum' | 'canonical_authority'>): RunManifestV1 {
+  const raw = { schema: 'atlas.run-manifest.v1' as const, ...input, canonical_authority: false as const };
+  return runManifestSchema.parse({ ...raw, manifest_checksum: temporalIndexChecksum(raw) });
+}
+
+export function buildTemporalDocumentIndex(input: Omit<TemporalDocumentIndexV1, 'schema' | 'index_checksum' | 'canonical_authority'>): TemporalDocumentIndexV1 {
+  const raw = { schema: 'atlas.temporal-document-index.v1' as const, ...input, canonical_authority: false as const };
+  return temporalDocumentIndexSchema.parse({ ...raw, index_checksum: temporalIndexChecksum(raw) });
 }
 
 export function buildTemporalIndexPlan(input: Omit<z.input<typeof temporalIndexPlanSchema>, 'schema' | 'actions' | 'plan_checksum' | 'canonical_authority' | 'plan_id'> & { plan_id?: string }): TemporalIndexPlanV1 {

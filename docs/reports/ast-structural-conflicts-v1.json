@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ast-structural-conflicts.v1",
-  "generatedAt": "2026-09-20T08:02:26.077Z",
+  "generatedAt": "2026-09-20T18:11:33.313Z",
   "inputs": {
     "candidateArtifact": ".tmp/atlas/ast-declaration-candidates-current-v1.jsonl",
     "candidateArtifactExists": true,

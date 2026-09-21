@@ -1,0 +1,263 @@
+{
+  "schema": "atlas.query-fanout-bitfrost.v1",
+  "generatedAt": "2026-09-20T18:48:16.148Z",
+  "gate": "QUERY_FANOUT_BITFROST_READ_ONLY_PROVEN",
+  "status": "PARTIAL_PROVEN",
+  "query": "why does packet cache invalidation leave stale bifrost semantic keys after a postgres packet update",
+  "requestHash": "sha256:985ba0d57dd35f9ee259576f23272a273315453dc4711a6bfab295443f29b5a7",
+  "workflowProgress": {
+    "percent": 70,
+    "basis": "sum(weight of DONE + half PARTIAL) / sum(all stage weights); workflow completion, not confidence",
+    "blockedStages": [
+      "som_cell",
+      "ace_cache_identity",
+      "bitfrost_bucket"
+    ]
+  },
+  "stages": [
+    {
+      "id": "request_identity",
+      "weight": 10,
+      "status": "DONE",
+      "requestHash": "sha256:985ba0d57dd35f9ee259576f23272a273315453dc4711a6bfab295443f29b5a7"
+    },
+    {
+      "id": "classification",
+      "weight": 10,
+      "status": "DONE",
+      "tool": "domain.classify",
+      "isError": false,
+      "raw": "{\n  \"status\": \"success\",\n  \"backend\": \"sklearn-lr\",\n  \"device\": \"cpu\",\n  \"features\": {\n    \"naive_bayes_domain_probability\": 0.5510762987183389,\n    \"logistic_regression_domain_probability\": 0.5477820774052953,\n    \"naive_bayes_score\": 0.5510762987183389,\n    \"logistic_regression_score\": 0.5477820774052953,\n    \"cluster_mean_distance\": 0.7701281486988899,\n    \"cluster_distance_std\": 0,\n    \"cluster_diversity\": 0.06666666666666667,\n    \"chunk_count\": 1\n  },\n  \"artifacts\": {\n    \"label\": \"ui\",\n    \"naive_bayes_label\": \"ui\",\n    \"logistic_regression_label\": \"ui\",\n    \"model_revision\": \"domain-classifier-nblr-v1-1788454983\"\n  },\n  \"warnings\": []\n}",
+      "predictedLabel": "ui",
+      "modelRevision": "domain-classifier-nblr-v1-1788454983",
+      "backend": "sklearn-lr",
+      "nbProbability": 0.5510762987183389,
+      "lrProbability": 0.5477820774052953,
+      "minConfidenceFloor": null,
+      "provisional": "UNPROVEN_NO_CALIBRATION_SET",
+      "routingAdmissible": false,
+      "routingReasons": [
+        "NO_CALIBRATED_FLOOR_SUPPLIED (no calibration set exists; a default number would be invented)"
+      ]
+    },
+    {
+      "id": "okf_validation",
+      "weight": 10,
+      "status": "PARTIAL",
+      "okfCounts": {
+        "domains": 3,
+        "concepts": 6,
+        "languages": 1,
+        "indexes": 3
+      },
+      "okfMatchesInClassification": [],
+      "note": "classifier output named no .okf domain/concept id; vocabulary validation not satisfied"
+    },
+    {
+      "id": "capability_plan",
+      "weight": 10,
+      "status": "DONE",
+      "traceToolCount": 177,
+      "plan": [
+        {
+          "lane": "lexical",
+          "tools": [
+            "kb.trace_search",
+            "search.postgres_fts",
+            "search.hybrid"
+          ]
+        },
+        {
+          "lane": "ast",
+          "tools": [
+            "file.read_window",
+            "hypergraph.search",
+            "codebase.context_for_file"
+          ]
+        },
+        {
+          "lane": "semantic_768",
+          "tools": [
+            "trace.kag_search",
+            "search.go_hybrid",
+            "atlas.packet_dense_search"
+          ]
+        },
+        {
+          "lane": "taxonomy",
+          "tools": [
+            "taxonomy.children",
+            "taxonomy.path",
+            "atlas.pos_concept_tagging",
+            "domain.classify"
+          ]
+        },
+        {
+          "lane": "graph",
+          "tools": [
+            "graph.expand_neighborhood",
+            "graph.pagerank_top",
+            "atlas.graph.pagerank"
+          ]
+        },
+        {
+          "lane": "db_schema",
+          "tools": [
+            "db.schema_overview",
+            "db.table_inspect"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "semantic_topk",
+      "weight": 20,
+      "status": "DONE",
+      "collection": "codebase_chunks_768_v2",
+      "queryPromptContract": "NOT_PROVEN (EG-GGUF-3: retrieval-query task prefix unverified)",
+      "hitCount": 10,
+      "hitsWithPacketKey": 10,
+      "hits": [
+        {
+          "id": "2c6ea307-70f7-4622-b783-5f18cbdb740d",
+          "score": 0.6356,
+          "packetKey": "packet:b8c65b14e284",
+          "sourceRef": "docs/CANONICAL-PACKET-REGISTRY-DESIGN.md"
+        },
+        {
+          "id": "0adc213b-14fc-42f4-b18d-71f0f236986c",
+          "score": 0.6248,
+          "packetKey": "packet:dfab43511204",
+          "sourceRef": "docs/architecture/packet-truth-flow-canonical-pattern.md"
+        },
+        {
+          "id": "00484f68-b579-4dac-a7d6-1423bfb1ee71",
+          "score": 0.6247,
+          "packetKey": "packet:5aa6701e291d",
+          "sourceRef": "docs/INFRASTRUCTURE-AUDIT-INDEX.md"
+        },
+        {
+          "id": "b2f87a83-e741-4c7e-b088-fbf3ada0675a",
+          "score": 0.6055,
+          "packetKey": "ace:packet:9909926b2c1f",
+          "sourceRef": "docs/architecture/grpc-binary-memory-registry-plan.md"
+        },
+        {
+          "id": "746e1eb9-cd7a-40c6-81ea-b56066e50507",
+          "score": 0.6006,
+          "packetKey": "packet:418f76df1550",
+          "sourceRef": "docs/PHASE2-NEXT-ACTIONS.md"
+        },
+        {
+          "id": "00ddbe71-61aa-4255-81f9-4e5e4f71bfb1",
+          "score": 0.5945,
+          "packetKey": "ace:packet:99afef6c935f",
+          "sourceRef": "docs/architecture/DAG-ACP-OPEN-MEMORY-WIRING.md"
+        },
+        {
+          "id": "e0713b5c-1dd5-41de-b59b-ca607b6c5137",
+          "score": 0.5935,
+          "packetKey": "packet:6c11300e3eea",
+          "sourceRef": "docs/PHASE-2-TABLE-MIGRATIONS-PLAN.md"
+        },
+        {
+          "id": "633e9d2d-78e7-4784-8237-20374ed4c112",
+          "score": 0.5918,
+          "packetKey": "ace:packet:80ff8115ce0f",
+          "sourceRef": "docs/PHASE-5-EXTENDED-EVENT-SOURCING-ARCHITECTURE.md"
+        },
+        {
+          "id": "907586a7-bad4-4eac-ac5b-7451143e0b21",
+          "score": 0.5859,
+          "packetKey": "packet:d5ff4a84bc27",
+          "sourceRef": "docs/PACKET-CENTRIC-ARCHITECTURE.md"
+        },
+        {
+          "id": "5e346e16-4465-469b-b93f-f9a146380b2e",
+          "score": 0.5832,
+          "packetKey": "packet:1db2be9746be",
+          "sourceRef": "docs/P1-PRODUCTION-HARDENING-COMPLETE.md"
+        }
+      ]
+    },
+    {
+      "id": "kmeans_centroid",
+      "weight": 10,
+      "status": "DONE",
+      "centroidCount": 64,
+      "space": "768-d",
+      "clusterTypes": [
+        "kmeans_js"
+      ],
+      "centroidsDatedOldest": "2026-07-14 (kmeans_js)",
+      "top3": [
+        {
+          "clusterId": 36,
+          "clusterType": "kmeans_js",
+          "cosine": 0.5246
+        },
+        {
+          "clusterId": 1,
+          "clusterType": "kmeans_js",
+          "cosine": 0.4914
+        },
+        {
+          "clusterId": 4,
+          "clusterType": "kmeans_js",
+          "cosine": 0.4813
+        }
+      ],
+      "role": "routing hint only — not identity, not an RRF vote"
+    },
+    {
+      "id": "som_cell",
+      "weight": 5,
+      "status": "BLOCKED",
+      "reason": "codebook is 64-d (autoencoder latent, weights recorded untrained); no somRevision on assignments; PG som_cell_x/y vs som_row/col disagree on 99.7% of rows",
+      "evidence": "CLAUDE.md SOM_REVISION_PROVENANCE_01"
+    },
+    {
+      "id": "ace_cache_identity",
+      "weight": 10,
+      "status": "BLOCKED",
+      "schema": "AceBitfrostCacheIdentityV1 (atlas/cache/ace-bitfrost-cache-identity-v1.ts)",
+      "unbuildableBecauseMissing": [
+        "candidateSnapshotRevision",
+        "ordinalMapChecksum",
+        "graphRevision",
+        "featureRevision",
+        "representationRevision",
+        "producerRevision",
+        "normalizationPolicyRevision"
+      ],
+      "reason": "no frozen CandidateOrdinalMap / CandidateFeatureMatrix exists for this query (14.3b/14.3c blocked upstream); a key built without them would be invented",
+      "knownRevisions": {
+        "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9"
+      }
+    },
+    {
+      "id": "bitfrost_bucket",
+      "weight": 10,
+      "status": "BLOCKED",
+      "proposedBucket": null,
+      "reason": "no ACE cache identity (see ace_cache_identity) => no bucket key; taxonomy/cluster ids never serve as cache identity by themselves"
+    },
+    {
+      "id": "cache_state",
+      "weight": 5,
+      "status": "DONE",
+      "maxmemory": "2147483648",
+      "maxmemoryPolicy": "noeviction",
+      "dbsize": 233,
+      "bifrostSem": 0,
+      "bitfrostKeys": 1,
+      "residencyPolicy": "HOT 30d / WARM 7d / COLD 1d (bitfrost-residency-policy-v1.json, WIRED_POLICY_ADAPTER_PROVEN_TESTS_ONLY — Valkey behavior NOT proven)",
+      "lookup": "MISS_NO_IDENTITY",
+      "hit": false
+    }
+  ],
+  "canonicalAuthority": false,
+  "cacheWrites": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false
+}

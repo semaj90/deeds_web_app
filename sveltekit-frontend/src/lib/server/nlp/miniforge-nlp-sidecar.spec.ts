@@ -22,7 +22,12 @@ describe('miniforge-nlp-sidecar', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: any, init?: any) => {
       const url = String(input);
       if (url.endsWith('/health')) {
-        return new Response(JSON.stringify({ status: 'ok', model: 'miniforge-nlp-sidecar', capabilities: { spacy: true } }), { status: 200 });
+        return new Response(JSON.stringify({
+          status: 'ok',
+          model: 'miniforge-nlp-sidecar',
+          capabilities: { spacy: true, spacy_pos: false },
+          capabilityDetails: { spacy_model: { installed: false, loaded: false, pos_ready: false } },
+        }), { status: 200 });
       }
       if (url.endsWith('/analyze')) {
         const body = JSON.parse(String(init?.body ?? '{}'));
@@ -73,6 +78,9 @@ describe('miniforge-nlp-sidecar', () => {
 
     const health = await client.health();
     expect(health.ready).toBe(true);
+    expect(health.capabilities?.spacy).toBe(true);
+    expect(health.capabilities?.spacy_pos).toBe(false);
+    expect(health.capabilityDetails?.spacy_model?.pos_ready).toBe(false);
 
     const analysis = await client.analyze({
       text: 'export function hello() { return 1; }',

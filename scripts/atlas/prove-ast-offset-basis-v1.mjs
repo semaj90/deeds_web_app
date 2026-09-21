@@ -75,6 +75,8 @@ const report = {
   writesPerformed: false,
 };
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+const temporaryReportPath = `${reportPath}.${process.pid}.${Date.now()}.tmp`;
+fs.writeFileSync(temporaryReportPath, `${JSON.stringify(report, null, 2)}\n`);
+fs.renameSync(temporaryReportPath, reportPath);
 console.log(JSON.stringify({ reportPath, status, candidateRows: rows.length, bomFiles: files.size, writesPerformed: false }, null, 2));
 process.exitCode = status === 'BOM_OFFSET_BASIS_PROVEN' ? 0 : 1;

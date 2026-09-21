@@ -792,7 +792,17 @@ extraction call site is added — do not reintroduce the flattened-prompt path.
   audit `scripts/atlas/audit-doc-15-retrieval-fanout-owner-v1.mjs` confirms the existing hybrid,
   Postgres FTS, Qdrant, retrieval-orchestrator, and identity-resolution surfaces are present;
   report: `docs/reports/parent-atlas/doc-15-retrieval-fanout-owner-v1.json`. Same-query live
-  fan-out replay and documentation-specific version/authority filtering remain open.
+  fan-out replay and documentation-specific version/authority filtering remain open. The shared
+  research/document retrieval runtime is now bounded-smoke proven by
+  `scripts/atlas/prove-research-document-retrieval-v2.mjs` with report
+  `docs/reports/research-document-retrieval-v2.json`; its stale container image was corrected by
+  adding `COPY research_contracts.py` to `docker/langgraph-synthesis/Dockerfile` and rebuilding
+  only `legal-ai-langgraph`. This proves shared runtime wiring, not DOC-15's documentation-specific
+  fan-out or canonical admission. A bounded owner/fixture proof now records the existing
+  same-query PostgreSQL + Qdrant fan-out, `stable_key` fusion, one semantic-lane vote, and
+  version-before-fusion filtering in `scripts/atlas/prove-doc-15-same-query-fanout-v1.mjs`;
+  report: `docs/reports/parent-atlas/doc-15-same-query-fanout-v1.json`. The report deliberately
+  keeps live documentation fan-out/version-authority admission open and `canonicalAuthority=false`.
 - [ ] **DOC-16** `AceRepairPacketV1` — `NEW` contract, `EXTEND` of the existing general ACE packet
   envelope pattern. A descriptor-only fixture proof now binds candidate snapshot, ordinal map,
   packet/source/evidence references, diagnostic and documentation-rule references while rejecting
@@ -852,6 +862,34 @@ extraction call site is added — do not reintroduce the flattened-prompt path.
     This does not close DOC-26: live manifest/crawler integration and durable readback remain open.
 
 ## Explicitly deferred / not part of this proposal
+
+### Temporal document/claim spine contract (supporting proof, 2026-09-21)
+
+The existing `packages/parent-atlas/src/core/temporal-indexing-fabric.ts` owner now
+exports revision-qualified `SourceArtifactV1`, `SourceCoordinateMapV1`,
+`DocumentObservationV1`, `KnowledgeClaimV1`, `RunManifestV1`, and
+`TemporalDocumentIndexV1` contracts. UTF-8 source bytes are the only authoritative
+coordinate basis; observations and claims require non-empty evidence references;
+claim freshness is classified against changed source revisions; aggregate checksums
+are deterministic; and every envelope is hard-coded noncanonical. The bounded proof
+`scripts/atlas/prove-temporal-document-claim-fabric-v1.mjs` produced
+`docs/reports/temporal-document-claim-fabric-v1.json` with 13/13 tests passing,
+`TEMPORAL_DOCUMENT_CLAIM_FABRIC_PROVEN`, `writes_performed=false`, and
+`promotion_authorized=false`. This is a contract foundation only: DOC-13/14/15/16/17/18/19/20/21/26
+remain open for their existing live index, graph, retrieval, cache, acceleration, and
+manifest readback gates.
+
+The downstream read-only composition was also re-run against current artifacts:
+`prove-doc-symbol-mutual-index-live-v1.mjs` returned
+`LIVE_DOC_EXTRACTION_SYMBOL_JOIN_PROVEN` (200 active registry rows),
+`prove-doc-symbol-nlp-dag-context-v1.mjs` returned
+`COMPOSITION_OWNER_WIRING_PROVEN`, `prove-parent-atlas-context-manifest-v1.mjs`
+returned `CONTEXT_MANIFEST_REPLAY_PROVEN` for the 15-row lineage-qualified canary,
+and `prove-ornith-agent-dag-readonly-gate-v1.mjs` returned
+`ORNITH_AGENT_DAG_READONLY_GATE_PROVEN` with seven candidate ordinals and zero
+mutation nodes. The current-pass selector remains blocked by separately tracked
+live view drift (`success` versus `succeeded`, and missing `id DESC` tiebreak); no
+DDL or source-of-truth change was applied.
 
 - Registering Firecrawl as a live MCP server with a budget cap — separate follow-up, needs an API
   key provisioned first.

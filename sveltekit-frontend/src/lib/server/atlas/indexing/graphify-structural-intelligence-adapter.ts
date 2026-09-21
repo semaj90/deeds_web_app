@@ -4,6 +4,7 @@ import {
   adaptAstGrepExtractedFeature,
   adaptAstGrepMatches,
   adaptGroundedLangExtract,
+  groundLangExtractUtf8SpansV1,
   adaptSidecarGroundedExtractions,
   buildGroundedDomainCandidates,
   type GroundedDomainCandidateV1,
@@ -37,6 +38,15 @@ export type GraphifyStructuralIntelligenceReceipt = {
   referenceFactCount: number;
   astGrepObservationCount: number;
   langExtractObservationCount: number;
+  langExtractParserBufferPresent: boolean;
+  langExtractParserBufferChecksum: string | null;
+  langExtractOffsetBasis: 'PYTHON_CODEPOINT';
+  langExtractSourceTextEncodingRevision: 'UTF8_PARSER_BUFFER_V1';
+  langExtractFallbackUsed: boolean;
+  langExtractFallbackReason: string | null;
+  langExtractUtf8SpanCount: number;
+  langExtractUtf8RejectionCount: number;
+  langExtractUtf8MismatchCount: number;
   groundedDomainCandidateCount: number;
   compatibilityNodeIdCount: number;
   compatibilityFileIdCount: number;
@@ -53,6 +63,10 @@ export type GraphifyStructuralIntelligenceResult = {
 
 function structuralStageChecksum(value: unknown): string {
   return `sha256:${createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
+}
+
+function bytesChecksum(value: Uint8Array): string {
+  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
 }
 
 /** Pure bridge from the existing structural receipt to coordinator stage receipts. It does not
@@ -96,6 +110,7 @@ function unique(values: readonly string[]): string[] {
  */
 export function compileGraphifyStructuralIntelligence(input: {
   source: string;
+  parserBuffer?: Uint8Array;
   workspaceRevision: string;
   materialization: StructuralMaterializationResult;
   astGrepFeatures?: ExtractedFeature[];
@@ -136,6 +151,15 @@ export function compileGraphifyStructuralIntelligence(input: {
         referenceFactCount: 0,
         astGrepObservationCount: 0,
         langExtractObservationCount: 0,
+        langExtractParserBufferPresent: false,
+        langExtractParserBufferChecksum: null,
+        langExtractOffsetBasis: 'PYTHON_CODEPOINT',
+        langExtractSourceTextEncodingRevision: 'UTF8_PARSER_BUFFER_V1',
+        langExtractFallbackUsed: false,
+        langExtractFallbackReason: null,
+        langExtractUtf8SpanCount: 0,
+        langExtractUtf8RejectionCount: 0,
+        langExtractUtf8MismatchCount: 0,
         groundedDomainCandidateCount: 0,
         compatibilityNodeIdCount: 0,
         compatibilityFileIdCount: 0,
@@ -178,6 +202,17 @@ export function compileGraphifyStructuralIntelligence(input: {
     producer_revision: input.revisions.adapter,
     extractions: rawLangExtract,
   });
+  const parserBufferPresent = input.parserBuffer !== undefined;
+  const parserBuffer = input.parserBuffer ?? Buffer.from(input.source, 'utf8');
+  const utf8Grounding = groundLangExtractUtf8SpansV1({
+    source_ref: materialization.evidence.file_path,
+    source_revision: materialization.evidence.source_revision,
+    expected_source_revision: materialization.evidence.source_revision,
+    workspace_revision: input.workspaceRevision,
+    parser_buffer: parserBuffer,
+    offset_basis: 'PYTHON_CODEPOINT',
+    extractions: rawLangExtract,
+  });
 
   const enriched = adaptAtlasAstEvidenceToStructuralInput({
     evidence: materialization.evidence,
@@ -216,11 +251,18 @@ export function compileGraphifyStructuralIntelligence(input: {
     && materialization.sourceRevisionAuthority === 'PROVEN'
     && materialization.sourceRevision !== null
     && strictNativeMode
+    && parserBufferPresent
     && compatibilityCount === 0;
 
   const langExtractDiagnostics = groundedLangExtract.receipt.rejected_ungrounded_count > 0
     ? [`LANGEXTRACT_UNGROUNDED_REJECTED:${groundedLangExtract.receipt.rejected_ungrounded_count}`]
     : [];
+  const utf8Diagnostics = [
+    ...(utf8Grounding.rejections.length > 0 ? [`LANGEXTRACT_UTF8_REJECTED:${utf8Grounding.rejections.length}`] : []),
+    ...(utf8Grounding.spans.some((span) => !span.text_matches_extraction)
+      ? [`LANGEXTRACT_UTF8_TEXT_MISMATCH:${utf8Grounding.spans.filter((span) => !span.text_matches_extraction).length}`]
+      : []),
+  ];
 
   return {
     fabric,
@@ -243,6 +285,15 @@ export function compileGraphifyStructuralIntelligence(input: {
       referenceFactCount: fabric.receipt.reference_fact_count,
       astGrepObservationCount: fabric.receipt.ast_grep_observation_count,
       langExtractObservationCount: fabric.receipt.grounded_langextract_count,
+      langExtractParserBufferPresent: parserBufferPresent,
+      langExtractParserBufferChecksum: bytesChecksum(parserBuffer),
+      langExtractOffsetBasis: 'PYTHON_CODEPOINT',
+      langExtractSourceTextEncodingRevision: 'UTF8_PARSER_BUFFER_V1',
+      langExtractFallbackUsed: !parserBufferPresent,
+      langExtractFallbackReason: parserBufferPresent ? null : 'PARSER_BUFFER_DERIVED_FROM_SOURCE_TEXT',
+      langExtractUtf8SpanCount: utf8Grounding.spans.length,
+      langExtractUtf8RejectionCount: utf8Grounding.rejections.length,
+      langExtractUtf8MismatchCount: utf8Grounding.spans.filter((span) => !span.text_matches_extraction).length,
       groundedDomainCandidateCount: groundedDomainCandidates.length,
       compatibilityNodeIdCount: enriched.receipt.compatibility_node_id_count,
       compatibilityFileIdCount: enriched.receipt.compatibility_file_id_count,
@@ -251,6 +302,7 @@ export function compileGraphifyStructuralIntelligence(input: {
         ...materialization.diagnostics,
         ...enriched.receipt.diagnostics,
         ...langExtractDiagnostics,
+        ...utf8Diagnostics,
         ...fabric.receipt.diagnostics,
       ]),
       canonicalIdentityCreated: false,

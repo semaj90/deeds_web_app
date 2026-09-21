@@ -26,6 +26,8 @@ import {
 } from './event-hypergraph-contract.js';
 import { buildRecommendationPolicyResults, type RecommendationPolicyResult } from '$lib/server/analytics/recommendation-policy.js';
 
+const NonBlankStringSchema = z.string().trim().min(1);
+
 const EvidenceSpanSchema = z
 	.object({
 		sourceRef: z.string().min(1),
@@ -61,8 +63,8 @@ export const AnalysisPassResultSchema = z
 	.object({
 		requestId: z.string().min(1),
 		packetKey: z.string().min(1).nullable().default(null),
-		sourceRef: z.string().min(1),
-		sourceRevision: z.string().min(1),
+		sourceRef: NonBlankStringSchema,
+		sourceRevision: NonBlankStringSchema,
 		family: AnalysisPassFamilySchema,
 		passName: z.string().min(1),
 		passRevision: z.string().min(1),
@@ -262,8 +264,8 @@ export const ExperimentFeatureMatrixSchema = z
 		requestId: z.string().min(1),
 		candidateId: z.string().min(1),
 		packetKey: z.string().min(1).nullable().default(null),
-		sourceRef: z.string().min(1),
-		sourceRevision: z.string().min(1),
+		sourceRef: NonBlankStringSchema,
+		sourceRevision: NonBlankStringSchema,
 		featureRevision: z.string().min(1),
 		graphRevision: z.string().min(1).nullable().default(null),
 		representationRevision: z.string().min(1).nullable().default(null),
@@ -332,6 +334,29 @@ export interface CompileExperimentFeatureMatrixInput {
 	passResults: AnalysisPassResult[];
 }
 
+export class FeatureMatrixLineageMismatchError extends Error {
+	readonly code = 'FEATURE_MATRIX_LINEAGE_MISMATCH' as const;
+
+	constructor(message: string) {
+		super(message);
+		this.name = 'FeatureMatrixLineageMismatchError';
+	}
+}
+
+function assertFeatureMatrixPassLineage(
+	passResults: AnalysisPassResult[],
+	sourceRef: string,
+	sourceRevision: string,
+): void {
+	for (const passResult of passResults) {
+		if (passResult.sourceRef !== sourceRef || passResult.sourceRevision !== sourceRevision) {
+			throw new FeatureMatrixLineageMismatchError(
+				`Analysis pass ${passResult.passName} does not match feature-matrix lineage ${sourceRef}@${sourceRevision}`,
+			);
+		}
+	}
+}
+
 function latestPass(
 	passResults: AnalysisPassResult[],
 	family: AnalysisPassFamily,
@@ -386,6 +411,9 @@ export function compileExperimentFeatureMatrix(
 ): { matrix: ExperimentFeatureMatrix; control5: Control5 } {
 	const requestId = input.requestId ?? randomUUID();
 	const canonicalPassResultsSet = canonicalPassResults(input.passResults);
+	const sourceRef = input.sourceRef.trim();
+	const sourceRevision = input.sourceRevision.trim();
+	assertFeatureMatrixPassLineage(canonicalPassResultsSet, sourceRef, sourceRevision);
 	const structural = latestPass(canonicalPassResultsSet, 'structural');
 	const lexical = latestPass(canonicalPassResultsSet, 'lexical');
 	const semantic = latestPass(canonicalPassResultsSet, 'semantic');
@@ -394,8 +422,6 @@ export function compileExperimentFeatureMatrix(
 	const grounded = latestPass(canonicalPassResultsSet, 'grounded');
 
 	const control5 = deriveControl5(input.passResults);
-	const sourceRef = input.sourceRef;
-	const sourceRevision = input.sourceRevision;
 	const featureRevision = input.featureRevision ?? 'nlp-feature-compiler-v1';
 	const packetKey = input.packetKey ?? null;
 

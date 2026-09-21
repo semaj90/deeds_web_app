@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
- * 14.3b tier T0 (exact, case-insensitive) domain-tuple resolver — REHEARSAL by default.
+ * 14.3b domain-tuple resolver, tiers T0 + T1 — REHEARSAL by default.
  *
- * Resolves feature_ontology_tuples rows (predicates CLASSIFIED_AS / BELONGS_TO_DOMAIN, object_type 'domain') whose domain key
- * matches EXACTLY ONE atlas_domain_ontology row by group_id or group_label (case-insensitive). No aliasing, no judgment:
- * T1/T2 alias tiers, generic buckets, the error sentinel and USES_CONCEPT are deliberately NOT touched.
+ * Resolves feature_ontology_tuples rows (predicates CLASSIFIED_AS / BELONGS_TO_DOMAIN, object_type 'domain'):
+ *   T0: the domain key matches EXACTLY ONE atlas_domain_ontology row by group_id or group_label (case-insensitive).
+ *   T1: the key is one of the 7 operator-approved high-confidence aliases in ALIAS_T1 (exact, case-sensitive key).
+ * T2 aliases, no-fit keys, generic buckets, the error sentinel and USES_CONCEPT are deliberately NOT touched.
  *
  * Writes: resolution_state='RESOLVED', resolved_concept_id='domain:<group_id>' (namespace-prefixed so a domain is never
  * mistaken for an ontology concept), and merges a `resolution` object (resolver id/version, matched_on, group_id) into

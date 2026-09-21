@@ -90,3 +90,24 @@
 !docs/reports/docker-reproducibility-v1.json
 !sveltekit-frontend/memory/graphify/gds/*.json
 !openspec/drafts/*.md
+
+# --- Classification + AST-authority evidence (2026-09-20) ---------------------------------------------
+# Gitignored on purpose: the git hook rejects files > 10 MB and *.jsonl / .tmp/ are ignored. They must
+# still be rg-searchable for offline joins (packet_key, sourceRef, qualifiedSymbol). Selective on purpose:
+# .tmp/atlas is ~422 MB in total, so only the evidence files below are un-ignored, not the whole directory.
+# These are derived/regenerable artifacts, never canonical evidence; regenerate before citing them.
+!docs/reports/domain-calibration-draft-v1.jsonl
+!docs/reports/domain-calibration-reviewed-v1.jsonl
+# .tmp/ is ignored as a whole directory, and a file cannot be re-included while its parent directory is
+# ignored. So: re-include .tmp/, ignore its children, re-include .tmp/atlas/, ignore its children, then
+# re-include the named evidence files. Last matching rule wins. Everything else under .tmp/ stays hidden.
+!.tmp/
+.tmp/*
+!.tmp/atlas/
+.tmp/atlas/*
+!.tmp/atlas/ast-declaration-candidates-current-v1.jsonl
+!.tmp/atlas/ast-canary-eligible-v1.jsonl
+!.tmp/atlas/ast-source-authority-cohort-v1.json
+!.tmp/atlas/current-graphify-symbol-nominations-v1.jsonl
+!.tmp/atlas/current-graph-symbol-resolution-v1.jsonl
+!.tmp/knowledge-source-snapshot-live-v1.json

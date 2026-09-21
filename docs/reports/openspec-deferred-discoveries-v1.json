@@ -1,6 +1,6 @@
 {
   "schema": "atlas.openspec-deferred-discoveries.v1",
-  "generatedAt": "2026-09-20T08:41:28.591Z",
+  "generatedAt": "2026-09-21T01:05:54.919Z",
   "tasks": [
     {
       "taskKey": "atlas-feature-intelligence:133",
@@ -524,7 +524,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:d3e1b36566e53935abcfe971fd03d327b64ca49de8981c0c843a357c6db31bc0",
       "sectionSlug": "p0-queue-artifact-transport",
@@ -561,7 +561,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:31c8b6bf036e3eaccd0b02b5608b944ef8ed88ca067f17da58ee39ccc8675c71",
       "sectionSlug": "p1-candidate-feature-fabric",
@@ -598,7 +598,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:19a4414d084b3ead3b4e11c78eca703cacae0e0477efae63857b91141b04bf7f",
       "sectionSlug": "p2-crossencoder",
@@ -635,7 +635,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:01e7244acf1129ece1443527ce003bb79a5db626efb8ef94d5d4d68fd78503b6",
       "sectionSlug": "p3-neural-retrieval-adaptation",
@@ -672,7 +672,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:6f54bd7df7311523844a1dfc5ac0f075b0080002c7064a772ad4a8fa4064922f",
       "sectionSlug": "p3-neural-retrieval-adaptation",
@@ -697,10 +697,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-candidate-feature-execution-fabric:717",
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:719",
       "change": "parent-atlas-candidate-feature-execution-fabric",
       "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
-      "line": 717,
+      "line": 719,
       "text": "ALIGN-OPT-01 Keep TensorRT-RTX, cuTile, TurboVec, and learned routing as benchmarked challengers only. Do not add them to the correctness gate until the corresponding baseline, held-out evaluation, and replay receipt exist.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -709,7 +709,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-18T19:27:07.825Z",
+      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:840268401142875101ac3f75dc71efa586c9e876920e217d1ebb103e1e9fdbad",
       "sectionSlug": "latest-proof-log-gate-state-2026-08-29",
@@ -723,7 +723,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-candidate-feature-execution-fabric:ALIGN-OPT-01",
         "taskRevision": "sha256:840268401142875101ac3f75dc71efa586c9e876920e217d1ebb103e1e9fdbad",
-        "sourceLine": 717,
+        "sourceLine": 719,
         "migrationKey": "parent-atlas-candidate-feature-execution-fabric#5b41c1851f0c71da",
         "basis": "DECLARED_ID"
       },
@@ -1921,7 +1921,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:d4795b128def6f3201131536d09cf1ca69d464c4f5fda47d9451ade38e1d146b",
       "sectionSlug": "current-top-todo-structural-graph-artifact-ppr-proof",
@@ -1958,7 +1958,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:58f35c71ede97ca54001ae28cc04ddc002ee460d39ec127ebdb1863fb53f0eef",
       "sectionSlug": "document-integrity-and-encoder-to-decoder-wiring",
@@ -1995,7 +1995,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:c73922fa4c50f28b912aac47cf61c55576070d79ced960112ec74d6dcea32d7f",
       "sectionSlug": "p1-retrieval-and-learning-heads",
@@ -2032,7 +2032,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:4829a6fd5a314a3c44fe1c5e4cc0d6272fddddbee7fa3e2384b2a7c5e713a53f",
       "sectionSlug": "p1-retrieval-and-learning-heads",
@@ -2069,7 +2069,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:bc7e2d0d46c85615598623abc3df2db628923fcd0e0668d8f0e83e135500121a",
       "sectionSlug": "p1-retrieval-and-learning-heads",
@@ -2106,7 +2106,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:c23569e71465d45d1fd8d268867b874be868d9e731998902aa08f623d5dc583c",
       "sectionSlug": "p1-retrieval-and-learning-heads",
@@ -2143,7 +2143,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:9a3c0af535d33bf9bcf012f3f81c5973cbf8aadf7c09c3cab4be394926de47c4",
       "sectionSlug": "operator-lookup-checklist",
@@ -2180,7 +2180,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:191567b5fbd960b8c6f18d8cf90e5426a3989e0385b35c5a218d9fb9d4ae44d1",
       "sectionSlug": "repo-file-top-k-ranking-lane",
@@ -2216,7 +2216,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:452fa1e4a0508c25adfea477a38836e12b9ec951a522f4b5cabf3f3ee23860ad",
       "sectionSlug": "mcp-routing-and-gpu-graph-execution-boundary",
@@ -2240,10 +2240,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:6106",
+      "taskKey": "parent-atlas-neural-prefill-encoder:6113",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 6106,
+      "line": 6113,
       "text": "Reconcile the two historical `graphify_files` owners before applying",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2252,7 +2252,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 70,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:09afe39ad1439c923b1280a712c7dd98a49c0d4cfe1781068fb16783ed56908d",
       "sectionSlug": "db-migration-audit-01-postgresql-pgvector-and-drizzle-alignm",
@@ -2265,7 +2265,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:09afe39ad1439c923b1280a712c7dd98a49c0d4cfe1781068fb16783ed56908d",
-        "sourceLine": 6106,
+        "sourceLine": 6113,
         "migrationKey": "parent-atlas-neural-prefill-encoder#6b12c696ac3e0807",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -2276,10 +2276,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:6150",
+      "taskKey": "parent-atlas-neural-prefill-encoder:6157",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 6150,
+      "line": 6157,
       "text": "Retire or repoint the four historical registry writer scripts:",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2288,7 +2288,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 70,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:3503d57147ea5c86c2eea815d8683b63f3790806a31298c221b6db98485806f4",
       "sectionSlug": "db-migration-audit-01-postgresql-pgvector-and-drizzle-alignm",
@@ -2301,44 +2301,8 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:3503d57147ea5c86c2eea815d8683b63f3790806a31298c221b6db98485806f4",
-        "sourceLine": 6150,
+        "sourceLine": 6157,
         "migrationKey": "parent-atlas-neural-prefill-encoder#88603ecc37092879",
-        "basis": "MIGRATION_TITLE_HASH"
-      },
-      "controller": {
-        "state": "SUPERSEDED",
-        "blockerKey": "HISTORICAL_TASK",
-        "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-neural-prefill-encoder:6846",
-      "change": "parent-atlas-neural-prefill-encoder",
-      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 6846,
-      "text": "Rename the runtime API fields from historical `bm25` names to explicit",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "SUPERSEDED_OR_HISTORICAL",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 30,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:7173c1aecfe48ac81b9a69978a158099cd789a0d799049cfc85e9022026e72e5",
-      "sectionSlug": "lexical-owner-02-true-bm25-versus-fts-and-vector-lanes-2026-",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-neural-prefill-encoder#c78a9ff7f32592f8",
-      "logicalTaskKey": null,
-      "taskIdentity": {
-        "logicalTaskKey": null,
-        "taskRevision": "sha256:7173c1aecfe48ac81b9a69978a158099cd789a0d799049cfc85e9022026e72e5",
-        "sourceLine": 6846,
-        "migrationKey": "parent-atlas-neural-prefill-encoder#c78a9ff7f32592f8",
         "basis": "MIGRATION_TITLE_HASH"
       },
       "controller": {
@@ -2352,6 +2316,42 @@
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
       "line": 6853,
+      "text": "Rename the runtime API fields from historical `bm25` names to explicit",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:7173c1aecfe48ac81b9a69978a158099cd789a0d799049cfc85e9022026e72e5",
+      "sectionSlug": "lexical-owner-02-true-bm25-versus-fts-and-vector-lanes-2026-",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-neural-prefill-encoder#c78a9ff7f32592f8",
+      "logicalTaskKey": null,
+      "taskIdentity": {
+        "logicalTaskKey": null,
+        "taskRevision": "sha256:7173c1aecfe48ac81b9a69978a158099cd789a0d799049cfc85e9022026e72e5",
+        "sourceLine": 6853,
+        "migrationKey": "parent-atlas-neural-prefill-encoder#c78a9ff7f32592f8",
+        "basis": "MIGRATION_TITLE_HASH"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:6860",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 6860,
       "text": "Benchmark true BM25 against PostgreSQL FTS, Qdrant dense, and hybrid",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2360,7 +2360,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:7efd8f8e311f5258c89780d88faabea8c379ee65b35660a7d78d2e7c36816b7b",
       "sectionSlug": "lexical-owner-02-true-bm25-versus-fts-and-vector-lanes-2026-",
@@ -2373,7 +2373,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:7efd8f8e311f5258c89780d88faabea8c379ee65b35660a7d78d2e7c36816b7b",
-        "sourceLine": 6853,
+        "sourceLine": 6860,
         "migrationKey": "parent-atlas-neural-prefill-encoder#60c7c05c1311a633",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -2384,10 +2384,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:7000",
+      "taskKey": "parent-atlas-neural-prefill-encoder:7007",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 7000,
+      "line": 7007,
       "text": "`LEXICAL-02F` — benchmark `POSTGRES_FTS` vs `QDRANT_BM25` on the same frozen",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2396,7 +2396,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:8474b4ced03f17e587f80fd7149121281be7ec352b6d7455c7af731899b06613",
       "sectionSlug": "correction-idfenabled-bm25proven-encoder-mechanism-overclaim",
@@ -2410,7 +2410,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-neural-prefill-encoder:LEXICAL-02F",
         "taskRevision": "sha256:8474b4ced03f17e587f80fd7149121281be7ec352b6d7455c7af731899b06613",
-        "sourceLine": 7000,
+        "sourceLine": 7007,
         "migrationKey": "parent-atlas-neural-prefill-encoder#086f091714d467fc",
         "basis": "DECLARED_ID"
       },
@@ -2421,10 +2421,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:7005",
+      "taskKey": "parent-atlas-neural-prefill-encoder:7012",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 7005,
+      "line": 7012,
       "text": "`LEXICAL-02G` — retain exactly one logical lexical vote regardless of benchmark outcome",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2433,7 +2433,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:1050ca301bc621d72b7869863b9ded92efc3bb06a4ee069a6c04644f278a702d",
       "sectionSlug": "correction-idfenabled-bm25proven-encoder-mechanism-overclaim",
@@ -2447,7 +2447,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-neural-prefill-encoder:LEXICAL-02G",
         "taskRevision": "sha256:1050ca301bc621d72b7869863b9ded92efc3bb06a4ee069a6c04644f278a702d",
-        "sourceLine": 7005,
+        "sourceLine": 7012,
         "migrationKey": "parent-atlas-neural-prefill-encoder#84d0a4393baf3b52",
         "basis": "DECLARED_ID"
       },
@@ -2458,10 +2458,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:7517",
+      "taskKey": "parent-atlas-neural-prefill-encoder:7524",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 7517,
+      "line": 7524,
       "text": "`MCP-FILE-TOPK-06` — TurboVec/cuVS-CAGRA challenger parity, same measurement methodology.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2470,7 +2470,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:61b7ec57499b62ede0b6ce5a90511784aada215976f820301110aea352a5786b",
       "sectionSlug": "mcp-file-topk-01-file-top-k-ranking-via-embeddinggemma-plann",
@@ -2484,7 +2484,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-neural-prefill-encoder:MCP-FILE-TOPK-06",
         "taskRevision": "sha256:61b7ec57499b62ede0b6ce5a90511784aada215976f820301110aea352a5786b",
-        "sourceLine": 7517,
+        "sourceLine": 7524,
         "migrationKey": "parent-atlas-neural-prefill-encoder#070d8ba1c176ecf9",
         "basis": "DECLARED_ID"
       },
@@ -2495,10 +2495,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:8293",
+      "taskKey": "parent-atlas-neural-prefill-encoder:8300",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 8293,
+      "line": 8300,
       "text": "**Not yet done**: the `LEXICAL-02F` benchmark (`POSTGRES_FTS` vs this new `pg_search` index,",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2507,7 +2507,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:a36dba0bd4e8d0c87cb7bcd879f16dbc993e5db91e717b975cc2dadb189e6eca",
       "sectionSlug": "lexical-02-real-bm25-index-built-on-codebasechunkindex-2026-",
@@ -2520,7 +2520,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:a36dba0bd4e8d0c87cb7bcd879f16dbc993e5db91e717b975cc2dadb189e6eca",
-        "sourceLine": 8293,
+        "sourceLine": 8300,
         "migrationKey": "parent-atlas-neural-prefill-encoder#fb08025325ee767e",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -2531,10 +2531,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:9836",
+      "taskKey": "parent-atlas-neural-prefill-encoder:9843",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 9836,
+      "line": 9843,
       "text": "Treat free-threaded Python as a separate benchmark lane. A free-threaded",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2543,7 +2543,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:68ee16891f6937a038cac4ff741786fad62f5f636e8f5077da63081b7be91509",
       "sectionSlug": "langextract-version-and-python-runtime-alignment-2026-08-26",
@@ -2556,7 +2556,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:68ee16891f6937a038cac4ff741786fad62f5f636e8f5077da63081b7be91509",
-        "sourceLine": 9836,
+        "sourceLine": 9843,
         "migrationKey": "parent-atlas-neural-prefill-encoder#86a819440efc579c",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -2567,10 +2567,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:10357",
+      "taskKey": "parent-atlas-neural-prefill-encoder:10364",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 10357,
+      "line": 10364,
       "text": "Benchmark TurboVec 64-D prefilter against Qdrant 768-D retrieval on a",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2579,7 +2579,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:b29b8766b1cd358fc5f35bc154668febec374e2018d0fac29d03732fecbb0078",
       "sectionSlug": "retrieval-orchestration-alignment-and-turbovec-probe-2026-08",
@@ -2592,7 +2592,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:b29b8766b1cd358fc5f35bc154668febec374e2018d0fac29d03732fecbb0078",
-        "sourceLine": 10357,
+        "sourceLine": 10364,
         "migrationKey": "parent-atlas-neural-prefill-encoder#2742a06d6edd2e8e",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -2603,10 +2603,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:10952",
+      "taskKey": "parent-atlas-neural-prefill-encoder:10959",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 10952,
+      "line": 10959,
       "text": "Keep historical audit success criteria from being marked current until",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2615,7 +2615,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 70,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:21ede20c41d909d6c014af99cb745bdf42ed8bca4f374f8cc3598838d7ea5cd0",
       "sectionSlug": "deep-audit-reconciliation-2026-08-26",
@@ -2628,7 +2628,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:21ede20c41d909d6c014af99cb745bdf42ed8bca4f374f8cc3598838d7ea5cd0",
-        "sourceLine": 10952,
+        "sourceLine": 10959,
         "migrationKey": "parent-atlas-neural-prefill-encoder#79111ba9b3e86931",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -2639,10 +2639,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:10955",
+      "taskKey": "parent-atlas-neural-prefill-encoder:10962",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 10955,
+      "line": 10962,
       "text": "Do not promote the historical July route-hardening count (`116+`)",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2651,7 +2651,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 70,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:8633bac84b503fa2489b233c22ee5216a6c026810e36c7d6c76cb62c5f3cd3af",
       "sectionSlug": "deep-audit-reconciliation-2026-08-26",
@@ -2664,7 +2664,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:8633bac84b503fa2489b233c22ee5216a6c026810e36c7d6c76cb62c5f3cd3af",
-        "sourceLine": 10955,
+        "sourceLine": 10962,
         "migrationKey": "parent-atlas-neural-prefill-encoder#47dd24f70feca396",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -2675,10 +2675,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:11508",
+      "taskKey": "parent-atlas-neural-prefill-encoder:11515",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 11508,
+      "line": 11515,
       "text": "Prove `FASTEMBED_CUDA` locally if it becomes a challenger; contract",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2687,7 +2687,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:0632b198ac003db929ec5c95aa1f5cc53a6217d6b8c254897f0d861eaad0a1b6",
       "sectionSlug": "embed-abi-01-executor-neutral-semantic-embedding-abi-2026-08",
@@ -2700,7 +2700,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:0632b198ac003db929ec5c95aa1f5cc53a6217d6b8c254897f0d861eaad0a1b6",
-        "sourceLine": 11508,
+        "sourceLine": 11515,
         "migrationKey": "parent-atlas-neural-prefill-encoder#7a2107413372f001",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -2711,10 +2711,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-neural-prefill-encoder:15549",
+      "taskKey": "parent-atlas-neural-prefill-encoder:15556",
       "change": "parent-atlas-neural-prefill-encoder",
       "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "line": 15549,
+      "line": 15556,
       "text": "Do not promote retrieved historical claims or duplicate projection IDs;",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2723,7 +2723,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 70,
-      "lastUpdatedAt": "2026-09-14T17:00:50.490Z",
+      "lastUpdatedAt": "2026-09-20T07:24:51.094Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:1d2e02024f366bc8c17f3cf8710b26c664294417a959061386446d34e96d0ecf",
       "sectionSlug": "trace-mcp-45-live-trace-retrieval-and-historical-context-cla",
@@ -2736,9 +2736,46 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:1d2e02024f366bc8c17f3cf8710b26c664294417a959061386446d34e96d0ecf",
-        "sourceLine": 15549,
+        "sourceLine": 15556,
         "migrationKey": "parent-atlas-neural-prefill-encoder#ba61e8456fae48f2",
         "basis": "MIGRATION_TITLE_HASH"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-nlp-sidecar-feature-compiler:712",
+      "change": "parent-atlas-nlp-sidecar-feature-compiler",
+      "source": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+      "line": 712,
+      "text": "PR-RECONCILE-01 (2026-09-20; `docs/reports/parent-atlas-pr-reconciliation-v1.json`): the 11 open PRs were treated as candidate implementations, not merged. Adopted only files absent from the tree: #89 owner-reconcile v2 (script ran read-only), #90 Valkey stream contract (+4 additive event-fabric patches, 9/9 tests), #91 Graphify projection/preflight/writer contracts (preflight rebased: strict schema -> strip because main's receipt gained 10 keys; 21/21 tests), #98 pure digest contracts (13/13; main's newer planner/producer kept), #97-tip lineage audits (bridge: 0 of 25,271 current members have an exact packet-chunk bridge, all CURRENT_SOURCE_BINDING_MISSING; deployment present, 7,421 proven rows; migration-owner blockers: sidecar manifest unregistered, Drizzle ledger empty, proof not bound to current SQL checksum). #93-#96 superseded by main or contained in #97; #92 parked; #37 historical. NLP-EXTRACT-03: extended the existing `langextract-grounding-adapter.ts` with `groundLangExtractUtf8SpansV1` (explicit offset basis PYTHON_CODEPOINT vs UTF16_CODE_UNIT, UTF8_PARSER_BUFFER_V1 byte spans, fail-closed; 11 new tests, 13/13). Found: the older `adaptGroundedLangExtract` slices by UTF-16 units although LangExtract counts code points, wrong on astral text. Not done: wiring the new function into the structural adapter. No DB/Valkey/Qdrant/Graphify writes, no DDL, nothing committed. canonicalAuthority=false; next gate CURRENT_SOURCE_AUTHORITY_PROVEN.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 20,
+      "lastUpdatedAt": "2026-09-20T23:21:01.552Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:94a2551e187f1bc2aecc93df452a0086af685cb71598a80fa7dac1d9cc9ade4b",
+      "sectionSlug": "14-6-deep-audit-results-2026-09-20-trace-mcp-stale-probe-rea",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-nlp-sidecar-feature-compiler#9f6da9151369e406",
+      "ledgerId": "PR-RECONCILE-01",
+      "logicalTaskKey": "parent-atlas-nlp-sidecar-feature-compiler:PR-RECONCILE-01",
+      "taskIdentity": {
+        "logicalTaskKey": "parent-atlas-nlp-sidecar-feature-compiler:PR-RECONCILE-01",
+        "taskRevision": "sha256:94a2551e187f1bc2aecc93df452a0086af685cb71598a80fa7dac1d9cc9ade4b",
+        "sourceLine": 712,
+        "migrationKey": "parent-atlas-nlp-sidecar-feature-compiler#9f6da9151369e406",
+        "basis": "DECLARED_ID"
       },
       "controller": {
         "state": "SUPERSEDED",
@@ -3002,10 +3039,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7061",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7070",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 7061,
+      "line": 7070,
       "text": "Do NOT rewrite historical `graphify_runs` rows.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3014,7 +3051,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T05:34:11.940Z",
+      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:e52ad5eca089b704ab240b7c5eef831c3b1e250fb65986fb7b1210e6667b61a7",
       "sectionSlug": "graphify-execution-ledger-schema-02-2026-09-03",
@@ -3027,7 +3064,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:e52ad5eca089b704ab240b7c5eef831c3b1e250fb65986fb7b1210e6667b61a7",
-        "sourceLine": 7061,
+        "sourceLine": 7070,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#851a8307a088eae1",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3038,10 +3075,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12083",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12092",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 12083,
+      "line": 12092,
       "text": "Do not start Graphify, relabel an historical execution, or advance",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3050,7 +3087,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T05:34:11.940Z",
+      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:772db201c0096b2230832eccde99204918bad14a431cd406b04f8b9e22a18d75",
       "sectionSlug": "current-snapshot-readback-blocker-2026-09-14",
@@ -3063,7 +3100,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:772db201c0096b2230832eccde99204918bad14a431cd406b04f8b9e22a18d75",
-        "sourceLine": 12083,
+        "sourceLine": 12092,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#92dc80df6c50645d",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3074,10 +3111,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12341",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12350",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 12341,
+      "line": 12350,
       "text": "Do not treat historical index claims as proof of current source",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3086,7 +3123,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T05:34:11.940Z",
+      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:5f76b2aa41fd35ac6ed738a41dc7e4abaca30cf8c26eaad5b94a8df70dff1132",
       "sectionSlug": "master-atlas-index-historical-reconciliation-01-2026-09-11",
@@ -3099,7 +3136,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:5f76b2aa41fd35ac6ed738a41dc7e4abaca30cf8c26eaad5b94a8df70dff1132",
-        "sourceLine": 12341,
+        "sourceLine": 12350,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#5434ed5edcda8b11",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3110,10 +3147,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13223",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13232",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 13223,
+      "line": 13232,
       "text": "Keep this cohort historical; do not promote or use it to seed current",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3122,7 +3159,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T05:34:11.940Z",
+      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:a6acf6db7632423623cd66a887fecaf80a32d7c8d7826d3c48756a6f3660bde0",
       "sectionSlug": "current-source-cohort-lineage-recheck-01-2026-09-11",
@@ -3135,7 +3172,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:a6acf6db7632423623cd66a887fecaf80a32d7c8d7826d3c48756a6f3660bde0",
-        "sourceLine": 13223,
+        "sourceLine": 13232,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#e25c27ceaa8d9f86",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3146,10 +3183,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13238",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13247",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 13238,
+      "line": 13247,
       "text": "Do not combine this admitted historical revision with the newer",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3158,7 +3195,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T05:34:11.940Z",
+      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:435143ebb1d67e9f2eabb1f98607109712b95ea4ec1a8fa897041c87003dd190",
       "sectionSlug": "graphify-snapshot-binding-recheck-01-2026-09-11",
@@ -3171,7 +3208,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:435143ebb1d67e9f2eabb1f98607109712b95ea4ec1a8fa897041c87003dd190",
-        "sourceLine": 13238,
+        "sourceLine": 13247,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#3893806a9ddbc74d",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3182,10 +3219,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:15826",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:15835",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 15826,
+      "line": 15835,
       "text": "TOURNAMENT-FEATURES-01 Define and populate real ranking features upstream (controller or adapter) from the signals above — a controller-contract change, so it needs its own decision; do not synthesize features inside the challenger.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3194,7 +3231,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T05:34:11.940Z",
+      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:ef293d6ed2378bc2f78359e56f8af2f0369c47e3fdb0a5cdb2a8c8ef8d3c15cf",
       "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
@@ -3208,7 +3245,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:ef293d6ed2378bc2f78359e56f8af2f0369c47e3fdb0a5cdb2a8c8ef8d3c15cf",
-        "sourceLine": 15826,
+        "sourceLine": 15835,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#46b1f778b75a08d2",
         "basis": "AMBIGUOUS_DECLARED_ID"
       },
@@ -3699,10 +3736,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric:224",
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric:272",
       "change": "parent-atlas-workboard-feature-utility-fabric",
       "source": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
-      "line": 224,
+      "line": 272,
       "text": "**REGISTRY-COVERAGE-01b** The 200 `workspace:0` registry rows carry a legacy revision. Repo rule: never coerce a SHA-256 revision into legacy `0`. Classify them historical / non-promotion-eligible or re-materialize under a real revision.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3711,7 +3748,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-20T06:06:24.010Z",
+      "lastUpdatedAt": "2026-09-20T06:12:53.009Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:a92f1c612a6880ed3b991f99b14d6179eeee062626fa52a9e26e840bd8b5420b",
       "sectionSlug": "registry-coverage-01-result-2026-09-20-read-only-no-writes",
@@ -3725,7 +3762,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-workboard-feature-utility-fabric:REGISTRY-COVERAGE-01b",
         "taskRevision": "sha256:a92f1c612a6880ed3b991f99b14d6179eeee062626fa52a9e26e840bd8b5420b",
-        "sourceLine": 224,
+        "sourceLine": 272,
         "migrationKey": "parent-atlas-workboard-feature-utility-fabric#64ae0a1cad5187d8",
         "basis": "DECLARED_ID"
       },
@@ -3736,10 +3773,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric:296",
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric:344",
       "change": "parent-atlas-workboard-feature-utility-fabric",
       "source": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
-      "line": 296,
+      "line": 344,
       "text": "**FOREST-02** If ML: keep XGBoost as the ranker; evaluate cuML FIL only when a trained model exists and batch inference latency is a measured problem; treat cuML Random Forest as a challenger needing its own gap proof.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3748,7 +3785,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-20T06:06:24.010Z",
+      "lastUpdatedAt": "2026-09-20T06:12:53.009Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:1857b473c53264ec2801d400ece8ebca0ec26bac2b4686a175cb2485decc2028",
       "sectionSlug": "forest-two-meanings-corrected-2026-09-20",
@@ -3762,7 +3799,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-workboard-feature-utility-fabric:FOREST-02",
         "taskRevision": "sha256:1857b473c53264ec2801d400ece8ebca0ec26bac2b4686a175cb2485decc2028",
-        "sourceLine": 296,
+        "sourceLine": 344,
         "migrationKey": "parent-atlas-workboard-feature-utility-fabric#6ce45d5a447f7270",
         "basis": "DECLARED_ID"
       },

@@ -1,14 +1,16 @@
 {
   "schema": "atlas.ast-canary-readiness.v1",
-  "generatedAt": "2026-09-20T08:41:26.449Z",
+  "generatedAt": "2026-09-20T18:59:22.289Z",
   "inputChecksums": {
-    "know09": "sha256:626b55c3fcc36ab0367a1a18f528bb74594ad94fb66314399e465f0dfbb2591c",
+    "know09": "sha256:231317628e5f380910e41627adca747ec070a76e59cb0058b8fcecaac2796058",
     "sourceParity": "sha256:e9759191cf75cd2c847e30de957ad485ae5c498684eeae0dbf1f720704c724de",
-    "sourceWorktree": "sha256:dc91584b700bcccc220939f3980a477381560f099cab6a94b908f018d83a68c1",
+    "sourceWorktree": "sha256:535c5bb89f7b6725dda25dcab617d9cd56bc681a82c79b547171e87ed9f27c19",
     "rehearsal": "sha256:e6b10b87a253ffb2c064bd9d44fb0b3108297d2b69d77b276fde1301734b8d12",
-    "offset": "sha256:1337568ec336bb52f9361c07a26d4405209bdc2f18e5eb1441f48f00d179454d",
-    "digest": "sha256:6317182828aa257fa63b82c108812e921dcc72bcc0bd1e17fe8f55d3c74b37d6",
-    "conflicts": "sha256:36c19268e3681d0314a9a9931cca730706e7d205ef94dd4e09f490101c7357bf",
+    "trancheRehearsal": "sha256:efbc8181411dbae784f0f953bb429a18b4452cf4ea1bcbdb0c225adff4c07ade",
+    "hashGrain": "sha256:5c5aa197692f4a695aa2a4885612d1ed1dce7a27fea31070a9dc4c5880037186",
+    "offset": "sha256:fea00d411022a6b4b1f782255f63e659b7d9fac8e509a45156257b3f2073a7b2",
+    "digest": "sha256:f8ec22013295d27c9cd707e228a74b918907684496b0c95b8cd1c1c31f9c4703",
+    "conflicts": "sha256:63c414f01dfaf623251a83e7ecd73a0562516b475fc800a3152cabb08e76465a",
     "rekey": "sha256:5171f75ff5c337b5f8f0ae62dbaf5fa71ce92f45f9059f4a82dc521e4c2b7943"
   },
   "checks": [
@@ -18,6 +20,16 @@
       "detail": "status=REHEARSAL_PROVEN; persistentRowsAdded=0"
     },
     {
+      "id": "COHORT_ROLLBACK_REHEARSAL",
+      "passed": true,
+      "detail": "status=REHEARSAL_PROVEN; inserted=21226; expected=21226; conflicts=0"
+    },
+    {
+      "id": "HASH_GRAIN_CONTRACT",
+      "passed": false,
+      "detail": "status=AST_HASH_GRAIN_REVIEW_REQUIRED; unknownGroups=11194"
+    },
+    {
       "id": "BOM_OFFSET_BASIS",
       "passed": true,
       "detail": "BOM_OFFSET_BASIS_PROVEN"
@@ -25,7 +37,7 @@
     {
       "id": "CURRENT_WORKTREE_PARITY",
       "passed": false,
-      "detail": "status=WAITING_ON_CURRENT_WORKTREE_PARITY; mismatches=645; missing=8; issueSampleOnly=true; dirty=117; notDirty=528"
+      "detail": "status=WAITING_ON_CURRENT_WORKTREE_PARITY; mismatches=645; missing=8; issueSampleOnly=true; dirty=18; notDirty=635"
     },
     {
       "id": "DIGEST_DIVERGENCE_DISPOSITIONED",
@@ -35,7 +47,7 @@
     {
       "id": "STRUCTURAL_CONFLICTS_CLOSED",
       "passed": false,
-      "detail": "structuralKeyConflicts=122"
+      "detail": "conflictCount=122; supersessionProposalsAllowed=0"
     },
     {
       "id": "REKEY_REHEARSAL",
@@ -44,16 +56,18 @@
     }
   ],
   "blockers": [
+    "HASH_GRAIN_CONTRACT",
     "CURRENT_WORKTREE_PARITY",
     "STRUCTURAL_CONFLICTS_CLOSED"
   ],
   "retry": {
-    "blockerFingerprint": "sha256:2b2294da668fa86683b99a5c131f44e6d4eb183e62313c8da0d30d322f502792",
+    "blockerFingerprint": "sha256:478bcc3cddf6c61dfb9dcef5044b4f46de37871c71772d485dfbc6b52d5c1521",
     "allowed": false,
     "reason": "UNCHANGED_BLOCKER_EVIDENCE_REQUIRES_STATE_CHANGE",
     "retryWhen": [
       "workspaceRevisionChanges",
       "sourceSnapshotRevisionChanges",
+      "hashGrainReceiptChanges",
       "structuralConflictDispositionChanges"
     ]
   },
@@ -74,6 +88,7 @@
     "retryWhen": [
       "workspaceRevisionChanges",
       "sourceSnapshotRevisionChanges",
+      "hashGrainReceiptChanges",
       "structuralConflictDispositionChanges"
     ],
     "noAutomaticChoice": true

@@ -108,5 +108,7 @@ const report = {
 };
 report.semanticChecksum = semanticChecksum(report);
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-fs.writeFileSync(outputPath, JSON.stringify(report, null, 2) + '\n');
+const tempPath = `${outputPath}.${process.pid}.${Date.now()}.tmp`;
+fs.writeFileSync(tempPath, JSON.stringify(report, null, 2) + '\n');
+fs.renameSync(tempPath, outputPath);
 console.log(JSON.stringify({ outputPath, ...report.summary, semanticChecksum: report.semanticChecksum }, null, 2));

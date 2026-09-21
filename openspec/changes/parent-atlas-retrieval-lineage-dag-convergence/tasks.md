@@ -138,6 +138,15 @@ materialization, or digest backfill.
 
 Receipt: `docs/reports/current-source-owner-reconciliation-v1.json`.
 
+**Source-owner reconciliation recheck (read-only, 2026-09-20):** the same
+gate remains `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` with `25,066` current
+sources, `34` current-execution candidates, and `1` exact current owner.
+The admitted snapshot still requires refresh: `23,792` shared files match,
+`656` drifted, `618` were added after the snapshot, and `1,094` are absent
+from the current worktree. `writesPerformed=false`, `graphifyMutations=0`,
+`packetWrites=0`, and `projectionWrites=0`; no re-admission or Graphify
+refresh is implied. Evidence: `docs/reports/current-source-owner-reconciliation-v1.json`.
+
 **Tournament admission boundary refresh (read-only, 2026-09-18):**
 `audit-graphify-tournament-admission-v1.mts` remains
 `TOURNAMENT_ADMISSION_AUDIT_BLOCKED` with

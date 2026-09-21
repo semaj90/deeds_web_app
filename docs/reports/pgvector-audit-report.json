@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2026-09-19T05:11:51.601Z",
+  "generatedAt": "2026-09-20T22:55:00.241Z",
   "embeddingDim": 768,
   "allowedDims": [
     768,
     1536,
     384,
     512,
+    256,
     128,
     64,
     32
@@ -53,16 +54,10 @@
     },
     {
       "check": "vector_dimensions",
-      "pass": false,
-      "message": "Non-standard vector dimensions found: sveltekit-frontend\\src\\lib\\server\\db\\schema-postgres.ts:256",
-      "violations": [
-        {
-          "file": "sveltekit-frontend\\src\\lib\\server\\db\\schema-postgres.ts",
-          "dim": 256,
-          "expected": 768
-        }
-      ],
-      "suggestedFix": "Change vector dimensions to 768 (embeddinggemma:latest canonical output) or 64 (autoencoder compressed)."
+      "pass": true,
+      "message": "All vector columns use allowed dimensions (768/1536/384/512/256/128/64/32).",
+      "violations": [],
+      "suggestedFix": null
     },
     {
       "check": "live_postgres",

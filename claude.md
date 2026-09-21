@@ -2596,6 +2596,235 @@ docker exec deeds-redis-prod redis-cli config set maxmemory-policy allkeys-lru
 | `rabbitmq-manager-fixed.ts` | Queue operation traces | +35 |
 | `BACKEND_INFRASTRUCTURE_AUDIT.md` | 17-gate service health checks | 500+ |
 
+### BitFrost warm buckets — measured state + target contract (2026-09-20)
+
+**Live Valkey is COLD, not the "155K keys" this file's status banner claims.** Measured 2026-09-20
+(`docker exec legal-ai-valkey valkey-cli -a redis`): `DBSIZE` 257; `bitfrost:*` 1 key, `gpu:*` 0,
+`centroid:*` 0, `bifrost:*` 0. Most keys are BullMQ/Langfuse queues, `embed:v2:*`, `ace:chunk:*`.
+`keyspace_hits` 9,951 vs `keyspace_misses` 263,532 (~3.6% hit rate). Treat the "BitFrost 155K keys"
+and `gpu:karpathy:*` claims elsewhere in this file as historical until re-warmed and re-measured.
+
+| Fact | Measured value | Implication |
+|---|---|---|
+| `maxmemory` / used | 2 GiB / 9.35 MiB | no memory pressure today |
+| `maxmemory-policy` | `noeviction` (NOT `volatile-lru`) | a full cache would reject writes, not evict; Session 203's "volatile-lru fix" is not what is live |
+| `ace:chunk:hits:*` TTL | `-1` (no expiry) | `volatile-lru` would never evict these — TTL-less keys are invisible to it |
+| `embed:v2:*` TTL | ~3-5 days remaining (7-day `TTL.EMBEDDING`) | only lane that already follows a 7-day TTL |
+| `TTL.CENTROID` / `BIFROST_INDEX` (`cache-keys.ts`) | 6 h | centroid buckets expire in 6 h, not 7 days |
+| SOM assignment (`atlas_packets.som_cell_x/y`) | 58,365 / 61,718 rows (94.6%); 400 distinct cells = full 20x20 | the 20x20 grid that warm buckets would key on is populated in Postgres |
+| Summaries (`codebase_chunk_index`) | 40,306 / 274,465 non-empty (14.7%) | older "39,151 total / 100%" figures are stale; total chunk count has grown ~7x |
+
+**Target contract (DIRECTION ONLY — nothing below is implemented; do not claim it is):**
+- Warm-bucket key = domain-taxonomy node + SOM cell (20x20) + `representation_revision`, built from
+  Postgres truth (`atlas_packets`, `codebase_chunk_index`) — never the other way around.
+- Warm buckets carry a 7-day TTL (raising `TTL.CENTROID`/`BIFROST_INDEX` from 6 h is a deliberate
+  change, not a default). LRU-before-eviction requires BOTH `maxmemory-policy volatile-lru` (or
+  `allkeys-lru`) AND a TTL on every warm key; changing the live policy from `noeviction` is an
+  operator-approved infra change (also needs `ace:chunk:hits:*` TTL-less keys decided first).
+- Bucket rank/progress is a measured ratio (warm buckets populated / 400 SOM cells, hit rate from
+  `INFO stats`), reported as counts per the Status Language rules — not a hand-set percentage.
+- Neural-prefill / decoder synthesis may read bucket hits only via the `PrefillReceiptV1` boundary
+  (`acePolicyRevision`, `bitfrostRevision`, `residencyPlanChecksum`); the cache is never identity.
+- Warm order: Postgres write first, Redis invalidate after, warm from Postgres (Canonical Truth Flow).
+
+**Status**: warm buckets = `NOT_PROVEN` (no bucket keys exist live).
+
+**Writer census (2026-09-20, read-only grep of `src/` + `scripts/`, static — no live-caller proof):**
+the key prefix is spelled two ways for the same packet cache, so writers and invalidators can
+disagree. `src/lib/server/ace/cache-keys.ts` (`bifrostPacketKey`, `bifrostFeatureKey`) carries a
+"use these ONLY" comment, but per `docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json`
+(BITFROST-INVALIDATION-OWNER-01, 2026-09-04) its `bifrost:packet:*` shape is **live-absent** — not
+the canonical shape. **Canonical (confirmed live shape): `cache-keys.ts` `bifrostKey.semantic.*` →
+`bifrost:sem:packet:{packet_key}`, `bifrost:sem:feature:{feature_id}`,
+`bitfrost:summary:packet:v1:{packet_key}`; canonical writer/invalidator =
+`src/lib/server/cache/atlas-reward-cache.ts` (`setPacketCache`, `invalidateBitfrostPacket`).** Treat
+every writer below that emits a non-`bifrost:sem:*` packet key as writing a dead-shape key until
+proven otherwise.
+
+| Logical key | `bifrost:` spelling (builder-owned) | `bitfrost:` spelling (ad-hoc) |
+|---|---|---|
+| packet | `ace/cache-keys.ts`, `cache-keys.ts`, `redis-cache-invalidate.ts`, `mcp-tool-implementations.ts`, `index-doc`, `batch-embeddings`, `predictions/promote`, `phase7-postgres-persistence.mts` | `packet-summary-pipeline.ts`, `packet-truth-flow.mts`, `phase8b`, `phase9`, `phase10*`, `batch-summarize-packets.mjs`, `graphify-incremental.mjs` |
+| trace / source | `bifrost:trace:*` (`redis-cache-invalidate.ts`, `mcp-tool-implementations.ts`) | `bitfrost:trace:*`, `bitfrost:source:*` (`packet-truth-flow.mts`, `phase8b`) |
+| centroid | `centroid:feature\|packet\|directory:*` (`ace/centroid-compression.ts`), `centroid:v1:*` (`tensor-similarity-cache.ts`) | `bitfrost:centroid:*` (`redis-packet-projection.ts` doc), `centroid:som:*` (`phase8a`), `centroid:cluster:*` (`phase8`) |
+| semantic / hot | `bifrost:sem:*` (`atlas-cache-envelope.ts`, `warm-bifrost-semantic-cache.mjs`) | `bitfrost:hot:*`, `bitfrost:som:*`, `bitfrost:summary:*` (`phase8-bitfrost-hot-buckets-bulk.mjs`, `phase8a`) |
+
+**Invalidation status (corrected 2026-09-20 after reading the 2026-09-04 receipt — an earlier
+draft of this section wrongly called `redis-cache-invalidate.ts` a live gap):**
+`dispatcher/redis-cache-invalidate.ts` already delegates to `invalidateBitfrostPacket()`
+(`APPLY_PROVEN` with disposable synthetic keys: seed → mutate → invalidate → readback, fail-open on
+Redis error, no namespace flush). **Remaining open gap is reachability, not spelling:** all 4
+delegating invalidators are unreachable from any live Postgres-mutation path (their RabbitMQ
+listener/worker have zero callers), and `setPacketCache`/`setFeatureCache` have no located external
+caller — the real writer of the live `bifrost:sem:packet:*` keys was not found in `src/`. Still-live
+stale/spelling risks: `packet-truth-flow.mts` and this file's Canonical Truth Flow section still say
+`bitfrost:packet:{key}` (dead shape); two `cache-keys.ts` files (764 and 126 lines) both define
+packet/feature keys; `cache/cache-invalidation.ts` uses a third unrelated shape
+(`semantic:bifrost:*`, flagged `COMPATIBILITY`, not audited).
+
+**CORRECTION (2026-09-20, same day): the packet/query identity conflation below was already FIXED
+on 2026-09-04 (`BIFROST-KEY-SEMANTICS-OWNER-01`) in the builder and the repo-root copy.** There are
+TWO copies of this warmer: repo-root `scripts/cache/warm-bifrost-semantic-cache.mjs` (commit
+`cef902bec6`, 2026-09-04) was migrated onto `bifrostKey.semantic.query()` (`bifrost:sem:query:{query_hash}`);
+the stale duplicate `sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs` (`7111345b40`,
+2026-06-07) still writes `bifrost:sem:packet:{query_hash}` — that duplicate is the defect described
+next, classify it `COMPATIBILITY`/archive-candidate (do not delete). The description below was
+written from the stale copy.
+
+**Live-shape writer located (2026-09-20, static + live count; `CREATED`, not `APPLY_PROVEN`):**
+`sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs` (stale copy; one commit, `7111345b40`, 2026-06-07) writes the `bifrost:sem:*` layout — `bifrost:sem:packet:{query_hash}`,
+`bifrost:sem:feature:{feature_id}`, `bifrost:sem:sourceRef:{sha256(ref)}`, `reward:zset`,
+`stale:zset`, all `setex` 24 h. Live Valkey holds **0** `bifrost:sem:*` keys today, consistent with
+a 24 h TTL lapsing with no re-warm. Findings that constrain any rewire:
+- **Identity mismatch:** it keys packets by `query_hash`; the canonical
+  `atlas-reward-cache.ts::invalidateBitfrostPacket()` deletes by `packet_key`. A packet warmed under
+  `query_hash` is not reachable by that invalidator — reconcile the key identity before wiring an
+  invalidation trigger to this writer.
+- **Input is small and old:** reads `memory/packets/semantic-cache-candidates.jsonl` (15.8 KB,
+  2026-06-08, DuckDB-join output) — not a fresh Postgres read, so it also violates "warm from
+  Postgres" until repointed.
+- **No caller:** no `package.json` script references it. `package.json` instead points at a
+  different script, `scripts/atlas/warm-bitfrost-semantic-cache.mjs` (`atlas:bitfrost-semantic-cache:warm[:apply]`),
+  whose 2026-09-11 receipt (`docs/reports/bitfrost-semantic-cache-warm.json`) is **dry-run only —
+  0 writes applied** — planning `bifrost:sem:*` (24 h), `ace:*` (1 h) and `atlas:centroid:*` (2 h) keys
+  from `atlas_higher_hop_index`. That table **now exists** (an older note in `sveltekit-frontend/CLAUDE.md`
+  saying it is missing is stale).
+- So two warmers target the same `bifrost:sem:*` namespace with different key identities; neither has
+  ever populated live Valkey in this audit's window. Classify the June script `COMPATIBILITY` and the
+  September script the candidate owner, pending a decision on `query_hash` vs `packet_key` identity.
+
+**September warmer dry-run (2026-09-20, `--limit=25`, `DRY_RUN_PROVEN`, 0 writes, 0 failures):**
+`scripts/atlas/warm-bitfrost-semantic-cache.mjs` already keys `bifrost:sem:packet:${packet_key}` and
+`bifrost:sem:feature:${feature_id}` (24 h) — i.e. the `packet_key` identity is already what it uses;
+the `query_hash` identity exists only in the June script. All 25 planned `packet_key`s resolve in
+`atlas_packets` (bare 16-hex is a real canonical key form there, alongside the `packet:<12hex>`
+form). Two limits found: (1) the key is built inline, not through the canonical builder
+(`cache-keys.ts` `bifrostKey.semantic.*`) — patch target; (2) its source ledger
+`atlas_higher_hop_index` (58,309 rows) has **`som_cluster` NULL on every row**, so this warmer
+cannot produce SOM-cell warm buckets; SOM assignments live in `atlas_packets.som_cell_x/y`.
+Any SOM/domain warm-bucket producer must read `atlas_packets`, not this ledger.
+
+**Cache identity roots (DECIDED 2026-09-20) + BCI-02..06 (`APPLY_PROVEN` for the code path on
+disposable synthetic keys; live warm population still 0):** packet cache root = `packet_key`;
+query/retrieval cache root = `query_hash` (`bifrost:sem:query:*`); feature = `feature_id`;
+centroid/routing = representation + cluster/SOM coordinate; prefill = `PrefillContentIdentity`
+checksum. These never substitute for one another. Landed (additive, v1 shapes unchanged) in
+`src/lib/server/cache-keys.ts`: `PacketSemanticCacheIdentityV2`, `packetSemanticIdentityDigestV2`
+(sha256 of `canonicalSha256V1`), `packetSemanticCacheKeyV2` → `bifrost:sem:packet:v2:{packet_key}:{digest}`,
+`packetSemanticIndexKeyV2` → `bifrost:sem:index:packet:{packet_key}` (Valkey SET reverse locator,
+disposable metadata only); and in `cache/atlas-reward-cache.ts`: `setPacketCacheV2` (SET+SADD+EXPIRE
+in one MULTI, index TTL 7 d) and `invalidateBitfrostPacket()` now `SMEMBERS`→`UNLINK` all v2 objects +
+the index (no SCAN/KEYS; still fail-open). The old "no revision segment in the key" rationale in
+`cache-keys.ts` assumed a warm live cache; the cache is empty, so v2 is additive, not an orphaning
+change. Proof: `atlas-reward-cache-v2.spec.ts` 10/10 (incl. `ATLAS_LIVE_VALKEY=1` live fixture: 2
+revisions seeded, invalidated by locator, unrelated packet survived, 0 leftover keys) +
+`tests/cache-keys.spec.ts` 15/15. **Census miss, corrected 2026-09-20:** a second revision-qualified cache identity already existed and
+is LIVE — `AceBitfrostCacheIdentityV1` (`src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.ts`,
+`atlas:bitfrost:v1:{cacheKind}:…:{sha256}` keys for `ACE_PACKET`/`ACE_CONTEXT`/`CENTROID`/`RESIDENCY`;
+callers `cache/ace-packet-cache.ts`, `cache/redis-cache-aggressive.ts`, `scripts/atlas/prove-bitfrost-centroid-replay-v1.mts`).
+My earlier writer census grepped key-prefix literals and missed builders that assemble keys from parts.
+Layering, not merge: `AceBitfrostCacheIdentityV1` = ACE artifact/centroid/residency identity (no
+per-packet reverse locator, cannot be invalidated by `packet_key`); `PacketSemanticCacheIdentityV2` =
+only the `bifrost:sem:packet:*` lane + reverse locator. Two revision-qualified identities now coexist —
+converge them under one owner before adding any third. Related residency contract:
+`docs/reports/bitfrost-residency-policy-v1.json` (HOT 30 d / WARM 7 d / COLD 1 d;
+`WIRED_POLICY_ADAPTER_PROVEN_TESTS_ONLY`, 35 tests, Valkey behavior NOT proven — so the 7-day WARM TTL
+is a policy value, not a live-proven setting). Remote branch `origin/agent/bitfrost-fanout-contract-20260920`
+(commit `93777aaf46`, `claude.md` only, +196 lines appended at the end, not merged) freezes the
+query-fanout/warm-bucket contract; verified it matches that policy file.
+**Not done / deferred:** no production caller writes v2 yet (BCI-10
+warm canary is gated); Postgres cache-receipt table `DEFERRED_PENDING_NEED_PROOF`; 7-day value TTL
+and LRU/LFU are deferred until writer → invalidation → readback → hit/miss telemetry exist.
+
+**Centroid / SOM re-measure for warm-bucket keys (2026-09-20, read-only; `PARTIAL_PROVEN`):**
+- `atlas_packets`: 58,365 / 61,718 rows have `som_cell_x/y` (94.6%), exactly **400 distinct non-null
+  cells** (20x20 fully occupied). **`som_revision` is NULL on all 58,365** — the warm-bucket identity
+  needs a `somRevision`, and none exists on the assignments, so SOM-cell bucket keys cannot be
+  revision-qualified yet (blocker: stamp a revision from the codebook run, do not invent one).
+- SOM codebook = `models/som/som_20x20_codebook.json` (400 rows, **`latent_dim` 64**, `native-cuda`,
+  50 iterations, 2026-07-28), not in Postgres (`som_adjacency_matrix` exists; no codebook table).
+  It lives in the 64-d autoencoder latent space, while `codebase_chunk_index.latent_64` has only 1,703
+  populated rows and this file already records the autoencoder weights as untrained — so SOM cell
+  quality is `NOT_PROVEN`; treat cells as a routing prefilter hint, never as identity or ranking.
+- `gpu_cluster_centroids`: 64 rows, **768-dim** float4[], `cluster_type='kmeans_js'`, all dated
+  2026-07-14 (older JS k-means, different space from the 64-d SOM codebook). `qdrant_centroid_clusters`
+  (202 rows) stores only `centroid_vector_hash`, no vectors. Two centroid sets in two different vector
+  spaces — do not mix them in one packed matrix. At 64x768 (or 400x64) float32 a brute-force
+  dot/cosine prefilter is a few hundred KB and needs no vector database.
+
+**`SOM_REVISION_PROVENANCE_01` (2026-09-20, read-only) — verdict: a `somRevision` CANNOT be honestly
+derived from what exists; do not stamp one.**
+- `models/som/som_assignments.json` (2026-07-28, same run as the codebook) is **per-chunk**, not
+  per-packet: 32,310 assignments keyed by `codebase_chunk_index.id` (300/300 sampled ids resolve
+  there), covering **388** cells. Zero of its ids match any `atlas_packets` id column
+  (`chunk_id`, `file_id`, `symbol_id`, `packet_id`).
+- Postgres `atlas_packets` carries packet-level SOM values that are **not derivable from that file**
+  (58,365 rows, 400 cells, keyed by `packet_key`) and are internally inconsistent: `som_cell_x/y`
+  vs `som_row/som_col` disagree on **58,200 of 58,365 rows (99.7%)**, and `som_row/som_col` covers
+  only 342 distinct cells vs 400 for `som_cell_x/y` — two coordinate conventions or two runs in one
+  table. `som_revision` is non-null on 1 row of the whole table (NULL on all 58,365 assigned rows).
+- **Consequence:** SOM-cell warm buckets and any `somRevision`-qualified key stay `BLOCKED` until a
+  fresh, versioned SOM run writes assignments and a content-addressed revision (checksum of the
+  codebook + input candidate snapshot) together, with one documented coordinate convention. Checksumming
+  the July codebook file alone would label assignments it did not produce — that would be an invented
+  revision. Until then use KMeans/domain-taxonomy buckets (no SOM axis) for warm-bucket identity.
+
+**`QUERY_FANOUT_BITFROST_READ_ONLY` receipt (2026-09-20, `PARTIAL_PROVEN`, workflow progress 70% =
+weighted completed stages, NOT model confidence; replay: `node scripts/atlas/prove-query-fanout-bitfrost-v1.mjs [--query=…]`,
+output `docs/reports/query-fanout-bitfrost-v1.json`, writes only that file):** one query through the
+chain — DONE: request identity, TRACE `domain.classify`, capability plan (177 TRACE tools; lexical/AST/
+semantic/taxonomy/graph/db lanes all have tools), semantic Top-K (Ollama `embeddinggemma` 768-d → Qdrant
+`codebase_chunks_768_v2` `content`: 10/10 hits carry `packet_key`), KMeans nearest centroid (brute force
+over 64 x 768-d `gpu_cluster_centroids`), live cache state. PARTIAL: `.okf` validation (3 domains / 6
+concepts / 1 language / 3 indexes loaded, but the classifier output named none of them). BLOCKED, with
+reasons in the receipt: SOM cell (`SOM_REVISION_PROVENANCE_01`), ACE cache identity (no frozen
+CandidateOrdinalMap/FeatureMatrix, so the 7 required revision fields cannot be honestly supplied),
+BitFrost bucket (`proposedBucket:null`). Cache lookup = `MISS_NO_IDENTITY`; live Valkey: `noeviction`,
+2 GiB, 0 `bifrost:sem:*` keys, 1 `bitfrost:*` key.
+**Two findings the receipt exposed:** (1) `domain.classify` (sklearn-lr, cpu, NB+LR) labelled a
+cache-invalidation query `ui` at ~0.55 probability — a weak, provisional classifier; do not let its label
+drive fanout or bucket choice without a confidence floor. (2) `codebase_chunks_768_v2` is live with 3
+named vectors (`content`/`error`/`signature`) and 52,816 points, not the "dense-only, 52,380" description
+in the Embedding Dimensions Policy above — that description is stale.
+
+**Schema tournament + next steps (2026-09-20, read-only; `node scripts/atlas/audit-schema-tournament-v1.mjs` → `docs/reports/schema-tournament-v1.json`; full detail in `openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md`, `SCHEMA_TOURNAMENT_V1`):**
+**Do NOT create `*_v2` tables for the NLP/ontology fabric — the schema already exists and is empty.** Reuse:
+`atlas_ontology_linked_tuples` (token/POS/`evidence_span`/`producer_revision`), `atlas_taxonomy_assignment_candidates`
+(revision-qualified evidence lanes), `atlas_ontology_concepts`/`_relations`, `domain_taxonomy_v1` (versioned hierarchy),
+`registry_topology_projection`; `feature_ontology_tuples` (539,124 UNRESOLVED) stays the 14.3b resolution owner;
+`atlas_ontology_tuples`, `atlas_concepts`, `concept_records` (0 rows each) are duplicate/dead candidates (archive, never delete).
+Never `UPDATE atlas_packets.domain_class` to fix labels — use `replaced_by` rows + a normalizing VIEW. Feature matrices
+(Query / Candidate `[C,25]` / Token `[T,F]` / Topology) are Arrow/mmap artifacts + JSON receipts sharing one `CandidateOrdinalMap`
+checksum, not tables; a 4x6 matrix is a test fixture only. **Domain vocabularies:** three coexist (packet labels 39, code
+`CANONICAL_DOMAINS` 9, DB `atlas_domain_ontology` 13+4) — 65.9% of packet rows map cleanly onto the DB ontology; the owner
+decision is pending (recommended: `atlas_domain_ontology`, versioned via `domain_taxonomy_v1`). **Needs operator approval:**
+workspace snapshot admission (`AST-AUTH-01`), method-symbol convention (`Class.method` clears 106/161 deferred rows), 4 DDL items
+(`atlas_ast_nodes.ast_generation`, `atlas_symbol_versions` indexes on `source_revision`/`qualified_name`, topology revision columns,
+`atlas_ontology_linked_tuples` `source_revision`/`workspace_revision` + `label_kind` — its `evidence_span` is unconstrained jsonb, so a
+writer-side `GroundedExtractionV1` contract with mandatory `UTF8_PARSER_BUFFER_V1` spans is required first),
+4 bounded-canary populations, the domain owner. Five tuple-ish tables coexist (`feature_ontology_tuples` 539k owner,
+`ontology_domain_tuples` 61k, and empty `atlas_ontology_tuples`, `registry_ontology_tuples`, `atlas_ontology_linked_tuples`) — add no sixth. **Tranche order:** DOMAIN-VOCAB-01 → DOMAIN-CAL-02 → NLP-EXTRACT-03 → SYMBOL-LINK-04
+→ FEATURE-LINK-05 → PG18-PLAN-06 → SEMANTIC-07 (exact vs HNSW) → CLUSTER-08 (CPU KMeans oracle vs cuVS; SOM separate) → RANK-09
+→ TENSOR-10 → CONTEXT-11 → SYNTH-12; no deep RL / neural domain classifier before trustworthy labels + `.okf` reconciliation +
+revision-qualified feature production. The `:8095` NLP sidecar is an evidence EXECUTOR, never an identity owner. Governed
+implementation proven != canonical data authority proven (`node scripts/atlas/audit-ast-authority-gap-derivation-v1.mjs`).
+**Validation corpus (2026-09-20, `docs/reports/validation-corpus-inventory-v1.json`): ONE shared core, TWO adapters.** Core = source-text
+encoding, revision-qualified identity, `UTF8_PARSER_BUFFER_V1` spans, `GroundedExtractionV1`, `.okf`, `CandidateOrdinalMap`, receipts.
+WORKSTATION adapter (code/schemas/specs/configs) and LEGAL adapter (statutes/citations/opinions/evidence) differ in corpus + validators
+only; Ornith gets both, tagged `adapter: WORKSTATION | LEGAL | BOTH`, identity namespaces never merged. Measured gaps: only TS/JS has
+an AST lane (svelte/python/sql/shell/proto/go/cuda/wgsl none evidenced); 33 fixture files vs 2,407 specs; no negative corpus; **the legal
+adapter's live corpus is near-empty (evidence 806, cases 11, statutes/citations/precedents 0) and EVERY legal Qdrant collection has 0
+points — the "Qdrant Collections" table above listing them Active is stale.** Legal fixtures must be PII-safe synthetic or public-domain.
+`DOMAIN-CAL-02` draft = `docs/reports/domain-calibration-draft-v1.jsonl` (142 rows, all UNREVIEWED; only 49 revision-qualified).
+
+**Postgres registry check (2026-09-20):** no table is a cache-key/parameter registry.
+`atlas_vector_registry` (4,480 rows) = per-`source_ref` embedding lineage; `vector_index_registry`
+(4 rows) = stale 2026-07-21 `pending_build` seeds naming a 384-dim index (retired lane);
+`registry_topology_projection` = 0 rows, duplicates `atlas_packets.som_cell_x/y` +
+`gpu_cluster_centroids` (64 rows); `registry_projection_stats` view shows only `enrichment`
+populated. Classify the last two as `DEAD`/duplicate candidates — archive, do not delete. Do not add
+a Postgres key registry before the code-side builders are consolidated. PG18 AIO is on
+(`io_method=worker`, 3 workers) but benefits bitmap/seq scans, not btree key lookups.
+
 ---
 
 ## Degraded Response Contract (API Routes)
@@ -5461,3 +5690,15 @@ Manifests must record the UUID algorithm, frozen namespace, name input, and
 YAML/JQ, DuckDB, Redis/BitFrost, Qdrant, centroids, and GPU IDs remain derived layers.
 
 RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.
+
+### Classification gates everything downstream; matching is approximate, identity is exact (2026-09-20)
+
+**Operator direction:** classification must be finished under its OpenSpecs before file analysis, top-k, KMeans/KNN clustering, query fanout, document analysis, recommendations, the kanban task board, the feature matrix and the cache — all depend on it. Matching does not have to be exact; no ranker is 100%.
+
+**How to apply that without weakening the contracts:** classification, symbol matching and ranking are probabilistic lanes, judged by recall@k / precision / ECE on a reviewed set, with a caller-supplied confidence floor and fail-closed routing. Identity stays exact: `source_revision`, whole-source vs chunk digests, `UTF8_PARSER_BUFFER_V1` spans, `packet_key`, `CandidateOrdinalMap` and cache keys never become fuzzy or inferred.
+
+**Owners (do not add a second):** offline sklearn NB+LR trainer `python/train_domain_classifier.py`; read-only FastAPI seam `python/atlas_nlp_classification_helper_v1.py`; `:8095` sidecar `miniforge_nlp_sidecar_v2.py` (evidence executor only); TRACE `domain.classify` (provisional); ast-grep/Tree-sitter helpers under `scripts/atlas/lib/` (TS/JS only). No PyTorch logistic-regression trainer exists; one would be a challenger behind the sklearn baseline, only after a reviewed set exists. OpenSpec state (checked/open): search-classifier-sidecar 70/16, workstation-domain-classifier 115/26, query-routing-classifier 41/57, unified-symbol-ranking 17/0. Full detail and dependency order: `openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md` (`CLASSIFICATION-GATE-01`).
+
+**Domain review sheet + rules (2026-09-20):** `node scripts/atlas/build-domain-review-sheet-v1.mjs` builds an offline searchable review page `docs/reports/domain-review-sheet-v1.html` (blind mode, localStorage autosave, JSONL export the eval harness reads via `python python/atlas_domain_classifier_eval_v1.py --input <file>`). Labeling rules: judge primary responsibility from the path/file (the LLM evidence text is not truth); one of the 13 top-level `atlas_domain_ontology` groups; `AMBIGUOUS` / `NOT_A_DOMAIN` / `SKIP` are counted, never gold; second reviewer on >=10%. Trust floor 200 reviewed rows AND 30 per class; the 49 revision-qualified rows are far short (largest class 11; machine-learning, compiler, error-handling have 0), and closing that depends on CURRENT_SOURCE_AUTHORITY_PROVEN, not on labelling alone. Report Tier A (revision-qualified) and Tier B (unresolved-revision, evaluation only) separately.
+
+**Searching gitignored evidence (2026-09-20):** files over 10 MB cannot enter git (hook), so the AST/classification evidence lives under gitignored `.tmp/atlas/` and `*.jsonl`. `.rgignore` re-includes a selected set so a plain `rg` from the repo root finds them (draft/reviewed domain JSONL, AST candidates, canary-eligible rows, source-authority cohort, symbol nominations/resolution, knowledge snapshot). Test from the repo ROOT: searching inside an ignored directory bypasses ignore rules and gives a false pass. Searchable is not authoritative; regenerate before citing.

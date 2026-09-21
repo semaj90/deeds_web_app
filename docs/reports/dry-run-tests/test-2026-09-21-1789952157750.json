@@ -1,0 +1,145 @@
+{
+  "testId": "test-2026-09-21-1789952157750",
+  "timestamp": "2026-09-21T00:55:57.750Z",
+  "mode": "dry-run",
+  "stages": {
+    "orchestrator_dry_run": {
+      "status": "pass",
+      "logs": [
+        "[graphify-chain] ✅ Lock acquired (C:\\Users\\james\\Videos\\deeds-web-app\\.graphify-pipeline-lock)",
+        "[graphify-chain] Starting downstream pipeline orchestrator (DRY-RUN mode)",
+        "[graphify-chain] Services: SvelteKit=http://127.0.0.1:5173, DB=127.0.0.1:5434/legal_ai_db",
+        "[graphify-chain] Skipping readiness check (use --wait-ready to enable or run in --apply mode)",
+        "[graphify-chain] Running: npm.cmd run atlas:code-features:pagerank --dry-run",
+        "> yorha-legal-ai-frontend@1.0.0 atlas:code-features:pagerank",
+        "> node scripts/atlas/update-code-feature-pagerank.mjs --dry-run",
+        "📊 Code Features PageRank Computation",
+        "Mode: DRY-RUN (no writes)",
+        "Connecting to database...",
+        "✓ Connected",
+        "[1/4] Fetching code features...",
+        "✓ Fetched 1477 features",
+        "[2/4] Fetching code feature edges...",
+        "✓ Fetched 6558 edges",
+        "[3/4] Computing PageRank (20 iterations, d=0.85)...",
+        "✓ Computed 1477 scores",
+        "[4/4] Updating database...",
+        "✓ (DRY-RUN) Would update 1477 features",
+        "✅ PageRank computation complete",
+        "Summary:",
+        "  Features: 1477",
+        "  Edges: 6558",
+        "  Scores computed: 1477",
+        "  Scores updated: 0",
+        "  Errors: 0",
+        "[graphify-chain] ✅ PageRank complete (exit code 0)",
+        "[graphify-chain] Running: node C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\graphify-langgraph-pipeline.mjs --stage kanban_task",
+        "═══ Graphify LangGraph Pipeline (DRY RUN) ═══",
+        "Running single node: kanban_task",
+        "══ Pipeline Summary ══════════════════════════════════════",
+        "  addressable packets:   0",
+        "  feature_ids assigned:  0",
+        "  vectors upserted:      0",
+        "  bm25 backfilled:       500",
+        "  noise pruned:          0",
+        "  Kanban task queue (2 tasks):",
+        "    [P2] rank_signals — 0 items — gate: All 3 ranking gates PASS (BM25 ≥85%, concepts ≥60%, community_conf coverage)",
+        "    [P2] xgboost_export — 0 items — gate: NDCG@10 ≥ 0.80, ≥500 success traces",
+        "  Ranking gate summary:",
+        "    ❌ bm25_coverage_85pct              0.0% (0/61718)",
+        "    ✅ concept_coverage_60pct           94.6% (58360/61718)",
+        "    ❌ community_conf_95pct             94.6% (58366/61718)",
+        "    ✅ qdrant_coverage_50pct            532.0% (~328348/61718)",
+        "  XGBoost export ready: ❌",
+        "  Mode: dry-run (add --apply to write)",
+        "[graphify-chain] ✅ Kanban tasks emitted (exit code 0)",
+        "[graphify-chain] Running: C:\\Program Files\\nodejs\\node.exe C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\node_modules\\tsx\\dist\\cli.mjs C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\scripts\\atlas\\kanban-turbovec-consolidation.mts",
+        "[simdjson-bridge] Loaded native addon from C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\Release\\tensorrt_bridge.node",
+        "[libtorch-bridge] Added to PATH: C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib",
+        "[libtorch-bridge] Added cuDNN to PATH: C:/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0",
+        "[libtorch-bridge] Added CUDA bin to PATH: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin",
+        "[libtorch-bridge] Probed native addon C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\Release\\tensorrt_bridge.node (CUDA)",
+        "[libtorch-bridge] Selected native addon from C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\Release\\tensorrt_bridge.node (CUDA)",
+        "Wrote C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\kanban-turbovec-consolidation-latest.json",
+        "Wrote C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\kanban-turbovec-consolidation-latest.md",
+        "Board updated: no",
+        "Groups: 6518",
+        "Embedded records: 6725/6725",
+        "[graphify-chain] ✅ TurboVec consolidation complete (exit code 0)",
+        "[graphify-chain] ℹ️  Found 4 kanban tasks (dry-run, not writing)",
+        "[graphify-chain] ✅ Pipeline complete (15925ms)",
+        "[graphify-chain] Report written to docs\\reports\\graphify-downstream-chain-2026-09-21.json",
+        "Exit code: 0"
+      ]
+    },
+    "admin_kanban_output": {
+      "status": "pass",
+      "outputFile": "docs\\reports\\dry-run-tests\\kanban-board-2026-09-21.json"
+    }
+  },
+  "validations": {
+    "openspec_validation": {
+      "status": "pass",
+      "checks": {
+        "API response shape": {
+          "pass": true,
+          "note": "SvelteKit not required for dry-run"
+        },
+        "npm script availability": {
+          "pass": true,
+          "note": "All 3 scripts present"
+        },
+        "JSON report format": {
+          "pass": true,
+          "note": "Valid report structure"
+        }
+      }
+    }
+  },
+  "recommendations": {
+    "daily_recommendations_trigger": {
+      "status": "pass",
+      "triggers": {
+        "Kanban task file generation": {
+          "pass": true,
+          "note": "File exists (age: 128662 min)",
+          "filesize": 1905884
+        },
+        "GSD integration readiness": {
+          "pass": true,
+          "note": "GSD error fixer available"
+        },
+        "Recommendation engine wiring": {
+          "pass": true,
+          "note": "Recommendation engine found"
+        }
+      }
+    }
+  },
+  "gsd": {
+    "gsd_integration": {
+      "status": "pass",
+      "components": {
+        "Phase 66 error fixer": {
+          "exists": true
+        },
+        "GSD planner": {
+          "exists": false
+        },
+        "Error fixing agent": {
+          "exists": false
+        }
+      }
+    }
+  },
+  "errors": [],
+  "summary": {
+    "success": true,
+    "totalStages": 4,
+    "passedStages": 4,
+    "failedStages": 0,
+    "validationsPass": false,
+    "message": "All tests passed",
+    "elapsed_ms": 16128
+  }
+}

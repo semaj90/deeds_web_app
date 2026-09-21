@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.ast-symbol-resolution.v1",
+  "gate": "AST-SYMBOL-03",
+  "status": "READ_ONLY_BLOCKED",
+  "ownerScripts": [
+    "scripts/atlas/prove-current-structural-symbol-resolution-v1.mjs",
+    "scripts/atlas/prove-tree-bound-symbol-registry-resolution-v1.mjs",
+    "scripts/atlas/plan-current-tree-bound-symbol-registry-input-v1.mjs"
+  ],
+  "inputs": {
+    "plan": {
+      "path": ".tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson",
+      "checksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rowCount": 0,
+      "planChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "structural": {
+      "path": ".tmp/atlas/current-structural-symbol-resolution-v1.ndjson",
+      "checksum": "sha256:a3d0a3068bf371a5fec4507dedb4199b2d28162f3c92a99cff7aeb9ca38b4d7a",
+      "rowCount": 461,
+      "reportChecksum": "sha256:a3d0a3068bf371a5fec4507dedb4199b2d28162f3c92a99cff7aeb9ca38b4d7a"
+    },
+    "registry": {
+      "path": ".tmp/atlas/tree-bound-symbol-registry-resolution-v2.ndjson",
+      "checksum": "sha256:54ce4ce3a9b3580229fbe6c22e8f12fb72f2cab8d0ab793700131b5b13d5d91f",
+      "rowCount": 461,
+      "reportInputPlanChecksum": "sha256:011a7d0b66f80f451b20ad7d8af1fd8e53f19c44b1c61b2c2b74b7f5bb88a3e2"
+    }
+  },
+  "workspaceRevision": null,
+  "sourceRevisionPolicy": "EXACT_SOURCE_AND_WORKSPACE_REVISION_REQUIRED",
+  "counts": {
+    "inputDeclarations": 0,
+    "exact": 0,
+    "registryMissing": 0,
+    "ambiguous": 0,
+    "revisionMismatch": 0,
+    "pathMismatch": 0,
+    "parentMismatch": 0,
+    "signatureMismatch": 0,
+    "spanMismatch": 0,
+    "unresolved": 0
+  },
+  "resolutionRate": 0,
+  "resolutionAttempted": false,
+  "classificationNote": "Counts are diagnostic only because the plan, structural, and registry artifacts are not cohort-aligned; do not interpret pathMismatch or registryMissing as canonical resolution failures.",
+  "registryCountsStatus": "STALE_NOT_PROMOTABLE",
+  "byLanguage": {},
+  "byNodeKind": {},
+  "bySourceRevision": {},
+  "freshness": {
+    "cohortAligned": false,
+    "resolutionAttempted": false,
+    "structuralFreshForPlan": false,
+    "registryFreshForStructural": false,
+    "registryPlanParity": false,
+    "planReportWorkspaceRevisionParity": false,
+    "planWorkspaceRevisions": [],
+    "structuralExpectedWorkspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+    "registryInputPlanChecksum": "sha256:011a7d0b66f80f451b20ad7d8af1fd8e53f19c44b1c61b2c2b74b7f5bb88a3e2",
+    "registryStructuralInputChecksum": null,
+    "registryWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+  },
+  "canonicalAuthority": false,
+  "canonicalWrites": 0,
+  "databaseWrites": 0,
+  "promotionAuthorized": false,
+  "readOnly": true,
+  "nextGate": "REGENERATE_STRUCTURAL_INPUT_FROM_ADMITTED_WORKSPACE_OWNER"
+}

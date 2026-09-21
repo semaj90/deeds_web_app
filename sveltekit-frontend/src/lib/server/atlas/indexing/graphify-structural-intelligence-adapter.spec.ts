@@ -74,6 +74,7 @@ const revisions = {
 describe('Graphify structural intelligence adapter', () => {
   it('compiles native evidence + ast-grep + grounded LangExtract without creating canonical identity', () => {
     const result = compileGraphifyStructuralIntelligence({
+      parserBuffer: Buffer.from(source, 'utf8'),
       source,
       workspaceRevision: 'ws-742',
       materialization: materialization('PROVEN'),
@@ -114,6 +115,12 @@ describe('Graphify structural intelligence adapter', () => {
     expect(result.receipt.compatibilityChunkIdCount).toBe(0);
     expect(result.receipt.astGrepObservationCount).toBe(1);
     expect(result.receipt.langExtractObservationCount).toBe(1);
+    expect(result.receipt.langExtractParserBufferPresent).toBe(true);
+    expect(result.receipt.langExtractParserBufferChecksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(result.receipt.langExtractFallbackUsed).toBe(false);
+    expect(result.receipt.langExtractUtf8SpanCount).toBe(1);
+    expect(result.receipt.langExtractUtf8RejectionCount).toBe(0);
+    expect(result.receipt.langExtractUtf8MismatchCount).toBe(0);
     expect(result.receipt.groundedDomainCandidateCount).toBe(1);
     expect(result.groundedDomainCandidates[0]?.domainId).toBe('software.security');
     expect(result.groundedDomainCandidates[0]?.canonicalAuthority).toBe(false);
@@ -137,8 +144,23 @@ describe('Graphify structural intelligence adapter', () => {
     expect(result.fabric).not.toBeNull();
   });
 
+  it('marks source-text reconstruction as non-promotable fallback', () => {
+    const result = compileGraphifyStructuralIntelligence({
+      source,
+      workspaceRevision: 'ws-742',
+      materialization: materialization('PROVEN'),
+      revisions,
+    });
+
+    expect(result.receipt.langExtractParserBufferPresent).toBe(false);
+    expect(result.receipt.langExtractFallbackUsed).toBe(true);
+    expect(result.receipt.langExtractFallbackReason).toBe('PARSER_BUFFER_DERIVED_FROM_SOURCE_TEXT');
+    expect(result.receipt.canonicalPromotionMayBeAttempted).toBe(false);
+  });
+
   it('builds chained AST and structural stage receipts without persistence', () => {
     const result = compileGraphifyStructuralIntelligence({
+      parserBuffer: Buffer.from(source, 'utf8'),
       source,
       workspaceRevision: 'ws-742',
       materialization: materialization('PROVEN'),

@@ -38,6 +38,7 @@ async function enrichTranscription(
 			documentType: 'legal',
 			extractEntities: true,
 			language: language ?? 'en',
+			groundedExtractionRequired: true,
 		}),
 		extractEntities(text, 20_000),
 	]);

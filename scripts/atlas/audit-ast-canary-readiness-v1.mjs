@@ -16,9 +16,11 @@ const paths = {
   sourceParity: path.join(ROOT, 'docs/reports/ast-source-parity-disposition-v1.json'),
   sourceWorktree: path.join(ROOT, 'docs/reports/ast-source-parity-worktree-v1.json'),
   rehearsal: path.join(ROOT, 'docs/reports/atlas-ast-canary-apply-v1.rehearsal.json'),
+  trancheRehearsal: path.join(ROOT, 'docs/reports/atlas-ast-tranche-rehearsal-v1.json'),
+  hashGrain: path.join(ROOT, 'docs/reports/ast-hash-grain-classification-v1.json'),
   offset: path.join(ROOT, 'docs/reports/ast-offset-basis-proof-v1.json'),
   digest: path.join(ROOT, 'docs/reports/ast-digest-divergence-v1.json'),
-  conflicts: path.join(ROOT, 'docs/reports/ast-structural-conflicts-v1.json'),
+  conflicts: path.join(ROOT, 'docs/reports/ast-conflict-disposition-v1.json'),
   rekey: path.join(ROOT, 'docs/reports/atlas-ast-canary-rekey-v1.rehearsal.json'),
 };
 const read = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -31,6 +33,22 @@ const checks = [
       receipts.rehearsal.steps?.readback?.persistentRowsAdded === 0 &&
       receipts.rehearsal.steps?.after?.persisted === false,
     detail: `status=${receipts.rehearsal.status}; persistentRowsAdded=${receipts.rehearsal.steps?.readback?.persistentRowsAdded}`,
+  },
+  {
+    id: 'COHORT_ROLLBACK_REHEARSAL',
+    passed: receipts.trancheRehearsal.status === 'REHEARSAL_PROVEN' &&
+      receipts.trancheRehearsal.steps?.constraintCheck?.startsWith('PASS') &&
+      receipts.trancheRehearsal.steps?.readback?.persistentRowsAdded === 0 &&
+      receipts.trancheRehearsal.steps?.after?.persisted === false &&
+      receipts.trancheRehearsal.steps?.write?.inserted === receipts.trancheRehearsal.steps?.write?.expectedRows &&
+      receipts.trancheRehearsal.steps?.write?.skippedByConflict === 0,
+    detail: `status=${receipts.trancheRehearsal.status}; inserted=${receipts.trancheRehearsal.steps?.write?.inserted ?? 'UNKNOWN'}; expected=${receipts.trancheRehearsal.steps?.write?.expectedRows ?? 'UNKNOWN'}; conflicts=${receipts.trancheRehearsal.steps?.write?.skippedByConflict ?? 'UNKNOWN'}`,
+  },
+  {
+    id: 'HASH_GRAIN_CONTRACT',
+    passed: receipts.hashGrain.status === 'AST_HASH_GRAIN_CLASSIFIED_WITH_EXPLICIT_MATCHES' &&
+      Number(receipts.hashGrain.counts?.byClassification?.UNKNOWN ?? 0) === 0,
+    detail: `status=${receipts.hashGrain.status}; unknownGroups=${receipts.hashGrain.counts?.byClassification?.UNKNOWN ?? 'UNKNOWN'}`,
   },
   {
     id: 'BOM_OFFSET_BASIS',
@@ -51,8 +69,9 @@ const checks = [
   },
   {
     id: 'STRUCTURAL_CONFLICTS_CLOSED',
-    passed: Number(receipts.conflicts.identityProof?.structuralKeyConflicts ?? 0) === 0,
-    detail: `structuralKeyConflicts=${receipts.conflicts.identityProof?.structuralKeyConflicts ?? 'UNKNOWN'}`,
+    passed: Number(receipts.conflicts.input?.conflictCount ?? 0) === 0 &&
+      Number(receipts.conflicts.input?.supersessionProposalsAllowed ?? 0) === 0,
+    detail: `conflictCount=${receipts.conflicts.input?.conflictCount ?? 'UNKNOWN'}; supersessionProposalsAllowed=${receipts.conflicts.input?.supersessionProposalsAllowed ?? 'UNKNOWN'}`,
   },
   {
     id: 'REKEY_REHEARSAL',
@@ -76,7 +95,7 @@ const receipt = {
     blockerFingerprint,
     allowed: blockers.length === 0,
     reason: blockers.length === 0 ? 'READY_FOR_OPERATOR_REVIEW' : 'UNCHANGED_BLOCKER_EVIDENCE_REQUIRES_STATE_CHANGE',
-    retryWhen: ['workspaceRevisionChanges', 'sourceSnapshotRevisionChanges', 'structuralConflictDispositionChanges'],
+    retryWhen: ['workspaceRevisionChanges', 'sourceSnapshotRevisionChanges', 'hashGrainReceiptChanges', 'structuralConflictDispositionChanges'],
   },
   status: blockers.length === 0 ? 'PERSISTENT_CANARY_READY_FOR_EXPLICIT_APPROVAL' : 'PERSISTENT_CANARY_BLOCKED',
   authorization: {
@@ -99,6 +118,7 @@ const receipt = {
     retryWhen: [
       'workspaceRevisionChanges',
       'sourceSnapshotRevisionChanges',
+      'hashGrainReceiptChanges',
       'structuralConflictDispositionChanges',
     ],
     noAutomaticChoice: true,

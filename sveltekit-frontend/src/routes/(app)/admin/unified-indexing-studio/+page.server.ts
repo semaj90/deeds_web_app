@@ -116,11 +116,32 @@ export const load: PageServerLoad = async ({ locals }) => {
     SELECT 
       (SELECT COUNT(*) FROM embedded_summaries) as summary_count,
       (SELECT COUNT(*) FROM hypergraph_edges) as hyper_edge_count,
-      (SELECT COUNT(*) FROM graph_pathway_cards) as pathway_count,
       (SELECT COUNT(*) FROM users) as user_count,
       (SELECT COUNT(*) FROM embedded_summaries WHERE som_bmu_row IS NOT NULL AND som_bmu_col IS NOT NULL) as bmu_covered_count,
       (SELECT COUNT(*) FROM embedded_summaries WHERE manifold4 IS NOT NULL AND array_length(manifold4, 1) = 4) as manifold4_covered_count
   `).then(r => r.rows[0]);
+
+  // graph_pathway_cards is a Drizzle-owned optional projection. Some
+  // deployments have the schema declaration before the migration is applied;
+  // expose that state instead of turning the whole read-only admin page into
+  // a 500. No fallback rows or synthetic counts are created.
+  let pathwayTableAvailable = false;
+  let pathwayCount: number | null = null;
+  try {
+    const table = await pgPool.query<{ pathway_table: string | null }>(
+      `SELECT to_regclass('public.graph_pathway_cards')::text AS pathway_table`
+    );
+    pathwayTableAvailable = Boolean(table.rows[0]?.pathway_table);
+    if (pathwayTableAvailable) {
+      pathwayCount = Number((await pgPool.query<{ count: string }>(
+        'SELECT COUNT(*)::text AS count FROM graph_pathway_cards'
+      )).rows[0]?.count ?? 0);
+    }
+  } catch (e) {
+    console.warn('Pathway-card schema probe failed; leaving count unavailable.', e);
+  }
+  pgStats.pathway_count = pathwayCount;
+  pgStats.pathway_table_available = pathwayTableAvailable;
 
   // 2. Redis Stats
   let redisStats = { keys: 0, memory: '0MB' };

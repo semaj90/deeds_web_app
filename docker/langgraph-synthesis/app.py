@@ -43,6 +43,8 @@ from langgraph.graph import END, StateGraph
 from pydantic import BaseModel, Field
 from qdrant_client import AsyncQdrantClient
 
+from research_contracts import WebSearchResultV1
+
 # ── Config ────────────────────────────────────────────────────────────────────
 
 log = logging.getLogger("langgraph-synthesis")
@@ -247,8 +249,27 @@ async def embed_query(text: str) -> list[float]:
 # Web search  (SearXNG → DuckDuckGo fallback)
 # ═══════════════════════════════════════════════════════════════════════════════
 
+def _validated_web_results(rows: list[dict], limit: int) -> list[dict]:
+    """Validate and bound provider output before it enters the DAG state."""
+    validated: list[dict] = []
+    for row in rows[: max(0, min(limit, 50))]:
+        try:
+            item = WebSearchResultV1.model_validate(row)
+        except Exception:
+            continue
+        validated.append(item.model_dump(by_alias=True))
+    return validated
+
+
 async def web_search(query: str, limit: int = 5) -> list[dict]:
-    """Search web via SearXNG (self-hosted) with DuckDuckGo fallback."""
+    """LDR-style bounded web-search tool with typed evidence output.
+
+    Search remains an executor observation. It does not create source revisions,
+    persist documents, or promote canonical Atlas identity.
+    """
+    if not query.strip() or limit < 1:
+        return []
+    limit = min(limit, 50)
     # Try SearXNG first
     try:
         async with httpx.AsyncClient(timeout=8) as client:
@@ -258,10 +279,10 @@ async def web_search(query: str, limit: int = 5) -> list[dict]:
             )
             if r.status_code == 200:
                 data = r.json()
-                return [
+                return _validated_web_results([
                     {"title": h.get("title",""), "url": h.get("url",""), "snippet": h.get("content",""), "source": "searxng"}
                     for h in data.get("results", [])[:limit]
-                ]
+                ], limit)
     except Exception:
         pass
     # DuckDuckGo instant answer fallback
@@ -280,7 +301,7 @@ async def web_search(query: str, limit: int = 5) -> list[dict]:
                 for rt in data.get("RelatedTopics", [])[:limit - len(results)]:
                     if isinstance(rt, dict) and rt.get("Text"):
                         results.append({"title": rt.get("Text","")[:60], "url": rt.get("FirstURL",""), "snippet": rt.get("Text",""), "source": "duckduckgo"})
-                return results
+                return _validated_web_results(results, limit)
     except Exception as exc:
         log.debug(f"[web_search] fallback failed: {exc}")
     return []

@@ -192,12 +192,27 @@ export interface NlpHealthResponse {
     ast_grep?: boolean;
     torch?: boolean;
   };
+  capabilityDetails?: {
+    spacy_model?: {
+      package?: string;
+      installed?: boolean;
+      loaded?: boolean;
+      pos_ready?: boolean;
+    };
+    [key: string]: unknown;
+  };
   resolvedUrl?: string;
   latencyMs?: number;
 }
 
 export interface MiniforgeNlpSidecarClient {
-  health(): Promise<{ ready: boolean; status?: string; model?: string; capabilities?: NlpHealthResponse['capabilities'] }>;
+  health(): Promise<{
+    ready: boolean;
+    status?: string;
+    model?: string;
+    capabilities?: NlpHealthResponse['capabilities'];
+    capabilityDetails?: NlpHealthResponse['capabilityDetails'];
+  }>;
   analyze(req: NlpAnalyzeRequest): Promise<NlpAnalyzeResponse>;
   extract(req: NlpAnalyzeRequest): Promise<NlpExtractResponse>;
   astChunk(req: { source: string; language: string; filePath: string; sourceRevision: string }): Promise<AtlasStructuralEvidence>;
@@ -254,6 +269,7 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           status: data.status,
           model: data.model,
           capabilities: data.capabilities,
+          capabilityDetails: data.capabilityDetails,
         };
       } catch {
         cachedHealthy = false;

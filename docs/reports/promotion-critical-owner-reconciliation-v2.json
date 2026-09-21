@@ -1,0 +1,520 @@
+{
+  "schema": "atlas.promotion-critical-owner-reconciliation.v2",
+  "generatedAt": "2026-09-20T19:42:35.289Z",
+  "gate": "OWNER-COLLISION-RECONCILE-01",
+  "promotionBoardGate": "PROMOTION-BOARD-RECONCILE-02",
+  "ownershipGateStatus": "OWNER_COLLISION_RECONCILE_BLOCKED",
+  "promotionStatus": "PROMOTION_BOARD_BLOCKED",
+  "readOnly": true,
+  "coordinationChange": "parent-atlas-ace-rlm-bitfrost-integration",
+  "policy": {
+    "mcpDefault": "READ_ONLY",
+    "canonicalOwner": "POSTGRESQL",
+    "derivedStores": [
+      "QDRANT",
+      "NEO4J",
+      "GPU",
+      "CACHE",
+      "MODEL_ARTIFACT"
+    ],
+    "automaticMutation": false
+  },
+  "inputs": {
+    "portfolio": "docs/reports/openspec-portfolio-implementation-readiness-v1.json",
+    "promotionGates": "docs/reports/parent-atlas-promotion-gates-v1.json",
+    "rrfLedger": "openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md",
+    "aceLedger": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md"
+  },
+  "portfolio": {
+    "generatedAt": "2026-09-13T22:18:34.187Z",
+    "changeCount": 99,
+    "taskTotal": 10884,
+    "taskComplete": 7006,
+    "relationCount": 1426,
+    "ownerCollisionCount": 117,
+    "ownerCollisionPriorityCounts": {
+      "P1_CANONICAL_TABLE_REVIEW": 70,
+      "P2_SHARED_DERIVED_SURFACE": 47
+    },
+    "mutationRecommendedCount": 0
+  },
+  "summary": {
+    "criticalResources": 14,
+    "criticalOwnerCollisions": 1,
+    "duplicateOwnerViolations": 0,
+    "unresolvedOwnerClaims": 1,
+    "criticalEvidenceBlockers": 5,
+    "ownershipBlockingResources": [
+      "SYMBOL_REPRESENTATION_REGISTRY"
+    ],
+    "evidenceBlockingResources": [
+      "PACKET_CHUNK_IDENTITY",
+      "SYMBOL_REPRESENTATION_REGISTRY",
+      "CURRENT_SEMANTIC_CORPUS",
+      "RRF_CALLER_CONVERGENCE",
+      "CURRENT_JUDGMENT_CORPUS"
+    ]
+  },
+  "liveEvidence": {
+    "workspaceAdmitted": true,
+    "terminalGraphifyMatches": true,
+    "rrfCallerEvidence": {
+      "mapped": null,
+      "unmapped": null,
+      "total": null,
+      "executorAsLaneViolations": 2
+    },
+    "symbolRegistryEvidence": {
+      "explicitlyResolved": false,
+      "currentRevisionProven": false
+    }
+  },
+  "resources": [
+    {
+      "resource": "SOURCE_WORKSPACE_AUTHORITY",
+      "coordinationChange": "parent-atlas-ace-rlm-bitfrost-integration",
+      "canonicalOwnerArtifact": "PostgreSQL canonical source/workspace lineage bound to the admitted Graphify snapshot",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "PROVEN",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-code-ingestion-pipeline",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-graphify-recovery-proof-ladder",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-canonical-directory-ingestion-fabric",
+          "classification": "DERIVED_PROJECTION"
+        }
+      ],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "docs/reports/parent-atlas-promotion-gates-v1.json",
+        "docs/reports/workspace-revision-tournament-admission-v1.json",
+        "docs/reports/current-graphify-run-owner-v1.json",
+        "docs/reports/current-source-owner-reconciliation-v1.json"
+      ],
+      "blocksPromotion": false,
+      "blockers": [],
+      "notes": "ACE coordinates receipts only; it is not emitted as canonical source storage."
+    },
+    {
+      "resource": "PACKET_CHUNK_IDENTITY",
+      "coordinationChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "canonicalOwnerArtifact": "PostgreSQL atlas_packets + atlas_packet_chunk_lineage + codebase_chunk_index canonical chunk identity",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "BLOCKED",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-graph-retrieval-proof",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-candidate-feature-execution-fabric",
+          "classification": "DERIVED_PROJECTION"
+        },
+        {
+          "changeId": "add-packet-ontology-registry",
+          "classification": "UNRESOLVED"
+        }
+      ],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/atlas-registry-writer-ownership-v2.json"
+      ],
+      "blocksPromotion": true,
+      "blockers": [
+        "STATUS_NOT_PROMOTABLE:CURRENT_PACKET_CHUNK_JOIN_PARTIAL",
+        "CURRENT_PACKET_CHUNK_JOIN_PARTIAL"
+      ],
+      "notes": null
+    },
+    {
+      "resource": "SYMBOL_REPRESENTATION_REGISTRY",
+      "coordinationChange": "parent-atlas-ace-rlm-bitfrost-integration",
+      "canonicalOwnerArtifact": "UNRESOLVED: one current-revision symbol/version/representation registry must be selected after writer/reader/migration reconciliation",
+      "ownershipStatus": "OWNER_UNRESOLVED",
+      "evidenceStatus": "BLOCKED",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-code-ingestion-pipeline",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-graph-retrieval-proof",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-topology-representation-admission",
+          "classification": "UNRESOLVED"
+        }
+      ],
+      "competingArtifacts": [
+        {
+          "artifact": "graphify_symbols",
+          "classification": "COMPATIBILITY_LAYER",
+          "reason": "Current promotion gate checks this surface, but latest audit found it empty."
+        },
+        {
+          "artifact": "atlas_symbol_registry / atlas_symbol_versions",
+          "classification": "UNRESOLVED",
+          "reason": "Populated candidate owner, but latest audit binds it to non-admitted canary/staging workspace revision."
+        },
+        {
+          "artifact": "pending atlas_representations migration",
+          "classification": "UNRESOLVED",
+          "reason": "Schema candidate is not applied and therefore cannot be selected from intent alone."
+        }
+      ],
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+        "docs/reports/parent-atlas-promotion-gates-v1.json"
+      ],
+      "blocksPromotion": true,
+      "blockers": [
+        "SYMBOL_REPRESENTATION_REGISTRY_OWNER_UNRESOLVED",
+        "SYMBOL_REPRESENTATION_CURRENT_REVISION_NOT_PROVEN"
+      ],
+      "notes": "Do not select a registry by row count; require current workspace binding, stable symbol-version identity, active writer/readers, migration ownership, and promotion-gate adoption."
+    },
+    {
+      "resource": "SEMANTIC_768_CONTRACT",
+      "coordinationChange": "parent-atlas-semantic-768-canonical-contract",
+      "canonicalOwnerArtifact": "semantic_768 representation/identity contract with PostgreSQL exact-vector lineage",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "PROVEN",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-semantic-512-canonicalization",
+          "classification": "CHALLENGER"
+        },
+        {
+          "changeId": "parent-atlas-768-dim-migration",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-gpu-graph-vector-substrate",
+          "classification": "EXECUTOR"
+        },
+        {
+          "changeId": "parent-atlas-topology-representation-admission",
+          "classification": "DERIVED_PROJECTION"
+        }
+      ],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "docs/reports/semantic-768-writer-ownership-v1.json",
+        "docs/reports/semantic-768-contract-proof.json"
+      ],
+      "blocksPromotion": false,
+      "blockers": [
+        "OWNER_NOT_PROVEN",
+        "multiple 768 surfaces remain populated or referenced"
+      ],
+      "notes": "Owner selection and writer/current-corpus admission are intentionally separate."
+    },
+    {
+      "resource": "CURRENT_SEMANTIC_CORPUS",
+      "coordinationChange": "parent-atlas-semantic-768-canonical-contract",
+      "canonicalOwnerArtifact": "One revision-qualified semantic_768 cohort bound one-to-one to the admitted workspace/source frame",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "BLOCKED",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-retrieval-staging-planes",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-gpu-sidecar-patch-tournament",
+          "classification": "EXECUTOR"
+        }
+      ],
+      "competingArtifacts": [
+        {
+          "artifact": "codebase_chunks_768",
+          "classification": "DERIVED_PROJECTION",
+          "reason": "Declared current online Qdrant projection; rebuildable, not canonical source truth."
+        },
+        {
+          "artifact": "codebase_chunks_768_v2",
+          "classification": "CHALLENGER",
+          "reason": "Challenger until one-to-one source/representation lineage and caller/eval promotion are proven."
+        }
+      ],
+      "evidenceRefs": [
+        "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+        "docs/reports/semantic-768-writer-ownership-v1.json",
+        "docs/reports/qdrant-collection-roles-v1.json"
+      ],
+      "blocksPromotion": true,
+      "blockers": [
+        "BLOCKED_BY_PREVIOUS_GATE",
+        "ONE_TO_ONE_REVISION_QUALIFIED_CORPUS_RECONCILIATION_REQUIRED"
+      ],
+      "notes": null
+    },
+    {
+      "resource": "RRF_SEARCH_RUNTIME_OWNER",
+      "coordinationChange": "parent-atlas-retrieval-fusion-reachability",
+      "canonicalOwnerArtifact": "SearchRuntime / combineViaRRF() canonical fusion owner with one logical vote per lane",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "PROVEN",
+      "competingChanges": [
+        {
+          "changeId": "phase1-rrf-semantic-fusion",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-rrf-weight-table-lane-registry-consolidation",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-gpu-graph-vector-substrate",
+          "classification": "EXECUTOR"
+        }
+      ],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md",
+        "docs/reports/rrf-lane-weight-census-v1.json",
+        "docs/reports/rrf-real-caller-identity-envelope-v1.json"
+      ],
+      "blocksPromotion": false,
+      "blockers": [],
+      "notes": null
+    },
+    {
+      "resource": "RRF_CALLER_CONVERGENCE",
+      "coordinationChange": "parent-atlas-retrieval-fusion-reachability",
+      "canonicalOwnerArtifact": "All live RRF/fusion callers classified and delegated to the selected SearchRuntime owner without executor-as-lane inflation",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "BLOCKED",
+      "competingChanges": [],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md",
+        "docs/reports/rrf-lane-weight-census-v1.json"
+      ],
+      "blocksPromotion": true,
+      "blockers": [
+        "RRF_CALLER_COUNTS_NOT_EXTRACTABLE_FROM_CURRENT_LEDGER",
+        "EXECUTOR_AS_LANE_VIOLATIONS:2"
+      ],
+      "notes": {
+        "mapped": null,
+        "unmapped": null,
+        "total": null,
+        "executorAsLaneViolations": 2
+      }
+    },
+    {
+      "resource": "CURRENT_JUDGMENT_CORPUS",
+      "coordinationChange": "phase-2f1-real-evaluation-corpus",
+      "canonicalOwnerArtifact": "Historical evaluation corpus retained as compatibility owner; current judgments must be rebound to current semantic/workspace/representation/query/judgment checksums",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "BLOCKED",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-neural-prefill-encoder",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-best-fit-score-fabric",
+          "classification": "TEST_ONLY"
+        }
+      ],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "docs/reports/golden-relevance-review-queue-validation-v1.json",
+        "docs/reports/retrieval-judgment-set-v1.json"
+      ],
+      "blocksPromotion": true,
+      "blockers": [
+        "INCOMPLETE_FAIL_CLOSED",
+        "Complete grades 0-3, reviewer/confidence metadata, and hard negatives; then rerun validation.",
+        "CURRENT_SEMANTIC_CORPUS_CHECKSUM_BINDING_REQUIRED"
+      ],
+      "notes": null
+    },
+    {
+      "resource": "GRAPHIFY_PROMOTION_BOUNDARY",
+      "coordinationChange": "parent-atlas-code-ingestion-pipeline",
+      "canonicalOwnerArtifact": "Graphify producer/materializer lifecycle under PostgreSQL source/workspace authority",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "PROVEN",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-graphify-recovery-proof-ladder",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "ace-hyperrag-chr97-graphify-audit",
+          "classification": "TEST_ONLY"
+        },
+        {
+          "changeId": "parent-atlas-graph-analysis-contract",
+          "classification": "DERIVED_PROJECTION"
+        }
+      ],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "docs/reports/current-graphify-run-owner-v1.json",
+        "docs/reports/current-graphify-snapshot-authority-v1.json"
+      ],
+      "blocksPromotion": false,
+      "blockers": [],
+      "notes": null
+    },
+    {
+      "resource": "ACE_CONTEXT_ADMISSION",
+      "coordinationChange": "parent-atlas-ace-rlm-bitfrost-integration",
+      "canonicalOwnerArtifact": "ACE context admission / ContextManifest coordination; canonical source data remains outside ACE",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "BLOCKED",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-neural-prefill-encoder",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-ace-bitfrost-cache-correctness",
+          "classification": "CACHE"
+        }
+      ],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "docs/reports/ace-live-dry-input-readiness-v2.json"
+      ],
+      "blocksPromotion": false,
+      "blockers": [
+        "CandidateOrdinalMapV1:MISSING_ARGUMENT"
+      ],
+      "notes": null
+    },
+    {
+      "resource": "BITFROST_RESIDENCY_CACHE",
+      "coordinationChange": "parent-atlas-ace-rlm-bitfrost-integration",
+      "canonicalOwnerArtifact": "BitFrost/Valkey revision-qualified cache/residency state only",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "NOT_APPLICABLE",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-ace-bitfrost-cache-correctness",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-memory-architecture-freeze",
+          "classification": "COMPATIBILITY_LAYER"
+        }
+      ],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "docs/reports/bitfrost-valkey-tracking-proof.json"
+      ],
+      "blocksPromotion": false,
+      "blockers": [],
+      "notes": null
+    },
+    {
+      "resource": "KAG_HYPERGRAPH_EVIDENCE",
+      "coordinationChange": "parent-atlas-ace-rlm-bitfrost-integration",
+      "canonicalOwnerArtifact": "Derived KAG/hypergraph evidence expansion linked back to canonical source/packet identity",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "PARTIAL",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-ontology-kernel",
+          "classification": "COMPATIBILITY_LAYER"
+        },
+        {
+          "changeId": "parent-atlas-grounded-knowledge-fabric",
+          "classification": "DERIVED_PROJECTION"
+        },
+        {
+          "changeId": "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+          "classification": "DERIVED_PROJECTION"
+        }
+      ],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "docs/reports/atlas-hypergraph-current-arity-census-v1.json",
+        "docs/.okf/ontology-tuples.jsonl"
+      ],
+      "blocksPromotion": false,
+      "blockers": [
+        "REVISION_QUALIFIED_ONTOLOGY_TUPLE_SOURCE_MISSING"
+      ],
+      "notes": null
+    },
+    {
+      "resource": "FROZEN_EVIDENCE_SNAPSHOT",
+      "coordinationChange": "parent-atlas-ace-rlm-bitfrost-integration",
+      "canonicalOwnerArtifact": "Immutable evidence snapshot/checksum used by HEVAL and judgment replay",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "BLOCKED",
+      "competingChanges": [],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "docs/reports/parent-atlas-promotion-gates-v1.json"
+      ],
+      "blocksPromotion": false,
+      "blockers": [
+        "PACKET_CHUNK_LINEAGE_NOT_PROVEN",
+        "CURRENT_SEMANTIC_CORPUS_NOT_PROVEN"
+      ],
+      "notes": null
+    },
+    {
+      "resource": "HEVAL_EVALUATION_RECEIPTS",
+      "coordinationChange": "parent-atlas-ace-rlm-bitfrost-integration",
+      "canonicalOwnerArtifact": "HEVAL/WikiSkill evaluation receipts over frozen evidence; no production mutation authority",
+      "ownershipStatus": "OWNER_RESOLVED",
+      "evidenceStatus": "BLOCKED",
+      "competingChanges": [
+        {
+          "changeId": "parent-atlas-best-fit-score-fabric",
+          "classification": "TEST_ONLY"
+        },
+        {
+          "changeId": "parent-atlas-neural-prefill-encoder",
+          "classification": "TEST_ONLY"
+        }
+      ],
+      "competingArtifacts": [],
+      "evidenceRefs": [
+        "docs/reports/atlas-heval-wikiskill-integration-v1.json"
+      ],
+      "blocksPromotion": false,
+      "blockers": [
+        "FROZEN_EVIDENCE_SNAPSHOT_NOT_PROVEN",
+        "CURRENT_JUDGMENT_CORPUS_NOT_PROVEN"
+      ],
+      "notes": null
+    }
+  ],
+  "readiness": {
+    "safeToBuildSemanticCohort": false,
+    "safeToProject": false,
+    "safeToImportJudgments": false,
+    "safeToMigrateRrfCallers": false,
+    "safeToRunHEVAL": false
+  },
+  "inputErrors": [],
+  "writesPerformed": false,
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "neo4jWrites": 0,
+  "graphifyWrites": 0,
+  "cacheWrites": 0,
+  "modelWrites": 0,
+  "judgmentWrites": 0,
+  "symbolWrites": 0,
+  "representationWrites": 0,
+  "dockerMutations": 0,
+  "projectionWrites": 0,
+  "nextGate": "REVIEW_PROMOTION_CRITICAL_OWNER_BLOCKERS"
+}

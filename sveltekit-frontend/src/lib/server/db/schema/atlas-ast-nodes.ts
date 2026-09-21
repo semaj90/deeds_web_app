@@ -36,8 +36,8 @@ export const atlasAstNodes = pgTable('atlas_ast_nodes', {
   lineEnd:              integer('line_end').notNull().default(0),
 
   // version hashes
-  normalizedNodeHash:   text('normalized_node_hash').notNull(),           // sha256 of normalized AST subtree JSON
-  sourceContentHash:    text('source_content_hash').notNull(),            // sha256 of raw span bytes
+  normalizedNodeHash:   text('normalized_node_hash').notNull(),           // sha256 of normalized AST/node content (NORMALIZED_NODE_V1)
+  sourceContentHash:    text('source_content_hash').notNull(),            // sha256 of complete raw source-file bytes (RAW_FILE_BYTES_SHA256)
 
   // added 2026-08-02: without this, cross-revision symbol_id stability (does
   // symbol_id stay the same across a body-only edit on a NEW revision?)

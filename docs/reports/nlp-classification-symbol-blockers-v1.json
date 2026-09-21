@@ -1,0 +1,75 @@
+{
+  "schema": "atlas.nlp-classification-symbol-blockers.v1",
+  "generatedAt": "2026-09-20T23:38:41.402Z",
+  "mode": "READ_ONLY",
+  "ownerReports": {
+    "symbol": "docs/reports/ast-symbol-resolution-v1.json",
+    "classifierEvaluation": "docs/reports/domain-classifier-eval-baseline-v1.json",
+    "classifierReadiness": "docs/reports/domain-classifier-training-readiness-v1.json",
+    "ownership": "docs/reports/symbol-classifier-owner-census-v1.json"
+  },
+  "duplicateCanonicalOwnersProven": false,
+  "blockers": [
+    {
+      "key": "AST_SYMBOL_RESOLUTION_COHORT_ALIGNED",
+      "state": "BLOCKED_UPSTREAM",
+      "evidence": {
+        "status": "READ_ONLY_BLOCKED",
+        "inputDeclarations": 461,
+        "planWorkspaceRevision": [
+          "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57"
+        ],
+        "structuralFreshForPlan": false,
+        "registryFreshForStructural": false,
+        "nextGate": "REGENERATE_STRUCTURAL_INPUT_FROM_ADMITTED_WORKSPACE_OWNER"
+      },
+      "nextAction": "Regenerate structural, plan, and registry artifacts from one admitted or explicitly frozen frame."
+    },
+    {
+      "key": "CLASSIFIER_REVIEWED_CALIBRATION_READY",
+      "state": "BLOCKED_REVIEW",
+      "evidence": {
+        "status": "NO_GOLD_LABELS",
+        "rowsConsidered": 142,
+        "goldRows": 0,
+        "inputChecksum": "e5b4a91d236c33e593287225486db453e6f965e84e40bbbcb1b41e7ea6c6a1a4"
+      },
+      "nextAction": "Obtain human-reviewed, revision-qualified labels; weak-label agreement is not accuracy."
+    },
+    {
+      "key": "CURRENT_SOURCE_AUTHORITY_FOR_CLASSIFICATION",
+      "state": "BLOCKED_SOURCE_AUTHORITY",
+      "evidence": {
+        "path": ".tmp/knowledge-source-snapshot-live-v1.json",
+        "status": "BLOCKED",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "sourceRegistryParity": true,
+        "worktreeFingerprintParity": false,
+        "exactRegistryMatches": 24456,
+        "sourceCount": 24456,
+        "issueCount": 672,
+        "error": null
+      },
+      "nextAction": "Refresh/admit the current source frame or keep outputs noncanonical."
+    }
+  ],
+  "downstream": {
+    "fileAnalysis": "BLOCKED_BY_CLASSIFICATION_AND_SOURCE_AUTHORITY",
+    "topK": "BLOCKED_BY_CLASSIFICATION_AND_SOURCE_AUTHORITY",
+    "kmeans": "CHALLENGER_ONLY",
+    "knnFanout": "BLOCKED_BY_CLASSIFICATION_AND_SOURCE_AUTHORITY",
+    "documentAnalysis": "BLOCKED_BY_CLASSIFICATION_AND_SOURCE_AUTHORITY",
+    "recommendations": "BLOCKED_BY_CLASSIFICATION_AND_SOURCE_AUTHORITY",
+    "featureMatrix": "BLOCKED_BY_SYMBOL_AND_ONTOLOGY_AUTHORITY",
+    "cacheAdmission": "BLOCKED_BY_EXACT_IDENTITY_AND_REVIEWED_CLASSIFICATION"
+  },
+  "policy": {
+    "identityExact": true,
+    "classifierProbabilistic": true,
+    "rankersChallengerOnly": true,
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false
+  },
+  "inputChecksum": "sha256:fa364c80e217eb5d0be2c96b987b52e2d098ce2c31613dc0fda2bb727b9628bd"
+}

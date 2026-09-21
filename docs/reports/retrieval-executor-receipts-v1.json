@@ -1,8 +1,8 @@
 {
   "schema": "atlas.retrieval-executor-receipts.v1",
-  "generatedAt": "2026-09-19T05:36:59.111Z",
+  "generatedAt": "2026-09-20T22:54:10.003Z",
   "status": "RECEIPTS_REVIEWED",
-  "reviewedCount": 75,
+  "reviewedCount": 83,
   "reviewed": [
     {
       "file": "docs/reports/analyze-this-adapters-v1.json",
@@ -53,6 +53,11 @@
       "file": "docs/reports/candidate-feature-gpu-residency-proof-v4.json",
       "writesPerformed": null,
       "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/candidate-manifest-ephemeral-residency-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
     },
     {
       "file": "docs/reports/centroid-cache-families-v1.json",
@@ -130,6 +135,11 @@
       "canonicalAuthority": null
     },
     {
+      "file": "docs/reports/gpu-residency-wiring-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
       "file": "docs/reports/langgraph-llama-context-capacity-v1.json",
       "writesPerformed": null,
       "canonicalAuthority": null
@@ -145,12 +155,22 @@
       "canonicalAuthority": false
     },
     {
+      "file": "docs/reports/llama-server-chat-ownership-v1.json",
+      "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
       "file": "docs/reports/llama-server-ornith-runtime-owner-v1.json",
       "writesPerformed": false,
       "canonicalAuthority": false
     },
     {
       "file": "docs/reports/mcp-compatibility-callers-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
+      "file": "docs/reports/ollama-generation-callers-v2.json",
       "writesPerformed": false,
       "canonicalAuthority": false
     },
@@ -172,6 +192,11 @@
     {
       "file": "docs/reports/ornith-cache-capability-v1.json",
       "writesPerformed": null,
+      "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/parent-atlas-capability-census-v1.json",
+      "writesPerformed": false,
       "canonicalAuthority": null
     },
     {
@@ -198,6 +223,11 @@
       "file": "docs/reports/pgvector-audit-report.json",
       "writesPerformed": null,
       "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/pgvector-chunk-stream-dry-run-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
     },
     {
       "file": "docs/reports/pgvector-semantic-768-exact-hnsw-replay-v1.json",
@@ -245,6 +275,11 @@
       "canonicalAuthority": null
     },
     {
+      "file": "docs/reports/postgres-index-capability-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    {
       "file": "docs/reports/postgres-pgvector-exact-hnsw-replay-v1.json",
       "writesPerformed": false,
       "canonicalAuthority": false
@@ -268,6 +303,11 @@
       "file": "docs/reports/runtime-capability-registry-v1.json",
       "writesPerformed": null,
       "canonicalAuthority": null
+    },
+    {
+      "file": "docs/reports/smoke-workstation-pgvector-stack-v1.json",
+      "writesPerformed": false,
+      "canonicalAuthority": false
     },
     {
       "file": "docs/reports/task-semantic-packet-disposable-compatibility-v1.json",

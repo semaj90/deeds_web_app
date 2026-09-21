@@ -118,7 +118,13 @@ report.checksum = sha256(JSON.stringify({
 }));
 
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const temporaryPath = `${reportPath}.${process.pid}.${Date.now()}.tmp`;
+try {
+  fs.writeFileSync(temporaryPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  fs.renameSync(temporaryPath, reportPath);
+} finally {
+  try { fs.unlinkSync(temporaryPath); } catch { /* already renamed */ }
+}
 console.log(JSON.stringify({
   schema: report.schema,
   status: report.status,

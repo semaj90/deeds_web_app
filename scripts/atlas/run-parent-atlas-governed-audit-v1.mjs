@@ -8,10 +8,27 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { assertResourceHeadroom } from './lib/resource-headroom.mjs';
 
 const root = process.cwd();
 const reportsDir = path.join(root, 'docs/reports');
 const reportPath = path.join(reportsDir, 'parent-atlas-governed-audit-v1.json');
+try {
+  assertResourceHeadroom(root, process.env);
+} catch (error) {
+  const details = error?.details ?? {};
+  console.error(JSON.stringify({
+    schema: 'atlas.governed-audit-resource-preflight.v1',
+    status: error?.message ?? 'REFUSED_INSUFFICIENT_RESOURCE_HEADROOM',
+    freeDiskGiB: details.freeDiskBytes === null || details.freeDiskBytes === undefined ? null : Number((details.freeDiskBytes / 1024 ** 3).toFixed(2)),
+    minimumFreeDiskGiB: details.minimumFreeDiskBytes === undefined ? null : Number((details.minimumFreeDiskBytes / 1024 ** 3).toFixed(2)),
+    freeMemoryGiB: details.freeMemoryBytes === undefined ? null : Number((details.freeMemoryBytes / 1024 ** 3).toFixed(2)),
+    minimumFreeMemoryGiB: details.minimumFreeMemoryBytes === undefined ? null : Number((details.minimumFreeMemoryBytes / 1024 ** 3).toFixed(2)),
+    writesPerformed: false,
+    nextGate: 'RESTORE_AUDIT_RESOURCE_HEADROOM',
+  }, null, 2));
+  process.exit(2);
+}
 
 const steps = [
   {
@@ -21,10 +38,71 @@ const steps = [
     reports: ['current-source-owner-reconciliation-v1.json'],
   },
   {
+    id: 'SOURCE_AUTHORITY_REPAIR_PLAN',
+    command: process.execPath,
+    args: ['node_modules/tsx/dist/cli.mjs', 'scripts/atlas/plan-current-source-authority-repair-v1.mts'],
+    reports: ['current-source-authority-repair-plan-v1.json'],
+  },
+  {
+    id: 'SOURCE_COHORT_LINEAGE',
+    command: process.execPath,
+    args: ['scripts/atlas/audit-current-source-cohort-lineage-v1.mjs'],
+    reports: ['current-source-cohort-lineage-v1.json'],
+  },
+  {
+    id: 'WORKSPACE_FRAME_ADMISSION',
+    command: process.execPath,
+    args: ['scripts/atlas/audit-current-workspace-frame-admission-v1.mjs'],
+    reports: ['current-workspace-frame-admission-v1.json'],
+  },
+  {
+    id: 'LINEAGE_CLOSURE',
+    command: process.execPath,
+    args: ['scripts/atlas/audit-current-lineage-closure-v1.mjs'],
+    reports: ['current-lineage-closure-v1.json', 'parent-atlas-current-lineage-funnel-v1.json'],
+  },
+  {
+    id: 'AST_HASH_COLUMN_CONTRACT',
+    command: process.execPath,
+    args: ['scripts/atlas/audit-ast-hash-column-contract-v1.mjs'],
+    reports: ['ast-hash-column-contract-v1.json'],
+  },
+  {
+    id: 'AST_HASH_GRAIN_CLASSIFICATION',
+    command: process.execPath,
+    args: ['scripts/atlas/audit-ast-hash-grain-classification-v1.mjs'],
+    reports: ['ast-hash-grain-classification-v1.json'],
+  },
+  {
+    id: 'AST_OFFSET_BASIS_PROOF',
+    command: process.execPath,
+    args: ['scripts/atlas/prove-ast-offset-basis-v1.mjs'],
+    reports: ['ast-offset-basis-proof-v1.json'],
+  },
+  {
+    id: 'AST_DIGEST_DIVERGENCE',
+    command: process.execPath,
+    args: ['scripts/atlas/audit-ast-digest-divergence-v1.mjs'],
+    reports: ['ast-digest-divergence-v1.json'],
+  },
+  {
+    id: 'AST_CONFLICT_DISPOSITION',
+    command: process.execPath,
+    args: ['scripts/atlas/audit-ast-conflict-disposition-v1.mjs'],
+    reports: ['ast-conflict-disposition-v1.json'],
+  },
+  {
     id: 'AST_CANARY_READINESS',
     command: process.execPath,
     args: ['scripts/atlas/audit-ast-canary-readiness-v1.mjs'],
     reports: ['ast-canary-readiness-v1.json'],
+  },
+  {
+    id: 'STRUCTURAL_PROVENANCE_RUNTIME',
+    command: process.execPath,
+    args: ['scripts/atlas/prove-structural-intelligence-integration.mjs'],
+    env: { ...process.env, ATLAS_PROVE_LIVE_SIDECAR: '1' },
+    reports: ['structural-intelligence-integration-proof.json'],
   },
   {
     id: 'ONTOLOGY_POPULATION_DECISION',
@@ -123,6 +201,7 @@ for (const step of steps) {
     cwd: root,
     encoding: 'utf8',
     stdio: 'inherit',
+    env: step.env ?? process.env,
   });
   stepResults.push(stepSummary(step, result));
   if (result.error) {
@@ -132,7 +211,17 @@ for (const step of steps) {
 
 const controller = readJson('openspec-execution-controller-v1.json') ?? {};
 const sourceOwner = readJson('current-source-owner-reconciliation-v1.json') ?? {};
+const sourceRepair = readJson('current-source-authority-repair-plan-v1.json') ?? {};
+const sourceCohort = readJson('current-source-cohort-lineage-v1.json') ?? {};
+const workspaceFrame = readJson('current-workspace-frame-admission-v1.json') ?? {};
+const lineageClosure = readJson('current-lineage-closure-v1.json') ?? {};
 const astCanary = readJson('ast-canary-readiness-v1.json') ?? {};
+const astHashContract = readJson('ast-hash-column-contract-v1.json') ?? {};
+const astHashGrain = readJson('ast-hash-grain-classification-v1.json') ?? {};
+const astOffsetBasis = readJson('ast-offset-basis-proof-v1.json') ?? {};
+const astDigestDivergence = readJson('ast-digest-divergence-v1.json') ?? {};
+const astConflictDisposition = readJson('ast-conflict-disposition-v1.json') ?? {};
+const structuralProof = readJson('structural-intelligence-integration-proof.json') ?? {};
 const ontologyDecision = readJson('ontology-population-decision-v1.json') ?? {};
 const packetScope = readJson('packet-source-scope-v1.json') ?? {};
 const capability = readJson('parent-atlas-capability-census-v1.json') ?? {};
@@ -166,11 +255,106 @@ const report = {
     workspaceRevision: sourceOwner.sourceAuthority?.sourceSnapshot?.workspaceRevision ?? null,
     writesPerformed: false,
   },
+  sourceAuthorityChain: {
+    repairPlan: {
+      status: sourceRepair.status ?? 'UNPROVEN',
+      counts: sourceRepair.counts ?? null,
+      exactCurrentBindingCount: sourceRepair.exactCurrentBindingCount ?? null,
+      currentWorkspaceRevision: sourceRepair.currentWorkspaceRevision ?? null,
+      authorizationRequired: sourceRepair.authorizationRequired !== false,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+    cohort: {
+      status: sourceCohort.status ?? 'UNPROVEN',
+      nextGate: sourceCohort.nextGate ?? null,
+      counts: sourceCohort.counts ?? null,
+      sourceAuthority: sourceCohort.sourceAuthority ?? null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+    workspaceFrame: {
+      status: workspaceFrame.status ?? 'UNPROVEN',
+      nextGate: workspaceFrame.nextGate ?? null,
+      admittedWorkspaceRevision: workspaceFrame.admittedWorkspaceRevision ?? null,
+      sourceAuthority: workspaceFrame.sourceAuthority ?? null,
+      canonicalAuthority: false,
+      promotionEligible: false,
+      writesPerformed: false,
+    },
+    closure: {
+      status: lineageClosure.status ?? 'UNPROVEN',
+      firstFailureBoundary: lineageClosure.firstFailureBoundary ?? null,
+      counts: lineageClosure.promotionFunnel
+        ?? lineageClosure.funnel
+        ?? lineageClosure.counts
+        ?? null,
+      supportingCounts: lineageClosure.supportingCounts ?? null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+  },
   lineageSubgates: {
     astCanary: {
       status: astCanary.status ?? 'UNPROVEN',
       blockers: astCanary.blockers ?? [],
       nextGate: astCanary.nextGate ?? null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+    astHashContract: {
+      status: astHashContract.status ?? 'UNPROVEN',
+      counts: astHashContract.counts ?? null,
+      nextGate: astHashContract.nextGate ?? null,
+      contract: astHashContract.contract ?? null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+    astOffsetBasis: {
+      status: astOffsetBasis.status ?? 'UNPROVEN',
+      candidateRows: astOffsetBasis.candidateRows ?? null,
+      bomFiles: astOffsetBasis.bomFiles ?? null,
+      shiftedRoundTrip: astOffsetBasis.shiftedRoundTrip ?? null,
+      unshiftedWouldDiffer: astOffsetBasis.unshiftedWouldDiffer ?? null,
+      nextGate: astOffsetBasis.status === 'BOM_OFFSET_BASIS_PROVEN'
+        ? 'DIGEST_DIVERGENCE_AND_STRUCTURAL_CONFLICT_REVIEW'
+        : 'BOM_OFFSET_BASIS_REVIEW_REQUIRED',
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+    astHashGrain: {
+      status: astHashGrain.status ?? 'UNPROVEN',
+      counts: astHashGrain.counts ?? null,
+      nextGate: astHashGrain.nextGate ?? 'REVIEW_UNKNOWN_HASH_GRAIN_BEFORE_SUPERSESSION',
+      policy: astHashGrain.policy ?? null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+    astDigestDivergence: {
+      status: astDigestDivergence.sourceCount === 0
+        ? 'NO_DIGEST_DIVERGENCE'
+        : 'DIGEST_DIVERGENCE_REVIEW_REQUIRED',
+      sourceCount: astDigestDivergence.sourceCount ?? 0,
+      byClassification: astDigestDivergence.byClassification ?? {},
+      checksum: astDigestDivergence.checksum ?? null,
+      nextGate: astDigestDivergence.sourceCount > 0
+        ? 'EXCLUDE_DIVERGED_SOURCES_FROM_CANARY'
+        : null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+    astConflictDisposition: {
+      status: astConflictDisposition.status ?? 'UNPROVEN',
+      conflictCount: astConflictDisposition.input?.conflictCount ?? null,
+      byClass: astConflictDisposition.input?.byClass ?? {},
+      supersessionProposalsAllowed: astConflictDisposition.input?.supersessionProposalsAllowed ?? null,
+      nextGate: astConflictDisposition.disposition ?? 'REVIEW_REQUIRED',
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+    structuralProvenance: {
+      status: structuralProof.status ?? 'UNPROVEN',
+      live8095: structuralProof.status === 'PROVEN_WITH_LIVE_8095',
       canonicalAuthority: false,
       writesPerformed: false,
     },

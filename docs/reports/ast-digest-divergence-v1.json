@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ast-digest-divergence.v1",
-  "generatedAt": "2026-09-20T07:58:15.589Z",
+  "generatedAt": "2026-09-20T18:59:22.153Z",
   "sourceReceipt": "docs/reports/ast-declaration-candidates-current-v1.json",
   "admittedSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
   "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
@@ -18,7 +18,7 @@
       "snapshotBytes": 15119,
       "classification": "KNOW09_DRIFT_ALREADY_DECLARED",
       "originalReceiptDeclaredDrift": false,
-      "gitStatus": "M sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-residency-v1.ts",
+      "gitStatus": "CLEAN",
       "declaredInKnow09": true
     },
     {
@@ -30,11 +30,11 @@
       "snapshotBytes": 4234,
       "classification": "KNOW09_DRIFT_ALREADY_DECLARED",
       "originalReceiptDeclaredDrift": false,
-      "gitStatus": "M sveltekit-frontend/src/lib/server/atlas/tensors/unified-residency-adapter-v1.spec.ts",
+      "gitStatus": "CLEAN",
       "declaredInKnow09": true
     }
   ],
-  "checksum": "f3ce6c6ed9aad4cf27e129a6d144c13c5f7a09749d4aebdb394f9de425afcbf7",
+  "checksum": "e7d0705c55bb17aabe63bc0864a249670d259288bcd7c53f3693b390f47f2d0a",
   "policy": {
     "changedSinceAdmission": "EXCLUDE_FROM_CANARY",
     "know09Drift": "RETAIN_AS_DECLARED_DRIFT; DO_NOT_STAMP",

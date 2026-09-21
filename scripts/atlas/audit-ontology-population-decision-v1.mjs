@@ -80,7 +80,10 @@ try {
     writesPerformed: false,
   };
   receipt.checksum = sha256(JSON.stringify({ ...receipt, generatedAt: undefined, checksum: undefined }));
-  fs.writeFileSync(outputPath, `${JSON.stringify(receipt, null, 2)}\n`);
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  const tempPath = `${outputPath}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(tempPath, `${JSON.stringify(receipt, null, 2)}\n`);
+  fs.renameSync(tempPath, outputPath);
   console.log(JSON.stringify({
     reportPath: outputPath,
     status: receipt.nextGate,

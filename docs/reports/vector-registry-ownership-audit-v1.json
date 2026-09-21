@@ -1,0 +1,225 @@
+{
+  "schema": "atlas.vector-registry-ownership-audit.v1",
+  "generatedAt": "2026-09-21T00:13:18.409Z",
+  "mode": "READ_ONLY_LIVE_SCHEMA_CENSUS",
+  "policy": {
+    "canonicalAuthority": false,
+    "registryWritesPerformed": false,
+    "cacheWritesPerformed": false,
+    "deletesPerformed": false
+  },
+  "relations": [
+    {
+      "name": "atlas_vector_registry",
+      "expectedRole": "vector identity and lineage metadata",
+      "exists": true,
+      "kind": "table",
+      "schema": "public",
+      "columns": [
+        "id",
+        "source_ref",
+        "packet_key",
+        "embedding_model",
+        "embedding_dim",
+        "vector_version",
+        "qdrant_point_id",
+        "content_hash",
+        "exported_arrow",
+        "exported_at",
+        "created_at",
+        "updated_at"
+      ],
+      "rowCount": 4480,
+      "classification": "CANONICAL_OWNER",
+      "notes": "PostgreSQL-owned vector identity/lineage metadata; not a cache-key registry.",
+      "dimensionColumn": "embedding_dim",
+      "statusColumn": null,
+      "vectorIdentityColumn": "embedding_model",
+      "timestampSummary": {
+        "updated_at": {
+          "min_value": "2026-07-25T22:53:07.285Z",
+          "max_value": "2026-07-25T22:53:07.521Z"
+        },
+        "created_at": {
+          "min_value": "2026-07-25T22:53:07.285Z",
+          "max_value": "2026-07-25T22:53:07.521Z"
+        }
+      },
+      "distinctSummary": {
+        "embedding_dim": [
+          {
+            "value": "768",
+            "count": 4480
+          }
+        ],
+        "embedding_model": [
+          {
+            "value": "embeddinggemma:latest",
+            "count": 4480
+          }
+        ]
+      }
+    },
+    {
+      "name": "vector_index_registry",
+      "expectedRole": "index configuration/status registry",
+      "exists": true,
+      "kind": "table",
+      "schema": "public",
+      "columns": [
+        "id",
+        "index_name",
+        "index_type",
+        "index_backend",
+        "vector_dimension",
+        "total_points",
+        "created_at",
+        "updated_at",
+        "last_validation",
+        "validation_status",
+        "config"
+      ],
+      "rowCount": 4,
+      "classification": "LEGACY_REGISTRY",
+      "notes": "Retained registry for index configuration; legacy dimensions/status must not authorize current vectors.",
+      "dimensionColumn": "vector_dimension",
+      "statusColumn": "validation_status",
+      "vectorIdentityColumn": "index_name",
+      "timestampSummary": {
+        "updated_at": {
+          "min_value": "2026-07-21T22:37:35.985Z",
+          "max_value": "2026-07-21T22:37:35.985Z"
+        },
+        "created_at": {
+          "min_value": "2026-07-21T22:37:35.985Z",
+          "max_value": "2026-07-21T22:37:35.985Z"
+        }
+      },
+      "distinctSummary": {
+        "vector_dimension": [
+          {
+            "value": "384",
+            "count": 3
+          },
+          {
+            "value": "64",
+            "count": 1
+          }
+        ],
+        "validation_status": [
+          {
+            "value": "not_validated",
+            "count": 4
+          }
+        ],
+        "index_name": [
+          {
+            "value": "kmeans_k32",
+            "count": 1
+          },
+          {
+            "value": "qdrant_codebase_chunks_384",
+            "count": 1
+          },
+          {
+            "value": "som_20x20",
+            "count": 1
+          },
+          {
+            "value": "turbovec_quantized_4bit",
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "registry_topology_projection",
+      "expectedRole": "derived topology projection",
+      "exists": true,
+      "kind": "table",
+      "schema": "public",
+      "columns": [
+        "id",
+        "packet_key",
+        "tree_node_id",
+        "community_id",
+        "page_rank_score",
+        "som_cluster",
+        "kmeans_cluster",
+        "materialization_version",
+        "created_at",
+        "updated_at"
+      ],
+      "rowCount": 0,
+      "classification": "STALE_PROJECTION",
+      "notes": "Derived graph/topology projection; never canonical identity.",
+      "dimensionColumn": null,
+      "statusColumn": null,
+      "vectorIdentityColumn": null,
+      "timestampSummary": {
+        "updated_at": {
+          "min_value": null,
+          "max_value": null
+        },
+        "created_at": {
+          "min_value": null,
+          "max_value": null
+        }
+      },
+      "distinctSummary": {}
+    },
+    {
+      "name": "registry_projection_stats",
+      "expectedRole": "projection reporting view",
+      "exists": true,
+      "kind": "view",
+      "schema": "public",
+      "columns": [
+        "projection_type",
+        "total_rows",
+        "unique_packets",
+        "first_materialized",
+        "last_updated"
+      ],
+      "rowCount": 4,
+      "classification": "REPORTING_VIEW",
+      "notes": "Reporting-only aggregate; not an ownership or write surface.",
+      "dimensionColumn": null,
+      "statusColumn": null,
+      "vectorIdentityColumn": "projection_type",
+      "timestampSummary": {
+        "last_updated": {
+          "min_value": "2026-07-21T22:37:15.533Z",
+          "max_value": "2026-07-21T22:37:15.533Z"
+        }
+      },
+      "distinctSummary": {
+        "projection_type": [
+          {
+            "value": "embedding",
+            "count": 1
+          },
+          {
+            "value": "enrichment",
+            "count": 1
+          },
+          {
+            "value": "ontology",
+            "count": 1
+          },
+          {
+            "value": "topology",
+            "count": 1
+          }
+        ]
+      }
+    }
+  ],
+  "nextGate": "REVIEW_STALE_VECTOR_AND_TOPOLOGY_REGISTRIES",
+  "semanticChecksum": "sha256:8432c6efe8644073503da948ebab356c636303157b8ddf4d8ed9a432f941bc8a",
+  "writesPerformed": false,
+  "database": {
+    "schema": "public"
+  },
+  "status": "AUDIT_COMPLETE"
+}

@@ -1,10 +1,11 @@
 {
   "schema": "atlas.current-source-cohort-lineage.v1",
-  "generatedAt": "2026-09-19T04:56:44.710Z",
+  "generatedAt": "2026-09-20T23:37:22.320Z",
   "mode": "READ_ONLY_LINEAGE_AUDIT",
   "inputs": {
     "cohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151",
     "observationPath": "docs/reports/workspace-source-binding-observation.json",
+    "sourceOwnerPath": "docs/reports/current-source-owner-reconciliation-v1.json",
     "workspaceRevisionSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT"
   },
   "workspaceFrame": {
@@ -20,6 +21,12 @@
   },
   "observationWorkspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
   "observationMatchesSelectedFrame": false,
+  "sourceAuthority": {
+    "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
+    "safeToPromote": false,
+    "requiresSnapshotRefresh": true,
+    "deltaChecksum": "sha256:b9ccee8031f5e7f83da3662a8823c2c60a0240886f28c472992038196404a38d"
+  },
   "counts": {
     "cohortRows": 52,
     "currentWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
@@ -619,6 +626,6 @@
   "graphifyWrites": false,
   "qdrantWrites": false,
   "status": "WORKSPACE_REVISION_SOURCE_MISMATCH",
-  "nextGate": "WORKSPACE_REVISION_SOURCE_RECONCILIATION_REQUIRED",
-  "reportChecksum": "8e3f4111243e89f9ffb743e33688017026838ce692346f86cdffff1dac0aa73e"
+  "nextGate": "CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED",
+  "reportChecksum": "248a6cb7d7276a3be618cfc99b5a7a77c35ef2687f927ad45250461c379fc485"
 }

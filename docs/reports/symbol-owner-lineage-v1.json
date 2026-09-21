@@ -1,6 +1,6 @@
 {
   "schema": "atlas.symbol-owner-lineage.v1",
-  "generatedAt": "2026-09-10T01:56:33.168Z",
+  "generatedAt": "2026-09-20T19:57:30.340Z",
   "mode": "READ_ONLY_LINEAGE_RECONCILIATION",
   "writes": {
     "postgres": false,
@@ -8,14 +8,14 @@
     "neo4j": false,
     "valkey": false
   },
-  "databaseError": null,
+  "databaseError": "ATLAS_WORKSPACE_REVISION_REQUIRED",
   "summary": {
     "symbolRows": 0,
     "sourceBindings": 0,
     "sourceWorkspaceMatches": 0,
     "missingBindings": 0,
     "workspaceRevisionMismatches": 0,
-    "workspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57"
+    "workspaceRevision": null
   },
   "revisionAxes": {
     "repositoryRevision": "atlas_symbol_versions.source_revision",

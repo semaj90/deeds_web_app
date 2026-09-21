@@ -41,8 +41,8 @@
   "editor.renderControlCharacters": false,
   "editor.renderWhitespace": "none",
 
-  // Multi-Core TypeScript Server (12GB Memory + All Cores)
-  "typescript.tsserver.maxTsServerMemory": 16288,
+  // Optimized TypeScript Server heap; heavy audits must pass resource preflight first.
+  "typescript.tsserver.maxTsServerMemory": 12288,
   "typescript.tsserver.useSeparateSyntaxServer": true,
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.suggest.autoImports": true,

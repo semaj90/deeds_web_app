@@ -90,7 +90,13 @@ try {
     writesPerformed: false,
   };
   receipt.checksum = `sha256:${sha256(JSON.stringify({ ...receipt, generatedAt: undefined, checksum: undefined }))}`;
-  fs.writeFileSync(outputPath, `${JSON.stringify(receipt, null, 2)}\n`);
+  const temporaryPath = `${outputPath}.${process.pid}.${Date.now()}.tmp`;
+  try {
+    fs.writeFileSync(temporaryPath, `${JSON.stringify(receipt, null, 2)}\n`);
+    fs.renameSync(temporaryPath, outputPath);
+  } finally {
+    try { fs.unlinkSync(temporaryPath); } catch { /* already renamed */ }
+  }
   console.log(JSON.stringify({ reportPath: outputPath, status: receipt.status, folderCount: rows.length, totals: receipt.totals, writesPerformed: false }, null, 2));
 } finally {
   client.release();

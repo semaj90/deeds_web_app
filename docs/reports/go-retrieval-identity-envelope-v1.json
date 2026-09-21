@@ -1,0 +1,116 @@
+{
+  "schema": "atlas.go-retrieval-identity-envelope.v1",
+  "generatedAt": "2026-09-21T03:01:45.979Z",
+  "baseUrl": "http://127.0.0.1:8100",
+  "query": "PostgreSQL source revision",
+  "limit": 3,
+  "status": "IDENTITY_ENVELOPE_REVIEW_REQUIRED",
+  "health": {
+    "dependencies": {
+      "embedding_service": {
+        "connected": true,
+        "required": true
+      },
+      "postgres": {
+        "connected": true,
+        "required": true
+      },
+      "qdrant": {
+        "connected": true,
+        "required": true
+      },
+      "redis": {
+        "connected": true,
+        "required": false
+      }
+    },
+    "embeddingServiceUp": true,
+    "pgvectorConnected": true,
+    "qdrantConnected": true,
+    "readiness_state": "READY_FULL",
+    "redisConnected": true,
+    "status": "healthy",
+    "timestamp": 1789959705902
+  },
+  "resultCount": 3,
+  "rows": [
+    {
+      "chunkId": null,
+      "chunkIdKind": "MISSING",
+      "packetKey": "packet:85296781bd60",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/index-clean.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/db/index-clean.ts",
+      "contentHash": "8c0dd1aac9881528",
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "sourceRevision": null
+    },
+    {
+      "chunkId": null,
+      "chunkIdKind": "MISSING",
+      "packetKey": "ace:packet:4cae3db56507",
+      "sourceRef": "src/routes/(app)/admin/codebase-viewer/+page.server.ts",
+      "canonicalSourceRef": "src/routes/(app)/admin/codebase-viewer/+page.server.ts",
+      "contentHash": "71d86dd5718d1f46",
+      "representationId": null,
+      "representationRevision": null,
+      "sourceRevision": null
+    },
+    {
+      "chunkId": null,
+      "chunkIdKind": "MISSING",
+      "packetKey": "packet:85296781bd60",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/index-clean.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/db/index-clean.ts",
+      "contentHash": "8c0dd1aac9881528",
+      "representationId": "embeddinggemma_768_native_v1",
+      "representationRevision": null,
+      "sourceRevision": null
+    }
+  ],
+  "checks": [
+    {
+      "name": "health",
+      "status": "PASS",
+      "detail": "READY_FULL"
+    },
+    {
+      "name": "bounded-search",
+      "status": "PASS",
+      "detail": "http_200"
+    },
+    {
+      "name": "packet-key-envelope",
+      "status": "PASS",
+      "detail": "0/3 missing"
+    },
+    {
+      "name": "source-ref-envelope",
+      "status": "PASS",
+      "detail": "0/3 missing"
+    },
+    {
+      "name": "content-hash-envelope",
+      "status": "PASS",
+      "detail": "0/3 missing"
+    },
+    {
+      "name": "canonical-chunk-id-envelope",
+      "status": "REVIEW_REQUIRED",
+      "detail": "3/3 missing"
+    },
+    {
+      "name": "representation-revision-binding",
+      "status": "REVIEW_REQUIRED",
+      "detail": "2/3 representation ids lack a revision"
+    },
+    {
+      "name": "chunk-id-shape",
+      "status": "PASS",
+      "detail": "MISSING"
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false
+}

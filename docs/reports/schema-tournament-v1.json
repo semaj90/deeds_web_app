@@ -1,0 +1,499 @@
+{
+  "schema": "atlas.schema-tournament.v1",
+  "generatedAt": "2026-09-20T19:21:08.371Z",
+  "rubric": "ddl none0/alter1/view1/newtable3 + newOwner3 + mutatesCanonical5 + backfill1 + fk1; lowest wins",
+  "liveFacts": {
+    "atlas_domain_ontology": {
+      "rows": 17,
+      "fkDependents": 0
+    },
+    "domain_taxonomy_v1": {
+      "rows": 0,
+      "fkDependents": 0
+    },
+    "taxonomy_nodes": {
+      "rows": 5527,
+      "fkDependents": 0
+    },
+    "atlas_taxonomy_assignment_candidates": {
+      "rows": 0,
+      "fkDependents": 0
+    },
+    "atlas_ontology_linked_tuples": {
+      "rows": 0,
+      "fkDependents": 0
+    },
+    "atlas_ontology_tuples": {
+      "rows": 0,
+      "fkDependents": 0
+    },
+    "feature_ontology_tuples": {
+      "rows": 539124,
+      "fkDependents": 0
+    },
+    "atlas_ontology_concepts": {
+      "rows": 0,
+      "fkDependents": 2
+    },
+    "atlas_ontology_relations": {
+      "rows": 0,
+      "fkDependents": 0
+    },
+    "atlas_concepts": {
+      "rows": 0,
+      "fkDependents": 0
+    },
+    "concept_records": {
+      "rows": 0,
+      "fkDependents": 0
+    },
+    "ontology_keywords": {
+      "rows": 31097,
+      "fkDependents": 0
+    },
+    "registry_topology_projection": {
+      "rows": 0,
+      "fkDependents": 0
+    },
+    "atlas_symbol_versions": {
+      "rows": 479,
+      "fkDependents": 0
+    },
+    "atlas_ast_nodes": {
+      "rows": 11273,
+      "fkDependents": 5
+    },
+    "feature_domain": {
+      "rows": 61659,
+      "fkDependents": 0
+    },
+    "feature_domain_facts": {
+      "rows": 123376,
+      "fkDependents": 0
+    },
+    "atlas_packets": {
+      "rows": 61718,
+      "fkDependents": 17
+    }
+  },
+  "capabilities": [
+    {
+      "id": "DOMAIN_HIERARCHY_OWNER",
+      "needs": "versioned hierarchy owner for domain_class",
+      "options": [
+        {
+          "name": "populate domain_taxonomy_v1",
+          "action": "REUSE_POPULATE",
+          "target": "domain_taxonomy_v1",
+          "cost": 1,
+          "breakdown": {
+            "backfill": 1
+          },
+          "why": "0 rows; already has version/is_active/parent_domain_id/deprecated_at/replaced_by — no DDL"
+        },
+        {
+          "name": "alter atlas_domain_ontology",
+          "action": "ALTER_EXISTING",
+          "target": "atlas_domain_ontology",
+          "cost": 1,
+          "breakdown": {
+            "ddl": 1
+          },
+          "why": "17 rows; has hierarchy but no revision/active/deprecation columns"
+        },
+        {
+          "name": "create domain_hierarchy_v2",
+          "action": "CREATE_NEW",
+          "target": "domain_hierarchy_v2",
+          "cost": 7,
+          "breakdown": {
+            "ddl": 3,
+            "newOwner": 1,
+            "backfill": 1
+          },
+          "why": "fourth vocabulary owner — violates Duplication Prevention"
+        }
+      ],
+      "operatorDecision": "which vocabulary owns domain_class (atlas_domain_ontology vs code CANONICAL_DOMAINS)",
+      "reindex": "none until owner chosen",
+      "winner": "populate domain_taxonomy_v1",
+      "winnerAction": "REUSE_POPULATE",
+      "needsOperator": "which vocabulary owns domain_class (atlas_domain_ontology vs code CANONICAL_DOMAINS)"
+    },
+    {
+      "id": "LABEL_ALIAS_NORMALIZATION",
+      "needs": "fold graph/Graph, ui->frontend, etc. without rewriting packets",
+      "options": [
+        {
+          "name": "deprecated-label rows with replaced_by + normalizing VIEW",
+          "action": "VIEW_PLUS_REUSE",
+          "target": "domain_taxonomy_v1 + v_atlas_packets_domain_normalized",
+          "cost": 2,
+          "breakdown": {
+            "ddl": 1,
+            "backfill": 1
+          },
+          "why": "no packet rows mutated; alias = deprecated label replaced_by canonical"
+        },
+        {
+          "name": "UPDATE atlas_packets.domain_class",
+          "action": "MUTATE_CANONICAL",
+          "target": "atlas_packets",
+          "cost": 6,
+          "breakdown": {
+            "mutatesCanonical": 1,
+            "backfill": 1,
+            "fk": 0
+          },
+          "why": "61718 rows rewritten; classifier lineage lost"
+        },
+        {
+          "name": "create domain_label_alias table",
+          "action": "CREATE_NEW",
+          "target": "domain_label_alias",
+          "cost": 7,
+          "breakdown": {
+            "ddl": 3,
+            "newOwner": 1,
+            "backfill": 1
+          },
+          "why": "duplicates replaced_by semantics"
+        }
+      ],
+      "reindex": "feature_domain / Qdrant payload domain field re-derive only AFTER approval",
+      "winner": "deprecated-label rows with replaced_by + normalizing VIEW",
+      "winnerAction": "VIEW_PLUS_REUSE",
+      "needsOperator": "DDL approval"
+    },
+    {
+      "id": "GROUNDED_EXTRACTION_TOKEN_EVIDENCE",
+      "needs": "LangExtract spans, POS, token evidence (NLP-EXTRACT-03, TokenFeatureMatrix inputs)",
+      "options": [
+        {
+          "name": "populate atlas_ontology_linked_tuples (+ revision columns, Zod span contract)",
+          "action": "REUSE_ALTER_POPULATE",
+          "target": "atlas_ontology_linked_tuples",
+          "cost": 2,
+          "breakdown": {
+            "ddl": 1,
+            "backfill": 1
+          },
+          "why": "0 rows; has packet_key, tree_node_id, token_index, part_of_speech, label_kind, evidence_refs, relation_revision"
+        },
+        {
+          "name": "alter feature_ontology_tuples",
+          "action": "ALTER_EXISTING",
+          "target": "feature_ontology_tuples",
+          "cost": 6,
+          "breakdown": {
+            "ddl": 1,
+            "unfit": 1
+          },
+          "why": "539124 UNRESOLVED rows; feature-level, not token-level"
+        },
+        {
+          "name": "create grounded_extraction_v2",
+          "action": "CREATE_NEW",
+          "target": "grounded_extraction_v2",
+          "cost": 7,
+          "breakdown": {
+            "ddl": 3,
+            "newOwner": 1,
+            "backfill": 1
+          },
+          "why": "duplicates linked_tuples"
+        }
+      ],
+      "verify": "linked_tuples has evidence_span, evidence_state, lifecycle, provenance, producer_revision; confirm evidence_span stores UTF8_PARSER_BUFFER_V1 byte offsets before populating",
+      "reindex": "none (empty table)",
+      "winner": "populate atlas_ontology_linked_tuples (+ revision columns, Zod span contract)",
+      "winnerAction": "REUSE_ALTER_POPULATE",
+      "needsOperator": "DDL approval + bounded-canary write"
+    },
+    {
+      "id": "TAXONOMY_ASSIGNMENT_CANDIDATES",
+      "needs": "per-lane evidence candidates for domain/topic/concept assignment",
+      "options": [
+        {
+          "name": "populate atlas_taxonomy_assignment_candidates",
+          "action": "REUSE_POPULATE",
+          "target": "atlas_taxonomy_assignment_candidates",
+          "cost": 1,
+          "breakdown": {
+            "backfill": 1
+          },
+          "why": "0 rows; already carries taxonomy_revision/semantic_revision/graph_revision + lexical/nlp/graph evidence_refs + semantic_score"
+        },
+        {
+          "name": "create assignment_v2",
+          "action": "CREATE_NEW",
+          "target": "assignment_v2",
+          "cost": 7,
+          "breakdown": {
+            "ddl": 3,
+            "newOwner": 1,
+            "backfill": 1
+          },
+          "why": "duplicate"
+        }
+      ],
+      "reindex": "none",
+      "winner": "populate atlas_taxonomy_assignment_candidates",
+      "winnerAction": "REUSE_POPULATE",
+      "needsOperator": "write approval (bounded canary)"
+    },
+    {
+      "id": "CONCEPTS_AND_RELATIONS",
+      "needs": "OAK concept/relation store",
+      "options": [
+        {
+          "name": "populate atlas_ontology_concepts + atlas_ontology_relations",
+          "action": "REUSE_POPULATE",
+          "target": "atlas_ontology_concepts, atlas_ontology_relations",
+          "cost": 2,
+          "breakdown": {
+            "backfill": 1,
+            "fk": 1
+          },
+          "why": "concepts 0 rows (2 FK dependents), relations 0 rows"
+        },
+        {
+          "name": "create concept_registry_v2",
+          "action": "CREATE_NEW",
+          "target": "concept_registry_v2",
+          "cost": 7,
+          "breakdown": {
+            "ddl": 3,
+            "newOwner": 1,
+            "backfill": 1
+          },
+          "why": "duplicate of existing OAK tables"
+        }
+      ],
+      "flagDuplicates": [
+        "atlas_concepts: 0 rows, zero FK dependents — DEAD/duplicate candidate (archive, do not delete)",
+        "concept_records: 0 rows, zero FK dependents — DEAD/duplicate candidate (archive, do not delete)"
+      ],
+      "winner": "populate atlas_ontology_concepts + atlas_ontology_relations",
+      "winnerAction": "REUSE_POPULATE",
+      "needsOperator": "write approval (bounded canary)"
+    },
+    {
+      "id": "TUPLE_OWNER",
+      "needs": "one owner for ontology tuple resolution",
+      "options": [
+        {
+          "name": "keep feature_ontology_tuples as resolution owner (14.3b)",
+          "action": "REUSE_EXISTING",
+          "target": "feature_ontology_tuples",
+          "cost": 0,
+          "breakdown": {
+            "backfill": 0
+          },
+          "why": "539124 rows, 100% UNRESOLVED — the real 14.3b target"
+        },
+        {
+          "name": "promote atlas_ontology_tuples",
+          "action": "REUSE_POPULATE",
+          "target": "atlas_ontology_tuples",
+          "cost": 4,
+          "breakdown": {
+            "backfill": 1,
+            "newOwner": 1
+          },
+          "why": "0 rows — would compete with feature_ontology_tuples"
+        }
+      ],
+      "flagDuplicates": [
+        "atlas_ontology_tuples (0 rows) overlaps feature_ontology_tuples and atlas_ontology_linked_tuples; registry_ontology_tuples / ontology_domain_tuples not audited here"
+      ],
+      "winner": "keep feature_ontology_tuples as resolution owner (14.3b)",
+      "winnerAction": "REUSE_EXISTING",
+      "needsOperator": "no"
+    },
+    {
+      "id": "SYMBOL_LINK",
+      "needs": "exact StructuralMatch -> symbol registry resolution (SYMBOL-LINK-04)",
+      "options": [
+        {
+          "name": "add indexes on atlas_symbol_versions(source_revision, qualified_name)",
+          "action": "ALTER_EXISTING",
+          "target": "atlas_symbol_versions",
+          "cost": 1,
+          "breakdown": {
+            "ddl": 1
+          },
+          "why": "479 rows; index-only ALTER, no data change; audit-postgres-index-capability found both missing"
+        },
+        {
+          "name": "create symbol_link_v2",
+          "action": "CREATE_NEW",
+          "target": "symbol_link_v2",
+          "cost": 7,
+          "breakdown": {
+            "ddl": 3,
+            "newOwner": 1,
+            "backfill": 1
+          },
+          "why": "duplicate of atlas_symbol_versions"
+        }
+      ],
+      "reindex": "atlas_symbol_versions must be re-materialized from regenerated sept_v2 candidates (only 479 versions vs 3,043 candidate files)",
+      "winner": "add indexes on atlas_symbol_versions(source_revision, qualified_name)",
+      "winnerAction": "ALTER_EXISTING",
+      "needsOperator": "DDL approval"
+    },
+    {
+      "id": "AST_GENERATION",
+      "needs": "separate sept_v2 rows from 11,273 legacy rows",
+      "options": [
+        {
+          "name": "add atlas_ast_nodes.ast_generation (20260920 migration)",
+          "action": "ALTER_EXISTING",
+          "target": "atlas_ast_nodes",
+          "cost": 1,
+          "breakdown": {
+            "ddl": 1
+          },
+          "why": "drafted + rollback-rehearsed; column present now: false; FK dependents 5"
+        },
+        {
+          "name": "create atlas_ast_nodes_sept_v2",
+          "action": "CREATE_NEW",
+          "target": "atlas_ast_nodes_sept_v2",
+          "cost": 8,
+          "breakdown": {
+            "ddl": 3,
+            "newOwner": 1,
+            "backfill": 1,
+            "fk": 1
+          },
+          "why": "breaks 5 FK dependents; competing identity owner"
+        }
+      ],
+      "winner": "add atlas_ast_nodes.ast_generation (20260920 migration)",
+      "winnerAction": "ALTER_EXISTING",
+      "needsOperator": "DDL approval"
+    },
+    {
+      "id": "TOPOLOGY_FEATURES",
+      "needs": "revision-qualified KMeans/SOM projection (som_revision is NULL on 58,365 packets)",
+      "options": [
+        {
+          "name": "alter registry_topology_projection (+som_revision, kmeans_revision, representation_revision, candidate_snapshot_revision)",
+          "action": "ALTER_EXISTING",
+          "target": "registry_topology_projection",
+          "cost": 1,
+          "breakdown": {
+            "ddl": 1
+          },
+          "why": "0 rows — empty, so column adds are free; already has som_cluster/kmeans_cluster/page_rank_score/community_id/materialization_version"
+        },
+        {
+          "name": "create topology_projection_v2",
+          "action": "CREATE_NEW",
+          "target": "topology_projection_v2",
+          "cost": 7,
+          "breakdown": {
+            "ddl": 3,
+            "newOwner": 1,
+            "backfill": 1
+          },
+          "why": "duplicate of an empty table built for this"
+        }
+      ],
+      "reindex": "needs a fresh versioned SOM run + KMeans run (cannot derive revisions from July artifacts)",
+      "winner": "alter registry_topology_projection (+som_revision, kmeans_revision, representation_revision, candidate_snapshot_revision)",
+      "winnerAction": "ALTER_EXISTING",
+      "needsOperator": "DDL approval"
+    },
+    {
+      "id": "FEATURE_MATRICES",
+      "needs": "Query/Candidate/Token/Topology matrices under one ordinal+checksum contract",
+      "options": [
+        {
+          "name": "Arrow/mmap artifacts + JSON receipt",
+          "action": "ARTIFACT_ONLY",
+          "target": "artifact + docs/reports receipt",
+          "cost": 0,
+          "breakdown": {},
+          "why": "wire-format rule: bulk numeric arrays never through JSON/tables; CandidateOrdinal is a frozen coordinate, not identity"
+        },
+        {
+          "name": "create feature_matrix table",
+          "action": "CREATE_NEW",
+          "target": "feature_matrix_v2",
+          "cost": 7,
+          "breakdown": {
+            "ddl": 3,
+            "newOwner": 1,
+            "backfill": 1
+          },
+          "why": "violates wire-format layering"
+        }
+      ],
+      "reindex": "none",
+      "winner": "Arrow/mmap artifacts + JSON receipt",
+      "winnerAction": "ARTIFACT_ONLY",
+      "needsOperator": "no"
+    },
+    {
+      "id": "CALIBRATION_EXAMPLES",
+      "needs": "100-300 hand-reviewed revision-qualified examples (DOMAIN-CAL-02)",
+      "options": [
+        {
+          "name": "checked-in JSONL fixture with revision + reviewer",
+          "action": "ARTIFACT_ONLY",
+          "target": "fixture file",
+          "cost": 0,
+          "breakdown": {},
+          "why": "small, hand-reviewed, versioned by git; no table until volume/lifecycle demands one"
+        },
+        {
+          "name": "create domain_calibration_v2 table",
+          "action": "CREATE_NEW",
+          "target": "domain_calibration_v2",
+          "cost": 7,
+          "breakdown": {
+            "ddl": 3,
+            "newOwner": 1,
+            "backfill": 1
+          },
+          "why": "premature for <=300 rows"
+        }
+      ],
+      "winner": "checked-in JSONL fixture with revision + reviewer",
+      "winnerAction": "ARTIFACT_ONLY",
+      "needsOperator": "no"
+    },
+    {
+      "id": "KEYWORD_LEXICAL_FEATURES",
+      "needs": "lexical features per feature",
+      "options": [
+        {
+          "name": "reuse ontology_keywords",
+          "action": "REUSE_EXISTING",
+          "target": "ontology_keywords",
+          "cost": 0,
+          "breakdown": {},
+          "why": "31097 rows keyed by feature_id"
+        }
+      ],
+      "winner": "reuse ontology_keywords",
+      "winnerAction": "REUSE_EXISTING",
+      "needsOperator": "no"
+    }
+  ],
+  "winnerTally": {
+    "REUSE_POPULATE": 3,
+    "VIEW_PLUS_REUSE": 1,
+    "REUSE_ALTER_POPULATE": 1,
+    "REUSE_EXISTING": 2,
+    "ALTER_EXISTING": 3,
+    "ARTIFACT_ONLY": 2
+  },
+  "createNewWinners": [],
+  "applied": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

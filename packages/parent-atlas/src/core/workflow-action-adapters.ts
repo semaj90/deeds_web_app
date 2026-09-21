@@ -9,6 +9,7 @@ import {
 } from './workflow-action-event.js';
 
 const workflowIdentitySchema = z.object({
+  runId: z.string().min(1),
   workflowId: z.string().min(1),
   workflowRevision: z.number().int().nonnegative(),
   actionId: z.string().min(1),

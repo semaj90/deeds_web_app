@@ -1,0 +1,69 @@
+{
+  "schema": "atlas.nlp-sidecar-ast-runtime.v1",
+  "generatedAt": "2026-09-20T23:40:25.423Z",
+  "endpoint": "http://127.0.0.1:8095/analyze",
+  "sourceRef": "scripts/atlas/audit-pgvector-schema.mjs",
+  "sourceRevision": "sha256:ea54b36305cd06319a42753575b77052cbd388c1fa7cea5c2d4db4ef907c9fd0",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false,
+  "checks": [
+    {
+      "id": "http",
+      "status": "PASS",
+      "statusCode": 200
+    },
+    {
+      "id": "structural-pass-present",
+      "status": "PASS"
+    },
+    {
+      "id": "source-reference-preserved",
+      "status": "PASS",
+      "observed": "scripts/atlas/audit-pgvector-schema.mjs"
+    },
+    {
+      "id": "source-revision-preserved",
+      "status": "PASS",
+      "observed": "sha256:ea54b36305cd06319a42753575b77052cbd388c1fa7cea5c2d4db4ef907c9fd0"
+    },
+    {
+      "id": "ast-units-emitted",
+      "status": "PASS",
+      "count": 50
+    },
+    {
+      "id": "parser-revision-populated",
+      "status": "PASS",
+      "values": [
+        "0.9.0"
+      ]
+    },
+    {
+      "id": "grammar-revision-populated",
+      "status": "PASS",
+      "values": [
+        "javascript"
+      ]
+    },
+    {
+      "id": "packet-key-not-emitted",
+      "status": "PASS",
+      "observed": null
+    },
+    {
+      "id": "canonical-promotion-closed",
+      "status": "PASS"
+    }
+  ],
+  "observed": {
+    "engine": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0",
+    "astUnitCount": 50,
+    "firstNodeKind": "import_statement",
+    "parserRevision": "0.9.0",
+    "grammarRevision": "javascript"
+  },
+  "status": "NLP_SIDECAR_AST_RUNTIME_PROVEN",
+  "passCount": 9,
+  "failCount": 0
+}

@@ -126,7 +126,7 @@ type AstNodeInput = {
   endByte: number;
   startLine: number;
   endLine: number;
-  contentHash: string;
+  sourceContentDigest: string;
   parentIndex: number | null;
 };
 
@@ -136,7 +136,7 @@ type AstNodeInput = {
  * output into atlas_ast_nodes writer input, preserving parent_chain as parent_tree_node_id
  * linkage via index into the flat node list (same ordering the extractors already produce:
  * parent before child). */
-function toAstNodeInputs(symbols: ExtractedSymbol[]): AstNodeInput[] {
+function toAstNodeInputs(symbols: ExtractedSymbol[], sourceContentDigest: string): AstNodeInput[] {
   const indexByQualifiedPath = new Map<string, number>();
   return symbols.map((symbol, i) => {
     const qualifiedPath = [...symbol.parent_chain.map((p) => p.name), symbol.name].join('.');
@@ -150,7 +150,10 @@ function toAstNodeInputs(symbols: ExtractedSymbol[]): AstNodeInput[] {
       endByte: symbol.end_byte,
       startLine: symbol.start_line,
       endLine: symbol.end_line,
-      contentHash: symbol.ast_fingerprint,
+      // ast_fingerprint is node-grain evidence and is intentionally not used
+      // for atlas_ast_nodes.source_content_hash. The caller supplies the
+      // whole-file digest from graphify_files.content_hash.
+      sourceContentDigest,
       parentIndex,
     };
   });
@@ -320,8 +323,13 @@ async function main() {
     source_ref: string;
     workspace_id: string;
     workspace_revision: string | null;
+    source_revision: string;
+    content_hash: string;
+    parser_name: string | null;
+    parser_version: string | null;
   }>(
-    `SELECT file_id, source_ref, workspace_id, workspace_revision
+    `SELECT file_id, source_ref, workspace_id, workspace_revision, source_revision,
+            content_hash, parser_name, parser_version
      FROM graphify_files
      WHERE parse_status = 'UNPROCESSED'
        ${sourceRefClause}
@@ -486,8 +494,10 @@ async function main() {
           sourceRef: row.source_ref,
           parserLanguage,
           parserName,
+          parserVersion: row.parser_version,
+          sourceRevision: row.source_revision,
           workspaceId: row.workspace_id,
-          nodes: toAstNodeInputs(astNodes),
+          nodes: toAstNodeInputs(astNodes, row.content_hash),
         });
         totalSymbolsInserted += inserted;
       }

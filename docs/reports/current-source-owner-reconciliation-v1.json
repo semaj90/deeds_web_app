@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-owner-reconciliation.v1",
-  "generatedAt": "2026-09-20T08:38:24.087Z",
+  "generatedAt": "2026-09-21T01:19:47.216Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "databaseWrites": 0,
@@ -11,17 +11,17 @@
     "root": "C:\\Users\\james\\Videos\\deeds-web-app",
     "gitRoot": "C:/Users/james/Videos/deeds-web-app",
     "gitCommonDir": ".git",
-    "headCommit": "11263b5391f731fa39daa66f59ac20c33e07702d",
-    "headTree": "4e1004d1be5184a2222a79629b6e9f1c19b35124",
+    "headCommit": "9c4f4c07274872505e3cb9bda759958bf210ceb7",
+    "headTree": "f65d5ebfe08796f56cb9f8a66f87dbcd6e55c2b2",
     "hostname": "DESKTOP-Q18MPHM",
     "dirty": true,
-    "sourceCount": 25048,
-    "sourceRefChecksum": "sha256:a86cdab8aaa99fb3be60529325c22baa5e4c85b1af1ea11812ba8bf956f57fcb",
+    "sourceCount": 25116,
+    "sourceRefChecksum": "sha256:6c8ecb1a458fc8a2d9c1be8c04ae6e446a50cec6d499b677e3aca5a1750ff590",
     "inventoryPolicy": {
       "command": "git ls-files --cached --others --exclude-standard -z",
-      "trackedAtHeadCount": 28876,
-      "candidateCount": 25087,
-      "admittedCount": 25048,
+      "trackedAtHeadCount": 29117,
+      "candidateCount": 25155,
+      "admittedCount": 25116,
       "skippedCount": 39,
       "maxSourceBytes": 5242880,
       "generatedPrefixesExcluded": [
@@ -73,7 +73,91 @@
         "NOT_VALID_UTF8_SOURCE": 8
       }
     },
-    "status": "PROVEN"
+    "status": "PROVEN",
+    "admittedSnapshotDelta": {
+      "snapshotRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "snapshotSourceCount": 25542,
+      "currentSourceCount": 25116,
+      "sharedSourceCount": 24448,
+      "currentOnlyCount": 668,
+      "admittedOnlyCount": 1094,
+      "sharedDigestMatchCount": 23765,
+      "sharedDigestMismatchCount": 683,
+      "dispositionCounts": {
+        "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 23765,
+        "WORKTREE_BYTES_DRIFTED": 683,
+        "WORKTREE_ADDED_AFTER_SNAPSHOT": 668,
+        "MISSING_FROM_CURRENT_WORKTREE": 1094
+      },
+      "requiresSnapshotRefresh": true,
+      "currentOnlySample": [
+        ".codex/skills/parent-atlas-openspec-progress/SKILL.md",
+        ".okf/pipelines/sveltekit-vitest-validation.md",
+        ".scripts/find-and-kill-udp8443.ps1",
+        ".scripts/fix-ports-and-restart-vec-ai.ps1",
+        ".scripts/git-commit-and-push.ps1",
+        ".scripts/show-quic-diagnostics.ps1",
+        ".scripts/start-core-services.ps1",
+        ".scripts/start-quic-health.ps1",
+        ".scripts/start-vector-and-ai.ps1",
+        "atlas-openspec-awareness-v2/README.md",
+        "atlas-openspec-awareness-v2/READMEv3.md",
+        "atlas-openspec-awareness-v2/package-scripts-snippet.json",
+        "atlas-openspec-awareness-v2/scripts/atlas/adapt-openspec-controller-to-ranker-v2.mjs",
+        "atlas-openspec-awareness-v2/scripts/atlas/adapt-openspec-controller-to-ranker-v3.mjs",
+        "atlas-openspec-awareness-v2/scripts/atlas/audit-atlas-runtime-readiness-v1.mjs",
+        "atlas-openspec-awareness-v2/scripts/atlas/audit-openspec-actionable-readiness-v2.mjs",
+        "atlas-openspec-awareness-v2/scripts/atlas/audit-openspec-board-topics-v1.mjs",
+        "atlas-openspec-awareness-v2/scripts/atlas/audit-openspec-directory-graph-v1.mjs",
+        "atlas-openspec-awareness-v2/scripts/atlas/audit-openspec-progress-v2.mjs",
+        "atlas-openspec-awareness-v2/scripts/atlas/build-ace-packet-draft-v1.mjs"
+      ],
+      "admittedOnlySample": [
+        "claude-mem/.agent/rules/claude-mem-context.md",
+        "claude-mem/.agents/plugins/marketplace.json",
+        "claude-mem/.claude-plugin/marketplace.json",
+        "claude-mem/.claude-plugin/plugin.json",
+        "claude-mem/.claude/commands/anti-pattern-czar.md",
+        "claude-mem/.claude/plans/animated-installer.md",
+        "claude-mem/.claude/reports/test-audit-2026-01-05.md",
+        "claude-mem/.claude/settings.json",
+        "claude-mem/.codex-plugin/plugin.json",
+        "claude-mem/.github/FUNDING.yml",
+        "claude-mem/.github/ISSUE_TEMPLATE/bug_report.md",
+        "claude-mem/.github/ISSUE_TEMPLATE/feature_request.md",
+        "claude-mem/.github/copilot-instructions.md",
+        "claude-mem/.markdownlint.json",
+        "claude-mem/.plan/issue-2341-reliability-slice.md",
+        "claude-mem/.plan/npx-distribution.md",
+        "claude-mem/.plan/subagent-summary-disable-and-labeling.md",
+        "claude-mem/.plan/worktree-adoption.md",
+        "claude-mem/.translation-cache.json",
+        "claude-mem/.windsurf/rules/claude-mem-context.md"
+      ],
+      "sharedDigestMismatchSample": [
+        ".okf/index.md",
+        "claude.md",
+        "codex.md",
+        "docker-compose.yml",
+        "docker/clickhouse-mirror/clickhouse-mirror.py",
+        "docker/docker-compose.gpu.yml",
+        "docker/docling-vlm/app.py",
+        "docker/image-synthesis/app.py",
+        "docker/langgraph-synthesis/app.py",
+        "docs/.okf/schema.yaml",
+        "docs/OPENSPEC-WORKBOARD.md",
+        "docs/architecture/runtime-ownership-baseline.json",
+        "docs/architecture/runtime-ownership-registry.json",
+        "docs/graph/contract-error-map.json",
+        "docs/parent-atlas-workstation-todo.md",
+        "docs/vector-governance/pca-svd-representation-comparison-v1.json",
+        "memory/exports/mcp-health-probe.json",
+        "openspec/changes/atlas-feature-intelligence/tasks.md",
+        "openspec/changes/local-llm-offload-ownership/tasks.md",
+        "openspec/changes/manual-migration-reconciliation/tasks.md"
+      ],
+      "deltaChecksum": "sha256:9a4ce9db7ae38f5f9f48d4a58a633e1f47769b524a78084e45ab0e2ef1a09179"
+    }
   },
   "currentExecutionCandidates": [
     {
@@ -939,5 +1023,5 @@
       "625743d2-092b-4fa8-abe0-9dc094920c80"
     ]
   },
-  "checksum": "sha256:b26f96e14fc12f503e1e126f2c7210cde7d3067ac7a99b0ce4511ed363e95056"
+  "checksum": "sha256:115744a4854ea98cc3e09cadaee1a644c2039a4dadd6569739c1c76315ad4ef7"
 }

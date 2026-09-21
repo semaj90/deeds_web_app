@@ -15,7 +15,12 @@
 
 import type Redis from 'ioredis';
 import { createHash } from 'node:crypto';
-import { bifrostKey } from '$lib/server/cache-keys.js';
+import {
+  bifrostKey,
+  packetSemanticIdentityDigestV2,
+  packetSemanticIndexKeyV2,
+  type PacketSemanticCacheIdentityV2,
+} from '$lib/server/cache-keys.js';
 
 // ── Key builders ──────────────────────────────────────────────────────────────
 
@@ -73,6 +78,36 @@ export async function setPacketCache(
     await redis.set(key, JSON.stringify({ ...entry, cachedAt: new Date().toISOString() }), 'EX', ttlSeconds);
   } catch {
     // non-fatal
+  }
+}
+
+/** Reverse-locator SET lifetime (7 days). Longer than any value TTL so it never expires first. */
+export const PACKET_INDEX_TTL_SECONDS = 604_800;
+
+/**
+ * Revision-qualified packet cache write (BCI-03/04): SETEX the object under its v2 key, then
+ * record that physical key in the packet's reverse-locator SET so invalidation can UNLINK it
+ * without SCAN. Fail-open like every writer here — returns null instead of throwing.
+ */
+export async function setPacketCacheV2(
+  redis: Redis,
+  identity: PacketSemanticCacheIdentityV2,
+  entry: PacketCacheEntry,
+  ttlSeconds = 3600,
+): Promise<{ key: string; indexKey: string; identityDigest: string } | null> {
+  try {
+    const identityDigest = packetSemanticIdentityDigestV2(identity);
+    const key = bifrostKey.semantic.packetV2(identity.packetKey, identityDigest);
+    const indexKey = packetSemanticIndexKeyV2(identity.packetKey);
+    await redis
+      .multi()
+      .set(key, JSON.stringify({ ...entry, cachedAt: new Date().toISOString() }), 'EX', ttlSeconds)
+      .sadd(indexKey, key)
+      .expire(indexKey, Math.max(ttlSeconds, PACKET_INDEX_TTL_SECONDS))
+      .exec();
+    return { key, indexKey, identityDigest };
+  } catch {
+    return null;
   }
 }
 
@@ -196,7 +231,19 @@ export async function invalidateBitfrostPacket(
   };
 
   try {
-    const deletedCount = await redis.del(...keysToDelete);
+    // v2 revision-qualified objects (BCI-04): the reverse locator names exactly which physical
+    // keys reference this packet — no KEYS/SCAN. SMEMBERS failure is non-fatal; the fixed v1
+    // keys below are still deleted.
+    const indexKey = packetSemanticIndexKeyV2(packetKey);
+    let v2Keys: string[] = [];
+    try {
+      v2Keys = await redis.smembers(indexKey);
+    } catch {
+      v2Keys = [];
+    }
+    keysToDelete.push(...v2Keys, indexKey);
+    result.keysAttempted = keysToDelete.length;
+    const deletedCount = await redis.unlink(...keysToDelete);
     result.keysDeleted = deletedCount;
     result.deletedKeys = keysToDelete;
   } catch (err) {

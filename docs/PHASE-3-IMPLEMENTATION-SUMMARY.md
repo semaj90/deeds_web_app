@@ -1,14 +1,14 @@
 # Phase 3: GPU Acceleration & Topology Inference — Implementation Summary
 
-**Status**: ✅ STAGE 3A COMPLETE | 3B-3D INFRASTRUCTURE VERIFIED  
-**Date**: 2026-07-19  
-**Phase**: Phase 3 GPU Acceleration  
+**Status**: ✅ STAGE 3A COMPLETE | 3B-3D INFRASTRUCTURE VERIFIED
+**Date**: 2026-07-19
+**Phase**: Phase 3 GPU Acceleration
 
 ---
 
 ## Executive Summary
 
-Phase 3 adds GPU-accelerated vector operations to unlock large-scale retrieval on canonical 384-dim embeddings. All four stages have been planned and partially implemented:
+Phase 3 adds GPU-accelerated vector operations to unlock large-scale retrieval on canonical 768-dim embeddings. All four stages have been planned and partially implemented:
 
 - **Stage 3A**: GPU k-NN Search via cuVS ✅ **IMPLEMENTED**
 - **Stage 3B**: Topology Propagation & Symbol Extraction ✅ **VERIFIED** (extensive existing infra)
@@ -28,7 +28,7 @@ Phase 3 adds GPU-accelerated vector operations to unlock large-scale retrieval o
 
 **Key Features**:
 - HTTP client for cuVS k-NN search
-- Support for 384-dim canonical embeddings
+- Support for 768-dim canonical embeddings
 - Health check + index info endpoints
 - Batch search capability
 - Graceful degradation on service unavailability
@@ -60,7 +60,7 @@ const result = await cuVS.search(queryVector); // Returns { indices, distances, 
 - `GET /api/retrieval/gpu-knn` — Service status + configuration
 
 **Pipeline**:
-1. **Embed Query** (768-dim via Ollama, truncate to canonical 384-dim)
+1. **Embed Query** (768-dim via Ollama, truncate to canonical 768-dim)
 2. **GPU k-NN Search** (cuVS HNSW/CAGRA/IVF-Flat on indexed embeddings)
 3. **Postgres Join** (fetch full packet metadata by row IDs)
 4. **Score Conversion** (GPU distance → cosine similarity)
@@ -76,7 +76,7 @@ const result = await cuVS.search(queryVector); // Returns { indices, distances, 
 **Purpose**: Python service that loads embeddings from Postgres and serves GPU k-NN queries via HTTP API.
 
 **Architecture**:
-- Loads canonical 384-dim embeddings from `codebase_chunk_index` into GPU memory
+- Loads canonical 768-dim embeddings from `codebase_chunk_index` into GPU memory
 - Builds RAPIDS cuVS index (CAGRA, IVF-Flat, or HNSW)
 - Serves HTTP API on port 8791 (configurable)
 - Supports `/health`, `/index-info`, `/search`, `/rebuild` endpoints
@@ -94,7 +94,7 @@ const result = await cuVS.search(queryVector); // Returns { indices, distances, 
 **Usage**:
 ```bash
 # Start cuVS service (loads index on startup)
-python gpu-knn-search.py --query-dim 384 --k 100 --index-type ivfflat
+python gpu-knn-search.py --query-dim 768 --k 100 --index-type ivfflat
 
 # Or via npm script (WSL2 RAPIDS environment)
 npm run atlas:gpu:knn:start:wsl
@@ -166,14 +166,14 @@ npm run atlas:phase3:smoke -- --verbose  # Verbose output
 ### Extensive Infrastructure (40+ scripts found)
 
 **SOM (Self-Organizing Map) 20×20**:
-- `train-som-20x20.mjs` — SOM training on 384-dim embeddings
+- `train-som-20x20.mjs` — SOM training on 768-dim embeddings
 - `backfill-neo4j-som-coordinates-session-76.mjs` — Coordinate enrichment
 - `create-som-topology-edges.mjs` — Neo4j edge creation
 - `validate-som-20x20-topology.mjs` — Grid validation
 - Performance: <30 minutes for 58K packets
 
 **KMeans Clustering (k=128)**:
-- `kmeans-chunk-cluster-384.py` — Python RAPIDS implementation
+- `kmeans-chunk-cluster-768.py` — Python RAPIDS implementation
 - `compute-som-centroids.mjs` — Centroid computation
 - `load-som-packets-to-redis.mjs` — Redis caching
 - Backfill scripts for Postgres, Qdrant, Neo4j, Redis
@@ -318,7 +318,7 @@ DATABASE_URL=postgresql://...           # Postgres connection
 
 ### Hardware Requirements
 - **GPU**: NVIDIA RTX 3060 Ti (8GB) minimum (CUDA 12.1)
-- **VRAM**: ~6GB for 40K 384-dim vectors + index
+- **VRAM**: ~6GB for 40K 768-dim vectors + index
 - **CPU**: 4+ cores for parallel processing
 - **RAM**: 16GB system RAM for WSL2 RAPIDS environment
 
@@ -328,7 +328,7 @@ DATABASE_URL=postgresql://...           # Postgres connection
 
 ### Phase 4: Matryoshka Embedding (Deferred)
 - MRL training for native multi-dimensional embeddings
-- Replace truncation with trained 384-dim → 256-dim → 128-dim support
+- Replace truncation with trained 768-dim -> 512-dim → 256-dim → 128-dim support
 - Expected 5-10% quality improvement
 
 ### Phase 5: TensorRT Optimization (Deferred)
@@ -383,7 +383,7 @@ Phase 3 is **COMPLETE** when:
 
 ---
 
-**Status**: Phase 3A COMPLETE | Stages 3B-3D VERIFIED & READY  
-**Ready for Execution**: ✅ YES  
-**Estimated Timeline**: 7-11 days (4 stages, 2-3 days each)  
-**Critical Path**: 3A → 3B → 3C → 3D  
+**Status**: Phase 3A COMPLETE | Stages 3B-3D VERIFIED & READY
+**Ready for Execution**: ✅ YES
+**Estimated Timeline**: 7-11 days (4 stages, 2-3 days each)
+**Critical Path**: 3A → 3B → 3C → 3D

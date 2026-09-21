@@ -715,7 +715,7 @@ async function main() {
     console.log('[dev:gpu]   Execution provider: Ollama-managed (on-demand runner, unloads on idle)');
     console.log('[dev:gpu]                   Set EMBEDDING_BACKEND=llama_cpp_gguf to enable the dedicated :8081 server');
   }
-  console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + tree-sitter + ast-grep)`);
+  console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + treesitter-chunker + ast-grep; runtime=launcher-selected, Docker provenance-v2 by default)`);
 
   const desiredVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
   const vitePort = await findFreePort(desiredVitePort);

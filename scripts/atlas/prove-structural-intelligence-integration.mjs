@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, renameSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -131,6 +131,8 @@ const receipt = {
 };
 
 mkdirSync(reportDir, { recursive: true });
-writeFileSync(reportPath, `${JSON.stringify(receipt, null, 2)}\n`);
+const tempReportPath = `${reportPath}.${process.pid}.${Date.now()}.tmp`;
+writeFileSync(tempReportPath, `${JSON.stringify(receipt, null, 2)}\n`);
+renameSync(tempReportPath, reportPath);
 console.log(JSON.stringify({ status, reportPath, steps: results.map(({ id, status: stepStatus }) => ({ id, status: stepStatus })) }, null, 2));
 if (!requiredPass || (runLive && liveResult?.status !== 'PASS')) process.exitCode = 2;

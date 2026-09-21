@@ -56,6 +56,7 @@ const currentInventoryOutput = gitMaybe(['ls-files', '--cached', '--others', '--
 const trackedRefs = new Set(tracked.split('\0').filter(Boolean).map(normalizeSourceRef));
 const candidateRefs = [...new Set(currentInventoryOutput.split('\0').filter(Boolean).map(normalizeSourceRef))].filter(isCandidateSource).sort();
 const sourceRefs = [];
+const sourceContentDigests = new Map();
 const skippedSourceRefs = [];
 for (const sourceRef of candidateRefs) {
   try {
@@ -76,6 +77,7 @@ for (const sourceRef of candidateRefs) {
       continue;
     }
     sourceRefs.push(sourceRef);
+    sourceContentDigests.set(sourceRef, crypto.createHash('sha256').update(bytes).digest('hex'));
   } catch (error) {
     skippedSourceRefs.push({ sourceRef, reason: error instanceof Error ? error.message : String(error) });
   }
@@ -129,6 +131,59 @@ try {
 } catch {
   report.sourceAuthority = null;
 }
+
+const snapshotManifestPath = report.sourceAuthority?.sourceSnapshot?.snapshotManifestPath;
+let snapshotManifest = null;
+if (typeof snapshotManifestPath === 'string') {
+  try {
+    const resolvedSnapshotManifestPath = path.resolve(snapshotManifestPath);
+    if (resolvedSnapshotManifestPath.startsWith(path.resolve(root) + path.sep)) {
+      snapshotManifest = JSON.parse(fs.readFileSync(resolvedSnapshotManifestPath, 'utf8'));
+    }
+  } catch {
+    snapshotManifest = null;
+  }
+}
+const admittedSources = Array.isArray(snapshotManifest?.sources)
+  ? snapshotManifest.sources
+  : Array.isArray(report.sourceAuthority?.sourceSnapshot?.sources)
+    ? report.sourceAuthority.sourceSnapshot.sources
+    : [];
+const admittedByRef = new Map(admittedSources.map((source) => [normalizeSourceRef(String(source.sourceRef)), source]));
+const currentRefSet = new Set(sourceRefs);
+const admittedRefSet = new Set(admittedByRef.keys());
+const currentOnlyRefs = [...currentRefSet].filter((sourceRef) => !admittedRefSet.has(sourceRef)).sort();
+const admittedOnlyRefs = [...admittedRefSet].filter((sourceRef) => !currentRefSet.has(sourceRef)).sort();
+const sharedRefs = [...currentRefSet].filter((sourceRef) => admittedRefSet.has(sourceRef)).sort();
+const digestMatches = sharedRefs.filter((sourceRef) => {
+  const admittedDigest = String(admittedByRef.get(sourceRef)?.contentDigest ?? '').replace(/^sha256:/, '').toLowerCase();
+  return Boolean(admittedDigest) && admittedDigest === sourceContentDigests.get(sourceRef);
+});
+const digestMatchSet = new Set(digestMatches);
+const sharedDigestMismatchRefs = sharedRefs.filter((sourceRef) => !digestMatchSet.has(sourceRef));
+report.workspace.admittedSnapshotDelta = {
+  snapshotRevision: report.sourceAuthority?.sourceSnapshot?.workspaceRevision ?? snapshotManifest?.workspaceRevision ?? null,
+  snapshotSourceCount: admittedRefSet.size,
+  currentSourceCount: currentRefSet.size,
+  sharedSourceCount: sharedRefs.length,
+  currentOnlyCount: currentOnlyRefs.length,
+  admittedOnlyCount: admittedOnlyRefs.length,
+  sharedDigestMatchCount: digestMatches.length,
+  sharedDigestMismatchCount: sharedDigestMismatchRefs.length,
+  dispositionCounts: {
+    CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT: digestMatches.length,
+    WORKTREE_BYTES_DRIFTED: sharedDigestMismatchRefs.length,
+    WORKTREE_ADDED_AFTER_SNAPSHOT: currentOnlyRefs.length,
+    MISSING_FROM_CURRENT_WORKTREE: admittedOnlyRefs.length,
+  },
+  requiresSnapshotRefresh: currentOnlyRefs.length > 0
+    || admittedOnlyRefs.length > 0
+    || sharedDigestMismatchRefs.length > 0,
+  currentOnlySample: currentOnlyRefs.slice(0, 20),
+  admittedOnlySample: admittedOnlyRefs.slice(0, 20),
+  sharedDigestMismatchSample: sharedDigestMismatchRefs.slice(0, 20),
+  deltaChecksum: digest(JSON.stringify({ currentOnlyRefs, admittedOnlyRefs, sharedRefs, digestMatches })),
+};
 
 const client = new pg.Client({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), statement_timeout: 30_000 });
 try {
@@ -215,7 +270,13 @@ report.admission.status = report.admission.safeToPromote ? 'CURRENT_SOURCE_AUTHO
 report.checksum = digest(JSON.stringify({ workspace: report.workspace, current: report.currentExecutionCandidates, legacy: report.legacyGraphifyCandidates, ownerDecision: report.ownerDecision }));
 
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+function atomicWrite(targetPath, contents) {
+  const temporaryPath = `${targetPath}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(temporaryPath, contents, 'utf8');
+  fs.renameSync(temporaryPath, targetPath);
+}
+
+atomicWrite(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 const md = [
   '# Current Source Owner Reconciliation', '',
   `- Status: **${report.admission.status}**`,
@@ -231,5 +292,5 @@ const md = [
   ...(report.admission.reasons.length ? report.admission.reasons.map((reason) => `- ${reason}`) : ['- none']), '',
   `Receipt checksum: \`${report.checksum}\``,
 ].join('\n');
-fs.writeFileSync(markdownPath, `${md}\n`, 'utf8');
+atomicWrite(markdownPath, `${md}\n`);
 console.log(JSON.stringify({ status: report.admission.status, ownerDecision: report.ownerDecision, sourceCount: report.workspace.sourceCount, currentExecutionCandidates: report.currentExecutionCandidates.length, exactCurrentOwners: exactCurrent.length, legacyCompletedCandidates: legacyCompleted.length, writesPerformed: false, reportPath, markdownPath }, null, 2));

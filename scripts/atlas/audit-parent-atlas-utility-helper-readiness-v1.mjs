@@ -31,6 +31,7 @@ const centroid = read('ace-bitfrost-centroid-alignment-v1.json');
 const astCanary = read('ast-canary-readiness-v1.json');
 const ontologyDecision = read('ontology-population-decision-v1.json');
 const packetScope = read('packet-source-scope-v1.json');
+const structuralProof = read('structural-intelligence-integration-proof.json');
 const nlp = readTmp('atlas-nlp-analysis-smoke-v1.json');
 
 const capabilityMap = new Map((capability?.capabilities ?? []).map((item) => [item.id, item]));
@@ -152,6 +153,15 @@ const helpers = [
     writesPerformed: astCanary?.writesPerformed ?? false
   },
   {
+    id: 'STRUCTURAL_PROVENANCE_RUNTIME',
+    owner: 'parent-atlas-nlp-sidecar-feature-compiler',
+    state: structuralProof?.status === 'PROVEN_WITH_LIVE_8095' ? 'PROVEN_LIVE_RUNTIME_NONCANONICAL' : structuralProof?.status ?? 'UNPROVEN',
+    evidence: structuralProof ? 'structural-intelligence-integration-proof.json' : null,
+    live8095: structuralProof?.status === 'PROVEN_WITH_LIVE_8095',
+    canonicalAuthority: false,
+    writesPerformed: false
+  },
+  {
     id: 'ONTOLOGY_POPULATION_DECISION',
     owner: 'parent-atlas-nlp-sidecar-feature-compiler',
     state: ontologyDecision?.status ?? 'UNPROVEN',
@@ -187,7 +197,7 @@ const helpers = [
 
 const output = {
   schema: 'atlas.parent-atlas-utility-helper-readiness.v1',
-  status: helpers.every((helper) => ['PROVEN', 'DERIVED_TOPIC_IDENTITIES_PROVEN', 'DERIVED_CLAIMS_PRESENT', 'READ_ONLY_AST_CONTEXT_AUDIT', 'OKF_SCHEMA_BOUNDARIES_PROVEN', 'OPENWIKI_INPUT_BOUNDARY_PROVEN', 'OKF_WORK_ITEM_FIXTURE_PROVEN', 'OKF_GAP_RECOMMENDATIONS_DERIVED'].includes(helper.state))
+  status: helpers.every((helper) => ['PROVEN', 'PROVEN_LIVE_RUNTIME_NONCANONICAL', 'DERIVED_TOPIC_IDENTITIES_PROVEN', 'DERIVED_CLAIMS_PRESENT', 'READ_ONLY_AST_CONTEXT_AUDIT', 'OKF_SCHEMA_BOUNDARIES_PROVEN', 'OPENWIKI_INPUT_BOUNDARY_PROVEN', 'OKF_WORK_ITEM_FIXTURE_PROVEN', 'OKF_GAP_RECOMMENDATIONS_DERIVED'].includes(helper.state))
     ? 'UTILITY_HELPERS_PROVEN'
     : 'UTILITY_HELPERS_PARTIAL_WITH_GATES',
   helpers,
@@ -214,6 +224,6 @@ console.log(JSON.stringify({
   schema: output.schema,
   status: output.status,
   helpers: helpers.length,
-  waiting: helpers.filter((helper) => !['PROVEN', 'DERIVED_TOPIC_IDENTITIES_PROVEN', 'DERIVED_CLAIMS_PRESENT', 'READ_ONLY_AST_CONTEXT_AUDIT', 'OKF_SCHEMA_BOUNDARIES_PROVEN', 'OPENWIKI_INPUT_BOUNDARY_PROVEN', 'OKF_WORK_ITEM_FIXTURE_PROVEN', 'OKF_GAP_RECOMMENDATIONS_DERIVED'].includes(helper.state)).length,
+  waiting: helpers.filter((helper) => !['PROVEN', 'PROVEN_LIVE_RUNTIME_NONCANONICAL', 'DERIVED_TOPIC_IDENTITIES_PROVEN', 'DERIVED_CLAIMS_PRESENT', 'READ_ONLY_AST_CONTEXT_AUDIT', 'OKF_SCHEMA_BOUNDARIES_PROVEN', 'OPENWIKI_INPUT_BOUNDARY_PROVEN', 'OKF_WORK_ITEM_FIXTURE_PROVEN', 'OKF_GAP_RECOMMENDATIONS_DERIVED'].includes(helper.state)).length,
   writesPerformed: false
 }, null, 2));

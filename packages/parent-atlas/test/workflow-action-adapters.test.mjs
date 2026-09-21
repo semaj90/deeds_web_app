@@ -7,6 +7,7 @@ import {
 } from '../dist/core/workflow-action-adapters.js';
 
 const identity = {
+  runId: 'run:q-1',
   workflowId: 'workflow:q-1',
   workflowRevision: 7,
   actionId: 'action:retrieve-1',

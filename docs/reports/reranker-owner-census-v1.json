@@ -1,0 +1,259 @@
+{
+  "schema": "atlas.reranker-owner-census.v1",
+  "generatedAt": "2026-09-21T00:19:35.503Z",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false,
+  "owner": "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.ts",
+  "entries": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/attention-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:e44a3def1c2a7b8ffdde17bec2377cd939ea929acd5d469578dcb5a325bd16e4",
+      "runtimeCallerCount": 2,
+      "testCallerCount": 0,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/lib/gpu/index.ts",
+        "sveltekit-frontend/src/lib/server/router/authority-ranking-bridge.ts"
+      ],
+      "testCallers": []
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/boosted-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:3d6e7551d8eeba9a119a026bab23cfce675b9584bbaed1f737c2e6f54b7736ab",
+      "runtimeCallerCount": 1,
+      "testCallerCount": 0,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/lib/server/retrieval/ranking-features.ts"
+      ],
+      "testCallers": []
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/cuda-rnn-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:c45bd1b0d81f321723541f36c478bd73a9705bc10be98a9b4f41c32821c82088",
+      "runtimeCallerCount": 2,
+      "testCallerCount": 0,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts"
+      ],
+      "testCallers": []
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404",
+      "runtimeCallerCount": 10,
+      "testCallerCount": 3,
+      "runtimeCallers": [
+        "scripts/atlas/build-feature-ontology-grounded-review-snapshot-v1.mjs",
+        "scripts/atlas/build-feature-ontology-review-triage-v1.mjs",
+        "sveltekit-frontend/src/routes/api/codebase/rerank/+server.ts",
+        "sveltekit-frontend/src/lib/server/types/retrieval.ts",
+        "sveltekit-frontend/src/lib/server/rg-atlas/run.ts",
+        "sveltekit-frontend/src/lib/server/features/rag/multi-lane-retrieval.ts",
+        "sveltekit-frontend/src/lib/server/features/rag/codebase-context.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/executor-tree.ts"
+      ],
+      "testCallers": [
+        "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/executor-tree.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/executor-tree.runtime.spec.ts"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/gpu-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:c783faf30203ea6d93e0c4171fe052c16f5b675151c18c9aa999850c9164165d",
+      "runtimeCallerCount": 9,
+      "testCallerCount": 1,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/lib/utils/gpu-reranker.ts",
+        "scripts/atlas/audit-rrf-lane-weight-census-v1.mjs",
+        "scripts/atlas/classify-rrf-callers-v1.mjs",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "sveltekit-frontend/src/routes/api/search/+server.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/attention-reranker.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/graph-informed-retrieval.ts",
+        "scripts/atlas/smoke-phase3-routing.mts",
+        "sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts"
+      ],
+      "testCallers": [
+        "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/cluster-aware-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:3b4d3839450d64eea3b48fa7fd18ad15dff7da45552e7e76fcb6b72032edee8d",
+      "runtimeCallerCount": 3,
+      "testCallerCount": 0,
+      "runtimeCallers": [
+        "scripts/atlas/fix-missing-packet-keys.mjs",
+        "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts"
+      ],
+      "testCallers": []
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/noun-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:4d6af37e8eb45628c5adde5f8e5f9fd2f32661fcd12a58e782fce41ac134eea7",
+      "runtimeCallerCount": 4,
+      "testCallerCount": 0,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/mcp/tools/repair_tools.ts",
+        "sveltekit-frontend/src/mcp/server.ts",
+        "sveltekit-frontend/src/routes/api/phase102/retrieval-pipeline/+server.ts",
+        "sveltekit-frontend/src/lib/server/analysis/keyword-matrix-analysis.ts"
+      ],
+      "testCallers": []
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/post-process-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:424093bccc5a2974e679b39c4657be2848262fbedc713873a4063909784946a6",
+      "runtimeCallerCount": 4,
+      "testCallerCount": 2,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/latent256-dedup.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/latent256-candidate-provider.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/candidate-scorer.ts"
+      ],
+      "testCallers": [
+        "sveltekit-frontend/src/lib/server/retrieval/__tests__/scoring-rerank.test.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/post-process-reranker.spec.ts"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "runtimeCallerCount": 6,
+      "testCallerCount": 2,
+      "runtimeCallers": [
+        "scripts/atlas/apply-feature-ontology-human-review-decision-v1.mjs",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "sveltekit-frontend/src/lib/server/rg-atlas/types.ts",
+        "sveltekit-frontend/src/lib/server/rg-atlas/run.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/executor-tree.ts"
+      ],
+      "testCallers": [
+        "sveltekit-frontend/src/lib/server/retrieval/executor-tree.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/executor-tree.runtime.spec.ts"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/reranker-blend.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:0cbdcf1a6ac99eff12865742ed3ca066f641b221ba060896c04bd5c1065547c1",
+      "runtimeCallerCount": 1,
+      "testCallerCount": 0,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/routes/api/retrieval/reranked-search/+server.ts"
+      ],
+      "testCallers": []
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/semantic-vector-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:14fe9841e2d5236508d3937a77ae1554846af4dc453170eb4a0cc5ac7dd3270a",
+      "runtimeCallerCount": 2,
+      "testCallerCount": 0,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/routes/api/retrieval/semantic-rerank/+server.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts"
+      ],
+      "testCallers": []
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/triton-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:39aa334cde390e0c7b7844b28cdd057ca6d77e072da38834ee490d60df50a2a4",
+      "runtimeCallerCount": 4,
+      "testCallerCount": 1,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/routes/api/analytics/health/+server.ts",
+        "sveltekit-frontend/src/lib/server/features/rag/codebase-context.ts",
+        "sveltekit-frontend/src/lib/server/analytics/research-refiner.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts"
+      ],
+      "testCallers": [
+        "sveltekit-frontend/src/lib/server/retrieval/triton-reranker.spec.ts"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/runtime-reranker.ts",
+      "exists": true,
+      "classification": "LIVE_SECONDARY",
+      "sourceChecksum": "sha256:81572cfa8819bd362b2cfc9025a44c04a5c3a3d22ff2c7f3376724683a13bba7",
+      "runtimeCallerCount": 5,
+      "testCallerCount": 1,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/lib/server/atlas/ranking/index.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/grouped-ranking-baseline-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/feature-matrix.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/candidate-scorer.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.ts"
+      ],
+      "testCallers": [
+        "sveltekit-frontend/src/lib/server/retrieval/__tests__/feature-matrix.test.ts"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.ts",
+      "exists": true,
+      "classification": "CANONICAL_OWNER",
+      "sourceChecksum": "sha256:2e2810db1588ba23934d64abaa2f2d4de4f66845daa26b107f1622181884ff7a",
+      "runtimeCallerCount": 10,
+      "testCallerCount": 9,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/mcp/tools/phase18-reranker-tool.ts",
+        "packages/parent-atlas/src/core/kernel-operator-library-symbol-repair-v0.ts",
+        "scripts/atlas/evaluate-xgboost-shadow-receipts.mjs",
+        "sveltekit-frontend/src/lib/server/trpc/procedures/phase18-reranker.ts",
+        "sveltekit-frontend/src/routes/api/retrieval/canonical-rerank/+server.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+        "sveltekit-frontend/src/lib/server/atlas/policy/policy-training.ts",
+        "sveltekit-frontend/src/lib/server/atlas/ranking/index.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/index.ts"
+      ],
+      "testCallers": [
+        "sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.spec.ts",
+        "sveltekit-frontend/src/lib/server/analysis/event-hypergraph-contract.spec.ts",
+        "sveltekit-frontend/src/lib/server/analysis/analysis-contracts.spec.ts",
+        "sveltekit-frontend/src/routes/api/retrieval/canonical-rerank/server.route.test.ts",
+        "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-taxonomy-shadow.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-route.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.test.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.spec.ts"
+      ]
+    }
+  ],
+  "counts": {
+    "LIVE_SECONDARY": 13,
+    "CANONICAL_OWNER": 1
+  },
+  "nextGate": "RERANKER_OWNER_CENSUS_REVIEW"
+}

@@ -265,7 +265,11 @@ const report = {
   // Full machine-readable population for downstream audits and rankers.
   // The bounded arrays below remain navigation samples only.
   allTasks: classifiedTasks,
-  actionableTasks: actionable.sort((a, b) => a.priority - b.priority || a.change.localeCompare(b.change) || a.line - b.line).slice(0, 200),
+  // The selector consumes the complete ACTIONABLE population. Keep ranking
+  // deterministic, but do not silently turn the controller into a top-200
+  // sample; the controller's state is the authority and pagination belongs to
+  // an explicit consumer boundary.
+  actionableTasks: actionable.sort((a, b) => a.priority - b.priority || a.change.localeCompare(b.change) || a.line - b.line),
   waitingTasks: waiting.slice(0, 300),
   deferredTasks: deferred.slice(0, 300),
   blockerGroups: waitingGroups,

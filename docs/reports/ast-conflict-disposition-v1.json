@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ast-conflict-disposition.v1",
-  "generatedAt": "2026-09-20T08:17:12.383Z",
+  "generatedAt": "2026-09-20T18:59:22.212Z",
   "gate": "AST_BF_18C_STRUCTURAL_CONFLICT_DISPOSITION",
   "input": {
     "backfillReport": "docs/reports/atlas-ast-backfill-idempotency-proof-v1.json",
@@ -29,11 +29,12 @@
     "currentCanaryReadiness": "PERSISTENT_CANARY_BLOCKED",
     "currentCanaryBlockers": [
       "CURRENT_WORKTREE_PARITY",
+      "HASH_GRAIN_CONTRACT",
       "STRUCTURAL_CONFLICTS_CLOSED"
     ]
   },
   "status": "REVIEW_REQUIRED_IDENTITY_ALGORITHM_CHANGE",
   "canonicalAuthority": false,
   "writesPerformed": false,
-  "checksum": "7ac91c8cd08cc054f95718c62e9050fafba1d4f551dcfc7f7ddfbffe44eee6c4"
+  "checksum": "93cb22f033ebbb9cc3664e419fa55b0ba235ee1066299a77938b81b67e547713"
 }

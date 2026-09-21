@@ -514,7 +514,7 @@
       }
     ]
   },
-  "generatedAt": "2026-09-19T05:14:26.630Z",
+  "generatedAt": "2026-09-21T01:54:06.207Z",
   "mode": "READ_ONLY",
   "relation": "public.codebase_chunk_index",
   "representation": {
@@ -523,8 +523,8 @@
     "distance": "cosine"
   },
   "bounds": {
-    "cohortLimit": 4,
-    "topK": 3
+    "cohortLimit": 8,
+    "topK": 5
   },
   "requestedWorkspaceRevision": null,
   "status": "PGVECTOR_REPLAY_BLOCKED_SOURCE_REVISION",
@@ -536,6 +536,6 @@
   "cohort": {
     "revisionQualifiedVectorRows": 0
   },
-  "queryChecksum": "sha256:4b17d2d6e692c065d594b125b76477bf4a513b319844ba4bec0ef495560accf7",
+  "queryChecksum": "sha256:e0b24d8105d107c4c1dbb62741f01738ef9769192395a6781dfee45e755b1acf",
   "evidenceChecksum": "sha256:dbe3b110ce32e20063386f5d9f4f4c60b329d2ea97c438d2c78b3551377c09e4"
 }

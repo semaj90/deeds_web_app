@@ -1,8 +1,8 @@
 {
   "schema": "atlas.postgres-fts-replay.v1",
-  "generatedAt": "2026-09-19T05:09:22.557Z",
+  "generatedAt": "2026-09-21T02:47:09.311Z",
   "mode": "READ_ONLY",
-  "queryText": "Graphify",
+  "queryText": "Graphify retrieval",
   "writesPerformed": false,
   "canonicalAuthority": false,
   "status": "POSTGRES_FTS_BLOCKED_SOURCE_REVISION",
@@ -128,16 +128,16 @@
     "indexCount": 51
   },
   "replay": {
-    "unqualifiedHitCount": 5153,
+    "unqualifiedHitCount": 2423,
     "revisionQualifiedHitCount": 0,
     "revisionQualifiedRows": [],
     "stableEvidenceMetadata": true,
-    "queryChecksum": "sha256:b7c1f46be03907e7d0eeb484da90c94fbe6bf683a8a97922aee1b9bff8ffb095",
-    "evidenceChecksum": "sha256:ba3f09cef3e32a14618e76f642bdc576a752dfb5f403677ce7a15d45b277ee01"
+    "queryChecksum": "sha256:025c15e185dceee31f58212196cd4a9b73cd16edbd7c1f4a115a3a1c276205be",
+    "evidenceChecksum": "sha256:7ecc8bb4db747475ec660f5209c0fcc79da6b2f19f2d7980d5cb634b63abebc7"
   },
   "blockers": [
     "CANONICAL_SOURCE_REVISION_MISSING_FOR_FTS_HITS",
     "GIN_INDEX_EVIDENCE_UNAVAILABLE"
   ],
-  "receiptChecksum": "sha256:b181d747bcb074af050ef65f1b28d864ac224d43828726ee4fc221cb0f00c1ac"
+  "receiptChecksum": "sha256:1bdace2090917fc080e610a56ff4a77436661cedc80d03fc4908fb91d48d45c7"
 }

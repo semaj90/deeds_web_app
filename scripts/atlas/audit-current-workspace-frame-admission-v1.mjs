@@ -32,6 +32,7 @@ const readJson = (filePath) => {
 
 const frame = resolveCurrentWorkspaceFrameV1({ root });
 const cohortLineage = readJson(reportPath('current-source-cohort-lineage-v1.json'));
+const sourceOwner = readJson(reportPath('current-source-owner-reconciliation-v1.json'));
 
 function classify(frame, cohortLineage) {
   if (frame.status !== 'CURRENT_WORKSPACE_FRAME_SELECTED') {
@@ -61,6 +62,13 @@ function classify(frame, cohortLineage) {
 
 const status = classify(frame, cohortLineage);
 const counts = cohortLineage?.counts ?? null;
+const sourceAuthorityReady = sourceOwner?.admission?.safeToPromote === true
+  && sourceOwner?.workspace?.admittedSnapshotDelta?.requiresSnapshotRefresh !== true;
+const nextGate = !sourceAuthorityReady
+  ? 'CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED'
+  : status === 'CURRENT_WORKSPACE_FRAME_PROVEN'
+    ? 'CURRENT_WORKSPACE_FRAME_PROVEN'
+    : 'CURRENT_WORKSPACE_FRAME_ADMISSION_REQUIRED';
 
 const receipt = {
   schema: 'atlas.current-workspace-frame-receipt.v1',
@@ -85,6 +93,15 @@ const receipt = {
   workspaceMismatches: counts?.workspaceMismatchAfterSourceQualification ?? null,
   staleProjectionCandidates: status === 'STALE_WORKSPACE_PROJECTION' ? (counts?.workspaceMismatchAfterSourceQualification ?? null) : 0,
   conflictingSourceRows: (counts?.mismatched ?? 0) + (counts?.missing ?? 0),
+  sourceAuthority: {
+    status: sourceOwner?.admission?.status ?? 'NOT_PROVEN',
+    safeToPromote: sourceOwner?.admission?.safeToPromote === true,
+    requiresSnapshotRefresh: sourceOwner?.workspace?.admittedSnapshotDelta?.requiresSnapshotRefresh === true,
+    deltaChecksum: sourceOwner?.workspace?.admittedSnapshotDelta?.deltaChecksum ?? null,
+  },
+  nextGate,
+  canonicalAuthority: false,
+  promotionEligible: false,
   writesPerformed: false,
   status,
 };
@@ -92,5 +109,11 @@ const receipt = {
 console.log(JSON.stringify(receipt, null, 2));
 
 const outPath = reportPath('current-workspace-frame-admission-v1.json');
-fs.writeFileSync(outPath, JSON.stringify(receipt, null, 2) + '\n');
+const tempPath = `${outPath}.${process.pid}.${Date.now()}.tmp`;
+try {
+  fs.writeFileSync(tempPath, JSON.stringify(receipt, null, 2) + '\n');
+  fs.renameSync(tempPath, outPath);
+} finally {
+  try { fs.unlinkSync(tempPath); } catch {}
+}
 console.error(`\nReceipt written (read-only report artifact, no datastore writes): ${outPath}`);

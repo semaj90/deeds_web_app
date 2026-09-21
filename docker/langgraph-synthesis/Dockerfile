@@ -31,6 +31,7 @@ RUN pip install --no-cache-dir --break-system-packages \
 
 # ── App ───────────────────────────────────────────────────────────────────────
 COPY app.py .
+COPY research_contracts.py .
 
 EXPOSE 8091
 

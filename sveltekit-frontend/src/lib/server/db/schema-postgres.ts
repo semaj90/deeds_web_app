@@ -4507,6 +4507,15 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	contentEmbedding: halfvec('content_embedding', { dimensions: 768 }),
 	summaryEmbedding: halfvec('summary_embedding', { dimensions: 768 }),
 	signatureEmbedding: halfvec('signature_embedding', { dimensions: 768 }),
+	// Existing nullable vector lanes declared here for Drizzle read-model parity.
+	// These declarations do not authorize new writers, migrations, or promotion.
+	contentEmbedding768: vector('content_embedding_768', { dimensions: 768 }),
+	summaryEmbedding384: vector('summary_embedding_384', { dimensions: 384 }),
+	errorEmbedding: halfvec('error_embedding', { dimensions: 768 }),
+	errorEmbeddingLatent256: halfvec('error_embedding_latent_256', { dimensions: 256 }),
+	errorEmbeddingLatent128: halfvec('error_embedding_latent_128', { dimensions: 128 }),
+	errorEmbeddingLatent64: vector('error_embedding_latent_64', { dimensions: 64 }),
+	latent128: halfvec('latent_128', { dimensions: 128 }),
 
 	// Learned nested-autoencoder representation (2026-08-29). NOT a prefix truncation of
 	// content_embedding -- an actual model forward pass (NestedSemanticAutoencoder.encode()).

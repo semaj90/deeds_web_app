@@ -43,6 +43,7 @@ const sourceAuthorityRepairPlan = loadReceipt(inputPaths.sourceAuthorityRepairPl
 const sourceEvidence = loadReceipt(inputPaths.sourceEvidence);
 const cohort = sourceCohort.counts ?? {};
 const join = packetChunkJoin.counts ?? {};
+const sourceDelta = sourceOwner.workspace?.admittedSnapshotDelta ?? null;
 
 const workspaceRevision = cohort.currentWorkspaceRevision ?? null;
 const executionId = executionOwner.chosenExecutionId ?? packetChunkJoin.executionId ?? null;
@@ -88,6 +89,15 @@ const report = {
     repairPlanWorkspaceRevision: sourceAuthorityRepairPlan.currentWorkspaceRevision ?? null,
     repairPlanExactCurrentBindingCount: sourceAuthorityRepairPlan.exactCurrentBindingCount ?? null,
     repairPlanAuthorizationRequired: sourceAuthorityRepairPlan.authorizationRequired === true,
+    worktreeSnapshotDelta: sourceDelta
+      ? {
+          requiresSnapshotRefresh: sourceDelta.requiresSnapshotRefresh === true,
+          currentOnlyCount: sourceDelta.currentOnlyCount ?? null,
+          admittedOnlyCount: sourceDelta.admittedOnlyCount ?? null,
+          sharedDigestMismatchCount: sourceDelta.sharedDigestMismatchCount ?? null,
+          deltaChecksum: sourceDelta.deltaChecksum ?? null,
+        }
+      : null,
   },
   packetRevisionOwner,
   funnel: {
@@ -158,7 +168,13 @@ report.packetRevisionUnqualifiedByReason = {
 };
 report.reportChecksum = createHash('sha256').update(JSON.stringify(report)).digest('hex');
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+function atomicWrite(targetPath, contents) {
+  const temporaryPath = `${targetPath}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(temporaryPath, contents, 'utf8');
+  fs.renameSync(temporaryPath, targetPath);
+}
+
+atomicWrite(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 const funnelReport = {
   schema: 'ParentAtlasCurrentLineageFunnelV1',
   generatedAt: report.generatedAt,
@@ -190,7 +206,7 @@ const funnelReport = {
   inputReceipts: inputPaths,
 };
 funnelReport.reportChecksum = createHash('sha256').update(JSON.stringify(funnelReport)).digest('hex');
-fs.writeFileSync(funnelReportPath, `${JSON.stringify(funnelReport, null, 2)}\n`, 'utf8');
+atomicWrite(funnelReportPath, `${JSON.stringify(funnelReport, null, 2)}\n`);
 console.log(JSON.stringify({
   status: report.firstFailureBoundary,
   workspaceSourceRows: report.funnel.workspaceSourceRows,

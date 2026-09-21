@@ -412,6 +412,24 @@ export const bifrostKey = {
      * single source of truth for it going forward.
      */
     packetSummary: (packetKey: string) => `bitfrost:summary:packet:v1:${packetKey}`,
+
+    /**
+     * bifrost:sem:packet:v2:{packet_key}:{identityDigest} — revision-qualified packet cache
+     * object (BCI-03, 2026-09-20). `packet_key` says WHICH canonical packet; `identityDigest`
+     * (sha256 of PacketSemanticCacheIdentityV2, see `packetSemanticIdentityDigestV2`) says WHICH
+     * derived representation/revisions are cached. Build via `packetSemanticCacheKeyV2()`, not by
+     * hand. Additive: the v1 `packet()` shape above is unchanged and still owned by its callers.
+     */
+    packetV2: (packetKey: string, identityDigest: string) =>
+      `bifrost:sem:packet:v2:${packetKey}:${identityDigest}`,
+
+    /**
+     * bifrost:sem:index:packet:{packet_key} — reverse locator (a Valkey SET of the physical v2
+     * cache keys currently referencing this packet, BCI-04). Lets invalidation UNLINK exactly the
+     * live objects with SMEMBERS instead of KEYS/SCAN. Disposable residency metadata only — it
+     * never carries or proves canonical identity (Postgres does).
+     */
+    packetIndex: (packetKey: string) => `bifrost:sem:index:packet:${packetKey}`,
   },
 
   /**
@@ -443,6 +461,83 @@ export interface BitfrostPacketIdentity {
   packetKey: string;
   featureId?: string;
   sourceRevision?: string;
+}
+
+/**
+ * Revision-qualified identity of ONE derived packet-cache object (BCI-02). `packetKey` is the
+ * packet identity root; every other field pins which derived representation is cached, so a
+ * revision change yields a NEW immutable physical key instead of overwriting an old one.
+ * `queryHash`, `candidateOrdinal` and prefill checksums are different identity roots and must
+ * never be passed here (see `assertPacketKeyShape`).
+ *
+ * LAYERING (Duplication Prevention, 2026-09-20): this is NOT the ACE artifact identity. That is
+ * `AceBitfrostCacheIdentityV1` in `atlas/cache/ace-bitfrost-cache-identity-v1.ts` (`atlas:bitfrost:v1:*`
+ * keys for ACE_PACKET / ACE_CONTEXT / CENTROID / RESIDENCY, live via `ace-packet-cache.ts` and
+ * `redis-cache-aggressive.ts`). This V2 covers only the `bifrost:sem:packet:*` lane owned by
+ * `invalidateBitfrostPacket()` and adds the per-packet reverse locator that lane needs. Do not add a
+ * third revision-qualified identity; converge these two deliberately if ever merged.
+ */
+export interface PacketSemanticCacheIdentityV2 {
+  packetKey: string;
+  workspaceRevision: string;
+  sourceRevision: string;
+  representationRevision: string;
+  featureRevision: string;
+  modelRevision: string;
+  producerRevision: string;
+  ontologyRevision?: string | null;
+  graphRevision?: string | null;
+}
+
+const PACKET_CACHE_REQUIRED_V2 = [
+  'packetKey',
+  'workspaceRevision',
+  'sourceRevision',
+  'representationRevision',
+  'featureRevision',
+  'modelRevision',
+  'producerRevision',
+] as const;
+
+/** Reject empty, whitespace-bearing, or glob-bearing packet keys (cannot alias a pattern delete). */
+function assertPacketKeyShape(packetKey: string): void {
+  if (typeof packetKey !== 'string' || packetKey.trim() === '' || /[\s*?[\]]/.test(packetKey)) {
+    throw new TypeError(`invalid packetKey for packet cache identity: ${JSON.stringify(packetKey)}`);
+  }
+}
+
+/** sha256 hex of the canonical encoding of the full identity (BCI-02). Deterministic. */
+export function packetSemanticIdentityDigestV2(identity: PacketSemanticCacheIdentityV2): string {
+  assertPacketKeyShape(identity.packetKey);
+  for (const field of PACKET_CACHE_REQUIRED_V2) {
+    const value = identity[field];
+    if (typeof value !== 'string' || value.trim() === '') {
+      throw new TypeError(`packet cache identity v2 missing required field: ${field}`);
+    }
+  }
+  return canonicalSha256V1({
+    schema: 'atlas.packet-semantic-cache-identity.v2',
+    packetKey: identity.packetKey,
+    workspaceRevision: identity.workspaceRevision,
+    sourceRevision: identity.sourceRevision,
+    representationRevision: identity.representationRevision,
+    featureRevision: identity.featureRevision,
+    modelRevision: identity.modelRevision,
+    producerRevision: identity.producerRevision,
+    ontologyRevision: identity.ontologyRevision ?? null,
+    graphRevision: identity.graphRevision ?? null,
+  });
+}
+
+/** Physical v2 cache key: changes when ANY revision field changes (BCI-03). */
+export function packetSemanticCacheKeyV2(identity: PacketSemanticCacheIdentityV2): string {
+  return bifrostKey.semantic.packetV2(identity.packetKey, packetSemanticIdentityDigestV2(identity));
+}
+
+/** Reverse-locator key: depends on packetKey ONLY, so it is stable across revisions (BCI-04). */
+export function packetSemanticIndexKeyV2(packetKey: string): string {
+  assertPacketKeyShape(packetKey);
+  return bifrostKey.semantic.packetIndex(packetKey);
 }
 
 // ── LLM Cache Key Utilities ───────────────────────────────────────────────
