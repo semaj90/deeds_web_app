@@ -1,0 +1,244 @@
+{
+  "schema": "atlas.qdrant-producer-cohort-census.v1",
+  "canonicalAuthority": false,
+  "mode": "READ_ONLY",
+  "threshold": 0.995,
+  "perCohortSample": 12,
+  "collections": {
+    "codebase_chunks_768": {
+      "actualPointCount": 328348,
+      "distinctCohorts": 21,
+      "lineageQualifiedPoints": 30,
+      "cohortsAnalyzed": 20,
+      "pointsInAnalyzedCohorts": 328347,
+      "pointsInUnanalyzedTail": 1,
+      "cohorts": [
+        {
+          "cohort": "id=uuid pv=- lv=- pr=- rep=yy em=- mr=embeddinggemma:latest pg=n ref=n bf=- pgU=-",
+          "size": 219221,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 12,
+          "vectorSource": {
+            "FRESH_raw": 12
+          }
+        },
+        {
+          "cohort": "id=numeric pv=- lv=packet-identity-v1 pr=- rep=yn em=embeddinggemma mr=2026-07-29 pg=y ref=n bf=- pgU=2026-07",
+          "size": 50864,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 1,
+          "vectorSource": {
+            "FRESH_raw": 1
+          }
+        },
+        {
+          "cohort": "id=uuid pv=- lv=packet-identity-v1 pr=- rep=yn em=- mr=- pg=n ref=n bf=- pgU=-",
+          "size": 49476,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 1,
+          "vectorSource": {
+            "UNKNOWN": 1
+          }
+        },
+        {
+          "cohort": "id=uuid pv=- lv=packet-identity-v1 pr=- rep=yn em=- mr=- pg=n ref=y bf=2026-09 pgU=-",
+          "size": 2860,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 0,
+          "vectorSource": {}
+        },
+        {
+          "cohort": "id=uuid pv=- lv=- pr=- rep=nn em=- mr=- pg=n ref=n bf=- pgU=-",
+          "size": 2790,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 0,
+          "vectorSource": {}
+        },
+        {
+          "cohort": "id=numeric pv=- lv=packet-identity-v1 pr=- rep=yn em=embeddinggemma mr=2026-07-29 pg=y ref=y bf=2026-09 pgU=2026-07",
+          "size": 1499,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 12,
+          "vectorSource": {
+            "UNKNOWN": 11,
+            "FRESH_raw": 1
+          }
+        },
+        {
+          "cohort": "id=numeric pv=qdrant-backfill-v1 lv=packet-identity-v1 pr=- rep=yn em=- mr=- pg=n ref=n bf=- pgU=-",
+          "size": 866,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 12,
+          "vectorSource": {
+            "UNKNOWN": 12
+          }
+        },
+        {
+          "cohort": "id=uuid pv=- lv=packet-identity-v1 pr=graphify-content-768-v1+graphify-signature-768-v1 rep=nn em=embeddinggemma:latest mr=- pg=n ref=n bf=- pgU=-",
+          "size": 396,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 0,
+          "vectorSource": {}
+        },
+        {
+          "cohort": "id=numeric pv=qdrant-backfill-v1 lv=packet-identity-v1 pr=- rep=yn em=- mr=- pg=n ref=y bf=2026-09 pgU=-",
+          "size": 133,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 0,
+          "vectorSource": {}
+        },
+        {
+          "cohort": "id=numeric pv=- lv=packet-identity-v1 pr=graphify-content-768-v1+graphify-signature-768-v1 rep=nn em=embeddinggemma:latest mr=- pg=n ref=n bf=- pgU=-",
+          "size": 130,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 0,
+          "vectorSource": {}
+        },
+        {
+          "cohort": "id=uuid pv=- lv=packet-identity-v1 pr=graphify-content-768-v1 rep=nn em=embeddinggemma:latest mr=- pg=n ref=n bf=- pgU=-",
+          "size": 36,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 1,
+          "vectorSource": {
+            "COPY_OF_content_embedding_768": 1
+          }
+        },
+        {
+          "cohort": "id=uuid pv=- lv=- pr=- rep=yn em=- mr=- pg=n ref=y bf=2026-09 pgU=-",
+          "size": 29,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 1,
+          "vectorSource": {
+            "UNKNOWN": 1
+          }
+        },
+        {
+          "cohort": "id=uuid pv=- lv=- pr=- rep=yy em=embeddinggemma:latest mr=- pg=n ref=n bf=- pgU=-",
+          "size": 15,
+          "lineageQualified": 15,
+          "sampled": 12,
+          "eligibleForVectorComparison": 12,
+          "vectorSource": {
+            "COPY_OF_content_embedding_768": 12
+          }
+        },
+        {
+          "cohort": "id=numeric pv=- lv=packet-identity-v1 pr=- rep=yy em=embeddinggemma mr=2026-07-29 pg=y ref=n bf=- pgU=2026-07",
+          "size": 14,
+          "lineageQualified": 14,
+          "sampled": 12,
+          "eligibleForVectorComparison": 12,
+          "vectorSource": {
+            "COPY_OF_content_embedding_768": 12
+          }
+        },
+        {
+          "cohort": "id=numeric pv=- lv=packet-identity-v1 pr=graphify-content-768-v1 rep=nn em=embeddinggemma:latest mr=- pg=n ref=n bf=- pgU=-",
+          "size": 12,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 3,
+          "vectorSource": {
+            "COPY_OF_content_embedding_768": 3
+          }
+        },
+        {
+          "cohort": "id=numeric pv=- lv=- pr=- rep=yn em=embeddinggemma mr=2026-07-29 pg=y ref=y bf=2026-09 pgU=2026-07",
+          "size": 2,
+          "lineageQualified": 0,
+          "sampled": 2,
+          "eligibleForVectorComparison": 2,
+          "vectorSource": {
+            "FRESH_raw": 2
+          }
+        },
+        {
+          "cohort": "id=numeric pv=qdrant-backfill-v1 lv=- pr=- rep=yn em=- mr=- pg=n ref=y bf=2026-09 pgU=-",
+          "size": 1,
+          "lineageQualified": 0,
+          "sampled": 1,
+          "eligibleForVectorComparison": 0,
+          "vectorSource": {}
+        },
+        {
+          "cohort": "id=numeric pv=- lv=packet-identity-v1 pr=- rep=yy em=embeddinggemma mr=2026-07-29 pg=y ref=y bf=2026-09 pgU=2026-07",
+          "size": 1,
+          "lineageQualified": 1,
+          "sampled": 1,
+          "eligibleForVectorComparison": 1,
+          "vectorSource": {
+            "COPY_OF_content_embedding_768": 1
+          }
+        },
+        {
+          "cohort": "id=numeric pv=- lv=- pr=- rep=nn em=- mr=- pg=n ref=n bf=- pgU=-",
+          "size": 1,
+          "lineageQualified": 0,
+          "sampled": 1,
+          "eligibleForVectorComparison": 0,
+          "vectorSource": {}
+        },
+        {
+          "cohort": "id=uuid pv=- lv=- pr=graphify-content-768-v1+graphify-signature-768-v1 rep=nn em=embeddinggemma:latest mr=- pg=n ref=y bf=2026-09 pgU=-",
+          "size": 1,
+          "lineageQualified": 0,
+          "sampled": 1,
+          "eligibleForVectorComparison": 0,
+          "vectorSource": {}
+        }
+      ]
+    },
+    "codebase_chunks_768_v2": {
+      "actualPointCount": 52816,
+      "distinctCohorts": 3,
+      "lineageQualifiedPoints": 0,
+      "cohortsAnalyzed": 3,
+      "pointsInAnalyzedCohorts": 52816,
+      "pointsInUnanalyzedTail": 0,
+      "cohorts": [
+        {
+          "cohort": "id=uuid pv=- lv=- pr=v2_uuid_clean rep=nn em=embeddinggemma mr=- pg=y ref=n bf=- pgU=-",
+          "size": 52380,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 9,
+          "vectorSource": {
+            "FRESH_raw": 5,
+            "UNKNOWN": 4
+          }
+        },
+        {
+          "cohort": "id=uuid pv=- lv=- pr=- rep=yn em=- mr=- pg=n ref=n bf=- pgU=-",
+          "size": 435,
+          "lineageQualified": 0,
+          "sampled": 12,
+          "eligibleForVectorComparison": 0,
+          "vectorSource": {}
+        },
+        {
+          "cohort": "id=uuid pv=- lv=- pr=- rep=nn em=- mr=- pg=n ref=n bf=- pgU=-",
+          "size": 1,
+          "lineageQualified": 0,
+          "sampled": 1,
+          "eligibleForVectorComparison": 0,
+          "vectorSource": {}
+        }
+      ]
+    }
+  },
+  "databaseWrites": false,
+  "qdrantWrites": false,
+  "outcome": "QDRANT_PRODUCER_COHORT_CENSUS_PROVEN_UNKNOWN_COHORTS_PRESERVED"
+}
