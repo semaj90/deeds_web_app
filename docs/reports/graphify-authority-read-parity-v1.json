@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.graphify-authority-read-parity.v1",
+  "generatedAt": "2026-09-21T19:39:00.529Z",
+  "mode": "READ_ONLY_LIVE_LOADER_READBACK",
+  "transaction": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY; ... ROLLBACK",
+  "databaseError": null,
+  "booleanCanonicalRows": 1,
+  "authorityRows": 0,
+  "status": "PARITY_NOT_PROVEN",
+  "reasons": [
+    "NO_MATCHING_REVISION",
+    "BOOLEAN_ONLY:1"
+  ],
+  "counts": {
+    "MATCH": 0,
+    "MISMATCH": 0,
+    "BOOLEAN_ONLY": 1,
+    "AUTHORITY_ONLY": 0,
+    "BOOLEAN_CONFLICT": 0
+  },
+  "revisions": [
+    {
+      "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "parity": "BOOLEAN_ONLY",
+      "booleanExecutionIds": [
+        "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      ],
+      "authorityExecutionId": null
+    }
+  ],
+  "runtimeOwner": "canonical_authority",
+  "runtimeReaderCutover": false,
+  "writesPerformed": false
+}
