@@ -200,6 +200,7 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
     const res = await executeACPTool('openspec:workboard_recommend', {
       limit: task.metadata?.limit,
       change_id: task.metadata?.change_id,
+      released_events: task.metadata?.released_events,
     });
     return json({
       id: task.id,

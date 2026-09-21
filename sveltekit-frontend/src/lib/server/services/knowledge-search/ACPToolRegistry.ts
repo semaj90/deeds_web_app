@@ -927,6 +927,11 @@ const handlers: Record<string, HandlerFn> = {
     const startTime = Date.now();
     const limit = Math.min(50, Math.max(1, Number(args?.limit) || 10));
     const changeId = typeof args?.change_id === 'string' && args.change_id.trim() ? args.change_id.trim() : null;
+    // Gates the caller has itself proven (e.g. 'CURRENT_SOURCE_AUTHORITY_PROVEN'); a BLOCKED receipt whose
+    // `unblocks` lists one of these becomes retryable. Caller-asserted, not verified by this tool.
+    const releasedEvents: string[] = Array.isArray(args?.released_events)
+      ? args.released_events.filter((e: unknown): e is string => typeof e === 'string' && e.length > 0 && e.length <= 200).slice(0, 20)
+      : [];
 
     if (options?.dryRun) {
       return planResult([
@@ -957,7 +962,7 @@ const handlers: Record<string, HandlerFn> = {
         .filter((t) => t.state === 'ACTIONABLE' && (!changeId || t.changeId === changeId))
         .filter((t) => {
           const last = lastReceipt.get(String((t.raw as Record<string, unknown>).stableKey ?? t.id)) ?? null;
-          if (last && !shouldRetryTask(last)) { suppressedByReceipts += 1; return false; }
+          if (last && !shouldRetryTask(last, releasedEvents)) { suppressedByReceipts += 1; return false; }
           return true;
         })
         .map((t) => ({ t, blockerClass: classify(t.title, t.blockerKey) }));
@@ -989,6 +994,7 @@ const handlers: Record<string, HandlerFn> = {
           ready,
           actionableByBlockerClass: blockerCounts,
           receiptsRead: lastReceipt.size,
+          releasedEventsApplied: releasedEvents,
           suppressedByReceipts,
           blockerClassMethod: 'KEYWORD_HEURISTIC_NOT_AUTHORITATIVE',
           advisoryOnly: true,
@@ -1565,7 +1571,8 @@ export const TOOLS: Record<string, ACPTool> = {
       type: 'object',
       properties: {
         limit: { type: 'number', description: 'Max tasks to return (1-50, default 10)', minimum: 1, maximum: 50 },
-        change_id: { type: 'string', description: 'Optional OpenSpec change id to filter to', maxLength: 200 }
+        change_id: { type: 'string', description: 'Optional OpenSpec change id to filter to', maxLength: 200 },
+        released_events: { type: 'array', items: { type: 'string', maxLength: 200 }, maxItems: 20, description: 'Gates the caller has proven (e.g. CURRENT_SOURCE_AUTHORITY_PROVEN). BLOCKED receipts whose unblocks include one of these are re-offered. Caller-asserted, not verified here.' }
       },
       additionalProperties: false
     },
