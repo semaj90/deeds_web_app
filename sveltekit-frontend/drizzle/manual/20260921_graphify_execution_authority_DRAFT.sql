@@ -57,7 +57,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS graphify_executions_one_canonical_uidx_v1
   ON graphify_executions (workspace_id, workspace_revision) WHERE canonical_authority IS TRUE;
 
 -- 5. Input identity for RECOGNIZING an identical processing contract over an identical immutable input (e.g. to decide
---    COMPLETED_REUSED). Nullable and NOT backfilled: the contract revisions behind the 36 historical runs are not recorded.
+--    COMPLETED_REUSED). Nullable and NOT backfilled by this file (operator decision). Correction 2026-09-21: parser / extraction / graph-algorithm
+--    contract versions ARE recorded on all 36 historical rows; only a feature-contract revision has no column, so a backfill of a reduced recipe is possible later.
 --    The runner MUST NOT populate this until the canonical input serialization is frozen and reviewed. Intended recipe:
 --      sha256(canonicalEncode({ workspaceId, workspaceRevision, snapshotChecksum, parserRevision, graphifyAlgorithmRevision,
 --                               extractionContractRevision, featureContractRevision }))
