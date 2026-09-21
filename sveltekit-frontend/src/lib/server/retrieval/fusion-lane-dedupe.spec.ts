@@ -65,3 +65,27 @@ describe('fuseCandidates semantic executors (DIR-INDEX-10C)', () => {
     expect([...(fused[0]!.contributingLanes ?? [])].sort()).toEqual(['qdrant', 'qdrant_768']);
   });
 });
+
+describe('fuseSearchRuntimeCandidates diagnostics (DIR-INDEX-10D)', () => {
+  it('keeps lane-local evidence separate from the cross-lane fusion score', () => {
+    const fused = fuseCandidates([
+      cand('A', 'qdrant', 0.9, { retrievalExecutor: 'qdrant-http' }),
+      cand('A', 'qdrant_768', 0.85, { retrievalExecutor: 'pgvector-exact' }),
+      cand('A', 'postgres_trigram', 0.7),
+    ]);
+    const a = fused[0]!;
+    const evidence = a.laneEvidence ?? [];
+    expect(evidence.map((e) => e.lane).sort()).toEqual(['dense', 'lexical']);
+
+    const dense = evidence.find((e) => e.lane === 'dense')!;
+    // both physical executors are recorded for audit ...
+    expect([...dense.executorIds].sort()).toEqual(['pgvector-exact', 'qdrant-http']);
+    expect(dense.supportingHitCount).toBe(2);
+    expect(dense.bestRank).toBe(1);
+
+    // ... but only one vote per lane reaches the cross-lane score
+    const summed = evidence.reduce((sum, e) => sum + 1 / (RRF_K + e.bestRank), 0);
+    expect(a.fusionScore).toBeCloseTo(summed, 10);
+    expect(a.fusionScore).toBeCloseTo(2 / (RRF_K + 1), 10);
+  });
+});
