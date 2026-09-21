@@ -1,35 +1,35 @@
 {
   "schema": "atlas.graphify-authority-read-parity.v1",
-  "generatedAt": "2026-09-21T19:39:00.529Z",
+  "generatedAt": "2026-09-21T19:41:05.257Z",
   "mode": "READ_ONLY_LIVE_LOADER_READBACK",
   "transaction": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY; ... ROLLBACK",
   "databaseError": null,
   "booleanCanonicalRows": 1,
   "authorityRows": 0,
-  "status": "PARITY_NOT_PROVEN",
-  "reasons": [
-    "NO_MATCHING_REVISION",
-    "BOOLEAN_ONLY:1"
-  ],
+  "status": "LEGACY_PRESENT_AUTHORITY_MISSING",
+  "readParityProven": false,
   "counts": {
-    "MATCH": 0,
-    "MISMATCH": 0,
-    "BOOLEAN_ONLY": 1,
-    "AUTHORITY_ONLY": 0,
-    "BOOLEAN_CONFLICT": 0
+    "MULTIPLE_LEGACY_CANONICAL_ROWS": 0,
+    "MULTIPLE_AUTHORITY_ROWS": 0,
+    "SELECTION_MISMATCH": 0,
+    "AUTHORITY_PRESENT_LEGACY_MISSING": 0,
+    "LEGACY_PRESENT_AUTHORITY_MISSING": 1,
+    "NO_SELECTION": 0,
+    "PARITY_PROVEN": 0
   },
   "revisions": [
     {
       "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
       "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-      "parity": "BOOLEAN_ONLY",
-      "booleanExecutionIds": [
+      "state": "LEGACY_PRESENT_AUTHORITY_MISSING",
+      "legacyExecutionIds": [
         "74d50c86-8194-45ea-8c3d-61aab737ef83"
       ],
-      "authorityExecutionId": null
+      "authorityExecutionIds": []
     }
   ],
-  "runtimeOwner": "canonical_authority",
+  "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+  "mutationAuthorized": false,
   "runtimeReaderCutover": false,
   "writesPerformed": false
 }

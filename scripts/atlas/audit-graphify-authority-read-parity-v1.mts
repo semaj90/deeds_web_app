@@ -39,13 +39,14 @@ const report = {
   booleanCanonicalRows: counts?.boolean_canonical_rows ?? null,
   authorityRows: counts?.authority_rows ?? null,
   status: databaseError ? 'LOADER_FAILED' : result.status,
-  reasons: result?.reasons ?? [],
+  readParityProven: result?.readParityProven ?? false,
   counts: result?.counts ?? null,
   revisions: result?.revisions ?? [],
-  runtimeOwner: 'canonical_authority',
+  runtimeOwner: result?.runtimeOwner ?? 'LEGACY_CANONICAL_AUTHORITY',
+  mutationAuthorized: result?.mutationAuthorized ?? false,
   runtimeReaderCutover: false,
   writesPerformed: false,
 };
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
-console.log(JSON.stringify({ ...report, revisions: report.revisions.map((r: any) => ({ parity: r.parity, legacy: r.booleanExecutionIds.map((i: string) => i.slice(0, 8)), authority: r.authorityExecutionId })) }, null, 2));
+console.log(JSON.stringify({ ...report, revisions: report.revisions.map((r: any) => ({ state: r.state, legacy: r.legacyExecutionIds.map((i: string) => i.slice(0, 8)), authority: r.authorityExecutionIds })) }, null, 2));
