@@ -7,10 +7,12 @@
  * it remains UNKNOWN.
  */
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { blockHash, parseWfu, resolveDeclarations, sectionSlug, sha256, stripWfuComment, summarizeDeclared, taskBlock } from './lib/wfu-metadata.mjs';
 
-const root = process.cwd();
+// Repo root is owned by this script's location, not by process.cwd() (running from scripts/atlas wrote to a nonexistent scripts/atlas/docs path).
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const changesRoot = join(root, 'openspec', 'changes');
 const reportPath = join(root, 'docs', 'reports', 'openspec-workboard-v1.json');
 const markdownPath = join(root, 'docs', 'OPENSPEC-WORKBOARD.md');
