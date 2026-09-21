@@ -67,6 +67,10 @@ let sharedPool: pg.Pool | null = null;
 // whose live schema (chunk_id/grade) does not match this runner. Dry-run only; results are deduped to file level.
 const qrelsFile = optArg('--qrels-file', '');
 if (qrelsFile && !dryRun) throw new Error('--qrels-file requires --dry-run');
+const allowUnjudged = args.includes('--allow-unjudged-as-irrelevant');
+// Qrels-mode assertions (frozen policy): @K metrics use unique FILES after collapse; judged-but-unretrieved relevant files stay in the
+// Recall/NDCG denominators (gt-based); unjudged retrieved files are NOT silently treated as irrelevant: coverage is reported and the run fails closed.
+const coverage = new Map<string, { judged: number; total: number; shortQueries: number; queries: number }>();
 const qrelsQueries: Array<{ id: string; query: string; domain: string }> = [];
 const qrelsGt: Array<{ query_id: string; packet_key: string; relevance_grade: number; confidence: number; judgment_source: string }> = [];
 if (qrelsFile) {
@@ -426,6 +430,15 @@ async function runAblation(
     }
     // Grade each result against ground-truth
     const grades = results.map(r => gtByKey.get(r.packetKey)?.grade ?? 0);
+    if (qrelsFile) {
+      const c = coverage.get(config.id) ?? { judged: 0, total: 0, shortQueries: 0, queries: 0 };
+      const top = results.slice(0, 10);
+      c.total += top.length;
+      c.judged += top.filter((r) => gtByKey.has(r.packetKey)).length;
+      c.queries += 1;
+      if (top.length < 10) c.shortQueries += 1;
+      coverage.set(config.id, c);
+    }
 
     const metrics: QueryMetrics = {
       ndcg10: ndcg(grades, 10, gt.map(g => g.grade)),
@@ -623,6 +636,18 @@ async function main(): Promise<void> {
   };
   console.log(`\nBest NDCG@10: ${best('ndcg10')}  |  Best MAP: ${best('map')}  |  Best MRR: ${best('mrr')}`);
 
+  console.log('NDCG definition: JUDGED_IDEAL_V2 (ideal DCG from the judged grades for that query; not comparable to earlier runner receipts, which used the retrieved list as the ideal)');
+  if (qrelsFile) {
+    for (const [id, c] of coverage) {
+      const pct = c.total ? (100 * c.judged / c.total).toFixed(1) : 'n/a';
+      console.log(`judgment coverage ${id}: ${c.judged}/${c.total} of top-10 unique files judged (${pct}%); queries with <10 unique files: ${c.shortQueries}/${c.queries}`);
+    }
+    const incomplete = [...coverage.values()].some((c) => c.judged < c.total || c.shortQueries > 0);
+    if (incomplete && !allowUnjudged) {
+      console.log('INCOMPLETE_JUDGMENT_COVERAGE: unjudged or missing top-10 files present; metrics above are provisional. Grade the missing files or pass --allow-unjudged-as-irrelevant to accept the TREC-style policy explicitly.');
+      process.exitCode = 2;
+    }
+  }
   if (dryRun) {
     console.log('\n[DRY-RUN] No results written to database.');
   } else {
