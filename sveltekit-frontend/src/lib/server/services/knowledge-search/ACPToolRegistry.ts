@@ -947,8 +947,35 @@ const handlers: Record<string, HandlerFn> = {
         if (/operator|decision|owner|approve/.test(s)) return 'NEEDS_OPERATOR_DECISION';
         return 'UNCLASSIFIED_POSSIBLY_READY';
       };
+      // WORKBOARD-05: suppress tasks whose latest attempt receipt says do-not-retry. Receipts are an
+      // append-only JSONL in the reports dir; missing file or unparsable lines are ignored (fail open).
+      const lastReceipt = new Map<string, import('$lib/server/atlas/contracts/task-attempt-receipt-v1').TaskAttemptReceiptV1>();
+      try {
+        const [{ TaskAttemptReceiptV1Schema }, { resolveOpenSpecReportDirectory }, fsp, pathMod] = await Promise.all([
+          import('$lib/server/atlas/contracts/task-attempt-receipt-v1'),
+          import('$lib/server/atlas/openspec-board/report-reader'),
+          import('node:fs/promises'),
+          import('node:path'),
+        ]);
+        const dir = await resolveOpenSpecReportDirectory();
+        const raw = await fsp.readFile(pathMod.join(dir, 'task-attempt-receipts-v1.jsonl'), 'utf8');
+        for (const line of raw.split(/\r?\n/)) {
+          if (!line.trim()) continue;
+          try {
+            const parsed = TaskAttemptReceiptV1Schema.safeParse(JSON.parse(line));
+            if (parsed.success) lastReceipt.set(parsed.data.logicalTaskKey, parsed.data);
+          } catch { /* skip malformed line */ }
+        }
+      } catch { /* no receipts file yet */ }
+      const { shouldRetryTask } = await import('$lib/server/atlas/contracts/task-attempt-receipt-v1');
+      let suppressedByReceipts = 0;
       const candidates = snapshot.tasks
         .filter((t) => t.state === 'ACTIONABLE' && (!changeId || t.changeId === changeId))
+        .filter((t) => {
+          const last = lastReceipt.get(t.id) ?? null;
+          if (last && !shouldRetryTask(last)) { suppressedByReceipts += 1; return false; }
+          return true;
+        })
         .map((t) => ({ t, blockerClass: classify(t.title, t.blockerKey) }));
       const blockerCounts: Record<string, number> = {};
       for (const c of candidates) blockerCounts[c.blockerClass] = (blockerCounts[c.blockerClass] ?? 0) + 1;
@@ -975,6 +1002,8 @@ const handlers: Record<string, HandlerFn> = {
           freshness: snapshot.freshness,
           ready,
           actionableByBlockerClass: blockerCounts,
+          receiptsRead: lastReceipt.size,
+          suppressedByReceipts,
           blockerClassMethod: 'KEYWORD_HEURISTIC_NOT_AUTHORITATIVE',
           advisoryOnly: true,
           canonicalAuthority: false,
