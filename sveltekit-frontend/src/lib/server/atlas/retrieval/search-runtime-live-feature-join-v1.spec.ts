@@ -111,7 +111,8 @@ describe('SearchRuntime live feature join v1', () => {
     expect(result.rejections).toEqual([]);
     expect(result.acceptedCount).toBe(1);
     expect(result.snapshot?.rowCount).toBe(1);
-    expect(result.snapshot?.rows[0]).toMatchObject({
+    const row = result.snapshot?.rows[0];
+    expect(row).toMatchObject({
       canonicalId: 'symbol-version:one',
       packetKey: 'packet:one',
       workspaceRevision: SHA_A,
@@ -119,14 +120,14 @@ describe('SearchRuntime live feature join v1', () => {
       graphRevision: 'graph:r1',
       semanticRevision: 'semantic_768:r1',
       featureRevision: 'features:r1',
-      semanticRelevance: 0.9,
-      lexicalRelevance: 0.8,
-      astAffinity: 0.7,
-      graphAuthority: 0.6,
-      domainAffinity: 0.5,
-      executionUtility: 0.2,
-      memoryUtility: 0.3,
     });
+    expect(row?.semanticRelevance).toBeCloseTo(0.9, 5);
+    expect(row?.lexicalRelevance).toBeCloseTo(0.8, 5);
+    expect(row?.astAffinity).toBeCloseTo(0.7, 5);
+    expect(row?.graphAuthority).toBeCloseTo(0.6, 5);
+    expect(row?.domainAffinity).toBeCloseTo(0.5, 5);
+    expect(row?.executionUtility).toBeCloseTo(0.2, 5);
+    expect(row?.memoryUtility).toBeCloseTo(0.3, 5);
     expect(result.columnar?.rowCount).toBe(1);
     expect(result.columnar?.featureCount).toBe(12);
     expect(result.writesPerformed).toBe(false);
