@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.golden-pool-identity-binding-v1",
+  "status": "POOLED_QUEUE_ADAPTED",
+  "canonicalAuthority": false,
+  "queries": 60,
+  "candidatesAfterDedupe": 1287,
+  "bindingStats": {
+    "exactLineage": 267,
+    "sourceRefFallback": 2041,
+    "unresolved": 174
+  },
+  "note": "SOURCE_REF_FALLBACK_DEGRADED binds at file level (chunk grain lost); UNRESOLVED excluded, not invented. No symbol_version_id column exists on codebase_chunk_index.",
+  "databaseWrites": false,
+  "nextRequiredStep": "validate-golden-relevance-review-queue-v1 then blind human grading"
+}
