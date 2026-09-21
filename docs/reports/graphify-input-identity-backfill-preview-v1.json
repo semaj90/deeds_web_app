@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-input-identity-backfill-preview.v1",
-  "generatedAt": "2026-09-21T19:00:40.035Z",
+  "generatedAt": "2026-09-21T19:18:26.004Z",
   "mode": "READ_ONLY_PREVIEW",
   "recipeSchema": "atlas.graphify-input-identity.v1",
   "recipeFields": [
@@ -13,18 +13,35 @@
     "graphAlgorithmRevision"
   ],
   "databaseError": null,
+  "mapping": {
+    "sourceIdentityKey": "repository_id:repository_relative_path",
+    "sourceRevision": "code_source_revision",
+    "byteLength": "byte_length",
+    "sortOrder": "UTF-8 byte order"
+  },
+  "parity": {
+    "membership_rows": 351065,
+    "missing_fields": 0,
+    "source_revision_content_hash_mismatch": 0,
+    "non_normalized_content_hash": 0,
+    "paths_needing_normalization": 0,
+    "identity_key_collisions": 0
+  },
   "executionsExamined": 36,
   "recipeInputsComplete": 36,
   "incompleteExecutionIds": [],
-  "distinctInputIdentities": 26,
-  "duplicateGroups": 6,
+  "distinctInputIdentities": 28,
+  "duplicateGroups": 4,
   "conflictingCanonicalSerializations": 0,
   "groups": [
     {
-      "inputIdentity": "sha256:974f2bb13cdc2c766f1cc1d02aa1f9c01c9cd91daa3bf5864b4225d0813a4d23",
+      "inputIdentity": "sha256:fa9109a650aaf767cb53b9db15336f56bc43ca6c41be0a43148faf0e4dcdd7bf",
       "count": 5,
       "workspaceRevision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
-      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "sourceSelectionChecksum": "sha256:caa587eed6b9d76f0038263c3fc37899ec194470314f6149f9b9db9df5a462ea",
+      "refsOnlyChecksums": [
+        "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -58,15 +75,28 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "bfc5739f-554a-44c9-86f6-d239cb9b842a",
+        "6e64486f-c195-4b31-9b9e-7fe8f194523b",
+        "f9115616-7747-4879-a98f-fc0e189f71d8"
+      ],
+      "reuseIneligibleExecutionIds": [
+        "9fb02c30-5f7d-4c36-bb9f-24663a53e7a9",
+        "9873c46e-9f13-4183-81f8-82cf74c06d81"
+      ],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
     },
     {
-      "inputIdentity": "sha256:9549745ecfeb755698b3f2e081bacc91b48ebba98bbd2a3a5f0f34f292f516c7",
+      "inputIdentity": "sha256:89fb8de582f5455e1d624bb8aa3162bd4d7be42747c5b132e6d57b2b91e74186",
       "count": 3,
       "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
-      "sourceSelectionChecksum": "sha256:09d72ebc06e32055ba3d0b6ed62497d5f63d384ea9087ac5780a82707bdc7652",
+      "sourceSelectionChecksum": "sha256:8c9c522d2be9f556a52e018943618d619b7e1e5938e65a3df2aebd23a49d6858",
+      "refsOnlyChecksums": [
+        "sha256:09d72ebc06e32055ba3d0b6ed62497d5f63d384ea9087ac5780a82707bdc7652"
+      ],
       "memberCount": 1,
       "contracts": [
         "graphify.parser.v1",
@@ -90,15 +120,25 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "24c421a1-28b1-431d-ac09-2793ed807ca6",
+        "3ded0ce6-cd8c-419f-96c9-49984824c956",
+        "b337f94c-850b-44b5-99a7-ba6a6cfaeedf"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
     },
     {
-      "inputIdentity": "sha256:10e6e615bb7f9ce4e0ad51c9d37961b824345488a449a05163997e38fe4dcace",
+      "inputIdentity": "sha256:772dceb7956534f32419745c9a5ef422e4cac356a6dae77e1093dc87d2b5cfb1",
       "count": 2,
       "workspaceRevision": "sha256:c57775da8eb8320fbeae542e7e9ee608f35db56f19d76ed00363ed8c759fe1f0",
-      "sourceSelectionChecksum": "sha256:150aabf95d88ac048d2fb61f7d48ace24ddc8a641a939c708d53112cbfef7927",
+      "sourceSelectionChecksum": "sha256:ae0ed732142b50306effa1696b66936cdc3aff86803e4058c4a5061296688ac1",
+      "refsOnlyChecksums": [
+        "sha256:150aabf95d88ac048d2fb61f7d48ace24ddc8a641a939c708d53112cbfef7927"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -117,69 +157,24 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "747d0c3d-f9a6-4376-8314-387ecdef9923",
+        "24b32bc1-beca-4451-ad97-d71e7abe1af4"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
     },
     {
-      "inputIdentity": "sha256:198be8eb9c6e62add7f7f0391376fab98fe0ef9d294451a652fc1ec48198bb28",
-      "count": 2,
-      "workspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
-      "sourceSelectionChecksum": "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642",
-      "memberCount": 25266,
-      "contracts": [
-        "graphify.parser.v1",
-        "graphify.extraction.v1",
-        "graphify.graph.v1"
-      ],
-      "executions": [
-        {
-          "executionId": "c418970d-b6d1-4258-a262-2ba3fb06f213",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        },
-        {
-          "executionId": "49681845-d45e-4e00-851a-31a28fb993ab",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        }
-      ],
-      "canonicalCount": 0,
-      "canonicalExecutionId": null,
-      "outputsEquivalent": "MEMBERSHIP_DIFFERS"
-    },
-    {
-      "inputIdentity": "sha256:a51534a949e6dcc36253dcf7dc415218bd2db7b0b09b044a3aed5b39b09aa4fb",
-      "count": 2,
-      "workspaceRevision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
-      "sourceSelectionChecksum": "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642",
-      "memberCount": 25266,
-      "contracts": [
-        "graphify.parser.v1",
-        "graphify.extraction.v1",
-        "graphify.graph.v1"
-      ],
-      "executions": [
-        {
-          "executionId": "9524dd40-b9d4-4c13-9c7f-ccdbf0387af4",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        },
-        {
-          "executionId": "255ca44b-947a-4a25-9e6c-a8890ea7555a",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        }
-      ],
-      "canonicalCount": 0,
-      "canonicalExecutionId": null,
-      "outputsEquivalent": "MEMBERSHIP_DIFFERS"
-    },
-    {
-      "inputIdentity": "sha256:3613382a894b524710504df5b3f2d0388bccab657f6ee96843518783dfe47942",
+      "inputIdentity": "sha256:6f18e102767b8c53a29bcdd9fe40e04fc01becb7fb58cc0121364149dadacc81",
       "count": 2,
       "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-      "sourceSelectionChecksum": "sha256:a589265fa5491d8ceffaab4759470d5bb44119e3f88cd89c715f1757b5e83c86",
+      "sourceSelectionChecksum": "sha256:da4d765d0cd0a399605ebde21a0fb58f7d6a251aba9a572ddbc265c56b89985b",
+      "refsOnlyChecksums": [
+        "sha256:a589265fa5491d8ceffaab4759470d5bb44119e3f88cd89c715f1757b5e83c86"
+      ],
       "memberCount": 25542,
       "contracts": [
         "graphify.parser.v1",
@@ -198,15 +193,24 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 1,
       "canonicalExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
       "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
     },
     {
-      "inputIdentity": "sha256:79ef2a81f52e6eb425346b4479a8286301321211083594327550dd2dad29d236",
+      "inputIdentity": "sha256:186ffdad0fe36137e8bac627cac73939e9383be61a7a2221a8fb852077bbeaa6",
       "count": 1,
       "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
-      "sourceSelectionChecksum": "sha256:84123573ab91217d8135f97f5f32f9094fabd7a2d0fdba3bc3c5bf81d5f9f243",
+      "sourceSelectionChecksum": "sha256:c5c265ba56c7fb735984991d6e08ffd054cca9cb818a3eadf68869081e71c66c",
+      "refsOnlyChecksums": [
+        "sha256:84123573ab91217d8135f97f5f32f9094fabd7a2d0fdba3bc3c5bf81d5f9f243"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -220,15 +224,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "5dc82676-d8a5-470e-a3b9-e06a98fb3de5"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:b116472bfc6897a187842a5445003665d59e60ceabd2ff1234f723f034fe00f2",
+      "inputIdentity": "sha256:9139192aeab4f72b001473c27cdace68794c11c1327340ee2e0062c3b1f1895b",
       "count": 1,
       "workspaceRevision": "sha256:c17c40c28da9c0ec831c4a5beb7390fb73a581c6b147cae95c8da79d3fcfb4d2",
-      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "sourceSelectionChecksum": "sha256:caa587eed6b9d76f0038263c3fc37899ec194470314f6149f9b9db9df5a462ea",
+      "refsOnlyChecksums": [
+        "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -242,15 +254,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "fe3dcfa6-da34-4a30-9281-e56d752f77ec"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:7fa7beb02a981e8255ba4c9ca7f1c0684810d09a2de24d104059e8b704fef72c",
+      "inputIdentity": "sha256:c720be36972a6e5a64b58f58f5fdef1eff970895f4c985e91b385669c9251e22",
       "count": 1,
       "workspaceRevision": "sha256:817549d78646b52a0f34f8af96970ae95256b87e59125d1542611f8f386d69bb",
-      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "sourceSelectionChecksum": "sha256:caa587eed6b9d76f0038263c3fc37899ec194470314f6149f9b9db9df5a462ea",
+      "refsOnlyChecksums": [
+        "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -264,15 +284,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "680906bc-2bfd-48d5-b96e-5b9b4a4198d1"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:30a9a888766989d9a9fefbdb9e9fc4b3a29dc71d5477fefa63f36fe923b2b0f9",
+      "inputIdentity": "sha256:4d1788b4af738f41d9f3eb6a72ceefc581b1a1e12f5c94143e532070d26ab735",
       "count": 1,
       "workspaceRevision": "sha256:bc74ddc7e74af1e6fa9681182e2bc97fa4b2dc49d59c40c251fb505d22bf3ba1",
-      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "sourceSelectionChecksum": "sha256:caa587eed6b9d76f0038263c3fc37899ec194470314f6149f9b9db9df5a462ea",
+      "refsOnlyChecksums": [
+        "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -286,15 +314,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "5b219159-d033-4d09-8174-6f602789e89b"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:519e22c0f9a95862be15549d4321bcbfd08f9e8e985e8f784d7e946e79431c46",
+      "inputIdentity": "sha256:068ea1b1be102deac3be77d30e66916f6ed776ce216e29e2b783b887cf38474b",
       "count": 1,
       "workspaceRevision": "sha256:ec2cc83d87c6f88c7fea4980f3d6d50db8a5d8686f6f4899d87645f0b5cd6507",
-      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "sourceSelectionChecksum": "sha256:caa587eed6b9d76f0038263c3fc37899ec194470314f6149f9b9db9df5a462ea",
+      "refsOnlyChecksums": [
+        "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -308,15 +344,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "709e5232-879a-46a8-963d-71c45e2658f0"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:5060b601d899035ad01dbfcaa9e75ca661a83531a8fc14d69e5953e3624d82dc",
+      "inputIdentity": "sha256:2ca601b2ca0377d4fb39d2f9298b1b873fa5689d625fe442f8101b34164753e8",
       "count": 1,
       "workspaceRevision": "sha256:c44511cb21e26ca33b97ae6a7f3878827883dd11680db7aeefd60c477711be70",
-      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "sourceSelectionChecksum": "sha256:caa587eed6b9d76f0038263c3fc37899ec194470314f6149f9b9db9df5a462ea",
+      "refsOnlyChecksums": [
+        "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -330,15 +374,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "8894000e-d7cc-4298-8201-3f3ad6a0ce57"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:5de0e07d46bb579b1a5e393d8ea2a35cca3ced5091dc7074d6c49cd4823d1d01",
+      "inputIdentity": "sha256:8827bc66d192092a9411cd367ad7ef4efbf5b05692a5ec8b285d6bce6d2c5311",
       "count": 1,
       "workspaceRevision": "sha256:5d4ee74f53ea47ba80d4835494856fd0cfbc9ae532cabf8db1a17277d937510f",
-      "sourceSelectionChecksum": "sha256:72dad9e9f47b5fd87c5a6de94ea7ca8ea86380255e4143fd1ffc7ce4e1db74ca",
+      "sourceSelectionChecksum": "sha256:5d4f9dbd7a5a74d71775a208aa2b64c0a872f4a286b5050a50ef01cbfa0c9cfe",
+      "refsOnlyChecksums": [
+        "sha256:72dad9e9f47b5fd87c5a6de94ea7ca8ea86380255e4143fd1ffc7ce4e1db74ca"
+      ],
       "memberCount": 50,
       "contracts": [
         "graphify.parser.v1",
@@ -352,15 +404,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "45938370-7d17-4b25-a118-363997035e40"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:6f5044734cbfb4bab19756572c37372e030bd51eb925e914c8fbf46c7904f06a",
+      "inputIdentity": "sha256:ef73029f4c9f6ee3959e469719776e3b44110d2bcee19751ad63b47e061d9e02",
       "count": 1,
       "workspaceRevision": "sha256:5db2bc428d4dcf07c2a11096039aad18c916b50aa17e849b2325a782d981dcdc",
-      "sourceSelectionChecksum": "sha256:21fbb359d7a6be98e021a6fda53279e259e87570b287711342ed7018778a521a",
+      "sourceSelectionChecksum": "sha256:ff9ea82adfb8e003ab8f88e97ff6dadd000f12bc49a8c2ee3c3fc863ee8106cf",
+      "refsOnlyChecksums": [
+        "sha256:21fbb359d7a6be98e021a6fda53279e259e87570b287711342ed7018778a521a"
+      ],
       "memberCount": 24132,
       "contracts": [
         "graphify.parser.v1",
@@ -374,15 +434,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "ccb615ba-99da-4801-bcf7-0e8a63e7376a"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:6a9f379325fba43dc56e48eaddd85160f6f7649c6597755ed056615992742b8c",
+      "inputIdentity": "sha256:2164cb2c6cb84f2fe3129aa413c8af379842ddaf93aebd42ed289b7203d6857f",
       "count": 1,
       "workspaceRevision": "sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82",
-      "sourceSelectionChecksum": "sha256:21fbb359d7a6be98e021a6fda53279e259e87570b287711342ed7018778a521a",
+      "sourceSelectionChecksum": "sha256:dd8c005b7b95dafcbe8fefff5a9c3d1b48b5ba3368c920345aa25179c4dc1d23",
+      "refsOnlyChecksums": [
+        "sha256:21fbb359d7a6be98e021a6fda53279e259e87570b287711342ed7018778a521a"
+      ],
       "memberCount": 24132,
       "contracts": [
         "graphify.parser.v1",
@@ -396,15 +464,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "24719bbd-3d33-4daf-bdec-f65277c6b149"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:99ce580b09937e92e9116bda512a501c8779078f4dc426167e95f62155c78e8b",
+      "inputIdentity": "sha256:5317e7704168c34f20a493ec91e501889a786aa25c409da2276cff19fe7188e0",
       "count": 1,
       "workspaceRevision": "sha256:0b5cb14bd9014009ea8debc779df62cb3f6e669f8de94c79ad98ca8b88ff5e24",
-      "sourceSelectionChecksum": "sha256:cf2154f1b0c515a5af981803646cca0e0b76b89b213fd52ab4a2d9044fdf1990",
+      "sourceSelectionChecksum": "sha256:9198adff2d38bd72d2e8da980fbc16e7e469db2e7535fdeeb423fd03fc8f045f",
+      "refsOnlyChecksums": [
+        "sha256:cf2154f1b0c515a5af981803646cca0e0b76b89b213fd52ab4a2d9044fdf1990"
+      ],
       "memberCount": 24139,
       "contracts": [
         "graphify.parser.v1",
@@ -418,15 +494,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "8bd073a7-a8a9-43b7-b53a-778d33e3b524"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:d972132b71425b440a594dbcba95942b3b4a6d21022afe6ea6c10b0f870f676f",
+      "inputIdentity": "sha256:7f1b5bdc13641ac3aaf34df81a58bbd5f02d955d10cf39245fab79efd78d7024",
       "count": 1,
       "workspaceRevision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
-      "sourceSelectionChecksum": "sha256:150aabf95d88ac048d2fb61f7d48ace24ddc8a641a939c708d53112cbfef7927",
+      "sourceSelectionChecksum": "sha256:ae0ed732142b50306effa1696b66936cdc3aff86803e4058c4a5061296688ac1",
+      "refsOnlyChecksums": [
+        "sha256:150aabf95d88ac048d2fb61f7d48ace24ddc8a641a939c708d53112cbfef7927"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -440,15 +524,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "de2b1e77-9849-4449-98ca-96a729491f2e"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:d57627fee76884db05b285a76ac96e4da9ccdfca8ad7897a3884de1e8a69b4c0",
+      "inputIdentity": "sha256:3b7c24a8fe30d5f079ef7bb61ad4e595adbf1a608fdd50965f4aa36fc793acf8",
       "count": 1,
       "workspaceRevision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
-      "sourceSelectionChecksum": "sha256:9d100f01792d9648e52cefa1ed4671372b1d462ee000b82ed4529cee8a5fc5aa",
+      "sourceSelectionChecksum": "sha256:57c1fce881290512042a9d890401735876795c5cc381149dbdd05df098a3dad3",
+      "refsOnlyChecksums": [
+        "sha256:9d100f01792d9648e52cefa1ed4671372b1d462ee000b82ed4529cee8a5fc5aa"
+      ],
       "memberCount": 50,
       "contracts": [
         "graphify.parser.v1",
@@ -462,15 +554,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "8c6891d3-27fe-4913-9f46-bd8f6cb129cf"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:06ea60d85615221433c7feb26ed71120b0fc4854730c8414eb57332beb9044c7",
+      "inputIdentity": "sha256:603b4039e90b7dbeb8c038dd23261d2851b860b9766f1b11950f47701ac41433",
       "count": 1,
       "workspaceRevision": "sha256:578fc2602ee7ad6c29afea852f011cbff297b42ec0d4e8509e083e74f3d85500",
-      "sourceSelectionChecksum": "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642",
+      "sourceSelectionChecksum": "sha256:5a9a8ef7fec9e9df9a3071a927395a5543292ff5c9afa7fa8218988d475acb47",
+      "refsOnlyChecksums": [
+        "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642"
+      ],
       "memberCount": 25266,
       "contracts": [
         "graphify.parser.v1",
@@ -484,15 +584,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "956f03c2-d396-4e9e-9b68-69a8fb38cdb4"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:06e238b55cd6068f7bcd9005f06c09d29e1039e95d09916a3710090b573aff2e",
+      "inputIdentity": "sha256:63ca49b3203a5737f47bb51c9c22f4fd448eae1cdf9c7e52d6c22ceb040397cf",
       "count": 1,
       "workspaceRevision": "sha256:8ebe1fdd07b6e2c0c78d55e42c7fc9bf73ee21a6f87d31dbf2ca4032eb624669",
-      "sourceSelectionChecksum": "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642",
+      "sourceSelectionChecksum": "sha256:5d49b7a498a1b6147e2a4230b3e6420fb895951951b9cb31c890469db8f5eef4",
+      "refsOnlyChecksums": [
+        "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642"
+      ],
       "memberCount": 25266,
       "contracts": [
         "graphify.parser.v1",
@@ -506,15 +614,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "945b3d60-784a-4669-a08a-82405bbb8133"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:9af9bb7a9bdef5245483746a85ac288317ce857fb34209f2bf87810f6ee0d92f",
+      "inputIdentity": "sha256:ed8b828bb684c9c51c85598d6f756a08cbac9b9a9f56af64f11e020c4726a2aa",
       "count": 1,
       "workspaceRevision": "sha256:bf3acebd9e4140b8d77ee4fd8839a888b57c3401d26a74e06aeca7e4ae2579e2",
-      "sourceSelectionChecksum": "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642",
+      "sourceSelectionChecksum": "sha256:5d49b7a498a1b6147e2a4230b3e6420fb895951951b9cb31c890469db8f5eef4",
+      "refsOnlyChecksums": [
+        "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642"
+      ],
       "memberCount": 25266,
       "contracts": [
         "graphify.parser.v1",
@@ -528,15 +644,83 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "98c5f3a0-290c-4ae6-a76a-a48d565b91b7"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:035289840d231548e77438b8b07c38aa50879433d335dc8b503a00d0e5b6ca42",
+      "inputIdentity": "sha256:17b5c9db135985c44cdbbac248a795a397c4194f7aa0b6b5162b8bd7c32d8ec4",
+      "count": 1,
+      "workspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+      "sourceSelectionChecksum": "sha256:5d49b7a498a1b6147e2a4230b3e6420fb895951951b9cb31c890469db8f5eef4",
+      "refsOnlyChecksums": [
+        "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642"
+      ],
+      "memberCount": 25266,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "c418970d-b6d1-4258-a262-2ba3fb06f213",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "c418970d-b6d1-4258-a262-2ba3fb06f213"
+      ],
+      "reuseIneligibleExecutionIds": [],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:240fac447390d259fad1d16646fa0d70b0552936ede7466daaf828cce950959b",
+      "count": 1,
+      "workspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+      "sourceSelectionChecksum": "sha256:afb198849b0cf9c78949a196463ca9e379e448390cf84a07b58b44c341b817a7",
+      "refsOnlyChecksums": [
+        "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642"
+      ],
+      "memberCount": 25266,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "49681845-d45e-4e00-851a-31a28fb993ab",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "49681845-d45e-4e00-851a-31a28fb993ab"
+      ],
+      "reuseIneligibleExecutionIds": [],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:c11ac74d0e2d9187fa6c3de8b08dec35072bb390b90037886bd5b1abc017c352",
       "count": 1,
       "workspaceRevision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
-      "sourceSelectionChecksum": "sha256:150aabf95d88ac048d2fb61f7d48ace24ddc8a641a939c708d53112cbfef7927",
+      "sourceSelectionChecksum": "sha256:ae0ed732142b50306effa1696b66936cdc3aff86803e4058c4a5061296688ac1",
+      "refsOnlyChecksums": [
+        "sha256:150aabf95d88ac048d2fb61f7d48ace24ddc8a641a939c708d53112cbfef7927"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -550,15 +734,83 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "de58de64-0b29-4dea-b1bc-88949458793a"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:5d1e02426e8797088ef962abca1627c64be00952cf6ced06900319e1e667473f",
+      "inputIdentity": "sha256:3aa22dde2355ab0c300f802676a2c9a17d77752c27ce5f9beedfd66e2755352a",
+      "count": 1,
+      "workspaceRevision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+      "sourceSelectionChecksum": "sha256:7286ae37c218739bb90a240ee9e3ed4bca1ff8d2ab6e582a8924a403b264445d",
+      "refsOnlyChecksums": [
+        "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642"
+      ],
+      "memberCount": 25266,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "9524dd40-b9d4-4c13-9c7f-ccdbf0387af4",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "9524dd40-b9d4-4c13-9c7f-ccdbf0387af4"
+      ],
+      "reuseIneligibleExecutionIds": [],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:a9af396e4d75cb43dd19084eb3ccbe9f6a51069e50d88de810306561d8bfc25f",
+      "count": 1,
+      "workspaceRevision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+      "sourceSelectionChecksum": "sha256:e2a338754fefd8aa388ef2e0146d2621781982f9c34ae9fe669b8da583b12d6e",
+      "refsOnlyChecksums": [
+        "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642"
+      ],
+      "memberCount": 25266,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "255ca44b-947a-4a25-9e6c-a8890ea7555a",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "255ca44b-947a-4a25-9e6c-a8890ea7555a"
+      ],
+      "reuseIneligibleExecutionIds": [],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:0f4f31dea328bf7f4484f722259af307fd168f462b619840e884b585e621d0a7",
       "count": 1,
       "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
-      "sourceSelectionChecksum": "sha256:602e349946080e3949b3c2f86674ea04a2981ce34206d87a3749502361f90eac",
+      "sourceSelectionChecksum": "sha256:79a60a2ea2ba6ee7ca24970c7a71887ce3a03c67332d1a1a077b2d3def2382fe",
+      "refsOnlyChecksums": [
+        "sha256:602e349946080e3949b3c2f86674ea04a2981ce34206d87a3749502361f90eac"
+      ],
       "memberCount": 25271,
       "contracts": [
         "graphify.parser.v1",
@@ -572,15 +824,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "14667026-459c-4a99-b3c2-c20b739a6e0d"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:fe7af9aefd5b70ab81d98e13c0f8a9c8fcc1fe10803a051aae9a1559e94c161e",
+      "inputIdentity": "sha256:5b16543920eeda5f5691425963d32fb64d65241cbdd9ed6af86129dd33e10744",
       "count": 1,
       "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
-      "sourceSelectionChecksum": "sha256:8d41e03fc6899c4343714f9a06e3002805b60d35c6268bd049a23989d7a5b7a8",
+      "sourceSelectionChecksum": "sha256:68b43fdc2389bc9b92e153332cbe341902bbe3542156c65a276a901d044a6cef",
+      "refsOnlyChecksums": [
+        "sha256:8d41e03fc6899c4343714f9a06e3002805b60d35c6268bd049a23989d7a5b7a8"
+      ],
       "memberCount": 25291,
       "contracts": [
         "graphify.parser.v1",
@@ -594,15 +854,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:775ba7f213a794b7aeddf2934246fb189c162d4c838f99ae1dd32bfd75e7e6c1",
+      "inputIdentity": "sha256:032935cf005034596fdfb6230d25d86d142df7aac3568ecd9a3be72b41d93cea",
       "count": 1,
       "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
-      "sourceSelectionChecksum": "sha256:da7a1478ba0afae423ddcd69fbf04523d9f42b145d17da0317fa642f10d0bedc",
+      "sourceSelectionChecksum": "sha256:9b9a16a88411d6db9ddc07ca77793e3b103b71d9ce8199d2c84c9328e81c436a",
+      "refsOnlyChecksums": [
+        "sha256:da7a1478ba0afae423ddcd69fbf04523d9f42b145d17da0317fa642f10d0bedc"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -616,15 +884,23 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "5013de19-7bed-4703-bd6b-1684b19e2aaf"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:1f510dd12b73e09692933ced5c13141199521c559dca0e0de1dc131f26f4de4c",
+      "inputIdentity": "sha256:cd0b33dedb8a5db9fee570499dedcb318d8504191c66a1c0745809fc4dd4e4ca",
       "count": 1,
       "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
-      "sourceSelectionChecksum": "sha256:f3c5dbe2cbf9ed433f0a354779a8371d0b295b4192dffa01ded5883082abbf52",
+      "sourceSelectionChecksum": "sha256:9f87c4b30343d4465a0507d1104c3d31ca3ce77027b6f3075844706290160556",
+      "refsOnlyChecksums": [
+        "sha256:f3c5dbe2cbf9ed433f0a354779a8371d0b295b4192dffa01ded5883082abbf52"
+      ],
       "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
@@ -638,6 +914,11 @@
           "canonicalAuthority": false
         }
       ],
+      "identityEquivalent": true,
+      "reuseEligibleExecutionIds": [
+        "c531a1b0-c932-482f-8a21-5d067f504a13"
+      ],
+      "reuseIneligibleExecutionIds": [],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
       "outputsEquivalent": null

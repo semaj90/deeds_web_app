@@ -54,8 +54,18 @@ function independentSerialization(p: Omit<Payload, 'schema'>): string {
 }
 
 const normalizeRef = (value: unknown) => String(value ?? '').replaceAll('\\', '/').replace(/^\.\//, '').replace(/^\/+/, '').trim();
-export const sourceSelectionChecksum = (refs: string[]) =>
+/** Superseded refs-only checksum, kept only to report which groups the content-bearing checksum splits. */
+export const refsOnlySelectionChecksum = (refs: string[]) =>
   `sha256:${crypto.createHash('sha256').update(JSON.stringify(refs.map(normalizeRef).sort()), 'utf8').digest('hex')}`;
+
+export interface SelectionEntry { sourceIdentityKey: string; sourceRevision: string; byteLength: number }
+/** Frozen content-bearing checksum: entries sorted by UTF-8 BYTE order of sourceIdentityKey (not UTF-16 .sort()), fixed property order, JSON.stringify, UTF-8, SHA-256. */
+export function sourceSelectionChecksum(entries: SelectionEntry[]): string {
+  const sorted = entries
+    .map((e) => ({ sourceIdentityKey: e.sourceIdentityKey, sourceRevision: e.sourceRevision, byteLength: Number(e.byteLength) }))
+    .sort((a, b) => Buffer.compare(Buffer.from(a.sourceIdentityKey, 'utf8'), Buffer.from(b.sourceIdentityKey, 'utf8')));
+  return `sha256:${crypto.createHash('sha256').update(JSON.stringify(sorted), 'utf8').digest('hex')}`;
+}
 
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 60000 });
 let rows: any[] = [];
@@ -63,6 +73,7 @@ let databaseError: string | null = null;
 const groups = new Map<string, any[]>();
 const incomplete: string[] = [];
 let conflictingSerializations = 0;
+let parity: any = null;
 
 try {
   rows = (await pool.query(`
@@ -71,14 +82,28 @@ try {
            started_at, completed_at
       FROM public.graphify_executions ORDER BY started_at`)).rows;
 
+  parity = (await pool.query(`
+    SELECT count(*)::int AS membership_rows,
+           count(*) FILTER (WHERE repository_id IS NULL OR repository_relative_path IS NULL OR code_source_revision IS NULL OR content_hash IS NULL OR byte_length IS NULL)::int AS missing_fields,
+           count(*) FILTER (WHERE code_source_revision <> 'sha256:' || lower(content_hash))::int AS SOURCE_REVISION_CONTENT_HASH_MISMATCH,
+           count(*) FILTER (WHERE content_hash !~ '^[a-f0-9]{64}$')::int AS non_normalized_content_hash,
+           count(*) FILTER (WHERE repository_relative_path ~ '\\\\|^\\./|^/')::int AS paths_needing_normalization,
+           (SELECT count(*) FROM (SELECT execution_id, lower(repository_id || ':' || replace(repository_relative_path, '\\', '/')) FROM public.graphify_execution_file_membership_v2
+              GROUP BY 1, 2 HAVING count(*) > 1) d)::int AS identity_key_collisions
+      FROM public.graphify_execution_file_membership_v2`)).rows[0];
   const membershipRows = (await pool.query(`
-    SELECT execution_id::text AS execution_id, array_agg(source_ref) AS refs, count(*)::int AS members
+    SELECT execution_id::text AS execution_id, array_agg(source_ref) AS refs,
+           json_agg(json_build_object('k', repository_id || ':' || repository_relative_path, 'r', code_source_revision, 'b', byte_length)) AS entries,
+           count(*)::int AS members
       FROM public.graphify_execution_file_membership_v2 GROUP BY execution_id`)).rows;
-  const membershipByExecution = new Map<string, { refs: string[]; members: number }>(membershipRows.map((m: any) => [m.execution_id, { refs: m.refs, members: m.members }]));
+  const membershipByExecution = new Map<string, { refs: string[]; entries: SelectionEntry[]; members: number }>(membershipRows.map((m: any) => [m.execution_id, {
+    refs: m.refs, members: m.members, entries: m.entries.map((e: any) => ({ sourceIdentityKey: e.k, sourceRevision: e.r, byteLength: Number(e.b) })),
+  }]));
 
   for (const r of rows) {
     const membership = membershipByExecution.get(r.execution_id);
-    r.source_selection_checksum = membership && membership.members > 0 ? sourceSelectionChecksum(membership.refs) : null;
+    r.source_selection_checksum = membership && membership.members > 0 ? sourceSelectionChecksum(membership.entries) : null;
+    r.refs_only_checksum = membership && membership.members > 0 ? refsOnlySelectionChecksum(membership.refs) : null;
     r.member_count = membership?.members ?? 0;
     const complete = r.workspace_id && r.workspace_revision && r.source_selection_checksum && r.parser_contract_version && r.extraction_contract_version && r.graph_algorithm_revision;
     if (!complete) { incomplete.push(r.execution_id); continue; }
@@ -122,9 +147,13 @@ if (!databaseError) {
       count: members.length,
       workspaceRevision: members[0].workspace_revision,
       sourceSelectionChecksum: members[0].source_selection_checksum,
+      refsOnlyChecksums: [...new Set(members.map((m) => m.refs_only_checksum))],
       memberCount: members[0].member_count,
       contracts: [members[0].parser_contract_version, members[0].extraction_contract_version, members[0].graph_algorithm_revision],
       executions: members.map((m) => ({ executionId: m.execution_id, status: m.status, canonicalAuthority: m.canonical_authority })),
+      identityEquivalent: true,
+      reuseEligibleExecutionIds: members.filter((m) => m.status === 'COMPLETED').map((m) => m.execution_id),
+      reuseIneligibleExecutionIds: members.filter((m) => m.status !== 'COMPLETED').map((m) => m.execution_id),
       canonicalCount: canonical.length,
       canonicalExecutionId: canonical.length === 1 ? canonical[0].execution_id : null,
       outputsEquivalent: outputs,
@@ -141,6 +170,8 @@ const report = {
   recipeSchema: SCHEMA,
   recipeFields: ['schema', 'workspaceId', 'workspaceRevision', 'sourceSelectionChecksum', 'parserContractVersion', 'extractionContractVersion', 'graphAlgorithmRevision'],
   databaseError,
+  mapping: { sourceIdentityKey: 'repository_id:repository_relative_path', sourceRevision: 'code_source_revision', byteLength: 'byte_length', sortOrder: 'UTF-8 byte order' },
+  parity,
   executionsExamined: rows.length,
   recipeInputsComplete: rows.length - incomplete.length,
   incompleteExecutionIds: incomplete,
