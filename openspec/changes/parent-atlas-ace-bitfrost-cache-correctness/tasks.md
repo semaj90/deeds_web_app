@@ -832,3 +832,4 @@ applied by the coordinating session afterward, not by the fork itself).
 
 ## Run Receipts
 - wf-mcp-bitfrost-ace-optimization-fork-20260905/MCP_BITFROST_ACE_OPTIMIZATION_FORK#1: MCP/BitFrost/ACE synthesis optimization fork (state=succeeded)
+- [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
