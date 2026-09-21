@@ -203,7 +203,11 @@ function compareExecution(execution: any) {
 const comparisons = executions.map(compareExecution);
 const matching = comparisons.filter((row) => row.eligibleWithoutAdmission);
 const admittedMatching = matching.filter((row) => row.workspaceRevision === admittedWorkspaceRevision);
-const firstBlockingInvariant = admissionAuthority && admittedMatching.length === 1
+// Several executions may legitimately match one admitted revision (equivalent re-runs). That is resolved
+// only when exactly one of them holds canonical_authority; zero or several canonical owners stay blocked.
+const admittedCanonical = admittedMatching.filter((row) => row.canonicalAuthority === true);
+const bindingResolved = admittedMatching.length === 1 || (admittedMatching.length > 1 && admittedCanonical.length === 1);
+const firstBlockingInvariant = admissionAuthority && bindingResolved
   ? null
   : databaseError
     ? 'GRAPHIFY_SCHEMA_OR_DATABASE_UNAVAILABLE'
@@ -218,7 +222,7 @@ const status = databaseError
   ? 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED'
   : snapshotReadback.status !== 'SNAPSHOT_BYTES_READBACK_PROVEN'
     ? 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK'
-    : admissionAuthority && admittedMatching.length === 1
+    : admissionAuthority && bindingResolved
       ? 'GRAPHIFY_SNAPSHOT_BINDING_PROVEN'
       : 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED';
 const report = {

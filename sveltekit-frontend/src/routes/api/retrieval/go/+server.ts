@@ -27,7 +27,7 @@ import {
   SearchMetadataFilterSchema
 } from '$lib/server/retrieval/search-contract.js';
 
-const GoRetrievalRequestSchema = RetrievalSearchRequestSchema.extend({
+const GoRetrievalRequestSchema = RetrievalSearchRequestSchema.safeExtend({
   search_kinds: z.array(z.enum([
     'lexical',
     'dense',

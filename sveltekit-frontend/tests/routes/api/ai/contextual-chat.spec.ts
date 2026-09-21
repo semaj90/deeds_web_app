@@ -19,7 +19,7 @@ vi.mock('$lib/server/llm/contextual-chat.js', () => ({
 	contextualChat: mockContextualChat,
 }));
 
-vi.mock('$lib/server/analytics/search-analytics.js', () => ({
+vi.mock('$lib/server/features/observability/index.js', () => ({
 	recordSearchQuery: mockRecordSearchQuery,
 }));
 

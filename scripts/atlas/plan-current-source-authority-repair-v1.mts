@@ -4,6 +4,7 @@
  * It produces a candidate input artifact; it never writes canonical or
  * projection state.
  */
+import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -31,8 +32,38 @@ const pool = new pg.Pool({
 let databaseError: string | null = null;
 let ownerRunId: string | null = null;
 let graphRows: any[] = [];
-let ownerSelection = 'COMPLETED_BOUND_OWNER_BY_FILE_COUNT';
+let ownerSelection = 'COMPLETED_BOUND_OWNER_BY_FILE_COUNT_FALLBACK';
 try {
+  // Prefer the canonical Graphify execution's own per-source membership. Picking the run with the
+  // most graphify_files rows bound the plan to a non-canonical legacy run (found 2026-09-21:
+  // run 48485685 has no execution; the canonical execution's legacy run has 0 graphify_files rows).
+  const canonical = await pool.query(`
+    SELECT execution_id::text AS execution_id
+      FROM public.graphify_executions
+     WHERE canonical_authority = true AND status = 'COMPLETED'
+     ORDER BY completed_at DESC NULLS LAST, execution_id
+     LIMIT 1
+  `);
+  const canonicalExecutionId: string | null = canonical.rows[0]?.execution_id ?? null;
+  if (canonicalExecutionId) {
+    const membership = await pool.query(`
+      SELECT source_ref, workspace_revision, code_source_revision, content_hash, byte_length
+        FROM public.graphify_execution_file_membership_v2
+       WHERE execution_id = $1
+       ORDER BY source_ref
+    `, [canonicalExecutionId]);
+    if (membership.rows.length > 0) {
+      ownerRunId = canonicalExecutionId;
+      ownerSelection = 'CANONICAL_EXECUTION_FILE_MEMBERSHIP_V2';
+      graphRows = membership.rows.map((row) => ({ ...row, source_revision: null, parse_status: null, last_seen_run_id: null }));
+    }
+  }
+}
+catch (error) {
+  databaseError = error instanceof Error ? error.message : String(error);
+}
+try {
+  if (graphRows.length > 0 || databaseError) throw new Error('__SKIP_FALLBACK__');
   const owner = await pool.query(`
     SELECT gf.last_seen_run_id AS run_id, COUNT(*)::int AS file_count,
            MAX(gr.completed_at) AS completed_at
@@ -58,7 +89,9 @@ try {
   `, [ownerRunId]);
   graphRows = result.rows;
 } catch (error) {
-  databaseError = error instanceof Error ? error.message : String(error);
+  if (!(error instanceof Error && error.message === '__SKIP_FALLBACK__')) {
+    databaseError = error instanceof Error ? error.message : String(error);
+  }
 } finally {
   await pool.end();
 }
@@ -75,9 +108,26 @@ try {
   materializationError = error instanceof Error ? error.message : String(error);
 }
 
+// Submodule contents carry their own commit identity and are not bound by the superproject
+// workspace revision (found 2026-09-21: all 1,086 NOT_IN_CURRENT_WORKSPACE rows were submodule
+// files). Declare them out of scope for this cohort; report them separately, never as exact.
+const submodulePaths: string[] = (() => {
+  try {
+    return execFileSync('git', ['config', '--file', '.gitmodules', '--get-regexp', '^submodule\\..*\\.path$'], { cwd: REPO_ROOT, encoding: 'utf8' })
+      .split('\n').filter(Boolean)
+      .map((line) => line.split(/\s+/).slice(1).join(' ').replaceAll('\\', '/'));
+  } catch {
+    return [];
+  }
+})();
+const isSubmodulePath = (ref: string) => submodulePaths.some((sub) => ref === sub || ref.startsWith(`${sub}/`));
+
 const bindingByRef = new Map<string, any>(currentWorkspace?.bindings?.map((binding: any) => [binding.sourceRef, binding]) ?? []);
 const rows = graphRows.map((row) => {
   const sourceRef = String(row.source_ref);
+  if (isSubmodulePath(sourceRef)) {
+    return { sourceRef, status: 'EXCLUDED_SUBMODULE', graphContentHash: row.content_hash ?? null };
+  }
   const binding = bindingByRef.get(sourceRef);
   const absolute = safePath(sourceRef);
   if (!absolute || !fs.existsSync(absolute)) {
@@ -132,6 +182,7 @@ const mismatchReasonCounts = rows.reduce<Record<string, number>>((out, row) => {
   return out;
 }, {});
 const exactRows = rows.filter((row) => row.status === 'EXACT_CURRENT_BINDING');
+const inScopeRowCount = rows.filter((row) => row.status !== 'EXCLUDED_SUBMODULE').length;
 const planIdentity = digest(JSON.stringify({
   ownerRunId,
   currentWorkspaceRevision: currentWorkspace?.record.workspaceRevision ?? null,
@@ -153,13 +204,16 @@ const report = {
   counts,
   mismatchReasonCounts,
   exactCurrentBindingCount: exactRows.length,
+  submodulePaths,
+  excludedSubmoduleCount: rows.length - inScopeRowCount,
+  inScopeRowCount,
   planIdentity,
   canonicalAuthority: false,
   authorizationRequired: true,
   writesPerformed: { postgres: false, qdrant: false, neo4j: false, valkey: false, filesystem: true },
   status: databaseError || materializationError
     ? 'REPAIR_PLAN_FAILED'
-    : exactRows.length === rows.length && rows.length > 0
+    : exactRows.length === inScopeRowCount && inScopeRowCount > 0
       ? 'REPAIR_PLAN_READY_ALL_ROWS_EXACT'
       : exactRows.length > 0
         ? 'REPAIR_PLAN_PARTIAL_EXACT_BLOCKED'

@@ -118,8 +118,8 @@ describe('outbox worker — centroid routing cache fanout', () => {
 });
 
 describe('outbox worker — Qdrant fanout', () => {
-    it('upserts to Qdrant when embedding is 384-dim', async () => {
-        const embedding = Array.from({ length: 384 }, (_, i) => i / 384);
+    it('upserts to Qdrant when embedding is 768-dim', async () => {
+        const embedding = Array.from({ length: 768 }, (_, i) => i / 768);
         mockDbExecute.mockResolvedValueOnce({
             rows: [makeRow({
                 eventType: 'encode.embedding.succeeded',
@@ -142,7 +142,7 @@ describe('outbox worker — Qdrant fanout', () => {
 
         const [collection, body] = mockQdrantUpsert.mock.calls[0] as [string, { points: { vector: number[] }[] }];
         expect(collection).toBe('agent_memory_observations');
-        expect(body.points[0]!.vector).toHaveLength(384);
+        expect(body.points[0]!.vector).toHaveLength(768);
     });
 
     it('skips Qdrant when embedding is wrong dimension', async () => {
@@ -179,7 +179,7 @@ describe('outbox worker — partial failure semantics', () => {
     it('publishes successfully when at least one handler succeeds', async () => {
         // encode.embedding.succeeded triggers both Qdrant (will fail) and nothing else,
         // but Qdrant missing sourceRef = skip (not a throw) → publishedAt set
-        const embedding = Array.from({ length: 384 }, () => 0.5);
+        const embedding = Array.from({ length: 768 }, () => 0.5);
         mockDbExecute.mockResolvedValueOnce({
             rows: [makeRow({
                 eventType: 'encode.embedding.succeeded',

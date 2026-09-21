@@ -177,3 +177,14 @@ not applied, still needs explicit go-ahead given the blast radius)**:
       may be intentional for production warm-start behavior, needs review before changing).
 - [ ] Re-run the FULL 791-file `tests/routes/auto/**` tree (not just the 137-file repaired
       subtree) after G8 closes, to get a true updated baseline replacing the stale 674/117 number.
+      **Interim run 2026-09-21 (NOT the final baseline — G8 closure not confirmed; box left open).**
+      `tests/routes/auto` (787 files found, not 791): first run 4,273 tests = 1,172 pass / 14 fail /
+      3,087 `it.todo` stubs (about 72% placeholders, not coverage), 11 failing files. After fixes the
+      full-tree rerun = 1,185 pass / 1 fail; that 1 (`api/v1/chat/completions` stream test) was then fixed
+      (2 consecutive isolated passes). Full tree not re-run after that last fix.
+      Causes: 2 production bugs (`api/retrieval/go` Zod `.extend()` -> `.safeExtend()`, crashed at import;
+      `lib/server/ai/tool-selection.ts` read `d.points` instead of `d.result.points`, Qdrant tool lane always
+      empty); 4 hook timeouts (`vitest.config.ts` `hookTimeout: 30000`, bare `STACK_TRACE_ERROR`); 8 stale/
+      order-dependent tests (select-tools auth + mock shape, outbox-worker 384->768, system/health port 8080->8090,
+      api/health `not_configured`, gds-status needs `apply:true`, contextual-chat mock path, chat/completions
+      stream test depended on live Redis cache state — now mocked). tsgo: no errors in the two touched sources.

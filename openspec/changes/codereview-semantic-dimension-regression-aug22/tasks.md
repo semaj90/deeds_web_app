@@ -60,8 +60,9 @@ already been verified against live code/data more than once across 2026-08-23, 2
   `parent-atlas-semantic-512-canonicalization/tasks.md` now marked `SUPERSEDED` (kept as historical
   record, not deleted); `parent-atlas-768-dim-migration/SPEC.md` unblocked to proceed against its
   original (now-confirmed-correct) premise.
-- [ ] 2.3 Still open: add or confirm an integration test that actually calls `/api/admin/atlas/synthesize`'s semantic512 branch end-to-end, so this class of always-throws regression is caught by CI next time, not by a code-review pass discovering it after the fact. Not done this pass — the dimension-choice question was the blocker for this task section; this sub-item is independent follow-up work.
+- [x] 2.3 DONE 2026-09-21 (was open): add or confirm an integration test that actually calls `/api/admin/atlas/synthesize`'s semantic512 branch end-to-end, so this class of always-throws regression is caught by CI next time, not by a code-review pass discovering it after the fact. Not done this pass — the dimension-choice question was the blocker for this task section; this sub-item is independent follow-up work.
   **Re-verified 2026-09-05**: confirmed no spec/test file exists alongside `src/routes/api/admin/atlas/synthesize/+server.ts` — still genuinely open, not silently done elsewhere.
+  **Closed 2026-09-21**: `sveltekit-frontend/tests/atlas/synthesize-semantic512-route.test.ts` (3 tests, mocked deps; asserts `representationId: 'semantic_512'`, 512-dim rows, skip on 768-dim, fail-open on client throw) passes 3/3. Mutation check: flipping the route literal to `'semantic_768'` fails the first test (1 failed, 2 passed); source restored, no diff. Placed under `tests/atlas/` because `vitest.config` include is an explicit list (`tests/routes/*.test.ts` files are not globbed).
 
 ## 3. Fix the spec/test break (finding #3)
 

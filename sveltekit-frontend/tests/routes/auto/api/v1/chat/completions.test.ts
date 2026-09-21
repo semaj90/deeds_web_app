@@ -21,6 +21,15 @@ vi.mock('$lib/server/ai/openai-facade.js', () => ({
   runChatCompletion: mocks.runChatCompletion,
 }));
 
+// Force a legacy stream-cache miss and never write: without this the test hit live
+// Redis, so the first run cached "hello" and every later run skipped the provider
+// path (runChatCompletion never called).
+vi.mock('$lib/server/ai/cached-stream.js', () => ({
+  getCachedStreamResponse: vi.fn(async () => null),
+  storeCachedStreamResponse: vi.fn(async () => undefined),
+  streamCachedResponse: vi.fn(async function* () {}),
+}));
+
 describe('src/routes/api/v1/chat/completions/+server.ts', () => {
   describe('POST /api/v1/chat/completions', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;

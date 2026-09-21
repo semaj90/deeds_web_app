@@ -6,6 +6,21 @@
   import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
   import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 
+  import type { WorkspaceAdmissionPanelV1 } from '$lib/server/atlas/admission/workspace-admission-panel-v1.js';
+
+  let { data }: { data: { admission: WorkspaceAdmissionPanelV1 | null; admissionError: string | null } } = $props();
+  const admission = $derived(data.admission);
+
+  function badgeClass(badge: string): string {
+    if (badge === 'LIVE_PROVEN') return 'text-green-500';
+    if (badge === 'DEGRADED_READ_ONLY') return 'text-yellow-500';
+    if (badge === 'STALE_RECEIPT') return 'text-orange-500';
+    return 'text-red-500';
+  }
+
+  const short = (v: string | null) => (v ? `${v.slice(0, 15)}…` : '—');
+  const age = (s: number | null) => (s === null ? 'no timestamp' : s < 90 ? `${s}s ago` : `${Math.round(s / 60)}m ago`);
+
   interface LaneStatus {
     lane: string;
     state: string;
@@ -245,9 +260,97 @@
       </Card>
     </section>
   {/if}
+
+  <!-- Workspace Admission: read-only. No admit / retire / set-canonical / run action exists here. -->
+  <section class="admission-panel" data-testid="workspace-admission">
+    <h2>Workspace Admission</h2>
+    <p class="subtitle">
+      Read-only view of the snapshot, derivation, preflight and binding receipts plus <code>graphify_executions</code>.
+      Admission needs an explicit operator authorization outside this page.
+    </p>
+
+    {#if !admission}
+      <div class="error-state" data-testid="admission-unavailable">
+        <Icon name="alert-triangle" class="w-6 h-6" />
+        <p>Admission state unavailable{data.admissionError ? `: ${data.admissionError}` : ''}</p>
+      </div>
+    {:else}
+      {#if admission.unavailableInputs.length > 0}
+        <p class="degraded-note" data-testid="admission-degraded">
+          Degraded — unavailable inputs: {admission.unavailableInputs.join(', ')}
+        </p>
+      {/if}
+
+      <div class="admission-grid">
+        <Card>
+          <CardHeader><CardTitle>Candidate snapshot <span class={badgeClass(admission.candidate.badge)} data-testid="candidate-badge">{admission.candidate.badge}</span></CardTitle></CardHeader>
+          <CardContent>
+            <dl>
+              <dt>Snapshot revision</dt><dd><code>{short(admission.candidate.snapshotRevision)}</code></dd>
+              <dt>Candidate workspace revision</dt><dd><code>{short(admission.candidate.candidateWorkspaceRevision)}</code></dd>
+              <dt>Sources / repositories</dt><dd>{admission.candidate.sourceCount ?? '—'} / {admission.candidate.repositoryCount ?? '—'}</dd>
+              <dt>Snapshot readback</dt><dd>{admission.candidate.snapshotReadback ?? 'unknown'}</dd>
+              <dt>Snapshot artifact</dt><dd>{admission.candidate.artifactPresent ? 'present' : 'missing'}</dd>
+              <dt>Derivation</dt><dd>{admission.candidate.derive.status ?? 'unknown'} <span class="muted">({age(admission.candidate.derive.ageSeconds)})</span></dd>
+              <dt>Preflight</dt><dd>{admission.candidate.preflight.status ?? 'unknown'} <span class="muted">({age(admission.candidate.preflight.ageSeconds)})</span></dd>
+              <dt>Blocking invariant</dt><dd>{admission.candidate.preflight.blockingInvariant ?? 'none'}</dd>
+              <dt>Graphify processing</dt><dd data-testid="graphify-processing">{admission.candidate.graphifyProcessing}</dd>
+            </dl>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Admitted snapshot <span class={badgeClass(admission.admitted.badge)} data-testid="admitted-badge">{admission.admitted.badge}</span></CardTitle></CardHeader>
+          <CardContent>
+            <dl>
+              <dt>Admitted workspace revision</dt><dd><code>{short(admission.admitted.workspaceRevision)}</code></dd>
+              <dt>Snapshot revision</dt><dd><code>{short(admission.admitted.snapshotRevision)}</code></dd>
+              <dt>Snapshot readback</dt><dd>{admission.admitted.snapshotReadback ?? 'unknown'} ({admission.admitted.sourceCount ?? '—'} sources)</dd>
+              <dt>Binding</dt><dd>{admission.admitted.binding.status ?? 'unknown'} <span class="muted">({age(admission.admitted.binding.ageSeconds)})</span></dd>
+              <dt>Blocking invariant</dt><dd>{admission.admitted.binding.blockingInvariant ?? 'none'}</dd>
+              <dt>Matching / canonical executions</dt><dd data-testid="execution-counts">{admission.admitted.matchingCount} / {admission.admitted.canonicalCount}</dd>
+            </dl>
+            <ul class="exec-list">
+              {#each admission.admitted.executions as row (row.executionId)}
+                <li>
+                  <code>{row.executionId.slice(0, 8)}…</code> {row.status}
+                  {#if row.canonicalAuthority}<strong> CANONICAL</strong>{:else} equivalent re-run{/if}
+                  <span class="muted">{row.startedAt ?? '—'} → {row.completedAt ?? '—'}</span>
+                </li>
+              {/each}
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader><CardTitle>Receipt consistency</CardTitle></CardHeader>
+        <CardContent>
+          <ul class="exec-list" data-testid="consistency">
+            {#each admission.consistency as item (item.check)}
+              <li class={item.ok ? 'text-green-500' : 'text-orange-500'}>{item.ok ? '✓' : '✗'} {item.check} <span class="muted">{item.detail}</span></li>
+            {/each}
+          </ul>
+        </CardContent>
+      </Card>
+
+      <p class="admission-state" data-testid="admission-state">
+        Admission: <strong>{admission.admission.label}</strong> — authorized: {String(admission.admission.authorized)}, authority granted: {String(admission.admission.authorityGranted)}
+      </p>
+    {/if}
+  </section>
 </div>
 
 <style>
+  .admission-panel { margin-top: 2rem; }
+  .admission-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .admission-panel dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; }
+  .admission-panel dt { color: #9a958c; }
+  .admission-panel .muted { color: #7a766e; font-size: 0.8em; }
+  .admission-panel .exec-list { list-style: none; padding: 0; margin: 0.5rem 0 0; }
+  .admission-panel .degraded-note { color: #eab308; }
+  .admission-panel .admission-state { margin-top: 1rem; }
+
   .graphify-readiness {
     min-height: 100vh;
     padding: 2rem;

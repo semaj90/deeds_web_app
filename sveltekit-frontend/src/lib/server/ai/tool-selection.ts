@@ -626,10 +626,10 @@ async function searchToolManifest(
       signal: AbortSignal.timeout(10_000),
     });
     if (!res.ok) return [];
-    const d = await res.json() as { points?: Array<{ score: number; payload?: Record<string, unknown> }> };
+    const d = await res.json() as { result?: { points?: Array<{ score: number; payload?: Record<string, unknown> }> } };
 
     const signalSet = new Set(signals);
-    return (d.points ?? [])
+    return (d.result?.points ?? [])
       .map((hit) => {
         const ontology = (hit.payload?.ontology as string[] | undefined) ?? [];
         const boost = ontology.filter((tag) => signalSet.has(tag)).length * 0.05;
