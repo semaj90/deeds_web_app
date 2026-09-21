@@ -279,7 +279,7 @@ tree-lineage work is closed.
 - [ ] 7.1 SUPERSEDED_BY_EMBEDDINGGEMMA_768_ARCHITECTURE / DO_NOT_WIRE (operator direction 2026-09-20: MiniLM and MS MARCO are retired from the Parent Atlas runtime; no runtime reranker, embedding, vote or matrix producer; see `parent-atlas-retrieval-staging-planes` SPINE-04). Original text follows, kept for history: Wire MiniLM (`ms-marco-MiniLM-L6-v2`, `sentence-transformers`
       `CrossEncoder`) as `RERANK_FAST` behind `canonical-rerank-executor.ts`
       — for the ~30-50 candidate tier, not a new standalone file.
-- [ ] 7.2 Wire Mixedbread (`mxbai-rerank-base-v2`) as `RERANK_DEEP`, disabled
+- [ ] 7.2 SUPERSEDED_BY_EMBEDDINGGEMMA_768_ARCHITECTURE / DO_NOT_WIRE (operator direction 2026-09-20, same decision as 7.1: no runtime reranker, embedding or vote from Mixedbread; existing default-off module stays COMPATIBILITY pending archive). Original text follows, kept for history: Wire Mixedbread (`mxbai-rerank-base-v2`) as `RERANK_DEEP`, disabled
       unless explicitly requested — for the ~8-20 candidate tier.
 - [ ] 7.3 Live-verify both against a real candidate set, confirm scores are
       sane and the existing canonical rerank cache/fallback behavior
