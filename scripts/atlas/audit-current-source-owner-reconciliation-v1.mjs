@@ -13,6 +13,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 
 const root = REPO_ROOT;
 const reportPath = path.join(root, 'docs/reports/current-source-owner-reconciliation-v1.json');
@@ -198,6 +199,15 @@ try {
      ORDER BY completed_at DESC NULLS LAST, execution_id
      LIMIT 100
   `);
+  // Shadow observation via the ONE shared owner, per distinct (workspace, revision). Diagnostic only: owner decisions below use the legacy boolean.
+  report.authorityShadow = { runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY', error: null, observations: [] };
+  try {
+    const { loadAuthorityShadowV1 } = await loadAuthorityShadowModuleV1();
+    const scopes = new Map(currentRevisions.map((e) => [`${e.workspace_id}|${e.workspace_revision}`, { workspaceId: String(e.workspace_id), workspaceRevision: String(e.workspace_revision) }]));
+    for (const scope of scopes.values()) report.authorityShadow.observations.push(await loadAuthorityShadowV1(client, scope));
+  } catch (error) {
+    report.authorityShadow.error = error instanceof Error ? error.message : String(error);
+  }
   for (const execution of currentRevisions) {
     let members = await q(client, `
       SELECT source_ref, workspace_revision, code_source_revision, content_hash, byte_length
