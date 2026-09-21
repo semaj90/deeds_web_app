@@ -1,158 +1,54 @@
 {
   "schema": "atlas.current-source-authority.v1",
-  "status": "CURRENT_SOURCE_AUTHORITY_PROVEN",
-  "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
-  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-  "sourceCount": 25542,
-  "sourceSelectionChecksum": "sha256:da4d765d0cd0a399605ebde21a0fb58f7d6a251aba9a572ddbc265c56b89985b",
-  "snapshotSelectionChecksum": "sha256:da4d765d0cd0a399605ebde21a0fb58f7d6a251aba9a572ddbc265c56b89985b",
-  "membershipSetChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
-  "counts": {
-    "qualified": 25542,
-    "missingRevision": 0,
-    "revisionMismatch": 0,
-    "namespaceAmbiguous": 0,
-    "notInAdmittedCohort": 0
+  "gate": "CURRENT-SOURCE-OWNER-RECONCILIATION-01",
+  "generatedAt": "2026-09-09T04:16:57.660Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "workspaceRevision": "sha256:ec542383b52ed4c597750d4273522239284fdb3d819619414df5f36333f85e1f",
+  "sourceSetRevision": "ec542383b52ed4c597750d4273522239284fdb3d819619414df5f36333f85e1f",
+  "selectedSourceSetId": "",
+  "selectedSourceCount": 0,
+  "bindingChecksum": "8cff5a225fa0b16cf9a6df7f137b8c83c4cd769c25f901399da077331393c93f",
+  "evidenceRefs": [
+    "docs/reports/current-source-evidence-authority-v1.json",
+    "docs/reports/current-graphify-run-owner-v1.json"
+  ],
+  "admission": "NO_CURRENT_SOURCE_SET",
+  "acceptance": {
+    "selectedAuthoritativeSourceSets": 0,
+    "ambiguousBindings": 0,
+    "mixedWorkspaceRevisions": 0,
+    "syntheticSourceAuthority": 0
   },
-  "proof": {
-    "workspaceAuthorityProven": true,
-    "exactMembershipProven": true,
-    "sourceIdentityProven": true,
-    "sourceRevisionProven": true,
-    "sourceSelectionChecksumProven": true
-  },
-  "registryCoverage": {
-    "exact": 24456,
-    "absent": 1086,
-    "mismatch": 0
-  },
-  "stableFileIdentityClaimed": false,
-  "generatedAt": "2026-09-21T23:13:20.291Z",
-  "blockers": [],
-  "owners": {
-    "admissionReceipt": {
-      "file": "docs/reports/workspace-revision-tournament-admission-v1.json",
-      "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
-      "authority": true,
-      "sourceCount": 25542
+  "supportingEvidence": {
+    "currentWorkspace": {
+      "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspaceRevision": "sha256:ec542383b52ed4c597750d4273522239284fdb3d819619414df5f36333f85e1f",
+      "sourceManifestDigest": "ec542383b52ed4c597750d4273522239284fdb3d819619414df5f36333f85e1f",
+      "sourceCount": 24109,
+      "repositoryId": "semaj90/deeds_web_app",
+      "baseCommitOid": "8fdbcb53619b5ef5551c097948906ebdd6b01188",
+      "dirty": true
     },
-    "admissionChecksumSemantics": "The admission field `sourceSelectionChecksum` hashes the SORTED IDENTITY KEYS ONLY (membership set = snapshot.sourceMembershipChecksum). It is NOT the content-bearing GraphifyInputIdentityV1 sourceSelectionChecksumV1 reported above; the two are different quantities that share a name.",
-    "snapshotManifest": {
-      "file": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
-      "digest": "sha256:4b2455785d5827a2991626316c4000eb024f7642fe4d2b56a60349d138d517e8",
-      "status": "CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK",
-      "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
-      "selfDigestValid": true,
-      "workspaceRevisionClaimedBySnapshot": null,
-      "violations": 0
+    "runCounts": {
+      "totalRuns": 19,
+      "completed": 12,
+      "running": 0,
+      "completedBound": 4,
+      "completedUnbound": 8,
+      "runningBound": 0,
+      "runningUnbound": 0
     },
-    "admissionPreflight": {
-      "file": "docs/reports/workspace-revision-tournament-source-authority-recheck-v4.json",
-      "status": "CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION",
-      "workspaceRevisionCandidate": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-      "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+    "selectorStatus": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+    "toleranceWindow": {
+      "toleranceMs": 300000,
+      "nowMs": 1788927317747,
+      "checkedAt": "2026-09-09T04:15:17.747Z"
     },
-    "workspaceRevisionDerivationRecomputed": false,
-    "graphifyExecution": {
-      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
-      "ownerAgreesWithAuthorityShadow": true,
-      "authorityState": "LEGACY_IMPORTED",
-      "parityStatus": "PARITY_PROVEN",
-      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY"
-    },
-    "registry": {
-      "table": "atlas_workspace_source_bindings",
-      "bindingRowsForRevision": 24456,
-      "registryRepoIds": [
-        "deeds-web-app"
-      ],
-      "membershipRepoIds": [
-        "repo:root",
-        "repo:claude-mem",
-        "repo:mcp-server-mcp",
-        "repo:granite-docling-258M",
-        "repo:models/embeddinggemma_300m",
-        "repo:sites/parent-atlas-gateboard",
-        "repo:turbovec"
-      ],
-      "repoIdMapAssumed": {
-        "repo:root": "deeds-web-app"
-      },
-      "rootRepositoryMembers": 24456,
-      "note": "Registry uses a different repo namespace than Graphify. The map is an assumption, supported (not proven) by exact binding count vs root member count."
-    }
+    "workspaceDirty": true,
+    "runOwnerStatus": "GRAPHIFY_RUN_OWNER_BLOCKED",
+    "note": "currentWorkspace.dirty=true -- the live git working tree has uncommitted changes at the moment this was sealed, so no historical completed Graphify run can structurally match the current source-manifest digest by design (the digest incorporates working-tree state, not just HEAD). This is not a script defect; it is the real, honest reason CURRENT_SOURCE_AUTHORITY_PROVEN cannot be reached right now. A CURRENT_SOURCE_AUTHORITY_PROVEN result requires either a clean working tree at the time of the next Graphify run, or committing pending changes first."
   },
-  "independentRecomputation": {
-    "selectionChecksum": "sha256:da4d765d0cd0a399605ebde21a0fb58f7d6a251aba9a572ddbc265c56b89985b",
-    "matchesHelper": true,
-    "membershipSetChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
-    "membershipSetMatchesAdmission": true
-  },
-  "blockerCensus": {
-    "reasonCounts": {},
-    "byRepository": {
-      "repo:claude-mem": {
-        "sources": 763,
-        "registryExact": 0,
-        "registryAbsent": 763,
-        "registryMismatch": 0
-      },
-      "repo:granite-docling-258M": {
-        "sources": 10,
-        "registryExact": 0,
-        "registryAbsent": 10,
-        "registryMismatch": 0
-      },
-      "repo:mcp-server-mcp": {
-        "sources": 192,
-        "registryExact": 0,
-        "registryAbsent": 192,
-        "registryMismatch": 0
-      },
-      "repo:models/embeddinggemma_300m": {
-        "sources": 13,
-        "registryExact": 0,
-        "registryAbsent": 13,
-        "registryMismatch": 0
-      },
-      "repo:root": {
-        "sources": 24456,
-        "registryExact": 24456,
-        "registryAbsent": 0,
-        "registryMismatch": 0
-      },
-      "repo:sites/parent-atlas-gateboard": {
-        "sources": 22,
-        "registryExact": 0,
-        "registryAbsent": 22,
-        "registryMismatch": 0
-      },
-      "repo:turbovec": {
-        "sources": 86,
-        "registryExact": 0,
-        "registryAbsent": 86,
-        "registryMismatch": 0
-      }
-    },
-    "registryCoverage": {
-      "exact": 24456,
-      "absent": 1086,
-      "mismatch": 0
-    },
-    "nonQualifiedSample": []
-  },
-  "safety": {
-    "databaseWrites": 0,
-    "graphifyRun": false,
-    "inputIdentityBackfill": false,
-    "readerCutover": false,
-    "vectorWrites": 0,
-    "graphWrites": 0,
-    "cacheWrites": 0,
-    "acePromotion": false,
-    "cagraPromotion": false,
-    "transaction": "REPEATABLE READ READ ONLY, ROLLBACK"
-  },
-  "receiptChecksum": "sha256:2b0105e38fabec3f38b51f0dbadc7771c640c6a95aebf3ff96f32b6d2577ab73",
-  "versionedReceipt": "docs/reports/current-source-authority-v1.2b0105e38fab.json"
+  "nextAction": "Do not backfill any packet revision, promote any packet cohort, or run a new Graphify batch based on assumed authority. Re-run this seal after either (a) committing pending workspace changes and running a fresh bound Graphify pass, or (b) the underlying selector finds a run that clears the tolerance window against a clean workspace."
 }

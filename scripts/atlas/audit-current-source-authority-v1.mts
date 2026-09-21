@@ -3,7 +3,7 @@
  * S01-07 — CurrentSourceAuthorityV1 live proof. READ-ONLY (one REPEATABLE READ READ ONLY transaction, SELECTs only).
  * Authority chain: admission receipt -> sealed snapshot sources -> Graphify execution membership (v2) [+ registry bindings as evidence].
  * No Graphify run, no input_identity backfill, no reader cutover, no writes to any store. Blocker => census + stop; nothing is repaired here.
- * Receipts are versioned by content checksum and never overwritten; `current-source-authority-v1.json` is a mutable latest-pointer copy.
+ * Receipts are versioned by content checksum and never overwritten; `current-source-authority-cohort-v1.json` is the mutable latest pointer (the sealer owns current-source-authority-v1.json).
  */
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
-import { classifyCurrentSourcesV1, membershipSetChecksumV1, type MembershipRowV1, type RegistryBindingV1, type SnapshotSourceV1 } from '../../sveltekit-frontend/src/lib/server/atlas/identity/current-source-authority-v1.ts';
+import { classifyCurrentSourcesV1, classifyLiveDriftV1, membershipSetChecksumV1, type MembershipRowV1, type RegistryBindingV1, type SnapshotSourceV1 } from '../../sveltekit-frontend/src/lib/server/atlas/identity/current-source-authority-v1.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const readJson = (rel: string) => JSON.parse(readFileSync(resolve(ROOT, rel), 'utf8'));
@@ -104,12 +104,27 @@ try {
   if (!independent.membershipSetMatchesAdmission) blockers.push('ADMISSION_MEMBERSHIP_CHECKSUM_NOT_REPRODUCED');
   for (const [k, v] of Object.entries(result.proof)) if (!v) blockers.push(`PROOF_FLAG_FALSE:${k}`);
   if (result.counts.qualified !== result.sourceCount) blockers.push(`NON_QUALIFIED_SOURCES:${result.sourceCount - result.counts.qualified}`);
+  // ---- B. LIVE WORKING-TREE DRIFT: diagnostic only, computed AFTER and never fed back into A (classification, checksum, status). ----
+  const plannerRel = 'docs/reports/current-source-authority-repair-plan-v1.json';
+  const planner = existsSync(resolve(ROOT, plannerRel)) ? readJson(plannerRel) : null;
+  const drift = planner ? classifyLiveDriftV1(membership.map((m) => m.sourceRef), planner.rows ?? []) : null;
+  const plannerObservation = planner ? { file: plannerRel, generatedAt: planner.generatedAt ?? null, status: planner.status, ownerRunId: planner.ownerRunId, ownerRunIsCohortExecution: planner.ownerRunId === executionId, currentWorkspaceRevision: planner.currentWorkspaceRevision, plannerCounts: planner.counts } : null;
   const status = blockers.length === 0 && result.status === 'CURRENT_SOURCE_AUTHORITY_PROVEN' ? 'CURRENT_SOURCE_AUTHORITY_PROVEN' : 'CURRENT_SOURCE_AUTHORITY_BLOCKED';
 
   const { classified, ...resultRest } = result;
   const body = {
     ...resultRest,
+    role: 'S01_07_COHORT_PROOF',
     status,
+    // Uppercase vocabulary alias of `counts` for consumers keyed on the class names.
+    classificationCounts: { QUALIFIED: result.counts.qualified, MISSING_REVISION: result.counts.missingRevision, REVISION_MISMATCH: result.counts.revisionMismatch, NAMESPACE_AMBIGUOUS: result.counts.namespaceAmbiguous, NOT_IN_ADMITTED_COHORT: result.counts.notInAdmittedCohort },
+    independentSourceSelectionChecksum: independent.selectionChecksum,
+    proof: { ...result.proof, independentChecksumParityProven: independent.matchesHelper },
+    // A. what exact source cohort was admitted/sealed?  (the ONLY input to `status`)
+    sealedCohort: { question: 'What exact source cohort was admitted/sealed?', admitted: result.sourceCount, qualified: result.counts.qualified, blockers: blockers.length, qualification: 'SEALED_AUTHORITY_QUALIFIED' },
+    // B. does today's working tree still match that sealed cohort?  (diagnostic; never changes A)
+    liveWorkingTreeDrift: drift ? { question: "Does today's working tree still match that sealed cohort?", state: drift.driftCount === 0 ? 'NO_DRIFT' : 'DRIFT_PRESENT', ...drift, observation: plannerObservation, note: 'Planner labels are preserved verbatim in plannerLabelCounts. The drift census reflects the working tree at the planner report generatedAt, not now; re-run the planner for a fresh reading.' } : { state: 'PLANNER_REPORT_ABSENT', affectsAuthorityProof: false, mustBeRespectedByFutureLiveCanary: true },
+    existingPlannerClassifications: drift ? drift.plannerLabelCounts : null,
     generatedAt: new Date().toISOString(),
     blockers,
     owners: {
@@ -127,10 +142,11 @@ try {
   };
   const receiptChecksum = digest(JSON.stringify(body));
   const receipt = { ...body, receiptChecksum };
-  const versioned = resolve(ROOT, `docs/reports/current-source-authority-v1.${receiptChecksum.slice(7, 19)}.json`);
+  // Ownership: this audit writes ONLY current-source-authority-cohort-v1*.json. `current-source-authority-v1.json` belongs to seal-current-source-authority-v1.mjs (SEALER_OUTPUT).
+  const versioned = resolve(ROOT, `docs/reports/current-source-authority-cohort-v1.${receiptChecksum.slice(7, 19)}.json`);
   if (!existsSync(versioned)) writeFileSync(versioned, `${JSON.stringify(receipt, null, 2)}\n`);
-  writeFileSync(resolve(ROOT, 'docs/reports/current-source-authority-v1.json'), `${JSON.stringify({ ...receipt, versionedReceipt: versioned.slice(ROOT.length + 1).replaceAll('\\', '/') }, null, 2)}\n`);
-  console.log(JSON.stringify({ status, blockers, sourceCount: result.sourceCount, counts: result.counts, proof: result.proof, sourceSelectionChecksum: result.sourceSelectionChecksum, independent, registryCoverage: result.registryCoverage, versionedReceipt: versioned }, null, 2));
+  writeFileSync(resolve(ROOT, 'docs/reports/current-source-authority-cohort-v1.json'), `${JSON.stringify({ ...receipt, versionedReceipt: versioned.slice(ROOT.length + 1).replaceAll('\\', '/') }, null, 2)}\n`);
+  console.log(JSON.stringify({ status, blockers, sourceCount: result.sourceCount, counts: result.counts, proof: result.proof, sourceSelectionChecksum: result.sourceSelectionChecksum, independent, registryCoverage: result.registryCoverage, liveDrift: drift ? { state: drift.driftCount === 0 ? 'NO_DRIFT' : 'DRIFT_PRESENT', exact: drift.liveExactMatch, changed: drift.changedSinceSeal, excludedNested: drift.excludedNestedRepository, unavailable: drift.unavailable, notObserved: drift.notObserved, driftCount: drift.driftCount } : null, versionedReceipt: versioned }, null, 2));
   process.exitCode = status === 'CURRENT_SOURCE_AUTHORITY_PROVEN' ? 0 : 1;
 } finally {
   await client.query('ROLLBACK');

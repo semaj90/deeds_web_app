@@ -13,7 +13,62 @@ import { sourceSelectionChecksumV1, type SourceSelectionEntry } from './graphify
  * The content-bearing selection checksum is the existing `sourceSelectionChecksumV1` (GraphifyInputIdentityV1), reused unchanged.
  * There is no "latest" fallback, no path-only match, and no fuzzy matching anywhere in here.
  */
-export const CURRENT_SOURCE_AUTHORITY_SCHEMA = 'atlas.current-source-authority.v1';
+/**
+ * Distinct from the sealer's artifact schema `atlas.current-source-authority.v1` (owned by scripts/atlas/seal-current-source-authority-v1.mjs,
+ * role SEALER_OUTPUT at docs/reports/current-source-authority-v1.json). This module's role is S01_07_COHORT_PROOF.
+ */
+export const CURRENT_SOURCE_AUTHORITY_SCHEMA = 'atlas.current-source-authority-cohort.v1';
+export const SEALER_ARTIFACT_SCHEMA = 'atlas.current-source-authority.v1';
+
+/**
+ * Two separate predicates, never mixed:
+ *  A. SEALED AUTHORITY  ("what exact source cohort was admitted/sealed?")  -> `classifyCurrentSourcesV1`, the S01-07 gate.
+ *  B. LIVE WORKING-TREE DRIFT ("does today's tree still match that sealed cohort?") -> `classifyLiveDriftV1`, diagnostic only.
+ * B never feeds A's classification, checksum, or status. It must be respected by any future live canary (S01-12) instead of
+ * treating current working-tree bytes as the sealed source material.
+ */
+export type LiveDriftClass = 'LIVE_EXACT_MATCH' | 'LIVE_CHANGED_SINCE_SEAL' | 'LIVE_EXCLUDED_NESTED_REPOSITORY' | 'LIVE_UNAVAILABLE' | 'LIVE_NOT_OBSERVED';
+export interface PlannerRowV1 { sourceRef: string; status: string; mismatchReasons?: string[] | null }
+
+/** Maps the repair planner's labels onto the live-drift vocabulary by predicate on the planner's status; unknown labels stay LIVE_NOT_OBSERVED (never silently exact). */
+const PLANNER_TO_LIVE: Record<string, LiveDriftClass> = {
+  EXACT_CURRENT_BINDING: 'LIVE_EXACT_MATCH',
+  CURRENT_BINDING_MISMATCH: 'LIVE_CHANGED_SINCE_SEAL',
+  EXCLUDED_SUBMODULE: 'LIVE_EXCLUDED_NESTED_REPOSITORY',
+  SOURCE_UNAVAILABLE: 'LIVE_UNAVAILABLE',
+};
+export function classifyLiveDriftV1(cohortSourceRefs: readonly string[], plannerRows: readonly PlannerRowV1[]) {
+  const byRef = new Map<string, PlannerRowV1[]>();
+  for (const r of plannerRows) byRef.set(r.sourceRef, [...(byRef.get(r.sourceRef) ?? []), r]);
+  const counts: Record<LiveDriftClass, number> = { LIVE_EXACT_MATCH: 0, LIVE_CHANGED_SINCE_SEAL: 0, LIVE_EXCLUDED_NESTED_REPOSITORY: 0, LIVE_UNAVAILABLE: 0, LIVE_NOT_OBSERVED: 0 };
+  const plannerLabelCounts: Record<string, number> = {};
+  for (const r of plannerRows) plannerLabelCounts[r.status] = (plannerLabelCounts[r.status] ?? 0) + 1;
+  const cohort = new Set(cohortSourceRefs);
+  const drifted: Array<{ sourceRef: string; live: LiveDriftClass; plannerStatus: string | null }> = [];
+  for (const ref of cohort) {
+    const rows = byRef.get(ref) ?? [];
+    const live: LiveDriftClass = rows.length === 1 ? (PLANNER_TO_LIVE[rows[0].status] ?? 'LIVE_NOT_OBSERVED') : 'LIVE_NOT_OBSERVED';
+    counts[live] += 1;
+    if (live !== 'LIVE_EXACT_MATCH') drifted.push({ sourceRef: ref, live, plannerStatus: rows[0]?.status ?? null });
+  }
+  const plannerRowsOutsideCohort = plannerRows.filter((r) => !cohort.has(r.sourceRef)).length;
+  const driftCount = cohortSourceRefs.length - counts.LIVE_EXACT_MATCH;
+  return {
+    admitted: cohort.size,
+    liveExactMatch: counts.LIVE_EXACT_MATCH,
+    changedSinceSeal: counts.LIVE_CHANGED_SINCE_SEAL,
+    excludedNestedRepository: counts.LIVE_EXCLUDED_NESTED_REPOSITORY,
+    unavailable: counts.LIVE_UNAVAILABLE,
+    notObserved: counts.LIVE_NOT_OBSERVED,
+    driftCount,
+    plannerRowsOutsideCohort,
+    plannerLabelCounts,
+    /** Drift is diagnostic: it does not change the sealed cohort's qualification, checksum, or status. */
+    affectsAuthorityProof: false as const,
+    mustBeRespectedByFutureLiveCanary: true as const,
+    drifted,
+  };
+}
 
 export type SourceClass = 'QUALIFIED' | 'MISSING_REVISION' | 'REVISION_MISMATCH' | 'NAMESPACE_AMBIGUOUS' | 'NOT_IN_ADMITTED_COHORT';
 export type RegistryBindingState = 'EXACT' | 'ABSENT' | 'MISMATCH' | 'NOT_CHECKED';
