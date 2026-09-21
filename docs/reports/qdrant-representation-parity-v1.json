@@ -1,131 +1,172 @@
 {
-  "schema": "atlas.qdrant-representation-parity.v1",
+  "schema": "atlas.qdrant-representation-parity.v2",
   "canonicalAuthority": false,
   "mode": "READ_ONLY",
   "sampleRequested": 300,
   "threshold": 0.995,
   "collections": {
     "codebase_chunks_768": {
-      "pointsCount": 328348,
-      "sampled": 300,
-      "matchedToPostgresByUuid": 141,
-      "unmatchedOrStale": 159,
-      "hashVerifiedMatches": 109,
-      "evaluated": 109,
-      "classificationHistogram": {
-        "raw": 40,
-        "UNKNOWN": 69
-      },
-      "rawRecipeByContentLength": {
-        "<=2000 chars": {
-          "n": 106,
-          "matchesRaw": 40,
-          "avgRawCosine": 0.9451
+      "payloadCensus": {
+        "actualPointCount": 328348,
+        "documentedPointCount": 105762,
+        "uuidIdCount": 55270,
+        "sourceRefPresentCount": 328348,
+        "badSourceRefCount": 1,
+        "contentHashPresentCount": 325550,
+        "packetKeyPresentCount": 328348,
+        "sourceRevisionPresentCount": 30,
+        "workspaceRevisionPresentCount": 30,
+        "representationRevisionPresentCount": 219251,
+        "modelRevisionPresentCount": 271601,
+        "producerEras": {
+          "qdrant-backfill-v1": 1000,
+          "(none)": 326772,
+          "graphify-signature-768-v1": 528,
+          "graphify-content-768-v1": 48
         },
-        ">2000 chars": {
-          "n": 3,
-          "matchesRaw": 0,
-          "avgRawCosine": 0.9704
+        "identityShapes": {
+          "uuid|badref|hash": 1,
+          "nouuid|ref|hash": 270287,
+          "uuid|ref|hash": 55262,
+          "nouuid|ref|nohash": 2791,
+          "uuid|ref|nohash": 7
         }
       },
-      "freshRecipeCosine": {
+      "sample": {
+        "size": 300,
+        "buckets": 8,
+        "perBucket": 37
+      },
+      "identityClassHistogram": {
+        "SOURCE_REF_CORRUPT": 1,
+        "SOURCE_REF_AND_CONTENT_HASH_FALLBACK": 181,
+        "QDRANT_PAYLOAD_INCOMPLETE": 69,
+        "EXACT_ID_HASH_MISMATCH": 41,
+        "EXACT_ID_AND_CONTENT_HASH": 5,
+        "POSTGRES_ROW_MISSING": 3
+      },
+      "eligibleForRepresentationInference": 143,
+      "recipeHistogramEligible": {
+        "UNKNOWN": 103,
+        "raw": 40
+      },
+      "recipeHistogramByProducerEra": {
+        "qdrant-backfill-v1": {
+          "UNKNOWN": 42
+        },
+        "(none)": {
+          "raw": 40,
+          "UNKNOWN": 13
+        },
+        "graphify-content-768-v1": {
+          "UNKNOWN": 48
+        }
+      },
+      "freshRecipeCosineEligible": {
         "raw": {
-          "n": 109,
-          "min": 0.7229,
-          "avg": 0.9458,
+          "n": 143,
+          "min": 0.282,
+          "avg": 0.7621,
           "ge_threshold": 40
         },
         "title_none": {
-          "n": 109,
-          "min": 0.7077,
-          "avg": 0.9251,
+          "n": 143,
+          "min": 0.3057,
+          "avg": 0.7442,
           "ge_threshold": 0
         },
         "title_relative_path": {
-          "n": 109,
-          "min": 0.7542,
-          "avg": 0.9434,
+          "n": 143,
+          "min": 0.319,
+          "avg": 0.7681,
           "ge_threshold": 0
         }
       },
-      "storedColumnCosine": {
-        "content_embedding": {
-          "n": 109,
-          "min": 0.7542,
-          "avg": 0.9394,
-          "ge_threshold": 0
-        },
-        "content_embedding_768": {
-          "n": 2,
-          "min": 0.8401,
-          "avg": 0.8991,
-          "ge_threshold": 0
-        }
-      },
-      "payloadRepresentationLabels": [],
-      "verdict": "QDRANT_REPRESENTATION_MIXED_OR_UNKNOWN"
+      "vectorRecipe": "QDRANT_REPRESENTATION_MIXED_OR_UNKNOWN",
+      "vectorRecipeReason": "COHORTS_DISAGREE",
+      "interchangeableExecutorProven": false,
+      "interchangeableExecutorBlockers": [
+        "representation_revision present on <90 percent of points",
+        "model_revision present on <90 percent of points",
+        "source_revision present on <90 percent of points",
+        "workspace_revision present on <90 percent of points"
+      ]
     },
     "codebase_chunks_768_v2": {
-      "pointsCount": 52816,
-      "sampled": 300,
-      "matchedToPostgresByUuid": 298,
-      "unmatchedOrStale": 2,
-      "hashVerifiedMatches": 266,
-      "evaluated": 266,
-      "classificationHistogram": {
-        "UNKNOWN": 183,
-        "raw": 83
-      },
-      "rawRecipeByContentLength": {
-        "<=2000 chars": {
-          "n": 266,
-          "matchesRaw": 83,
-          "avgRawCosine": 0.9408
+      "payloadCensus": {
+        "actualPointCount": 52816,
+        "documentedPointCount": 52380,
+        "uuidIdCount": 52380,
+        "sourceRefPresentCount": 52815,
+        "badSourceRefCount": 0,
+        "contentHashPresentCount": 45472,
+        "packetKeyPresentCount": 6747,
+        "sourceRevisionPresentCount": 6746,
+        "workspaceRevisionPresentCount": 434,
+        "representationRevisionPresentCount": 0,
+        "modelRevisionPresentCount": 0,
+        "producerEras": {
+          "v2_uuid_clean": 52380,
+          "(none)": 436
         },
-        ">2000 chars": {
-          "n": 0,
-          "matchesRaw": 0,
-          "avgRawCosine": null
+        "identityShapes": {
+          "uuid|ref|hash": 45472,
+          "uuid|ref|nohash": 6908,
+          "nouuid|ref|nohash": 435,
+          "nouuid|noref|nohash": 1
         }
       },
-      "freshRecipeCosine": {
+      "sample": {
+        "size": 300,
+        "buckets": 4,
+        "perBucket": 75
+      },
+      "identityClassHistogram": {
+        "EXACT_ID_AND_CONTENT_HASH": 100,
+        "QDRANT_PAYLOAD_INCOMPLETE": 200
+      },
+      "eligibleForRepresentationInference": 100,
+      "recipeHistogramEligible": {
+        "raw": 34,
+        "UNKNOWN": 66
+      },
+      "recipeHistogramByProducerEra": {
+        "v2_uuid_clean": {
+          "raw": 34,
+          "UNKNOWN": 66
+        }
+      },
+      "freshRecipeCosineEligible": {
         "raw": {
-          "n": 266,
-          "min": 0.7078,
-          "avg": 0.9408,
-          "ge_threshold": 83
+          "n": 100,
+          "min": 0.6815,
+          "avg": 0.9515,
+          "ge_threshold": 34
         },
         "title_none": {
-          "n": 266,
-          "min": 0.7105,
-          "avg": 0.92,
+          "n": 100,
+          "min": 0.6655,
+          "avg": 0.9285,
           "ge_threshold": 0
         },
         "title_relative_path": {
-          "n": 266,
-          "min": 0.7592,
-          "avg": 0.9448,
+          "n": 100,
+          "min": 0.823,
+          "avg": 0.9467,
           "ge_threshold": 0
         }
       },
-      "storedColumnCosine": {
-        "content_embedding": {
-          "n": 266,
-          "min": 0.7452,
-          "avg": 0.9408,
-          "ge_threshold": 0
-        },
-        "content_embedding_768": {
-          "n": 5,
-          "min": 0.7963,
-          "avg": 0.8536,
-          "ge_threshold": 0
-        }
-      },
-      "payloadRepresentationLabels": [
-        "semantic_768"
-      ],
-      "verdict": "QDRANT_REPRESENTATION_MIXED_OR_UNKNOWN"
+      "vectorRecipe": "QDRANT_REPRESENTATION_MIXED_OR_UNKNOWN",
+      "vectorRecipeReason": "UNKNOWN_REMAINDER",
+      "interchangeableExecutorProven": false,
+      "interchangeableExecutorBlockers": [
+        "representation_revision present on <90 percent of points",
+        "model_revision present on <90 percent of points",
+        "packet_key present on <90 percent of points",
+        "source_revision present on <90 percent of points",
+        "workspace_revision present on <90 percent of points",
+        "content_hash present on <90 percent of points"
+      ]
     }
   },
   "databaseWrites": false,
