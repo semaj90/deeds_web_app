@@ -19,6 +19,7 @@
 
 import pg from 'pg';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -35,6 +36,48 @@ const argLimit = args.includes('--limit') ? parseInt(args[args.indexOf('--limit'
 const dryRun = args.includes('--dry-run');
 const argCorpus = args.includes('--corpus') ? args[args.indexOf('--corpus') + 1] : undefined;
 const topK = args.includes('--k') ? parseInt(args[args.indexOf('--k') + 1]) : TOP_K;
+
+// SEM768-GATE-00: recipe / representation / executor parameters (defaults preserve prior behavior).
+//   --query-recipe unprompted-v0 | retrieval-query-v1 | code-retrieval-query-v1
+//   --document-representation raw_semantic_768_v1 (content_embedding_768) | semantic_768_retrieval_v1 (content_embedding)
+//   --executor qdrant | pgvector_exact (exact cosine, sequential scan; use this for RECIPE selection)
+// Non-default runs are dry-run only: evaluation_results has no recipe column.
+const optArg = (flag: string, dflt: string): string => (args.includes(flag) ? args[args.indexOf(flag) + 1] : dflt);
+const QUERY_RECIPES: Record<string, (q: string) => string> = {
+  'unprompted-v0': (q) => q,
+  'retrieval-query-v1': (q) => `task: search result | query: ${q}`,
+  'code-retrieval-query-v1': (q) => `task: code retrieval query | query: ${q}`,
+};
+const DOC_COLUMNS: Record<string, { column: string; cast: string }> = {
+  raw_semantic_768_v1: { column: 'content_embedding_768', cast: 'vector(768)' },
+  semantic_768_retrieval_v1: { column: 'content_embedding', cast: 'halfvec(768)' },
+};
+const queryRecipe = optArg('--query-recipe', 'unprompted-v0');
+const documentRepresentation = optArg('--document-representation', 'semantic_768_retrieval_v1');
+const executor = optArg('--executor', 'qdrant');
+if (!QUERY_RECIPES[queryRecipe]) throw new Error(`Unknown --query-recipe ${queryRecipe}`);
+if (!DOC_COLUMNS[documentRepresentation]) throw new Error(`Unknown --document-representation ${documentRepresentation}`);
+if (executor !== 'qdrant' && executor !== 'pgvector_exact') throw new Error(`Unknown --executor ${executor}`);
+const nonDefaultRecipe = queryRecipe !== 'unprompted-v0' || executor !== 'qdrant' || args.includes('--document-representation');
+if (nonDefaultRecipe && !dryRun) throw new Error('Non-default recipe/representation/executor runs must use --dry-run');
+let sharedPool: pg.Pool | null = null;
+
+// --qrels-file <judged queue ndjson>: read judgments from the frozen human-judged review queue
+// (atlas.golden-relevance-review-item.v1; evaluationUnit SOURCE_FILE) instead of evaluation_relevance,
+// whose live schema (chunk_id/grade) does not match this runner. Dry-run only; results are deduped to file level.
+const qrelsFile = optArg('--qrels-file', '');
+if (qrelsFile && !dryRun) throw new Error('--qrels-file requires --dry-run');
+const qrelsQueries: Array<{ id: string; query: string; domain: string }> = [];
+const qrelsGt: Array<{ query_id: string; packet_key: string; relevance_grade: number; confidence: number; judgment_source: string }> = [];
+if (qrelsFile) {
+  for (const line of fs.readFileSync(qrelsFile, 'utf8').split(/\r?\n/).filter(Boolean)) {
+    const row = JSON.parse(line) as { queryPacketKey: string; queryText: string; judgments: Array<{ packetKey: string; relevanceGrade: number | null; confidence: number | null; judgmentSource: string | null }> };
+    const graded = row.judgments.filter((j) => j.relevanceGrade !== null);
+    if (graded.length === 0) continue;
+    qrelsQueries.push({ id: row.queryPacketKey, query: row.queryText, domain: 'golden_review' });
+    for (const j of graded) qrelsGt.push({ query_id: row.queryPacketKey, packet_key: j.packetKey, relevance_grade: j.relevanceGrade as number, confidence: j.confidence ?? 0, judgment_source: j.judgmentSource ?? 'UNKNOWN' });
+  }
+}
 
 // ─── Ablation Configs ────────────────────────────────────────────────────────
 
@@ -67,8 +110,8 @@ function dcg(grades: number[], k: number): number {
 }
 
 /** NDCG@K: DCG / IDCG (ideal DCG from perfect ranking) */
-function ndcg(grades: number[], k: number): number {
-  const idcg = dcg([...grades].sort((a, b) => b - a), k);
+function ndcg(grades: number[], k: number, idealGrades?: number[]): number {
+  const idcg = dcg([...(idealGrades ?? grades)].sort((a, b) => b - a), k);
   if (idcg === 0) return 0;
   return dcg(grades, k) / idcg;
 }
@@ -128,7 +171,7 @@ async function embedQuery(query: string): Promise<number[] | null> {
     const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: EMBED_MODEL, prompt: query }),
+      body: JSON.stringify({ model: EMBED_MODEL, prompt: QUERY_RECIPES[queryRecipe](query) }),
       signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) return null;
@@ -143,6 +186,27 @@ async function embedQuery(query: string): Promise<number[] | null> {
 async function retrieveDense(query: string, limit: number): Promise<Array<{ packetKey: string; sourceRef: string; chunkId: string; score: number; rank: number }>> {
   const embedding = await embedQuery(query);
   if (!embedding) return [];
+
+  if (executor === 'pgvector_exact') {
+    if (!sharedPool) return [];
+    const { column, cast } = DOC_COLUMNS[documentRepresentation];
+    const client = await sharedPool.connect();
+    try {
+      await client.query('SET enable_indexscan = off');
+      await client.query('SET enable_bitmapscan = off');
+      const r = await client.query<{ id: string; source_ref: string; packet_key: string | null; score: number }>(
+        `SELECT ci.id::text AS id, ci.source_ref, ap.packet_key, 1 - (ci.${column} <=> $1::${cast}) AS score
+         FROM codebase_chunk_index ci LEFT JOIN atlas_packets ap ON ap.source_ref = ci.source_ref
+         WHERE ci.${column} IS NOT NULL ORDER BY ci.${column} <=> $1::${cast} LIMIT $2`,
+        ['[' + embedding.join(',') + ']', limit],
+      );
+      return r.rows.map((row, i) => ({ packetKey: row.packet_key ?? row.source_ref, sourceRef: row.source_ref, chunkId: row.id, score: row.score, rank: i + 1 }));
+    } catch {
+      return [];
+    } finally {
+      client.release();
+    }
+  }
 
   try {
     const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {
@@ -355,11 +419,16 @@ async function runAblation(
       results = fuseWeighted(dense, lexical, config.denseWeight, config.lexicalWeight, topK);
     }
 
+    if (qrelsFile) {
+      // evaluation unit is SOURCE_FILE: collapse chunk hits to one entry per file (keep best rank)
+      const seenFiles = new Set<string>();
+      results = results.filter((r) => !seenFiles.has(r.packetKey) && seenFiles.add(r.packetKey)).map((r, i) => ({ ...r, finalRank: i + 1 }));
+    }
     // Grade each result against ground-truth
     const grades = results.map(r => gtByKey.get(r.packetKey)?.grade ?? 0);
 
     const metrics: QueryMetrics = {
-      ndcg10: ndcg(grades, 10),
+      ndcg10: ndcg(grades, 10, gt.map(g => g.grade)),
       map: map(grades),
       mrr: mrr(grades),
       p5: precisionAtK(grades, 5),
@@ -449,10 +518,14 @@ async function main(): Promise<void> {
   console.log('═══════════════════════════════════════════════════════\n');
 
   const pool = new pg.Pool({ connectionString: DB_URL });
+  sharedPool = pool;
+  console.log(`recipe: queryRecipe=${queryRecipe} documentRepresentation=${documentRepresentation} executor=${executor}`);
 
   // 1. Resolve corpus version
   let corpusVersion: string;
-  if (argCorpus) {
+  if (qrelsFile) {
+    corpusVersion = 'qrels-file';
+  } else if (argCorpus) {
     corpusVersion = argCorpus;
   } else {
     const cv = await pool.query<{ corpus_version: string }>(`
@@ -483,7 +556,7 @@ async function main(): Promise<void> {
   const qResult = await pool.query<EvalQuery>(`
     SELECT id, query, domain FROM evaluation_queries ORDER BY domain, query LIMIT $1
   `, [argLimit ?? 99999]);
-  const queries = qResult.rows;
+  const queries = qrelsFile ? qrelsQueries.slice(0, argLimit ?? 99999) : qResult.rows;
   console.log(`Loaded ${queries.length} evaluation queries`);
 
   if (queries.length === 0) {
@@ -493,21 +566,21 @@ async function main(): Promise<void> {
   }
 
   // 3. Load ground-truth relevance judgments
-  const gtResult = await pool.query<{ query_id: string; packet_key: string; relevance_grade: number; confidence: number; judgment_source: string }>(`
+  const gtRows: Array<{ query_id: string; packet_key: string; relevance_grade: number; confidence: number; judgment_source: string }> = qrelsFile ? qrelsGt : (await pool.query<{ query_id: string; packet_key: string; relevance_grade: number; confidence: number; judgment_source: string }>(`
     SELECT query_id, packet_key, relevance_grade, confidence, judgment_source
     FROM evaluation_relevance
     WHERE corpus_version = $1
-  `, [corpusVersion]);
+  `, [corpusVersion])).rows;
 
   const groundTruth = new Map<string, GroundTruth[]>();
-  for (const row of gtResult.rows) {
+  for (const row of gtRows) {
     const list = groundTruth.get(row.query_id) ?? [];
     list.push({ packetKey: row.packet_key, grade: row.relevance_grade, confidence: row.confidence, judgmentSource: row.judgment_source });
     groundTruth.set(row.query_id, list);
   }
-  console.log(`Loaded ground-truth for ${groundTruth.size} queries (${gtResult.rows.length} total judgments)`);
+  console.log(`Loaded ground-truth for ${groundTruth.size} queries (${gtRows.length} total judgments)`);
 
-  const avgJudgmentsPerQuery = gtResult.rows.length / Math.max(1, groundTruth.size);
+  const avgJudgmentsPerQuery = gtRows.length / Math.max(1, groundTruth.size);
   console.log(`Average judgments per query: ${avgJudgmentsPerQuery.toFixed(1)}\n`);
 
   // 4. Select ablations to run
