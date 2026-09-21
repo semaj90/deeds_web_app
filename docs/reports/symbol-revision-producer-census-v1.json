@@ -1,0 +1,385 @@
+{
+  "schema": "atlas.symbol-revision-producer-census.v1",
+  "gate": "S01-10A",
+  "generatedAt": "2026-09-21T23:56:06.268Z",
+  "findings": {
+    "placeholderRegistryRows": 10220,
+    "placeholderOriginExactExpression": "NOT a fallback expression in any symbol writer: no writer contains a `workspace:` literal or a revision fallback. The writers PASS THROUGH the revision value of their input row. The literal value `workspace:0` was already present in the 2026-08-24 nominations input (a `workspace:${workspace_id}` namespace label with workspace_id 0 used where a revision belongs; prove-ast-backfill-idempotency.mjs calls these \"legacy-coerced\"). The exact generating call site of that Aug-24 input is not recoverable: the input artifact has since been regenerated fully qualified.",
+    "legacy40HexOrigin": [
+      {
+        "oid": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+        "gitObjectType": "commit",
+        "authorDate": "2026-08-27T13:13:07-07:00",
+        "meaning": "A Git commit id: a repo-level revision, NOT a per-file content revision and NOT convertible to sha256 by formatting"
+      }
+    ],
+    "qualifiedRowsProducedBy": {
+      "registryRevisionLabels": [
+        "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+      ],
+      "versionProducer": [
+        "symbol-reconciliation-writer-v1"
+      ]
+    },
+    "upstreamFileIdPopulated": {
+      "populated": 0,
+      "rows": 479
+    },
+    "passThroughNoValidation": "Neither the registry writer nor the version materializer validates that a revision is a sha256-qualified value before writing, and the registry writer is ON CONFLICT DO NOTHING, so re-running it never repairs existing placeholders."
+  },
+  "registryByProducerAndShape": [
+    {
+      "producer": "promotion:ast-nominations:v1",
+      "shape": "PLACEHOLDER_workspace_N",
+      "status": "active",
+      "rows": 10170,
+      "first": "2026-08-24",
+      "last": "2026-08-24",
+      "sample_value": "workspace:0"
+    },
+    {
+      "producer": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "shape": "QUALIFIED_SHA256",
+      "status": "active",
+      "rows": 194,
+      "first": "2026-09-13",
+      "last": "2026-09-13",
+      "sample_value": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "producer": "atlas-current-tree-bound-symbol-canary-v1",
+      "shape": "LEGACY_40HEX",
+      "status": "active",
+      "rows": 90,
+      "first": "2026-08-30",
+      "last": "2026-08-30",
+      "sample_value": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf"
+    },
+    {
+      "producer": "promotion:ast-nominations:v1",
+      "shape": "PLACEHOLDER_workspace_N",
+      "status": "retired",
+      "rows": 50,
+      "first": "2026-08-24",
+      "last": "2026-08-24",
+      "sample_value": "workspace:0"
+    }
+  ],
+  "versionsByProducerAndShape": [
+    {
+      "producer": "atlas-ast-symbol-version-materializer-v1",
+      "source_shape": "PLACEHOLDER_workspace_N",
+      "workspace_shape": "PLACEHOLDER_workspace_N",
+      "rows": 200,
+      "sample_source": "workspace:0",
+      "sample_workspace": "workspace:0"
+    },
+    {
+      "producer": "symbol-reconciliation-writer-v1",
+      "source_shape": "QUALIFIED_SHA256",
+      "workspace_shape": "QUALIFIED_SHA256",
+      "rows": 194,
+      "sample_source": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sample_workspace": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "producer": "atlas-ast-symbol-version-materializer-v1",
+      "source_shape": "LEGACY_40HEX",
+      "workspace_shape": "QUALIFIED_SHA256",
+      "rows": 85,
+      "sample_source": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "sample_workspace": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9"
+    }
+  ],
+  "registrySymbolsByRevisionShapeAndVersionEvidence": [
+    {
+      "shape": "LEGACY_40HEX",
+      "has_version": false,
+      "rows": 5
+    },
+    {
+      "shape": "LEGACY_40HEX",
+      "has_version": true,
+      "rows": 85
+    },
+    {
+      "shape": "PLACEHOLDER_workspace_N",
+      "has_version": false,
+      "rows": 10020
+    },
+    {
+      "shape": "PLACEHOLDER_workspace_N",
+      "has_version": true,
+      "rows": 200
+    },
+    {
+      "shape": "QUALIFIED_SHA256",
+      "has_version": true,
+      "rows": 194
+    }
+  ],
+  "writers": [
+    {
+      "file": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+      "role": "registry writer",
+      "producerLabels": [
+        "promotion:ast-nominations:v1"
+      ],
+      "classification": "PLACEHOLDER_WRITER",
+      "why": "passes the nomination row source_revision straight into created_from_source_revision with no validation; ON CONFLICT DO NOTHING means a later clean run never repairs an earlier placeholder",
+      "source": {
+        "file": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+        "exists": true,
+        "insertsRegistry": true,
+        "insertsVersions": false,
+        "insertsAliases": false,
+        "validatesSha256Revision": false,
+        "literalPlaceholderExpression": false,
+        "randomUuid": false,
+        "revisionFallbackExpressions": [],
+        "revisionRelatedLines": [
+          {
+            "line": 135,
+            "text": "created_from_source_revision, registry_revision, status"
+          },
+          {
+            "line": 148,
+            "text": "row.source_revision,"
+          }
+        ],
+        "upstreamFileIdWritten": "no"
+      },
+      "rowsAttributed": [
+        {
+          "table": "atlas_symbol_registry",
+          "shape": "PLACEHOLDER_workspace_N",
+          "status": "active",
+          "rows": 10170
+        },
+        {
+          "table": "atlas_symbol_registry",
+          "shape": "PLACEHOLDER_workspace_N",
+          "status": "retired",
+          "rows": 50
+        }
+      ]
+    },
+    {
+      "file": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+      "role": "registry writer",
+      "producerLabels": [
+        "atlas-current-tree-bound-symbol-canary-v1"
+      ],
+      "classification": "LEGACY_WRITER",
+      "why": "wrote a Git commit oid as the revision (repo-level, not per-file content)",
+      "source": {
+        "file": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+        "exists": true,
+        "insertsRegistry": true,
+        "insertsVersions": false,
+        "insertsAliases": false,
+        "validatesSha256Revision": false,
+        "literalPlaceholderExpression": false,
+        "randomUuid": false,
+        "revisionFallbackExpressions": [
+          {
+            "line": 125,
+            "text": "if (!actual || actual.stable_symbol_id !== row.stable_symbol_id || actual.canonical_key !== row.symbol_key || actual.language !== row.language || actual.symbol_"
+          }
+        ],
+        "revisionRelatedLines": [
+          {
+            "line": 100,
+            "text": "created_from_source_ref, created_from_source_revision, registry_revision, status)"
+          },
+          {
+            "line": 105,
+            "text": "row.qualified_name, row.nomination_id, row.source_ref, row.source_revision,"
+          },
+          {
+            "line": 115,
+            "text": "created_from_source_ref, created_from_source_revision, registry_revision, status"
+          },
+          {
+            "line": 125,
+            "text": "if (!actual || actual.stable_symbol_id !== row.stable_symbol_id || actual.canonical_key !== row.symbol_key || actual.language !== row.language || actual.symbol_"
+          }
+        ],
+        "upstreamFileIdWritten": "no"
+      },
+      "rowsAttributed": [
+        {
+          "table": "atlas_symbol_registry",
+          "shape": "LEGACY_40HEX",
+          "status": "active",
+          "rows": 90
+        }
+      ]
+    },
+    {
+      "file": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "role": "version writer",
+      "producerLabels": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ],
+      "classification": "PLACEHOLDER_WRITER",
+      "why": "copies row.source_revision / row.workspace_revision from its input; the rows it wrote carry workspace:0 or a Git commit oid",
+      "source": {
+        "file": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+        "exists": true,
+        "insertsRegistry": false,
+        "insertsVersions": true,
+        "insertsAliases": false,
+        "validatesSha256Revision": false,
+        "literalPlaceholderExpression": false,
+        "randomUuid": false,
+        "revisionFallbackExpressions": [
+          {
+            "line": 72,
+            "text": "graphifySourceRevision: node.graphifySourceRevision ?? node.sourceRevision,"
+          }
+        ],
+        "revisionRelatedLines": [
+          {
+            "line": 85,
+            "text": "const revisionQualifiedRows = rows.filter((row) => row.source_revision && row.workspace_revision);"
+          },
+          {
+            "line": 93,
+            "text": "missingSourceRevision: rows.filter((row) => !row.source_revision).length,"
+          },
+          {
+            "line": 94,
+            "text": "missingWorkspaceRevision: rows.filter((row) => !row.workspace_revision).length,"
+          },
+          {
+            "line": 109,
+            "text": "&& comparableRevision(node.graphifySourceRevision) === comparableRevision(row.source_revision)"
+          },
+          {
+            "line": 139,
+            "text": "sourceRevision: row.source_revision,"
+          },
+          {
+            "line": 145,
+            "text": "symbol_version_id, stable_symbol_id, source_ref, source_revision, workspace_revision,"
+          },
+          {
+            "line": 153,
+            "text": "symbolVersionId, resolution.stable_symbol_id, row.source_ref, row.source_revision,"
+          },
+          {
+            "line": 154,
+            "text": "row.workspace_revision, row.upstream_node_id, null,"
+          }
+        ],
+        "upstreamFileIdWritten": "column named"
+      },
+      "rowsAttributed": [
+        {
+          "table": "atlas_symbol_versions",
+          "sourceShape": "PLACEHOLDER_workspace_N",
+          "workspaceShape": "PLACEHOLDER_workspace_N",
+          "rows": 200
+        },
+        {
+          "table": "atlas_symbol_versions",
+          "sourceShape": "LEGACY_40HEX",
+          "workspaceShape": "QUALIFIED_SHA256",
+          "rows": 85
+        }
+      ]
+    },
+    {
+      "file": "scripts/atlas/symbol-reconciliation-writer-v1.mts",
+      "role": "registry+version writer",
+      "producerLabels": [
+        "symbol-reconciliation-writer-v1"
+      ],
+      "classification": "QUALIFIED_WRITER",
+      "why": "every row it wrote carries a sha256-qualified source and workspace revision",
+      "source": {
+        "file": "scripts/atlas/symbol-reconciliation-writer-v1.mts",
+        "exists": true,
+        "insertsRegistry": false,
+        "insertsVersions": false,
+        "insertsAliases": false,
+        "validatesSha256Revision": false,
+        "literalPlaceholderExpression": false,
+        "randomUuid": false,
+        "revisionFallbackExpressions": [],
+        "revisionRelatedLines": [
+          {
+            "line": 65,
+            "text": "`SELECT canonical_source_ref FROM atlas_workspace_source_bindings WHERE workspace_revision = $1`,"
+          },
+          {
+            "line": 103,
+            "text": "? `workspace_revision ${targetWorkspaceRevision} has zero rows in atlas_workspace_source_bindings -- this is exactly the ungrounded-revision failure mode flagge"
+          },
+          {
+            "line": 104,
+            "text": ": `workspace_revision ${targetWorkspaceRevision} has ${('boundSourceRefCount' in gate ? gate.boundSourceRefCount : 0)} bound source_refs, but graphify_symbols h"
+          },
+          {
+            "line": 116,
+            "text": "`SELECT canonical_source_ref FROM atlas_workspace_source_bindings WHERE workspace_revision = $1`,"
+          },
+          {
+            "line": 151,
+            "text": "source_revision: targetWorkspaceRevision,"
+          },
+          {
+            "line": 152,
+            "text": "workspace_revision: targetWorkspaceRevision,"
+          },
+          {
+            "line": 173,
+            "text": "source_revision: targetWorkspaceRevision,"
+          },
+          {
+            "line": 174,
+            "text": "workspace_revision: targetWorkspaceRevision,"
+          }
+        ],
+        "upstreamFileIdWritten": "no"
+      },
+      "rowsAttributed": [
+        {
+          "table": "atlas_symbol_versions",
+          "sourceShape": "QUALIFIED_SHA256",
+          "workspaceShape": "QUALIFIED_SHA256",
+          "rows": 194
+        }
+      ]
+    }
+  ],
+  "currentNominationsInput": {
+    "present": true,
+    "file": ".tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl",
+    "rows": 461,
+    "sourceRevisionShapes": {
+      "QUALIFIED_SHA256": 461
+    },
+    "note": "the CURRENT nominations input is fully qualified; the placeholder rows were written from an earlier input artifact that no longer exists in this form"
+  },
+  "classificationCounts": {
+    "PLACEHOLDER_WRITER": 2,
+    "LEGACY_WRITER": 1,
+    "QUALIFIED_WRITER": 1
+  },
+  "nextGate": "S01-10B: stop new placeholders (shared revision validator that fails closed; a 40-hex value is never prefixed or hashed). No historical row is touched by that gate.",
+  "safety": {
+    "databaseWrites": 0,
+    "registryWrites": 0,
+    "schemaChanges": 0,
+    "graphifyRun": false,
+    "readerCutover": false,
+    "inputIdentityBackfill": false,
+    "upstreamFileIdModified": 0,
+    "newIdentityNamespaceCreated": false,
+    "transaction": "REPEATABLE READ READ ONLY, ROLLBACK"
+  },
+  "receiptChecksum": "sha256:d524f0d57440318f61fd8bf62c846d785e0d9968156e49d83220f3b6b48165ab",
+  "versionedReceipt": "docs/reports/symbol-revision-producer-census-v1.d524f0d57440.json"
+}
