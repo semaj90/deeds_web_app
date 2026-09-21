@@ -24,6 +24,9 @@
  *
  * Usage:
  *   node scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs --execution-id <uuid>              # dry-run
+ *   node scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs --execution-id <uuid> --rehearse    # real tx body, ROLLED BACK
+ * The owner is graphify_execution_authority (post-02B); canonical_authority is kept in step as the legacy field. --apply also needs
+ * --selected-by <operator> --selection-receipt <real receipt id>.
  *   ATLAS_AUTHORIZE_GRAPHIFY_EXECUTION_OWNER_DECISION=1 node scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs --execution-id <uuid> --apply
  */
 import fs from 'node:fs';
@@ -31,6 +34,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { applyGraphifyOwnerDecisionV1 } from './lib/graphify-owner-decision-v1.mjs';
 
 const require = createRequire(import.meta.url);
 const { Pool } = require('pg');
@@ -39,6 +43,10 @@ const root = REPO_ROOT;
 const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const AUTHORIZED = process.env.ATLAS_AUTHORIZE_GRAPHIFY_EXECUTION_OWNER_DECISION === '1';
+const REHEARSE = args.includes('--rehearse');
+const argValue = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] : null);
+const SELECTED_BY = argValue('--selected-by');
+const SELECTION_RECEIPT = argValue('--selection-receipt');
 const execArgIndex = args.indexOf('--execution-id');
 const CHOSEN_EXECUTION_ID = execArgIndex >= 0 ? args[execArgIndex + 1] : null;
 
@@ -85,7 +93,8 @@ const report = {
   schema: 'atlas.current-graphify-execution-owner-decision.v1',
   generatedAt: new Date().toISOString(),
   gate: 'GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02',
-  mode: APPLY && AUTHORIZED ? 'APPLY' : 'DRY_RUN',
+  mode: APPLY && AUTHORIZED ? 'APPLY' : REHEARSE ? 'REHEARSAL_ROLLED_BACK' : 'DRY_RUN',
+  authorityTableOwner: 'graphify_execution_authority',
   chosenExecutionId: CHOSEN_EXECUTION_ID,
   otherCandidateExecutionIds: candidateExecutionIds.filter((id) => id !== CHOSEN_EXECUTION_ID),
   authorizedEnvVarPresent: AUTHORIZED,
@@ -105,30 +114,37 @@ try {
   );
   report.before = before.rows;
 
-  if (APPLY && AUTHORIZED) {
-    await pool.query('BEGIN');
+  if (REHEARSE && !(APPLY && AUTHORIZED)) {
+    // Rehearsal: run the real transaction body with obviously non-real provenance, then ROLL BACK. Nothing persists.
+    const client = await pool.connect();
     try {
-      // Demote every other candidate sharing this workspace_revision first, so at most one
-      // execution ever carries canonical_authority=true for this admitted revision.
-      await pool.query(
-        `update public.graphify_executions
-            set canonical_authority = false
-          where execution_id = any($1::uuid[]) and execution_id != $2::uuid`,
-        [candidateExecutionIds, CHOSEN_EXECUTION_ID],
-      );
-      const updateResult = await pool.query(
-        `update public.graphify_executions
-            set canonical_authority = true
-          where execution_id = $1::uuid
-          returning execution_id::text, canonical_authority`,
-        [CHOSEN_EXECUTION_ID],
-      );
-      if (updateResult.rowCount !== 1) throw new Error(`EXECUTION_ID_NOT_FOUND_AT_APPLY_TIME:${CHOSEN_EXECUTION_ID}`);
-      await pool.query('COMMIT');
-      report.writesPerformed = true;
-    } catch (caught) {
-      await pool.query('ROLLBACK');
-      throw caught;
+      await client.query('BEGIN');
+      const rehearsal = await applyGraphifyOwnerDecisionV1(client, { chosenExecutionId: CHOSEN_EXECUTION_ID, selectedBy: 'REHEARSAL', selectionReceipt: 'REHEARSAL-NOT-A-RECEIPT' });
+      report.rehearsal = { legacy: rehearsal.legacy, authority: rehearsal.authority, previousAuthority: rehearsal.previousAuthority };
+      report.readbackVerified = true;
+    } finally {
+      await client.query('ROLLBACK').catch(() => undefined);
+      client.release();
+    }
+  }
+
+  if (APPLY && AUTHORIZED) {
+    if (!SELECTED_BY || !SELECTION_RECEIPT) {
+      throw new Error('SELECTION_PROVENANCE_REQUIRED: pass --selected-by <operator> and --selection-receipt <real receipt id>; this script never invents either.');
+    }
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      try {
+        report.applied = await applyGraphifyOwnerDecisionV1(client, { chosenExecutionId: CHOSEN_EXECUTION_ID, selectedBy: SELECTED_BY, selectionReceipt: SELECTION_RECEIPT });
+        await client.query('COMMIT');
+        report.writesPerformed = true;
+      } catch (caught) {
+        await client.query('ROLLBACK');
+        throw caught;
+      }
+    } finally {
+      client.release();
     }
 
     const after = await pool.query(

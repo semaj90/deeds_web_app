@@ -1,15 +1,16 @@
 {
   "schema": "atlas.current-graphify-execution-owner-decision.v1",
-  "generatedAt": "2026-09-18T22:12:42.596Z",
+  "generatedAt": "2026-09-21T19:57:14.268Z",
   "gate": "GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02",
-  "mode": "APPLY",
+  "mode": "REHEARSAL_ROLLED_BACK",
+  "authorityTableOwner": "graphify_execution_authority",
   "chosenExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
   "otherCandidateExecutionIds": [
     "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
   ],
-  "authorizedEnvVarPresent": true,
-  "applyFlagPresent": true,
-  "writesPerformed": true,
+  "authorizedEnvVarPresent": false,
+  "applyFlagPresent": false,
+  "writesPerformed": false,
   "before": [
     {
       "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
@@ -22,18 +23,30 @@
       "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
     }
   ],
-  "after": [
-    {
-      "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
-      "canonical_authority": false,
-      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
-    },
-    {
-      "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
-      "canonical_authority": true,
-      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
-    }
-  ],
+  "after": null,
   "readbackVerified": true,
-  "reportChecksum": "7deb0dc87c81ed2695b75a1c0bb9f1d7babd7a287cf5ecddd658711691b3b26c"
+  "rehearsal": {
+    "legacy": [
+      {
+        "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      }
+    ],
+    "authority": [
+      {
+        "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "authority_state": "SELECTED",
+        "selected_by": "REHEARSAL",
+        "selection_receipt": "REHEARSAL-NOT-A-RECEIPT",
+        "imported_at": null,
+        "import_receipt": null
+      }
+    ],
+    "previousAuthority": [
+      {
+        "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "authority_state": "LEGACY_IMPORTED"
+      }
+    ]
+  },
+  "reportChecksum": "1e06e2fd0cef8112d68bdce6fac491e1bfd3172bfd896d064e178be3f68aa087"
 }
