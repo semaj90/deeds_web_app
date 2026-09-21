@@ -15,6 +15,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
+import { graphifyInputIdentityV1 as sharedIdentity, sourceSelectionChecksumV1 as sharedChecksum } from '../../packages/atlas-core/src/identity/graphify-input-identity.ts';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
 const SCHEMA = 'atlas.graphify-input-identity.v1';
@@ -74,6 +75,7 @@ const groups = new Map<string, any[]>();
 const incomplete: string[] = [];
 let conflictingSerializations = 0;
 let parity: any = null;
+let sharedOwnerMismatches = 0;
 
 try {
   rows = (await pool.query(`
@@ -113,6 +115,7 @@ try {
     };
     if (canonicalInputIdentityPayload(input) !== independentSerialization(input)) conflictingSerializations += 1;
     const id = inputIdentityV1(input);
+    if (id !== sharedIdentity(input) || r.source_selection_checksum !== sharedChecksum(membershipByExecution.get(r.execution_id)!.entries)) sharedOwnerMismatches += 1;
     (groups.get(id) ?? groups.set(id, []).get(id)!).push(r);
   }
 } catch (error) {
@@ -172,6 +175,7 @@ const report = {
   databaseError,
   mapping: { sourceIdentityKey: 'repository_id:repository_relative_path', sourceRevision: 'code_source_revision', byteLength: 'byte_length', sortOrder: 'UTF-8 byte order' },
   parity,
+  sharedOwnerParityMismatches: sharedOwnerMismatches,
   executionsExamined: rows.length,
   recipeInputsComplete: rows.length - incomplete.length,
   incompleteExecutionIds: incomplete,

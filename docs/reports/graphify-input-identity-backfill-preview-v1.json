@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-input-identity-backfill-preview.v1",
-  "generatedAt": "2026-09-21T19:18:26.004Z",
+  "generatedAt": "2026-09-21T19:26:11.687Z",
   "mode": "READ_ONLY_PREVIEW",
   "recipeSchema": "atlas.graphify-input-identity.v1",
   "recipeFields": [
@@ -27,6 +27,7 @@
     "paths_needing_normalization": 0,
     "identity_key_collisions": 0
   },
+  "sharedOwnerParityMismatches": 0,
   "executionsExamined": 36,
   "recipeInputsComplete": 36,
   "incompleteExecutionIds": [],
