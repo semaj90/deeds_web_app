@@ -78,6 +78,9 @@ const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(proc
 let databaseError: string | null = null;
 let schema: Record<string, string[]> = {};
 let executions: any[] = [];
+// Shadow read of the new authority owner (graphify_execution_authority). Observation only: it never changes a binding decision.
+let authorityShadowRows: Array<{ workspace_id: string; workspace_revision: string; execution_id: string; authority_state: string }> = [];
+let authorityShadowError: string | null = null;
 let legacyFilesByExecution = new Map<string, any[]>();
 let v2FilesByExecution = new Map<string, any[]>();
 let stagesByExecution = new Map<string, any[]>();
@@ -104,6 +107,11 @@ try {
     [workspaceId],
   );
   executions = executionResult.rows;
+  try {
+    authorityShadowRows = (await pool.query(`SELECT workspace_id::text AS workspace_id, workspace_revision, execution_id::text AS execution_id, authority_state FROM public.graphify_execution_authority`)).rows;
+  } catch (error) {
+    authorityShadowError = error instanceof Error ? error.message : String(error);
+  }
 
   if (schema.graphify_execution_files?.length && schema.graphify_execution_files.includes('execution_id')) {
     const fileColumns = ['execution_id', 'source_ref', 'workspace_revision', 'code_source_revision', 'source_revision', 'content_hash', 'byte_length']
@@ -181,6 +189,7 @@ function compareExecution(execution: any) {
     workspaceRevision: execution.workspace_revision ?? null,
     completedAt: execution.completed_at ?? null,
     canonicalAuthority: execution.canonical_authority ?? null,
+    authorityTableSelected: authorityShadowRows.some((row) => row.execution_id === executionId),
     membershipSource,
     sourceSelectionStage: sourceStage,
     sourceCount: rows.length,
@@ -218,6 +227,18 @@ const firstBlockingInvariant = admissionAuthority && bindingResolved
         : admittedMatching.length > 1
           ? 'MULTIPLE_GRAPHIFY_EXECUTIONS_MATCH_SNAPSHOT'
           : 'WORKSPACE_REVISION_ADMISSION_REQUIRES_TOURNAMENT';
+const legacyAdmittedIds = admittedCanonical.map((row) => row.executionId).sort();
+const authorityAdmittedIds = authorityShadowRows.filter((row) => row.workspace_revision === admittedWorkspaceRevision).map((row) => row.execution_id).sort();
+const authorityShadow = {
+  source: 'graphify_execution_authority',
+  runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY',
+  error: authorityShadowError,
+  authorityRows: authorityShadowRows.length,
+  legacyCanonicalAdmittedExecutionIds: legacyAdmittedIds,
+  authorityAdmittedExecutionIds: authorityAdmittedIds,
+  // null = nothing to compare on one side; true/false = both sides selected and agree/disagree. Never changes the decision above.
+  agreesWithLegacy: authorityShadowError || (legacyAdmittedIds.length === 0 && authorityAdmittedIds.length === 0) ? null : JSON.stringify(legacyAdmittedIds) === JSON.stringify(authorityAdmittedIds),
+};
 const status = databaseError
   ? 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED'
   : snapshotReadback.status !== 'SNAPSHOT_BYTES_READBACK_PROVEN'
@@ -244,6 +265,7 @@ const report = {
   terminalExecutionCount: executions.length,
   comparisons,
   firstBlockingInvariant,
+  authorityShadow,
   nextGate: status === 'GRAPHIFY_SNAPSHOT_BINDING_PROVEN'
     ? 'CURRENT-STRUCTURAL-LINEAGE-01'
     : 'SNAPSHOT-BOUND-GRAPHIFY-CANARY-01',
