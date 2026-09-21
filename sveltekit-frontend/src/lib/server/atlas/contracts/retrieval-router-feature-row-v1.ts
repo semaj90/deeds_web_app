@@ -22,6 +22,16 @@ export const LatentRoutingFeatureV1Schema = z.object({
   vector: z.array(z.number().finite()).length(64).nullable(),
 }).strict();
 
+/**
+ * Workspace revision on a router row. Current live producers MUST emit the `sha256:<64 hex>` form (the canonical source-authority
+ * revision used by CandidateOrdinalMapV1 and the snapshot gate). A non-negative integer is accepted ONLY as a legacy compatibility shape for
+ * historical fixtures and is never comparable to a canonical SHA revision.
+ */
+export const RouterWorkspaceRevisionV1Schema = z.union([
+  z.string().regex(/^sha256:[a-f0-9]{64}$/i),
+  z.number().int().nonnegative(), // legacy compatibility only
+]);
+
 export const RetrievalRouterFeatureRowV1Schema = z.object({
   schema: z.literal('atlas.retrieval-router-feature-row.v1'),
   candidateOrdinal: z.number().int().nonnegative(),
@@ -31,7 +41,7 @@ export const RetrievalRouterFeatureRowV1Schema = z.object({
   treeNodeId: z.string().min(1).nullable(),
   sourceVersionReceiptId: z.string().min(1).nullable(),
   reconciliationReceiptId: z.string().min(1).nullable(),
-  workspaceRevision: z.number().int().nonnegative().nullable(),
+  workspaceRevision: RouterWorkspaceRevisionV1Schema.nullable(),
   featureRevision: z.string().min(1),
   graphRevision: z.string().min(1).nullable(),
 
@@ -104,7 +114,7 @@ export interface BuildRetrievalRouterFeatureRowInputV1 {
   treeNodeId?: string | null;
   sourceVersionReceiptId?: string | null;
   reconciliationReceiptId?: string | null;
-  workspaceRevision?: number | null;
+  workspaceRevision?: z.input<typeof RouterWorkspaceRevisionV1Schema> | null;
   featureRevision: string;
   graphRevision?: string | null;
   observation: ObservationFeatureProjectionV1;
