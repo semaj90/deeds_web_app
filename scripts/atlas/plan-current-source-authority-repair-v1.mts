@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 import { materializeWorkspaceRevisionOriginV1 } from '../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 
 const reportPath = path.join(REPO_ROOT, 'docs/reports/current-source-authority-repair-plan-v1.json');
@@ -33,14 +34,14 @@ let databaseError: string | null = null;
 let ownerRunId: string | null = null;
 let graphRows: any[] = [];
 let ownerSelection = 'COMPLETED_BOUND_OWNER_BY_FILE_COUNT_FALLBACK';
-// Shadow read of graphify_execution_authority (observation only; the legacy boolean still selects the owner above).
-let authorityShadow: { authorityExecutionIds: string[]; legacyCanonicalExecutionId: string | null; agreesWithLegacy: boolean | null; error: string | null } = { authorityExecutionIds: [], legacyCanonicalExecutionId: null, agreesWithLegacy: null, error: null };
+// Shadow observation via the ONE shared owner (observation only; the legacy boolean still selects the owner above).
+let authorityShadow: { error: string | null; observations: any[] } = { error: null, observations: [] };
 try {
   // Prefer the canonical Graphify execution's own per-source membership. Picking the run with the
   // most graphify_files rows bound the plan to a non-canonical legacy run (found 2026-09-21:
   // run 48485685 has no execution; the canonical execution's legacy run has 0 graphify_files rows).
   const canonical = await pool.query(`
-    SELECT execution_id::text AS execution_id
+    SELECT execution_id::text AS execution_id, workspace_id::text AS workspace_id, workspace_revision
       FROM public.graphify_executions
      WHERE canonical_authority = true AND status = 'COMPLETED'
      ORDER BY completed_at DESC NULLS LAST, execution_id
@@ -48,11 +49,11 @@ try {
   `);
   const canonicalExecutionId: string | null = canonical.rows[0]?.execution_id ?? null;
   try {
-    const authorityExecutionIds: string[] = (await pool.query(`SELECT execution_id::text AS execution_id FROM public.graphify_execution_authority ORDER BY execution_id`)).rows.map((r: any) => r.execution_id);
-    authorityShadow = {
-      authorityExecutionIds, legacyCanonicalExecutionId: canonicalExecutionId, error: null,
-      agreesWithLegacy: !canonicalExecutionId && authorityExecutionIds.length === 0 ? null : authorityExecutionIds.length === 1 && authorityExecutionIds[0] === canonicalExecutionId,
-    };
+    const scopeRow = canonical.rows[0];
+    if (scopeRow?.workspace_id && scopeRow?.workspace_revision) {
+      const { loadAuthorityShadowV1 } = await loadAuthorityShadowModuleV1();
+      authorityShadow.observations.push(await loadAuthorityShadowV1(pool, { workspaceId: String(scopeRow.workspace_id), workspaceRevision: String(scopeRow.workspace_revision) }));
+    }
   } catch (error) {
     authorityShadow.error = error instanceof Error ? error.message : String(error);
   }

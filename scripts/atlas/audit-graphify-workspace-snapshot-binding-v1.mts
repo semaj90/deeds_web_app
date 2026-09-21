@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
+import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const normalize = (value: unknown) => String(value ?? '').replaceAll('\\', '/').replace(/^\.\//, '').replace(/^\/+/, '').trim();
@@ -78,8 +79,8 @@ const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(proc
 let databaseError: string | null = null;
 let schema: Record<string, string[]> = {};
 let executions: any[] = [];
-// Shadow read of the new authority owner (graphify_execution_authority). Observation only: it never changes a binding decision.
-let authorityShadowRows: Array<{ workspace_id: string; workspace_revision: string; execution_id: string; authority_state: string }> = [];
+// Shadow observation of graphify_execution_authority via the ONE shared owner. Observation only: it never changes a binding decision.
+let authorityObservations: any[] = [];
 let authorityShadowError: string | null = null;
 let legacyFilesByExecution = new Map<string, any[]>();
 let v2FilesByExecution = new Map<string, any[]>();
@@ -108,7 +109,9 @@ try {
   );
   executions = executionResult.rows;
   try {
-    authorityShadowRows = (await pool.query(`SELECT workspace_id::text AS workspace_id, workspace_revision, execution_id::text AS execution_id, authority_state FROM public.graphify_execution_authority`)).rows;
+    const { loadAuthorityShadowV1 } = await loadAuthorityShadowModuleV1();
+    const scopes = new Map(executions.filter((row) => row.workspace_id && row.workspace_revision).map((row) => [`${row.workspace_id}|${row.workspace_revision}`, { workspaceId: String(row.workspace_id), workspaceRevision: String(row.workspace_revision) }]));
+    for (const scope of scopes.values()) authorityObservations.push(await loadAuthorityShadowV1(pool, scope));
   } catch (error) {
     authorityShadowError = error instanceof Error ? error.message : String(error);
   }
@@ -189,7 +192,7 @@ function compareExecution(execution: any) {
     workspaceRevision: execution.workspace_revision ?? null,
     completedAt: execution.completed_at ?? null,
     canonicalAuthority: execution.canonical_authority ?? null,
-    authorityTableSelected: authorityShadowRows.some((row) => row.execution_id === executionId),
+    authorityTableSelected: authorityObservations.some((o) => o.authorityExecutionId === executionId),
     membershipSource,
     sourceSelectionStage: sourceStage,
     sourceCount: rows.length,
@@ -227,17 +230,12 @@ const firstBlockingInvariant = admissionAuthority && bindingResolved
         : admittedMatching.length > 1
           ? 'MULTIPLE_GRAPHIFY_EXECUTIONS_MATCH_SNAPSHOT'
           : 'WORKSPACE_REVISION_ADMISSION_REQUIRES_TOURNAMENT';
-const legacyAdmittedIds = admittedCanonical.map((row) => row.executionId).sort();
-const authorityAdmittedIds = authorityShadowRows.filter((row) => row.workspace_revision === admittedWorkspaceRevision).map((row) => row.execution_id).sort();
 const authorityShadow = {
   source: 'graphify_execution_authority',
   runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY',
   error: authorityShadowError,
-  authorityRows: authorityShadowRows.length,
-  legacyCanonicalAdmittedExecutionIds: legacyAdmittedIds,
-  authorityAdmittedExecutionIds: authorityAdmittedIds,
-  // null = nothing to compare on one side; true/false = both sides selected and agree/disagree. Never changes the decision above.
-  agreesWithLegacy: authorityShadowError || (legacyAdmittedIds.length === 0 && authorityAdmittedIds.length === 0) ? null : JSON.stringify(legacyAdmittedIds) === JSON.stringify(authorityAdmittedIds),
+  // Never changes the decision above. One observation per distinct (workspace, revision) from the shared helper.
+  observations: authorityObservations,
 };
 const status = databaseError
   ? 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED'
