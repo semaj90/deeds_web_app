@@ -453,6 +453,177 @@ advisory, test, and ambiguous multi-collection references.
 
 - [x] Receipt exists: `docs/reports/mcp-current-code-reconciliation-v1.json` (generator `scripts/atlas/audit-mcp-current-code-reconciliation-v1.mjs`, read-only). Status `CURRENT_CODE_RECONCILED_HISTORICAL_MISMATCHES_CLASSIFIED`; `runtimeEnablementChanged=false`, `canonicalAuthorityChanged=false`, `writesPerformed=false`, `promotionAuthorized=false` (satisfies -06 semantics). Next gate named by the receipt: `SEARCH-REINTEGRATION-06_NON_AUTHORIZING_AUDIT_SEMANTICS`.
 - Current code: 164 `registerTool` declarations / 163 unique names under `sveltekit-frontend/src/mcp`; 9 search tools audited (7 `OPTIONAL_OR_DISABLED`, 2 `NOT_IN_CURRENT_RECEIPT_SCOPE`); ontology-unknown tools 63 historical vs 51 current.
-- [ ] SEARCH-REINTEGRATION-05a **Duplicate owner, flagged not fixed:** `context.prefetch_feature_context` is registered in both `src/mcp/new_tools.ts` and `src/mcp/trace-mcp-server.ts` (only duplicate name). Classify canonical vs duplicate before any change (Duplication Prevention rule).
+- [x] SEARCH-REINTEGRATION-05a **Duplicate owner classified, no removal performed:** `context.prefetch_feature_context` is registered in both `src/mcp/new_tools.ts` and `src/mcp/trace-mcp-server.ts` in the same runtime registry. Read-only receipt `docs/reports/mcp-prefetch-duplicate-owner-v1.json` classifies `new_tools.ts` as the shared-owner candidate because it uses the typed dispatcher and `buildFeaturePrefetchContext`; the inline TRACE bridge remains a legacy duplicate candidate. Removal/aliasing is deferred until a compatibility/readback test exists. No runtime behavior changed.
 - [ ] TRACE-MCP-JSONRPC-01 Trace MCP JSON-RPC 2.0 work is governed by `DEFER-TRACE-MCP-01` above (no new trace-tool surface until retrieval profile/ranking/pagination ownership closes). `parent-atlas-rpc-packet-registry-fabric` is 27/27 complete, so no open RPC tasks exist there; JSON-RPC framing itself is handled by the MCP SDK transport. Any protocol change must be recorded here first.
 - Related (not this change): workboard challenger tournament status is recorded under `RECOMMENDATION-TOURNAMENT-01` in `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`.
+
+## Search-fabric contract tranche — 2026-09-21
+
+These tasks extend the existing `search-contract.ts` and `SearchRuntime` owners. They do
+not create a second retrieval runtime, semantic lane, candidate identity owner, or cache
+registry. Canonical source/vector promotion remains blocked until
+`CURRENT_SOURCE_AUTHORITY_PROVEN`.
+
+- [x] **SEARCH-FABRIC-01 — Freeze `QueryPlanV1`.** `QueryUnderstandingV1` provides
+  deterministic exact/identifier/path/symbol/FTS/trigram hints, while `QueryPlanV1Schema`
+  and `buildQueryPlanV1()` freeze the normalized request, lane selection, bounded limits,
+  keyword bundle, semantic representation, optional workspace frame, and deterministic
+  SHA-256 `planChecksum`.
+  The plan is explicitly non-authoritative (`canonicalAuthority=false`,
+  `writesPerformed=false`, `promotionAuthorized=false`). Proof:
+  `docs/reports/search-fabric-contract-proof-v1.json`.
+- [x] **SEARCH-FABRIC-02 — Deterministic `KeywordBundleV1`.** The existing keyword
+  decomposition owner now emits the versioned `atlas.keyword-bundle.v1` envelope; replay
+  is deterministic and remains query-planning evidence only.
+- [ ] **SEARCH-FABRIC-03 — PostgreSQL FTS + `pg_trgm` executor proof.** Reuse the existing
+  PostgreSQL FTS owner and prove bounded read-only execution plus trigram capability; do
+  not create a second lexical lane.
+- [ ] **SEARCH-FABRIC-04/05/06 — pgvector exact oracle, HNSW parity, and filtered iterative
+  scan.** Keep blocked when no revision-qualified eligible corpus exists; no backfill is
+  authorized by this tranche.
+- [ ] **SEARCH-FABRIC-07 — One semantic-lane executor contract.** Reconcile
+  `SearchRuntime`, Go Retrieval, pgvector, Qdrant, and optional GPU executors so they emit
+  one logical `semantic_768` vote.
+- [ ] **SEARCH-FABRIC-08/09 — CandidateOrdinal join and production FeatureMatrix.** Reuse
+  the existing `CandidateOrdinalMapV1`/`CandidateFeatureMatrixV1` owners; promotion remains
+  downstream of source, symbol, and ontology authority.
+- [ ] **CACHE-FABRIC-01/04, DAG-CONTEXT-01/02, STUDIO-SEARCH-01/02.** Reconcile existing
+  revision-qualified ACE/BitFrost, ContextManifest, DAG, and SSR diagnostics owners after
+  the executor proofs; no live cache warming or ACE admission is implied here.
+
+### Search-fabric proof refresh — 2026-09-21
+
+- `docs/reports/rf6-semantic-vote-proof-v1.json`: bounded semantic-lane vote proof passed
+  (`9/9`); this proves one logical vote in the tested fusion contract, not full live caller
+  adoption.
+- `docs/reports/rf6-executor-lane-owner-v1.json`: source-trace lane-owner proof passed
+  (`11/11`); production caller convergence remains open.
+- `docs/reports/postgres-pgvector-exact-hnsw-replay-v1.json`: read-only replay failed closed
+  with `revisionQualifiedVectorRows=0` and
+  `CANONICAL_SOURCE_REVISION_MISSING_FOR_PGVECTOR_COHORT`; no parity or backfill was claimed.
+- The PostgreSQL capability audit was refused by the resource guard at `freeMemoryGiB=2.61`
+  against the `4 GiB` minimum. This is an execution-safety refusal, not a capability result.
+- Candidate snapshot/feature-coordinate focused tests passed `13/13`; this remains fixture
+  proof and does not promote a production candidate population.
+- `docs/reports/postgres-index-capability-v1.json`: direct one-shot read-only audit completed
+  after the resource guard refused the guarded invocation. PostgreSQL `18.4`, `io_method=worker`,
+  `effective_io_concurrency=16`, `pg_trgm=1.6`, and `vector=0.8.3` were observed. Plans were
+  captured for all four bounded fixtures; bitmap plans were generatable for `4/4`, selected by
+  the planner for `2/4`, and no `BitmapAnd` was observed. Missing live index capabilities remain
+  `atlas_symbol_versions.source_revision` and `qualified_name`; no migration was created or
+  applied. HNSW capability and iterative-scan support were observed, but parity remains
+  unproven because the revision-qualified vector cohort is empty.
+- `docs/reports/postgres-symbol-resolver-index-plan-v1.json`: read-only resolver index
+  plan completed. Live `atlas_symbol_versions` has 479 estimated rows, seven existing
+  indexes, and an existing `(source_ref, source_revision)` index. Production-shaped
+  exact predicates for `source_revision`, `qualified_name`, and their combination all
+  chose sequential scans on this small table; no index migration is justified by the
+  current bounded workload. Standalone and composite `CREATE INDEX CONCURRENTLY`
+  candidates are recorded for a future call-site/scale proof, but none was created or
+  applied. Legacy revision values remain query-level eligibility concerns and were not
+  hidden with a partial index.
+- `docs/reports/postgres-fts-replay-v1.json`: existing FTS owner replayed read-only for
+  `Graphify retrieval`. It found `2,423` unqualified lexical hits but `0` revision-qualified
+  hits and therefore correctly returned `POSTGRES_FTS_BLOCKED_SOURCE_REVISION`; GIN-index
+  evidence is also unavailable through the current function path. No FTS task checkbox is
+  closed: lexical execution is wired, but canonical promotion remains blocked by source
+  authority and index evidence.
+
+- **Go Retrieval FTS identity envelope — wired, fail-closed (2026-09-21):**
+  `services/go-retrieval-service/httpSearchBM25` now returns the canonical
+  `codebase_chunk_index` candidate id, content hash, workspace/source revisions,
+  representation revision, and lineage receipt fields when present. Each result and
+  the response expose `identity_status`; missing revision data remains
+  `REVIEW_REQUIRED` rather than being inferred from paths, Qdrant payloads, or packet
+  keys. Focused Go tests cover qualified and incomplete rows. This does not repair the
+  dense Qdrant lane: its sampled payloads still lack an exact canonical chunk bridge.
+
+- **Go Retrieval dense identity hydration — partial, fail-closed (2026-09-21):**
+  the live service now performs a bounded read-only join from the Qdrant projection id
+  against `codebase_chunk_index.qdrant_id`, then joins only `PROVEN`
+  `atlas_packet_chunk_lineage` rows and an exact current source binding. The earlier
+  row-id fallback was removed. The adapter classifies missing/ambiguous lineage and
+  revision failures explicitly, never filling packet keys from projection payloads.
+  Coverage receipt `docs/reports/go-retrieval-dense-lineage-v1.json` proves the adapter
+  is reachable but reports `fully_qualified_rows=0`; live data admission remains blocked.
+
+### LDR / documentation retrieval boundary tranche — 2026-09-21
+
+- Added `docker/langgraph-synthesis/research_contracts.py` with typed Pydantic
+  `WebSearchResultV1`, `WebSearchEnvelopeV1`, and `ParameterArtifactV1` contracts.
+  The existing LangGraph synthesis `web_search` owner now validates and bounds
+  SearXNG/DuckDuckGo results before they enter DAG state; no second research agent,
+  search lane, or canonical writer was introduced.
+- Added `docker/langgraph-synthesis/test_research_contracts.py`; focused contract
+  tests pass `2/2`. This proves typed non-authoritative evidence and DAG parameter
+  envelopes only. It does not prove Learning Circuit runtime parity, document
+  persistence, or source promotion.
+- Existing BeautifulSoup normalization/chunking remains the document extraction
+  owner in `python/atlas_external_docs.py`. PostgreSQL 18/AIO/bitmap indexing and
+  `semantic_768` streaming remain downstream read-only tasks until a revision-
+  qualified document cohort exists.
+- `scripts/atlas/prove-research-document-retrieval-v2.mjs` now provides the bounded
+  v2 end-to-end validation command (`npm run atlas:docs:research-retrieval:v2`). It
+  checks the existing owners, JavaScript syntax, Pydantic contracts, synthetic
+  BeautifulSoup/chunk UTF-8 spans, the live synthesis-container web-search smoke,
+  and captures existing FTS/pgvector/DAG report status. Receipt:
+  `docs/reports/research-document-retrieval-v2.json`.
+- **V2 fixture: PROVEN, noncanonical; live typed runtime: OPEN.** The receipt
+  reports `RESEARCH_DOCUMENT_RETRIEVAL_V2_REVIEW_REQUIRED`: the Pydantic and
+  BeautifulSoup/chunk fixture passes, but the running `legal-ai-langgraph` image
+  is a legacy image without `research_contracts.py`, so its blank-query smoke is
+  health-only. Rebuild/redeploy is required before claiming the typed v2 path is
+  live. The receipt still records `writesPerformed=false`,
+  `promotionAuthorized=false`, and no remote document fetch, vector backfill,
+  cache warm, or Graphify refresh. FTS and pgvector remain blocked where
+  revision-qualified rows are absent.
+- MCP parameter audit is now included in the same v2 receipt. The standalone LDR
+  owner passed its existing stdio `initialize`/`tools/list` health probe with four
+  tools: `ldr.start_research`, `ldr.poll_status`, `ldr.search_history`, and
+  `ldr.quick_summary`. Their bounded parameters are recorded exactly as
+  `query`, `max_iterations`, `search_engines`, `taskId`, `limit`, and
+  `max_results`. The Streamable TRACE registration separately exposes
+  `ldr_research` with `query`, `maxResults`, `maxDocs`, and `temperature`.
+  These are two existing transport surfaces over the LDR boundary, not new
+  retrieval owners; no `tools/call`, document ingestion, or canonical write was
+  performed.
+
+### Remaining search/cache/DAG/Studio tasks mapped to existing owners — 2026-09-20 (docs only)
+
+Added after the operator pasted a full search-fabric design. Verified by repo grep that most of its
+contracts already exist (`QueryPlanV1`/`KeywordBundleV1`/`QueryUnderstandingV1` in
+`retrieval/search-contract.ts`; `ResidencyHintV1` in `packages/parent-atlas-retrieval/src/bifrost/residency-scheduler.ts`;
+`candidateOrdinalMapV1Schema` in `atlas/features/*`; `CandidateFeatureMatrixV1` in
+`retrieval/retrieval-candidate-feature-matrix-v1.ts`; two pgvector exact/HNSW replay scripts). Only four
+contract NAMES from the design have no code: `ContextCacheIdentityV1`, `QueryExpansionPacketV1`,
+`PgVectorExecutorParityV1`, `AceRetrievalPacketV1`. Each must be built as an extension of an existing owner
+(`AceBitfrostCacheIdentityV1` / `PacketSemanticCacheIdentityV2` for cache identity), never as a new registry.
+BLOCKER for SEARCH-FABRIC-04/05/06: the authoritative `semantic_768` column is undecided (see
+`parent-atlas-retrieval-staging-planes` DIM-06/07/08; the two 768 columns are different embedding recipes and the
+Qdrant v2 mirror matches neither). No canonical vector promotion until that and `CURRENT_SOURCE_AUTHORITY_PROVEN`.
+
+- [ ] **SEARCH-FABRIC-05 — pgvector HNSW parity vs exact oracle.** Reuse ONE of the two existing scripts
+  (`scripts/atlas/prove-postgres-pgvector-exact-hnsw-replay-v1.mjs`, `scripts/atlas/replay-pgvector-semantic-768-exact-hnsw-v1.mjs`);
+  first record which is the owner and classify the other (COMPATIBILITY/duplicate). Emit one frozen-corpus receipt
+  (`PgVectorExecutorParityV1`: corpus/query-set checksums, workspace + representation revision, recall@10/50, MRR, p50/p95,
+  `ef_search`, IVFFlat `probes` as an optional challenger). Blocked on DIM-08.
+- [ ] **SEARCH-FABRIC-06 — Filtered HNSW iterative-scan proof.** pgvector 0.8.3 is installed (2026-09-04 audit) and supports iterative
+  scans; benchmark filtered queries (`domain_class` btree + `tags` GIN) with `EXPLAIN (ANALYZE, BUFFERS)`, treating the observed
+  no-BitmapAnd plan as a benchmark fixture, not a schema change. AIO is an executor detail, not a retrieval feature.
+- [ ] **SEARCH-FABRIC-09 — Production `CandidateFeatureMatrixV1`.** Existing owner `retrieval/retrieval-candidate-feature-matrix-v1.ts`; prove it
+  from a frozen `CandidateOrdinalMapV1` with matching checksums. Ordinals are never canonical identity.
+- [ ] **CACHE-FABRIC-02 — Centroid/SOM `ResidencyHintV1`.** Existing owner `bifrost/residency-scheduler.ts`. Routing only: centroid/SOM cell/cluster/
+  temperature never become packet identity; SOM revision provenance is still unsupplied (`SOM_REVISION_PROVENANCE_01`).
+- [ ] **CACHE-FABRIC-03 — BitFrost semantic prefetch.** Depends on CACHE-FABRIC-02; measure against next-query reuse and a graph-neighbor/LRU baseline;
+  cache holds pointers/state, not source facts.
+- [ ] **CACHE-FABRIC-04 — Immutable ACE packet caching by checksum.** Route through `AceBitfrostCacheIdentityV1` (see DIM-04/ACEPKT-02 in
+  `parent-atlas-retrieval-staging-planes`: the TRACE `ace:packet:*` store is not revision-qualified and is blocked on honest revision inputs).
+- [ ] **DAG-CONTEXT-01 — Pass ACE packet refs between DAG stages.** Stages exchange packet id + checksum, not raw result payloads; reuse the existing
+  `ContextManifest` (`ace/context-compiler.parent-atlas.ts`).
+- [ ] **DAG-CONTEXT-02 — Cached `ContextManifest` synthesis.** Cache key includes retrieval-policy, model and prompt-template revisions plus the evidence
+  checksum; `canonicalAuthority:false`.
+- [ ] **STUDIO-SEARCH-01 — SSR retrieval-fabric diagnostics page.** Extend the existing Studio/command-center retrieval pages; server-side owners
+  supply state (query plan, lane on/off, semantic executor, cache hit/tier, timings); the browser holds no canonical state.
+- [ ] **STUDIO-SEARCH-02 — Cache token-savings metrics.** Report measured tokens avoided from real hits only; no synthetic estimates.
+- [ ] **QUERY-EXPANSION-01 — Bounded Ornith expansion only when needed.** Deterministic `KeywordBundleV1` first; call Ornith only on low retrieval
+  confidence; cache the result (`QueryExpansionPacketV1`) keyed by normalized query hash + workspace/taxonomy/model/prompt revisions.
