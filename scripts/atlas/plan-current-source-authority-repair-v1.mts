@@ -33,6 +33,8 @@ let databaseError: string | null = null;
 let ownerRunId: string | null = null;
 let graphRows: any[] = [];
 let ownerSelection = 'COMPLETED_BOUND_OWNER_BY_FILE_COUNT_FALLBACK';
+// Shadow read of graphify_execution_authority (observation only; the legacy boolean still selects the owner above).
+let authorityShadow: { authorityExecutionIds: string[]; legacyCanonicalExecutionId: string | null; agreesWithLegacy: boolean | null; error: string | null } = { authorityExecutionIds: [], legacyCanonicalExecutionId: null, agreesWithLegacy: null, error: null };
 try {
   // Prefer the canonical Graphify execution's own per-source membership. Picking the run with the
   // most graphify_files rows bound the plan to a non-canonical legacy run (found 2026-09-21:
@@ -45,6 +47,15 @@ try {
      LIMIT 1
   `);
   const canonicalExecutionId: string | null = canonical.rows[0]?.execution_id ?? null;
+  try {
+    const authorityExecutionIds: string[] = (await pool.query(`SELECT execution_id::text AS execution_id FROM public.graphify_execution_authority ORDER BY execution_id`)).rows.map((r: any) => r.execution_id);
+    authorityShadow = {
+      authorityExecutionIds, legacyCanonicalExecutionId: canonicalExecutionId, error: null,
+      agreesWithLegacy: !canonicalExecutionId && authorityExecutionIds.length === 0 ? null : authorityExecutionIds.length === 1 && authorityExecutionIds[0] === canonicalExecutionId,
+    };
+  } catch (error) {
+    authorityShadow.error = error instanceof Error ? error.message : String(error);
+  }
   if (canonicalExecutionId) {
     const membership = await pool.query(`
       SELECT source_ref, workspace_revision, code_source_revision, content_hash, byte_length
@@ -194,6 +205,7 @@ const report = {
   mode: 'READ_ONLY_REPAIR_PLAN',
   ownerRunId,
   ownerSelection,
+  authorityShadow: { source: 'graphify_execution_authority', runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY', ...authorityShadow },
   currentWorkspaceRevision: currentWorkspace?.record.workspaceRevision ?? null,
   currentWorkspaceRecordChecksum: currentWorkspace?.record.checksum ?? null,
   currentWorkspaceRuntimeRevision: currentWorkspace?.runtimeRevision ?? null,
