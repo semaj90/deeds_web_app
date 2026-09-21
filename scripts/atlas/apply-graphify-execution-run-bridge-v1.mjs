@@ -10,6 +10,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 
 const root = process.cwd();
 const executionId = process.argv.find((arg) => arg.startsWith('--execution-id='))?.split('=')[1] ?? null;
@@ -18,7 +19,13 @@ const planChecksum = process.argv.find((arg) => arg.startsWith('--plan-checksum=
 const apply = process.argv.includes('--apply');
 const rollbackCanary = process.argv.includes('--rollback-canary');
 const authorized = process.env.ATLAS_AUTHORIZE_GRAPHIFY_EXECUTION_RUN_BRIDGE_V1 === '1';
-const reportPath = path.resolve(root, 'docs/reports/graphify-execution-run-bridge-apply-v1.json');
+// A read-only preflight must never overwrite the historical APPLY record; it gets its own report file.
+const reportPath = path.resolve(
+  root,
+  apply || rollbackCanary
+    ? 'docs/reports/graphify-execution-run-bridge-apply-v1.json'
+    : 'docs/reports/graphify-execution-run-bridge-preflight-v1.json',
+);
 if (!executionId || !runId) throw new Error('EXPLICIT_EXECUTION_ID_AND_RUN_ID_REQUIRED');
 if ((apply || rollbackCanary) && !planChecksum) throw new Error('PLAN_CHECKSUM_REQUIRED_FOR_APPLY');
 
@@ -28,6 +35,8 @@ let run = null;
 let databaseError = null;
 let readback = null;
 let writesPerformed = false;
+// Shadow observation (diagnostic only): never feeds `checks`, the FOR UPDATE target in the apply path, or apply eligibility.
+let authorityShadow = { runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY', error: null, observation: null };
 try {
   const plannerReportPath = path.resolve(root, 'docs/reports/graphify-execution-run-bridge-v1.json');
   const plannerReport = fs.existsSync(plannerReportPath) ? JSON.parse(fs.readFileSync(plannerReportPath, 'utf8')) : null;
@@ -62,6 +71,16 @@ try {
     if (execution) {
       execution.sourceSelection = sourceSelection;
       execution.membershipCount = membershipCount;
+    }
+    if (execution) {
+      await client.query('SAVEPOINT authority_shadow');
+      try {
+        const { loadAuthorityShadowV1 } = await loadAuthorityShadowModuleV1();
+        authorityShadow.observation = await loadAuthorityShadowV1(client, { workspaceId: execution.workspace_id, workspaceRevision: execution.workspace_revision });
+      } catch (error) {
+        authorityShadow.error = error instanceof Error ? error.message : String(error);
+        await client.query('ROLLBACK TO SAVEPOINT authority_shadow');
+      }
     }
     await client.query('ROLLBACK');
   } finally {
@@ -201,6 +220,7 @@ try {
   }
   const stable = { ...report, generatedAt: undefined, readback: report.readback ?? null, receiptChecksum: undefined };
   report.receiptChecksum = `sha256:${crypto.createHash('sha256').update(JSON.stringify(stable), 'utf8').digest('hex')}`;
+  report.authorityShadow = authorityShadow; // attached AFTER the checksum so the existing receiptChecksum is unaffected
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
   const tempPath = `${reportPath}.${process.pid}.${Date.now()}.tmp`;
   fs.writeFileSync(tempPath, `${JSON.stringify({ ...report, generatedAt: new Date().toISOString() }, null, 2)}\n`, 'utf8');
