@@ -949,30 +949,14 @@ const handlers: Record<string, HandlerFn> = {
       };
       // WORKBOARD-05: suppress tasks whose latest attempt receipt says do-not-retry. Receipts are an
       // append-only JSONL in the reports dir; missing file or unparsable lines are ignored (fail open).
-      const lastReceipt = new Map<string, import('$lib/server/atlas/contracts/task-attempt-receipt-v1').TaskAttemptReceiptV1>();
-      try {
-        const [{ TaskAttemptReceiptV1Schema }, { resolveOpenSpecReportDirectory }, fsp, pathMod] = await Promise.all([
-          import('$lib/server/atlas/contracts/task-attempt-receipt-v1'),
-          import('$lib/server/atlas/openspec-board/report-reader'),
-          import('node:fs/promises'),
-          import('node:path'),
-        ]);
-        const dir = await resolveOpenSpecReportDirectory();
-        const raw = await fsp.readFile(pathMod.join(dir, 'task-attempt-receipts-v1.jsonl'), 'utf8');
-        for (const line of raw.split(/\r?\n/)) {
-          if (!line.trim()) continue;
-          try {
-            const parsed = TaskAttemptReceiptV1Schema.safeParse(JSON.parse(line));
-            if (parsed.success) lastReceipt.set(parsed.data.logicalTaskKey, parsed.data);
-          } catch { /* skip malformed line */ }
-        }
-      } catch { /* no receipts file yet */ }
+      const { readLastTaskAttemptReceipts } = await import('$lib/server/atlas/openspec-board/receipt-store');
+      const lastReceipt = await readLastTaskAttemptReceipts();
       const { shouldRetryTask } = await import('$lib/server/atlas/contracts/task-attempt-receipt-v1');
       let suppressedByReceipts = 0;
       const candidates = snapshot.tasks
         .filter((t) => t.state === 'ACTIONABLE' && (!changeId || t.changeId === changeId))
         .filter((t) => {
-          const last = lastReceipt.get(t.id) ?? null;
+          const last = lastReceipt.get(String((t.raw as Record<string, unknown>).stableKey ?? t.id)) ?? null;
           if (last && !shouldRetryTask(last)) { suppressedByReceipts += 1; return false; }
           return true;
         })
@@ -984,6 +968,8 @@ const handlers: Record<string, HandlerFn> = {
         .slice(0, limit)
         .map(({ t, blockerClass }) => ({
           id: t.id,
+          // Use this as `logicalTaskKey` when writing a TaskAttemptReceiptV1 (board `id` is a derived hash).
+          stableKey: String((t.raw as Record<string, unknown>).stableKey ?? t.id),
           changeId: t.changeId,
           title: t.title,
           topic: t.topic,
@@ -1009,6 +995,34 @@ const handlers: Record<string, HandlerFn> = {
           canonicalAuthority: false,
           writesPerformed: false,
         },
+        duration: Date.now() - startTime,
+      };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
+  },
+
+  // Records one TaskAttemptReceiptV1 (WORKBOARD-05). Writes ONLY to task-attempt-receipts-v1.jsonl in the
+  // reports dir; never edits tasks.md and never marks a task done. Invalid receipts are rejected.
+  async openspecRecordAttempt(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    try {
+      const { TaskAttemptReceiptV1Schema } = await import('$lib/server/atlas/contracts/task-attempt-receipt-v1');
+      const parsed = TaskAttemptReceiptV1Schema.safeParse(args);
+      if (!parsed.success) {
+        return fail(`invalid TaskAttemptReceiptV1: ${parsed.error.issues.map((i) => i.message).join('; ').slice(0, 400)}`, startTime);
+      }
+      if (options?.dryRun) {
+        return planResult([
+          { action: 'analyze', target: 'task-attempt-receipts-v1.jsonl', detail: `would append receipt for ${parsed.data.logicalTaskKey} (${parsed.data.result})` },
+        ], startTime);
+      }
+      const { appendTaskAttemptReceipt } = await import('$lib/server/atlas/openspec-board/receipt-store');
+      const stored = await appendTaskAttemptReceipt(parsed.data);
+      return {
+        success: true,
+        kind: 'result',
+        data: { stored: true, logicalTaskKey: stored.logicalTaskKey, result: stored.result, blockerClass: stored.blockerClass, canonicalAuthority: false },
         duration: Date.now() - startTime,
       };
     } catch (error: any) {
@@ -1564,6 +1578,38 @@ export const TOOLS: Record<string, ACPTool> = {
       }
     ],
     handler: handlers.openspecWorkboardRecommend
+  },
+  'openspec:record_attempt': {
+    name: 'openspec:record_attempt',
+    description: 'Append one TaskAttemptReceiptV1 (an agent attempt at an OpenSpec task) to the append-only receipts JSONL so openspec:workboard_recommend stops re-offering blocked/finished tasks. Advisory only (canonicalAuthority false); never edits tasks.md and never marks a task done. COMPLETED requires a passing validation and no missing preconditions; BLOCKED must name a blockerClass. Use the stableKey from openspec:workboard_recommend as logicalTaskKey.',
+    category: 'search',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        logicalTaskKey: { type: 'string', description: 'The task stableKey from openspec:workboard_recommend', minLength: 1 },
+        taskRevision: { type: 'string', minLength: 1 },
+        result: { type: 'string', enum: ['COMPLETED', 'BLOCKED', 'SUPERSEDED', 'FAILED_VALIDATION'] },
+        blockerClass: { type: 'string', enum: ['IDENTITY_SOURCE_REVISION_GATED', 'NEEDS_DB_OR_CACHE_WRITE', 'NEEDS_RUNTIME_SERVICE', 'NEEDS_OPERATOR_DECISION', 'NONE'] },
+        preconditions: { type: 'array', items: { type: 'string' } },
+        missingPreconditions: { type: 'array', items: { type: 'string' } },
+        toolsUsed: { type: 'array', items: { type: 'string' } },
+        evidenceRefs: { type: 'array', items: { type: 'string' } },
+        validationsPassed: { type: 'array', items: { type: 'string' } },
+        patches: { type: 'array', items: { type: 'string' } },
+        unblocks: { type: 'array', items: { type: 'string' } }
+      },
+      required: ['logicalTaskKey', 'taskRevision', 'result', 'blockerClass'],
+      additionalProperties: false
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { logicalTaskKey: 'atlas-feature-intelligence#49497dc7828f92b4', taskRevision: 'sha256:abc', result: 'BLOCKED', blockerClass: 'IDENTITY_SOURCE_REVISION_GATED', missingPreconditions: ['CURRENT_SOURCE_AUTHORITY_PROVEN'], unblocks: ['CURRENT_SOURCE_AUTHORITY_PROVEN'] },
+        output: { stored: true, canonicalAuthority: false },
+        description: 'Record that an attempt was blocked on source-revision authority'
+      }
+    ],
+    handler: handlers.openspecRecordAttempt
   },
   'nlp:ast-chunk': {
     name: 'nlp:ast-chunk',
