@@ -1917,6 +1917,16 @@ Use only:
 
 **Never claim "production-ready" from dry-run evidence.**
 
+### Error handling in multi-step proof runs: record null, continue, never promote (2026-09-21)
+
+Parent Atlas workstation proofs (censuses, observation gates, preflights, audits) span many readers and steps. One failing step must not halt the whole run or be silently dropped:
+
+- **Record + continue**: a step that errors is written to the receipt as an explicit failure (`value: null` plus a `failures` reason such as `PROCESS_EXIT_FAILURE`, `MISSING_SHADOW_OBSERVATION`), and the run continues with the remaining steps.
+- **Never promote**: a null/failed step never counts toward `PROVEN`, `QUALIFIED`, `READY`, eligibility, or any pass criterion. The overall status stays `BLOCKED` until every required step passes. Null is "unknown", not "absent" and not "zero".
+- **Never coerce an identity/revision/authority fact to null and proceed**: a missing `sourceRevision`, `workspaceRevision`, `packet_key`, etc. is classified (`MISSING_REVISION`) and blocks; it is not defaulted, substituted, or treated as `depends=none`.
+- **Fix the cause in the harness, don't relax the gate**: when a failure is a census/harness defect (wrong argument, unrunnable loader), correct the harness and rerun, keeping the earlier receipt as history. Do not lower the criterion.
+- Reference implementation: `scripts/atlas/audit-graphify-authority-reader-shadow-census-v1.mts` (per-reader PASS/FAIL with reasons, 8/8 required).
+
 ---
 
 ## 🔧 NPX Execution Context & Module Alias Resolution
