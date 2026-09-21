@@ -3,8 +3,10 @@
  * GRAPHIFY-INPUT-IDENTITY-BACKFILL-01 PREVIEW (read-only). Computes atlas.graphify-input-identity.v1 for every
  * graphify_executions row and reports the grouping. It NEVER writes to any datastore; its only write is its own report file.
  *
- * Frozen recipe (operator-approved 2026-09-21): a fixed six-field payload in a CONTRACTUAL property order,
- *   { schema, workspaceId, workspaceRevision, parserContractVersion, extractionContractVersion, graphAlgorithmRevision }
+ * Frozen recipe (operator-approved 2026-09-21, amended after the first preview): a fixed seven-field payload in a CONTRACTUAL property order,
+ *   { schema, workspaceId, workspaceRevision, sourceSelectionChecksum, parserContractVersion, extractionContractVersion, graphAlgorithmRevision }
+ * sourceSelectionChecksum = sha256(JSON.stringify(sorted normalized source_refs of the execution's admitted membership)) — the SAME definition the
+ * snapshot-binding audit already uses for graphifyMembershipChecksum; never derived from execution id, timestamps or result order.
  * serialized with JSON.stringify in exactly that order, UTF-8, SHA-256, lowercase hex, prefixed "sha256:".
  * Excluded on purpose: executionId, timestamps, scheduler/environment revision, authority state, status.
  * The identity means "the requested logical Graphify computation"; it is NOT proof that an old output is reusable.
@@ -22,6 +24,7 @@ interface Payload {
   schema: string;
   workspaceId: string;
   workspaceRevision: string;
+  sourceSelectionChecksum: string;
   parserContractVersion: string;
   extractionContractVersion: string;
   graphAlgorithmRevision: string;
@@ -33,6 +36,7 @@ export function canonicalInputIdentityPayload(p: Omit<Payload, 'schema'>): strin
     schema: SCHEMA,
     workspaceId: p.workspaceId,
     workspaceRevision: p.workspaceRevision,
+    sourceSelectionChecksum: p.sourceSelectionChecksum,
     parserContractVersion: p.parserContractVersion,
     extractionContractVersion: p.extractionContractVersion,
     graphAlgorithmRevision: p.graphAlgorithmRevision,
@@ -44,10 +48,14 @@ export const inputIdentityV1 = (p: Omit<Payload, 'schema'>) =>
 /** Independent second implementation (manual assembly) used only to prove the serialization does not depend on the code path. */
 function independentSerialization(p: Omit<Payload, 'schema'>): string {
   const q = (v: string) => JSON.stringify(v);
-  return `{"schema":${q(SCHEMA)},"workspaceId":${q(p.workspaceId)},"workspaceRevision":${q(p.workspaceRevision)},` +
+  return `{"schema":${q(SCHEMA)},"workspaceId":${q(p.workspaceId)},"workspaceRevision":${q(p.workspaceRevision)},"sourceSelectionChecksum":${q(p.sourceSelectionChecksum)},` +
     `"parserContractVersion":${q(p.parserContractVersion)},"extractionContractVersion":${q(p.extractionContractVersion)},` +
     `"graphAlgorithmRevision":${q(p.graphAlgorithmRevision)}}`;
 }
+
+const normalizeRef = (value: unknown) => String(value ?? '').replaceAll('\\', '/').replace(/^\.\//, '').replace(/^\/+/, '').trim();
+export const sourceSelectionChecksum = (refs: string[]) =>
+  `sha256:${crypto.createHash('sha256').update(JSON.stringify(refs.map(normalizeRef).sort()), 'utf8').digest('hex')}`;
 
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 60000 });
 let rows: any[] = [];
@@ -63,11 +71,19 @@ try {
            started_at, completed_at
       FROM public.graphify_executions ORDER BY started_at`)).rows;
 
+  const membershipRows = (await pool.query(`
+    SELECT execution_id::text AS execution_id, array_agg(source_ref) AS refs, count(*)::int AS members
+      FROM public.graphify_execution_file_membership_v2 GROUP BY execution_id`)).rows;
+  const membershipByExecution = new Map<string, { refs: string[]; members: number }>(membershipRows.map((m: any) => [m.execution_id, { refs: m.refs, members: m.members }]));
+
   for (const r of rows) {
-    const complete = r.workspace_id && r.workspace_revision && r.parser_contract_version && r.extraction_contract_version && r.graph_algorithm_revision;
+    const membership = membershipByExecution.get(r.execution_id);
+    r.source_selection_checksum = membership && membership.members > 0 ? sourceSelectionChecksum(membership.refs) : null;
+    r.member_count = membership?.members ?? 0;
+    const complete = r.workspace_id && r.workspace_revision && r.source_selection_checksum && r.parser_contract_version && r.extraction_contract_version && r.graph_algorithm_revision;
     if (!complete) { incomplete.push(r.execution_id); continue; }
     const input = {
-      workspaceId: r.workspace_id, workspaceRevision: r.workspace_revision, parserContractVersion: r.parser_contract_version,
+      workspaceId: r.workspace_id, workspaceRevision: r.workspace_revision, sourceSelectionChecksum: r.source_selection_checksum, parserContractVersion: r.parser_contract_version,
       extractionContractVersion: r.extraction_contract_version, graphAlgorithmRevision: r.graph_algorithm_revision,
     };
     if (canonicalInputIdentityPayload(input) !== independentSerialization(input)) conflictingSerializations += 1;
@@ -105,6 +121,8 @@ if (!databaseError) {
       inputIdentity: identity,
       count: members.length,
       workspaceRevision: members[0].workspace_revision,
+      sourceSelectionChecksum: members[0].source_selection_checksum,
+      memberCount: members[0].member_count,
       contracts: [members[0].parser_contract_version, members[0].extraction_contract_version, members[0].graph_algorithm_revision],
       executions: members.map((m) => ({ executionId: m.execution_id, status: m.status, canonicalAuthority: m.canonical_authority })),
       canonicalCount: canonical.length,
@@ -121,6 +139,7 @@ const report = {
   generatedAt: new Date().toISOString(),
   mode: 'READ_ONLY_PREVIEW',
   recipeSchema: SCHEMA,
+  recipeFields: ['schema', 'workspaceId', 'workspaceRevision', 'sourceSelectionChecksum', 'parserContractVersion', 'extractionContractVersion', 'graphAlgorithmRevision'],
   databaseError,
   executionsExamined: rows.length,
   recipeInputsComplete: rows.length - incomplete.length,

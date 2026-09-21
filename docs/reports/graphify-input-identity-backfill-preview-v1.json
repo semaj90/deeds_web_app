@@ -1,65 +1,31 @@
 {
   "schema": "atlas.graphify-input-identity-backfill-preview.v1",
-  "generatedAt": "2026-09-21T18:55:16.018Z",
+  "generatedAt": "2026-09-21T19:00:40.035Z",
   "mode": "READ_ONLY_PREVIEW",
   "recipeSchema": "atlas.graphify-input-identity.v1",
+  "recipeFields": [
+    "schema",
+    "workspaceId",
+    "workspaceRevision",
+    "sourceSelectionChecksum",
+    "parserContractVersion",
+    "extractionContractVersion",
+    "graphAlgorithmRevision"
+  ],
   "databaseError": null,
   "executionsExamined": 36,
   "recipeInputsComplete": 36,
   "incompleteExecutionIds": [],
-  "distinctInputIdentities": 21,
-  "duplicateGroups": 7,
+  "distinctInputIdentities": 26,
+  "duplicateGroups": 6,
   "conflictingCanonicalSerializations": 0,
   "groups": [
     {
-      "inputIdentity": "sha256:464d1fa421e72166d54cb4bd8b5f4caa871c25632b76abf529d43bd49c684973",
-      "count": 6,
-      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
-      "contracts": [
-        "graphify.parser.v1",
-        "graphify.extraction.v1",
-        "graphify.graph.v1"
-      ],
-      "executions": [
-        {
-          "executionId": "cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        },
-        {
-          "executionId": "5013de19-7bed-4703-bd6b-1684b19e2aaf",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        },
-        {
-          "executionId": "c531a1b0-c932-482f-8a21-5d067f504a13",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        },
-        {
-          "executionId": "24c421a1-28b1-431d-ac09-2793ed807ca6",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        },
-        {
-          "executionId": "3ded0ce6-cd8c-419f-96c9-49984824c956",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        },
-        {
-          "executionId": "b337f94c-850b-44b5-99a7-ba6a6cfaeedf",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        }
-      ],
-      "canonicalCount": 0,
-      "canonicalExecutionId": null,
-      "outputsEquivalent": "MEMBERSHIP_DIFFERS"
-    },
-    {
-      "inputIdentity": "sha256:30a6e0096e2d86c6195172dd66bba01ea6062eb74e9932d5f2264208690f848f",
+      "inputIdentity": "sha256:974f2bb13cdc2c766f1cc1d02aa1f9c01c9cd91daa3bf5864b4225d0813a4d23",
       "count": 5,
       "workspaceRevision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -97,9 +63,11 @@
       "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
     },
     {
-      "inputIdentity": "sha256:9ba8fe3389388aa1e33aecbeb8f3c8bbb0cda117ecc23704f394ba3be7df809e",
+      "inputIdentity": "sha256:9549745ecfeb755698b3f2e081bacc91b48ebba98bbd2a3a5f0f34f292f516c7",
       "count": 3,
-      "workspaceRevision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sourceSelectionChecksum": "sha256:09d72ebc06e32055ba3d0b6ed62497d5f63d384ea9087ac5780a82707bdc7652",
+      "memberCount": 1,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -107,29 +75,31 @@
       ],
       "executions": [
         {
-          "executionId": "de58de64-0b29-4dea-b1bc-88949458793a",
+          "executionId": "24c421a1-28b1-431d-ac09-2793ed807ca6",
           "status": "COMPLETED",
           "canonicalAuthority": false
         },
         {
-          "executionId": "9524dd40-b9d4-4c13-9c7f-ccdbf0387af4",
+          "executionId": "3ded0ce6-cd8c-419f-96c9-49984824c956",
           "status": "COMPLETED",
           "canonicalAuthority": false
         },
         {
-          "executionId": "255ca44b-947a-4a25-9e6c-a8890ea7555a",
+          "executionId": "b337f94c-850b-44b5-99a7-ba6a6cfaeedf",
           "status": "COMPLETED",
           "canonicalAuthority": false
         }
       ],
       "canonicalCount": 0,
       "canonicalExecutionId": null,
-      "outputsEquivalent": "MEMBERSHIP_DIFFERS"
+      "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
     },
     {
-      "inputIdentity": "sha256:2d44855d8baf8e9014dde9c93e45ce83b1edd26ddbf2dc4bc2835e3ea0a0d568",
+      "inputIdentity": "sha256:10e6e615bb7f9ce4e0ad51c9d37961b824345488a449a05163997e38fe4dcace",
       "count": 2,
       "workspaceRevision": "sha256:c57775da8eb8320fbeae542e7e9ee608f35db56f19d76ed00363ed8c759fe1f0",
+      "sourceSelectionChecksum": "sha256:150aabf95d88ac048d2fb61f7d48ace24ddc8a641a939c708d53112cbfef7927",
+      "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -152,34 +122,11 @@
       "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
     },
     {
-      "inputIdentity": "sha256:1dcd8e7ffc5afb3eee5097b7256aebeeeeeffab3fcab0ac1f2845098def314dc",
-      "count": 2,
-      "workspaceRevision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
-      "contracts": [
-        "graphify.parser.v1",
-        "graphify.extraction.v1",
-        "graphify.graph.v1"
-      ],
-      "executions": [
-        {
-          "executionId": "de2b1e77-9849-4449-98ca-96a729491f2e",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        },
-        {
-          "executionId": "8c6891d3-27fe-4913-9f46-bd8f6cb129cf",
-          "status": "COMPLETED",
-          "canonicalAuthority": false
-        }
-      ],
-      "canonicalCount": 0,
-      "canonicalExecutionId": null,
-      "outputsEquivalent": "MEMBERSHIP_DIFFERS"
-    },
-    {
-      "inputIdentity": "sha256:5feff6ce0f88b33ace877928e87fa97cc2d38cc2ae84b3daba8fb5d49318d172",
+      "inputIdentity": "sha256:198be8eb9c6e62add7f7f0391376fab98fe0ef9d294451a652fc1ec48198bb28",
       "count": 2,
       "workspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+      "sourceSelectionChecksum": "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642",
+      "memberCount": 25266,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -202,9 +149,38 @@
       "outputsEquivalent": "MEMBERSHIP_DIFFERS"
     },
     {
-      "inputIdentity": "sha256:5f77151f49f7be5efcfa1933cde084761b0ba111903f8bb623aff4fa6b4fc817",
+      "inputIdentity": "sha256:a51534a949e6dcc36253dcf7dc415218bd2db7b0b09b044a3aed5b39b09aa4fb",
+      "count": 2,
+      "workspaceRevision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+      "sourceSelectionChecksum": "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642",
+      "memberCount": 25266,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "9524dd40-b9d4-4c13-9c7f-ccdbf0387af4",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        },
+        {
+          "executionId": "255ca44b-947a-4a25-9e6c-a8890ea7555a",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": "MEMBERSHIP_DIFFERS"
+    },
+    {
+      "inputIdentity": "sha256:3613382a894b524710504df5b3f2d0388bccab657f6ee96843518783dfe47942",
       "count": 2,
       "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "sourceSelectionChecksum": "sha256:a589265fa5491d8ceffaab4759470d5bb44119e3f88cd89c715f1757b5e83c86",
+      "memberCount": 25542,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -227,9 +203,11 @@
       "outputsEquivalent": "EQUIVALENT_MEMBERSHIP"
     },
     {
-      "inputIdentity": "sha256:a6c3bf4e45d2fa1941ab50c54a6905c3d32ffeab694215b3a67836c2d68c9c1f",
+      "inputIdentity": "sha256:79ef2a81f52e6eb425346b4479a8286301321211083594327550dd2dad29d236",
       "count": 1,
       "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "sourceSelectionChecksum": "sha256:84123573ab91217d8135f97f5f32f9094fabd7a2d0fdba3bc3c5bf81d5f9f243",
+      "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -247,9 +225,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:28e6f80324e979855ac07adaab4c3c272349a4f6255623a61ddc56df4b50ce46",
+      "inputIdentity": "sha256:b116472bfc6897a187842a5445003665d59e60ceabd2ff1234f723f034fe00f2",
       "count": 1,
       "workspaceRevision": "sha256:c17c40c28da9c0ec831c4a5beb7390fb73a581c6b147cae95c8da79d3fcfb4d2",
+      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -267,9 +247,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:b20f1a73b10dd04b95e979f8aa929ccf5170c399a96aa16512aad59b473ca5e3",
+      "inputIdentity": "sha256:7fa7beb02a981e8255ba4c9ca7f1c0684810d09a2de24d104059e8b704fef72c",
       "count": 1,
       "workspaceRevision": "sha256:817549d78646b52a0f34f8af96970ae95256b87e59125d1542611f8f386d69bb",
+      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -287,9 +269,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:44b2d86ce6d568c748554cadd83a8d7fb818c3ce75642f8bb85d1d2097338c52",
+      "inputIdentity": "sha256:30a9a888766989d9a9fefbdb9e9fc4b3a29dc71d5477fefa63f36fe923b2b0f9",
       "count": 1,
       "workspaceRevision": "sha256:bc74ddc7e74af1e6fa9681182e2bc97fa4b2dc49d59c40c251fb505d22bf3ba1",
+      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -307,9 +291,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:f668fb839c0415398add7fd62f719779d2ba75490a288adb43f4f73001164f01",
+      "inputIdentity": "sha256:519e22c0f9a95862be15549d4321bcbfd08f9e8e985e8f784d7e946e79431c46",
       "count": 1,
       "workspaceRevision": "sha256:ec2cc83d87c6f88c7fea4980f3d6d50db8a5d8686f6f4899d87645f0b5cd6507",
+      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -327,9 +313,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:3863850572134569af2135e31dcded4bc03b8c4409dd39aa75536240a6c92f12",
+      "inputIdentity": "sha256:5060b601d899035ad01dbfcaa9e75ca661a83531a8fc14d69e5953e3624d82dc",
       "count": 1,
       "workspaceRevision": "sha256:c44511cb21e26ca33b97ae6a7f3878827883dd11680db7aeefd60c477711be70",
+      "sourceSelectionChecksum": "sha256:a4f3a38c6478b4ca1d3273119e6aeea56e2f765a254848e72ca904a7371caf5c",
+      "memberCount": 3,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -347,9 +335,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:86a0d745a15479fc6abcc819da6c8e71654cfb79bdcd4c94dba41674eb5f3f7c",
+      "inputIdentity": "sha256:5de0e07d46bb579b1a5e393d8ea2a35cca3ced5091dc7074d6c49cd4823d1d01",
       "count": 1,
       "workspaceRevision": "sha256:5d4ee74f53ea47ba80d4835494856fd0cfbc9ae532cabf8db1a17277d937510f",
+      "sourceSelectionChecksum": "sha256:72dad9e9f47b5fd87c5a6de94ea7ca8ea86380255e4143fd1ffc7ce4e1db74ca",
+      "memberCount": 50,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -367,9 +357,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:6fd4cdfb987bd2666ae3687f32b235e86955c6f7bd3d25b120a969bb5dc7fef5",
+      "inputIdentity": "sha256:6f5044734cbfb4bab19756572c37372e030bd51eb925e914c8fbf46c7904f06a",
       "count": 1,
       "workspaceRevision": "sha256:5db2bc428d4dcf07c2a11096039aad18c916b50aa17e849b2325a782d981dcdc",
+      "sourceSelectionChecksum": "sha256:21fbb359d7a6be98e021a6fda53279e259e87570b287711342ed7018778a521a",
+      "memberCount": 24132,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -387,9 +379,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:fe412a32f4f0ad0f2fd6c0366e3ce97feaec22d307e8e97427f506c5449460d8",
+      "inputIdentity": "sha256:6a9f379325fba43dc56e48eaddd85160f6f7649c6597755ed056615992742b8c",
       "count": 1,
       "workspaceRevision": "sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82",
+      "sourceSelectionChecksum": "sha256:21fbb359d7a6be98e021a6fda53279e259e87570b287711342ed7018778a521a",
+      "memberCount": 24132,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -407,9 +401,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:682e649f4e3ee93f6556c321cba9a3c3a5156ae01518819829d064576c117879",
+      "inputIdentity": "sha256:99ce580b09937e92e9116bda512a501c8779078f4dc426167e95f62155c78e8b",
       "count": 1,
       "workspaceRevision": "sha256:0b5cb14bd9014009ea8debc779df62cb3f6e669f8de94c79ad98ca8b88ff5e24",
+      "sourceSelectionChecksum": "sha256:cf2154f1b0c515a5af981803646cca0e0b76b89b213fd52ab4a2d9044fdf1990",
+      "memberCount": 24139,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -427,9 +423,55 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:5014efed9ec12d642315c07af6d22ecdbce36b651d1e1cb696a2b6cd9ddb8e54",
+      "inputIdentity": "sha256:d972132b71425b440a594dbcba95942b3b4a6d21022afe6ea6c10b0f870f676f",
+      "count": 1,
+      "workspaceRevision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
+      "sourceSelectionChecksum": "sha256:150aabf95d88ac048d2fb61f7d48ace24ddc8a641a939c708d53112cbfef7927",
+      "memberCount": 3,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "de2b1e77-9849-4449-98ca-96a729491f2e",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:d57627fee76884db05b285a76ac96e4da9ccdfca8ad7897a3884de1e8a69b4c0",
+      "count": 1,
+      "workspaceRevision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
+      "sourceSelectionChecksum": "sha256:9d100f01792d9648e52cefa1ed4671372b1d462ee000b82ed4529cee8a5fc5aa",
+      "memberCount": 50,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "8c6891d3-27fe-4913-9f46-bd8f6cb129cf",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:06ea60d85615221433c7feb26ed71120b0fc4854730c8414eb57332beb9044c7",
       "count": 1,
       "workspaceRevision": "sha256:578fc2602ee7ad6c29afea852f011cbff297b42ec0d4e8509e083e74f3d85500",
+      "sourceSelectionChecksum": "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642",
+      "memberCount": 25266,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -447,9 +489,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:98fa74488aa220dab340146c7675f7bc87ce255e306f001c7b075cd04c12d7e5",
+      "inputIdentity": "sha256:06e238b55cd6068f7bcd9005f06c09d29e1039e95d09916a3710090b573aff2e",
       "count": 1,
       "workspaceRevision": "sha256:8ebe1fdd07b6e2c0c78d55e42c7fc9bf73ee21a6f87d31dbf2ca4032eb624669",
+      "sourceSelectionChecksum": "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642",
+      "memberCount": 25266,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -467,9 +511,11 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:d23ab2ce7c3f94892d5141e025bddbb7582eda4c2d11bfee3c15c8e83a69e922",
+      "inputIdentity": "sha256:9af9bb7a9bdef5245483746a85ac288317ce857fb34209f2bf87810f6ee0d92f",
       "count": 1,
       "workspaceRevision": "sha256:bf3acebd9e4140b8d77ee4fd8839a888b57c3401d26a74e06aeca7e4ae2579e2",
+      "sourceSelectionChecksum": "sha256:3b78512ff190d22a88d72a80290f554b2f6cb94823612f5ec9a2400112642642",
+      "memberCount": 25266,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -487,9 +533,33 @@
       "outputsEquivalent": null
     },
     {
-      "inputIdentity": "sha256:2846513386cc393891e769ef63720b6b807f0c28e7c60ed4f4edcd892bf0fb46",
+      "inputIdentity": "sha256:035289840d231548e77438b8b07c38aa50879433d335dc8b503a00d0e5b6ca42",
+      "count": 1,
+      "workspaceRevision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+      "sourceSelectionChecksum": "sha256:150aabf95d88ac048d2fb61f7d48ace24ddc8a641a939c708d53112cbfef7927",
+      "memberCount": 3,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "de58de64-0b29-4dea-b1bc-88949458793a",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:5d1e02426e8797088ef962abca1627c64be00952cf6ced06900319e1e667473f",
       "count": 1,
       "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+      "sourceSelectionChecksum": "sha256:602e349946080e3949b3c2f86674ea04a2981ce34206d87a3749502361f90eac",
+      "memberCount": 25271,
       "contracts": [
         "graphify.parser.v1",
         "graphify.extraction.v1",
@@ -498,6 +568,72 @@
       "executions": [
         {
           "executionId": "14667026-459c-4a99-b3c2-c20b739a6e0d",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:fe7af9aefd5b70ab81d98e13c0f8a9c8fcc1fe10803a051aae9a1559e94c161e",
+      "count": 1,
+      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sourceSelectionChecksum": "sha256:8d41e03fc6899c4343714f9a06e3002805b60d35c6268bd049a23989d7a5b7a8",
+      "memberCount": 25291,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:775ba7f213a794b7aeddf2934246fb189c162d4c838f99ae1dd32bfd75e7e6c1",
+      "count": 1,
+      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sourceSelectionChecksum": "sha256:da7a1478ba0afae423ddcd69fbf04523d9f42b145d17da0317fa642f10d0bedc",
+      "memberCount": 3,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "5013de19-7bed-4703-bd6b-1684b19e2aaf",
+          "status": "COMPLETED",
+          "canonicalAuthority": false
+        }
+      ],
+      "canonicalCount": 0,
+      "canonicalExecutionId": null,
+      "outputsEquivalent": null
+    },
+    {
+      "inputIdentity": "sha256:1f510dd12b73e09692933ced5c13141199521c559dca0e0de1dc131f26f4de4c",
+      "count": 1,
+      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sourceSelectionChecksum": "sha256:f3c5dbe2cbf9ed433f0a354779a8371d0b295b4192dffa01ded5883082abbf52",
+      "memberCount": 3,
+      "contracts": [
+        "graphify.parser.v1",
+        "graphify.extraction.v1",
+        "graphify.graph.v1"
+      ],
+      "executions": [
+        {
+          "executionId": "c531a1b0-c932-482f-8a21-5d067f504a13",
           "status": "COMPLETED",
           "canonicalAuthority": false
         }
