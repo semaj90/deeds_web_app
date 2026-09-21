@@ -1,0 +1,30 @@
+# Tasks: temporal retrieval + context fabric (docs only)
+
+Status vocabulary per root CLAUDE.md. Nothing here writes code, schema, or data.
+
+## 1. Reuse and ownership
+- [x] TRCF-01 Reuse audit done 2026-09-20 (see proposal.md table): 4 cited owners exist; `DocumentObservationV1`, `RunManifestV1`, `SourceRevisionDeltaV1`, `TemporalDocumentIndexV1` already exist in `temporal-indexing-fabric.ts`.
+- [ ] TRCF-01A Decide owner per duplicated contract (SourceArtifact, SourceCoordinateMap, KnowledgeClaim); record classification (CANONICAL_OWNER / COMPATIBILITY). Operator decision.
+- [ ] TRCF-01B Define claim-state mapping: VERIFIED=CURRENT, STALE=STALE_EVIDENCE, CONFLICTED=CONTRADICTED, RETRACTED=SUPERSEDED (needs edge), UNRESOLVED=UNVERIFIED. No third vocabulary.
+- [ ] TRCF-01C Note that owner A files are not exported from the package index; fabric file is (`export *`); check for name collisions before any consolidation.
+
+## 2. Missing contracts (design only)
+- [ ] TRCF-03 `TemporalSourceEdgeV1`: PREDECESSOR_OF / SUPERSEDES / MOVED_FROM / GENERATED_FROM / INVALIDATES, keyed (source_ref, source_revision) both ends; reconcile with `SourceRevisionDeltaV1` (MOVED already there).
+- [ ] TRCF-04 `TemporalQueryPlanV1`: intents CURRENT, AT_REVISION, DIFF, EVOLUTION, FIRST_INTRODUCED, LAST_CHANGED, REGRESSION, STALE_DOCS.
+- [ ] TRCF-05 `TemporalEvidenceBundleV1`: observations + claims + edges for one plan, checksummed, `canonicalAuthority:false`.
+- [ ] TRCF-06 `DiagnosticIncidentV1`: multi-file repair grouping (TS/TEST/LINT/RUNTIME/DATABASE/RETRIEVAL/LINEAGE), status OPEN..REGRESSED.
+- [ ] TRCF-07 RunManifestV1 lifecycle only: `.tmp/atlas/runs/<runId>/` layout and promotion rule (.tmp -> validated receipt -> docs/reports / Postgres registry / OKF). Contract already exists.
+
+## 3. Rules and mapping
+- [ ] TRCF-09 Claim invalidation rules: unchanged evidence keeps state; evidence revision changed -> STALE; contradiction -> CONFLICTED; replaced -> RETRACTED + SUPERSEDES edge; unresolvable -> UNRESOLVED.
+- [ ] TRCF-08 Physical index map: revision B-tree + claim-state B-tree + tsvector GIN + tags GIN (bitmap AND/OR, planner-chosen); pg_trgm; pgvector exact oracle / HNSW primary / IVFFlat challenger; test `hnsw.iterative_scan` for revision-filtered ANN.
+- [ ] TRCF-10 Graphify relations: SUPPORTED_BY, SUPERSEDES, INVALIDATES, GENERATED_FROM, DIAGNOSES, FIXED_BY, VERIFIED_BY (projection only).
+- [ ] TRCF-11 OpenWiki/OKF as projection consumer of claims (workspaceRevision, claimSetChecksum, sourceRevisionSetChecksum, verifiedAt, staleAfter).
+- [ ] TRCF-12 Experience -> claim/wiki -> skill promotion (TaskAttemptReceipt -> KnowledgeClaim -> `.claude/skills`), gated on validated receipts.
+- [ ] TRCF-13 Temporal evidence feeds `CandidateFeatureSnapshotV1` rows; reuse it and `CandidateOrdinalMapV1`, do not redesign.
+- [ ] TRCF-14 BitFrost boundary: cache ContextManifest/ACE products only, never source authority.
+- [ ] TRCF-15 Studio temporal-search diagnostics.
+
+## 4. Dependencies
+- Blocked on CURRENT_SOURCE_AUTHORITY_PROVEN for any admission of revision-qualified rows.
+- DIM-08 (219k embedding backfill) remains HOLD; SourceArtifactV1 becomes the per-row qualification envelope (sourceRef, sourceRevision, workspaceRevision, contentHash) for SEM768-GATE-08.
