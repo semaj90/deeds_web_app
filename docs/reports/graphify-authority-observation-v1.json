@@ -1,0 +1,144 @@
+{
+  "schema": "atlas.graphify-authority-observation.v1",
+  "gate": "GRAPHIFY-AUTHORITY-OBSERVATION-03",
+  "generatedAt": "2026-09-21T22:57:53.902Z",
+  "status": "READ_PARITY_OBSERVATION_PROVEN",
+  "failedCriteria": [],
+  "criteria": {
+    "IMPORT_AUTHORITY_MATCH": true,
+    "WRITER_AUTHORITY_FIRST": true,
+    "WRITER_PROVENANCE_REQUIRED": true,
+    "WRITER_ROLLBACK_REHEARSAL_PASS": true,
+    "WRITER_TESTS_ALL_PASSED": true,
+    "READER_SHADOW_8_OF_8": true,
+    "SHADOW_IMPLEMENTATION_COUNT_ONE": true,
+    "INITIAL_PARITY_PROVEN": true,
+    "SUBSEQUENT_PARITY_PROVEN": true,
+    "SELECTED_EXECUTION_UNCHANGED": true,
+    "AUTHORITY_STATE_UNCHANGED": true,
+    "GATE_0A_APPLY_RECORD_INTACT": true,
+    "MISMATCH_RECEIPT_COUNT_ZERO": true,
+    "PERSISTENT_MUTATION_DURING_OBSERVATION_ZERO": true,
+    "RUNTIME_OWNER_STILL_LEGACY": true
+  },
+  "expectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+  "readerCutover": false,
+  "mutationAuthorized": false,
+  "evidence": {
+    "importReceipt": {
+      "file": "docs/reports/graphify-execution-authority-import-receipt-v1.json",
+      "digest": "sha256:3477b5a92565e5e31c78e4527a32ae27279506ce32cc1c98e1c67e522c7488fa",
+      "dbImportReceipt": "sha256:3477b5a92565e5e31c78e4527a32ae27279506ce32cc1c98e1c67e522c7488fa"
+    },
+    "initialParity": {
+      "file": "docs/reports/graphify-authority-read-parity-v1.json (git HEAD blob, committed before this observation)",
+      "generatedAt": "2026-09-21T19:57:32.743Z",
+      "digest": "sha256:e4930a9644b6e2fb5938d7ea4d99a511b32f11037f2aeabe2634e49d2eab2e63",
+      "status": "PARITY_PROVEN"
+    },
+    "freshParity": {
+      "generatedAt": "2026-09-21T22:57:53.015Z",
+      "status": "PARITY_PROVEN",
+      "counts": {
+        "MULTIPLE_LEGACY_CANONICAL_ROWS": 0,
+        "MULTIPLE_AUTHORITY_ROWS": 0,
+        "SELECTION_MISMATCH": 0,
+        "AUTHORITY_PRESENT_LEGACY_MISSING": 0,
+        "LEGACY_PRESENT_AUTHORITY_MISSING": 0,
+        "NO_SELECTION": 0,
+        "PARITY_PROVEN": 1
+      }
+    },
+    "writerTests": {
+      "exitCode": 0,
+      "tests": [
+        {
+          "title": "refuses without real selection provenance and writes nothing",
+          "status": "passed"
+        },
+        {
+          "title": "refuses a missing or unfinished execution before any write",
+          "status": "passed"
+        },
+        {
+          "title": "demotes others, upserts the authority row as SELECTED with provenance, then promotes the legacy field (in that order)",
+          "status": "passed"
+        },
+        {
+          "title": "never writes a NULL selected_by / selection_receipt for a SELECTED row",
+          "status": "passed"
+        },
+        {
+          "title": "fails closed when the readback disagrees (two legacy canonicals, or authority points elsewhere)",
+          "status": "passed"
+        }
+      ]
+    },
+    "rehearsal": {
+      "file": "docs/reports/current-graphify-execution-owner-decision-rehearsal-v1.json",
+      "mode": "REHEARSAL_ROLLED_BACK",
+      "generatedAt": "2026-09-21T20:13:30.443Z",
+      "reportChecksum": "792b56fd943d37b7fbace2f30a912859c8df7fd6182ac448444a455e056c79cb"
+    },
+    "gate0aApplyRecord": {
+      "file": "docs/reports/current-graphify-execution-owner-decision-v1.json",
+      "digest": "sha256:ab0a40baa97fd453365245480da099bfa95f9daa9c6c18f0ea331a89da080673",
+      "generatedAt": "2026-09-18T22:12:42.596Z",
+      "mode": "APPLY"
+    },
+    "census": {
+      "file": "docs/reports/graphify-authority-reader-shadow-census-v1.json",
+      "status": "GRAPHIFY_AUTHORITY_READER_SHADOW_02_PROVEN",
+      "receiptChecksum": "sha256:81b75fb03f3c41386d4db0c5d72c1529a9a32438e0f9f84017cf0583d1178d5e",
+      "generatedAt": "2026-09-21T22:54:34.082Z"
+    },
+    "staticShadowSelectFiles": {
+      "helper": "sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-shadow-read-v1.ts",
+      "parityProofLoader": "sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-read-parity-v1.ts",
+      "classification": "helper = ONE per-reader scoped shadow selection; parityProofLoader = whole-table parity comparator loader (distinct purpose); others are writers/importer/parity tool/this census machinery",
+      "allSelectFiles": [
+        "scripts/atlas/apply-graphify-execution-authority-import-v1.mts",
+        "scripts/atlas/audit-graphify-authority-observation-v1.mts",
+        "scripts/atlas/audit-graphify-authority-read-parity-v1.mts",
+        "scripts/atlas/audit-graphify-authority-reader-shadow-census-v1.mts",
+        "scripts/atlas/lib/graphify-owner-decision-v1.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-read-parity-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-shadow-read-v1.ts"
+      ],
+      "strayReaderSelectFiles": []
+    },
+    "integrity": {
+      "before": {
+        "db": {
+          "authorityRows": {
+            "n": 1,
+            "h": "ea4432a38f3b0e65d18851c1f9138c7d"
+          },
+          "legacyCanonicalRows": {
+            "n": 1,
+            "h": "38d28b32da3302ef1b6fdd47a61f0fc8"
+          },
+          "executions": 36
+        },
+        "applyRecordDigest": "sha256:ab0a40baa97fd453365245480da099bfa95f9daa9c6c18f0ea331a89da080673"
+      },
+      "after": {
+        "db": {
+          "authorityRows": {
+            "n": 1,
+            "h": "ea4432a38f3b0e65d18851c1f9138c7d"
+          },
+          "legacyCanonicalRows": {
+            "n": 1,
+            "h": "38d28b32da3302ef1b6fdd47a61f0fc8"
+          },
+          "executions": 36
+        },
+        "applyRecordDigest": "sha256:ab0a40baa97fd453365245480da099bfa95f9daa9c6c18f0ea331a89da080673"
+      }
+    }
+  },
+  "databaseWrites": 0,
+  "receiptChecksum": "sha256:b478b19cfa6ea28aafd409754bc869a61f850b50a4919a47fd0fa95e08b44941"
+}
