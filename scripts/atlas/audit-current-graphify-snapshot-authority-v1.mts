@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { Client } from 'pg';
+import { loadAuthorityShadowV1, type AuthorityShadowObservationV1 } from '../../sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-shadow-read-v1.ts';
 
 const root = process.cwd();
 const databaseUrl = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
@@ -129,6 +130,9 @@ if (requestedExecutionId) {
 
 const client = new Client({ connectionString: databaseUrl, statement_timeout: 30_000 });
 const authorityCandidates: Array<Record<string, unknown>> = [];
+// Shadow observation via the ONE shared owner; never affects the candidate/authority decision below.
+let authorityShadow: AuthorityShadowObservationV1 | null = null;
+let authorityShadowError: string | null = null;
 let workspaceId: string | null = process.env.ATLAS_WORKSPACE_ID?.trim() || null;
 
 try {
@@ -149,6 +153,12 @@ try {
         ORDER BY execution_id`,
       [workspaceId, admittedWorkspaceRevision],
     );
+
+    try {
+      authorityShadow = await loadAuthorityShadowV1(client as any, { workspaceId, workspaceRevision: String(admittedWorkspaceRevision) });
+    } catch (error) {
+      authorityShadowError = error instanceof Error ? error.message : String(error);
+    }
 
     for (const execution of executions.rows) {
       const stageResult = await client.query(
@@ -288,6 +298,7 @@ const authorityReport = {
       : 'GRAPH_CANONICAL_AUTHORITY_UNPROVEN',
     canonicalAuthorityTrueExecutions: authorityCandidates.filter((candidate) => candidate.canonicalAuthority === true).length,
   },
+  authorityShadow: { runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY', error: authorityShadowError, observation: authorityShadow },
   canonicalAuthority: false,
   readOnly: true,
   writesPerformed: false,

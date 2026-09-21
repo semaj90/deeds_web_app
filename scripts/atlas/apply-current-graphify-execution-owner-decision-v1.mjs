@@ -51,7 +51,13 @@ const execArgIndex = args.indexOf('--execution-id');
 const CHOSEN_EXECUTION_ID = execArgIndex >= 0 ? args[execArgIndex + 1] : null;
 
 const resolutionPath = path.join(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
-const reportPath = path.join(root, 'docs/reports/current-graphify-execution-owner-decision-v1.json');
+const reportPath = path.join(
+  root,
+  // A rehearsal must never overwrite the historical APPLY record; it gets its own file.
+  args.includes('--rehearse') && !(args.includes('--apply') && process.env.ATLAS_AUTHORIZE_GRAPHIFY_EXECUTION_OWNER_DECISION === '1')
+    ? 'docs/reports/current-graphify-execution-owner-decision-rehearsal-v1.json'
+    : 'docs/reports/current-graphify-execution-owner-decision-v1.json',
+);
 
 if (!CHOSEN_EXECUTION_ID) {
   throw new Error(
@@ -166,7 +172,7 @@ report.reportChecksum = createHash('sha256').update(JSON.stringify(report)).dige
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 console.log(JSON.stringify(
-  { mode: report.mode, chosenExecutionId: CHOSEN_EXECUTION_ID, writesPerformed: report.writesPerformed, readbackVerified: report.readbackVerified, reportPath: 'docs/reports/current-graphify-execution-owner-decision-v1.json' },
+  { mode: report.mode, chosenExecutionId: CHOSEN_EXECUTION_ID, writesPerformed: report.writesPerformed, readbackVerified: report.readbackVerified, reportPath: path.relative(root, reportPath).split(path.sep).join('/') },
   null,
   2,
 ));

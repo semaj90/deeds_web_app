@@ -12,7 +12,7 @@
     "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
     "snapshotSourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
     "snapshotSourceContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
-    "observedAt": "2026-09-19T23:47:28.603Z"
+    "observedAt": "2026-09-21T20:13:47.034Z"
   },
   "qualifyingExecutionIds": [
     "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
@@ -80,6 +80,24 @@
   "graphSnapshot": {
     "status": "GRAPH_CANONICAL_AUTHORITY_PROVEN",
     "canonicalAuthorityTrueExecutions": 1
+  },
+  "authorityShadow": {
+    "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+    "error": null,
+    "observation": {
+      "schema": "atlas.graphify-authority-shadow-observation.v1",
+      "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "readParityProven": true,
+      "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+      "shadowAuthorityObserved": true,
+      "mutationAuthorized": false
+    }
   },
   "canonicalAuthority": false,
   "readOnly": true,
