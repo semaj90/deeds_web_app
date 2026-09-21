@@ -15,7 +15,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
-import { graphifyInputIdentityV1 as sharedIdentity, sourceSelectionChecksumV1 as sharedChecksum } from '../../packages/atlas-core/src/identity/graphify-input-identity.ts';
+import { graphifyInputIdentityV1 as sharedIdentity, sourceSelectionChecksumV1 as sharedChecksum } from '../sveltekit-frontend/src/lib/server/atlas/identity/graphify-input-identity.ts';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
 const SCHEMA = 'atlas.graphify-input-identity.v1';
