@@ -22,26 +22,41 @@ this block is a compaction pointer, not a replacement.**
    (`native-structural-materializer.mts`) already has a real "S01-10B" provenance gate
    (`qualifyPromotionNominationV1`) requiring genuine content-hash-verified
    `atlas_workspace_source_bindings` rows — independent of, not dependent on, S01-08K's
-   `StableFileIdentityV1`. (b) A concurrent, uncommitted process was separately observed adding
-   `upstream_file_id` propagation to `structural-symbol.ts`/`structural-extraction-fabric.ts` and
-   a v2 owner-census receipt — **not reviewed or committed by this arc**; check for it before
-   assuming SESSION-206h's v1 receipt is still current.
+   `StableFileIdentityV1`. (b) The `upstream_file_id`-propagation diff (schema + fabric forwarding
+   + v2 owner-census receipt) was reviewed and **committed** (`d968b4f772`) — 32/32 tests pass,
+   `parent-atlas` builds clean.
+7. `SESSION-206i` — **`upstream_file_id` != `stable_file_id`, by construction, not just by missing
+   data.** S01-08K's tables (`atlas_stable_file_identity`/`_revision_binding`/`_alias`) exist live
+   but are 0/0/0 rows. Even once populated, they are NOT directly comparable to `upstream_file_id`:
+   the latter is a sidecar-native opaque string or a `compatibilityId('file', [path, revision])`
+   hash (identity tied to current path+revision), while `stable_file_id` is a UUIDv7 designed to
+   survive renames via `atlas_stable_file_revision_binding` — opposite identity properties. The
+   real future proof is a **resolution** (`(source_ref, source_revision, workspace_revision)` ->
+   `stable_file_id` lookup), never a raw string-equality check between the two fields.
 
 **Live DB facts (verified, corrected once already — don't reuse older mislabeled counts)**:
 `atlas_symbol_registry` = 10,504 rows. `atlas_symbol_versions` = 479 rows (402 real `sha256:`
 revisions, 77 legacy). Only 15/5,557 eligible files have any version coverage; 6 of those 15 are
-genuinely revision-current (verified byte-for-byte against live source).
+genuinely revision-current (verified byte-for-byte against live source). S01-08K's stable-file
+tables are schema-deployed but 0 rows across all three.
 
 **Open, unresolved, not assumed either way:**
 - Does `atlas_workspace_source_bindings` have adequate live row coverage today? (determines
-  whether the S01-10B gate admits anything or rejects everything for lack of provenance)
-- Is S01-08K (stable-file-identity manifest, frozen READY, unapplied) still the intended path, or
-  has the concurrent uncommitted `upstream_file_id`-propagation work superseded part of it?
-- `VARIABLE` symbol-kind admission policy remains unproven/CONDITIONAL by design — not decided.
+  whether the S01-10B gate admits anything or rejects everything for lack of provenance) — **partly
+  answered**: 47,936 well-formed rows exist, substantial but not whole-corpus coverage (see the
+  live coverage check further below).
+- Is S01-08K (stable-file-identity manifest, frozen READY, unapplied) still the intended path?
+  Its tables exist live and are schema-compatible with the resolution proof described above —
+  applying it remains a separate, undecided operator call.
+- `VARIABLE` symbol-kind admission policy remains unproven/CONDITIONAL by design — not decided;
+  the recommended next step (per external review) is to break `VARIABLE` into sub-categories
+  (module bindings, class fields, locals, parameters, destructuring) before deciding policy on it
+  as one undifferentiated bucket, rather than deciding the bucket wholesale.
 
-**Writes across this entire arc: 0** (Postgres/Qdrant/Redis/Neo4j/Graphify). All commits pushed to
-`origin/main` through `dd57f07b6e`. See SESSION-206 through 206h below for full evidence,
-receipts, and test counts (41+ passing across the arc).
+**Writes across this entire arc: 0** (Postgres/Qdrant/Redis/Neo4j/Graphify) except the one
+committed code fix in item 6(b), which touched no data stores. All commits pushed to `origin/main`
+through `d968b4f772`. See SESSION-206 through 206i below for full evidence, receipts, and test
+counts (41+ passing across the arc).
 
 ---
 
@@ -1571,3 +1586,51 @@ use `workspace:0`; three workspace revisions are present. The current Graphify c
 fail-closed until canonical path selection resolves them. This proves that S01-10B has substantial
 live coverage, but does not prove whole-corpus admission, current-worktree parity, or S01-08K
 stable-file identity. No rows were written.
+
+## SESSION-206i — upstream_file_id vs. StableFileIdentityV1: identity-scheme check (2026-09-22, READ-ONLY, zero writes)
+
+**Prompted by external review of the `upstream_file_id` propagation commit, correctly cautioning
+that field propagation is not semantic equivalence.** Checked directly, not assumed either way.
+
+**S01-08K tables exist live but are empty — confirmed via `docker exec legal-ai-postgres psql`**:
+`atlas_stable_file_identity` (PK `stable_file_id uuid`, FK to `atlas_repository_identity`),
+`atlas_stable_file_revision_binding` (`stable_file_id uuid` FK, keyed by `repository_id` +
+`source_authority_repo_id` + `canonical_source_ref` + `source_revision` + `workspace_revision`,
+FK-constrained to `atlas_workspace_source_bindings`), `atlas_stable_file_alias` — schema is real
+and deployed, but **all three tables have 0 rows**, matching S01-08K's documented
+"frozen READY, unapplied" state exactly. No prior code/doc grep for these table names or
+`StableFileIdentityV1` returned any TypeScript reference outside `openspec/` — the DDL exists
+ahead of any application code that reads it.
+
+**Real, concrete finding beyond "pending" — `upstream_file_id` as propagated is not the same
+identity scheme as `stable_file_id`, by construction, not just by missing data.** Read
+`treesitter-chunker-evidence-adapter.ts` directly: `upstream_file_id` is either (a) the `:8095`
+sidecar's own native per-parse-session file id (opaque `z.string().min(1)`, no UUID shape
+enforced), or (b) when the sidecar doesn't supply one, a **compatibility fallback**
+`compatibilityId('file', [file_path, source_revision])` — a deterministic hash of the *current*
+path+revision pair. `stable_file_id` (S01-08K) is a UUIDv7 whose entire purpose is to persist
+identity *across* path/revision changes (renames, moves) via the `atlas_stable_file_revision_binding`
+join table — the opposite property from a path+revision hash. **Consequence: once S01-08K applies,
+a direct string-equality comparison between `upstream_file_id` and `stable_file_id` is not a valid
+parity check — it compares two structurally different identity schemes that happen to share a
+similar name.** The real future proof is a *resolution*, not an equality check: given a chunk's
+`(canonical_source_ref, source_revision, workspace_revision)`, look up `stable_file_id` via
+`atlas_stable_file_revision_binding`, and separately confirm that's the same file the chunk's
+`upstream_file_id` was captured for — not `upstream_file_id === stable_file_id`.
+
+**Corrected gate status** (supersedes the plain "pending" framing from the prior 206h follow-up):
+`CODE_PATH_PROVEN` (propagation works, confirmed by commit `d968b4f772` + 32/32 tests) AND
+`LIVE_SEMANTIC_PARITY_UNMEASURABLE_ZERO_STABLE_FILE_ROWS` (S01-08K unapplied, nothing to compare
+against yet) AND `IDENTITY_SCHEME_MISMATCH_BY_CONSTRUCTION` (even once populated, the two fields
+are not directly comparable — a resolver, not an equality check, is required). None of these are
+failures; they are honest scope boundaries for what the committed propagation fix does and does
+not establish.
+
+- [x] S01-08K table existence + row-count check (2026-09-22, read-only SQL) — schema deployed,
+  0/0/0 rows across `atlas_stable_file_identity`/`_revision_binding`/`_alias`.
+- [x] `upstream_file_id` identity-scheme trace (2026-09-22, read-only code read) —
+  `compatibilityId('file', [file_path, source_revision])` fallback / sidecar-native opaque string,
+  confirmed structurally distinct from S01-08K's UUIDv7 `stable_file_id`.
+- [ ] Not started: the resolution-based parity proof described above (blocked on S01-08K apply —
+  cannot run against zero rows). Not started: any decision on S01-08K apply, VARIABLE promotion
+  policy, or symbol canary — all remain operator-owned per the existing handoff summary.
