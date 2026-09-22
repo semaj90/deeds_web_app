@@ -1,7 +1,7 @@
 {
   "schema": "atlas.symbol-variable-subcategory-audit.v1",
   "gate": "SYMBOL-VARIABLE-SUBCATEGORY-01",
-  "generatedAt": "2026-09-22T21:32:34.594Z",
+  "generatedAt": "2026-09-22T21:49:09.928Z",
   "corpusManifestUsed": {
     "workspaceRevision": "1ec451233a652de4fe081dcd7aa0feb541e081ae",
     "corpusSize": 300,
@@ -27,7 +27,13 @@
   },
   "nestedDeclaratorInsideLexicalDeclarationCount": 5217,
   "nestedDeclaratorNote": "variable_declarator nodes counted here that ALSO sit inside a lexical_declaration ancestor in the SAME walk. Both node types independently map to VARIABLE, so a single `const a = 1, b = 2;` statement contributes 1 lexical_declaration + 2 variable_declarator observations -- this number quantifies that overlap, not a bug in this audit script.",
-  "exportedCount": 4944,
+  "exportedCount": 464,
+  "exportedCountNote": "isExported is gated on scopeContext === MODULE_LEVEL. A naive ancestorTypes.includes(export_statement) check was found and fixed same-session: it wrongly counted FUNCTION_LOCAL bindings nested inside an exported function/class as exported themselves (export only syntactically attaches to a top-level module statement). Verified via direct tree-sitter probe before landing this fix.",
+  "byScopeAndExported": {
+    "MODULE_LEVEL:NOT_EXPORTED": 1301,
+    "FUNCTION_LOCAL:NOT_EXPORTED": 8664,
+    "MODULE_LEVEL:EXPORTED": 464
+  },
   "writes": {
     "postgres": 0,
     "qdrant": 0,

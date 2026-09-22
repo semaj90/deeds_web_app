@@ -53,11 +53,14 @@ tables are schema-deployed but 0 rows across all three.
   categories turned out to be 0-occurrence (wrong node types for this bucket, by construction);
   the bigger finding is that the 10,429 figure double-counts every simple-binding statement at
   statement-vs-declarator granularity (100% overlap) — a future policy decision needs to pick one
-  granularity before the count means anything as "N candidate symbols."
+  granularity before the count means anything as "N candidate symbols." `SESSION-206k` (below)
+  then caught and fixed a real bug in that same audit's `exportedCount` (naive ancestor check
+  wrongly counted function-local bindings nested inside exported functions as exported) —
+  corrected value is **464** module-level exported bindings, not the originally reported 4,944.
 
 **Writes across this entire arc: 0** (Postgres/Qdrant/Redis/Neo4j/Graphify) except the one
 committed code fix in item 6(b), which touched no data stores. All commits pushed to `origin/main`
-through `049eb9cb7e`. See SESSION-206 through 206j below for full evidence, receipts, and test
+through `7c3692719d`. See SESSION-206 through 206k below for full evidence, receipts, and test
 counts (41+ passing across the arc).
 
 ---
@@ -1683,10 +1686,12 @@ counting the same population, not a different one.
 4. Scope split: `MODULE_LEVEL` 1,765 (17%) vs `FUNCTION_LOCAL` 8,664 (83%) — most VARIABLE
    observations are function-local, which this repo's existing registry-population policy
    discipline (identity requires durable, referenceable declarations) would likely treat very
-   differently from module-level bindings. `exportedCount = 4944` (counts `lexical_declaration`
-   nodes wrapped in an `export_statement` ancestor) is a plausible first-cut signal for "worth
-   promoting" within `MODULE_LEVEL`, but this was not cross-tabulated against scope in this pass —
-   flagged as a natural follow-up, not done here.
+   differently from module-level bindings. **Correction (SESSION-206k, same day): the originally
+   reported `exportedCount = 4944` had a real bug (see SESSION-206k below) — the corrected,
+   verified figure is `exportedCount = 464`, cross-tabulated as `byScopeAndExported`:
+   `MODULE_LEVEL:EXPORTED=464`, `MODULE_LEVEL:NOT_EXPORTED=1301`, `FUNCTION_LOCAL:NOT_EXPORTED=8664`.**
+   464 module-level exported bindings is a plausible first-cut signal for "worth promoting," still
+   unverified as an actual promotion criterion.
 
 **Not decided, not implied**: this audit does not recommend a VARIABLE promotion policy. It
 narrows the space an eventual policy decision would need to cover (dedupe statement-vs-binding
@@ -1705,3 +1710,44 @@ parent-atlas-nlp-sidecar-feature-compiler --strict`: PASS.
 - [ ] Not started, not implied by this audit: any VARIABLE promotion policy decision, statement-
   vs-binding granularity choice, or export-cross-tabulation follow-up — all remain either
   operator-owned or explicitly flagged as unstarted next steps.
+
+## SESSION-206k — self-caught bug in SESSION-206j's `exportedCount` (2026-09-22, READ-ONLY, zero writes)
+
+**Found and fixed before the figure was reused for anything, not after.** While starting the
+export-cross-tabulation follow-up flagged as unstarted above, checked the `isExported` logic in
+`symbol-variable-subcategory-audit-v1.mjs` before extending it, and it was wrong: `isExported:
+ancestorTypes.includes('export_statement')` counts ANY node whose ancestor chain contains
+`export_statement` anywhere — but `export` only syntactically attaches to a top-level module
+statement in JS/TS. A `FUNCTION_LOCAL` binding nested inside an exported function/class has
+`export_statement` in its ancestor chain too (it wraps the enclosing function, not the binding),
+so the original check silently miscounted function-local variables as "exported."
+
+**Verified empirically with a direct tree-sitter probe before touching the fix**: parsed
+`export function foo() { const x = 1; }` and printed the real ancestor chain for `x` — confirmed
+`export_statement` appears in it, proving the bug is real, not hypothetical.
+
+**Fix**: gate `isExported` on `scopeContext === 'MODULE_LEVEL'` first (export can only ever apply
+to a module-level statement's own declaration, never to something nested inside a function/class
+body — the existing `scopeContext` classification already encodes exactly that distinction).
+
+**Corrected result, rerun on the same frozen corpus**: `exportedCount` **464**, not the originally
+reported **4,944** — the bug inflated the figure by ~10.7x. Added `byScopeAndExported` cross-tab
+(the follow-up this correction was made while implementing):
+`MODULE_LEVEL:EXPORTED=464`, `MODULE_LEVEL:NOT_EXPORTED=1301`, `FUNCTION_LOCAL:NOT_EXPORTED=8664`
+(464+1301=1765 matches `MODULE_LEVEL` total exactly; all 8,664 `FUNCTION_LOCAL` bindings now
+correctly show zero as exported — internally consistent, unlike the original bug's output).
+
+**Impact on SESSION-206j's conclusions**: none of the other findings change (the 0-occurrence
+class-field/parameter categories, the 100% statement/declarator double-count, the binding-shape
+split are all independent of `isExported`). Only the "plausible first-cut worth-promoting signal"
+note changes: **464 module-level exported bindings**, not 4,944, is the real, much smaller
+candidate pool for that hypothesis — still unverified as an actual promotion signal, same caveat
+as before, just against the correct number now.
+
+Same script, in-place fix + rerun (not a new file). Receipt regenerated at
+`docs/reports/symbol-variable-subcategory-audit-v1.json` (overwritten, same path, corrected
+content). `npx openspec validate parent-atlas-nlp-sidecar-feature-compiler --strict`: PASS.
+
+- [x] Found + fixed the `isExported` over-count bug before it was reused anywhere (2026-09-22,
+  read-only script fix + rerun) — `exportedCount` corrected 4944 -> 464, `byScopeAndExported`
+  cross-tab added. Zero writes to any data store.

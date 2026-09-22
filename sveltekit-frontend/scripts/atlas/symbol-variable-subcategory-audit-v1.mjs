@@ -92,12 +92,20 @@ function auditFile(absPath) {
   const records = [];
   walkWithAncestors(tree.rootNode, [], (node, ancestorTypes) => {
     const nameNode = node.childForFieldName?.('name') ?? null;
+    const scopeContext = classifyScopeContext(ancestorTypes);
+    // `export` syntactically only attaches to a top-level module statement. A naive
+    // ancestorTypes.includes('export_statement') check is WRONG for non-module-level bindings:
+    // e.g. `export function foo() { const x = 1; }` puts `export_statement` in x's ancestor
+    // chain even though x itself is not exported -- foo is. Gate on MODULE_LEVEL first (see
+    // SESSION-206j correction note in tasks.md, found and fixed same-session via a direct
+    // tree-sitter probe before this figure was reused for anything).
+    const isExported = scopeContext === 'MODULE_LEVEL' && ancestorTypes.includes('export_statement');
     records.push({
       rawNodeType: node.type,
       bindingPatternType: node.type === 'variable_declarator' ? classifyBindingPatternType(nameNode) : 'N/A_LEXICAL_DECLARATION_WRAPPER',
-      scopeContext: classifyScopeContext(ancestorTypes),
+      scopeContext,
       isNestedInsideLexicalDeclaration: node.type === 'variable_declarator' && ancestorTypes.includes('lexical_declaration'),
-      isExported: ancestorTypes.includes('export_statement'),
+      isExported,
     });
   });
 
@@ -114,6 +122,7 @@ async function main() {
   const byRawNodeType = {};
   const byBindingPatternType = {};
   const byScopeContext = {};
+  const byScopeAndExported = {};
   let nestedDeclaratorCount = 0;
   let exportedCount = 0;
 
@@ -135,6 +144,8 @@ async function main() {
       byRawNodeType[r.rawNodeType] = (byRawNodeType[r.rawNodeType] ?? 0) + 1;
       byBindingPatternType[r.bindingPatternType] = (byBindingPatternType[r.bindingPatternType] ?? 0) + 1;
       byScopeContext[r.scopeContext] = (byScopeContext[r.scopeContext] ?? 0) + 1;
+      const scopeExportedKey = `${r.scopeContext}:${r.isExported ? 'EXPORTED' : 'NOT_EXPORTED'}`;
+      byScopeAndExported[scopeExportedKey] = (byScopeAndExported[scopeExportedKey] ?? 0) + 1;
       if (r.isNestedInsideLexicalDeclaration) nestedDeclaratorCount += 1;
       if (r.isExported) exportedCount += 1;
     }
@@ -168,6 +179,13 @@ async function main() {
       '= 2;` statement contributes 1 lexical_declaration + 2 variable_declarator observations -- ' +
       'this number quantifies that overlap, not a bug in this audit script.',
     exportedCount,
+    exportedCountNote:
+      'isExported is gated on scopeContext === MODULE_LEVEL. A naive ' +
+      'ancestorTypes.includes(export_statement) check was found and fixed same-session: it ' +
+      'wrongly counted FUNCTION_LOCAL bindings nested inside an exported function/class as ' +
+      'exported themselves (export only syntactically attaches to a top-level module statement). ' +
+      'Verified via direct tree-sitter probe before landing this fix.',
+    byScopeAndExported,
     writes: { postgres: 0, qdrant: 0, valkey: 0, neo4j: 0, graphifyRuns: 0 },
     canonicalAuthority: false,
     writesPerformed: false,
