@@ -1418,3 +1418,52 @@ together this session; full symbol-pipeline suite across all SESSION-206 gates i
   ALTER, retrieval, CandidateOrdinal scaling, Qdrant writes, ACE/BitFrost, Valkey, HyperGraphRAG,
   SOM/topology, Graphify. Applying S01-08K stable-file population is a **separate, operator-owned
   decision** outside this change's scope — flagged as the real next blocker to clear, not assumed.
+
+## SESSION-206h — SYMBOL-WRITER-OWNER-01 canonical owner census (2026-09-22, READ-ONLY, zero writes)
+
+**Scope disclosure (context-budget bounded, stated up front, not hidden)**: this census is `git
+grep` across `sveltekit-frontend/{src,scripts}`, `packages`, `python`, `drizzle/manual` plus direct
+inspection of the two concrete callers found — not a full transitive call-graph trace of every
+possible indirect caller. Real value delivered within that bound, not claimed beyond it.
+
+**Owner found**: `packages/parent-atlas/src/core/symbol-registry-repository.ts` ::
+`createSymbolRegistryRepository()`. Read directly, not just grepped. Findings:
+- **Schema compatibility: EXACT_MATCH** — its `INSERT` column lists were compared byte-for-byte
+  against the live `atlas_symbol_registry`/`atlas_symbol_versions` DDL and match exactly.
+- **Identity derivation is sound**: `stable_symbol_id = sha256(language, kind, symbol_key)`,
+  `symbol_version_id = sha256(stable_symbol_id, source_revision, upstream_node_id,
+  declaration_hash)` — deterministic, explicitly revision-qualified, no `latest`/`HEAD`/
+  `workspace:0`/path-only/fuzzy-name shortcuts found anywhere in the derivation.
+- **Explicit safety gate**: `promoteNomination()` throws
+  `SYMBOL_PROMOTION_REQUIRES_EXPLICIT_ALLOW_CREATE` unless `allow_create: true` is passed.
+- **No conflicting second writer found** — the broader census (`packages`, `python`,
+  `src/mcp`, `drizzle/manual`) returned zero additional direct `INSERT`/`UPDATE` matches against
+  either table. The previously-known `graphify-symbol-writer-v1.ts` (writes `stable_symbol_key`,
+  not `stable_symbol_id`) is confirmed schema-incompatible / targets a different table, not a
+  conflicting owner of these two.
+- **Reachability**: exactly 2 callers found (`native-structural-materializer.mts`,
+  `prove-revision-owner.mts`), neither wired to any `npm run` script — `MANUAL_SCRIPT_INVOCATION_ONLY`,
+  not automatic runtime/Graphify/MCP-triggered. `native-structural-materializer.mts` does pass
+  `allow_create: true` behind its own `ALLOW_CREATE_SYMBOLS` flag (a real, gated write path).
+
+**Real finding that changed the verdict from a first-pass bug**: initial run misclassified as
+`SYMBOL_CANONICAL_WRITER_PROVEN` due to a string-equality bug in the script itself (a note-suffixed
+value didn't match a strict `===` check) — caught and fixed before trusting it, not left standing.
+**Corrected, real result: `SYMBOL_CANONICAL_WRITER_LINEAGE_BLOCKED`** — the owner is real, sound,
+and conflict-free, but it does **not** itself consume `StableFileIdentityV1`/`upstream_file_id`;
+it accepts caller-supplied `source_ref`/`source_revision` directly. **This means applying S01-08K
+alone does not automatically wire file identity into this writer** — the caller
+(`native-structural-materializer.mts`) would need separate verification that it supplies a
+stable-file-identity-derived `source_ref`, which is unverified, not assumed either way.
+
+Script: `scripts/atlas/symbol-canonical-writer-owner-census-v1.mjs`. Receipt:
+`docs/reports/symbol-canonical-writer-owner-v1.json`. Test:
+`src/lib/server/atlas/indexing/symbol-canonical-writer-owner-v1.spec.ts` (3/3 passing — exactly-one-
+writer guard, `allow_create` gate present, no forbidden-identity-input strings present).
+`npx openspec validate parent-atlas-nlp-sidecar-feature-compiler --strict`: **PASS**.
+
+- [x] `SYMBOL-WRITER-OWNER-01` (2026-09-22, `SYMBOL_CANONICAL_WRITER_LINEAGE_BLOCKED`) — one real,
+  schema-exact, identity-sound, conflict-free owner found; blocked on file-identity consumption,
+  not on writer-ownership ambiguity. Zero writes.
+- [ ] Not started, per explicit stop instruction: S01-08K apply, symbol population, POS linkage,
+  retrieval, ACE/BitFrost, Valkey, HyperGraphRAG, SOM/topology, Graphify.

@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.symbol-canonical-writer-owner.v1",
+  "gate": "SYMBOL-WRITER-OWNER-01",
+  "generatedAt": "2026-09-22T20:42:16.529Z",
+  "scopeDisclosure": "Bounded by session context budget: git grep across sveltekit-frontend/{src,scripts}, packages, python, drizzle/manual -- NOT a full transitive call-graph trace of every possible caller. Two concrete callers found and inspected directly; not re-verified beyond those two.",
+  "directWritersFound": [
+    "packages/parent-atlas/src/core/symbol-registry-repository.ts"
+  ],
+  "owner": {
+    "path": "packages/parent-atlas/src/core/symbol-registry-repository.ts",
+    "export": "createSymbolRegistryRepository",
+    "tablesWritten": [
+      "atlas_symbol_registry",
+      "atlas_symbol_aliases",
+      "atlas_symbol_versions"
+    ],
+    "stableSymbolIdDerivation": "sha256(language.toLowerCase(), kind, symbol_key) -- deterministic, no path-only/latest/fuzzy input",
+    "symbolVersionIdDerivation": "sha256(stable_symbol_id, source_revision, upstream_node_id, declaration_hash) -- explicitly revision-qualified, never workspace-revision-substituted",
+    "schemaCompatibility": "EXACT_MATCH -- INSERT column lists verified byte-for-byte against live atlas_symbol_registry (stable_symbol_id, canonical_key, language, symbol_kind, canonical_name, canonical_qualified_name, created_from_nomination_id, created_from_source_ref, created_from_source_revision, registry_revision) and atlas_symbol_versions (symbol_version_id, stable_symbol_id, source_ref, source_revision, workspace_revision, upstream_node_id, upstream_symbol_id, upstream_chunk_id, qualified_name, declaration_hash, signature_normalized, byte_start, byte_end, parent_route, producer_revision).",
+    "safetyGate": "promoteNomination() throws SYMBOL_PROMOTION_REQUIRES_EXPLICIT_ALLOW_CREATE unless allow_create=true is explicitly passed -- writes are not accidental.",
+    "identityRelianceOnForbiddenInputs": "NONE -- no latest/HEAD/path-only/workspace:0/fuzzy-name identity found in stableSymbolId or symbolVersionId derivation.",
+    "upstreamFileIdentityConsumption": "NO_FILE_IDENTITY",
+    "upstreamFileIdentityConsumptionNote": "Reads nomination.source_ref/source_revision/upstream_node_id directly; does not consume a StableFileIdentityV1/upstream_file_id binding. This means it is currently a PATH_IDENTITY_ONLY consumer for file scoping, not yet wired to the S01-08K stable-file-identity chain -- a real, separate gap from the S01-08K blocker itself.",
+    "callers": [
+      "packages/parent-atlas/package.json",
+      "packages/parent-atlas/src/index.ts",
+      "sveltekit-frontend/scripts/atlas/native-structural-materializer.mts",
+      "sveltekit-frontend/scripts/atlas/prove-revision-owner.mts"
+    ],
+    "callersWiredToNpmScript": [],
+    "runtimeReachable": "MANUAL_SCRIPT_INVOCATION_ONLY",
+    "classification": "CANONICAL_RUNTIME_OWNER"
+  },
+  "schemaIncompatibleWriters": [
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-writer-v1.ts",
+      "reason": "Writes stable_symbol_key/symbol_kind columns; live atlas_symbol_registry schema has stable_symbol_id, not stable_symbol_key. Targets a different/legacy table shape, not this owner.",
+      "classification": "SCHEMA_INCOMPATIBLE_OR_DIFFERENT_TABLE"
+    }
+  ],
+  "conflicts": [],
+  "upstreamFileIdentity": {
+    "status": "NOT_CONSUMED_BY_OWNER",
+    "note": "The canonical owner does not itself read StableFileIdentityV1/upstream_file_id -- it accepts source_ref/source_revision as caller-supplied nomination fields. This means clearing S01-08K alone does not automatically wire file identity into this writer -- the CALLER (native-structural-materializer.mts) would need to supply a stable-file-identity-derived source_ref/source_revision, which is a separate, not-yet-verified wiring question."
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphifyRuns": 0
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "result": "SYMBOL_CANONICAL_WRITER_LINEAGE_BLOCKED",
+  "nextBlocker": "SYMBOL_CANONICAL_WRITER_LINEAGE_BLOCKED -- owner does not yet consume file identity even if S01-08K is applied; caller-side wiring unverified"
+}
