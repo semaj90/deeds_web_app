@@ -1,0 +1,90 @@
+{
+  "schema": "atlas.stable-file-schema-apply-manifest.v1",
+  "gate": "S01-08H-DDL-FREEZE",
+  "generatedAt": "2026-09-22T03:15:00.000Z",
+  "designOnly": true,
+  "databaseWrites": 0,
+  "ddlFile": "docs/reports/stable-file-schema-ddl-v1.sql",
+  "ddlChecksum": "sha256:538b82524f35a5b3b32a47300711aa5382d15fc00b6eb5e01e2edaefd3a568cf",
+  "rollbackFile": "docs/reports/stable-file-schema-rollback-v1.sql",
+  "rollbackChecksum": "sha256:5a7d2af50b4163a893a7787630ea928d56408d840446d5ebfc0fa22281e986e3",
+  "correctionsAppliedThisFreeze": [
+    "Added atlas_repository_identity.source_authority_repo_id (text, UNIQUE, and UNIQUE with repository_id) -- bridges the new UUID repository identity to the existing live text repo_id namespace ('deeds-web-app', etc.) without declaring that text key to be the future logical identity itself.",
+    "atlas_stable_file_revision_binding now carries repository_id, source_authority_repo_id, canonical_source_ref (renamed from repository_relative_path to match atlas_workspace_source_bindings' own column name, making the FK direct rather than a value-matching assumption).",
+    "Two FKs added: (repository_id, source_authority_repo_id) -> atlas_repository_identity, and (source_authority_repo_id, canonical_source_ref, source_revision, workspace_revision) -> atlas_workspace_source_bindings (repo_id, canonical_source_ref, source_revision, workspace_revision) -- confirmed live this gate: that exact UNIQUE constraint (atlas_workspace_source_bindin_repo_id_canonical_source_ref__key) already exists, so the FK is directly buildable, not hypothetical.",
+    "Path index changed from a bare repository_relative_path index (implied global path identity) to a scoped (repository_id, canonical_source_ref, workspace_revision) index -- src/index.ts in repo A is never confused with src/index.ts in repo B.",
+    "atlas_repository_identity now distinguishes repository_kind ('ROOT'|'NESTED_GIT_REPOSITORY') with repository_name/repository_path as the canonical fields and gitmodule_name kept as OPTIONAL metadata -- the root repository is no longer forced to pretend to be a gitmodule.",
+    "atlas_stable_file_alias's valid_from_revision/valid_to_revision (which implied ordering on non-orderable sha256 content hashes) renamed to introduced_in_workspace_revision/superseded_in_workspace_revision, with NO ordering CHECK (< / >) added -- only presence/nullability. Workspace revisions have an admission-order authority elsewhere (the workspace-revision-tournament-admission process already used this session), unlike raw content-hash source_revision values, which have no ordering relationship at all."
+  ],
+  "ddlFreezeChecklist": [
+    { "item": 1, "requirement": "still exactly 4 new tables", "status": "PASS" },
+    { "item": 2, "requirement": "repository identity supports ROOT, nested repos, source_authority_repo_id mapping", "status": "PASS" },
+    { "item": 3, "requirement": "stable_file_id: UUID, NO DEFAULT, minted by canonical writer only", "status": "PASS", "note": "no DEFAULT clause on stable_file_id anywhere in the DDL" },
+    { "item": 4, "requirement": "revision binding contains repository_id, source_authority_repo_id, canonical_source_ref, workspace_revision, source_revision, content_digest, byte_length", "status": "PASS" },
+    { "item": 5, "requirement": "CHECK source_revision = 'sha256:' || content_digest", "status": "PASS" },
+    { "item": 6, "requirement": "FK: exact admitted atlas_workspace_source_bindings row exists", "status": "PASS", "note": "verified live this gate against pg_get_constraintdef -- the target UNIQUE constraint's column set and order match exactly" },
+    { "item": 7, "requirement": "cross-repo same-path fixture passes", "status": "DEFERRED_TO_S01_08L", "note": "no data exists yet to run this fixture against; the schema STRUCTURALLY guarantees it (path uniqueness is always scoped through repository_id -> stable_file_id, never global) -- empirical proof is S01-08L's job, on real data, not this DDL-only gate" },
+    { "item": 8, "requirement": "UNIQUE(stable_file_id, workspace_revision) semantic assumption explicitly proven", "status": "DOCUMENTED_ASSUMPTION_NOT_YET_EMPIRICALLY_PROVEN", "note": "honestly reported, not claimed as proven: this is an ARCHITECTURAL assumption (one coherent admitted-workspace tree state implies one current path per stable file per workspace revision), not something queryable against data that doesn't exist yet. The current atlas_workspace_source_bindings table cannot test this either, since path IS its identity (a rename has no representation there at all). The real proof point is S01-08L's fixture B (RENAME) once real population exists -- named explicitly as a required follow-up test, not silently assumed safe." },
+    { "item": 9, "requirement": "alias lifecycle semantics clarified; no bogus ordering comparison of SHA hashes", "status": "PASS", "note": "renamed columns, no ordering CHECK added" },
+    { "item": 10, "requirement": "no rows populated", "status": "PASS", "note": "0 INSERT statements anywhere in this file" },
+    { "item": 11, "requirement": "no stableFileId minted", "status": "PASS" },
+    { "item": 12, "requirement": "no upstream_file_id change", "status": "PASS" },
+    { "item": 13, "requirement": "no registry changes", "status": "PASS", "note": "0 ALTER TABLE statements on any existing table" },
+    { "item": 14, "requirement": "no Graphify", "status": "PASS" },
+    { "item": 15, "requirement": "rollback DDL frozen", "status": "PASS", "note": "docs/reports/stable-file-schema-rollback-v1.sql, checksum above" },
+    { "item": 16, "requirement": "catalog-readback assertions frozen", "status": "PASS", "note": "see expectedTables/expectedColumns/expectedPKs/expectedFKs/expectedUniqueConstraints/expectedChecks/expectedIndexes below" },
+    { "item": 17, "requirement": "strict OpenSpec validation", "status": "PASS", "note": "run at commit time for this gate" }
+  ],
+  "expectedTables": ["atlas_repository_identity", "atlas_stable_file_identity", "atlas_stable_file_revision_binding", "atlas_stable_file_alias"],
+  "expectedColumns": {
+    "atlas_repository_identity": ["repository_id", "source_authority_repo_id", "repository_name", "repository_path", "repository_kind", "gitmodule_name", "origin_url", "parent_repository_id", "known_commit_oids", "created_at"],
+    "atlas_stable_file_identity": ["stable_file_id", "repository_id", "lifecycle_state", "created_at", "tombstoned_at"],
+    "atlas_stable_file_revision_binding": ["stable_file_id", "repository_id", "source_authority_repo_id", "canonical_source_ref", "workspace_revision", "source_revision", "content_digest", "byte_length", "source_identity_key", "observed_at", "provenance"],
+    "atlas_stable_file_alias": ["stable_file_id", "repository_id", "alias_path", "introduced_in_workspace_revision", "superseded_in_workspace_revision", "evidence"]
+  },
+  "expectedPKs": {
+    "atlas_repository_identity": ["repository_id"],
+    "atlas_stable_file_identity": ["stable_file_id"],
+    "atlas_stable_file_revision_binding": null,
+    "atlas_stable_file_alias": null
+  },
+  "expectedFKs": [
+    "atlas_repository_identity.parent_repository_id -> atlas_repository_identity.repository_id",
+    "atlas_stable_file_identity.repository_id -> atlas_repository_identity.repository_id",
+    "atlas_stable_file_revision_binding.stable_file_id -> atlas_stable_file_identity.stable_file_id",
+    "atlas_stable_file_revision_binding (repository_id, source_authority_repo_id) -> atlas_repository_identity (repository_id, source_authority_repo_id)",
+    "atlas_stable_file_revision_binding (source_authority_repo_id, canonical_source_ref, source_revision, workspace_revision) -> atlas_workspace_source_bindings (repo_id, canonical_source_ref, source_revision, workspace_revision)",
+    "atlas_stable_file_alias.stable_file_id -> atlas_stable_file_identity.stable_file_id",
+    "atlas_stable_file_alias.repository_id -> atlas_repository_identity.repository_id"
+  ],
+  "expectedUniqueConstraints": [
+    "atlas_repository_identity (source_authority_repo_id)",
+    "atlas_repository_identity (repository_id, source_authority_repo_id)",
+    "atlas_stable_file_revision_binding (stable_file_id, workspace_revision)",
+    "atlas_stable_file_alias (stable_file_id, alias_path, introduced_in_workspace_revision)"
+  ],
+  "expectedChecks": [
+    "atlas_repository_identity.repository_kind IN ('ROOT','NESTED_GIT_REPOSITORY')",
+    "atlas_stable_file_identity.lifecycle_state IN ('ACTIVE','TOMBSTONED')",
+    "atlas_stable_file_revision_binding.workspace_revision ~ sha256 shape",
+    "atlas_stable_file_revision_binding.source_revision ~ sha256 shape",
+    "atlas_stable_file_revision_binding.content_digest ~ 64-hex shape",
+    "atlas_stable_file_revision_binding.byte_length >= 0",
+    "atlas_stable_file_revision_binding: source_revision = 'sha256:' || content_digest",
+    "atlas_stable_file_alias.introduced_in_workspace_revision ~ sha256 shape",
+    "atlas_stable_file_alias.superseded_in_workspace_revision IS NULL OR ~ sha256 shape"
+  ],
+  "expectedIndexes": [
+    "idx_atlas_repository_identity_path", "idx_atlas_stable_file_identity_repo_state",
+    "idx_atlas_stable_file_revision_binding_scoped_path", "idx_atlas_stable_file_revision_binding_identity_key",
+    "idx_atlas_stable_file_alias_path"
+  ],
+  "provenNotClaimed": {
+    "rowsInserted": 0, "stableFileIdsMinted": 0, "graphifyRuns": 0, "existingTablesMutated": 0,
+    "newTableNameCollisions": 0
+  },
+  "applySequence": "BEGIN -> verify pre-apply catalog state matches this manifest's expectations -> execute the exact frozen DDL (docs/reports/stable-file-schema-ddl-v1.sql, checksum above) -> catalog readback -> assert 4 empty tables + exact constraints/indexes against expectedTables/expectedColumns/expectedPKs/expectedFKs/expectedUniqueConstraints/expectedChecks/expectedIndexes -> COMMIT. Any mismatch -> ROLLBACK, no partial apply.",
+  "result": "S01_08H_DDL_FREEZE_READY",
+  "authorizationRequired": true,
+  "authorizationNote": "Not authorized by this gate. The exact typed token for this gate, to be supplied only when the operator intends to apply: \"apply S01-08H stable file schema\""
+}
