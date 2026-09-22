@@ -132,19 +132,17 @@ async function main() {
       [stableIds],
     );
     const activeIds = new Set(active.rows.map((row) => row.stable_symbol_id));
-    const { qualifySymbolRevisionsV1 } = await loadSymbolRevisionQualificationV1();
+    const q = await loadSymbolRevisionQualificationV1();
+    const provenanceMap = await q.loadBindingProvenanceV1(pool, batch.map((r) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));
     await pool.query('BEGIN');
     for (const row of batch) {
       const resolution = resolutionByNomination.get(row.nomination_id);
       if (!activeIds.has(resolution.stable_symbol_id)) continue;
       // S01-10B: versions are revision-bound; both revisions must be sha256-qualified. Record and continue, never convert.
-      const verdict = qualifySymbolRevisionsV1('atlas_symbol_versions', [
-        { field: 'source_revision', value: row.source_revision },
-        { field: 'workspace_revision', value: row.workspace_revision },
-      ]);
-      if (!verdict.ok) {
+      const verdict = q.qualifySymbolVersionRevisionsV1({ sourceRef: row.source_ref, sourceRevision: row.source_revision, workspaceRevision: row.workspace_revision, provenance: q.provenanceForV1(provenanceMap, row.source_ref, row.source_revision) });
+      if (!verdict.admitted) {
         report.rowsRejectedUnqualifiedRevision++;
-        if (report.rejections.length < 50) report.rejections.push({ nominationId: row.nomination_id, codes: verdict.violations.map((v) => v.code) });
+        if (report.rejections.length < 50) report.rejections.push({ nominationId: row.nomination_id, reasons: verdict.reasons });
         continue;
       }
       report.rowsAttempted++;

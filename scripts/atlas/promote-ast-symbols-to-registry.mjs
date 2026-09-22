@@ -126,13 +126,15 @@ async function main() {
   const batch = uniqueCandidates.slice(OFFSET, OFFSET + LIMIT);
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
   try {
-    const { qualifySymbolRevisionsV1 } = await loadSymbolRevisionQualificationV1();
+    const q = await loadSymbolRevisionQualificationV1();
+    const provenanceMap = await q.loadBindingProvenanceV1(pool, batch.map(([, r]) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));
     for (const [canonicalKey, row] of batch) {
-      // S01-10B: a row that states a revision must state a qualified one; record and continue, never convert or substitute.
-      const verdict = qualifySymbolRevisionsV1('atlas_symbol_registry', [{ field: 'created_from_source_revision', value: row.source_revision }]);
-      if (!verdict.ok) {
+      // S01-10B: LogicalSymbolRegistryAdmissionV1. No NULL/sentinel exists for the NOT NULL revision columns, so an unqualified
+      // nomination writes NO canonical row. Record and continue; never convert or substitute.
+      const verdict = q.admitLogicalSymbolRegistryV1({ sourceRef: row.source_ref, createdFromSourceRevision: row.source_revision, registryRevision: REGISTRY_REVISION, provenance: q.provenanceForV1(provenanceMap, row.source_ref, row.source_revision) });
+      if (!verdict.admitted) {
         report.rowsRejectedUnqualifiedRevision++;
-        if (report.rejections.length < 50) report.rejections.push({ canonicalKey, codes: verdict.violations.map((v) => v.code) });
+        if (report.rejections.length < 50) report.rejections.push({ canonicalKey, reasons: verdict.reasons });
         continue;
       }
       report.rowsAttempted++;

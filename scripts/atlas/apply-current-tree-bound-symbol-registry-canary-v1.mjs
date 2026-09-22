@@ -94,13 +94,14 @@ try {
   const lockResult = await pool.query('SELECT pg_try_advisory_xact_lock($1, $2) AS acquired', [lockKey1, lockKey2]);
   report.lockAcquired = lockResult.rows[0].acquired === true;
   if (!report.lockAcquired) throw new Error('SYMBOL_REGISTRY_CANARY_LOCK_NOT_ACQUIRED_CONCURRENT_RUN_IN_PROGRESS');
-  const { qualifySymbolRevisionsV1 } = await loadSymbolRevisionQualificationV1();
+  const q = await loadSymbolRevisionQualificationV1();
+  const provenanceMap = await q.loadBindingProvenanceV1(pool, rows.map((r) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));
   for (const row of rows) {
-    // S01-10B: the canary previously wrote a Git commit id here; now record-and-continue on any unqualified revision.
-    const verdict = qualifySymbolRevisionsV1('atlas_symbol_registry', [{ field: 'created_from_source_revision', value: row.source_revision }]);
-    if (!verdict.ok) {
+    // S01-10B: LogicalSymbolRegistryAdmissionV1. A Git commit id is not a source revision; the canary previously wrote one here.
+    const verdict = q.admitLogicalSymbolRegistryV1({ sourceRef: row.source_ref, createdFromSourceRevision: row.source_revision, registryRevision: 'atlas-current-tree-bound-symbol-canary-v1', provenance: q.provenanceForV1(provenanceMap, row.source_ref, row.source_revision) });
+    if (!verdict.admitted) {
       report.rejectedUnqualifiedRevision += 1;
-      if (report.rejections.length < 50) report.rejections.push({ symbolKey: row.symbol_key, codes: verdict.violations.map((v) => v.code) });
+      if (report.rejections.length < 50) report.rejections.push({ symbolKey: row.symbol_key, reasons: verdict.reasons });
       continue;
     }
     report.attempted += 1;
