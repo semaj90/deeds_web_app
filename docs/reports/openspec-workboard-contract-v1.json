@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.openspec-workboard-contract-receipt.v1",
+  "generatedAt": "2026-09-22T00:59:43.595Z",
+  "artifactPath": "docs\\reports\\openspec-workboard-v1.json",
+  "workboardChecksum": "sha256:5b320d7af78767de4188ebd63a80dd90be90d7de7d5970ab93d1f430ad21d1fc",
+  "workboardGeneratedAt": "2026-09-21T22:39:20.966Z",
+  "summary": {
+    "completedTasks": 6046,
+    "openTasks": 3347,
+    "actionableTasks": 2534,
+    "waitingTasks": 752,
+    "supersededTasks": 59,
+    "totalTasks": 9393,
+    "progressFraction": 0.6436708186947727,
+    "progressBar": "[######----]",
+    "eta": {
+      "status": "UNKNOWN",
+      "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+    }
+  },
+  "parity": {
+    "total": true,
+    "complete": true,
+    "open": true,
+    "actionable": true,
+    "waiting": true,
+    "superseded": true
+  },
+  "noDuplicateStableKey": true,
+  "noDuplicateLogicalTaskKey": true,
+  "logicalTaskKeyNullCount": 6642,
+  "flatSchema": true,
+  "result": "OPENSPEC_WORKBOARD_CONTRACT_PROVEN"
+}
