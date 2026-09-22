@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.stable-file-schema-apply.v1",
+  "generatedAt": "2026-09-22T03:37:11.813Z",
+  "ddlChecksum": "sha256:538b82524f35a5b3b32a47300711aa5382d15fc00b6eb5e01e2edaefd3a568cf",
+  "manifestFile": "docs/reports/stable-file-schema-apply-manifest-v1.json",
+  "status": "SCHEMA_APPLIED",
+  "reasons": [],
+  "invariants": {
+    "fourTablesCreated": true,
+    "zeroCollisions": true,
+    "zeroMissingColumns": true,
+    "allTablesEmpty": true,
+    "fkCountMatches": true
+  },
+  "readback": {
+    "atlas_repository_identity": {
+      "columnCount": 10,
+      "rowCount": 0,
+      "constraintCount": 12
+    },
+    "atlas_stable_file_identity": {
+      "columnCount": 5,
+      "rowCount": 0,
+      "constraintCount": 7
+    },
+    "atlas_stable_file_revision_binding": {
+      "columnCount": 11,
+      "rowCount": 0,
+      "constraintCount": 20
+    },
+    "atlas_stable_file_alias": {
+      "columnCount": 6,
+      "rowCount": 0,
+      "constraintCount": 10
+    }
+  },
+  "fkCount": 7,
+  "independentPostTransactionReadback": [
+    {
+      "table_name": "atlas_repository_identity",
+      "col_count": 10
+    },
+    {
+      "table_name": "atlas_stable_file_alias",
+      "col_count": 6
+    },
+    {
+      "table_name": "atlas_stable_file_identity",
+      "col_count": 5
+    },
+    {
+      "table_name": "atlas_stable_file_revision_binding",
+      "col_count": 11
+    }
+  ]
+}
