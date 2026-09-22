@@ -1,0 +1,109 @@
+{
+  "schema": "atlas.stable-file-population-apply-manifest.v1",
+  "gate": "S01-08K-FREEZE",
+  "generatedAt": "2026-09-22T04:54:57.735Z",
+  "designOnly": true,
+  "databaseWrites": 0,
+  "source": {
+    "previewCommit": "5f3875e69e",
+    "previewReceipt": "docs/reports/stable-file-population-preview-v1.json",
+    "previewChecksum": "sha256:5892d6399c29bee86465f381cef5357c9e3b0c94b1a70e03a95e80851a8bbed3",
+    "sealedCohortReceipt": "docs/reports/current-source-authority-cohort-v1.json",
+    "sealedCohortStatus": "CURRENT_SOURCE_AUTHORITY_PROVEN",
+    "sealedCohortChecksum": "sha256:53d560a1314eac626cfe096935c09e4a48421d9da6a50ad300ecf125b2ec2b65",
+    "admittedWorkspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "snapshotFile": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+    "independentReclassificationAgreesWithCommittedPreview": true
+  },
+  "applySet": {
+    "classification": "SAFE_NEW_ID",
+    "sourceAuthorityRepoId": "deeds-web-app",
+    "rowCount": 24456,
+    "checksum": "sha256:33aa6861ab558c7b842dc3941ebd56b7b97adb82d1c23dc3c8917bb39d2ebc46"
+  },
+  "excluded": {
+    "repositoryNamespaceMissing": 1086,
+    "ambiguousContinuity": 0,
+    "sourceHistoryInsufficient": 0,
+    "note": "Every non-SAFE_NEW_ID classification is excluded from the apply set by construction (buildApplySetFromClassificationV1 filters on classification === SAFE_NEW_ID only) -- not by a separate exclusion list that could drift."
+  },
+  "applySetIntegrity": {
+    "totalRows": 24456,
+    "duplicateKeyCount": 0,
+    "duplicateKeys": [],
+    "invalidWorkspaceRevisionShapeCount": 0,
+    "invalidSourceRevisionShapeCount": 0,
+    "sourceRevisionDigestMismatchCount": 0,
+    "missingCanonicalSourceRefCount": 0,
+    "missingContentDigestCount": 0,
+    "negativeByteLengthCount": 0,
+    "allChecksPassed": true
+  },
+  "liveStateAtFreezeTime": {
+    "note": "Read inside one BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY transaction. SELECTs only. Reconfirms the tables are still empty at freeze time -- this manifest expires (must be re-frozen) if that ever changes before apply.",
+    "tableCounts": {
+      "atlas_repository_identity": 0,
+      "atlas_stable_file_identity": 0,
+      "atlas_stable_file_revision_binding": 0,
+      "atlas_stable_file_alias": 0,
+      "existingRootRepositoryIdentityRow": null
+    }
+  },
+  "expectedWrites": {
+    "atlas_repository_identity": "INSERT exactly 1 root RepositoryIdentityV1 row",
+    "atlas_stable_file_identity": "INSERT exactly 24456 rows",
+    "atlas_stable_file_revision_binding": "INSERT exactly 24456 rows",
+    "atlas_stable_file_alias": "INSERT 0 rows",
+    "unrelatedTables": {
+      "atlas_workspace_source_bindings": 0,
+      "atlas_symbol_registry": 0,
+      "atlas_symbol_versions": 0,
+      "atlas_packets": 0,
+      "qdrant": 0,
+      "valkey": 0,
+      "neo4j": 0,
+      "graphifyRuns": 0
+    }
+  },
+  "uuidPolicy": {
+    "repositoryId": "random UUIDv7 (mintOrReuseRepositoryIdentityV1 -- corrected from an earlier deterministic-UUIDv8 pass per commit da25db92ed; concurrency safety comes from the live UNIQUE(source_authority_repo_id) constraint + graceful 23505 handling, not determinism)",
+    "stableFileId": "UUIDv7, minted ONLY during S01-08K APPLY, inside the authorized transaction. This manifest's applySet rows carry no stableFileId field -- structurally impossible to pre-mint or freeze one here (see ApplySetRowV1 in stable-file-population-apply-manifest-v1.ts)."
+  },
+  "transactionPolicy": {
+    "allOrNothing": true,
+    "algorithm": [
+      "BEGIN",
+      "Revalidate manifest/input checksums (previewChecksum, sealedCohortChecksum, applySetChecksum) against this frozen file -- refuse on any drift.",
+      "Revalidate the exact admitted atlas_workspace_source_bindings row for every apply-set row.",
+      "Ensure every row still classifies SAFE_NEW_ID at apply time (re-run the same classifier, not trust this frozen snapshot blindly).",
+      "Mint or reuse the one root RepositoryIdentityV1 row (mintOrReuseRepositoryIdentityV1) -- idempotent, 23505-safe.",
+      "For each authorized source row, call the ONE canonical S01-08I writer (mintOrBindStableFileV1) -- mints a UUIDv7 only inside this transaction.",
+      "Independently read back: repository identity row, every stable file identity row, every revision binding row.",
+      "Require exact expected counts (repository +0 or +1, stable file identity +24456, revision binding +24456, alias +0) and zero unexpected classifications.",
+      "COMMIT only if every invariant passes.",
+      "Any mismatch at any step -> ROLLBACK the entire transaction. No partial population."
+    ]
+  },
+  "postApplyReplayExpectation": {
+    "note": "NOT executed by this freeze gate. Recorded so S01-08K's own apply script can assert it, and so a future re-run of this exact 24,456-row set is provably idempotent.",
+    "expected": {
+      "classification": "SAFE_EXISTING_CONTINUITY for all 24,456 rows",
+      "newStableFileIdsMinted": 0,
+      "duplicateStableFileRows": 0,
+      "duplicateRevisionBindings": 0
+    }
+  },
+  "rollbackReadbackHandling": {
+    "primaryMechanism": "transaction ROLLBACK before COMMIT (this is one bounded transaction, per transactionPolicy above)",
+    "postCommitVerification": "independent post-transaction readback on a FRESH pooled connection, matching the S01-08H/S01-10E apply-script pattern",
+    "onPostCommitDiscrepancy": "STOP -- report the discrepancy, do not attempt automatic repair",
+    "explicitlyProhibited": "a destructive post-commit delete/repair script that could erase identities after downstream references (e.g. a future S01-08M upstream_file_id FK) exist"
+  },
+  "authorization": {
+    "required": true,
+    "token": "apply S01-08K stable file population",
+    "note": "This exact literal string, matching the established S01-10D/S01-08H apply-token pattern. A generic \"yes\"/\"apply\"/\"continue\" is NOT sufficient."
+  },
+  "result": "S01_08K_APPLY_MANIFEST_FROZEN"
+}
