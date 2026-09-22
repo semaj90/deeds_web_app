@@ -8,6 +8,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadSymbolRevisionQualificationV1 } from './lib/load-symbol-revision-qualification-v1.mjs';
 import { normalizeAstNodeKind } from './lib/ast-source-ref-key.mjs';
 import { deriveSymbolVersionIdV1 } from '../../packages/parent-atlas/dist/core/identity-v1.js';
 
@@ -97,6 +98,8 @@ async function main() {
     limit: LIMIT,
     selectedCandidates: selectedRows.length,
     rowsAttempted: 0,
+    rowsRejectedUnqualifiedRevision: 0,
+    rejections: [],
     rowsInserted: 0,
     rowsAlreadyPresent: 0,
     projectionRowsUpserted: 0,
@@ -129,10 +132,21 @@ async function main() {
       [stableIds],
     );
     const activeIds = new Set(active.rows.map((row) => row.stable_symbol_id));
+    const { qualifySymbolRevisionsV1 } = await loadSymbolRevisionQualificationV1();
     await pool.query('BEGIN');
     for (const row of batch) {
       const resolution = resolutionByNomination.get(row.nomination_id);
       if (!activeIds.has(resolution.stable_symbol_id)) continue;
+      // S01-10B: versions are revision-bound; both revisions must be sha256-qualified. Record and continue, never convert.
+      const verdict = qualifySymbolRevisionsV1('atlas_symbol_versions', [
+        { field: 'source_revision', value: row.source_revision },
+        { field: 'workspace_revision', value: row.workspace_revision },
+      ]);
+      if (!verdict.ok) {
+        report.rowsRejectedUnqualifiedRevision++;
+        if (report.rejections.length < 50) report.rejections.push({ nominationId: row.nomination_id, codes: verdict.violations.map((v) => v.code) });
+        continue;
+      }
       report.rowsAttempted++;
       const symbolVersionId = deriveSymbolVersionIdV1({
         stableSymbolId: resolution.stable_symbol_id,

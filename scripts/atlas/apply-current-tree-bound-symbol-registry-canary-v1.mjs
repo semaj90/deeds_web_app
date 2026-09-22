@@ -11,6 +11,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import dotenv from 'dotenv';
+import { loadSymbolRevisionQualificationV1 } from './lib/load-symbol-revision-qualification-v1.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 dotenv.config({ path: path.resolve(root, 'sveltekit-frontend/.env') });
@@ -50,6 +51,8 @@ const report = {
   inputChecksum: digest(raw),
   selectedRowCount: rows.length,
   attempted: 0,
+  rejectedUnqualifiedRevision: 0,
+  rejections: [],
   inserted: 0,
   alreadyPresent: 0,
   readback: 0,
@@ -91,7 +94,15 @@ try {
   const lockResult = await pool.query('SELECT pg_try_advisory_xact_lock($1, $2) AS acquired', [lockKey1, lockKey2]);
   report.lockAcquired = lockResult.rows[0].acquired === true;
   if (!report.lockAcquired) throw new Error('SYMBOL_REGISTRY_CANARY_LOCK_NOT_ACQUIRED_CONCURRENT_RUN_IN_PROGRESS');
+  const { qualifySymbolRevisionsV1 } = await loadSymbolRevisionQualificationV1();
   for (const row of rows) {
+    // S01-10B: the canary previously wrote a Git commit id here; now record-and-continue on any unqualified revision.
+    const verdict = qualifySymbolRevisionsV1('atlas_symbol_registry', [{ field: 'created_from_source_revision', value: row.source_revision }]);
+    if (!verdict.ok) {
+      report.rejectedUnqualifiedRevision += 1;
+      if (report.rejections.length < 50) report.rejections.push({ symbolKey: row.symbol_key, codes: verdict.violations.map((v) => v.code) });
+      continue;
+    }
     report.attempted += 1;
     const result = await pool.query(
       `INSERT INTO public.atlas_symbol_registry

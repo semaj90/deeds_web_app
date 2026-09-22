@@ -1,0 +1,98 @@
+{
+  "schema": "atlas.symbol-revision-forward-qualification-receipt.v1",
+  "generatedAt": "2026-09-22T00:11:35.118Z",
+  "status": "FORWARD_QUALIFICATION_WIRED",
+  "evidenceClass": "STATIC_WIRING_PLUS_FIXTURE",
+  "scope": "revision-bearing writes only; revision-less registry skeletons remain a schema-contract gate (NOT NULL columns)",
+  "historicalRowsTouched": 0,
+  "dbWrites": 0,
+  "notWired": [
+    {
+      "file": "scripts/atlas/symbol-reconciliation-writer-v1.mts",
+      "reason": "delegates inserts to packages/parent-atlas/src/core (patch source, never dist); classified QUALIFIED_WRITER in S01-10; separate follow-up"
+    }
+  ],
+  "validatorCases": [
+    {
+      "name": "qualified",
+      "expectOk": true,
+      "ok": true,
+      "matches": true,
+      "codes": []
+    },
+    {
+      "name": "workspace:0",
+      "expectOk": false,
+      "ok": false,
+      "matches": true,
+      "codes": [
+        "SOURCE_REVISION_PLACEHOLDER"
+      ]
+    },
+    {
+      "name": "git-commit-oid",
+      "expectOk": false,
+      "ok": false,
+      "matches": true,
+      "codes": [
+        "SOURCE_REVISION_SHORT_OID"
+      ]
+    },
+    {
+      "name": "sha256-prefixed-oid",
+      "expectOk": false,
+      "ok": false,
+      "matches": true,
+      "codes": [
+        "SOURCE_REVISION_OTHER"
+      ]
+    },
+    {
+      "name": "null",
+      "expectOk": false,
+      "ok": false,
+      "matches": true,
+      "codes": [
+        "SOURCE_REVISION_MISSING"
+      ]
+    },
+    {
+      "name": "empty",
+      "expectOk": false,
+      "ok": false,
+      "matches": true,
+      "codes": [
+        "SOURCE_REVISION_MISSING"
+      ]
+    }
+  ],
+  "writers": [
+    {
+      "file": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+      "insert": "INSERT INTO atlas_symbol_registry",
+      "population": "A_placeholderRegistrySymbols",
+      "importsShim": true,
+      "callsValidator": true,
+      "validatesBeforeInsert": true,
+      "rejectsAndContinues": true
+    },
+    {
+      "file": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "insert": "INSERT INTO atlas_symbol_versions",
+      "population": "B/C/D_unqualifiedVersions",
+      "importsShim": true,
+      "callsValidator": true,
+      "validatesBeforeInsert": true,
+      "rejectsAndContinues": true
+    },
+    {
+      "file": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+      "insert": "INSERT INTO public.atlas_symbol_registry",
+      "population": "E_gitCommitOidRegistrySymbols",
+      "importsShim": true,
+      "callsValidator": true,
+      "validatesBeforeInsert": true,
+      "rejectsAndContinues": true
+    }
+  ]
+}

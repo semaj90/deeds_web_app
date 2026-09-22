@@ -32,6 +32,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadSymbolRevisionQualificationV1 } from './lib/load-symbol-revision-qualification-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DATABASE_URL = process.env.DATABASE_URL
@@ -100,6 +101,8 @@ async function main() {
     uniqueCandidatesAfterDedup: uniqueCandidates.length,
     offset: OFFSET,
     rowsAttempted: 0,
+    rowsRejectedUnqualifiedRevision: 0,
+    rejections: [],
     rowsInserted: 0,
     rowsAlreadyRegistered: 0,
     sample: uniqueCandidates.slice(OFFSET, OFFSET + 5).map(([canonicalKey, row]) => ({
@@ -123,7 +126,15 @@ async function main() {
   const batch = uniqueCandidates.slice(OFFSET, OFFSET + LIMIT);
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
   try {
+    const { qualifySymbolRevisionsV1 } = await loadSymbolRevisionQualificationV1();
     for (const [canonicalKey, row] of batch) {
+      // S01-10B: a row that states a revision must state a qualified one; record and continue, never convert or substitute.
+      const verdict = qualifySymbolRevisionsV1('atlas_symbol_registry', [{ field: 'created_from_source_revision', value: row.source_revision }]);
+      if (!verdict.ok) {
+        report.rowsRejectedUnqualifiedRevision++;
+        if (report.rejections.length < 50) report.rejections.push({ canonicalKey, codes: verdict.violations.map((v) => v.code) });
+        continue;
+      }
       report.rowsAttempted++;
       const stableSymbolId = stableSymbolIdFor(canonicalKey);
       try {
