@@ -1,0 +1,12 @@
+{
+  "schema": "atlas.stable-file-identity-mint-cli.v1",
+  "gate": "S01-08I",
+  "generatedAt": "2026-09-22T04:22:20.237Z",
+  "mode": "repository",
+  "dryRun": true,
+  "databaseWrites": 0,
+  "status": "DRY_RUN_PROVEN",
+  "decision": "MINT_NEW",
+  "existingRowCount": 0,
+  "wouldMintRepositoryId": "77487aff-d5ad-87cb-a1dd-bda46f07149c"
+}

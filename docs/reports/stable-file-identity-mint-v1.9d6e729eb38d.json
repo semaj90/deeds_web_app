@@ -1,0 +1,12 @@
+{
+  "schema": "atlas.stable-file-identity-mint-cli.v1",
+  "gate": "S01-08I",
+  "generatedAt": "2026-09-22T04:22:38.883Z",
+  "mode": "file",
+  "dryRun": true,
+  "databaseWrites": 0,
+  "status": "DRY_RUN_PROVEN",
+  "decision": "SAFE_NEW_ID",
+  "activeStableFileIdsForKey": [],
+  "existingBindingForRevision": false
+}

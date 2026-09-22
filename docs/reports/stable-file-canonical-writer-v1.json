@@ -1,0 +1,136 @@
+{
+  "schema": "atlas.stable-file-canonical-writer.v1",
+  "gate": "S01-08I",
+  "generatedAt": "2026-09-22T04:32:49.037Z",
+  "readOnly": true,
+  "databaseWrites": 0,
+  "canonicalWriter": {
+    "path": "sveltekit-frontend/src/lib/server/atlas/identity/stable-file-identity-mint-v1.ts",
+    "functions": [
+      "mintOrReuseRepositoryIdentityV1",
+      "mintOrBindStableFileV1",
+      "verifyRepositoryIdentityV1",
+      "verifySourceAuthorityBindingV1",
+      "computeSourceIdentityKeyV1"
+    ],
+    "cliEntrypoint": "scripts/atlas/mint-stable-file-identity-v1.mjs",
+    "loaderShim": "scripts/atlas/lib/load-stable-file-identity-mint-v1.mjs",
+    "ownerCount": 1
+  },
+  "ownerCensus": {
+    "referencingFileCount": 4,
+    "files": [
+      {
+        "file": "scripts/atlas/mint-stable-file-identity-v1.mjs",
+        "classification": "CANONICAL_OWNER"
+      },
+      {
+        "file": "scripts/atlas/prove-stable-file-canonical-writer-v1.mjs",
+        "classification": "CENSUS_TOOL"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/atlas/identity/stable-file-identity-mint-v1.spec.ts",
+        "classification": "CANONICAL_OWNER_TEST"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/atlas/identity/stable-file-identity-mint-v1.ts",
+        "classification": "CANONICAL_OWNER"
+      }
+    ],
+    "unknownCount": 0,
+    "canonicalStableFileWriterOwnerCount": 1
+  },
+  "inputContract": {
+    "repositoryMint": [
+      "sourceAuthorityRepoId",
+      "repositoryName",
+      "repositoryPath",
+      "repositoryKind",
+      "gitmoduleName?",
+      "originUrl?",
+      "parentRepositoryId?"
+    ],
+    "stableFileMintOrBind": [
+      "repositoryId",
+      "sourceAuthorityRepoId",
+      "canonicalSourceRef",
+      "workspaceRevision",
+      "sourceRevision",
+      "contentDigest",
+      "byteLength",
+      "provenance"
+    ],
+    "note": "sourceIdentityKey is deliberately NOT a caller-suppliable field -- computeSourceIdentityKeyV1() always derives it as `${repositoryId}:${canonicalSourceRef}` inside the writer, structurally forbidding path-only identity resolution."
+  },
+  "authoritySource": {
+    "table": "atlas_workspace_source_bindings",
+    "verifiedColumns": [
+      "repo_id",
+      "canonical_source_ref",
+      "source_revision",
+      "workspace_revision",
+      "content_digest"
+    ],
+    "consumedNotRedefined": true,
+    "note": "This writer reads the exact admitted row and refuses to mint/bind without it; it never inserts, updates, or otherwise redefines sourceRevision/contentDigest authority in atlas_workspace_source_bindings."
+  },
+  "typedFailureCodes": [
+    "REPOSITORY_IDENTITY_MISSING",
+    "REPOSITORY_IDENTITY_AMBIGUOUS",
+    "SOURCE_AUTHORITY_BINDING_MISSING",
+    "SOURCE_REVISION_MISMATCH",
+    "CONTENT_DIGEST_MISMATCH",
+    "STABLE_FILE_IDENTITY_AMBIGUOUS",
+    "CROSS_REPOSITORY_IDENTITY_CONFLICT",
+    "TOMBSTONED_IDENTITY_NOT_REUSABLE (reserved -- see deferredToS01_08L.tombstoneLifecycle)"
+  ],
+  "tests": {
+    "numTotalTests": 47,
+    "numPassedTests": 47,
+    "numFailedTests": 0,
+    "success": true,
+    "testError": null,
+    "areas": {
+      "create": "S08I-CREATE-01: mints a new stableFileId on first CREATE (SAFE_NEW_ID)",
+      "replay": "S08I-IDEMPOTENT-01: replaying the exact same CREATE returns SAFE_EXISTING_CONTINUITY, mints nothing new",
+      "modify": "S08I-MODIFY-01: MODIFY binds the SAME stableFileId for a new content revision",
+      "crossRepo": "S08I-REPO-01: identical relative path in two different repositories never collides",
+      "missingAuthority": "S08I-AUTH-01: rejects when the admitted source-authority binding is missing (SOURCE_AUTHORITY_BINDING_MISSING)",
+      "digestMismatch": "S08I-AUTH-02: rejects on digest mismatch (CONTENT_DIGEST_MISMATCH / SOURCE_AUTHORITY_BINDING_MISSING)",
+      "noLatestInference": "S08I-NO-INFER-01: malformed/non-sha256/40-hex-git-commit revisions rejected, never coerced (SOURCE_REVISION_MISMATCH)",
+      "noPathIdentity": "S08I-NO-PATH-ID-01: sourceIdentityKey is never caller-suppliable; always computed as repositoryId:canonicalSourceRef (PATH_ONLY_IDENTITY_FORBIDDEN, structural)"
+    }
+  },
+  "liveDryRunProofs": {
+    "note": "Read-only proofs run against the live (still-empty) applied schema this gate, via scripts/atlas/mint-stable-file-identity-v1.mjs --dry-run. Zero writes.",
+    "repositoryMintDryRun": {
+      "decision": "MINT_NEW",
+      "existingRowCount": 0,
+      "wouldMintRepositoryId": "77487aff-d5ad-87cb-a1dd-bda46f07149c"
+    },
+    "fileMintDryRunAgainstAdmittedRow": {
+      "decision": "SAFE_NEW_ID",
+      "activeStableFileIdsForKey": [],
+      "existingBindingForRevision": false
+    },
+    "fileMintDryRunRefusesOnUnmintedRepository": {
+      "errorCode": "REPOSITORY_IDENTITY_MISSING",
+      "proves": "admission order is enforced live, not just in fixtures"
+    }
+  },
+  "writes": {
+    "historicalRowsChanged": 0,
+    "corpusRowsPopulated": 0,
+    "symbolRowsChanged": 0,
+    "graphifyRuns": 0,
+    "stableFileIdsMinted": 0,
+    "repositoryIdentityRowsMinted": 0
+  },
+  "deferredToS01_08L": {
+    "renameLifecycle": "NOT_IMPLEMENTED -- no atlas_stable_file_alias writer exists yet; RENAME/alias-writing is out of scope for S01-08I per the frozen design (proofPlan.B_RENAME)",
+    "deleteLifecycle": "NOT_IMPLEMENTED -- no TOMBSTONE writer exists yet; TOMBSTONED_IDENTITY_NOT_REUSABLE is a reserved typed-error code with no live code path to trigger it until a tombstone writer exists",
+    "deleteRecreateLifecycle": "PARTIALLY_PROVEN_BY_CONSTRUCTION -- a tombstoned identity is structurally excluded from the ACTIVE-only dedup lookup (fixture-proven: \"a tombstoned stable file at the same key does not block a fresh mint\"), but no real tombstone-writing path exists yet to produce that precondition live",
+    "crossRepositorySamePathFixture": "FIXTURE_PROVEN_ONLY -- proven against the in-memory fixture double (S08I-REPO-01), not yet against live population data (S01-08H-DDL-FREEZE item 7, still deferred to S01-08L)"
+  },
+  "result": "STABLE_FILE_CANONICAL_WRITER_PROVEN"
+}
