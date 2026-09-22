@@ -1,0 +1,201 @@
+{
+  "schema": "atlas.stable-file-identity-design.v1",
+  "gate": "S01-08G",
+  "generatedAt": "2026-09-22T02:05:00.000Z",
+  "readOnly": true,
+  "designOnly": true,
+  "databaseWrites": 0,
+  "schemaApplied": false,
+  "dependsOn": "docs/reports/stable-file-uuid-role-census-v1.json (S01-08F, same session)",
+  "currentCandidateCensus": {
+    "source": "docs/reports/stable-file-identity-owner-v1.json (S01-08, unchanged, re-cited not re-run)",
+    "verdict": "NO_CANDIDATE_SATISFIES_ALL_REQUIREMENTS -- confirmed still true this session"
+  },
+  "uuidRoleCensus": { "ref": "docs/reports/stable-file-uuid-role-census-v1.json", "checksumNote": "see pointer file for content" },
+  "extensionAudit": [
+    { "candidate": "atlas_source_refs", "classification": "INSUFFICIENT_PATH_IDENTITY", "reason": "identity IS the path (source_ref_key); cannot represent a file independently of path by construction; adding an opaque id column here would still leave the row's own PK/uniqueness path-derived unless the table is restructured, which is functionally the same cost as a new table" },
+    { "candidate": "atlas_workspace_source_bindings", "classification": "INSUFFICIENT_REVISION_IDENTITY", "reason": "this table's entire purpose is per-revision observation (one row per (repo, workspace_revision, path)); repurposing it to also carry logical identity would conflate PROJECTION_COORDINATE with CANONICAL_LOGICAL_ID, which the design gate explicitly forbids" },
+    { "candidate": "atlas_source_aliases", "classification": "INSUFFICIENT_PATH_IDENTITY / NO_OWNER (for stableFileId itself)", "reason": "shape is alias-of-a-path-string (canonical_source_ref is itself a path, not an opaque id); 0 live rows, DEAD_WRITER; could plausibly be EXTENDED for the StableFileAliasV1 MECHANISM (effective_from/effective_to + evidence + status columns are the right shape) once a stableFileId column is added to it, but cannot itself become the identity owner" },
+    { "candidate": "atlas_identity_alias_decisions", "classification": "INSUFFICIENT_REPOSITORY_SCOPE (structurally closest match, schema-blocked)", "reason": "has real transition_kind/old_key/new_key/old_revision/new_revision/reviewer_id/evidence_refs -- the best-shaped existing rename/move-decision mechanism found. BUT its entity_kind CHECK constraint (confirmed live: only 'test'/'schema_object') excludes 'file' and has no repo_id column at all. EXTEND_EXISTING_OWNER is plausible for the MECHANISM if a future migration widens the CHECK constraint and adds repo scoping, but it cannot be repurposed as-is." },
+    { "candidate": "any existing repository identity registry", "classification": "NO_OWNER", "reason": "confirmed live: repo_id is populated with exactly one value ('deeds-web-app') across every table that has the column; graphify_files has no repository column at all; no table anywhere maps the 6 known git submodules to a canonical identity" },
+    { "candidate": "any existing lifecycle/tombstone owner", "classification": "NO_OWNER", "reason": "effective_from/effective_to columns exist on atlas_source_aliases (0/... populated) and atlas_source_refs (0/46945 populated per S01-08); no table has ever recorded a tombstone event" }
+  ],
+  "repositoryIdentityDesign": {
+    "problem": "S01-08 proved the root registry is effectively hardcoded to 'deeds-web-app' and the six nested repositories (git submodules, confirmed live this session from .gitmodules: claude-mem, granite-docling-258M, mcp-server-mcp, models/embeddinggemma_300m, sites/parent-atlas-gateboard, turbovec) have zero registry identity anywhere.",
+    "designPrinciple": "Do not infer identity from directory nesting alone. Do not use source-count equality as namespace proof. A repository's identity comes from its own external coordinates (its .gitmodules path + its own independent commit history), not from where it happens to be checked out inside the parent tree.",
+    "contract": {
+      "name": "RepositoryIdentityV1",
+      "fields": {
+        "repositoryId": "UUIDv7, minted once by the canonical creator, never regenerated",
+        "canonicalCoordinates": "{ gitmoduleName: text (the .gitmodules key, e.g. 'granite-docling-258M'), gitmodulePath: text (checkout path relative to the parent repo root), originUrl: text | null, knownCommitOids: text[] (append-only history of observed submodule commit SHAs -- NOT identity, just observation history) }",
+        "repositoryRelativePathNamespace": "every StableFileRevisionBindingV1 row's repositoryRelativePath is only unique WITHIN one repositoryId -- this is what makes 'CROSS-REPOSITORY SAME PATH -> distinct stableFileIds' hold structurally, not by convention",
+        "parentRelationship": "optional parentRepositoryId (nullable) -- e.g. models/embeddinggemma_300m nested inside deeds-web-app; recorded as observed fact, never used to infer or merge identity"
+      },
+      "rootRepository": "deeds-web-app itself gets its own RepositoryIdentityV1 row too -- it is not a privileged default, it is repository #0 with the same contract as the 6 submodules. This removes the 'hardcoded repo <-> deeds-web-app equivalence is not persisted proof' finding from S01-08 by making it an explicit, minted, checked row instead of an assumption baked into every other table's default."
+    }
+  },
+  "stableFileContract": {
+    "coreDistinction": "stableFileId = logical file lifecycle identity. sourceRevision = content/revision identity. repositoryRelativePath = observation/binding, never identity. graphify file UUID (graphify_files.file_id) = occurrence/revision identity, not logical identity. treeNodeOccurrenceId (atlas_ast_nodes.tree_node_id) = declaration/AST occurrence identity, a fourth, separate axis (S01-09C). These four are never conflated.",
+    "types": {
+      "StableFileIdentityV1": { "stableFileId": "UUIDv7", "repositoryId": "UUIDv7 (FK to RepositoryIdentityV1)", "lifecycleState": "enum: ACTIVE | TOMBSTONED", "createdAt": "timestamptz", "tombstonedAt": "timestamptz | null" },
+      "StableFileRevisionBindingV1": { "stableFileId": "UUIDv7 (FK)", "workspaceRevision": "text, sha256:<64hex> shape enforced (reuses the S01-10B REVISION_RE contract, not a new regex)", "sourceRevision": "text, same shape", "repositoryRelativePath": "text", "sourceIdentityKey": "text (repository_id:repository_relative_path, matching S01-07's existing convention)", "observedAt": "timestamptz", "provenance": "text (which writer/gate observed this binding)" },
+      "StableFileAliasV1": { "stableFileId": "UUIDv7 (FK)", "repositoryId": "UUIDv7 (FK)", "aliasPath": "text (a PRIOR path this stableFileId was known at)", "validFromRevision": "text (sha256 shape)", "validToRevision": "text | null (sha256 shape; null = still the most recent alias before the current path)", "evidence": "jsonb (what proved the rename -- e.g. a git rename-detection receipt, never inferred from path/content/treeNodeId/packetId/git-commit alone per the design gate's explicit prohibition)" },
+      "RepositoryIdentityV1": { "repositoryId": "UUIDv7", "canonicalCoordinates": "jsonb, see repositoryIdentityDesign" }
+    },
+    "hardRule": "stableFileId is assigned ONCE by exactly one canonical creator, on an explicit CREATE lifecycle event. It is NEVER a column default (DEFAULT gen_random_uuid() on a revision-row table would mint a new logical id per revision, exactly the graphify_files.file_id anti-pattern this design exists to fix)."
+  },
+  "schemaProposal": {
+    "note": "DESIGN ONLY. Not applied. No DDL executed. Prefers extending atlas_source_aliases's MECHANISM (effective_from/effective_to/evidence/status shape) for StableFileAliasV1 rather than inventing a fifth alias-shaped table, but StableFileIdentityV1/StableFileRevisionBindingV1/RepositoryIdentityV1 are new tables -- no existing table can safely absorb canonical logical identity per the extensionAudit above.",
+    "proposedTables": [
+      {
+        "name": "atlas_repository_identity",
+        "columns": [
+          "repository_id uuid PRIMARY KEY",
+          "gitmodule_name text NOT NULL",
+          "gitmodule_path text NOT NULL",
+          "origin_url text",
+          "parent_repository_id uuid REFERENCES atlas_repository_identity(repository_id)",
+          "known_commit_oids text[] NOT NULL DEFAULT '{}'",
+          "created_at timestamptz NOT NULL DEFAULT now()"
+        ],
+        "uniqueConstraints": ["UNIQUE (gitmodule_name)"],
+        "indexes": ["btree(gitmodule_path)"],
+        "transactionOwner": "a new, single canonical script (S01-08I) -- name TBD, e.g. mint-repository-identity-v1.mjs"
+      },
+      {
+        "name": "atlas_stable_file_identity",
+        "columns": [
+          "stable_file_id uuid PRIMARY KEY",
+          "repository_id uuid NOT NULL REFERENCES atlas_repository_identity(repository_id)",
+          "lifecycle_state text NOT NULL DEFAULT 'ACTIVE' CHECK (lifecycle_state IN ('ACTIVE','TOMBSTONED'))",
+          "created_at timestamptz NOT NULL DEFAULT now()",
+          "tombstoned_at timestamptz"
+        ],
+        "uniqueConstraints": ["PRIMARY KEY (stable_file_id) -- the ONLY uniqueness; explicitly NOT unique on any path"],
+        "indexes": ["btree(repository_id, lifecycle_state)"],
+        "transactionOwner": "the same single canonical creator as above (S01-08I) -- NEVER a column DEFAULT"
+      },
+      {
+        "name": "atlas_stable_file_revision_binding",
+        "columns": [
+          "stable_file_id uuid NOT NULL REFERENCES atlas_stable_file_identity(stable_file_id)",
+          "workspace_revision text NOT NULL CHECK (workspace_revision ~ '^sha256:[0-9a-f]{64}$')",
+          "source_revision text NOT NULL CHECK (source_revision ~ '^sha256:[0-9a-f]{64}$')",
+          "repository_relative_path text NOT NULL",
+          "source_identity_key text NOT NULL",
+          "observed_at timestamptz NOT NULL DEFAULT now()",
+          "provenance text NOT NULL"
+        ],
+        "uniqueConstraints": ["UNIQUE (stable_file_id, workspace_revision) -- one binding per stable file per workspace snapshot; path uniqueness is intentionally scoped by (repository_id via stable_file_id join, workspace_revision, repository_relative_path), NEVER globally unique by path alone -- this is what makes PATH_REUSE_NEW_ID and CROSS-REPOSITORY-SAME-PATH hold"],
+        "indexes": ["btree(repository_relative_path)", "btree(source_identity_key)"],
+        "transactionOwner": "the canonical creator (CREATE/MODIFY events) -- read/observation only for every other consumer"
+      },
+      {
+        "name": "atlas_stable_file_alias",
+        "columns": [
+          "stable_file_id uuid NOT NULL REFERENCES atlas_stable_file_identity(stable_file_id)",
+          "repository_id uuid NOT NULL REFERENCES atlas_repository_identity(repository_id)",
+          "alias_path text NOT NULL",
+          "valid_from_revision text NOT NULL CHECK (valid_from_revision ~ '^sha256:[0-9a-f]{64}$')",
+          "valid_to_revision text CHECK (valid_to_revision IS NULL OR valid_to_revision ~ '^sha256:[0-9a-f]{64}$')",
+          "evidence jsonb NOT NULL DEFAULT '{}'"
+        ],
+        "uniqueConstraints": ["UNIQUE (stable_file_id, alias_path, valid_from_revision)"],
+        "indexes": ["btree(alias_path)"],
+        "transactionOwner": "the canonical creator, RENAME lifecycle event only -- never inferred automatically"
+      }
+    ],
+    "tombstoneSemantics": "lifecycle_state = 'TOMBSTONED' + tombstoned_at set; a tombstoned stableFileId is never reused, never re-activated, and a subsequent CREATE at the same path always mints a NEW stableFileId unless a separately-proven RENAME/continuity event says otherwise (per the design gate's explicit fail-closed rule)",
+    "aliasSemantics": "atlas_stable_file_alias rows are append-only; validToRevision null means 'this alias was valid up to the file's current/most-recent binding'; an alias is only ever written by the canonical creator on a proven RENAME event, never inferred from path/content/treeNodeId/packetId/graphify-file-uuid/git-commit similarity alone"
+  },
+  "writerOwnership": {
+    "canonicalCreator": {
+      "entrypoint": "one new script (name TBD at S01-08H/I, not written yet) -- e.g. scripts/atlas/mint-stable-file-identity-v1.mjs",
+      "transactionBoundary": "one bounded transaction per lifecycle event (CREATE, MODIFY-binding, RENAME-alias, TOMBSTONE), never a bulk unscoped mint",
+      "conflictBehavior": "CREATE is idempotent per (repository_id, first-observed source_identity_key) via an explicit dedup check BEFORE minting -- never ON CONFLICT DO NOTHING on a UUIDv7 PK, since that would silently accept a duplicate identity for what should have been recognized as SAFE_EXISTING_CONTINUITY",
+      "readback": "required after every mint -- reads its own just-written row back inside the same transaction before COMMIT, matching this gate's established S01-10E pattern",
+      "moveRenameAction": "writes exactly one atlas_stable_file_alias row recording the OLD path with valid_to_revision = the revision the move was observed at, then writes/updates atlas_stable_file_revision_binding with the NEW path -- the stable_file_id itself never changes",
+      "deleteTombstoneAction": "sets lifecycle_state = TOMBSTONED + tombstoned_at; no row is deleted (this repo's own archive-not-delete convention, applied to logical identity too)",
+      "samePathRecreateAction": "MINTS A NEW stableFileId by default; only reuses the tombstoned one if a separately-proven continuity event exists (never inferred from path equality alone -- this is the design gate's explicit rule and this repo's existing Duplication Prevention discipline applied to identity)"
+    },
+    "everyOtherWriter": "PROJECTION or LEGACY, never a second creator: graphify_files (REVISION_RECORD_ID projection), atlas_packets.file_id (legacy duplicate namespace, do not extend), atlas_source_refs/atlas_workspace_source_bindings (path/revision projections that the canonical creator READS from to decide when to mint, but never writes stableFileId itself)",
+    "hardRule": "There must not be two stableFileId generators. Confirmed this census: zero existing writers mint anything resembling stableFileId today (S01-08's own finding, 'NO_PRODUCER_OR_CONSUMER_OF_stableFileId_IN_SCRIPTS_OR_SRC', re-confirmed unchanged), so this is a green-field single-owner design, not a migration away from a second owner."
+  },
+  "lifecycleRules": {
+    "CREATE": "mint a new, opaque stableFileId (UUIDv7)",
+    "MODIFY": "same stableFileId; a new atlas_stable_file_revision_binding row with the new sourceRevision",
+    "RENAME_MOVE_SAME_REPOSITORY": "same stableFileId; a new atlas_stable_file_alias row for the old path + an updated/new binding for the new path",
+    "DELETE": "tombstone the stableFileId (lifecycle_state = TOMBSTONED); no row removed",
+    "RECREATE_SAME_PATH": "a NEW stableFileId, unless continuity is explicitly proven by a separate lifecycle event -- never inferred from path/content/treeNodeId/packetId/graphify-file-uuid/git-commit alone",
+    "SAME_RELATIVE_PATH_DIFFERENT_REPOSITORY": "a DISTINCT stableFileId, enforced structurally by the schema (bindings are scoped through stable_file_id -> repository_id, path uniqueness is never global)"
+  },
+  "migrationStages": [
+    { "stage": "S01-08F", "name": "identity/UUID census", "status": "DONE this session -- docs/reports/stable-file-uuid-role-census-v1.json" },
+    { "stage": "S01-08G", "name": "schema + owner design", "status": "DONE this session -- this document" },
+    { "stage": "STOP", "name": "explicit schema authorization required", "status": "current position -- nothing beyond this point is done" },
+    { "stage": "S01-08H", "name": "apply schema", "status": "NOT STARTED -- requires operator DDL authorization" },
+    { "stage": "S01-08I", "name": "canonical stable-file writer", "status": "NOT STARTED" },
+    { "stage": "S01-08J", "name": "bounded population/backfill preview", "status": "NOT STARTED" },
+    { "stage": "STOP", "name": "explicit backfill authorization required", "status": "future" },
+    { "stage": "S01-08K", "name": "apply exact population", "status": "NOT STARTED" },
+    { "stage": "S01-08L", "name": "lifecycle proof (tests A-F)", "status": "NOT STARTED" },
+    { "stage": "S01-08M", "name": "wire symbol upstream_file_id", "status": "NOT STARTED" },
+    { "stage": "S01-09R2", "name": "rerun SymbolIdentityV1", "status": "NOT STARTED" }
+  ],
+  "backfillClassifier": {
+    "populations": {
+      "A_rootRepositorySourcesWithExistingBindings": { "count": 24456, "note": "atlas_workspace_source_bindings rows under repo_id='deeds-web-app' at the admitted revision" },
+      "B_sixNestedRepositoriesNoRegistryIdentity": { "count": 1086, "note": "S01-08's original figure, unchanged; blocked on RepositoryIdentityV1 rows existing first" },
+      "C_repeatedRevisionsOfSameLogicalFile": { "count": "198 logical sources per S01-08's REVISION_STABILITY finding (path-constant across multiple known revisions)" },
+      "D_historicalAliasesMoves": { "count": 0, "note": "atlas_source_aliases has 0 rows; no move evidence exists anywhere, confirmed live this census" },
+      "E_possiblePathReuse": { "count": "unknown -- no lifecycle tracking has ever existed to observe this" },
+      "F_ambiguousLifecycleContinuity": { "count": "effectively all 25,542, by default, in the absence of any continuity evidence" }
+    },
+    "classificationRuleForEveryFutureCandidate": {
+      "SAFE_NEW_ID": "a source with no prior stableFileId and no continuity claim -- the default outcome for population A absent further evidence",
+      "SAFE_EXISTING_CONTINUITY": "only if a stableFileId already exists for this exact source_identity_key from a prior CREATE event",
+      "MOVE_CONTINUITY_PROVEN": "only with an explicit, separately-verified rename event (never inferred)",
+      "PATH_REUSE_NEW_ID": "a path whose most recent occupant was tombstoned -- mints a NEW id by default",
+      "REPOSITORY_NAMESPACE_MISSING": "population B, until RepositoryIdentityV1 rows exist for the 6 submodules -- ALL 1,086 nested-repo sources classify here today",
+      "AMBIGUOUS_CONTINUITY": "any case where more than one plausible predecessor exists and none can be uniquely proven",
+      "SOURCE_HISTORY_INSUFFICIENT": "no binding/observation history exists to even attempt classification"
+    },
+    "failClosedRule": "AMBIGUOUS_CONTINUITY and SOURCE_HISTORY_INSUFFICIENT rows are never defaulted to SAFE_NEW_ID automatically by a bulk script -- they are held out of S01-08K's apply population until a human or a separately-proven signal resolves them, per this gate's explicit instruction that ambiguous rows fail closed."
+  },
+  "symbolIntegrationPlan": {
+    "futureChain": "stableFileId -> stableSymbolId -> symbolVersionId -> treeNodeOccurrenceId",
+    "upstreamFileIdWiring": "atlas_symbol_versions.upstream_file_id remains untouched (NULL) through this entire design gate. Once StableFileIdentityV1 exists and is populated (S01-08K), a future S01-08M gate adds the FK reference from upstream_file_id -> atlas_stable_file_identity.stable_file_id -- not done here.",
+    "explicitSeparationFromS01-09C": "S01-09C proved upstream_node_id behaves file-scoped for 22/303 groups (13 currently reproducible in live nominations, 9 historical-only). stableFileId is NOT the fix for that defect and must never be used as a substitute for treeNodeOccurrenceId/parseNodeId. The occurrence-id defect gets its own future gate, S01-09D (TREE_NODE_OCCURRENCE_FORWARD_CORRECTION), explicitly out of scope here."
+  },
+  "rollbackPlan": {
+    "thisGate": "nothing was applied; rollback is simply discarding this design document if it is revised",
+    "futureApplyStages": "S01-08H's 4 proposed tables are purely additive -- no existing table's schema is altered, no existing FK is added pointing INTO these new tables from elsewhere (upstream_file_id's FK is deliberately deferred to S01-08M). Rollback of S01-08H/I/J/K, if ever needed before S01-08M wires the FK, is DROP TABLE on the 4 new tables with no cascade risk to any existing table."
+  },
+  "proofPlan": {
+    "testsForS01_08L": [
+      { "id": "A_MODIFY", "scenario": "same file, different content", "assertion": "same stableFileId, different sourceRevision" },
+      { "id": "B_RENAME", "scenario": "old path -> new path", "assertion": "same stableFileId; an alias/history row is recorded" },
+      { "id": "C_DELETE_RECREATE", "scenario": "old file tombstoned; new unrelated file appears at same path", "assertion": "new stableFileId, distinct from the tombstoned one" },
+      { "id": "D_CROSS_REPOSITORY_SAME_PATH", "scenario": "same relative path in two different repositories", "assertion": "distinct stableFileIds" },
+      { "id": "E_NESTED_REPOSITORY", "scenario": "all six nested repositories", "assertion": "each receives a canonical RepositoryIdentityV1 row BEFORE any stableFileId population is attempted for its sources" },
+      { "id": "F_CONCURRENT_CREATE", "scenario": "two writers race to CREATE for the same logical source", "assertion": "exactly one logical id survives deterministically (the canonical creator's transaction boundary + idempotent dedup-before-mint check is what enforces this, per writerOwnership.canonicalCreator.conflictBehavior)" }
+    ],
+    "note": "these are designed acceptance tests for the future S01-08L gate; none were run this session -- there is no code to test yet"
+  },
+  "unresolvedDecisions": [
+    "Whether atlas_source_aliases is literally repurposed (add a stable_file_id column, widen its scope) for StableFileAliasV1, or a wholly new atlas_stable_file_alias table is created as proposed above. This design recommends the NEW table, because atlas_source_aliases's existing entity model (alias-of-a-source-ref, resolution_kind/status fields) is about resolving one path string to another canonical path string, not about binding a path to an opaque logical identity across a lifecycle -- a genuinely different entity, not a shape variation of the same one.",
+    "Whether repositoryId should be derived deterministically via the existing UUIDv8 utility (sveltekit-frontend/src/lib/utils/uuid.ts) keyed on {domainClass: 'atlas.repository-identity.v1', attributes: {gitmoduleName}} -- which would make repositoryId reproducible/idempotent by construction and arguably safer against the concurrent-create race in test F -- versus minted fresh via UUIDv7 with coordinates recorded only as attributes. Both are RFC 9562-compliant; this design leans toward UUIDv7 per the design gate's stated preference for stableFileId and treats this as an open question specifically for RepositoryIdentityV1, since a repository's identity (unlike a file's) has an unambiguous, stable, non-renaming name (the .gitmodules key) that a deterministic derivation could safely key on without violating the 'no path-derived stable id' rule (a gitmodule NAME is not a mutable file path).",
+    "Whether the 24,456 root-repository population A rows should be bulk-classified as SAFE_NEW_ID candidates now (as a read-only preview) or deferred entirely until S01-08J. This design defers it -- classifying at S01-08G risk pre-committing to a population count before the schema and canonical creator exist to validate against."
+  ],
+  "acceptance": {
+    "noExistingQualifiedOwnerOverlooked": true,
+    "canonicalRepositoryNamespaceDesignExists": true,
+    "oneStableFileIdCreatorSelected": true,
+    "uuidLifecycleSemanticsExplicit": true,
+    "pathContentRevisionIndependenceExplicit": true,
+    "nestedReposCovered": true,
+    "migrationBackfillPlanFailClosed": true,
+    "noSchemaOrDataMutationPerformed": true
+  },
+  "result": "STABLE_FILE_ID_DESIGN_READY"
+}
