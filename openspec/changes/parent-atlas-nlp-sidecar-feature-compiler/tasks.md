@@ -1467,3 +1467,21 @@ writer guard, `allow_create` gate present, no forbidden-identity-input strings p
   not on writer-ownership ambiguity. Zero writes.
 - [ ] Not started, per explicit stop instruction: S01-08K apply, symbol population, POS linkage,
   retrieval, ACE/BitFrost, Valkey, HyperGraphRAG, SOM/topology, Graphify.
+
+**Correction (2026-09-22, same day, bounded follow-up check)**: SESSION-206h's
+`upstreamFileIdentityConsumption: NO_FILE_IDENTITY` finding was accurate for the repository
+function itself but incomplete about its one real caller. Direct read of
+`native-structural-materializer.mts` (lines ~292-321) found an existing **"S01-10B main-repo
+boundary guard"**: before calling `promoteNomination()`, it calls `loadBindingProvenanceV1(pool,
+[{sourceRef, sourceRevision}])` then `qualifyPromotionNominationV1(nomination, REGISTRY_REVISION,
+provenance)`, and only proceeds if `revisionVerdict.admitted` — otherwise the nomination is
+counted in `symbols_rejected_unqualified_revision` and never reaches the writer. The code's own
+comment states the rationale explicitly: *"the package promoteNomination writes registry + aliases
++ version in one transaction with no revision validation, so an unqualified nomination must never
+reach it."* **This means the LINEAGE_BLOCKED verdict was too pessimistic about the caller side** —
+a real qualification gate already exists there. **Not yet verified, flagged for a future bounded
+check, not assumed either way**: whether `qualifyPromotionNominationV1`'s admission criteria are
+equivalent to (or dependent on) the S01-08K `StableFileIdentityV1` chain specifically, or a
+narrower/different provenance check. No code changed, no receipt regenerated, no tests run this
+follow-up — a one-file read only, recorded here so the next session starts from the corrected
+picture instead of the SESSION-206h LINEAGE_BLOCKED framing alone.
