@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.source-revision-catalog-addendum.v1",
+  "gate": "S01-08G-ADDENDUM",
+  "generatedAt": "2026-09-22T02:45:00.000Z",
+  "designOnly": true,
+  "databaseWrites": 0,
+  "schemaApplied": false,
+  "supersedesNothing": "extends docs/reports/stable-file-identity-design-v1.json (S01-08G) only; does not change its recommendation or migration stages, only widens the S01-08H apply scope",
+  "origin": "operator architecture proposal (2026-09-22): canonical lineage (RepositoryIdentityV1/StableFileIdentityV1/SourceRevisionV1/SymbolIdentityV1/SymbolVersionV1/PacketRevisionV1) in deterministic Postgres/TS contracts; everything else (manifold coordinates, topology, OKF, agents, caches, retrieval) is a derived projection, never canonical identity",
+  "decision": "FOLD source-revision-catalog semantics INTO atlas_stable_file_revision_binding (already designed in S01-08G) rather than create a separate SourceRevisionV1 table. Extension-audited first, per this session's own discipline: atlas_stable_file_revision_binding already carries stable_file_id, workspace_revision, source_revision, repository_relative_path, source_identity_key, observed_at, provenance -- it is missing only content_digest and byte_length to satisfy the proposal's SourceRevisionV1 shape. repositoryId and sourceRef are already derivable via stable_file_id -> atlas_repository_identity and source_identity_key, so they are not duplicated as separate columns.",
+  "extendedColumns": [
+    "content_digest text NOT NULL CHECK (content_digest ~ '^[0-9a-f]{64}$')",
+    "byte_length bigint NOT NULL CHECK (byte_length >= 0)"
+  ],
+  "strongerProvenanceConstraint": {
+    "proposalRequirement": "source_revision shape-valid AND source_revision == sha256(content_digest) AND a binding exists for (repositoryId, stableFileId/sourceRef, workspaceRevision)",
+    "implementation": "CHECK (source_revision = 'sha256:' || content_digest) added to atlas_stable_file_revision_binding, on top of the existing source_revision ~ '^sha256:[0-9a-f]{64}$' shape check. This is a DB-enforced provenance proof, not just syntax -- the exact identity S01-10B's application-level qualifyPromotionNominationV1() already checks in TypeScript is now also structurally guaranteed at the database boundary for every row in this table, closing the gap between 'the app validated it once at write time' and 'the row can never silently violate it later'.",
+    "note": "atlas_workspace_source_bindings already carries this same relationship informally (verified live this session: all 47,936 rows satisfy source_revision == sha256:content_digest) but has no CHECK constraint enforcing it -- this addendum proposes the constraint be added to the NEW stable-file table from the start, not retrofitted onto the existing bindings table (out of scope; a separate future hardening task if desired)."
+  },
+  "downstreamWritersToldToJoinNotValidate": "Per the proposal's principle ('downstream canonical writers FK/join to this authority rather than validating the string independently'): once atlas_stable_file_revision_binding exists (S01-08H+), any FUTURE writer needing to prove a source revision is real should join against it rather than re-implement the sha256(content_digest) check inline -- S01-10B's qualifySymbolVersionRevisionsV1 already does this correctly today against atlas_workspace_source_bindings, and would migrate to join the new table once stableFileId exists and S01-08M wires upstream_file_id -- not performed here, named as the natural future integration point.",
+  "explicitlyNotBuiltThisAddendum": [
+    "RepresentationSnapshotV1 (multi-source derived objects: KMeans/PageRank/manifold) -- correctly named as future, not folded into S01-08H; it has no dependency on stableFileId existing first",
+    "atlas_manifold_coordinates (vector(4), pgvector, not PostGIS) -- same, independent future gate",
+    "atlas_topology_snapshots/nodes/edges/hyperedges -- same, independent future gate",
+    "PacketRevisionV1 -- already tracked as S01-11, unchanged by this addendum"
+  ],
+  "s01_08H_scopeNowIncludes": ["atlas_repository_identity", "atlas_stable_file_identity", "atlas_stable_file_revision_binding (widened: + content_digest, + byte_length, + stronger CHECK)", "atlas_stable_file_alias"],
+  "authorizationRequired": true,
+  "authorizationNote": "Still requires the operator's explicit DDL authorization for S01-08H before any of the (now 4, unchanged in count) tables are created. No table added, no data changed by this addendum.",
+  "result": "SOURCE_REVISION_CATALOG_ADDENDUM_DESIGN_READY"
+}
