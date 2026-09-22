@@ -1,0 +1,467 @@
+{
+  "schema": "atlas.symbol-tree-node-occurrence-cardinality.v1",
+  "generatedAt": "2026-09-22T00:42:00.092Z",
+  "gate": "S01-09C",
+  "totals": {
+    "versionRowsWithUpstreamNodeId": 479,
+    "distinctUpstreamNodeIds": 303,
+    "sharedGroupCount": 22
+  },
+  "sharedGroups": [
+    {
+      "upstreamNodeId": "d752786a-debb-430f-ad99-6abde2bedf6a",
+      "rowCount": 24,
+      "stableSymbolCount": 24,
+      "declarationHashCount": 24,
+      "qualifiedNameCount": 24,
+      "byteSpanCount": 24,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "src/lib/ai/base64-fp32-quantizer.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "44ce8579-049e-41d0-be0b-204025820fa2",
+      "rowCount": 19,
+      "stableSymbolCount": 19,
+      "declarationHashCount": 19,
+      "qualifiedNameCount": 19,
+      "byteSpanCount": 19,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "packages/parent-atlas-core/src/policy-orchestrator.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "a68c23b1-95c1-4910-b25b-3721d01f4de0",
+      "rowCount": 14,
+      "stableSymbolCount": 14,
+      "declarationHashCount": 14,
+      "qualifiedNameCount": 14,
+      "byteSpanCount": 14,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "packages/atlas-core/src/workstation-orchestrator.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "b32ed195-20d4-45fc-8900-3c2a2f49edd3",
+      "rowCount": 13,
+      "stableSymbolCount": 13,
+      "declarationHashCount": 13,
+      "qualifiedNameCount": 13,
+      "byteSpanCount": 13,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "src/hooks.server.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "f72a09e0-0b2e-433f-8e07-f58fa1951c37",
+      "rowCount": 12,
+      "stableSymbolCount": 12,
+      "declarationHashCount": 12,
+      "qualifiedNameCount": 12,
+      "byteSpanCount": 12,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "packages/parent-atlas-core/src/types.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "97112531-98b2-4c7a-a53f-51639fa33695",
+      "rowCount": 12,
+      "stableSymbolCount": 12,
+      "declarationHashCount": 12,
+      "qualifiedNameCount": 12,
+      "byteSpanCount": 12,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "src/auth-store.svelte.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "fec8f1af-f04b-47a7-a6c8-9a121e981032",
+      "rowCount": 11,
+      "stableSymbolCount": 11,
+      "declarationHashCount": 11,
+      "qualifiedNameCount": 11,
+      "byteSpanCount": 11,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "packages/parent-atlas/src/pipelines/summary-packets.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "11cccdf5-9792-4ce9-95ba-3b087ddba577",
+      "rowCount": 11,
+      "stableSymbolCount": 11,
+      "declarationHashCount": 11,
+      "qualifiedNameCount": 11,
+      "byteSpanCount": 11,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "src/global.d.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "8f47e0d5-d14a-49a1-9d49-a9d71b4d8909",
+      "rowCount": 10,
+      "stableSymbolCount": 10,
+      "declarationHashCount": 10,
+      "qualifiedNameCount": 10,
+      "byteSpanCount": 10,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "2a799c9f-f0e4-4f93-89e9-90e12b5b27ea",
+      "rowCount": 10,
+      "stableSymbolCount": 10,
+      "declarationHashCount": 10,
+      "qualifiedNameCount": 10,
+      "byteSpanCount": 10,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "packages/parent-atlas/src/core/summary-context.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "b0ade807-62c9-49ca-9816-4849b1d9243c",
+      "rowCount": 8,
+      "stableSymbolCount": 8,
+      "declarationHashCount": 8,
+      "qualifiedNameCount": 8,
+      "byteSpanCount": 8,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "packages/atlas-core/src/packet-reader.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "10480d59-7d92-4d22-a4ed-481c84eb4258",
+      "rowCount": 7,
+      "stableSymbolCount": 7,
+      "declarationHashCount": 7,
+      "qualifiedNameCount": 7,
+      "byteSpanCount": 7,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "scripts/agent/agent-scheduler-orchestrator.mjs"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "1672cf2b-fd72-4d8e-b791-9c0814270ea6",
+      "rowCount": 7,
+      "stableSymbolCount": 7,
+      "declarationHashCount": 7,
+      "qualifiedNameCount": 7,
+      "byteSpanCount": 7,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "scripts/agent/idle-review.mjs"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "5e2f4dba-fbc4-4411-9065-d21be0cb230c",
+      "rowCount": 7,
+      "stableSymbolCount": 7,
+      "declarationHashCount": 7,
+      "qualifiedNameCount": 7,
+      "byteSpanCount": 7,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "scripts/agent/ace-assembler-recommendations.mjs"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "125d7439-1128-4b38-901e-4f5485d88871",
+      "rowCount": 6,
+      "stableSymbolCount": 6,
+      "declarationHashCount": 6,
+      "qualifiedNameCount": 6,
+      "byteSpanCount": 6,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "src/app.d.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "b2406e75-39d2-4940-b796-f8eaab381911",
+      "rowCount": 6,
+      "stableSymbolCount": 6,
+      "declarationHashCount": 6,
+      "qualifiedNameCount": 6,
+      "byteSpanCount": 6,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "scripts/agent/dag-reducer.mjs"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "8f248b75-1b27-416b-ba7d-549c7649d355",
+      "rowCount": 6,
+      "stableSymbolCount": 6,
+      "declarationHashCount": 6,
+      "qualifiedNameCount": 6,
+      "byteSpanCount": 6,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "packages/atlas-core/src/policy-task-router.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "8b2175ad-a897-4e4d-8f3f-2d6a5679607c",
+      "rowCount": 5,
+      "stableSymbolCount": 5,
+      "declarationHashCount": 5,
+      "qualifiedNameCount": 5,
+      "byteSpanCount": 5,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "src/hooks.client.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "9125faa1-fabc-4058-9b02-596496a70597",
+      "rowCount": 4,
+      "stableSymbolCount": 4,
+      "declarationHashCount": 4,
+      "qualifiedNameCount": 4,
+      "byteSpanCount": 4,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "packages/parent-atlas/src/core/service-contract.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "d18ff87f-f874-4a1f-9deb-1be8f6faeb75",
+      "rowCount": 2,
+      "stableSymbolCount": 2,
+      "declarationHashCount": 2,
+      "qualifiedNameCount": 2,
+      "byteSpanCount": 2,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "src/ambient-legacy.d.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "26f3c3d9-334b-4d44-ac4a-7157e771e361",
+      "rowCount": 2,
+      "stableSymbolCount": 2,
+      "declarationHashCount": 2,
+      "qualifiedNameCount": 2,
+      "byteSpanCount": 2,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "src/lib/ai/citation-cache.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    },
+    {
+      "upstreamNodeId": "700de106-bad8-4a6c-bad5-fe9cd0e8b59b",
+      "rowCount": 2,
+      "stableSymbolCount": 2,
+      "declarationHashCount": 2,
+      "qualifiedNameCount": 2,
+      "byteSpanCount": 2,
+      "sourceRefCount": 1,
+      "sourceRefs": [
+        "src/env.d.ts"
+      ],
+      "producerRevisions": [
+        "atlas-ast-symbol-version-materializer-v1"
+      ]
+    }
+  ],
+  "rootCause": {
+    "classification": "UPSTREAM_NODE_ID_IS_FILE_SCOPED_NOT_DECLARATION_SCOPED",
+    "distinctDeclarationsWithinGroup": true,
+    "eachGroupConfinedToOneFile": true,
+    "explanation": "Every shared group has exactly ONE distinct source_ref but N distinct declaration_hash/qualified_name/byte_span values -- the sibling rows are genuinely different declarations in the same file, not duplicate registrations of one physical AST node. upstream_node_id for these rows behaves as a file-scoped identifier, not a declaration-scoped tree-node occurrence id. This means the S01-09 predicate TREE_NODE_OCCURRENCE_UNIQUE_TO_SYMBOL is correctly VIOLATED, and root-caused: it is a field-population defect in the historical writer/input for this population, not evidence that any single physical AST node is claimed by more than one symbol."
+  },
+  "affectedPopulation": {
+    "totalRows": 198,
+    "qualified": 121,
+    "unqualified": 77,
+    "producerRevisions": [
+      "atlas-ast-symbol-version-materializer-v1"
+    ]
+  },
+  "correlationWithS01_10_repair": {
+    "allStillBadVersionRows": 77,
+    "unrepairedRowsFullyInsideSharedGroups": true,
+    "note": "Every one of the 77 rows left SOURCE_NOT_IN_COHORT by S01-10C/E falls inside these 22 shared-node groups; the remaining 121 rows in these groups were successfully repaired by S01-10E (qualified revisions do not depend on upstream_node_id in any way -- these are two independent facts about the same historical population, not causally linked)."
+  },
+  "currentNominationsFileCrossCheck": {
+    "path": ".tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl",
+    "exists": true,
+    "lineCount": 461,
+    "groupsPresentInCurrentFile": 13,
+    "groupsAbsentFromCurrentFile": 9,
+    "perGroup": [
+      {
+        "upstreamNodeId": "d752786a-debb-430f-ad99-6abde2bedf6a",
+        "presentInCurrentNominationsFile": false
+      },
+      {
+        "upstreamNodeId": "44ce8579-049e-41d0-be0b-204025820fa2",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "a68c23b1-95c1-4910-b25b-3721d01f4de0",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "b32ed195-20d4-45fc-8900-3c2a2f49edd3",
+        "presentInCurrentNominationsFile": false
+      },
+      {
+        "upstreamNodeId": "f72a09e0-0b2e-433f-8e07-f58fa1951c37",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "97112531-98b2-4c7a-a53f-51639fa33695",
+        "presentInCurrentNominationsFile": false
+      },
+      {
+        "upstreamNodeId": "fec8f1af-f04b-47a7-a6c8-9a121e981032",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "11cccdf5-9792-4ce9-95ba-3b087ddba577",
+        "presentInCurrentNominationsFile": false
+      },
+      {
+        "upstreamNodeId": "8f47e0d5-d14a-49a1-9d49-a9d71b4d8909",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "2a799c9f-f0e4-4f93-89e9-90e12b5b27ea",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "b0ade807-62c9-49ca-9816-4849b1d9243c",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "10480d59-7d92-4d22-a4ed-481c84eb4258",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "1672cf2b-fd72-4d8e-b791-9c0814270ea6",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "5e2f4dba-fbc4-4411-9065-d21be0cb230c",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "125d7439-1128-4b38-901e-4f5485d88871",
+        "presentInCurrentNominationsFile": false
+      },
+      {
+        "upstreamNodeId": "b2406e75-39d2-4940-b796-f8eaab381911",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "8f248b75-1b27-416b-ba7d-549c7649d355",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "8b2175ad-a897-4e4d-8f3f-2d6a5679607c",
+        "presentInCurrentNominationsFile": false
+      },
+      {
+        "upstreamNodeId": "9125faa1-fabc-4058-9b02-596496a70597",
+        "presentInCurrentNominationsFile": true
+      },
+      {
+        "upstreamNodeId": "d18ff87f-f874-4a1f-9deb-1be8f6faeb75",
+        "presentInCurrentNominationsFile": false
+      },
+      {
+        "upstreamNodeId": "26f3c3d9-334b-4d44-ac4a-7157e771e361",
+        "presentInCurrentNominationsFile": false
+      },
+      {
+        "upstreamNodeId": "700de106-bad8-4a6c-bad5-fe9cd0e8b59b",
+        "presentInCurrentNominationsFile": false
+      }
+    ],
+    "interpretation": "13/22 of the shared upstream_node_id groups still appear in the current on-disk nominations file; 9/22 do not. This is a mixed population, not uniformly historical: some of the sharing is reproducible from current AST-grep output (a live defect in that extraction/nomination step, not just stale writer input) and some is not (produced by an input that has since been regenerated). Presence in the current file does not by itself explain the 1-node-per-file sharing pattern -- that pattern (declaration_hash/qualified_name/byte_span all distinct, source_ref always singular per group) is present regardless of whether the group's id is still in the current file."
+  },
+  "excludedActions": "No repair, backfill, dedup, or schema change performed here. No stableFileId created. No Graphify run. This is a root-cause census only.",
+  "safety": {
+    "databaseWrites": 0,
+    "historicalRowsChanged": 0,
+    "graphifyRun": false,
+    "stableFileIdCreated": false
+  },
+  "status": "TREE_NODE_OCCURRENCE_CARDINALITY_ROOT_CAUSED"
+}
