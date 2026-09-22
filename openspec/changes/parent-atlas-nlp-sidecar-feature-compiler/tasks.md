@@ -1468,6 +1468,17 @@ writer guard, `allow_create` gate present, no forbidden-identity-input strings p
 - [ ] Not started, per explicit stop instruction: S01-08K apply, symbol population, POS linkage,
   retrieval, ACE/BitFrost, Valkey, HyperGraphRAG, SOM/topology, Graphify.
 
+**Follow-up (2026-09-22, read-only implementation + v2 census):** the upstream file identifier is
+now preserved from the canonical structural chunk schema through `StructuralSymbolNominationV1`
+and the single `atlas_symbol_versions` writer. Focused structural extraction tests pass (5/5),
+the vertical integration test passes (1/1), the parent-atlas package build passes, and strict
+OpenSpec validation passes. The regenerated v2 receipt is
+`docs/reports/symbol-canonical-writer-owner-v2.json` with
+`upstreamFileIdentityConsumption=UPSTREAM_FILE_ID_PROPAGATED_STABLE_FILE_ADMISSION_OPEN` and
+`result=SYMBOL_CANONICAL_WRITER_LINEAGE_BLOCKED`. This closes the field-propagation gap but does
+not claim that the values are S01-08K stableFileIds; S01-08K remains operator-blocked and no
+database rows were written.
+
 **Correction (2026-09-22, same day, bounded follow-up check)**: SESSION-206h's
 `upstreamFileIdentityConsumption: NO_FILE_IDENTITY` finding was accurate for the repository
 function itself but incomplete about its one real caller. Direct read of
@@ -1485,3 +1496,21 @@ equivalent to (or dependent on) the S01-08K `StableFileIdentityV1` chain specifi
 narrower/different provenance check. No code changed, no receipt regenerated, no tests run this
 follow-up — a one-file read only, recorded here so the next session starts from the corrected
 picture instead of the SESSION-206h LINEAGE_BLOCKED framing alone.
+
+**Second, final correction (same day, same bounded follow-up)**: read
+`qualifyPromotionNominationV1`'s actual implementation
+(`src/lib/server/atlas/identity/symbol-revision-qualification-v1.ts`, "S01-10B"). This answers
+the "equivalent to S01-08K?" question above: **no, it is a separate, independent, already-built
+provenance mechanism**, not dependent on S01-08K. It rejects `workspace:N` placeholders, raw
+40-hex git commit SHAs, and legacy `sha256:<40hex>` shapes outright, then requires a real
+`atlas_workspace_source_bindings` row proving `sourceRef` carries exactly that `sourceRevision`
+AND that `sourceRevision === sha256:<content_digest>` of that binding — genuine content-hash-
+verified provenance via a live `SELECT`, not a format check alone
+(`loadBindingProvenanceV1`/`provenanceHolds`). Both registry admission
+(`admitLogicalSymbolRegistryV1`) and version admission (`qualifySymbolVersionRevisionsV1`) must
+independently pass. **The canonical writer's caller is not blocked on S01-08K for its own
+safety** — it already has this real, independent, fail-closed gate, distinct from and not
+requiring `StableFileIdentityV1`. Remaining open question, not checked in this bounded pass:
+whether `atlas_workspace_source_bindings` has adequate live coverage for the current corpus —
+that determines whether this gate actually admits anything today, a separate, checkable fact for
+a future session.
