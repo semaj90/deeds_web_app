@@ -4,15 +4,47 @@ import { fingerprintStructuralSource } from './structural-observation-v1.js';
 /**
  * SourceCoordinateMapV1 — per-sourceRevision UTF-8 byte <-> UTF-16 code-unit reconciliation.
  *
- * UTF-8 byte offsets are the authority (matches ast-grep's JSON output, Tree-sitter's raw byte
- * offsets, and structural-observation-v1.ts's own StructuralObservationV1 spans). UTF-16
- * code-unit positions (what LSP commonly uses, subject to per-session position-encoding
- * negotiation) are a derived projection computed once here and reused, never re-derived per
- * caller.
+ * UTF-8 byte offsets are the authority (matches ast-grep's `--json` `range.byteOffset` output,
+ * the CLI/native Tree-sitter grammar's raw byte offsets, and structural-observation-v1.ts's own
+ * StructuralObservationV1 spans). UTF-16 code-unit positions (what LSP commonly uses, subject to
+ * per-session position-encoding negotiation) are a derived projection computed once here and
+ * reused, never re-derived per caller.
+ *
+ * RUNTIME CAVEAT (found 2026-09-22, wiring symbol-kind-smoke-fanout-v1.mjs to this module; wording
+ * corrected 2026-09-22 after review -- do not overclaim a universal package API contract). Upstream
+ * `@types/tree-sitter` still documents `SyntaxNode.startIndex`/`endIndex` as byte offsets. The
+ * installed Node tree-sitter runtime used by this repo's TS/JS symbol-kind producer (`tree-sitter`
+ * 0.25.1 + `tree-sitter-typescript` 0.23.2, JS-string input mode) has been empirically proven to
+ * expose JS-string/UTF-16-code-unit indexing for that path instead (a 3-byte-UTF-8 CJK character
+ * before a `function` declaration produced `startIndex=17`, matching the UTF-16 code-unit index,
+ * not the expected UTF-8 byte index of 23 -- proof fixture + versions recorded in the smoke-fanout
+ * receipt, not just asserted here). Do NOT assume this is true of every Tree-sitter/ast-grep
+ * producer or of a future package upgrade -- other producers (ast-grep's CLI `--json` output,
+ * native/Rust grammars) retain their own proven, separately-verified coordinate basis. Any adapter
+ * whose coordinate basis is not already known to be UTF-8 bytes MUST use `createSourceOffsetConverter()`
+ * below rather than assume a conversion recipe inline -- see `SourceOffsetBasisV1` for the producer
+ * vocabulary this module expects callers to be explicit about.
  *
  * Builds on fingerprintStructuralSource() for the whole-file sha256/utf8ByteLength/
  * utf16CodeUnitLength fields rather than recomputing them (see design.md's Reuse audit).
  */
+
+/**
+ * Explicit producer/coordinate-basis vocabulary. A caller must know and declare which basis its
+ * raw offsets are in before this module will convert them -- ambiguous "index: 123" values are
+ * exactly what caused the runtime caveat above. Every producer basis normalizes, after conversion,
+ * to UTF-8 bytes (this module's own authority) -- 'UTF8_PARSER_BUFFER_V1' names that normalized
+ * target state for receipts/logging, it is not itself a distinct input basis.
+ */
+export const SourceOffsetBasisV1Schema = z.enum([
+  'AST_GREP_JSON',        // ast-grep --json range.byteOffset -- already UTF-8 bytes
+  'NATIVE_TREE_SITTER',   // native/Rust Tree-sitter grammar -- already UTF-8 bytes
+  'NODE_TREE_SITTER_JS',  // tree-sitter npm package JS Node.startIndex/endIndex -- UTF-16 code units (this runtime, proven above)
+  'LSP_UTF16',            // LSP position with negotiated 'utf-16' encoding -- UTF-16 code units
+  'LSP_UTF8',             // LSP position with negotiated 'utf-8' encoding -- already UTF-8 bytes
+  'UTF8_PARSER_BUFFER_V1', // normalized target state -- not a producer, used for receipt labeling only
+]);
+export type SourceOffsetBasisV1 = z.infer<typeof SourceOffsetBasisV1Schema>;
 export const SourceCoordinateSpanInputSchema = z
   .object({
     utf8StartByte: z.number().int().nonnegative(),
@@ -48,6 +80,7 @@ export const SourceCoordinateMapV1Schema = z
 export type SourceCoordinateMapV1 = z.infer<typeof SourceCoordinateMapV1Schema>;
 
 interface Boundary {
+  byteOffset: number;
   utf16Offset: number;
   line: number;
   byteColumn: number;
@@ -56,18 +89,24 @@ interface Boundary {
 
 /**
  * Single forward pass over `source` (iterated by codepoint, so surrogate pairs are handled
- * correctly), recording a byte-offset -> {utf16Offset, line, column} boundary at every codepoint
- * boundary. Span lookups below require utf8StartByte/utf8EndByte to land exactly on a codepoint
- * boundary (true for any real tree-sitter/ast-grep byte offset) -- an offset that doesn't is a
- * caller bug, not something to silently coerce.
+ * correctly as one unit, never split), recording a boundary at every codepoint boundary, keyed
+ * BOTH by byte offset and by UTF-16 code-unit offset from the same pass -- one shared source of
+ * truth for both lookup directions, never two independently-computed indices that could drift.
+ * A byte or UTF-16 offset that does not land exactly on a codepoint boundary (e.g. a caller
+ * mid-surrogate offset) has no entry in either map -- lookups below fail closed on that, they do
+ * not silently coerce to a nearby boundary.
  */
 function buildBoundaryIndex(source: string): {
   lineStartByteOffsets: number[];
   boundaryByByteOffset: Map<number, Boundary>;
+  boundaryByUtf16Offset: Map<number, Boundary>;
 } {
   const boundaryByByteOffset = new Map<number, Boundary>();
+  const boundaryByUtf16Offset = new Map<number, Boundary>();
   const lineStartByteOffsets: number[] = [0];
-  boundaryByByteOffset.set(0, { utf16Offset: 0, line: 0, byteColumn: 0, utf16Column: 0 });
+  const zero: Boundary = { byteOffset: 0, utf16Offset: 0, line: 0, byteColumn: 0, utf16Column: 0 };
+  boundaryByByteOffset.set(0, zero);
+  boundaryByUtf16Offset.set(0, zero);
 
   let byteOffset = 0;
   let utf16Offset = 0;
@@ -89,10 +128,47 @@ function buildBoundaryIndex(source: string): {
       byteColumn += byteLen;
       utf16Column += utf16Len;
     }
-    boundaryByByteOffset.set(byteOffset, { utf16Offset, line, byteColumn, utf16Column });
+    const boundary: Boundary = { byteOffset, utf16Offset, line, byteColumn, utf16Column };
+    boundaryByByteOffset.set(byteOffset, boundary);
+    boundaryByUtf16Offset.set(utf16Offset, boundary);
   }
 
-  return { lineStartByteOffsets, boundaryByByteOffset };
+  return { lineStartByteOffsets, boundaryByByteOffset, boundaryByUtf16Offset };
+}
+
+/**
+ * Reusable per-source UTF-16-code-unit <-> UTF-8-byte converter. Build ONCE per file/source and
+ * reuse across every observation in that file -- NOT `Buffer.byteLength(source.slice(0, idx))`
+ * repeated per symbol, which is correct but re-walks the string prefix on every call. Fails
+ * closed (throws) rather than silently coercing when an offset does not land on a real codepoint
+ * boundary (out of range, or a mid-surrogate-pair offset) -- this is the mechanism the
+ * "invalid mid-surrogate: fail closed" regression proves.
+ */
+export function createSourceOffsetConverter(source: string): {
+  utf16CodeUnitToUtf8Byte(codeUnitOffset: number): number;
+  utf8ByteToUtf16CodeUnit(byteOffset: number): number;
+} {
+  const { boundaryByByteOffset, boundaryByUtf16Offset } = buildBoundaryIndex(source);
+  return {
+    utf16CodeUnitToUtf8Byte(codeUnitOffset: number): number {
+      const boundary = boundaryByUtf16Offset.get(codeUnitOffset);
+      if (!boundary) {
+        throw new Error(
+          `createSourceOffsetConverter: UTF-16 code-unit offset ${codeUnitOffset} does not land on a codepoint boundary (out of range or mid-surrogate-pair)`,
+        );
+      }
+      return boundary.byteOffset;
+    },
+    utf8ByteToUtf16CodeUnit(byteOffset: number): number {
+      const boundary = boundaryByByteOffset.get(byteOffset);
+      if (!boundary) {
+        throw new Error(
+          `createSourceOffsetConverter: UTF-8 byte offset ${byteOffset} does not land on a codepoint boundary (out of range or mid-multibyte-sequence)`,
+        );
+      }
+      return boundary.utf16Offset;
+    },
+  };
 }
 
 export function buildSourceCoordinateMap(input: {

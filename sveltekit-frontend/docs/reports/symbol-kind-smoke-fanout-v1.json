@@ -1,0 +1,130 @@
+{
+  "schema": "atlas.symbol-wire-01-utf8-grounding.v1",
+  "generatedAt": "2026-09-22T20:22:01.500Z",
+  "corpusManifestUsed": {
+    "workspaceRevision": "1ec451233a652de4fe081dcd7aa0feb541e081ae",
+    "corpusSize": 300,
+    "generatedAt": "2026-09-22T19:37:54.196Z"
+  },
+  "coordinateBasisInput": "NODE_TREE_SITTER_JS",
+  "coordinateBasisOutput": "UTF8_PARSER_BUFFER_V1",
+  "runtimeProof": {
+    "treeSitterVersion": "0.25.1",
+    "treeSitterTypescriptVersion": "0.23.2",
+    "inputMode": "JS_STRING",
+    "fixtureChecksum": "sha256:487e0f9c5d6793c29bc38fba3ad9662b8a6412face368b8112093f501eb37c16",
+    "observedStartIndex": 17,
+    "expectedUtf16CodeUnitIndex": 17,
+    "expectedUtf8ByteIndex": 23,
+    "observedCoordinateSemantics": "UTF16_CODE_UNITS"
+  },
+  "coverageAudit": {
+    "filesParsed": 300,
+    "filesFailed": 0,
+    "totalSymbols": 13502,
+    "sourceRevisionMatched": "300/300",
+    "spanWithinSourceBytes": "13502/13502",
+    "utf8RoundTripMatched": "13502/13502",
+    "negativeLength": 0,
+    "outOfBounds": 0,
+    "projectionFailures": 0,
+    "countsBySymbolKind": {
+      "VARIABLE": 10429,
+      "FUNCTION": 2462,
+      "METHOD": 174,
+      "TYPE": 171,
+      "INTERFACE": 240,
+      "CLASS": 26
+    },
+    "unknownCount": 0,
+    "unknownRate": 0,
+    "topUnknownRawNodeTypes": []
+  },
+  "schemaValidation": {
+    "status": "PASS",
+    "okfPath": ".okf\\languages\\typescript.yaml",
+    "totalChecks": 6,
+    "failedChecks": 0,
+    "checks": [
+      {
+        "okfKindName": "function",
+        "astLabel": "function_declaration",
+        "resolvedSymbolKind": "FUNCTION",
+        "status": "PASS"
+      },
+      {
+        "okfKindName": "function",
+        "astLabel": "arrow_function",
+        "resolvedSymbolKind": "FUNCTION",
+        "status": "PASS"
+      },
+      {
+        "okfKindName": "function",
+        "astLabel": "method_definition",
+        "resolvedSymbolKind": "METHOD",
+        "status": "PASS"
+      },
+      {
+        "okfKindName": "class",
+        "astLabel": "class_declaration",
+        "resolvedSymbolKind": "CLASS",
+        "status": "PASS"
+      },
+      {
+        "okfKindName": "interface",
+        "astLabel": "interface_declaration",
+        "resolvedSymbolKind": "INTERFACE",
+        "status": "PASS"
+      },
+      {
+        "okfKindName": "type_alias",
+        "astLabel": "type_alias_declaration",
+        "resolvedSymbolKind": "TYPE",
+        "status": "PASS"
+      },
+      {
+        "okfKindName": "route_handler",
+        "status": "SKIPPED_PATTERN_BASED_NOT_AST_LABEL",
+        "reason": "no ast_labels declared (evidence/imports/symbol_patterns/path_patterns/filename_patterns-based instead -- see SESSION-206c vocabulary-ownership finding, different dimension by design)"
+      },
+      {
+        "okfKindName": "schema",
+        "status": "SKIPPED_PATTERN_BASED_NOT_AST_LABEL",
+        "reason": "no ast_labels declared (evidence/imports/symbol_patterns/path_patterns/filename_patterns-based instead -- see SESSION-206c vocabulary-ownership finding, different dimension by design)"
+      },
+      {
+        "okfKindName": "store",
+        "status": "SKIPPED_PATTERN_BASED_NOT_AST_LABEL",
+        "reason": "no ast_labels declared (evidence/imports/symbol_patterns/path_patterns/filename_patterns-based instead -- see SESSION-206c vocabulary-ownership finding, different dimension by design)"
+      },
+      {
+        "okfKindName": "hook",
+        "status": "SKIPPED_PATTERN_BASED_NOT_AST_LABEL",
+        "reason": "no ast_labels declared (evidence/imports/symbol_patterns/path_patterns/filename_patterns-based instead -- see SESSION-206c vocabulary-ownership finding, different dimension by design)"
+      },
+      {
+        "okfKindName": "layout",
+        "status": "SKIPPED_PATTERN_BASED_NOT_AST_LABEL",
+        "reason": "no ast_labels declared (evidence/imports/symbol_patterns/path_patterns/filename_patterns-based instead -- see SESSION-206c vocabulary-ownership finding, different dimension by design)"
+      },
+      {
+        "okfKindName": "component",
+        "status": "SKIPPED_PATTERN_BASED_NOT_AST_LABEL",
+        "reason": "no ast_labels declared (evidence/imports/symbol_patterns/path_patterns/filename_patterns-based instead -- see SESSION-206c vocabulary-ownership finding, different dimension by design)"
+      },
+      {
+        "okfKindName": "test",
+        "status": "SKIPPED_PATTERN_BASED_NOT_AST_LABEL",
+        "reason": "no ast_labels declared (evidence/imports/symbol_patterns/path_patterns/filename_patterns-based instead -- see SESSION-206c vocabulary-ownership finding, different dimension by design)"
+      }
+    ]
+  },
+  "overallVerdict": "SYMBOL_WIRE_01_UTF8_GROUNDING_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "notes": [
+    "Read-only. No Postgres/Qdrant/Redis writes. Corpus is a bounded, deterministic sample, not the full repo.",
+    "SCOPE (per review, deliberately narrow): this proves structural observations are correctly revision- and byte-grounded for the declared DECLARATION_NODE_TYPES set. It does NOT yet measure the live :8095 sidecar's FRAGMENT/DECLARATION/CHUNK-boundary UNKNOWN rate -- that remains SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-01, a separate follow-up.",
+    "STOP CONDITION (explicit, per review): SymbolVersion resolution, POS/ACE/retrieval linkage, BitFrost/Redis-Valkey writes, and canonical promotion are OUT OF SCOPE for this script. This is SYMBOL-WIRE-01 only -- the next step is SYMBOL-WIRE-02 (classify each observation against EXACT/REGISTRY_MISSING/AMBIGUOUS/REVISION_MISMATCH/SPAN_MISMATCH against atlas_symbol_registry/atlas_symbol_versions), not started here."
+  ]
+}

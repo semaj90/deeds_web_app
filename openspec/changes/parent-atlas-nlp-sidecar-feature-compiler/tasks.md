@@ -886,3 +886,535 @@ chain exists. Evidence below is from live `GET :8095/capabilities`, the launcher
 - **PACKET-CHUNK-LINEAGE-PREFLIGHT refresh (2026-09-20, read-only):** promotion preflight found `eligibleCandidateCount=0`, with the first failing boundary `RUN_FILE_MISSING`. Execution membership exists (25,542 rows), but requested-run file evidence is absent; packet revision matches and chunk revision matches are both 0. Candidates remain `BLOCKED_LINEAGE_AUTHORITY` for missing packet/chunk or revision mismatch. No writes or promotion authorization occurred. Report: `docs/reports/packet-chunk-lineage-promotion-preflight-v1.json`.
 - **PACKET-CHUNK-LINEAGE-BRIDGE refresh (2026-09-20, resource-guarded, read-only):** deployment relation is present with **7,421 proven rows**, but the current selected **25,271 membership rows have 0 exact current packet/chunk bridge members**. Only **577** rows have exact proven lineage against other evidence; **24,694** do not. All 25,271 classify `CURRENT_SOURCE_BINDING_MISSING`; duplicate membership identities and workspace-revision mismatches are both 0. This confirms the bridge is structurally deployed but not current-source-qualified, so packet/chunk promotion, CandidateOrdinal admission, FeatureMatrix production, and downstream semantic/cache/GPU consumers remain closed. No database, vector, cache, Graphify, or source writes occurred. Report: `docs/reports/current-packet-chunk-lineage-bridge-v1.json`.
 - **PACKET-SOURCE-SCOPE-CONTRACT test (2026-09-20):** packet-source-scope contract test passed 8/8 while preserving `OPERATOR_FOLDER_DISPOSITION_REQUIRED`, 829 folders, 61,718 packet rows, and zero writes.
+
+## SESSION-206 CONSOLIDATED-ENHANCEMENT-REQUEST-01 — owner audit before any new build (2026-09-22)
+
+Operator asked, across two messages in one turn, for a wide bundle: closing ~1,000 unclassified
+files out of ~25k, an NLP-sidecar FastAPI POS tagger, a "neural decoder prefill," word-cluster
+sub-helper metrics, `ae:train`/KMeans cosine-similarity clustering, NB/logistic-regression via
+cuBLAS GEMM/cuML/cuDF gradient descent, a SIMT/cuTile GPU feature-matrix cache for
+ontology-linked-list ↔ oaklib/NetworkX alignment, a WSL2 cuTile/RTX/TensorRT sidecar, CUDA 13.4,
+"agentic dense search" + rg-keyword sub-helper scripts, and agentic error-fixing wiring. Per this
+repo's Duplication Prevention rule (CLAUDE.md "🚫 Duplication Prevention — Audit Before You
+Build"), grepped for an existing owner of each piece before adding any task. Every piece already
+has one; nothing here is a green-field build. Table below records the owner and the real next
+step. No code was written by this pass — it only updates the task ledger.
+
+| Requested piece | Existing owner (verified live/on-disk, this session) | Status | Next task |
+|---|---|---|---|
+| "~1,000 unknowns from 25k files" | **Unverified as stated.** The real, currently-tracked ~25k-scale blocked cohort is `PACKET-CHUNK-LINEAGE-BRIDGE`'s 25,271 membership rows (`CURRENT_SOURCE_BINDING_MISSING`, 0 exact bridge members) and the 25,542-row `PACKET-CHUNK-LINEAGE-PREFLIGHT` cohort (`RUN_FILE_MISSING`) — both above, same file. `DOMAIN-REVIEW-SHEET` (142 rows, 49 revision-qualified) is the actual domain-*label* cohort and is two orders of magnitude smaller than "1,000." No script or report in this repo currently emits a "1,000 unclassified of 25k" figure. | **NOT_PROVEN — number needs a source** | Do not build against an unverified count. Run `npm run atlas:docs:capability-census` (or the `domain_class` distribution directly: `SELECT domain_class, count(*) FROM atlas_packets GROUP BY 1 ORDER BY 2 DESC`) and compare to whatever produced "1,000/25k" for the operator before scoping work to it. |
+| Domain classification taxonomy / closing unknowns | `python/train_domain_classifier.py` (offline sklearn NB+LR trainer, canonical per CLAUDE.md "CLASSIFICATION-GATE-01"), `python/atlas_nlp_classification_helper_v1.py` (read-only FastAPI seam), `docs/reports/domain-review-sheet-v1.html` (human-label intake, 142/49 rows) | Trust floor not met: 49 revision-qualified rows vs. the 200-row / 30-per-class floor CLAUDE.md sets | Grow the reviewed set via the existing review-sheet workflow (`node scripts/atlas/build-domain-review-sheet-v1.mjs`) — do not add a second labeling tool or a second trainer. |
+| NLP sidecar FastAPI + POS tagger | `python/miniforge_nlp_sidecar.py` / `miniforge_nlp_sidecar_v2.py` (live `:8095`, spaCy POS confirmed available per `ACP-NLP-SIDECAR-LIVE-PROOF` above), `python/parent_atlas_ontology/enums.py` | Live, evidence-executor only (`canonicalAuthority=false` by design) | No new sidecar. If POS output needs to reach a new consumer, extend the existing `atlas.ast.evidence.v1` envelope — do not stand up a second `:80xx` FastAPI process for POS. |
+| "Neural decoder prefill" | `atlas-neural-decoder` Docker GPU service (`docker/atlas-neural-decoder/`, port 8121, `PrefillReceiptV1`/`PrefillContentIdentityV1` boundary — see CLAUDE.md's Neural Decoder Container section) | `DECODER-CONTAINER-01` closed, live-proven | Already exists; if this request meant something else (a *classification*-specific prefill lane), it needs a one-line clarification from the operator — do not build a second decoder container on the strength of a guess. |
+| Word-cluster sub-helper metrics / rg keyword helpers | `scripts/atlas/build-rg-search-matrix.mjs`, `scripts/atlas/hot-keyword-cluster-summary.mjs` (both present on disk) | Present, not audited this session for live-caller status | Before adding new rg/keyword helper scripts, run their existing `--dry-run` (if present) and check for live `npm run` wiring in `package.json`; extend these two rather than adding a third. |
+| `ae:train` / KMeans cosine clustering | `scripts/atlas/kmeans-chunk-cluster.py` (real cuVS/cuML KMeans on WSL2 `atlas-rapids-cu13`, `npm run atlas:kmeans:apply` family — k=64/128/256 all wired), `scripts/atlas/compute-som-centroids.mjs`, `scripts/atlas/kmeans-summary-enrichment.mts` | Live, pinned to CUDA 13.0/RAPIDS 26.06 per GPU-MINI-FABRIC-01 | No new KMeans/AE trainer. An `ae:train` alias for the existing autoencoder (`latent_64`/`128`/`256`, see CLAUDE.md Embedding Dimensions Policy) would be a thin npm-script wrapper at most, not a new algorithm. |
+| NB / logistic-regression / gradient descent via cuBLAS GEMM, cuML, cuDF | `python/train_domain_classifier.py` (NB+LR, sklearn, CPU, canonical per CLASSIFICATION-GATE-01), `python/atlas_rapids_sidecar.py`, `python/atlas_semantic512_build_routing.py`, `python/atlas_semantic512_runtime.py`, `python/atlas_contextual_feature_reference.py` (all already reference cuML) | sklearn baseline is canonical; a cuML/GEMM version would be a **challenger**, never a replacement, until it beats the baseline on the same reviewed set | Per CLAUDE.md's explicit rule under CLASSIFICATION-GATE-01: "No PyTorch logistic-regression trainer exists; one would be a challenger behind the sklearn baseline, only after a reviewed set exists." The reviewed set (49/200 rows) is the actual blocker — a GPU trainer cannot be evaluated without it. |
+| SIMT/cuTile GPU feature-matrix cache for ontology linked-lists ↔ oaklib/NetworkX | `python/atlas_oak_kernel.py` (live FastAPI kernel, `:8095`-adjacent, owned by the separate `parent-atlas-ontology-kernel` change — see Session 204 memory correction), `openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap/` (29/7 tasks, TS resolver layered *above* the Python kernel, not a duplicate), `native/cutile-ace-level2/`, `native/cutile-ace-level3/` (glyph-score/residency-key GPU proving ground, `DRY_RUN_PROVEN` both SIMT and Tile levels) | Layered, both halves already proven at small scale | A feature-matrix GPU cache for ontology/NetworkX alignment is new scope on top of proven primitives, not a new primitive. Route it through `parent-atlas-ontology-oaklib-fanout-bitmap`'s Phase 4 (not started) rather than opening a new change — see that file's own task list before adding here. |
+| WSL2 cuTile/RTX/TensorRT sidecar, CUDA 13.4 | `atlas-rapids-cu13` (WSL2 conda env, **pinned** CUDA 13.0/RAPIDS 26.06 — CLAUDE.md: "Do not create a second RAPIDS environment... without first demonstrating this environment is unusable"), `atlas-cutile-cu132` (separate pip venv, cuTile 1.5.0, CUDA 13.2, proven `DRY_RUN_PROVEN` through LEVEL 3), TensorRT (referenced in the 8-tier inference cascade at `:8099`, not confirmed installed this session) | Two GPU envs already exist and are pinned by explicit operator-recorded decision | **CUDA 13.4 is an operator decision, not a default action** — do not install it. If TensorRT-RTX specifically (vs. the existing TensorRT-LLM `:8099` tier) is the actual ask, that's a distinct, unverified capability gap — confirm with the operator before installing anything net-new per `DEPENDENCY-CAPABILITY-GUARD-01`. |
+| "Tricubic" (as stated) | **No match anywhere in the repo** (`git grep -i tricubic` / filesystem search, this session, zero hits outside node_modules/.venv) | Undefined term in this codebase | Needs a one-line clarification — likely meant is either (a) tricubic *interpolation* over the SOM 20×20 grid / 4D topology manifold (CLAUDE.md's "Topology 6-tier fallback clusters" / `topology_search_4d`), or (b) a mis-typing of "tri-gram"/"trie". Do not guess and build the wrong one. |
+| Agentic dense search | `mcp__trace__atlas_packet_dense_search` (closed this cycle per user memory — Postgres bitmap-index prefilter + Qdrant dense-ANN rerank, Recall@10=100% on its proof set), `atlas.packet_search`, `search_hybrid`, `search_rerank` (all live TRACE MCP tools) | Live | Extend the existing dense-search tool's query surface (e.g. wire the ~1,000/25k cohort once the real count is confirmed) rather than adding a second dense-search entry point. |
+| Agentic error fixing | `atlas:error:audit` → `atlas:error:plan` → `atlas:error:apply` → `atlas:error:verify` → `atlas:error:trace` (full P1 pipeline, `npm` scripts confirmed present) | Live pipeline exists; not re-verified live this session | Run `npm run atlas:error:audit:verbose` from `sveltekit-frontend/` to get current findings before deciding whether "update agentic error fixing" means a bug in this pipeline or a request to route classification failures through it. |
+
+**Net effect of this pass:** zero new files, zero new services, zero schema changes. Every
+requested capability maps onto an existing owner; the one genuinely blocking, common dependency
+across the classification-adjacent asks (domain unknowns, NB/LR-vs-cuML challenger comparison,
+ontology/oaklib fanout) is still `CLASSIFICATION-GATE-01`'s reviewed-set floor (49 of 200+30/class
+required). **Recommended real next action, in order:** (1) confirm the actual "unknowns" count
+against live `atlas_packets.domain_class`/`atlas_ast_nodes` data — do not build against the
+unverified "1,000/25k" figure; (2) grow the domain review sheet toward the 200/30-per-class floor;
+(3) only then evaluate a cuML/GPU challenger classifier against the sklearn baseline; (4) treat
+CUDA 13.4, the cuTile/TensorRT-RTX sidecar, and the ontology feature-matrix GPU cache as
+operator-gated follow-ons on `parent-atlas-ontology-oaklib-fanout-bitmap` Phase 4+, not new changes.
+
+## SESSION-206b — "is function a symbol?" is already answered; the real gap is coverage + linking (2026-09-22)
+
+Operator follow-up: "keyword recognition symbol = function? ast-grep didn't define this... POS
+tagger/symbol metadata enrichment ontology linked tuples? 4D topology manifold coordinates of
+indexed tables of what the keyword/function is/does/relates to (tuple)." Read the actual code
+before answering — this is already partially built, not a green-field question.
+
+**Finding 1 — the symbol-kind vocabulary already exists and answers the literal question.**
+`sveltekit-frontend/src/lib/server/atlas/indexing/structural-observation-v1.ts` defines
+`StructuralSymbolKindV1 = FILE | FUNCTION | METHOD | CLASS | INTERFACE | TYPE | ENUM | VARIABLE |
+UNKNOWN` and `normalizeStructuralSymbolKind(rawKind, rawNodeType)`, which maps raw ast-grep/
+tree-sitter node kinds (`function_declaration`, `arrow_function`, `method_definition`, etc.) onto
+that enum. **`ast-grep` itself never defines "is this a symbol" — this normalizer is the layer
+that does, and it already exists.** `UNKNOWN` is a deliberate, documented fallback (see the
+function's own comment: "Deliberately do not coerce FRAGMENT/DECLARATION/CHUNK into a symbol
+kind... cannot prove semantic symbol class") — not a missing case. `atlas_symbol_registry.symbol_kind`
+(migration `20260818_atlas_symbol_registry_v1.sql`) is the durable Postgres column this normalizer's
+output is meant to feed, via `graphify-symbol-writer-v1.ts`/`graphify-symbol-projection-v1.ts`.
+
+**Finding 2 — a second, differently-scoped `symbol_kind` vocabulary already exists too, and is not
+a duplicate to merge.** `scripts/atlas/lib/okf-schema.mts`'s `SymbolKindSchema` (per-language
+`.okf/*.yaml` manifests) is a *domain-evidence weighting* concept (`weight`, `evidence_weight`,
+`ast_labels`, used to score "does this symbol kind suggest the AUTH/DATA/UI domain"), not a
+structural-type enum. Same field name, genuinely different capability — layered ownership per
+CLAUDE.md's "One Canonical Runtime Owner Per Capability" rule, not something to consolidate. Flag
+only: nothing currently cross-validates that every `ast_labels` entry in the `.okf` YAML actually
+maps to a real `StructuralSymbolKindV1` value — this is exactly the "schema validation testing"
+the operator asked about, and it does not exist yet.
+
+**Finding 3 — no corpus-wide symbol classifier or coverage audit exists.** `rg -l "symbol.classifier|classifySymbol|symbolClassif"` across `src/`, `scripts/atlas/`, and `python/` returns
+zero hits. `normalizeStructuralSymbolKind` is called per-chunk inside the structural-evidence
+pipeline, but nothing aggregates `UNKNOWN` vs. classified counts across the corpus, and nothing
+compares the two `symbol_kind` vocabularies (Finding 1 vs. Finding 2) against each other. **This
+is almost certainly the real source of whatever "~1,000 unknowns" figure prompted this request** —
+not a missing classifier, but a missing *measurement* of the existing one's `UNKNOWN` rate.
+
+**Finding 4 — POS/symbol linkage is real but not yet joined to symbol identity.**
+`atlas_ontology_linked_tuples` (`drizzle/manual/20260825_atlas_ontology_linked_tuples.sql`) already
+carries `label_kind IN ('pos','tag','ontology')`, `part_of_speech`, `surface_text`, `token_index`,
+`tree_node_id`, `packet_key`, `source_ref`, `evidence_span`, `confidence`, `provenance` — a real POS
++ ontology tuple store, populated by `pos-concept-tagging-lane.ts` /
+`source-pos-concept-packet.ts` from the live `:8095` NLP sidecar (spaCy). **It has no column
+referencing `atlas_symbol_registry.stable_symbol_id` or `atlas_symbol_versions.symbol_version_id`.**
+So a POS tag on a token inside a function body is not currently linkable back to "this token is
+inside symbol X, which is a FUNCTION." That join is the concrete missing piece for "symbol metadata
+enrichment ↔ ontology linked tuples."
+
+**Finding 5 — "4D topology manifold coordinates of what the function is/does/relates to" has no
+join point yet, and building one now would be premature.** SOM cell coordinates
+(`atlas_packets.som_cell_x/y`) are per-*packet*, not per-*symbol*, and CLAUDE.md's own
+`SOM_REVISION_PROVENANCE_01` finding (2026-09-20) already recorded this lane `BLOCKED`: the two
+coordinate conventions on `atlas_packets` (`som_cell_x/y` vs `som_row/som_col`) disagree on 99.7%
+of rows, `som_revision` is null on all assigned rows, and the SOM codebook's own assignments file
+is keyed by `codebase_chunk_index.id`, not by any symbol or packet identity. Joining "4D manifold
+coordinates" onto symbols now would inherit that same unresolved-revision problem. Do not build
+this join before `SOM_REVISION_PROVENANCE_01`'s blocker (a fresh, checksum-versioned SOM run) is
+cleared.
+
+**Concrete next tasks (in dependency order):**
+- [x] `SYMBOL-KIND-COVERAGE-AUDIT-01` (2026-09-22, DRY_RUN_PROVEN, corpus-scoped) — implemented
+  as two scripts: `scripts/atlas/define-symbol-kind-corpus-v1.mjs` (deterministic, git-tracked,
+  bounded corpus definition; excludes `.svelte`/`.svelte.ts`/`.d.ts` with the reason recorded in
+  the manifest) and `scripts/atlas/symbol-kind-smoke-fanout-v1.mjs` (fans out with bounded
+  concurrency, parses each file with real `tree-sitter-typescript`, classifies every declaration
+  node through the actual canonical `normalizeStructuralSymbolKind` -- reused, not reimplemented).
+  Real run: 300/5,557 eligible files sampled, 300 parsed with 0 failures, 13,502 symbols
+  classified (VARIABLE 10429, FUNCTION 2462, METHOD 174, INTERFACE 240, TYPE 171, CLASS 26).
+  Receipts: `docs/reports/symbol-kind-corpus-v1.json`, `docs/reports/symbol-kind-smoke-fanout-v1.json`.
+  **Scope caveat, recorded in the receipt itself, not hidden**: this walk only visits node types
+  it already knows how to classify, so its 0% UNKNOWN rate is partly tautological -- it does NOT
+  yet measure the corpus-wide UNKNOWN rate the live `:8095` sidecar's real FRAGMENT/DECLARATION/
+  CHUNK-boundary chunk output would produce against the same normalizer. That remains open (see
+  follow-up below) -- this task closes the "define a corpus + fan out a smoke test" deliverable,
+  not the full "what is the real unknowns number" question.
+- [x] `SYMBOL-KIND-SCHEMA-VALIDATION-01` (2026-09-22, APPLY_PROVEN, 3/3 tests passing) — added
+  `src/lib/server/atlas/indexing/symbol-kind-schema-validation-v1.spec.ts`: asserts every
+  `ast_labels` entry in `.okf/languages/typescript.yaml`'s `symbol_kinds` map resolves through
+  `normalizeStructuralSymbolKind` to a non-`UNKNOWN` `StructuralSymbolKindV1` value (6/6 labels
+  pass; entries without `ast_labels` -- route_handler/schema/store/hook -- are out of scope by
+  design), locks the "symbol = function?" mapping down as a regression assertion, and proves
+  `FRAGMENT`/`DECLARATION`/`CHUNK`/`null` deliberately stay `UNKNOWN`. Verified live via
+  `npx vitest run src/lib/server/atlas/indexing/symbol-kind-schema-validation-v1.spec.ts`:
+  `Test Files 1 passed (1)`, `Tests 3 passed (3)`.
+- [x] `SYMBOL-KIND-UTF16-UTF8-SPAN-GROUNDING-01` (2026-09-22, APPLY_PROVEN) — operator asked
+  whether the symbol corpus has "LSP UTF-16 to UTF-8" handling wired. It didn't; wired it for
+  real using the existing canonical module rather than a new one. **Found and fixed a real,
+  previously-undocumented gap**: `source-coordinate-map-v1.ts`'s header comment claimed UTF-8
+  byte-offset parity with "Tree-sitter's raw byte offsets" generally, but the `tree-sitter`
+  **npm package's** JS `Node.startIndex`/`Node.endIndex` are verified empirically to be UTF-16
+  code-unit offsets, not bytes (a 3-byte CJK character before a `function` declaration produced
+  `startIndex=17`, matching the UTF-16 code-unit index, vs. the correct UTF-8 byte index of 23).
+  Corrected the header comment with the caveat and the exact conversion recipe
+  (`Buffer.byteLength(source.slice(0, node.startIndex), 'utf8')`); added a regression test to
+  `source-coordinate-map-v1.spec.ts` (same astral-emoji fixture as the existing ast-grep test,
+  proving both input sources converge on the identical `SourceCoordinateSpanV1`) -- verified live:
+  `Test Files 1 passed (1)`, `Tests 6 passed (6)`. Wired `symbol-kind-smoke-fanout-v1.mjs` to
+  convert every classified symbol's span and run it through `buildSourceCoordinateMap()` (reused,
+  not reimplemented) for a proper line/UTF-16-column/UTF-8-byte-column projection. Reran live:
+  **13,502/13,502 symbols coordinate-grounded (rate=1.0), 0 coordinate errors, 0 file failures**
+  across the 300-file corpus. Receipt: `docs/reports/symbol-kind-smoke-fanout-v1.json`
+  (`coverageAudit.coordinateGroundedRate`/`coordinateErrorFiles`).
+- [ ] `SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-01` (new follow-up, not started) — rerun the fan-out
+  audit against real `AtlasStructuralEvidenceChunk` output from the live `:8095` sidecar (not a
+  fresh tree-sitter walk with a pre-filtered node-type allowlist) to get the actual corpus-wide
+  UNKNOWN rate, i.e. the real number behind "~1,000 unknowns of 25k". This is what
+  `SYMBOL-KIND-COVERAGE-AUDIT-01` above deliberately stopped short of.
+- **Explicitly deferred, not wired (operator asked, answered honestly, not built without a clear
+  go-ahead)**: simdjson (wrong tool for this file size -- plain `JSON.stringify`/`YAML.parse` is
+  correct here), BitFrost/Redis-Valkey centroid writes (would require live-cache write authority
+  this pass was not given, and this repo's hard rule is Postgres-first/no-speculative-cache-write),
+  Ewin Tang low-rank sampling (unrelated capability -- retrieval candidate shortlisting, not
+  symbol classification), ACE hypergraph RAG fanout (this script's "fan out" is a plain bounded-
+  concurrency worker pool over files, not the ACE hypergraph retrieval mechanism -- same word,
+  different thing, flagged so it isn't conflated later).
+
+## SESSION-206c — external review correction + SESSION-206b re-sequenced (2026-09-22)
+
+An external review of SESSION-206b (pasted in full into this session) confirmed the AST-node-kind
+/ structural-symbol-kind / symbol-identity boundary this change already established, sharpened
+what "measure UNKNOWN" should actually mean, and **corrected one factual claim this file
+previously made**: that `atlas_ontology_linked_tuples` was "live and populated by spaCy." It is
+not. Re-verified live against Postgres before accepting or rejecting the correction, per this
+repo's own evidence discipline -- **the review was right, the earlier framing was wrong**:
+
+```sql
+SELECT count(*), count(*) FILTER (WHERE label_kind='pos'), count(DISTINCT source_ref)
+FROM atlas_ontology_linked_tuples;
+--  0 | 0 | 0
+```
+
+**Corrected picture, more nuanced than either the original claim or a flat "nothing's wired"**:
+- `atlas_ontology_linked_tuples`: real table, 0 rows, genuinely missing `source_revision`/
+  `workspace_revision` columns (only has `relation_revision`/`producer_revision`) -- confirmed via
+  `\d atlas_ontology_linked_tuples`, matching the review's point exactly.
+- A real Postgres writer, `persistOntologyLinkedTuples()` (`ontology-linked-tuple-postgres.ts`),
+  **is wired** into `taxonomy-topology-packet.ts` (called at the point where `summary.linkedTuples`
+  is persisted, with a `.catch()` fallback that swallows write failures into a
+  `{written:0, errors:[...]}` shape rather than throwing) -- and `taxonomy-topology-packet.ts`'s
+  `buildTaxonomyTopologyPacket()` **is** called from a registered tool in `src/mcp/trace-mcp-server.ts`.
+  So this is not dead code -- it is wired, real, and has apparently never produced a successful row
+  (reason unconfirmed: never invoked in this environment, upstream `linkedTuples` always empty, or
+  a silent write failure the `.catch()` is hiding -- not investigated further this pass).
+- Its default `labelKind` is `'tag'` (`labelSource` defaults to `'semantic_tagger'`) -- this writer
+  path is for tag/ontology-kind tuples, not POS-kind ones.
+- `pos-concept-tagging-lane.ts` / `buildPosConceptTaggingPacket()` (the real spaCy-backed lane,
+  called from `code-evidence-synthesizer.ts`, `daily-graphify-board-recommendations.ts`,
+  `trace-mcp-server.ts`, and the live route `routes/api/atlas/concept-tagging/+server.ts`) has
+  **zero references** to `atlas_ontology_linked_tuples` or the ontology-tuple contract anywhere --
+  confirmed via grep, not assumed. **The review's core claim is correct specifically for POS**:
+  POS evidence does not reach this table today, through any path found.
+
+**Vocabulary-ownership check (206b-02), resolved**: `okf-schema.mts`'s `SymbolKindSchema` export
+has zero production callers (only this change's own new schema-validation spec references the
+underlying YAML directly) -- safe to rename later with no blast radius. Combined with the earlier
+finding that 3 of its 7 `.okf/languages/typescript.yaml` `symbol_kinds` entries
+(`route_handler`/`schema`/`store`/`hook`) are defined by `evidence`/`imports`/`symbol_patterns`/
+`path_patterns`/`filename_patterns` rather than `ast_labels`: **this is a different dimension**
+(domain-evidence weighting for feature/domain classification) from `StructuralSymbolKindV1`
+(language-independent AST-node normalization), not the same concept under a colliding name.
+Per the review's rule ("are they intended to model the same dimension? NO -> rename both so
+accidental interchange is impossible"): recommend renaming the OKF-side export to
+`FeatureDomainSymbolKindSchema` (or similar) as a follow-up -- not done in this pass, since it
+touches a type name referenced by nothing live and isn't urgent, but recorded so nobody validates
+the two for equality later under the mistaken assumption they're the same enum.
+
+**Adopted, verbatim, as an explicit invariant for this change going forward** (per the review):
+
+```
+ast-grep raw node kind  ≠  canonical symbol kind  ≠  symbol identity  ≠  POS tag  ≠  topology coordinate
+```
+
+**SESSION-206b task list re-sequenced per the review's ordering** (supersedes the flat list above):
+
+- [x] `206b-01 STRUCTURAL-SYMBOL-KIND-COVERAGE` — done as `SYMBOL-KIND-COVERAGE-AUDIT-01` above.
+  **Refinement accepted, not yet implemented**: the review is right that raw UNKNOWN count is the
+  wrong headline number -- the one that matters is **UNKNOWN observations reaching canonical
+  `atlas_symbol_registry` promotion**, not UNKNOWN observations in general (chunk-boundary/
+  fragment noise that never gets promoted is a completely different severity than 1,000 promoted
+  `symbol_kind='UNKNOWN'` registry rows). Follow-up, not started: extend the coverage audit to
+  join against `atlas_symbol_registry`/`atlas_symbol_versions` and report the promoted-UNKNOWN
+  count separately from the raw-observation-UNKNOWN count, broken down by raw node kind, language,
+  producer, and source revision, per the review's exact breakdown list.
+- [x] `206b-02 SYMBOL-VOCABULARY-OWNERSHIP` — resolved above: different dimension, not the same
+  concept, rename recommended (not executed) since nothing live calls the OKF export.
+- [x] `206b-03A POS-STORAGE-OWNER-CENSUS` — done above, live-verified: `persistOntologyLinkedTuples`
+  is wired but zero rows produced; the POS lane specifically never reaches this table by any path.
+- [ ] `206b-03B SYMBOL↔TOKEN-LINK-CONTRACT` (not started, correctly blocked on schema work) — per
+  the review: join must go token evidence → exact `sourceRevision`/byte span → `SymbolVersionV1`
+  → `stable_symbol_id`, never token → `stable_symbol_id` directly (that would discard the revision
+  the token was observed under). Requires `source_revision`/`workspace_revision` columns on
+  `atlas_ontology_linked_tuples` first (confirmed missing above) -- this is now a precondition of
+  `ONTOLOGY-TUPLE-SYMBOL-LINK-01` from SESSION-206b, not a parallel task.
+- [ ] `206b-04 TOPOLOGY-SYMBOL-LINK` — stays `BLOCKED`, unchanged from SESSION-206b's
+  `SOM-SYMBOL-TOPOLOGY-JOIN-01`. Review's added detail for whenever it unblocks: the contract
+  should be `SymbolVersionV1 + RepresentationSnapshotV1 -> TopologyProjectionV1 -> {somCoordinate,
+  cluster, community}` keyed by `representationRevision`/`somRevision`/`candidateSnapshotRevision`
+  -- the coordinate is a fact true *under a specific representation snapshot*, never part of
+  symbol identity itself.
+
+No canonical writes were performed by this correction pass -- read-only census + task-ledger
+update only, consistent with every other entry in this section.
+
+## SESSION-206d — SYMBOL-WIRE-01: UTF-8 grounding wired for real, exit condition met, STOP (2026-09-22)
+
+Second external review, narrowly scoped this change to "SYMBOL-WIRE-01" and specified an exact
+exit condition + explicit stop condition. Implemented exactly that, nothing further.
+
+**What changed** (all in `source-coordinate-map-v1.ts`, its spec, and `symbol-kind-smoke-fanout-v1.mjs`):
+
+1. **Corrected the overclaim from SESSION-206b's comment.** The prior wording asserted "the
+   tree-sitter npm package returns UTF-16 offsets" as if it were a documented package contract.
+   It is not -- upstream `@types/tree-sitter` still documents `startIndex`/`endIndex` as byte
+   offsets. Reworded to: this repo's *installed runtime* (`tree-sitter` 0.25.1 +
+   `tree-sitter-typescript` 0.23.2, JS-string input mode) has been *empirically proven* to expose
+   UTF-16 code-unit indexing for this path -- with the exact versions, input mode, and a fixture
+   checksum now recorded in every fan-out receipt (`runtimeProof` field) so a future package
+   upgrade that changes this behavior is *detectable*, not silently trusted forever.
+2. **Added a reusable, canonical converter** -- `createSourceOffsetConverter(source)`, built ONCE
+   per file, exposing `utf16CodeUnitToUtf8Byte()`/`utf8ByteToUtf16CodeUnit()`. Replaces the prior
+   per-symbol `Buffer.byteLength(source.slice(0, idx), 'utf8')` recomputation (correct but
+   wasteful across 13,502 observations). Fails closed (throws) on out-of-range or
+   mid-surrogate/mid-multibyte offsets rather than silently coercing.
+3. **Added an explicit producer/coordinate-basis vocabulary** (`SourceOffsetBasisV1`:
+   `AST_GREP_JSON | NATIVE_TREE_SITTER | NODE_TREE_SITTER_JS | LSP_UTF16 | LSP_UTF8 |
+   UTF8_PARSER_BUFFER_V1`) so a caller must be explicit about which basis its raw offsets are in
+   -- the ambiguous "index: 123" problem the review flagged.
+4. **Full regression matrix added** to `source-coordinate-map-v1.spec.ts` (15 tests total now,
+   all passing): ASCII (offsets equal), BMP non-ASCII (é/漢, genuine divergence, exact
+   conversion), ASTRAL (😀 surrogate pair, exact), MIXED (ASCII+CJK+emoji), BOM (counted
+   correctly in both spaces, matches `fingerprintStructuralSource`), ROUND TRIP (every valid
+   boundary in a mixed fixture, utf16→utf8→utf16), INVALID MID-SURROGATE (fails closed, both
+   directions -- UTF-16-side and UTF-8-side), OUT OF BOUNDS (fails closed). Verified live:
+   `Test Files 1 passed (1)`, `Tests 15 passed (15)`.
+5. **`symbol-kind-smoke-fanout-v1.mjs` rewritten** to the full pipeline the review specified:
+   `tree-sitter node -> createSourceOffsetConverter -> UTF-8 byte span -> projectStructuralObservation()
+   -> StructuralObservationV1 -> normalizeStructuralSymbolKind()` -- not just kind classification,
+   real canonical span-grounded observations. Reran live on the same 300-file corpus:
+
+```
+Files parsed: 300  failed: 0
+Total symbols classified: 13,502
+sourceRevisionMatched:    300/300
+spanWithinSourceBytes:    13,502/13,502
+utf8RoundTripMatched:     13,502/13,502
+negativeLength: 0   outOfBounds: 0   projectionFailures: 0
+Schema validation: PASS (0/6 failed)
+runtimeProof.observedCoordinateSemantics: UTF16_CODE_UNITS (tree-sitter 0.25.1 / tree-sitter-typescript 0.23.2)
+Overall: SYMBOL_WIRE_01_UTF8_GROUNDING_PROVEN
+```
+
+**Exit condition, verified met exactly as specified**: 300/300 source revisions, 13,502/13,502
+projected observations, 0 byte-span mismatches, non-ASCII/astral/round-trip regressions PASS,
+coordinate round-trip PASS. Receipt: `docs/reports/symbol-kind-smoke-fanout-v1.json`
+(`schema: 'atlas.symbol-wire-01-utf8-grounding.v1'`, `overallVerdict:
+'SYMBOL_WIRE_01_UTF8_GROUNDING_PROVEN'`).
+
+**STOP, per explicit instruction.** SymbolVersion resolution (SYMBOL-WIRE-02: classify each
+observation as EXACT/REGISTRY_MISSING/AMBIGUOUS/REVISION_MISMATCH/SPAN_MISMATCH against
+`atlas_symbol_registry`/`atlas_symbol_versions`), POS/keyword linkage, feature matrices,
+CandidateOrdinal, retrieval, BitFrost/ACE, and prefill consumption are all explicitly **not
+started** and not to be started until SYMBOL-WIRE-02 is separately scoped. No canonical writes
+were performed anywhere in this pass -- read-only proof + task-ledger update only.
+
+- [x] `SYMBOL-WIRE-01` (2026-09-22, DRY_RUN_PROVEN -- exit condition met exactly)
+
+## SESSION-206e — SYMBOL-WIRE-02: registry classification against real Postgres data (2026-09-22)
+
+Instructed to continue to SYMBOL-WIRE-02 as scoped by the review: classify each SYMBOL-WIRE-01
+observation as EXACT/SPAN_MISMATCH/REVISION_MISMATCH/AMBIGUOUS/REGISTRY_MISSING against
+`atlas_symbol_registry`/`atlas_symbol_versions`. Read-only (SELECT only), no promotion.
+
+**Implementation**: extracted the shared parse+ground+project pipeline out of
+`symbol-kind-smoke-fanout-v1.mjs` into `scripts/atlas/lib/symbol-wire-observation-runner.mjs`
+(both SYMBOL-WIRE-01 and -02 now import it -- avoids duplicating the UTF-8 grounding logic per
+this repo's Duplication Prevention rule). Reran SYMBOL-WIRE-01 after the refactor: **identical
+results** (300/300, 13,502/13,502, `SYMBOL_WIRE_01_UTF8_GROUNDING_PROVEN`) -- confirms the
+extraction changed nothing behaviorally. New script: `scripts/atlas/symbol-wire-02-registry-classification.mjs`.
+
+**Real finding, discovered mid-implementation, not assumed**: `atlas_symbol_versions` source_ref
+values use two coexisting conventions (bare `src/...` and `sveltekit-frontend/src/...` prefixed)
+-- the classifier checks both forms per file. Live result on the 300-file corpus:
+
+```
+Files parsed: 300  failed: 0
+Files with >=1 registry row (either source_ref form): 0/300
+Total observations classified: 13,502
+Bucket counts: EXACT=0 SPAN_MISMATCH=0 REVISION_MISMATCH=0 AMBIGUOUS=0 REGISTRY_MISSING=13,502
+```
+
+**This 100%-REGISTRY_MISSING result is a real, honest finding about the data, not a classifier
+bug** -- verified by a second, independent check: only **15 distinct files** under a `src/`
+prefix have ANY `atlas_symbol_versions` row at all (out of 5,557 eligible corpus files, 0.27%
+coverage), and the 300-file deterministic sample simply didn't include any of those 15.
+
+**Self-test added to prove the classifier logic itself is sound** (`--self-test` flag, run
+against `src/lib/ai/base64-fp32-quantizer.ts`, one of the 15 known-registered files): found 24
+real registry rows for that file, all under `source_revision = 'workspace:0'` -- a **legacy
+pseudo-revision, not a real content hash** (the exact anti-pattern flagged elsewhere in this
+repo's own CLAUDE.md for `atlas_packets.workspace_revision=0`). The classifier correctly bucketed
+all 140 of that file's observations as `REVISION_MISMATCH` against the real computed
+`sha256:329b0939...` content hash -- proving the logic works and isn't silently defaulting
+everything to `REGISTRY_MISSING`. Self-test: **PASS**.
+
+Receipt: `docs/reports/symbol-wire-02-registry-classification-v1.json`
+(`schema: 'atlas.symbol-wire-02-registry-classification.v1'`), including the
+`databaseSnapshot` context (10,504 total rows, 15 distinct registered files, 0.27% coverage of
+the eligible corpus) so the 100% REGISTRY_MISSING figure isn't misread out of context.
+
+**What this means for the broader picture**: the registry is real, wired, but has essentially
+never been populated for the current `sveltekit-frontend/src/` tree at any meaningful scale (15
+files, all under a legacy `workspace:0` revision scheme) -- consistent with this whole session's
+running pattern (real pipelines, sparse/stale data). Any future symbol-identity promotion work
+starts from near-zero coverage, not from a partially-complete registry.
+
+- [x] `SYMBOL-WIRE-02` (2026-09-22, DRY_RUN_PROVEN) -- classifier implemented, self-test PASS,
+  full-corpus run complete: 13,502/13,502 REGISTRY_MISSING (verified as a real data-sparsity
+  finding, not a bug, via the self-test and the 15/5,557 coverage figure).
+- [ ] `SYMBOL-WIRE-03+` (not started, not scoped yet) -- per the review, only after SYMBOL-WIRE-02
+  should POS/keywords, feature matrices, CandidateOrdinal, retrieval, BitFrost/ACE, and prefill
+  begin consuming these observations. None of that is started. Given the registry's near-zero
+  coverage just measured, the next real question (not yet asked or scoped) is likely: should
+  `atlas_symbol_versions` be populated at scale from SYMBOL-WIRE-01's observations first, before
+  any consumer is built against it? That is an operator decision, not assumed here.
+
+## SESSION-206f -- SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-01 + SYMBOL-PROMOTED-UNKNOWN-01 (2026-09-22)
+
+Instructed to continue with a precisely-scoped read-only pair: measure the REAL raw UNKNOWN rate
+from the live `:8095` sidecar (unfiltered, not SYMBOL-WIRE-01's pre-filtered node-type walk), then
+determine how many of those UNKNOWN observations actually reached canonical symbol promotion
+(`atlas_symbol_registry.symbol_kind = 'UNKNOWN'`) via fail-closed EXACT resolution -- distinct
+from mere raw-UNKNOWN counting. No mutations anywhere (`atlas_symbol_registry`,
+`atlas_symbol_versions`, `atlas_ontology_linked_tuples`, Qdrant, Redis, Neo4j, Graphify all
+untouched).
+
+**Correction to a prior assumption, found mid-implementation, not assumed**: SESSION-206e's
+self-test found ONE known-registered file under a legacy `workspace:0` pseudo-revision and
+implicitly generalized that as "the registry is legacy-revision-only." **That generalization was
+wrong.** A live query found 6 of the 15 registered files have REAL `sha256:...` content-hash
+revisions, and a direct byte-for-byte check confirmed **all 6 files' current live content hashes
+exactly match their stored registry revision** -- these are genuinely revision-current, not
+stale. This is why the resolution logic had to be strict and real, not assumed sparse from one
+sample.
+
+**SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-01** (`scripts/atlas/symbol-kind-live-sidecar-coverage-v1.mjs`,
+`docs/reports/symbol-kind-live-sidecar-coverage-v1.json`): `:8095` confirmed live
+(`ornith-1.5-9b`, `treesitter_chunker`/`ast_grep`/`spacy` capabilities present). Called the real
+`POST /ast/chunk` endpoint for all 300 corpus files, classified every returned chunk (unfiltered)
+through the canonical `normalizeStructuralSymbolKind()`:
+
+```
+Total chunks: 8,832   Known: 7,063   Unknown: 1,769 (rate=0.2003)
+  of which structural noise (export/import, expected by design): 1,769
+  of which genuine/investigate-worthy: 0 (rate=0.0000)
+Top unknown raw kinds: export (932), import (837)
+```
+
+**Real finding**: the raw 20% UNKNOWN rate from the live producer is entirely accounted for by
+`export`/`import` chunk-boundary noise -- 0 genuinely unexplained UNKNOWN chunks in this sample.
+The normalizer is not missing any real structural-kind mapping on this corpus.
+
+**SYMBOL-PROMOTED-UNKNOWN-01** (`scripts/atlas/symbol-promoted-unknown-audit-v1.mjs`, pure logic
+extracted to `scripts/atlas/lib/symbol-promoted-unknown-classifier.mjs`,
+`docs/reports/symbol-promoted-unknown-audit-v1.json` +
+`docs/reports/symbol-promoted-unknown-audit-live-sidecar-v1.json`): fail-closed EXACT resolution
+(source_ref + exact source_revision content-hash match + unique exact UTF-8 byte span + non-
+conflicting name where both sides have one -- explicitly NO name-only joins, NO path-only joins,
+NO latest-version substitution, NO fuzzy matching, NO workspace-revision-for-source-revision
+substitution). Two runs, two different observation sources -- both necessary, one alone would
+mislead:
+
+- **Default mode** (tree-sitter/SYMBOL-WIRE-01 observations, 306 files = 300-corpus UNION the 6
+  known-registered files): 85 EXACT resolutions (real signal), but `rawUnknownObservations=0` and
+  `exactResolvedUnknownObservations=0` -- **tautologically**, since this observation source is
+  pre-filtered to declaration node types and structurally cannot emit UNKNOWN. Flagged in the
+  receipt as `observationSource: TREE_SITTER_..._STRUCTURALLY_CANNOT_PRODUCE_RAW_UNKNOWN` so this
+  0 is never mistaken for "no pollution."
+- **`--live-sidecar` mode** (real unfiltered `:8095` chunks, scoped to the 6 known-registered
+  files only): 256 observations, **55 genuinely raw UNKNOWN** (export/import), 85 EXACT
+  resolutions -- same count as the tree-sitter mode, confirming both producers agree on the
+  declaration-level symbols in these files. Of the 55 raw-UNKNOWN observations, **0 resolved
+  EXACT** (they fell into `SPAN_MISMATCH` -- the registry's stored chunk boundaries for these
+  files don't line up with the live sidecar's current export/import chunk spans at this revision).
+
+**Real, non-tautological answer: `exactResolvedUnknownObservations = 0`, `promotedUnknown.registryRowCount = 0`
+in the live-sidecar mode.** Zero canonical `atlas_symbol_registry` rows are currently polluted
+with `symbol_kind='UNKNOWN'` from a genuinely-UNKNOWN, exactly-resolved structural observation --
+measured, not assumed sparse. `observationUnknownRegistryTyped` and `typedObservationToUnknownRegistry`
+(the two inverse anomalies) are both 0 in this sample.
+
+**Ontology-linked-tuple writer observability** (`scripts/atlas/ontology-linked-tuple-writer-observability-v1.mjs`,
+`docs/reports/ontology-linked-tuple-writer-observability-v1.json`): read-only static census.
+2 registered callers found (`taxonomy-topology-packet.ts`, plus its own `.spec.ts`), confirmed
+`buildTaxonomyTopologyPacket()` is reachable from a registered MCP tool. Confirmed the writer's
+error path DOES `console.warn('[taxonomy-topology-packet] ... DEGRADED_PERSISTENCE ...')` on a
+thrown exception before falling back to `{written:0, errors:[...]}` -- **not silently swallowed
+at the code level**, but no persisted receipt/log file recording any PAST invocation (successful
+or failed) was found by static search. **Classification: `INSUFFICIENT_TELEMETRY`** -- this
+census cannot distinguish WRITER_NOT_OBSERVED / UPSTREAM_LINKED_TUPLES_EMPTY /
+WRITE_FAILURE_OBSERVED / WRITE_SUCCESS_WITH_ZERO_ROWS from static evidence alone, and per the
+read-only mandate this audit does not itself invoke the writer to find out.
+
+**Tests**: `src/lib/server/atlas/indexing/symbol-promoted-unknown-classifier-v1.spec.ts`, 12 focused
+tests covering exactly the list the review specified (raw UNKNOWN alone doesn't count; name-only
+match doesn't count; wrong sourceRevision doesn't count; wrong span doesn't count; AMBIGUOUS
+doesn't count; EXACT UNKNOWN->registry UNKNOWN counts; EXACT UNKNOWN->registry FUNCTION reported
+separately; known FUNCTION->registry UNKNOWN reported separately; multiple observations of one
+stable_symbol_id deduplicate to the smaller canonical pollution count). Verified live:
+**`Tests 12 passed (12)`**. Combined with SYMBOL-WIRE-01/02's existing specs: **30/30 tests
+passing** across the whole symbol-pipeline test suite.
+
+`npx openspec validate parent-atlas-nlp-sidecar-feature-compiler --strict`: **PASS** (`Change
+'parent-atlas-nlp-sidecar-feature-compiler' is valid`).
+
+- [x] `SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-01` (2026-09-22, DRY_RUN_PROVEN) -- 8,832 real chunks,
+  20% raw UNKNOWN, 100% accounted for by structural noise, 0 genuine/unexplained.
+- [x] `SYMBOL-PROMOTED-UNKNOWN-01` (2026-09-22, `SYMBOL_PROMOTED_UNKNOWN_AUDIT_PROVEN`, live-sidecar
+  mode) -- 0 canonical registry rows polluted with a genuinely-UNKNOWN, exactly-resolved
+  observation, measured (not assumed) against real revision-current registry data.
+- [x] Ontology writer observability census -- `INSUFFICIENT_TELEMETRY`, real static evidence
+  recorded, no live invocation performed.
+- [x] Focused Vitest (12/12 new, 30/30 total across the symbol-pipeline suite) + `openspec validate
+  --strict` (PASS).
+- [ ] Not started, per explicit stop instruction: `atlas_ontology_linked_tuples` ALTER, POS
+  persistence, symbol-registry repair, historical backfill, CandidateFeatureMatrix,
+  CandidateOrdinalMap scaling, ACE/BitFrost, Valkey, HyperGraphRAG, SOM/topology, Graphify. All
+  writes across this entire session remain 0.
+- [ ] `ONTOLOGY-TUPLE-SYMBOL-LINK-01` (not started) — add a nullable `stable_symbol_id` (and/or
+  `symbol_version_id`) FK column to `atlas_ontology_linked_tuples`, populate it where a tuple's
+  `tree_node_id`/byte span falls inside a known `atlas_symbol_versions` span, leave null where it
+  doesn't (e.g. module-level tokens). Additive migration only, per this repo's Drizzle Safety Rule.
+- [ ] `SOM-SYMBOL-TOPOLOGY-JOIN-01` (blocked) — explicitly gated behind `SOM_REVISION_PROVENANCE_01`
+  clearing. Do not start.
+
+## SESSION-206g — SYMBOL-REGISTRY-POPULATION-PREVIEW-01 (2026-09-22, READ-ONLY, zero writes)
+
+**Critical correction caught by review, verified live, not left standing**: SESSION-206f's receipt
+mislabeled `atlas_symbol_registry` (10,504 rows) and `atlas_symbol_versions` (479 rows) — swapped.
+Independently re-queried: `symbolRegistryRows=10504, symbolVersionRows=479,
+symbolVersionDistinctSourceRefs=69, realRevisionSymbolVersionRows=402,
+legacyRevisionSymbolVersionRows=77`.
+
+**Owner census (bounded by context budget, disclosed as bounded, not exhaustive)**: no literal
+`INSERT/UPDATE INTO atlas_symbol_registry|atlas_symbol_versions` or `stableSymbolId=`/
+`symbolVersionId=` mint-assignment matched under `src/lib/server/atlas`. **Status:
+`CANONICAL_WRITER_NOT_CONCLUSIVELY_IDENTIFIED`** — a real open finding, not resolved this pass.
+`graphify-symbol-writer-v1.ts` (found in a prior session) writes `stable_symbol_key`/`symbol_kind`
+columns that don't match this table's real schema (`stable_symbol_id`) — likely a different table,
+not disambiguated here.
+
+**Major finding not previously used in this arc**: this repo has an active, very recent "Stable
+File Identity" work stream (`S01-08` through `S01-10E`, visible in `git log`) directly answering
+the upstream-identity question. Most recent state: **S01-08K-FREEZE (commit `f8bcf9e0db`,
+2026-09-21) — manifest frozen READY (24,456 `SAFE_NEW_ID` / 1,086
+`REPOSITORY_NAMESPACE_MISSING`), zero DB writes, explicitly awaiting the token "apply S01-08K
+stable file population".** Not applied. This is the real, evidenced `BLOCKED_UPSTREAM_FILE_IDENTITY`
+blocker — found via `git log`, not re-derived from scratch.
+
+**Golden positive control (the 6 revision-current files / 85 known EXACT resolutions)**: PASSED
+exactly as required — `85/85 EXACT_CURRENT_VERSION_EXISTS` reproduced, **0 duplicate-insert
+proposals**. The planner correctly recognizes existing symbols and never proposes re-creating them.
+
+**Legacy negative control** (`src/lib/ai/base64-fp32-quantizer.ts`, `workspace:0`): PASSED — never
+classified `EXACT_CURRENT_VERSION_EXISTS`; correctly `LEGACY_LOGICAL_SYMBOL_CONTINUITY_UNPROVEN`.
+
+**Full 300-file preview**: 13,502 observations → **0 eligible for insertion** (not 13,502).
+`REJECT_KIND_POLICY: 10,429` (all `VARIABLE` — policy unproven, correctly rejected en masse) +
+`REJECT_FILE_IDENTITY: 3,073` (genuinely new `FUNCTION`/`METHOD`/`CLASS`/etc. candidates, blocked
+on S01-08K not being applied yet). **Result:
+`SYMBOL_REGISTRY_POPULATION_PREVIEW_READY_APPLY_BLOCKED_UPSTREAM_FILE_IDENTITY`.**
+
+Pure logic extracted to `scripts/atlas/lib/symbol-population-policy.mjs` (KIND_POLICY +
+`classifyPopulationAction()`), reusing `classifyObservation()` unchanged — no new resolution logic
+duplicated. Script: `scripts/atlas/symbol-registry-population-preview-v1.mjs`. Receipt:
+`docs/reports/symbol-registry-population-preview-v1.json`.
+
+**Tests**: `src/lib/server/atlas/indexing/symbol-population-policy-v1.spec.ts`, 11 focused tests
+(UNKNOWN never promotes, VARIABLE policy enforced, legacy revision never EXACT, wrong span fails
+closed, AMBIGUOUS fails closed, EXACT proposes zero writes, new-symbol gated by upstream identity,
+no revision-change auto-versioning, no name-only cross-file identity, deterministic). Verified live:
+**11/11 passing**. Combined with existing suite: **23/23** (population + promoted-unknown specs run
+together this session; full symbol-pipeline suite across all SESSION-206 gates is 41/41).
+
+`npx openspec validate parent-atlas-nlp-sidecar-feature-compiler --strict`: **PASS**.
+
+- [x] `SYMBOL-REGISTRY-POPULATION-PREVIEW-01` (2026-09-22,
+  `SYMBOL_REGISTRY_POPULATION_PREVIEW_READY_APPLY_BLOCKED_UPSTREAM_FILE_IDENTITY`) — golden control
+  85/85 exact, 0 duplicates; legacy control fail-closed; real eligible-insert count is 0, correctly
+  blocked, not inflated. Zero writes (postgres=0, qdrant=0, valkey=0, neo4j=0, graphifyRuns=0).
+- [ ] Not started, per explicit stop instruction: canary apply, POS persistence, ontology tuple
+  ALTER, retrieval, CandidateOrdinal scaling, Qdrant writes, ACE/BitFrost, Valkey, HyperGraphRAG,
+  SOM/topology, Graphify. Applying S01-08K stable-file population is a **separate, operator-owned
+  decision** outside this change's scope — flagged as the real next blocker to clear, not assumed.
