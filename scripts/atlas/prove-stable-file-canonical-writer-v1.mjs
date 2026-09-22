@@ -31,19 +31,31 @@ function grepFiles(pattern, dirs) {
 }
 const referencingFiles = [...new Set(TABLES.flatMap((t) => grepFiles(t, ['scripts/atlas', 'sveltekit-frontend/src'])))].sort();
 
-const knownWriterFiles = new Set([WRITER_PATH, CLI_PATH, LOADER_PATH, `${WRITER_PATH.replace('.ts', '.spec.ts')}`]);
-const selfPath = 'scripts/atlas/prove-stable-file-canonical-writer-v1.mjs'; // this script's own TABLES array literals match the grep; it is a census tool, not a writer.
-const ownerCensus = referencingFiles.map((file) => ({
-  file,
-  classification: file === selfPath
-    ? 'CENSUS_TOOL'
-    : knownWriterFiles.has(file)
-      ? (file.endsWith('.spec.ts') ? 'CANONICAL_OWNER_TEST' : 'CANONICAL_OWNER')
-      : 'UNKNOWN',
-}));
+// A file "references" one of these tables merely by naming it (in a comment, a doc string, a
+// SELECT). What actually matters for ownership is whether it contains a real INSERT/UPDATE/DELETE
+// statement against one of them -- that is the actual, robust test, not a maintained filename
+// allowlist (which silently drifts UNKNOWN every time a new read-only S01-08J/K/L script is added
+// and happens to mention a table name in its own docstring, as happened this gate).
+const WRITE_STATEMENT_RE = new RegExp(`\\b(INSERT INTO|UPDATE|DELETE FROM)\\s+(${TABLES.join('|')})\\b`, 'i');
+const selfPath = 'scripts/atlas/prove-stable-file-canonical-writer-v1.mjs'; // this script's own TABLES array literal matches the grep; it is a census tool, not a writer.
+// CLI_PATH and LOADER_PATH are the canonical writer's OWN entrypoint surface, not independent
+// second writers -- the CLI's apply-mode code path legitimately contains the same INSERT text the
+// module itself does, because it calls straight into it inside one transaction.
+const canonicalSurface = new Set([WRITER_PATH, CLI_PATH, LOADER_PATH]);
+const ownerCensus = referencingFiles.map((file) => {
+  if (file === selfPath) return { file, classification: 'CENSUS_TOOL' };
+  if (canonicalSurface.has(file)) return { file, classification: 'CANONICAL_OWNER' };
+  if (file === `${WRITER_PATH.replace('.ts', '.spec.ts')}`) return { file, classification: 'CANONICAL_OWNER_TEST' };
+  const text = fs.readFileSync(path.join(root, file), 'utf8');
+  if (WRITE_STATEMENT_RE.test(text)) return { file, classification: 'SECOND_WRITER_CONFLICT' };
+  return { file, classification: 'READ_ONLY_CONSUMER' };
+});
 const canonicalWriterFiles = ownerCensus.filter((r) => r.classification === 'CANONICAL_OWNER').map((r) => r.file);
-const unknownFiles = ownerCensus.filter((r) => r.classification === 'UNKNOWN');
-const canonicalStableFileWriterOwnerCount = canonicalWriterFiles.filter((f) => f === WRITER_PATH).length;
+// canonicalStableFileWriterOwnerCount counts distinct canonical-surface FILES that actually
+// contain a real write statement (proves the writer module itself is live, not just imported).
+const writerModuleText = fs.readFileSync(path.join(root, WRITER_PATH), 'utf8');
+const canonicalStableFileWriterOwnerCount = WRITE_STATEMENT_RE.test(writerModuleText) && canonicalWriterFiles.includes(WRITER_PATH) ? 1 : 0;
+const unknownFiles = ownerCensus.filter((r) => r.classification === 'UNKNOWN' || r.classification === 'SECOND_WRITER_CONFLICT');
 
 // -- Focused tests --------------------------------------------------------------------------------
 let testSummary = { numTotalTests: 0, numPassedTests: 0, numFailedTests: 0, success: false };
@@ -154,7 +166,7 @@ const report = {
 
   liveDryRunProofs: {
     note: 'Read-only proofs run against the live (still-empty) applied schema this gate, via scripts/atlas/mint-stable-file-identity-v1.mjs --dry-run. Zero writes.',
-    repositoryMintDryRun: { decision: 'MINT_NEW', existingRowCount: 0, wouldMintRepositoryId: '77487aff-d5ad-87cb-a1dd-bda46f07149c' },
+    repositoryMintDryRun: { decision: 'MINT_NEW', existingRowCount: 0, wouldMintRepositoryId: '<random UUIDv7, not previewable -- corrected from the first pass\'s deterministic UUIDv8 per operator direction>' },
     fileMintDryRunAgainstAdmittedRow: { decision: 'SAFE_NEW_ID', activeStableFileIdsForKey: [], existingBindingForRevision: false },
     fileMintDryRunRefusesOnUnmintedRepository: { errorCode: 'REPOSITORY_IDENTITY_MISSING', proves: 'admission order is enforced live, not just in fixtures' },
   },

@@ -75,11 +75,14 @@ try {
         [request.sourceAuthorityRepoId],
       );
       const decision = mod.decideRepositoryIdentityMintV1(existing.rows);
-      const wouldMintId = decision === 'MINT_NEW' ? await mod.deriveRepositoryIdV1(request.sourceAuthorityRepoId) : existing.rows[0]?.repository_id ?? null;
+      // repositoryId is now random UUIDv7 (per operator direction, superseding the first pass's
+      // deterministic UUIDv8) -- a dry-run cannot preview the exact value that would be minted,
+      // only whether a mint would happen at all. Concurrency safety at apply time comes from the
+      // live UNIQUE(source_authority_repo_id) constraint + graceful 23505 handling, not preview.
       report.status = 'DRY_RUN_PROVEN';
       report.decision = decision;
       report.existingRowCount = existing.rows.length;
-      report.wouldMintRepositoryId = wouldMintId;
+      report.wouldMintRepositoryId = decision === 'MINT_NEW' ? '<random UUIDv7, not previewable>' : existing.rows[0]?.repository_id ?? null;
     } else {
       const client = await pool.connect();
       try {

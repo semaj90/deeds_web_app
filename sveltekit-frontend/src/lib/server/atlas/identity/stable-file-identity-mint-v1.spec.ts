@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
-  REPOSITORY_IDENTITY_DOMAIN_CLASS_V1,
   StableFileWriterErrorCode,
   computeSourceIdentityKeyV1,
   decideRepositoryIdentityMintV1,
   decideStableFileMintV1,
-  deriveRepositoryIdV1,
   mintOrBindStableFileV1,
   mintOrReuseRepositoryIdentityV1,
   verifyRepositoryIdentityV1,
@@ -14,7 +12,6 @@ import {
   type StableFileIdentityDbClient,
   type StableFileRevisionBindingRowV1,
 } from './stable-file-identity-mint-v1';
-import { deriveUUID } from '../../../utils/uuid';
 
 // ---------------------------------------------------------------------------------------------
 // Pure decision functions -- no DB, no fixture double needed.
@@ -61,26 +58,6 @@ describe('computeSourceIdentityKeyV1 (pure, S08I-NO-PATH-ID-01)', () => {
   });
 });
 
-describe('deriveRepositoryIdV1', () => {
-  it('is deterministic for the same sourceAuthorityRepoId', async () => {
-    const a = await deriveRepositoryIdV1('deeds-web-app');
-    const b = await deriveRepositoryIdV1('deeds-web-app');
-    expect(a).toBe(b);
-  });
-  it('matches deriveUUID directly with the frozen domain class', async () => {
-    const expected = await deriveUUID(REPOSITORY_IDENTITY_DOMAIN_CLASS_V1, { sourceAuthorityRepoId: 'deeds-web-app' });
-    const actual = await deriveRepositoryIdV1('deeds-web-app');
-    expect(actual).toBe(expected);
-  });
-  it('differs for a different sourceAuthorityRepoId', async () => {
-    const a = await deriveRepositoryIdV1('deeds-web-app');
-    const b = await deriveRepositoryIdV1('granite-docling-258M');
-    expect(a).not.toBe(b);
-  });
-  it('rejects an empty sourceAuthorityRepoId (throws synchronously, before any derivation)', () => {
-    expect(() => deriveRepositoryIdV1('  ')).toThrow('REPOSITORY_IDENTITY_MINT_REQUIRES_SOURCE_AUTHORITY_REPO_ID');
-  });
-});
 
 // ---------------------------------------------------------------------------------------------
 // DB-effecting functions -- proven against an in-memory fixture double implementing the exact
@@ -255,6 +232,46 @@ describe('mintOrReuseRepositoryIdentityV1', () => {
     await expect(mintOrReuseRepositoryIdentityV1(db, { ...REPO_REQUEST, sourceAuthorityRepoId: 'x' })).rejects.toThrow(
       StableFileWriterErrorCode.REPOSITORY_IDENTITY_AMBIGUOUS,
     );
+  });
+
+  it('mints a UUIDv7-shaped repository_id (random, not deterministic -- per operator direction)', async () => {
+    const db = makeFixtureDb();
+    const a = await mintOrReuseRepositoryIdentityV1(db, REPO_REQUEST);
+    const b = await mintOrReuseRepositoryIdentityV1(makeFixtureDb(), { ...REPO_REQUEST, sourceAuthorityRepoId: 'deeds-web-app' });
+    expect(a.row.repository_id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    // Minting twice for the SAME key from two independent (unseeded) fixture DBs produces
+    // DIFFERENT ids -- proving this is no longer deterministic-by-construction like the first pass.
+    expect(a.row.repository_id).not.toBe(b.row.repository_id);
+  });
+
+  it('gracefully reuses the winning row on a live unique_violation (23505) race, instead of throwing or minting a duplicate', async () => {
+    const db = makeFixtureDb();
+    let insertAttempts = 0;
+    const racingDb: StableFileIdentityDbClient = {
+      async query(sql, params = []) {
+        const s = sql.trim();
+        if (s.startsWith('INSERT INTO atlas_repository_identity')) {
+          insertAttempts += 1;
+          if (insertAttempts === 1) {
+            // Simulate a concurrent transaction winning the race: it inserts the row for real...
+            await db.query(
+              `INSERT INTO atlas_repository_identity (repository_id, source_authority_repo_id, repository_name, repository_path, repository_kind, gitmodule_name, origin_url, parent_repository_id)`,
+              ['concurrent-winner-id', ...(params as unknown[]).slice(1)],
+            );
+            // ...then THIS transaction's own insert hits the live UNIQUE(source_authority_repo_id)
+            // constraint and Postgres reports it as a 23505 unique_violation.
+            const err = new Error('duplicate key value violates unique constraint "atlas_repository_identity_source_authority_repo_id_key"') as Error & { code: string };
+            err.code = '23505';
+            throw err;
+          }
+        }
+        return db.query(sql, params);
+      },
+    };
+    const result = await mintOrReuseRepositoryIdentityV1(racingDb, REPO_REQUEST);
+    expect(result.outcome).toBe('REUSED_EXISTING');
+    expect(result.row.repository_id).toBe('concurrent-winner-id');
+    expect(db.repositories).toHaveLength(1); // exactly one row exists -- no duplicate was created
   });
 });
 

@@ -1,7 +1,7 @@
 {
   "schema": "atlas.stable-file-canonical-writer.v1",
   "gate": "S01-08I",
-  "generatedAt": "2026-09-22T04:49:01.118Z",
+  "generatedAt": "2026-09-22T04:46:36.205Z",
   "readOnly": true,
   "databaseWrites": 0,
   "canonicalWriter": {
@@ -26,7 +26,7 @@
       },
       {
         "file": "scripts/atlas/plan-stable-file-population-preview-v1.mjs",
-        "classification": "READ_ONLY_CONSUMER"
+        "classification": "UNKNOWN"
       },
       {
         "file": "scripts/atlas/prove-stable-file-canonical-writer-v1.mjs",
@@ -34,7 +34,7 @@
       },
       {
         "file": "sveltekit-frontend/src/lib/server/atlas/identity/stable-file-backfill-classifier-v1.ts",
-        "classification": "READ_ONLY_CONSUMER"
+        "classification": "UNKNOWN"
       },
       {
         "file": "sveltekit-frontend/src/lib/server/atlas/identity/stable-file-identity-mint-v1.spec.ts",
@@ -45,7 +45,7 @@
         "classification": "CANONICAL_OWNER"
       }
     ],
-    "unknownCount": 0,
+    "unknownCount": 2,
     "canonicalStableFileWriterOwnerCount": 1
   },
   "inputContract": {
@@ -114,7 +114,7 @@
     "repositoryMintDryRun": {
       "decision": "MINT_NEW",
       "existingRowCount": 0,
-      "wouldMintRepositoryId": "<random UUIDv7, not previewable -- corrected from the first pass's deterministic UUIDv8 per operator direction>"
+      "wouldMintRepositoryId": "77487aff-d5ad-87cb-a1dd-bda46f07149c"
     },
     "fileMintDryRunAgainstAdmittedRow": {
       "decision": "SAFE_NEW_ID",
@@ -140,5 +140,5 @@
     "deleteRecreateLifecycle": "PARTIALLY_PROVEN_BY_CONSTRUCTION -- a tombstoned identity is structurally excluded from the ACTIVE-only dedup lookup (fixture-proven: \"a tombstoned stable file at the same key does not block a fresh mint\"), but no real tombstone-writing path exists yet to produce that precondition live",
     "crossRepositorySamePathFixture": "FIXTURE_PROVEN_ONLY -- proven against the in-memory fixture double (S08I-REPO-01), not yet against live population data (S01-08H-DDL-FREEZE item 7, still deferred to S01-08L)"
   },
-  "result": "STABLE_FILE_CANONICAL_WRITER_PROVEN"
+  "result": "STABLE_FILE_CANONICAL_WRITER_BLOCKED"
 }

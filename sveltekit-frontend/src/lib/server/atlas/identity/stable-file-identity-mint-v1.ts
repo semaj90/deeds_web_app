@@ -6,18 +6,29 @@
  * atlas_repository_identity / atlas_stable_file_identity / atlas_stable_file_revision_binding /
  * atlas_stable_file_alias -- canonicalStableFileWriterOwnerCount == 1.
  *
- * Decisions resolved here (previously open in S01-08G's unresolvedDecisions):
- *  - repositoryId: deterministic UUIDv8, derived via the existing `deriveUUID()` utility keyed
- *    on { sourceAuthorityRepoId }. A repository's identity has a stable, non-renaming external
- *    key (the live schema's `source_authority_repo_id` bridge column -- the existing text repo_id
- *    for the root repo, or the .gitmodules name for a nested repo that has none yet). Deterministic
- *    minting means two independent callers minting for the same repository always agree WITHOUT
- *    a race window, closing proofPlan.F_CONCURRENT_CREATE for repository identity specifically.
- *  - stableFileId: random UUIDv7 (`randomUUIDv7()`), per S01-08G's explicit rule -- a file's
+ * Decisions resolved here (previously open in S01-08G's unresolvedDecisions), CORRECTED per
+ * operator direction after the first pass (which used deterministic UUIDv8 for repositoryId):
+ *  - repositoryId: random UUIDv7 (`randomUUIDv7()`) -- SAME rule as stableFileId. Canonical
+ *    lifecycle entities (things a writer decides to CREATE, once, on an explicit event) mint
+ *    UUIDv7; only DERIVED identities (a value that is intentionally a deterministic function of
+ *    canonical inputs -- e.g. a future tree-node-occurrence ID keyed on sourceRevision+astPath)
+ *    use the existing `deriveUUID()` UUIDv8 utility. `source_authority_repo_id` (a separate,
+ *    already-persisted TEXT column) is what bridges to the external repo key -- repository_id
+ *    itself does not need to encode or derive from that key. Concurrency safety no longer comes
+ *    from determinism: it comes from the live `UNIQUE (source_authority_repo_id)` constraint on
+ *    `atlas_repository_identity` plus graceful handling of a `23505` unique-violation at INSERT
+ *    time (re-read and return the row the other transaction actually won), not from picking the
+ *    same UUID by construction. RFC 9562 gives UUIDv7 built-in creation-time-ordered uniqueness
+ *    semantics that UUIDv8 (explicitly application-defined, no such standard guarantee) does not.
+ *  - stableFileId: random UUIDv7 (`randomUUIDv7()`), unchanged from the first pass -- a file's
  *    identity has NO stable external key (path and content both change over its lifetime), so
  *    deterministic derivation would violate the "never derive stableFileId from path/content"
- *    prohibition. Concurrency safety instead comes from the dedup-before-mint check below plus
- *    the caller wrapping both statements in one transaction with a readback before COMMIT.
+ *    prohibition. Concurrency safety comes from the dedup-before-mint check below plus the caller
+ *    wrapping both statements in one transaction with a readback before COMMIT.
+ *  - The `uuid` npm package is deliberately NOT used for either -- `randomUUIDv7()` is a small
+ *    self-contained RFC 9562 implementation in `sveltekit-frontend/src/lib/utils/uuid.ts` (Node's
+ *    own `crypto.randomUUID()` only produces UUIDv4), so this module never depends on a package
+ *    that happens to be present only as someone else's transitive dependency.
  *
  * Hard rules enforced by this module (not just documented):
  *  - stable_file_id is NEVER a column default; it is minted here, once, on an explicit CREATE.
@@ -47,7 +58,7 @@
  * matched by the ACTIVE-only lookup, so a fresh mint happens automatically) but is not itself
  * independently fixture-tested against a real tombstone-writing path, since none exists yet.
  */
-import { deriveUUID, randomUUIDv7 } from '../../../utils/uuid';
+import { randomUUIDv7 } from '../../../utils/uuid';
 
 export interface StableFileIdentityDbClient {
   query<T = unknown>(sql: string, params?: unknown[]): Promise<{ rows: T[] }>;
@@ -100,15 +111,6 @@ export interface RepositoryIdentityRowV1 {
   created_at: string;
 }
 
-export const REPOSITORY_IDENTITY_DOMAIN_CLASS_V1 = 'atlas.repository-identity.v1' as const;
-
-/** Pure: the deterministic repositoryId for a given sourceAuthorityRepoId (RFC 9562 UUIDv8). */
-export function deriveRepositoryIdV1(sourceAuthorityRepoId: string): Promise<string> {
-  const key = sourceAuthorityRepoId.trim();
-  if (!key) throw new Error('REPOSITORY_IDENTITY_MINT_REQUIRES_SOURCE_AUTHORITY_REPO_ID');
-  return deriveUUID(REPOSITORY_IDENTITY_DOMAIN_CLASS_V1, { sourceAuthorityRepoId: key });
-}
-
 /** Pure: decide REUSE vs MINT vs AMBIGUOUS from already-fetched rows. Never picks arbitrarily. */
 export function decideRepositoryIdentityMintV1(
   existingRows: RepositoryIdentityRowV1[],
@@ -149,26 +151,49 @@ export async function mintOrReuseRepositoryIdentityV1(
     return { outcome: 'REUSED_EXISTING', row: existing.rows[0] };
   }
 
-  const repositoryId = await deriveRepositoryIdV1(request.sourceAuthorityRepoId);
-  const inserted = await db.query<RepositoryIdentityRowV1>(
-    `INSERT INTO atlas_repository_identity
-        (repository_id, source_authority_repo_id, repository_name, repository_path, repository_kind,
-         gitmodule_name, origin_url, parent_repository_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING repository_id, source_authority_repo_id, repository_name, repository_path, repository_kind,
-                gitmodule_name, origin_url, parent_repository_id, known_commit_oids, created_at`,
-    [
-      repositoryId,
-      request.sourceAuthorityRepoId,
-      request.repositoryName,
-      request.repositoryPath,
-      request.repositoryKind,
-      request.gitmoduleName ?? null,
-      request.originUrl ?? null,
-      request.parentRepositoryId ?? null,
-    ],
-  );
-  return { outcome: 'MINTED_NEW', row: inserted.rows[0] };
+  const repositoryId = randomUUIDv7();
+  try {
+    const inserted = await db.query<RepositoryIdentityRowV1>(
+      `INSERT INTO atlas_repository_identity
+          (repository_id, source_authority_repo_id, repository_name, repository_path, repository_kind,
+           gitmodule_name, origin_url, parent_repository_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING repository_id, source_authority_repo_id, repository_name, repository_path, repository_kind,
+                  gitmodule_name, origin_url, parent_repository_id, known_commit_oids, created_at`,
+      [
+        repositoryId,
+        request.sourceAuthorityRepoId,
+        request.repositoryName,
+        request.repositoryPath,
+        request.repositoryKind,
+        request.gitmoduleName ?? null,
+        request.originUrl ?? null,
+        request.parentRepositoryId ?? null,
+      ],
+    );
+    return { outcome: 'MINTED_NEW', row: inserted.rows[0] };
+  } catch (err) {
+    // repositoryId is now random (UUIDv7), not deterministic -- a genuine concurrent mint for the
+    // SAME sourceAuthorityRepoId can race past the SELECT-first check above. The live
+    // UNIQUE (source_authority_repo_id) constraint on atlas_repository_identity is the real
+    // safety net: on 23505 (unique_violation), re-read and return the row the OTHER transaction
+    // actually won, rather than surfacing a raw constraint error or minting a second row.
+    if (isPostgresUniqueViolation(err)) {
+      const reread = await db.query<RepositoryIdentityRowV1>(
+        `SELECT repository_id, source_authority_repo_id, repository_name, repository_path, repository_kind,
+                gitmodule_name, origin_url, parent_repository_id, known_commit_oids, created_at
+           FROM atlas_repository_identity
+          WHERE source_authority_repo_id = $1`,
+        [request.sourceAuthorityRepoId],
+      );
+      if (reread.rows.length === 1) return { outcome: 'REUSED_EXISTING', row: reread.rows[0] };
+    }
+    throw err;
+  }
+}
+
+function isPostgresUniqueViolation(err: unknown): boolean {
+  return typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === '23505';
 }
 
 // ---------------------------------------------------------------------------------------------
