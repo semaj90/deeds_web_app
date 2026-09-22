@@ -127,6 +127,5 @@
     "newIdentityNamespaceCreated": false,
     "transaction": "REPEATABLE READ READ ONLY, ROLLBACK"
   },
-  "receiptChecksum": "sha256:bbfa58992a416eeec4fa90c4727bbcf3f07cff88edbef82efe8654da03a4c50f",
-  "versionedReceipt": "docs/reports/symbol-identity-v1.bbfa58992a41.json"
+  "receiptChecksum": "sha256:bbfa58992a416eeec4fa90c4727bbcf3f07cff88edbef82efe8654da03a4c50f"
 }
