@@ -179,6 +179,7 @@ export function compileStructuralExtractionFabric(
       source_ref: input.source_ref,
       source_revision: input.source_revision,
       workspace_revision: input.workspace_revision,
+      upstream_file_id: chunk.upstream_file_id,
       upstream_node_id: chunk.upstream_node_id,
       upstream_symbol_id: chunk.upstream_symbol_id,
       upstream_chunk_id: chunk.upstream_chunk_id,
