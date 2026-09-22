@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.tree-node-occurrence-producer-census.v1",
+  "gate": "S01-09D",
+  "generatedAt": "2026-09-22T02:15:00.000Z",
+  "readOnly": true,
+  "databaseWrites": 0,
+  "trace": [
+    { "stage": "source file", "artifact": "real .ts/.js/.tsx source files, walked via rg --files under ROOT" },
+    { "stage": "packet lookup", "artifact": "atlas_packets row per (source_ref) -- ONE tree_node_id value per packet, confirmed live 61,659/61,659 distinct at the packet grain" },
+    { "stage": "parser / AST-grep", "artifact": "scripts/atlas/run-ast-entity-prefill-yaml.mjs extract(), @ast-grep/napi, visit(root) recursively finds every function/class/method/variable/interface/type/enum declaration node" },
+    { "stage": "declaration discovery", "artifact": "same function -- each matched node becomes one candidate row with distinct symbol_name/entity_kind/start_byte/end_byte, correctly declaration-scoped" },
+    { "stage": "upstream_node_id assignment (DEFECT LOCATION, now fixed)", "artifact": "the row builder spread `...packet` into every declaration row BEFORE this fix, carrying the packet's single tree_node_id verbatim into every declaration from that file -- file-scoped, not declaration-scoped" },
+    { "stage": "materializer", "artifact": "scripts/atlas/nominate-ast-symbols-dry-run.mjs -- correctly PREFERS candidate.tree_node_id when present (line 90), so it faithfully propagated whatever the earlier stage supplied; its own fallback (ast-span:<digest of sourceRef+sourceRevision+kind+name+startByte+endByte>) was already declaration-scoped and NOT the defect" },
+    { "stage": "atlas_symbol_versions.upstream_node_id", "artifact": "materialize-ast-symbol-versions.mjs writes the nomination's upstream_node_id as-is into the DB column -- confirmed by S01-09C to be the final resting place of the file-scoped value" }
+  ],
+  "for13CurrentlyReproducibleGroups": {
+    "exactProducerFileAndFunction": "scripts/atlas/run-ast-entity-prefill-yaml.mjs, the row-push inside extract()'s visit() closure (line ~97 before this fix)",
+    "inputAstNodeIdentityAvailable": "yes -- node.kind() (nodeType), node.range() (startByte/endByte via utf8ByteOffset), all genuinely per-declaration and already correctly computed before the defective field assignment",
+    "byteSpanAvailable": true,
+    "astPathAvailable": "not directly (no ancestor-path string was being built); startByte/endByte/nodeType alone proved sufficient to distinguish every declaration in the 13-file replay (362/362 distinct)",
+    "parserNodeIdentityStableWithinRevision": "yes, ast-grep's own node identity is per-parse-run and not itself persisted; this repo never relied on ast-grep's internal object identity, only on span+kind, which is what the fix uses",
+    "oneSourceFileReceivesOneUpstreamNodeIdIncorrectly": true,
+    "declarationScopedIdAlreadyExistsUnderAnotherName": "partially -- entity_id (`${packet_key}#${entityKind}:${name}`) is declaration-scoped by name+kind but NOT by byte span, so two same-named declarations in one file (e.g. overloaded functions) would still collide under entity_id alone; it was not sufficient on its own and is not being promoted to occurrenceId"
+  },
+  "existingCoordinateInventory": [
+    { "coordinate": "ParseNodeId / native ast-grep node object identity", "classification": "PROJECTION_ONLY", "note": "ephemeral per-parse-run object, never persisted; not usable as a stored identity" },
+    { "coordinate": "TreeNodeId (atlas_ast_nodes.tree_node_id, TEXT)", "classification": "QUALIFIED_OCCURRENCE_OWNER (separate table, different pipeline)", "note": "a different, pre-existing declaration-scoped occurrence table (structural_key-derived) used by populate-atlas-ast-nodes.mjs; NOT wired into ast-entities.jsonl's tree_node_id field, which instead came from atlas_packets.tree_node_id -- a naming collision between two different tables' fields, not the same mechanism" },
+    { "coordinate": "atlas_packets.tree_node_id", "classification": "FILE_SCOPED_OWNER (the defect source)", "note": "unique per packet row, but packets are file-grained here, so it is file-scoped relative to the declaration-grained candidates it was spread into" },
+    { "coordinate": "AST path (ancestor chain string)", "classification": "UNKNOWN", "note": "not computed by the existing extractor; not required once span+kind proved sufficient" },
+    { "coordinate": "start_byte / end_byte", "classification": "QUALIFIED_OCCURRENCE_OWNER (as an input, not a final identity)", "note": "correctly computed per-declaration; used as the core of the new derived occurrenceId" },
+    { "coordinate": "node_type (node.kind())", "classification": "QUALIFIED_OCCURRENCE_OWNER (as an input)", "note": "correctly computed per-declaration; part of the new derived occurrenceId's semantic tuple" },
+    { "coordinate": "declaration_hash (nominate-ast-symbols-dry-run.mjs's own hash of sourceRef+sourceRevision+kind+name+startByte+endByte)", "classification": "QUALIFIED_OCCURRENCE_OWNER (a parallel, already-correct declaration-scoped hash)", "note": "computed downstream at the nomination stage, already declaration-scoped; the new occurrenceId is deliberately a SEPARATE, earlier-stage identity (computed at extraction, not nomination) so the fix closes the defect at its origin rather than only downstream" },
+    { "coordinate": "qualified_name / entity_id", "classification": "PROJECTION_ONLY", "note": "name+kind scoped but not span-scoped; insufficient alone for overloads/same-name-different-scope" },
+    { "coordinate": "native parser node id", "classification": "UNKNOWN", "note": "@ast-grep/napi does not expose a stable persisted node id API used by this repo" },
+    { "coordinate": "upstream_chunk_id (packet_key-derived)", "classification": "PROJECTION_ONLY", "note": "packet/chunk identity, a different axis entirely per the design gate's own prohibition list" }
+  ],
+  "conclusion": "No existing single coordinate was both declaration-scoped AND already wired into this pipeline. The composition (sourceRef + sourceRevision + nodeType + startByte + endByte) was proven sufficient (0 collisions across 362 declarations in the 13-file bounded replay) before being adopted as the derivation input -- not hashed speculatively ahead of that proof.",
+  "result": "PRODUCER_CENSUS_COMPLETE"
+}
