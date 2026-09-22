@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.stable-file-population-preview.v1",
+  "gate": "S01-08J",
+  "generatedAt": "2026-09-22T04:39:32.254Z",
+  "readOnly": true,
+  "databaseWrites": 0,
+  "status": "STABLE_FILE_POPULATION_PREVIEW_READY",
+  "authority": {
+    "sealedCohortReceipt": "docs/reports/current-source-authority-cohort-v1.json",
+    "sealedCohortStatus": "CURRENT_SOURCE_AUTHORITY_PROVEN",
+    "admittedWorkspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "snapshotFile": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+    "expectedSourceCount": 25542,
+    "actualSourceCount": 25542,
+    "reconcilesExactlyAgainstSealedCohort": true
+  },
+  "liveDbContext": {
+    "note": "Read inside one BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY transaction. SELECTs only.",
+    "admittedBindingRowCount": 24456,
+    "distinctLiveRepoIdsInBindingsTable": [
+      "deeds-web-app"
+    ],
+    "graphifyToSourceAuthorityRepoIdBridge": {
+      "repo:root": "deeds-web-app"
+    },
+    "stableFileTableCountsAtRunTime": {
+      "atlas_stable_file_identity": 0,
+      "atlas_stable_file_revision_binding": 0,
+      "atlas_stable_file_alias": 0,
+      "atlas_repository_identity": 0
+    },
+    "note2": "atlas_stable_file_identity/_revision_binding/_alias are all 0 rows at run time, confirmed live -- activeStableFileExistsFor()/provenMoveEvidenceFor() report false honestly because the underlying tables are actually empty, not because the classifier assumes it."
+  },
+  "bySourceRepository": {
+    "repo:root": 24456,
+    "repo:claude-mem": 763,
+    "repo:granite-docling-258M": 10,
+    "repo:mcp-server-mcp": 192,
+    "repo:models/embeddinggemma_300m": 13,
+    "repo:sites/parent-atlas-gateboard": 22,
+    "repo:turbovec": 86
+  },
+  "classificationCounts": {
+    "SAFE_NEW_ID": 24456,
+    "REPOSITORY_NAMESPACE_MISSING": 1086
+  },
+  "classificationVocabularyNote": "SAFE_EXISTING_CONTINUITY, MOVE_CONTINUITY_PROVEN, and PATH_REUSE_NEW_ID are all 0 in this run because the stable-file tables and atlas_source_aliases are genuinely empty -- not because this classifier cannot represent them. A re-run after S01-08K populates some rows would classify differently for sources observed again at a later workspace revision.",
+  "keyFindings": [
+    "Population A (repo:root, 24456 sources): classify SAFE_NEW_ID -- an exact admitted atlas_workspace_source_bindings row exists for every one, verified per-row (not just by count).",
+    "Population B (six nested repositories, 1086 sources): classify REPOSITORY_NAMESPACE_MISSING -- deeper than \"no RepositoryIdentityV1 row exists yet\": atlas_workspace_source_bindings itself has ZERO rows for any repo_id besides deeds-web-app (verified live this run: distinctLiveRepoIdsInBindingsTable == [deeds-web-app]). Minting a RepositoryIdentityV1 row for a nested repo alone would NOT unblock these -- S01-08I's writer also requires an admitted atlas_workspace_source_bindings row, which does not exist for any nested-repo source today. A future admission pass for the six nested repositories into atlas_workspace_source_bindings is a prerequisite that is out of scope for S01-08J/K and not yet designed.",
+    "Population C (198 paths with >1 distinct historical source_revision across the full atlas_workspace_source_bindings history, confirmed live) collapses into SAFE_NEW_ID for THIS preview, same as any other population-A row -- the sealed cohort captures exactly one workspace_revision, so each such path still has exactly one admitted binding row at the admitted revision. Their multi-revision history only becomes relevant on a LATER re-run (a genuine S01-08I MODIFY case), not this initial backfill.",
+    "Population D (historical aliases/moves): atlas_source_aliases has 0 rows, confirmed live this run -- 0 MOVE_CONTINUITY_PROVEN classifications, consistent with S01-08G's original finding."
+  ],
+  "reconciliation": {
+    "sumOfClassificationsEqualsSourceCount": true,
+    "ambiguousOrInsufficientCount": 0,
+    "failClosedRuleHeld": true
+  },
+  "writesAuthorized": false,
+  "authorizationNote": "This is a preview only. S01-08K population apply requires its own, still-undefined, exact typed authorization token, to be proposed once this preview is reviewed -- matching the S01-10D/S01-08H pattern (freeze a manifest first, then request the token)."
+}
