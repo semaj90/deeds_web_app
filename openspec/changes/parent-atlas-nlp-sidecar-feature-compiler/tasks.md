@@ -1,3 +1,50 @@
+## HANDOFF SUMMARY (2026-09-22, SESSION-206 arc, compacted for a fresh reader)
+
+**Read this first. Full narrative for each gate is preserved below (SESSION-206 through 206h) —
+this block is a compaction pointer, not a replacement.**
+
+**What's proven, in order:**
+1. `SYMBOL-WIRE-01` — real UTF-16/UTF-8 tree-sitter offset bug found + fixed
+   (`createSourceOffsetConverter`, `source-coordinate-map-v1.ts`). 300/300 files, 13,502/13,502
+   observations byte-grounded.
+2. `SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-01` — real `:8095` output: 8,832 chunks, 20% raw UNKNOWN,
+   100% accounted for by `export`/`import` structural noise, 0 unexplained.
+3. `SYMBOL-PROMOTED-UNKNOWN-01` — fail-closed EXACT resolution: **0 canonical registry rows
+   polluted** with a genuinely-UNKNOWN observation (measured, not assumed sparse).
+4. `SYMBOL-REGISTRY-POPULATION-PREVIEW-01` — golden control 85/85 EXACT reproduced with 0
+   duplicate proposals; legacy `workspace:0` control correctly fails closed; **0 of 13,502
+   observations eligible for insertion today** (10,429 blocked by unproven `VARIABLE` policy,
+   3,073 blocked by upstream file-identity).
+5. `SYMBOL-WRITER-OWNER-01` — exactly one real canonical writer found
+   (`packages/parent-atlas/src/core/symbol-registry-repository.ts::createSymbolRegistryRepository`),
+   schema-exact, identity-sound, conflict-free.
+6. **Two-part correction, same day**: (a) that writer's one real caller
+   (`native-structural-materializer.mts`) already has a real "S01-10B" provenance gate
+   (`qualifyPromotionNominationV1`) requiring genuine content-hash-verified
+   `atlas_workspace_source_bindings` rows — independent of, not dependent on, S01-08K's
+   `StableFileIdentityV1`. (b) A concurrent, uncommitted process was separately observed adding
+   `upstream_file_id` propagation to `structural-symbol.ts`/`structural-extraction-fabric.ts` and
+   a v2 owner-census receipt — **not reviewed or committed by this arc**; check for it before
+   assuming SESSION-206h's v1 receipt is still current.
+
+**Live DB facts (verified, corrected once already — don't reuse older mislabeled counts)**:
+`atlas_symbol_registry` = 10,504 rows. `atlas_symbol_versions` = 479 rows (402 real `sha256:`
+revisions, 77 legacy). Only 15/5,557 eligible files have any version coverage; 6 of those 15 are
+genuinely revision-current (verified byte-for-byte against live source).
+
+**Open, unresolved, not assumed either way:**
+- Does `atlas_workspace_source_bindings` have adequate live row coverage today? (determines
+  whether the S01-10B gate admits anything or rejects everything for lack of provenance)
+- Is S01-08K (stable-file-identity manifest, frozen READY, unapplied) still the intended path, or
+  has the concurrent uncommitted `upstream_file_id`-propagation work superseded part of it?
+- `VARIABLE` symbol-kind admission policy remains unproven/CONDITIONAL by design — not decided.
+
+**Writes across this entire arc: 0** (Postgres/Qdrant/Redis/Neo4j/Graphify). All commits pushed to
+`origin/main` through `dd57f07b6e`. See SESSION-206 through 206h below for full evidence,
+receipts, and test counts (41+ passing across the arc).
+
+---
+
 Gate-by-gate, matching this repo's established discipline for large external
 plans (see `parent-atlas-agentic-repair-bundle-integration`,
 `parent-atlas-graph-runtime-enhancement`, and this session's own
@@ -1514,3 +1561,13 @@ requiring `StableFileIdentityV1`. Remaining open question, not checked in this b
 whether `atlas_workspace_source_bindings` has adequate live coverage for the current corpus —
 that determines whether this gate actually admits anything today, a separate, checkable fact for
 a future session.
+
+**Live coverage check (2026-09-22, read-only SQL):** `atlas_workspace_source_bindings` currently
+contains **47,936 rows**; all 47,936 have a canonical source ref, a `sha256:<64-hex>` source
+revision, a valid 64-hex content digest, and `source_revision = sha256:content_digest`. No rows
+use `workspace:0`; three workspace revisions are present. The current Graphify cohort contains
+25,643 distinct source refs: 23,745 exact canonical-ref matches and 282 matches through the
+`sveltekit-frontend/` alias. The remaining refs are not automatically admissible and must stay
+fail-closed until canonical path selection resolves them. This proves that S01-10B has substantial
+live coverage, but does not prove whole-corpus admission, current-worktree parity, or S01-08K
+stable-file identity. No rows were written.
