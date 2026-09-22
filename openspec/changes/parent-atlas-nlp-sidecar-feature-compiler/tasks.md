@@ -48,14 +48,16 @@ tables are schema-deployed but 0 rows across all three.
 - Is S01-08K (stable-file-identity manifest, frozen READY, unapplied) still the intended path?
   Its tables exist live and are schema-compatible with the resolution proof described above —
   applying it remains a separate, undecided operator call.
-- `VARIABLE` symbol-kind admission policy remains unproven/CONDITIONAL by design — not decided;
-  the recommended next step (per external review) is to break `VARIABLE` into sub-categories
-  (module bindings, class fields, locals, parameters, destructuring) before deciding policy on it
-  as one undifferentiated bucket, rather than deciding the bucket wholesale.
+- `VARIABLE` symbol-kind admission policy remains unproven/CONDITIONAL by design — not decided.
+  `SESSION-206j` (below) did the recommended sub-categorization: class-field and parameter
+  categories turned out to be 0-occurrence (wrong node types for this bucket, by construction);
+  the bigger finding is that the 10,429 figure double-counts every simple-binding statement at
+  statement-vs-declarator granularity (100% overlap) — a future policy decision needs to pick one
+  granularity before the count means anything as "N candidate symbols."
 
 **Writes across this entire arc: 0** (Postgres/Qdrant/Redis/Neo4j/Graphify) except the one
 committed code fix in item 6(b), which touched no data stores. All commits pushed to `origin/main`
-through `d968b4f772`. See SESSION-206 through 206i below for full evidence, receipts, and test
+through `049eb9cb7e`. See SESSION-206 through 206j below for full evidence, receipts, and test
 counts (41+ passing across the arc).
 
 ---
@@ -548,7 +550,7 @@ sections above before trusting an integration claim.
 - [ ] Dependency build reachability remains unproven: the current six container-scoped manifests are selected by directory only. Zero loose manifests in that subset does not establish coverage of every Docker build or transitive locking.
 
 - [x] Froze 15 additional Compose references across six existing Compose files to digests observed from the actual running Qdrant, Neo4j, SearXNG, SeaweedFS, RabbitMQ, CouchDB, and Caddy images. Existing tags retained; no upstream-version selection or container recreation. All six Compose configurations validate, and all 15 pins reconcile to the running-image receipt.
-- [ ] Current Compose coverage is 44 digest pins, 17 floating references, and 15 tag-only references; unresolved image families and local build provenance remain open. Repository-wide total is 45 Compose digest pins. These counts supersede earlier census counts without implying runtime upgrades or full reproducibility.
+- [ ] Current Compose coverage is verified by `docs/reports/docker-reproducibility-v1.json` (2026-09-22): 76 current external images, 44 digest-pinned, 17 floating, and 15 tag-only; repository-wide inventory is 356 images across 80 Compose files. Unresolved image families, one active-container inspection failure, and local build provenance remain open; this read-only census does not imply runtime upgrades or full reproducibility.
 
 - [x] Corrected runtime image provenance: inspect the container's immutable `Image` ID, never its potentially retargeted configured tag; inventory only running containers. Independent readback checked all 25 containers with zero report mismatches.
 - [ ] Running-image recovery remains open: Docker cannot inspect the original image IDs for `miniforge-nlp-sidecar` and `legal-ai-go-embedding`. These are explicitly `IMAGE_INSPECTION_FAILED`, not local-build proof. The other 23 running containers have registry digests. No container recreation or image replacement occurred.
@@ -1634,3 +1636,72 @@ not establish.
 - [ ] Not started: the resolution-based parity proof described above (blocked on S01-08K apply —
   cannot run against zero rows). Not started: any decision on S01-08K apply, VARIABLE promotion
   policy, or symbol canary — all remain operator-owned per the existing handoff summary.
+
+## SESSION-206j — SYMBOL-VARIABLE-SUBCATEGORY-01 (2026-09-22, READ-ONLY, zero writes)
+
+**Prompted by external review's recommendation: before any operator decides a VARIABLE promotion
+policy, inspect what the 10,429 `REJECT_KIND_POLICY` VARIABLE observations actually are (module
+bindings, class fields, locals, parameters, destructuring) rather than deciding policy on one
+undifferentiated bucket.** Not a decision — a read-only categorization to inform one.
+
+New additive script `scripts/atlas/symbol-variable-subcategory-audit-v1.mjs` (does not modify
+`normalizeStructuralSymbolKind`, `buildObservationsForFile`, or any canonical runner). Reuses the
+same frozen `docs/reports/symbol-kind-corpus-v1.json` manifest (300 files,
+`workspaceRevision=1ec451233a652de4fe081dcd7aa0feb541e081ae`) that produced the original 10,429
+figure, and walks the identical two raw node types
+(`variable_declarator`/`lexical_declaration`) that `normalizeStructuralSymbolKind()` maps to
+`VARIABLE`, but additionally tracks the ancestor-node-type chain (which the canonical runner does
+not capture — its `parent_route` is hardcoded to `[]`). Verified reproduction first:
+`totalVariableRawObservations = 10429`, exact match to
+`SYMBOL-REGISTRY-POPULATION-PREVIEW-01`'s `countsByKind.VARIABLE` — confirms this audit is
+counting the same population, not a different one.
+
+**Real findings, not assumed:**
+
+1. **"Class fields" and "parameters" are empty categories in this bucket — 0 occurrences of
+   either.** `byScopeContext` = `{MODULE_LEVEL: 1765, FUNCTION_LOCAL: 8664}` only —
+   `CLASS_BODY_DIRECT` and `PARAMETER_CONTEXT` both 0. Root cause: the canonical walker's
+   `DECLARATION_NODE_TYPES` set (in `symbol-wire-observation-runner.mjs`) only visits
+   `variable_declarator`/`lexical_declaration`, never `public_field_definition` (class fields) or
+   `required_parameter`/`optional_parameter` (function parameters) — those are structurally
+   different node types this pipeline never observes as `VARIABLE` at all. The review's suggested
+   sub-categories were a reasonable hypothesis; two of five don't apply to this specific bucket by
+   construction, and that's a real, useful disconfirmation, not a gap in this audit.
+2. **The 10,429 figure double-counts every simple binding statement by design — this is the
+   single largest structural finding.** Every one of the 5,217 `variable_declarator` observations
+   (100%, `nestedDeclaratorInsideLexicalDeclarationCount = 5217`) sits inside a
+   `lexical_declaration` ancestor that is ALSO independently counted as its own `VARIABLE`
+   observation (5,212 `lexical_declaration` nodes). A single `const a = 1, b = 2;` statement
+   therefore contributes 1 (statement wrapper) + 2 (individual bindings) = 3 VARIABLE
+   observations of what a human would call "2 variables." **Any future VARIABLE promotion-policy
+   decision needs to pick one granularity (statement-level XOR binding-level), not both — treating
+   10,429 as "10,429 candidate symbols" is off by roughly 2x for single-binding statements and
+   more for multi-binding ones.**
+3. Binding-shape breakdown (of the 5,217 `variable_declarator` nodes): `SIMPLE_BINDING` 4,900
+   (94%), `DESTRUCTURING_OBJECT` 266, `DESTRUCTURING_ARRAY` 51 — destructuring is a real but small
+   minority (6%), not a dominant shape requiring special-case policy up front.
+4. Scope split: `MODULE_LEVEL` 1,765 (17%) vs `FUNCTION_LOCAL` 8,664 (83%) — most VARIABLE
+   observations are function-local, which this repo's existing registry-population policy
+   discipline (identity requires durable, referenceable declarations) would likely treat very
+   differently from module-level bindings. `exportedCount = 4944` (counts `lexical_declaration`
+   nodes wrapped in an `export_statement` ancestor) is a plausible first-cut signal for "worth
+   promoting" within `MODULE_LEVEL`, but this was not cross-tabulated against scope in this pass —
+   flagged as a natural follow-up, not done here.
+
+**Not decided, not implied**: this audit does not recommend a VARIABLE promotion policy. It
+narrows the space an eventual policy decision would need to cover (dedupe statement-vs-binding
+granularity first; class-field/parameter categories don't apply to this bucket; module-level
+exported bindings are the most plausible "worth promoting" subset by volume, unverified).
+
+Receipt: `docs/reports/symbol-variable-subcategory-audit-v1.json`. No tests added (pure read-only
+analysis script, not a change to any tested contract). `npx openspec validate
+parent-atlas-nlp-sidecar-feature-compiler --strict`: PASS.
+
+- [x] `SYMBOL-VARIABLE-SUBCATEGORY-01` (2026-09-22, read-only) — reproduced the 10,429 figure
+  exactly; found 0 class-field/parameter VARIABLE observations (wrong node types for this bucket,
+  by construction); found the bucket double-counts every simple-binding statement at the
+  statement-vs-declarator granularity (100% overlap on `variable_declarator` nodes); binding-shape
+  and scope breakdowns recorded above.
+- [ ] Not started, not implied by this audit: any VARIABLE promotion policy decision, statement-
+  vs-binding granularity choice, or export-cross-tabulation follow-up — all remain either
+  operator-owned or explicitly flagged as unstarted next steps.

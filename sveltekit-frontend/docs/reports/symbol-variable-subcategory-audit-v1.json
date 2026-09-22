@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.symbol-variable-subcategory-audit.v1",
+  "gate": "SYMBOL-VARIABLE-SUBCATEGORY-01",
+  "generatedAt": "2026-09-22T21:32:34.594Z",
+  "corpusManifestUsed": {
+    "workspaceRevision": "1ec451233a652de4fe081dcd7aa0feb541e081ae",
+    "corpusSize": 300,
+    "generatedAt": "2026-09-22T19:37:54.196Z"
+  },
+  "filesParsed": 300,
+  "filesFailed": 0,
+  "totalVariableRawObservations": 10429,
+  "comparisonNote": "SYMBOL-REGISTRY-POPULATION-PREVIEW-01 reported countsByKind.VARIABLE=10429 for this same frozen corpus. This script walks the identical two raw node types (variable_declarator, lexical_declaration) that normalizeStructuralSymbolKind() maps to VARIABLE, so totalVariableRawObservations should match 10429 exactly if no other kind-normalization path contributes to VARIABLE -- if it does not match, that is itself a real finding, not noise.",
+  "byRawNodeType": {
+    "lexical_declaration": 5212,
+    "variable_declarator": 5217
+  },
+  "byBindingPatternType": {
+    "N/A_LEXICAL_DECLARATION_WRAPPER": 5212,
+    "SIMPLE_BINDING": 4900,
+    "DESTRUCTURING_OBJECT": 266,
+    "DESTRUCTURING_ARRAY": 51
+  },
+  "byScopeContext": {
+    "MODULE_LEVEL": 1765,
+    "FUNCTION_LOCAL": 8664
+  },
+  "nestedDeclaratorInsideLexicalDeclarationCount": 5217,
+  "nestedDeclaratorNote": "variable_declarator nodes counted here that ALSO sit inside a lexical_declaration ancestor in the SAME walk. Both node types independently map to VARIABLE, so a single `const a = 1, b = 2;` statement contributes 1 lexical_declaration + 2 variable_declarator observations -- this number quantifies that overlap, not a bug in this audit script.",
+  "exportedCount": 4944,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphifyRuns": 0
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}
