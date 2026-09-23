@@ -16164,3 +16164,52 @@ signals in the controller rows (`priority`, `kind`, `eta`, `lastUpdatedAt`, `dep
   - **OpenSpec control-plane track (separate from STEP-01 identity work, same tasks.md)**: OCP-00/OCP-01 done (`d539885277`, `57ca178165`). Next per that track's own plan: OCP-02 (`report-reader.ts` staleness audit + canonical-checksum wiring) or the `ContextManifestV1`/`PromptPlanV1` duplicate-owner census -- operator has not yet chosen; ask before starting either.
   - **Uncommitted working-tree state to leave alone**: the large pre-existing pile of regenerated `docs/reports/*` reader outputs, `docs/OPENSPEC-WORKBOARD.md`, submodule dirtiness (`claude-mem`, `granite-docling-258M`, `models/embeddinggemma_300m`, `turbovec`), `.tmp/`/staging directories, `simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml`. None of it was touched this session; verify with `git status --short` before any future `git add` and stage explicit paths only, never `-A`.
   - **Tooling notes** (reconfirmed working this session): run TS scripts from repo root with `node sveltekit-frontend/node_modules/tsx/dist/cli.mjs scripts/atlas/NAME.mts`, or via the plain-node loader-shim pattern for `.mts` modules consumed by plain `.mjs` scripts (see `scripts/atlas/lib/load-stable-file-identity-mint-v1.mjs`, `load-stable-file-backfill-classifier-v1.mjs`, `load-stable-file-population-apply-manifest-v1.mjs` for the exact template -- one per module, do not share); run vitest from `sveltekit-frontend` (`npx vitest run <spec-path>`); run `openspec` commands from the repo root, not `sveltekit-frontend/` -- the change directory is `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence` off the repo root, confirmed this session (`sveltekit-frontend/openspec/changes/*` is a DIFFERENT, unrelated set of changes); background long-running commands with `run_in_background` and read the output file, or just retry a short foreground `cat` of the output file a few times if the harness auto-backgrounds a `sleep`; `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -Atc "..."` for ad hoc live queries; `mcp__trace__db_table_inspect` for schema/FK/index inspection without shelling to `psql`.
+
+- [ ] HANDOFF-2026-09-22-STEP01-SESSION5 (fresh-session handoff; supersedes nothing, points at
+  HANDOFF-2026-09-22-STEP01-SESSION4 above and everything since). Implement everything below END
+  TO END, one gated micro-step at a time: focused tests, a live read-only proof (or bounded
+  transaction where explicitly authorized), an immutable receipt, `openspec validate
+  parent-atlas-retrieval-lineage-dag-convergence --strict` (from repo root), a ledger entry, a
+  local commit, then STOP at every gate marked STOP.
+  - **HEAD checkpoint**: `ecbd975759`, **pushed to `origin/main`** this session (verify with
+    `git log --oneline -1` and `git log origin/main..HEAD --oneline` -- should be empty/0).
+  - **DONE this session (2026-09-22), do NOT redo**: a full read-only reconciliation of
+    `CANONICAL-IDENTITY-V1-SPEC-01` against the S01-08/09/10 work above (`ecbd975759`) — see the
+    `CANONICAL-IDENTITY-V1-SPEC-RECONCILIATION` entry a few sections above this one and
+    `docs/reports/canonical-identity-v1-spec-reconciliation.json`. Confirmed: `stableFileId`
+    derivation and `treeNodeId` canonical status were STALE_DRAFT questions, already resolved
+    elsewhere in this file (no new decision made, just cross-referenced). Confirmed packet
+    source-revision admission is `PACKET_SOURCE_REVISION_CONTRACT_PROVEN` (separate MMR1.8 gate
+    in `manual-migration-reconciliation/tasks.md`, `docs/reports/
+    packet-writer-source-revision-authority-v1.json`, 15/15 live-DB tests) — the remaining gap is
+    production-caller adoption only, now its own task `PACKET-WRITER-PRODUCTION-OWNER-01` in that
+    same file, NOT a semantics defect here. Also ran `atlas-feature-intelligence:138` (canonical
+    identity survives path/cluster/projection changes): cluster/projection axis PROVEN, path axis
+    DISPROVEN (the live-dominant `packet_key` formula, `packet:`+SHA256(source_ref).slice(0,12),
+    94.6% of rows, IS a direct function of the path — a rename changes it, with no compensating
+    alias mechanism). That finding lives in `atlas-feature-intelligence/tasks.md` line ~138, not
+    duplicated here — read it before assuming `packet_key` is rename-stable.
+  - **Did NOT do this session (explicitly deferred, not started)**: `CANONICAL-IDENTITY-CANARY-01`
+    / S01-12 itself. No stable-file apply (S01-08K). No production-caller wiring. No new operator
+    decisions were made on identity semantics — two genuine operator decisions remain, unchanged
+    from SESSION4: (1) the `apply S01-08K stable file population` token; (2) which runtime
+    route/job becomes `PACKET-WRITER-PRODUCTION-OWNER-01`'s caller.
+  - **HARD RULES**: unchanged from SESSION4 above — re-read that block, still binding. In
+    particular: no DB write of any kind without the operator's exact authorization token for that
+    specific gate; the next real write token, already frozen, not yet supplied: `apply S01-08K
+    stable file population`.
+  - **NEXT, in order**: unchanged from SESSION4's numbered list above (STOP for the S01-08K
+    token → S01-08L lifecycle proof → S01-08M → S01-10B-followup → final S01-09 rerun → S01-11 →
+    S01-12/canary → STEP-02). This session's reconciliation did not reorder or add to that
+    sequence — it only confirmed the sequence has no hidden semantics blocker left in it.
+  - **Separately, this same broader session (not just this file) closed a large batch of
+    unrelated quick-hit OpenSpec tasks across ~9 other changes** (a real UI bug fix in
+    `tts.ts`; `manual-migration-reconciliation` MMR1.3/1.4/1.8 gates;
+    `parent-atlas-ontology-oaklib-fanout-bitmap` tasks 5.1/6.1/6.2/6.3;
+    `parent-atlas-graph-runtime-python-consolidation` caller re-grep;
+    `parent-atlas-graph-retrieval-proof` GS1.9; `parent-atlas-agentic-repair-bundle-integration`
+    T3; `atlas-feature-intelligence` 4 acceptance-gate test executions plus the `:138` gate;
+    `parent-atlas-ace-bitfrost-cache-correctness` CACHE-RETRIEVAL-IDENTITY-03 partial fix in
+    `context-assembler.ts`; `parent-atlas-transport-memory-boundaries` ACP-02B investigation) —
+    all in the same push (`ecbd975759`), none of it re-summarized here since each lives in its
+    own file's own tasks.md.
