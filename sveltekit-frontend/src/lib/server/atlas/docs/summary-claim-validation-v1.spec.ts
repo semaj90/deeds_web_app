@@ -1,11 +1,10 @@
 // @vitest-environment node
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
 import {
-	buildSummaryClaimValidationV1, computeSummaryClaimChecksumV1, pendingSummaryClaimValidationV1, SummaryClaimValidationV1Schema, SUMMARY_CLAIM_VALIDATION_SCHEMA, verifySummaryClaimByteSpanV1,
+	buildSummaryClaimValidationV1, computeSummaryClaimChecksumV1, pendingSummaryClaimValidationV1, SummaryClaimValidationV1Schema, SUMMARY_CLAIM_VALIDATION_SCHEMA,
 	type SummaryClaimValidationInputV1
 } from './summary-claim-validation-v1.js';
 
@@ -96,23 +95,10 @@ describe('SummaryClaimValidationV1 (VAL-01, contract only)', () => {
 		expect(buildSummaryClaimValidationV1({ ...populated, ontology: { status: 'PASS', kernelRevision: 'oak-kernel:r1', assertions: [{ subject: 'hnsw.iterative_scan', predicate: 'PART_OF', object: 'pgvector', status: 'SUPPORTED', evidenceRef: 'span:10-20' }] } }).ontology.status).toBe('PASS');
 	});
 
-	it('spans are chunk-relative, non-empty ranges with a checksum', () => {
+	it('source spans are structurally claimed only; VAL-05 owns byte verification', () => {
 		const span = { startByte: 10, endByte: 20, textChecksum: sum('bytes') };
-		expect(buildSummaryClaimValidationV1({ ...populated, sourceSpan: { status: 'VERIFIED', spans: [span] } }).sourceSpan.spans[0]).toEqual(span);
-		expect(() => buildSummaryClaimValidationV1({ ...populated, sourceSpan: { status: 'VERIFIED', spans: [{ ...span, endByte: 10 }] } })).toThrow();
-	});
-
-	it('VAL-05 verifies exact UTF-8 byte spans, revision binding and checksums independently', () => {
-		const chunkEvidenceRevision = base.chunkEvidenceRevision;
-		const bytes = Buffer.from('alpha 🧭 beta', 'utf8');
-		const startByte = Buffer.from('alpha ', 'utf8').byteLength;
-		const selected = Buffer.from('🧭', 'utf8');
-		const span = { startByte, endByte: startByte + selected.byteLength, textChecksum: createHash('sha256').update(selected).digest('hex') };
-		expect(verifySummaryClaimByteSpanV1({ canonicalChunkEvidenceRevision: chunkEvidenceRevision, claimedChunkEvidenceRevision: chunkEvidenceRevision, canonicalChunkBytes: bytes, span })).toEqual({ verified: true, status: 'VERIFIED', reason: 'EXACT' });
-		expect(verifySummaryClaimByteSpanV1({ canonicalChunkEvidenceRevision: chunkEvidenceRevision, claimedChunkEvidenceRevision: `sha256:${'0'.repeat(64)}`, canonicalChunkBytes: bytes, span }).reason).toBe('REVISION_MISMATCH');
-		expect(verifySummaryClaimByteSpanV1({ canonicalChunkEvidenceRevision: chunkEvidenceRevision, claimedChunkEvidenceRevision: chunkEvidenceRevision, canonicalChunkBytes: bytes, span: { ...span, endByte: bytes.byteLength + 1 } }).reason).toBe('OUT_OF_BOUNDS');
-		expect(verifySummaryClaimByteSpanV1({ canonicalChunkEvidenceRevision: chunkEvidenceRevision, claimedChunkEvidenceRevision: chunkEvidenceRevision, canonicalChunkBytes: bytes, span: { ...span, textChecksum: sum('different') } }).reason).toBe('CHECKSUM_MISMATCH');
-		expect(verifySummaryClaimByteSpanV1({ canonicalChunkEvidenceRevision: chunkEvidenceRevision, claimedChunkEvidenceRevision: chunkEvidenceRevision, canonicalChunkBytes: bytes, span: { ...span, startByte: startByte + 1, endByte: startByte + 3 } }).reason).toBe('INVALID_UTF8');
+		expect(buildSummaryClaimValidationV1({ ...populated, sourceSpan: { status: 'CLAIMED', spans: [span] } }).sourceSpan).toEqual({ status: 'CLAIMED', spans: [span] });
+		expect(() => buildSummaryClaimValidationV1({ ...populated, sourceSpan: { status: 'CLAIMED', spans: [{ ...span, endByte: 10 }] } })).toThrow();
 	});
 
 	it('requires chunk-grain identity (sha256: chunk evidence revision, not a bare hash)', () => {

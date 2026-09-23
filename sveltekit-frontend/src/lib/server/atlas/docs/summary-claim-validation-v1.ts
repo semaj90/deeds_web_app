@@ -16,7 +16,6 @@
  * only (OaK is a frozen typed kernel, not a prose judge).
  */
 import { z } from 'zod';
-import { createHash } from 'node:crypto';
 import { canonicalSha256V1, sha256HexSchema } from '../prefill/canonical-hash-v1.js';
 
 export const SUMMARY_CLAIM_VALIDATION_SCHEMA = 'atlas.summary-claim-validation.v1' as const;
@@ -58,7 +57,7 @@ export const VersionSlotV1Schema = z.object({
 }).strict();
 
 export const SourceSpanSlotV1Schema = z.object({
-	status: z.enum(['NOT_RUN', 'VERIFIED', 'UNVERIFIED', 'NO_CLAIMED_SPAN']),
+	status: z.enum(['NOT_RUN', 'CLAIMED', 'VERIFIED', 'REJECTED', 'NO_CLAIMED_SPAN']),
 	spans: z.array(ChunkByteSpanV1Schema)
 }).strict();
 
@@ -165,33 +164,6 @@ export type SummaryClaimValidationV1 = z.infer<typeof SummaryClaimValidationV1Sc
  */
 export function computeSummaryClaimChecksumV1(claimText: string): string {
 	return canonicalSha256V1({ schema: 'atlas.summary-claim.v1', claimText });
-}
-
-/** Independently verify a claimed support span against the exact canonical chunk bytes (VAL-05). */
-export function verifySummaryClaimByteSpanV1(input: {
-	canonicalChunkEvidenceRevision: string;
-	claimedChunkEvidenceRevision: string;
-	canonicalChunkBytes: Uint8Array;
-	span: ChunkByteSpanV1;
-}): { verified: boolean; status: 'VERIFIED' | 'UNVERIFIED'; reason: 'EXACT' | 'REVISION_MISMATCH' | 'OUT_OF_BOUNDS' | 'INVALID_UTF8' | 'CHECKSUM_MISMATCH' } {
-	const parsedSpan = ChunkByteSpanV1Schema.safeParse(input.span);
-	if (!parsedSpan.success) return { verified: false, status: 'UNVERIFIED', reason: 'OUT_OF_BOUNDS' };
-	const canonicalRevision = chunkEvidenceRevisionSchema.safeParse(input.canonicalChunkEvidenceRevision);
-	const claimedRevision = chunkEvidenceRevisionSchema.safeParse(input.claimedChunkEvidenceRevision);
-	if (!canonicalRevision.success || !claimedRevision.success || canonicalRevision.data !== claimedRevision.data) {
-		return { verified: false, status: 'UNVERIFIED', reason: 'REVISION_MISMATCH' };
-	}
-	const { startByte, endByte, textChecksum } = parsedSpan.data;
-	if (endByte > input.canonicalChunkBytes.byteLength) return { verified: false, status: 'UNVERIFIED', reason: 'OUT_OF_BOUNDS' };
-	const selectedBytes = input.canonicalChunkBytes.subarray(startByte, endByte);
-	try {
-		new TextDecoder('utf-8', { fatal: true }).decode(selectedBytes);
-	} catch {
-		return { verified: false, status: 'UNVERIFIED', reason: 'INVALID_UTF8' };
-	}
-	const actualChecksum = createHash('sha256').update(selectedBytes).digest('hex');
-	if (actualChecksum !== textChecksum) return { verified: false, status: 'UNVERIFIED', reason: 'CHECKSUM_MISMATCH' };
-	return { verified: true, status: 'VERIFIED', reason: 'EXACT' };
 }
 
 export function sealSummaryClaimValidationV1(input: SummaryClaimValidationInputV1): { claimChecksum: string; validationId: string; validationChecksum: string } {
