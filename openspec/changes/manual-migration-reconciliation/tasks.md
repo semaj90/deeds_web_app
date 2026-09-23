@@ -434,10 +434,32 @@ seven as single-owner candidates requiring review, not as safe-to-apply work.
     fail-closed cases that need a live-DB test rather than pure schema construction.
   - **Writes**: postgres 0, qdrant 0, valkey 0, neo4j 0, graphifyRuns 0 — matches the receipt.
 
-Status: `PACKET_REVISION_AXIS_PRESENT_SOURCE_REVISION_UNPOPULATED`;
+Status: `PACKET_SOURCE_REVISION_ADMISSION_PROOF_COMPLETE`
+(2026-09-22 bookkeeping correction — this gate's own stated acceptance condition was
+"resolve the admitted source-revision input and prove bounded readback before
+migration/backfill"; that is satisfied — mechanism `PROVEN`, bounded live-DB readback `PROVEN`
+15/15. Keeping this checkbox open because production adoption is separately absent conflated
+two distinct gates. Production-caller adoption is now tracked as its own open task,
+**`PACKET-WRITER-PRODUCTION-OWNER-01`** (below) — it does not reopen or block this one.);
 `migrationApplied=false`; `promotionAllowed=false`; `writesPerformed=false`.
 Evidence: `docs/reports/packet-write-revision-contract-v1.json`,
-`docs/reports/canonical-owner-revision-migration-safety-v1.json`.
+`docs/reports/canonical-owner-revision-migration-safety-v1.json`,
+`docs/reports/packet-writer-source-revision-authority-v1.json`.
+
+### PACKET-WRITER-PRODUCTION-OWNER-01 (new, opened 2026-09-22, split out of MMR1.8)
+
+- [ ] Determine which runtime route/job/event is the authoritative producer allowed to call
+  `persistAdmittedSemanticPacketEmbedding()` (`sveltekit-frontend/src/lib/server/embedding/
+  semantic-packet-writer.ts`). Sole concern of this task — do not wire it here.
+  Qualification mechanism: `PROVEN` (MMR1.8, above). Production adoption: `UNWIRED` — zero live
+  callers repo-wide. One candidate location was read, not wired:
+  `src/routes/api/admin/batch-embeddings/embed/+server.ts` — its own code comment already
+  defers persistence pending "an authoritative producer," classified `ADMIN_TRIGGER_ONLY`
+  (reachable only via manual admin action, not a systematic ingestion/materialization event —
+  not itself a strong CANONICAL_OWNER_CANDIDATE without further design). No other candidate
+  route/job was read in this pass; a full inventory of embedding-materialization,
+  Graphify-projection, source-ingestion, and packet-compiler event paths is future work for
+  this task, not done here.
 
 ### MMR1.9 - Priority-1 lineage disposition recheck — 2026-09-14
 

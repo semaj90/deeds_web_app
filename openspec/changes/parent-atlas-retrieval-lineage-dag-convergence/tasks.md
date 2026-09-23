@@ -15881,6 +15881,67 @@ signals in the controller rows (`priority`, `kind`, `eta`, `lastUpdatedAt`, `dep
 - [x] GRAPHIFY-INPUT-IDENTITY-BACKFILL-01 PREVIEW = PROVEN (2026-09-21, read-only): recipe `atlas.graphify-input-identity.v1`; `sourceSelectionChecksum` = CONTENT_BEARING, sha256 of entries `{sourceIdentityKey, sourceRevision, byteLength}` sorted in UTF-8 byte order; mapping `sourceIdentityKey = repository_id:repository_relative_path` (source_ref is evidence only), `sourceRevision = code_source_revision` (asserted equal to `sha256:`+content_hash: 0 mismatches over 351,065 rows; 0 missing fields, 0 non-normalized paths/hashes, 0 key collisions); serializer parity vs an independent serializer: 0 conflicts. Result: 36/36 complete, distinct identities 26 -> 28, duplicate groups 6 -> 4, MEMBERSHIP_DIFFERS groups 2 -> 0, canonical pair `74d50c86`+`0dba1c0d` still grouped; 2 ABANDONED executions are identity-equivalent but reuse-ineligible. Same inputIdentity => same logical Graphify input; it is NOT proof that a derived graph/output is valid or reusable. databaseWrites=0, inputIdentityWrites=0, backfillApplied=false. Still HOLD: input_identity backfill/producer (frozen serializer must first move into the shared identity owner), 02B, admission, Graphify run. Status: `DRY_RUN_PROVEN`.
 
 - [ ] CANONICAL-IDENTITY-CANARY-01 = BLOCKED_NOT_PROVEN (2026-09-21, read-only, fail-closed; no writes). sourceAuthorityProven/astIdentityProven/semantic768IdentityProven/lexicalIdentityProven/candidateOrdinalBound/crossLaneIdentityParityProven all false. Evidence: `atlas_symbol_versions` 479 rows, only 194 with a `sha256:` source_revision, all sharing ONE revision across 10 `deeds_labs/archive/scaffolds` files (not a per-file digest); 0 of those match an `atlas_ast_nodes` row by source_ref/relative_path; symbol `candidate_ordinal` NULL on all 479; 55,169 embedded chunks have no `sha256:` source_revision and empty workspace_revision in metadata; the 98 revision-qualified AST nodes match no symbol version or chunk. Any pass would need a latest-row fallback or a substituted revision. Unblock: a producer stamps per-file source digest + workspace revision in one pass (admitted snapshot + Graphify run, needs the typed admission token) OR a bounded approved write of one file's symbol/chunk/AST rows under the identity owner. Status: `NOT_PROVEN`.
+  **SUPERSEDED BY the S01-08/S01-09/S01-10 series below (2026-09-21/22, same tasks.md, this same
+  session) — this 2026-09-21 snapshot predates almost all of that work.** Do not treat this
+  entry's blockers as current; see `CANONICAL-IDENTITY-V1-SPEC-RECONCILIATION` below for the
+  reconciled status. The canary itself is re-sequenced as S01-11/S01-12 in the frozen HANDOFF
+  plan, not abandoned.
+
+- [ ] CANONICAL-IDENTITY-V1-SPEC-RECONCILIATION (2026-09-22, read-only except this note + the
+  receipt below; zero DB/Qdrant/Valkey/Neo4j writes, no Graphify, no stable-file apply, no packet
+  writes, no symbol promotion). Reconciled the original `CANONICAL-IDENTITY-V1-SPEC-01` draft
+  (lines above) against the S01-08 through S01-10 work that resolved most of it *after* the draft
+  was written. Full decision table, taxonomy, and canary-readiness rationale:
+  `docs/reports/canonical-identity-v1-spec-reconciliation.json`.
+  - **`stableFileId` derivation — confirmed STALE_DRAFT, not genuinely open.** The draft's "exact
+    live assignment/derivation rule is OPEN" (CANONICAL-IDENTITY-V1 DECISIONS point 2, above) was
+    resolved later in this same document by S01-08G/S01-08I: `stableFileId` = random UUIDv7,
+    minted once on explicit CREATE by the one canonical writer
+    (`sveltekit-frontend/src/lib/server/atlas/identity/stable-file-identity-mint-v1.ts`, owner
+    census confirms `canonicalStableFileWriterOwnerCount == 1`), never derived from
+    path/content/sourceRevision — exactly matching the draft's own prohibition list. Verified
+    live this pass: the 5 cited commits (`93797b4108`, `8bebc06741`, `da25db92ed`, `5f3875e69e`,
+    `f8bcf9e0db`) exist in `git log`, the writer file exists on disk, and the 4 target tables
+    exist live in Postgres (0 rows — schema applied, population not yet authorized). This
+    reconciliation did not invent a new rule — it points to the one already built in this file.
+  - **`treeNodeId` canonical status — confirmed STALE_DRAFT, resolved by the draft's own later
+    text never being back-referenced.** Line 15876's "open decisions unchanged: ... whether
+    treeNodeId is ever canonical" was already answered 2 lines later at line 15878: "canonical
+    structural occurrence coordinate YES; canonical source-object identity NO." Settled, not
+    open.
+  - **Packet source-revision qualification — `PACKET_SOURCE_REVISION_CONTRACT_PROVEN`, distinct
+    from `PACKET_WRITER_PRODUCTION_OWNER_UNRESOLVED`.** Per this session's own MMR1.8 gate
+    (`manual-migration-reconciliation/tasks.md`, `docs/reports/
+    packet-writer-source-revision-authority-v1.json`): the admission mechanism is `PROVEN`,
+    live-DB-tested 15/15; production-caller adoption is separately tracked as
+    `PACKET-WRITER-PRODUCTION-OWNER-01` (new task, split out of MMR1.8 this same pass) — not a
+    semantics defect, an adoption gap.
+  - **One real conflict found, not resolved here (out of scope for a semantics reconciliation)**:
+    `packet_key` has two coexisting live schemes — `packet-key-builder.ts::computePacketKey()`
+    (64-hex, unused by live data) and the actual dominant live formula `packet:` +
+    `SHA256(source_ref).slice(0,12)` (94.6% of rows, verified 500/500 sample match this session
+    via `atlas-feature-intelligence:138`). The spec's own gate condition "exactly one owner is
+    named" is not yet true for `packet_key` specifically — recorded as a real, already-tracked
+    finding, not re-litigated here.
+  - **Owner-location decision (`packages/atlas-core/src/identity/canonical-identity-v1.ts`) is
+    the one genuinely still-open mechanical item** — verified live this pass: that file does not
+    exist; only the pre-existing `feature-identity.ts` is there. The component identities the
+    envelope would discriminate over are each separately proven elsewhere. Not a semantics
+    question — a small assembly step, does not block the canary.
+  - **Canary readiness: `CANONICAL_IDENTITY_CANARY_BLOCKED_UPSTREAM_OWNER`**, not
+    `BLOCKED_OPERATOR_DECISION` on identity semantics. Identity semantics are frozen; what
+    remains is the already-designed S01-08K population apply (waiting on the operator's exact
+    token `apply S01-08K stable file population`, per HANDOFF-2026-09-22-STEP01-SESSION4 above),
+    then S01-08L/M and a final S01-09 symbol-identity rerun, all sequenced before S01-11/S01-12
+    (the canary's current name in the frozen plan). No new operator decision on identity
+    semantics is required to reach `CANARY_READY` — only the existing authorization gate plus
+    finishing the already-sequenced work ahead of it.
+  - **Genuine operator decisions remaining (2, both already named above, neither about identity
+    semantics)**: (1) the S01-08K apply-authorization token; (2) which runtime route/job/event
+    becomes `PACKET-WRITER-PRODUCTION-OWNER-01`'s authorized caller. Full detail in the receipt.
+  - Not started per the operator's explicit instruction: `CANONICAL-IDENTITY-CANARY-01`/S01-12
+    itself. No production data, schema, Qdrant/Valkey/Neo4j, Graphify, stable-file-apply, packet,
+    or symbol writes performed anywhere in this reconciliation pass.
 - [x] GRAPHIFY-INPUT-IDENTITY-V1 SHARED OWNER = CREATED (2026-09-21): `sveltekit-frontend/src/lib/server/atlas/identity/graphify-input-identity.ts` (main repo first; a packages/atlas-core projection is deferred until the main-repo work is done) (`sourceSelectionChecksumV1`, `canonicalGraphifyInputIdentityPayloadV1`, `graphifyInputIdentityV1`) + spec pinning checksum/identity hashes and payload property order (4 tests pass). Preview script now reports `sharedOwnerParityMismatches = 0` over 36 executions (28 distinct / 4 duplicate groups unchanged). Still HOLD: input_identity backfill and producer writes, 02B, admission, Graphify run. Status: `DRY_RUN_PROVEN` (no data written).
 
 - [x] GRAPHIFY-AUTHORITY-READ-PARITY-01 SHADOW COMPARATOR = CREATED/WIRED (2026-09-21, read-only): `sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-read-parity-v1.ts` (+ spec, 6 tests pass) compares `graphify_executions.canonical_authority` with `graphify_execution_authority` per (workspace_id, workspace_revision): MATCH / MISMATCH / BOOLEAN_ONLY / AUTHORITY_ONLY / BOOLEAN_CONFLICT; PARITY_PROVEN only if every revision matches and at least one exists (no vacuous pass); loader issues SELECTs only. Live inputs now: 1 boolean canonical row (`74d50c86`), 0 authority rows => BOOLEAN_ONLY:1, `PARITY_NOT_PROVEN` (expected until 02B). No reader was switched; the boolean and its transitional unique index stay. Still HOLD: 02B (real receipt + `apply 02B`), any reader cutover (needs a read-parity period), boolean/index retirement. Status: `WIRED`, parity `NOT_PROVEN`.
