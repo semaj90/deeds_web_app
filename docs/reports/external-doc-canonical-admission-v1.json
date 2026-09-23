@@ -1,0 +1,179 @@
+{
+  "schema": "atlas.external-doc-canonical-admission.v1",
+  "generatedAt": "2026-09-23T19:20:10.654Z",
+  "baseline": {
+    "pages": 0,
+    "chunks": 0
+  },
+  "expected": {
+    "pages": 30,
+    "chunks": 852
+  },
+  "after": {
+    "pages": 30,
+    "chunks": 852
+  },
+  "chunkRowsVerified": 852,
+  "ftsHitsForSnippet": 43,
+  "distinctProductVersions": 8,
+  "failures": [],
+  "result": "EXTERNAL_DOC_CANONICAL_ADMISSION_PROVEN",
+  "admissionReceipts": [
+    {
+      "pageEvidenceRevision": "sha256:1bdc50767090c39b908226c036df74789ee1da28bf8f94275675de740b102688",
+      "chunkCount": 28,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:4f8200be9e774d78211b635402ac017b1780d8f079cf597c00e7fde4c2c67456",
+      "chunkCount": 61,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:d67110cf1f8d74ddb90e606f4a7fa95f7070f3af0efdfcbf37f6ccf0d6d188d1",
+      "chunkCount": 98,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:369d5272fd1c9917385a9a9bb8fe9dea358a05e6f99385fa8d662420969dade0",
+      "chunkCount": 24,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:2124d2270c3a38db5373bdf81e38eb72ed9f7728a5724d6512934a07d5c81cf2",
+      "chunkCount": 23,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:7cc27f10b3620e5ae65227e816b600e65108cc511f67c9e9ccf22b82bbed28e4",
+      "chunkCount": 18,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:7c3e701b350fb3b64f229b10ea90ea95ab83072c74a6a96f50045f2e7cabb5ff",
+      "chunkCount": 26,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:25c08f4fe0a575ce499a449eb6abd4d2927e50db972292a7364b529a811b4748",
+      "chunkCount": 19,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:164454cba8af388085895998390440dbb1b29a4b918d121724fa442d5e2fad8c",
+      "chunkCount": 51,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:bfc6e23d83ef71c6b9e8f1170a14cb91af493ccfbdedc0891c01041c6e89c5c2",
+      "chunkCount": 17,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:be973d79163593e5c69f150451c647a4b60725c063267c5b05a57dbbbdc28b13",
+      "chunkCount": 71,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:2db756444c0d0af821887a25751eb2916e658e6fccd4ce413f6ced4b2ef98b54",
+      "chunkCount": 10,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:cd5a9d8abcf1879be1bedc976ea5e5d8bb642203cc27df8ff40160d2ee1395e4",
+      "chunkCount": 19,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:aae28b7474f2ee186daa25eb5e1e24180c812dbafbd0c8fe7bf633e5c499a0f3",
+      "chunkCount": 6,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:550d68370f81eae46c7f0d52c6e4d149d90fbe428316a7eef3f9edd583e82eba",
+      "chunkCount": 19,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:5aab6caa41e15d82dadfcc5c07bdf55c7494f3aeca04a262f8a5b266aa480aa3",
+      "chunkCount": 38,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:c75c2639536fb9223ebf6d2478f362ce8f8826bbc1fa9e39c16df8faf6ab607e",
+      "chunkCount": 12,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:8f6a4231e88450818daa8c562b17eb50d10748f0dbb1f69685613230208e7f58",
+      "chunkCount": 3,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:d957c55e5f6e359d1e2b36dc20809741fce9984eb07e8798333797184ddcc9dd",
+      "chunkCount": 11,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:a01039df71de2a354a4b141c5bf47e39568e02df4e8c9f83f17cd02b37eaa76b",
+      "chunkCount": 4,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:9c3bf4e431b334a82c434a12542053a91cba718dc9768dc12b615ed453ae7ec1",
+      "chunkCount": 5,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:bb452f08ff08de98a0fabb6c7ebc99e5a15e7b8cfd030ceaf391f06487cf68f8",
+      "chunkCount": 46,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:c5513189c438dad1ee82f9905f6f18361089859e4926384cfa25d491e0052f8e",
+      "chunkCount": 30,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:07580e227be6f47c076e7f718cc91f5d942f11fa26eb8fe44c02a7797258632d",
+      "chunkCount": 39,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:581f60b56a54f2f69ed871fd99b87462d1e21708d9a5f1fa87761733fa563ec4",
+      "chunkCount": 4,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:6bc99499584f31dd8418b0286eecfaf15146f3ee657b5dbf74fdc23d14adf0a1",
+      "chunkCount": 51,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:f9a6c0eb36814b0887965c042918c85bcc433ce4fbc1cc15182ab7e6b1ee38b6",
+      "chunkCount": 100,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:605e30cd452761cc3e8a84d299718c1bc2bc68ffd097acbae8104457ecbd3eff",
+      "chunkCount": 10,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:35d76a5724e1fc1cde547a9a37bdb57a1dae1ce3a8265b90152a0d1bce3ef157",
+      "chunkCount": 5,
+      "transactionCommitted": true
+    },
+    {
+      "pageEvidenceRevision": "sha256:c277eae9e29facd1b84c47b38b9ece46bb8261a84ff167da045a914224096764",
+      "chunkCount": 4,
+      "transactionCommitted": true
+    }
+  ],
+  "writes": {
+    "postgres": "COMMITTED",
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0
+  }
+}

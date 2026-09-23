@@ -1,6 +1,6 @@
 {
   "schema": "atlas.external-doc-studio-readiness.v1",
-  "generatedAt": "2026-09-23T18:03:25.733Z",
+  "generatedAt": "2026-09-23T19:20:30.796Z",
   "runtimeVersions": {
     "postgres": "18.4 (Debian 18.4-1.pgdg12+1)",
     "pgvector": "0.8.3",
@@ -163,13 +163,8 @@
     "staleSources": [],
     "missingSources": [],
     "validation": {
-      "status": "PARTIAL",
-      "issues": [
-        {
-          "code": "DOC_CANONICAL_CORPUS_EMPTY",
-          "detail": "atlas_external_doc_* has 0 admitted rows"
-        }
-      ]
+      "status": "PASS",
+      "issues": []
     },
     "sources": [
       {
@@ -517,9 +512,9 @@
   },
   "canonicalCorpus": {
     "authority": "CANONICAL_POSTGRES",
-    "status": "EMPTY",
-    "pageCount": 0,
-    "chunkCount": 0,
+    "status": "PRESENT",
+    "pageCount": 30,
+    "chunkCount": 852,
     "constraints": [
       "atlas_external_doc_chunks.atlas_external_doc_chunks_chunk_id_uq[u]",
       "atlas_external_doc_chunks.atlas_external_doc_chunks_evidence_revision_uq[u]",
@@ -971,7 +966,8 @@
         {
           "name": "atlas_external_doc_chunks.domain_tags GIN containment",
           "nodeTypes": [
-            "Seq Scan"
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan"
           ]
         }
       ]
@@ -1215,8 +1211,49 @@
       }
     ],
     "ftsSmoke": {
-      "status": "NOT_RUN",
-      "reason": "DOC_CANONICAL_CORPUS_EMPTY or Postgres unavailable"
+      "status": "RAN",
+      "queries": [
+        {
+          "query": "pgvector",
+          "mode": "POSTGRES_FTS",
+          "rowsMatched": 3,
+          "top": [
+            "pgvector@CURRENT_UPSTREAM@2026-09-23",
+            "drizzle-orm@UNVERSIONED@2026-09-23",
+            "drizzle-orm@CURRENT_UPSTREAM@2026-09-23"
+          ]
+        },
+        {
+          "query": "HNSW",
+          "mode": "POSTGRES_FTS",
+          "rowsMatched": 3,
+          "top": [
+            "pgvector@CURRENT_UPSTREAM@2026-09-23",
+            "drizzle-orm@CURRENT_UPSTREAM@2026-09-23",
+            "drizzle-orm@CURRENT_UPSTREAM@2026-09-23"
+          ]
+        },
+        {
+          "query": "halfvec",
+          "mode": "POSTGRES_FTS",
+          "rowsMatched": 3,
+          "top": [
+            "pgvector@CURRENT_UPSTREAM@2026-09-23",
+            "drizzle-orm@CURRENT_UPSTREAM@2026-09-23",
+            "drizzle-orm@CURRENT_UPSTREAM@2026-09-23"
+          ]
+        },
+        {
+          "query": "PostgreSQL",
+          "mode": "POSTGRES_FTS",
+          "rowsMatched": 3,
+          "top": [
+            "postgresql@18",
+            "drizzle-orm@CURRENT_UPSTREAM@2026-09-23",
+            "drizzle-orm@CURRENT_UPSTREAM@2026-09-23"
+          ]
+        }
+      ]
     }
   },
   "localSearchSmoke": {
@@ -1430,10 +1467,8 @@
     ],
     "note": "environmentInputs are optional dotenv files and node_modules-installed package versions; they are never required for the smoke to pass."
   },
-  "result": "DOC_CANONICAL_CORPUS_EMPTY",
-  "secondaryResults": [
-    "DOC_CANONICAL_CORPUS_EMPTY"
-  ],
+  "result": "DOC_INTELLIGENCE_STUDIO_READINESS_PROVEN",
+  "secondaryResults": [],
   "writes": {
     "postgres": 0,
     "qdrant": 0,

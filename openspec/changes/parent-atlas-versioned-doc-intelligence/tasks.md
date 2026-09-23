@@ -259,8 +259,10 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   nullable for now — `NOT NULL` is deferred until DOC-06A's admission writer (below) is the thing
   actually enforcing every row populates them, not added as a premature constraint ahead of it.
   Combined regression across all Phase A/B test files after this change: 67/67 pass.
-- [x] **DOC-06A** `EXTERNAL_DOC_POSTGRES_ADMISSION_01` — done, live-proven (writer/adapter only; corpus admission NOT run —
-  `atlas_external_doc_pages/chunks` still 0 rows, see DOC-CANARY-ADMISSION-01). Operator-directed,
+- [x] **DOC-06A** `EXTERNAL_DOC_POSTGRES_ADMISSION_01` — done, live-proven (writer/adapter contract proven earlier; **pinned corpus admitted 2026-09-23, operator-confirmed:** 30 pages / 852 chunks committed via
+  `sveltekit-frontend/scripts/atlas/run-external-doc-admission-v1.mts --apply`, `EXTERNAL_DOC_CANONICAL_ADMISSION_PROVEN`, receipt `docs/reports/external-doc-canonical-admission-v1.json`:
+  852/852 rows match id, evidence revision, checksum, byte length and text; 30 unique page and 852 unique chunk revisions/ids in Postgres; generated FTS works (43 hits for `snippet`);
+  no embeddings/Qdrant/Valkey/Neo4j; text = post-fidelity representation. Still open downstream: Studio canonical-FTS wiring, embeddings, analyses). Operator-directed,
   depends on DOC-04/05/06. The missing join: DOC-06 proved the tables and their invariants via
   hand-written SQL; nothing yet takes the real Python `chunk_document()`/`fetch_beautifulsoup()`
   output and transactionally admits it. Scope: a TypeScript admission adapter — Pydantic-validated
@@ -376,7 +378,7 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   DOC-06A above proves the writer/adapter contract only; canonical pinned-corpus admission has NOT run.
   **Result (2026-09-23, `--apply`, receipt `docs/reports/external-doc-canary-admission-v1.json`):** baseline 0/0 -> inside the transaction 3 pages / 46 chunks
   -> exact id/evidence-revision/checksum/byte-length/text readback 0 failures, generated-FTS query returned 13 hits (token `snippet`) -> ROLLBACK -> 0/0, independently
-  re-confirmed with psql. No embeddings, no :8081, no other stores. The real 30-page canonical admission has NOT run and still needs its own OK.
+  re-confirmed with psql. No embeddings, no :8081, no other stores. The real 30-page canonical admission then ran separately (see DOC-06A above).
   **Runner (built earlier the same day):** `admitExternalDocPage` COMMITs its own transaction, so a
   rollback canary cannot wrap it directly; `src/lib/server/atlas/docs/external-doc-canary-v1.ts` maps the writer's BEGIN/COMMIT/ROLLBACK onto
   savepoints inside one always-rolled-back outer transaction (4 no-database vitest tests incl. the real writer against a fake client).
