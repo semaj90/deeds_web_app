@@ -64,6 +64,29 @@ def assess(chunk_only: str, summary: str, meta: str = "") -> dict:
     return {"label": label, "unsupportedTokens": unsupported, "corruptedTokens": corrupted, "omittedKeyTokens": omitted}
 
 
+JUDGE_SYSTEM = ("You audit a summary of one documentation chunk. Split the summary into its individual factual claims. For each claim answer SUPPORTED (the chunk states it), "
+                "PARTIALLY_SUPPORTED (the chunk states part of it or it is a loose paraphrase) or UNSUPPORTED (the chunk does not say it). Judge only against the chunk text. "
+                'Reply with JSON only: {"claims":[{"claim":"...","verdict":"SUPPORTED|PARTIALLY_SUPPORTED|UNSUPPORTED"}]}')
+
+
+def judge(chunk_text: str, summary: str, model: str) -> dict:
+    user = "Chunk:\n" + chunk_text + "\n\nSummary:\n" + summary
+    body = json.dumps({"model": model, "temperature": 0, "max_tokens": 900, "stream": False, "seed": 1729, "messages": [{"role": "system", "content": JUDGE_SYSTEM}, {"role": "user", "content": user}]}).encode()
+    try:
+        d = json.load(urllib.request.urlopen(urllib.request.Request(f"{LLAMA}/v1/chat/completions", data=body, headers={"content-type": "application/json"}), timeout=90))
+        raw = d["choices"][0]["message"]["content"].strip()
+        start = min(i for i in (raw.find("{"), raw.find("[")) if i >= 0)
+        parsed = json.JSONDecoder().raw_decode(raw[start:])[0]  # first complete JSON value only; fences/trailing prose are ignored
+        claims = parsed["claims"] if isinstance(parsed, dict) else parsed  # the model sometimes returns a bare array instead of {"claims": [...]}
+        claims = [c for c in claims if isinstance(c, dict)]
+        verdicts = [c["verdict"] for c in claims if c.get("verdict") in ("SUPPORTED", "PARTIALLY_SUPPORTED", "UNSUPPORTED")]
+        if not verdicts:
+            return {"status": "JUDGE_PARSE_FAILED", "raw": raw[:300]}
+        return {"status": "JUDGED", "claims": claims, "counts": dict(Counter(verdicts))}
+    except Exception as e:  # recorded as null, never promoted
+        return {"status": "JUDGE_ERROR", "error": str(e)[:200], "raw": locals().get("raw", "")[:300]}
+
+
 def psql_json(sql: str):
     out = subprocess.run(["docker", "exec", "-i", "legal-ai-postgres", "psql", "-U", "legal_admin", "-d", "legal_ai_db", "-tA"], input=sql, capture_output=True, text=True, encoding="utf-8", check=True).stdout
     return json.loads(out)
@@ -99,22 +122,27 @@ def main() -> int:
     for r in picked:
         text, finish, toks, ms = summarize(r, model)
         a = assess(r["text"], text, r["product"] + " " + r["ver"] + " " + r["title"])
+        a["semanticJudge"] = judge("Header (page context, legitimate support): " + r["product"] + " " + r["ver"] + " | " + r["title"] + " | " + (" > ".join(r["head"] or []) or "none") + "\n" + r["text"], text, model)
         items.append({"chunkId": r["id"], "chunkEvidenceRevision": r["rev"], "product": r["product"], "productVersion": r["ver"], "finishReason": finish, "completionTokens": toks, "latencyMs": round(ms),
                       "containsSeedIdentifiers": [t for t in MUST_TRY if t in r["text"]], "summary": text, **a})
     counts = Counter(i["label"] for i in items)
     bad = counts["UNSUPPORTED"] + counts["TECHNICAL_TOKEN_CORRUPTED"]
+    jstat = Counter(i["semanticJudge"]["status"] for i in items)
+    jclaims = Counter(v for i in items for v, n in i["semanticJudge"].get("counts", {}).items() for _ in range(n))
+    judge_unsupported = [i["chunkId"] for i in items if i["semanticJudge"].get("counts", {}).get("UNSUPPORTED")]
+    judge_unrun = jstat["JUDGED"] != len(items)
     receipt = {
         "schema": "atlas.external-doc-summary-faithfulness.v1", "generatedAt": datetime.now(timezone.utc).isoformat(), "gate": "EXTERNAL_DOC_SUMMARY_FAITHFULNESS_01",
         "backend": {"kind": "llama-server (NOT Ollama)", "url": LLAMA, "resolvedModelId": model, "listedModels": models}, "method": "deterministic token/number support against the same canonical chunk plus the prompt's own product/version/title metadata; plain hyphenated compounds whose words occur in the chunk are accepted, API-like tokens (dotted/underscored/backticked/numeric) stay strict; NOT a semantic entailment judge", "firstPassNote": "the first pass flagged 4/19 UNSUPPORTED (version 18 from the metadata header, low-selectivity, re-runs); all four were checker limits, so the checker was refined, not the acceptance bar",
-        "semanticJudge": "NOT_RUN", "sample": {"chunks": len(items), "products": sorted(by_product), "perProductTarget": SAMPLE_PER_PRODUCT}, "labelCounts": dict(counts),
-        "acceptance": {"rule": "0 UNSUPPORTED and 0 TECHNICAL_TOKEN_CORRUPTED (strict on invented/corrupted technical facts; concise omission allowed)", "invalid": bad},
+        "semanticJudge": {"kind": "LLM self-judge (same Ornith model, temperature 0); a weak second signal, not independent ground truth", "statusCounts": dict(jstat), "claimVerdictCounts": dict(jclaims), "chunksWithUnsupportedClaim": judge_unsupported}, "sample": {"chunks": len(items), "products": sorted(by_product), "perProductTarget": SAMPLE_PER_PRODUCT}, "labelCounts": dict(counts),
+        "acceptance": {"rule": "a summary is accepted only if: 0 UNSUPPORTED/TECHNICAL_TOKEN_CORRUPTED under the token gate AND the judge ran and found 0 UNSUPPORTED claims; PARTIALLY_SUPPORTED claims are counted and routed to review, not auto-rejected; a judge failure is null and never counts as a pass; concise omission allowed", "invalid": bad + len(judge_unsupported), "judgeIncomplete": judge_unrun},
         "seedIdentifiersCovered": sorted({t for i in items for t in i["containsSeedIdentifiers"]}), "items": items,
         "invariant": "SUMMARY = context compression / ranking aid; citations and evidence stay on the canonical chunkEvidenceRevision",
         "persistence": "none (analysis table untouched)", "writes": {"postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0, "graphify": 0},
-        "result": "EXTERNAL_DOC_SUMMARY_FAITHFULNESS_TOKEN_GATE_PASSED" if bad == 0 else "EXTERNAL_DOC_SUMMARY_FAITHFULNESS_FINDINGS",
+        "result": "EXTERNAL_DOC_SUMMARY_FAITHFULNESS_GATE_PASSED" if bad == 0 and not judge_unsupported and not judge_unrun else "EXTERNAL_DOC_SUMMARY_FAITHFULNESS_JUDGE_INCOMPLETE" if bad == 0 and not judge_unsupported else "EXTERNAL_DOC_SUMMARY_FAITHFULNESS_FINDINGS",
     }
     (ROOT / "docs/reports/external-doc-summary-faithfulness-v1.json").write_text(json.dumps(receipt, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(json.dumps({"result": receipt["result"], "chunks": len(items), "labels": dict(counts), "seedsCovered": receipt["seedIdentifiersCovered"]}, indent=1))
+    print(json.dumps({"result": receipt["result"], "chunks": len(items), "labels": dict(counts), "judgeStatus": dict(jstat), "judgeClaims": dict(jclaims), "judgeUnsupportedChunks": judge_unsupported, "seedsCovered": receipt["seedIdentifiersCovered"]}, indent=1))
     for i in items:
         if i["label"] in ("UNSUPPORTED", "TECHNICAL_TOKEN_CORRUPTED"):
             print(i["chunkId"], i["label"], i["unsupportedTokens"], i["corruptedTokens"])
