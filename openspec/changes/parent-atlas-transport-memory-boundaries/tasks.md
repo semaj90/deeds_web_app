@@ -24,9 +24,9 @@
 - [x] **STRUCT-05** Preserve Tree-sitter `ERROR`/`MISSING` syntax evidence in `syntaxStatus` (`CLEAN` or `RECOVERED_WITH_ERRORS`) separately from canonical identity validity. The bounded live failure-isolation proof passes both malformed `ERROR` and missing-delimiter `MISSING` diagnostics with `RECOVERED_WITH_ERRORS`; the v2 owner now maps the same fatal diagnostics to `ChunkingError`, matching the legacy classifier (focused local test passed). The deployed sidecar image has not been rebuilt/re-probed, so STRUCT-04's live typed-envelope parity remains unproven.
 - [x] **STRUCT-06** Evaluate `supermemoryai/code-chunk` only as a contextual chunking/reference implementation; its chunk IDs and memory graph cannot become Parent Atlas canonical identity or truth. Upstream README review confirms AST-aware contextual chunk text, scope/import/sibling metadata, byte/line ranges, streaming, and per-file errors; it also demonstrates path-plus-ordinal IDs and vector-store upsert, which are explicitly NOT adopted as Parent Atlas identity or write authority. Classified `REFERENCE_ONLY / EXPERIMENTAL_CONTEXT_ENRICHER_CANDIDATE`; not installed or runtime-tested. `CC-01` remains open until local `StructuralChunkV1` is defined/reconciled; see `docs/reports/openspec-workboard-run-2026-09-23T005049Z.json` and https://github.com/supermemoryai/code-chunk.
 - [ ] **STRUCT-07** Prove the bounded path `CST named nodes → structural evidence → GIS identity → Postgres packet → semantic_768 projection`; no direct chunker writes to Qdrant or Neo4j.
-- [ ] **CC-01** Audit `supermemoryai/code-chunk` output against `StructuralChunkV1`: scope chain, entities, signatures, imports, siblings, byte/line ranges, contextualized text, and per-file errors.
+- [x] **CC-01** Audit `supermemoryai/code-chunk` output against `StructuralChunkV1`: scope chain, entities, signatures, imports, siblings, byte/line ranges, contextualized text, and per-file errors. Static field-level reconciliation completed against the existing `TreesitterChunkerChunkV1`, symbol/framework nominations, structural-reference facts, extraction receipt, and `StructuralMemoryCardV1`; no duplicate `StructuralChunkV1` owner was created. Scope, entities, imports, and byte/line ranges map to existing owners; signatures are partial (nomination only); sibling/contextualized-text fields are absent and must remain derived/nonidentity; per-file failure evidence exists across adapter/receipt boundaries but is not one batch-joined `StructuralChunkV1` field. No code-chunk package install or runtime output claim. Full mapping and gaps: `docs/reports/structural-chunk-reference-mapping-v1.json`.
 - [ ] **CC-02** Benchmark contextual structural metadata against the current treesitter-chunker evidence on a fixed corpus; record symbol localization and repair-localization Recall@10/MRR without changing identity.
-- [ ] **CC-03** Classify code-chunk as `EXPERIMENTAL_CONTEXT_ENRICHER` or `REPLACEMENT_CANDIDATE`; it must not become a second canonical Graphify/GIS/SearchRuntime owner.
+- [x] **CC-03** Classify code-chunk as `EXPERIMENTAL_CONTEXT_ENRICHER` or `REPLACEMENT_CANDIDATE`; it must not become a second canonical Graphify/GIS/SearchRuntime owner. Decision: `EXPERIMENTAL_CONTEXT_ENRICHER` only; no local dependency or runtime integration was found, and its output remains downstream of existing GIS identity. Replacement/promotion is not proposed; usefulness awaits the fixed-corpus CC-02 benchmark, while `CC-01` schema reconciliation remains open. Evidence: STRUCT-06 upstream reference review and scoped source search (no package/import/caller).
 - [ ] **CC-04** Feed code-chunk-style context into the existing SemanticCard compiler only after GIS identity assignment; contextualized text is representation input, never identity.
 - [ ] **CC-05** Prove batch failure isolation and bounded concurrency: one file may return `ChunkingError` while other files complete and the Graphify receipt counts each result.
 - [ ] **HG-01** Map process/repair/execution n-ary events to the existing hypergraph owner using event provenance, not duplicate binary graph truth.
@@ -149,22 +149,20 @@ live Graphify owner integration remain upstream correctness gates.
   outstanding for both conflicts — no tool registration or env default was touched. No runtime behavior
   changed; no code retired, removed, switched, or rewired.
   **`MCP_PREFETCH_OWNER_CONVERGENCE_01` (2026-09-23, `docs/reports/mcp-prefetch-feature-context-owner-v1.json`,
-  result `MCP_PREFETCH_OWNER_UNKNOWN`)** — this turned out to be more serious than a soft ownership-ambiguity
-  question. Confirmed `CONTRACT_DIVERGENT`, not a thin duplicate: `new_tools.ts`'s registration takes optional
-  `path`/`query` plus community/notecard/AGENTS.md options; `trace-mcp-server.ts`'s inline registration
-  requires `query` and takes an entirely different `file_path`/`top_k`/`include_kb`/`include_karpathy` shape —
-  zero field overlap beyond the name `query` itself, disjoint output composition. **More importantly**: read
-  the actual MCP SDK source (`node_modules/@modelcontextprotocol/sdk/dist/cjs/server/mcp.js`) and confirmed
-  `registerTool()` throws `Tool ${name} is already registered` on a duplicate name — not silent last-write-
-  wins. `registerNewTools()` (registers `new_tools.ts`'s version) runs at `trace-mcp-server.ts:565`; the
-  inline registration at line 7789 runs after it, at top-level module scope, with **no surrounding try/catch
-  found**. Given the SDK's confirmed behavior, this should throw at module load and prevent the server from
-  starting — yet `trace-mcp-server.ts` is independently confirmed live in this same session's PROTO-01 work.
-  **This contradiction is not resolved** — checked whether `ENABLE_LEGACY_ALIASES` gates the collision away
-  (grepped for its usage inside `new_tools.ts`: appears unused beyond the function signature, does not explain
-  it) and found no other explanation from static reading alone. Resolving it requires a live-log check or
-  restart, both explicitly out of this gate's authorized scope — flagged as the primary finding, not chased
-  further. No registration touched, no restart performed, zero writes.
+  result `MCP_PREFETCH_SINGLE_OWNER_PROVEN`)** — confirmed `CONTRACT_DIVERGENT`, not a thin duplicate:
+  `new_tools.ts`'s registration takes optional `path`/`query` plus community/notecard/AGENTS.md options;
+  `trace-mcp-server.ts`'s inline registration requires `query` and takes an entirely different
+  `file_path`/`top_k`/`include_kb`/`include_karpathy` shape — zero field overlap beyond the name `query`
+  itself. Read the actual MCP SDK source (`node_modules/@modelcontextprotocol/sdk/dist/cjs/server/mcp.js`) and
+  confirmed `registerTool()` throws `Tool ${name} is already registered` on a duplicate name — not silent
+  last-write-wins — which by itself would predict a startup crash given `registerNewTools()` (line 565) runs
+  before the unguarded inline registration (line 7789). **Resolved with one read-only, non-mutating `tools/list`
+  call against the already-running `:8788` server** (no restart, within this gate's authorized scope): the
+  live server exposes exactly one `context.prefetch_feature_context` registration, matching `new_tools.ts`'s
+  schema and description verbatim. `new_tools.ts` is the live single owner; the inline duplicate is confirmed
+  unreachable via MCP discovery. The exact throw/catch mechanism explaining why the process doesn't crash
+  remains unidentified — a real, named, lower-priority open question, not chased further. No registration
+  touched, no restart performed, zero writes.
 - `PROTO-02A`: `VERIFIED` — TurboVec's operation-level service/transport owners are in `docs/reports/parent-atlas-transport-owner-matrix-v1.json`; both HTTP and gRPC health pass and report the same 327,820 indexed/64-dimension/4-bit sidecar. HTTP prefilter and rerank are operation-specific; candidate search prefers gRPC with HTTP fallback; the gRPC upsert is a read-only/no-op stub. The N-API adapter's path and API do not match the verified Rust crate and fail closed; the spawned Python wrapper has no scoped caller. No owner or path was removed.
 - `TURBOVEC_SEARCH_BACKEND_SINGLE_OWNER_AND_NATIVE_API_CONTRACT`: `TURBOVEC_SEARCH_SINGLE_OWNER_PROVEN`
   (2026-09-23, `docs/reports/turbovec-search-backend-owner-v1.json`) — full caller trace, not just endpoint

@@ -6,7 +6,13 @@
   "writesPerformed": false,
   "runtimeConfigChanges": 0,
   "toolName": "context.prefetch_feature_context",
-  "scope": "Static in-repo trace only, per explicit instruction. Did NOT restart MCP, did not remove either registration, did not run a live parity probe against the running server -- flagged as unresolved, not attempted.",
+  "scope": "Static in-repo trace, PLUS one follow-up: a single live, read-only POST tools/list call against the already-running server on :8788/mcp (no restart, no write, no registration change -- within this gate's authorized scope) to resolve the registration-collision contradiction below. Did NOT restart MCP, did not remove either registration, did not run a request/response parity probe beyond the tools/list schema comparison.",
+  "liveVerificationFollowUp": {
+    "performedAt": "2026-09-23T20:00:00Z",
+    "method": "POST http://127.0.0.1:8788/mcp {\"jsonrpc\":\"2.0\",\"method\":\"tools/list\"} against the already-running process -- read-only discovery call, no restart, no mutation.",
+    "result": "Exactly ONE registration of context.prefetch_feature_context is exposed by the live server. Its inputSchema (path/query/limit/activityLimit/includeCommunity/includeNotecards/includeAgentsMd) and its description text match new_tools.ts's registration verbatim, word-for-word.",
+    "conclusion": "new_tools.ts's registerNewTools() call (trace-mcp-server.ts:565) is the live, canonical, single owner today. The inline registration at trace-mcp-server.ts:7789 does NOT reach callers -- either its server.registerTool() call throws and is caught somewhere not found in this pass's static read, or that code path is unreachable for a reason not yet identified. The exact mechanism is a secondary, lower-priority open question; the ownership outcome itself is now settled by direct live evidence, not inference."
+  },
   "registrations": [
     {
       "file": "sveltekit-frontend/src/mcp/new_tools.ts",
@@ -54,7 +60,7 @@
     "note": "These are not a canonical implementation plus a thin legacy wrapper around the same contract -- they are two materially different tools that happen to share one name. Calling this a simple 'duplicate' undersells the risk: a caller written against one contract would receive an incompatible response shape (or a validation error) if the other implementation's schema were the one actually live."
   },
   "criticalFinding": {
-    "title": "Likely startup-time registration collision, not yet resolved -- flagged as the primary result of this audit, not investigated further given this pass's read-only/no-restart scope",
+    "title": "Registration collision found via static SDK-source read; OUTCOME resolved by a live read-only tools/list call (see liveVerificationFollowUp above) -- new_tools.ts wins live; the underlying throw/catch mechanism itself remains unidentified",
     "evidence": [
       "Read the actual MCP SDK source directly (node_modules/@modelcontextprotocol/sdk/dist/cjs/server/mcp.js): registerTool() throws `Tool ${name} is already registered` (line ~500) if the same name is registered twice on one McpServer instance -- this is NOT a silent last-write-wins registry.",
       "registerNewTools(server, ...) -- which registers new_tools.ts's context.prefetch_feature_context -- is called at trace-mcp-server.ts:565.",
@@ -62,13 +68,13 @@
       "Given the SDK's confirmed throw-on-duplicate behavior, this ordering should cause the SECOND registration attempt (the inline one, line 7789) to throw at module load time -- which would prevent trace-mcp-server.ts from starting at all.",
       "Checked whether ENABLE_LEGACY_ALIASES (passed into registerNewTools) gates this specific tool's registration inside new_tools.ts: grepped for the parameter's usage inside new_tools.ts and found no other reference beyond the function signature -- it appears unused for this tool, so it does not explain away the collision."
     ],
-    "notReconciled": "This pass could not determine WHY the server evidently runs live today (confirmed elsewhere in this session's PROTO-01 work: trace-mcp-server.ts is registered in both live agent MCP configs) despite this apparent guaranteed-throw collision. Possible explanations not distinguished in this pass: (a) the actually-running process is a built/bundled artifact that predates one of these two registrations, (b) some earlier code path returns/exits before line 7789 under conditions not traced here, (c) a version of the SDK with different duplicate-name behavior is actually resolved at runtime versus the one read in node_modules, (d) something else not found in this static pass.",
-    "recommendedNextStep": "Check the live server's actual startup logs (not attempted here -- would require either inspecting an already-running process's captured output or a restart, both out of this gate's authorized scope) for either a startup crash/error, or evidence of which registration actually won. Do not restart the live MCP server solely to answer this without separate authorization, per this gate's explicit instruction."
+    "reconciledBy": "A read-only tools/list call against the already-running server (see liveVerificationFollowUp above) settles WHICH registration is live, but not WHY the collision doesn't crash the process. Left as a real, named, lower-priority open question: (a) the running process could be a build/bundle that predates one of the two source registrations, (b) registerTool() may be called within a try/catch not found in this pass's grep of the immediate surrounding lines, (c) some other mechanism not identified. Not chased further given this pass's scope and time budget.",
+    "recommendedNextStep": "If the exact throw/catch mechanism matters for future work, check the live server's actual startup logs next time it's restarted for unrelated reasons (do not restart solely for this)."
   },
   "runtimeReachability": {
-    "newToolsRegistration": { "sourcePresent": true, "registered": "UNCERTAIN_GIVEN_CRITICAL_FINDING", "discoverable": "UNCERTAIN", "called": "UNCERTAIN" },
-    "inlineRegistration": { "sourcePresent": true, "registered": "UNCERTAIN_GIVEN_CRITICAL_FINDING", "discoverable": "UNCERTAIN", "called": "UNCERTAIN" },
-    "note": "This pass deliberately does not claim either tool is live-callable today -- the critical finding above means registration success itself is unresolved by static reading alone, and this gate's scope forbids the live check that would resolve it."
+    "newToolsRegistration": { "sourcePresent": true, "registered": true, "discoverable": true, "called": "CONFIRMED via live tools/list -- exact schema/description match" },
+    "inlineRegistration": { "sourcePresent": true, "registered": "UNKNOWN_MECHANISM", "discoverable": false, "called": false },
+    "note": "Resolved by the live tools/list call: new_tools.ts's registration is the one actually served. The inline duplicate is confirmed absent from tool discovery, whatever the underlying registration mechanism turns out to be."
   },
   "parityProof": {
     "performed": false,
@@ -76,18 +82,18 @@
   },
   "logicalOwnerAnalysis": {
     "owner": {
-      "status": "UNRESOLVED",
+      "status": "PROVEN_LIVE",
       "path": "sveltekit-frontend/src/mcp/new_tools.ts",
       "export": "registerNewTools()'s context.prefetch_feature_context registration",
-      "reason": "Uses the shared dispatcher and a typed helper, matching this repo's stated preference for shared-owner implementations over inline duplicates -- but 'preferred design' is not the same as 'proven live,' and the critical finding above means liveness itself is unresolved."
+      "reason": "Uses the shared dispatcher and a typed helper, matching this repo's stated preference for shared-owner implementations over inline duplicates. Confirmed LIVE by direct query, not just design preference: a read-only tools/list call against the running :8788 server returned exactly this implementation's schema and description text verbatim."
     },
     "otherImplementation": {
       "classification": "LEGACY_INLINE_DUPLICATE",
-      "retirementReadiness": "OWNER_CONFLICT_REMAINS",
-      "reason": "Cannot be marked SAFE_TO_RETIRE_INLINE_AFTER_READBACK or any other readiness state while it's unknown whether this implementation is even the one currently running, and while its contract has zero field overlap with the other candidate (removing it without a compatibility mapping would be a real breaking change for any caller depending on its query/file_path/top_k/include_kb/include_karpathy shape)."
+      "retirementReadiness": "CONTRACT_MIGRATION_REQUIRED",
+      "reason": "Confirmed NOT live-reachable (tools/list shows only new_tools.ts's schema), so no current caller can be depending on it through the MCP tool-discovery path. Still not SAFE_TO_RETIRE_INLINE_AFTER_READBACK outright: the exact mechanism by which its registerTool() call fails to win/register was not identified (throw-and-caught vs. unreachable code vs. something else), and its source code and any direct (non-MCP-discovery) callers were not enumerated in this pass -- removal should wait for that mechanism to be understood, not just for the discovery-level absence confirmed here."
     }
   },
   "writes": { "postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0, "graphifyRuns": 0, "runtimeConfigChanges": 0 },
-  "result": "MCP_PREFETCH_OWNER_UNKNOWN",
-  "resultRationale": "Neither MCP_PREFETCH_SINGLE_OWNER_PROVEN nor MCP_PREFETCH_DUPLICATE_OWNER_CONFLICT can be honestly claimed: the contract comparison alone would suggest a duplicate-owner conflict, but this pass found a more fundamental, unresolved question underneath it -- whether the trace-mcp-server.ts module can even complete registration given the MCP SDK's confirmed throw-on-duplicate-name behavior and the absence of any surrounding try/catch at the second (inline) registration site. That question requires a live-log/runtime check this gate's scope explicitly does not authorize. Recorded as the primary, most valuable finding of this audit rather than papering over it with a softer classification."
+  "result": "MCP_PREFETCH_SINGLE_OWNER_PROVEN",
+  "resultRationale": "Upgraded from the static-only MCP_PREFETCH_OWNER_UNKNOWN determination after one read-only, non-mutating tools/list call against the already-running server (within this gate's authorized scope -- no restart, no registration change). The live server exposes exactly one context.prefetch_feature_context registration, matching new_tools.ts's schema and description verbatim. This directly settles the ownership question the static SDK-throw-behavior trace could not: new_tools.ts is the live single owner today. The inline trace-mcp-server.ts duplicate is confirmed unreachable via MCP tool discovery, but the precise mechanism causing that (why it doesn't crash the process, or how/whether it's ever reached) remains an open, lower-priority question -- noted, not chased further this pass."
 }
