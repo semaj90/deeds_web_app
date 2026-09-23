@@ -405,7 +405,10 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   revision + analysis type + producer/model/prompt revision) after a fresh owner audit; `analysis_pass_results` and `atlas_summary_layers`
   are packet-keyed and not reusable. `20260923_external_doc_summaries_v1.sql` is `DRAFT_SUPERSEDED_PENDING_ANALYSIS_OWNER` and must not be applied.
   Per-chunk BitFrost/Valkey analysis warming stays blocked until canonical chunks exist. Scope: derived-analysis persistence design,
-  not canonical chunk storage.
+  not canonical chunk storage. **Draft written 2026-09-23 (UNAPPLIED, checkbox stays open):** `sveltekit-frontend/drizzle/manual/20260923b_external_doc_analyses_v1.sql`
+  (append-only via trigger, FK to `atlas_external_doc_chunks(evidence_revision)`, `canonical_authority=false`, contract refinements as CHECKs);
+  4 static vitest tests (`external-doc-analyses-ddl.spec.ts`) pin it to `ExternalDocAnalysisV1` fields/types. Not run against a database, so SQL
+  syntax is unproven until an operator applies it (needs a review + explicit OK); closing this task requires apply + insert/replay/append-only proof.
 - [ ] **DOC-03** Firecrawl bounded crawler — `EXISTS` (`fetch_firecrawl_v2`), verify
   bounded-crawl behavior (maxPages/maxDepth/sitemap-follow) matches the manifest's
   `maximum_pages`/`maximum_depth` fields; **blocked** on Firecrawl actually being registered
