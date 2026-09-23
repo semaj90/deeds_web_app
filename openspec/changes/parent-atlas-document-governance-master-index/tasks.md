@@ -8,6 +8,25 @@ change in task state -- no task reopening, restructuring, or different change in
 with this repo's own standing caution: treat each change's `tasks.md` as task authority; the
 aggregate workboard is projection evidence only until a clean rebuild succeeds.
 
+**Partial CLAUDE_INSTRUCTION_SUPERSESSION_PLAN_2_2 contribution (2026-09-23, read-only, bounded --
+NOT the full gate)**: located the 7 real `CLAUDE.md` files (excluding `node_modules/`,
+`.tmp/workspace-source-snapshots/`, and `deeds_labs/archive/` snapshot copies): `CLAUDE.md` (root),
+`.claude/CLAUDE.md`, `claude-mem/CLAUDE.md`, `llama-cpp-turboquant-gemma4/CLAUDE.md`,
+`mcp-server-mcp/CLAUDE.md`, `tools/agentic-research/src/firecrawl/CLAUDE.md`,
+`sveltekit-frontend/CLAUDE.md` -- matches the expected 1 root / 6 nested inventory. Cross-checked
+these 7 paths against the existing `docs/reports/document-supersession-audit-v1.json` (16 explicit
+"supersedes"-style reference edges found across the whole repo by an earlier, broader audit): **zero
+edges have both `from` and `to` as CLAUDE.md files** -- the only CLAUDE.md-involving edge is
+`CLAUDE.md -> docs/archive-manifest.json` (not another instruction document). This is real,
+reused, supporting evidence for `NO_SUPERSESSION_EVIDENCE` across all 7 files, consistent with
+governance 2.2's expected default outcome. **This is NOT the full gate**: no
+`ClaudeInstructionSupersessionPlanV1` contract was built, no `InstructionScopeV1`/
+`DocumentSupersessionV1` dimension types were frozen, no fixture proofs (A-F) were written, no
+deterministic-replay checksum was generated, and the existing supersession audit's search pattern
+was not verified to be scoped correctly for this specific question (it was built for a different,
+broader purpose). Left as a real, bounded, honestly-partial contribution for the next session with
+full budget to build the actual contract/fixtures on top of.
+
 ## 1. Registry and discovery
 
 - [x] 1.1 Add `DocumentGovernanceRecordV1` schema with explicit status, topic ownership, supersession, OpenSpec, validation, workflow-progress-reference, and archive fields. Evidence: `packages/parent-atlas/src/core/document-governance-record-v1.ts` is the strict shared Zod owner; the deterministic registry builder validates every emitted record before serialization, and the SSR API validates the registry before summarizing it. Unassigned topics, unassessed supersession, unchecked validation, absent workflow receipts, and blocked archive state are explicit; no authority is inferred. Focused package tests: 4/4.
