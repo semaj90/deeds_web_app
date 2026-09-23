@@ -1,0 +1,93 @@
+{
+  "schema": "atlas.mcp-prefetch-feature-context-owner.v1",
+  "gate": "MCP_PREFETCH_OWNER_CONVERGENCE_01",
+  "generatedAt": "2026-09-23T19:30:00Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "runtimeConfigChanges": 0,
+  "toolName": "context.prefetch_feature_context",
+  "scope": "Static in-repo trace only, per explicit instruction. Did NOT restart MCP, did not remove either registration, did not run a live parity probe against the running server -- flagged as unresolved, not attempted.",
+  "registrations": [
+    {
+      "file": "sveltekit-frontend/src/mcp/new_tools.ts",
+      "registrationLine": 508,
+      "registrationCall": "server.registerTool('context.prefetch_feature_context', {...}, createToolWithDispatcher(dispatcherMiddleware, 'context.prefetch_feature_context', sessionId_prefetch, handler))",
+      "inputSchema": {
+        "path": "optional string",
+        "query": "optional string",
+        "limit": "number, 1-10, default 4",
+        "activityLimit": "number, 1-100, default 24",
+        "includeCommunity": "boolean, default true",
+        "includeNotecards": "boolean, default true",
+        "includeAgentsMd": "boolean, default true"
+      },
+      "requiredFields": "none individually required, but handler fails closed if BOTH path and query are absent",
+      "implementation": "buildFeaturePrefetchContext() via dispatcherMiddleware -- directory KAG context, community graph context, notecard search, AGENTS.md quick hits, recent activity log",
+      "delegatesToExistingOwners": "Uses the shared dispatcher middleware and a typed buildFeaturePrefetchContext() helper -- does not appear to mint its own feature/candidate identity or bypass SearchRuntime, based on this pass's read of the handler body; not exhaustively traced into buildFeaturePrefetchContext()'s own internals given this pass's scope.",
+      "sourcePresent": true,
+      "registeredCallOrder": "First -- reached via registerNewTools(server, ...) called at trace-mcp-server.ts:565"
+    },
+    {
+      "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+      "registrationLine": 7789,
+      "registrationCall": "server.registerTool('context.prefetch_feature_context', {...}, inline async handler) -- top-level module scope, NOT wrapped in try/catch",
+      "inputSchema": {
+        "query": "REQUIRED string",
+        "file_path": "optional string",
+        "top_k": "number, 1-20, default 8",
+        "include_kb": "boolean, default true",
+        "include_karpathy": "boolean, default true"
+      },
+      "requiredFields": "query is required (no path-only mode)",
+      "implementation": "inline bridge: TRACE :8788 (KAG graph search) + KB :8789 (research summaries) + Redis Karpathy blend scores + LLMS.md rules",
+      "delegatesToExistingOwners": "Calls out to existing TRACE/KB/Redis services directly rather than through the shared dispatcher/feature-prefetch helper used by new_tools.ts -- a materially different implementation, not a thin wrapper around the same owner.",
+      "sourcePresent": true,
+      "registeredCallOrder": "Second -- top-level statement at line 7789, after the registerNewTools() call at line 565 in the same file's execution order"
+    }
+  ],
+  "contractComparison": {
+    "fieldOverlap": ["query (present in both, but OPTIONAL in new_tools.ts vs REQUIRED in trace-mcp-server.ts)"],
+    "fieldsUniqueToNewTools": ["path", "limit", "activityLimit", "includeCommunity", "includeNotecards", "includeAgentsMd"],
+    "fieldsUniqueToInline": ["file_path", "top_k", "include_kb", "include_karpathy"],
+    "outputComposition": "Disjoint: new_tools.ts returns community/notecard/AGENTS.md/activity-derived context; the inline version returns KAG/KB/Karpathy/LLMS.md-derived context. No shared output shape found.",
+    "classification": "CONTRACT_DIVERGENT",
+    "note": "These are not a canonical implementation plus a thin legacy wrapper around the same contract -- they are two materially different tools that happen to share one name. Calling this a simple 'duplicate' undersells the risk: a caller written against one contract would receive an incompatible response shape (or a validation error) if the other implementation's schema were the one actually live."
+  },
+  "criticalFinding": {
+    "title": "Likely startup-time registration collision, not yet resolved -- flagged as the primary result of this audit, not investigated further given this pass's read-only/no-restart scope",
+    "evidence": [
+      "Read the actual MCP SDK source directly (node_modules/@modelcontextprotocol/sdk/dist/cjs/server/mcp.js): registerTool() throws `Tool ${name} is already registered` (line ~500) if the same name is registered twice on one McpServer instance -- this is NOT a silent last-write-wins registry.",
+      "registerNewTools(server, ...) -- which registers new_tools.ts's context.prefetch_feature_context -- is called at trace-mcp-server.ts:565.",
+      "The inline server.registerTool('context.prefetch_feature_context', ...) at trace-mcp-server.ts:7789 executes AFTER that, at top-level module scope, with no surrounding try/catch found in this pass.",
+      "Given the SDK's confirmed throw-on-duplicate behavior, this ordering should cause the SECOND registration attempt (the inline one, line 7789) to throw at module load time -- which would prevent trace-mcp-server.ts from starting at all.",
+      "Checked whether ENABLE_LEGACY_ALIASES (passed into registerNewTools) gates this specific tool's registration inside new_tools.ts: grepped for the parameter's usage inside new_tools.ts and found no other reference beyond the function signature -- it appears unused for this tool, so it does not explain away the collision."
+    ],
+    "notReconciled": "This pass could not determine WHY the server evidently runs live today (confirmed elsewhere in this session's PROTO-01 work: trace-mcp-server.ts is registered in both live agent MCP configs) despite this apparent guaranteed-throw collision. Possible explanations not distinguished in this pass: (a) the actually-running process is a built/bundled artifact that predates one of these two registrations, (b) some earlier code path returns/exits before line 7789 under conditions not traced here, (c) a version of the SDK with different duplicate-name behavior is actually resolved at runtime versus the one read in node_modules, (d) something else not found in this static pass.",
+    "recommendedNextStep": "Check the live server's actual startup logs (not attempted here -- would require either inspecting an already-running process's captured output or a restart, both out of this gate's authorized scope) for either a startup crash/error, or evidence of which registration actually won. Do not restart the live MCP server solely to answer this without separate authorization, per this gate's explicit instruction."
+  },
+  "runtimeReachability": {
+    "newToolsRegistration": { "sourcePresent": true, "registered": "UNCERTAIN_GIVEN_CRITICAL_FINDING", "discoverable": "UNCERTAIN", "called": "UNCERTAIN" },
+    "inlineRegistration": { "sourcePresent": true, "registered": "UNCERTAIN_GIVEN_CRITICAL_FINDING", "discoverable": "UNCERTAIN", "called": "UNCERTAIN" },
+    "note": "This pass deliberately does not claim either tool is live-callable today -- the critical finding above means registration success itself is unresolved by static reading alone, and this gate's scope forbids the live check that would resolve it."
+  },
+  "parityProof": {
+    "performed": false,
+    "reason": "Cannot construct a meaningful fixture-parity test across a CONTRACT_DIVERGENT pair with near-zero field overlap and disjoint output composition -- there is no shared request/response shape to probe for equivalence. A compatibility MAPPING (not a parity probe) would be required first if unification is ever pursued, and none exists today."
+  },
+  "logicalOwnerAnalysis": {
+    "owner": {
+      "status": "UNRESOLVED",
+      "path": "sveltekit-frontend/src/mcp/new_tools.ts",
+      "export": "registerNewTools()'s context.prefetch_feature_context registration",
+      "reason": "Uses the shared dispatcher and a typed helper, matching this repo's stated preference for shared-owner implementations over inline duplicates -- but 'preferred design' is not the same as 'proven live,' and the critical finding above means liveness itself is unresolved."
+    },
+    "otherImplementation": {
+      "classification": "LEGACY_INLINE_DUPLICATE",
+      "retirementReadiness": "OWNER_CONFLICT_REMAINS",
+      "reason": "Cannot be marked SAFE_TO_RETIRE_INLINE_AFTER_READBACK or any other readiness state while it's unknown whether this implementation is even the one currently running, and while its contract has zero field overlap with the other candidate (removing it without a compatibility mapping would be a real breaking change for any caller depending on its query/file_path/top_k/include_kb/include_karpathy shape)."
+    }
+  },
+  "writes": { "postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0, "graphifyRuns": 0, "runtimeConfigChanges": 0 },
+  "result": "MCP_PREFETCH_OWNER_UNKNOWN",
+  "resultRationale": "Neither MCP_PREFETCH_SINGLE_OWNER_PROVEN nor MCP_PREFETCH_DUPLICATE_OWNER_CONFLICT can be honestly claimed: the contract comparison alone would suggest a duplicate-owner conflict, but this pass found a more fundamental, unresolved question underneath it -- whether the trace-mcp-server.ts module can even complete registration given the MCP SDK's confirmed throw-on-duplicate-name behavior and the absence of any surrounding try/catch at the second (inline) registration site. That question requires a live-log/runtime check this gate's scope explicitly does not authorize. Recorded as the primary, most valuable finding of this audit rather than papering over it with a softer classification."
+}
