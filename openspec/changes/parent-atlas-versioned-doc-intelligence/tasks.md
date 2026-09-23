@@ -357,6 +357,22 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   exactly one page; requesting the never-indexed `13.3` returns `VERSION_NOT_INDEXED` with
   `availableVersions: ["13.2"]` — confirms the fail-closed behavior end to end, not just at the
   database-constraint level.
+- [ ] **DOC-CANARY-ADMISSION-01** (opened 2026-09-23; needs explicit operator authorization, it writes Postgres) three-page
+  rollback canary: 3 of the 30 pinned pages (`docs/.okf/pinned`, envelopes from
+  `scripts/atlas/build-external-doc-admission-envelopes-v1.py`) -> existing `admitExternalDocPage` (needs a small runner; the
+  writer has no pipeline caller yet) -> exact page/chunk/checksum/version/byte-span readback + generated-FTS query -> ROLLBACK ->
+  `atlas_external_doc_pages/chunks` back to 0 rows. No embeddings, no `:8081`, no Qdrant. Only after this passes may the 30-page
+  canonical text load be authorized. Evidence baseline: `docs/reports/external-doc-chunk-evidence-identity-v1.json`
+  (`EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_PROVEN`, 30 pages / 847 chunks, 0 duplicate chunk revisions).
+- [ ] **EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT** review `chunk_id` (`doc:<source_id>:<16-hex truncated document digest>:<ordinal>`); unchanged by
+  the identity repair, audited separately, must not be combined with it.
+- [ ] **EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY** `chunk_document` re-normalizes page text and collapses code indentation (23 of 30 stored
+  pages differ from the text the byte spans address); decide whether normalization should preserve fenced-code whitespace. Changing it
+  changes every content hash, so it needs its own re-capture proof.
+- [ ] **EXTERNAL_DOC_ANALYSIS_OWNER_01** create `atlas_external_doc_analyses` for `ExternalDocAnalysisV1` (append-only by chunk evidence
+  revision + analysis type + producer/model/prompt revision) after a fresh owner audit; `analysis_pass_results` and `atlas_summary_layers`
+  are packet-keyed and not reusable. `20260923_external_doc_summaries_v1.sql` is `DRAFT_SUPERSEDED_PENDING_ANALYSIS_OWNER` and must not be applied.
+  Per-chunk BitFrost/Valkey analysis warming stays blocked until canonical chunks exist.
 - [ ] **DOC-03** Firecrawl bounded crawler — `EXISTS` (`fetch_firecrawl_v2`), verify
   bounded-crawl behavior (maxPages/maxDepth/sitemap-follow) matches the manifest's
   `maximum_pages`/`maximum_depth` fields; **blocked** on Firecrawl actually being registered
