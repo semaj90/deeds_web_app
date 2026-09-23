@@ -215,7 +215,13 @@
       neither `cupy` nor `cugraph`/`nx_cugraph` installed. Both scripts correctly fall back to
       CPU-only behavior when unavailable (verified live), but neither has been proven on the real
       GPU lane yet.
-- [ ] 7.3 The Ewin Tang citation (arXiv:1807.04271) was not independently checked against arXiv.
+- [x] 7.3 Checked independently against arXiv (2026-09-23): arXiv:1807.04271 is
+      Ewin Tang's "A quantum-inspired classical algorithm for recommendation
+      systems" (Ewin Tang, sole author) — the paper that shows an
+      $O(\text{poly}(k)\log(mn))$-time classical $\ell_2$-norm-sampling
+      algorithm matching Kerenidis–Prakash's quantum recommendation system
+      without the claimed exponential speedup. Citation is correct; no
+      correction needed. Read-only, no writes.
 - [ ] 7.4 Whether the V1 classification lineage should eventually be retired in favor of V2 is an
       open operator question, explicitly not decided here (see design.md Open Questions).
 
