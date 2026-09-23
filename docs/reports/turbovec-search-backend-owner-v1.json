@@ -1,0 +1,157 @@
+{
+  "schema": "atlas.turbovec-search-backend-owner.v1",
+  "gate": "TURBOVEC_SEARCH_BACKEND_SINGLE_OWNER_AND_NATIVE_API_CONTRACT",
+  "generatedAt": "2026-09-23T18:00:00Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "scope": "Static in-repo caller/contract trace of every TurboVec integration point (HTTP, gRPC, two independent N-API loading paths, spawned CLI). No runtime routing, config default, or code was changed. Live health probes reused from the existing parent-atlas-transport-owner-matrix-v1.json census, not re-probed this pass.",
+  "keyDistinction": "logical search owner != transport protocol != executor binding. This report's central finding is that HTTP and gRPC are NOT two competing owners of the same capability -- they cover two DIFFERENT TurboVec operations (ANN /search vs candidate /rerank), each with its own separately-config-gated primary path. Both operations independently degrade to real Qdrant when their TurboVec transport is unavailable.",
+  "engineMetadata": {
+    "http": {
+      "healthEndpoint": "http://127.0.0.1:8791/health",
+      "healthPrevProbe": { "status": 200, "indexed": 327820, "dim": 64, "bits": 4, "collection": "codebase_chunks_768", "observedAt": "2026-09-23T00:42:38Z (reused, not re-probed)" },
+      "realOperationCalled": "POST /rerank only -- confirmed by grepping every fetch() call in turbovec-search.ts (2 total: 1 to Qdrant directly, 1 to `${sidecarUrl}/rerank`). No code path in this file issues an HTTP request to a /search-shaped endpoint.",
+      "callers": [
+        {
+          "path": "sveltekit-frontend/src/lib/server/search/turbovec-search.ts::searchTurboVecSidecar()",
+          "runtimeReachable": true,
+          "logicalLane": "candidate rerank refinement on top of Qdrant-sourced candidates",
+          "resultShape": "QdrantCodeResult[] (payload-hydrated, same shape as direct Qdrant results)",
+          "fallbackBehavior": "On non-OK response, empty results, or thrown error: falls through to searchTurboVecFallback() (returns the raw Qdrant+SOM-pruned candidates, unreranked by TurboVec) -- fail-open, never a hard error to the caller.",
+          "canAddRrfVote": false,
+          "note": "This function's OWN candidate generation is real Qdrant (searchQdrantWithVectors) plus local SOM-cluster pruning, not a TurboVec ANN call. TurboVec HTTP only reranks candidates Qdrant already found. Calling this the 'TurboVec HTTP search path' (as prior census entries did) is imprecise -- it is a TurboVec-assisted Qdrant rerank path.",
+          "classification": "EXECUTOR_ADAPTER"
+        },
+        {
+          "path": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts::TurboVecSearchBackend",
+          "runtimeReachable": "CONFIG_GATED_OFF_BY_DEFAULT",
+          "logicalLane": "one of 3 pluggable CodebaseAnnBackend implementations (qdrant/cuvs/turbovec), selected by CODEBASE_ANN_BACKEND env var",
+          "gatingFact": "getCodebaseAnnBackend() in codebase-ann-backend.ts defaults to 'qdrant' when CODEBASE_ANN_BACKEND is unset -- confirmed unset in both .env and .env.local (grepped, zero matches). All 10 real callers of qdrant-search.ts's searchCodebaseAnn/searchQdrantCode therefore resolve to QdrantSearchBackend today, not TurboVecSearchBackend.",
+          "canAddRrfVote": false,
+          "note": "Present, complete, and would work if CODEBASE_ANN_BACKEND=turbovec were set, but is not live in the current default configuration.",
+          "classification": "COMPATIBILITY_CALLER"
+        }
+      ],
+      "lifecycle": "OPTIONAL",
+      "classification": "OPTIONAL_ALTERNATE"
+    },
+    "grpc": {
+      "healthEndpoint": "127.0.0.1:50062 Health()",
+      "healthPrevProbe": { "ok": true, "indexed": 327820, "dim": 64, "bits": 4, "backend": "bridge:py(python)+addon(cuda)", "observedAt": "2026-09-23T00:42:38Z (reused, not re-probed)" },
+      "envGate": "TURBOVEC_SIDECAR_GRPC_ENABLED=true, TURBOVEC_SIDECAR_GRPC_URL=127.0.0.1:50062 -- both explicitly set in .env (grepped directly, not assumed).",
+      "realOperationCalled": "TurboVec's ANN /search operation (turbovecGrpcSearch), not rerank.",
+      "callers": [
+        {
+          "path": "sveltekit-frontend/src/lib/server/retrieval/turbovec-prefilter.ts::turbovecSearch()",
+          "runtimeReachable": true,
+          "logicalLane": "the ONE logical TurboVecSearchExecutorV1 call site for RRF fusion",
+          "transportBehavior": "gRPC PRIMARY (tried first when TURBOVEC_SIDECAR_GRPC_ENABLED), HTTP /search fallback on gRPC throw/null -- both transports live inside this ONE function, correctly modeled as one executor with two adapters, not two callers.",
+          "wiredInto": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts -- called unconditionally (not backend-gated) as one of exactly 3 parallel Promise.allSettled lanes (qdrantPromise, turbovecPromise, neoPromise) feeding combineViaRRF().",
+          "canAddRrfVote": true,
+          "duplicateVoteRisk": "NONE FOUND: rrf-integration.ts's qdrantPromise calls queryQdrantVectorSignal() (real Qdrant), a completely separate function from anything TurboVec-related. TurboVec contributes exactly one RRF lane via this one call site.",
+          "classification": "CANONICAL_SEARCHRUNTIME_CALLER"
+        },
+        {
+          "path": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+          "runtimeReachable": true,
+          "logicalLane": "ACE context-assembly signal boosting, calls turbovecGrpcSearch() DIRECTLY (bypasses turbovec-prefilter.ts's HTTP-fallback wrapper)",
+          "canAddRrfVote": false,
+          "note": "Not the primary RRF fusion path; a secondary ACE-internal signal. Because it bypasses the shared wrapper, it does NOT get the same gRPC-failure-to-HTTP fallback safety net as the canonical caller -- a real, disclosed inconsistency across callers, not fixed here.",
+          "classification": "EXECUTOR_ADAPTER"
+        },
+        {
+          "path": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+          "runtimeReachable": true,
+          "logicalLane": "route-level custom scoring, also calls turbovecGrpcSearch() DIRECTLY (same bypass-of-wrapper pattern as context-assembler.ts)",
+          "canAddRrfVote": false,
+          "classification": "EXECUTOR_ADAPTER"
+        },
+        {
+          "path": "sveltekit-frontend/src/lib/server/retrieval/autoencoder-cuvs-bridge.ts",
+          "runtimeReachable": false,
+          "logicalLane": "n/a",
+          "note": "File's own 2026-08-12 audit comment (read directly, not re-derived) already states this file has ZERO callers anywhere in the repo, confirmed via rg -- dead/routing-only code despite the misleading cuVS-suggesting filename.",
+          "canAddRrfVote": false,
+          "classification": "DEAD_ORPHAN"
+        }
+      ],
+      "lifecycle": "CANONICAL",
+      "classification": "PRIMARY_CANDIDATE"
+    },
+    "napi": {
+      "twoIndependentAdapterImplementationsFound": true,
+      "adapterA": {
+        "path": "sveltekit-frontend/src/lib/server/search/rust-napi-search-backend.ts",
+        "modulePresent": false,
+        "attemptedModulePath": "sveltekit-frontend/src/lib/gpu/turbovec-napi/index.js",
+        "verifiedCrate": "crates/turbovec-napi/index.js",
+        "verifiedExports": ["loadJsonlPackets", "hashSourceRefs", "scoreSom20X20", "packQdrantPayloads", "dedupeEdgesJson"],
+        "expectedExport": "searchAnn",
+        "exportedSearchAnn": false,
+        "classification": "NAPI_CONTRACT_INCOMPATIBLE",
+        "failsClosed": true,
+        "callers": [
+          {
+            "path": "sveltekit-frontend/src/lib/server/retrieval/semantic-search-workflow.ts",
+            "runtimeReachable": "GATED (manifest file existence check first)",
+            "logicalLane": "explicit SHADOW comparison -- SearchShadowSchema, step name 'rust_shadow_compare', records overlapCount/overlapRatio against the primary result set",
+            "canAddRrfVote": false,
+            "note": "Correctly architected as a non-voting parity/diagnostic measurement, not a second retrieval owner -- even if the underlying N-API call were fixed, this caller's role would remain diagnostic by design.",
+            "classification": "DIAGNOSTIC"
+          },
+          {
+            "path": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts + sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts::rustNapiSearch()",
+            "runtimeReachable": "CONFIG_GATED_OFF_BY_DEFAULT",
+            "envGate": "CODEBASE_SEARCH_BACKEND defaults to 'qdrant' in createCodebaseSearchBackendFromEnv() (create-codebase-search-backend.ts); unset in .env/.env.local (grepped, zero matches).",
+            "logicalLane": "STAGE 1.5 of unified-orchestrator.ts's pipeline, explicitly commented 'optional, fallback to Qdrant'",
+            "substitutionPattern": "If rustHits succeeds and is non-empty, qdrantHits = rustHits (SUBSTITUTES the Qdrant call entirely); otherwise a real Qdrant call runs. This is correct executor-substitution design, not additive voting -- confirmed by reading the exact conditional, not assumed from the comment.",
+            "canAddRrfVote": false,
+            "classification": "EXECUTOR_ADAPTER"
+          }
+        ]
+      },
+      "adapterB": {
+        "path": "sveltekit-frontend/src/lib/server/search/turbovec-search.ts::loadNativeTurboVec() + searchTurboVecNative()",
+        "note": "A SECOND, independently-written native-module loader, found while tracing turbovec-search.ts's own fallback chain -- not the same code as adapterA. Tries native.searchCodebaseAnn ?? native.search ?? native.query.",
+        "verifiedCrate": "same crates/turbovec-napi/index.js, same 5 verified exports as adapterA",
+        "expectedExports": ["searchCodebaseAnn", "search", "query"],
+        "anyExported": false,
+        "classification": "NAPI_CONTRACT_INCOMPATIBLE",
+        "failsClosed": true,
+        "duplicationFinding": "Two independently-implemented N-API loaders in this codebase, expecting two different sets of method names, both incompatible with the one real crate. This is itself a duplication the Duplication Prevention rule would flag -- recorded, not consolidated in this pass."
+      }
+    },
+    "cli": {
+      "path": "sveltekit-frontend/src/lib/server/vector/turbovec-client.ts -> scripts/turbovec_search_bridge.py",
+      "callers": [],
+      "runtimeReachable": false,
+      "lifecycle": "LEGACY",
+      "classification": "LEGACY",
+      "note": "Zero importing callers found (re-confirmed this pass with a dedicated grep across src/ for both module paths together -- no file imports both, and turbovec-client.ts itself has no importers)."
+    }
+  },
+  "duplicateFunctionFinding": {
+    "surface": "searchCodebaseAnn defined independently in BOTH qdrant-search.ts and turbovec-search.ts, same name, overlapping purpose",
+    "liveOwner": "qdrant-search.ts::searchCodebaseAnn -- confirmed as the one actually imported by rrf-integration.ts and 9 other real callers",
+    "deadDuplicate": "turbovec-search.ts::searchCodebaseAnn (and its searchQdrantCode wrapper) -- grepped for importers of turbovec-search.js's searchCodebaseAnn/searchQdrantCode specifically: zero external callers found. Only searchTurboVecCode is actually imported from this file (by qdrant-search.ts).",
+    "risk": "Low today (dead code, not reached), but a future caller could import the wrong one and get materially different behavior (the dead copy has no options/hydration-step gating that the live one added). Flagged, not consolidated in this read-only pass."
+  },
+  "logicalOwner": {
+    "currentOwner": "TurboVecSearchExecutorV1 for the ANN /search capability = turbovec-prefilter.ts::turbovecSearch(), gRPC-primary/HTTP-fallback, one call site wired into RRF fusion as one lane.",
+    "secondaryCapability": "TurboVec /rerank (a genuinely different operation, not a competing owner of /search) is reachable via qdrant-search.ts's TurboVecSearchBackend, but config-gated off by default (CODEBASE_ANN_BACKEND=qdrant).",
+    "ownerCandidates": ["gRPC (primary, live, canonical for /search)", "HTTP (live fallback for /search inside the same function; separately, live primary for /rerank when explicitly enabled)"],
+    "conflicts": ["None found for the ANN /search RRF-fusion vote -- exactly one logical lane, transport-substitutable as designed.", "The two direct-gRPC callers (context-assembler.ts, atlas/search route) bypass the shared fallback wrapper -- not a vote-duplication risk, but a real fallback-behavior inconsistency across callers, flagged above."]
+  },
+  "voteInvariant": {
+    "duplicateVotePossible": false,
+    "evidence": "Traced every real caller of every TurboVec transport (HTTP, gRPC, both N-API adapters, CLI) against rrf-integration.ts's actual 3-lane Promise.allSettled fusion call. Exactly one TurboVec-derived lane (turbovecPromise, via turbovec-prefilter.ts) reaches RRF. The Qdrant lane in the same fusion (qdrantPromise) calls a separate function (queryQdrantVectorSignal) with no TurboVec involvement. qdrant-search.ts's TurboVecSearchBackend and both N-API adapters are either config-gated off by default or non-RRF diagnostic/dead paths -- none contribute a second vote today."
+  },
+  "parityProbe": {
+    "performed": false,
+    "reason": "HTTP and gRPC do not expose equivalent operations to compare -- gRPC's live caller uses ANN /search; HTTP's live caller uses candidate /rerank on Qdrant-sourced input. A parity probe between them would compare two different capabilities, not two transports of the same one, and would produce a misleading result. The genuinely comparable pair (gRPC /search vs HTTP /search, both reachable inside turbovec-prefilter.ts::turbovecSearch()) was not probed this pass -- flagged as the correct future parity-probe target if one is wanted, distinct from the naive HTTP-vs-gRPC framing this gate started from."
+  },
+  "writes": { "postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0, "graphifyRuns": 0 },
+  "result": "TURBOVEC_SEARCH_SINGLE_OWNER_PROVEN",
+  "resultRationale": "For the capability that actually matters for retrieval fusion (ANN /search contributing to RRF), single ownership is objectively established by existing code: turbovec-prefilter.ts::turbovecSearch() is the one call site, gRPC-primary/HTTP-fallback within one function, wired into exactly one RRF lane, with the alternate TurboVec-touching paths (HTTP-only rerank backend, both N-API adapters, CLI wrapper) either config-gated off by default, architected as non-voting diagnostics, or dead code. No operator decision is required to establish this specific invariant. An operator decision (not made here) would still be needed to decide whether to (a) reconcile the two independent N-API loader implementations, (b) unify the two direct-gRPC callers onto the shared fallback-safe wrapper, or (c) remove the dead-duplicate searchCodebaseAnn definition -- all flagged, none acted on."
+}
