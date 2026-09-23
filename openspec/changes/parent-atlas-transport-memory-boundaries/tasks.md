@@ -3,22 +3,25 @@
 ## Classification backlog
 
 - [ ] **PROTO-01** Freeze the transport ownership matrix for tRPC, gRPC, MCP, ACP, and A2A; record current callers and reject duplicate bus ownership.
-- [ ] **PROTO-02** Audit all active sidecar transports, including HTTP, gRPC, N-API, and spawned CLI paths; assign each to exactly one owner or mark it legacy/experimental.
-- [ ] **PROTO-03** Declare gRPC canonical for native polyglot compute only: Node, Python, Rust, C/CUDA, RAPIDS, TurboVec, and simdjson services.
-- [ ] **PROTO-04** Declare tRPC optional for TypeScript application-local control surfaces: SvelteKit UI, Kanban, recommendations, and receipts.
+- [x] **PROTO-02A** Classify TurboVec HTTP/gRPC operations, N-API adapter, and spawned-Python wrapper against one service owner; prove HTTP/gRPC health and fail closed on the missing N-API module/method. Evidence: `parent-atlas-transport-owner-matrix-v1.json`; no writes.
+- [ ] **PROTO-02B** Extend the owner/lifecycle matrix to all remaining active sidecars and verify each operation's runtime caller/protocol, without treating parallel interfaces as duplicate canonical owners.
+- [x] **PROTO-03** Declare gRPC the typed cross-language contract for native/polyglot compute, while permitting operation-specific HTTP health/compatibility/fallback routes under the same service owner. No app identity or fusion ownership transfers; contract added to the OpenSpec spec.
+- [x] **PROTO-04** Declare tRPC optional for demonstrated TypeScript application-local control surfaces. OpenSpec now states it is dormant capability without a client and cannot own identity, durable truth, cross-language compute, or workflow authority; the caller census found no in-repo tRPC client. Server mount remains unchanged.
 - [ ] **ACP-01** Define the Parent Atlas coding-agent ACP boundary for editor sessions, permissions, tool actions, patches, terminal output, and progress.
-- [ ] **ACP-02** Map ACP session/task/action identifiers to existing `runId`, `taskId`, `ContextManifest` hash, and `ExecutionReceipt`; ACP must not own graph identity.
+- [x] **ACP-02A** Add a strict projection-only mapping contract for checksummed ACP ingress task/action/session/run references to the existing Kanban task attempt and `WorkflowActionEventV1` run/action/receipt references, carrying a supplied ContextManifest checksum; mismatched run, receipt, external refs, or ingress checksum fail closed. Fixture-proven only; no ACP runtime wiring, ContextManifest readback, or canonical authority is claimed.
+- [ ] **ACP-02B** Wire the ACP ingress caller to resolve the canonical task attempt, ContextManifest checksum, and ExecutionReceipt from their existing owners, then prove a bounded end-to-end mapping/readback. ACP must not own graph identity.
 - [ ] **A2A-01** Add a Parent Atlas AgentCard only after single-agent execution and receipts are proven.
-- [ ] **A2A-02** Map A2A task/message/artifact identifiers to existing task, run, receipt, and provenance records.
+- [x] **A2A-02A** Add a projection-only adapter contract that binds an A2A task to a caller-resolved Atlas task attempt, matching run and receipt IDs and carrying workflow/action/evidence/resource/artifact provenance; mismatches fail closed. Focused fixtures prove mapping only; no canonical authority or live resolver is claimed.
+- [ ] **A2A-02B** Wire the A2A adapter to the existing canonical task-attempt resolver and prove bounded end-to-end task/run/receipt/provenance readback. Keep A2A identifiers protocol-local and noncanonical.
 - [ ] **A2A-03** Prohibit exposing canonical Postgres/Graphify operations as peer-agent writable state.
-- [ ] **MEM-01** Freeze the three-memory taxonomy: llama KV prompt cache, BitFrost/Valkey hot memory, and Postgres durable semantic/canonical memory.
-- [ ] **MEM-02** Keep `ContextManifest` as the reproducible model-context boundary; KV cache reuse is an optimization and never durable truth.
+- [x] **MEM-01** Freeze the three-memory taxonomy: ephemeral llama KV prompt cache, disposable BitFrost/Valkey residency, and PostgreSQL durable canonical memory. Qdrant/Neo4j are rebuildable projections, not memory authorities; CLAUDE.md's historical linear hierarchy has been explicitly superseded. Documentation contract only; no runtime-state claim.
+- [x] **MEM-02** Keep `ContextManifest` as the reproducible model-context boundary; KV cache reuse is an optimization and never durable truth. `ContextManifestV2` preserves the existing V1 payload and deterministically checksums context/revision inputs (`context-manifest-v2.ts` and its focused spec); llama prompt reuse is marked `ephemeral` in `context-prompt-streamer.ts`. Contract-level proof only; live llama-server KV persistence behavior is not claimed.
 - [ ] **MEM-03** Prove revision-qualified BitFrost keys and fail-open behavior across workspace, policy, graph, and representation revisions.
 - [ ] **STRUCT-01** Use Tree-sitter CST named-node projection for compact structural memory; do not create a canonical CAST subsystem.
 - [ ] **STRUCT-02** Define `StructuralMemoryCard` as derived evidence containing canonical IDs, source span, typed relationships, syntax status, and representation revision; upstream Tree-sitter node IDs remain provenance.
 - [x] **STRUCT-03** Define one language-extension registry for TypeScript (`.ts/.tsx/.mts/.cts`), JavaScript (`.js/.jsx/.mjs/.cjs`), Python (`.py/.pyi`), Rust (`.rs`), Go (`.go`), and Java (`.java`); unsupported extensions stop at explicit classification. Live 8095 probe passed.
 - [x] **STRUCT-04** Normalize failures into typed diagnostics: `ChunkingError` for parse/extraction failure and `UnsupportedLanguageError` for unsupported extensions; preserve source revision and file path without fabricating evidence. Live unsupported-language probe passed; parse-failure parity remains tracked by STRUCT-05/GPH-15.
-- [ ] **STRUCT-05** Preserve Tree-sitter `ERROR`/`MISSING` syntax evidence in `syntaxStatus` (`CLEAN` or `RECOVERED_WITH_ERRORS`) separately from canonical identity validity. `ERROR` detection is live-proven; a dedicated `MISSING` fixture remains to be added.
+- [x] **STRUCT-05** Preserve Tree-sitter `ERROR`/`MISSING` syntax evidence in `syntaxStatus` (`CLEAN` or `RECOVERED_WITH_ERRORS`) separately from canonical identity validity. The bounded live failure-isolation proof passes both malformed `ERROR` and missing-delimiter `MISSING` diagnostics with `RECOVERED_WITH_ERRORS`; the v2 owner now maps the same fatal diagnostics to `ChunkingError`, matching the legacy classifier (focused local test passed). The deployed sidecar image has not been rebuilt/re-probed, so STRUCT-04's live typed-envelope parity remains unproven.
 - [ ] **STRUCT-06** Evaluate `supermemoryai/code-chunk` only as a contextual chunking/reference implementation; its chunk IDs and memory graph cannot become Parent Atlas canonical identity or truth.
 - [ ] **STRUCT-07** Prove the bounded path `CST named nodes → structural evidence → GIS identity → Postgres packet → semantic_768 projection`; no direct chunker writes to Qdrant or Neo4j.
 - [ ] **CC-01** Audit `supermemoryai/code-chunk` output against `StructuralChunkV1`: scope chain, entities, signatures, imports, siblings, byte/line ranges, contextualized text, and per-file errors.
@@ -122,13 +125,37 @@ live Graphify owner integration remain upstream correctness gates.
 
 ## Current lane state
 
-- `PROTO-01`: `IN_PROGRESS` — ownership matrix not yet closed.
-- `PROTO-02`: `IN_PROGRESS` — duplicate transport audit not yet closed.
+- `PROTO-01`: `CALLER_AND_LIFECYCLE_RECONCILED_TWO_CONFLICTS_OPEN` (2026-09-23, `lifecycleReconciliationV1` section added to
+  `docs/reports/parent-atlas-transport-owner-matrix-v1.json`) — every transport surface (tRPC, the three Go
+  services' HTTP/gRPC pairs, MCP's 4 server groupings, ACP's two surfaces, A2A's two surfaces) now carries an
+  explicit classification into the 7-bucket taxonomy (`CANONICAL`/`OPTIONAL`/`COMPATIBILITY`/`EXPERIMENTAL`/
+  `LEGACY`/`DORMANT`/`UNKNOWN`), with `endpointExists`/`reachable`/`hasInRepoCaller`/`canonicalOwner` recorded
+  as separate, deliberately unmerged facts per surface. Real findings, not asserted from the comment text:
+  `retrieval-client.ts`'s actual probe-order conditionals (traced, not just read from its header comment) show
+  `RETRIEVAL_GRPC_ENABLED`/`RETRIEVAL_HTTP_ENABLED` both default `false` and are unset in `.env`/`.env.local`
+  (grepped, zero matches), so the app's configured retrieval path falls through to `go-search-service` (:8096)
+  — classified `CANONICAL` by configuration, but PROTO-02B's own live snapshot (below) reports it `DEGRADED`
+  (`qdrantConnected=false`), while `go-retrieval-service` (:8100, `READY_FULL` per that same snapshot) sits
+  disabled one env flag away, classified `OPTIONAL`. This tension — combining this pass's static config trace
+  with PROTO-02B's independent live probe — was not visible in either source alone and is flagged as an open
+  operator-decision conflict, not fixed. MCP: cross-checked BOTH live agent-surface configs directly
+  (repo-root `.mcp.json` for Claude Code, `.opencode/opencode.jsonc` for OpenCode) — `trace-mcp-server.ts` is
+  the only MCP server registered in both, classified `CANONICAL`; `src/mcp/server.ts` (stdio) and the three
+  domain-specific server factories are registered in neither and have no npm-script launcher, classified
+  `DORMANT`/`EXPERIMENTAL` respectively. The pre-existing MCP duplicate-tool finding
+  (`context.prefetch_feature_context`) is carried forward as the second open conflict, `UNKNOWN`, pending an
+  operator decision on which registration is authoritative. PROTO-01 is not marked fully `CLOSED` because its
+  own text requires "reject duplicate bus ownership," and that action (not just the classification) remains
+  outstanding for both conflicts — no tool registration or env default was touched. No runtime behavior
+  changed; no code retired, removed, switched, or rewired.
+- `PROTO-02A`: `VERIFIED` — TurboVec's operation-level service/transport owners are in `docs/reports/parent-atlas-transport-owner-matrix-v1.json`; both HTTP and gRPC health pass and report the same 327,820 indexed/64-dimension/4-bit sidecar. HTTP prefilter and rerank are operation-specific; candidate search prefers gRPC with HTTP fallback; the gRPC upsert is a read-only/no-op stub. The N-API adapter's path and API do not match the verified Rust crate and fail closed; the spawned Python wrapper has no scoped caller. No owner or path was removed.
+- `PROTO-02B`: `OPEN` — remaining-sidecar fleet inventory and per-operation caller/lifecycle proof are still required. Current live Go snapshot: retrieval HTTP READY_FULL at :8100 (gRPC :50053 published, unprobed); search HTTP DEGRADED at :8096 (`qdrantConnected=false`; gRPC :50055 published, unprobed); embedding HTTP healthy at :8097, model loaded on CPU (gRPC :50051 published, unprobed). A gRPC port being published is not a gRPC health/method proof.
+- `PROTO-03`: `VERIFIED` as an architecture contract only — OpenSpec now declares gRPC the typed native/polyglot compute boundary while allowing operation-specific HTTP health/compatibility/fallback paths under one service owner. It does not claim every running service is gRPC-primary or that runtime migration is complete.
 - TurboVec HTTP, gRPC, N-API, and spawned-CLI evidence: historical capability evidence; no live transport promotion.
 - ACP packet artifacts: capability evidence only; no proven editor-agent session.
-- A2A: not started; no independent-agent delegation requirement has been proven.
+- A2A: `A2A-02A` projection contract now requires a resolved Atlas task attempt, rejects run/receipt mismatches, and records Atlas task/run refs alongside workflow/action/evidence/resource/artifact provenance. Package build and focused tests pass 15/15. `A2A-02B` remains open: there is no demonstrated runtime adapter caller/resolver readback; no runtime caller or independent-agent delegation need is proven.
 - `STRUCT-03/04`: implementation is live in the rebuilt `miniforge-nlp-sidecar`; supported TypeScript returned `CLEAN` with chunks and unsupported `.txt` returned `UnsupportedLanguageError` with a diagnostic. Python syntax and client tests pass.
-- `STRUCT-05`: syntax recovery is represented in the response contract; live malformed-source `ERROR` detection is proven, while a dedicated `MISSING` node fixture remains open.
+- `STRUCT-05`: syntax recovery is represented in the response contract; the live failure-isolation receipt proves both malformed `ERROR` and missing-delimiter `MISSING` diagnostics with `RECOVERED_WITH_ERRORS`. The v2 source now uses the legacy fatal-diagnostic classifier for both `error_tag` and `syntax_status`; focused local tests cover recovered syntax errors and nonfatal CRLF span remapping. The live receipt still reflects the pre-fix service image (`error_tag=null` for recovered syntax), so runtime typed-envelope parity remains open until a normal image rebuild and bounded re-probe.
 - Runtime mutations from this OpenSpec: none.
 
 ## Existing evidence boundary

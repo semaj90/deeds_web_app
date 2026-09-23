@@ -1,0 +1,374 @@
+{
+  "schema": "atlas.parent-atlas-transport-owner-matrix.v1",
+  "generatedAt": "2026-09-23T00:48:21Z",
+  "status": "STATIC_CENSUS_PARTIAL_REVIEW_REQUIRED",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "scope": "Current repository code/config plus a read-only Docker container listing and targeted in-repo caller search; endpoint health, external clients, and protocol conformance were not exhaustively probed.",
+  "callerAudit": {
+    "tRPC": {
+      "inRepoClientCallFound": false,
+      "evidence": "createTRPCProxyClient/httpBatchLink occurs only in the example comment of the route mount; source search found no client construction or fetch to /api/trpc outside that comment.",
+      "classification": "MOUNTED_SERVER_OWNER_NO_IN_REPO_CLIENT_FOUND"
+    },
+    "ACP": {
+      "confirmedCallers": [
+        "sveltekit-frontend/src/routes/(app)/acp/+page.svelte -> GET /api/acp/tools; POST /api/acp/execute",
+        "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.server.ts -> GET /api/acp/kv-cache-stats",
+        "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.svelte -> GET /api/acp/kv-cache-stats"
+      ],
+      "classification": "INTERNAL_SVELTEKIT_HTTP_CONTROL_UI; NOT_PROOF_OF_EDITOR_ACP_PROTOCOL_SESSION"
+    },
+    "A2A": {
+      "confirmedCallers": [
+        "sveltekit-frontend/src/lib/models/ChatSession.svelte.ts -> POST /api/ai/agent"
+      ],
+      "batchCallerFound": false,
+      "classification": "SINGLE_AGENT_CHAT_HTTP_ROUTE; INDEPENDENT_PEER_AGENT_A2A_USE_NOT_PROVEN"
+    },
+    "GoRetrievalGrpcCompatibilityAdapter": {
+      "file": "sveltekit-frontend/src/lib/server/atlas/go-retrieval-grpc-client.ts",
+      "classification": "LEGACY_HTTP_FALLBACK_WRAPPER_WITH_UNIMPLEMENTED_GRPC_STUB",
+      "evidence": "The wrapper defaults its unused gRPC placeholder to localhost:50051, while environment configuration declares retrieval gRPC at 127.0.0.1:50053. Its actual retrieve path uses GO_RETRIEVAL_HTTP_URL and fetch; focused tests document buildContext/validatePacket fallbacks as Postgres-owned. Do not infer an active gRPC caller from this wrapper name."
+    }
+  },
+  "transportOwners": [
+    {
+      "transport": "tRPC",
+      "candidateOwner": "sveltekit-frontend/src/lib/server/trpc/router.ts",
+      "mount": "sveltekit-frontend/src/routes/api/trpc/[...procedure]/+server.ts",
+      "currentCallers": ["No in-repo tRPC client constructor/request found; route mount includes a usage example comment only"],
+      "classification": "APPLICATION_LOCAL_CONTROL_SURFACE",
+      "evidence": "One route mount imports appRouter and createContext and passes them to fetchRequestHandler.",
+      "lifecycle": "STATIC_SERVER_OWNER_CONFIRMED_CLIENT_REACHABILITY_UNPROVEN"
+    },
+    {
+      "transport": "gRPC",
+      "candidateOwners": [
+        "services/go-retrieval-service/main.go",
+        "services/go-search-service/main.go",
+        "services/go-embedding-service/main.go"
+      ],
+      "currentCallers": [
+        "sveltekit-frontend/src/lib/server/grpc/retrieval-client.ts",
+        "sveltekit-frontend/src/lib/server/grpc/embedding-client.ts",
+        "sveltekit-frontend/src/lib/server/atlas/go-retrieval-grpc-client.ts"
+      ],
+      "classification": "POLYGLOT_EXECUTOR_TRANSPORT_DUAL_HTTP_GRPC",
+      "liveObservation": "docker ps showed legal-ai-go-retrieval (8100 HTTP/50053 gRPC), legal-ai-go-search (8096 HTTP/50055 gRPC), and legal-ai-go-embedding (8097 HTTP/50051 gRPC) running.",
+      "unresolved": "HTTP and gRPC are both exposed; canonical-vs-compatibility lifecycle and full caller/fallback map remain unproven. This is not canonical identity ownership."
+    },
+    {
+      "transport": "MCP",
+      "candidateOwners": [
+        "sveltekit-frontend/src/mcp/server.ts (stdio)",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts (Streamable HTTP, optional stdio using the same registry)",
+        "sveltekit-frontend/src/mcp/domain-server-core.ts (domain-specific stdio server factory)",
+        "sveltekit-frontend/src/mcp/atlas-context-server.ts",
+        "sveltekit-frontend/src/mcp/atlas-actions-server.ts"
+      ],
+      "classification": "MULTIPLE_DOMAIN_AND_TRANSPORT_SURFACES; COMPLETE_REGISTRY_OVERLAP_NOT_PROVEN",
+      "duplicateEvidence": "docs/reports/mcp-prefetch-duplicate-owner-v1.json identifies one same-registry duplicate: new_tools.ts shared-owner candidate and trace-mcp-server.ts inline legacy candidate for context.prefetch_feature_context.",
+      "lifecycle": "STATIC_ONLY; current process reachability not probed",
+      "unresolved": "No full registered-tool overlap audit across all MCP server configurations was run; existing duplicate still awaits compatibility/readback gate."
+    },
+    {
+      "transport": "ACP",
+      "candidateOwners": [
+        "sveltekit-frontend/src/routes/api/acp/*",
+        "packages/parent-atlas/src/core/agentic-workflow-control-plane.ts::acpLegacyIngressSchema"
+      ],
+      "currentCallers": ["(app)/acp page calls tools and execute; Atlas Control Panel calls kv-cache-stats; no caller found for rpc or service-ports in the scoped search"],
+      "classification": "APP_HTTP_CONTROL_SURFACE_AND_UNWIRED_LEGACY_INGRESS_CONTRACT",
+      "evidence": "Repository-wide source search found no runtime consumer of acpLegacyIngressSchema or buildAcpIdentityProjectionV1 outside their contract/test owner.",
+      "lifecycle": "ROUTES_STATICALLY_PRESENT; package ingress mapping not wired; runtime health not probed"
+    },
+    {
+      "transport": "A2A",
+      "candidateOwners": [
+        "sveltekit-frontend/src/routes/api/ai/agent/+server.ts (inline task/message compatibility shape)",
+        "packages/parent-atlas/src/core/a2a-wire-v1.ts (typed A2A 1.0 wire contract)",
+        "packages/parent-atlas/src/core/agentic-workflow-control-plane.ts (derived workflow-to-A2A projection)"
+      ],
+      "currentCallers": ["ChatSession.svelte.ts calls POST /api/ai/agent; no in-repo caller found for /api/ai/agent/batch in the scoped search"],
+      "classification": "INLINE_COMPATIBILITY_CONTRACT_DUPLICATION_CANDIDATE",
+      "evidence": "The route validates its own id/message/metadata schema; separate package contract defines A2A 1.0 task/parts/states. No delegation from route to package wire schema was found in this census.",
+      "lifecycle": "STATIC_ROUTE_PRESENT; protocol conformance, AgentCard authority, and receipt lineage not proven"
+    }
+  ],
+  "proto02SidecarTransportAudit": {
+    "status": "CLASSIFIED_WITH_LIVE_HEALTH_GAPS",
+    "turbovec": [
+      {
+        "transport": "HTTP",
+        "owner": "sveltekit-frontend/src/lib/server/search/turbovec-search.ts and retrieval adapters using ENV.TURBOVEC_SIDECAR",
+        "classification": "LIVE_COMPATIBILITY_EXECUTOR; PRIMARY_SELECTION_UNRESOLVED",
+        "liveProbe": {
+          "url": "http://127.0.0.1:8791/health",
+          "status": 200,
+          "ok": true,
+          "indexed": 327820,
+          "dim": 64,
+          "bits": 4,
+          "collection": "codebase_chunks_768",
+          "observedAt": "2026-09-23T00:42:38Z"
+        },
+        "evidence": "Multiple current server callers and the configured default HTTP endpoint are present; this is derived retrieval/reranking, not identity or final cross-lane fusion ownership."
+      },
+      {
+        "transport": "gRPC",
+        "owner": "sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts",
+        "classification": "LIVE_OPT_IN_EXECUTOR; PRIMARY_SELECTION_UNRESOLVED",
+        "liveProbe": {
+          "url": "127.0.0.1:50062",
+          "ok": true,
+          "indexed": 327820,
+          "dim": 64,
+          "bits": 4,
+          "backend": "bridge:py(python)+addon(cuda)",
+          "observedAt": "2026-09-23T00:42:38Z"
+        },
+        "evidence": "Consumers exist in turbovec-prefilter, Atlas search, and autoencoder bridge. ENV parsing defaults disabled, but the local .env sets TURBOVEC_SIDECAR_GRPC_ENABLED=true and URL 127.0.0.1:50062. The bounded read-only Health() probe succeeded; caller-level primary selection remains inconsistent/unresolved."
+      },
+      {
+        "transport": "Rust N-API",
+        "owner": "crates/turbovec-napi; SvelteKit adapter sveltekit-frontend/src/lib/server/search/rust-napi-search-backend.ts",
+        "classification": "EXPERIMENTAL_OR_LOCAL_EXECUTOR; PRODUCTION_CALLER_AND_BINARY_HEALTH_UNPROVEN",
+        "evidence": "A backend adapter loads the native module and packet-pipeline references the Rust wrapper; repository evidence does not establish it as the selected production retrieval executor."
+      },
+      {
+        "transport": "spawned Python CLI",
+        "owner": "sveltekit-frontend/src/lib/server/vector/turbovec-client.ts -> scripts/turbovec_search_bridge.py",
+        "classification": "LEGACY_OR_UNREACHABLE_CANDIDATE",
+        "evidence": "The wrapper spawns a per-project Python executable, but scoped source search found no importing runtime caller; no subprocess was launched."
+      }
+    ],
+    "goServices": "All three currently listed Go services expose HTTP plus gRPC. Docker presence and health checks prove process/HTTP health only; they do not select which transport callers use. Retrieval gRPC caller mapping is separate from the unused go-retrieval-grpc-client placeholder noted above.",
+    "goServiceLiveProbe": {
+      "observedAt": "2026-09-23T00:47:21Z",
+      "services": [
+        { "owner": "legal-ai-go-retrieval", "http": "8100/health READY_FULL", "grpc": "50053 published; health not probed", "classification": "ONE_GO_RETRIEVAL_OWNER; HTTP_AND_GRPC_ADAPTERS" },
+        { "owner": "legal-ai-go-search", "http": "8096/health DEGRADED; qdrantConnected=false", "grpc": "50055 published; health not probed", "classification": "ONE_GO_SEARCH_OWNER; HTTP_AND_GRPC_ADAPTERS" },
+        { "owner": "legal-ai-go-embedding", "http": "8097/health healthy; model_loaded=true; device=cpu", "grpc": "50051 published; health not probed", "classification": "ONE_GO_EMBEDDING_OWNER; HTTP_AND_GRPC_ADAPTERS" }
+      ],
+      "interpretation": "The Go process is the service owner; HTTP and gRPC are interfaces, not separate canonical owners. Current health results do not prove gRPC method readiness or select a primary for every operation."
+    },
+    "turbovecOperationOwners": [
+      { "operation": "cluster prefilter", "owner": "TurboVec sidecar HTTP /prefilter", "lifecycle": "ACTIVE_COMPATIBILITY_EXECUTOR", "distinctFromGrpcSearch": true },
+      { "operation": "candidate search", "owner": "TurboVec sidecar; gRPC Search preferred when enabled/successful, HTTP /search fallback", "lifecycle": "ACTIVE_DUAL_INTERFACE_SINGLE_SERVICE_OWNER", "semanticLaneVotes": 1 },
+      { "operation": "bounded rerank of Qdrant candidates", "owner": "TurboVec sidecar HTTP /rerank", "lifecycle": "ACTIVE_OPERATION_SPECIFIC_INTERFACE", "distinctFromGrpcSearch": true },
+      { "operation": "vector transform", "owner": "TurboVec sidecar gRPC Transform", "lifecycle": "ACTIVE_OPT_IN_EXECUTOR" },
+      { "operation": "direct vector upsert", "owner": "gRPC stub", "lifecycle": "READ_ONLY_OR_NOOP; NOT A LIVE WRITER" }
+    ],
+    "turboVecProof": {
+      "httpHealth": "PASS; 327820 indexed, dim=64, bits=4",
+      "grpcHealth": "PASS; 327820 indexed, dim=64, bits=4",
+      "napiExports": "Rust crate exports 5/5 expected methods; adapter's searchAnn method absent and its imported app path missing, therefore STALE/UNWIRED",
+      "spawnedPythonClient": "No importer found in scoped current server source; classify LEGACY_OR_UNREACHABLE, not active",
+      "runtimeWrites": false
+    },
+    "rustNapiIntegration": {
+      "adapter": "sveltekit-frontend/src/lib/server/search/rust-napi-search-backend.ts",
+      "attemptedModulePath": "sveltekit-frontend/src/lib/gpu/turbovec-napi/index.js",
+      "modulePathExists": false,
+      "verifiedCrate": "crates/turbovec-napi/index.js",
+      "verifiedExports": ["loadJsonlPackets", "hashSourceRefs", "scoreSom20X20", "packQdrantPayloads", "dedupeEdgesJson"],
+      "adapterRequiredMethod": "searchAnn",
+      "methodExported": false,
+      "classification": "INCOMPATIBLE_OR_STALE_ADAPTER; FAILS_CLOSED_BEFORE_NATIVE_CALL",
+      "proof": "Read-only verify-rust-napi-exports script passed 5/5 expected TurboVec crate exports; its separate optional C++ addon probe emitted 'require is not defined' under ESM, so that C++ result is not treated as proof. No code path was redirected."
+    },
+    "limitations": [
+      "TurboVec HTTP and gRPC health were probed; N-API and spawned CLI were not runtime-probed.",
+      "Historical receipts establish capability, not current production selection.",
+      "A deployment-specific owner decision is still needed before retiring any compatibility path."
+    ]
+  },
+  "a2aProjectionAudit": {
+    "contractOwner": "packages/parent-atlas/src/core/a2a-wire-v1.ts",
+    "existingProjection": "WorkflowActionEventV1 plus caller-resolved Atlas task attempt -> A2A Task, status/artifact StreamResponse events, and A2A projection receipt",
+    "fixtureProof": "15/15 focused Node tests pass; package TypeScript build passes. Fixtures cover the supplied Atlas task/run/receipt linkage and fail-closed mismatched run/receipt cases.",
+    "identityBoundary": "Projection carries atlasTaskId/atlasRunId and workflow/action/receipt/evidence/resource/artifact refs as protocol metadata/provenance; canonicalAuthority remains false.",
+    "gap": "The adapter requires a caller-resolved taskAttempt but no runtime caller/resolver readback is wired. A2A task_id/context_id remain protocol-local identifiers. No runtime A2A caller or AgentCard admission is proven.",
+    "classification": "PROJECTION_MAPPING_CONTRACT_PROVEN; CANONICAL_TASK_RESOLVER_WIRING_OPEN",
+    "testsOnly": true,
+    "writesPerformed": false
+  },
+  "decision": {
+    "proto01Closed": false,
+    "why": [
+      "There are concrete multi-transport Go services and multiple MCP/A2A surfaces whose caller and lifecycle classifications remain incomplete.",
+      "tRPC has a server mount but no in-repo client call was found; external use and health remain unknown.",
+      "ACP UI usage is confirmed, but it is an internal SvelteKit HTTP control surface rather than proof of editor-session ACP conformance.",
+      "The gRPC-named retrieval compatibility wrapper's actual retrieval path is HTTP; its placeholder gRPC address is inconsistent with configured retrieval gRPC and is not initialized by the current code path.",
+      "A2A wire projection maps workflow events and provenance into protocol resources, but the supplied A2A task/context identifiers are not resolved to the canonical task-attempt registry; do not mark A2A-02 done from projection tests alone.",
+      "A known duplicate MCP tool remains classified but not reconciled.",
+      "The A2A route's inline contract is not yet shown to delegate to the existing package wire owner.",
+      "Static source presence and Docker container presence do not prove endpoint health or protocol-level reachability."
+    ],
+    "noCodeOrRuntimeRemoval": true,
+    "nextGate": "PROTO_01_CALLER_AND_LIFECYCLE_RECONCILIATION"
+  },
+  "lifecycleReconciliationV1": {
+    "generatedAt": "2026-09-23T17:00:00Z",
+    "readOnly": true,
+    "writesPerformed": false,
+    "canonicalAuthority": false,
+    "taxonomy": ["CANONICAL", "OPTIONAL", "COMPATIBILITY", "EXPERIMENTAL", "LEGACY", "DORMANT", "UNKNOWN"],
+    "axisNote": "Four distinct, deliberately unmerged facts per surface: endpointExists (code/route/service is present), reachable (a live probe succeeded; UNPROBED where no live check was run), hasInRepoCaller (a real caller was found by static search), canonicalOwner (this transport is THE selected production path for its capability, not merely present). A surface can be reachable with zero callers, or have a caller while unreachable, or exist canonically without having been live-probed this pass.",
+    "surfaces": [
+      {
+        "surface": "tRPC (router.ts mount)",
+        "endpointExists": true,
+        "reachable": "UNPROBED",
+        "hasInRepoCaller": false,
+        "canonicalOwner": false,
+        "classification": "DORMANT",
+        "evidence": "Repeated exhaustive search (this pass and the prior caller audit) found zero client construction or fetch to /api/trpc outside an example comment in the mount file itself. A dormant server mount with no confirmed caller is DORMANT, not LEGACY (nothing was ever removed or superseded) and not EXPERIMENTAL (it is a complete, typed router, not a prototype).",
+        "conflictsOperatorDecisionNeeded": false
+      },
+      {
+        "surface": "HTTP go-retrieval-service (:8100, RETRIEVAL_HTTP_URL)",
+        "endpointExists": true,
+        "reachable": true,
+        "hasInRepoCaller": true,
+        "canonicalOwner": false,
+        "classification": "OPTIONAL",
+        "evidence": "Traced retrieval-client.ts's real probe order in checkRetrievalHealth(), not just its comment: step 1 (gRPC) is gated on RETRIEVAL_GRPC_ENABLED, step 2 (this HTTP path) on RETRIEVAL_HTTP_ENABLED. Both default false in env.server.ts (parseBoolean(..., false)) and neither is set in .env or .env.local -- confirmed by direct grep of both files (zero matches) -- so this branch is skipped by current configured code path even though it is live. This repo's own PROTO-02B live snapshot (tasks.md, 2026-09-23) reports this exact service READY_FULL at :8100 -- the healthiest of the three candidate paths, yet not the one the app's default config selects. Classified OPTIONAL (present, healthy, has a real caller function, but config-gated off) rather than COMPATIBILITY, since it is not a fallback FROM the canonical path -- current config never reaches it at all.",
+        "conflictsOperatorDecisionNeeded": true,
+        "operatorDecisionNeeded": "RETRIEVAL_HTTP_ENABLED/RETRIEVAL_GRPC_ENABLED default to false, so the app's configured retrieval path bypasses this READY_FULL service in favor of a DEGRADED one (see the go-search-service entry below). Not changed here -- a config default change is exactly the kind of decision this reconciliation pass is scoped to surface, not make."
+      },
+      {
+        "surface": "gRPC RetrievalService (services/go-retrieval-service)",
+        "endpointExists": true,
+        "reachable": "PORT_PUBLISHED_METHOD_UNPROBED",
+        "hasInRepoCaller": true,
+        "canonicalOwner": false,
+        "classification": "COMPATIBILITY",
+        "evidence": "Same probe-order trace as the HTTP entry above; step 1 gated on RETRIEVAL_GRPC_ENABLED, default false, unset in both env files. PROTO-02B (tasks.md) records gRPC :50053 as 'published, unprobed' -- a port being published is explicitly not treated as a gRPC health/method proof per that entry's own caveat, reused here rather than re-asserted."
+      },
+      {
+        "surface": "HTTP go-search-service (:8096, GO_SEARCH_URL)",
+        "endpointExists": true,
+        "reachable": "DEGRADED",
+        "hasInRepoCaller": true,
+        "canonicalOwner": true,
+        "classification": "CANONICAL",
+        "evidence": "GO_SEARCH_URL=http://localhost:8096 is the only one of the probe-order env conditions actually set in .env.local. Given RETRIEVAL_GRPC_ENABLED=false and RETRIEVAL_HTTP_ENABLED=false (both default, unset), retrieval-client.ts's real code path (not the leading comment) falls through gRPC and go-retrieval-HTTP to this branch -- this is the live default retrieval path for this transport family today, by configuration, traced through actual conditionals. Reachability is DEGRADED, not healthy: PROTO-02B's live snapshot (tasks.md, 2026-09-23) reports this exact service as DEGRADED at :8096 with qdrantConnected=false.",
+        "conflictsOperatorDecisionNeeded": true,
+        "operatorDecisionNeeded": "The config-selected canonical retrieval path is degraded (qdrantConnected=false) while a healthier alternative (go-retrieval-service :8100, READY_FULL) sits disabled by default one gate away. This is a real, named architectural tension surfaced by combining this pass's static config trace with PROTO-02B's independent live probe -- not resolved, not switched, not restarted here."
+      },
+      {
+        "surface": "gRPC EmbeddingService (services/go-embedding-service)",
+        "endpointExists": true,
+        "reachable": "UNPROBED_THIS_PASS",
+        "hasInRepoCaller": true,
+        "canonicalOwner": false,
+        "classification": "COMPATIBILITY",
+        "evidence": "embedding-client.ts gates its gRPC path on ENV.EMBEDDING_GRPC_ENABLED (env.server.ts default false); not set in .env or .env.local (grepped, zero matches). Asymmetric with TurboVec, where the local .env explicitly sets TURBOVEC_SIDECAR_GRPC_ENABLED=true -- this repo enables gRPC selectively per-service, not uniformly, and that per-service enable state is itself real evidence, not noise."
+      },
+      {
+        "surface": "go-retrieval-grpc-client.ts compatibility wrapper",
+        "endpointExists": true,
+        "reachable": false,
+        "hasInRepoCaller": true,
+        "canonicalOwner": false,
+        "classification": "LEGACY",
+        "evidence": "Already documented in callerAudit above: its gRPC placeholder defaults to :50051 while configured retrieval gRPC is :50053, and it is never actually initialized -- its real retrieve path uses HTTP. A wrapper whose named transport is provably never exercised and whose default config is internally inconsistent is LEGACY, not COMPATIBILITY (compatibility implies the alternate path still genuinely works if selected; this one's gRPC path does not)."
+      },
+      {
+        "surface": "MCP trace-mcp-server.ts (Streamable HTTP, :8788/mcp)",
+        "endpointExists": true,
+        "reachable": "UNPROBED_THIS_PASS",
+        "hasInRepoCaller": true,
+        "canonicalOwner": true,
+        "classification": "CANONICAL",
+        "evidence": "Cross-checked BOTH live agent-surface MCP configs directly, not just one: repo-root .mcp.json (Claude Code) registers 'trace' as type 'http' -> http://127.0.0.1:8788/mcp; .opencode/opencode.jsonc separately registers 'trace' as type 'remote' -> the same URL. This is the only MCP server registered in both independent agent configs -- the strongest caller-level evidence of canonical status found across any MCP surface."
+      },
+      {
+        "surface": "MCP src/mcp/server.ts (stdio)",
+        "endpointExists": true,
+        "reachable": "UNPROBED_THIS_PASS",
+        "hasInRepoCaller": false,
+        "canonicalOwner": false,
+        "classification": "DORMANT",
+        "evidence": "Not referenced by any command/args in .mcp.json or .opencode/opencode.jsonc (both read directly), and not referenced by any npm script in package.json (grepped, zero matches). Other .mcp.json files found elsewhere in the tree (.tmp/merge-validation-20260912, claude-mem/plugin, mcp-server-mcp) are scratch/vendored/unrelated configs, not this repo's active agent surface -- not used as evidence either way."
+      },
+      {
+        "surface": "MCP domain-server-core.ts / atlas-context-server.ts / atlas-actions-server.ts",
+        "endpointExists": true,
+        "reachable": "UNPROBED_THIS_PASS",
+        "hasInRepoCaller": false,
+        "canonicalOwner": false,
+        "classification": "EXPERIMENTAL",
+        "evidence": "Same non-registration finding as src/mcp/server.ts (not in either active MCP config, no npm script). Classified EXPERIMENTAL rather than DORMANT specifically because these are narrower, purpose-built server factories (domain-specific, context-specific, actions-specific) that read as in-development capability surfaces rather than a formerly-wired-now-unused entry point -- this distinction is a judgment call on code shape, not proven by any additional static evidence beyond non-registration, and should be revisited if that shape assessment turns out wrong."
+      },
+      {
+        "surface": "MCP duplicate tool: context.prefetch_feature_context (new_tools.ts vs trace-mcp-server.ts inline)",
+        "endpointExists": true,
+        "reachable": "UNPROBED_THIS_PASS",
+        "hasInRepoCaller": "AMBIGUOUS_BY_DEFINITION",
+        "canonicalOwner": "UNRESOLVED",
+        "classification": "UNKNOWN",
+        "evidence": "docs/reports/mcp-prefetch-duplicate-owner-v1.json (pre-existing, not regenerated this pass) already identifies this exact duplicate. Not reconciled here -- this is the one concrete case in this census where two owners register the same tool name under the transport this repo has otherwise confirmed CANONICAL (trace-mcp-server.ts), so it cannot be waved through as a dormant/experimental peer.",
+        "conflictsOperatorDecisionNeeded": true,
+        "operatorDecisionNeeded": "Which of the two registrations of context.prefetch_feature_context is authoritative, and whether the other should be marked COMPATIBILITY (kept, deprecated) or removed. Not decided or acted on in this pass -- no tool registration was touched."
+      },
+      {
+        "surface": "ACP app routes (/api/acp/tools, /execute, /kv-cache-stats)",
+        "endpointExists": true,
+        "reachable": "UNPROBED_THIS_PASS",
+        "hasInRepoCaller": true,
+        "canonicalOwner": true,
+        "classification": "CANONICAL",
+        "scopeCaveat": "Canonical ONLY for its actual demonstrated scope: an internal SvelteKit HTTP control surface with 3 confirmed UI callers. This is explicitly NOT evidence of a live editor-session ACP protocol boundary (ACP-01, still open) -- the prior census already drew this line and it is preserved here, not re-litigated or loosened.",
+        "conflictsOperatorDecisionNeeded": false
+      },
+      {
+        "surface": "ACP package legacy ingress (acpLegacyIngressSchema, agentic-workflow-control-plane.ts)",
+        "endpointExists": true,
+        "reachable": "N/A_NOT_AN_HTTP_ENDPOINT",
+        "hasInRepoCaller": false,
+        "canonicalOwner": false,
+        "classification": "DORMANT",
+        "evidence": "Prior census already found zero runtime consumers outside its own contract/test owner. Named 'legacy' in its own schema identifier, consistent with DORMANT rather than EXPERIMENTAL (it reads as a superseded ingress shape, not an in-development one)."
+      },
+      {
+        "surface": "A2A route (/api/ai/agent, inline compatibility shape)",
+        "endpointExists": true,
+        "reachable": "UNPROBED_THIS_PASS",
+        "hasInRepoCaller": true,
+        "canonicalOwner": true,
+        "classification": "CANONICAL",
+        "scopeCaveat": "Canonical only for single-agent chat via ChatSession.svelte.ts. /api/ai/agent/batch has no confirmed in-repo caller (unchanged from prior census) and is separately DORMANT within the same route file's surface.",
+        "conflictsOperatorDecisionNeeded": false
+      },
+      {
+        "surface": "A2A package wire contract (a2a-wire-v1.ts, A2A-02A projection adapter)",
+        "endpointExists": true,
+        "reachable": "N/A_NOT_AN_HTTP_ENDPOINT",
+        "hasInRepoCaller": false,
+        "canonicalOwner": false,
+        "classification": "DORMANT",
+        "evidence": "15/15 fixture tests pass and the package builds -- a genuinely proven, working contract, not a stub. Classified DORMANT rather than EXPERIMENTAL precisely because 'proven but never invoked by any runtime caller' is what DORMANT means in this taxonomy; test-proof is not the same axis as hasInRepoCaller, and this receipt keeps them separate rather than letting proof status stand in for adoption. Do not read this DORMANT label as a quality judgment on the contract itself."
+      }
+    ],
+    "unresolvedConflictsRequiringOperatorDecision": [
+      "MCP duplicate tool context.prefetch_feature_context (new_tools.ts vs trace-mcp-server.ts inline) -- see surface entry above.",
+      "Retrieval-client.ts's configured probe order selects the DEGRADED go-search-service (:8096, qdrantConnected=false) as canonical while the READY_FULL go-retrieval-service (:8100) sits disabled behind RETRIEVAL_HTTP_ENABLED=false -- see the two retrieval surface entries above. Found by combining this pass's static config trace with PROTO-02B's independent live probe in tasks.md; not present in either source alone."
+    ],
+    "notReconciledThisPass": [
+      "Live reachability probes for every surface marked UNPROBED_THIS_PASS -- this reconciliation pass is static-evidence-only per the operator's explicit scope; no new network/process probes were run this pass (the go-retrieval/go-search/go-embedding reachability figures above are reused from PROTO-02B's existing live snapshot in tasks.md, not re-probed here; the TurboVec/tRPC live probes in the base census likewise predate this section and are unchanged).",
+      "MCP full-registry overlap audit beyond the one already-known duplicate.",
+      "External (non-in-repo) callers of any transport -- out of scope for a static in-repo search by construction."
+    ],
+    "noRetireRemoveSwitchOrRewire": true,
+    "decision": {
+      "proto01Status": "CALLER_AND_LIFECYCLE_RECONCILED_TWO_CONFLICTS_OPEN",
+      "why": "Every transport surface listed above now carries a concrete classification with named evidence, resolving the prior census's open callers/lifecycle questions for tRPC, gRPC (Go services), MCP, ACP, and A2A. PROTO-01 is not marked fully CLOSED because its own requirement text includes 'reject duplicate bus ownership,' and two real conflicts remain open pending operator decisions -- reconciliation work is done; the reject-duplicate/config-selection actions are not, by design (no tool registration or env default was touched without authorization).",
+      "proto02Status": "TAXONOMY_APPLIED_TO_ALL_KNOWN_OVERLAPPING_TRANSPORTS",
+      "nextGate": "OPERATOR_DECISION_ON_MCP_DUPLICATE_TOOL_AND_RETRIEVAL_TRANSPORT_DEFAULT"
+    }
+  }
+}
