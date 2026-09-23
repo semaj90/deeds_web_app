@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.semantic-doc-01-embedding-population.v1",
+  "generatedAt": "2026-09-23T21:18:51.164Z",
+  "mode": "APPLY",
+  "executor": {
+    "url": "http://127.0.0.1:8081",
+    "kind": "llama-server EmbeddingGemma (NOT Ollama)",
+    "pooling": "mean",
+    "ctxTokens": 1024,
+    "promptRevision": "embeddinggemma-document-prompt-v1: \"title: {title} | text: {text}\"",
+    "promptContractChecksum": "52c2dc0add2f62831676f6b51c891be49562de2abeec23cb0e915fe251971f6e"
+  },
+  "before": {
+    "total": 852,
+    "embedded": 0
+  },
+  "considered": 852,
+  "embeddedInMemoryOrWritten": 852,
+  "written": 852,
+  "tooLongLeftNull": [],
+  "failures": [],
+  "readback": {
+    "embedded": 852,
+    "dim768": 852,
+    "total": 852
+  },
+  "writes": {
+    "postgres": {
+      "column": "atlas_external_doc_chunks.content_embedding",
+      "rows": 852
+    },
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "result": "SEMANTIC_DOC_01_POPULATED"
+}

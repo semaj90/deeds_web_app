@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.semantic-doc-01-embedding-parity.v1",
+  "generatedAt": "2026-09-23T21:18:14.531072+00:00",
+  "gate": "SEMANTIC-DOC-01 parity (EG-GGUF-4 equivalent)",
+  "executor": {
+    "url": "http://127.0.0.1:8081",
+    "kind": "llama-server EmbeddingGemma GGUF Q8_0, pooling mean, ctx 1024 (NOT Ollama)",
+    "artifact": "models\\embeddinggemma-300m-q8_0.gguf",
+    "artifactSha256": "4a2f0fe92d9326ed8cc69e543f997d748d806a2c534d48974350afa5a292d4bf",
+    "artifactMatchesPublishedGgmlOrg": false,
+    "note": "checksum differs from the cited ggml-org release, so parity is measured here rather than inherited"
+  },
+  "reference": {
+    "kind": "SentenceTransformers full-precision, CPU",
+    "model": "models/embeddinggemma_300m (google/embeddinggemma-300m)",
+    "safetensorsSha256": "cbf5a78393b6a033e0b8a63a57549964f7ed5c6fbeb4ba0694214f36123f2fd2"
+  },
+  "promptContract": {
+    "document": "title: {page title | none} | text: {chunk text}",
+    "query": "task: search result | query: {text}",
+    "identicalStringsOnBothSides": true
+  },
+  "sample": {
+    "documents": 48,
+    "queries": 10,
+    "stratifiedEvery": 17
+  },
+  "measured": {
+    "mean_cosine": 0.999616579868423,
+    "min_cosine": 0.9993596379859873,
+    "top1_agreement": 1.0,
+    "top5_overlap": 1.0
+  },
+  "thresholds": {
+    "mean_cosine_min": 0.98,
+    "min_cosine_min": 0.95,
+    "top1_agreement_min": 0.8
+  },
+  "perDocumentCosine": {
+    "min": 0.9993596379859873,
+    "mean": 0.9996030454809547
+  },
+  "perQueryCosine": {
+    "min": 0.9995901061885137,
+    "mean": 0.9996815449282709
+  },
+  "result": "EMBEDDING_PARITY_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}
