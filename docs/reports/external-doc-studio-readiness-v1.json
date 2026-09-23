@@ -1,6 +1,6 @@
 {
   "schema": "atlas.external-doc-studio-readiness.v1",
-  "generatedAt": "2026-09-23T17:19:50.861Z",
+  "generatedAt": "2026-09-23T17:25:35.613Z",
   "runtimeVersions": {
     "postgres": "18.4 (Debian 18.4-1.pgdg12+1)",
     "pgvector": "0.8.3",
@@ -1243,7 +1243,6 @@
   },
   "fsInputs": {
     "requiredInputs": [
-      "docs/.okf/dev/corpus.jsonl",
       "docs/.okf/dev/index.md",
       "docs/.okf/dev/manifest.json",
       "docs/.okf/dev/pinned-docs.coordinates.json",
@@ -1328,17 +1327,6 @@
       "docs/.okf/dev/summary.json",
       "docs/.okf/dev/symbol-summary.json",
       "docs/.okf/langextract/manifest.json",
-      "docs/reports/external-doc-admission-envelopes-v1.json",
-      "docs/reports/external-doc-studio-readiness-v1.json",
-      "scripts/docs-atlas/index-okf-dev-corpus.mjs",
-      "sveltekit-frontend/drizzle/manual/20260904_external_doc_intelligence_v1.sql",
-      "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
-    ],
-    "generatedInputs": [
-      "docs/.okf/pinned/admission-envelopes-v1.json"
-    ],
-    "missingInputs": [
-      "docs/.okf/dev/corpus.jsonl",
       "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-child-snippet.json",
       "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-child-snippet.md",
       "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-components-dialog.json",
@@ -1398,7 +1386,19 @@
       "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-page-options.json",
       "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-page-options.md",
       "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-state-management.json",
-      "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-state-management.md"
+      "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-state-management.md",
+      "docs/reports/external-doc-admission-envelopes-v1.json",
+      "docs/reports/external-doc-studio-readiness-v1.json",
+      "scripts/docs-atlas/index-okf-dev-corpus.mjs",
+      "sveltekit-frontend/drizzle/manual/20260904_external_doc_intelligence_v1.sql",
+      "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+    ],
+    "generatedInputs": [
+      "docs/.okf/pinned/admission-envelopes-v1.json"
+    ],
+    "missingInputs": [],
+    "optionalRebuildableInputs": [
+      "docs/.okf/dev/corpus.jsonl"
     ],
     "environmentInputs": [
       ".env",

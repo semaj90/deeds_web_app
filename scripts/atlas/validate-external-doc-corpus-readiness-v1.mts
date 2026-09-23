@@ -44,6 +44,8 @@ const outputPath = resolve(process.argv[2] ?? join(root, 'docs', 'reports', 'ext
 
 /** Inputs produced by a deterministic offline prerequisite that the npm smoke script runs first. */
 const GENERATED_INPUTS = new Set(['docs/.okf/pinned/admission-envelopes-v1.json']);
+/** Gitignored (`*.jsonl`) rebuildable indexes that the readers use only when present. */
+const OPTIONAL_REBUILDABLE_INPUTS = new Set(['docs/.okf/dev/corpus.jsonl', 'docs/.okf/dev/symbol-index.jsonl', 'docs/.okf/langextract/corpus.jsonl']);
 
 function declaredVectorType(table: string): { source: string | null; declaredType: string | null } {
 	const manualDir = join(root, 'sveltekit-frontend', 'drizzle', 'manual');
@@ -87,12 +89,14 @@ function auditInputs() {
 		for (const p of (result.stdout ?? '').split('\0').filter(Boolean)) tracked.add(p);
 	}
 	const isEnvironment = (p: string) => /(^|\/)\.env(\.|$)/.test(p);
-	const requiredInputs = files.filter((p) => !isEnvironment(p));
+	// Gitignored (*.jsonl) rebuildable indexes: read when present, existsSync-guarded, proven optional by the fresh-checkout run.
+	const optionalRebuildableInputs = files.filter((p) => !tracked.has(p) && OPTIONAL_REBUILDABLE_INPUTS.has(p));
+	const requiredInputs = files.filter((p) => !isEnvironment(p) && !OPTIONAL_REBUILDABLE_INPUTS.has(p));
 	const trackedInputs = requiredInputs.filter((p) => tracked.has(p));
 	const generatedInputs = requiredInputs.filter((p) => !tracked.has(p) && GENERATED_INPUTS.has(p));
 	const missingInputs = requiredInputs.filter((p) => !tracked.has(p) && !GENERATED_INPUTS.has(p));
 	return {
-		requiredInputs, trackedInputs, generatedInputs, missingInputs,
+		requiredInputs, trackedInputs, generatedInputs, missingInputs, optionalRebuildableInputs,
 		environmentInputs: files.filter(isEnvironment),
 		directoriesListed: dirs,
 		note: 'environmentInputs are optional dotenv files and node_modules-installed package versions; they are never required for the smoke to pass.'

@@ -622,7 +622,7 @@ export function computeVersionDrift(coords: CoordinatesFile | null, sources: Sou
 		let status: DriftStatus;
 		if (!captures.length) status = 'DOC_MISSING';
 		else if ((now.getTime() - newest) / 86_400_000 > STALE_AFTER_DAYS) status = 'DOC_STALE';
-		else if (!capturedDocVersion || cfg.versionQualification === 'CURRENT_UPSTREAM' || cfg.versionQualification === 'UNVERSIONED') status = 'UNVERSIONED';
+		else if (!capturedDocVersion || !runtimeVersion || cfg.versionQualification === 'CURRENT_UPSTREAM' || cfg.versionQualification === 'UNVERSIONED') status = 'UNVERSIONED'; // nothing to compare against
 		else if (runtimeVersion && capturedDocVersion === runtimeVersion) status = 'EXACT_MATCH';
 		else if (majorOf(capturedDocVersion) === majorOf(runtimeVersion)) status = 'COMPATIBLE_SERIES';
 		else status = majorOf(capturedDocVersion) > majorOf(runtimeVersion) ? 'UPSTREAM_NEWER' : 'DOC_STALE';

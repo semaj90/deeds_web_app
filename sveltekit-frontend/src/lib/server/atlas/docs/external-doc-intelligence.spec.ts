@@ -44,6 +44,11 @@ describe('version drift', () => {
 		expect(status('pgvector')).toBe('DOC_MISSING');
 	});
 
+	it('does not call a version stale when the runtime version is unknown (no database)', () => {
+		const noRuntime = computeVersionDrift(coords, [cap('postgresql-18', '2026-09-20T00:00:00Z')], { ...RUNTIME, postgres: null, pgvector: null }, NOW);
+		expect(noRuntime.find((r) => r.sourceId === 'postgresql-18')).toMatchObject({ runtimeVersion: null, status: 'UNVERSIONED' });
+	});
+
 	it('reports DOC_STALE for old captures and never mutates dependencies', () => {
 		const stale = computeVersionDrift(coords, [cap('bits-ui', '2026-06-01T00:00:00Z')], RUNTIME, NOW);
 		expect(stale.find((r) => r.sourceId === 'bits-ui')?.status).toBe('DOC_STALE');
