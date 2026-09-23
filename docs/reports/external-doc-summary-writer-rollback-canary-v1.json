@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.external-doc-summary-writer.v1",
+  "generatedAt": "2026-09-23T21:22:38.668Z",
+  "mode": "ROLLBACK_CANARY",
+  "backend": {
+    "kind": "llama-server (NOT Ollama)",
+    "url": "http://127.0.0.1:8090",
+    "modelId": "ornith-1.5-9b",
+    "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7"
+  },
+  "producer": {
+    "id": "atlas-external-doc-summarizer",
+    "revision": "external-doc-summary-writer-v1",
+    "promptRevision": "sha256:763321e3b92fe3a74f0334784042c3ca5b3caeb915781ad790fb711d39a3c361"
+  },
+  "analysesBefore": 0,
+  "considered": 3,
+  "generated": 3,
+  "written": 3,
+  "readbackOk": true,
+  "afterRollback": 0,
+  "medianLatencyMs": 2021,
+  "failures": [],
+  "samples": [
+    {
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "chunkEvidenceRevision": "sha256:0e92134210a648a9abb1aeaf94a050469d74118b30013f3f687046c70581d7ff",
+      "analysisId": "eda:7346af15cb0696c42254165d9de99c77c6ea74242c5771f9525a4b4ee225d4c8",
+      "summary": "This chunk is an introductory section for the \"Getting Started\" documentation of Bits UI, which explains how to begin using Bits in your app. It notes that this section may contain examples, demos, and other useful information, and that you can ignore the classnames applied to the demos unless they are relevant to the user's issue."
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:16",
+      "chunkEvidenceRevision": "sha256:0b7a9cfd5fe58c9aabd41af002fbcfef506598b1946ad875243f660e0431e453",
+      "analysisId": "eda:91a6ff38550e7da406d1029999a0b0f2bcbae0ae8cc442fdf2845763e5742f23",
+      "summary": "Building an HNSW index is faster when the graph fits into `maintenance_work_mem`, and a notice appears when it no longer fits after 100000 tuples, warning that the build will take significantly more time. You can speed up index creation by loading initial data first and increasing parallel workers via `max_parallel_maintenance_workers` (2 by default) and `max_parallel_workers` (8 by default). The index options also affect build time, so use the defaults unless you see low recall, and use binary quantization for faster builds at scale."
+    },
+    {
+      "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:26",
+      "chunkEvidenceRevision": "sha256:baa7cf198f61045ff5cbb1c348a5d66583bd38c645b435f20b0dbcd9e330b323",
+      "analysisId": "eda:3c0475e1ba1f2affb11ae885c99e7c658244ee679f15d493285267dc4ad13b23",
+      "summary": "The `$state` feature was introduced in Svelte v0.1.100. The `console` module provides a debugging console similar to the JavaScript console in web browsers, exporting a `Console` class with methods like `console.log()`, `console.error()`, and `console.warn()` that can write to any Node.js stream, along with a global `console` instance configured to write to `process.stdout` and `process.stderr`. These methods are neither consistently synchronous like browser APIs nor consistently asynchronous like other Node.js streams."
+    }
+  ],
+  "writes": {
+    "postgres": "ROLLED_BACK",
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "result": "EXTERNAL_DOC_SUMMARY_WRITER_ROLLBACK_PROVEN"
+}
