@@ -1,5 +1,5 @@
 {
-  "schema": "atlas.external-doc-canonical-admission.v1",
+  "schema": "atlas.external-doc-canonical-admission.v2",
   "generatedAt": "2026-09-23T19:20:10.654Z",
   "baseline": {
     "pages": 0,
@@ -171,9 +171,163 @@
     }
   ],
   "writes": {
-    "postgres": "COMMITTED",
+    "postgres": {
+      "performed": "by the earlier authorized --apply (this verification wrote nothing)",
+      "pages": 30,
+      "chunks": 852
+    },
     "qdrant": 0,
     "valkey": 0,
-    "neo4j": 0
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "verifiedAt": "2026-09-23T19:32:05.935Z",
+  "authorization": {
+    "operator": "explicit \"admit all 30 pages\" (confirmed through the question prompt, 2026-09-23)",
+    "scope": "permanent canonical admission of the pinned 30-page / 852-chunk corpus; no cleanup/destructive reconciliation"
+  },
+  "liveReadback": {
+    "pages": 30,
+    "chunks": 852,
+    "analyses": 0
+  },
+  "liveState": "FULL",
+  "identity": {
+    "uniquePageEvidenceRevisions": 30,
+    "uniqueChunkEvidenceRevisions": 852,
+    "uniqueChunkIds": 852,
+    "duplicatePageGroups": 0,
+    "duplicateChunkGroups": 0,
+    "unexpectedPages": 0,
+    "unexpectedChunks": 0,
+    "distinctProductVersions": 8
+  },
+  "parity": {
+    "pagesMatching": 30,
+    "chunksIdentityMatching": 852,
+    "checksumsMatching": 852,
+    "spansMatching": 852,
+    "textMatching": 852
+  },
+  "ftsProof": [
+    {
+      "query": "hnsw.iterative_scan",
+      "ftsHits": 2,
+      "literalTextHits": 2,
+      "source": "CANONICAL_POSTGRES",
+      "topHit": {
+        "product": "pgvector",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+        "url": "https://github.com/pgvector/pgvector",
+        "chunkId": "doc:pgvector:fe883c75f323441d:24",
+        "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+        "containsLiteral": true
+      }
+    },
+    {
+      "query": "hnsw.scan_mem_multiplier",
+      "ftsHits": 1,
+      "literalTextHits": 1,
+      "source": "CANONICAL_POSTGRES",
+      "topHit": {
+        "product": "pgvector",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+        "url": "https://github.com/pgvector/pgvector",
+        "chunkId": "doc:pgvector:fe883c75f323441d:26",
+        "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+        "containsLiteral": true
+      }
+    },
+    {
+      "query": "io_method",
+      "ftsHits": 3,
+      "literalTextHits": 3,
+      "source": "CANONICAL_POSTGRES",
+      "topHit": {
+        "product": "postgresql",
+        "productVersion": "18",
+        "url": "https://www.postgresql.org/docs/18/release-18.html",
+        "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+        "chunkEvidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1",
+        "containsLiteral": true
+      }
+    },
+    {
+      "query": "Bitmap Heap Scan",
+      "ftsHits": 17,
+      "literalTextHits": 17,
+      "source": "CANONICAL_POSTGRES",
+      "topHit": {
+        "product": "postgresql",
+        "productVersion": "18",
+        "url": "https://www.postgresql.org/docs/18/using-explain.html",
+        "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:25",
+        "chunkEvidenceRevision": "sha256:2c2fd744af4bc94dc6945ee3d607d696c942b1ee4b54c34d748eace349644535",
+        "containsLiteral": true
+      }
+    },
+    {
+      "query": "uuidv7",
+      "ftsHits": 3,
+      "literalTextHits": 3,
+      "source": "CANONICAL_POSTGRES",
+      "topHit": {
+        "product": "postgresql",
+        "productVersion": "18",
+        "url": "https://www.postgresql.org/docs/18/functions-uuid.html",
+        "chunkId": "doc:postgresql-18:a92f2cf09489fb29:1",
+        "chunkEvidenceRevision": "sha256:310a88163ea716a17249804ef78aaccbcd1663fd0853223ad32728ebb584c471",
+        "containsLiteral": true
+      }
+    },
+    {
+      "query": "drizzle-kit",
+      "ftsHits": 26,
+      "literalTextHits": 26,
+      "source": "CANONICAL_POSTGRES",
+      "topHit": {
+        "product": "drizzle-kit",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+        "url": "https://orm.drizzle.team/docs/kit-overview",
+        "chunkId": "doc:drizzle-kit:b13a84ba576d603b:0",
+        "chunkEvidenceRevision": "sha256:5f7e0bda2f87878f5bb7f9113d5bf10ad3809759396af9bd3a7dd82a4b322fe2",
+        "containsLiteral": true
+      }
+    },
+    {
+      "query": "$derived",
+      "ftsHits": 29,
+      "literalTextHits": 25,
+      "source": "CANONICAL_POSTGRES",
+      "topHit": {
+        "product": "svelte",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+        "url": "https://svelte.dev/docs/svelte/$derived",
+        "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:16",
+        "chunkEvidenceRevision": "sha256:7176f545c5847e23ae960cdcc7c2292e3e393114aa3bf5ad0fe4d08e09ac41ac",
+        "containsLiteral": true
+      }
+    }
+  ],
+  "runnerRecoverySemantics": {
+    "classification": "PARTIAL_COMMIT_RECOVERY_GAP",
+    "detail": "run-external-doc-admission-v1.mts calls admitExternalDocPage once per page, each in its own committed transaction, and refuses to start unless both canonical tables are empty. A crash after page N would leave a valid partial corpus that a naive rerun refuses to resume. Not triggered here (all 30 pages committed); recorded as a reliability follow-up (resumable first-load: exact readback of already-admitted pages, admit only missing ones, fail closed on conflicts)."
+  },
+  "studioSmoke": {
+    "command": "npm run atlas:docs:studio:smoke",
+    "result": "DOC_INTELLIGENCE_STUDIO_READINESS_PROVEN",
+    "canonicalStatus": "PRESENT",
+    "previousStatus": "DOC_CANONICAL_CORPUS_EMPTY",
+    "vitest": {
+      "files": 3,
+      "tests": 38,
+      "failed": 0
+    },
+    "liveProbe": "scripts/atlas/probe-studio-canonical-search-v1.mts (read-only): canonicalCorpus PRESENT 30/852; searches hnsw.iterative_scan, io_method, uuidv7 returned only CANONICAL_POSTGRES-badged hits (2/3/3)"
+  },
+  "validation": {
+    "typescript": "tsc --noEmit --strict on run-external-doc-admission, verify-external-doc-canonical-admission and run-doc-canary-admission scripts: 0 errors in those files (only the SvelteKit $lib alias in the writer, unresolvable in an ad hoc tsc call); earlier editor diagnostics were a stale language-server cache",
+    "openspec": "validate --strict passed",
+    "previousApplyOutcome": "SUCCEEDED (live readback: 30/852, exact parity)"
   }
 }

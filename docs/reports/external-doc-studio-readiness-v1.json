@@ -1,6 +1,6 @@
 {
   "schema": "atlas.external-doc-studio-readiness.v1",
-  "generatedAt": "2026-09-23T19:20:30.796Z",
+  "generatedAt": "2026-09-23T19:34:58.418Z",
   "runtimeVersions": {
     "postgres": "18.4 (Debian 18.4-1.pgdg12+1)",
     "pgvector": "0.8.3",
