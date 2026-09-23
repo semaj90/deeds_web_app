@@ -15,10 +15,22 @@
  * - Automatic AudioContext management
  */
 
-import type { PiperWasm } from 'piper-wasm';
+/**
+ * `piper-wasm` is not a declared dependency (see openspec/changes/route-import-infra-isolation
+ * task TTS-PIPER-WASM-UNRESOLVED-01) — it is loaded only if present at runtime, never statically
+ * resolved by Vite. Minimal local shape for the two members this module actually calls.
+ */
+interface PiperWasmInstance {
+	synthesize(text: string): Promise<{ buffer: ArrayBuffer }>;
+}
+interface PiperWasmModule {
+	PiperWasm: {
+		load(modelPath: string): Promise<PiperWasmInstance>;
+	};
+}
 
 class TTSService {
-	private piper: PiperWasm | null = null;
+	private piper: PiperWasmInstance | null = null;
 	private audioContext: AudioContext | null = null;
 	private isInitializing = false;
 	private initPromise: Promise<void> | null = null;
@@ -44,8 +56,21 @@ class TTSService {
 		this.isInitializing = true;
 		this.initPromise = (async () => {
 			try {
-				// Dynamically import piper-wasm (only in browser)
-				const { PiperWasm } = await import('piper-wasm');
+				// Non-literal specifier: prevents Vite's import-analysis pass from statically
+				// resolving/failing on this optional package (matches the granite-docling.ts
+				// /* @vite-ignore */ pattern used for other not-always-installed native deps).
+				const piperWasmSpecifier = 'piper-wasm';
+				let piperModule: PiperWasmModule;
+				try {
+					piperModule = (await import(
+						/* @vite-ignore */ piperWasmSpecifier
+					)) as PiperWasmModule;
+				} catch {
+					throw new Error(
+						'[TTS] "piper-wasm" package is not installed — TTS is unavailable in this build.'
+					);
+				}
+				const { PiperWasm } = piperModule;
 
 				console.log('[TTS] Loading Piper model...');
 				const startTime = performance.now();
