@@ -1,6 +1,6 @@
 {
   "schema": "atlas.inference-facade-read-only-live-replay.v1",
-  "generatedAt": "2026-09-23T16:06:31.969Z",
+  "generatedAt": "2026-09-23T20:18:04.056Z",
   "entrypoint": "runChatCompletion (existing OpenAI-compatible application facade)",
   "legacyCompatibilityModule": null,
   "runtimeResolver": "resolveLlamaInferenceTarget → resolveLoadedLlamaModel → GET /v1/models",
@@ -78,7 +78,7 @@
   "liveReplay": {
     "attempted": true,
     "status": 200,
-    "requestId": "inference-replay-9453620f-d85d-472f-9516-4cc910bb374f",
+    "requestId": "inference-replay-e6795295-164c-400b-8271-df0027b980b5",
     "streaming": false,
     "finishReason": "stop",
     "promptTokens": 17,
@@ -86,11 +86,9 @@
   },
   "readbackProof": {
     "result": "NO_WRITES_ATTRIBUTABLE_TO_REPLAY",
-    "basis": "control-flow proof: fail-closed replay branch skips all durable writer paths; mocked tests assert cache/retrieval writers are not called; prompt caching disabled at llama-server",
-    "durableStoreSnapshot": "not taken; no durable writer is reachable from this replay branch, so the claim is scoped to writes attributable to this request, not unrelated concurrent activity",
+    "basis": "fail-closed replay branch skips all durable writer paths; mocked tests assert cache/retrieval writers are not called; prompt caching disabled at llama-server",
     "globalConcurrentWritesExcluded": true
   },
-  "responseModelNote": "The facade response model label is normalized from the resolved target; the receipt does not claim to capture a distinct raw model field from the llama-server response body.",
   "result": "INFERENCE_FACADE_READ_ONLY_LIVE_REPLAY_PROVEN",
   "writes": {
     "postgres": 0,
