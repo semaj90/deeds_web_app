@@ -7,6 +7,7 @@ import pytest
 
 from atlas_summary_claim_judge_v1 import (
     build_judge_input_body_v1, build_messages, judge_claim_v1, parse_output, resolve_model, seal_judge_input_v1,
+    validate_judge_input_v1,
 )
 
 DOCS = Path(__file__).resolve().parents[2] / "sveltekit-frontend" / "src" / "lib" / "server" / "atlas" / "docs" / "__fixtures__"
@@ -32,10 +33,20 @@ def test_builder_reproduces_the_typescript_body_and_requires_exact_id_and_revisi
 
 
 def test_prompt_contains_only_the_chunk_claim_metadata_and_findings() -> None:
-    polluted = {**TS_INPUT, "webResults": ["LEAK-WEB"], "qdrantNeighbors": ["LEAK-NEIGHBOR"], "aceMemory": "LEAK-ACE"}
-    text = "\n".join(m["content"] for m in build_messages(polluted))
+    text = "\n".join(m["content"] for m in build_messages(TS_INPUT))
     assert TS_INPUT["canonicalChunkText"] in text and TS_INPUT["claim"]["claimText"] in text
-    assert not any(leak in text for leak in ("LEAK-WEB", "LEAK-NEIGHBOR", "LEAK-ACE"))
+
+
+def test_input_seal_and_strict_shape_fail_closed_before_transport() -> None:
+    for polluted in (
+        {**TS_INPUT, "webResults": ["LEAK-WEB"]},
+        {**TS_INPUT, "judgeInputChecksum": "0" * 64},
+        {**TS_INPUT, "claim": {**TS_INPUT["claim"], "claimText": "tampered"}},
+    ):
+        with pytest.raises(ValueError):
+            validate_judge_input_v1(polluted)
+        slot = judge_claim_v1(polluted, lambda _m: pytest.fail("transport must not run"), MODEL)
+        assert slot["status"] == "JUDGE_ERROR" and slot["verdict"] is None
 
 
 @pytest.mark.parametrize("raw", [

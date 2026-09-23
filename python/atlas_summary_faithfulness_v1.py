@@ -132,7 +132,10 @@ def validate_summary_claim_versions_v1(source_text: str, claim_text: str) -> dic
     """Compare version literals as strings; never coerce versions to numbers."""
     source_versions = _ordered_unique([match.group(1) for match in VERSION_RE.finditer(source_text)])
     claim_versions = _ordered_unique([match.group(1) for match in VERSION_RE.finditer(claim_text)])
-    unsupported = [version for version in claim_versions if version not in source_versions]
+    # A claimed version is supported by the same EXACT text anywhere in the source, even when the source states it without a product prefix
+    # ("Starting with 0.8.0" supports "pgvector 0.8.0"). Still exact text: 18.04 != 18.4.
+    source_literals = set(re.findall(r"(?<![\w.])\d+(?:\.\d+){1,3}(?![\w.])", source_text))
+    unsupported = [version for version in claim_versions if version not in source_versions and version not in source_literals]
     return {
         "status": "FAIL" if unsupported else "PASS",
         "sourceVersions": source_versions,

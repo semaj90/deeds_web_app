@@ -40,3 +40,10 @@ def test_unqualified_numeric_values_do_not_become_version_assertions() -> None:
     assert validate_summary_claim_versions_v1("The value is 18.4.", "The value is 18.4.")["claimVersions"] == []
     assert validate_summary_claim_numeric_v1("The value is 18.4.", "The value is 18.4.")["status"] == "PASS"
 
+
+
+def test_claimed_version_is_supported_by_the_same_exact_text_even_without_a_product_prefix_in_the_source() -> None:
+    source = "the index is scanned. Starting with 0.8.0, you can enable iterative index scans, PostgreSQL 18.4 adds io_method."
+    assert validate_summary_claim_versions_v1(source, "Starting with pgvector 0.8.0, scans continue.")["status"] == "PASS"
+    assert validate_summary_claim_versions_v1(source, "PostgreSQL 18.04 adds io_method.")["status"] == "FAIL"  # exact text: 18.04 != 18.4
+    assert validate_summary_claim_versions_v1(source, "Starting with pgvector 0.8.1, scans continue.")["status"] == "FAIL"

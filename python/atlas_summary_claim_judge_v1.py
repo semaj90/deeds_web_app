@@ -30,8 +30,57 @@ SYSTEM_PROMPT = (
 Transport = Callable[[list[dict[str, str]]], str]
 
 
+def validate_judge_input_v1(judge_input: dict[str, Any]) -> None:
+    """Fail closed on anything other than the sealed, strict VAL-06 wire shape."""
+    required = {
+        "schema", "chunkId", "chunkEvidenceRevision", "summaryOutputChecksum", "canonicalChunkText",
+        "promptVisibleMetadata", "claim", "deterministicFindings", "promptRevision", "canonicalAuthority", "judgeInputChecksum",
+    }
+    if not isinstance(judge_input, dict) or set(judge_input) != required:
+        raise ValueError("JUDGE_INPUT_FIELDS_MISMATCH")
+    if judge_input["schema"] != "atlas.summary-judge-input.v1" or judge_input["canonicalAuthority"] is not False:
+        raise ValueError("JUDGE_INPUT_SCHEMA_OR_AUTHORITY_INVALID")
+    if not isinstance(judge_input["chunkId"], str) or not judge_input["chunkId"].strip():
+        raise ValueError("JUDGE_INPUT_CHUNK_ID_INVALID")
+    if not re.fullmatch(r"sha256:[a-f0-9]{64}", str(judge_input["chunkEvidenceRevision"])):
+        raise ValueError("JUDGE_INPUT_CHUNK_REVISION_INVALID")
+    for key in ("summaryOutputChecksum", "judgeInputChecksum"):
+        if not re.fullmatch(r"[a-f0-9]{64}", str(judge_input[key])):
+            raise ValueError("JUDGE_INPUT_CHECKSUM_INVALID")
+    if not isinstance(judge_input["canonicalChunkText"], str) or not judge_input["canonicalChunkText"].strip() or len(judge_input["canonicalChunkText"].encode("utf-8")) > 32 * 1024:
+        raise ValueError("JUDGE_INPUT_CHUNK_TEXT_INVALID")
+    metadata = judge_input["promptVisibleMetadata"]
+    if not isinstance(metadata, dict) or set(metadata) != {"product", "productVersion", "title", "headingPath"} or not isinstance(metadata["headingPath"], list):
+        raise ValueError("JUDGE_INPUT_METADATA_INVALID")
+    if not isinstance(judge_input["promptRevision"], str) or not judge_input["promptRevision"].strip() or judge_input["promptRevision"].strip().lower() in {"latest", "unknown"}:
+        raise ValueError("JUDGE_INPUT_PROMPT_REVISION_INVALID")
+    claim = judge_input["claim"]
+    if not isinstance(claim, dict) or set(claim) != {"claimOrdinal", "claimText", "claimChecksum"}:
+        raise ValueError("JUDGE_INPUT_CLAIM_INVALID")
+    if type(claim["claimOrdinal"]) is not int or claim["claimOrdinal"] < 0 or not isinstance(claim["claimText"], str) or not claim["claimText"].strip():
+        raise ValueError("JUDGE_INPUT_CLAIM_INVALID")
+    if claim["claimChecksum"] != claim_checksum_v1(claim["claimText"]):
+        raise ValueError("JUDGE_INPUT_CLAIM_CHECKSUM_MISMATCH")
+    findings = judge_input["deterministicFindings"]
+    expected_slots = {"technical", "numeric", "version", "sourceSpan"}
+    if not isinstance(findings, dict) or set(findings) != expected_slots:
+        raise ValueError("JUDGE_INPUT_FINDINGS_INVALID")
+    slot_fields = {
+        "technical": {"status", "sourceTokens", "claimTokens", "missingTechnicalTokens", "unexpectedTechnicalTokens"},
+        "numeric": {"status", "sourceValues", "claimValues", "unsupportedValues"},
+        "version": {"status", "sourceVersions", "claimVersions", "unsupportedVersions"},
+        "sourceSpan": {"status", "spans"},
+    }
+    for key, fields in slot_fields.items():
+        if not isinstance(findings[key], dict) or set(findings[key]) != fields:
+            raise ValueError("JUDGE_INPUT_FINDINGS_INVALID")
+    if canonical_sha256_v1({k: v for k, v in judge_input.items() if k != "judgeInputChecksum"}) != judge_input["judgeInputChecksum"]:
+        raise ValueError("JUDGE_INPUT_SEAL_MISMATCH")
+
+
 def build_messages(judge_input: dict[str, Any]) -> list[dict[str, str]]:
     """Deterministic prompt from ONLY the judge-visible fields; extra keys in the input are ignored by construction."""
+    validate_judge_input_v1(judge_input)
     meta = judge_input["promptVisibleMetadata"]
     findings = judge_input["deterministicFindings"]
     brief = {k: {"status": v["status"], **({"unsupported": v.get("unexpectedTechnicalTokens") or v.get("unsupportedValues") or v.get("unsupportedVersions") or []} if v["status"] == "FAIL" else {})} for k, v in findings.items() if k != "sourceSpan"}
@@ -69,11 +118,14 @@ def resolve_model(llama_url: str, fetch: Callable[[str], Any] | None = None) -> 
     return {"id": alias, "revision": f"{alias}:{path}"}
 
 
-def http_transport(llama_url: str, model: str, timeout: int = 120) -> Transport:
+def http_transport(llama_url: str, model: str, timeout: int = 120, on_response: Callable[[dict[str, Any]], None] | None = None) -> Transport:
     def call(messages: list[dict[str, str]]) -> str:
         body = json.dumps({"model": model, "temperature": 0, "max_tokens": 200, "stream": False, "seed": 1729, "messages": messages}).encode()
         req = urllib.request.Request(f"{llama_url}/v1/chat/completions", data=body, headers={"content-type": "application/json"})
-        return json.load(urllib.request.urlopen(req, timeout=timeout))["choices"][0]["message"]["content"]
+        response = json.load(urllib.request.urlopen(req, timeout=timeout))
+        if on_response is not None:
+            on_response(response)
+        return response["choices"][0]["message"]["content"]
     return call
 
 
