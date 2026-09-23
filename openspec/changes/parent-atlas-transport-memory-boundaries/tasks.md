@@ -66,11 +66,20 @@
   `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts`,
   `sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts`, and
   `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.spec.ts`.
-- [ ] **A2A-04** Direct-invocation authorization audit (not started). Test whether a peer can call an
-  unadvertised mutating/mirror RPC method by name despite A2A-03's discovery-level suppression.
-  Read-only-safe approach: exercise authorization at the dispatch/handler-admission layer with
-  invalid or dry-run fixtures (no real mutation needs to occur) and prove rejection happens before
-  handler invocation, not merely that the method is unlisted in discovery output.
+- [ ] **A2A-04** `A2A_INVOCATION_AUTHORIZATION_BOUNDARY` — direct-invocation authorization audit
+  (not started). Test whether a peer can call an unadvertised mutating/mirror RPC method by name
+  despite A2A-03's discovery-level suppression. Read-only-safe approach: exercise authorization at
+  the dispatch/handler-admission layer with invalid or dry-run fixtures (no real mutation needs to
+  occur) and prove rejection happens before handler invocation, not merely that the method is
+  unlisted in discovery output. Acceptance criteria (none proven yet, all still open):
+  (1) direct invocation of an unadvertised/write-like method is rejected;
+  (2) rejection occurs before handler invocation, not merely omitted from discovery;
+  (3) missing/invalid authorization fails closed;
+  (4) peer-supplied canonical IDs cannot become authority merely by being supplied;
+  (5) mirror/canonical mutation cannot occur through the peer surface without the required
+  authorization; (6) tests proving this remain non-mutating. Do not implement or claim this gate
+  proven until fixtures exercising all six criteria exist and pass without changing runtime
+  behavior.
 - [x] **MEM-01** Freeze the three-memory taxonomy: ephemeral llama KV prompt cache, disposable BitFrost/Valkey residency, and PostgreSQL durable canonical memory. Qdrant/Neo4j are rebuildable projections, not memory authorities; CLAUDE.md's historical linear hierarchy has been explicitly superseded. Documentation contract only; no runtime-state claim.
 - [x] **MEM-02** Keep `ContextManifest` as the reproducible model-context boundary; KV cache reuse is an optimization and never durable truth. `ContextManifestV2` preserves the existing V1 payload and deterministically checksums context/revision inputs (`context-manifest-v2.ts` and its focused spec); llama prompt reuse is marked `ephemeral` in `context-prompt-streamer.ts`. Contract-level proof only; live llama-server KV persistence behavior is not claimed.
 - [x] **MEM-03** Prove revision-qualified BitFrost keys and fail-open behavior across workspace, policy, graph, and representation revisions. `buildAceBitfrostCacheKeyV1` identity test now asserts a distinct key for each of those four revision changes; the existing cache-aside suite proves reconstruction after Valkey read failure and returning reconstructed canonical data when the cache write fails. Focused suites pass 27/27. Contract/fixture proof only; no live Valkey readback or cache write is claimed. Evidence: `sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.test.ts`, `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts`.
