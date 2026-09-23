@@ -202,11 +202,25 @@
 
 - [ ] 6.1 Re-run this change's own capability scenarios (specs/ontology-resolution-boundary,
       specs/ontology-fanout-storage) as real tests, not just design-time checklist items.
-- [ ] 6.2 Confirm no existing consumer of `feature_ontology_tuples` broke (additive-only schema
-      change, so this should be a no-op check, but verify rather than assume).
-- [ ] 6.3 Update `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s ontology audit
+- [x] 6.2 Confirm no existing consumer of `feature_ontology_tuples` broke (additive-only schema
+      change, so this should be a no-op check, but verify rather than assume). Verified rather
+      than assumed: grepped all real consumers repo-wide. Only one Drizzle-typed consumer exists
+      (`sveltekit-frontend/src/lib/server/agents/regen/loaders/features.ts`) and it uses an
+      explicit named-column `.select({...})` — unaffected by the two additive nullable/defaulted
+      columns. The one route consumer written against the new columns
+      (`src/routes/api/admin/atlas/ontology-resolution/+server.ts`) gates on
+      `resolutionColumnsExist()` and was live-tested: `curl http://127.0.0.1:5173/api/admin/atlas/ontology-resolution`
+      returns `200` with `"migrationApplied":true` and real `resolutionStats`/`totalTuples` data
+      against the live 539,124-row table. Broader census (34 files total, app + `scripts/atlas/`
+      + `sveltekit-frontend/scripts/atlas/`) confirmed via `grep -l "SELECT \*.*feature_ontology_tuples"`:
+      zero matches — no script or route references this table with a positional/`SELECT
+      *`-and-array-index-destructure pattern that a new trailing column could break; the rest are
+      read-only auditors or use explicit named columns.
+- [x] 6.3 Update `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s ontology audit
       section with a pointer to this change once Phase 1 is live, so the two records stay
-      linked.
+      linked. Added a pointer note under that file's 8-gate reframing item (5) (KAG/hyperedges/
+      ontology→Neo4j), clarifying `feature_ontology_tuples`'s new resolution columns are a
+      separate table from the `atlas_ontology_tuples`/hyperedges gap that item already tracks.
 
 ## 7. Correction: a real, LIVE OAK/oaklib FastAPI kernel already existed and was missed by
       task 2.1's original decision (2026-09-15, found while researching per operator request)

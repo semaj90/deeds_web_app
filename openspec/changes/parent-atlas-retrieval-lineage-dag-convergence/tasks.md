@@ -547,6 +547,16 @@ L0 material); (8) agent program optimization — RouteTrace/evals→DSPy→GEPA 
 runtime — not a new capability). Full ownership-audit detail in the freeze document's seventh
 addendum, same day.
 
+**Pointer (2026-09-22, added per `parent-atlas-ontology-oaklib-fanout-bitmap` task 6.3, that
+change's Phase 1 now live)**: `feature_ontology_tuples` (539,124 rows, the table gap 5 above
+refers to under item (5)'s ontology mention) gained two additive resolution columns
+(`resolved_concept_id`, `resolution_state`, applied 2026-09-15) plus a bounded OAK/oaklib
+resolver (`resolveOntologyLabelV1`) and a `WITH NO DATA` bitmap-fanout materialized view draft —
+see `openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap/tasks.md` for the full record.
+Zero rows are resolved yet (Phase 1 only added the schema + resolver; Phase 2's write path is
+explicitly reframed/not-yet-built per that file's task 3.4) — this does not change the "real open
+gap" status noted above for `atlas_ontology_tuples`/hyperedges→Neo4j, which is a separate table.
+
 **Gate 6 blocker RESOLVED, same pass — `latent_64` confirmed to be a slice of `latent_256`, not a
 separately-learned output.** The contradiction between `sveltekit-frontend/src/lib/server/
 retrieval/latent-derive.ts` (slice hypothesis) and the newer `schema-postgres.ts`
