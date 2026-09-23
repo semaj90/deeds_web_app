@@ -259,7 +259,8 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   nullable for now — `NOT NULL` is deferred until DOC-06A's admission writer (below) is the thing
   actually enforcing every row populates them, not added as a premature constraint ahead of it.
   Combined regression across all Phase A/B test files after this change: 67/67 pass.
-- [x] **DOC-06A** `EXTERNAL_DOC_POSTGRES_ADMISSION_01` — done, live-proven. Operator-directed,
+- [x] **DOC-06A** `EXTERNAL_DOC_POSTGRES_ADMISSION_01` — done, live-proven (writer/adapter only; corpus admission NOT run —
+  `atlas_external_doc_pages/chunks` still 0 rows, see DOC-CANARY-ADMISSION-01). Operator-directed,
   depends on DOC-04/05/06. The missing join: DOC-06 proved the tables and their invariants via
   hand-written SQL; nothing yet takes the real Python `chunk_document()`/`fetch_beautifulsoup()`
   output and transactionally admits it. Scope: a TypeScript admission adapter — Pydantic-validated
@@ -364,15 +365,27 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `atlas_external_doc_pages/chunks` back to 0 rows. No embeddings, no `:8081`, no Qdrant. Only after this passes may the 30-page
   canonical text load be authorized. Evidence baseline: `docs/reports/external-doc-chunk-evidence-identity-v1.json`
   (`EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_PROVEN`, 30 pages / 847 chunks, 0 duplicate chunk revisions).
-- [ ] **EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT** review `chunk_id` (`doc:<source_id>:<16-hex truncated document digest>:<ordinal>`); unchanged by
-  the identity repair, audited separately, must not be combined with it.
+  **Prerequisite: EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY** — 23/30 pages are chunked from a second-normalized text that collapses
+  code indentation; the canary must exercise the FINAL canonical text representation, not a known lossy intermediate. The runner must be
+  TypeScript (calls `admitExternalDocPage`; the Python crawler must not write Postgres).
+  **Frozen order (open versioned-doc tasks):** `EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY` -> replay chunk/page hashes + uniqueness ->
+  `DOC-CANARY-ADMISSION-01` (temporary transactional write, rolled back) -> real 30-page corpus admission -> `EXTERNAL_DOC_ANALYSIS_OWNER_01`
+  -> derived analysis (Ornith / LangExtract). Anything whose acceptance needs actual Postgres corpus rows waits for real admission.
+  `EXTERNAL_DOC_ANALYSIS_OWNER_01` (schema/owner design) is independent of admitted rows unless its own design requires them;
+  `EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT` is independent of this chain. Not started; no mutation authorized by this note.
+  DOC-06A above proves the writer/adapter contract only; canonical pinned-corpus admission has NOT run.
+- [ ] **EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT** review `chunk_id` (`doc:<source_id>:<16-hex truncated document digest>:<ordinal>`) for
+  address/key collisions only; unchanged by the identity repair and does NOT redefine `chunkEvidenceRevision` (proven separately, not
+  reopened); must not be combined with it.
 - [ ] **EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY** `chunk_document` re-normalizes page text and collapses code indentation (23 of 30 stored
   pages differ from the text the byte spans address); decide whether normalization should preserve fenced-code whitespace. Changing it
-  changes every content hash, so it needs its own re-capture proof.
+  changes every content hash, so it needs its own re-capture proof. Scope: canonical text-buffer / UTF-8-span correctness before
+  admission; blocks DOC-CANARY-ADMISSION-01.
 - [ ] **EXTERNAL_DOC_ANALYSIS_OWNER_01** create `atlas_external_doc_analyses` for `ExternalDocAnalysisV1` (append-only by chunk evidence
   revision + analysis type + producer/model/prompt revision) after a fresh owner audit; `analysis_pass_results` and `atlas_summary_layers`
   are packet-keyed and not reusable. `20260923_external_doc_summaries_v1.sql` is `DRAFT_SUPERSEDED_PENDING_ANALYSIS_OWNER` and must not be applied.
-  Per-chunk BitFrost/Valkey analysis warming stays blocked until canonical chunks exist.
+  Per-chunk BitFrost/Valkey analysis warming stays blocked until canonical chunks exist. Scope: derived-analysis persistence design,
+  not canonical chunk storage.
 - [ ] **DOC-03** Firecrawl bounded crawler — `EXISTS` (`fetch_firecrawl_v2`), verify
   bounded-crawl behavior (maxPages/maxDepth/sitemap-follow) matches the manifest's
   `maximum_pages`/`maximum_depth` fields; **blocked** on Firecrawl actually being registered
@@ -647,6 +660,23 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   is reported as `NOT_OBSERVED` rather than fabricated. Keep the gate open for broader live
   ambiguity coverage and downstream index admission.
 
+  **DOC-13 status decomposition (ledger-only, 2026-09-23 audit; verdict `MULTIPLE_GATES_COLLAPSED_INTO_ONE_TASK`; acceptance
+  semantics unchanged, checkbox stays open; artifacts below re-verified present).** Only the DOC-13 bullet itself (up to the
+  "DOC-10/DOC-12 root cause found" paragraph) is DOC-13; the long DOC-10/DOC-12 notes that follow (before Phase E) are separate history, not DOC-13 work.
+
+  | Sub-gate | Purpose | Owner | Status | Mutation / runtime |
+  |---|---|---|---|---|
+  | 13.A | exact-match adapter + fixture outcomes (matched/stale/ambiguous/unmapped) | `prove-doc-symbol-mutual-index-v1.mjs`, receipt `doc-13-symbol-mutual-index-v1.json` | PROVEN (fixture) | no / no |
+  | 13.B | live read-only join to `atlas_symbol_registry` + `atlas_symbol_versions` | `prove-doc-symbol-mutual-index-live-v1.mjs`, receipt `...-live-v1.json` | PROVEN (read-only; 402 active rows) | no writes / Postgres read |
+  | 13.C | doc vs code revision-domain separation (`targetSourceRevision`) | shared exact-match helper (deterministic tests) | PROVEN | no / no |
+  | 13.D | live DOC-12 extraction -> symbol join | live proof | PARTIAL: extracted rule has no target code revision -> `UNRESOLVED`; resolves only in the labeled registry-backed control | no / needs sidecar |
+  | 13.E | ground a target code revision to current source authority | current-source-authority chain | BLOCKED (depends on `CURRENT_SOURCE_AUTHORITY_PROVEN`) | no / no |
+  | 13.F | broader live ambiguity coverage | live proof | PARTIAL (full-cohort duplicate exercised, 4 candidates; broader cohorts unobserved) | no / Postgres read |
+  | 13.G | downstream index admission | none yet | OPEN, depends on 13.E, canonical corpus admission, DOC-14+ | yes (persistent write) / yes |
+  | 13.H | owner composition with `analysis_pass_results` + Ornith `:8090` | `prove-doc-symbol-nlp-dag-context-v1.mjs` | PROVEN (wiring only); pass selection, ContextManifest admission, SynthesisReceipt are separate open gates | no / no |
+
+  Recommendation: keep the checkbox open until 13.E and 13.G close; work 13.E first (no mutation needed), 13.D follows from it.
+
   Composition follow-up: `scripts/atlas/prove-doc-symbol-nlp-dag-context-v1.mjs` confirms the
   indexed symbol/version owner, existing append-only `analysis_pass_results` owner, bounded
   `ParameterArtifactV1` checksums, and Ornith `:8090` synthesis boundary compose without a
@@ -854,13 +884,23 @@ extraction call site is added — do not reintroduce the flattened-prompt path.
 
 ## Phase G — Acceleration (optional, only after corpus is stable)
 
-- [ ] **DOC-19** cuVS exact baseline — `EXISTS` (`GPU-MINI-FABRIC-01`), reuse.
+Audit 2026-09-23 (read-only; `EXISTS, reuse` is a verification signal, not completion; none of DOC-19/20/21 can close today —
+`GPU-MINI-FABRIC-01` receipts are synthetic-fixture / codebase `semantic_768`, no doc-corpus vectors exist, and this phase is gated on a stable corpus):
+
+- [ ] **DOC-19** cuVS exact baseline — `EXISTS` (`GPU-MINI-FABRIC-01`), reuse. Status: `IMPLEMENTATION_EXISTS_PROOF_PARTIAL` —
+  `semantic_exact_parity_01.py` + `docs/reports/gpu-mini-fabric-01-semantic-exact-parity-01.json` (recall@16 1.0, synthetic) and
+  `retrieval_01l_08a_cuvs_exact_v1.py` exist; nothing runs on doc-corpus embeddings. Missing gate: exact-vs-oracle parity on admitted,
+  embedded doc chunks (needs canonical admission + DOC-07/08 vectors).
 - [ ] **DOC-20** CAGRA — `EXISTS` (`GPU-MINI-FABRIC-01`), reuse tuned `itopk_size` (default params
-  proven insufficient at N=65536 in that gate — do not reuse default params blindly here).
+  proven insufficient at N=65536 in that gate — do not reuse default params blindly here). Status: `IMPLEMENTATION_EXISTS_PROOF_PARTIAL` —
+  itopk sweep + build-isolation + real codebase `semantic_768` receipts (`gpu-mini-fabric-01-graph-ann-0{2-itopk-sweep,2-build-isolation,3-semantic-768}.json`)
+  exist; none on doc corpus. Missing gate: tuned-CAGRA recall vs exact oracle on doc vectors, after DOC-19.
 - [ ] **DOC-21** IVF-PQ exact-refinement two-stage candidate generation (K0=80 -> exact refine ->
   final K=20 style) — `AUDIT_FIRST`. `GPU-MINI-FABRIC-01` tested `ivf_pq` as a CAGRA *build_algo*,
   not necessarily as a standalone two-stage generate-then-refine candidate pipeline — confirm which
-  is actually needed before assuming the existing proof covers this use case.
+  is actually needed before assuming the existing proof covers this use case. Status: `REAL_OPEN_WORK` — grep of `python/atlas_compute`
+  finds `ivf_pq` only as a build-algo parameter (`cuvs_analytics.py`, `ann_compare.py`); no generate-K0-then-exact-refine pipeline or test exists.
+  Missing gate: implement + prove it against the DOC-19 oracle; optional (Phase G), only after the corpus is stable.
 - [ ] **DOC-17** `HotBucketDescriptorV1` BitFrost bucket warming — `NEW` contract, `EXTEND` of
   existing BitFrost. Descriptor-only (candidateOrdinals/docChunkIds/conceptIds/centroidIds), never
   the canonical documents in Valkey.
