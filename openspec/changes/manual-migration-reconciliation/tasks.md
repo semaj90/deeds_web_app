@@ -352,6 +352,31 @@ seven as single-owner candidates requiring review, not as safe-to-apply work.
   `audit-canonical-owner-revision-migration-safety-v1.mjs`.
 - [ ] Resolve the packet writer's admitted source-revision input and prove
   bounded readback before considering any migration or packet backfill.
+  **Investigated 2026-09-22 — the mechanism already exists, is proven, and is NOT the
+  remaining gap; the remaining gap is that nothing live calls it.** Traced the real writer
+  chain: `buildSemanticPacketWriteAdmissionV1()`
+  (`sveltekit-frontend/src/lib/server/embedding/semantic-packet-write-admission-v1.ts`) takes
+  a `WorkspaceSourceBindingV1` (the same `atlas_workspace_source_bindings`-backed admitted
+  revision source used elsewhere in this repo) and produces a
+  `SemanticPacketWriteAdmissionV1` carrying `sourceRevision: binding.sourceRevision`, which
+  `persistAdmittedSemanticPacketEmbedding()` (`semantic-packet-writer.ts`) writes straight
+  into `atlas_packets.source_revision` via the canonical writer. Ran both specs against the
+  real DB (not a mock — confirmed via the test's own `📡 [DB] Canonical target:
+  127.0.0.1:5434/legal_ai_db` log line): `semantic-packet-write-admission-v1.spec.ts` (5/5)
+  and `semantic-packet-writer.spec.ts` (10/10, including
+  `writes sourceRevision when the caller supplies real revision evidence` and
+  `never fabricates sourceRevision -- leaves it null when the caller has no evidence`) — this
+  IS the bounded readback proof the task asks for, already written and passing on disposable
+  test packet keys. **The actual remaining gap**: `persistAdmittedSemanticPacketEmbedding()`
+  has zero live production callers anywhere in the repo. The one route that could plausibly
+  call it (`src/routes/api/admin/batch-embeddings/embed/+server.ts`) explicitly and
+  deliberately defers persistence with its own comment: "Canonical packet persistence is
+  intentionally closed here... admitted lineage required... deferred: admitted lineage
+  required." This is why all `61,718/61,718` live packet rows remain NULL — not because the
+  admission mechanism is broken or unproven, but because no authoritative producer is wired
+  to call it with real data yet. Deciding/building that producer is separate, larger work
+  (which route or job becomes the authoritative caller) — not attempted here, and not a
+  migration/backfill question at all once framed this way.
 
 Status: `PACKET_REVISION_AXIS_PRESENT_SOURCE_REVISION_UNPOPULATED`;
 `migrationApplied=false`; `promotionAllowed=false`; `writesPerformed=false`.
