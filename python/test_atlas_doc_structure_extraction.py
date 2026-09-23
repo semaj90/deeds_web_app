@@ -174,3 +174,42 @@ class CodeTokenFidelityTests(unittest.TestCase):
             self.assertIn(identifier, joined)
         block_code = [block["code"] for chunk in chunks for block in chunk.code_blocks]
         self.assertIn("SET hnsw.iterative_scan = strict_order;", block_code)
+
+
+class ChunkTextIndentationFidelityTests(unittest.TestCase):
+    """EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY: the stored page text is the text chunk spans and content hash address."""
+
+    CODE = "def f(x):\n    if x:\n        return 1\n\treturn 0"
+
+    def _page_text(self) -> str:
+        html = _page("<p>Intro   text  here.</p><pre><code class=\"language-python\">" + self.CODE + "</code></pre><p>After   it.</p>")
+        return extract_structured_text(html, base_url="https://example.test/")[1]
+
+    def test_normalize_ws_is_idempotent_on_extracted_text(self) -> None:
+        from atlas_external_docs import _normalize_ws
+        text = self._page_text()
+        self.assertEqual(_normalize_ws(text), text)
+
+    def test_normalize_ws_still_collapses_prose_and_preserves_fenced_indent(self) -> None:
+        from atlas_external_docs import _normalize_ws
+        out = _normalize_ws("a   b\t\tc\n```py\n    x  =  1\n\ty\n```\nd    e")
+        self.assertEqual(out, "a b c\n```py\n    x  =  1\n\ty\n```\nd e")
+
+    def test_unterminated_fence_protects_remainder(self) -> None:
+        from atlas_external_docs import _normalize_ws
+        self.assertEqual(_normalize_ws("p  q\n```\n  keep   this"), "p q\n```\n  keep   this")
+
+    def test_chunks_keep_code_indentation_and_spans_slice_exact_bytes(self) -> None:
+        from atlas_external_docs import _normalize_ws
+        text = self._page_text()
+        chunks = chunk_document(source_id="s", source_revision="r", source_url="https://example.test/", title="T", text=text)
+        self.assertIn("    if x:\n        return 1", "\n".join(chunk.text for chunk in chunks))
+        raw = _normalize_ws(text).encode("utf-8")
+        for chunk in chunks:
+            self.assertEqual(raw[chunk.start_byte:chunk.end_byte].decode("utf-8"), chunk.text)
+
+    def test_page_content_hash_of_stored_text_equals_chunk_document_checksum(self) -> None:
+        from atlas_external_docs import _sha
+        text = self._page_text()
+        chunks = chunk_document(source_id="s", source_revision="r", source_url="https://example.test/", title="T", text=text)
+        self.assertEqual(chunks[0].document_checksum, _sha(text))

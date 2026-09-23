@@ -28,7 +28,7 @@ import numpy as np
 import pytest
 
 from atlas_doc_coordinate import build_doc_coordinate
-from atlas_external_docs import chunk_document
+from atlas_external_docs import _normalize_ws, _sha, chunk_document
 from atlas_okf_docs_pipeline import (
     PipelineManifest,
     build_qdrant_points,
@@ -117,7 +117,7 @@ def test_live_upsert_and_readback(qdrant_test_collection):
     coordinate = build_doc_coordinate(
         provider="nvidia", product="cuda-tile-ir", product_version="13.2", architecture="sm_86",
         language="python", url="https://docs.nvidia.com/cuda/tile-ir/13.2/doc08-proof/",
-        content_hash="a" * 64,
+        content_hash=_sha(_normalize_ws("# H\nProof chunk text.")),
     )
     chunks = chunk_document(
         source_id="doc08-proof", source_revision="sha256:" + "b" * 64,

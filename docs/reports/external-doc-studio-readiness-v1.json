@@ -1,6 +1,6 @@
 {
   "schema": "atlas.external-doc-studio-readiness.v1",
-  "generatedAt": "2026-09-23T17:37:59.378Z",
+  "generatedAt": "2026-09-23T18:03:25.733Z",
   "runtimeVersions": {
     "postgres": "18.4 (Debian 18.4-1.pgdg12+1)",
     "pgvector": "0.8.3",
@@ -850,28 +850,28 @@
   "doc06aHandoff": {
     "result": "EXTERNAL_DOC_ADMISSION_HANDOFF_READY",
     "pages": 30,
-    "chunks": 847,
+    "chunks": 852,
     "blockers": [],
     "chunkEvidence": {
       "formula": "sha256:canonicalSha256V1{schema,pageEvidenceRevision,ordinal,startByte,endByte,chunkChecksum}",
       "uniquePageEvidenceRevisions": 30,
-      "uniqueChunkEvidenceRevisions": 847,
+      "uniqueChunkEvidenceRevisions": 852,
       "duplicateChunkEvidenceRevisionGroups": 0,
       "duplicateChunkEvidenceRevisionRows": 0
     },
     "manifestRevision": "okf-pinned-docs-r3",
-    "envelopesDigest": "sha256:215b142e7c46cb04b11ebe58f95fa69ccb9cf94e97057802f09a600fa77ec4fe",
+    "envelopesDigest": "sha256:037b641abd0691a114970cfe0e4fed6fc7b6f6f5634b381f5d6cf4d5ad950b36",
     "coordinateSource": "manifest fields (provider/product/product_version/version_qualification/...) via atlas_okf_docs_pipeline.build_page_coordinate; sidecar mirrors and is checked for drift",
     "native": {
-      "nativeChunks": 847,
+      "nativeChunks": 852,
       "nativeChunksWithoutDocCoordinate": 0,
-      "pageNormalizationDiffersFromStoredText": 23,
+      "pageNormalizationDiffersFromStoredText": 0,
       "uniquePageEvidenceRevisionCount": 30,
       "duplicatePageEvidenceRevision": {
         "groups": 0,
         "rows": 0
       },
-      "uniqueChunkEvidenceRevisionCount": 847,
+      "uniqueChunkEvidenceRevisionCount": 852,
       "duplicateChunkEvidenceRevision": {
         "groups": 0,
         "rows": 0

@@ -377,10 +377,18 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
 - [ ] **EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT** review `chunk_id` (`doc:<source_id>:<16-hex truncated document digest>:<ordinal>`) for
   address/key collisions only; unchanged by the identity repair and does NOT redefine `chunkEvidenceRevision` (proven separately, not
   reopened); must not be combined with it.
-- [ ] **EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY** `chunk_document` re-normalizes page text and collapses code indentation (23 of 30 stored
-  pages differ from the text the byte spans address); decide whether normalization should preserve fenced-code whitespace. Changing it
-  changes every content hash, so it needs its own re-capture proof. Scope: canonical text-buffer / UTF-8-span correctness before
-  admission; blocks DOC-CANARY-ADMISSION-01.
+- [x] **EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY** `chunk_document` re-normalized page text and collapsed code indentation (23 of 30 stored
+  pages differed from the text the byte spans address). Scope: canonical text-buffer / UTF-8-span correctness before
+  admission; blocks DOC-CANARY-ADMISSION-01. **Done 2026-09-23 (offline, 0 datastore writes, `EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY_PROVEN`):**
+  `python/atlas_external_docs.py::_normalize_ws` is now fence-aware (lines inside ``` fences keep indentation; prose still collapses;
+  unterminated fence protects the remainder) and idempotent on `extract_structured_text` output. Replay
+  (`docs/reports/external-doc-chunk-text-fidelity-v1.json`): stored-text-vs-chunked-text mismatches 23 -> 0; 30 pages / 852 chunks
+  (was 847; windows now measure real indentation); page `contentHash` == sha256 of stored text; 0 byte-span slice mismatches;
+  852 unique chunk evidence revisions and 852 unique `chunkId`s. All content hashes for the 23 code pages changed, so the earlier
+  847-chunk receipt (`external-doc-chunk-evidence-identity-v1.json`) is superseded for counts only; its identity design is unchanged.
+  Tests: 5 new `ChunkTextIndentationFidelityTests` (idempotence, fenced indent preserved, unterminated fence, exact byte-span slicing,
+  page hash == chunk checksum); 76 focused Python tests + 38 vitest tests pass; DOC-06A handoff still `EXTERNAL_DOC_ADMISSION_HANDOFF_READY`.
+  Not covered: the 7 pages without fenced code were already stable; nothing re-crawled (fix applies to stored evidence).
 - [ ] **EXTERNAL_DOC_ANALYSIS_OWNER_01** create `atlas_external_doc_analyses` for `ExternalDocAnalysisV1` (append-only by chunk evidence
   revision + analysis type + producer/model/prompt revision) after a fresh owner audit; `analysis_pass_results` and `atlas_summary_layers`
   are packet-keyed and not reusable. `20260923_external_doc_summaries_v1.sql` is `DRAFT_SUPERSEDED_PENDING_ANALYSIS_OWNER` and must not be applied.

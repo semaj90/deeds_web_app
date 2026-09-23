@@ -1,23 +1,23 @@
 {
   "schema": "atlas.external-doc-admission-envelopes.v1",
-  "generatedAt": "2026-09-23T17:37:58.185387+00:00",
+  "generatedAt": "2026-09-23T18:02:33.796240+00:00",
   "manifestRevision": "okf-pinned-docs-r3",
   "acquired": false,
   "acquisitionFailures": [],
   "pages": 30,
-  "chunks": 847,
-  "envelopesDigest": "sha256:215b142e7c46cb04b11ebe58f95fa69ccb9cf94e97057802f09a600fa77ec4fe",
+  "chunks": 852,
+  "envelopesDigest": "sha256:037b641abd0691a114970cfe0e4fed6fc7b6f6f5634b381f5d6cf4d5ad950b36",
   "envelopesFile": "docs/.okf/pinned/admission-envelopes-v1.json",
   "native": {
-    "nativeChunks": 847,
+    "nativeChunks": 852,
     "nativeChunksWithoutDocCoordinate": 0,
-    "pageNormalizationDiffersFromStoredText": 23,
+    "pageNormalizationDiffersFromStoredText": 0,
     "uniquePageEvidenceRevisionCount": 30,
     "duplicatePageEvidenceRevision": {
       "groups": 0,
       "rows": 0
     },
-    "uniqueChunkEvidenceRevisionCount": 847,
+    "uniqueChunkEvidenceRevisionCount": 852,
     "duplicateChunkEvidenceRevision": {
       "groups": 0,
       "rows": 0
@@ -44,13 +44,13 @@
         "fetcher": "BEAUTIFULSOUP_HTTP",
         "crawlRevision": "sveltekit-2-2026-09-23",
         "parserRevision": "beautifulsoup4==4.15.0/html.parser",
-        "contentHash": "7a324db7f230dd74fd451c3a6096b3990cac25e9880d3e8a7f76baa7b4a47d18",
-        "evidenceRevision": "sha256:8923b47d1e3a0e6c10806c4005a8497a19abd9a450a017d6458d45ffc8ff50e7",
+        "contentHash": "e650ae13a08417392fa9cb09b0823c058cc04b0d6a79f6bb7c67f4c53c4e703e",
+        "evidenceRevision": "sha256:1bdc50767090c39b908226c036df74789ee1da28bf8f94275675de740b102688",
         "retrievedAt": "2026-09-23T17:14:46.680949Z"
       },
       "chunks": [
         {
-          "chunkId": "doc:sveltekit:7a324db7f230dd74:0",
+          "chunkId": "doc:sveltekit:e650ae13a0841739:0",
           "ordinal": 0,
           "headingPath": [
             "Getting started"
@@ -68,10 +68,10 @@
           "codeBlocks": [],
           "apiSignatures": [],
           "chunkChecksum": "74a268417f2b604bd086edd467ada5f0abccb7fe2a1fa561940bba8b1e52646e",
-          "evidenceRevision": "sha256:4eaa0e00a1dd634d683f3daec9cd37187943e6248dc9458777d432c80770fc6f"
+          "evidenceRevision": "sha256:ed92b8993de59770889664bb191e2822cc1adcf559a60c306eb4bcbdf77f12ed"
         },
         {
-          "chunkId": "doc:sveltekit:7a324db7f230dd74:1",
+          "chunkId": "doc:sveltekit:e650ae13a0841739:1",
           "ordinal": 1,
           "headingPath": [
             "Getting started",
@@ -90,7 +90,7 @@
           "codeBlocks": [],
           "apiSignatures": [],
           "chunkChecksum": "ba0d4327c767b64c0f4cbdd9fe468a872d1dc9cf7a2ca9c25052ffde5fa5262f",
-          "evidenceRevision": "sha256:b0b38dc649810b7bb11ca94da358694ccc78e0e92c0cca25fee538e96967e5bb"
+          "evidenceRevision": "sha256:264eac7bb6128505f8c3ebec8cf0d8c8d242c583dec5beccbdc782ca0053c231"
         }
       ]
     },
@@ -113,13 +113,13 @@
         "fetcher": "BEAUTIFULSOUP_HTTP",
         "crawlRevision": "sveltekit-2-2026-09-23",
         "parserRevision": "beautifulsoup4==4.15.0/html.parser",
-        "contentHash": "c2b99e4ad0d9394fef98f2d6b6f6016e02085d738cc6eb6b532ccc27ca7dcf5b",
-        "evidenceRevision": "sha256:a7a2f3fa1d55c57f79dbea77e4621263e8805f37e87d61825bbaca9400d1012e",
+        "contentHash": "a96c1d15fd75f782fb56a8c89e2871b6a97e02566ca7585b37903d38070618bf",
+        "evidenceRevision": "sha256:4f8200be9e774d78211b635402ac017b1780d8f079cf597c00e7fde4c2c67456",
         "retrievedAt": "2026-09-23T17:14:46.679602Z"
       },
       "chunks": [
         {
-          "chunkId": "doc:sveltekit:c2b99e4ad0d9394f:0",
+          "chunkId": "doc:sveltekit:a96c1d15fd75f782:0",
           "ordinal": 0,
           "headingPath": [
             "Getting started"
@@ -137,10 +137,10 @@
           "codeBlocks": [],
           "apiSignatures": [],
           "chunkChecksum": "74a268417f2b604bd086edd467ada5f0abccb7fe2a1fa561940bba8b1e52646e",
-          "evidenceRevision": "sha256:084562c041a09717c03fddae483568995251c23b8db3e5ea0112a8ec30359826"
+          "evidenceRevision": "sha256:b63564b200d7adecabb7f88294ab8505ea28a97be60246d26e973ac3e91625ad"
         },
         {
-          "chunkId": "doc:sveltekit:c2b99e4ad0d9394f:1",
+          "chunkId": "doc:sveltekit:a96c1d15fd75f782:1",
           "ordinal": 1,
           "headingPath": [
             "Getting started",
@@ -159,7 +159,7 @@
           "codeBlocks": [],
           "apiSignatures": [],
           "chunkChecksum": "ba0d4327c767b64c0f4cbdd9fe468a872d1dc9cf7a2ca9c25052ffde5fa5262f",
-          "evidenceRevision": "sha256:73edb4500d13b3e1c5ff7118fa73cd93c9f55dda3af28552d53659ca79e18030"
+          "evidenceRevision": "sha256:2499eaab78e2cca4b1932a4e6c4a8e9b3e2b291df783b222b9cb9d999ec271a1"
         }
       ]
     },
@@ -182,13 +182,13 @@
         "fetcher": "BEAUTIFULSOUP_HTTP",
         "crawlRevision": "sveltekit-2-2026-09-23",
         "parserRevision": "beautifulsoup4==4.15.0/html.parser",
-        "contentHash": "06e90a20fdbc13da899fcd0a03df520332e24f01db06d4912bb49f921800cea1",
-        "evidenceRevision": "sha256:add0f66bb8e9b3d437acb3b0d9207131812d3d1f1d2ced7593a9cd8a42e09c57",
+        "contentHash": "62e6dd9932a74b58fed956607f84f28f2f14057bdc8b4882ce6a2b9ceaf699e6",
+        "evidenceRevision": "sha256:d67110cf1f8d74ddb90e606f4a7fa95f7070f3af0efdfcbf37f6ccf0d6d188d1",
         "retrievedAt": "2026-09-23T17:14:46.675342Z"
       },
       "chunks": [
         {
-          "chunkId": "doc:sveltekit:06e90a20fdbc13da:0",
+          "chunkId": "doc:sveltekit:62e6dd9932a74b58:0",
           "ordinal": 0,
           "headingPath": [
             "Getting started"
@@ -206,10 +206,10 @@
           "codeBlocks": [],
           "apiSignatures": [],
           "chunkChecksum": "74a268417f2b604bd086edd467ada5f0abccb7fe2a1fa561940bba8b1e52646e",
-          "evidenceRevision": "sha256:e71d359d5b075121fb1a0359dc53035077b6e4f6ef0e3171ba4de8c4afe745f9"
+          "evidenceRevision": "sha256:bc8d5460547d73ca729db1d18bf4ba94ce78a9e414edc2419dea554d6832210b"
         },
         {
-          "chunkId": "doc:sveltekit:06e90a20fdbc13da:1",
+          "chunkId": "doc:sveltekit:62e6dd9932a74b58:1",
           "ordinal": 1,
           "headingPath": [
             "Getting started",
@@ -228,7 +228,7 @@
           "codeBlocks": [],
           "apiSignatures": [],
           "chunkChecksum": "ba0d4327c767b64c0f4cbdd9fe468a872d1dc9cf7a2ca9c25052ffde5fa5262f",
-          "evidenceRevision": "sha256:f26ae0b02e016f17265565d86548262d6a0ed7c614e5640ae0b98151912dba32"
+          "evidenceRevision": "sha256:b4e94867f12b6c814909a6bf166d9e43cee329125f666dc9fdac6bf4fd97179d"
         }
       ]
     }

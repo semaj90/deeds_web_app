@@ -37,7 +37,24 @@ def _stable_json(value: Any) -> str:
 
 
 def _normalize_ws(text: str) -> str:
-    return re.sub(r"[ \t]+", " ", re.sub(r"\r\n?", "\n", text)).strip()
+    """Collapse runs of spaces/tabs and normalize newlines, EXCEPT inside fenced code blocks.
+
+    A line starting with three backticks opens/closes a fence; fenced lines keep their indentation byte-for-byte, so the
+    function is idempotent on text produced by ``extract_structured_text``: the stored page text is the same text the chunk
+    byte spans and the page content hash address (EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY). An unterminated fence
+    protects the remainder of the text.
+    """
+    out: list[str] = []
+    in_fence = False
+    for line in re.sub(r"\r\n?", "\n", text).split("\n"):
+        if line.startswith("```"):
+            in_fence = not in_fence
+            out.append(line)
+        elif in_fence:
+            out.append(line)
+        else:
+            out.append(re.sub(r"[ \t]+", " ", line))
+    return "\n".join(out).strip()
 
 
 @dataclass(frozen=True)
