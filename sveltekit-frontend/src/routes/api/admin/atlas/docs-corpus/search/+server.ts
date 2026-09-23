@@ -7,7 +7,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
 import { requireAdmin } from '$lib/server/auth-utils';
-import { findRepoRoot, searchDocCorpus } from '$lib/server/atlas/docs/doc-corpus-studio-read.js';
+import { findRepoRoot, searchDocCorpus } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
 
 const querySchema = z.object({
 	q: z.string().trim().min(2).max(300),

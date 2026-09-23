@@ -172,7 +172,7 @@
     "okf:dev:export": "node scripts/atlas/export-okf-dev-corpus.mjs",
     "atlas:okf:library-modules:crawl": "tsx ../scripts/atlas/library-module-crawl.mts",
     "atlas:okf:library-modules:crawl:dry": "tsx ../scripts/atlas/library-module-crawl.mts --dry-run",
-    "atlas:docs:studio:smoke": "tsx ../scripts/atlas/validate-doc-corpus-readiness-v1.mts && vitest run src/lib/server/atlas/docs/doc-corpus-studio-read.spec.ts \"src/routes/(app)/admin/atlas/DocCorpusPanel.ssr.spec.ts\"",
+    "atlas:docs:studio:smoke": "tsx ../scripts/atlas/validate-external-doc-corpus-readiness-v1.mts && vitest run src/lib/server/atlas/docs/doc-intelligence-read-model.spec.ts src/lib/server/atlas/docs/external-doc-intelligence.spec.ts \"src/routes/(app)/admin/atlas/DocCorpusPanel.ssr.spec.ts\"",
     "atlas:backfill:hybrid:dry": "node ../scripts/atlas/backfill-hybrid-collection.mjs --dry-run",
     "atlas:ast-nodes:dry": "node ../scripts/atlas/populate-atlas-ast-nodes.mjs --dry-run",
     "atlas:ast-nodes:apply": "node ../scripts/atlas/populate-atlas-ast-nodes.mjs --apply",

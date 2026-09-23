@@ -1,5 +1,5 @@
 {
-  "manifest_revision": "okf-pinned-docs-r1",
+  "manifest_revision": "okf-pinned-docs-r2",
   "workspace_revision": "workspace-current",
   "source_snapshot_revision": "pinned-docs-2026-09-23",
   "producer_revision": "parent-atlas-okf-pipeline-r1",
@@ -34,13 +34,14 @@
       "authority_class": "OFFICIAL_PRIMARY",
       "default_fetcher": "BEAUTIFULSOUP_HTTP",
       "output_namespace": "docs/.okf/pinned/sveltekit",
-      "maximum_pages": 4,
+      "maximum_pages": 5,
       "maximum_depth": 0,
       "pages": [
         "https://svelte.dev/docs/kit/load",
         "https://svelte.dev/docs/kit/page-options",
         "https://svelte.dev/docs/kit/state-management",
-        "https://svelte.dev/docs/kit/hooks"
+        "https://svelte.dev/docs/kit/hooks",
+        "https://svelte.dev/docs/kit/form-actions"
       ]
     },
     {
@@ -78,12 +79,14 @@
       "authority_class": "OFFICIAL_PRIMARY",
       "default_fetcher": "BEAUTIFULSOUP_HTTP",
       "output_namespace": "docs/.okf/pinned/bits-ui",
-      "maximum_pages": 3,
+      "maximum_pages": 5,
       "maximum_depth": 0,
       "pages": [
         "https://bits-ui.com/docs/getting-started",
         "https://bits-ui.com/docs/migration-guide",
-        "https://bits-ui.com/docs/components/dialog"
+        "https://bits-ui.com/docs/components/dialog",
+        "https://bits-ui.com/docs/child-snippet",
+        "https://bits-ui.com/docs/state-management"
       ]
     },
     {
@@ -123,13 +126,15 @@
       "authority_class": "OFFICIAL_PRIMARY",
       "default_fetcher": "BEAUTIFULSOUP_HTTP",
       "output_namespace": "docs/.okf/pinned/postgresql-18",
-      "maximum_pages": 4,
+      "maximum_pages": 6,
       "maximum_depth": 0,
       "pages": [
         "https://www.postgresql.org/docs/18/release-18.html",
         "https://www.postgresql.org/docs/18/runtime-config-resource.html",
         "https://www.postgresql.org/docs/18/indexes-bitmap-scans.html",
-        "https://www.postgresql.org/docs/18/using-explain.html"
+        "https://www.postgresql.org/docs/18/using-explain.html",
+        "https://www.postgresql.org/docs/18/view-pg-aios.html",
+        "https://www.postgresql.org/docs/18/functions-uuid.html"
       ]
     },
     {
@@ -145,10 +150,32 @@
       "authority_class": "OFFICIAL_PRIMARY",
       "default_fetcher": "BEAUTIFULSOUP_HTTP",
       "output_namespace": "docs/.okf/pinned/pgvector",
-      "maximum_pages": 1,
+      "maximum_pages": 2,
       "maximum_depth": 0,
       "pages": [
-        "https://github.com/pgvector/pgvector"
+        "https://github.com/pgvector/pgvector",
+        "https://github.com/pgvector/pgvector/blob/master/CHANGELOG.md"
+      ]
+    },
+    {
+      "source_id": "drizzle-kit",
+      "source_revision": "drizzle-kit-0.31-2026-09-23",
+      "title": "Drizzle Kit Documentation",
+      "base_urls": [
+        "https://orm.drizzle.team/docs/kit-overview"
+      ],
+      "allowed_domains": [
+        "orm.drizzle.team"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/pinned/drizzle-kit",
+      "maximum_pages": 3,
+      "maximum_depth": 0,
+      "pages": [
+        "https://orm.drizzle.team/docs/kit-overview",
+        "https://orm.drizzle.team/docs/drizzle-kit-generate",
+        "https://orm.drizzle.team/docs/drizzle-kit-migrate"
       ]
     }
   ]

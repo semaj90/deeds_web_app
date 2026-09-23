@@ -2,7 +2,7 @@
 	import { env as publicEnv } from '$env/dynamic/public';
 	import * as Bits from 'bits-ui';
 	import DocCorpusPanel from './DocCorpusPanel.svelte';
-	import type { DocCorpusStudioSnapshotV1, DocSearchResult } from '$lib/server/atlas/docs/doc-corpus-studio-read.js';
+	import type { DocIntelligenceStudioSnapshotV1, DocSearchResult } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
 	import type {
 		AtlasNode,
 		AtlasEdge,
@@ -108,7 +108,7 @@
 		health: AtlasHealthStatus | null;
 		runtimeRegistry?: AtlasRuntimeRegistrySnapshot | null;
 		documentGovernance?: DocumentGovernanceSummary | null;
-		docsCorpus?: DocCorpusStudioSnapshotV1 | null;
+		docsCorpus?: DocIntelligenceStudioSnapshotV1 | null;
 		docsSearch?: DocSearchResult | null;
 		docsQuery?: string;
 		cacheStats?: AdminCacheStats | null;

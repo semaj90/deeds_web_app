@@ -6,11 +6,11 @@ import { join } from 'node:path';
 import type { Pool } from 'pg';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-	buildDocCorpusStudioSnapshotV1, collectLocalCaptures, computeCoverage, scanRequiredTerms, searchDocCorpus,
+	buildDocIntelligenceStudioSnapshotV1, collectLocalCaptures, computeCoverage, scanRequiredTerms, searchDocCorpus,
 	type RuntimeVersions
-} from './doc-corpus-studio-read.js';
+} from './doc-intelligence-read-model.js';
 
-const RUNTIME: RuntimeVersions = { postgres: '18.4', pgvector: '0.8.3', drizzleOrm: '0.45.2', drizzleKit: '0.31.10', pg: '^8.0.0' };
+const RUNTIME: RuntimeVersions = { postgres: '18.4', pgvector: '0.8.3', drizzleOrm: '0.45.2', drizzleKit: '0.31.10', pg: '8.16.0', svelte: '5.46.0', svelteKit: '2.59.1', bitsUi: '2.16.2' };
 const sha = (t: string) => createHash('sha256').update(t, 'utf8').digest('hex');
 const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
 
@@ -57,6 +57,8 @@ function fakePool(opts: { chunks?: number; ftsRows?: Record<string, string | nul
 			if (/count\(\*\)::int AS n FROM atlas_external_doc_chunks/.test(s)) return { rows: [{ n: opts.chunks ?? 0 }] };
 			if (/FROM pg_index x JOIN pg_class i ON i\.oid = x\.indexrelid JOIN pg_class t/.test(s)) return { rows: [
 				{ tbl: 'atlas_external_doc_chunks', name: 'aedc_fts_gin', am: 'gin', def: 'CREATE INDEX aedc_fts_gin ON x USING gin (search_vector)', predicate: null }] };
+			if (/FROM pg_constraint/.test(s)) return { rows: [{ tbl: 'atlas_external_doc_chunks', conname: 'atlas_external_doc_chunks_evidence_revision_uq', contype: 'u' }] };
+			if (/attgenerated/.test(s)) return { rows: [{ n: 1 }] };
 			if (/current_setting/.test(s)) return { rows: [{ v: 'worker' }] };
 			if (/extname='vector'/.test(s)) return { rows: [{ extversion: '0.8.3' }] };
 			if (/relname='pg_aios'/.test(s)) return { rows: [{ n: 1 }] };
@@ -128,31 +130,35 @@ describe('server read model', () => {
 	it('reads an empty Postgres corpus and represents capabilities', async () => {
 		writeDev(); writeAllGroups();
 		const { pool, statements } = fakePool({ chunks: 0 });
-		const snap = await buildDocCorpusStudioSnapshotV1({ pool, root });
-		expect(snap.postgresCorpus).toMatchObject({ status: 'EMPTY', chunkCount: 0, ftsAvailable: true, vectorColumnAvailable: true });
-		expect(snap.capabilities).toMatchObject({ aio: { ioMethod: 'worker', pgAiosAvailable: true }, hnsw: true, halfvec: true });
-		expect(snap.capabilities.bitmap).toMatchObject({ plannerSelectedBitmap: true, aioRelevant: true });
-		expect(snap.validation.issues.map((i) => i.code)).toContain('DOC_CORPUS_POSTGRES_EMPTY');
+		const snap = await buildDocIntelligenceStudioSnapshotV1({ pool, root });
+		expect(snap.canonicalCorpus).toMatchObject({ authority: 'CANONICAL_POSTGRES', status: 'EMPTY', chunkCount: 0 });
+		expect(snap.canonicalCorpus.constraints).toContain('atlas_external_doc_chunks.atlas_external_doc_chunks_evidence_revision_uq[u]');
+		expect(snap.ftsCapability).toMatchObject({ available: true, searchVectorGenerated: true });
+		expect(snap.vectorCapability).toMatchObject({ columnType: 'vector(768)', dimensions: 768, halfvecType: true });
+		expect(snap.aioCapability).toMatchObject({ level: 'CAPABILITY', ioMethod: 'worker', pgAiosAvailable: true, productionObserved: 'NOT_OBSERVED' });
+		expect(snap.bitmapCapability).toMatchObject({ plannerSelected: true, aioRelevant: true, productionObserved: 'NOT_OBSERVED' });
+		expect(snap.validation.issues.map((i) => i.code)).toContain('DOC_CANONICAL_CORPUS_EMPTY');
+		expect(snap.localCorpus.authority).toBe('REFERENCE_ONLY');
 		expect(snap).toMatchObject({ canonicalAuthority: 'POSTGRES', generatedCorpusAuthority: false });
 		expect(statements.every((s) => /^\s*(SELECT|EXPLAIN|SHOW)/i.test(s))).toBe(true);
 	});
 
 	it('reports PRESENT when canonical rows exist', async () => {
 		writeDev(); writeAllGroups();
-		const snap = await buildDocCorpusStudioSnapshotV1({ pool: fakePool({ chunks: 5 }).pool, root });
-		expect(snap.postgresCorpus.status).toBe('PRESENT');
+		const snap = await buildDocIntelligenceStudioSnapshotV1({ pool: fakePool({ chunks: 5 }).pool, root });
+		expect(snap.canonicalCorpus.status).toBe('PRESENT');
 	});
 
 	it('falls back to local corpus when Postgres is unavailable', async () => {
 		writeDev(); writeAllGroups();
-		const snap = await buildDocCorpusStudioSnapshotV1({ pool: fakePool({ down: true }).pool, root });
-		expect(snap.postgresCorpus.status).toBe('UNAVAILABLE');
+		const snap = await buildDocIntelligenceStudioSnapshotV1({ pool: fakePool({ down: true }).pool, root });
+		expect(snap.canonicalCorpus.status).toBe('UNAVAILABLE');
 		expect(snap.localCorpus.missingSources).toEqual([]);
 		expect(snap.validation.issues.map((i) => i.code)).toContain('POSTGRES_UNAVAILABLE');
 	});
 
 	it('fails validation when the local corpus is missing', async () => {
-		const snap = await buildDocCorpusStudioSnapshotV1({ pool: null, root });
+		const snap = await buildDocIntelligenceStudioSnapshotV1({ pool: null, root });
 		expect(snap.validation.status).toBe('FAIL');
 		expect(snap.localCorpus.missingSources.sort()).toEqual(['drizzle', 'pgvector', 'postgresql18']);
 	});
@@ -164,7 +170,7 @@ describe('search', () => {
 		const { pool } = fakePool({ chunks: 3, ftsRows: [{ chunk_id: 'c1', title: 'pgvector', product: 'pgvector', product_version: '0.8.3', url: 'https://x', source_authority: 'OFFICIAL', evidence_revision: 'sha256:abc', excerpt: 'halfvec index' }] });
 		const r = await searchDocCorpus({ pool, root, q: 'halfvec' });
 		expect(r.mode).toBe('POSTGRES_FTS');
-		expect(r.hits[0]).toMatchObject({ badge: 'CANONICAL', productVersion: '0.8.3', revision: 'sha256:abc', authorityClass: 'OFFICIAL' });
+		expect(r.hits[0]).toMatchObject({ badge: 'CANONICAL_POSTGRES', productVersion: '0.8.3', revision: 'sha256:abc', authorityClass: 'OFFICIAL' });
 	});
 
 	it('falls back to local lexical search labelled REFERENCE_ONLY when Postgres is empty', async () => {

@@ -1,0 +1,1209 @@
+{
+  "schema": "atlas.external-doc-studio-readiness.v1",
+  "generatedAt": "2026-09-23T16:48:54.396Z",
+  "runtimeVersions": {
+    "postgres": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "pgvector": "0.8.3",
+    "drizzleOrm": "0.45.2",
+    "drizzleKit": "0.31.10",
+    "pg": "8.16.3",
+    "svelte": "5.53.3",
+    "svelteKit": "2.59.1",
+    "bitsUi": "2.16.2"
+  },
+  "sourceCoverage": [
+    {
+      "sourceId": "sveltekit",
+      "provider": "sveltejs",
+      "product": "sveltekit",
+      "runtimeVersion": "2.59.1",
+      "capturedDocVersion": null,
+      "qualification": "CURRENT_UPSTREAM",
+      "status": "UNVERSIONED",
+      "pages": 5,
+      "capturedAt": "2026-09-23T16:37:44.456Z",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    {
+      "sourceId": "svelte5-runes",
+      "provider": "sveltejs",
+      "product": "svelte",
+      "runtimeVersion": "5.53.3",
+      "capturedDocVersion": null,
+      "qualification": "CURRENT_UPSTREAM",
+      "status": "UNVERSIONED",
+      "pages": 4,
+      "capturedAt": "2026-09-23T16:37:49.587Z",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    {
+      "sourceId": "bits-ui",
+      "provider": "huntabyte",
+      "product": "bits-ui",
+      "runtimeVersion": "2.16.2",
+      "capturedDocVersion": null,
+      "qualification": "CURRENT_UPSTREAM",
+      "status": "UNVERSIONED",
+      "pages": 5,
+      "capturedAt": "2026-09-23T16:37:55.757Z",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    {
+      "sourceId": "drizzle-orm",
+      "provider": "drizzle-team",
+      "product": "drizzle-orm",
+      "runtimeVersion": "0.45.2",
+      "capturedDocVersion": null,
+      "qualification": "CURRENT_UPSTREAM",
+      "status": "UNVERSIONED",
+      "pages": 4,
+      "capturedAt": "2026-09-23T16:38:02.903Z",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    {
+      "sourceId": "drizzle-kit",
+      "provider": "drizzle-team",
+      "product": "drizzle-kit",
+      "runtimeVersion": "0.31.10",
+      "capturedDocVersion": null,
+      "qualification": "CURRENT_UPSTREAM",
+      "status": "UNVERSIONED",
+      "pages": 3,
+      "capturedAt": "2026-09-23T16:38:21.633Z",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    {
+      "sourceId": "postgresql-18",
+      "provider": "postgresql",
+      "product": "postgresql",
+      "runtimeVersion": "18.4",
+      "capturedDocVersion": "18",
+      "qualification": "MAJOR_VERSION",
+      "status": "COMPATIBLE_SERIES",
+      "pages": 6,
+      "capturedAt": "2026-09-23T16:38:14.421Z",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    {
+      "sourceId": "pgvector",
+      "provider": "pgvector",
+      "product": "pgvector",
+      "runtimeVersion": "0.8.3",
+      "capturedDocVersion": null,
+      "qualification": "CURRENT_UPSTREAM",
+      "status": "UNVERSIONED",
+      "pages": 2,
+      "capturedAt": "2026-09-23T16:38:17.930Z",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    }
+  ],
+  "manifestSources": [
+    {
+      "sourceId": "sveltekit",
+      "provider": "sveltejs",
+      "product": "sveltekit",
+      "pagesDeclared": 5,
+      "pagesCaptured": 5,
+      "qualification": "CURRENT_UPSTREAM"
+    },
+    {
+      "sourceId": "svelte5-runes",
+      "provider": "sveltejs",
+      "product": "svelte",
+      "pagesDeclared": 4,
+      "pagesCaptured": 4,
+      "qualification": "CURRENT_UPSTREAM"
+    },
+    {
+      "sourceId": "bits-ui",
+      "provider": "huntabyte",
+      "product": "bits-ui",
+      "pagesDeclared": 5,
+      "pagesCaptured": 5,
+      "qualification": "CURRENT_UPSTREAM"
+    },
+    {
+      "sourceId": "drizzle-orm",
+      "provider": "drizzle-team",
+      "product": "drizzle-orm",
+      "pagesDeclared": 5,
+      "pagesCaptured": 5,
+      "qualification": "CURRENT_UPSTREAM"
+    },
+    {
+      "sourceId": "postgresql-18",
+      "provider": "postgresql",
+      "product": "postgresql",
+      "pagesDeclared": 6,
+      "pagesCaptured": 6,
+      "qualification": "MAJOR_VERSION"
+    },
+    {
+      "sourceId": "pgvector",
+      "provider": "pgvector",
+      "product": "pgvector",
+      "pagesDeclared": 2,
+      "pagesCaptured": 2,
+      "qualification": "CURRENT_UPSTREAM"
+    },
+    {
+      "sourceId": "drizzle-kit",
+      "provider": "drizzle-team",
+      "product": "drizzle-kit",
+      "pagesDeclared": 3,
+      "pagesCaptured": 3,
+      "qualification": "CURRENT_UPSTREAM"
+    }
+  ],
+  "localCorpus": {
+    "authority": "REFERENCE_ONLY",
+    "sourceCount": 8,
+    "pageCount": 31,
+    "capturedAt": "2026-09-23T16:38:21.633720Z",
+    "staleSources": [],
+    "missingSources": [],
+    "validation": {
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "code": "DOC_CANONICAL_CORPUS_EMPTY",
+          "detail": "atlas_external_doc_* has 0 admitted rows"
+        }
+      ]
+    },
+    "sources": [
+      {
+        "sourceId": "firecrawl",
+        "sourceUrl": "https://docs.firecrawl.dev/api-reference/introduction",
+        "provenance": "DEV_CORPUS",
+        "authorityClass": "GENERATED",
+        "capturedAt": "2026-08-24T06:06:21.617Z",
+        "contentChecksum": "17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+        "versionQualification": "UNVERSIONED",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "bits-ui",
+        "sourceUrl": "https://bits-ui.com/docs/child-snippet",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:55.755996Z",
+        "contentChecksum": "9aca018e2721b9b8e0d9e7519a9654d2a74b19560c74fc22b4c8d8251d1f628a",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "bits-ui",
+        "sourceUrl": "https://bits-ui.com/docs/components/dialog",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:55.754771Z",
+        "contentChecksum": "ca1345389afe0ab11f41446be13e5ff474a538364f923af90fab09598cb0daf5",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "bits-ui",
+        "sourceUrl": "https://bits-ui.com/docs/getting-started",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:55.751986Z",
+        "contentChecksum": "f15bebf06ed8bb3e13c3b4ab6007670718f170f5f70399a8de33a3b1becfcddd",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "bits-ui",
+        "sourceUrl": "https://bits-ui.com/docs/migration-guide",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:55.753235Z",
+        "contentChecksum": "c2518c9dc5ebcc35dfdca2f5e7d0dd3df3f22e9dc83fbd5ac1075732d9c0756f",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "bits-ui",
+        "sourceUrl": "https://bits-ui.com/docs/state-management",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:55.757640Z",
+        "contentChecksum": "fe3d954ca4488d3c7e246084418c2ef6f7763c4ab8535cd98c27a55c899d4ec1",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-kit",
+        "sourceUrl": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:21.632550Z",
+        "contentChecksum": "6872cb7911d7dde69b9357d44a9e6c8a708bd5abd2c977402460b1f5e8f363a1",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-kit",
+        "sourceUrl": "https://orm.drizzle.team/docs/drizzle-kit-migrate",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:21.633720Z",
+        "contentChecksum": "9c73de2c188a024c0b96075de9253449d8134a2ffbc8608baecac59ca7077789",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-kit",
+        "sourceUrl": "https://orm.drizzle.team/docs/kit-overview",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:21.630857Z",
+        "contentChecksum": "a2cd8b9f3833e42f70e9d55de7e1081988fa0a9e8c6b7eb66365613d1306a110",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-orm",
+        "sourceUrl": "https://github.com/drizzle-team/drizzle-orm/issues/5792",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "SECONDARY_ISSUE_EVIDENCE",
+        "capturedAt": "2026-09-23T16:38:02.905051Z",
+        "contentChecksum": "76051f71087829d11fa39a8739f92b937efc20eb878ff26796dbeeb58e38a3af",
+        "versionQualification": "UNVERSIONED",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-orm",
+        "sourceUrl": "https://orm.drizzle.team/docs/column-types",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:02.901201Z",
+        "contentChecksum": "f27096bceb1d33d3be63cb5272221f43c6fe6b5c829ec43c03ddff275addfba1",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-orm",
+        "sourceUrl": "https://orm.drizzle.team/docs/extensions",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:02.903913Z",
+        "contentChecksum": "2818bc8b5cb33a06deb22fa757ccfd5eb3c1f8b31f1a9b1dd71a54c7ab464c73",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-orm",
+        "sourceUrl": "https://orm.drizzle.team/docs/guides/vector-similarity-search",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:02.903004Z",
+        "contentChecksum": "9a561cf18bb00c628cabc53bce582f76059f54610ec4d9b0cf23dc434485aa65",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-orm",
+        "sourceUrl": "https://orm.drizzle.team/docs/indexes-constraints",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:02.902144Z",
+        "contentChecksum": "a0275b2bbace1d14aa515a5ea226d23220af10a90cc4e4d90556d08e1f0068d8",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "pgvector",
+        "sourceUrl": "https://github.com/pgvector/pgvector/blob/master/CHANGELOG.md",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:17.930958Z",
+        "contentChecksum": "ca39935f7857789b3e3e12371cdb5767a38b657a0e5f695cdc592968c78b119b",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "pgvector",
+        "sourceUrl": "https://github.com/pgvector/pgvector",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:17.929900Z",
+        "contentChecksum": "0c83b105aa0b232c58563b1d65b35e5f8c5185f281ad329991d0ea548a611e11",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "postgresql-18",
+        "sourceUrl": "https://www.postgresql.org/docs/18/functions-uuid.html",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:14.421760Z",
+        "contentChecksum": "a92f2cf09489fb2942f85a4858ab44715eff5af918f954735c1d13868cb19faf",
+        "versionQualification": "MAJOR_VERSION_PIN",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "postgresql-18",
+        "sourceUrl": "https://www.postgresql.org/docs/18/indexes-bitmap-scans.html",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:14.418159Z",
+        "contentChecksum": "24d9f452d20b88e0ff3b0591731474894795049abed48a104c530b1aaff2a5be",
+        "versionQualification": "MAJOR_VERSION_PIN",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "postgresql-18",
+        "sourceUrl": "https://www.postgresql.org/docs/18/release-18.html",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:14.415798Z",
+        "contentChecksum": "38d5e74bafb89df87b15449d01a95562158ba1c3740b7a1cb8dd58f0d8e07efc",
+        "versionQualification": "MAJOR_VERSION_PIN",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "postgresql-18",
+        "sourceUrl": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:14.417127Z",
+        "contentChecksum": "70d86642ca56e9b0ee731082d7c4f370a06d0bdfe325ccf8ea4231eaa301b073",
+        "versionQualification": "MAJOR_VERSION_PIN",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "postgresql-18",
+        "sourceUrl": "https://www.postgresql.org/docs/18/using-explain.html",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:14.419314Z",
+        "contentChecksum": "c80bd7e95d17f8aeb2d0a091ef40c6c51a5dd32d16bbd3d7efc2d72305fd2c2e",
+        "versionQualification": "MAJOR_VERSION_PIN",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "postgresql-18",
+        "sourceUrl": "https://www.postgresql.org/docs/18/view-pg-aios.html",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:38:14.420304Z",
+        "contentChecksum": "0c1f6c86b4bbe623d9502852c2d3cebbbdde89069f1e78eb1e1d059875d00fe7",
+        "versionQualification": "MAJOR_VERSION_PIN",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "svelte5-runes",
+        "sourceUrl": "https://svelte.dev/docs/svelte/$derived",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:49.586173Z",
+        "contentChecksum": "e97be291833c4b24e3247519c674d02f49bc1407f3474fc197b82928c2710a62",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "svelte5-runes",
+        "sourceUrl": "https://svelte.dev/docs/svelte/$effect",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:49.586992Z",
+        "contentChecksum": "d2e8fdfc7ca499e99ffee874a976e36b9926a450dd5188220ebc51c3f2280e83",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "svelte5-runes",
+        "sourceUrl": "https://svelte.dev/docs/svelte/$props",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:49.587813Z",
+        "contentChecksum": "9189f3a0ee6101f0b665d133078cd2e10c8acf3b9b2bf8ecf5a930513380c9a5",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "svelte5-runes",
+        "sourceUrl": "https://svelte.dev/docs/svelte/$state",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:49.584973Z",
+        "contentChecksum": "8a6054a43ac58a455f12fdc8d5f51a1703c2b6451809b86e6b50d0b473f0d536",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "sveltekit",
+        "sourceUrl": "https://svelte.dev/docs/kit/form-actions",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:44.456893Z",
+        "contentChecksum": "149073cfead437ac6ed80283e06f4136290906bb3d2584b7f6794945c84d273d",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "sveltekit",
+        "sourceUrl": "https://svelte.dev/docs/kit/hooks",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:44.456021Z",
+        "contentChecksum": "bb672e1469003d6379429364607e4ff559bf14905584bb7ce096feeea1e05447",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "sveltekit",
+        "sourceUrl": "https://svelte.dev/docs/kit/load",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:44.452725Z",
+        "contentChecksum": "3802ee9392148968511337d820f29c0f38870b79b4f18aabb730a4161fe744bc",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "sveltekit",
+        "sourceUrl": "https://svelte.dev/docs/kit/page-options",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:44.453749Z",
+        "contentChecksum": "1885d5fd301e265429372994253de18ab08479f485f7452a173c095c7cea8771",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "sveltekit",
+        "sourceUrl": "https://svelte.dev/docs/kit/state-management",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:37:44.454692Z",
+        "contentChecksum": "9b58ac2b35ba7df1e89c4047aa7a5b99d0393021d88c2554078f241eab9fc295",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "fileExists": true,
+        "checksumMatches": true
+      }
+    ]
+  },
+  "canonicalCorpus": {
+    "authority": "CANONICAL_POSTGRES",
+    "status": "EMPTY",
+    "pageCount": 0,
+    "chunkCount": 0,
+    "constraints": [
+      "atlas_external_doc_chunks.atlas_external_doc_chunks_chunk_id_uq[u]",
+      "atlas_external_doc_chunks.atlas_external_doc_chunks_evidence_revision_uq[u]",
+      "atlas_external_doc_chunks.atlas_external_doc_chunks_page_id_fkey[f]",
+      "atlas_external_doc_chunks.atlas_external_doc_chunks_pkey[p]",
+      "atlas_external_doc_pages.atlas_external_doc_pages_evidence_revision_uq[u]",
+      "atlas_external_doc_pages.atlas_external_doc_pages_identity_uq[u]",
+      "atlas_external_doc_pages.atlas_external_doc_pages_pkey[p]",
+      "atlas_external_doc_pages.atlas_external_doc_pages_source_authority_check[c]"
+    ]
+  },
+  "requiredTermCoverage": [
+    {
+      "group": "svelte",
+      "term": "$state",
+      "totalHits": 123,
+      "tokenSplitHits": 45,
+      "sources": {
+        "svelte5-runes": 123
+      }
+    },
+    {
+      "group": "svelte",
+      "term": "$derived",
+      "totalHits": 70,
+      "tokenSplitHits": 17,
+      "sources": {
+        "svelte5-runes": 70
+      }
+    },
+    {
+      "group": "svelte",
+      "term": "$effect",
+      "totalHits": 58,
+      "tokenSplitHits": 26,
+      "sources": {
+        "svelte5-runes": 58
+      }
+    },
+    {
+      "group": "svelte",
+      "term": "SSR",
+      "totalHits": 19,
+      "tokenSplitHits": 7,
+      "sources": {
+        "sveltekit": 19
+      }
+    },
+    {
+      "group": "svelte",
+      "term": "load",
+      "totalHits": 697,
+      "tokenSplitHits": 0,
+      "sources": {
+        "dev:firecrawl": 3,
+        "drizzle-orm": 2,
+        "pgvector": 11,
+        "postgresql-18": 19,
+        "svelte5-runes": 33,
+        "sveltekit": 629
+      }
+    },
+    {
+      "group": "svelte",
+      "term": "+page.server",
+      "totalHits": 32,
+      "tokenSplitHits": 0,
+      "sources": {
+        "sveltekit": 32
+      }
+    },
+    {
+      "group": "bits-ui",
+      "term": "bits-ui",
+      "totalHits": 21,
+      "tokenSplitHits": 0,
+      "sources": {
+        "bits-ui": 21
+      }
+    },
+    {
+      "group": "bits-ui",
+      "term": "bind",
+      "totalHits": 74,
+      "tokenSplitHits": 0,
+      "sources": {
+        "bits-ui": 39,
+        "postgresql-18": 2,
+        "svelte5-runes": 33
+      }
+    },
+    {
+      "group": "bits-ui",
+      "term": "snippet",
+      "totalHits": 103,
+      "tokenSplitHits": 0,
+      "sources": {
+        "bits-ui": 93,
+        "svelte5-runes": 8,
+        "sveltekit": 2
+      }
+    },
+    {
+      "group": "bits-ui",
+      "term": "children",
+      "totalHits": 55,
+      "tokenSplitHits": 0,
+      "sources": {
+        "bits-ui": 37,
+        "postgresql-18": 5,
+        "svelte5-runes": 1,
+        "sveltekit": 12
+      }
+    },
+    {
+      "group": "drizzle",
+      "term": "halfvec",
+      "totalHits": 55,
+      "tokenSplitHits": 2,
+      "sources": {
+        "drizzle-orm": 17,
+        "pgvector": 38
+      }
+    },
+    {
+      "group": "drizzle",
+      "term": "vector",
+      "totalHits": 312,
+      "tokenSplitHits": 0,
+      "sources": {
+        "drizzle-orm": 69,
+        "pgvector": 225,
+        "postgresql-18": 2,
+        "sveltekit": 16
+      }
+    },
+    {
+      "group": "drizzle",
+      "term": "hnsw",
+      "totalHits": 94,
+      "tokenSplitHits": 0,
+      "sources": {
+        "drizzle-orm": 36,
+        "pgvector": 58
+      }
+    },
+    {
+      "group": "drizzle",
+      "term": "operator class",
+      "totalHits": 10,
+      "tokenSplitHits": 0,
+      "sources": {
+        "drizzle-orm": 9,
+        "postgresql-18": 1
+      }
+    },
+    {
+      "group": "drizzle",
+      "term": "vector_cosine_ops",
+      "totalHits": 12,
+      "tokenSplitHits": 0,
+      "sources": {
+        "drizzle-orm": 9,
+        "pgvector": 3
+      }
+    },
+    {
+      "group": "drizzle",
+      "term": "halfvec_cosine_ops",
+      "totalHits": 2,
+      "tokenSplitHits": 0,
+      "sources": {
+        "drizzle-orm": 2
+      }
+    },
+    {
+      "group": "pgvector",
+      "term": "hnsw.iterative_scan",
+      "totalHits": 0,
+      "tokenSplitHits": 3,
+      "sources": {}
+    },
+    {
+      "group": "pgvector",
+      "term": "strict_order",
+      "totalHits": 2,
+      "tokenSplitHits": 0,
+      "sources": {
+        "pgvector": 2
+      }
+    },
+    {
+      "group": "pgvector",
+      "term": "relaxed_order",
+      "totalHits": 2,
+      "tokenSplitHits": 0,
+      "sources": {
+        "pgvector": 2
+      }
+    },
+    {
+      "group": "pgvector",
+      "term": "hnsw.max_scan_tuples",
+      "totalHits": 2,
+      "tokenSplitHits": 1,
+      "sources": {
+        "pgvector": 2
+      }
+    },
+    {
+      "group": "pgvector",
+      "term": "hnsw.scan_mem_multiplier",
+      "totalHits": 0,
+      "tokenSplitHits": 1,
+      "sources": {}
+    },
+    {
+      "group": "postgresql18",
+      "term": "io_method",
+      "totalHits": 3,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 3
+      }
+    },
+    {
+      "group": "postgresql18",
+      "term": "effective_io_concurrency",
+      "totalHits": 5,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 5
+      }
+    },
+    {
+      "group": "postgresql18",
+      "term": "maintenance_io_concurrency",
+      "totalHits": 3,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 3
+      }
+    },
+    {
+      "group": "postgresql18",
+      "term": "pg_aios",
+      "totalHits": 9,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 9
+      }
+    },
+    {
+      "group": "postgresql18",
+      "term": "Bitmap Heap Scan",
+      "totalHits": 16,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 16
+      }
+    },
+    {
+      "group": "postgresql18",
+      "term": "asynchronous I/O",
+      "totalHits": 7,
+      "tokenSplitHits": 1,
+      "sources": {
+        "postgresql-18": 7
+      }
+    },
+    {
+      "group": "postgresql18",
+      "term": "uuidv7",
+      "totalHits": 4,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 4
+      }
+    }
+  ],
+  "requiredTermNote": "Token appearance is lexical usefulness only, never factual validation. tokenSplitHits count matches that only appear once whitespace is removed (GitHub highlighted code is captured one token per line).",
+  "doc06aHandoff": {
+    "result": "DOC_ADMISSION_HANDOFF_BLOCKED",
+    "pages": 30,
+    "chunks": 881,
+    "blockers": [
+      {
+        "code": "PIPELINE_DOES_NOT_EMIT_DOC_COORDINATE",
+        "detail": "atlas_okf_docs_pipeline chunks carry doc_coordinate=null because SourceConfigV1 forbids provider/product/version fields; coordinates were supplied from a sidecar. Additive manifest fields + passing doc_coordinate into chunk_document are needed for a native path.",
+        "count": 881
+      },
+      {
+        "code": "CHUNK_EVIDENCE_REVISION_NOT_UNIQUE",
+        "detail": "DocCoordinateV1 chunk revision hashes (url, section_anchor, document hash), so several chunks under one heading share it; atlas_external_doc_chunks_evidence_revision_uq would reject the second insert",
+        "count": 314
+      }
+    ],
+    "candidateChunkRevision": {
+      "unique": true,
+      "formula": "sha256(json{pageEvidenceRevision,chunkId,chunkChecksum,startByte,endByte})",
+      "distinct": 881,
+      "total": 881
+    },
+    "duplicateNativeChunkRevisions": 314,
+    "manifestRevision": "okf-pinned-docs-r2",
+    "envelopesDigest": "sha256:165114abddac7be0bb6550b71c01249ccf93b51c29ab31aef0980159fc1a689b",
+    "coordinateSource": "docs/.okf/dev/pinned-docs.coordinates.json (sidecar; SourceConfigV1 forbids these fields)",
+    "native": {
+      "nativeChunks": 881,
+      "nativeChunksWithoutDocCoordinate": 881,
+      "rechunkChecksumMismatches": 0
+    },
+    "calledRealWriter": false
+  },
+  "symbolMapping": {
+    "result": "AST_GREP_DOC_SYMBOL_MAPPING_INCOMPLETE",
+    "authority": "GENERATED_CORPUS",
+    "methods": [
+      "ast-grep",
+      "ts-morph"
+    ],
+    "codeBlocks": 0,
+    "symbols": 0,
+    "blockers": [
+      "SYMBOL_RECORD_HAS_NO_CHUNK_ID_BYTE_SPAN_OR_EVIDENCE_REVISION",
+      "SYMBOL_SPAN_IS_MARKDOWN_LINE_NOT_UTF8_BYTES",
+      "SYMBOL_SOURCE_REVISION_IS_FILE_SHA_NOT_DOC_EVIDENCE_REVISION",
+      "SYMBOL_INDEX_SCOPE_IS_DEV_RAW_ONLY_NOT_PINNED_OR_POSTGRES_CHUNKS",
+      "SYMBOL_INDEX_HAS_ZERO_SYMBOLS_TODAY"
+    ]
+  },
+  "langExtractJoin": {
+    "result": "LANGEXTRACT_DOC_EVIDENCE_JOIN_BLOCKED",
+    "authority": "GENERATED_CORPUS",
+    "documents": 7,
+    "blockers": [
+      {
+        "code": "LANGEXTRACT_ROWS_LACK_DOC_COORDINATE",
+        "count": 7
+      },
+      {
+        "code": "LANGEXTRACT_ROWS_LACK_CHUNK_ID_AND_BYTE_SPANS",
+        "count": 7
+      },
+      {
+        "code": "LANGEXTRACT_JOIN_WOULD_BE_URL_ONLY",
+        "count": 7
+      },
+      {
+        "code": "LANGEXTRACT_ABSOLUTE_MARKDOWN_PATH",
+        "count": 7
+      }
+    ]
+  },
+  "ornithAnalysisContract": {
+    "contract": "ExternalDocAnalysisV1",
+    "result": "EXTERNAL_DOC_ANALYSIS_CONTRACT_READY",
+    "authority": "DERIVED_ANALYSIS",
+    "persistedRows": null,
+    "ornithSummary": "NOT_RUN",
+    "existingOwnerReviewed": "analysis_pass_results (legal evidence/packet keyed; no chunk revision, model or prompt identity) - not reused"
+  },
+  "postgresCapabilities": {
+    "fts": {
+      "available": true,
+      "ginIndexes": [
+        "aedc_api_signatures_gin",
+        "aedc_domain_tags_gin",
+        "aedc_fts_gin",
+        "aedc_heading_path_gin",
+        "aedc_symbols_gin",
+        "aedp_url_trgm"
+      ],
+      "searchVectorGenerated": true
+    },
+    "vector": {
+      "columnType": "vector(768)",
+      "dimensions": 768,
+      "hnswIndex": true,
+      "opclass": "vector_cosine_ops",
+      "halfvecType": true
+    },
+    "aio": {
+      "level": "CAPABILITY",
+      "ioMethod": "worker",
+      "effectiveIoConcurrency": "16",
+      "maintenanceIoConcurrency": "16",
+      "pgAiosAvailable": true,
+      "productionObserved": "NOT_OBSERVED"
+    },
+    "bitmap": {
+      "capability": true,
+      "plannerSelected": true,
+      "productionObserved": "NOT_OBSERVED",
+      "aioRelevant": true,
+      "fixtures": [
+        {
+          "name": "codebase_chunk_index.semantic_tags GIN containment",
+          "nodeTypes": [
+            "Bitmap Heap Scan",
+            "Bitmap Index Scan"
+          ]
+        },
+        {
+          "name": "atlas_external_doc_chunks.domain_tags GIN containment",
+          "nodeTypes": [
+            "Seq Scan"
+          ]
+        }
+      ]
+    },
+    "indexes": [
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_api_signatures_gin",
+        "accessMethod": "gin",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_domain_tags_gin",
+        "accessMethod": "gin",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_embedding_hnsw",
+        "accessMethod": "hnsw",
+        "operatorClass": "vector_cosine_ops",
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_fts_gin",
+        "accessMethod": "gin",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_heading_path_gin",
+        "accessMethod": "gin",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_page_id_ordinal",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_symbols_gin",
+        "accessMethod": "gin",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "atlas_external_doc_chunks_chunk_id_uq",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "atlas_external_doc_chunks_evidence_revision_uq",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "atlas_external_doc_chunks_pkey",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "aedp_product_version_arch",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "aedp_provider_product",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "aedp_url_trgm",
+        "accessMethod": "gin",
+        "operatorClass": "gin_trgm_ops",
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "atlas_external_doc_pages_evidence_revision_uq",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "atlas_external_doc_pages_identity_uq",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "atlas_external_doc_pages_pkey",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null
+      }
+    ],
+    "catalogParity": [
+      {
+        "table": "atlas_external_doc_chunks",
+        "declaredSource": "drizzle/manual/20260904_external_doc_intelligence_v1.sql",
+        "declaredType": "vector(768)",
+        "liveType": "vector(768)",
+        "dimensions": "768",
+        "typeParity": true,
+        "indexes": [
+          {
+            "name": "aedc_domain_tags_gin",
+            "accessMethod": "gin",
+            "operatorClass": null,
+            "predicate": null
+          },
+          {
+            "name": "aedc_embedding_hnsw",
+            "accessMethod": "hnsw",
+            "operatorClass": "vector_cosine_ops",
+            "predicate": null
+          },
+          {
+            "name": "aedc_fts_gin",
+            "accessMethod": "gin",
+            "operatorClass": null,
+            "predicate": null
+          }
+        ]
+      },
+      {
+        "table": "codebase_chunk_index",
+        "declaredSource": "src/lib/server/db/schema-postgres.ts (declaration comment)",
+        "declaredType": "halfvec(768)",
+        "liveType": "halfvec(768)",
+        "dimensions": "768",
+        "typeParity": true,
+        "indexes": [
+          {
+            "name": "codebase_chunk_index_content_hnsw",
+            "accessMethod": "hnsw",
+            "operatorClass": "halfvec_cosine_ops",
+            "predicate": null
+          },
+          {
+            "name": "codebase_chunk_index_summary_hnsw",
+            "accessMethod": "hnsw",
+            "operatorClass": "halfvec_cosine_ops",
+            "predicate": null
+          },
+          {
+            "name": "idx_codebase_chunk_bm25_search",
+            "accessMethod": "gin",
+            "operatorClass": null,
+            "predicate": null
+          },
+          {
+            "name": "idx_codebase_chunk_content_embedding_768_hnsw",
+            "accessMethod": "hnsw",
+            "operatorClass": "vector_cosine_ops",
+            "predicate": null
+          },
+          {
+            "name": "idx_codebase_chunk_embedding_model_normalized",
+            "accessMethod": "btree",
+            "operatorClass": null,
+            "predicate": "((embedding_model IS NOT NULL) AND (embedding_normalized = true))"
+          },
+          {
+            "name": "idx_codebase_chunk_error_embedding_latent64_hnsw",
+            "accessMethod": "hnsw",
+            "operatorClass": "vector_cosine_ops",
+            "predicate": "(error_embedding_latent_64 IS NOT NULL)"
+          },
+          {
+            "name": "idx_codebase_chunk_error_embedding_latent_128_hnsw",
+            "accessMethod": "hnsw",
+            "operatorClass": "halfvec_cosine_ops",
+            "predicate": "(error_embedding_latent_128 IS NOT NULL)"
+          },
+          {
+            "name": "idx_codebase_chunk_error_embedding_latent_256_checkpoint_revisi",
+            "accessMethod": "btree",
+            "operatorClass": null,
+            "predicate": "(error_embedding_latent_256_checkpoint_revision IS NOT NULL)"
+          },
+          {
+            "name": "idx_codebase_chunk_error_embedding_latent_256_hnsw",
+            "accessMethod": "hnsw",
+            "operatorClass": "halfvec_cosine_ops",
+            "predicate": "(error_embedding_latent_256 IS NOT NULL)"
+          },
+          {
+            "name": "idx_codebase_chunk_error_embedding_latent_valid",
+            "accessMethod": "btree",
+            "operatorClass": null,
+            "predicate": null
+          },
+          {
+            "name": "idx_codebase_chunk_index_error_embedding_hnsw",
+            "accessMethod": "hnsw",
+            "operatorClass": "halfvec_cosine_ops",
+            "predicate": null
+          },
+          {
+            "name": "idx_codebase_chunk_latent_valid",
+            "accessMethod": "btree",
+            "operatorClass": null,
+            "predicate": null
+          },
+          {
+            "name": "idx_codebase_chunk_summary_embedding_384_hnsw",
+            "accessMethod": "hnsw",
+            "operatorClass": "vector_cosine_ops",
+            "predicate": null
+          },
+          {
+            "name": "idx_codebase_chunk_summary_embedding_ivfflat",
+            "accessMethod": "ivfflat",
+            "operatorClass": "halfvec_cosine_ops",
+            "predicate": null
+          }
+        ]
+      }
+    ],
+    "ftsSmoke": {
+      "status": "NOT_RUN",
+      "reason": "DOC_CANONICAL_CORPUS_EMPTY or Postgres unavailable"
+    }
+  },
+  "localSearchSmoke": {
+    "query": "io_method",
+    "mode": "LOCAL_LEXICAL",
+    "postgresNote": null,
+    "hits": 2,
+    "badges": [
+      "REFERENCE_ONLY"
+    ]
+  },
+  "studio": {
+    "route": "/admin/atlas",
+    "ssr": "PROVEN_BY_VITEST_SPEC:DocCorpusPanel.ssr.spec.ts",
+    "searchEndpoint": "/api/admin/atlas/docs-corpus/search",
+    "snapshotEndpoint": "/api/admin/atlas/docs-corpus"
+  },
+  "authority": {
+    "canonical": "POSTGRES",
+    "localCorpusCanonical": false,
+    "qdrantCanonical": false,
+    "derivedAnalysis": "ExternalDocAnalysisV1 contract only, no rows"
+  },
+  "result": "DOC_ADMISSION_HANDOFF_BLOCKED",
+  "secondaryResults": [
+    "DOC_CANONICAL_CORPUS_EMPTY"
+  ],
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

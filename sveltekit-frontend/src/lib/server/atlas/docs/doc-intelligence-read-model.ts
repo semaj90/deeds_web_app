@@ -1,5 +1,5 @@
 /**
- * DOC-CORPUS-STUDIO read model (STUDIO-DOCS-SSR-01 / DOC-CORPUS-VALIDATION-01 / DOC-CORPUS-SEARCH-01).
+ * DOC INTELLIGENCE read model (STUDIO-DOCS-SSR-01 / DOC-CORPUS-VALIDATION-01 / DOC-CORPUS-SEARCH-01).
  *
  * READ ONLY. Never writes Postgres/Qdrant/Valkey/Neo4j, never crawls, never runs DDL.
  * Pool is injected (same style as external-doc-admission.ts) so the module has no $lib dependency
@@ -13,15 +13,19 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import type { Pool } from 'pg';
+import { ExternalDocAnalysisV1Schema, externalDocAnalysisId } from './external-doc-intelligence-contracts-v1.js';
 
 export const STALE_AFTER_DAYS = 30;
 
-export const REQUIRED_TERMS = [
-	'halfvec', 'halfvec_cosine_ops', 'vector_cosine_ops', 'hnsw.iterative_scan', 'strict_order',
-	'relaxed_order', 'hnsw.max_scan_tuples', 'hnsw.scan_mem_multiplier', 'io_method',
-	'effective_io_concurrency', 'maintenance_io_concurrency', 'pg_aios', 'bitmap heap', 'uuidv7',
-	'drizzle-kit', 'operator class'
+export const REQUIRED_TERM_GROUPS = [
+	{ group: 'svelte', terms: ['$state', '$derived', '$effect', 'SSR', 'load', '+page.server'] },
+	{ group: 'bits-ui', terms: ['bits-ui', 'bind', 'snippet', 'children'] },
+	{ group: 'drizzle', terms: ['halfvec', 'vector', 'hnsw', 'operator class', 'vector_cosine_ops', 'halfvec_cosine_ops'] },
+	{ group: 'pgvector', terms: ['hnsw.iterative_scan', 'strict_order', 'relaxed_order', 'hnsw.max_scan_tuples', 'hnsw.scan_mem_multiplier'] },
+	{ group: 'postgresql18', terms: ['io_method', 'effective_io_concurrency', 'maintenance_io_concurrency', 'pg_aios', 'Bitmap Heap Scan', 'asynchronous I/O', 'uuidv7'] }
 ] as const;
+
+export const REQUIRED_TERMS: readonly string[] = REQUIRED_TERM_GROUPS.flatMap((g) => g.terms);
 
 /** Required pinned coverage groups -> capture directory under docs/.okf/pinned. */
 export const PINNED_GROUPS = [
@@ -33,7 +37,9 @@ export const PINNED_GROUPS = [
 export type VersionQualification = 'EXACT_PIN' | 'MAJOR_VERSION_PIN' | 'CURRENT_UPSTREAM' | 'UNVERSIONED';
 export type RuntimeCompatibility = 'MATCH' | 'NEWER_UPSTREAM' | 'UNKNOWN';
 export type CoverageStatus = 'CAPTURED_CURRENT' | 'CAPTURED_STALE' | 'VERSION_UNQUALIFIED' | 'MISSING';
-export type AuthorityBadge = 'CANONICAL' | 'REFERENCE_ONLY' | 'GENERATED_CORPUS';
+export type AuthorityLabel = 'CANONICAL_POSTGRES' | 'GENERATED_CORPUS' | 'REFERENCE_ONLY' | 'DERIVED_ANALYSIS';
+export type AuthorityBadge = AuthorityLabel;
+export type DriftStatus = 'EXACT_MATCH' | 'COMPATIBLE_SERIES' | 'UPSTREAM_NEWER' | 'DOC_STALE' | 'DOC_MISSING' | 'UNVERSIONED';
 
 export interface SourceCapture {
 	sourceId: string;
@@ -61,6 +67,9 @@ export interface RuntimeVersions {
 	drizzleOrm: string | null;
 	drizzleKit: string | null;
 	pg: string | null;
+	svelte: string | null;
+	svelteKit: string | null;
+	bitsUi: string | null;
 }
 
 export interface IndexInfo {
@@ -73,6 +82,9 @@ export interface IndexInfo {
 }
 
 export interface PostgresCorpusReadout {
+	constraints: string[];
+	searchVectorGenerated: boolean;
+	vector: { type: string | null; dimensions: number | null; opclass: string | null; method: string | null };
 	available: boolean;
 	error: string | null;
 	tablesPresent: string[];
@@ -104,6 +116,7 @@ export interface CapabilityReadout {
 }
 
 export interface DocSearchHit {
+	provider: string | null;
 	title: string;
 	sourceId: string;
 	url: string | null;
@@ -122,33 +135,84 @@ export interface DocSearchResult {
 	postgresNote: string | null;
 }
 
-export interface DocCorpusStudioSnapshotV1 {
-	schema: 'atlas.doc-corpus-studio-snapshot.v1';
+export interface VersionDriftRow {
+	sourceId: string;
+	provider: string;
+	product: string;
+	runtimeVersion: string | null;
+	capturedDocVersion: string | null;
+	qualification: string;
+	status: DriftStatus;
+	pages: number;
+	capturedAt: string | null;
+	authorityClass: string;
+}
+
+export interface ManifestSourceRow {
+	sourceId: string;
+	provider: string;
+	product: string;
+	pagesDeclared: number;
+	pagesCaptured: number;
+	qualification: string;
+}
+
+export interface LangExtractStatus {
+	result: 'LANGEXTRACT_DOC_EVIDENCE_JOIN_READY' | 'LANGEXTRACT_DOC_EVIDENCE_JOIN_BLOCKED';
+	authority: AuthorityLabel;
+	documents: number;
+	blockers: { code: string; count: number }[];
+}
+
+export interface SymbolIndexStatus {
+	result: 'AST_GREP_DOC_SYMBOL_MAPPING_PROVEN' | 'AST_GREP_DOC_SYMBOL_MAPPING_INCOMPLETE';
+	authority: AuthorityLabel;
+	methods: string[];
+	codeBlocks: number | null;
+	symbols: number | null;
+	blockers: string[];
+}
+
+export interface AnalysisStatus {
+	contract: 'ExternalDocAnalysisV1';
+	result: 'EXTERNAL_DOC_ANALYSIS_CONTRACT_READY' | 'EXTERNAL_DOC_ANALYSIS_CONTRACT_INVALID';
+	authority: AuthorityLabel;
+	persistedRows: null;
+	ornithSummary: 'NOT_RUN';
+	existingOwnerReviewed: string;
+}
+
+export interface DocIntelligenceStudioSnapshotV1 {
+	schema: 'atlas.doc-intelligence-studio-snapshot.v1';
 	generatedAt: string;
 	runtimeVersions: RuntimeVersions;
+	manifestSources: ManifestSourceRow[];
 	localCorpus: {
+		authority: AuthorityLabel;
 		sourceCount: number;
 		pageCount: number;
 		capturedAt: string | null;
 		staleSources: string[];
 		missingSources: string[];
 	};
-	postgresCorpus: {
+	canonicalCorpus: {
+		authority: 'CANONICAL_POSTGRES';
+		status: 'PRESENT' | 'EMPTY' | 'UNAVAILABLE';
 		pageCount: number | null;
 		chunkCount: number | null;
-		ftsAvailable: boolean;
-		vectorColumnAvailable: boolean;
-		indexes: IndexInfo[];
-		status: 'PRESENT' | 'EMPTY' | 'UNAVAILABLE';
+		constraints: string[];
 	};
-	capabilities: {
-		aio: { ioMethod: string | null; pgAiosAvailable: boolean };
-		bitmap: CapabilityReadout['bitmap'];
-		hnsw: boolean;
-		halfvec: boolean;
-	};
-	coverage: { group: string; status: CoverageStatus; bestQualification: VersionQualification | null; runtimeCompatibility: RuntimeCompatibility; captures: number }[];
+	versionDrift: VersionDriftRow[];
+	ftsCapability: { available: boolean; ginIndexes: string[]; searchVectorGenerated: boolean };
+	vectorCapability: { columnType: string | null; dimensions: number | null; hnswIndex: boolean; opclass: string | null; halfvecType: boolean };
+	aioCapability: { level: 'CAPABILITY'; ioMethod: string | null; effectiveIoConcurrency: string | null; maintenanceIoConcurrency: string | null; pgAiosAvailable: boolean; productionObserved: 'NOT_OBSERVED' };
+	bitmapCapability: { capability: boolean; plannerSelected: boolean; productionObserved: 'NOT_OBSERVED'; aioRelevant: boolean; fixtures: { name: string; nodeTypes: string[] }[] };
+	langExtractStatus: LangExtractStatus;
+	symbolIndexStatus: SymbolIndexStatus;
+	analysisStatus: AnalysisStatus;
+	admissionHandoff: { result: string; blockers: { code: string; count?: number }[]; source: string } | null;
 	sources: SourceCapture[];
+	issues: ValidationIssue[];
 	validation: { status: 'PASS' | 'PARTIAL' | 'FAIL'; issues: ValidationIssue[] };
 	canonicalAuthority: 'POSTGRES';
 	generatedCorpusAuthority: false;
@@ -349,7 +413,7 @@ export async function readIndexes(pool: Pool, tables: string[]): Promise<IndexIn
 }
 
 export async function readPostgresCorpus(pool: Pool): Promise<PostgresCorpusReadout> {
-	const empty: PostgresCorpusReadout = { available: false, error: null, tablesPresent: [], pageCount: null, chunkCount: null, columns: {}, ftsAvailable: false, vectorColumnAvailable: false, indexes: [], empty: false };
+	const empty: PostgresCorpusReadout = { constraints: [], searchVectorGenerated: false, vector: { type: null, dimensions: null, opclass: null, method: null }, available: false, error: null, tablesPresent: [], pageCount: null, chunkCount: null, columns: {}, ftsAvailable: false, vectorColumnAvailable: false, indexes: [], empty: false };
 	try {
 		const tables = await pool.query(`SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name = ANY($1)`, [DOC_TABLES]);
 		const tablesPresent = tables.rows.map((r: { table_name: string }) => r.table_name);
@@ -365,7 +429,19 @@ export async function readPostgresCorpus(pool: Pool): Promise<PostgresCorpusRead
 		const pages = Number((await pool.query('SELECT count(*)::int AS n FROM atlas_external_doc_pages')).rows[0].n);
 		const chunks = Number((await pool.query('SELECT count(*)::int AS n FROM atlas_external_doc_chunks')).rows[0].n);
 		const indexes = await readIndexes(pool, DOC_TABLES);
+		const cons = await pool.query(
+			`SELECT conrelid::regclass::text AS tbl, conname, contype FROM pg_constraint WHERE conrelid = ANY(ARRAY['public.atlas_external_doc_pages'::regclass, 'public.atlas_external_doc_chunks'::regclass]) ORDER BY 1, 2`
+		);
+		const gen = await pool.query(
+			`SELECT count(*)::int AS n FROM pg_attribute WHERE attrelid = 'public.atlas_external_doc_chunks'::regclass AND attname = 'search_vector' AND attgenerated <> ''`
+		);
+		const hnswIdx = indexes.find((i) => i.accessMethod === 'hnsw');
+		const typeMatch = /^(?:half)?vec(?:tor)?\((\d+)\)$/.exec(columns.content_embedding ?? '');
 		return {
+			// NOT NULL constraints (contype 'n', catalogued in PG18) are noise here; keep keys, uniques, FKs and checks.
+			constraints: (cons.rows as { tbl: string; conname: string; contype: string }[]).filter((r) => r.contype !== 'n').map((r) => `${r.tbl}.${r.conname}[${r.contype}]`),
+			searchVectorGenerated: Number(gen.rows[0]?.n ?? 0) > 0,
+			vector: { type: columns.content_embedding ?? null, dimensions: typeMatch ? Number(typeMatch[1]) : null, opclass: hnswIdx?.operatorClass ?? null, method: hnswIdx?.accessMethod ?? null },
 			available: true, error: null, tablesPresent, pageCount: pages, chunkCount: chunks, columns,
 			ftsAvailable: !!columns.search_vector && indexes.some((i) => i.accessMethod === 'gin' && /search_vector/.test(i.definition)),
 			vectorColumnAvailable: /^(half)?vec/.test(columns.content_embedding ?? ''),
@@ -432,7 +508,7 @@ export async function readCapabilities(pool: Pool): Promise<CapabilityReadout> {
 // ---------------------------------------------------------------------------------------------
 // search: canonical Postgres FTS first, local lexical fallback second (never web, never Qdrant)
 
-function localLexicalSearch(root: string, q: string, limit: number, sources: SourceCapture[]): DocSearchHit[] {
+function localLexicalSearch(root: string, q: string, limit: number, sources: SourceCapture[], coords: CoordinatesFile | null): DocSearchHit[] {
 	const tokens = q.toLowerCase().split(/\s+/).filter((t) => t.length > 1);
 	if (!tokens.length) return [];
 	const hits: (DocSearchHit & { score: number })[] = [];
@@ -444,7 +520,8 @@ function localLexicalSearch(root: string, q: string, limit: number, sources: Sou
 		const at = lower.indexOf(tokens[0]);
 		const score = tokens.reduce((n, t) => n + lower.split(t).length - 1, 0);
 		hits.push({
-			title: s.title, sourceId: s.sourceId, url: s.sourceUrl, product: null, productVersion: null,
+			provider: coords?.sources[s.sourceId]?.provider ?? null, title: s.title, sourceId: s.sourceId, url: s.sourceUrl,
+			product: coords?.sources[s.sourceId]?.product ?? null, productVersion: coords?.sources[s.sourceId]?.productVersion ?? coords?.sources[s.sourceId]?.versionQualification ?? null,
 			authorityClass: s.authorityClass, revision: s.contentChecksum ? `sha256:${s.contentChecksum.slice(0, 16)}` : null,
 			excerpt: text.slice(Math.max(0, at - 80), at + 220).replace(/\s+/g, ' ').trim(),
 			badge: s.provenance === 'DEV_CORPUS' ? 'GENERATED_CORPUS' : 'REFERENCE_ONLY', score
@@ -462,7 +539,7 @@ export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q
 			const counts = await opts.pool.query(`SELECT count(*)::int AS n FROM atlas_external_doc_chunks`);
 			if (counts.rows[0].n > 0) {
 				const { rows } = await opts.pool.query(
-					`SELECT c.chunk_id, p.title, p.product, p.product_version, p.url, p.source_authority, p.evidence_revision,
+					`SELECT c.chunk_id, p.title, p.provider, p.product, p.product_version, p.url, p.source_authority, p.evidence_revision,
 					        ts_headline('english', c.text, query, 'MaxFragments=1,MaxWords=35,MinWords=12') AS excerpt
 					   FROM atlas_external_doc_chunks c
 					   JOIN atlas_external_doc_pages p ON p.id = c.page_id, plainto_tsquery('english', $1) query
@@ -473,8 +550,8 @@ export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q
 				return {
 					query: q, mode: 'POSTGRES_FTS', postgresNote: null,
 					hits: rows.map((r: Record<string, string | null>) => ({
-						title: String(r.title), sourceId: String(r.product ?? ''), url: r.url, product: r.product, productVersion: r.product_version,
-						authorityClass: String(r.source_authority ?? ''), revision: r.evidence_revision, excerpt: String(r.excerpt ?? ''), badge: 'CANONICAL' as const
+						provider: r.provider, title: String(r.title), sourceId: String(r.product ?? ''), url: r.url, product: r.product, productVersion: r.product_version,
+						authorityClass: String(r.source_authority ?? ''), revision: r.evidence_revision, excerpt: String(r.excerpt ?? ''), badge: 'CANONICAL_POSTGRES' as const
 					}))
 				};
 			}
@@ -483,24 +560,129 @@ export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q
 			postgresNote = `POSTGRES_UNAVAILABLE:${error instanceof Error ? error.message : String(error)}`;
 		}
 	}
-	const runtime = opts.runtime ?? { postgres: null, pgvector: null, drizzleOrm: null, drizzleKit: null, pg: null };
+	const runtime = opts.runtime ?? { postgres: null, pgvector: null, drizzleOrm: null, drizzleKit: null, pg: null, svelte: null, svelteKit: null, bitsUi: null };
 	const { sources } = collectLocalCaptures(opts.root, runtime);
-	return { query: q, mode: 'LOCAL_LEXICAL', postgresNote, hits: q.length >= 2 ? localLexicalSearch(opts.root, q, limit, sources) : [] };
+	return { query: q, mode: 'LOCAL_LEXICAL', postgresNote, hits: q.length >= 2 ? localLexicalSearch(opts.root, q, limit, sources, readCoordinates(opts.root)) : [] };
 }
 
 // ---------------------------------------------------------------------------------------------
-// runtime versions + snapshot
+// coordinates sidecar, version drift, langextract / symbol index / analysis status (all read-only)
 
-export function readRepoVersions(root: string): Pick<RuntimeVersions, 'drizzleOrm' | 'drizzleKit' | 'pg'> {
-	const candidates = [join(root, 'sveltekit-frontend', 'package.json'), join(root, 'package.json')];
-	const pkgPath = candidates.find((c) => existsSync(c) && /drizzle-orm/.test(readFileSync(c, 'utf8')));
-	if (!pkgPath) return { drizzleOrm: null, drizzleKit: null, pg: null };
-	const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as { dependencies?: Record<string, string>; devDependencies?: Record<string, string> };
-	const all = { ...pkg.devDependencies, ...pkg.dependencies };
-	return { drizzleOrm: all['drizzle-orm'] ?? null, drizzleKit: all['drizzle-kit'] ?? null, pg: all.pg ?? null };
+interface CoordinateSource {
+	provider: string;
+	product: string;
+	versionQualification: string;
+	productVersion?: string;
+	authorityClass: string;
+	runtime: { kind: 'npm'; package: string } | { kind: 'postgres'; setting: string } | { kind: 'pgvector' };
+}
+export interface CoordinatesFile {
+	sources: Record<string, CoordinateSource>;
 }
 
-export async function buildDocCorpusStudioSnapshotV1(opts: { pool: Pool | null; root?: string; now?: Date }): Promise<DocCorpusStudioSnapshotV1> {
+export function readCoordinates(root: string): CoordinatesFile | null {
+	const path = join(root, 'docs', '.okf', 'dev', 'pinned-docs.coordinates.json');
+	if (!existsSync(path)) return null;
+	try { return JSON.parse(readFileSync(path, 'utf8')) as CoordinatesFile; } catch { return null; }
+}
+
+function installedVersion(root: string, pkg: string): string | null {
+	for (const base of [join(root, 'sveltekit-frontend', 'node_modules'), join(root, 'node_modules')]) {
+		const file = join(base, ...pkg.split('/'), 'package.json');
+		if (existsSync(file)) {
+			try { return (JSON.parse(readFileSync(file, 'utf8')) as { version?: string }).version ?? null; } catch { /* fall through */ }
+		}
+	}
+	return null;
+}
+
+export function readRepoVersions(root: string): Pick<RuntimeVersions, 'drizzleOrm' | 'drizzleKit' | 'pg' | 'svelte' | 'svelteKit' | 'bitsUi'> {
+	return {
+		drizzleOrm: installedVersion(root, 'drizzle-orm'), drizzleKit: installedVersion(root, 'drizzle-kit'), pg: installedVersion(root, 'pg'),
+		svelte: installedVersion(root, 'svelte'), svelteKit: installedVersion(root, '@sveltejs/kit'), bitsUi: installedVersion(root, 'bits-ui')
+	};
+}
+
+const majorOf = (v: string | null) => (v ? Number(/(\d+)/.exec(v)?.[1] ?? NaN) : NaN);
+
+export function computeVersionDrift(coords: CoordinatesFile | null, sources: SourceCapture[], runtime: RuntimeVersions, now = new Date()): VersionDriftRow[] {
+	if (!coords) return [];
+	const npm: Record<string, string | null> = { 'drizzle-orm': runtime.drizzleOrm, 'drizzle-kit': runtime.drizzleKit, svelte: runtime.svelte, '@sveltejs/kit': runtime.svelteKit, 'bits-ui': runtime.bitsUi };
+	return Object.entries(coords.sources).map(([sourceId, cfg]) => {
+		const runtimeVersion = cfg.runtime.kind === 'npm' ? (npm[cfg.runtime.package] ?? null) : cfg.runtime.kind === 'postgres' ? (runtime.postgres?.split(' ')[0] ?? null) : runtime.pgvector;
+		const captures = sources.filter((s) => s.provenance === 'PINNED_CAPTURE' && s.sourceId === sourceId && s.authorityClass === 'OFFICIAL_PRIMARY');
+		const newest = captures.length ? Math.max(...captures.map((c) => (c.capturedAt ? Date.parse(c.capturedAt) : 0))) : 0;
+		const capturedAt = newest ? new Date(newest).toISOString() : null;
+		const capturedDocVersion = cfg.productVersion ?? null;
+		let status: DriftStatus;
+		if (!captures.length) status = 'DOC_MISSING';
+		else if ((now.getTime() - newest) / 86_400_000 > STALE_AFTER_DAYS) status = 'DOC_STALE';
+		else if (!capturedDocVersion || cfg.versionQualification === 'CURRENT_UPSTREAM' || cfg.versionQualification === 'UNVERSIONED') status = 'UNVERSIONED';
+		else if (runtimeVersion && capturedDocVersion === runtimeVersion) status = 'EXACT_MATCH';
+		else if (majorOf(capturedDocVersion) === majorOf(runtimeVersion)) status = 'COMPATIBLE_SERIES';
+		else status = majorOf(capturedDocVersion) > majorOf(runtimeVersion) ? 'UPSTREAM_NEWER' : 'DOC_STALE';
+		return { sourceId, provider: cfg.provider, product: cfg.product, runtimeVersion, capturedDocVersion, qualification: cfg.versionQualification, status, pages: captures.length, capturedAt, authorityClass: cfg.authorityClass };
+	});
+}
+
+export function readManifestSources(root: string, coords: CoordinatesFile | null, sources: SourceCapture[]): ManifestSourceRow[] {
+	const path = join(root, 'docs', '.okf', 'dev', 'pinned-docs.manifest.json');
+	if (!existsSync(path)) return [];
+	try {
+		const manifest = JSON.parse(readFileSync(path, 'utf8')) as { sources: { source_id: string; pages?: string[] }[] };
+		return manifest.sources.map((m) => ({
+			sourceId: m.source_id, provider: coords?.sources[m.source_id]?.provider ?? '?', product: coords?.sources[m.source_id]?.product ?? '?',
+			pagesDeclared: m.pages?.length ?? 0, pagesCaptured: sources.filter((s) => s.provenance === 'PINNED_CAPTURE' && s.sourceId === m.source_id).length,
+			qualification: coords?.sources[m.source_id]?.versionQualification ?? 'UNVERSIONED'
+		}));
+	} catch { return []; }
+}
+
+export function readLangExtractStatus(root: string): LangExtractStatus {
+	const { rows } = readJsonl(join(root, 'docs', '.okf', 'langextract', 'corpus.jsonl'));
+	const count = (pred: (r: Record<string, unknown>) => boolean) => rows.filter(pred).length;
+	const blockers = [
+		{ code: 'LANGEXTRACT_ROWS_LACK_DOC_COORDINATE', count: count((r) => !r.doc_coordinate && !r.evidence_revision && !r.product_version) },
+		{ code: 'LANGEXTRACT_ROWS_LACK_CHUNK_ID_AND_BYTE_SPANS', count: count((r) => r.start_byte == null || r.end_byte == null || !r.chunk_id) },
+		{ code: 'LANGEXTRACT_JOIN_WOULD_BE_URL_ONLY', count: count((r) => !!r.source_url) },
+		{ code: 'LANGEXTRACT_ABSOLUTE_MARKDOWN_PATH', count: count((r) => /^[A-Za-z]:[\\/]/.test(String(r.markdown_path ?? ''))) }
+	].filter((b) => b.count > 0);
+	return { result: rows.length && !blockers.length ? 'LANGEXTRACT_DOC_EVIDENCE_JOIN_READY' : 'LANGEXTRACT_DOC_EVIDENCE_JOIN_BLOCKED', authority: 'GENERATED_CORPUS', documents: rows.length, blockers };
+}
+
+export function readSymbolIndexStatus(root: string): SymbolIndexStatus {
+	const scriptPath = join(root, 'scripts', 'docs-atlas', 'index-okf-dev-corpus.mjs');
+	const script = existsSync(scriptPath) ? readFileSync(scriptPath, 'utf8') : '';
+	let summary: { code_blocks?: number; symbols?: number } = {};
+	try { summary = JSON.parse(readFileSync(join(root, 'docs', '.okf', 'dev', 'symbol-summary.json'), 'utf8')) as typeof summary; } catch { /* absent */ }
+	const methods = [/@ast-grep\/napi|astGrep/.test(script) ? 'ast-grep' : null, /ts-morph/.test(script) ? 'ts-morph' : null].filter((m): m is string => !!m);
+	const blockers: string[] = [];
+	if (!script) blockers.push('SYMBOL_INDEX_SCRIPT_MISSING');
+	if (!/chunk_id|start_byte|evidence_revision/.test(script)) blockers.push('SYMBOL_RECORD_HAS_NO_CHUNK_ID_BYTE_SPAN_OR_EVIDENCE_REVISION');
+	if (/markdown_line/.test(script) && !/start_byte/.test(script)) blockers.push('SYMBOL_SPAN_IS_MARKDOWN_LINE_NOT_UTF8_BYTES');
+	if (/source_revision:\s*sha256\(markdown\)/.test(script)) blockers.push('SYMBOL_SOURCE_REVISION_IS_FILE_SHA_NOT_DOC_EVIDENCE_REVISION');
+	if (/docs\/\.okf\/dev/.test(script) && !/pinned/.test(script)) blockers.push('SYMBOL_INDEX_SCOPE_IS_DEV_RAW_ONLY_NOT_PINNED_OR_POSTGRES_CHUNKS');
+	if ((summary.symbols ?? 0) === 0) blockers.push('SYMBOL_INDEX_HAS_ZERO_SYMBOLS_TODAY');
+	return { result: blockers.length ? 'AST_GREP_DOC_SYMBOL_MAPPING_INCOMPLETE' : 'AST_GREP_DOC_SYMBOL_MAPPING_PROVEN', authority: 'GENERATED_CORPUS', methods, codeBlocks: summary.code_blocks ?? null, symbols: summary.symbols ?? null, blockers };
+}
+
+export function readAnalysisStatus(): AnalysisStatus {
+	const base = { schema: 'atlas.external-doc-analysis.v1' as const, chunkId: 'doc:x:0', chunkEvidenceRevision: 'sha256:c', analysisType: 'SUMMARY' as const, producerId: 'ornith', producerRevision: 'p1', modelId: 'ornith-1.5-9b', modelRevision: 'm1', inputChecksum: 'a'.repeat(64), outputChecksum: 'b'.repeat(64), summaryText: 's', metadata: {}, canonicalAuthority: false as const, createdAt: '2026-09-23T00:00:00Z' };
+	const idFor = (promptRevision: string) => externalDocAnalysisId({ ...base, promptRevision });
+	const ok = ExternalDocAnalysisV1Schema.safeParse({ ...base, promptRevision: 'v1', analysisId: idFor('v1') }).success && idFor('v1') !== idFor('v2') && idFor('v1') === idFor('v1');
+	return { contract: 'ExternalDocAnalysisV1', result: ok ? 'EXTERNAL_DOC_ANALYSIS_CONTRACT_READY' : 'EXTERNAL_DOC_ANALYSIS_CONTRACT_INVALID', authority: 'DERIVED_ANALYSIS', persistedRows: null, ornithSummary: 'NOT_RUN', existingOwnerReviewed: 'analysis_pass_results (legal evidence/packet keyed; no chunk revision, model or prompt identity) - not reused' };
+}
+
+function readHandoffFromReport(root: string): DocIntelligenceStudioSnapshotV1['admissionHandoff'] {
+	const path = join(root, 'docs', 'reports', 'external-doc-studio-readiness-v1.json');
+	if (!existsSync(path)) return null;
+	try {
+		const r = JSON.parse(readFileSync(path, 'utf8')) as { doc06aHandoff?: { result: string; blockers: { code: string; count?: number }[] } };
+		return r.doc06aHandoff ? { result: r.doc06aHandoff.result, blockers: r.doc06aHandoff.blockers.map(({ code, count }) => ({ code, count })), source: 'docs/reports/external-doc-studio-readiness-v1.json' } : null;
+	} catch { return null; }
+}
+
+export async function buildDocIntelligenceStudioSnapshotV1(opts: { pool: Pool | null; root?: string; now?: Date }): Promise<DocIntelligenceStudioSnapshotV1> {
 	const root = opts.root ?? findRepoRoot();
 	const now = opts.now ?? new Date();
 	const repo = readRepoVersions(root);
@@ -508,37 +690,53 @@ export async function buildDocCorpusStudioSnapshotV1(opts: { pool: Pool | null; 
 	const caps = opts.pool ? await readCapabilities(opts.pool) : null;
 	const runtimeVersions: RuntimeVersions = { postgres: caps?.settings.server_version ?? null, pgvector: caps?.pgvectorVersion ?? null, ...repo };
 	const local = collectLocalCaptures(root, runtimeVersions);
+	const coordinates = readCoordinates(root);
 	const coverage = computeCoverage(local.sources, now);
+	const drift = computeVersionDrift(coordinates, local.sources, runtimeVersions, now);
 	const pinned = local.sources.filter((s) => s.provenance === 'PINNED_CAPTURE');
 	const issues = [...local.issues];
 	for (const c of coverage) if (c.status === 'MISSING') issues.push({ code: 'PINNED_SOURCE_MISSING', detail: c.group });
-	if (pg && pg.available && pg.empty) issues.push({ code: 'DOC_CORPUS_POSTGRES_EMPTY', detail: 'atlas_external_doc_* has 0 admitted rows' });
+	if (pg && pg.available && pg.empty) issues.push({ code: 'DOC_CANONICAL_CORPUS_EMPTY', detail: 'atlas_external_doc_* has 0 admitted rows' });
 	if (!pg?.available) issues.push({ code: 'POSTGRES_UNAVAILABLE', detail: pg?.error ?? 'no pool' });
 	const hard = local.issues.length > 0 || coverage.some((c) => c.status === 'MISSING');
 	const captured = pinned.map((s) => s.capturedAt).filter((x): x is string => !!x).sort();
+	const ginIndexes = (pg?.indexes ?? []).filter((i) => i.accessMethod === 'gin').map((i) => i.name);
+	const hnsw = (pg?.indexes ?? []).some((i) => i.accessMethod === 'hnsw');
 	return {
-		schema: 'atlas.doc-corpus-studio-snapshot.v1',
+		schema: 'atlas.doc-intelligence-studio-snapshot.v1',
 		generatedAt: now.toISOString(),
 		runtimeVersions,
+		manifestSources: readManifestSources(root, coordinates, local.sources),
 		localCorpus: {
+			authority: 'REFERENCE_ONLY',
 			sourceCount: new Set(local.sources.map((s) => s.sourceId)).size,
 			pageCount: local.sources.length,
 			capturedAt: captured.at(-1) ?? null,
 			staleSources: coverage.filter((c) => c.status === 'CAPTURED_STALE').map((c) => c.group),
 			missingSources: coverage.filter((c) => c.status === 'MISSING').map((c) => c.group)
 		},
-		postgresCorpus: {
-			pageCount: pg?.pageCount ?? null, chunkCount: pg?.chunkCount ?? null, ftsAvailable: pg?.ftsAvailable ?? false,
-			vectorColumnAvailable: pg?.vectorColumnAvailable ?? false, indexes: pg?.indexes ?? [],
-			status: !pg?.available ? 'UNAVAILABLE' : pg.empty ? 'EMPTY' : 'PRESENT'
+		canonicalCorpus: {
+			authority: 'CANONICAL_POSTGRES',
+			status: !pg?.available ? 'UNAVAILABLE' : pg.empty ? 'EMPTY' : 'PRESENT',
+			pageCount: pg?.pageCount ?? null, chunkCount: pg?.chunkCount ?? null, constraints: pg?.constraints ?? []
 		},
-		capabilities: {
-			aio: { ioMethod: caps?.settings.io_method ?? null, pgAiosAvailable: caps?.pgAiosAvailable ?? false },
-			bitmap: caps?.bitmap ?? { plannerCanGenerateBitmap: false, plannerSelectedBitmap: false, aioRelevant: false, ioMethod: null, fixtures: [] },
-			hnsw: caps?.hnswIndexPresent ?? false, halfvec: caps?.halfvecAvailable ?? false
+		versionDrift: drift,
+		ftsCapability: { available: pg?.ftsAvailable ?? false, ginIndexes, searchVectorGenerated: pg?.searchVectorGenerated ?? false },
+		vectorCapability: { columnType: pg?.vector.type ?? null, dimensions: pg?.vector.dimensions ?? null, hnswIndex: hnsw, opclass: pg?.vector.opclass ?? null, halfvecType: caps?.halfvecAvailable ?? false },
+		aioCapability: {
+			level: 'CAPABILITY', ioMethod: caps?.settings.io_method ?? null, effectiveIoConcurrency: caps?.settings.effective_io_concurrency ?? null,
+			maintenanceIoConcurrency: caps?.settings.maintenance_io_concurrency ?? null, pgAiosAvailable: caps?.pgAiosAvailable ?? false, productionObserved: 'NOT_OBSERVED'
 		},
-		coverage,
+		bitmapCapability: {
+			capability: caps?.bitmap.plannerCanGenerateBitmap ?? false, plannerSelected: caps?.bitmap.plannerSelectedBitmap ?? false,
+			productionObserved: 'NOT_OBSERVED', aioRelevant: caps?.bitmap.aioRelevant ?? false, fixtures: caps?.bitmap.fixtures ?? []
+		},
+		langExtractStatus: readLangExtractStatus(root),
+		symbolIndexStatus: readSymbolIndexStatus(root),
+		analysisStatus: readAnalysisStatus(),
+		admissionHandoff: readHandoffFromReport(root),
 		sources: local.sources,
+		issues,
 		validation: { status: hard ? 'FAIL' : issues.length ? 'PARTIAL' : 'PASS', issues },
 		canonicalAuthority: 'POSTGRES',
 		generatedCorpusAuthority: false
