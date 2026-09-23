@@ -617,3 +617,57 @@ done this pass (would be a code change, out of read-only scope).
 
 `writesPerformed=false` across Postgres/Qdrant/Valkey/Neo4j; no code changed.
 Evidence: `docs/reports/packet-key-single-owner-convergence-v2-addendum.json`.
+
+#### PACKET-KEY-LIFECYCLE-CONTRACT-01 — 2026-09-23 (read-only)
+
+- [x] Traced 7 runtime packet_key **consumers** (bounded/representative, not
+  exhaustive) across every named category: `atlas_packet_registry_projections`
+  schema (FK to `packet_key`, confirming it — not `packet_id` — is the
+  intended join key), `qdrant-packet-projection.ts` (explicit written
+  contract: key must be identical across all representation/collection
+  lanes), `identity-resolution.ts` (precedence `symbol_version_id ->
+  packet_key -> content_hash`), `unified-orchestrator.ts`'s
+  `CandidateIdentityV1` envelope (packetKey/sourceRef/sourceRevision/
+  workspaceRevision tracked as 4 independent co-equal fields), both traced
+  writers (`semantic-packet-writer.ts` upserts on `packetId` via real
+  UPDATE; `upsert-whole-codebase-atlas-packets.mjs` upserts on `packet_key`
+  via `ON CONFLICT DO NOTHING`, never mutating).
+- [x] Classified 8 continuity expectations (A-H): content-revision,
+  workspace-revision, representation-revision, re-embedding, process-restart
+  all `MUST_REMAIN_STABLE`; graph-reprojection, cluster-reassignment
+  `DOES_NOT_CARE`; rename the one genuine `UNKNOWN` (absence of consumer
+  evidence, not conflicting evidence).
+- [x] Evaluated 7 candidate lifecycle models against that evidence:
+  `SOURCE_COORDINATE_PACKET` is the only one supported by every consumer
+  traced (matches the formula, the writer's own "preserve on existing
+  source_ref" comment, the co-equal revision-field pattern everywhere, and
+  a test fixture that explicitly holds `packetKey` fixed while varying
+  `sourceRevision`).
+- [x] **Lifecycle result: `PACKET_KEY_LIFECYCLE_CONTRACT_PROVEN`** — evidence
+  converges cleanly, no consumer conflict found.
+- [x] **Encoding status (separate axis): `CURRENT_ENCODING_COLLISION_POLICY_DEFECT`**
+  — the model is correctly implemented, but `ON CONFLICT (packet_key) DO
+  NOTHING` means a genuine 12-hex truncation collision between two distinct
+  `source_ref`s would silently drop the second file's packet row with no
+  error, receipt, or rejection — matching none of the acceptable collision
+  policies. Required behavior per this repo's own existing fail-closed
+  identity discipline (stable-file-identity-mint-v1.ts's "ambiguity throws
+  rather than picks arbitrarily"): `COLLISION_RECEIPT_AND_REJECT`, with
+  full-width digest as a complementary risk-reduction, not a substitute.
+- [x] **Shared-builder readiness: `SHARED_PACKET_IDENTITY_BUILDER_BLOCKED`**
+  (lifecycle proven, encoding does not satisfy it) — NOT extracted this
+  pass. Recorded the future module's required contract (source_ref-only
+  input, collision-receipt-and-reject behavior, revision/rename explicitly
+  excluded from the key) for whenever it is built.
+- [x] **Production-owner readiness: `PRODUCTION_OWNER_BLOCKED_PACKET_IDENTITY`**
+  — not evaluated for owner selection (out of scope), blocked regardless
+  since the collision-safe key builder it would consume doesn't exist yet.
+- [x] Re-ran the existing `packet-key-dominant-scheme.spec.ts` +
+  `compute-packet-key-containment.spec.ts` (9/9) as regression confirmation
+  — no new tests added (none needed to prove this pass's findings).
+- [x] `openspec validate manual-migration-reconciliation --strict` PASS.
+
+No packet_key rewritten, no builder extracted, no writers changed, no
+S01-08K applied, `PACKET-WRITER-PRODUCTION-OWNER-01` not selected.
+`writesPerformed=false` across Postgres/Qdrant/Valkey/Neo4j.
+Evidence: `docs/reports/packet-key-lifecycle-contract-v1.json`.

@@ -1,0 +1,218 @@
+{
+  "schema": "atlas.packet-key-lifecycle-contract.v1",
+  "gate": "PACKET-KEY-LIFECYCLE-CONTRACT-01",
+  "generatedAt": "2026-09-23T00:00:00Z",
+  "mode": "READ_ONLY",
+  "anchorCommit": "HEAD at time of run (built on 5c9b1c2618 / 42f0edcd1b / ab455e58db)",
+  "priorEvidenceReused": [
+    "docs/reports/packet-key-single-owner-convergence-v1.json",
+    "docs/reports/packet-key-single-owner-convergence-v2-addendum.json"
+  ],
+  "scopeNote": "Answers what packet_key is normatively intended to identify, traced from CONSUMERS this time (not producers, which the prior two gates already covered). Does NOT extract a shared builder, does NOT apply S01-08K, does NOT select PACKET-WRITER-PRODUCTION-OWNER-01.",
+  "consumers": [
+    {
+      "path": "sveltekit-frontend/src/lib/server/db/schema/atlas-packet-registry.ts",
+      "table": "atlas_packet_registry_projections",
+      "readWrite": "SCHEMA (FK reference)",
+      "joinTarget": "atlasPackets.packetKey (FK -- confirms packet_key, not packet_id, is the intended cross-table join key)",
+      "retentionExpectation": "one registry-projection row per packet_key per lane (not further audited this pass)",
+      "revisionAssumptions": "none encoded directly -- carries its own representationRevision/modelRevision/indexRevision, separate axes from packet_key",
+      "renameAssumptions": "none found",
+      "aliasHandling": "none -- FK targets packet_key directly, does not route through atlas_packet_identity_aliases",
+      "sourceRefUsage": "none (not a column on this table)",
+      "sourceRevisionUsage": "none",
+      "stableFileIdUsage": "none"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/projections/qdrant-packet-projection.ts",
+      "readWrite": "READ+WRITE (payload mapper, both directions)",
+      "joinTarget": "packet_key field in Qdrant payload, snake_case <-> camelCase mapping",
+      "retentionExpectation": "explicit written comment: 'CRITICAL: packet_key must be identical across all collections for the same logical packet' -- i.e. MUST_REMAIN_STABLE across representation/collection changes (dense_768, dense_384, latent_64 lanes)",
+      "revisionAssumptions": "carries workspaceRevision as a separate payload field alongside packetKey -- co-equal axis, not folded into the key",
+      "renameAssumptions": "none found",
+      "aliasHandling": "none",
+      "sourceRefUsage": "carried as a separate payload field",
+      "sourceRevisionUsage": "not present on this payload shape (only workspaceRevision is); contentHash is present separately",
+      "stableFileIdUsage": "none",
+      "otherFinding": "isValidPacketKey() here accepts a THIRD prefix form, 'pkt_' (underscore), never seen in the live census or any producer traced by the prior two gates -- flagged, not investigated further (likely dead defensive code; zero live packet_key rows begin with 'pkt_' per the v1/v2 census regexes, which would have caught it under OTHER_UNRECOGNIZED if present)."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts",
+      "readWrite": "READ (pure resolution function)",
+      "joinTarget": "explicit precedence: symbol_version_id -> packet_key -> content_hash / canonical_chunk_id",
+      "retentionExpectation": "packet_key is a canonical, stable dedup/join key for a retrieval pass -- but subordinate to symbol_version_id when that's available. This is strong evidence packet_key is NOT expected to track symbol-version granularity; it sits at a coarser (source-coordinate) grain.",
+      "revisionAssumptions": "none encoded in the precedence chain itself",
+      "renameAssumptions": "none found",
+      "aliasHandling": "not this module's concern (resolves within a single retrieval pass over already-hydrated candidates, not against atlas_packets directly)",
+      "sourceRefUsage": "present as a fallback identity source below packet_key",
+      "sourceRevisionUsage": "none directly in this file's precedence chain",
+      "stableFileIdUsage": "none"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "readWrite": "READ (candidate identity assembly)",
+      "joinTarget": "CandidateIdentityV1 envelope: { candidateId, qdrantPointId, packetKey, sourceRef, sourceRevision, workspaceRevision, symbolVersionId, identitySource, missingFields }",
+      "retentionExpectation": "packetKey, sourceRef, sourceRevision, workspaceRevision are tracked as 4 INDEPENDENT, co-equal fields with a shared missingFields[] audit list -- direct evidence of a deliberate multi-axis identity model, not a single collapsed key.",
+      "revisionAssumptions": "sourceRevision and workspaceRevision are expected to vary independently of packetKey -- packetKey is not expected to change when either revision field changes.",
+      "renameAssumptions": "none found",
+      "aliasHandling": "none in this file",
+      "sourceRefUsage": "co-equal field, not subsumed by packetKey",
+      "sourceRevisionUsage": "co-equal field, not subsumed by packetKey",
+      "stableFileIdUsage": "none -- not yet part of this identity envelope"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts",
+      "readWrite": "TEST FIXTURE -- included here as direct evidence of an ASSERTED consumer expectation, not as a runtime consumer itself (per the gate's own instruction not to treat docs/tests as runtime consumers, this row is evidence-only, not counted toward the consumer inventory total)",
+      "finding": "Line 485-486 constructs two candidates with the SAME packetKey ('pkt:file') and SAME sourceRef, but DIFFERENT sourceRevision (one has 'a' characters replaced with 'c'). This is the clearest available evidence that a fixed packetKey + evolving sourceRevision is the EXPECTED, exercised scenario in this codebase's own test suite -- not an edge case being guarded against."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/packet-bitmap-prefilter.ts + packet-dense-search.ts",
+      "readWrite": "READ (SQL SELECT)",
+      "joinTarget": "SELECT packet_key, source_ref, source_revision, workspace_revision, representation_revision, title_id, ... -- packet_key selected alongside, never derived from, the revision columns",
+      "retentionExpectation": "packet_key is a stored, stable column read directly from atlas_packets; revision fields are independently stored sibling columns on the same row.",
+      "revisionAssumptions": "co-equal, independent",
+      "renameAssumptions": "none found",
+      "aliasHandling": "none in these two files"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+      "readWrite": "WRITE (upsert)",
+      "joinTarget": "onConflictDoUpdate({ target: atlasPackets.packetId, ... }) -- NOT packetKey",
+      "finding": "This writer's ON CONFLICT target is packetId (the table's actual primary key), while the dominant bulk-backfill writer's ON CONFLICT target is packet_key (a separate UNIQUE constraint). Because packetId is currently always set equal to packetKey by every observed writer (packetId = input.packetId?.trim() || packetKey), the two targets coincide in practice today -- but they are architecturally two different constraints, and nothing in the schema enforces that packetId and packetKey can never diverge for a future writer.",
+      "mutationBehavior": "MUTATES existing row in place on conflict (real UPDATE, including sourceRevision via COALESCE-preserve semantics, see prior gate)."
+    },
+    {
+      "path": "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs",
+      "readWrite": "WRITE (bulk backfill)",
+      "joinTarget": "INSERT ... ON CONFLICT (packet_key) DO NOTHING",
+      "mutationBehavior": "NEVER mutates an existing row -- a re-run over an already-inserted source_ref is a pure no-op. This is the source of the 'preserve existing packet_key when source_ref already exists' comment already cited in the prior gate."
+    }
+  ],
+  "consumerCountNote": "7 runtime consumers traced (schema/projection/retrieval/writer files); 1 test fixture cited as corroborating evidence only, per instruction not to count docs/tests as runtime consumers. This is a bounded, representative trace across every named category in scope (registry, projections, retrieval joins, Qdrant payload mapping, cache keys already covered in the prior gate, writers) -- not an exhaustive enumeration of the ~150 files that reference packet_key/packetKey repo-wide, which would be out of proportion to this gate's purpose.",
+  "continuityExpectations": {
+    "A_contentRevisionChange": {
+      "classification": "MUST_REMAIN_STABLE",
+      "evidence": "search-runtime-fusion.test.ts fixture explicitly constructs same packetKey + different sourceRevision as the expected scenario; unified-orchestrator.ts's CandidateIdentityV1 tracks sourceRevision as an independent field from packetKey; dominant formula has no revision input by construction."
+    },
+    "B_sourcePathRename": {
+      "classification": "UNKNOWN (from consumers) / MUST_CHANGE (from the producer, empirically)",
+      "evidence": "No consumer traced tests, asserts, or depends on packet_key surviving a source_ref rename. The producer-side behavior (packet_key = f(source_ref) only) mechanically changes on rename, but no consumer was found that would break BECAUSE of this, nor one that relies on it happening. This is the one true UNKNOWN -- not because evidence conflicts, but because no consumer evidence exists either way."
+    },
+    "C_workspaceRevisionChange": {
+      "classification": "MUST_REMAIN_STABLE",
+      "evidence": "workspaceRevision is carried as a co-equal, independent field in every traced envelope (Qdrant payload, CandidateIdentityV1, SQL SELECT column lists) -- never folded into or derived from packetKey."
+    },
+    "D_representationRevisionChange": {
+      "classification": "MUST_REMAIN_STABLE",
+      "evidence": "qdrant-packet-projection.ts's explicit written contract: packet_key must be identical across all collections/representations for the same logical packet."
+    },
+    "E_reEmbedding": {
+      "classification": "MUST_REMAIN_STABLE",
+      "evidence": "Same as D -- re-embedding produces a new representationRevision/embeddingDigest (per semantic-lineage.ts, established in a prior gate), never a new packetKey."
+    },
+    "F_graphReprojection": {
+      "classification": "DOES_NOT_CARE",
+      "evidence": "graph-snapshot-materializer.ts (traced in the prior producer gate) derives its Neo4j nodeKey FROM packet.packetKey (prefixing 'packet:' if absent) -- packetKey is an upstream input to graph projection, not something graph reprojection is expected to influence."
+    },
+    "G_clusterReassignment": {
+      "classification": "DOES_NOT_CARE",
+      "evidence": "atlas_packets.clusterId / communityId / som_cell_x/y are separate mutable columns on the same row (per the schema read this pass); nothing ties packet_key to cluster membership."
+    },
+    "H_processRestart": {
+      "classification": "MUST_REMAIN_STABLE",
+      "evidence": "packet_key is a stored Postgres column, read fresh on every process start -- trivially stable, no in-memory-only component found."
+    }
+  },
+  "candidateModels": [
+    {
+      "model": "SOURCE_COORDINATE_PACKET",
+      "verdict": "SUPPORTED",
+      "rationale": "Matches every piece of collected evidence: the dominant formula's sole input (source_ref), the bulk writer's own comment ('preserve existing packet_key when source_ref already exists'), the co-equal independent treatment of sourceRevision/workspaceRevision/representationRevision in every consumer traced, and the Qdrant projection's explicit cross-representation stability requirement (which SOURCE_COORDINATE_PACKET naturally satisfies since source_ref does not vary by representation)."
+    },
+    {
+      "model": "FILE_LIFECYCLE_PACKET",
+      "verdict": "NOT_SUPPORTED",
+      "rationale": "Would require rename survival. No producer or consumer implements or expects this; stableFileId (UUIDv7, already frozen) already fills this exact role as a separate identity axis -- packet_key is not wired to it anywhere found."
+    },
+    {
+      "model": "SOURCE_REVISION_PACKET",
+      "verdict": "NOT_SUPPORTED",
+      "rationale": "Would require a distinct packet_key per sourceRevision. Directly contradicted by the search-runtime-fusion.test.ts fixture and the dominant formula's lack of a revision input."
+    },
+    {
+      "model": "SYMBOL_VERSION_PACKET",
+      "verdict": "NOT_SUPPORTED",
+      "rationale": "identity-resolution.ts explicitly ranks symbol_version_id ABOVE packet_key in its precedence chain -- packet_key is a fallback used precisely when symbol-version granularity is unavailable, not a proxy for it."
+    },
+    {
+      "model": "CHUNK_OCCURRENCE_PACKET",
+      "verdict": "NOT_SUPPORTED",
+      "rationale": "No byte-span/occurrence input to the dominant formula; TreeNodeOccurrenceV1 (a separate, already-frozen contract) owns this grain instead."
+    },
+    {
+      "model": "MATERIALIZATION_PACKET",
+      "verdict": "NOT_SUPPORTED",
+      "rationale": "No append-only behavior found anywhere -- both traced writers produce at most one row per source_ref (one mutates in place via onConflictDoUpdate on packetId, the other no-ops via ON CONFLICT DO NOTHING on packet_key); atlas_packets is not an append-only revision log for this axis."
+    },
+    {
+      "model": "MIXED_OR_UNDEFINED",
+      "verdict": "NOT_NEEDED",
+      "rationale": "Evidence converges cleanly on SOURCE_COORDINATE_PACKET without conflicting signals from any traced consumer -- the one genuine open question (B, rename) is an absence of evidence, not a conflict between two evidenced expectations."
+    }
+  ],
+  "packetLifecycleModel": "SOURCE_COORDINATE_PACKET",
+  "renameSemantics": "Packet identity is scoped to a source_ref coordinate. A rename (source_ref A -> B for the same logical file) legitimately produces a different packet_key under this model -- this is not a defect relative to the SOURCE_COORDINATE_PACKET contract, though it does mean packet_key cannot answer 'is this the same file that moved', which is stableFileId's job, a deliberately separate axis.",
+  "revisionSemantics": "packet_key does NOT change when sourceRevision, workspaceRevision, or representationRevision change -- those are tracked as independent, co-equal fields on the same identity envelope everywhere this pass found packet_key used. This is the model's central design point: one packet_key per source coordinate, revisions layered alongside it, never folded in.",
+  "aliasSemantics": "LEGACY_ENCODING_COMPATIBILITY only, confirmed by both prior gates and this one -- atlas_packet_identity_aliases exists to reconcile a historical wrong-prefix bug (ace:packet: vs packet:), not to provide rename continuity, revision continuity, or cross-scheme compatibility beyond that one bug. No consumer traced this pass expands that contract.",
+  "collisionPolicy": {
+    "currentBehavior": "SILENT_SKIP -- INSERT ... ON CONFLICT (packet_key) DO NOTHING against a live UNIQUE(packet_key) constraint. A genuine 12-hex truncation collision between two distinct source_refs causes the second file to silently receive no atlas_packets row at all, with no error, no receipt, and no log entry inspected this pass.",
+    "requiredBehaviorUnderExistingRepoPolicy": "COLLISION_RECEIPT_AND_REJECT",
+    "requiredBehaviorRationale": "Inferred from this repo's own existing fail-closed identity discipline, not invented: stable-file-identity-mint-v1.ts's own stated rule is 'Ambiguity (>1 existing row for what should be a unique scope) throws rather than picking arbitrarily' -- the same standard should apply to a genuine packet_key collision between two distinct source_refs. A complementary, not mutually exclusive, mitigation is FULL_DIGEST_REQUIRED (drop the 12-hex truncation in favor of a full-width digest, which reduces collision probability by many orders of magnitude but does not by itself add receipt/rejection behavior for the residual risk).",
+    "defect": "PACKET_KEY_COLLISION_POLICY_DEFECT",
+    "defectRationale": "SILENT_SKIP does not match COLLISION_RECEIPT_AND_REJECT, HARD_FAIL_IDENTITY_COLLISION, SECONDARY_DISAMBIGUATION, or FULL_DIGEST_REQUIRED -- it is the one behavior explicitly not on the acceptable list. The prior gate's birthday-bound estimate (~1-in-165,000 at current scale, ~1-in-14,000 at a projected 200k rows) means this defect is currently low-probability but not zero, and grows with corpus size under the present formula."
+  },
+  "lifecycleResult": "PACKET_KEY_LIFECYCLE_CONTRACT_PROVEN",
+  "lifecycleResultRationale": "Every traced consumer and both traced writers agree, without contradiction, on the same model: packet_key identifies a source_ref coordinate, is stable across revision/representation/cluster/graph-reprojection/process-restart, and is NOT expected to survive rename or track symbol-version/revision granularity. The only open axis (B, rename) is an absence of evidence rather than conflicting evidence, and does not block calling the model PROVEN -- it blocks nothing about the model itself, only confirms rename-instability is an accepted, uncontested consequence of the model rather than an unaddressed requirement.",
+  "encodingStatus": "CURRENT_ENCODING_COLLISION_POLICY_DEFECT",
+  "encodingStatusRationale": "The lifecycle MODEL is proven and the current 12-hex truncated-hash formula's INPUT semantics (source_ref only) correctly implement that model -- the defect is narrowly in the WRITE-TIME COLLISION HANDLING (silent DO NOTHING), not in what the formula identifies. This is deliberately reported separately from lifecycleResult per the gate's mandatory A/B split.",
+  "sharedBuilderReadiness": "SHARED_PACKET_IDENTITY_BUILDER_BLOCKED",
+  "sharedBuilderReadinessRationale": "Lifecycle is PROVEN, but current encoding does NOT satisfy the contract (collision policy defect) -- extracting the current formula verbatim into a permanent shared module would canonize the silent-skip defect alongside the correct source-coordinate semantics. Per instruction, no builder is created in this gate regardless.",
+  "futureSharedBuilderRequiredContract": {
+    "inputs": "source_ref only (confirmed sufficient for the SOURCE_COORDINATE_PACKET model; no revision/representation/cluster input should ever be added, per the proven co-equal-axis design)",
+    "output": "a packet_key string -- digest width increased from 12 hex (48 bits) to at least full sha256 (or another collision-resistant width with an explicit, documented birthday-bound justification for the target corpus size) to satisfy FULL_DIGEST_REQUIRED as a complementary mitigation",
+    "collisionBehavior": "COLLISION_RECEIPT_AND_REJECT -- on a write attempt whose computed key already exists in atlas_packets under a DIFFERENT source_ref, the writer must reject the write and emit an explicit collision receipt (matching this repo's existing evidence-receipt discipline), never silently skip",
+    "normalization": "not audited this pass whether source_ref normalization (case, path separators, leading/trailing slashes) is applied consistently across the traced writers -- flagged as an open question for whoever implements the shared builder, not resolved here",
+    "revisionBehavior": "MUST NOT be an input to the key formula -- sourceRevision/workspaceRevision/representationRevision remain co-equal sibling fields, never folded into packet_key, per the proven model",
+    "renameBehavior": "MUST NOT attempt rename continuity -- that is stableFileId's role; a shared packet-key builder that tried to survive rename would violate the proven SOURCE_COORDINATE_PACKET model, not fix a defect"
+  },
+  "productionOwnerReadiness": "PRODUCTION_OWNER_BLOCKED_PACKET_IDENTITY",
+  "productionOwnerReadinessRationale": "PACKET-WRITER-PRODUCTION-OWNER-01 was not evaluated for owner selection (out of scope, per instruction) and is blocked from proceeding regardless, since the canonical key-builder it would need to consume (event -> WorkspaceSourceBindingV1 -> SemanticPacketWriteAdmissionV1 -> canonical PacketIdentity builder -> persistAdmittedSemanticPacketEmbedding()) does not yet exist in collision-safe form.",
+  "tests": {
+    "added": [],
+    "note": "No new tests added this pass -- the gate's own instruction was to add pure/static tests ONLY if needed to prove existing contract behavior, and the existing packet-key-dominant-scheme.spec.ts (7 tests, added in the prior gate) already proves the formula's single-argument, revision-blind, rename-unstable behavior that this lifecycle analysis depends on. Re-running it here as regression confirmation."
+  },
+  "testsRerun": {
+    "command": "npx vitest run src/lib/server/atlas/identity/packet-key-dominant-scheme.spec.ts src/lib/server/atlas/identity/compute-packet-key-containment.spec.ts",
+    "result": "9/9 PASS"
+  },
+  "openSpecValidation": {
+    "manual-migration-reconciliation": "run after write, before commit",
+    "parent-atlas-retrieval-lineage-dag-convergence": "NOT_UPDATED_THIS_PASS -- this gate's findings are filed under manual-migration-reconciliation only, matching the prior two packet-key gates; no edit made to the retrieval-lineage-dag-convergence tasks.md, so its own validation is unaffected and not re-run"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphifyRuns": 0
+  },
+  "scopeLimits": [
+    "Read-only: no packet_key rewritten, no aliases inserted, no writers changed.",
+    "No shared canonical key-builder module extracted or created.",
+    "S01-08K NOT applied, NOT started.",
+    "PACKET-WRITER-PRODUCTION-OWNER-01 NOT selected or wired.",
+    "Consumer trace is bounded/representative (7 runtime files across every named category), not an exhaustive census of every packet_key reference in the repo.",
+    "Normalization behavior of source_ref across writers not audited.",
+    "The 'pkt_' underscore prefix found in qdrant-packet-projection.ts's isValidPacketKey() flagged but not investigated further."
+  ]
+}
