@@ -193,10 +193,40 @@
 
 ## 5. Cleanup (Duplication Prevention)
 
-- [ ] 5.1 Draft an archival plan (per this repo's archive-not-delete convention, with a
+- [x] 5.1 Draft an archival plan (per this repo's archive-not-delete convention, with a
       manifest entry) for the six empty ontology-shaped tables identified in task 1.6 — archive
       only, never delete, and only after confirming zero live callers via the same
-      caller-check discipline used elsewhere in this repo's audits.
+      caller-check discipline used elsewhere in this repo's audits. **Draft only — no archive
+      manifest entry written, no table touched.** Re-ran the caller check per-table (grep across
+      `sveltekit-frontend/src`, `sveltekit-frontend/scripts`, `scripts`, `python`, plus live row
+      counts) rather than reusing the original six-table list unchanged, and it changed the
+      outcome for 3 of the 6:
+      - **EXCLUDE, confirmed live callers (do not archive)**: `atlas_ontology_concepts`,
+        `atlas_ontology_relations` — read by the live, healthy `miniforge-nlp-sidecar` OAK
+        kernel's `AtlasPostgresOntologyAdapter` (task 7.1 finding, `curl :8095/oak/health`
+        confirmed live). `concept_records` — has a genuine production writer,
+        `src/lib/server/telemetry/retrieval-recorder.ts` (`UPDATE concept_records ...`), plus a
+        real Drizzle schema (`src/lib/server/db/schema/concept-records.ts`); still 0 rows live
+        (verified via `docker exec legal-ai-postgres psql ... count(*)`), meaning the writer
+        exists and is wired but its call path apparently never fires in current traffic — that
+        is a live-code question for whoever owns `retrieval-recorder.ts`, not an archival
+        candidate.
+      - **ARCHIVE-CANDIDATE, best confidence**: `atlas_ontology_tuples` — every repo-wide match
+        is a code comment/docstring reference (`atlas-knowledge-envelope.ts`,
+        `ontology-fanout-authority-v1.ts`), zero real SQL read/write against it found; 0 rows
+        live.
+      - **UNCLEAR, needs a deeper per-table pass before archiving (not resolved here)**:
+        `atlas_concepts` — has a real writer (`scripts/atlas/phase-8a-concept-extraction.mts`,
+        creates the table + `INSERT`s) and a verifier (`verify-used-concept-edges.mjs`), neither
+        referenced by any `npm run` script in either `package.json` — likely dormant but not
+        confirmed dead by this pass. `registry_ontology_tuples` — has a real writer
+        (`scripts/atlas/materialize-registry-ontology-tuples.mts`), same unresolved
+        wired-elsewhere-or-dead question. Both 0 rows live.
+      **Conclusion**: the archival plan this task asked for narrows to exactly ONE confident
+      candidate (`atlas_ontology_tuples`) plus two that need one more verification pass before
+      a plan could safely include them. Writing a manifest entry now would have been premature
+      for 5 of the 6 original candidates — recording the corrected classification here instead
+      of drafting a plan against the stale six-table list.
 
 ## 6. Verification
 
