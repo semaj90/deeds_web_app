@@ -18,11 +18,17 @@ import crypto from 'node:crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 
-export const LLM_BASE_URL =
+/** Normalize OpenAI API URLs to the origin/base expected by the `/v1/*` owners below. */
+export function normalizeLlamaServerBaseUrlV1(value: string): string {
+  return value.trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
+}
+
+export const LLM_BASE_URL = normalizeLlamaServerBaseUrlV1(
   ENV.LLAMA_SERVER_URL ??
   ENV.TURBOQUANT_URL ??
   ENV.TURBOQUANT_BASE_URL ??
-  'http://127.0.0.1:8090';
+  'http://127.0.0.1:8090'
+);
 
 const resolvedModelPath = ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? null;
 

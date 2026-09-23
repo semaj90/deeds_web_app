@@ -1,0 +1,105 @@
+{
+  "schema": "atlas.inference-facade-read-only-live-replay.v1",
+  "generatedAt": "2026-09-23T16:06:31.969Z",
+  "entrypoint": "runChatCompletion (existing OpenAI-compatible application facade)",
+  "legacyCompatibilityModule": null,
+  "runtimeResolver": "resolveLlamaInferenceTarget → resolveLoadedLlamaModel → GET /v1/models",
+  "reportedModelIds": [
+    "ornith-1.5-9b"
+  ],
+  "reportedModelId": "ornith-1.5-9b",
+  "resolvedModelId": "ornith-1.5-9b",
+  "outboundModelId": "ornith-1.5-9b",
+  "sideEffectInventory": [
+    {
+      "category": "PURE_READ",
+      "path": "GET /v1/models through the shared runtime resolver"
+    },
+    {
+      "category": "IN_MEMORY_EPHEMERAL",
+      "path": "bounded prompt/response held only for this call"
+    },
+    {
+      "category": "CACHE_READ",
+      "path": "none; replay branch precedes scenario and exact-cache lookup"
+    },
+    {
+      "category": "CACHE_WRITE",
+      "path": "none; all cache writers are bypassed"
+    },
+    {
+      "category": "POSTGRES_WRITE",
+      "path": "none; synthesis persistence path is bypassed"
+    },
+    {
+      "category": "VALKEY_WRITE",
+      "path": "none; facade and stream cache paths are bypassed"
+    },
+    {
+      "category": "USER_MEMORY_WRITE",
+      "path": "none; Engram persistence path is bypassed"
+    },
+    {
+      "category": "CONVERSATION_WRITE",
+      "path": "none; no conversation persistence is called"
+    },
+    {
+      "category": "METRICS_DURABLE_WRITE",
+      "path": "none; intent and ACE metric writers are bypassed"
+    },
+    {
+      "category": "FILESYSTEM_WRITE",
+      "path": "only this explicit proof receipt"
+    },
+    {
+      "category": "OTHER_SIDE_EFFECT",
+      "path": "llama-server inference compute; cache_prompt=false"
+    }
+  ],
+  "replayPolicy": {
+    "schema": "atlas.inference-replay-policy.v1",
+    "cacheReadAllowed": false,
+    "cacheWriteAllowed": false,
+    "userMemoryWriteAllowed": false,
+    "conversationWriteAllowed": false,
+    "postgresWriteAllowed": false,
+    "valkeyWriteAllowed": false,
+    "qdrantWriteAllowed": false,
+    "neo4jWriteAllowed": false,
+    "graphifyRunAllowed": false,
+    "retrievalAllowed": false,
+    "toolExecutionAllowed": false,
+    "durableMetricsWriteAllowed": false
+  },
+  "focusedTests": {
+    "facadeMocked": "PASS: tests/openai-facade.spec.ts read-only replay case",
+    "streamCacheBypass": "PASS: tests/openai-facade.spec.ts stream-mode replay case"
+  },
+  "liveReplay": {
+    "attempted": true,
+    "status": 200,
+    "requestId": "inference-replay-9453620f-d85d-472f-9516-4cc910bb374f",
+    "streaming": false,
+    "finishReason": "stop",
+    "promptTokens": 17,
+    "completionTokens": 2
+  },
+  "readbackProof": {
+    "result": "NO_WRITES_ATTRIBUTABLE_TO_REPLAY",
+    "basis": "control-flow proof: fail-closed replay branch skips all durable writer paths; mocked tests assert cache/retrieval writers are not called; prompt caching disabled at llama-server",
+    "durableStoreSnapshot": "not taken; no durable writer is reachable from this replay branch, so the claim is scoped to writes attributable to this request, not unrelated concurrent activity",
+    "globalConcurrentWritesExcluded": true
+  },
+  "responseModelNote": "The facade response model label is normalized from the resolved target; the receipt does not claim to capture a distinct raw model field from the llama-server response body.",
+  "result": "INFERENCE_FACADE_READ_ONLY_LIVE_REPLAY_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "valkey": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "userMemory": 0,
+    "conversationPersistence": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0
+  }
+}

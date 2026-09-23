@@ -36,7 +36,19 @@ const mocks = vi.hoisted(() => ({
   lookupScenario: vi.fn(),
   storeScenario: vi.fn(),
   buildAceRevisionedExactAnswerCacheKeyV1: vi.fn(),
+  resolveLlamaInferenceTarget: vi.fn(),
+  getCachedStreamResponse: vi.fn(),
+  storeCachedStreamResponse: vi.fn(),
+  streamCachedResponse: vi.fn(),
 }));
+
+vi.mock('$lib/server/llm/runtime-contract.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('$lib/server/llm/runtime-contract.js')>();
+  return {
+    ...actual,
+    resolveLlamaInferenceTarget: mocks.resolveLlamaInferenceTarget,
+  };
+});
 
 vi.mock('$lib/server/ai/turbovec-ingest-sidecar.js', () => ({
   runTurbovecPreIngestion: mocks.runTurbovecPreIngestion,
@@ -117,6 +129,12 @@ vi.mock('$lib/server/ai/scenario-cache.js', () => ({
   storeScenario: mocks.storeScenario,
 }));
 
+vi.mock('$lib/server/ai/cached-stream.js', () => ({
+  getCachedStreamResponse: mocks.getCachedStreamResponse,
+  storeCachedStreamResponse: mocks.storeCachedStreamResponse,
+  streamCachedResponse: mocks.streamCachedResponse,
+}));
+
 describe('openai-facade — runChatCompletion', () => {
   beforeEach(() => {
     mocks.assembleACEContext.mockReset();
@@ -128,6 +146,23 @@ describe('openai-facade — runChatCompletion', () => {
     mocks.runGemma4Agent.mockReset();
     mocks.runTurbovecPreIngestion.mockReset();
     mocks.buildAceRevisionedExactAnswerCacheKeyV1.mockReset();
+    mocks.resolveLlamaInferenceTarget.mockReset();
+    mocks.resolveLlamaInferenceTarget.mockResolvedValue({
+      baseUrl: 'http://llama.test',
+      model: 'ornith-1.5-fixture',
+      configuredModel: EXPECTED_INTERNAL_MODEL,
+      modelSource: 'llama-server-loaded',
+      selectionPolicy: 'LOADED_ACTIVE',
+      selectionReceiptChecksum: 'fixture-checksum',
+    });
+    mocks.getCachedStreamResponse.mockReset();
+    mocks.getCachedStreamResponse.mockResolvedValue(null);
+    mocks.storeCachedStreamResponse.mockReset();
+    mocks.storeCachedStreamResponse.mockResolvedValue(undefined);
+    mocks.streamCachedResponse.mockReset();
+    mocks.streamCachedResponse.mockImplementation(async function* (cached: any) {
+      yield { content: typeof cached === 'string' ? cached : cached?.content ?? '', done: true };
+    });
     mocks.recordRagAnswer.mockResolvedValue(undefined);
     mocks.buildDevContextPlan.mockResolvedValue(undefined);
     // Default: non-coding prompts; tests that want coding override this
@@ -146,6 +181,90 @@ describe('openai-facade — runChatCompletion', () => {
     mocks.buildAceRevisionedExactAnswerCacheKeyV1.mockImplementation(
       (input: any) => `ace:completion:v2:mock:${JSON.stringify(input)}`,
     );
+  });
+
+  it('runs an explicitly read-only replay through the facade before any cache, retrieval, or memory path', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      model: 'ornith-1.5-fixture',
+      choices: [{ message: { content: 'bounded response' }, finish_reason: 'length' }],
+      usage: { prompt_tokens: 5, completion_tokens: 3 },
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      const {
+        runChatCompletion,
+        INFERENCE_READ_ONLY_REPLAY_POLICY_V1,
+      } = await import('$lib/server/ai/openai-facade.js');
+      let replayMeta: Record<string, unknown> | undefined;
+      const response = await runChatCompletion({
+        model: 'ui-label-not-runtime-identity',
+        messages: [{ role: 'user', content: 'Reply with OK.' }],
+        max_tokens: 16,
+        temperature: 0,
+        stream: false,
+        use_mcp: false,
+      }, {
+        replayPolicy: INFERENCE_READ_ONLY_REPLAY_POLICY_V1,
+        onReplayResult: (value) => { replayMeta = value; },
+      });
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock.mock.calls[0]?.[0]).toBe('http://llama.test/v1/chat/completions');
+      const sent = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+      expect(sent.model).toBe('ornith-1.5-fixture');
+      expect(sent).toMatchObject({ max_tokens: 16, stream: false, cache_prompt: false });
+      expect(response.model).toBe('ornith-1.5-fixture');
+      expect(response.choices[0]?.message.content).toBe('bounded response');
+      expect(replayMeta).toMatchObject({
+        reportedModelId: 'ornith-1.5-fixture',
+        resolvedModelId: 'ornith-1.5-fixture',
+        outboundModelId: 'ornith-1.5-fixture',
+        responseStatus: 200,
+        finishReason: 'length',
+      });
+      expect(mocks.lookupScenario).not.toHaveBeenCalled();
+      expect(mocks.getExactMatchCache).not.toHaveBeenCalled();
+      expect(mocks.setExactMatchCache).not.toHaveBeenCalled();
+      expect(mocks.assembleACEContext).not.toHaveBeenCalled();
+      expect(mocks.storeScenario).not.toHaveBeenCalled();
+      expect(mocks.recordRagAnswer).not.toHaveBeenCalled();
+      expect(mocks.bifrostChat).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('keeps stream-mode replay outside both stream-cache read and write paths', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      choices: [{ message: { content: 'stream replay' }, finish_reason: 'stop' }],
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      const {
+        INFERENCE_READ_ONLY_REPLAY_POLICY_V1,
+      } = await import('$lib/server/ai/openai-facade.js');
+      const { streamFromProviderAndCache } = await import('$lib/server/ai/streaming-cache.js');
+      const chunks = [];
+      for await (const chunk of streamFromProviderAndCache({
+        model: 'ui-label-not-runtime-identity',
+        messages: [{ role: 'user', content: 'Reply with OK.' }],
+        max_tokens: 16,
+        temperature: 0,
+        stream: true,
+        use_mcp: false,
+      }, { replayPolicy: INFERENCE_READ_ONLY_REPLAY_POLICY_V1 }, { chunkSize: 4 })) {
+        chunks.push(chunk.content);
+      }
+      expect(chunks.join('')).toBe('stream replay');
+      expect(mocks.getCachedStreamResponse).not.toHaveBeenCalled();
+      expect(mocks.storeCachedStreamResponse).not.toHaveBeenCalled();
+      expect(mocks.lookupScenario).not.toHaveBeenCalled();
+      expect(mocks.storeScenario).not.toHaveBeenCalled();
+      expect(mocks.setExactMatchCache).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('extracts last user message as query, earlier messages as history', async () => {
@@ -691,6 +810,14 @@ describe('openai-facade — POST /api/v1/chat/completions handler', () => {
     mocks.bifrostChat.mockReset();
     mocks.getExactMatchCache.mockReset();
     mocks.getExactMatchCache.mockResolvedValue(null);
+    mocks.getCachedStreamResponse.mockReset();
+    mocks.getCachedStreamResponse.mockResolvedValue(null);
+    mocks.storeCachedStreamResponse.mockReset();
+    mocks.storeCachedStreamResponse.mockResolvedValue(undefined);
+    mocks.streamCachedResponse.mockReset();
+    mocks.streamCachedResponse.mockImplementation(async function* (cached: any) {
+      yield { content: typeof cached === 'string' ? cached : cached?.content ?? '', done: true };
+    });
     mocks.setExactMatchCache.mockReset();
     mocks.setExactMatchCache.mockResolvedValue(undefined);
     mocks.turboQuantChat.mockReset();

@@ -1,6 +1,8 @@
 import {
   runChatCompletion,
   type RevisionedExactAnswerCacheOptionsV1,
+  type InferenceReplayPolicyV1,
+  type InferenceReplayResultV1,
 } from '$lib/server/ai/openai-facade.js';
 import type { OpenAIChatCompletionRequest } from '$lib/server/ai/openai-types.js';
 import {
@@ -26,6 +28,10 @@ export interface StreamProviderOptions {
    * deliberately bypassed.
    */
   revisionedExactAnswerCache?: RevisionedExactAnswerCacheOptionsV1;
+  /** Internal-only; bypasses both read and write sides of the stream cache. */
+  replayPolicy?: InferenceReplayPolicyV1;
+  /** Metadata-only replay observer; never receives prompt or response text. */
+  onReplayResult?: (result: Omit<InferenceReplayResultV1, 'response'>) => void;
 }
 
 export interface OpenAISseChunk {
@@ -95,7 +101,7 @@ export async function* streamFromProviderAndCache(
   // A strict V2 handoff must never be shadowed by the legacy message-only
   // cache. runChatCompletion computes the rendered-request and generation
   // signatures and performs the revision-qualified exact-answer lookup.
-  if (!opts.revisionedExactAnswerCache) {
+  if (!opts.revisionedExactAnswerCache && !opts.replayPolicy) {
     const cached = await getCachedStreamResponse(normalizedMessages, cacheOptions);
     if (cached !== null) {
       for await (const chunk of streamCachedResponse(cached, cacheOptions)) {
@@ -112,7 +118,7 @@ export async function* streamFromProviderAndCache(
   // cache inside runChatCompletion. Do not also write the legacy
   // message-only stream cache: that would create an unqualified alias that
   // can be reused after the admitted source or model identity changes.
-  if (!opts.revisionedExactAnswerCache) {
+  if (!opts.revisionedExactAnswerCache && !opts.replayPolicy) {
     await storeCachedStreamResponse(normalizedMessages, content, cacheOptions);
   }
 
