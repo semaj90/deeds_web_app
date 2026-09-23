@@ -265,3 +265,15 @@ def parse_summary_claim_validation_v1(payload: dict[str, Any]) -> SummaryClaimVa
 
 def dump_summary_claim_validation_v1(model: SummaryClaimValidation) -> dict[str, Any]:
     return _plain(model)
+
+
+# V1-suffixed names mirror the TypeScript exports (TechnicalTokenSlotV1Schema, ...); the unsuffixed classes stay for existing callers.
+ChunkByteSpanV1 = ChunkByteSpan
+TechnicalTokenSlotV1 = TechnicalSlot
+NumericSlotV1 = NumericSlot
+VersionSlotV1 = VersionSlot
+SourceSpanSlotV1 = SourceSpanSlot
+SemanticSlotV1 = SemanticSlot
+OntologyAssertionV1 = OntologyAssertion
+OntologySlotV1 = OntologySlot
+ClaimDecisionV1 = ClaimDecision
