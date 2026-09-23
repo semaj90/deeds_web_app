@@ -1,10 +1,11 @@
 // @vitest-environment node
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
 import {
-	buildSummaryClaimValidationV1, pendingSummaryClaimValidationV1, SummaryClaimValidationV1Schema, SUMMARY_CLAIM_VALIDATION_SCHEMA,
+	buildSummaryClaimValidationV1, computeSummaryClaimChecksumV1, pendingSummaryClaimValidationV1, SummaryClaimValidationV1Schema, SUMMARY_CLAIM_VALIDATION_SCHEMA, verifySummaryClaimByteSpanV1,
 	type SummaryClaimValidationInputV1
 } from './summary-claim-validation-v1.js';
 
@@ -25,13 +26,14 @@ const base = {
 const populated: SummaryClaimValidationInputV1 = {
 	...base,
 	schema: SUMMARY_CLAIM_VALIDATION_SCHEMA,
-	technical: { status: 'PASS', technicalTokens: ['HNSW'], exactTokens: ['HNSW'], missingTokens: [] },
-	numeric: { status: 'PASS', numbers: [], missingNumbers: [] },
-	version: { status: 'PASS', versions: [], missingVersions: [] },
+	technical: { status: 'PASS', sourceTokens: ['HNSW'], claimTokens: ['HNSW'], missingTechnicalTokens: [], unexpectedTechnicalTokens: [] },
+	numeric: { status: 'PASS', sourceValues: [], claimValues: [], unsupportedValues: [] },
+	version: { status: 'PASS', sourceVersions: [], claimVersions: [], unsupportedVersions: [] },
 	sourceSpan: { status: 'NO_CLAIMED_SPAN', spans: [] },
-	semantic: { status: 'JUDGED', verdict: 'PARTIALLY_SUPPORTED', citedSpans: [], unsupportedFragment: 'low-selectivity', judgeModelId: 'ornith-1.5-9b', judgeModelRevision: 'llama-server:8090/props', judgePromptRevision: 'summary-claim-judge-prompt-v0', independenceClass: 'SAME_MODEL_SEMANTIC_JUDGE' },
+	semantic: { status: 'NOT_RUN', verdict: null, citedSpans: [], unsupportedFragment: null, judgeModelId: null, judgeModelRevision: null, judgePromptRevision: null, independenceClass: null },
 	ontology: { status: 'NOT_APPLICABLE', kernelRevision: null, assertions: [] },
 	result: { decision: 'PENDING', escalationRevision: null },
+	resolutionLayer: 'NOT_RESOLVED',
 	canonicalAuthority: false
 };
 
@@ -66,23 +68,22 @@ describe('SummaryClaimValidationV1 (VAL-01, contract only)', () => {
 		expect(SummaryClaimValidationV1Schema.safeParse({ ...good, canonicalAuthority: true }).success).toBe(false);
 	});
 
-	it('cannot decide while any validator slot is NOT_RUN, and a decision needs the VAL-09 revision', () => {
-		expect(() => buildSummaryClaimValidationV1({ ...populated, result: { decision: 'ADMIT', escalationRevision: 'val-09' }, ontology: { status: 'NOT_RUN', kernelRevision: null, assertions: [] } })).toThrow();
-		expect(() => buildSummaryClaimValidationV1({ ...populated, result: { decision: 'REVIEW', escalationRevision: null } })).toThrow();
-		expect(() => buildSummaryClaimValidationV1({ ...populated, result: { decision: 'PENDING', escalationRevision: 'val-09' } })).toThrow();
-		expect(buildSummaryClaimValidationV1({ ...populated, result: { decision: 'REVIEW', escalationRevision: 'val-09' } }).result.decision).toBe('REVIEW');
+	it('accepts structurally valid result values without implementing the VAL-09 decision algorithm', () => {
+		const result = { decision: 'ADMIT', escalationRevision: null } as const;
+		const pendingWithUnrunSlots = pendingSummaryClaimValidationV1(base);
+		expect(buildSummaryClaimValidationV1({ ...populated, result, technical: pendingWithUnrunSlots.technical }).result.decision).toBe('ADMIT');
+		expect(buildSummaryClaimValidationV1({ ...populated, result: { decision: 'REVIEW', escalationRevision: null } }).result.decision).toBe('REVIEW');
 	});
 
-	it('ADMIT is structurally impossible with a failed slot, an UNSUPPORTED verdict or unverified spans', () => {
-		const admit = { decision: 'ADMIT', escalationRevision: 'val-09' } as const;
-		expect(() => buildSummaryClaimValidationV1({ ...populated, result: admit, technical: { status: 'FAIL', technicalTokens: ['x.y'], exactTokens: [], missingTokens: ['x.y'] } })).toThrow();
-		expect(() => buildSummaryClaimValidationV1({ ...populated, result: admit, semantic: { ...populated.semantic, verdict: 'UNSUPPORTED' } })).toThrow();
-		expect(() => buildSummaryClaimValidationV1({ ...populated, result: admit, sourceSpan: { status: 'UNVERIFIED', spans: [] } })).toThrow();
-		expect(buildSummaryClaimValidationV1({ ...populated, result: admit, semantic: { ...populated.semantic, verdict: 'SUPPORTED', unsupportedFragment: null } }).result.decision).toBe('ADMIT');
+	it('accepts the full semantic verdict taxonomy without executing a judge', () => {
+		const schemaOnlyJudgeShape = { ...populated.semantic, status: 'JUDGED' as const, verdict: 'UNKNOWN' as const, judgeModelId: 'fixture-only', judgeModelRevision: 'fixture-model:r1', judgePromptRevision: 'fixture-prompt:r1', independenceClass: 'SAME_MODEL_SEMANTIC_JUDGE' as const };
+		for (const verdict of ['SUPPORTED', 'SUPPORTED_PARAPHRASE', 'SUPPORTED_WITH_OMISSION', 'PARTIALLY_SUPPORTED', 'UNSUPPORTED_CLAIM', 'CONTRADICTED', 'INSUFFICIENT_EVIDENCE', 'UNKNOWN'] as const) {
+			expect(buildSummaryClaimValidationV1({ ...populated, semantic: { ...schemaOnlyJudgeShape, verdict } }).semantic.verdict).toBe(verdict);
+		}
 	});
 
 	it('semantic slot: a verdict only when JUDGED, judge provenance required, NOT_RUN must be empty', () => {
-		const sem = populated.semantic;
+		const sem = { ...populated.semantic, status: 'JUDGED' as const, verdict: 'SUPPORTED' as const, citedSpans: [], unsupportedFragment: null, judgeModelId: 'fixture-only', judgeModelRevision: 'fixture-model:r1', judgePromptRevision: 'fixture-prompt:r1', independenceClass: 'SAME_MODEL_SEMANTIC_JUDGE' as const };
 		expect(() => buildSummaryClaimValidationV1({ ...populated, semantic: { ...sem, status: 'NOT_RUN' } })).toThrow();
 		expect(() => buildSummaryClaimValidationV1({ ...populated, semantic: { ...sem, judgeModelId: null } })).toThrow();
 		expect(() => buildSummaryClaimValidationV1({ ...populated, semantic: { ...sem, verdict: null } })).toThrow();
@@ -91,17 +92,50 @@ describe('SummaryClaimValidationV1 (VAL-01, contract only)', () => {
 
 	it('ontology slot applies to typed assertions only and needs a kernel revision when run', () => {
 		expect(() => buildSummaryClaimValidationV1({ ...populated, ontology: { status: 'PASS', kernelRevision: null, assertions: [] } })).toThrow();
-		expect(() => buildSummaryClaimValidationV1({ ...populated, ontology: { status: 'NOT_APPLICABLE', kernelRevision: null, assertions: [{ subject: 'a', predicate: 'IS_A', object: 'b', oakStatus: 'VALID' }] } })).toThrow();
-		expect(buildSummaryClaimValidationV1({ ...populated, ontology: { status: 'PASS', kernelRevision: 'oak-kernel:r1', assertions: [{ subject: 'hnsw.iterative_scan', predicate: 'PART_OF', object: 'pgvector', oakStatus: 'VALID' }] } }).ontology.status).toBe('PASS');
+		expect(() => buildSummaryClaimValidationV1({ ...populated, ontology: { status: 'NOT_APPLICABLE', kernelRevision: null, assertions: [{ subject: 'a', predicate: 'IS_A', object: 'b', status: 'SUPPORTED', evidenceRef: 'span:0-1' }] } })).toThrow();
+		expect(buildSummaryClaimValidationV1({ ...populated, ontology: { status: 'PASS', kernelRevision: 'oak-kernel:r1', assertions: [{ subject: 'hnsw.iterative_scan', predicate: 'PART_OF', object: 'pgvector', status: 'SUPPORTED', evidenceRef: 'span:10-20' }] } }).ontology.status).toBe('PASS');
 	});
 
 	it('spans are chunk-relative, non-empty ranges with a checksum', () => {
-		const span = { startByte: 10, endByte: 20, spanChecksum: sum('bytes') };
+		const span = { startByte: 10, endByte: 20, textChecksum: sum('bytes') };
 		expect(buildSummaryClaimValidationV1({ ...populated, sourceSpan: { status: 'VERIFIED', spans: [span] } }).sourceSpan.spans[0]).toEqual(span);
 		expect(() => buildSummaryClaimValidationV1({ ...populated, sourceSpan: { status: 'VERIFIED', spans: [{ ...span, endByte: 10 }] } })).toThrow();
 	});
 
+	it('VAL-05 verifies exact UTF-8 byte spans, revision binding and checksums independently', () => {
+		const chunkEvidenceRevision = base.chunkEvidenceRevision;
+		const bytes = Buffer.from('alpha 🧭 beta', 'utf8');
+		const startByte = Buffer.from('alpha ', 'utf8').byteLength;
+		const selected = Buffer.from('🧭', 'utf8');
+		const span = { startByte, endByte: startByte + selected.byteLength, textChecksum: createHash('sha256').update(selected).digest('hex') };
+		expect(verifySummaryClaimByteSpanV1({ canonicalChunkEvidenceRevision: chunkEvidenceRevision, claimedChunkEvidenceRevision: chunkEvidenceRevision, canonicalChunkBytes: bytes, span })).toEqual({ verified: true, status: 'VERIFIED', reason: 'EXACT' });
+		expect(verifySummaryClaimByteSpanV1({ canonicalChunkEvidenceRevision: chunkEvidenceRevision, claimedChunkEvidenceRevision: `sha256:${'0'.repeat(64)}`, canonicalChunkBytes: bytes, span }).reason).toBe('REVISION_MISMATCH');
+		expect(verifySummaryClaimByteSpanV1({ canonicalChunkEvidenceRevision: chunkEvidenceRevision, claimedChunkEvidenceRevision: chunkEvidenceRevision, canonicalChunkBytes: bytes, span: { ...span, endByte: bytes.byteLength + 1 } }).reason).toBe('OUT_OF_BOUNDS');
+		expect(verifySummaryClaimByteSpanV1({ canonicalChunkEvidenceRevision: chunkEvidenceRevision, claimedChunkEvidenceRevision: chunkEvidenceRevision, canonicalChunkBytes: bytes, span: { ...span, textChecksum: sum('different') } }).reason).toBe('CHECKSUM_MISMATCH');
+		expect(verifySummaryClaimByteSpanV1({ canonicalChunkEvidenceRevision: chunkEvidenceRevision, claimedChunkEvidenceRevision: chunkEvidenceRevision, canonicalChunkBytes: bytes, span: { ...span, startByte: startByte + 1, endByte: startByte + 3 } }).reason).toBe('INVALID_UTF8');
+	});
+
 	it('requires chunk-grain identity (sha256: chunk evidence revision, not a bare hash)', () => {
 		expect(() => buildSummaryClaimValidationV1({ ...populated, chunkEvidenceRevision: 'b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a' })).toThrow();
+	});
+
+	it('claim checksum is canonical and independent of execution-local ordinal', () => {
+		const claimChecksum = computeSummaryClaimChecksumV1(populated.claimText);
+		const first = buildSummaryClaimValidationV1(populated);
+		const second = buildSummaryClaimValidationV1({ ...populated, claimOrdinal: 7 });
+		expect(first.claimChecksum).toBe(claimChecksum);
+		expect(second.claimChecksum).toBe(claimChecksum);
+		expect(computeSummaryClaimChecksumV1(`${populated.claimText} Changed.`)).not.toBe(claimChecksum);
+		expect(first.resolutionLayer).toBe('NOT_RESOLVED');
+		const left = { claim: { text: populated.claimText, kind: 'FACT' }, lineage: { chunkId: base.chunkId, ordinal: 1 } };
+		const right = { lineage: { ordinal: 1, chunkId: base.chunkId }, claim: { kind: 'FACT', text: populated.claimText } };
+		expect(canonicalSha256V1(left)).toBe(canonicalSha256V1(right));
+	});
+
+	it('rejects empty identity, placeholder revision, negative ordinal and bad checksum fields', () => {
+		expect(() => buildSummaryClaimValidationV1({ ...populated, chunkId: '' })).toThrow();
+		expect(() => buildSummaryClaimValidationV1({ ...populated, validatorRevision: 'latest' })).toThrow();
+		expect(() => buildSummaryClaimValidationV1({ ...populated, claimOrdinal: -1 })).toThrow();
+		expect(SummaryClaimValidationV1Schema.safeParse({ ...buildSummaryClaimValidationV1(populated), claimChecksum: 'not-a-sha256' }).success).toBe(false);
 	});
 });

@@ -8,21 +8,25 @@
     "summaryOutputChecksum": "099b9e1d0ea636413f67312877aab4a7d1bcfc0c0fbf61936ab68630bfe8b872",
     "claimOrdinal": 0,
     "claimText": "Queries with low-selectivity filters can return fewer results under HNSW.",
+    "claimChecksum": "73b79b05b4348ea12c084ff248bd27651504ded712ab175e47790fc19ed7600f",
     "technical": {
       "status": "NOT_RUN",
-      "technicalTokens": [],
-      "exactTokens": [],
-      "missingTokens": []
+      "sourceTokens": [],
+      "claimTokens": [],
+      "missingTechnicalTokens": [],
+      "unexpectedTechnicalTokens": []
     },
     "numeric": {
       "status": "NOT_RUN",
-      "numbers": [],
-      "missingNumbers": []
+      "sourceValues": [],
+      "claimValues": [],
+      "unsupportedValues": []
     },
     "version": {
       "status": "NOT_RUN",
-      "versions": [],
-      "missingVersions": []
+      "sourceVersions": [],
+      "claimVersions": [],
+      "unsupportedVersions": []
     },
     "sourceSpan": {
       "status": "NOT_RUN",
@@ -47,10 +51,11 @@
       "decision": "PENDING",
       "escalationRevision": null
     },
+    "resolutionLayer": "NOT_RESOLVED",
     "validatorRevision": "summary-claim-validator:val-01-contract-only",
     "canonicalAuthority": false,
     "validationId": "scv:9152dcb883cdb48769fbecb3992089a8dedacae8aea483e5a98ab1ed38f46a43",
-    "validationChecksum": "328772524524532502d87436a56100106184bc3646973a897e85640e5ea35622"
+    "validationChecksum": "f49a16293312e805c309414b68d99674540435ece80ecb5a1347ecb84aad0c74"
   },
   "populated": {
     "schema": "atlas.summary-claim-validation.v1",
@@ -61,39 +66,43 @@
     "summaryOutputChecksum": "099b9e1d0ea636413f67312877aab4a7d1bcfc0c0fbf61936ab68630bfe8b872",
     "claimOrdinal": 0,
     "claimText": "Queries with low-selectivity filters can return fewer results under HNSW.",
+    "claimChecksum": "73b79b05b4348ea12c084ff248bd27651504ded712ab175e47790fc19ed7600f",
     "technical": {
       "status": "PASS",
-      "technicalTokens": [
+      "sourceTokens": [
         "HNSW"
       ],
-      "exactTokens": [
+      "claimTokens": [
         "HNSW"
       ],
-      "missingTokens": []
+      "missingTechnicalTokens": [],
+      "unexpectedTechnicalTokens": []
     },
     "numeric": {
       "status": "PASS",
-      "numbers": [],
-      "missingNumbers": []
+      "sourceValues": [],
+      "claimValues": [],
+      "unsupportedValues": []
     },
     "version": {
       "status": "PASS",
-      "versions": [],
-      "missingVersions": []
+      "sourceVersions": [],
+      "claimVersions": [],
+      "unsupportedVersions": []
     },
     "sourceSpan": {
       "status": "NO_CLAIMED_SPAN",
       "spans": []
     },
     "semantic": {
-      "status": "JUDGED",
-      "verdict": "PARTIALLY_SUPPORTED",
+      "status": "NOT_RUN",
+      "verdict": null,
       "citedSpans": [],
-      "unsupportedFragment": "low-selectivity",
-      "judgeModelId": "ornith-1.5-9b",
-      "judgeModelRevision": "llama-server:8090/props",
-      "judgePromptRevision": "summary-claim-judge-prompt-v0",
-      "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      "unsupportedFragment": null,
+      "judgeModelId": null,
+      "judgeModelRevision": null,
+      "judgePromptRevision": null,
+      "independenceClass": null
     },
     "ontology": {
       "status": "NOT_APPLICABLE",
@@ -104,9 +113,10 @@
       "decision": "PENDING",
       "escalationRevision": null
     },
+    "resolutionLayer": "NOT_RESOLVED",
     "validatorRevision": "summary-claim-validator:val-01-contract-only",
     "canonicalAuthority": false,
     "validationId": "scv:9152dcb883cdb48769fbecb3992089a8dedacae8aea483e5a98ab1ed38f46a43",
-    "validationChecksum": "b5e8f18308485eb165c037ce20b91074637315dcfb0744d106dbeedda32998ca"
+    "validationChecksum": "6abe5f57b315e7019a6ae1872595eb5218ef8a0501c80e0e566b7cbaf3ecfc59"
   }
 }
