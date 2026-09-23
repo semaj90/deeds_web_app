@@ -17,8 +17,9 @@
  * Qdrant, Valkey, Neo4j, or Graphify writes occur.
  */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { POST } from './+server.js';
+import { TOOLS } from '$lib/server/services/knowledge-search/ACPToolRegistry.js';
 
 function makeEvent(body: unknown, user: { id: string; role: string } | null) {
 	return {
@@ -96,5 +97,46 @@ describe('A2A-04 dispatch-boundary negative control: /api/acp/execute', () => {
 		expect(res.status).toBe(200);
 		expect(data.success).toBe(false);
 		expect(typeof data.error).toBe('string');
+	});
+
+	it('SPY-BACKED: handlerInvocationCount > 0 for an unadvertised mutating tool with no authorization gate (the defect, proven with a call-count assertion, not just response-shape inference)', async () => {
+		// Spies on the REAL handler function in place (no vi.mock module
+		// replacement, no behavior change) so the assertion is a direct
+		// invocation count rather than an inference from response shape.
+		const spy = vi.spyOn(TOOLS['atlas.kanban.claim'], 'handler');
+		try {
+			const res = await POST(
+				makeEvent(
+					{ tool: 'atlas.kanban.claim', args: { taskId: 'a2a-04-spy-probe' }, dryRun: true },
+					{ id: 'viewer-1', role: 'viewer' }
+				)
+			);
+			expect(res.status).toBe(200);
+			// This is the exact assertion the audit requires as insufficient-by-itself
+			// evidence to be replaced with: not "response is 200", but a real
+			// handler-invocation count. A correctly-authorized system would show
+			// spy.mock.calls.length === 0 here (rejected before dispatch). It does not.
+			expect(spy.mock.calls.length).toBe(1);
+		} finally {
+			spy.mockRestore();
+		}
+	});
+
+	it('POSITIVE READ CONTROL: an A2A-03-advertised-equivalent read-only tool (openspec:workboard_recommend, canonicalAuthority=false, writesPerformed=false) resolves through the same dispatcher normally -- proves dispatch is not simply broken/rejecting-everything', async () => {
+		const res = await POST(
+			makeEvent({ tool: 'openspec:workboard_recommend', args: { limit: 1 } }, { id: 'viewer-1', role: 'viewer' })
+		);
+		expect(res.status).toBe(200);
+		const data = await res.json();
+		expect(data.success).toBe(true);
+	});
+
+	it('MIRROR-SYNC SPECIFIC CHECK: mirror:sync_qdrant and mirror:sync_neo4j (the exact tool ids A2A-03 named as suppressed) are NOT resolvable through this dispatcher at all -- they exist only as descriptor metadata in acp-grpc-quic-bridge.ts, never registered in ACPToolRegistry.TOOLS, so they 404 before dispatch exactly like any unknown method', async () => {
+		expect(TOOLS['mirror:sync_qdrant']).toBeUndefined();
+		expect(TOOLS['mirror:sync_neo4j']).toBeUndefined();
+		for (const tool of ['mirror:sync_qdrant', 'mirror:sync_neo4j']) {
+			const res = await POST(makeEvent({ tool, args: {} }, { id: 'viewer-1', role: 'viewer' }));
+			expect(res.status).toBe(404);
+		}
 	});
 });

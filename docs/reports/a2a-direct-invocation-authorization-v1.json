@@ -147,7 +147,9 @@
       "handlerInvoked": true,
       "handlerInvocationProof": "authorization-boundary.spec.ts (new, this pass): non-admin `role: 'viewer'` caller, dryRun:true -> HTTP 200, `{success:true, kind:'plan'}` -- the response `kind` value only appears on the dryRun branch inside the handler, proving execution reached past schema validation into the real handler body for a non-admin caller with no authorization check.",
       "mutationClass": "CANONICAL_WRITE",
-      "result": "BLOCKER -- reachable, dispatched, no authorization gate before handler invocation"
+      "result": "BLOCKER -- reachable, dispatched, no authorization gate before handler invocation",
+      "handlerInvocationCount": 1,
+      "handlerInvocationCountEvidence": "vi.spyOn(TOOLS[\"atlas.kanban.claim\"], \"handler\") -- spy.mock.calls.length === 1 after a non-admin viewer dispatch, dryRun:true. A correctly-authorized system would show 0."
     },
     {
       "method": "definitely-not-a-real-tool-name-xyz (unknown method)",
@@ -158,7 +160,8 @@
       "dispatchReached": false,
       "handlerInvoked": false,
       "mutationClass": "N/A",
-      "result": "SAFE -- getACPToolSchema returns undefined, route returns 404 BEFORE calling executeACPTool(); unknown methods do not fall through to any default/generic handler"
+      "result": "SAFE -- getACPToolSchema returns undefined, route returns 404 BEFORE calling executeACPTool(); unknown methods do not fall through to any default/generic handler",
+      "handlerInvocationCount": 0
     },
     {
       "method": "/api/acp/execute (the endpoint itself, as a generic-dispatch pattern)",
@@ -170,6 +173,19 @@
       "handlerInvoked": "N/A",
       "mutationClass": "N/A",
       "result": "DANGEROUS_PATTERN_PRESENT -- this route IS the 'default ExecuteTool' / 'generic registry lookup followed by invocation' pattern the audit explicitly asks to check for. A single endpoint accepts any string in `tool` and dispatches to whatever ACPToolRegistry.TOOLS[tool] resolves to, entirely independent of what A2A-03 or agent.json chose to advertise."
+    },
+    {
+      "method": "mirror:sync_qdrant / mirror:sync_neo4j",
+      "advertised": false,
+      "advertisedVia": "these exact tool ids appear ONLY as descriptor metadata in acp-grpc-quic-bridge.ts (the module A2A-03 uses for discovery); they were never registered in ACPToolRegistry.TOOLS, the registry POST /api/acp/execute actually dispatches through",
+      "directlyResolvable": false,
+      "authenticated": true,
+      "authorized": "N/A -- rejected before authorization would matter (same as unknown method)",
+      "dispatchReached": false,
+      "handlerInvoked": false,
+      "handlerInvocationCount": 0,
+      "mutationClass": "N/A -- no real handler exists behind these ids in the dispatch-capable registry (executeTraversalRpc, the nearest related function, is an explicit stub: returns empty nodes/edges with a \"For now, return a stub\" comment)",
+      "result": "SAFE -- the specific tool ids A2A-03 named as suppressed mirror operations are not even resolvable through the dispatcher; confirmed via TOOLS[id]===undefined plus a live 404 for both ids"
     }
   ],
   "unknownMethodBehavior": "PASS -- unknown/unregistered tool names are rejected with 404 before dispatch (getACPToolSchema check happens before executeACPTool is called). Confirmed both by source read and by the new focused test.",
@@ -178,7 +194,8 @@
     "negativeControl": "Authenticated NON-ADMIN caller ('viewer' role) requesting an unadvertised CANONICAL_WRITE tool ('atlas.kanban.claim') with dryRun:true -> HTTP 200, {success:true, kind:'plan'} -- proves dispatch reached the real handler body. A second test with dryRun omitted (defaults false) against a nonexistent taskId also reaches the real (non-dry-run) code path and returns a clean failure ({success:false, error: string}) rather than being rejected pre-dispatch -- consistent with 'guarded UPDATE matched zero rows', not with any authorization check.",
     "expectedSafeShape": "request -> authentication -> authorization -> REJECT -> dispatch NOT reached -> handler NOT invoked",
     "actualShape": "request -> authentication -> [no authorization step] -> dispatch REACHED -> handler INVOKED",
-    "handlerInvocationCountAssertion": "Not measured via a spy/mock call-count (the real handler was exercised directly, safely, via its own dryRun branch, per the file's design) -- the `kind: 'plan'` response value is definitive, non-inferred proof that the handler body executed past its dryRun check, which is only reachable after `TOOLS[name].handler(args, options)` is actually invoked."
+    "handlerInvocationCountAssertion": "Not measured via a spy/mock call-count (the real handler was exercised directly, safely, via its own dryRun branch, per the file's design) -- the `kind: 'plan'` response value is definitive, non-inferred proof that the handler body executed past its dryRun check, which is only reachable after `TOOLS[name].handler(args, options)` is actually invoked.",
+    "spyBackedAssertion": "authorization-boundary.spec.ts, test 5: vi.spyOn(TOOLS[\"atlas.kanban.claim\"], \"handler\") -- spy.mock.calls.length === 1 for a non-admin caller with no authorization gate. This directly satisfies the requirement that a 401/403/response-shape observation alone is insufficient -- this is a real call-count assertion against the live handler reference."
   },
   "canonicalAuthorityChecks": [
     {
@@ -223,9 +240,9 @@
   "resultRationale": "A concrete, source-traced and test-confirmed unguarded dispatch path exists: POST /api/acp/execute accepts any registered ACP tool name (including several real Postgres-mutating tools not advertised by A2A-03's discovery descriptor or the AgentCard's skills list) from any session-authenticated caller regardless of role, with zero authorization check before the handler runs. This matches the audit's own definition of a blocker (dispatch reached, handler invoked, for an unadvertised write-capable method, with no independent authorization gate). Scoped precisely: today's actual caller population is same-app authenticated users, not yet true external A2A peers, because Bearer-token authentication (which the AgentCard claims) is unimplemented -- but that is a coincidental mitigation, not a security control, and does not change the classification.",
   "tests": {
     "added": [
-      "sveltekit-frontend/src/routes/api/acp/execute/authorization-boundary.spec.ts (4 tests, new)"
+      "sveltekit-frontend/src/routes/api/acp/execute/authorization-boundary.spec.ts (7 tests, updated this pass: +3 -- spy-backed handlerInvocationCount, positive read control, mirror-sync-specific check)"
     ],
-    "result": "4/4 PASS",
+    "result": "7/7 PASS",
     "runCommand": "npx vitest run src/routes/api/acp/execute/authorization-boundary.spec.ts",
     "mutationSafety": "All cases use dryRun:true (handler returns before any DB call) except the final case, which targets a nonexistent taskId against a guarded UPDATE...WHERE clause that matches zero rows by construction -- no real mutation occurred in any case."
   },
@@ -248,5 +265,38 @@
     "Did not trace mirror-sync (Qdrant/Neo4j) tools specifically for this same gap -- flagged as a remaining extension of this finding, not investigated.",
     "Did not individually trace atlas.kanban.complete / atlas.kanban.create_child handler bodies (classified by strong analogy to atlas.kanban.claim/block, not independently read).",
     "Did not require or perform a container rebuild; no live runtime proof beyond the local dev-process-level test run was attempted or needed."
-  ]
+  ],
+  "entrypoint": {
+    "path": "sveltekit-frontend/src/routes/api/ai/agent/+server.ts",
+    "role": "REAL external A2A peer entrypoint (native + A2A Task format, both tasks/send and tasks/sendSubscribe)",
+    "authenticationOwner": "session cookie only (`locals.user`, set in hooks.server.ts from `event.cookies.get('auth_session')`) -- NOT Bearer token, despite the AgentCard's documented `authentication.schemes: ['Bearer']`",
+    "authorizationOwner": "none beyond `if (!locals.user) return 401` at the route level; per-request rate limit (20/user/min via Redis)",
+    "dispatchOwner": "runGemma4Agent() for the general case; ONE hardcoded exception at line 198-211 (`task.metadata?.skill === 'openspec-workboard'`) that calls executeACPTool('openspec:workboard_recommend', ...) directly from ACPToolRegistry.js"
+  },
+  "mirrorWriteCheck": {
+    "operationTested": "mirror:sync_qdrant, mirror:sync_neo4j (the exact ids named in A2A-03s own suppressed-tags list: tags include mirror, search-index / mirror, topology)",
+    "advertised": false,
+    "directlyResolvable": false,
+    "authorizationGateEncountered": "N/A -- resolution fails (404) before authorization would apply",
+    "dispatchReached": false,
+    "handlerInvoked": false,
+    "result": "SAFE for these specific tool ids -- not a live exposure. Distinct from the atlas.kanban.claim finding: that tool IS registered and IS dispatched under the same route, with the same lack of independent authorization. The dispatch-layer defect (no authorization gate on /api/acp/execute) is real regardless of whether a mirror-tagged tool happens to be wired yet -- any future mirror:* tool registered in ACPToolRegistry.TOOLS would inherit the same gap."
+  },
+  "unknownMethodCheck": {
+    "method": "definitely-not-a-real-tool-name-xyz",
+    "result": "FAIL_CLOSED -- getACPToolSchema returns undefined, route returns 404 before executeACPTool is ever called. Confirmed via spy-adjacent reasoning (no handler exists to invoke) and via the live test asserting res.status===404."
+  },
+  "allowedReadControl": {
+    "method": "openspec:workboard_recommend",
+    "advertised": true,
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "authenticated": true,
+    "dispatchReached": true,
+    "handlerInvoked": true,
+    "result": "Resolves normally through the SAME dispatcher (/api/acp/execute) used for the blocked case -- proves the defect is a missing authorization gate, not a broken/rejecting-everything dispatcher (which would have falsely made the system look safe)."
+  },
+  "authenticationOwner": "session cookie only (event.cookies.get(\"auth_session\") -> hooks.server.ts -> locals.user); no Bearer-token handling exists anywhere despite the AgentCard advertising Bearer auth",
+  "authorizationOwner": "ABSENT on POST /api/acp/execute (the route this audit targets). The existing, correct owner for this role is sveltekit-frontend/src/lib/server/auth/tool-authorization.ts (checkToolAccess/toolAuthorizationGuard against atlasToolRegistry) -- already used correctly by /api/acp/rpc and /api/agent/execute, not wired into /api/acp/execute.",
+  "dispatchOwner": "executeACPTool() / getACPToolSchema() in sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts -- raw TOOLS[name] lookup, no authorization checkpoint"
 }

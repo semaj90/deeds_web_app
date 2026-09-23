@@ -75,15 +75,27 @@
   ACP tool name and dispatches it (`getACPToolSchema` → `executeACPTool` → `TOOLS[name].handler()`)
   with **only `if (!locals.user)` session-presence auth — no role/permission check, no call into
   the existing `tool-authorization.ts` capability owner that its sibling routes (`/api/acp/rpc`,
-  `/api/agent/execute`) correctly use.** Confirmed live via a new focused test
-  (`authorization-boundary.spec.ts`, 4/4 pass, no real mutation — every mutating-tool case uses
+  `/api/agent/execute`) correctly use.** Confirmed live via a focused test suite
+  (`authorization-boundary.spec.ts`, 7/7 pass, no real mutation — every mutating-tool case uses
   `dryRun:true`, which the traced handler (`atlas.kanban.claim`) returns from *before* touching
   Postgres): a non-admin (`role: 'viewer'`) authenticated caller successfully dispatches
   `atlas.kanban.claim` — a real `CANONICAL_WRITE` tool never advertised by A2A-03's discovery
-  descriptor or the AgentCard's skills list. Unknown tool names ARE correctly rejected (404) before
-  dispatch — that part is safe. Peer-supplied `taskId` resolves against an existing row (does not
-  mint fake authority); `workerId` is a narrower, non-blocking impersonation risk, not canonical-
-  identity forgery. Separate caveat, not a mitigation: the AgentCard claims Bearer-token auth, but
+  descriptor or the AgentCard's skills list, with a **spy-backed `handlerInvocationCount === 1`**
+  assertion (`vi.spyOn(TOOLS['atlas.kanban.claim'], 'handler')`) — a direct call-count proof, not
+  just a response-shape inference; a correctly-authorized system would show `0`. A positive read
+  control (`openspec:workboard_recommend`, `canonicalAuthority:false`) resolves normally through
+  the same dispatcher, proving the gap is a missing authorization gate, not a broken dispatcher.
+  Unknown tool names ARE correctly rejected (404) before dispatch. **Mirror-sync specific check**
+  (the exact `mirror:sync_qdrant`/`mirror:sync_neo4j` ids A2A-03 tagged `mirror`): these are SAFE —
+  they exist only as descriptor metadata in `acp-grpc-quic-bridge.ts`, never registered in
+  `ACPToolRegistry.TOOLS`, so they 404 before dispatch exactly like an unknown method (their nearest
+  related function, `executeTraversalRpc`, is an explicit stub). The real, live blocker is
+  `atlas.kanban.claim`/`block`/`complete`/`create_child` — genuine `CANONICAL_WRITE` tools, not
+  tagged `mirror`, but reachable through the identical unguarded dispatch path; any future
+  `mirror:*` tool registered in the same `TOOLS` object would inherit the same gap. Peer-supplied
+  `taskId` resolves against an existing row (does not mint fake authority); `workerId` is a
+  narrower, non-blocking impersonation risk, not canonical-identity forgery. Separate caveat, not a
+  mitigation: the AgentCard claims Bearer-token auth, but
   `hooks.server.ts` implements none — so today's actual exposure is to any authenticated same-app
   user, not yet arbitrary external peers; if Bearer auth is ever implemented to match the AgentCard,
   this gap becomes externally peer-reachable immediately. **Fix path identified, not implemented
