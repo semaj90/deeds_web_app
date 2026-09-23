@@ -20,6 +20,9 @@
 
 import { createHash } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
+import { z } from 'zod';
+import { canonicalSha256V1, sha256HexSchema } from '$lib/server/atlas/prefill/canonical-hash-v1.js';
+import type { AcquisitionResultV1, ExtractionResultV1 } from '../acquisition/contracts.js';
 
 export type ExternalDocSourceAuthorityV1 = 'OFFICIAL' | 'COMMUNITY' | 'THIRD_PARTY';
 
@@ -85,10 +88,159 @@ export interface ExternalDocAdmissionReceiptV1 {
 	chunkCount: number;
 	expectedChecksums: string[];
 	readbackChecksums: string[];
+	pageReadback: {
+		provider: string;
+		product: string;
+		productVersion: string;
+		architecture: string | null;
+		crawlRevision: string;
+		parserRevision: string;
+		url: string;
+		contentHash: string;
+		evidenceRevision: string;
+	};
 	versionQualified: boolean;
 	architectureQualified: boolean;
 	transactionCommitted: boolean;
 	writesPerformed: boolean;
+}
+
+export const ExternalDocAcquisitionHandoffV1Schema = z.object({
+	schema: z.literal('atlas.external-doc-acquisition-handoff.v1'),
+	acquisitionFetchId: z.string().uuid(),
+	acquisitionSourceRevisionId: z.string().uuid(),
+	rawContentDigest: sha256HexSchema,
+	normalizedTextDigest: sha256HexSchema,
+	extractorName: z.string().min(1),
+	extractorVersion: z.string().nullable(),
+	documentSourceRevision: z.string().min(1),
+	manifestRevision: z.string().min(1),
+	pageEvidenceRevision: z.string().min(1),
+	pageId: z.string().uuid(),
+	productVersion: z.string().min(1),
+	architecture: z.string().nullable(),
+	chunkIds: z.array(z.string().min(1)),
+	byteSpans: z.array(z.object({ chunkId: z.string().min(1), startByte: z.number().int().nonnegative(), endByte: z.number().int().positive(), checksum: sha256HexSchema }).strict()),
+	readbackChecksums: z.array(sha256HexSchema),
+	pageVersionReadback: z.literal(true),
+	pageContentHashReadback: z.literal(true),
+	chunkChecksumReadback: z.literal(true),
+	admissionTransactionCommitted: z.literal(true),
+	admissionWritesPerformed: z.literal(true),
+	writesPerformed: z.literal(false),
+	canonicalAuthority: z.literal(false),
+	handoffChecksum: sha256HexSchema,
+}).strict();
+export type ExternalDocAcquisitionHandoffV1 = z.infer<typeof ExternalDocAcquisitionHandoffV1Schema>;
+
+type ExternalDocHandoffChunkV1 = Pick<ExternalDocChunkAdmissionInputV1,
+	'chunkId' | 'ordinal' | 'startByte' | 'endByte' | 'text' | 'chunkChecksum'>;
+
+/**
+ * Validate the link between the raw acquisition owner, normalized extraction,
+ * DOC-06A versioned admission, exact UTF-8 spans, and DOC-06A's committed
+ * readback receipt. This is a pure post-admission verifier: it does not write
+ * and keeps the two source-revision identifiers distinct.
+ */
+export function buildExternalDocAcquisitionHandoffV1(input: {
+	acquisition: AcquisitionResultV1;
+	extraction: ExtractionResultV1;
+	documentSourceRevision: string;
+	manifestRevision: string;
+	page: ExternalDocPageAdmissionInputV1;
+	canonicalText: string;
+	chunks: ExternalDocHandoffChunkV1[];
+	admissionReceipt: ExternalDocAdmissionReceiptV1;
+}): ExternalDocAcquisitionHandoffV1 {
+	const { acquisition, extraction, page, admissionReceipt: receipt } = input;
+	if (!['fetched', 'cache_hit', 'not_modified'].includes(acquisition.status)) {
+		throw new Error('DOC_HANDOFF_ACQUISITION_NOT_SUCCESSFUL');
+	}
+	if (!acquisition.sourceRevisionId || !acquisition.contentDigest || !acquisition.storageUri) {
+		throw new Error('DOC_HANDOFF_ACQUISITION_LINEAGE_INCOMPLETE');
+	}
+	if (extraction.fetchId !== acquisition.fetchId || extraction.sourceRevisionId !== acquisition.sourceRevisionId) {
+		throw new Error('DOC_HANDOFF_ACQUISITION_EXTRACTION_REVISION_MISMATCH');
+	}
+	if (extraction.contentDigest !== acquisition.contentDigest) {
+		throw new Error('DOC_HANDOFF_RAW_CONTENT_DIGEST_MISMATCH');
+	}
+	if (acquisition.finalUrl !== page.url) {
+		throw new Error('DOC_HANDOFF_FINAL_URL_MISMATCH');
+	}
+	const canonicalTextBytes = Buffer.from(input.canonicalText, 'utf8');
+	const normalizedTextDigest = createHash('sha256').update(canonicalTextBytes).digest('hex');
+	if (normalizedTextDigest !== extraction.normalizedTextDigest || normalizedTextDigest !== page.contentHash) {
+		throw new Error('DOC_HANDOFF_NORMALIZED_TEXT_DIGEST_MISMATCH');
+	}
+	if (input.chunks.length === 0) throw new Error('DOC_HANDOFF_REQUIRES_CHUNKS');
+	const orderedChunks = [...input.chunks].sort((a, b) => a.ordinal - b.ordinal);
+	if (new Set(input.chunks.map((chunk) => chunk.ordinal)).size !== input.chunks.length) {
+		throw new Error('DOC_HANDOFF_DUPLICATE_CHUNK_ORDINAL');
+	}
+	const byteSpans = orderedChunks.map((chunk, index) => {
+		if (chunk.endByte <= chunk.startByte || chunk.endByte > canonicalTextBytes.byteLength) {
+			throw new Error(`DOC_HANDOFF_BYTE_SPAN_INVALID:${chunk.chunkId}`);
+		}
+		if (index > 0 && chunk.startByte < orderedChunks[index - 1]!.endByte) {
+			throw new Error(`DOC_HANDOFF_BYTE_SPANS_OVERLAP:${chunk.chunkId}`);
+		}
+		const exactSpan = canonicalTextBytes.subarray(chunk.startByte, chunk.endByte).toString('utf8');
+		if (exactSpan !== chunk.text || sha256Hex(chunk.text) !== chunk.chunkChecksum) {
+			throw new Error(`DOC_HANDOFF_BYTE_SPAN_OR_CHECKSUM_MISMATCH:${chunk.chunkId}`);
+		}
+		return { chunkId: chunk.chunkId, startByte: chunk.startByte, endByte: chunk.endByte, checksum: chunk.chunkChecksum };
+	});
+	if (receipt.manifestRevision !== input.manifestRevision || receipt.sourceRevision !== input.documentSourceRevision ||
+		receipt.pageEvidenceRevision !== page.evidenceRevision || !receipt.transactionCommitted || !receipt.writesPerformed ||
+		receipt.pageCount !== 1 || receipt.chunkCount !== input.chunks.length) {
+		throw new Error('DOC_HANDOFF_ADMISSION_RECEIPT_MISMATCH');
+	}
+	if (!receipt.versionQualified || receipt.architectureQualified !== (page.architecture !== null) || !receipt.pageReadback ||
+		receipt.pageReadback.provider !== page.provider || receipt.pageReadback.product !== page.product ||
+		receipt.pageReadback.productVersion !== page.productVersion || receipt.pageReadback.architecture !== page.architecture ||
+		receipt.pageReadback.crawlRevision !== page.crawlRevision || receipt.pageReadback.parserRevision !== page.parserRevision ||
+		receipt.pageReadback.url !== page.url || receipt.pageReadback.contentHash !== page.contentHash ||
+		receipt.pageReadback.evidenceRevision !== page.evidenceRevision) {
+		throw new Error('DOC_HANDOFF_PAGE_VERSION_READBACK_MISMATCH');
+	}
+	const inputOrderChecksums = input.chunks.map((chunk) => chunk.chunkChecksum);
+	const ordinalOrderChecksums = orderedChunks.map((chunk) => chunk.chunkChecksum);
+	if (JSON.stringify(receipt.expectedChecksums) !== JSON.stringify(inputOrderChecksums) ||
+		JSON.stringify(receipt.readbackChecksums) !== JSON.stringify(ordinalOrderChecksums) ||
+		JSON.stringify(receipt.chunkIds) !== JSON.stringify(orderedChunks.map((chunk) => chunk.chunkId))) {
+		throw new Error('DOC_HANDOFF_CHUNK_READBACK_MISMATCH');
+	}
+	const handoffBody = {
+		schema: 'atlas.external-doc-acquisition-handoff.v1' as const,
+		acquisitionFetchId: acquisition.fetchId,
+		acquisitionSourceRevisionId: acquisition.sourceRevisionId,
+		rawContentDigest: acquisition.contentDigest,
+		normalizedTextDigest,
+		extractorName: extraction.extractor.name,
+		extractorVersion: extraction.extractor.version ?? null,
+		documentSourceRevision: input.documentSourceRevision,
+		manifestRevision: input.manifestRevision,
+		pageEvidenceRevision: page.evidenceRevision,
+		pageId: receipt.pageId,
+		productVersion: page.productVersion,
+		architecture: page.architecture,
+		chunkIds: orderedChunks.map((chunk) => chunk.chunkId),
+		byteSpans,
+		readbackChecksums: receipt.readbackChecksums,
+		pageVersionReadback: true as const,
+		pageContentHashReadback: true as const,
+		chunkChecksumReadback: true as const,
+		admissionTransactionCommitted: true as const,
+		admissionWritesPerformed: true as const,
+		writesPerformed: false as const,
+		canonicalAuthority: false as const,
+	};
+	const handoff = {
+		...handoffBody,
+		handoffChecksum: canonicalSha256V1(handoffBody),
+	};
+	return ExternalDocAcquisitionHandoffV1Schema.parse(handoff);
 }
 
 function sha256Hex(text: string): string {
@@ -163,6 +315,41 @@ export async function admitExternalDocPage(
 			]
 		);
 		const pageId = pageResult.rows[0].id as string;
+		const pageReadbackResult = await client.query(
+			`SELECT provider, product, product_version, architecture, crawl_revision, parser_revision,
+			        url, content_hash, evidence_revision
+			 FROM atlas_external_doc_pages WHERE id = $1`,
+			[pageId]
+		);
+		if (pageReadbackResult.rows.length !== 1) {
+			throw new Error(`ADMISSION_PAGE_READBACK_COUNT_MISMATCH:expected=1:actual=${pageReadbackResult.rows.length}`);
+		}
+		const pageRow = pageReadbackResult.rows[0];
+		const pageReadback = {
+			provider: pageRow.provider as string,
+			product: pageRow.product as string,
+			productVersion: pageRow.product_version as string,
+			architecture: pageRow.architecture as string | null,
+			crawlRevision: pageRow.crawl_revision as string,
+			parserRevision: pageRow.parser_revision as string,
+			url: pageRow.url as string,
+			contentHash: pageRow.content_hash as string,
+			evidenceRevision: pageRow.evidence_revision as string,
+		};
+		const expectedPageReadback = {
+			provider: input.page.provider,
+			product: input.page.product,
+			productVersion: input.page.productVersion,
+			architecture: input.page.architecture,
+			crawlRevision: input.page.crawlRevision,
+			parserRevision: input.page.parserRevision,
+			url: input.page.url,
+			contentHash: input.page.contentHash,
+			evidenceRevision: input.page.evidenceRevision,
+		};
+		if (JSON.stringify(pageReadback) !== JSON.stringify(expectedPageReadback)) {
+			throw new Error('ADMISSION_PAGE_READBACK_MISMATCH');
+		}
 
 		for (const chunk of input.chunks) {
 			await client.query(
@@ -232,6 +419,7 @@ export async function admitExternalDocPage(
 			chunkCount: readbackChecksums.length,
 			expectedChecksums,
 			readbackChecksums,
+			pageReadback,
 			versionQualified: input.page.productVersion.length > 0,
 			architectureQualified: input.page.architecture !== null,
 			transactionCommitted: true,

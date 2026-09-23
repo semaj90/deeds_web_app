@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.deep-research-live-discovery-replay.v1",
+  "recordedAt": "2026-09-22T23:51:52.022Z",
+  "mode": "bounded-live-read-only",
+  "query": "Svelte 5 runes official documentation",
+  "requestedMaxResults": 3,
+  "searchOwner": "sveltekit-frontend/src/lib/server/agent/tools/web-search.ts::webSearch",
+  "providerMethod": "curated",
+  "outcome": "CURATED_FALLBACK",
+  "resultCount": 2,
+  "queryChecksum": "9e9abf1bd2154ef24cac0a5bccf8f0886f8632b946c35bbf22f36664a35e07ec",
+  "resultSetChecksum": "c8be4c4d34e17ff40d69fed093bbbabe48fed44a88276b572236b967b56c4899",
+  "snapshotChecksum": "a4b1760298c91d8cb9987e809fbf3a1a8a8e14e593b9f834f1fb77de8ba80c8f",
+  "observedAt": "2026-09-22T23:51:52.022Z",
+  "recency": {
+    "ttlMs": 60000,
+    "status": "FRESH",
+    "expiresAt": "2026-09-22T23:52:52.022Z"
+  },
+  "sourceRevisionCreated": false,
+  "candidateIdentityCreated": false,
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false,
+  "datastores": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false
+  },
+  "limitations": [
+    "The curated fallback is fixture-like application data, not acquired source evidence.",
+    "No DOC-06A admission, source revision, or exact fetched-byte/span receipt was created."
+  ]
+}

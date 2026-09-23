@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildSearchObservationV1,
+  buildAgentToolSearchObservationV1,
+  evaluateSearchRecencyV1,
   freezeSearchSnapshotV1,
   observeAndFreezeWebSearchV1,
   SearchObservationV1Schema,
@@ -120,6 +122,35 @@ describe('SearchObservationV1 / SearchSnapshotV1 (DISCOVERY-01)', () => {
     expect(a.queryChecksum).toBe(b.queryChecksum);
     expect(a.resultSetChecksum).toBe(b.resultSetChecksum);
     expect(a.snapshotChecksum).not.toBe(b.snapshotChecksum);
+  });
+
+  it('keeps TTL changes in the recency decision and out of snapshot identity', () => {
+    const snapshot = freezeSearchSnapshotV1(
+      buildSearchObservationV1(baseRequest, successResponse, '2026-01-01T00:00:00.000Z'),
+    );
+    const before = evaluateSearchRecencyV1(snapshot, 60_000, '2026-01-01T00:00:30.000Z');
+    const after = evaluateSearchRecencyV1(snapshot, 20_000, '2026-01-01T00:00:30.000Z');
+    expect(before.status).toBe('FRESH');
+    expect(after.status).toBe('EXPIRED');
+    expect(snapshot.queryChecksum).toBe(
+      freezeSearchSnapshotV1(buildSearchObservationV1(baseRequest, successResponse, snapshot.observedAt)).queryChecksum,
+    );
+    expect(Object.keys(after).sort()).toEqual(['evaluatedAt', 'expiresAt', 'observedAt', 'schema', 'status', 'ttlMs'].sort());
+    expect(() => evaluateSearchRecencyV1(snapshot, 0, '2026-01-01T00:00:30.000Z')).toThrow();
+  });
+
+  it('distinguishes curated fallback from successful-empty and provider failure', () => {
+    const curated = buildAgentToolSearchObservationV1(baseRequest, {
+      query: 'hearsay exception',
+      method: 'curated',
+      results: [{ title: 'Curated reference', url: 'https://example.org/', snippet: 'fixture', source: 'fixture' }],
+    }, '2026-01-01T00:00:00.000Z');
+    const empty = buildSearchObservationV1(baseRequest, emptyResponse, '2026-01-01T00:00:00.000Z');
+    const failure = buildSearchObservationV1(baseRequest, failedResponse, '2026-01-01T00:00:00.000Z');
+    expect(curated.outcome).toBe('CURATED_FALLBACK');
+    expect(curated.results[0]?.source).toBe('curated');
+    expect(empty.outcome).toBe('SUCCESS_EMPTY');
+    expect(failure.outcome).toBe('PROVIDER_FAILURE');
   });
 
   it('observeAndFreezeWebSearchV1 wraps an injected search function without calling the network itself', async () => {

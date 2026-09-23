@@ -49,7 +49,7 @@ const searchObservationResultSchema = z
     title: z.string(),
     url: z.string().min(1),
     snippet: z.string(),
-    source: z.enum(['duckduckgo', 'searxng']),
+    source: z.enum(['duckduckgo', 'searxng', 'curated']),
   })
   .strict();
 
@@ -57,8 +57,43 @@ export const SearchObservationOutcomeSchema = z.enum([
   'SUCCESS_WITH_RESULTS',
   'SUCCESS_EMPTY',
   'PROVIDER_FAILURE',
+  'CURATED_FALLBACK',
 ]);
 export type SearchObservationOutcomeV1 = z.infer<typeof SearchObservationOutcomeSchema>;
+
+export const SearchRecencyDecisionV1Schema = z.object({
+  schema: z.literal('atlas.search-recency-decision.v1'),
+  observedAt: z.iso.datetime(),
+  evaluatedAt: z.iso.datetime(),
+  expiresAt: z.iso.datetime(),
+  ttlMs: z.number().int().positive(),
+  status: z.enum(['FRESH', 'EXPIRED']),
+}).strict();
+export type SearchRecencyDecisionV1 = z.infer<typeof SearchRecencyDecisionV1Schema>;
+
+/**
+ * TTL is an observation-freshness policy only. Its deliberately narrow result
+ * contains no source, candidate, packet, or revision identity fields.
+ */
+export function evaluateSearchRecencyV1(
+  snapshot: Pick<SearchSnapshotV1, 'observedAt'>,
+  ttlMs: number,
+  evaluatedAt: string = new Date().toISOString(),
+): SearchRecencyDecisionV1 {
+  const ttl = z.number().int().positive().max(30 * 24 * 60 * 60 * 1000).parse(ttlMs);
+  const observedAtMs = Date.parse(z.iso.datetime().parse(snapshot.observedAt));
+  const evaluatedAtValue = z.iso.datetime().parse(evaluatedAt);
+  const evaluatedAtMs = Date.parse(evaluatedAtValue);
+  const expiresAt = new Date(observedAtMs + ttl).toISOString();
+  return SearchRecencyDecisionV1Schema.parse({
+    schema: 'atlas.search-recency-decision.v1',
+    observedAt: snapshot.observedAt,
+    evaluatedAt: evaluatedAtValue,
+    expiresAt,
+    ttlMs: ttl,
+    status: evaluatedAtMs < observedAtMs + ttl ? 'FRESH' : 'EXPIRED',
+  });
+}
 
 /** Normalized description of one live web-search call, pre-freeze (not yet checksummed). */
 export const SearchObservationV1Schema = z
@@ -116,6 +151,41 @@ function detectUnsupportedOptions(
 function classifyOutcome(response: WebSearchResponse): SearchObservationOutcomeV1 {
   if (response.provider === 'none') return 'PROVIDER_FAILURE';
   return response.results.length > 0 ? 'SUCCESS_WITH_RESULTS' : 'SUCCESS_EMPTY';
+}
+
+/** Adapts the existing agent-tool search response; it performs no search itself. */
+export function buildAgentToolSearchObservationV1(
+  request: z.input<typeof SearchObservationRequestV1Schema>,
+  response: {
+    query: string;
+    results: Array<{ title: string; url: string; snippet: string; source: string }>;
+    method: 'searxng' | 'duckduckgo' | 'curated';
+  },
+  observedAt: string = new Date().toISOString(),
+): SearchObservationV1 {
+  const parsedRequest = SearchObservationRequestV1Schema.parse(request);
+  const observation = SearchObservationV1Schema.parse({
+    schema: 'atlas.search-observation.v1',
+    normalizedQuery: normalizeQuery(parsedRequest.query),
+    normalizerRevision: SEARCH_OBSERVATION_NORMALIZER_REVISION,
+    requested: parsedRequest,
+    effective: {
+      provider: response.method === 'curated' ? 'none' : response.method,
+      enginesObservable: false,
+    },
+    unsupportedOptions: detectUnsupportedOptions(parsedRequest),
+    outcome: response.method === 'curated'
+      ? 'CURATED_FALLBACK'
+      : response.results.length > 0 ? 'SUCCESS_WITH_RESULTS' : 'SUCCESS_EMPTY',
+    observedAt,
+    results: response.results.map((result) => ({
+      title: result.title,
+      url: result.url,
+      snippet: result.snippet,
+      source: response.method === 'curated' ? 'curated' : response.method,
+    })),
+  });
+  return observation;
 }
 
 function toObservationResult(result: WebSearchResult) {

@@ -75,13 +75,30 @@
   11/11 focused Vitest tests pass (accept-path, each rejection reason individually, duplicate
   dedup correctness, bounded truncation, order preservation, checksum pass-through). `tsgo
   --noEmit`: 0 new errors (same 16 pre-existing unrelated errors as DISCOVERY-01/02).
-- [ ] DISCOVERY-04 reuse fetched content hashes, canonical acquisition envelope and
-  exact source spans from the document owner; prove receipt-linked handoff and
-  version/checksum readback. Any admission writer remains owned by DOC-06A and
-  requires separate bounded authorization; no direct Qdrant/Neo4j/cache projection.
-- [ ] DISCOVERY-05 prove observedAt/TTL affect recency policy only, never source
-  identity/revision; distinguish empty search, provider failure and curated fallback.
-  Then run a bounded live discovery replay with explicit zero datastore writes.
+- [x] DISCOVERY-04A (2026-09-22) — wired a pure `ExternalDocAcquisitionHandoffV1` verifier
+  into the existing DOC-06A admission owner. It preserves acquisition `sourceRevisionId` /
+  raw-byte `contentDigest` separately from the document `sourceRevision` /
+  `normalizedTextDigest`; validates exact UTF-8 chunk spans and hashes; and requires exact
+  page version, URL, content-hash, crawl/parser revision, and ordinal checksum readbacks.
+  DOC-06A now reads the inserted page row back inside the existing transaction and rolls back
+  if any of those versioned page fields differ. Seven focused handoff/writer-fixture tests pass.
+  The new bridge receipt is derived and noncanonical; the verifier itself performs zero writes.
+- [ ] DISCOVERY-04B live handoff readback — exercise the existing acquisition and DOC-06A owners
+  against one bounded, self-cleaning database fixture, then record the actual receipt proving
+  fetch/extraction lineage, normalized content hash, exact byte spans, page version readback,
+  and ordered chunk checksum readback. This requires a real DOC-06A admission write; no live
+  admission was run without a separately bounded authorization. No direct Qdrant/Neo4j/cache
+  projection is allowed.
+- [x] DISCOVERY-05 (2026-09-22) — `evaluateSearchRecencyV1()` consumes only
+  `observedAt` plus a caller-supplied bounded TTL and returns a freshness decision with no
+  source/candidate/revision identity fields. Focused fixture proves TTL can change FRESH to
+  EXPIRED without changing snapshot query identity; invalid zero TTL is rejected. Outcomes
+  distinguish successful-empty, provider failure, and curated fallback. A bounded live call
+  through the existing agent-tool `webSearch()` owner returned the explicit `curated` method
+  (2 results); frozen snapshot and recency decision are recorded in
+  `docs/reports/deep-research-live-discovery-replay-v1.json`. Explicitly zero datastore writes,
+  `canonicalAuthority=false`; this proves discovery/recency only, not acquisition or source
+  admission. Focused Vitest: 23/23 across observation and acquisition-routing specs.
 
 ## Dependency and proof boundary
 
