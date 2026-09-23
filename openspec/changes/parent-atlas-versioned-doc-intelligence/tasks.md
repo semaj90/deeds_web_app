@@ -374,9 +374,13 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `EXTERNAL_DOC_ANALYSIS_OWNER_01` (schema/owner design) is independent of admitted rows unless its own design requires them;
   `EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT` is independent of this chain. Not started; no mutation authorized by this note.
   DOC-06A above proves the writer/adapter contract only; canonical pinned-corpus admission has NOT run.
-- [ ] **EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT** review `chunk_id` (`doc:<source_id>:<16-hex truncated document digest>:<ordinal>`) for
+- [x] **EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT** review `chunk_id` (`doc:<source_id>:<16-hex truncated document digest>:<ordinal>`) for
   address/key collisions only; unchanged by the identity repair and does NOT redefine `chunkEvidenceRevision` (proven separately, not
-  reopened); must not be combined with it.
+  reopened); must not be combined with it. **Audit done 2026-09-23 (read-only, 0 writes; `docs/reports/external-doc-chunk-id-collision-audit-v1.json`):**
+  current corpus 852 chunks / 852 unique chunk_ids, no shared (source, digest16), no duplicate page hashes. Latent finding F1: chunk_id excludes
+  page URL/version, so identical normalized text under one `source_id` across two versions/aliases would violate `UNIQUE(chunk_id)` on the second
+  admission (fails closed, never overwrites); 64-bit truncation risk is negligible. `chunk_id` NOT changed; if multi-version admission of identical
+  text is expected, open a separate contract change (add page evidenceRevision or version+url digest) with a replay proof.
 - [x] **EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY** `chunk_document` re-normalized page text and collapsed code indentation (23 of 30 stored
   pages differed from the text the byte spans address). Scope: canonical text-buffer / UTF-8-span correctness before
   admission; blocks DOC-CANARY-ADMISSION-01. **Done 2026-09-23 (offline, 0 datastore writes, `EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY_PROVEN`):**

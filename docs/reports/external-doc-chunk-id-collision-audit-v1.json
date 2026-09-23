@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.external-doc-chunk-id-collision-audit.v1",
+  "generatedAt": "2026-09-23T18:07:48.826191+00:00",
+  "gate": "EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT",
+  "headAtGeneration": "3c081fb2f4aa0b29b3483332e0b96c5945d39af7",
+  "scope": "chunk_id address/key only; chunkEvidenceRevision is separate and not reopened",
+  "format": "doc:<source_id>:<first 16 hex of page content sha256>:<ordinal>",
+  "dbConstraint": "atlas_external_doc_chunks_chunk_id_uq UNIQUE (chunk_id) (20260904_external_doc_intelligence_v1.sql:92)",
+  "currentCorpus": {
+    "chunks": 852,
+    "uniqueChunkIds": 852,
+    "pagesSharingSourceAndDigest16": 0,
+    "duplicatePageContentHashes": 0,
+    "digest16CollisionsAcrossDistinctHashes": false
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "LATENT",
+      "text": "chunk_id excludes page URL and product version. Two pages of the same source_id with identical normalized text (e.g. an unchanged page across two product versions, or a duplicate URL alias) get identical chunk_ids and the second admission violates UNIQUE(chunk_id). Not triggered by the current 30 pages."
+    },
+    {
+      "id": "F2",
+      "severity": "NEGLIGIBLE",
+      "text": "16 hex = 64 bits of the page digest; birthday risk is negligible at corpus scale (~1e-15 at 1e2 pages, still ~1e-8 at 1e6 pages)."
+    },
+    {
+      "id": "F3",
+      "severity": "INFO",
+      "text": "chunk_id depends on the page content digest, so any text change (including the fence-fidelity fix) renames every chunk_id of that page; identity continuity across recapture is carried by page/chunk evidence revisions, not chunk_id."
+    }
+  ],
+  "recommendation": "Do not change chunk_id in this audit. If multi-version admission of identical text is expected, open a separate contract change adding the page evidenceRevision (or productVersion+url digest) to the chunk_id derivation, with a migration/replay proof. Otherwise keep as is; version collisions fail closed (unique violation), never silently overwrite.",
+  "result": "CHUNK_ID_COLLISION_AUDIT_COMPLETE_NO_CURRENT_COLLISION_LATENT_VERSION_RISK",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}
