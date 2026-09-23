@@ -372,6 +372,47 @@ applied by the coordinating session afterward, not by the fork itself).
       current cache behavior as legacy/degraded and do not claim revision-safe retrieval reuse.
       Existing multi-lane RRF tests pass 8/8; that proves lane execution and deduplication, not
       cache identity correctness.
+      **Partial progress (2026-09-22): fixed one real, concrete write/read mismatch in the ACE
+      context assembler's own write path; the other two named callers (MCP trace route,
+      retrieval-lanes.ts) are still legacy-only — not a full close.**
+      - **Root cause found**: `multi-lane-retrieval.ts::runAceCacheLane()` already had dual-mode
+        read logic (revisioned key when `retrievalCacheIdentity` is supplied, legacy `aceTopkKey`
+        fallback otherwise) — landed under CACHE-RETRIEVAL-IDENTITY-02. But
+        `context-assembler.ts::fetchRAGChunks()` (the "P0-B" writer that warms this exact cache
+        lane) only ever wrote the legacy `aceTopkKey`, never the revisioned key — so even when a
+        caller supplied `retrievalCacheIdentity`, the revisioned read path could never observe a
+        hit from this writer, no matter how fresh. Fixed: threaded `retrievalCacheIdentity`
+        through `fetchRAGChunks()`'s signature (from `opts.retrievalCacheIdentity`, the same
+        object already passed into the sibling `multiLaneSearch()` call a few lines above in
+        `assembleACEContext`) and added an additional write via the existing
+        `persistRevisionedAceTopRetrievalCache()` helper alongside the untouched legacy write.
+        `topN=8` is hardcoded to match this file's own `multiLaneSearch({ topK: 8, ... })` call,
+        since admission requires an exact topN match (flagged in a comment for future drift).
+      - **Verified**: `npx tsgo --noEmit` shows zero new errors from this change (checked full
+        project output, not just this file). The two underlying contract test files this reuses
+        unmodified (`ace-top-retrieval-cache.spec.ts`, `cache-keys-retrieval-identity.spec.ts`)
+        still pass 8/8. `AceTopRetrievalResult`'s shape (`id`, `sourceRef`, `snippet`, `score`)
+        was hand-verified against `runAceCacheLane()`'s actual consumption
+        (`result.id`/`result.snippet ?? ''`/`result.score`/`result.sourceRef`).
+      - **NOT verified**: no new automated test exercises the exact new code path — `fetchRAGChunks`
+        is a non-exported internal function deep in a 7,680-line file with heavy Qdrant/embedding
+        dependencies, impractical to invoke directly without a much larger test-harness
+        investment. Correctness rests on type-checking + shape review + the existing pure-function
+        contract tests, not a fresh end-to-end proof. Flagging this limitation rather than
+        overclaiming.
+      - **Honest scope limit**: no caller anywhere in the repo currently constructs a
+        `RetrievalCacheIdentityV1` object to pass into `assembleACEContext`'s `opts` (grepped
+        repo-wide for `retrievalCacheIdentity:` — the only match is this fix's own pass-through).
+        So this fix closes a real wiring bug but does not make revision-safe retrieval reuse live
+        today — nothing yet supplies the identity for it to activate on.
+      - **Still open**: `retrieval-lanes.ts::runRedisAceLane()` (a third, independent reader with
+        its own separate query-hash scheme, sha256-based, not md5) and the MCP trace route
+        (`trace-mcp-server.ts`, one of `multiLaneSearch`'s 4 real callers) are both still
+        legacy-only — migrating them requires constructing a full 7-field
+        `RetrievalCacheIdentityV1` (workspaceRevision, candidateSnapshotRevision,
+        ordinalMapChecksum, representationRevision, featureRevision, retrievalPolicyRevision,
+        contextPolicyRevision) from scratch in each of those files, which none of their current
+        scopes have on hand — a separate, larger piece of work, not attempted in this pass.
 
 ### Retrieval-cache admission hardening — 2026-09-15
 
