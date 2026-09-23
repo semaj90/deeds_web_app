@@ -1,8 +1,40 @@
 # GAN Deep Audit Guide
 
-**Status**: ✅ COMPLETE  
+**Status**: HISTORICAL SNAPSHOT (2026-06-26) — see the Current Alignment Overlay below; the original "COMPLETE" claim is not current  
 **Date**: June 26, 2026 (Session 85)  
 **Scope**: Feature registry search + token savings analysis + production hardening
+
+---
+
+## Current Alignment Overlay — 2026-09-23 (supersedes conflicting statements below)
+
+This guide is a **June 26, 2026 (Session 85) implementation snapshot**. Its implementation notes remain useful evidence, but "COMPLETE", "FEATURE-COMPLETE", "Ready for production use", latency ranges, hit rates, packet counts and runtime topology below are NOT current authority unless replayed against the present Parent Atlas owners. The guide contradicts itself (the Qdrant tier, endpoint wiring, npm scripts, audit persistence, production-data run and worker integration are all unchecked in its own Integration Checklist), so the accurate state is: core audit implementation = historically implemented; production integration = not proven; current runtime status = requires replay.
+
+**Status:** `PROVEN_HISTORICAL_REQUIRES_CURRENT_REPLAY` (feature-registry-search.ts, gan-deep-audit.ts, token-savings estimation, hardening checks, recommendation generation, audit CLI harnesses). Readiness = `READY_FOR_CURRENT_OWNER_REPLAY`, not `READY_FOR_PRODUCTION`.
+
+**Ownership rules** (OWNER != REPRESENTATION != EXECUTOR != CACHE != TRANSPORT):
+- Canonical feature/packet identity comes from the current Parent Atlas registry and revision-qualified lineage owners, not from whichever search tier answers.
+- PostgreSQL is the durable canonical/queryable evidence surface where the current schema establishes ownership. BitFrost/Valkey is disposable hot derived state (fail-open, exact reads only, never registry authority). Qdrant is a semantic projection/executor and may not promote a feature or packet into canonical authority.
+- The "three search tiers" below are **executors/storage surfaces, not authority tiers**. A cache or semantic result must resolve back to the same canonical feature identity and revision before admission; "BitFrost misses, then Postgres misses, then a Qdrant result, therefore a canonical feature" is forbidden. Candidate ordinals, vector point IDs, cache keys and transport IDs are not canonical identity.
+- Token-savings analysis is advisory utility and can never weaken identity, revision, evidence or hardening validation. CORRECTNESS (schema, identity, revision, constraint, owner, hardening) and UTILITY (token estimate, context reduction, cache hit, latency, recommendation) stay separate; a recommendation can never make an invalid packet admissible.
+- "Full integration with the GAN audit pipeline" means core-module integration only; endpoint/runtime/telemetry replay is unproven.
+- Synthesis for new work = Ornith-1.5-9B via llama-server `:8090` (Gemma4 names are legacy compatibility labels; no Ollama on a canonical path). The "LangGraph worker" path is historical: trace current adaptive-DAG/agent-runtime ownership before wiring anything. ML route selection is a challenger only, after a deterministic routing/evaluation baseline. Do not create another registry owner or a `feature_registry_queries` table: first census the current registry/materializer and whether existing retrieval telemetry, audit receipts or workflow-event tables already own that data.
+
+**Historical benchmark policy:** every latency/memory/hit-rate/packet-count figure in this guide is `HISTORICAL_BENCHMARK_2026_06_26` (500-1000 packets, June corpus), not an SLA. A current benchmark must record workstation/runtime revision, packet/feature cohort checksum, candidate count, cache state, warm/cold, per-executor and total latency, sample count, and errors/fallbacks.
+
+**Target shape:** GAN/feature audit request -> current canonical registry owner -> revision-qualified `FeatureRegistrySnapshotV1` -> deterministic audit (schema/identity/constraints) -> optional retrieval helpers (BitFrost exact, Postgres lexical/registry, semantic executor) -> `AuditFindingV1[]` -> `RecommendationProposalV1[]` -> validation/replay -> receipt.
+
+**Current gates (none started; read-only until stated):**
+1. `GAN-AUDIT-CURRENT-OWNER-CENSUS-01` (next; entirely read-only, no mutation): trace `feature-registry-search.ts`, `gan-deep-audit.ts`, the current registry owner, packet identity owner, BitFrost owner, Postgres query owner, Qdrant representation owner, recommendation owner, telemetry owner and current runtime callers; classify each as rehabilitate / adapt / retire.
+2. `GAN-AUDIT-REPLAY-01`: replay the audit against a frozen current registry/packet cohort with zero persistent mutations.
+3. `GAN-AUDIT-IDENTITY-01`: every returned feature/search result resolves to current canonical identity and required revisions.
+4. `GAN-AUDIT-CACHE-01`: BitFrost is fail-open and cannot create or promote registry identity.
+5. `GAN-AUDIT-SEMANTIC-01`: if Qdrant registry search is retained, prove its representation revision and exact canonical joinback; one logical semantic lane = one vote.
+6. `GAN-AUDIT-RECOMMENDATION-01`: recommendations stay revision-qualified proposals until separately validated/promoted.
+7. `GAN-AUDIT-RUNTIME-01`: trace and wire the current API/agent-runtime caller instead of assuming the June LangGraph path.
+8. `GAN-AUDIT-RECEIPT-01`: revision-qualified receipt with cohort identity, executor use, cache behavior, findings, recommendations, latency and writes.
+
+Once the audit proves it can consume today's canonical registry snapshot without inventing identity, it can become a reusable validator/tool node in the adaptive DAG. Gate authority = an OpenSpec `tasks.md` (to be assigned when the census starts); proof authority = revision-qualified receipts.
 
 ---
 
@@ -62,7 +94,7 @@ Input Query: "Validate packet structure for GAN audit"
 Output: Top-N ranked features with token savings estimates
 ```
 
-### Three Search Tiers
+### Three Search Executors (historical "tiers"; executors/storage surfaces, NOT authority tiers)
 
 #### Tier 1: Redis BitFrost (L1 Exact Match)
 - **Speed**: <1ms
@@ -310,7 +342,7 @@ Add to `sveltekit-frontend/package.json`:
 
 **Usage**:
 ```bash
-npm run atlas:gan-audit:deep --verbose
+npm run atlas:gan-audit:deep -- --verbose
 npm run atlas:feature-registry:search "validate packet structure"
 npm run atlas:gan-audit:deep:full 2>&1 | tee logs/gan-deep-audit.log
 ```
@@ -341,7 +373,7 @@ npm run atlas:gan-audit:deep:full 2>&1 | tee logs/gan-deep-audit.log
 
 ---
 
-## Performance Characteristics
+## Performance Characteristics (`HISTORICAL_BENCHMARK_2026_06_26`, not a current SLA)
 
 ### Latency (per execution)
 
@@ -370,7 +402,7 @@ npm run atlas:gan-audit:deep:full 2>&1 | tee logs/gan-deep-audit.log
 - [ ] Qdrant semantic workflow search (requires query embedding)
 - [ ] GPU-accelerated workflow similarity scoring
 - [ ] Prompt caching with system prompt KV reuse
-- [ ] Integration with Gemma4 token budget estimation
+- [ ] Integration with synthesis token budget estimation (live synthesis = Ornith-1.5-9B on llama-server `:8090`; "Gemma4" is a legacy label)
 - [ ] Custom trace logger hooks (Datadog/Langfuse)
 - [ ] Feature registry materialization (Drizzle schema)
 - [ ] Automated route selection via ML classifier
@@ -383,9 +415,9 @@ npm run atlas:gan-audit:deep:full 2>&1 | tee logs/gan-deep-audit.log
 - [x] Token savings analysis working (per-packet estimates)
 - [x] Production hardening checks implemented (4 categories)
 - [x] Agentic recommendations generated (6 recommendation types)
-- [x] Full integration with GAN audit pipeline
+- [x] Core-module integration with the GAN audit (endpoint/runtime/telemetry replay NOT proven)
 - [x] Comprehensive documentation and examples
-- [x] Ready for production use
+- [ ] ~~Ready for production use~~ -> `READY_FOR_CURRENT_OWNER_REPLAY` (production promotion needs the GAN-AUDIT replay/identity/cache/semantic/runtime/receipt gates)
 
 ---
 
@@ -393,16 +425,16 @@ npm run atlas:gan-audit:deep:full 2>&1 | tee logs/gan-deep-audit.log
 
 - [ ] Wire `/api/atlas/gan-audit/deep` endpoint
 - [ ] Add npm scripts to `sveltekit-frontend/package.json`
-- [ ] Create `feature_registry_queries` audit table
+- [ ] ~~Create `feature_registry_queries` audit table~~ do NOT create yet: first census whether current telemetry/receipt/workflow-event owners already hold this data
 - [ ] Update OpenCode skill docs with deep audit patterns
 - [ ] Add Grafana dashboard for token savings metrics
 - [ ] Set up alerts (critical hardening issues > threshold)
 - [ ] Run initial deep audit on production data
-- [ ] Integrate recommendations into LangGraph worker
+- [ ] ~~Integrate recommendations into LangGraph worker~~ historical path; trace current adaptive-DAG/agent-runtime ownership first (GAN-AUDIT-RUNTIME-01)
 
 ---
 
 **Maintained by**: Claude (Anthropic)  
 **Last Updated**: June 26, 2026 @ 18:15 UTC  
 **Session**: 85 (Phase 2.5 Continuation)  
-**Status**: ✅ FEATURE-COMPLETE, READY FOR INTEGRATION
+**Status**: PROVEN_HISTORICAL_REQUIRES_CURRENT_REPLAY (was "FEATURE-COMPLETE, READY FOR INTEGRATION"; now READY_FOR_CURRENT_OWNER_REPLAY)
