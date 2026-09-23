@@ -2,6 +2,35 @@
 
 Generated from the current workstation evidence. This is the production-readiness board for the remaining open lanes, not a runtime plan.
 
+## Current-State Overlay — 2026-09-23 (supersedes older statements below where they conflict)
+
+This file is a lane index, not current truth. Everything below this overlay is historical evidence until individually reconciled; current truth comes from OpenSpec `tasks.md` files and revision-qualified receipts in `docs/reports/`. Section labels used from here on: `CURRENT` | `PROVEN_HISTORICAL` | `STALE_REQUIRES_REPLAY` | `EXPERIMENTAL_CHALLENGER`. Snapshot conflicts (e.g. "Neo4j USED_CONCEPT 32,012 edges" in Completed lanes vs "USED_CONCEPT / Neo4j projection coverage: 0%" in Runtime Coverage Audit) are different-date snapshots, not two current facts: neither is current until replayed.
+
+Invariant: OWNER != REPRESENTATION != EXECUTOR != TRANSPORT.
+
+| Surface | Current owner | State to record |
+|---|---|---|
+| Source/file/symbol identity | current source authority + registry chain | root dependency; directory readiness does NOT imply canonical revision authority |
+| Packet evidence | Postgres packet owners | `packet_key` live; representation/projection IDs are not canonical identity |
+| External docs | Postgres `atlas_external_doc_pages/chunks` | 30 pages / 852 chunks canonical; FTS + Studio consumer PROVEN |
+| Doc semantics | `content_embedding` + frozen `representationRevision` `semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be` | 852/852 populated (EmbeddingGemma `:8081`); DOC-19 exact oracle PROVEN; `aedc_embedding_hnsw` exists, ANN parity is a separate executor proof |
+| Summary analysis | `atlas_external_doc_analyses` | writer PROVEN (rollback canary); persistent rows 0; faithfulness gate OPEN (`LDR-VALIDATION-SPINE-01`) |
+| Lexical | `rg` exact + PostgreSQL FTS/trigram (BM42 only where actually owned) | old "BM25 everywhere" wording is not current authority |
+| Semantic retrieval | ONE logical semantic lane / one vote | pgvector exact/HNSW, Qdrant, cuVS, CAGRA, IVF-PQ = executor choices; Qdrant external-doc projection NOT YET proven for the 852 cohort |
+| Graph | Neo4j/cuGraph | projection, not an evidence owner |
+| Cache | Valkey/BitFrost/ACE residency | disposable derived state |
+| Synthesis | Ornith-1.5-9B on llama-server `:8090` | Gemma4 names below are compatibility labels only; Ollama is not on the LDR/synthesis path |
+| Workflow | Adaptive DAG | decides actions, fetches, validators |
+| Events | NATS/JetStream (shadow), RabbitMQ (existing dispatch where wired) | progress/audit only, never canonical authority |
+| Learning | receipts -> offline evaluation -> challenger | no model/policy self-promotes |
+| Accelerators | TensorRT-RTX, simdjson N-API, TurboVec/TurboQuant, QUIC | benchmark/challenger only; TurboQuant/TurboVec role = representation/executor challenger, owns no identity |
+
+Two retrieval surfaces, never one corpus: **CODEBASE/PACKET** (Postgres packets -> rg/AST/`semantic_768` codebase lane/graph -> fusion -> ACE -> Ornith; `codebase_chunks_768`) and **EXTERNAL DOCUMENT** (`atlas_external_doc_pages/chunks` -> Postgres FTS -> `semantic_768` doc cohort -> exact/HNSW -> later Qdrant projection -> LDR ContextManifest -> Ornith). The 852 doc vectors and `codebase_chunks_768` must not be treated as one corpus.
+
+LDR path: `DeepResearchRequestV1` -> local canonical retrieval -> coverage decision -> bounded acquisition only for gaps (BeautifulSoup = normalization owner; Firecrawl v2 = optional adapter; Playwright/Crawl4AI = fallback only; acquisition method never owns chunk identity) -> `EvidenceEnvelopeV1` -> `ContextManifestV1` -> Ornith `:8090` -> validators (identity/revision -> Zod -> Pydantic mirror -> exact token/number/version/span -> OaK only for typed assertions -> bounded semantic judge -> DAG ADMIT/REVIEW/REJECT) -> `ResearchReceiptV1` -> `LearningReceiptV1`. OaK is a frozen typed kernel, not an LLM judge. Detail and tasks: `openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md` Phase V.
+
+Dependency order (replaces "Finish Order" below): P0 authority/lineage -> P1 canonical retrieval (Postgres rows, rg/FTS, exact oracle, HNSW parity) -> P2 feature/context (CandidateFeatureMatrix, OaK/structural evidence, ContextManifest, ACE) -> P3 LDR/validation spine -> P4 projections/executors (Qdrant projection, cuVS exact, CAGRA, IVF-PQ, Neo4j/cuGraph) -> P5 learned challengers (XGBoost, classifier/policy, PyTorch policy) -> P6 accelerators. Doc-lane next chain: `LDR-VALIDATION-SPINE-01` -> summary semantic faithfulness -> bounded `--apply --limit 20` (explicit authorization) -> Postgres HNSW parity -> DOC-03B acquisition router -> LDR local-first wiring -> Qdrant external-doc cohort projection -> DOC-20 CAGRA / DOC-21 IVF-PQ. Source-authority/identity gates stay upstream blockers for codebase canonical promotion.
+
 ## Event Plane
 
 PostgreSQL is the canonical task, gate, checkpoint, and outbox store for Atlas work. RabbitMQ handles durable async dispatch, Redis / Valkey holds hot context and leases, Arrow + `mmap` hold immutable batch snapshots, and gRPC / Protobuf carries typed sidecar commands. Browser-local work stays in Web Workers, IndexedDB, Service Workers, and SharedArrayBuffer; those are compute or cache lanes only, not canonical state.
@@ -306,7 +335,7 @@ Accelerator boundary:
 
 ### Status
 
-Production-ready at the directory level.
+[STALE_REQUIRES_REPLAY] Directory projection/readiness proofs exist (original wording "Production-ready at the directory level" was too broad: the same file records a 0/6765 `atlas_feature_map` <-> `parent_atlas_documents` join and 0% SOM coverage).
 
 The directory-lineage foundation is healthy, the core topology chain is now working, and the remaining work now moves into higher-order graph, recommendation, and storage-tiering lanes.
 
@@ -376,8 +405,8 @@ Approx completion: ~75%
 Approx completion: ~65%
 
 - HyperRAG Packet RPC / Qdrant tagging: packet contract helper is wired, ACE-ready packet metadata now emits `packet_type`, `canonical_source_ref`, `recommended_action`, and `verification_command`; remaining gap is telemetry depth / E2E benchmark gating rather than core fusion wiring
-- 5-stage ANN cascade operational: BM25 + Qdrant ANN + TurboVec + Neo4j expansion + RRF fusion
-- XGBoost reranker (Stage 4): all 7 training gates now pass; training unblocked
+- [PROVEN_HISTORICAL, packet retrieval only; re-prove which logical lanes/executors are active before citing; not the external-doc/LDR architecture] 5-stage ANN cascade operational: BM25 + Qdrant ANN + TurboVec + Neo4j expansion + RRF fusion
+- [PROVEN_HISTORICAL, TRAINING_READY_AT_2026-06-12_SNAPSHOT] XGBoost reranker (Stage 4): all 7 training gates passed then; revalidate current feature cohort (old names such as `bm25_rank_norm`) -> freeze dataset checksum -> train -> NDCG gate -> shadow serve; no ranking authority until parity/eval
 - higher-hop enrichment and supernode backfill: open
 - packet reader / writer: implementation lane for replayable NDJSON/JSONL packet flow; the current full-corpus bounded apply now tags batching, full materialization, resume semantics, atomic publication, and Qdrant mirror as PROVEN while identity coverage remains partial; evidence: `docs/reports/packet-reader-writer-audit.json` and `docs/reports/qdrant-postgres-mirror-reconciliation.json`
 - SOM 20x20 / auto-clustering: follows the packet reader/writer and graph pass before board consolidation
@@ -657,7 +686,7 @@ Read-only community coverage audit:
 
 ### Updated Status
 
-Status: Production-ready at the directory level.
+Status: [STALE_REQUIRES_REPLAY] directory projection/readiness proofs exist; not "production-ready" (see overlay).
 
 P0 is now:
 
@@ -674,7 +703,7 @@ P0 tasks #3 and #4 are now verified complete by `scripts/atlas/verify-feature-li
 - Use `sveltekit-frontend/.opencode/tasks/task-state.md` and `npm run opencode:tasks:refresh` for the durable Kanban layer.
 - Concept-memory telemetry is live on `packet_keys` and `feature_ids`; `evidence_cards` is compatibility/backfill only.
 
-## Current Runtime Topology Order
+## HISTORICAL_RUNTIME_ORDER (undated snapshot; STALE_REQUIRES_REPLAY — was titled "Current Runtime Topology Order"; conflicts with sections that call Neo4j edge projection complete)
 
 1. Feature coverage: close `feature_id` payload/fallback gaps to >95%.
 2. Replay telemetry: 50+ golden/cache-hit/graph/low-density/Kanban queries, one row per query.
@@ -903,7 +932,7 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
   - `.tmp/kanban_tasks.jsonl`
   - `.tmp/missing_feature_todos.jsonl`
 
-### 4. Engram / Gemma4 memory wiring
+### 4. Engram memory wiring (label kept for cross-reference; synthesis owner is Ornith `:8090`, Gemma4 = legacy compatibility label only)
 - Status: partial
 - Missing: dedicated Engram adapter startup hook
 - Finish line:
@@ -1045,7 +1074,7 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 - Report: `docs/reports/domain-ontology-classification.json`
 
 ### 12. Proto / RPC tool registry
-- Status: **open** (P0 — enables Gemma4 to receive narrowed tools[], not a flat 300+ list)
+- Status: **open** (P0 — tool registry -> revision-qualified capability candidates -> bounded top-K `tools[]` -> Ornith `:8090` / agent runtime, not a flat 300+ list; wording was "Gemma4 receives narrowed tools[]")
 - Active proto files: `chat_assistant, chr97_agent, codeintel, codeintel_enrichment, embedding, evidence_metadata, gpu_bridge, library_search, retrieval, tool_calling, turbovec, vectors`
 - Compatibility: `turbovec_cuda.proto`
 - Archived: `ai-service, analytics-service, auth, case_scoring, chat, cuda, embed`
@@ -1118,7 +1147,7 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 - [ ] keep Gemma4 away from raw large artifacts by default
 - [ ] keep TurboVec / KAG / DAG / ACE / Bitfrost / Redis / Qdrant on the hot-indexed lane, not on raw artifact parsing
 
-### 4. Engram / Gemma4 memory wiring
+### 4. Engram memory wiring (label kept for cross-reference; synthesis owner is Ornith `:8090`, Gemma4 = legacy compatibility label only)
 - [ ] keep `repo_report_answer` as the repo-audit path
 - [ ] keep `gemma4_chat` deprecated
 - [ ] decide whether Engram stays optional or gets a startup hook
@@ -1208,7 +1237,9 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 - [x] sync meaningful Neo4j trace edges only after trace coverage is stable
 - [x] enrich Qdrant payloads with concept IDs, community ID, temperature, strategy, and trace count only after trace coverage is stable
 
-## Finish Order
+## Finish Order — HISTORICAL_FINISH_ORDER (packet-centric, STALE_REQUIRES_REPLAY; superseded by the dependency order in the Current-State Overlay at the top)
+
+Kept for archaeology only. Do not start with "XGBoost first"; XGBoost/PyTorch policy are P5 learned challengers, and QLoRA/RL export stays last.
 
 1. XGBoost supervised reranker — train (`npm run atlas:xgboost:train`) + smoke (`atlas:xgboost:serve` + `atlas:cascade:smoke`)
 2. Proto/RPC tool registry packetization — audit-proto-registry.mjs → packetize gRPC services + RPC methods → embed tool manifests → Qdrant rpc retrieval → Neo4j rpc graph → MCP runtime selection
@@ -1219,7 +1250,7 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 7. Atlas / NESCHR97 cold-storage restore proof — finish remaining 3.7% LD-JSON surfaces; tier Gemma checkpoint to cold storage
 8. QLoRA/RL policy export — only after reward labels are stable and ≥500 success traces with NDCG≥0.80
 
-Completed lanes (no further action needed):
+Completed lanes (PROVEN_HISTORICAL snapshot; each count below is dated and must be replayed before being cited as current, e.g. USED_CONCEPT 32,012 edges vs the later 0% projection-coverage audit):
 - ✅ Domain ontology classification (100% addressable gate)
 - ✅ Startup intelligence (7/7 gates)
 - ✅ Neo4j USED_CONCEPT (32,012 edges)
@@ -1238,8 +1269,8 @@ Completed lanes (no further action needed):
 - Domain classification coverage ≥95% (addressable). ✅
 - XGBoost reranker smoke reports `rerank_source=xgboost` or explicit sidecar model type.
 - OpenCode startup uses ACE, recommendations, Bitfrost, and tool-manifest candidates first.
-- Gemma4 receives narrowed `tools[]`, not a flat 300+ tool list.
-- No lane depends on hidden legacy Gemma4 forwarding.
+- The synthesis/agent runtime (Ornith `:8090`) receives bounded top-K `tools[]`, not a flat 300+ tool list.
+- No lane depends on hidden legacy Gemma4 forwarding (Gemma4 filenames/exports are compatibility labels only).
 - All mutations remain behind bounded scripts with `--apply`.
 
 ## Known Issue — Orphaned Test: `tests/rrf-fuse.spec.ts` (found 2026-09-09, not fixed)
