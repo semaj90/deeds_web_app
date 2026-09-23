@@ -528,3 +528,41 @@ Status: `LEGACY_TASK_LINK_SURFACE_ABSENT_PROPOSAL_ONLY`; migration and linking r
 unauthorized; `writesPerformed=false`.
 Evidence: bounded dry-run output `SCHEMA_SURFACE_UNAVAILABLE` and
 `docs/reports/migration-inventory-classification-v1.json`.
+
+### PACKET-KEY-SINGLE-OWNER-CONVERGENCE-01 — 2026-09-22 (read-only)
+
+- [x] Inventoried every `packet_key` producer (7 producers/schemes classified:
+  `CANONICAL_WRITER`, `LEGACY_WRITER`, `COMPATIBILITY_WRITER`,
+  `MIGRATION_BACKFILL`, `CANONICAL_OWNER_CANDIDATE` x2, `DEAD_ORPHAN`).
+- [x] Live census of `atlas_packets.packet_key` (61,718 rows): dominant
+  `packet:<12hex>` scheme 94.6%, `ace:packet:<12hex>` alias-equivalent cohort
+  5.3% (100% covered by `atlas_packet_identity_aliases`), a distinct RPC/proto
+  sub-domain scheme 0.1%, 1 unclassified legacy row. **Zero live rows** for
+  either non-live candidate scheme (`packet-key-builder.ts` hex64,
+  `compute-packet-key.ts` `pkt:`-workspace-scoped).
+- [x] Confirmed `packet-identity-resolver.ts::resolveCanonicalPacketKey()`
+  (built Session 200) already actively rejects both non-live candidate
+  schemes as `StructuralScopedAddressExperimentError` — production code has
+  already decided those two are not canonical, independent of this gate.
+- [x] Determined the live lifecycle contract empirically (no written spec
+  states it): `packet_key = f(source_ref)` only — revision-invariant, but
+  does NOT survive rename and is not derived from `stableFileId`.
+- [x] Added 7 new characterization tests
+  (`packet-key-dominant-scheme.spec.ts`) proving determinism, rename
+  non-survival, revision-invariance, scheme mutual-distinctness, and
+  legacy-prefix hash-equivalence; 9/9 pass with the pre-existing containment
+  spec.
+- [x] `openspec validate parent-atlas-retrieval-lineage-dag-convergence --strict`
+  and `openspec validate manual-migration-reconciliation --strict` both PASS.
+
+Result: `PACKET_KEY_LIFECYCLE_CONTRACT_UNDEFINED` — live data ownership is
+empirically single (not `OWNER_CONFLICT`; the one needed compatibility layer,
+the alias table, already exists and is fully applied), but no written
+contract states whether `packet_key` must survive rename or become
+revision-/`stableFileId`-qualified. This is what blocks judging whether
+`packet-key-builder.ts`'s hex64 candidate is the right future owner — a
+design question, independent of both open operator decisions above
+(S01-08K apply token; `PACKET-WRITER-PRODUCTION-OWNER-01` caller choice).
+No packet_key rewritten, no aliases inserted, no writers changed.
+`writesPerformed=false` across Postgres/Qdrant/Valkey/Neo4j.
+Evidence: `docs/reports/packet-key-single-owner-convergence-v1.json`.
