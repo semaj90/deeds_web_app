@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import unittest
 
-from atlas_external_docs import _heading_sections, extract_structured_text
+from atlas_external_docs import _heading_sections, chunk_document, extract_code_blocks_and_signatures, extract_structured_text
 
 
 class StructuredTextExtractionTests(unittest.TestCase):
@@ -85,3 +85,92 @@ class StructuredTextExtractionTests(unittest.TestCase):
         html = b"<html><body><main></main></body></html>"
         _title, text, _urls = extract_structured_text(html, base_url="https://example.test/")
         self.assertEqual(text, "")
+
+
+def _page(body: str) -> bytes:
+    return f"<html><body><main><h1>T</h1>{body}</main></body></html>".encode("utf-8")
+
+
+def _fenced_code(text: str) -> str:
+    blocks, _signatures = extract_code_blocks_and_signatures(text)
+    assert len(blocks) == 1, blocks
+    return blocks[0]["code"]
+
+
+class CodeTokenFidelityTests(unittest.TestCase):
+    """Regression guard: styling spans inside one logical source line must not introduce artificial newlines
+    (the pre-fix extractor used get_text("\\n"), splitting `hnsw.iterative_scan` into three lines)."""
+
+    def test_github_token_spans_stay_one_identifier(self) -> None:
+        html = _page('<pre><code><span>hnsw</span><span>.</span><span>iterative_scan</span></code></pre>')
+        _t, text, _u = extract_structured_text(html, base_url="https://example.test/")
+        self.assertEqual(_fenced_code(text), "hnsw.iterative_scan")
+
+    def test_assignment_statement_stays_one_logical_line(self) -> None:
+        html = _page(
+            '<div class="highlight highlight-source-sql"><pre>'
+            '<span class="pl-k">SET</span> <span class="pl-k">LOCAL</span> <span>hnsw</span>.<span>iterative_scan</span> '
+            '<span class="pl-k">=</span> relaxed_order;</pre></div>'
+        )
+        _t, text, _u = extract_structured_text(html, base_url="https://example.test/")
+        self.assertEqual(_fenced_code(text), "SET LOCAL hnsw.iterative_scan = relaxed_order;")
+
+    def test_github_highlight_source_language_is_the_language_not_the_word_source(self) -> None:
+        html = _page('<div class="highlight highlight-source-sql"><pre><span>SELECT 1;</span></pre></div>')
+        _t, text, _u = extract_structured_text(html, base_url="https://example.test/")
+        self.assertIn("```sql\n", text)
+        self.assertNotIn("```source", text)
+
+    def test_python_indentation_is_preserved_byte_for_byte_across_spans(self) -> None:
+        source = "def f(x):\n    if x:\n        return <1>\n    return 0"
+        html = _page(
+            '<pre><code class="language-python"><span>def</span> <span>f</span>(x):\n'
+            '    <span>if</span> x:\n        <span>return</span> &lt;1&gt;\n    <span>return</span> 0</code></pre>'
+        )
+        _t, text, _u = extract_structured_text(html, base_url="https://example.test/")
+        self.assertEqual(_fenced_code(text), source)
+        self.assertIn("```python", text)
+
+    def test_real_source_newlines_remain_separate_lines(self) -> None:
+        html = _page("<pre><code><span>first_line()</span>\n<span>second_line()</span></code></pre>")
+        _t, text, _u = extract_structured_text(html, base_url="https://example.test/")
+        self.assertEqual(_fenced_code(text).split("\n"), ["first_line()", "second_line()"])
+
+    def test_br_and_per_line_elements_without_newline_text_become_lines(self) -> None:
+        html = _page(
+            '<pre><code><span class="line"><span>a</span><span>.</span><span>b</span></span>'
+            '<span class="line"><span>c()</span></span></code></pre>'
+            '<pre><code>x<br>y</code></pre>'
+        )
+        _t, text, _u = extract_structured_text(html, base_url="https://example.test/")
+        blocks, _s = extract_code_blocks_and_signatures(text)
+        self.assertEqual([b["code"] for b in blocks], ["a.b\nc()", "x\ny"])
+
+    def test_shiki_style_lines_with_newline_text_do_not_gain_blank_lines(self) -> None:
+        html = _page('<pre><code><span class="line"><span>a</span></span>\n<span class="line"><span>b</span></span></code></pre>')
+        _t, text, _u = extract_structured_text(html, base_url="https://example.test/")
+        self.assertEqual(_fenced_code(text), "a\nb")
+
+    def test_inline_code_retains_the_exact_identifier(self) -> None:
+        html = _page("<p>Set <code>hnsw.scan_mem_multiplier</code> to raise the memory budget.</p>")
+        _t, text, _u = extract_structured_text(html, base_url="https://example.test/")
+        self.assertIn("`hnsw.scan_mem_multiplier`", text)
+
+    def test_inline_code_with_nested_spans_is_not_split(self) -> None:
+        html = _page("<p>Use <code><span>vector</span><span>_cosine_ops</span></code> here.</p>")
+        _t, text, _u = extract_structured_text(html, base_url="https://example.test/")
+        self.assertIn("`vector_cosine_ops`", text)
+
+    def test_exact_api_identifiers_survive_into_chunks_and_signature_extraction(self) -> None:
+        html = _page(
+            "<pre><code><span>SET</span> <span>hnsw</span>.<span>iterative_scan</span> = <span>strict_order</span>;</code></pre>"
+            "<p>Also <code>hnsw.scan_mem_multiplier</code>; index with "
+            "<code>halfvec_cosine_ops</code> or <code>vector_cosine_ops</code>.</p>"
+        )
+        _t, text, _u = extract_structured_text(html, base_url="https://example.test/")
+        chunks = chunk_document(source_id="s", source_revision="r", source_url="https://example.test/", title="T", text=text)
+        joined = "\n".join(chunk.text for chunk in chunks)
+        for identifier in ("hnsw.iterative_scan", "hnsw.scan_mem_multiplier", "halfvec_cosine_ops", "vector_cosine_ops"):
+            self.assertIn(identifier, joined)
+        block_code = [block["code"] for chunk in chunks for block in chunk.code_blocks]
+        self.assertIn("SET hnsw.iterative_scan = strict_order;", block_code)

@@ -236,6 +236,11 @@ def fetch_firecrawl_v2(url: str, *, api_key: str, timeout_seconds: int = 60) -> 
 
 
 _CODE_LANGUAGE_RE = re.compile(r"(?:language|lang|highlight)-([a-zA-Z0-9+#]+)")
+# GitHub wraps rendered code as ``<div class="highlight highlight-source-sql">``; the language is the part after
+# ``source-`` (the generic pattern above would report the literal word "source").
+_GITHUB_HIGHLIGHT_SOURCE_RE = re.compile(r"^highlight-source-([a-zA-Z0-9+#]+)")
+# Syntax highlighters that emit one element per source line, sometimes with no newline text node between lines.
+_CODE_LINE_CLASSES = frozenset({"line", "code-line", "token-line", "highlight-line", "cm-line"})
 
 
 def _detect_code_language(tag: Any) -> str | None:
@@ -247,11 +252,52 @@ def _detect_code_language(tag: Any) -> str | None:
         if node is None:
             break
         for cls in node.get("class") or []:
+            github = _GITHUB_HIGHLIGHT_SOURCE_RE.match(str(cls))
+            if github:
+                return github.group(1).lower()
             match = _CODE_LANGUAGE_RE.match(str(cls))
             if match:
                 return match.group(1).lower()
         node = getattr(node, "parent", None)
     return None
+
+
+def _code_block_text(node: Any) -> str:
+    """Source text of a ``<pre>``/``<code>`` subtree.
+
+    A newline exists in the result only where the source has one: a literal newline in a text node, a ``<br>``, or a
+    boundary between per-line highlighter elements (``class="line"`` and friends) that have no newline text between
+    them. Styling ``<span>`` elements inside one logical line are concatenated with NO separator. (The previous
+    ``get_text("\\n")`` put a newline between every text node, so ``<span>hnsw</span><span>.</span><span>iterative_scan</span>``
+    became three lines and exact API tokens like ``hnsw.iterative_scan`` were destroyed.)
+    """
+    from bs4.element import NavigableString, PreformattedString, Tag
+
+    parts: list[str] = []
+    tail = ""  # last emitted character
+
+    def emit(value: str) -> None:
+        nonlocal tail
+        if value:
+            parts.append(value)
+            tail = value[-1]
+
+    def walk(current: Any) -> None:
+        for child in current.children:
+            if isinstance(child, PreformattedString):  # comments, CDATA, doctype
+                continue
+            if isinstance(child, NavigableString):
+                emit(str(child))
+            elif isinstance(child, Tag):
+                if child.name == "br":
+                    emit("\n")
+                    continue
+                if _CODE_LINE_CLASSES.intersection(child.get("class") or []) and parts and tail != "\n":
+                    emit("\n")
+                walk(child)
+
+    walk(node)
+    return "".join(parts)
 
 
 def extract_structured_text(raw_html: bytes | str, *, base_url: str) -> tuple[str, str, tuple[str, ...]]:
@@ -287,7 +333,7 @@ def extract_structured_text(raw_html: bytes | str, *, base_url: str) -> tuple[st
     for pre in main.find_all("pre"):
         code_tag = pre.find("code")
         language = _detect_code_language(code_tag) or _detect_code_language(pre)
-        code_text = (code_tag or pre).get_text("\n").strip("\n")
+        code_text = _code_block_text(code_tag or pre).strip("\n")
         fence = f"```{language or ''}\n{code_text}\n```"
         placeholder = f"\x00CODEBLOCK{len(code_fences)}\x00"
         code_fences.append(fence)

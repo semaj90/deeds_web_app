@@ -685,6 +685,8 @@ vectors/*.feather
 ########################################
 *.jsonl
 !docs/reports/workstation-soak-history.jsonl
+# Generated (deterministic, offline) DOC-06A handoff envelopes; rebuilt by scripts/atlas/build-external-doc-admission-envelopes-v1.py
+docs/.okf/pinned/admission-envelopes-v1.json
 # NES/CHROM packet pipeline interchange files — must be tracked
 !memory/packets/*.jsonl
 !memory/packets/lora-training-pairs*.jsonl

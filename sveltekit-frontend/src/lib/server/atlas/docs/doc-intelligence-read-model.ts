@@ -20,7 +20,7 @@ export const STALE_AFTER_DAYS = 30;
 export const REQUIRED_TERM_GROUPS = [
 	{ group: 'svelte', terms: ['$state', '$derived', '$effect', 'SSR', 'load', '+page.server'] },
 	{ group: 'bits-ui', terms: ['bits-ui', 'bind', 'snippet', 'children'] },
-	{ group: 'drizzle', terms: ['halfvec', 'vector', 'hnsw', 'operator class', 'vector_cosine_ops', 'halfvec_cosine_ops'] },
+	{ group: 'drizzle', terms: ['halfvec', 'vector', 'hnsw', 'operator class', 'vector_cosine_ops', 'halfvec_cosine_ops', 'drizzle-kit'] },
 	{ group: 'pgvector', terms: ['hnsw.iterative_scan', 'strict_order', 'relaxed_order', 'hnsw.max_scan_tuples', 'hnsw.scan_mem_multiplier'] },
 	{ group: 'postgresql18', terms: ['io_method', 'effective_io_concurrency', 'maintenance_io_concurrency', 'pg_aios', 'Bitmap Heap Scan', 'asynchronous I/O', 'uuidv7'] }
 ] as const;
@@ -39,6 +39,7 @@ export type RuntimeCompatibility = 'MATCH' | 'NEWER_UPSTREAM' | 'UNKNOWN';
 export type CoverageStatus = 'CAPTURED_CURRENT' | 'CAPTURED_STALE' | 'VERSION_UNQUALIFIED' | 'MISSING';
 export type AuthorityLabel = 'CANONICAL_POSTGRES' | 'GENERATED_CORPUS' | 'REFERENCE_ONLY' | 'DERIVED_ANALYSIS';
 export type AuthorityBadge = AuthorityLabel;
+export type TermHitStatus = 'LITERAL_HIT' | 'TOKEN_ONLY_HIT' | 'MISSING';
 export type DriftStatus = 'EXACT_MATCH' | 'COMPATIBLE_SERIES' | 'UPSTREAM_NEWER' | 'DOC_STALE' | 'DOC_MISSING' | 'UNVERSIONED';
 
 export interface SourceCapture {
@@ -285,7 +286,9 @@ export function collectLocalCaptures(root: string, runtime: RuntimeVersions): { 
 	} else issues.push({ code: 'DEV_SUMMARY_MISSING', detail: 'docs/.okf/dev/summary.json' });
 
 	const corpusPath = join(dev, 'corpus.jsonl');
-	if (!existsSync(corpusPath)) issues.push({ code: 'DEV_CORPUS_MISSING', detail: 'docs/.okf/dev/corpus.jsonl' });
+	// corpus.jsonl is a gitignored, rebuildable index (`*.jsonl`); the tracked raw pages are the evidence. Its absence is
+	// only an issue when there is no raw evidence at all (a fresh checkout has raw pages but not the JSONL).
+	if (!existsSync(corpusPath) && listFiles(join(dev, 'raw'), '.md').length === 0) issues.push({ code: 'DEV_CORPUS_MISSING', detail: 'docs/.okf/dev/corpus.jsonl' });
 	const { rows, badLines } = readJsonl(corpusPath);
 	if (badLines) issues.push({ code: 'DEV_CORPUS_UNPARSEABLE_LINES', detail: String(badLines) });
 
@@ -383,7 +386,9 @@ export function scanRequiredTerms(root: string, terms: readonly string[] = REQUI
 			// misses it. Whitespace-insensitive hits are reported separately and never counted as literal support.
 			split += Math.max(0, count(compact, compactNeedle) - literal);
 		}
-		return { term, totalHits: Object.values(bySource).reduce((a, b) => a + b, 0), tokenSplitHits: split, sources: bySource };
+		const totalHits = Object.values(bySource).reduce((a, b) => a + b, 0);
+		const status: TermHitStatus = totalHits > 0 ? 'LITERAL_HIT' : split > 0 ? 'TOKEN_ONLY_HIT' : 'MISSING';
+		return { term, status, totalHits, tokenSplitHits: split, sources: bySource };
 	});
 }
 
@@ -639,7 +644,13 @@ export function readManifestSources(root: string, coords: CoordinatesFile | null
 }
 
 export function readLangExtractStatus(root: string): LangExtractStatus {
-	const { rows } = readJsonl(join(root, 'docs', '.okf', 'langextract', 'corpus.jsonl'));
+	// Prefer the tracked manifest's documents (same rows as the gitignored corpus.jsonl); fall back to the JSONL.
+	let rows: Record<string, unknown>[] = [];
+	try {
+		const manifestPath = join(root, 'docs', '.okf', 'langextract', 'manifest.json');
+		if (existsSync(manifestPath)) rows = ((JSON.parse(readFileSync(manifestPath, 'utf8')) as { documents?: Record<string, unknown>[] }).documents) ?? [];
+	} catch { rows = []; }
+	if (!rows.length) rows = readJsonl(join(root, 'docs', '.okf', 'langextract', 'corpus.jsonl')).rows;
 	const count = (pred: (r: Record<string, unknown>) => boolean) => rows.filter(pred).length;
 	const blockers = [
 		{ code: 'LANGEXTRACT_ROWS_LACK_DOC_COORDINATE', count: count((r) => !r.doc_coordinate && !r.evidence_revision && !r.product_version) },

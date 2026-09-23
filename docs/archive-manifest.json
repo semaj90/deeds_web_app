@@ -551,5 +551,12 @@
     "sha256": "03c5a7f1f58179afee7677a280bfab67cc6f24a9155c363ddefc0e66cdaeb569",
     "archived": "2026-09-23T16:17:29Z",
     "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": "docs/.okf/pinned/fetch-receipt-okf-pinned-docs-r1.json",
+    "archive_path": "deeds_labs/archive/2026-09-23/fetch-receipt-okf-pinned-docs-r1.json",
+    "sha256": "04e30b7dc63f09275368cc9a1cac2d79db1ab9369582689287d0346562b52e12",
+    "archived": "2026-09-23T17:19:46Z",
+    "reason": "stale scratch receipt from the first 21-page inline fetch (6 sources); superseded by docs/reports/external-doc-admission-envelopes-v1.json from the manifest-driven builder. Not consumed by any validator."
   }
 ]

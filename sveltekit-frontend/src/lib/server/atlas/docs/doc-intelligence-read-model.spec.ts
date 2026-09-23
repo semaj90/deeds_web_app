@@ -87,6 +87,15 @@ describe('corpus validator', () => {
 		expect(sources.find((s) => s.sourceId === 'drizzle-orm')).toMatchObject({ versionQualification: 'CURRENT_UPSTREAM', runtimeCompatibility: 'UNKNOWN' });
 	});
 
+	it('does not require the gitignored corpus.jsonl when tracked raw evidence exists (fresh checkout)', () => {
+		writeDev(); writeAllGroups();
+		writeFileSync(join(root, 'docs', '.okf', 'dev', 'raw', 'page.md'), '# raw');
+		rmSync(join(root, 'docs', '.okf', 'dev', 'corpus.jsonl'));
+		expect(collectLocalCaptures(root, RUNTIME).issues.map((i) => i.code)).not.toContain('DEV_CORPUS_MISSING');
+		rmSync(join(root, 'docs', '.okf', 'dev', 'raw', 'page.md'));
+		expect(collectLocalCaptures(root, RUNTIME).issues.map((i) => i.code)).toContain('DEV_CORPUS_MISSING');
+	});
+
 	it('flags a missing referenced markdown file', () => {
 		writeDev([{ source_id: 's', source_ref: 'r', url: 'u', title: 't', content_hash: 'h', fetched_at: daysAgo(1), markdown_path: join(root, 'nope.md') }]);
 		writePinned('pgvector', 'p1', { url: 'https://github.com/pgvector/pgvector', skipMarkdown: true });
@@ -121,8 +130,9 @@ describe('corpus validator', () => {
 	it('counts required terms literally and reports token-split hits separately', () => {
 		writePinned('pgvector', 'p1', { url: 'https://github.com/pgvector/pgvector', text: 'SET\nhnsw\n.\niterative_scan\n=\nx\nio_method' });
 		const byTerm = Object.fromEntries(scanRequiredTerms(root).map((t) => [t.term, t]));
-		expect(byTerm['hnsw.iterative_scan']).toMatchObject({ totalHits: 0, tokenSplitHits: 1 });
-		expect(byTerm.io_method.totalHits).toBe(1);
+		expect(byTerm['hnsw.iterative_scan']).toMatchObject({ status: 'TOKEN_ONLY_HIT', totalHits: 0, tokenSplitHits: 1 });
+		expect(byTerm.io_method).toMatchObject({ status: 'LITERAL_HIT', totalHits: 1 });
+		expect(byTerm.uuidv7.status).toBe('MISSING');
 	});
 });
 

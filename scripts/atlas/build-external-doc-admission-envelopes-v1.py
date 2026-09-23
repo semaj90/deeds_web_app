@@ -73,19 +73,22 @@ def build(manifest, coords: dict) -> tuple[list[dict], dict]:
     for source in manifest.sources:
         cfg = coords["sources"][source.source_id]
         raw_dir = ROOT / source.output_namespace / "raw"
-        native = {}
-        chunks_path = ROOT / source.output_namespace / "chunks.jsonl"
-        if chunks_path.exists():
-            for line in chunks_path.read_text(encoding="utf-8").splitlines():
-                if line.strip():
-                    row = json.loads(line)
-                    native[row["chunk_id"]] = row
-                    native_total += 1
-                    native_null += 1 if row.get("doc_coordinate") is None else 0
         for receipt_path in sorted(raw_dir.glob("*.json")):
             receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
             text = receipt_path.with_suffix(".md").read_text(encoding="utf-8").replace("\r\n", "\n")
             url = receipt["resolved_url"]
+            # Native pipeline output, recomputed deterministically from the committed raw page (chunks.jsonl is a
+            # gitignored, rebuildable intermediate and must not be required): the pipeline's own compile_chunks.
+            artifact = P.PageArtifact(
+                source_id=source.source_id, source_revision=source.source_revision, requested_url=receipt["requested_url"],
+                resolved_url=url, title=receipt["title"], text=text, fetcher=receipt["fetcher"], raw_checksum=receipt["raw_checksum"],
+                normalized_checksum=receipt["normalized_checksum"], outgoing_urls=tuple(receipt.get("outgoing_urls") or ()),
+                metadata=receipt.get("metadata") or {},
+            )
+            native = {c.chunk_id: c for c in P.compile_chunks([artifact], stanza_pipeline=None, stanza_model_revision="none",
+                                                              maximum_chars=MAX_CHARS, overlap_chars=OVERLAP)}
+            native_total += len(native)
+            native_null += sum(1 for c in native.values() if c.doc_coordinate is None)
             override = cfg.get("urlOverrides", {}).get(url, {})
             qualification = override.get("versionQualification", cfg["versionQualification"])
             authority_class = override.get("authorityClass", cfg["authorityClass"])
@@ -101,7 +104,7 @@ def build(manifest, coords: dict) -> tuple[list[dict], dict]:
                                     doc_coordinate=coordinate)
             chunk_rows = []
             for c in chunks:
-                if c.chunk_id in native and native[c.chunk_id]["chunk_checksum"] != sha(c.text):
+                if c.chunk_id not in native or native[c.chunk_id].text != c.text:
                     parity_mismatch += 1
                 chunk_rows.append({
                     "chunkId": c.chunk_id, "ordinal": c.ordinal, "headingPath": list(c.heading_path),

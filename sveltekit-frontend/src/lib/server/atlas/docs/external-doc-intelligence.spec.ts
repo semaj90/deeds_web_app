@@ -71,6 +71,14 @@ describe('langextract / symbol index / analysis status', () => {
 		expect(readLangExtractStatus(root).result).toBe('LANGEXTRACT_DOC_EVIDENCE_JOIN_READY');
 	});
 
+	it('reads the tracked manifest documents when the gitignored corpus.jsonl is absent', () => {
+		mkdirSync(join(root, 'docs', '.okf', 'langextract'), { recursive: true });
+		writeFileSync(join(root, 'docs', '.okf', 'langextract', 'manifest.json'), JSON.stringify({ documents: [{ source_id: 'a', source_url: 'https://x' }] }));
+		const s = readLangExtractStatus(root);
+		expect(s.documents).toBe(1);
+		expect(s.result).toBe('LANGEXTRACT_DOC_EVIDENCE_JOIN_BLOCKED');
+	});
+
 	it('reports the ast-grep symbol mapping as incomplete when records have no chunk link or byte span', () => {
 		mkdirSync(join(root, 'scripts', 'docs-atlas'), { recursive: true });
 		mkdirSync(join(root, 'docs', '.okf', 'dev'), { recursive: true });

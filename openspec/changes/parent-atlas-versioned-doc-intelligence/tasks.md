@@ -901,21 +901,33 @@ DDL or source-of-truth change was applied.
   names the Studio as the shell) via `doc-intelligence-read-model.ts` + `GET /api/admin/atlas/docs-corpus[/search]`,
   SSR-rendered (`DocCorpusPanel.ssr.spec.ts`). `npm run atlas:docs:studio:smoke` writes
   `docs/reports/external-doc-studio-readiness-v1.json` (supersedes `doc-corpus-studio-smoke-v1.json`).
-  Result: `DOC_ADMISSION_HANDOFF_BLOCKED` (secondary `DOC_CANONICAL_CORPUS_EMPTY`). 30 pages / 881 chunks were
-  acquired through the existing pipeline (`docs/.okf/dev/pinned-docs.manifest.json` + coordinates sidecar) and
-  never admitted: `admitExternalDocPage` still has no runtime caller and no database write was made. Typed
-  blockers: (1) `PIPELINE_DOES_NOT_EMIT_DOC_COORDINATE` — `SourceConfigV1` forbids provider/product/version
-  fields, so all 881 native chunks carry `doc_coordinate=null`; (2) `CHUNK_EVIDENCE_REVISION_NOT_UNIQUE` —
-  DocCoordinateV1's chunk revision hashes (url, section_anchor, document hash), so 314 of 881 chunks collide and
+  Result: `DOC_ADMISSION_HANDOFF_BLOCKED` (secondary `DOC_CANONICAL_CORPUS_EMPTY`). 30 pages / 847 chunks (after
+  the extractor fix below; 881 before) were acquired through the existing pipeline
+  (`docs/.okf/dev/pinned-docs.manifest.json` + coordinates sidecar) and never admitted: `admitExternalDocPage`
+  still has no runtime caller and no database write was made. Typed blockers: (1)
+  `PIPELINE_DOES_NOT_EMIT_DOC_COORDINATE` — `SourceConfigV1` forbids provider/product/version fields, so all 847
+  native chunks carry `doc_coordinate=null`; (2) `CHUNK_EVIDENCE_REVISION_NOT_UNIQUE` — DocCoordinateV1's chunk
+  revision hashes (url, section_anchor, document hash), so 280 of 847 chunks collide and
   `atlas_external_doc_chunks_evidence_revision_uq` would reject them; a deterministic candidate (page revision +
-  chunkId + checksum + byte span) is unique for all 881 and needs an owner decision before any admission.
+  chunkId + checksum + byte span) is unique for all 847 and needs an owner decision before any admission.
   Also `AST_GREP_DOC_SYMBOL_MAPPING_INCOMPLETE` (dev symbol index: no chunk id / byte span / evidence revision,
   line-based spans, 0 symbols), `LANGEXTRACT_DOC_EVIDENCE_JOIN_BLOCKED` (no coordinate / chunk id / byte
   spans, URL-only join, absolute Windows paths) and `EXTERNAL_DOC_ANALYSIS_CONTRACT_READY`
   (`ExternalDocAnalysisV1` in `external-doc-intelligence-contracts-v1.ts`, no migration; `analysis_pass_results`
   reviewed and not reused). Closure of the admin/search item still needs admitted rows, Postgres provenance and
-  a live FTS hit; no ingestion, semantic/Qdrant or Ornith task is closed by this. Extractor finding: GitHub
-  highlighted code is captured one token per line, so `hnsw.iterative_scan` has 0 literal hits (`tokenSplitHits` 3).
+  a live FTS hit; no ingestion, semantic/Qdrant or Ornith task is closed by this.
+  **EXTRACTION FIDELITY FIX (`DOC-04` owner `atlas_external_docs.py`, 2026-09-23, evidence-backed):** root cause
+  was `get_text("\n")` on the code node in `extract_structured_text` (now `_code_block_text`), which put a newline
+  between every text node, so highlighted `<span>` tokens became one line each (`hnsw` / `.` / `iterative_scan`). Fixed in
+  the existing owner (no second parser): source newlines now exist only where the source has them (literal
+  newline, `<br>`, or a boundary between per-line `class="line"` elements with no newline text), and
+  `highlight-source-<lang>` now yields the real language. 10 new regression tests (8 fail on the old extractor);
+  50 focused Python tests pass. Re-acquired all 30 pinned pages: 22 normalized hashes changed (20 with identical
+  raw HTML = extractor-only; 2 GitHub pages whose HTML also moved), and `hnsw.iterative_scan` /
+  `hnsw.scan_mem_multiplier` are now `LITERAL_HIT`. Raw pages under `docs/.okf/pinned/*/raw` are tracked evidence
+  (same convention as `docs/.okf/dev/raw`); `*.jsonl` intermediates stay ignored and the smoke rebuilds its handoff
+  envelopes offline. Fresh-checkout input audit and receipt: `docs/reports/external-doc-corpus-reproducibility-v1.json`.
+  Still open: DOC-06A admission, semantic embedding, LangExtract integration, and Studio admin/search closure.
 - Classifying `docs/.okf/dev/*`'s "okf.dev.manifest.v1" corpus as CANONICAL_OWNER / EXPERIMENT /
   DEAD relative to `atlas_okf_docs_pipeline.py`'s manifest lineage — flagged in proposal.md's Risks
   section, needs its own short audit before Phase A assumes they're the same generation.
