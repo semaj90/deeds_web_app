@@ -4,8 +4,10 @@
 	let {
 		snapshot = null,
 		search = null,
-		query = ''
-	}: { snapshot?: DocIntelligenceStudioSnapshotV1 | null; search?: DocSearchResult | null; query?: string } = $props();
+		query = '',
+		product = '',
+		version = ''
+	}: { snapshot?: DocIntelligenceStudioSnapshotV1 | null; search?: DocSearchResult | null; query?: string; product?: string; version?: string } = $props();
 
 	const issueCount = $derived(snapshot?.issues.length ?? 0);
 	const yes = (value: boolean | null | undefined) => (value ? 'yes' : 'no');
@@ -101,21 +103,24 @@
 
 	<form method="GET" action="/admin/atlas#docs-corpus" class="flex gap-2" role="search">
 		<input type="search" name="docq" value={query} minlength="2" maxlength="300" placeholder="Search docs: halfvec, io_method, bitmap heap…" aria-label="Search documentation corpus" class="flex-1 px-2 py-1 bg-[#23221c] border border-[#5c594c] text-[0.7rem] text-[#efede4]" />
+		<input type="text" name="docprod" value={product} maxlength="100" placeholder="product (optional)" aria-label="Filter by product" class="w-28 px-2 py-1 bg-[#23221c] border border-[#5c594c] text-[0.7rem] text-[#efede4]" />
+		<input type="text" name="docver" value={version} maxlength="100" placeholder="version (optional)" aria-label="Filter by product version" class="w-32 px-2 py-1 bg-[#23221c] border border-[#5c594c] text-[0.7rem] text-[#efede4]" />
 		<button type="submit" class="px-3 py-1 border border-[#5c594c] text-[0.6rem] font-bold uppercase text-[#d1cdb8]">Search</button>
 	</form>
 
 	{#if search}
 		<p class="text-[0.6rem] text-[#a39f90]" data-testid="docs-search-mode">
-			{search.hits.length} result{search.hits.length === 1 ? '' : 's'} for “{search.query}” · {search.mode}{search.postgresNote ? ` · ${search.postgresNote}` : ''}{search.mode === 'LOCAL_LEXICAL' ? ' · NONCANONICAL' : ''}
+			{search.hits.length} result{search.hits.length === 1 ? '' : 's'} for “{search.query}” · {search.mode}{search.postgresNote ? ` · ${search.postgresNote}` : ''}{search.mode === 'LOCAL_LEXICAL' ? ' · NONCANONICAL (local reference fallback, not canonical Postgres results)' : ' · SOURCE CANONICAL'}{search.filters?.product || search.filters?.productVersion ? ` · filter ${search.filters?.product ?? '*'}${search.filters?.productVersion ? ` @ ${search.filters.productVersion}` : ''}` : ''}
 		</p>
 		<ul class="space-y-2" data-testid="docs-search-results">
-			{#each search.hits as hit (hit.url + hit.excerpt.slice(0, 40))}
+			{#each search.hits as hit (hit.chunkId ?? hit.url + hit.excerpt.slice(0, 40))}
 				<li class="border border-[#3f3e37] bg-[#23221c] px-3 py-2 text-[0.62rem]">
 					<div class="flex flex-wrap items-center gap-2">
 						<strong class="text-[#efede4]">{hit.title}</strong>
-						<span class="px-1.5 py-0.5 border text-[0.55rem] font-bold uppercase {badgeClass(hit.badge)}">{hit.badge}</span>
-						<span class="text-[#a39f90] font-mono">{hit.provider ?? '—'} / {hit.product ?? hit.sourceId}{hit.productVersion ? ` @ ${hit.productVersion}` : ''} · {hit.authorityClass}{hit.revision ? ` · ${hit.revision}` : ''}</span>
+						<span class="px-1.5 py-0.5 border text-[0.55rem] font-bold uppercase {badgeClass(hit.badge)}" data-source-class={hit.sourceClass}>{hit.sourceClass}</span>
+						<span class="text-[#a39f90] font-mono">{hit.provider ?? '—'} / {hit.product ?? hit.sourceId}{hit.productVersion ? ` @ ${hit.productVersion}` : ''} · {hit.authorityClass}{hit.revision && !hit.chunkEvidenceRevision ? ` · ${hit.revision}` : ''}</span>
 					</div>
+					{#if hit.chunkId}<p class="mt-1 text-[#a39f90] font-mono break-all" data-testid="docs-hit-provenance">chunk {hit.chunkId} · evidence {hit.chunkEvidenceRevision?.slice(0, 19)}… · page {hit.pageId?.slice(0, 8)}{hit.headingPath?.length ? ` · ${hit.headingPath.join(' › ')}` : ''}</p>{/if}
 					<p class="mt-1 text-[#d1cdb8] leading-relaxed">{hit.excerpt}</p>
 					{#if hit.url}<a href={hit.url} class="text-[#a39f90] underline break-all" rel="noreferrer noopener">{hit.url}</a>{/if}
 				</li>

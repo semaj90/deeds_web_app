@@ -1,0 +1,368 @@
+{
+  "schema": "atlas.doc-corpus-studio-canonical-fts.v1",
+  "generatedAt": "2026-09-23T19:45:28.996Z",
+  "canonicalCorpus": {
+    "pages": 30,
+    "chunks": 852,
+    "analyses": 0
+  },
+  "canonicalReadOwner": "sveltekit-frontend/src/lib/server/atlas/docs/doc-intelligence-read-model.ts searchDocCorpus (generated atlas_external_doc_chunks.search_vector + its GIN index; no BM25/pg_search/new column/Qdrant)",
+  "queries": [
+    {
+      "query": "hnsw.iterative_scan",
+      "canonicalHitCount": 2,
+      "returned": 2,
+      "mode": "POSTGRES_FTS",
+      "source": "CANONICAL_POSTGRES",
+      "top": {
+        "product": "pgvector",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+        "url": "https://github.com/pgvector/pgvector",
+        "chunkId": "doc:pgvector:fe883c75f323441d:24",
+        "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+        "sourceClass": "CANONICAL"
+      }
+    },
+    {
+      "query": "hnsw.scan_mem_multiplier",
+      "canonicalHitCount": 1,
+      "returned": 1,
+      "mode": "POSTGRES_FTS",
+      "source": "CANONICAL_POSTGRES",
+      "top": {
+        "product": "pgvector",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+        "url": "https://github.com/pgvector/pgvector",
+        "chunkId": "doc:pgvector:fe883c75f323441d:26",
+        "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+        "sourceClass": "CANONICAL"
+      }
+    },
+    {
+      "query": "io_method",
+      "canonicalHitCount": 3,
+      "returned": 3,
+      "mode": "POSTGRES_FTS",
+      "source": "CANONICAL_POSTGRES",
+      "top": {
+        "product": "postgresql",
+        "productVersion": "18",
+        "url": "https://www.postgresql.org/docs/18/release-18.html",
+        "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+        "chunkEvidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1",
+        "sourceClass": "CANONICAL"
+      }
+    },
+    {
+      "query": "Bitmap Heap Scan",
+      "canonicalHitCount": 17,
+      "returned": 17,
+      "mode": "POSTGRES_FTS",
+      "source": "CANONICAL_POSTGRES",
+      "top": {
+        "product": "postgresql",
+        "productVersion": "18",
+        "url": "https://www.postgresql.org/docs/18/using-explain.html",
+        "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:25",
+        "chunkEvidenceRevision": "sha256:2c2fd744af4bc94dc6945ee3d607d696c942b1ee4b54c34d748eace349644535",
+        "sourceClass": "CANONICAL"
+      }
+    },
+    {
+      "query": "uuidv7",
+      "canonicalHitCount": 3,
+      "returned": 3,
+      "mode": "POSTGRES_FTS",
+      "source": "CANONICAL_POSTGRES",
+      "top": {
+        "product": "postgresql",
+        "productVersion": "18",
+        "url": "https://www.postgresql.org/docs/18/functions-uuid.html",
+        "chunkId": "doc:postgresql-18:a92f2cf09489fb29:1",
+        "chunkEvidenceRevision": "sha256:310a88163ea716a17249804ef78aaccbcd1663fd0853223ad32728ebb584c471",
+        "sourceClass": "CANONICAL"
+      }
+    },
+    {
+      "query": "drizzle-kit",
+      "canonicalHitCount": 26,
+      "returned": 25,
+      "mode": "POSTGRES_FTS",
+      "source": "CANONICAL_POSTGRES",
+      "top": {
+        "product": "drizzle-kit",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+        "url": "https://orm.drizzle.team/docs/kit-overview",
+        "chunkId": "doc:drizzle-kit:b13a84ba576d603b:0",
+        "chunkEvidenceRevision": "sha256:5f7e0bda2f87878f5bb7f9113d5bf10ad3809759396af9bd3a7dd82a4b322fe2",
+        "sourceClass": "CANONICAL"
+      }
+    },
+    {
+      "query": "$derived",
+      "canonicalHitCount": 29,
+      "returned": 25,
+      "mode": "POSTGRES_FTS",
+      "source": "CANONICAL_POSTGRES",
+      "top": {
+        "product": "svelte",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+        "url": "https://svelte.dev/docs/svelte/$derived",
+        "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:16",
+        "chunkEvidenceRevision": "sha256:7176f545c5847e23ae960cdcc7c2292e3e393114aa3bf5ad0fe4d08e09ac41ac",
+        "sourceClass": "CANONICAL"
+      }
+    }
+  ],
+  "directSqlParity": [
+    {
+      "query": "hnsw.iterative_scan",
+      "studioHits": 2,
+      "directRows": 2,
+      "orderedIdentityExact": true,
+      "hitsChecked": 2,
+      "hitsExact": 2,
+      "fields": [
+        "chunkId",
+        "chunkEvidenceRevision",
+        "pageId",
+        "pageEvidenceRevision",
+        "provider",
+        "product",
+        "productVersion",
+        "url",
+        "headingPath",
+        "snippet-in-source-row-text"
+      ]
+    },
+    {
+      "query": "hnsw.scan_mem_multiplier",
+      "studioHits": 1,
+      "directRows": 1,
+      "orderedIdentityExact": true,
+      "hitsChecked": 1,
+      "hitsExact": 1,
+      "fields": [
+        "chunkId",
+        "chunkEvidenceRevision",
+        "pageId",
+        "pageEvidenceRevision",
+        "provider",
+        "product",
+        "productVersion",
+        "url",
+        "headingPath",
+        "snippet-in-source-row-text"
+      ]
+    },
+    {
+      "query": "io_method",
+      "studioHits": 3,
+      "directRows": 3,
+      "orderedIdentityExact": true,
+      "hitsChecked": 3,
+      "hitsExact": 3,
+      "fields": [
+        "chunkId",
+        "chunkEvidenceRevision",
+        "pageId",
+        "pageEvidenceRevision",
+        "provider",
+        "product",
+        "productVersion",
+        "url",
+        "headingPath",
+        "snippet-in-source-row-text"
+      ]
+    },
+    {
+      "query": "Bitmap Heap Scan",
+      "studioHits": 17,
+      "directRows": 17,
+      "orderedIdentityExact": true,
+      "hitsChecked": 17,
+      "hitsExact": 17,
+      "fields": [
+        "chunkId",
+        "chunkEvidenceRevision",
+        "pageId",
+        "pageEvidenceRevision",
+        "provider",
+        "product",
+        "productVersion",
+        "url",
+        "headingPath",
+        "snippet-in-source-row-text"
+      ]
+    },
+    {
+      "query": "uuidv7",
+      "studioHits": 3,
+      "directRows": 3,
+      "orderedIdentityExact": true,
+      "hitsChecked": 3,
+      "hitsExact": 3,
+      "fields": [
+        "chunkId",
+        "chunkEvidenceRevision",
+        "pageId",
+        "pageEvidenceRevision",
+        "provider",
+        "product",
+        "productVersion",
+        "url",
+        "headingPath",
+        "snippet-in-source-row-text"
+      ]
+    },
+    {
+      "query": "drizzle-kit",
+      "studioHits": 25,
+      "directRows": 25,
+      "orderedIdentityExact": true,
+      "hitsChecked": 25,
+      "hitsExact": 25,
+      "fields": [
+        "chunkId",
+        "chunkEvidenceRevision",
+        "pageId",
+        "pageEvidenceRevision",
+        "provider",
+        "product",
+        "productVersion",
+        "url",
+        "headingPath",
+        "snippet-in-source-row-text"
+      ]
+    },
+    {
+      "query": "$derived",
+      "studioHits": 25,
+      "directRows": 25,
+      "orderedIdentityExact": true,
+      "hitsChecked": 25,
+      "hitsExact": 25,
+      "fields": [
+        "chunkId",
+        "chunkEvidenceRevision",
+        "pageId",
+        "pageEvidenceRevision",
+        "provider",
+        "product",
+        "productVersion",
+        "url",
+        "headingPath",
+        "snippet-in-source-row-text"
+      ]
+    }
+  ],
+  "versionQualification": [
+    {
+      "product": "bits-ui",
+      "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 5,
+      "qualification": "CURRENT_UPSTREAM",
+      "exposedExactly": true,
+      "filteredHits": 0
+    },
+    {
+      "product": "drizzle-kit",
+      "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 3,
+      "qualification": "CURRENT_UPSTREAM",
+      "exposedExactly": true,
+      "filteredHits": 0
+    },
+    {
+      "product": "drizzle-orm",
+      "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 4,
+      "qualification": "CURRENT_UPSTREAM",
+      "exposedExactly": true,
+      "filteredHits": 0
+    },
+    {
+      "product": "drizzle-orm",
+      "productVersion": "UNVERSIONED@2026-09-23",
+      "pages": 1,
+      "qualification": "UNVERSIONED",
+      "exposedExactly": true,
+      "filteredHits": 0
+    },
+    {
+      "product": "pgvector",
+      "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 2,
+      "qualification": "CURRENT_UPSTREAM",
+      "exposedExactly": true,
+      "filteredHits": 0
+    },
+    {
+      "product": "postgresql",
+      "productVersion": "18",
+      "pages": 6,
+      "qualification": "DECLARED_VERSION",
+      "exposedExactly": true,
+      "filteredHits": 0
+    },
+    {
+      "product": "svelte",
+      "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 4,
+      "qualification": "CURRENT_UPSTREAM",
+      "exposedExactly": true,
+      "filteredHits": 0
+    },
+    {
+      "product": "sveltekit",
+      "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 5,
+      "qualification": "CURRENT_UPSTREAM",
+      "exposedExactly": true,
+      "filteredHits": 0
+    }
+  ],
+  "zeroHit": {
+    "query": "zzqxjkvw",
+    "mode": "POSTGRES_FTS",
+    "hits": 0,
+    "postgresNote": null,
+    "canonicalEmptyNotFallback": true
+  },
+  "fallbackBehavior": {
+    "onDatabaseFailure": {
+      "mode": "LOCAL_LEXICAL",
+      "postgresNote": "POSTGRES_UNAVAILABLE:connect ECONNREFUSED 127.0.0.1:1",
+      "hits": 2,
+      "sourceClasses": [
+        "REFERENCE_ONLY"
+      ],
+      "neverCanonical": true
+    },
+    "note": "a database failure falls back to local reference results but they are labelled LOCAL_LEXICAL / REFERENCE_ONLY|GENERATED_CORPUS with a POSTGRES_UNAVAILABLE note and are never CANONICAL; canonical zero hits do NOT fall back"
+  },
+  "ssrProof": {
+    "specs": [
+      "src/routes/(app)/admin/atlas/DocCorpusPanel.ssr.spec.ts",
+      "src/routes/(app)/admin/atlas/DocCorpusPanel.live.spec.ts (ATLAS_LIVE_DOC_DB=1)"
+    ],
+    "plainGetForm": "GET /admin/atlas?docq=&docprod=&docver=, server-rendered, no client JavaScript required"
+  },
+  "provenanceProof": "every canonical hit carries sourceClass CANONICAL, pageId, chunkId, chunkEvidenceRevision (chunk grain, distinct from page revision), provider/product/productVersion, url, headingPath; local hits carry REFERENCE_ONLY/GENERATED_CORPUS and null canonical ids",
+  "snippetFidelityNote": {
+    "hitsWithExactSubstringSnippet": 64,
+    "hitsWithSubsetOnlySnippet": 12,
+    "check": "exact substring, else every highlighted term and snippet word occurs in that same row text",
+    "cause": "PostgreSQL ts_headline treats <...> as markup and splices around it in the displayed snippet only; atlas_external_doc_chunks.text and chunk checksums are unchanged",
+    "followUp": "if verbatim code snippets matter, render the snippet from row text with offsets instead of ts_headline"
+  },
+  "failures": [],
+  "result": "STUDIO_CANONICAL_EXTERNAL_DOC_FTS_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

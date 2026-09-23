@@ -1,5 +1,5 @@
 /**
- * GET /api/admin/atlas/docs-corpus/search?q=...&limit=10 (READ ONLY).
+ * GET /api/admin/atlas/docs-corpus/search?q=...&limit=10[&product=...&productVersion=...] (READ ONLY).
  * Precedence: canonical Postgres FTS when admitted rows exist, else local lexical over the
  * reference/generated corpora. No web search, no Qdrant.
  */
@@ -11,13 +11,15 @@ import { findRepoRoot, searchDocCorpus } from '$lib/server/atlas/docs/doc-intell
 
 const querySchema = z.object({
 	q: z.string().trim().min(2).max(300),
-	limit: z.coerce.number().int().min(1).max(25).default(10)
+	limit: z.coerce.number().int().min(1).max(25).default(10),
+	product: z.string().trim().max(100).optional(),
+	productVersion: z.string().trim().max(100).optional()
 });
 
 export const GET: RequestHandler = async (event) => {
 	requireAdmin(event);
 	const parsed = querySchema.safeParse(Object.fromEntries(event.url.searchParams));
 	if (!parsed.success) return json({ query: '', mode: 'LOCAL_LEXICAL', hits: [], postgresNote: null, error: 'INVALID_QUERY' }, { status: 400 });
-	const result = await searchDocCorpus({ pool, root: findRepoRoot(), q: parsed.data.q, limit: parsed.data.limit });
+	const result = await searchDocCorpus({ pool, root: findRepoRoot(), q: parsed.data.q, limit: parsed.data.limit, product: parsed.data.product || null, productVersion: parsed.data.productVersion || null });
 	return json(result, { headers: { 'Cache-Control': 'no-store' } });
 };

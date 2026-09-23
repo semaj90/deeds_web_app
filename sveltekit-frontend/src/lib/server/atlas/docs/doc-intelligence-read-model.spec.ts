@@ -43,11 +43,13 @@ function writeAllGroups() {
 }
 
 /** Minimal SQL router standing in for pg.Pool; records every statement so tests can assert read-only. */
-function fakePool(opts: { chunks?: number; ftsRows?: Record<string, string | null>[]; down?: boolean } = {}) {
+function fakePool(opts: { chunks?: number; ftsRows?: Record<string, unknown>[]; down?: boolean } = {}) {
 	const statements: string[] = [];
+	const ftsParams: unknown[][] = [];
 	const pool = {
-		async query(sql: string) {
+		async query(sql: string, params?: unknown[]) {
 			statements.push(sql);
+			if (/ts_headline/.test(sql)) ftsParams.push(params ?? []);
 			if (opts.down) throw new Error('connection refused');
 			const s = sql.replace(/\s+/g, ' ');
 			if (/information_schema\.tables/.test(s)) return { rows: [{ table_name: 'atlas_external_doc_pages' }, { table_name: 'atlas_external_doc_chunks' }] };
@@ -70,7 +72,7 @@ function fakePool(opts: { chunks?: number; ftsRows?: Record<string, string | nul
 			return { rows: [] };
 		}
 	};
-	return { pool: pool as unknown as Pool, statements };
+	return { pool: pool as unknown as Pool, statements, ftsParams };
 }
 
 beforeEach(() => { root = mkdtempSync(join(tmpdir(), 'doc-corpus-')); });
@@ -175,12 +177,64 @@ describe('server read model', () => {
 });
 
 describe('search', () => {
-	it('returns canonical FTS hits with a CANONICAL badge and provenance', async () => {
+	const canonicalRow = (over: Record<string, unknown> = {}) => ({
+		chunk_id: 'doc:pgvector:abc:3', chunk_evidence_revision: 'sha256:chunkrev', heading_path: ['Indexing', 'HNSW'], page_id: '11111111-2222-3333-4444-555555555555', title: 'pgvector',
+		provider: 'pgvector', product: 'pgvector', product_version: '0.8.3', url: 'https://x', source_authority: 'OFFICIAL', page_evidence_revision: 'sha256:pagerev', excerpt: 'halfvec «index»', ...over
+	});
+
+	it('returns canonical FTS hits with an explicit CANONICAL source class and full row provenance', async () => {
 		writeDev(); writeAllGroups();
-		const { pool } = fakePool({ chunks: 3, ftsRows: [{ chunk_id: 'c1', title: 'pgvector', product: 'pgvector', product_version: '0.8.3', url: 'https://x', source_authority: 'OFFICIAL', evidence_revision: 'sha256:abc', excerpt: 'halfvec index' }] });
+		const { pool } = fakePool({ chunks: 3, ftsRows: [canonicalRow()] });
 		const r = await searchDocCorpus({ pool, root, q: 'halfvec' });
 		expect(r.mode).toBe('POSTGRES_FTS');
-		expect(r.hits[0]).toMatchObject({ badge: 'CANONICAL_POSTGRES', productVersion: '0.8.3', revision: 'sha256:abc', authorityClass: 'OFFICIAL' });
+		expect(r.hits[0]).toMatchObject({
+			badge: 'CANONICAL_POSTGRES', sourceClass: 'CANONICAL', productVersion: '0.8.3', authorityClass: 'OFFICIAL', provider: 'pgvector', product: 'pgvector', url: 'https://x',
+			pageId: '11111111-2222-3333-4444-555555555555', chunkId: 'doc:pgvector:abc:3', chunkEvidenceRevision: 'sha256:chunkrev', revision: 'sha256:pagerev', headingPath: ['Indexing', 'HNSW']
+		});
+		// chunk grain and page grain must never be conflated
+		expect(r.hits[0].chunkEvidenceRevision).not.toBe(r.hits[0].revision);
+	});
+
+	it('applies bounded exact-match product/version filters as query parameters', async () => {
+		writeDev(); writeAllGroups();
+		const f = fakePool({ chunks: 3, ftsRows: [canonicalRow()] });
+		const r = await searchDocCorpus({ pool: f.pool, root, q: 'halfvec', limit: 7, product: 'pgvector', productVersion: 'x'.repeat(300) });
+		expect(f.ftsParams[0]).toEqual(['halfvec', 7, 'pgvector', 'x'.repeat(100)]);
+		expect(r.filters).toEqual({ product: 'pgvector', productVersion: 'x'.repeat(100) });
+		const none = fakePool({ chunks: 3, ftsRows: [] });
+		await searchDocCorpus({ pool: none.pool, root, q: 'halfvec' });
+		expect(none.ftsParams[0]).toEqual(['halfvec', 10, null, null]);
+	});
+
+	it('preserves CURRENT_UPSTREAM@ / UNVERSIONED@ qualification exactly (no invented semver)', async () => {
+		writeDev(); writeAllGroups();
+		const { pool } = fakePool({ chunks: 3, ftsRows: [canonicalRow({ product_version: 'CURRENT_UPSTREAM@2026-09-23' }), canonicalRow({ chunk_id: 'c2', chunk_evidence_revision: 'sha256:r2', product_version: 'UNVERSIONED@2026-09-23' })] });
+		const r = await searchDocCorpus({ pool, root, q: 'halfvec' });
+		expect(r.hits.map((h) => h.productVersion)).toEqual(['CURRENT_UPSTREAM@2026-09-23', 'UNVERSIONED@2026-09-23']);
+	});
+
+	it('canonical zero hits stays canonical: empty result, NO silent reference fallback', async () => {
+		writeDev(); writeAllGroups();
+		const r = await searchDocCorpus({ pool: fakePool({ chunks: 852, ftsRows: [] }).pool, root, q: 'io_method' });
+		expect(r.mode).toBe('POSTGRES_FTS');
+		expect(r.hits).toEqual([]);
+		expect(r.postgresNote).toBeNull();
+	});
+
+	it('database failure falls back visibly: LOCAL_LEXICAL + POSTGRES_UNAVAILABLE note, never a CANONICAL class', async () => {
+		writeDev(); writeAllGroups();
+		const r = await searchDocCorpus({ pool: fakePool({ down: true }).pool, root, q: 'io_method' });
+		expect(r.mode).toBe('LOCAL_LEXICAL');
+		expect(r.postgresNote).toMatch(/^POSTGRES_UNAVAILABLE:/);
+		expect(r.hits.length).toBeGreaterThan(0);
+		for (const h of r.hits) { expect(h.sourceClass).not.toBe('CANONICAL'); expect(h.badge).not.toBe('CANONICAL_POSTGRES'); expect(h.chunkId).toBeNull(); }
+	});
+
+	it('the canonical lane only reads (no write statements)', async () => {
+		writeDev(); writeAllGroups();
+		const f = fakePool({ chunks: 3, ftsRows: [canonicalRow()] });
+		await searchDocCorpus({ pool: f.pool, root, q: 'halfvec' });
+		for (const sql of f.statements) expect(sql).not.toMatch(/(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE)/i);
 	});
 
 	it('falls back to local lexical search labelled REFERENCE_ONLY when Postgres is empty', async () => {
@@ -190,6 +244,7 @@ describe('search', () => {
 		expect(r.postgresNote).toBe('DOC_CORPUS_POSTGRES_EMPTY');
 		expect(r.hits.length).toBeGreaterThan(0);
 		expect(new Set(r.hits.map((h) => h.badge))).toEqual(new Set(['REFERENCE_ONLY']));
+		expect(new Set(r.hits.map((h) => h.sourceClass))).toEqual(new Set(['REFERENCE_ONLY']));
 	});
 
 	it('returns no hits for an unmatched query and never a CANONICAL badge locally', async () => {

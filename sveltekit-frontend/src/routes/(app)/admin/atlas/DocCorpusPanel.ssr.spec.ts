@@ -29,7 +29,7 @@ const snapshot: DocIntelligenceStudioSnapshotV1 = {
 
 const search: DocSearchResult = {
 	query: 'io_method', mode: 'LOCAL_LEXICAL', postgresNote: 'DOC_CORPUS_POSTGRES_EMPTY',
-	hits: [{ provider: 'postgresql', title: 'Resource Consumption', sourceId: 'postgresql-18', url: 'https://www.postgresql.org/docs/18/runtime-config-resource.html', product: 'postgresql', productVersion: '18', authorityClass: 'OFFICIAL_PRIMARY', revision: 'sha256:0123456789abcdef', excerpt: 'io_method = worker', badge: 'REFERENCE_ONLY' }]
+	hits: [{ provider: 'postgresql', title: 'Resource Consumption', sourceId: 'postgresql-18', url: 'https://www.postgresql.org/docs/18/runtime-config-resource.html', product: 'postgresql', productVersion: '18', authorityClass: 'OFFICIAL_PRIMARY', revision: 'sha256:0123456789abcdef', excerpt: 'io_method = worker', badge: 'REFERENCE_ONLY', sourceClass: 'REFERENCE_ONLY', pageId: null, chunkId: null, chunkEvidenceRevision: null, headingPath: null }]
 };
 
 describe('DocCorpusPanel SSR (no client hydration)', () => {
@@ -60,6 +60,45 @@ describe('DocCorpusPanel SSR (no client hydration)', () => {
 		expect(body).toContain('postgresql / postgresql @ 18');
 		expect(body).toContain('sha256:0123456789abcdef');
 		expect(body).not.toMatch(/>CANONICAL_POSTGRES</);
+	});
+
+	const canonicalSearch: DocSearchResult = {
+		query: 'hnsw.iterative_scan', mode: 'POSTGRES_FTS', postgresNote: null, filters: { product: 'pgvector', productVersion: 'CURRENT_UPSTREAM@2026-09-23' },
+		hits: [{ provider: 'pgvector', title: 'GitHub - pgvector/pgvector', sourceId: 'pgvector', url: 'https://github.com/pgvector/pgvector', product: 'pgvector', productVersion: 'CURRENT_UPSTREAM@2026-09-23', authorityClass: 'OFFICIAL',
+			revision: 'sha256:pagerevision0000000000', excerpt: 'SET «hnsw.iterative_scan» = strict_order;', badge: 'CANONICAL_POSTGRES', sourceClass: 'CANONICAL', pageId: 'aaaaaaaa-1111-2222-3333-444444444444',
+			chunkId: 'doc:pgvector:f9a6c0eb36814b08:12', chunkEvidenceRevision: 'sha256:chunkevidence1234567890abcdef', headingPath: ['Iterative Index Scans', 'HNSW'] }]
+	};
+
+	it('renders canonical Postgres hits with CANONICAL class, version and chunk/evidence provenance (server-side)', () => {
+		const { body } = render(DocCorpusPanel, { props: { snapshot, search: canonicalSearch, query: 'hnsw.iterative_scan', product: 'pgvector', version: 'CURRENT_UPSTREAM@2026-09-23' } });
+		expect(body).toContain('data-source-class="CANONICAL"');
+		expect(body).toContain('SOURCE CANONICAL');
+		expect(body).toContain('POSTGRES_FTS');
+		expect(body).toContain('pgvector / pgvector @ CURRENT_UPSTREAM@2026-09-23');
+		expect(body).toContain('docs-hit-provenance');
+		expect(body).toContain('doc:pgvector:f9a6c0eb36814b08:12');
+		expect(body).toContain('sha256:chunkevidenc…');
+		expect(body).toContain('Iterative Index Scans › HNSW');
+		expect(body).toContain('name="docprod"');
+		expect(body).toContain('name="docver"');
+		expect(body).toContain('filter pgvector @ CURRENT_UPSTREAM@2026-09-23');
+		expect(body).not.toContain('NONCANONICAL');
+	});
+
+	it('renders a canonical zero-hit result as canonical (not a reference fallback)', () => {
+		const { body } = render(DocCorpusPanel, { props: { snapshot, search: { ...canonicalSearch, hits: [] }, query: 'zzzz' } });
+		expect(body).toContain('0 results');
+		expect(body).toContain('SOURCE CANONICAL');
+		expect(body).toContain('No matching documentation.');
+		expect(body).not.toContain('NONCANONICAL');
+	});
+
+	it('marks a database-failure fallback as noncanonical with the reason visible', () => {
+		const fallback: DocSearchResult = { ...search, postgresNote: 'POSTGRES_UNAVAILABLE:connection refused' };
+		const { body } = render(DocCorpusPanel, { props: { snapshot, search: fallback, query: 'io_method' } });
+		expect(body).toContain('POSTGRES_UNAVAILABLE:connection refused');
+		expect(body).toContain('NONCANONICAL (local reference fallback, not canonical Postgres results)');
+		expect(body).not.toContain('data-source-class="CANONICAL"');
 	});
 
 	it('degrades to an explicit unavailable state', () => {

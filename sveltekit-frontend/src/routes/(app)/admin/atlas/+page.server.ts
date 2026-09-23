@@ -20,11 +20,13 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 
 	// Documentation Corpus panel: read-only snapshot + optional GET search (?docq=), rendered server-side (works without JS).
 	const docsQuery = (url.searchParams.get('docq') ?? '').trim().slice(0, 300);
+	const docsProduct = (url.searchParams.get('docprod') ?? '').trim().slice(0, 100);
+	const docsVersion = (url.searchParams.get('docver') ?? '').trim().slice(0, 100);
 	const docsCorpusPromise = fetch('/api/admin/atlas/docs-corpus')
 		.then(async (r) => (r.ok ? await r.json() : null))
 		.catch(() => null);
 	const docsSearchPromise = docsQuery.length >= 2
-		? fetch(`/api/admin/atlas/docs-corpus/search?q=${encodeURIComponent(docsQuery)}`)
+		? fetch(`/api/admin/atlas/docs-corpus/search?q=${encodeURIComponent(docsQuery)}${docsProduct ? `&product=${encodeURIComponent(docsProduct)}` : ''}${docsVersion ? `&productVersion=${encodeURIComponent(docsVersion)}` : ''}`)
 				.then(async (r) => (r.ok ? await r.json() : null))
 				.catch(() => null)
 		: Promise.resolve(null);
@@ -69,6 +71,8 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		docsCorpus,
 		docsSearch,
 		docsQuery,
+		docsProduct,
+		docsVersion,
 		workflowStatus: workflowStatus?.status ?? null,
 		rotorquantModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? ENV.HFORF_MODEL_PATH ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
 		hforfModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? ENV.HFORF_MODEL_PATH ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',

@@ -111,6 +111,8 @@
 		docsCorpus?: DocIntelligenceStudioSnapshotV1 | null;
 		docsSearch?: DocSearchResult | null;
 		docsQuery?: string;
+		docsProduct?: string;
+		docsVersion?: string;
 		cacheStats?: AdminCacheStats | null;
 		workflowStatus?: TaskPacketWorkflowStatus | null;
 		rotorquantModelPath?: string;
@@ -928,7 +930,7 @@
 				</p>
 			</div>
 
-			<DocCorpusPanel snapshot={data.docsCorpus ?? null} search={data.docsSearch ?? null} query={data.docsQuery ?? ''} />
+			<DocCorpusPanel snapshot={data.docsCorpus ?? null} search={data.docsSearch ?? null} query={data.docsQuery ?? ''} product={data.docsProduct ?? ''} version={data.docsVersion ?? ''} />
 
 			<!-- Document Governance -->
 			<div class="p-4 border-b border-[#3f3e37] bg-[#1c1b18]/40 space-y-3">

@@ -127,6 +127,13 @@ export interface DocSearchHit {
 	revision: string | null;
 	excerpt: string;
 	badge: AuthorityBadge;
+	/** Explicit provenance class: CANONICAL only for rows read from atlas_external_doc_chunks; local captures are never CANONICAL. */
+	sourceClass: 'CANONICAL' | 'REFERENCE_ONLY' | 'GENERATED_CORPUS';
+	/** Canonical-row identity (null for local captures). `revision` above is the PAGE evidence revision; the chunk grain is chunkEvidenceRevision. */
+	pageId: string | null;
+	chunkId: string | null;
+	chunkEvidenceRevision: string | null;
+	headingPath: string[] | null;
 }
 
 export interface DocSearchResult {
@@ -134,6 +141,8 @@ export interface DocSearchResult {
 	mode: 'POSTGRES_FTS' | 'LOCAL_LEXICAL';
 	hits: DocSearchHit[];
 	postgresNote: string | null;
+	/** Applied bounded, exact-match filters (canonical lane only). */
+	filters?: { product: string | null; productVersion: string | null };
 }
 
 export interface VersionDriftRow {
@@ -529,34 +538,46 @@ function localLexicalSearch(root: string, q: string, limit: number, sources: Sou
 			product: coords?.sources[s.sourceId]?.product ?? null, productVersion: coords?.sources[s.sourceId]?.productVersion ?? coords?.sources[s.sourceId]?.versionQualification ?? null,
 			authorityClass: s.authorityClass, revision: s.contentChecksum ? `sha256:${s.contentChecksum.slice(0, 16)}` : null,
 			excerpt: text.slice(Math.max(0, at - 80), at + 220).replace(/\s+/g, ' ').trim(),
-			badge: s.provenance === 'DEV_CORPUS' ? 'GENERATED_CORPUS' : 'REFERENCE_ONLY', score
+			badge: s.provenance === 'DEV_CORPUS' ? 'GENERATED_CORPUS' : 'REFERENCE_ONLY', score,
+			sourceClass: s.provenance === 'DEV_CORPUS' ? 'GENERATED_CORPUS' : 'REFERENCE_ONLY',
+			pageId: null, chunkId: null, chunkEvidenceRevision: null, headingPath: null
 		});
 	}
 	return hits.sort((a, b) => b.score - a.score).slice(0, limit).map(({ score: _score, ...hit }) => hit);
 }
 
-export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q: string; limit?: number; runtime?: RuntimeVersions }): Promise<DocSearchResult> {
+export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q: string; limit?: number; runtime?: RuntimeVersions; product?: string | null; productVersion?: string | null }): Promise<DocSearchResult> {
 	const limit = Math.min(Math.max(opts.limit ?? 10, 1), 25);
 	const q = opts.q.trim().slice(0, 300);
 	let postgresNote: string | null = null;
+	const product = opts.product?.trim().slice(0, 100) || null;
+	const productVersion = opts.productVersion?.trim().slice(0, 100) || null;
 	if (q.length >= 2 && opts.pool) {
 		try {
 			const counts = await opts.pool.query(`SELECT count(*)::int AS n FROM atlas_external_doc_chunks`);
 			if (counts.rows[0].n > 0) {
 				const { rows } = await opts.pool.query(
-					`SELECT c.chunk_id, p.title, p.provider, p.product, p.product_version, p.url, p.source_authority, p.evidence_revision,
-					        ts_headline('english', c.text, query, 'MaxFragments=1,MaxWords=35,MinWords=12') AS excerpt
+					// Canonical lane: the existing generated search_vector (GIN) is the only lexical owner; filters are optional exact matches.
+					`SELECT c.chunk_id, c.evidence_revision AS chunk_evidence_revision, c.heading_path, p.id AS page_id, p.title, p.provider, p.product,
+					        p.product_version, p.url, p.source_authority, p.evidence_revision AS page_evidence_revision,
+					        ts_headline('english', c.text, query, 'MaxFragments=1,MaxWords=35,MinWords=12,StartSel=«,StopSel=»') AS excerpt
 					   FROM atlas_external_doc_chunks c
 					   JOIN atlas_external_doc_pages p ON p.id = c.page_id, plainto_tsquery('english', $1) query
 					  WHERE c.search_vector @@ query
-					  ORDER BY ts_rank(c.search_vector, query) DESC LIMIT $2`,
-					[q, limit]
+					    AND ($3::text IS NULL OR p.product = $3)
+					    AND ($4::text IS NULL OR p.product_version = $4)
+					  ORDER BY ts_rank(c.search_vector, query) DESC, c.chunk_id
+					  LIMIT $2`,
+					[q, limit, product, productVersion]
 				);
 				return {
-					query: q, mode: 'POSTGRES_FTS', postgresNote: null,
-					hits: rows.map((r: Record<string, string | null>) => ({
-						provider: r.provider, title: String(r.title), sourceId: String(r.product ?? ''), url: r.url, product: r.product, productVersion: r.product_version,
-						authorityClass: String(r.source_authority ?? ''), revision: r.evidence_revision, excerpt: String(r.excerpt ?? ''), badge: 'CANONICAL_POSTGRES' as const
+					query: q, mode: 'POSTGRES_FTS', postgresNote: null, filters: { product, productVersion },
+					hits: rows.map((r: Record<string, unknown>) => ({
+						provider: (r.provider as string | null) ?? null, title: String(r.title), sourceId: String(r.product ?? ''), url: (r.url as string | null) ?? null,
+						product: (r.product as string | null) ?? null, productVersion: (r.product_version as string | null) ?? null,
+						authorityClass: String(r.source_authority ?? ''), revision: (r.page_evidence_revision as string | null) ?? null, excerpt: String(r.excerpt ?? ''),
+						badge: 'CANONICAL_POSTGRES' as const, sourceClass: 'CANONICAL' as const, pageId: String(r.page_id), chunkId: String(r.chunk_id),
+						chunkEvidenceRevision: String(r.chunk_evidence_revision), headingPath: (r.heading_path as string[] | null) ?? []
 					}))
 				};
 			}
@@ -567,7 +588,7 @@ export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q
 	}
 	const runtime = opts.runtime ?? { postgres: null, pgvector: null, drizzleOrm: null, drizzleKit: null, pg: null, svelte: null, svelteKit: null, bitsUi: null };
 	const { sources } = collectLocalCaptures(opts.root, runtime);
-	return { query: q, mode: 'LOCAL_LEXICAL', postgresNote, hits: q.length >= 2 ? localLexicalSearch(opts.root, q, limit, sources, readCoordinates(opts.root)) : [] };
+	return { query: q, mode: 'LOCAL_LEXICAL', postgresNote, filters: { product, productVersion }, hits: q.length >= 2 ? localLexicalSearch(opts.root, q, limit, sources, readCoordinates(opts.root)) : [] };
 }
 
 // ---------------------------------------------------------------------------------------------
