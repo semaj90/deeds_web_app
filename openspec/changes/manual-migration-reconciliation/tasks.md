@@ -566,3 +566,54 @@ design question, independent of both open operator decisions above
 No packet_key rewritten, no aliases inserted, no writers changed.
 `writesPerformed=false` across Postgres/Qdrant/Valkey/Neo4j.
 Evidence: `docs/reports/packet-key-single-owner-convergence-v1.json`.
+
+#### PACKET-KEY-SINGLE-OWNER-CONVERGENCE-01 addendum — 2026-09-22 (read-only)
+
+- [x] Separated FORMULA_OWNER / WRITER_OWNER / RESOLVER_OWNER per scheme
+  (v1 conflated these). Found the dominant live formula
+  (`'packet:' + sha256(source_ref).slice(0,12)`) has **no shared canonical
+  module** — it's duplicated inline in 2 scripts (one writer, one read-only
+  joiner) with zero shared function, a real DRY gap even though outputs
+  agree.
+- [x] Backward-traced every live cohort to its actual producing script by
+  matching statement + formula, not regex alone (already true of v1;
+  re-confirmed, and the pasted caution that "62 uncharacterized rows might
+  be computePacketKey() rows" was already false in v1 — those 61+1 rows
+  were already SQL-confirmed as a distinct RPC/proto scheme + 1 legacy row,
+  0 hex64 rows).
+- [x] Broader grep surfaced a **3rd dormant writer**: `phase-17-hyperrag-indexing-e2e.mjs::stablePacketKey()`
+  — a real `INSERT INTO atlas_packets` under a `packet:<32hex>` shape
+  (chunk+content-qualified), not wired to any npm script, 0 live rows
+  (SQL-confirmed). Brings total distinct formula implementations found in
+  source to 6; only 3 have ever produced live rows (dominant, its
+  wrong-prefix bug variant, and the unrelated RPC sub-domain).
+- [x] Audited the 12-hex (48-bit) truncation: `atlas_packets_packet_key_key`
+  is a live UNIQUE constraint (0 duplicates is guaranteed by it, not
+  independent collision-freedom evidence); the writer uses
+  `ON CONFLICT (packet_key) DO NOTHING`, so a genuine truncation collision
+  would silently drop the second file's packet row with no error — an
+  unmeasured, real failure mode, not investigated further (would need a
+  full source_ref-vs-atlas_packets cross-census, out of scope). Birthday-bound
+  collision probability ~6e-6 at current scale (58,362 rows), ~7e-5 at a
+  projected 200k rows.
+- [x] Result (ownership-state axis, distinct from v1's lifecycle-contract
+  axis): `ONE_CANONICAL_OWNER_WITH_LEGACY_COMPATIBILITY` — not
+  `MULTIPLE_ACTIVE_PACKET_KEY_OWNERS` (only 1 scheme is live-active outside
+  the fully-aliased legacy cohort and the unrelated RPC sub-domain), not
+  `CANONICAL_FUTURE_OWNER_NOT_ADOPTED` (no dormant scheme is actually
+  designated as a future replacement — packet-key-builder.ts's own header
+  declines that status), not `PACKET_KEY_OWNER_UNDEFINED` (an owner IS
+  identifiable for live data). This does not contradict v1's
+  `PACKET_KEY_LIFECYCLE_CONTRACT_UNDEFINED` — that's a separate axis
+  (what the key is supposed to mean over time), still true.
+
+Target contract for `PACKET-WRITER-PRODUCTION-OWNER-01` (not selected, per
+operator instruction — kept open in parallel): `event → WorkspaceSourceBindingV1
+→ SemanticPacketWriteAdmissionV1 → ONE canonical PacketIdentityV1 key builder
+(does not exist yet as an exported module) → persistAdmittedSemanticPacketEmbedding()`.
+Extracting the dominant formula into a shared, tested module is a prerequisite
+mechanical step before that production event can be safely authorized — not
+done this pass (would be a code change, out of read-only scope).
+
+`writesPerformed=false` across Postgres/Qdrant/Valkey/Neo4j; no code changed.
+Evidence: `docs/reports/packet-key-single-owner-convergence-v2-addendum.json`.

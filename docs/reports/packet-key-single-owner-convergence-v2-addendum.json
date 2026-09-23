@@ -1,0 +1,131 @@
+{
+  "schema": "atlas.packet-key-single-owner-convergence.v2-addendum",
+  "gate": "PACKET-KEY-SINGLE-OWNER-CONVERGENCE-01",
+  "supersedesInPart": "docs/reports/packet-key-single-owner-convergence-v1.json",
+  "relationToV1": "This addendum does NOT retract v1's census or result -- it ADDS the FORMULA_OWNER/WRITER_OWNER/RESOLVER_OWNER role separation, per-cohort backward writer tracing, a collision-policy audit for the 12-hex truncation, and 3 previously-unlisted dormant formula implementations that a broader grep surfaced. v1's numeric census (61,718 rows, 58,362 / 3,294 / 61 / 1 split) is unchanged and re-confirmed live at this same commit.",
+  "generatedAt": "2026-09-22T00:00:00Z",
+  "mode": "READ_ONLY",
+  "anchorCommit": "d5b7a5902a",
+  "anchorCommitNote": "d5b7a5902a is the current SESSION5 handoff HEAD. ecbd975759 remains the earlier canonical-identity reconciliation evidence commit, not the anchor for this gate.",
+
+  "correctionApplied": {
+    "claim": "v1 already did NOT assume computePacketKey() (hex64) had live rows -- it queried Postgres directly and found 0. The pasted addendum's caution is satisfied by v1's own liveCensus, not newly satisfied here.",
+    "verification": "Re-ran: SELECT count(*) FROM atlas_packets WHERE packet_key ~ '^[0-9a-f]{64}$' -> 0 (unchanged). The 62 uncharacterized-at-the-time rows were NOT assumed to be hex64 rows in v1 either -- v1 already classified 61 of them as a distinct RPC_PROTO_16HEX scheme (16-hex, source_kind='rpc_method', produced by packetize-proto-rpc-tools.mjs::packetKeyFor) and 1 as a legacy cluster-summary row, both confirmed by direct SQL inspection, not by string-pattern guessing alone."
+  },
+
+  "ownershipRoleSeparation": [
+    {
+      "scheme": "DOMINANT_SOURCE_REF_HASH (packet:<12hex>)",
+      "formulaOwner": {
+        "status": "NO_SHARED_CANONICAL_MODULE",
+        "locations": [
+          "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs (inline sha256() helper, line ~48-76)",
+          "scripts/atlas/backfill-summary-layers-from-chunks.mjs (inline stableHash() + identical formula, line 116 -- READ/JOIN-only re-implementation, does not write atlas_packets)"
+        ],
+        "finding": "The formula is duplicated verbatim in at least 2 files with no shared exported function. This is exactly the DRY violation the operator's target architecture (one key builder) is meant to prevent, even though both copies currently agree on output for the same input."
+      },
+      "writerOwner": {
+        "status": "SINGLE_LIVE_WRITER",
+        "location": "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs",
+        "liveRowsProduced": 58362,
+        "constraint": "INSERT ... ON CONFLICT (packet_key) DO NOTHING against a live UNIQUE(packet_key) constraint (atlas_packets_packet_key_key)"
+      },
+      "resolverOwner": {
+        "status": "SINGLE",
+        "location": "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts::resolveCanonicalPacketKey",
+        "behavior": "Direct-match fast path against atlas_packets.packet_key; this is the scheme that resolves on the fast path for 94.6% of rows."
+      }
+    },
+    {
+      "scheme": "ACE_PREFIX_VARIANT (ace:packet:<12hex>)",
+      "formulaOwner": { "status": "SAME_FORMULA_AS_DOMINANT, wrong historical prefix applied at write time" },
+      "writerOwner": {
+        "status": "HISTORICAL_ONLY, since fixed",
+        "location": "scripts/atlas/register-orphaned-chunks.mjs",
+        "liveRowsProduced": 3294,
+        "note": "Not re-verified this pass whether the bug is still present in the live script file (read-only, out of scope)."
+      },
+      "resolverOwner": {
+        "status": "SINGLE, via compatibility table",
+        "location": "atlas_packet_identity_aliases + packet-identity-resolver.ts alias-lookup fallback",
+        "coverage": "3294/3294 (100%)"
+      }
+    },
+    {
+      "scheme": "RPC_PROTO_16HEX",
+      "formulaOwner": { "status": "SINGLE", "location": "scripts/atlas/packetize-proto-rpc-tools.mjs::packetKeyFor(service, method)" },
+      "writerOwner": { "status": "SINGLE_LIVE_WRITER", "location": "same file", "liveRowsProduced": 61 },
+      "resolverOwner": { "status": "N/A -- distinct identity sub-domain (source_kind='rpc_method'), never resolved through the codebase-file packet_key path" }
+    },
+    {
+      "scheme": "CHUNK_CONTENT_HASH_32HEX (packet:<32hex>, formula = sha256(sourceRef\\0chunkIndex\\0contentHash).slice(0,32))",
+      "status": "NEWLY_SURFACED_THIS_ADDENDUM -- not enumerated in v1",
+      "formulaOwner": { "status": "SINGLE", "location": "scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs::stablePacketKey(sourceRef, chunkIndex, contentHash)" },
+      "writerOwner": {
+        "status": "CAPABLE_BUT_DORMANT",
+        "location": "same file -- has a real 'INSERT INTO atlas_packets (packet_key,source_ref,feature_id,title_id,domain_class,content_hash,summary,embedding) ...' statement",
+        "liveRowsProduced": 0,
+        "verification": "SELECT count(*) FROM atlas_packets WHERE packet_key ~ '^packet:[0-9a-f]{32}$' -> 0",
+        "wiredToNpmScript": false,
+        "note": "This is the clearest instance of the 'MULTIPLE_LEGACY_WRITERS, unclear if any is adopted' risk the operator flagged -- a real writer with a real formula and a real INSERT statement that has simply never been run against the live table. It shares the 'packet:' prefix with the dominant scheme but a structurally different, longer (32 vs 12 hex), chunk+content-qualified derivation -- if ever run, its output space does not overlap the dominant scheme's 12-hex suffix length, so no silent identity collision between the two formulas is possible by construction (different key lengths), but it WOULD introduce a second live formula under the same prefix if activated."
+      },
+      "resolverOwner": { "status": "NONE -- packet-identity-resolver.ts has no special handling for this shape; it would only resolve via the generic exact-match fast path if a row existed" }
+    },
+    {
+      "scheme": "COMPUTE_PACKET_KEY_V1_HEX64_NODESCOPED",
+      "formulaOwner": { "status": "SINGLE", "location": "sveltekit-frontend/.../identity/packet-key-builder.ts::computePacketKey" },
+      "writerOwner": { "status": "NONE_LIVE", "liveRowsProduced": 0, "note": "8+ production files import this formula, but the resolver rejects its output before persistence in every observed live write path (see v1 producers[])." },
+      "resolverOwner": { "status": "ACTIVE_REJECTION", "location": "packet-identity-resolver.ts -- throws StructuralScopedAddressExperimentError for any 64-hex candidate" }
+    },
+    {
+      "scheme": "COMPUTE_PACKET_KEY_V1_WORKSPACE_SCOPED (pkt:*)",
+      "formulaOwner": { "status": "SINGLE", "location": "sveltekit-frontend/.../identity/compute-packet-key.ts::computePacketKey" },
+      "writerOwner": { "status": "NONE -- zero production callers found anywhere outside its own containment spec" },
+      "resolverOwner": { "status": "ACTIVE_REJECTION", "location": "packet-identity-resolver.ts -- throws StructuralScopedAddressExperimentError for any pkt: candidate" }
+    }
+  ],
+
+  "backwardWriterTraceMethodology": "For each live cohort, traced to the specific script/module whose INSERT/UPDATE statement and formula match the observed key shape, rather than classifying by regex alone. Dominant and ACE_PREFIX_VARIANT cohorts were both confirmed this way in v1 (upsert-whole-codebase-atlas-packets.mjs's own 'preserve existing packet_key' comment; register-orphaned-chunks.mjs's known wrong-prefix bug, matched 1:1 by the alias table's 3294 rows). RPC_PROTO_16HEX confirmed by regenerating the exact formula against 5 sampled live rows and matching. The 32-hex and hex64/pkt: schemes were confirmed dormant by directly querying for their exact output shape and finding zero matches -- absence proven by data, not inferred from absence of a write-site grep.",
+
+  "truncationCollisionAudit": {
+    "scheme": "DOMINANT_SOURCE_REF_HASH",
+    "digestWidth": "12 hex characters = 48 bits (truncated from full sha256's 256 bits)",
+    "observedCollisionsInLiveTable": {
+      "count": 0,
+      "caveat": "This is NOT independent evidence of collision-freedom -- atlas_packets.packet_key carries a live UNIQUE constraint (atlas_packets_packet_key_key), so two rows sharing a key literally cannot coexist. Zero duplicates is guaranteed by the constraint, not a measurement of the hash's real collision rate."
+    },
+    "writeTimeCollisionBehavior": {
+      "statement": "INSERT INTO atlas_packets (...) ... ON CONFLICT (packet_key) DO NOTHING",
+      "consequence": "If a genuinely different source_ref ever truncated to the same 12-hex suffix as an already-inserted row, ON CONFLICT DO NOTHING would silently DROP the second file's packet row entirely -- no error, no log entry inspected this pass, no alias created. This is a real, currently-unmeasured failure mode, not merely theoretical: the current row count (58,362) is the count of successful inserts, not necessarily the count of distinct source_refs attempted -- a silently-dropped collision would show up as a source_ref with no atlas_packets row, which this gate did not independently audit (would require a full source_ref census cross-check, out of scope for this read-only pass)."
+    },
+    "theoreticalCollisionProbability": {
+      "model": "birthday-bound approximation p ~= n^2 / (2 * 2^48)",
+      "atCurrentScale_n_58362": "~= 6.06e-6 (about 1 in 165,000) -- negligible at today's row count",
+      "atProjectedScale_n_200000": "~= 7.11e-5 (about 1 in 14,000) -- still small but no longer negligible if the codebase corpus grows several-fold",
+      "conclusion": "Zero observed collisions today is consistent with, but does not prove, the truncation being a sufficient canonical identity design at larger scale. A pre-write collision check (SELECT before INSERT, or a collision-resistant full-width key) is not currently implemented anywhere in the writer."
+    },
+    "resolverDistinguishability": "packet-identity-resolver.ts cannot distinguish a hypothetical collision after the fact -- resolveCanonicalPacketKey() resolves packet_key -> row by exact string match; if two distinct source_refs ever produced the same 12-hex key, only the first-inserted row would ever be resolvable under that key, and the second file would have no discoverable packet identity at all (not an aliased duplicate, not a resolvable row -- absent)."
+  },
+
+  "newlyEnumeratedDormantSchemesCount": 1,
+  "totalDistinctFormulaImplementationsFoundInSource": 6,
+  "totalWithAnyLiveRowsProduced": 3,
+
+  "ownershipStateResult": "ONE_CANONICAL_OWNER_WITH_LEGACY_COMPATIBILITY",
+  "ownershipStateRationale": "For the codebase-file packet identity domain specifically (excluding the structurally distinct RPC_PROTO_16HEX sub-domain, which is not a competitor): exactly one formula has ever produced live rows that remain in the table today under its own writer's intent (DOMINANT_SOURCE_REF_HASH, 58,362 rows, upsert-whole-codebase-atlas-packets.mjs), plus one fully-resolved legacy-compatibility cohort from a since-identified bug (ACE_PREFIX_VARIANT, 3,294 rows, 100% aliased). Three additional formula implementations exist in source (hex64 node-scoped, pkt: workspace-scoped, 32-hex chunk+content-scoped) but have PRODUCED ZERO LIVE ROWS and none is designated as the adopted future owner by any written decision -- they are dormant/unadopted, not competing active owners. This is distinct from MULTIPLE_ACTIVE_PACKET_KEY_OWNERS (which would require >=2 schemes both currently producing rows outside a resolved compatibility relationship) and from CANONICAL_FUTURE_OWNER_NOT_ADOPTED (which would require one of the dormant schemes to actually be the designated future replacement -- none is; packet-key-builder.ts's own header explicitly declines that status, calling itself NOT_YET_PROVEN, and the resolver actively rejects it).",
+  "notPACKET_KEY_OWNER_UNDEFINED_because": "An owner IS identifiable for live data (the dominant scheme, enforced by the resolver) -- what is undefined is not 'who owns the live data' but 'what packet_key is supposed to mean over a file's lifecycle' (rename survival, revision qualification), which v1 already captured separately as PACKET_KEY_LIFECYCLE_CONTRACT_UNDEFINED. These are two different questions and both answers stand: ownership state = single-with-compatibility; lifecycle semantics = undefined.",
+
+  "targetContractForFutureConvergence": {
+    "note": "Per operator direction: this gate establishes the contract PACKET-WRITER-PRODUCTION-OWNER-01's future production event must consume -- it does not select that event.",
+    "desiredShape": "event -> WorkspaceSourceBindingV1 -> SemanticPacketWriteAdmissionV1 -> ONE canonical PacketIdentityV1 key builder (does not yet exist as an exported module -- see formulaOwner.status: NO_SHARED_CANONICAL_MODULE above) -> persistAdmittedSemanticPacketEmbedding()",
+    "currentGapBlockingThatShape": "The dominant live formula ('packet:' + sha256(source_ref).slice(0,12)) has no canonical exported TypeScript module -- it exists only inline in a MIGRATION_BACKFILL script, duplicated a second time (read-only) in a separate script. Extracting it into one shared, tested key-builder function (mirroring packet-key-builder.ts's existing shape but matching the DOMINANT formula, not the hex64 one) is a prerequisite mechanical step before any future production event can be safely authorized to mint new packet_key values under the live-adopted scheme -- not done in this pass (would be a code change, out of the read-only scope of this gate)."
+  },
+
+  "writes": { "postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0, "graphifyRuns": 0 },
+  "scopeLimits": [
+    "Read-only: no packet_key rewritten, no aliases inserted, no packet writers changed, no key-builder module extracted.",
+    "S01-08K NOT applied, NOT started.",
+    "PACKET-WRITER-PRODUCTION-OWNER-01 left open and unwired, per operator instruction, pending the key-builder extraction noted above.",
+    "Did not independently audit whether any source_ref exists in the codebase with no corresponding atlas_packets row (would be required to fully rule out a silent truncation-collision drop) -- flagged as a real, unmeasured gap, not resolved."
+  ]
+}
