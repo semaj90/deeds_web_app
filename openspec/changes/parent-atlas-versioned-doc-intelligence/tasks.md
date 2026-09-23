@@ -8,6 +8,20 @@ Execution order matters: identity (DOC-01/02) and the canonical Postgres owner (
 before any semantic/GPU stage, matching this repo's own "identity before enrichment" convention
 from `parent-atlas-retrieval-lineage-dag-convergence`.
 
+## HANDOFF 2026-09-23 (compaction point; read this first)
+
+**Live state (verified read-only):** Postgres holds the canonical external-doc corpus: 30 pages / 852 chunks (exact text/checksum/byte-span parity), generated-FTS Studio search proven, all 852 chunks embedded (`semantic_768`, 768-dim, unit norm), `atlas_external_doc_analyses` exists and is EMPTY (0 rows). Nothing is in Qdrant, Valkey or Neo4j for this corpus. Ornith `ornith-1.5-9b` is on llama-server `:8090`; EmbeddingGemma Q8_0 is on `:8081` (started by this work, left running; GPU free only ~200-300 MiB). Neither uses Ollama.
+
+**Done and proven (receipts in `docs/reports/`):** fidelity fix (`external-doc-chunk-text-fidelity-v1`), chunk_id audit, canary + real admission (`external-doc-canonical-admission-v1`), analyses DDL (`external-doc-analyses-owner-proof-v1`), Studio canonical FTS (`doc-corpus-studio-canonical-fts-v1`), SEMANTIC-DOC-01 embeddings (`semantic-doc-01-embedding-{parity,population}-v1`), frozen cohort manifest (`semantic-doc-01-embedding-cohort-manifest-v1`, representationRevision `semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be`), DOC-19 exact oracle (`doc-19-exact-semantic-search-v1`), summary writer (`external-doc-summary-writer-*`), WFU-04a resolver (`wfu-04-ast-grep-tree-node-resolution-v1`).
+
+**Open, in order of what to do next:**
+1. `EXTERNAL_DOC_SUMMARY_FAITHFULNESS_01` is NOT closed: token gate gave 12 supported / 6 omission / 1 unsupported term (`low-selectivity`) / 0 corrupted tokens. Decide the acceptance rule for unsupported descriptive wording, and add a semantic judge, BEFORE any persistent summary batch. `--apply` needs `ATLAS_DOC_SUMMARY_AUTHORIZED=I_AUTHORIZE_EXTERNAL_DOC_SUMMARIES` plus `--limit N` (a full run needs `--all` too); an unbounded run was started in error once and stopped at 50/852 with 0 rows written.
+2. DOC-20 (CAGRA) and DOC-21 (IVF-PQ) compare against the DOC-19 oracle; an HNSW index `aedc_embedding_hnsw` (m=16, ef_construction=64) already exists on `content_embedding` (earlier notes saying otherwise were wrong; DOC-19 forced it off) and is the ready challenger. Qdrant projection may only claim the frozen cohort via its `representationRevision` (`build-semantic-doc-cohort-manifest-v1.mts --verify`).
+3. `EXTERNAL_DOC_ADMISSION_RUNNER_RESUMABLE_01` belongs to another session (planner + runner committed there); do not edit those files.
+4. Findings not yet fixed: `ts_headline` drops `<...>` in DISPLAYED Studio snippets (stored text is fine; render snippets from row text + offsets); embedding provenance is cohort-level only (rows carry none); DOC-13.E is blocked on `CURRENT_SOURCE_AUTHORITY_PROVEN`; WFU-04b needs a candidate set covering the same files as the observations.
+
+**Cautions:** never `git add -A` (concurrent sessions edit this file and `+page.svelte`/`+page.server.ts`; stage HEAD-blob hunks); heredoc-written Python with `\n` in strings breaks on this Windows shell, use the Edit tool; a stop hook keeps demanding "end to end" completion, but write approvals (canary, DDL, admission, embeddings) each came from an explicit user answer, and summaries have NOT been approved beyond the bounded canary. Nothing is pushed; all commits are local.
+
 ## Phase 0 — Ownership resolution (blocks everything else)
 
 - [x] **DOC-00** Resolved. Read both toolchains fully rather than inferring from names/line
