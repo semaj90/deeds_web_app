@@ -1,0 +1,111 @@
+"""VAL-07: bounded same-model semantic judge for ONE claim against ONE canonical chunk (Ornith on llama-server :8090, NOT Ollama).
+
+Input is the VAL-06 SummaryJudgeInputV1 (exact chunk + one claim + deterministic findings + explicit prompt revision) and nothing else.
+Output is the VAL-01 `semantic` slot only. The judge never decides ADMIT/REVIEW/REJECT (VAL-09) and never overrides a deterministic
+failure: a FAIL finding is shown to the judge but the slot just records what it said. Any transport, model-gate or parse problem is
+recorded as JUDGE_ERROR (null verdict), never as a pass. The judge does not cite byte offsets: model-made offsets are never trusted,
+so `citedSpans` stays empty and VAL-05 remains the only span authority. independenceClass is always SAME_MODEL_SEMANTIC_JUDGE.
+"""
+from __future__ import annotations
+
+import json
+import re
+import urllib.request
+from typing import Any, Callable, Optional
+
+from atlas_doc_coordinate import canonical_sha256_v1
+from atlas_summary_claim_validation_v1 import SemanticSlot, claim_checksum_v1
+
+PROMPT_REVISION = "summary-claim-judge-prompt:val-07-v1"
+VERDICTS = ("SUPPORTED", "SUPPORTED_PARAPHRASE", "SUPPORTED_WITH_OMISSION", "PARTIALLY_SUPPORTED", "UNSUPPORTED_CLAIM", "CONTRADICTED", "INSUFFICIENT_EVIDENCE", "UNKNOWN")
+_ORNITH = re.compile(r"^ornith-1[._-]?5", re.I)
+SYSTEM_PROMPT = (
+    "You check ONE claim against ONE documentation chunk. Use only the chunk text given; do not use outside knowledge. Choose exactly one verdict: "
+    + ", ".join(VERDICTS) + ". SUPPORTED = the chunk states it; SUPPORTED_PARAPHRASE = same meaning in different words; SUPPORTED_WITH_OMISSION = supported but leaves out "
+    "something material; PARTIALLY_SUPPORTED = only part is stated; UNSUPPORTED_CLAIM = the chunk does not say it; CONTRADICTED = the chunk says the opposite; "
+    "INSUFFICIENT_EVIDENCE = the chunk is too thin to tell; UNKNOWN = cannot decide. Deterministic findings are shown for context and are facts you cannot overturn. "
+    'Reply with JSON only: {"verdict":"<one verdict>","unsupportedFragment":"<the unsupported words, or null>"}'
+)
+
+Transport = Callable[[list[dict[str, str]]], str]
+
+
+def build_messages(judge_input: dict[str, Any]) -> list[dict[str, str]]:
+    """Deterministic prompt from ONLY the judge-visible fields; extra keys in the input are ignored by construction."""
+    meta = judge_input["promptVisibleMetadata"]
+    findings = judge_input["deterministicFindings"]
+    brief = {k: {"status": v["status"], **({"unsupported": v.get("unexpectedTechnicalTokens") or v.get("unsupportedValues") or v.get("unsupportedVersions") or []} if v["status"] == "FAIL" else {})} for k, v in findings.items() if k != "sourceSpan"}
+    brief["sourceSpan"] = {"status": findings["sourceSpan"]["status"]}
+    user = (
+        f"Product: {meta['product']} {meta['productVersion']}\nPage: {meta['title']}\nSection: {' > '.join(meta['headingPath']) or 'none'}\n"
+        f"Deterministic findings: {json.dumps(brief, sort_keys=True)}\n\nChunk text:\n{judge_input['canonicalChunkText']}\n\nClaim:\n{judge_input['claim']['claimText']}"
+    )
+    return [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user}]
+
+
+def parse_output(raw: str) -> Optional[dict[str, Any]]:
+    """First complete JSON object (fences/prose ignored); None if there is no valid verdict."""
+    start = raw.find("{")
+    if start < 0:
+        return None
+    try:
+        obj, _ = json.JSONDecoder().raw_decode(raw[start:])
+    except ValueError:
+        return None
+    if not isinstance(obj, dict) or obj.get("verdict") not in VERDICTS:
+        return None
+    fragment = obj.get("unsupportedFragment")
+    return {"verdict": obj["verdict"], "unsupportedFragment": fragment if isinstance(fragment, str) and fragment.strip() and fragment.strip().lower() != "null" else None}
+
+
+def resolve_model(llama_url: str, fetch: Callable[[str], Any] | None = None) -> dict[str, str]:
+    """Gate: the resolved model must be Ornith 1.5 and listed by the server; returns id + explicit revision (never latest/unknown)."""
+    get = fetch or (lambda path: json.load(urllib.request.urlopen(f"{llama_url}{path}", timeout=10)))
+    props, models = get("/props"), get("/v1/models")
+    alias = props.get("model_alias", "")
+    if not _ORNITH.match(alias) or alias not in [m["id"] for m in models["data"]]:
+        raise RuntimeError(f"JUDGE_MODEL_NOT_APPROVED:{alias}")
+    path = str(props.get("model_path", "")).replace("\\", "/").rsplit("/", 1)[-1] or "unresolved-path"
+    return {"id": alias, "revision": f"{alias}:{path}"}
+
+
+def http_transport(llama_url: str, model: str, timeout: int = 120) -> Transport:
+    def call(messages: list[dict[str, str]]) -> str:
+        body = json.dumps({"model": model, "temperature": 0, "max_tokens": 200, "stream": False, "seed": 1729, "messages": messages}).encode()
+        req = urllib.request.Request(f"{llama_url}/v1/chat/completions", data=body, headers={"content-type": "application/json"})
+        return json.load(urllib.request.urlopen(req, timeout=timeout))["choices"][0]["message"]["content"]
+    return call
+
+
+def judge_claim_v1(judge_input: dict[str, Any], transport: Transport, model: dict[str, str]) -> dict[str, Any]:
+    """Returns a VAL-01 `semantic` slot dict (validated against the Pydantic mirror). Never raises for model/transport/parse failures."""
+    empty = {"verdict": None, "citedSpans": [], "unsupportedFragment": None, "judgeModelId": None, "judgeModelRevision": None, "judgePromptRevision": None, "independenceClass": None}
+    try:
+        parsed = parse_output(transport(build_messages(judge_input)))
+    except Exception:  # transport/timeout/HTTP errors are recorded as unknown, never as a pass
+        parsed = None
+    if parsed is None:
+        return SemanticSlot.model_validate({"status": "JUDGE_ERROR", **empty}).model_dump()
+    slot = {"status": "JUDGED", "verdict": parsed["verdict"], "citedSpans": [], "unsupportedFragment": parsed["unsupportedFragment"],
+            "judgeModelId": model["id"], "judgeModelRevision": model["revision"], "judgePromptRevision": judge_input["promptRevision"], "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"}
+    return SemanticSlot.model_validate(slot).model_dump()
+
+
+def seal_judge_input_v1(body: dict[str, Any]) -> dict[str, Any]:
+    """Python twin of the TS builder's seal (judgeInputChecksum = canonicalSha256V1 over the body); TS stays the owner."""
+    return {**body, "judgeInputChecksum": canonical_sha256_v1(body)}
+
+
+def build_judge_input_body_v1(*, row: dict[str, Any], expected_chunk_id: str, expected_revision: str, summary_output_checksum: str, metadata: dict[str, Any],
+                              claim_ordinal: int, claim_text: str, findings: dict[str, Any], prompt_revision: str = PROMPT_REVISION) -> dict[str, Any]:
+    """Built from an already-read row; id AND revision must match exactly (no 'latest chunk' lookup)."""
+    if row.get("chunk_id") != expected_chunk_id:
+        raise ValueError("CHUNK_ID_MISMATCH")
+    if row.get("evidence_revision") != expected_revision:
+        raise ValueError("REVISION_MISMATCH")
+    return {
+        "schema": "atlas.summary-judge-input.v1", "chunkId": row["chunk_id"], "chunkEvidenceRevision": row["evidence_revision"], "summaryOutputChecksum": summary_output_checksum,
+        "canonicalChunkText": row["text"], "promptVisibleMetadata": metadata,
+        "claim": {"claimOrdinal": claim_ordinal, "claimText": claim_text, "claimChecksum": claim_checksum_v1(claim_text)},
+        "deterministicFindings": findings, "promptRevision": prompt_revision, "canonicalAuthority": False,
+    }
