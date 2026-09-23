@@ -502,5 +502,54 @@
     "sha256": "f7950245e66de026b00c9b0bfe19b941ee2c4f4096b4c09cb6d91b03d5e09706",
     "archived": "2026-09-14T00:00:00Z",
     "reason": "Orphaned, broken, dangerous same-named duplicate of the real, safe `sveltekit-frontend/scripts/phase79-agentic-repair.mts` (1255 lines, exact-preimage-checked, post-write-hash-verified, git-diff-checked, rollback-capable). This root-level file (233 lines) is a much older, cruder prototype: `toolApplyPatch()` does a naive `content.replace(search_content, replace_content)` and calls `fs.writeFile()` directly with zero preimage check, zero post-write verification, zero git diff check, and zero rollback. Confirmed dead as written, not merely risky: it imports `db`/`errorEvents`/`errorSuggestions`/`errorSuggestionStates` from `../src/lib/server/db/schema-postgres` (the root-level `src/` tree, not sveltekit-frontend), but that schema file does not export those names, and its own `main()` only ever runs against hardcoded mock data -- the real DB query is commented out. Git history explains why: commit `a2e4dab329` ('wip(atlas): restore orphaned root src tree, retire Atlas v1 in favor of v2/semantic_768 alignment') explicitly marks the entire root `src/` tree this script depends on as orphaned and being retired. Confirmed zero references anywhere in the repo (no npm script, VS Code task, or doc mentions `scripts/phase79-agentic-repair.mts` at the root path) before archiving. Found during a live reachability-trace audit of the agentic repair architecture (2026-09-14) that also verified the review's other P0 claims (WorkflowActionEventV1 has 4 divergent schema owners, not 3; `preflightFileMutation` has zero production callers; the safe sveltekit-frontend Phase 79 bypasses FileMutationPlanV1/MutationApprovalReceiptV1 entirely and uses env-var-only authorization). Do not restore or reference this file -- if a root-level repair script is ever needed again, it must be built against the safe sveltekit-frontend Phase 79's preimage/rollback/verification pattern, not this one."
+  },
+  {
+    "path": "scripts/okf-docs-crawl.py",
+    "archive_path": "deeds_labs/archive/2026-09-23/okf-docs-crawl.py",
+    "sha256": "c769e29568b10daba414e6bad02925c793d603e7f82beef21a842efc332ceeb1",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/drizzle-issue-5792-hnsw-opclass-push.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/drizzle-issue-5792-hnsw-opclass-push.md",
+    "sha256": "79bc761d1dc7fa0c052b94230f35478a7ec329a2f089a29f50e1db47d09d52d8",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/drizzle-postgresql-extensions.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/drizzle-postgresql-extensions.md",
+    "sha256": "9d30ab8864bf027b64e9d363e278add6d0dbfa30e7227cb1417e4e1017f5bfc6",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/drizzle-vector-similarity-search.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/drizzle-vector-similarity-search.md",
+    "sha256": "b315e09fcdf52fc9b48a0313028949b75867860ca5ebd64050ad586c2f284df6",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/pgvector-hnsw-postgres18-tuning.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/pgvector-hnsw-postgres18-tuning.md",
+    "sha256": "fc3d04b00d250b2878ba329863abdb0ead1aeeec4909de59d8fd009dcc4febab",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/pgvector-readme.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/pgvector-readme.md",
+    "sha256": "03202bbcb6a42635e52907738268dfc2c4d6e1123a981228522ceb1fb1a777a9",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/supabase-hnsw-indexes.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/supabase-hnsw-indexes.md",
+    "sha256": "03c5a7f1f58179afee7677a280bfab67cc6f24a9155c363ddefc0e66cdaeb569",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
   }
 ]

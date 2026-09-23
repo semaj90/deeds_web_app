@@ -1,0 +1,155 @@
+{
+  "manifest_revision": "okf-pinned-docs-r1",
+  "workspace_revision": "workspace-current",
+  "source_snapshot_revision": "pinned-docs-2026-09-23",
+  "producer_revision": "parent-atlas-okf-pipeline-r1",
+  "output_root": ".",
+  "embedding": {
+    "url": "http://127.0.0.1:8081",
+    "model": "embeddinggemma-300m-f16.gguf"
+  },
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "external_programming_docs_768"
+  },
+  "features": {
+    "low_rank": 64,
+    "kmeans_clusters": 64,
+    "som": {
+      "rows": 20,
+      "columns": 20
+    }
+  },
+  "sources": [
+    {
+      "source_id": "sveltekit",
+      "source_revision": "sveltekit-2-2026-09-23",
+      "title": "SvelteKit 2 Documentation",
+      "base_urls": [
+        "https://svelte.dev/docs/kit/load"
+      ],
+      "allowed_domains": [
+        "svelte.dev"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/pinned/sveltekit",
+      "maximum_pages": 4,
+      "maximum_depth": 0,
+      "pages": [
+        "https://svelte.dev/docs/kit/load",
+        "https://svelte.dev/docs/kit/page-options",
+        "https://svelte.dev/docs/kit/state-management",
+        "https://svelte.dev/docs/kit/hooks"
+      ]
+    },
+    {
+      "source_id": "svelte5-runes",
+      "source_revision": "svelte5-runes-5-2026-09-23",
+      "title": "Svelte 5 Runes",
+      "base_urls": [
+        "https://svelte.dev/docs/svelte/$state"
+      ],
+      "allowed_domains": [
+        "svelte.dev"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/pinned/svelte5-runes",
+      "maximum_pages": 4,
+      "maximum_depth": 0,
+      "pages": [
+        "https://svelte.dev/docs/svelte/$state",
+        "https://svelte.dev/docs/svelte/$derived",
+        "https://svelte.dev/docs/svelte/$effect",
+        "https://svelte.dev/docs/svelte/$props"
+      ]
+    },
+    {
+      "source_id": "bits-ui",
+      "source_revision": "bits-ui-2-2026-09-23",
+      "title": "Bits UI v2 Documentation",
+      "base_urls": [
+        "https://bits-ui.com/docs/getting-started"
+      ],
+      "allowed_domains": [
+        "bits-ui.com"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/pinned/bits-ui",
+      "maximum_pages": 3,
+      "maximum_depth": 0,
+      "pages": [
+        "https://bits-ui.com/docs/getting-started",
+        "https://bits-ui.com/docs/migration-guide",
+        "https://bits-ui.com/docs/components/dialog"
+      ]
+    },
+    {
+      "source_id": "drizzle-orm",
+      "source_revision": "drizzle-orm-0.45-2026-09-23",
+      "title": "Drizzle ORM (PostgreSQL)",
+      "base_urls": [
+        "https://orm.drizzle.team/docs/column-types/pg"
+      ],
+      "allowed_domains": [
+        "orm.drizzle.team",
+        "github.com"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/pinned/drizzle-orm",
+      "maximum_pages": 5,
+      "maximum_depth": 0,
+      "pages": [
+        "https://orm.drizzle.team/docs/column-types/pg",
+        "https://orm.drizzle.team/docs/indexes-constraints",
+        "https://orm.drizzle.team/docs/guides/vector-similarity-search",
+        "https://orm.drizzle.team/docs/extensions",
+        "https://github.com/drizzle-team/drizzle-orm/issues/5792"
+      ]
+    },
+    {
+      "source_id": "postgresql-18",
+      "source_revision": "postgresql-18-18-2026-09-23",
+      "title": "PostgreSQL 18 Documentation",
+      "base_urls": [
+        "https://www.postgresql.org/docs/18/release-18.html"
+      ],
+      "allowed_domains": [
+        "www.postgresql.org"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/pinned/postgresql-18",
+      "maximum_pages": 4,
+      "maximum_depth": 0,
+      "pages": [
+        "https://www.postgresql.org/docs/18/release-18.html",
+        "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+        "https://www.postgresql.org/docs/18/indexes-bitmap-scans.html",
+        "https://www.postgresql.org/docs/18/using-explain.html"
+      ]
+    },
+    {
+      "source_id": "pgvector",
+      "source_revision": "pgvector-0.8-2026-09-23",
+      "title": "pgvector",
+      "base_urls": [
+        "https://github.com/pgvector/pgvector"
+      ],
+      "allowed_domains": [
+        "github.com"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/pinned/pgvector",
+      "maximum_pages": 1,
+      "maximum_depth": 0,
+      "pages": [
+        "https://github.com/pgvector/pgvector"
+      ]
+    }
+  ]
+}

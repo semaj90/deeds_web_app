@@ -18,17 +18,30 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		.then(async (r) => (r.ok ? await r.json() : null))
 		.catch(() => null);
 
+	// Documentation Corpus panel: read-only snapshot + optional GET search (?docq=), rendered server-side (works without JS).
+	const docsQuery = (url.searchParams.get('docq') ?? '').trim().slice(0, 300);
+	const docsCorpusPromise = fetch('/api/admin/atlas/docs-corpus')
+		.then(async (r) => (r.ok ? await r.json() : null))
+		.catch(() => null);
+	const docsSearchPromise = docsQuery.length >= 2
+		? fetch(`/api/admin/atlas/docs-corpus/search?q=${encodeURIComponent(docsQuery)}`)
+				.then(async (r) => (r.ok ? await r.json() : null))
+				.catch(() => null)
+		: Promise.resolve(null);
+
 	const cacheStatsPromise = locals.user.role === 'admin'
 		? fetch('/api/admin/cache-stats')
 			.then(async (r) => (r.ok ? await r.json() : null))
 			.catch(() => null)
 		: Promise.resolve(null);
 
-	const [health, runtimeRegistry, documentGovernance, cacheStats] = await Promise.all([
+	const [health, runtimeRegistry, documentGovernance, cacheStats, docsCorpus, docsSearch] = await Promise.all([
 		healthPromise,
 		runtimeRegistryPromise,
 		documentGovernancePromise,
-		cacheStatsPromise
+		cacheStatsPromise,
+		docsCorpusPromise,
+		docsSearchPromise
 	]);
 
 	const workflowTaskId = url.searchParams.get('taskId');
@@ -53,6 +66,9 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		runtimeRegistry,
 		documentGovernance,
 		cacheStats,
+		docsCorpus,
+		docsSearch,
+		docsQuery,
 		workflowStatus: workflowStatus?.status ?? null,
 		rotorquantModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? ENV.HFORF_MODEL_PATH ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
 		hforfModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? ENV.HFORF_MODEL_PATH ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',

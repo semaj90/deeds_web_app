@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { env as publicEnv } from '$env/dynamic/public';
 	import * as Bits from 'bits-ui';
+	import DocCorpusPanel from './DocCorpusPanel.svelte';
+	import type { DocCorpusStudioSnapshotV1, DocSearchResult } from '$lib/server/atlas/docs/doc-corpus-studio-read.js';
 	import type {
 		AtlasNode,
 		AtlasEdge,
@@ -106,6 +108,9 @@
 		health: AtlasHealthStatus | null;
 		runtimeRegistry?: AtlasRuntimeRegistrySnapshot | null;
 		documentGovernance?: DocumentGovernanceSummary | null;
+		docsCorpus?: DocCorpusStudioSnapshotV1 | null;
+		docsSearch?: DocSearchResult | null;
+		docsQuery?: string;
 		cacheStats?: AdminCacheStats | null;
 		workflowStatus?: TaskPacketWorkflowStatus | null;
 		rotorquantModelPath?: string;
@@ -922,6 +927,8 @@
 					Last sync: {runtime.refreshedAt || 'pending'}
 				</p>
 			</div>
+
+			<DocCorpusPanel snapshot={data.docsCorpus ?? null} search={data.docsSearch ?? null} query={data.docsQuery ?? ''} />
 
 			<!-- Document Governance -->
 			<div class="p-4 border-b border-[#3f3e37] bg-[#1c1b18]/40 space-y-3">

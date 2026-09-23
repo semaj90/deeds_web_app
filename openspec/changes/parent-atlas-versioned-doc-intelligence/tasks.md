@@ -896,6 +896,17 @@ DDL or source-of-truth change was applied.
 - A dedicated admin/search UI page for the doc corpus (mentioned in the original ask as
   "hypergraphrag admin page") — should extend the existing `/command-center/retrieval/` UI once
   Phase A-C prove the corpus is real and queryable, not be built speculatively first.
+  **STATUS 2026-09-23 (`STUDIO-DOCS-SSR-01`, NOT closed):** a read-only Documentation Corpus panel now
+  extends `(app)/admin/atlas` (not `/command-center/retrieval/`; WFU-12 names the Studio as the shell)
+  via `doc-corpus-studio-read.ts` + `GET /api/admin/atlas/docs-corpus[/search]`, SSR-rendered
+  (`DocCorpusPanel.ssr.spec.ts`), with `npm run atlas:docs:studio:smoke` writing
+  `docs/reports/doc-corpus-studio-smoke-v1.json`. Result today: `DOC_CORPUS_POSTGRES_EMPTY` —
+  `atlas_external_doc_pages/chunks` still hold 0 rows and `admitExternalDocPage` has no runtime caller, so
+  the panel searches only local REFERENCE_ONLY captures (`docs/.okf/pinned/*`, python-pipeline fetch+chunk
+  output, 21 pages / 749 chunks). Closure still requires admitted rows, provenance shown from Postgres, and
+  a live Postgres FTS hit. Finding: the BeautifulSoup extractor splits GitHub syntax-highlighted code one
+  token per line (`hnsw` / `.` / `iterative_scan`), so literal term search misses `hnsw.iterative_scan`
+  (reported as `tokenSplitHits`, not literal support) — extractor fidelity is an open owner-side defect.
 - Classifying `docs/.okf/dev/*`'s "okf.dev.manifest.v1" corpus as CANONICAL_OWNER / EXPERIMENT /
   DEAD relative to `atlas_okf_docs_pipeline.py`'s manifest lineage — flagged in proposal.md's Risks
   section, needs its own short audit before Phase A assumes they're the same generation.
