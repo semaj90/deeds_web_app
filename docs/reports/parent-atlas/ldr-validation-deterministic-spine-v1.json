@@ -1,0 +1,95 @@
+{
+  "schema": "atlas.ldr-validation-deterministic-spine.v1",
+  "generatedAt": "2026-09-23T23:17:55.426795+00:00",
+  "gate": "LDR_VALIDATION_DETERMINISTIC_SPINE_READY",
+  "result": "LDR_VALIDATION_DETERMINISTIC_SPINE_READY",
+  "contractOwner": "sveltekit-frontend",
+  "contractPath": "sveltekit-frontend/src/lib/server/atlas/docs/summary-claim-validation-v1.ts",
+  "packageProjection": false,
+  "checksumOwner": "sveltekit-frontend/src/lib/server/atlas/prefill/canonical-hash-v1.ts::canonicalSha256V1",
+  "fixtures": [
+    "sveltekit-frontend/src/lib/server/atlas/docs/__fixtures__/summary-claim-validation-v1.fixture.json",
+    "sveltekit-frontend/src/lib/server/atlas/docs/__fixtures__/canonical-hash-parity-v1.golden.json"
+  ],
+  "gates": {
+    "VAL01": {
+      "zodOwner": "PROVEN",
+      "ownerCollision": "RESOLVED (package-level duplicate discarded; frontend owner kept)",
+      "schemaOnly": true,
+      "spanVerificationInContract": false,
+      "tests": "12 focused Vitest"
+    },
+    "VAL02": {
+      "pydanticStrictMirror": "PROVEN",
+      "module": "python/atlas_summary_claim_validation_v1.py",
+      "strictNoCoercion": true
+    },
+    "VAL02B": {
+      "claimChecksumParity": "PROVEN",
+      "validationIdParity": "PROVEN",
+      "validationChecksumParity": "PROVEN",
+      "hasherTwin": "python/atlas_doc_coordinate.py::canonical_sha256_v1",
+      "goldenVectors": 17,
+      "tsIsOwner": true,
+      "pythonIsParityVerifierOnly": true,
+      "knownLimit": "Python port accepts only plain lowerCamel ASCII object keys"
+    },
+    "VAL03": {
+      "technicalValidator": "PROVEN",
+      "claimOmissionIsNonGating": true,
+      "status": "FAIL only for invented/corrupted identifiers; omission is observational (missingTechnicalTokens)",
+      "summaryLevelCoverage": "NOT_BUILT (separate future signal)"
+    },
+    "VAL04": {
+      "numericValidator": "PROVEN",
+      "versionValidator": "PROVEN",
+      "versionComparison": "EXACT_TEXT",
+      "evidence": "18.04 != 18.4; 1.0 != 1; CUDA 13.1 != 13.0"
+    },
+    "VAL05": {
+      "byteSpanVerifier": "PROVEN",
+      "module": "python/atlas_summary_claim_span_v1.py",
+      "revisionQualified": true,
+      "utf8ByteBoundaries": true,
+      "failClosed": true,
+      "liveReadOnlyReplay": {
+        "asciiChunk": "doc:pgvector:fe883c75f323441d:22",
+        "multibyteChunk": "doc:bits-ui:933224c7e6a17940:59",
+        "cases": [
+          "exact VERIFIED",
+          "REVISION_MISMATCH",
+          "CHUNK_ID_MISMATCH",
+          "CHECKSUM_MISMATCH",
+          "shifted CHECKSUM_MISMATCH",
+          "OUT_OF_BOUNDS",
+          "BYTE_RANGE_INVALID",
+          "SPAN_NOT_UTF8_BOUNDARY x2",
+          "whole multibyte char VERIFIED"
+        ]
+      }
+    }
+  },
+  "tests": {
+    "python": {
+      "pytest": 23,
+      "unittest": 10,
+      "failed": 0
+    },
+    "typescript": {
+      "vitest": 15,
+      "files": 2,
+      "failed": 0,
+      "targetedTsc": "clean"
+    }
+  },
+  "openSpecStrict": "PASS (parent-atlas-versioned-doc-intelligence at commits 1093630c7c and 9ba0eef4c6; re-run after this commit)",
+  "counts": {
+    "modelCalls": 0,
+    "oakCalls": 0,
+    "retrievalCalls": 0,
+    "storeWrites": 0,
+    "readOnlyPostgresQueries": 2
+  },
+  "supersedes": "docs/reports/parent-atlas/summary-claim-validation-contract-v1.json (recorded 0 tests and referenced the discarded package-level duplicate; not proof)",
+  "next": "VAL-06 bounded judge input (exact chunk + claim + deterministic findings + prompt revision only; no web/Firecrawl/Qdrant/other chunks/ACE)"
+}

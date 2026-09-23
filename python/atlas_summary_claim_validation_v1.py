@@ -83,7 +83,7 @@ class VersionSlot(_Strict):
 
 
 class SourceSpanSlot(_Strict):
-    status: Literal["NOT_RUN", "VERIFIED", "UNVERIFIED", "NO_CLAIMED_SPAN"]
+    status: Literal["NOT_RUN", "CLAIMED", "VERIFIED", "REJECTED", "NO_CLAIMED_SPAN"]
     spans: list[ChunkByteSpan]
 
 

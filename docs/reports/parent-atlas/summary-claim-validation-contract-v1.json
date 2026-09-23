@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.summary-claim-validation-contract-proof.v1",
+  "gate": "VAL-01",
+  "result": "DUPLICATE_CONTRACT_SCAFFOLDING_SUPERSEDED",
+  "contract": "sveltekit-frontend/src/lib/server/atlas/docs/summary-claim-validation-v1.ts",
+  "fixture": "sveltekit-frontend/src/lib/server/atlas/docs/__fixtures__/summary-claim-validation-v1.fixture.json",
+  "checksumOwner": "sveltekit-frontend/src/lib/server/atlas/prefill/canonical-hash-v1.ts::canonicalSha256V1",
+  "focusedTests": {
+    "path": "packages/parent-atlas/test/summary-claim-validation-v1.test.mjs",
+    "passed": 0,
+    "failed": 0
+  },
+  "typeScriptBuild": "DISCARDED_DUPLICATE_OWNER_BUILD_NOT_CANONICAL_PROOF",
+  "openSpecStrictValidation": "PASS; canonical owner still requires alignment review",
+  "scopedDiffCheck": "PASS",
+  "proven": {
+    "strictZodShape": false,
+    "revisionAndChecksumSyntax": false,
+    "claimChecksumKeyOrderStable": false,
+    "claimTextChangeChangesChecksum": false,
+    "claimOrdinalExcludedFromClaimChecksum": false,
+    "unknownAndCanonicalAuthorityFieldsRejected": false,
+    "semanticAndOntologyExecution": false,
+    "sourceByteSpanReadback": false,
+    "canonicalPromotion": false
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "source": 0
+  },
+  "correction": "Package-level duplicate from prior turn was removed after discovering the established SvelteKit contract. Its local test/build results are not canonical evidence.",
+  "commit": "not-created; concurrent working-tree edits preserved",
+  "supersededBy": "docs/reports/parent-atlas/ldr-validation-deterministic-spine-v1.json",
+  "citeAsProof": false
+}

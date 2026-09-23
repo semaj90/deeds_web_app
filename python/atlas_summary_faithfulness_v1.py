@@ -25,6 +25,10 @@ USER_TEMPLATE = "Product: {product} {productVersion}\nPage: {title}\nSection: {h
 MUST_TRY = ["hnsw.iterative_scan", "hnsw.scan_mem_multiplier", "io_method", "uuidv7", "$derived"]
 SAMPLE_PER_PRODUCT = 2
 TOKEN_RE = re.compile(r"`([^`\n]{2,80})`|([A-Za-z_$][\w$]*(?:[._-][\w$]+)+)|([A-Za-z]+_[A-Za-z_]+)|\b(\d+(?:\.\d+)*)\b")
+VERSION_RE = re.compile(
+    r"(?i)\b(?:v|version\s+|release\s+|postgresql\s+|postgres\s+|cuda\s+|python\s+|node(?:\.js)?\s+|pgvector\s+)(\d+(?:\.\d+){1,3}(?:[-+][\w.]+)?)"
+)
+NUMERIC_RE = re.compile(r"(?<![\w.])[-+]?\d+(?:,\d{3})*(?:\.\d+)?(?:\s?(?:%|ms|s|MB|GB))?(?![\w.])", re.IGNORECASE)
 
 
 def norm(t: str) -> str:
@@ -62,6 +66,79 @@ def assess(chunk_only: str, summary: str, meta: str = "") -> dict:
     omitted = [t for t in key if t not in summary]
     label = "TECHNICAL_TOKEN_CORRUPTED" if corrupted else "UNSUPPORTED" if unsupported else "SUPPORTED_WITH_OMISSION" if omitted and key else "SUPPORTED"
     return {"label": label, "unsupportedTokens": unsupported, "corruptedTokens": corrupted, "omittedKeyTokens": omitted}
+
+
+def validate_summary_claim_technical_tokens_v1(source_text: str, claim_text: str) -> dict:
+    """Produce the VAL-03 technical-token slot (claim-level; omission is observational and non-gating); numeric/version checks stay separate.
+
+    This reuses the existing deterministic token assessment and exposes its result in
+    the VAL-01 wire shape. It does not decide the overall claim result.
+    """
+    result = assess(source_text, claim_text)
+
+    def technical_only(values: list[str]) -> list[str]:
+        return sorted({
+            value for value in values
+            if not re.fullmatch(r"\d+(?:\.\d+)*", value)
+        })
+
+    source_tokens = technical_only(sorted(technical_tokens(source_text)))
+    claim_tokens = technical_only(sorted(technical_tokens(claim_text)))
+    missing = technical_only(result["omittedKeyTokens"])
+    unexpected = technical_only(result["unsupportedTokens"] + result["corruptedTokens"])
+    # CLAIM-LEVEL scope: only invented or corrupted tokens fail a claim. A source identifier the claim does not mention is NOT an
+    # error (an atomic claim need not repeat every identifier in the chunk); `missingTechnicalTokens` is observational coverage data
+    # here and never gates. Summary-wide omission belongs to a separate summary-level coverage signal, not to this slot.
+    status = "FAIL" if unexpected else "PASS"
+    return {
+        "status": status,
+        "sourceTokens": source_tokens,
+        "claimTokens": claim_tokens,
+        "missingTechnicalTokens": missing,
+        "unexpectedTechnicalTokens": unexpected,
+    }
+
+
+def _ordered_unique(values: list[str]) -> list[str]:
+    return list(dict.fromkeys(values))
+
+
+def validate_summary_claim_numeric_v1(source_text: str, claim_text: str) -> dict:
+    """Compare exact numeric literals, excluding numeric substrings of named versions."""
+    source_versions = [match.group(1) for match in VERSION_RE.finditer(source_text)]
+    claim_versions = [match.group(1) for match in VERSION_RE.finditer(claim_text)]
+
+    def values(text: str) -> list[str]:
+        version_spans = [match.span(1) for match in VERSION_RE.finditer(text)]
+        result = []
+        for match in NUMERIC_RE.finditer(text):
+            if any(match.start() >= start and match.end() <= end for start, end in version_spans):
+                continue
+            result.append(match.group(0))
+        return _ordered_unique(result)
+
+    source_values = values(source_text)
+    claim_values = values(claim_text)
+    unsupported = [value for value in claim_values if value not in source_values]
+    return {
+        "status": "FAIL" if unsupported else "PASS",
+        "sourceValues": source_values,
+        "claimValues": claim_values,
+        "unsupportedValues": unsupported,
+    }
+
+
+def validate_summary_claim_versions_v1(source_text: str, claim_text: str) -> dict:
+    """Compare version literals as strings; never coerce versions to numbers."""
+    source_versions = _ordered_unique([match.group(1) for match in VERSION_RE.finditer(source_text)])
+    claim_versions = _ordered_unique([match.group(1) for match in VERSION_RE.finditer(claim_text)])
+    unsupported = [version for version in claim_versions if version not in source_versions]
+    return {
+        "status": "FAIL" if unsupported else "PASS",
+        "sourceVersions": source_versions,
+        "claimVersions": claim_versions,
+        "unsupportedVersions": unsupported,
+    }
 
 
 JUDGE_SYSTEM = ("You audit a summary of one documentation chunk. Split the summary into its individual factual claims. For each claim answer SUPPORTED (the chunk states it), "
