@@ -358,7 +358,7 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   exactly one page; requesting the never-indexed `13.3` returns `VERSION_NOT_INDEXED` with
   `availableVersions: ["13.2"]` — confirms the fail-closed behavior end to end, not just at the
   database-constraint level.
-- [ ] **DOC-CANARY-ADMISSION-01** (opened 2026-09-23; needs explicit operator authorization, it writes Postgres) three-page
+- [x] **DOC-CANARY-ADMISSION-01** (opened 2026-09-23; operator-authorized and run 2026-09-23: `DOC_CANARY_ADMISSION_ROLLBACK_PROVEN`) three-page
   rollback canary: 3 of the 30 pinned pages (`docs/.okf/pinned`, envelopes from
   `scripts/atlas/build-external-doc-admission-envelopes-v1.py`) -> existing `admitExternalDocPage` (needs a small runner; the
   writer has no pipeline caller yet) -> exact page/chunk/checksum/version/byte-span readback + generated-FTS query -> ROLLBACK ->
@@ -374,7 +374,10 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `EXTERNAL_DOC_ANALYSIS_OWNER_01` (schema/owner design) is independent of admitted rows unless its own design requires them;
   `EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT` is independent of this chain. Not started; no mutation authorized by this note.
   DOC-06A above proves the writer/adapter contract only; canonical pinned-corpus admission has NOT run.
-  **Runner built 2026-09-23 (not applied; needs your explicit OK to run `--apply`):** `admitExternalDocPage` COMMITs its own transaction, so a
+  **Result (2026-09-23, `--apply`, receipt `docs/reports/external-doc-canary-admission-v1.json`):** baseline 0/0 -> inside the transaction 3 pages / 46 chunks
+  -> exact id/evidence-revision/checksum/byte-length/text readback 0 failures, generated-FTS query returned 13 hits (token `snippet`) -> ROLLBACK -> 0/0, independently
+  re-confirmed with psql. No embeddings, no :8081, no other stores. The real 30-page canonical admission has NOT run and still needs its own OK.
+  **Runner (built earlier the same day):** `admitExternalDocPage` COMMITs its own transaction, so a
   rollback canary cannot wrap it directly; `src/lib/server/atlas/docs/external-doc-canary-v1.ts` maps the writer's BEGIN/COMMIT/ROLLBACK onto
   savepoints inside one always-rolled-back outer transaction (4 no-database vitest tests incl. the real writer against a fake client).
   `sveltekit-frontend/scripts/atlas/run-doc-canary-admission-v1.mts`: default DRY RUN (validated handoff, 3 pages = first page of the first 3 sources
@@ -401,14 +404,16 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   Tests: 5 new `ChunkTextIndentationFidelityTests` (idempotence, fenced indent preserved, unterminated fence, exact byte-span slicing,
   page hash == chunk checksum); 76 focused Python tests + 38 vitest tests pass; DOC-06A handoff still `EXTERNAL_DOC_ADMISSION_HANDOFF_READY`.
   Not covered: the 7 pages without fenced code were already stable; nothing re-crawled (fix applies to stored evidence).
-- [ ] **EXTERNAL_DOC_ANALYSIS_OWNER_01** create `atlas_external_doc_analyses` for `ExternalDocAnalysisV1` (append-only by chunk evidence
+- [x] **EXTERNAL_DOC_ANALYSIS_OWNER_01** create `atlas_external_doc_analyses` for `ExternalDocAnalysisV1` (append-only by chunk evidence
   revision + analysis type + producer/model/prompt revision) after a fresh owner audit; `analysis_pass_results` and `atlas_summary_layers`
   are packet-keyed and not reusable. `20260923_external_doc_summaries_v1.sql` is `DRAFT_SUPERSEDED_PENDING_ANALYSIS_OWNER` and must not be applied.
   Per-chunk BitFrost/Valkey analysis warming stays blocked until canonical chunks exist. Scope: derived-analysis persistence design,
-  not canonical chunk storage. **Draft written 2026-09-23 (UNAPPLIED, checkbox stays open):** `sveltekit-frontend/drizzle/manual/20260923b_external_doc_analyses_v1.sql`
+  not canonical chunk storage. **Applied and proven 2026-09-23 (operator-authorized; `EXTERNAL_DOC_ANALYSIS_OWNER_APPLY_PROVEN`, receipt `docs/reports/external-doc-analyses-owner-proof-v1.json`):** `sveltekit-frontend/drizzle/manual/20260923b_external_doc_analyses_v1.sql`
   (append-only via trigger, FK to `atlas_external_doc_chunks(evidence_revision)`, `canonical_authority=false`, contract refinements as CHECKs);
-  4 static vitest tests (`external-doc-analyses-ddl.spec.ts`) pin it to `ExternalDocAnalysisV1` fields/types. Not run against a database, so SQL
-  syntax is unproven until an operator applies it (needs a review + explicit OK); closing this task requires apply + insert/replay/append-only proof.
+  4 static vitest tests (`external-doc-analyses-ddl.spec.ts`) pin it to `ExternalDocAnalysisV1` fields/types. DDL applied with `psql -1` (table + 3 indexes +
+  trigger, table empty). Proof in one always-rolled-back transaction with a synthetic page+chunk: insert, idempotent replay (`INSERT 0 0`), new model revision appends (2 rows);
+  rejected: bogus chunk FK, UPDATE, DELETE, SUMMARY without text, model without revisions, `canonical_authority=true`, bad checksum, deleting a referenced chunk; after rollback
+  0 analyses / 0 chunks / 0 pages. Only the empty analyses table persists; no analysis rows were written.
 - [ ] **DOC-03** Firecrawl bounded crawler — `EXISTS` (`fetch_firecrawl_v2`), verify
   bounded-crawl behavior (maxPages/maxDepth/sitemap-follow) matches the manifest's
   `maximum_pages`/`maximum_depth` fields; **blocked** on Firecrawl actually being registered
