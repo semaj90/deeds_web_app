@@ -136,6 +136,48 @@ must remain derived and `liveImplementationMembership = UNPROVEN`.
 ## Acceptance gates
 
 - [ ] Canonical identity survives path/cluster/projection changes in live Postgres readback.
+      **Investigated 2026-09-22, read-only, live Postgres — result is SPLIT: cluster/projection
+      axis PROVEN, path axis DISPROVEN. Not marking this gate met.**
+      - **Found the real live formula, not assumed**: sampled `atlas_packets.packet_key` against
+        several candidate hash formulas. `computePacketKey(source_ref, tree_node_id, title_id)`
+        (`packet-key-builder.ts`, a full 64-hex SHA256) does NOT match any live row (0/10
+        sampled) — confirms this session's earlier SESSION-200 finding that it's a separate,
+        rarely-used scheme. The actual dominant live formula is
+        `'packet:' + SHA256(source_ref).slice(0, 12)` (from
+        `scripts/atlas/packet-chunk-lineage-canary-01.mts:44`) — verified **500/500 (100%)** on a
+        random sample from the `packet:%`-prefixed population. Live population split:
+        `58,362/61,718` (94.6%) use this `packet:` form, `3,294` (5.3%) use `ace:packet:` form
+        (the Session-200-fixed `PREFIX_DIVERGENCE_ACE_PACKET` typo cohort, same underlying hash),
+        `62` use some other form (not characterized here).
+      - **Cluster/projection axis: PROVEN.** The live formula's only input is `source_ref` — it
+        does not incorporate `cluster_id`, `som_cluster`, `kmeans_cluster`, `community_id`, or
+        any embedding/representation value, so those cannot mathematically affect `packet_key`.
+        Confirmed at the write-path level too: every cluster-reassignment `UPDATE atlas_packets`
+        found (`scripts/atlas/backfill-som-cluster-direct.mjs`,
+        `scripts/atlas/kmeans-multi-k-experiment.mjs`) targets rows via
+        `WHERE packet_key = $1`/`WHERE atlas_packets.packet_key = data.key` and only ever `SET`s
+        the cluster column — `packet_key` itself is never in any cluster-reassignment `SET`
+        clause. Cluster/projection changes cannot mutate identity, by construction and by every
+        live write path checked.
+      - **Path axis: DISPROVEN — this is a real, negative finding, not glossed over.** Because
+        the live formula IS `SHA256(source_ref)`, `packet_key` is a direct, deterministic function
+        of the path itself. A file rename/move changes `source_ref`, which changes the recomputed
+        hash, which means the row created for the new path gets a **different** `packet_key` than
+        the old one — there is no live mechanism that recognizes "this is the same logical file
+        under a new path." Checked the one identity-alias mechanism that exists
+        (`resolveCanonicalPacketKey()`, `packet-identity-resolver.ts`) — it only resolves an
+        exact existing `packet_key` string or a literal pre-inserted `alias_key` row; nothing
+        computes or tracks a rename relationship generally. The only live alias rows
+        (`atlas_packet_identity_aliases`, `alias_kind = 'PREFIX_DIVERGENCE_ACE_PACKET'`, 3,294
+        rows) are a one-time prefix-typo fix, not a path-rename tracker.
+      - **Conclusion**: this acceptance gate as written ("survives path/cluster/projection
+        changes") is not met by the live system — 2 of 3 named axes hold, the path axis does
+        not, and no compensating mechanism exists today. This is consistent with (and gives
+        concrete live-data teeth to) the still-open `stableFileId` design question recorded in
+        `CANONICAL-IDENTITY-V1-SPEC-01` (`parent-atlas-retrieval-lineage-dag-convergence/tasks.md`)
+        — a `stableFileId` layer, if built, is exactly what would need to survive path changes
+        where `packet_key` (as currently derived) does not. Not building that here — read-only
+        investigation only, no writes performed.
 - [ ] Neo4j/NetworkX/cuGraph/Qdrant records round-trip to canonical feature/evidence/relationship IDs.
 - [x] Recursive same-entity-type relationships can have multiple participants but degree 1.
 - [x] Relationship degree is distinct from cardinality and graph node degree.
