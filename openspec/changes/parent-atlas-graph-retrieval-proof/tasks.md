@@ -3,12 +3,36 @@
 ## GS1.9 - Inventory identity fields
 
 - [x] Inventory identity fields across `atlas_tree_nodes`, `atlas_packets`, `graphify_files`, `graphify_symbols`, `graphify_edges`, and the topology tables.
-- [ ] Record which fields are stable keys, which are version-bound occurrences, and which are derived projections.
-- [ ] Verify the live join semantics for packet-to-tree and packet-to-symbol links.
-- [ ] Validation commands:
-  - `node scripts/atlas/audit-tree-nodes.mjs --verbose`
-  - `node scripts/atlas/backfill-tree-nodes.mjs --dry-run --limit=100`
-  - `node scripts/atlas/phase1-tree-node-derivation.mjs --dry-run --limit=5000`
+- [x] Record which fields are stable keys, which are version-bound occurrences, and which are derived projections.
+      From `\d atlas_tree_nodes` (269,972 rows live):
+      - **Stable keys**: `node_id` (PK, uuid), `packet_key` (text, references `atlas_packets`,
+        indexed), `source_ref`/`file_path` (source identity).
+      - **Version-bound occurrences**: `lineage_version` (`'tree-nodes-v1'` default — a schema
+        generation marker, not per-row data), `feature_id`/`feature_label` (labels attached at
+        derivation time, not re-verified per revision).
+      - **Derived projections (pointers into mirrors, not identity)**: `qdrant_point_id`,
+        `neo4j_node_id`, `glyph_record_id`, `community_id`, `som_cluster`/`som_x`/`som_y` —
+        clustering/topology results written after the fact, never joined-on as identity.
+      - `root_id`/`parent_id`/`tree_depth`/`page_index_path` are structural tree-shape fields,
+        not identity in either sense.
+- [x] Verify the live join semantics for packet-to-tree and packet-to-symbol links.
+      Packet-to-tree: live, via `packet_key`/`feature_id`, but **partial** — re-ran
+      `node scripts/atlas/audit-tree-nodes.mjs --verbose`: 269,972 rows, 0 duplicate `node_id`s,
+      0 orphans, but only **61,659/269,972 (23%) linked** to a `feature_id` — the audit gate's
+      own `linkage` check reports `pass:false`. Packet-to-symbol: **no direct join exists at
+      all** — `atlas_tree_nodes` has no `symbol_id`/`symbol_version_id` column, confirming this
+      file's own GS1.10 finding ("No live `symbol_version_id` or `parse_node_id` contract was
+      found") from the schema side, not just the package-scan side.
+- [x] Validation commands:
+  - `node scripts/atlas/audit-tree-nodes.mjs --verbose` → **GATE FAIL** (linkage 23%, otherwise
+    clean: 0 duplicate node_ids, 0 orphans, max depth 2).
+  - `node scripts/atlas/backfill-tree-nodes.mjs --dry-run --limit=100` → 100/100 files, 0 docs
+    created, 100 reused, 0 chunks created, 100 reused, 0 packet links updated; no changes
+    committed (dry-run confirmed via its own report, `docs/reports/tree-nodes-backfill.json`).
+  - `node scripts/atlas/phase1-tree-node-derivation.mjs --dry-run --limit=5000` → 59 packets with
+    NULL `tree_node_id` found (far below the 5000 limit — most packets already have one derived);
+    all 59 resolved via stage-1 `feature_id` heuristic (100%), stage-2 AST and stage-3 TurboVec
+    confidence lanes saw 0 — not exercised by this cohort. Dry-run only, `--apply` not run.
 
 ## GS1.10 - Separate identity contracts
 
