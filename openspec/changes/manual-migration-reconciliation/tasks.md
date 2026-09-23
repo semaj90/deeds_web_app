@@ -350,7 +350,7 @@ seven as single-owner candidates requiring review, not as safe-to-apply work.
 - [x] Confirmed the canonical-owner revision migration is additive-only,
   unapplied, and promotion-blocked by
   `audit-canonical-owner-revision-migration-safety-v1.mjs`.
-- [ ] Resolve the packet writer's admitted source-revision input and prove
+- [x] Resolve the packet writer's admitted source-revision input and prove
   bounded readback before considering any migration or packet backfill.
   **Investigated 2026-09-22 — the mechanism already exists, is proven, and is NOT the
   remaining gap; the remaining gap is that nothing live calls it.** Traced the real writer
@@ -377,6 +377,62 @@ seven as single-owner candidates requiring review, not as safe-to-apply work.
   to call it with real data yet. Deciding/building that producer is separate, larger work
   (which route or job becomes the authoritative caller) — not attempted here, and not a
   migration/backfill question at all once framed this way.
+
+  **Full structured re-run 2026-09-22 (read-only, no writes) per the 14-section packet-writer
+  source-revision authority gate — receipt:
+  `docs/reports/packet-writer-source-revision-authority-v1.json`.**
+  - **Writer census**: 5 writers touch `atlas_packets` in TypeScript production code beyond the
+    canonical one — `hyperrag-packet-pipeline.ts`, `acp/packet-materializer-pipeline.ts`,
+    `topology/canonical-id-hierarchy.ts`, `unknown/promotion-executor.ts` (all `LEGACY_WRITER`,
+    none insert a `source_revision` column at all), plus `packet-write-transaction-v1.ts`
+    (`TEST_ONLY`, its own docstring says "SCAFFOLDING ONLY... Not called from
+    semantic-packet-writer.ts or any other writer"). ~140 historical `scripts/atlas/*.mjs`/`.mts`
+    files bulk-classified `MIGRATION_BACKFILL` (3 spot-checked, not exhaustively read — flagged
+    as a scope limit, not silently assumed).
+  - **`source_revision` traced past `input.sourceRevision`, to its real origin**: Graphify
+    execution → `graphify_execution_file_membership_v2.code_source_revision` →
+    `scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs` (admission-gated) →
+    `atlas_workspace_source_bindings` (24,458 distinct `canonical_source_ref`s live) →
+    `WorkspaceSourceBindingV1` (Zod `.superRefine()` enforces `sourceRevision ===
+    sha256:${contentDigest}`, a structural content-binding, not a shape-only check) →
+    `buildSemanticPacketWriteAdmissionV1()` → `persistAdmittedSemanticPacketEmbedding()` →
+    `atlas_packets.source_revision`.
+  - **`workspaceRevision` proven independent, not derived**: bound via a *separate* superRefine
+    to `sha256:${sortedSourceManifestDigest}` (whole-workspace) vs. `sourceRevision`'s
+    single-file `contentDigest` — two different digests over two different inputs, so the writer
+    cannot conflate them even accidentally.
+  - **`CurrentSourceAuthority` chain IS consumed** by the admitted path; `stableFileId` is
+    explicitly NOT consumed anywhere in that chain (not inferred as a dependency that isn't
+    there, per the gate's own instruction).
+  - **Fail-closed behavior**: 5 of 8 named failure modes are `PROVEN_BY_CONSTRUCTION` (Zod
+    schema/regex makes the bad state syntactically unrepresentable — missing field, malformed
+    shape, `workspace:0`, Git SHA, absent binding); 2 are `PROVEN_BY_TEST` (workspace-revision
+    mismatch, content-digest mismatch — both re-run live, PASS); 1
+    (`multipleConflictingSourceBindingsExist`) is real but softer than "fails closed" —
+    the producer script uses `ON CONFLICT ... DO NOTHING`, silently skipping a second
+    conflicting binding rather than erroring or overwriting. Flagged precisely, not rounded up
+    to "fails closed."
+  - **Identity boundary** (packet_key / sourceRevision / workspaceRevision / stableFileId /
+    treeNodeId / symbolVersionId / CandidateOrdinal / representationRevision) recorded in full in
+    the receipt; confirmed no downstream representation/execution id feeds back into packet
+    identity anywhere in the code paths read.
+  - **Live readback (SELECT-only)**: population count (not sample extrapolation) —
+    `61,718/61,718` rows `source_revision IS NULL`, 0 qualified, 0 legacy-shaped garbage — the
+    table is uniformly in one state, so a 20-row sample fully characterizes it. Binding-join
+    check found the same app-relative-vs-repo-root-relative `source_ref` prefix mismatch this
+    session's separate `parent-atlas-nlp-sidecar-feature-compiler` 14.3a work already found — a
+    literal `canonical_source_ref = source_ref` join misses most real bindings, not because they
+    don't exist. Classification: `61,718 MISSING_BINDING`, 0 in every other bucket.
+  - **Result: `PACKET_WRITER_OWNER_CONFLICT`** (not `PROVEN`, not `UNKNOWN`). Distinguishing
+    code defect from data gap per the gate's own instruction: the admitted path itself is
+    `CODE_PATH_PROVEN` — correct, live-DB-tested, structurally fail-closed. The reason live data
+    is unqualified is that 4+ other writers can still create/update `atlas_packets` rows without
+    going through it, and nothing currently prevents that — ownership is unresolved, not the
+    mechanism.
+  - **Tests**: reran the 2 existing specs live (15/15 pass, real DB); no new tests added — the
+    existing coverage already matches this gate's "add focused tests if useful" bar for the
+    fail-closed cases that need a live-DB test rather than pure schema construction.
+  - **Writes**: postgres 0, qdrant 0, valkey 0, neo4j 0, graphifyRuns 0 — matches the receipt.
 
 Status: `PACKET_REVISION_AXIS_PRESENT_SOURCE_REVISION_UNPOPULATED`;
 `migrationApplied=false`; `promotionAllowed=false`; `writesPerformed=false`.
