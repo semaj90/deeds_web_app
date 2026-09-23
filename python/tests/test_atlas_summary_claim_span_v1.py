@@ -51,3 +51,29 @@ def test_python_wire_mirror_matches_frontend_span_statuses() -> None:
         pass
     else:
         raise AssertionError("stale UNVERIFIED status must not survive the strict mirror")
+
+
+def test_deterministic_multibyte_fixture_verifies_on_code_point_boundaries_and_rejects_inside_sequences() -> None:
+    import hashlib
+
+    text = "PostgreSQL résumé — café 日本語 🚀"
+    row = {"chunk_id": "doc:fixture:multibyte:0", "evidence_revision": "sha256:" + "a" * 64, "text": text}
+    data = text.encode("utf-8")
+
+    def verify(start: int, end: int) -> dict:
+        return verify_summary_claim_byte_span_v1(
+            expected_chunk_id=row["chunk_id"], expected_chunk_evidence_revision=row["evidence_revision"], canonical_chunk_row=row,
+            start_byte=start, end_byte=end, text_checksum=hashlib.sha256(data[start:end]).hexdigest(),
+        )
+
+    for word in ("résumé", "—", "café", "日本語", "🚀"):
+        start = data.index(word.encode("utf-8"))
+        assert verify(start, start + len(word.encode("utf-8")))["status"] == "VERIFIED", word
+    for label, (start, end) in {
+        "inside é": (data.index("é".encode()) + 1, data.index("é".encode()) + 2),
+        "inside em dash": (data.index("—".encode()) + 1, data.index("—".encode()) + 3),
+        "inside 日": (data.index("日".encode()) + 1, data.index("日".encode()) + 3),
+        "inside emoji": (data.index("🚀".encode()) + 1, data.index("🚀".encode()) + 3),
+    }.items():
+        result = verify(start, end)
+        assert result["status"] == "REJECTED" and result["reason"] == "SPAN_NOT_UTF8_BOUNDARY", label
