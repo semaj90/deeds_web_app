@@ -374,6 +374,14 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `EXTERNAL_DOC_ANALYSIS_OWNER_01` (schema/owner design) is independent of admitted rows unless its own design requires them;
   `EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT` is independent of this chain. Not started; no mutation authorized by this note.
   DOC-06A above proves the writer/adapter contract only; canonical pinned-corpus admission has NOT run.
+  **Runner built 2026-09-23 (not applied; needs your explicit OK to run `--apply`):** `admitExternalDocPage` COMMITs its own transaction, so a
+  rollback canary cannot wrap it directly; `src/lib/server/atlas/docs/external-doc-canary-v1.ts` maps the writer's BEGIN/COMMIT/ROLLBACK onto
+  savepoints inside one always-rolled-back outer transaction (4 no-database vitest tests incl. the real writer against a fake client).
+  `sveltekit-frontend/scripts/atlas/run-doc-canary-admission-v1.mts`: default DRY RUN (validated handoff, 3 pages = first page of the first 3 sources
+  by id: bits-ui, drizzle-kit, drizzle-orm; 46 chunks; 0 DB connections); `--apply` additionally requires
+  `ATLAS_DOC_CANARY_AUTHORIZED=I_AUTHORIZE_ROLLBACK_CANARY`, aborts if the canonical tables are not empty, reads back id/checksum/byte-length/text
+  and a generated-FTS hit, rolls back, and requires counts back to 0. Receipt path `docs/reports/external-doc-canary-admission-v1.json`
+  (written only by `--apply`). Fidelity prerequisite is now met (see EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY, 852 chunks).
 - [x] **EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT** review `chunk_id` (`doc:<source_id>:<16-hex truncated document digest>:<ordinal>`) for
   address/key collisions only; unchanged by the identity repair and does NOT redefine `chunkEvidenceRevision` (proven separately, not
   reopened); must not be combined with it. **Audit done 2026-09-23 (read-only, 0 writes; `docs/reports/external-doc-chunk-id-collision-audit-v1.json`):**
