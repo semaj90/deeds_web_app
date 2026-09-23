@@ -76,14 +76,35 @@ zero-caller claim with a fresh grep (repo state moves).
         app + adds semantic512 routes on top) from the one actually deployed
         (`services/atlas-gpu-8098/app.py`); no name-collision risk, they're just two different
         FastAPI entrypoints and only one is wired into Docker today.
-- [ ] Add entries to `docs/architecture/runtime-ownership-registry.json` for the 4 remaining
-      zero/near-zero caller files above (`atlas_subgraph_cugraph.py`,
-      `atlas_rapids_community_sidecar.py`, `atlas_compute/cugraph_ppr.py`,
-      `atlas_compute/graph_programs.py`) with classification + evidence (caller-trace result) per
-      file. Fresh grep already run for the first two (2026-08-31): both show only their own
+- [ ] Add entries to `docs/architecture/runtime-ownership-registry.json` for the 4 files flagged
+      above (`atlas_subgraph_cugraph.py`, `atlas_rapids_community_sidecar.py`,
+      `atlas_compute/cugraph_ppr.py`, `atlas_compute/graph_programs.py`) with classification +
+      evidence (caller-trace result) per file. **Correction (2026-09-22, see the re-run below):
+      only 3 of these 4 are actually zero/near-zero-caller — `graph_programs.py` has a real,
+      currently-passing test exercising its API and should not be classified alongside the other
+      3.** Fresh grep already run for the first two (2026-08-31): both show only their own
       `__pycache__/*.pyc` as a "match" — confirmed zero real callers, DEAD.
-- [ ] Re-run the caller grep fresh at reclassification time for the remaining 2
-      (`atlas_compute/cugraph_ppr.py`, `atlas_compute/graph_programs.py`) — not yet done this pass.
+- [x] Re-run the caller grep fresh at reclassification time for the remaining 2
+      (`atlas_compute/cugraph_ppr.py`, `atlas_compute/graph_programs.py`) — done, and the two
+      files land in different classifications, not the same one:
+      - **`atlas_compute/cugraph_ppr.py`**: eagerly imported by `atlas_compute/__init__.py`
+        (line 11, re-exports `CuGraphPprParityReceipt`/`run_cugraph_ppr_parity`) — reachable as
+        an import-time side effect of any of the 45 real files that do
+        `from atlas_compute.<submodule> import ...` (any submodule import runs the package
+        `__init__.py` first). But grepped every one of those 45 callers plus the rest of
+        `python/`: **zero of them actually call `run_cugraph_ppr_parity()` or reference
+        `CuGraphPprParityReceipt`** outside the module's own definition. Import-reachable, not
+        functionally used anywhere — a real distinction from the two fully pycache-only-dead
+        files above, but not `PROVEN` either. Recommend `FIXTURE_ONLY`-or-`DEAD` per the
+        ownership vocabulary, not a third `DEAD` twin of the confirmed-dead pair.
+      - **`atlas_compute/graph_programs.py`**: same import-reachability as above, PLUS genuinely
+        called — `python/test_atlas_compute_graph_representation.py` imports and calls both
+        `deterministic_bfs()` and `condense_and_lexicographically_sort()`. Re-ran that test live:
+        `python -m pytest python/test_atlas_compute_graph_representation.py -q` → **4 passed**.
+        Not dead, not near-zero-caller — has a real, currently-passing test exercising its actual
+        API. Should not be grouped with the other 3 zero/near-zero-caller files in the entry
+        above; it needs its own classification (test-proven, matching the T5 note below about
+        GR10 prior art) rather than folding into this batch.
 - [ ] For `atlas_compute/graph_programs.py` specifically: check `parent-atlas-graph-runtime-enhancement`
       GR10 (semantic best-first, TypeScript, not yet started) before finalizing DEAD — if GR10 work
       begins and this file's heapq-based traversal turns out to be relevant prior art, surface it
