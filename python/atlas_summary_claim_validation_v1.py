@@ -37,7 +37,7 @@ def _explicit(value: Optional[str]) -> Optional[str]:
 
 
 class _Strict(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    model_config = ConfigDict(extra="forbid", populate_by_name=True, strict=True)
 
 
 class ChunkByteSpan(_Strict):
@@ -181,7 +181,9 @@ def seal_v1(body: dict[str, Any]) -> dict[str, str]:
     return {"claimChecksum": claim_checksum, "validationId": validation_id, "validationChecksum": canonical_sha256_v1({**rest, "claimChecksum": claim_checksum, "validationId": validation_id})}
 
 
-class SummaryClaimValidation(_Strict):
+class SummaryClaimValidationV1(_Strict):
+    """Shape-only WIRE model of the TypeScript contract (strict fields, invariants on every slot, no seal derivation)."""
+
     schema_: Literal["atlas.summary-claim-validation.v1"] = Field(alias="schema")
     chunkId: str = Field(min_length=1)
     chunkEvidenceRevision: str
@@ -230,6 +232,13 @@ class SummaryClaimValidation(_Strict):
             raise ValueError("validatorRevision required")
         return _explicit(v) or v
 
+
+
+class SummaryClaimValidation(SummaryClaimValidationV1):
+    """Sealed model: additionally RECOMPUTES claimChecksum/validationId/validationChecksum with the Python twin of the frontend-owned
+    canonicalSha256V1 and requires them to equal the carried values. TypeScript stays the checksum OWNER; this is an independent
+    PARITY VERIFIER (VAL-02B), never a second authority."""
+
     @model_validator(mode="after")
     def _seal(self) -> "SummaryClaimValidation":
         expected = seal_v1(_plain(self))
@@ -240,6 +249,14 @@ class SummaryClaimValidation(_Strict):
         if self.validationChecksum != expected["validationChecksum"]:
             raise ValueError("validationChecksum does not match the recomputed content")
         return self
+
+
+
+class SummaryClaimValidationFixtureV1(_Strict):
+    """The canonical TypeScript fixture envelope ({skeleton, populated}); shape-only parse of both wire objects."""
+
+    skeleton: SummaryClaimValidationV1
+    populated: SummaryClaimValidationV1
 
 
 def parse_summary_claim_validation_v1(payload: dict[str, Any]) -> SummaryClaimValidation:
