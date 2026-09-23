@@ -45,6 +45,7 @@ export * from './core/external-doc-runtime-capabilities.js';
 export * from './core/external-doc-retrieval-proof.js';
 export * from './core/external-doc-retrieval-runtime.js';
 export * from './core/ast-grep-observation-adapter.js';
+export * from './core/ast-grep-tree-node-resolution-v1.js';
 export * from './core/simdjson-typed-evidence-adapter.js';
 export * from './core/adaptive-dag-plan-v1.js';
 export * from './core/parameter-artifact-v1.js';
