@@ -202,6 +202,19 @@
 
 - [ ] 6.1 Re-run this change's own capability scenarios (specs/ontology-resolution-boundary,
       specs/ontology-fanout-storage) as real tests, not just design-time checklist items.
+      **Partial, honestly split — not both sides are provable yet.**
+      `ontology-resolution-boundary`: real, proven. `sveltekit-frontend/src/lib/server/atlas/
+      ontology-resolution-boundary-postgres.spec.ts` exists and was re-run:
+      `npx vitest run .../ontology-resolution-boundary-postgres.spec.ts` → 6/6 tests pass
+      (2026-09-22 rerun). `ontology-fanout-storage`: **cannot be run as a real test yet, not
+      attempted here** — every one of its 4 scenarios (unresolved-row exclusion, bitmap-scan
+      plan, refresh cadence, admission-gate bypass) requires either resolved rows (0 exist,
+      per 3.3/3.4/3.5 above) or the `OntologyFanoutAuthorityV1` admission table (confirmed by
+      task 4.2 to have zero production callers / no persisted admission decisions at all). A
+      test written against this state would either trivially pass on empty data (proving
+      nothing) or need to fabricate rows/admission state that doesn't exist in production —
+      neither is real coverage. Blocked on 4.6 (human-authorized apply) and Phase 2 (3.4/3.5)
+      producing real resolved+admitted rows first.
 - [x] 6.2 Confirm no existing consumer of `feature_ontology_tuples` broke (additive-only schema
       change, so this should be a no-op check, but verify rather than assume). Verified rather
       than assumed: grepped all real consumers repo-wide. Only one Drizzle-typed consumer exists
