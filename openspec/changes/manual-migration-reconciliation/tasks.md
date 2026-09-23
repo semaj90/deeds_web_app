@@ -171,7 +171,17 @@ Per CLAUDE.md Consolidation Sweep Rule: audit canonical vs. duplicate before pat
     statements manually. Not something to decide unilaterally.
 - [ ] `drizzle/manual/proposed_20260530_task_semantic_packets.sql` (153 lines) → creates `feature_registry`, `workspace_tasks`, `task_semantic_packets`, `task_file_links`, `task_cluster_links`, `agent_pickup_queue`, `agent_run_events`.
   - [ ] Filename is literally prefixed `proposed_` — confirm with repo history / commit log whether this was ever accepted, or is still an open proposal.
-  - [ ] Confirm `agent_run_events` is not a duplicate of the canonical `agent_actions` (already live).
+  - [x] Confirm `agent_run_events` is not a duplicate of the canonical `agent_actions` (already live).
+        Confirmed, not a duplicate. `agent_actions` (live, `\d agent_actions`) is a flat per-tool-call
+        audit log with no FK to any task/workflow entity (session_id, action_type, tool_name,
+        target_file/symbol, result_code, duration_ms). The proposed `agent_run_events`
+        (`drizzle/manual/proposed_20260530_task_semantic_packets.sql:134-149`) is a task-lifecycle
+        event log FK'd to `workspace_task_id`/`pickup_id` referencing `workspace_tasks`/
+        `agent_pickup_queue` -- both themselves not live -- with a typed `event_type`
+        (task_received/summary_generated/files_attached/patch_proposed/validation_run/completed/
+        failed) and a `langfuse_trace_id` column `agent_actions` has no equivalent of. Different
+        grain and purpose; `agent_run_events` also can't be applied standalone today since its FKs
+        target two other not-yet-live tables from the same proposed bundle.
   - [ ] Do not apply without an explicit decision recorded here.
   - [ ] **Live alignment checked 2026-08-31:** `public.feature_registry` is absent; the current Drizzle owner defines a UUID `id` plus unique `feature_key`. `public.kanban_tasks` and its lifecycle tables already exist and are live-aligned, so this proposed file must not be used to recreate or replace the Kanban control plane.
   - [ ] **Shape conflict confirmed 2026-08-31:** current `feature-registry.ts` includes `summary`, `chunk_ids`, `tags`, and `retry_queries`; journal migration `0024_nebulous_mongoose.sql` omits those columns. Select one reconciled owner and generate a new journaled migration only after the empty live migration ledgers are reconciled.
@@ -180,8 +190,30 @@ Per CLAUDE.md Consolidation Sweep Rule: audit canonical vs. duplicate before pat
 ## MMR1.4 - Tier C: needs statement-by-statement review (mutates existing live tables)
 
 - [ ] `drizzle/manual/20260402_indexing_ace_schema_merge.sql` (520 lines) — NOT a pure additive file. Contains `DROP TRIGGER IF EXISTS legal_nodes_tsv_trigger ON public.legal_nodes` and `DROP TRIGGER IF EXISTS legal_chunks_tsv_trigger ON public.legal_chunks` — both `legal_nodes` and `legal_chunks` are confirmed live tables today.
-  - [ ] Full read-through required: what does this file do to `legal_nodes`/`legal_chunks` beyond the trigger drop (recreate with new definition? add columns? just idempotent no-op if the trigger doesn't currently exist)?
-  - [ ] Confirm the 18 `CREATE TABLE IF NOT EXISTS public.*` statements in this file don't collide with anything live (regex-parsed table names during triage were unreliable because they're schema-qualified `public.<name>` — re-extract cleanly with `rg "^CREATE TABLE IF NOT EXISTS public\." drizzle/manual/20260402_indexing_ace_schema_merge.sql`).
+  - [x] Full read-through required: what does this file do to `legal_nodes`/`legal_chunks` beyond the trigger drop (recreate with new definition? add columns? just idempotent no-op if the trigger doesn't currently exist)?
+        Done, read-only, nothing applied. The file adds 2 nullable columns to `legal_nodes`
+        (`tsv tsvector`, `tags_json jsonb`) and 3 to `legal_chunks` (`tsv tsvector`, `summary
+        text`, `qdrant_point_id text`) via `ADD COLUMN IF NOT EXISTS`, then `CREATE OR REPLACE
+        FUNCTION` for 2 tsv-update functions and drop+recreate their triggers. Checked each
+        against live schema (`\d public.legal_nodes`, `\d public.legal_chunks`): **partially
+        already applied**. `legal_nodes.tsv`/`tags_json` and `legal_chunks.summary`/
+        `qdrant_point_id` already exist live -- those 4 `ADD COLUMN`s would be no-ops.
+        **`legal_chunks.tsv` does NOT exist live** -- that one `ADD COLUMN` would be a real,
+        new mutation. **Neither trigger exists live** (`SELECT tgname FROM pg_trigger WHERE
+        tgname IN ('legal_nodes_tsv_trigger','legal_chunks_tsv_trigger')` → 0 rows) -- applying
+        this file would newly wire live auto-population-on-write behavior for both tables that
+        does not exist today, not just recreate an existing trigger. This is the real live
+        behavioral change the file's own last bullet (explicit sign-off required) is guarding
+        against -- not the column adds, which are almost entirely already-applied no-ops.
+  - [x] Confirm the 18 `CREATE TABLE IF NOT EXISTS public.*` statements in this file don't collide with anything live (regex-parsed table names during triage were unreliable because they're schema-qualified `public.<name>` — re-extract cleanly with `rg "^CREATE TABLE IF NOT EXISTS public\." drizzle/manual/20260402_indexing_ace_schema_merge.sql`).
+        Confirmed via the given re-extraction: 18 tables (`jurisdictions`, `library_documents`,
+        `library_document_versions`, `legal_nodes`, `legal_chunks`, `legal_definitions`,
+        `legal_glossary`, `case_library_links`, `ingestion_jobs`, `evidence_relationships`,
+        `citation_collections`, `collection_citations`, `citation_tags`, `document_topics`,
+        `embedding_cache`, `yorha_cases`, `yorha_evidence_nodes`, `yorha_evidence_connections`).
+        Queried `pg_tables` for all 18 by name: **all 18 already exist live today** -- every
+        `CREATE TABLE IF NOT EXISTS` in this file is a no-op. Zero collision risk from the
+        table-creation statements; the only real risk is the trigger/column mutation above.
   - [ ] Per Drizzle Safety Rule: review generated/manual SQL before journaling or applying — do this against a throwaway DB snapshot or `legal-ai-postgres18-test` sidecar container first, not directly against `legal_ai_db`.
   - [ ] Only apply after explicit sign-off — this file is the one candidate in the set that can affect data already in production tables, not just add new empty ones.
 
