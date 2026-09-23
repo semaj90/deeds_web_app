@@ -53,7 +53,24 @@
 - [ ] **A2A-01** Add a Parent Atlas AgentCard only after single-agent execution and receipts are proven.
 - [x] **A2A-02A** Add a projection-only adapter contract that binds an A2A task to a caller-resolved Atlas task attempt, matching run and receipt IDs and carrying workflow/action/evidence/resource/artifact provenance; mismatches fail closed. Focused fixtures prove mapping only; no canonical authority or live resolver is claimed.
 - [ ] **A2A-02B** Wire the A2A adapter to the existing canonical task-attempt resolver and prove bounded end-to-end task/run/receipt/provenance readback. Keep A2A identifiers protocol-local and noncanonical.
-- [x] **A2A-03** Prohibit exposing canonical Postgres/Graphify operations as peer-agent writable state. The peer discovery descriptor is now default-deny: only `identity:recover` and retrieval `Search`/`RRFFuse`/`Rerank` are advertised; generic `ExecuteTool*`, mirror tools, unknown tools, and unknown methods are omitted. The discovery route renders tools from the filtered descriptor IDs rather than the complete ACP registry. Focused contract test passes 2/2. This is an advertisement boundary only; the route remains admin-protected and RPC execution endpoints still require their own authz. Evidence: `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts`, `sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts`, and `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.spec.ts`.
+- [x] **A2A-03** `DISCOVERY_DESCRIPTOR_BOUNDARY_PROVEN` (status label corrected 2026-09-23 —
+  previously read as if it closed peer-write authorization; it does not). Prohibit *advertising*
+  canonical Postgres/Graphify operations as peer-agent writable state. The peer discovery
+  descriptor is now default-deny: only `identity:recover` and retrieval `Search`/`RRFFuse`/`Rerank`
+  are advertised; generic `ExecuteTool*`, mirror tools, unknown tools, and unknown methods are
+  omitted. The discovery route renders tools from the filtered descriptor IDs rather than the
+  complete ACP registry. Focused contract test passes 2/2. **This proves only that a peer cannot
+  discover a mutating capability through this descriptor — it does NOT prove a peer cannot invoke
+  an unadvertised mirror/write RPC method directly by name.** That is a distinct, still-open
+  question (see A2A-04 below), not covered by this task's evidence. Evidence:
+  `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts`,
+  `sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts`, and
+  `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.spec.ts`.
+- [ ] **A2A-04** Direct-invocation authorization audit (not started). Test whether a peer can call an
+  unadvertised mutating/mirror RPC method by name despite A2A-03's discovery-level suppression.
+  Read-only-safe approach: exercise authorization at the dispatch/handler-admission layer with
+  invalid or dry-run fixtures (no real mutation needs to occur) and prove rejection happens before
+  handler invocation, not merely that the method is unlisted in discovery output.
 - [x] **MEM-01** Freeze the three-memory taxonomy: ephemeral llama KV prompt cache, disposable BitFrost/Valkey residency, and PostgreSQL durable canonical memory. Qdrant/Neo4j are rebuildable projections, not memory authorities; CLAUDE.md's historical linear hierarchy has been explicitly superseded. Documentation contract only; no runtime-state claim.
 - [x] **MEM-02** Keep `ContextManifest` as the reproducible model-context boundary; KV cache reuse is an optimization and never durable truth. `ContextManifestV2` preserves the existing V1 payload and deterministically checksums context/revision inputs (`context-manifest-v2.ts` and its focused spec); llama prompt reuse is marked `ephemeral` in `context-prompt-streamer.ts`. Contract-level proof only; live llama-server KV persistence behavior is not claimed.
 - [x] **MEM-03** Prove revision-qualified BitFrost keys and fail-open behavior across workspace, policy, graph, and representation revisions. `buildAceBitfrostCacheKeyV1` identity test now asserts a distinct key for each of those four revision changes; the existing cache-aside suite proves reconstruction after Valkey read failure and returning reconstructed canonical data when the cache write fails. Focused suites pass 27/27. Contract/fixture proof only; no live Valkey readback or cache write is claimed. Evidence: `sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.test.ts`, `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts`.
