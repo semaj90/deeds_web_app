@@ -66,20 +66,33 @@
   `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts`,
   `sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts`, and
   `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.spec.ts`.
-- [ ] **A2A-04** `A2A_INVOCATION_AUTHORIZATION_BOUNDARY` — direct-invocation authorization audit
-  (not started). Test whether a peer can call an unadvertised mutating/mirror RPC method by name
-  despite A2A-03's discovery-level suppression. Read-only-safe approach: exercise authorization at
-  the dispatch/handler-admission layer with invalid or dry-run fixtures (no real mutation needs to
-  occur) and prove rejection happens before handler invocation, not merely that the method is
-  unlisted in discovery output. Acceptance criteria (none proven yet, all still open):
-  (1) direct invocation of an unadvertised/write-like method is rejected;
-  (2) rejection occurs before handler invocation, not merely omitted from discovery;
-  (3) missing/invalid authorization fails closed;
-  (4) peer-supplied canonical IDs cannot become authority merely by being supplied;
-  (5) mirror/canonical mutation cannot occur through the peer surface without the required
-  authorization; (6) tests proving this remain non-mutating. Do not implement or claim this gate
-  proven until fixtures exercising all six criteria exist and pass without changing runtime
-  behavior.
+- [ ] **A2A-04** `A2A_PEER_WRITE_EXPOSURE_UNGUARDED` — direct-invocation authorization audit run
+  2026-09-23 (read-only, non-mutating). **Found a real blocker, not proof of safety — stays open.**
+  Traced the actual external A2A entrypoint: `.well-known/agent.json` advertises only
+  `POST /api/ai/agent` (whose LLM tool-calling loop is correctly scoped to a separate, read-only
+  `GEMMA4_ALLOWED_TOOLS` allowlist — DB mutation is explicitly "reserved for future", not exposed).
+  But a SEPARATE, unadvertised, admin-console-internal route, `POST /api/acp/execute`, accepts any
+  ACP tool name and dispatches it (`getACPToolSchema` → `executeACPTool` → `TOOLS[name].handler()`)
+  with **only `if (!locals.user)` session-presence auth — no role/permission check, no call into
+  the existing `tool-authorization.ts` capability owner that its sibling routes (`/api/acp/rpc`,
+  `/api/agent/execute`) correctly use.** Confirmed live via a new focused test
+  (`authorization-boundary.spec.ts`, 4/4 pass, no real mutation — every mutating-tool case uses
+  `dryRun:true`, which the traced handler (`atlas.kanban.claim`) returns from *before* touching
+  Postgres): a non-admin (`role: 'viewer'`) authenticated caller successfully dispatches
+  `atlas.kanban.claim` — a real `CANONICAL_WRITE` tool never advertised by A2A-03's discovery
+  descriptor or the AgentCard's skills list. Unknown tool names ARE correctly rejected (404) before
+  dispatch — that part is safe. Peer-supplied `taskId` resolves against an existing row (does not
+  mint fake authority); `workerId` is a narrower, non-blocking impersonation risk, not canonical-
+  identity forgery. Separate caveat, not a mitigation: the AgentCard claims Bearer-token auth, but
+  `hooks.server.ts` implements none — so today's actual exposure is to any authenticated same-app
+  user, not yet arbitrary external peers; if Bearer auth is ever implemented to match the AgentCard,
+  this gap becomes externally peer-reachable immediately. **Fix path identified, not implemented
+  this pass** (explicitly out of this read-only audit's scope): wire `/api/acp/execute` through the
+  existing `tool-authorization.ts` owner (`checkToolAccess`/`toolAuthorizationGuard` against
+  `atlasToolRegistry`) the same way `/api/agent/execute` already does — reuse the existing owner,
+  do not build a second capability registry. Evidence:
+  `docs/reports/a2a-direct-invocation-authorization-v1.json`,
+  `sveltekit-frontend/src/routes/api/acp/execute/authorization-boundary.spec.ts`.
 - [x] **MEM-01** Freeze the three-memory taxonomy: ephemeral llama KV prompt cache, disposable BitFrost/Valkey residency, and PostgreSQL durable canonical memory. Qdrant/Neo4j are rebuildable projections, not memory authorities; CLAUDE.md's historical linear hierarchy has been explicitly superseded. Documentation contract only; no runtime-state claim.
 - [x] **MEM-02** Keep `ContextManifest` as the reproducible model-context boundary; KV cache reuse is an optimization and never durable truth. `ContextManifestV2` preserves the existing V1 payload and deterministically checksums context/revision inputs (`context-manifest-v2.ts` and its focused spec); llama prompt reuse is marked `ephemeral` in `context-prompt-streamer.ts`. Contract-level proof only; live llama-server KV persistence behavior is not claimed.
 - [x] **MEM-03** Prove revision-qualified BitFrost keys and fail-open behavior across workspace, policy, graph, and representation revisions. `buildAceBitfrostCacheKeyV1` identity test now asserts a distinct key for each of those four revision changes; the existing cache-aside suite proves reconstruction after Valkey read failure and returning reconstructed canonical data when the cache write fails. Focused suites pass 27/27. Contract/fixture proof only; no live Valkey readback or cache write is claimed. Evidence: `sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.test.ts`, `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts`.
