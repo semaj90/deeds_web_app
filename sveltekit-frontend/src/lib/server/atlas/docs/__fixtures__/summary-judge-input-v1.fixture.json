@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.summary-judge-input.v1",
+  "chunkId": "doc:pgvector:fe883c75f323441d:22",
+  "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+  "summaryOutputChecksum": "099b9e1d0ea636413f67312877aab4a7d1bcfc0c0fbf61936ab68630bfe8b872",
+  "canonicalChunkText": "PostgreSQL pgvector supports HNSW iterative scans for filtered search.",
+  "promptVisibleMetadata": {
+    "product": "pgvector",
+    "productVersion": "0.8.0",
+    "title": "HNSW indexes",
+    "headingPath": [
+      "Indexing",
+      "HNSW"
+    ]
+  },
+  "claim": {
+    "claimOrdinal": 0,
+    "claimText": "pgvector supports HNSW iterative scans.",
+    "claimChecksum": "37d03a909baafc881df33bab010c2f0948e176f536bb6d8606c0460c43ebadcd"
+  },
+  "deterministicFindings": {
+    "technical": {
+      "status": "PASS",
+      "sourceTokens": [
+        "HNSW"
+      ],
+      "claimTokens": [
+        "HNSW"
+      ],
+      "missingTechnicalTokens": [],
+      "unexpectedTechnicalTokens": []
+    },
+    "numeric": {
+      "status": "PASS",
+      "sourceValues": [],
+      "claimValues": [],
+      "unsupportedValues": []
+    },
+    "version": {
+      "status": "PASS",
+      "sourceVersions": [],
+      "claimVersions": [],
+      "unsupportedVersions": []
+    },
+    "sourceSpan": {
+      "status": "NO_CLAIMED_SPAN",
+      "spans": []
+    }
+  },
+  "promptRevision": "summary-judge-prompt:val-06-v1",
+  "canonicalAuthority": false,
+  "judgeInputChecksum": "76cee8a4d93cd4e829abf6127444f85ac187ce493044d4ec2a050717bb89399e"
+}
