@@ -1,0 +1,1514 @@
+{
+  "schema": "atlas.doc-19-exact-semantic-search.v1",
+  "generatedAt": "2026-09-23T21:33:47.765359+00:00",
+  "gate": "DOC-19",
+  "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+  "cohortVerification": {
+    "verify": "COHORT_UNCHANGED",
+    "frozenChecksum": "354fdd73836dd7be9f61ab27950f140f961dcc50ea41f6ffd4b6b87cb05b29cb",
+    "liveChecksum": "354fdd73836dd7be9f61ab27950f140f961dcc50ea41f6ffd4b6b87cb05b29cb",
+    "storedVectorCount": 852,
+    "dimension": 768
+  },
+  "queryPromptRevision": "embeddinggemma-query-prompt-v1: 'task: search result | query: '",
+  "embeddingModelRevision": "4a2f0fe92d93",
+  "queries": [
+    {
+      "query": "hnsw iterative scan strict order",
+      "input": "task: search result | query: hnsw iterative scan strict order"
+    },
+    {
+      "query": "postgres asynchronous io method worker",
+      "input": "task: search result | query: postgres asynchronous io method worker"
+    },
+    {
+      "query": "svelte 5 derived state rune",
+      "input": "task: search result | query: svelte 5 derived state rune"
+    },
+    {
+      "query": "drizzle kit migration schema",
+      "input": "task: search result | query: drizzle kit migration schema"
+    },
+    {
+      "query": "uuidv7 postgres",
+      "input": "task: search result | query: uuidv7 postgres"
+    },
+    {
+      "query": "how do I keep vector search accurate when a WHERE clause filters most rows",
+      "input": "task: search result | query: how do I keep vector search accurate when a WHERE clause filters most rows"
+    },
+    {
+      "query": "which setting lets the database read from disk without blocking the query",
+      "input": "task: search result | query: which setting lets the database read from disk without blocking the query"
+    },
+    {
+      "query": "reactive value that recomputes when its dependencies change",
+      "input": "task: search result | query: reactive value that recomputes when its dependencies change"
+    },
+    {
+      "query": "generate sql files that describe a schema change",
+      "input": "task: search result | query: generate sql files that describe a schema change"
+    },
+    {
+      "query": "time ordered unique identifier function",
+      "input": "task: search result | query: time ordered unique identifier function"
+    },
+    {
+      "query": "limit how much memory an approximate index scan may use",
+      "input": "task: search result | query: limit how much memory an approximate index scan may use"
+    },
+    {
+      "query": "component snippet that renders a custom element for a headless dialog",
+      "input": "task: search result | query: component snippet that renders a custom element for a headless dialog"
+    }
+  ],
+  "postgresExactResults": [
+    {
+      "query": "hnsw iterative scan strict order",
+      "results": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:24",
+          "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Iterative Index Scans"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.4763098955154419
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:52",
+          "chunkEvidenceRevision": "sha256:1078b6f71a8ba08a476540a9f8d31c3076940e0e8d9138cb28bca14e8a20905d",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Troubleshooting",
+            "Why isn\u2019t a query using an index?"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.3691307008266449
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:8",
+          "chunkEvidenceRevision": "sha256:89cbc1d8f236fb85a765b85fca38ca587c0d6b2cbe25c82c547ca0016ddd7334",
+          "pageId": "3fa0d572-e72d-4e4f-b23d-14d1e2c428e0",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/using-explain.html",
+          "headingPath": [
+            "14.1.\u00a0Using EXPLAIN #",
+            "14.1.1. EXPLAIN Basics #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.36590502756551
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:42",
+          "chunkEvidenceRevision": "sha256:123b086611c68af5fa7a6d37fb0c596246f6d39306b86942a503f61e18e05308",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Performance",
+            "Vacuuming"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.35716284172756485
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:26",
+          "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Iterative Index Scans",
+            "Iterative Scan Options",
+            "HNSW"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.3270651990531577
+        }
+      ]
+    },
+    {
+      "query": "postgres asynchronous io method worker",
+      "results": [
+        {
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:25",
+          "chunkEvidenceRevision": "sha256:204a00eecbf70725da63304e97b79a07d3cb11dcaf7ccf2c4552fddf3bf1f5c6",
+          "pageId": "f3f3066d-1727-4378-bca8-df1820d1885d",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "headingPath": [
+            "19.4.\u00a0Resource Consumption #",
+            "19.4.1.\u00a0Memory #",
+            "19.4.5.\u00a0I/O #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.6042266003680359
+        },
+        {
+          "chunkId": "doc:postgresql-18:0c1f6c86b4bbe623:1",
+          "chunkEvidenceRevision": "sha256:757ff5ee4c33e2f11572a232cc4776036f5ab72d43886956223d0a5423bb62c2",
+          "pageId": "88730338-765b-4037-b743-658ae4de1a4d",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/view-pg-aios.html",
+          "headingPath": [
+            "53.2. pg_aios #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5901862871424851
+        },
+        {
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:24",
+          "chunkEvidenceRevision": "sha256:3dd567b096fa11ac5b4dadd0d8ccedb17beef0d24a7ec120bf13e956c9a41dd9",
+          "pageId": "f3f3066d-1727-4378-bca8-df1820d1885d",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "headingPath": [
+            "19.4.\u00a0Resource Consumption #",
+            "19.4.1.\u00a0Memory #",
+            "19.4.5.\u00a0I/O #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5449725660698164
+        },
+        {
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:23",
+          "chunkEvidenceRevision": "sha256:93e0c120a5987c9ed5184890070b4f53c4b3bad321a4455d0e64b064805f376c",
+          "pageId": "f3f3066d-1727-4378-bca8-df1820d1885d",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "headingPath": [
+            "19.4.\u00a0Resource Consumption #",
+            "19.4.1.\u00a0Memory #",
+            "19.4.5.\u00a0I/O #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5416098187434928
+        },
+        {
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+          "chunkEvidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1",
+          "pageId": "c6619e59-38e0-4d03-bebd-62282d19eb87",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/release-18.html",
+          "headingPath": [
+            "E.6.\u00a0Release 18 #",
+            "E.6.1.\u00a0Overview #",
+            "E.6.3.\u00a0Changes #",
+            "E.6.3.1.\u00a0Server #",
+            "E.6.3.1.3.\u00a0General Performance #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5349379140212677
+        }
+      ]
+    },
+    {
+      "query": "svelte 5 derived state rune",
+      "results": [
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:10",
+          "chunkEvidenceRevision": "sha256:76591a0398570a37fc6abd34d561bbe12f1d97165e70bcdc2cf19a71d1b7901c",
+          "pageId": "100af5d8-2f0a-4ae6-8631-386753265317",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/svelte/$derived",
+          "headingPath": [
+            "$derived",
+            "See also",
+            "On this page"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.6859011871696983
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:16",
+          "chunkEvidenceRevision": "sha256:7176f545c5847e23ae960cdcc7c2292e3e393114aa3bf5ad0fe4d08e09ac41ac",
+          "pageId": "100af5d8-2f0a-4ae6-8631-386753265317",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/svelte/$derived",
+          "headingPath": [
+            "$derived",
+            "Destructuring"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.6258509159088135
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:1",
+          "chunkEvidenceRevision": "sha256:53b9fed87f6fb357f9339c2e4286449edafd17a2f9a0df70b73e7e7c81618432",
+          "pageId": "100af5d8-2f0a-4ae6-8631-386753265317",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/svelte/$derived",
+          "headingPath": [
+            "Introduction",
+            "Runes"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.6252993941307068
+        },
+        {
+          "chunkId": "doc:svelte5-runes:9d3a717d27cb2c0d:1",
+          "chunkEvidenceRevision": "sha256:cc88298225921e5349b97a76cb5c090f86ca2b60ff10bb96860646593ac49bc2",
+          "pageId": "9a3cba59-53cd-4ed1-900f-9d38769496fa",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/svelte/$state",
+          "headingPath": [
+            "Introduction",
+            "Runes"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.611528373451733
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:14",
+          "chunkEvidenceRevision": "sha256:78aab3e9c4ef03dd7bf2334f6b1b9bccb76a733b983ad25ca321a36f7320a0f0",
+          "pageId": "100af5d8-2f0a-4ae6-8631-386753265317",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/svelte/$derived",
+          "headingPath": [
+            "$derived",
+            "Deriveds and reactivity"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.609794932895748
+        }
+      ]
+    },
+    {
+      "query": "drizzle kit migration schema",
+      "results": [
+        {
+          "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0",
+          "chunkEvidenceRevision": "sha256:fd87694e2e8aeda0463ff46f80d5e48b00194b0982caa4609ad12f8fc17520c4",
+          "pageId": "88474083-badc-4280-bd0b-3e6f33dd8c57",
+          "provider": "drizzle-team",
+          "product": "drizzle-kit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/drizzle-kit-migrate",
+          "headingPath": [
+            "drizzle-kit migrate"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.7518276424305239
+        },
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:0",
+          "chunkEvidenceRevision": "sha256:5f7e0bda2f87878f5bb7f9113d5bf10ad3809759396af9bd3a7dd82a4b322fe2",
+          "pageId": "ed3377c3-35ed-4a84-9eb7-dfcf493630a9",
+          "provider": "drizzle-team",
+          "product": "drizzle-kit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/kit-overview",
+          "headingPath": [
+            "Migrations with Drizzle Kit"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.7311160128643518
+        },
+        {
+          "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:4",
+          "chunkEvidenceRevision": "sha256:3e51a0459db456d3431257494de1c688d19c84350f63345620b36c82f35e7833",
+          "pageId": "88474083-badc-4280-bd0b-3e6f33dd8c57",
+          "provider": "drizzle-team",
+          "product": "drizzle-kit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/drizzle-kit-migrate",
+          "headingPath": [
+            "drizzle-kit migrate",
+            "Applied migrations log in the database",
+            "Extended example"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.7225156591823317
+        },
+        {
+          "chunkId": "doc:drizzle-kit:b13a84ba576d603b:2",
+          "chunkEvidenceRevision": "sha256:9ba69dea027c721894b06c59090f9a068a3423abac2609749f2c367fb3addc25",
+          "pageId": "ed3377c3-35ed-4a84-9eb7-dfcf493630a9",
+          "provider": "drizzle-team",
+          "product": "drizzle-kit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/kit-overview",
+          "headingPath": [
+            "Migrations with Drizzle Kit"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.71021568775177
+        },
+        {
+          "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:0",
+          "chunkEvidenceRevision": "sha256:fd72378b2259e6c8bbf845e0f141aa39bd943267a949de846f94f27838710ad6",
+          "pageId": "c06fc409-e46b-4398-8421-e218fc9ed892",
+          "provider": "drizzle-team",
+          "product": "drizzle-kit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+          "headingPath": [
+            "drizzle-kit generate"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.7061334287643546
+        }
+      ]
+    },
+    {
+      "query": "uuidv7 postgres",
+      "results": [
+        {
+          "chunkId": "doc:postgresql-18:a92f2cf09489fb29:1",
+          "chunkEvidenceRevision": "sha256:310a88163ea716a17249804ef78aaccbcd1663fd0853223ad32728ebb584c471",
+          "pageId": "7d9e2e33-12d6-4b66-9ac5-8a70621eaa56",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/functions-uuid.html",
+          "headingPath": [
+            "9.14.\u00a0UUID Functions #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.7161656022071838
+        },
+        {
+          "chunkId": "doc:postgresql-18:a92f2cf09489fb29:2",
+          "chunkEvidenceRevision": "sha256:0d9939831f31f7e171678270cbc4831b0705577aa991779a7c0fd17df4bb531e",
+          "pageId": "7d9e2e33-12d6-4b66-9ac5-8a70621eaa56",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/functions-uuid.html",
+          "headingPath": [
+            "9.14.\u00a0UUID Functions #",
+            "Note"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.661952872930553
+        },
+        {
+          "chunkId": "doc:drizzle-orm:fa0a1af1c2ddb64c:18",
+          "chunkEvidenceRevision": "sha256:5195f4bf45b1952fcf42adfaffac7b5c47247bc16443f582df075cfdb7dc17e4",
+          "pageId": "311ddd2c-ba49-4a4e-8021-046fe0e91334",
+          "provider": "drizzle-team",
+          "product": "drizzle-orm",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/column-types",
+          "headingPath": [
+            "PostgreSQL column types",
+            "---",
+            "uuid"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.6233816146850586
+        },
+        {
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+          "chunkEvidenceRevision": "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716",
+          "pageId": "c6619e59-38e0-4d03-bebd-62282d19eb87",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/release-18.html",
+          "headingPath": [
+            "E.6.\u00a0Release 18 #",
+            "E.6.1.\u00a0Overview #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5662830730507936
+        },
+        {
+          "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+          "chunkEvidenceRevision": "sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2",
+          "pageId": "c6619e59-38e0-4d03-bebd-62282d19eb87",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/release-18.html",
+          "headingPath": [
+            "E.6.\u00a0Release 18 #",
+            "E.6.1.\u00a0Overview #",
+            "E.6.3.\u00a0Changes #",
+            "E.6.3.4.\u00a0Functions #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5482381745647843
+        }
+      ]
+    },
+    {
+      "query": "how do I keep vector search accurate when a WHERE clause filters most rows",
+      "results": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:24",
+          "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Iterative Index Scans"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5988363027572632
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:52",
+          "chunkEvidenceRevision": "sha256:1078b6f71a8ba08a476540a9f8d31c3076940e0e8d9138cb28bca14e8a20905d",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Troubleshooting",
+            "Why isn\u2019t a query using an index?"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5769872665405273
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:22",
+          "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Filtering"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.576195478439331
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:55",
+          "chunkEvidenceRevision": "sha256:96e80e051e6f8f29ab57c34970cea9e8042650b832b4267cc1573698475022f2",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Troubleshooting",
+            "Why isn\u2019t a query using an index?",
+            "Why are there less results for a query after adding an IVFFlat index?"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5478182435035706
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:54",
+          "chunkEvidenceRevision": "sha256:aef0472f44693d94e3c3c88c90c57b060cdf0a4e9e8c19c7fd50ec2d792e13e7",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Troubleshooting",
+            "Why isn\u2019t a query using an index?",
+            "Why are there less results for a query after adding an HNSW index?"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5397285223007202
+        }
+      ]
+    },
+    {
+      "query": "which setting lets the database read from disk without blocking the query",
+      "results": [
+        {
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:4",
+          "chunkEvidenceRevision": "sha256:fb1411a19e9035a6582f78ee43365d2f430321f7457ed77a6c74785def0f3db7",
+          "pageId": "f3f3066d-1727-4378-bca8-df1820d1885d",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "headingPath": [
+            "19.4.\u00a0Resource Consumption #",
+            "19.4.1.\u00a0Memory #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.46804409014785
+        },
+        {
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:22",
+          "chunkEvidenceRevision": "sha256:a5ddd4afeceb7a582b8cf17eabe5a29dcac0cac616713d52257414e801b0ddaf",
+          "pageId": "f3f3066d-1727-4378-bca8-df1820d1885d",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "headingPath": [
+            "19.4.\u00a0Resource Consumption #",
+            "19.4.1.\u00a0Memory #",
+            "19.4.5.\u00a0I/O #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.4640482184930046
+        },
+        {
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:23",
+          "chunkEvidenceRevision": "sha256:93e0c120a5987c9ed5184890070b4f53c4b3bad321a4455d0e64b064805f376c",
+          "pageId": "f3f3066d-1727-4378-bca8-df1820d1885d",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "headingPath": [
+            "19.4.\u00a0Resource Consumption #",
+            "19.4.1.\u00a0Memory #",
+            "19.4.5.\u00a0I/O #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.45761118702921855
+        },
+        {
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:21",
+          "chunkEvidenceRevision": "sha256:0f50f1212e518a6109cda2593ea476f5f14295f9129cb7b3d3b101e50a7246a5",
+          "pageId": "f3f3066d-1727-4378-bca8-df1820d1885d",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "headingPath": [
+            "19.4.\u00a0Resource Consumption #",
+            "19.4.1.\u00a0Memory #",
+            "19.4.4.\u00a0Background Writer #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.45760191850667975
+        },
+        {
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:3",
+          "chunkEvidenceRevision": "sha256:13e2bbf2bd170f75c3941f376382343e9f0e0572bf4b2c7224492dcb9de76846",
+          "pageId": "f3f3066d-1727-4378-bca8-df1820d1885d",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "headingPath": [
+            "19.4.\u00a0Resource Consumption #",
+            "19.4.1.\u00a0Memory #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.4535413058722797
+        }
+      ]
+    },
+    {
+      "query": "reactive value that recomputes when its dependencies change",
+      "results": [
+        {
+          "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+          "chunkEvidenceRevision": "sha256:73c10463c028ab80e2616fe5c662410e0d7ff66aa26d9160fd6b78fa2e9a2e5f",
+          "pageId": "c01ddade-94c0-4e3f-8d52-fc8b0f59182e",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/svelte/$effect",
+          "headingPath": [
+            "$effect",
+            "See also",
+            "Understanding dependencies"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5856961258830959
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:13",
+          "chunkEvidenceRevision": "sha256:d1851c1516b336d25136e630ca63e34ff099d6109928372bbdb8224b01629bb0",
+          "pageId": "100af5d8-2f0a-4ae6-8631-386753265317",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/svelte/$derived",
+          "headingPath": [
+            "$derived",
+            "Overriding derived values"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5254392027854919
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:12",
+          "chunkEvidenceRevision": "sha256:9960184370471abd348a21c69e551396afa10dc89d9caee0760292df9437750a",
+          "pageId": "100af5d8-2f0a-4ae6-8631-386753265317",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/svelte/$derived",
+          "headingPath": [
+            "$derived",
+            "Understanding dependencies"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.511855959892273
+        },
+        {
+          "chunkId": "doc:svelte5-runes:a9f84a9bc441daa2:17",
+          "chunkEvidenceRevision": "sha256:d83d6c4901a1a48b6780018d613c51fe8f45893df8a090d41a0541ae8845926b",
+          "pageId": "100af5d8-2f0a-4ae6-8631-386753265317",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/svelte/$derived",
+          "headingPath": [
+            "$derived",
+            "Update propagation"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5114856667212059
+        },
+        {
+          "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+          "chunkEvidenceRevision": "sha256:c6fbdca5bcbaa86c6974834dc4b8a959ac7da79de4ad2fd6e60f8cf4249398f3",
+          "pageId": "5b7a3446-191d-4f22-86db-727fe0898c44",
+          "provider": "sveltejs",
+          "product": "sveltekit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/kit/state-management",
+          "headingPath": [
+            "State management",
+            "Component and page state is preserved"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.4836820075701479
+        }
+      ]
+    },
+    {
+      "query": "generate sql files that describe a schema change",
+      "results": [
+        {
+          "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:0",
+          "chunkEvidenceRevision": "sha256:fd72378b2259e6c8bbf845e0f141aa39bd943267a949de846f94f27838710ad6",
+          "pageId": "c06fc409-e46b-4398-8421-e218fc9ed892",
+          "provider": "drizzle-team",
+          "product": "drizzle-kit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+          "headingPath": [
+            "drizzle-kit generate"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.4951401494652258
+        },
+        {
+          "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:6",
+          "chunkEvidenceRevision": "sha256:b9b40229d4d1d7c237d756c7b6ed0de9da302ad50ba6b8aa6c4c11846cbb5c9a",
+          "pageId": "c06fc409-e46b-4398-8421-e218fc9ed892",
+          "provider": "drizzle-team",
+          "product": "drizzle-kit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+          "headingPath": [
+            "drizzle-kit generate",
+            "Schema files path",
+            "Custom migrations"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.46344314188746905
+        },
+        {
+          "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:2",
+          "chunkEvidenceRevision": "sha256:346107d6c3f4408e1a4a94420b97f5f1ec1ca6685beb345a0be297f5a3c10b26",
+          "pageId": "c06fc409-e46b-4398-8421-e218fc9ed892",
+          "provider": "drizzle-team",
+          "product": "drizzle-kit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+          "headingPath": [
+            "drizzle-kit generate",
+            "Schema files path"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.4616906024033198
+        },
+        {
+          "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:1",
+          "chunkEvidenceRevision": "sha256:e47963527d66ccd30cd89d112e5f0e32a44c8477d996883ed7014ea9f6e91800",
+          "pageId": "c06fc409-e46b-4398-8421-e218fc9ed892",
+          "provider": "drizzle-team",
+          "product": "drizzle-kit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+          "headingPath": [
+            "drizzle-kit generate"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.4597031563078102
+        },
+        {
+          "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:9",
+          "chunkEvidenceRevision": "sha256:d20182650265b6981e5f07c719318b31929ea53cc5e7cade18128c5318d350d5",
+          "pageId": "c06fc409-e46b-4398-8421-e218fc9ed892",
+          "provider": "drizzle-team",
+          "product": "drizzle-kit",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+          "headingPath": [
+            "drizzle-kit generate",
+            "Schema files path",
+            "Extended example"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.45638379194639955
+        }
+      ]
+    },
+    {
+      "query": "time ordered unique identifier function",
+      "results": [
+        {
+          "chunkId": "doc:postgresql-18:a92f2cf09489fb29:1",
+          "chunkEvidenceRevision": "sha256:310a88163ea716a17249804ef78aaccbcd1663fd0853223ad32728ebb584c471",
+          "pageId": "7d9e2e33-12d6-4b66-9ac5-8a70621eaa56",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/functions-uuid.html",
+          "headingPath": [
+            "9.14.\u00a0UUID Functions #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.4399913084504401
+        },
+        {
+          "chunkId": "doc:postgresql-18:a92f2cf09489fb29:2",
+          "chunkEvidenceRevision": "sha256:0d9939831f31f7e171678270cbc4831b0705577aa991779a7c0fd17df4bb531e",
+          "pageId": "7d9e2e33-12d6-4b66-9ac5-8a70621eaa56",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/functions-uuid.html",
+          "headingPath": [
+            "9.14.\u00a0UUID Functions #",
+            "Note"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.3942800399231934
+        },
+        {
+          "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:18",
+          "chunkEvidenceRevision": "sha256:b1004b199d2630410ad8b99b047923db569a9ec16c297dc7068eaac21eee2a6f",
+          "pageId": "49b7e99e-ef2f-4250-9b65-b98b980362cc",
+          "provider": "sveltejs",
+          "product": "svelte",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://svelte.dev/docs/svelte/$props",
+          "headingPath": [
+            "$props",
+            "$props.id()"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.3366286955254493
+        },
+        {
+          "chunkId": "doc:drizzle-orm:fa0a1af1c2ddb64c:18",
+          "chunkEvidenceRevision": "sha256:5195f4bf45b1952fcf42adfaffac7b5c47247bc16443f582df075cfdb7dc17e4",
+          "pageId": "311ddd2c-ba49-4a4e-8021-046fe0e91334",
+          "provider": "drizzle-team",
+          "product": "drizzle-orm",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/column-types",
+          "headingPath": [
+            "PostgreSQL column types",
+            "---",
+            "uuid"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.30892852869416876
+        },
+        {
+          "chunkId": "doc:drizzle-orm:fa0a1af1c2ddb64c:32",
+          "chunkEvidenceRevision": "sha256:a76c724f234fb420f346f205b8ce9f8911a60632a2491087cc8508e5e51b07c2",
+          "pageId": "311ddd2c-ba49-4a4e-8021-046fe0e91334",
+          "provider": "drizzle-team",
+          "product": "drizzle-orm",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://orm.drizzle.team/docs/column-types",
+          "headingPath": [
+            "PostgreSQL column types",
+            "---",
+            "Identity Columns"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.29259205736494254
+        }
+      ]
+    },
+    {
+      "query": "limit how much memory an approximate index scan may use",
+      "results": [
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:25",
+          "chunkEvidenceRevision": "sha256:253fdab9d40e356917bf9e018487348c96428c2f6a28ae843ae50074e715cb68",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Iterative Index Scans",
+            "Iterative Scan Options"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5412455797195435
+        },
+        {
+          "chunkId": "doc:postgresql-18:c80bd7e95d17f8ae:35",
+          "chunkEvidenceRevision": "sha256:5f17313841dce2fc42cdd81479f9703cb771dedfca475ca990de9c14e18f7238",
+          "pageId": "3fa0d572-e72d-4e4f-b23d-14d1e2c428e0",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/using-explain.html",
+          "headingPath": [
+            "14.1.\u00a0Using EXPLAIN #",
+            "14.1.1. EXPLAIN Basics #",
+            "14.1.3.\u00a0Caveats #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5286979832857248
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:26",
+          "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Iterative Index Scans",
+            "Iterative Scan Options",
+            "HNSW"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5134269458139212
+        },
+        {
+          "chunkId": "doc:pgvector:fe883c75f323441d:24",
+          "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+          "pageId": "d1c6cac6-9e1b-4d41-b997-30ef462b2e33",
+          "provider": "pgvector",
+          "product": "pgvector",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://github.com/pgvector/pgvector",
+          "headingPath": [
+            "pgvector",
+            "Iterative Index Scans"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5026112794876099
+        },
+        {
+          "chunkId": "doc:postgresql-18:70d86642ca56e9b0:7",
+          "chunkEvidenceRevision": "sha256:2950b01558733a9e8d90614ee4ed7a2bd15bb74cadbd0d0bfb305986020d90db",
+          "pageId": "f3f3066d-1727-4378-bca8-df1820d1885d",
+          "provider": "postgresql",
+          "product": "postgresql",
+          "productVersion": "18",
+          "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+          "headingPath": [
+            "19.4.\u00a0Resource Consumption #",
+            "19.4.1.\u00a0Memory #"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.497830331325531
+        }
+      ]
+    },
+    {
+      "query": "component snippet that renders a custom element for a headless dialog",
+      "results": [
+        {
+          "chunkId": "doc:bits-ui:933224c7e6a17940:14",
+          "chunkEvidenceRevision": "sha256:8ecb26c9331cc11ab3256ae34626d2a30c46129b3c6976764d9cdf434c69287e",
+          "pageId": "0bf50f39-aa57-4717-b711-94a5a744e6c7",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://bits-ui.com/docs/components/dialog",
+          "headingPath": [
+            "Dialog Documentation",
+            "Reusable Components",
+            "Building a Reusable Dialog"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.559400200843811
+        },
+        {
+          "chunkId": "doc:bits-ui:933224c7e6a17940:60",
+          "chunkEvidenceRevision": "sha256:786a9c0053cdbd4cf098e962f1e557d0a75f9fcb402f6a1b7ba246eb85163990",
+          "pageId": "0bf50f39-aa57-4717-b711-94a5a744e6c7",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://bits-ui.com/docs/components/dialog",
+          "headingPath": [
+            "Dialog Documentation",
+            "API Reference",
+            "Dialog. Trigger"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.558083176612854
+        },
+        {
+          "chunkId": "doc:bits-ui:6b3cf8151e01df1d:13",
+          "chunkEvidenceRevision": "sha256:7aa512c98275a127ff1b1fddc6c345911763ac19cd4d017b7c49654ae74f4974",
+          "pageId": "76a6dc16-29c8-487c-8c75-31313f73add9",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://bits-ui.com/docs/child-snippet",
+          "headingPath": [
+            "Child Snippet Documentation",
+            "Examples",
+            "With Svelte Transitions"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5327754020690918
+        },
+        {
+          "chunkId": "doc:bits-ui:933224c7e6a17940:68",
+          "chunkEvidenceRevision": "sha256:cca2a1b8b35693fdeff3d57cbc8945c4bd8f6dcd2444e9e0b3941d914383ef1b",
+          "pageId": "0bf50f39-aa57-4717-b711-94a5a744e6c7",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://bits-ui.com/docs/components/dialog",
+          "headingPath": [
+            "Dialog Documentation",
+            "API Reference",
+            "Dialog. Close"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5300415754318237
+        },
+        {
+          "chunkId": "doc:bits-ui:933224c7e6a17940:70",
+          "chunkEvidenceRevision": "sha256:8ffedc77ecfe332b552560ef80fa0de79bf4b09909f52616de345436384505e7",
+          "pageId": "0bf50f39-aa57-4717-b711-94a5a744e6c7",
+          "provider": "huntabyte",
+          "product": "bits-ui",
+          "productVersion": "CURRENT_UPSTREAM@2026-09-23",
+          "url": "https://bits-ui.com/docs/components/dialog",
+          "headingPath": [
+            "Dialog Documentation",
+            "API Reference",
+            "Dialog. Description"
+          ],
+          "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+          "cosine": 0.5207620548747754
+        }
+      ]
+    }
+  ],
+  "cpuExactParity": [
+    {
+      "query": "hnsw iterative scan strict order",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 3.908836154753459e-08
+    },
+    {
+      "query": "postgres asynchronous io method worker",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 3.650668867205553e-08
+    },
+    {
+      "query": "svelte 5 derived state rune",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 9.282169355362413e-08
+    },
+    {
+      "query": "drizzle kit migration schema",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 1.7311402811248655e-07
+    },
+    {
+      "query": "uuidv7 postgres",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 6.872006297342637e-08
+    },
+    {
+      "query": "how do I keep vector search accurate when a WHERE clause filters most rows",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 6.763994464531464e-08
+    },
+    {
+      "query": "which setting lets the database read from disk without blocking the query",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 6.656229339929709e-08
+    },
+    {
+      "query": "reactive value that recomputes when its dependencies change",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 9.601329020725302e-08
+    },
+    {
+      "query": "generate sql files that describe a schema change",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 6.878067060345217e-08
+    },
+    {
+      "query": "time ordered unique identifier function",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 3.6045746054647054e-08
+    },
+    {
+      "query": "limit how much memory an approximate index scan may use",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 5.583387852059474e-08
+    },
+    {
+      "query": "component snippet that renders a custom element for a headless dialog",
+      "top1Agreement": true,
+      "topKOverlap": 1.0,
+      "orderExact": true,
+      "maxScoreDelta": 3.024012917851593e-08
+    }
+  ],
+  "exactnessProof": {
+    "planIsExact": true,
+    "method": "PGOPTIONS enable_indexscan=off enable_bitmapscan=off",
+    "contentEmbeddingIndexesOnTable": "1",
+    "plan": [
+      "Limit  (cost=234.80..234.81 rows=5 width=42)",
+      "  ->  Sort  (cost=234.80..236.93 rows=852 width=42)",
+      "        Sort Key: ((content_embedding <=> '[-0.034079026,-0.01429596,0.015693173,-0.009695293,-0.034580436,-0.008033983,-0.017475108,0.038997367,0.085482135,-0.037758965,0.024122108,0.0024409902,-0.024490377,0.012557258,-0.015751095,0.053184856,0.048538662,0.03609429,-0.06958693,-0.014419241,0.02263696,0.008037571,0.005661234,0.041992847,0.0065631825,0.027674451,0.013093458,-0.039278638,0.0099994335,-0.08492667,0.028605428,-0.031024713,0.021542704,0.087147065,0.014679052,-0.029652331,-0.005268727,0.007949153,0.05514351,-0.04499783,-0.02285935,0.06316156,-0.020729788,0.070406586,0.043751203,-0.10369169,-0.077088796,0.020115454,0.063626476,-0.037645236,-0.0068077287,-0.008969023,-0.0062772376,-0.0004177394,-0.021870533,-0.02556097,-0.07668458,0.018905135,0.0019127127,0.025278103,-0.07940733,0.002873479,0.022289997,0.03757631,0.022105562,0.010955693,0.039874684,-0.020812316,0.034071285,0.12102908,-0.003508448,0.0037606352,0.012887219,-0.0373322,0.11479928,0.11022671,-0.059074473,0.013488107,0.010774034,-0.049985986,-0.029606195,-0.023582535,-0.009551125,0.023472743,0.035753585,0.027406937,-0.0024430384,-0.051489163,0.0140015595,-0.011695324,-0.023405332,-0.00098778,-0.0031797744,-0.011721703,0.040142976,0.01368084,-0.043721206,0.02730859,-0.0053863274,0.016217232,0.05184717,-0.029390298,0.0472308,0.010472412,-0.045605134,0.060556326,-0.034579795,0.020443894,-0.052199002,-0.001485774,-0.014758179,0.015071492,0.01452726,-0.064946614,-0.060859464,-0.0049548224,-0.076161996,0.040421624,0.0038984572,-0.0022630019,0.055550825,-0.021659696,-0.0050415685,-0.044676986,0.047861733,-0.010912214,-0.023504587,-0.028152773,0.012520788,0.02443757,0.008239434,-0.0009365317,0.02271197,-0.03512185,-0.021849249,-0.0048060003,0.041257843,0.033531763,0.0037419416,0.060604215,-0.0066084396,-0.06752217,-0.0069847316,0.06984862,0.014088061,0.015421153,-0.08158434,0.0056803045,-0.062635444,0.048638064,0.03692703,-0.016920384,0.0005693659,-0.050372776,0.002812905,-0.013874889,-0.018597301,0.0063171834,0.012853339,-0.046554282,-0.07314499,-0.023139674,0.08779152,0.037770495,0.021535337,0.057551917,0.00043065706,0.0054369397,-0.014238612,0.017247692,0.018035593,-0.0068933074,0.0009235894,0.039715562,0.023821298,0.0011170686,0.0030678671,-0.015495241,-1.2194986e-05,0.017704219,-0.027141636,0.08505803,-0.010422717,0.034815162,-0.04084253,-0.005664726,-0.07280329,-0.027415594,0.031214051,-0.026343815,-0.0076148026,-0.018715171,0.017622836,0.027280178,-0.0027051084,-0.010656838,0.037727628,0.08145235,0.0117314495,0.014992044,-0.045626402,-0.010410385,0.053896133,0.052854415,0.01802216,0.01707501,-0.047570966,-0.0062621795,-0.055182017,-0.023163483,-0.023862656,0.004420721,-0.022294246,0.042272013,0.066713795,0.01726281,-0.058306918,-0.023807043,0.02670398,0.0016811255,0.015119547,-0.053002656,-0.043391056,-0.019485053,-0.03791451,0.03278027,-0.03435458,-0.0541025,-0.018384073,0.049471263,0.021272538,-0.06395536,0.018372357,0.01893998,-0.01726288,0.018001152,0.046035975,0.025382953,-0.026125792,-0.0099604465,-0.040499795,0.023653103,-0.0057900893,0.069367245,-0.0032091157,0.0009287258,5.8285277e-05,-0.005433669,0.00988523,-0.041291796,0.016910441,0.095466934,0.029889423,-0.0074718394,-0.00882493,0.010454919,-0.021747641,0.051845063,0.0040324377,0.013341349,-0.011536759,-0.034289267,-0.00987182,0.014178176,-0.008976989,0.0063144453,-0.034245092,0.033181977,-0.10207391,-0.08493387,0.0054393136,0.058703184,-0.0645296,-0.032862328,-0.0047924356,0.0028838157,-0.0066573396,-0.0035331466,0.034532387,-0.013610105,-0.02547706,-0.001175647,0.008615693,-0.0042185667,0.012801606,-0.015648104,0.0078099025,-0.0015705662,-0.06433792,-0.023711713,-0.017217776,0.01028266,0.010058399,-0.02159826,-0.073155254,0.055729467,-0.06862567,0.05889576,-0.015380769,-0.019085146,0.043567173,-0.043636966,0.03290583,0.009876569,-0.021129683,0.031185824,-0.09421219,0.01085907,-0.018898342,-0.035315033,0.02338282,0.005271208,-0.01817713,-0.0410406,-0.0014595665,0.04973496,-0.03767688,0.022095634,0.01796535,0.052311406,-0.0018409909,0.030774174,0.009987017,0.020682696,0.028197702,-0.0035039259,0.02211301,0.007401561,-0.07199749,0.05538369,-0.002780571,-0.044460226,0.040581327,0.0078076376,-0.02038306,0.020591324,0.008340821,-0.028488494,-0.043834765,0.06106463,0.043657273,-0.0126633085,0.0012792001,-0.024276309,-0.037154816,0.042098965,-0.03960707,0.024023421,0.008547181,-0.047178816,-0.011626472,0.0106977485,0.012717112,-0.014897711,-0.08443017,0.023126045,-0.042279657,0.027302757,0.037676603,0.0042346525,-0.039357476,-0.07264712,0.010209194,-0.03956062,-0.041867908,0.0014279247,-0.0628373,-0.03464827,-0.014095124,0.008109779,0.0018390601,0.07232523,-0.016207179,-0.0015702624,-0.050132047,0.017675355,-0.026073674,0.008506137,-0.024083506,0.018663637,-0.045947615,0.009939164,0.0045497343,-0.03244852,0.05135813,0.020430272,-0.047438487,0.02819873,-0.013559143,-0.014003975,0.007194792,0.008002178,-0.042263675,-0.089155,0.009969075,-0.06429085,0.044640742,0.006013596,-0.007870542,-0.015487429,0.0019920166,-0.012821807,-0.09304732,-0.006498205,0.07714266,-0.042179983,0.015977342,0.009448848,-0.038065072,-0.031278256,0.048568916,-0.06778943,0.07227443,0.0140514,-0.05546834,-0.058437925,-0.033509307,-0.00065357436,-0.066490464,0.023120152,-0.043874063,-0.0070955423,-0.015239407,-0.014792888,-0.006555106,0.016500292,-0.025945334,-0.035192385,0.026760217,0.0012279147,0.030268844,-0.008705344,0.0072555686,0.021731753,-0.011378896,-0.005015812,-0.015108986,-0.014568471,-0.022846622,-0.024443401,-0.010683203,-0.039766643,-0.0316419,-0.07246287,0.019758679,-0.07803607,0.02678108,-0.0891981,-0.0017247685,0.027531812,0.031172046,0.0025269787,-0.06233969,-0.030589685,-0.003930721,-0.03908224,0.0038993638,0.016251765,-0.072683476,-0.0065135756,-0.010854793,-0.0047108103,-0.013922196,-0.05022974,0.03329955,-0.02310239,0.018174013,-0.009763011,-0.026506748,0.014502166,-0.009353284,0.040125657,0.0532358,-0.031064246,0.0065821866,-0.007805583,-0.0048927446,0.013249929,0.02777965,0.041965526,-0.012505558,0.014106904,0.014756186,-0.044169646,0.0049094176,-0.03218398,0.03740377,0.057842437,0.01385432,0.039001502,-0.008059271,0.03043857,0.029632665,-0.022202037,0.0097441375,0.04354136,-0.021749863,-0.05220043,0.043793593,0.027531225,0.020295005,0.031554032,-0.007519506,0.04388871,0.018992532,0.008602051,0.010010273,-0.014904191,-0.0019752744,-0.025719367,-0.019338623,-0.05012841,0.0012224751,0.07373815,0.050100897,0.07593416,0.03971062,-0.0384376,-0.056507442,-0.0038626567,0.024718318,0.03260302,-0.045703813,0.047802806,-0.029330544,-0.0063585774,-0.019127246,0.0041991714,0.006993768,0.034087963,-0.02644201,-0.03261991,0.004505709,-0.047446582,0.041675173,-0.00082919764,-0.035031248,-0.00408135,0.06026,-0.028862994,-0.095611446,-0.097566694,0.006111588,-0.03409058,0.0025341965,-0.021651432,0.032813184,-0.042784147,0.052827578,-0.0143095,0.05111277,0.057044275,0.0011890106,0.052854262,-0.004922608,0.037255783,-0.040328275,-0.05267964,-0.0382367,-0.013148948,0.029805824,0.00081209175,-0.04414631,0.031794947,-0.025464851,-0.0051512355,-0.02998643,0.016175736,-0.05612378,-0.00062044704,0.013938889,-0.0038121708,0.018662773,0.00016314353,0.027050242,0.008963109,-0.023228021,-0.041478455,-0.024644164,-0.0024540299,0.047159147,0.006508371,0.06340823,-0.016174054,0.0013777793,0.017981932,0.012847278,0.04341887,-0.025846971,0.010830893,0.038195435,-0.025391264,0.028301165,0.057742793,0.005321679,0.060898706,-0.011753205,-0.018008258,0.038119093,-0.046656225,-0.0058640502,0.02666966,0.03583951,0.006389235,0.09677942,0.009586625,0.0066588433,0.027210498,0.022260325,-0.01876188,-0.045529805,-0.0345534,0.022899644,-0.028674439,-0.0059662107,-0.0268559,0.0408744,0.03774432,0.03306519,-0.021350719,0.01140479,-0.042553946,0.02940608,0.029113945,0.023473617,-0.040592134,0.017066123,-0.010236489,0.036035426,0.0112477755,0.04480933,0.014415655,0.05873064,-0.022788687,-0.00796917,0.012576761,-0.020538956,-0.002949003,-0.022941532,-0.00850136,0.01690505,0.039928433,-0.003009919,-0.008541395,0.00084263744,-0.0045397272,0.032650113,0.021419076,-0.015937565,-0.028736234,-0.045625605,-0.004770153,0.005419864,-0.09114915,0.03629906,-0.040373895,0.002798106,-0.00029715657,0.007510605,0.0064826612,-0.022279352,0.014202566,0.03386654,0.0018797553,-0.03468155,-0.0043132533,0.009177444,0.011604547,0.011345339,0.035733066,-0.05115365,-0.034325734,-0.04128185,0.029412914,0.07223939,-0.009620559,-0.035449345,0.054342262,-0.085785225,0.023553686,0.015838714,-0.0032559913,-0.025243677,0.031743295,-0.0015510485,-0.07907909,0.009483588,-0.015427425,0.022930203,0.0705089,-0.035162877,0.0070396727,-0.0014383246,-0.0014375031,-0.027569793,-0.05356895,0.044363115,0.087393455,-0.037922893,0.016000263,0.071946606,-0.028848784,0.02108126,-0.011547797,0.062265072,0.020662716,-0.027899422,0.035430755,0.039192434,-0.05639158,-0.019351289,0.036689423,-3.2051397e-05,-0.009535035,0.019669473,0.015216794,-0.08548349,0.023323772,0.023247015,0.022007588,-0.021810481,-0.028147796,-0.019607836,-0.01425401,0.00669085,0.0108669065,0.022946082,0.0030173184,0.034392577,-0.018889852,0.020572243,-0.0029401253,0.023878224,0.06899844,0.045143023,0.0835806,0.027489092,0.05394919,0.014206579,0.044953275,0.0053412206,0.013864716,0.039084468,-0.012830587,0.008290219,0.004304519,0.05876324,-0.017240353,-0.057501566,0.029739747,0.018174713,0.00015879415,-0.010763092,0.007979518,-0.04104194,-0.01994569,0.034391075,0.014701147,0.021685211,-0.01551814,-0.014433511,0.01933669,0.04695369,-0.04232683,-0.054844607,0.050253008,0.0007082491,-0.01645699]'::vector))",
+      "        ->  Seq Scan on atlas_external_doc_chunks  (cost=0.00..220.65 rows=852 width=42)"
+    ]
+  },
+  "optionalGpuExactParity": {
+    "status": "NOT_RUN",
+    "reason": "optional; GPU has ~300 MiB free with Ornith + EmbeddingGemma resident, and DOC-19 is proven by Postgres + CPU exact"
+  },
+  "filtersProof": {
+    "filteredAgainst": "canonical atlas_external_doc_chunks/pages rows",
+    "cases": [
+      {
+        "product": "pgvector",
+        "productVersion": null,
+        "candidateRows": 151,
+        "postgresTopK": [
+          "doc:pgvector:fe883c75f323441d:24",
+          "doc:pgvector:fe883c75f323441d:55",
+          "doc:pgvector:fe883c75f323441d:22",
+          "doc:pgvector:fe883c75f323441d:18",
+          "doc:pgvector:fe883c75f323441d:52"
+        ],
+        "cpuTopK": [
+          "doc:pgvector:fe883c75f323441d:24",
+          "doc:pgvector:fe883c75f323441d:55",
+          "doc:pgvector:fe883c75f323441d:22",
+          "doc:pgvector:fe883c75f323441d:18",
+          "doc:pgvector:fe883c75f323441d:52"
+        ],
+        "orderExact": true,
+        "allMatchFilter": true
+      },
+      {
+        "product": "postgresql",
+        "productVersion": "18",
+        "candidateRows": 128,
+        "postgresTopK": [
+          "doc:postgresql-18:c80bd7e95d17f8ae:28",
+          "doc:postgresql-18:c80bd7e95d17f8ae:27",
+          "doc:postgresql-18:24d9f452d20b88e0:1",
+          "doc:postgresql-18:c80bd7e95d17f8ae:7",
+          "doc:postgresql-18:c80bd7e95d17f8ae:10"
+        ],
+        "cpuTopK": [
+          "doc:postgresql-18:c80bd7e95d17f8ae:28",
+          "doc:postgresql-18:c80bd7e95d17f8ae:27",
+          "doc:postgresql-18:24d9f452d20b88e0:1",
+          "doc:postgresql-18:c80bd7e95d17f8ae:7",
+          "doc:postgresql-18:c80bd7e95d17f8ae:10"
+        ],
+        "orderExact": true,
+        "allMatchFilter": true
+      }
+    ]
+  },
+  "lexicalComparison": [
+    {
+      "query": "hnsw iterative scan strict order",
+      "ftsTopK": [
+        "doc:pgvector:fe883c75f323441d:22"
+      ],
+      "semanticTopK": [
+        "doc:pgvector:fe883c75f323441d:24",
+        "doc:pgvector:fe883c75f323441d:52",
+        "doc:postgresql-18:c80bd7e95d17f8ae:8",
+        "doc:pgvector:fe883c75f323441d:42",
+        "doc:pgvector:fe883c75f323441d:26"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 1,
+      "ftsHits": 1
+    },
+    {
+      "query": "postgres asynchronous io method worker",
+      "ftsTopK": [],
+      "semanticTopK": [
+        "doc:postgresql-18:70d86642ca56e9b0:25",
+        "doc:postgresql-18:0c1f6c86b4bbe623:1",
+        "doc:postgresql-18:70d86642ca56e9b0:24",
+        "doc:postgresql-18:70d86642ca56e9b0:23",
+        "doc:postgresql-18:38d5e74bafb89df8:10"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 0,
+      "ftsHits": 0
+    },
+    {
+      "query": "svelte 5 derived state rune",
+      "ftsTopK": [],
+      "semanticTopK": [
+        "doc:svelte5-runes:a9f84a9bc441daa2:10",
+        "doc:svelte5-runes:a9f84a9bc441daa2:16",
+        "doc:svelte5-runes:a9f84a9bc441daa2:1",
+        "doc:svelte5-runes:9d3a717d27cb2c0d:1",
+        "doc:svelte5-runes:a9f84a9bc441daa2:14"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 0,
+      "ftsHits": 0
+    },
+    {
+      "query": "drizzle kit migration schema",
+      "ftsTopK": [
+        "doc:drizzle-kit:b13a84ba576d603b:0",
+        "doc:drizzle-kit:b13a84ba576d603b:1",
+        "doc:drizzle-kit:0608a335e55cd6ac:0",
+        "doc:drizzle-kit:83cd7433d94e8f78:0",
+        "doc:drizzle-kit:83cd7433d94e8f78:1"
+      ],
+      "semanticTopK": [
+        "doc:drizzle-kit:0608a335e55cd6ac:0",
+        "doc:drizzle-kit:b13a84ba576d603b:0",
+        "doc:drizzle-kit:0608a335e55cd6ac:4",
+        "doc:drizzle-kit:b13a84ba576d603b:2",
+        "doc:drizzle-kit:83cd7433d94e8f78:0"
+      ],
+      "overlap": 3,
+      "semanticOnly": 2,
+      "lexicalOnly": 2,
+      "ftsHits": 5
+    },
+    {
+      "query": "uuidv7 postgres",
+      "ftsTopK": [],
+      "semanticTopK": [
+        "doc:postgresql-18:a92f2cf09489fb29:1",
+        "doc:postgresql-18:a92f2cf09489fb29:2",
+        "doc:drizzle-orm:fa0a1af1c2ddb64c:18",
+        "doc:postgresql-18:38d5e74bafb89df8:2",
+        "doc:postgresql-18:38d5e74bafb89df8:26"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 0,
+      "ftsHits": 0
+    },
+    {
+      "query": "how do I keep vector search accurate when a WHERE clause filters most rows",
+      "ftsTopK": [],
+      "semanticTopK": [
+        "doc:pgvector:fe883c75f323441d:24",
+        "doc:pgvector:fe883c75f323441d:52",
+        "doc:pgvector:fe883c75f323441d:22",
+        "doc:pgvector:fe883c75f323441d:55",
+        "doc:pgvector:fe883c75f323441d:54"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 0,
+      "ftsHits": 0
+    },
+    {
+      "query": "which setting lets the database read from disk without blocking the query",
+      "ftsTopK": [],
+      "semanticTopK": [
+        "doc:postgresql-18:70d86642ca56e9b0:4",
+        "doc:postgresql-18:70d86642ca56e9b0:22",
+        "doc:postgresql-18:70d86642ca56e9b0:23",
+        "doc:postgresql-18:70d86642ca56e9b0:21",
+        "doc:postgresql-18:70d86642ca56e9b0:3"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 0,
+      "ftsHits": 0
+    },
+    {
+      "query": "reactive value that recomputes when its dependencies change",
+      "ftsTopK": [],
+      "semanticTopK": [
+        "doc:svelte5-runes:4606958abe2e620d:13",
+        "doc:svelte5-runes:a9f84a9bc441daa2:13",
+        "doc:svelte5-runes:a9f84a9bc441daa2:12",
+        "doc:svelte5-runes:a9f84a9bc441daa2:17",
+        "doc:sveltekit:7eecebe5e0d7481c:20"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 0,
+      "ftsHits": 0
+    },
+    {
+      "query": "generate sql files that describe a schema change",
+      "ftsTopK": [],
+      "semanticTopK": [
+        "doc:drizzle-kit:83cd7433d94e8f78:0",
+        "doc:drizzle-kit:83cd7433d94e8f78:6",
+        "doc:drizzle-kit:83cd7433d94e8f78:2",
+        "doc:drizzle-kit:83cd7433d94e8f78:1",
+        "doc:drizzle-kit:83cd7433d94e8f78:9"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 0,
+      "ftsHits": 0
+    },
+    {
+      "query": "time ordered unique identifier function",
+      "ftsTopK": [],
+      "semanticTopK": [
+        "doc:postgresql-18:a92f2cf09489fb29:1",
+        "doc:postgresql-18:a92f2cf09489fb29:2",
+        "doc:svelte5-runes:05fda9b18acd27b3:18",
+        "doc:drizzle-orm:fa0a1af1c2ddb64c:18",
+        "doc:drizzle-orm:fa0a1af1c2ddb64c:32"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 0,
+      "ftsHits": 0
+    },
+    {
+      "query": "limit how much memory an approximate index scan may use",
+      "ftsTopK": [],
+      "semanticTopK": [
+        "doc:pgvector:fe883c75f323441d:25",
+        "doc:postgresql-18:c80bd7e95d17f8ae:35",
+        "doc:pgvector:fe883c75f323441d:26",
+        "doc:pgvector:fe883c75f323441d:24",
+        "doc:postgresql-18:70d86642ca56e9b0:7"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 0,
+      "ftsHits": 0
+    },
+    {
+      "query": "component snippet that renders a custom element for a headless dialog",
+      "ftsTopK": [],
+      "semanticTopK": [
+        "doc:bits-ui:933224c7e6a17940:14",
+        "doc:bits-ui:933224c7e6a17940:60",
+        "doc:bits-ui:6b3cf8151e01df1d:13",
+        "doc:bits-ui:933224c7e6a17940:68",
+        "doc:bits-ui:933224c7e6a17940:70"
+      ],
+      "overlap": 0,
+      "semanticOnly": 5,
+      "lexicalOnly": 0,
+      "ftsHits": 0
+    }
+  ],
+  "latency": [
+    {
+      "query": "hnsw iterative scan strict order",
+      "embedMs": 59.9,
+      "postgresExactMs": 188.9,
+      "totalMs": 248.8,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "postgres asynchronous io method worker",
+      "embedMs": 34.9,
+      "postgresExactMs": 143.5,
+      "totalMs": 178.4,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "svelte 5 derived state rune",
+      "embedMs": 36.0,
+      "postgresExactMs": 215.7,
+      "totalMs": 251.7,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "drizzle kit migration schema",
+      "embedMs": 35.6,
+      "postgresExactMs": 184.9,
+      "totalMs": 220.4,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "uuidv7 postgres",
+      "embedMs": 52.6,
+      "postgresExactMs": 147.2,
+      "totalMs": 199.8,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "how do I keep vector search accurate when a WHERE clause filters most rows",
+      "embedMs": 36.8,
+      "postgresExactMs": 190.4,
+      "totalMs": 227.1,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "which setting lets the database read from disk without blocking the query",
+      "embedMs": 35.9,
+      "postgresExactMs": 136.8,
+      "totalMs": 172.6,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "reactive value that recomputes when its dependencies change",
+      "embedMs": 41.9,
+      "postgresExactMs": 144.4,
+      "totalMs": 186.3,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "generate sql files that describe a schema change",
+      "embedMs": 35.3,
+      "postgresExactMs": 147.2,
+      "totalMs": 182.5,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "time ordered unique identifier function",
+      "embedMs": 58.4,
+      "postgresExactMs": 143.3,
+      "totalMs": 201.7,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "limit how much memory an approximate index scan may use",
+      "embedMs": 59.9,
+      "postgresExactMs": 156.3,
+      "totalMs": 216.2,
+      "candidates": 852,
+      "k": 5
+    },
+    {
+      "query": "component snippet that renders a custom element for a headless dialog",
+      "embedMs": 36.3,
+      "postgresExactMs": 166.8,
+      "totalMs": 203.1,
+      "candidates": 852,
+      "k": 5
+    }
+  ],
+  "oneLaneOneVoteInvariant": "semantic retrieval is ONE logical lane; Postgres exact, cuVS exact, HNSW, CAGRA and IVF-PQ are executors of it and get no independent RRF vote; no fusion weights are defined here",
+  "hnsw": {
+    "present": true,
+    "index": "aedc_embedding_hnsw (m=16, ef_construction=64, vector_cosine_ops) exists since the DOC-06 migration and is maintained on insert",
+    "usedByThisProof": false,
+    "correction": "earlier notes said no HNSW index existed for the doc chunks; that was wrong"
+  },
+  "qdrant": {
+    "projected": false
+  },
+  "runtime": {
+    "embeddingGemma8081": "ok",
+    "ornith8090": "ok",
+    "gpuFreeMiB": "280 MiB"
+  },
+  "result": "DOC_19_EXACT_SEMANTIC_ORACLE_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}
