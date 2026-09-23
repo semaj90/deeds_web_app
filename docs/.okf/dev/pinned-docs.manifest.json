@@ -1,5 +1,5 @@
 {
-  "manifest_revision": "okf-pinned-docs-r2",
+  "manifest_revision": "okf-pinned-docs-r3",
   "workspace_revision": "workspace-current",
   "source_snapshot_revision": "pinned-docs-2026-09-23",
   "producer_revision": "parent-atlas-okf-pipeline-r1",
@@ -42,7 +42,12 @@
         "https://svelte.dev/docs/kit/state-management",
         "https://svelte.dev/docs/kit/hooks",
         "https://svelte.dev/docs/kit/form-actions"
-      ]
+      ],
+      "provider": "sveltejs",
+      "product": "sveltekit",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Svelte"
     },
     {
       "source_id": "svelte5-runes",
@@ -64,7 +69,12 @@
         "https://svelte.dev/docs/svelte/$derived",
         "https://svelte.dev/docs/svelte/$effect",
         "https://svelte.dev/docs/svelte/$props"
-      ]
+      ],
+      "provider": "sveltejs",
+      "product": "svelte",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Svelte"
     },
     {
       "source_id": "bits-ui",
@@ -87,7 +97,12 @@
         "https://bits-ui.com/docs/components/dialog",
         "https://bits-ui.com/docs/child-snippet",
         "https://bits-ui.com/docs/state-management"
-      ]
+      ],
+      "provider": "huntabyte",
+      "product": "bits-ui",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Bits UI"
     },
     {
       "source_id": "drizzle-orm",
@@ -110,6 +125,14 @@
         "https://orm.drizzle.team/docs/indexes-constraints",
         "https://orm.drizzle.team/docs/guides/vector-similarity-search",
         "https://orm.drizzle.team/docs/extensions",
+        "https://github.com/drizzle-team/drizzle-orm/issues/5792"
+      ],
+      "provider": "drizzle-team",
+      "product": "drizzle-orm",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Drizzle Team",
+      "unversioned_urls": [
         "https://github.com/drizzle-team/drizzle-orm/issues/5792"
       ]
     },
@@ -135,7 +158,13 @@
         "https://www.postgresql.org/docs/18/using-explain.html",
         "https://www.postgresql.org/docs/18/view-pg-aios.html",
         "https://www.postgresql.org/docs/18/functions-uuid.html"
-      ]
+      ],
+      "provider": "postgresql",
+      "product": "postgresql",
+      "version_qualification": "MAJOR_VERSION",
+      "product_version": "18",
+      "language": "sql",
+      "publisher": "PostgreSQL Global Development Group"
     },
     {
       "source_id": "pgvector",
@@ -155,7 +184,12 @@
       "pages": [
         "https://github.com/pgvector/pgvector",
         "https://github.com/pgvector/pgvector/blob/master/CHANGELOG.md"
-      ]
+      ],
+      "provider": "pgvector",
+      "product": "pgvector",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "sql",
+      "publisher": "pgvector"
     },
     {
       "source_id": "drizzle-kit",
@@ -176,7 +210,12 @@
         "https://orm.drizzle.team/docs/kit-overview",
         "https://orm.drizzle.team/docs/drizzle-kit-generate",
         "https://orm.drizzle.team/docs/drizzle-kit-migrate"
-      ]
+      ],
+      "provider": "drizzle-team",
+      "product": "drizzle-kit",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Drizzle Team"
     }
   ]
 }

@@ -10,6 +10,7 @@
  */
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
 import type { ExternalDocAdmissionInputV1 } from './external-doc-admission.js';
 
 const sha256 = (text: string) => createHash('sha256').update(text, 'utf8').digest('hex');
@@ -73,17 +74,25 @@ export interface AdmissionHandoffResult {
 	pages: number;
 	chunks: number;
 	blockers: HandoffBlocker[];
-	/** Proof that a deterministic chunk-level revision CAN be unique when the native one is not. */
-	candidateChunkRevision: { unique: boolean; formula: string; distinct: number; total: number };
-	duplicateNativeChunkRevisions: number;
+	chunkEvidence: { formula: string; uniquePageEvidenceRevisions: number; uniqueChunkEvidenceRevisions: number; duplicateChunkEvidenceRevisionGroups: number; duplicateChunkEvidenceRevisionRows: number };
 }
 
-/** Deterministic chunk-level revision: unique per chunk by construction (page revision + chunk identity + span). */
-export function candidateChunkEvidenceRevision(pageEvidenceRevision: string, chunk: { chunkId: string; chunkChecksum: string; startByte: number; endByte: number }): string {
-	return `sha256:${sha256(JSON.stringify({ pageEvidenceRevision, chunkId: chunk.chunkId, chunkChecksum: chunk.chunkChecksum, startByte: chunk.startByte, endByte: chunk.endByte }))}`;
+export const EXTERNAL_DOC_CHUNK_EVIDENCE_SCHEMA = 'atlas.external-doc-chunk-evidence.v1';
+export const CHUNK_EVIDENCE_FORMULA = 'sha256:canonicalSha256V1{schema,pageEvidenceRevision,ordinal,startByte,endByte,chunkChecksum}';
+
+/**
+ * ExternalDocChunkEvidenceV1: CHUNK-grain evidence identity. DocCoordinateV1 stays PAGE/VERSION identity; a chunk is its exact
+ * UTF-8 span + bytes under that page revision. heading/section, parser/chunker and model revisions are provenance, not identity.
+ * Byte-identical to python/atlas_doc_coordinate.py chunk_evidence_revision (golden value asserted in both test suites).
+ */
+export function chunkEvidenceRevisionV1(pageEvidenceRevision: string, chunk: { ordinal: number; startByte: number; endByte: number; chunkChecksum: string }): string {
+	return `sha256:${canonicalSha256V1({
+		schema: EXTERNAL_DOC_CHUNK_EVIDENCE_SCHEMA, pageEvidenceRevision, ordinal: chunk.ordinal, startByte: chunk.startByte, endByte: chunk.endByte, chunkChecksum: chunk.chunkChecksum
+	})}`;
 }
 
-export function toExternalDocAdmissionInputV1(envelope: ExternalDocAdmissionEnvelopeV1, chunkRevision: 'native' | 'candidate'): ExternalDocAdmissionInputV1 {
+/** Maps a Python envelope to ExternalDocAdmissionInputV1. Page and chunk evidenceRevision are different grains and are never interchanged. */
+export function toExternalDocAdmissionInputV1(envelope: ExternalDocAdmissionEnvelopeV1): ExternalDocAdmissionInputV1 {
 	return {
 		manifestRevision: envelope.manifestRevision,
 		sourceRevision: envelope.sourceRevision,
@@ -98,7 +107,7 @@ export function toExternalDocAdmissionInputV1(envelope: ExternalDocAdmissionEnve
 			startChar: c.startChar, endChar: c.endChar, startByte: c.startByte, endByte: c.endByte, text: c.text,
 			domainClass: c.domainClass, ontologyClasses: c.ontologyClasses, codeBlocks: c.codeBlocks.map((b) => ({ language: b.language ?? null, code: b.code })), apiSignatures: c.apiSignatures,
 			chunkChecksum: c.chunkChecksum,
-			evidenceRevision: chunkRevision === 'native' ? c.evidenceRevision : candidateChunkEvidenceRevision(envelope.page.evidenceRevision, c)
+			evidenceRevision: c.evidenceRevision
 		}))
 	};
 }
@@ -114,7 +123,7 @@ export function validateExternalDocAdmissionHandoff(input: unknown, native: { na
 		return {
 			result: 'DOC_ADMISSION_HANDOFF_BLOCKED', pages: 0, chunks: 0,
 			blockers: [{ code: 'ENVELOPE_SCHEMA_INVALID', detail: parsed.error.issues.slice(0, 3).map((i) => `${i.path.join('.')}: ${i.message}`).join('; ') }],
-			candidateChunkRevision: { unique: false, formula: '', distinct: 0, total: 0 }, duplicateNativeChunkRevisions: 0
+			chunkEvidence: { formula: CHUNK_EVIDENCE_FORMULA, uniquePageEvidenceRevisions: 0, uniqueChunkEvidenceRevisions: 0, duplicateChunkEvidenceRevisionGroups: 0, duplicateChunkEvidenceRevisionRows: 0 }
 		};
 	}
 	const envelopes = parsed.data;
@@ -123,7 +132,7 @@ export function validateExternalDocAdmissionHandoff(input: unknown, native: { na
 	if (native.nativeChunksWithoutDocCoordinate && native.nativeChunksWithoutDocCoordinate > 0) {
 		blockers.push({
 			code: 'PIPELINE_DOES_NOT_EMIT_DOC_COORDINATE',
-			detail: 'atlas_okf_docs_pipeline chunks carry doc_coordinate=null because SourceConfigV1 forbids provider/product/version fields; coordinates were supplied from a sidecar. Additive manifest fields + passing doc_coordinate into chunk_document are needed for a native path.',
+			detail: 'atlas_okf_docs_pipeline chunks carry doc_coordinate=null: the manifest source declares no provider/product, so the pipeline built no page DocCoordinateV1.',
 			count: native.nativeChunksWithoutDocCoordinate
 		});
 	}
@@ -140,22 +149,25 @@ export function validateExternalDocAdmissionHandoff(input: unknown, native: { na
 	const dupIdentity = duplicates(envelopes.map((e) => [e.page.provider, e.page.product, e.page.productVersion, e.page.url].join('|')));
 	if (dupIdentity) blockers.push({ code: 'PAGE_IDENTITY_NOT_UNIQUE', detail: 'atlas_external_doc_pages_identity_uq (provider, product, product_version, url)', count: dupIdentity });
 
-	const dupNative = duplicates(chunks.map(({ c }) => c.evidenceRevision));
-	if (dupNative) {
-		blockers.push({
-			code: 'CHUNK_EVIDENCE_REVISION_NOT_UNIQUE',
-			detail: 'DocCoordinateV1 chunk revision hashes (url, section_anchor, document hash), so several chunks under one heading share it; atlas_external_doc_chunks_evidence_revision_uq would reject the second insert',
-			count: dupNative
-		});
+	const wrongRevision = chunks.filter(({ e, c }) => c.evidenceRevision !== chunkEvidenceRevisionV1(e.page.evidenceRevision, c)).length;
+	if (wrongRevision) blockers.push({ code: 'CHUNK_EVIDENCE_REVISION_MISMATCH', detail: 'envelope chunk evidenceRevision differs from ExternalDocChunkEvidenceV1 recomputed from page revision + ordinal + byte span + checksum', count: wrongRevision });
+	const pageAsChunk = chunks.filter(({ e, c }) => c.evidenceRevision === e.page.evidenceRevision).length;
+	if (pageAsChunk) blockers.push({ code: 'CHUNK_EVIDENCE_REVISION_EQUALS_PAGE_REVISION', detail: 'page evidence revision must never be sent as a chunk evidence revision', count: pageAsChunk });
+	const chunkRevisions = chunks.map(({ c }) => c.evidenceRevision);
+	const dupGroups = new Map<string, number>();
+	for (const revision of chunkRevisions) dupGroups.set(revision, (dupGroups.get(revision) ?? 0) + 1);
+	const duplicated = [...dupGroups.values()].filter((n) => n > 1);
+	if (duplicated.length) {
+		blockers.push({ code: 'CHUNK_EVIDENCE_REVISION_NOT_UNIQUE', detail: 'atlas_external_doc_chunks_evidence_revision_uq would reject the duplicates', count: duplicated.reduce((a, b) => a + b, 0) });
 	}
-	const candidates = chunks.map(({ e, c }) => candidateChunkEvidenceRevision(e.page.evidenceRevision, c));
-	const distinct = new Set(candidates).size;
 
 	return {
 		result: blockers.length ? 'DOC_ADMISSION_HANDOFF_BLOCKED' : 'EXTERNAL_DOC_ADMISSION_HANDOFF_READY',
 		pages: envelopes.length, chunks: chunks.length, blockers,
-		candidateChunkRevision: { unique: distinct === candidates.length, formula: 'sha256(json{pageEvidenceRevision,chunkId,chunkChecksum,startByte,endByte})', distinct, total: candidates.length },
-		duplicateNativeChunkRevisions: dupNative
+		chunkEvidence: {
+			formula: CHUNK_EVIDENCE_FORMULA, uniquePageEvidenceRevisions: new Set(envelopes.map((e) => e.page.evidenceRevision)).size,
+			uniqueChunkEvidenceRevisions: dupGroups.size, duplicateChunkEvidenceRevisionGroups: duplicated.length, duplicateChunkEvidenceRevisionRows: duplicated.reduce((a, b) => a + b, 0)
+		}
 	};
 }
 

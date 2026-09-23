@@ -928,6 +928,23 @@ DDL or source-of-truth change was applied.
   (same convention as `docs/.okf/dev/raw`); `*.jsonl` intermediates stay ignored and the smoke rebuilds its handoff
   envelopes offline. Fresh-checkout input audit and receipt: `docs/reports/external-doc-corpus-reproducibility-v1.json`.
   Still open: DOC-06A admission, semantic embedding, LangExtract integration, and Studio admin/search closure.
+  **CHUNK EVIDENCE IDENTITY (`EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_01`, 2026-09-23, supersedes blockers (1) and (2)
+  above): `EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_PROVEN`.** Decisions: `DocCoordinateV1` is PAGE/VERSION identity, built
+  natively by `atlas_okf_docs_pipeline.build_page_coordinate` from new optional manifest fields and carried unchanged
+  into every chunk; its `content_hash` is over the same normalized text the byte spans address. A chunk's own identity
+  is `ExternalDocChunkEvidenceV1` = `sha256:canonicalSha256V1{schema, pageEvidenceRevision, ordinal, startByte,
+  endByte, chunkChecksum}` (headingPath/sectionAnchor/parser/chunker/model revisions are provenance, not identity);
+  Python and TypeScript agree on a golden value and a committed cross-language fixture. Before: chunks under one
+  heading shared a revision (78 groups / 358 rows; 280 rows the unique constraint would reject). After: 30 unique page
+  and 847 unique chunk revisions, 0 duplicate groups, all 847 native chunks carry the page coordinate; the DOC-06A
+  handoff validates `EXTERNAL_DOC_ADMISSION_HANDOFF_READY` with no writer call. `chunk_id` is unchanged (future gate
+  `EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT`). Finding: 23 of 30 stored pages differ from the text `chunk_document`
+  normalizes (code indentation is collapsed at chunking; future gate `EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY`).
+  Analysis owner: `analysis_pass_results` and `atlas_summary_layers` are packet-keyed and not reusable ->
+  `EXTERNAL_DOC_ANALYSIS_OWNER_REQUIRED` (`ExternalDocAnalysisV1` / conceptual `atlas_external_doc_analyses`, not
+  created); the summary-only SQL is `DRAFT_SUPERSEDED_PENDING_ANALYSIS_OWNER`, unapplied. Receipt:
+  `docs/reports/external-doc-chunk-evidence-identity-v1.json`. No canonical admission, embedding, Qdrant, LangExtract,
+  Ornith or Studio canonical-search task is closed; per-chunk cache warming stays blocked until admission.
 - Classifying `docs/.okf/dev/*`'s "okf.dev.manifest.v1" corpus as CANONICAL_OWNER / EXPERIMENT /
   DEAD relative to `atlas_okf_docs_pipeline.py`'s manifest lineage — flagged in proposal.md's Risks
   section, needs its own short audit before Phase A assumes they're the same generation.

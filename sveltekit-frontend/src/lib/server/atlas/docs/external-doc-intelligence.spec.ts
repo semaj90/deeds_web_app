@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { createHash } from 'node:crypto';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -8,7 +8,7 @@ import {
 	computeVersionDrift, readAnalysisStatus, readLangExtractStatus, readSymbolIndexStatus, type CoordinatesFile, type RuntimeVersions, type SourceCapture
 } from './doc-intelligence-read-model.js';
 import {
-	candidateChunkEvidenceRevision, ExternalDocAnalysisV1Schema, externalDocAnalysisId, toExternalDocAdmissionInputV1,
+	chunkEvidenceRevisionV1, ExternalDocAnalysisV1Schema, externalDocAnalysisId, toExternalDocAdmissionInputV1,
 	validateExternalDocAdmissionHandoff, type ExternalDocAdmissionEnvelopeV1
 } from './external-doc-intelligence-contracts-v1.js';
 
@@ -124,21 +124,24 @@ describe('ExternalDocAnalysisV1', () => {
 });
 
 describe('DOC-06A admission handoff (pure, no writer)', () => {
-	function envelope(id: string, texts: string[], sharedChunkRevision = false): ExternalDocAdmissionEnvelopeV1 {
+	/** Envelope whose chunk evidenceRevision is the ExternalDocChunkEvidenceV1 value (or a deliberately shared/wrong one). */
+	function envelope(id: string, texts: string[], mode: 'correct' | 'shared' = 'correct'): ExternalDocAdmissionEnvelopeV1 {
 		let offset = 0;
+		const pageEvidenceRevision = `sha256:page-${id}`;
 		return {
 			manifestRevision: 'm1', sourceRevision: `s-${id}`, sourceId: id, authorityClass: 'OFFICIAL_PRIMARY', versionQualification: 'MAJOR_VERSION',
 			page: {
 				provider: 'p', product: id, productVersion: '18', architecture: null, language: 'sql', url: `https://example.org/${id}`, title: id, publisher: null,
-				sourceAuthority: 'OFFICIAL', fetcher: 'BEAUTIFULSOUP_HTTP', crawlRevision: 'c1', parserRevision: 'bs4', contentHash: sha(texts.join()), evidenceRevision: `sha256:page-${id}`, retrievedAt: '2026-09-23T00:00:00Z'
+				sourceAuthority: 'OFFICIAL', fetcher: 'BEAUTIFULSOUP_HTTP', crawlRevision: 'c1', parserRevision: 'bs4', contentHash: sha(texts.join()), evidenceRevision: pageEvidenceRevision, retrievedAt: '2026-09-23T00:00:00Z'
 			},
 			chunks: texts.map((text, i) => {
 				const startByte = offset;
 				offset += Buffer.byteLength(text, 'utf8');
+				const chunk = { ordinal: i, startByte, endByte: offset, chunkChecksum: sha(text) };
 				return {
-					chunkId: `doc:${id}:${i}`, ordinal: i, headingPath: ['H'], sectionAnchor: 'H', startChar: 0, endChar: text.length, startByte, endByte: offset, text,
-					domainClass: 'api', ontologyClasses: [], codeBlocks: [], apiSignatures: [], chunkChecksum: sha(text),
-					evidenceRevision: sharedChunkRevision ? `sha256:shared-${id}` : `sha256:chunk-${id}-${i}`
+					chunkId: `doc:${id}:${i}`, headingPath: ['H'], sectionAnchor: 'H', startChar: 0, endChar: text.length, text,
+					domainClass: 'api', ontologyClasses: [], codeBlocks: [], apiSignatures: [], ...chunk,
+					evidenceRevision: mode === 'shared' ? `sha256:shared-${id}` : chunkEvidenceRevisionV1(pageEvidenceRevision, chunk)
 				};
 			})
 		};
@@ -147,14 +150,25 @@ describe('DOC-06A admission handoff (pure, no writer)', () => {
 	it('is READY when envelopes satisfy every admission and uniqueness check', () => {
 		const r = validateExternalDocAdmissionHandoff([envelope('a', ['one', 'two']), envelope('b', ['three'])]);
 		expect(r).toMatchObject({ result: 'EXTERNAL_DOC_ADMISSION_HANDOFF_READY', pages: 2, chunks: 3, blockers: [] });
+		expect(r.chunkEvidence).toMatchObject({ uniquePageEvidenceRevisions: 2, uniqueChunkEvidenceRevisions: 3, duplicateChunkEvidenceRevisionGroups: 0, duplicateChunkEvidenceRevisionRows: 0 });
 	});
 
-	it('is BLOCKED when several chunks share DocCoordinateV1\'s chunk revision, and a deterministic candidate is unique', () => {
-		const r = validateExternalDocAdmissionHandoff([envelope('a', ['one', 'two', 'three'], true)]);
+	it('matches the Python golden value for ExternalDocChunkEvidenceV1 (cross-language parity)', () => {
+		expect(chunkEvidenceRevisionV1('sha256:abcdefgh', { ordinal: 0, startByte: 0, endByte: 5, chunkChecksum: 'a'.repeat(64) }))
+			.toBe('sha256:98cbfe4d64ab8f50dd05e59da3b31ddcc8bd9445bde3327eada3bdcf732be786');
+	});
+
+	it('is BLOCKED when chunks reuse one revision (the old page/section coordinate behaviour)', () => {
+		const r = validateExternalDocAdmissionHandoff([envelope('a', ['one', 'two', 'three'], 'shared')]);
 		expect(r.result).toBe('DOC_ADMISSION_HANDOFF_BLOCKED');
-		expect(r.blockers.map((b) => b.code)).toContain('CHUNK_EVIDENCE_REVISION_NOT_UNIQUE');
-		expect(r.duplicateNativeChunkRevisions).toBe(2);
-		expect(r.candidateChunkRevision).toMatchObject({ unique: true, distinct: 3, total: 3 });
+		expect(r.blockers.map((b) => b.code)).toEqual(expect.arrayContaining(['CHUNK_EVIDENCE_REVISION_NOT_UNIQUE', 'CHUNK_EVIDENCE_REVISION_MISMATCH']));
+		expect(r.chunkEvidence).toMatchObject({ duplicateChunkEvidenceRevisionGroups: 1, duplicateChunkEvidenceRevisionRows: 3 });
+	});
+
+	it('is BLOCKED when a page revision is sent as a chunk revision', () => {
+		const e = envelope('a', ['one']);
+		e.chunks[0].evidenceRevision = e.page.evidenceRevision;
+		expect(validateExternalDocAdmissionHandoff([e]).blockers.map((b) => b.code)).toContain('CHUNK_EVIDENCE_REVISION_EQUALS_PAGE_REVISION');
 	});
 
 	it('is BLOCKED when the pipeline emitted no doc_coordinate, on checksum drift, and on byte-span drift', () => {
@@ -162,7 +176,7 @@ describe('DOC-06A admission handoff (pure, no writer)', () => {
 		e.chunks[0].chunkChecksum = sha('tampered');
 		e.chunks[0].endByte += 1;
 		const r = validateExternalDocAdmissionHandoff([e], { nativeChunks: 1, nativeChunksWithoutDocCoordinate: 1 });
-		expect(r.blockers.map((b) => b.code)).toEqual(expect.arrayContaining(['PIPELINE_DOES_NOT_EMIT_DOC_COORDINATE', 'ADMISSION_CHUNK_CHECKSUM_MISMATCH', 'BYTE_SPAN_LENGTH_MISMATCH']));
+		expect(r.blockers.map((b) => b.code)).toEqual(expect.arrayContaining(['PIPELINE_DOES_NOT_EMIT_DOC_COORDINATE', 'ADMISSION_CHUNK_CHECKSUM_MISMATCH', 'BYTE_SPAN_LENGTH_MISMATCH', 'CHUNK_EVIDENCE_REVISION_MISMATCH']));
 	});
 
 	it('is BLOCKED on duplicate page identity and on a schema-invalid envelope', () => {
@@ -171,13 +185,48 @@ describe('DOC-06A admission handoff (pure, no writer)', () => {
 		expect(validateExternalDocAdmissionHandoff([{ nope: true }]).blockers[0].code).toBe('ENVELOPE_SCHEMA_INVALID');
 	});
 
-	it('maps an envelope to ExternalDocAdmissionInputV1 with either revision strategy', () => {
-		const e = envelope('a', ['one', 'two'], true);
-		const native = toExternalDocAdmissionInputV1(e, 'native');
-		const candidate = toExternalDocAdmissionInputV1(e, 'candidate');
-		expect(new Set(native.chunks.map((c) => c.evidenceRevision)).size).toBe(1);
-		expect(new Set(candidate.chunks.map((c) => c.evidenceRevision)).size).toBe(2);
-		expect(candidate.chunks[0].evidenceRevision).toBe(candidateChunkEvidenceRevision(e.page.evidenceRevision, e.chunks[0]));
-		expect(candidate.page.architecture).toBeNull();
+	it('changes chunk evidence when any identity input changes and ignores heading metadata', () => {
+		const base = { ordinal: 0, startByte: 0, endByte: 10, chunkChecksum: 'a'.repeat(64) };
+		const revision = chunkEvidenceRevisionV1('sha256:p1', base);
+		expect(chunkEvidenceRevisionV1('sha256:p1', base)).toBe(revision);
+		expect(chunkEvidenceRevisionV1('sha256:p2', base)).not.toBe(revision);
+		expect(chunkEvidenceRevisionV1('sha256:p1', { ...base, startByte: 1 })).not.toBe(revision);
+		expect(chunkEvidenceRevisionV1('sha256:p1', { ...base, endByte: 11 })).not.toBe(revision);
+		expect(chunkEvidenceRevisionV1('sha256:p1', { ...base, chunkChecksum: 'b'.repeat(64) })).not.toBe(revision);
+		expect(chunkEvidenceRevisionV1('sha256:p1', { ...base, ordinal: 1 })).not.toBe(revision);
+	});
+
+	it('maps the envelope to ExternalDocAdmissionInputV1 preserving revisions, spans and checksums exactly', () => {
+		const e = envelope('a', ['one', 'two'], 'correct');
+		const input = toExternalDocAdmissionInputV1(e);
+		expect(input.page.evidenceRevision).toBe(e.page.evidenceRevision);
+		expect(input.chunks.map((c) => c.evidenceRevision)).toEqual(e.chunks.map((c) => c.evidenceRevision));
+		expect(input.chunks.every((c, i) => c.startByte === e.chunks[i].startByte && c.endByte === e.chunks[i].endByte && c.chunkChecksum === e.chunks[i].chunkChecksum)).toBe(true);
+		expect(input.chunks.some((c) => c.evidenceRevision === input.page.evidenceRevision)).toBe(false);
+		expect(input.page.architecture).toBeNull();
+	});
+});
+
+describe('Python native output -> TypeScript admission adapter (committed cross-language fixture)', () => {
+	const fixture = JSON.parse(readFileSync(join(__dirname, '__fixtures__', 'external-doc-python-envelope-v1.json'), 'utf8')) as ExternalDocAdmissionEnvelopeV1[];
+
+	it('is READY, collision-free for same-heading multi-chunk pages, and every revision recomputes identically in TypeScript', () => {
+		const r = validateExternalDocAdmissionHandoff(fixture);
+		expect(r).toMatchObject({ result: 'EXTERNAL_DOC_ADMISSION_HANDOFF_READY', blockers: [], pages: 1 });
+		expect(r.chunks).toBeGreaterThan(2);
+		expect(new Set(fixture[0].chunks.map((c) => c.headingPath.join('/')))).toEqual(new Set(['Guide']));
+		for (const c of fixture[0].chunks) expect(c.evidenceRevision).toBe(chunkEvidenceRevisionV1(fixture[0].page.evidenceRevision, c));
+	});
+
+	it('preserves UTF-8 byte spans, checksums and the page revision through the adapter', () => {
+		const input = toExternalDocAdmissionInputV1(fixture[0]);
+		expect(input.page.evidenceRevision).toBe(fixture[0].page.evidenceRevision);
+		for (const [i, c] of input.chunks.entries()) {
+			expect(Buffer.byteLength(c.text, 'utf8')).toBe(c.endByte - c.startByte);
+			expect(sha(c.text)).toBe(c.chunkChecksum);
+			expect(c.evidenceRevision).toBe(fixture[0].chunks[i].evidenceRevision);
+			expect(c.evidenceRevision).not.toBe(input.page.evidenceRevision);
+		}
+		expect(fixture[0].chunks.some((c) => /日本語/.test(c.text))).toBe(true);
 	});
 });

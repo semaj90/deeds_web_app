@@ -23,7 +23,7 @@ import os
 from pathlib import Path
 import re
 import time
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Mapping, Sequence
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 from uuid import NAMESPACE_URL, UUID, uuid5
@@ -104,6 +104,14 @@ class SourceConfig:
     pages: tuple[str, ...]
     ldr_export_files: tuple[str, ...]
     source_namespace: str | None = None
+    provider: str | None = None
+    product: str | None = None
+    product_version: str | None = None
+    version_qualification: str | None = None
+    architecture: str | None = None
+    language: str | None = None
+    publisher: str | None = None
+    unversioned_urls: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -138,6 +146,7 @@ class PageArtifact:
     normalized_checksum: str
     outgoing_urls: tuple[str, ...]
     metadata: Mapping[str, Any]
+    retrieved_at: str | None = None
 
 
 QDRANT_PAYLOAD_INDEXES: tuple[tuple[str, Any], ...] = (
@@ -212,6 +221,14 @@ def load_manifest(path: str | Path) -> PipelineManifest:
             pages=source.pages,
             ldr_export_files=source.ldr_export_files,
             source_namespace=source.source_namespace,
+            provider=source.provider,
+            product=source.product,
+            product_version=source.product_version,
+            version_qualification=source.version_qualification,
+            architecture=source.architecture,
+            language=source.language,
+            publisher=source.publisher,
+            unversioned_urls=source.unversioned_urls,
         )
         for source in validated.sources
     )
@@ -381,6 +398,7 @@ def _fetch_single(source: SourceConfig, url: str) -> PageArtifact:
         normalized_checksum=fetched.normalized_checksum,
         outgoing_urls=fetched.outgoing_urls,
         metadata=fetched.metadata,
+        retrieved_at=_now(),
     )
 
 
@@ -407,6 +425,30 @@ def make_stanza_pipeline(*, language: str = "en") -> Any:
     return stanza.Pipeline(lang=language, processors="tokenize,pos,lemma,depparse", use_gpu=True, verbose=False)
 
 
+def build_page_coordinate(source: SourceConfig, page: PageArtifact) -> Any:
+    """ONE page-level DocCoordinateV1 for a fetched page/version, built natively from the manifest source and the
+    page's normalized text. content_hash is the hash of the SAME normalized text the chunk byte spans address
+    (chunk_document's whole-document normalization). Returns None when the source declares no provider/product."""
+    if not (source.provider and source.product):
+        return None
+    from atlas_doc_coordinate import build_doc_coordinate
+    from atlas_external_docs import _normalize_ws
+
+    qualification = source.version_qualification or "CURRENT_UPSTREAM"
+    if page.requested_url in source.unversioned_urls or page.resolved_url in source.unversioned_urls:
+        qualification = "UNVERSIONED"
+    if qualification in ("EXACT_VERSION", "MAJOR_VERSION"):
+        if not source.product_version:
+            raise ValueError(f"DOC_COORDINATE_PRODUCT_VERSION_REQUIRED:{source.source_id}")
+        product_version = source.product_version
+    else:  # never fabricate an exact version for a live/current page
+        product_version = f"{qualification}@{(page.retrieved_at or '')[:10] or 'undated'}"
+    return build_doc_coordinate(
+        provider=source.provider, product=source.product, product_version=product_version, url=page.resolved_url,
+        content_hash=_sha(_normalize_ws(page.text)), architecture=source.architecture, language=source.language,
+    )
+
+
 def compile_chunks(
     pages: Sequence[PageArtifact],
     *,
@@ -414,6 +456,7 @@ def compile_chunks(
     stanza_model_revision: str,
     maximum_chars: int,
     overlap_chars: int,
+    coordinate_for: Callable[[PageArtifact], Any] | None = None,
 ) -> tuple[ChunkRecord, ...]:
     chunks: list[ChunkRecord] = []
     for page in pages:
@@ -433,6 +476,7 @@ def compile_chunks(
             maximum_chars=maximum_chars,
             overlap_chars=overlap_chars,
             nlp=nlp,
+            doc_coordinate=coordinate_for(page) if coordinate_for else None,
         ))
     return tuple(chunks)
 
@@ -746,7 +790,7 @@ def write_source_artifacts(root: Path, source: SourceConfig, pages: Sequence[Pag
             **asdict(page),
             "text": None,
             "markdown_path": str(markdown_path),
-            "fetched_at": _now(),
+            "fetched_at": page.retrieved_at or _now(),
             "canonical_authority": False,
         }
         receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True), encoding="utf-8")
@@ -788,6 +832,7 @@ def run_pipeline(
             stanza_model_revision="stanza-en-default",
             maximum_chars=maximum_chars,
             overlap_chars=overlap_chars,
+            coordinate_for=lambda page, source=source: build_page_coordinate(source, page),
         )
         all_pages.extend(pages)
         all_chunks.extend(chunks)

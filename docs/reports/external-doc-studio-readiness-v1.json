@@ -1,6 +1,6 @@
 {
   "schema": "atlas.external-doc-studio-readiness.v1",
-  "generatedAt": "2026-09-23T17:25:35.613Z",
+  "generatedAt": "2026-09-23T17:37:59.378Z",
   "runtimeVersions": {
     "postgres": "18.4 (Debian 18.4-1.pgdg12+1)",
     "pgvector": "0.8.3",
@@ -848,35 +848,34 @@
   ],
   "requiredTermNote": "Token appearance is lexical usefulness only, never factual validation. LITERAL_HIT = exact text present; TOKEN_ONLY_HIT = only present once whitespace is removed (token-split capture); MISSING = absent.",
   "doc06aHandoff": {
-    "result": "DOC_ADMISSION_HANDOFF_BLOCKED",
+    "result": "EXTERNAL_DOC_ADMISSION_HANDOFF_READY",
     "pages": 30,
     "chunks": 847,
-    "blockers": [
-      {
-        "code": "PIPELINE_DOES_NOT_EMIT_DOC_COORDINATE",
-        "detail": "atlas_okf_docs_pipeline chunks carry doc_coordinate=null because SourceConfigV1 forbids provider/product/version fields; coordinates were supplied from a sidecar. Additive manifest fields + passing doc_coordinate into chunk_document are needed for a native path.",
-        "count": 847
-      },
-      {
-        "code": "CHUNK_EVIDENCE_REVISION_NOT_UNIQUE",
-        "detail": "DocCoordinateV1 chunk revision hashes (url, section_anchor, document hash), so several chunks under one heading share it; atlas_external_doc_chunks_evidence_revision_uq would reject the second insert",
-        "count": 280
-      }
-    ],
-    "candidateChunkRevision": {
-      "unique": true,
-      "formula": "sha256(json{pageEvidenceRevision,chunkId,chunkChecksum,startByte,endByte})",
-      "distinct": 847,
-      "total": 847
+    "blockers": [],
+    "chunkEvidence": {
+      "formula": "sha256:canonicalSha256V1{schema,pageEvidenceRevision,ordinal,startByte,endByte,chunkChecksum}",
+      "uniquePageEvidenceRevisions": 30,
+      "uniqueChunkEvidenceRevisions": 847,
+      "duplicateChunkEvidenceRevisionGroups": 0,
+      "duplicateChunkEvidenceRevisionRows": 0
     },
-    "duplicateNativeChunkRevisions": 280,
-    "manifestRevision": "okf-pinned-docs-r2",
-    "envelopesDigest": "sha256:92543b9bfce7a5669903b7b972fa1fe5565db621e53f2bd34e3ef459a7440458",
-    "coordinateSource": "docs/.okf/dev/pinned-docs.coordinates.json (sidecar; SourceConfigV1 forbids these fields)",
+    "manifestRevision": "okf-pinned-docs-r3",
+    "envelopesDigest": "sha256:215b142e7c46cb04b11ebe58f95fa69ccb9cf94e97057802f09a600fa77ec4fe",
+    "coordinateSource": "manifest fields (provider/product/product_version/version_qualification/...) via atlas_okf_docs_pipeline.build_page_coordinate; sidecar mirrors and is checked for drift",
     "native": {
       "nativeChunks": 847,
-      "nativeChunksWithoutDocCoordinate": 847,
-      "rechunkChecksumMismatches": 0
+      "nativeChunksWithoutDocCoordinate": 0,
+      "pageNormalizationDiffersFromStoredText": 23,
+      "uniquePageEvidenceRevisionCount": 30,
+      "duplicatePageEvidenceRevision": {
+        "groups": 0,
+        "rows": 0
+      },
+      "uniqueChunkEvidenceRevisionCount": 847,
+      "duplicateChunkEvidenceRevision": {
+        "groups": 0,
+        "rows": 0
+      }
     },
     "calledRealWriter": false
   },
@@ -1431,7 +1430,7 @@
     ],
     "note": "environmentInputs are optional dotenv files and node_modules-installed package versions; they are never required for the smoke to pass."
   },
-  "result": "DOC_ADMISSION_HANDOFF_BLOCKED",
+  "result": "DOC_CANONICAL_CORPUS_EMPTY",
   "secondaryResults": [
     "DOC_CANONICAL_CORPUS_EMPTY"
   ],

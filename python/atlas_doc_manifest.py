@@ -102,6 +102,16 @@ class SourceConfigV1(BaseModel):
     pages: tuple[str, ...] = Field(default_factory=tuple)
     ldr_export_files: tuple[str, ...] = Field(default_factory=tuple)
     source_namespace: Optional[str] = None
+    # Native DocCoordinateV1 inputs (EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_01). When provider AND product are set the
+    # pipeline builds one page-level DocCoordinateV1 per fetched page; otherwise chunks carry no coordinate (legacy).
+    provider: Optional[str] = None
+    product: Optional[str] = None
+    product_version: Optional[str] = None  # required for EXACT_VERSION / MAJOR_VERSION; never invented otherwise
+    version_qualification: Optional[str] = None  # EXACT_VERSION | MAJOR_VERSION | CURRENT_UPSTREAM | UNVERSIONED
+    architecture: Optional[str] = None
+    language: Optional[str] = None
+    publisher: Optional[str] = None
+    unversioned_urls: tuple[str, ...] = Field(default_factory=tuple)
 
     model_config = _STRICT
 

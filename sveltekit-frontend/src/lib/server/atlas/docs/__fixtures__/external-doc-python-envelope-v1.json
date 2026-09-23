@@ -1,0 +1,154 @@
+[
+ {
+  "authorityClass": "OFFICIAL_PRIMARY",
+  "chunks": [
+   {
+    "apiSignatures": [],
+    "chunkChecksum": "10cd0be021d7f7d37e7d3f14dae5e336e7b98e4395bb0e80edfd4d82ff24dae1",
+    "chunkId": "doc:fixture:5c22383e022718e8:0",
+    "codeBlocks": [],
+    "domainClass": "retrieval",
+    "endByte": 347,
+    "endChar": 297,
+    "evidenceRevision": "sha256:d7487df1c8a49fc061c74b28106e532e8f14f3e1d4f2a8fc2bcbf33fea59295b",
+    "headingPath": [
+     "Guide"
+    ],
+    "ontologyClasses": [
+     "ALGORITHM"
+    ],
+    "ordinal": 0,
+    "sectionAnchor": "Guide",
+    "startByte": 8,
+    "startChar": 8,
+    "text": "Zeile 0: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 1: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 2: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 3: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 4: 日本語 café naïve — halfvec hnsw index tuning here."
+   },
+   {
+    "apiSignatures": [],
+    "chunkChecksum": "6195b9828bafd6d9ad353dcfb268bbc11102787e1940ce78ac269cef5acfe533",
+    "chunkId": "doc:fixture:5c22383e022718e8:1",
+    "codeBlocks": [],
+    "domainClass": "retrieval",
+    "endByte": 619,
+    "endChar": 529,
+    "evidenceRevision": "sha256:658d3d6bc743cff3882bb3918371a0236a4167f1c14edb47b6bfd4d850e58a0f",
+    "headingPath": [
+     "Guide"
+    ],
+    "ontologyClasses": [
+     "ALGORITHM"
+    ],
+    "ordinal": 1,
+    "sectionAnchor": "Guide",
+    "startByte": 305,
+    "startChar": 258,
+    "text": "naïve — halfvec hnsw index tuning here.\nZeile 5: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 6: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 7: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 8: 日本語 café naïve — halfvec hnsw index tuning here."
+   },
+   {
+    "apiSignatures": [],
+    "chunkChecksum": "6b31d0eef5a8d59950cc5c005f1f057a8975dfd1182b7c0275783b5ed1065b9e",
+    "chunkId": "doc:fixture:5c22383e022718e8:2",
+    "codeBlocks": [],
+    "domainClass": "retrieval",
+    "endByte": 894,
+    "endChar": 764,
+    "evidenceRevision": "sha256:6aee006b7b942d0a9c0bc8ef79fc04134fb0806da9525fe58288f7b7fb611811",
+    "headingPath": [
+     "Guide"
+    ],
+    "ontologyClasses": [
+     "ALGORITHM"
+    ],
+    "ordinal": 2,
+    "sectionAnchor": "Guide",
+    "startByte": 577,
+    "startChar": 490,
+    "text": "naïve — halfvec hnsw index tuning here.\nZeile 9: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 10: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 11: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 12: 日本語 café naïve — halfvec hnsw index tuning here."
+   },
+   {
+    "apiSignatures": [],
+    "chunkChecksum": "f6fdcea3bcffcb357455aa789559ea96cf7b93454af761a8a95ade9c32b1912d",
+    "chunkId": "doc:fixture:5c22383e022718e8:3",
+    "codeBlocks": [],
+    "domainClass": "retrieval",
+    "endByte": 1170,
+    "endChar": 1000,
+    "evidenceRevision": "sha256:78ac9c318255d4748ee0a1245ed0ab0bfd8003d4e8edf90b8f5c321c62519794",
+    "headingPath": [
+     "Guide"
+    ],
+    "ontologyClasses": [
+     "ALGORITHM"
+    ],
+    "ordinal": 3,
+    "sectionAnchor": "Guide",
+    "startByte": 852,
+    "startChar": 725,
+    "text": "naïve — halfvec hnsw index tuning here.\nZeile 13: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 14: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 15: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 16: 日本語 café naïve — halfvec hnsw index tuning here."
+   },
+   {
+    "apiSignatures": [],
+    "chunkChecksum": "d5d9cf7cca838dfab134fd07ef5dcdf545f957b293affb2179eb272328373c34",
+    "chunkId": "doc:fixture:5c22383e022718e8:4",
+    "codeBlocks": [],
+    "domainClass": "retrieval",
+    "endByte": 1446,
+    "endChar": 1236,
+    "evidenceRevision": "sha256:0a21c0cf8b32b14cb01c70f45b401ee3cc077eea7751db29db42e8983868c451",
+    "headingPath": [
+     "Guide"
+    ],
+    "ontologyClasses": [
+     "ALGORITHM"
+    ],
+    "ordinal": 4,
+    "sectionAnchor": "Guide",
+    "startByte": 1128,
+    "startChar": 961,
+    "text": "naïve — halfvec hnsw index tuning here.\nZeile 17: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 18: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 19: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 20: 日本語 café naïve — halfvec hnsw index tuning here."
+   },
+   {
+    "apiSignatures": [],
+    "chunkChecksum": "06a926bb85a2841977adb81330addcee2761604f0204d19dc3f029137d6d33d0",
+    "chunkId": "doc:fixture:5c22383e022718e8:5",
+    "codeBlocks": [],
+    "domainClass": "retrieval",
+    "endByte": 1653,
+    "endChar": 1413,
+    "evidenceRevision": "sha256:4c303b0b5d8c4f5d7d4b06c27106b28543fd73d41a9ac57dc6cd20e30a014984",
+    "headingPath": [
+     "Guide"
+    ],
+    "ontologyClasses": [
+     "ALGORITHM"
+    ],
+    "ordinal": 5,
+    "sectionAnchor": "Guide",
+    "startByte": 1404,
+    "startChar": 1197,
+    "text": "naïve — halfvec hnsw index tuning here.\nZeile 21: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 22: 日本語 café naïve — halfvec hnsw index tuning here.\nZeile 23: 日本語 café naïve — halfvec hnsw index tuning here."
+   }
+  ],
+  "manifestRevision": "fixture-m1",
+  "page": {
+   "architecture": null,
+   "contentHash": "5c22383e022718e8fc5a408f48f4c1b4a61e65e34543bbcf83d47c30d0d2ab63",
+   "crawlRevision": "fixture-r1",
+   "evidenceRevision": "sha256:b69ca7f49f0794d04c27699ae0e92e25b214b5c00ba9be0bf5c16dbb77dbd264",
+   "fetcher": "BEAUTIFULSOUP_HTTP",
+   "language": "sql",
+   "parserRevision": "beautifulsoup4==fixture/html.parser",
+   "product": "pgvector",
+   "productVersion": "0.8",
+   "provider": "pgvector",
+   "publisher": null,
+   "retrievedAt": "2026-09-23T00:00:00Z",
+   "sourceAuthority": "OFFICIAL",
+   "title": "Fixture",
+   "url": "https://example.org/fixture"
+  },
+  "sourceId": "fixture",
+  "sourceRevision": "fixture-r1",
+  "versionQualification": "EXACT_VERSION"
+ }
+]

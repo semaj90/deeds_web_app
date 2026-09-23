@@ -101,6 +101,9 @@ class ChunkRecord:
     # (the real production constructor) always populates real values.
     start_byte: int = 0
     end_byte: int = 0
+    # EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_01: chunk-grain evidence identity (ExternalDocChunkEvidenceV1), distinct
+    # from the PARENT page coordinate carried in ``doc_coordinate``. None when no page coordinate was supplied.
+    chunk_evidence_revision: str | None = None
 
     def to_dict(self) -> Json:
         result = asdict(self)
@@ -560,8 +563,13 @@ def chunk_document(
 ) -> tuple[ChunkRecord, ...]:
     if maximum_chars <= 0 or overlap_chars < 0 or overlap_chars >= maximum_chars:
         raise ValueError("INVALID_CHUNK_WINDOW")
+    from atlas_doc_coordinate import chunk_evidence_revision  # local: keeps this module importable without pydantic
+
     normalized = _normalize_ws(text)
     document_checksum = _sha(normalized)
+    if doc_coordinate is not None and doc_coordinate.content_hash != document_checksum:
+        # The byte spans below address `normalized`; a page coordinate hashed over different text would mis-bind them.
+        raise ValueError("DOC_COORDINATE_CONTENT_HASH_MISMATCH")
     domain = classify_domain(title, normalized)
     chunks: list[ChunkRecord] = []
     ordinal = 0
@@ -601,11 +609,13 @@ def chunk_document(
                 start_byte = len(normalized[:absolute_start].encode("utf-8"))
                 end_byte = start_byte + len(chunk_text.encode("utf-8"))
                 chunk_id = f"doc:{source_id}:{document_checksum[:16]}:{ordinal}"
-                chunk_coordinate = None
+                # The PAGE coordinate is carried unchanged into every child chunk (heading/section stays chunk
+                # metadata in heading_path); the chunk's own identity is its span + bytes under that page revision.
+                chunk_evidence = None
                 if doc_coordinate is not None:
-                    section_anchor = "/".join(heading_path) or None
-                    chunk_coordinate = doc_coordinate.model_copy(
-                        update={"content_hash": document_checksum, "section_anchor": section_anchor}
+                    chunk_evidence = chunk_evidence_revision(
+                        page_evidence_revision=doc_coordinate.evidence_revision, ordinal=ordinal,
+                        start_byte=start_byte, end_byte=end_byte, chunk_checksum=_sha(chunk_text),
                     )
                 code_blocks, api_signatures = extract_code_blocks_and_signatures(chunk_text)
                 chunks.append(ChunkRecord(
@@ -623,11 +633,12 @@ def chunk_document(
                     ontology_classes=classify_ontology(chunk_text),
                     lexical_tokens=lexical,
                     ontology_tuples=tuples,
-                    doc_coordinate=chunk_coordinate,
+                    doc_coordinate=doc_coordinate,
                     code_blocks=code_blocks,
                     api_signatures=api_signatures,
                     start_byte=start_byte,
                     end_byte=end_byte,
+                    chunk_evidence_revision=chunk_evidence,
                 ))
                 ordinal += 1
             if end >= len(body):
