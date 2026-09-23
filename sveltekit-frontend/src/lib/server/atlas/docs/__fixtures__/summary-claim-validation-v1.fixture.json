@@ -1,0 +1,112 @@
+{
+  "skeleton": {
+    "schema": "atlas.summary-claim-validation.v1",
+    "chunkId": "doc:pgvector:fe883c75f323441d:22",
+    "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+    "analysisId": null,
+    "summaryInputChecksum": "14c38b2606d47e4b80a9c76a357fa44608153b3a39b0243c4c21261d99a46136",
+    "summaryOutputChecksum": "099b9e1d0ea636413f67312877aab4a7d1bcfc0c0fbf61936ab68630bfe8b872",
+    "claimOrdinal": 0,
+    "claimText": "Queries with low-selectivity filters can return fewer results under HNSW.",
+    "technical": {
+      "status": "NOT_RUN",
+      "technicalTokens": [],
+      "exactTokens": [],
+      "missingTokens": []
+    },
+    "numeric": {
+      "status": "NOT_RUN",
+      "numbers": [],
+      "missingNumbers": []
+    },
+    "version": {
+      "status": "NOT_RUN",
+      "versions": [],
+      "missingVersions": []
+    },
+    "sourceSpan": {
+      "status": "NOT_RUN",
+      "spans": []
+    },
+    "semantic": {
+      "status": "NOT_RUN",
+      "verdict": null,
+      "citedSpans": [],
+      "unsupportedFragment": null,
+      "judgeModelId": null,
+      "judgeModelRevision": null,
+      "judgePromptRevision": null,
+      "independenceClass": null
+    },
+    "ontology": {
+      "status": "NOT_RUN",
+      "kernelRevision": null,
+      "assertions": []
+    },
+    "result": {
+      "decision": "PENDING",
+      "escalationRevision": null
+    },
+    "validatorRevision": "summary-claim-validator:val-01-contract-only",
+    "canonicalAuthority": false,
+    "validationId": "scv:9152dcb883cdb48769fbecb3992089a8dedacae8aea483e5a98ab1ed38f46a43",
+    "validationChecksum": "328772524524532502d87436a56100106184bc3646973a897e85640e5ea35622"
+  },
+  "populated": {
+    "schema": "atlas.summary-claim-validation.v1",
+    "chunkId": "doc:pgvector:fe883c75f323441d:22",
+    "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+    "analysisId": null,
+    "summaryInputChecksum": "14c38b2606d47e4b80a9c76a357fa44608153b3a39b0243c4c21261d99a46136",
+    "summaryOutputChecksum": "099b9e1d0ea636413f67312877aab4a7d1bcfc0c0fbf61936ab68630bfe8b872",
+    "claimOrdinal": 0,
+    "claimText": "Queries with low-selectivity filters can return fewer results under HNSW.",
+    "technical": {
+      "status": "PASS",
+      "technicalTokens": [
+        "HNSW"
+      ],
+      "exactTokens": [
+        "HNSW"
+      ],
+      "missingTokens": []
+    },
+    "numeric": {
+      "status": "PASS",
+      "numbers": [],
+      "missingNumbers": []
+    },
+    "version": {
+      "status": "PASS",
+      "versions": [],
+      "missingVersions": []
+    },
+    "sourceSpan": {
+      "status": "NO_CLAIMED_SPAN",
+      "spans": []
+    },
+    "semantic": {
+      "status": "JUDGED",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "citedSpans": [],
+      "unsupportedFragment": "low-selectivity",
+      "judgeModelId": "ornith-1.5-9b",
+      "judgeModelRevision": "llama-server:8090/props",
+      "judgePromptRevision": "summary-claim-judge-prompt-v0",
+      "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+    },
+    "ontology": {
+      "status": "NOT_APPLICABLE",
+      "kernelRevision": null,
+      "assertions": []
+    },
+    "result": {
+      "decision": "PENDING",
+      "escalationRevision": null
+    },
+    "validatorRevision": "summary-claim-validator:val-01-contract-only",
+    "canonicalAuthority": false,
+    "validationId": "scv:9152dcb883cdb48769fbecb3992089a8dedacae8aea483e5a98ab1ed38f46a43",
+    "validationChecksum": "b5e8f18308485eb165c037ce20b91074637315dcfb0744d106dbeedda32998ca"
+  }
+}

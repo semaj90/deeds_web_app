@@ -1,0 +1,189 @@
+/**
+ * SummaryClaimValidationV1 (LDR-VALIDATION-SPINE-01 / VAL-01): the typed, checksum-sealed RESULT of validating ONE claim of one derived
+ * SUMMARY against its own canonical chunk. It is DERIVED validation evidence, never source identity or canonical authority.
+ *
+ * Reused primitives (census 2026-09-23, nothing re-invented):
+ *  - `canonicalSha256V1` / `sha256HexSchema` (prefill/canonical-hash-v1.ts): the canonical-encoding checksum owner.
+ *  - chunk identity = `chunkId` + `chunkEvidenceRevision` (ExternalDocChunkEvidenceV1, external-doc-intelligence-contracts-v1.ts). The
+ *    optional `analysisId` links to the ExternalDocAnalysisV1 row (`eda:...`) the claim came from; it is provenance, not identity.
+ *  - NOT reused, deliberately: `verifiedSourceByteSpanSchema` (packages/parent-atlas lsp-semantic-observation.ts) is SOURCE-FILE grain
+ *    (source_ref + LSP position encoding); a doc-chunk support span is CHUNK grain (byte offsets inside the canonical chunk text).
+ *
+ * Structure: technical / numeric / version / sourceSpan / semantic / ontology are SEPARATE typed slots. The final `decision` is
+ * structurally represented but is computed only by VAL-09; until then every result is `PENDING`. A decision other than PENDING
+ * requires an `escalationRevision` and every slot to have run, so an unvalidated claim can never be admitted by construction.
+ * The semantic slot holds future judge output (VAL-07) as typed fields only; the ontology slot applies to typed ontology assertions
+ * only (OaK is a frozen typed kernel, not a prose judge).
+ */
+import { z } from 'zod';
+import { canonicalSha256V1, sha256HexSchema } from '../prefill/canonical-hash-v1.js';
+
+export const SUMMARY_CLAIM_VALIDATION_SCHEMA = 'atlas.summary-claim-validation.v1' as const;
+
+const chunkEvidenceRevisionSchema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
+const nonEmpty = z.string().min(1);
+
+/** Chunk-relative UTF-8 byte span plus the checksum of the exact bytes it covers (verified by code in VAL-05, never trusted from a model). */
+export const ChunkByteSpanV1Schema = z.object({
+	startByte: z.number().int().nonnegative(),
+	endByte: z.number().int().positive(),
+	spanChecksum: sha256HexSchema
+}).strict().refine((s) => s.endByte > s.startByte, { message: 'endByte must exceed startByte', path: ['endByte'] });
+export type ChunkByteSpanV1 = z.infer<typeof ChunkByteSpanV1Schema>;
+
+const deterministicStatus = z.enum(['NOT_RUN', 'PASS', 'FAIL']);
+
+export const TechnicalTokenSlotV1Schema = z.object({
+	status: deterministicStatus,
+	technicalTokens: z.array(nonEmpty),
+	exactTokens: z.array(nonEmpty),
+	missingTokens: z.array(nonEmpty)
+}).strict();
+
+export const NumericSlotV1Schema = z.object({
+	status: deterministicStatus,
+	numbers: z.array(nonEmpty),
+	missingNumbers: z.array(nonEmpty)
+}).strict();
+
+export const VersionSlotV1Schema = z.object({
+	status: deterministicStatus,
+	versions: z.array(nonEmpty),
+	missingVersions: z.array(nonEmpty)
+}).strict();
+
+export const SourceSpanSlotV1Schema = z.object({
+	status: z.enum(['NOT_RUN', 'VERIFIED', 'UNVERIFIED', 'NO_CLAIMED_SPAN']),
+	spans: z.array(ChunkByteSpanV1Schema)
+}).strict();
+
+export const SEMANTIC_VERDICT_VALUES = ['SUPPORTED', 'PARTIALLY_SUPPORTED', 'UNSUPPORTED'] as const;
+export const JUDGE_INDEPENDENCE_VALUES = ['SAME_MODEL_SEMANTIC_JUDGE', 'INDEPENDENT_MODEL_JUDGE'] as const;
+
+export const SemanticSlotV1Schema = z.object({
+	status: z.enum(['NOT_RUN', 'JUDGED', 'JUDGE_ERROR']),
+	verdict: z.enum(SEMANTIC_VERDICT_VALUES).nullable(),
+	/** Spans the judge CITED; only meaningful once the source-span slot verifies them. */
+	citedSpans: z.array(ChunkByteSpanV1Schema),
+	unsupportedFragment: z.string().nullable(),
+	judgeModelId: z.string().nullable(),
+	judgeModelRevision: z.string().nullable(),
+	judgePromptRevision: z.string().nullable(),
+	independenceClass: z.enum(JUDGE_INDEPENDENCE_VALUES).nullable()
+}).strict().superRefine((v, ctx) => {
+	const judged = v.status === 'JUDGED';
+	if (judged && v.verdict === null) ctx.addIssue({ code: 'custom', message: 'JUDGED requires a verdict', path: ['verdict'] });
+	if (!judged && v.verdict !== null) ctx.addIssue({ code: 'custom', message: 'a verdict is only valid when JUDGED', path: ['verdict'] });
+	if (judged && (!v.judgeModelId || !v.judgeModelRevision || !v.judgePromptRevision || !v.independenceClass)) {
+		ctx.addIssue({ code: 'custom', message: 'JUDGED requires judge model id/revision, prompt revision and independenceClass', path: ['judgeModelId'] });
+	}
+	if (v.status === 'NOT_RUN' && (v.citedSpans.length || v.unsupportedFragment !== null)) {
+		ctx.addIssue({ code: 'custom', message: 'NOT_RUN semantic slot must be empty', path: ['status'] });
+	}
+});
+
+export const OntologyAssertionV1Schema = z.object({
+	subject: nonEmpty,
+	predicate: nonEmpty,
+	object: nonEmpty,
+	oakStatus: z.enum(['VALID', 'UNRESOLVED', 'VIOLATION'])
+}).strict();
+
+export const OntologySlotV1Schema = z.object({
+	status: z.enum(['NOT_RUN', 'NOT_APPLICABLE', 'PASS', 'FAIL']),
+	kernelRevision: z.string().nullable(),
+	assertions: z.array(OntologyAssertionV1Schema)
+}).strict().superRefine((v, ctx) => {
+	if ((v.status === 'PASS' || v.status === 'FAIL') && !v.kernelRevision) ctx.addIssue({ code: 'custom', message: 'a run ontology slot requires kernelRevision', path: ['kernelRevision'] });
+	if ((v.status === 'NOT_RUN' || v.status === 'NOT_APPLICABLE') && v.assertions.length) ctx.addIssue({ code: 'custom', message: 'no assertions without a run', path: ['assertions'] });
+});
+
+export const CLAIM_DECISION_VALUES = ['PENDING', 'ADMIT', 'REVIEW', 'REJECT'] as const;
+
+export const ClaimDecisionV1Schema = z.object({
+	decision: z.enum(CLAIM_DECISION_VALUES),
+	/** Revision of the VAL-09 escalation DAG that computed the decision; null while PENDING. */
+	escalationRevision: z.string().nullable()
+}).strict();
+
+const body = {
+	schema: z.literal(SUMMARY_CLAIM_VALIDATION_SCHEMA),
+	chunkId: nonEmpty,
+	chunkEvidenceRevision: chunkEvidenceRevisionSchema,
+	analysisId: z.string().regex(/^eda:[a-f0-9]{64}$/).nullable(),
+	summaryInputChecksum: sha256HexSchema,
+	summaryOutputChecksum: sha256HexSchema,
+	/** Coordinate of the claim inside its summary only; not an identity. */
+	claimOrdinal: z.number().int().nonnegative(),
+	claimText: nonEmpty,
+	technical: TechnicalTokenSlotV1Schema,
+	numeric: NumericSlotV1Schema,
+	version: VersionSlotV1Schema,
+	sourceSpan: SourceSpanSlotV1Schema,
+	semantic: SemanticSlotV1Schema,
+	ontology: OntologySlotV1Schema,
+	result: ClaimDecisionV1Schema,
+	validatorRevision: nonEmpty,
+	canonicalAuthority: z.literal(false)
+};
+
+const slotStatuses = (v: z.infer<z.ZodObject<typeof body>>) => [v.technical.status, v.numeric.status, v.version.status, v.sourceSpan.status, v.semantic.status, v.ontology.status];
+
+function refineDecision(v: z.infer<z.ZodObject<typeof body>>, ctx: z.RefinementCtx): void {
+	if (v.result.decision === 'PENDING') {
+		if (v.result.escalationRevision !== null) ctx.addIssue({ code: 'custom', message: 'PENDING must not carry an escalationRevision', path: ['result', 'escalationRevision'] });
+		return;
+	}
+	if (!v.result.escalationRevision) ctx.addIssue({ code: 'custom', message: 'a non-PENDING decision requires the VAL-09 escalationRevision', path: ['result', 'escalationRevision'] });
+	if (slotStatuses(v).includes('NOT_RUN')) ctx.addIssue({ code: 'custom', message: 'a decision cannot be made while any validator slot is NOT_RUN', path: ['result', 'decision'] });
+	if (v.result.decision === 'ADMIT' && (v.technical.status === 'FAIL' || v.numeric.status === 'FAIL' || v.version.status === 'FAIL' || v.ontology.status === 'FAIL' || v.semantic.verdict === 'UNSUPPORTED' || v.sourceSpan.status === 'UNVERIFIED')) {
+		ctx.addIssue({ code: 'custom', message: 'ADMIT is impossible with a failed deterministic/ontology slot, an unsupported verdict, or unverified spans', path: ['result', 'decision'] });
+	}
+}
+
+/** Input shape (no seal fields). */
+export const SummaryClaimValidationInputV1Schema = z.object(body).strict().superRefine(refineDecision);
+export type SummaryClaimValidationInputV1 = z.input<typeof SummaryClaimValidationInputV1Schema>;
+
+export const SummaryClaimValidationV1Schema = z.object({
+	...body,
+	validationId: z.string().regex(/^scv:[a-f0-9]{64}$/),
+	validationChecksum: sha256HexSchema
+}).strict().superRefine(refineDecision).superRefine((v, ctx) => {
+	const { validationId, validationChecksum } = sealSummaryClaimValidationV1(v as unknown as SummaryClaimValidationInputV1);
+	if (v.validationId !== validationId) ctx.addIssue({ code: 'custom', message: 'validationId does not match the recomputed identity', path: ['validationId'] });
+	if (v.validationChecksum !== validationChecksum) ctx.addIssue({ code: 'custom', message: 'validationChecksum does not match the recomputed content', path: ['validationChecksum'] });
+});
+export type SummaryClaimValidationV1 = z.infer<typeof SummaryClaimValidationV1Schema>;
+
+/**
+ * Identity: the claim's position under one canonical chunk + one exact summary output + one validator revision. Re-validating the same
+ * inputs with the same validator is idempotent (same id); a new validator revision appends. The checksum seals every field but itself.
+ */
+export function sealSummaryClaimValidationV1(input: SummaryClaimValidationInputV1): { validationId: string; validationChecksum: string } {
+	const i = input as Record<string, unknown> & { chunkEvidenceRevision: string; summaryOutputChecksum: string; claimOrdinal: number; validatorRevision: string };
+	const validationId = `scv:${canonicalSha256V1({ schema: SUMMARY_CLAIM_VALIDATION_SCHEMA, chunkEvidenceRevision: i.chunkEvidenceRevision, summaryOutputChecksum: i.summaryOutputChecksum, claimOrdinal: i.claimOrdinal, validatorRevision: i.validatorRevision })}`;
+	const { validationId: _id, validationChecksum: _ck, ...rest } = i as Record<string, unknown>;
+	return { validationId, validationChecksum: canonicalSha256V1({ ...rest, validationId }) };
+}
+
+export function buildSummaryClaimValidationV1(input: SummaryClaimValidationInputV1): SummaryClaimValidationV1 {
+	const parsed = SummaryClaimValidationInputV1Schema.parse(input);
+	return SummaryClaimValidationV1Schema.parse({ ...parsed, ...sealSummaryClaimValidationV1(parsed) });
+}
+
+/** A claim with every validator slot NOT_RUN and decision PENDING: the starting point the VAL-03..09 validators fill in. */
+export function pendingSummaryClaimValidationV1(base: Pick<SummaryClaimValidationInputV1, 'chunkId' | 'chunkEvidenceRevision' | 'analysisId' | 'summaryInputChecksum' | 'summaryOutputChecksum' | 'claimOrdinal' | 'claimText' | 'validatorRevision'>): SummaryClaimValidationV1 {
+	return buildSummaryClaimValidationV1({
+		...base,
+		schema: SUMMARY_CLAIM_VALIDATION_SCHEMA,
+		technical: { status: 'NOT_RUN', technicalTokens: [], exactTokens: [], missingTokens: [] },
+		numeric: { status: 'NOT_RUN', numbers: [], missingNumbers: [] },
+		version: { status: 'NOT_RUN', versions: [], missingVersions: [] },
+		sourceSpan: { status: 'NOT_RUN', spans: [] },
+		semantic: { status: 'NOT_RUN', verdict: null, citedSpans: [], unsupportedFragment: null, judgeModelId: null, judgeModelRevision: null, judgePromptRevision: null, independenceClass: null },
+		ontology: { status: 'NOT_RUN', kernelRevision: null, assertions: [] },
+		result: { decision: 'PENDING', escalationRevision: null },
+		canonicalAuthority: false
+	});
+}
