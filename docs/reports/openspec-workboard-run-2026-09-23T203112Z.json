@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T20:31:12Z",
+  "runKind": "OPEN_SPEC_CHANGE_PIVOT_AND_TASK_PROOF",
+  "pivot": {
+    "fromChange": "parent-atlas-transport-memory-boundaries",
+    "fromProgress": "43/93 complete",
+    "toChange": "parent-atlas-versioned-doc-intelligence",
+    "toProgressBefore": "26/38 complete",
+    "reason": "The user selected the resumable external-document admission gate after canonical documentation storage and Studio retrieval were independently proven."
+  },
+  "selectedTask": {
+    "id": "EXTERNAL_DOC_ADMISSION_RUNNER_RESUMABLE_01",
+    "classification": "IMPLEMENTABLE_AND_READ_ONLY_PROOF",
+    "result": "EXTERNAL_DOC_ADMISSION_RESUMABILITY_PROVEN",
+    "receipt": "docs/reports/external-doc-admission-resumability-v1.json",
+    "completed": true
+  },
+  "validation": {
+    "focusedVitest": "PASS 43/43",
+    "targetedTypecheck": "PASS 0 diagnostics using the SvelteKit tsconfig options and targeted root files",
+    "canonicalReadOnlyVerifier": "PASS 30 pages / 852 chunks; exact checksum, span, identity, and text parity",
+    "liveReadOnlyReconciliation": "PASS 30 exact / 0 missing / 0 conflict; writer calls 0",
+    "projectTypecheck": "FAIL existing whole-project diagnostics: 32 errors and 291 warnings across 117 files; targeted files typecheck clean",
+    "openSpecStrict": "PASS",
+    "gitDiffCheck": "PASS for scoped changed source and OpenSpec paths",
+    "openSpecProgress": "27/38 complete after this gate",
+    "containerRebuild": false,
+    "persistentWrites": 0
+  },
+  "deferred": {
+    "task": "EXTERNAL_DOC_CORPUS_SUPERSESSION_01",
+    "reason": "Exact-resume support does not define how changed future corpus revisions supersede existing rows.",
+    "embeddingOrProjectionWrites": false
+  }
+}
