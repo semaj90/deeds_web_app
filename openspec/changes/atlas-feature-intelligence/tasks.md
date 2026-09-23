@@ -139,10 +139,10 @@ must remain derived and `liveImplementationMembership = UNPROVEN`.
 - [ ] Neo4j/NetworkX/cuGraph/Qdrant records round-trip to canonical feature/evidence/relationship IDs.
 - [x] Recursive same-entity-type relationships can have multiple participants but degree 1.
 - [x] Relationship degree is distinct from cardinality and graph node degree.
-- [ ] Pairwise graph projection of an N-ary fact reconstructs the original canonical relationship ID in executed tests/parity receipts. **Test written; not executed in this connector session.**
-- [ ] Incidence projection retains one relationship node plus every typed participant role in executed parity proof.
-- [ ] Query-conditioned fanout selects the highest supported relation rather than relationship-ID order. **Test written; not executed.**
-- [ ] CPU incidence-PPR is deterministic and cuGraph/Neo4j PPR matches within a declared tolerance. **CPU test written; cross-backend execution pending.**
+- [x] Pairwise graph projection of an N-ary fact reconstructs the original canonical relationship ID in executed tests/parity receipts. Executed 2026-09-22: `node --test packages/parent-atlas/test/hypergraph-retrieval.test.mjs` -> `pairwise projection is reversible and normalizes relationship mass` PASS (5/5 in file).
+- [x] Incidence projection retains one relationship node plus every typed participant role in executed parity proof. Same run, same file: `incidence projection preserves one relationship node and all typed participants` PASS.
+- [x] Query-conditioned fanout selects the highest supported relation rather than relationship-ID order. Executed 2026-09-22: `node --test packages/parent-atlas/test/ace-hypergraph-packet.test.mjs` -> `query-conditioned fanout selects higher-scoring relationship instead of alphabetical id` PASS (4/4 in file).
+- [ ] CPU incidence-PPR is deterministic and cuGraph/Neo4j PPR matches within a declared tolerance. **Half proven, not fully closed**: executed 2026-09-22, `node --test packages/parent-atlas/test/hypergraph-ppr.test.mjs` -> `incidence PPR is deterministic and favors relationships reachable from the query seed` PASS -- proves CPU-side determinism only. The cuGraph/Neo4j cross-backend tolerance comparison this line also requires is not covered by this test (no GPU/Neo4j execution in this pass) and remains open.
 - [ ] Dynamic SQL hyperedges cannot enter canonical relationship tables without promotion review.
 - [ ] ACE packet construction produces canonical relationship IDs, typed participant roles, evidence refs, chain lineage and a sufficient-context decision. **End-to-end fixture written; execution pending.**
 - [ ] A checked markdown task alone cannot produce `VERIFIED`.
