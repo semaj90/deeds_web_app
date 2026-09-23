@@ -17,7 +17,7 @@
     "completed": true
   },
   "validation": {
-    "focusedVitest": "PASS 43/43",
+    "focusedVitest": "PASS 51/51 total: resumability/intelligence/acquisition 43/43; existing admission canary and analyses DDL 8/8",
     "targetedTypecheck": "PASS 0 diagnostics using the SvelteKit tsconfig options and targeted root files",
     "canonicalReadOnlyVerifier": "PASS 30 pages / 852 chunks; exact checksum, span, identity, and text parity",
     "liveReadOnlyReconciliation": "PASS 30 exact / 0 missing / 0 conflict; writer calls 0",
