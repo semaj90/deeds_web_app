@@ -1,0 +1,161 @@
+[
+  {
+    "name": "null",
+    "value": null,
+    "encoding": "n;",
+    "sha256": "0492cf50f43a86cd8a34e48fb3969f207abed99f8d7a5662fc41cce70fe1e46b"
+  },
+  {
+    "name": "booleans",
+    "value": [
+      true,
+      false
+    ],
+    "encoding": "a2[b1;b0;]",
+    "sha256": "fa3153a02c52b2f3139714c25f1716aaa72251b2dc90b13341464a98c0342314"
+  },
+  {
+    "name": "integers as float64",
+    "value": [
+      0,
+      1,
+      -1,
+      42,
+      65535,
+      2147483647,
+      9007199254740991
+    ],
+    "encoding": "a7[f0000000000000000;f3ff0000000000000;fbff0000000000000;f4045000000000000;f40efffe000000000;f41dfffffffc00000;f433fffffffffffff;]",
+    "sha256": "0112011b72e25824ca72ea5ed110bd7fee10d969a42b05a784bef861164ca0e1"
+  },
+  {
+    "name": "negative zero equals zero",
+    "value": [
+      0,
+      0
+    ],
+    "encoding": "a2[f0000000000000000;f0000000000000000;]",
+    "sha256": "e30b922f0c14ccb06fd4306cee1b434d4e8e81bafc04bd834d2aee711e7d95f9"
+  },
+  {
+    "name": "floats",
+    "value": [
+      0.5,
+      -2.25,
+      1e-7,
+      123456.789
+    ],
+    "encoding": "a4[f3fe0000000000000;fc002000000000000;f3e7ad7f29abcaf48;f40fe240c9fbe76c9;]",
+    "sha256": "6d71ed2e01141915b1ee3fc789dd216dac3b5012b0deec5be7bb3b3841a9f43e"
+  },
+  {
+    "name": "empty string",
+    "value": "",
+    "encoding": "s0:;",
+    "sha256": "4a44ca33cb2ab92e0983a99b93ed982e7681f376253b3d3574c2a76b9e433c83"
+  },
+  {
+    "name": "ascii string",
+    "value": "hnsw.iterative_scan",
+    "encoding": "s19:hnsw.iterative_scan;",
+    "sha256": "85d29fb7706a33dba57163dce03d051cbc3c321475d13315a9fc9c60a6327d88"
+  },
+  {
+    "name": "unicode NFC precomposed",
+    "value": "café",
+    "encoding": "s5:café;",
+    "sha256": "1b1e3d913ad25cd837095f758da4144134ff61bd54391678123c614b7bfeaa7b"
+  },
+  {
+    "name": "unicode NFD normalizes to NFC",
+    "value": "café",
+    "encoding": "s5:café;",
+    "sha256": "1b1e3d913ad25cd837095f758da4144134ff61bd54391678123c614b7bfeaa7b"
+  },
+  {
+    "name": "multibyte and emoji",
+    "value": "π≈3.14 — 日本語 🙂",
+    "encoding": "s28:π≈3.14 — 日本語 🙂;",
+    "sha256": "b88f6c6c2a94fa4f6026b693f5b00ce2b880e4ff62a7acf0b30aa806c294aa27"
+  },
+  {
+    "name": "string with length-prefix lookalike",
+    "value": "3:abc;s3:abc;",
+    "encoding": "s13:3:abc;s3:abc;;",
+    "sha256": "3da6f99cf2d5983d05ffb61b967f9735468f3e9349bd0fee46564ad596231f34"
+  },
+  {
+    "name": "empty array and object",
+    "value": {
+      "emptyArray": [],
+      "emptyObject": {}
+    },
+    "encoding": "o2{k10:emptyArray;a0[]k11:emptyObject;o0{}}",
+    "sha256": "ce941cb315a7c567fabddba638d04bb362bcbfde0e656576d269aab44b8a12f5"
+  },
+  {
+    "name": "arrays preserve order",
+    "value": [
+      "b",
+      "a",
+      "c"
+    ],
+    "encoding": "a3[s1:b;s1:a;s1:c;]",
+    "sha256": "d0afb89be399ba2084b32a99bd5879191b573ceb3e01e90d220310d54af588bb"
+  },
+  {
+    "name": "nested objects sort keys",
+    "value": {
+      "zeta": {
+        "beta": 1,
+        "alpha": [
+          3,
+          2,
+          1
+        ]
+      },
+      "alpha": {
+        "gamma": null,
+        "delta": false
+      },
+      "mid": "x"
+    },
+    "encoding": "o3{k5:alpha;o2{k5:delta;b0;k5:gamma;n;}k3:mid;s1:x;k4:zeta;o2{k5:alpha;a3[f4008000000000000;f4000000000000000;f3ff0000000000000;]k4:beta;f3ff0000000000000;}}",
+    "sha256": "4699c8149420f9dd7ab9f028f8131e13189f9786b7418970d61efc87c6587c4b"
+  },
+  {
+    "name": "same content different key order (a)",
+    "value": {
+      "chunkId": "c",
+      "claimOrdinal": 0,
+      "nested": {
+        "second": 2,
+        "first": 1
+      }
+    },
+    "encoding": "o3{k7:chunkId;s1:c;k12:claimOrdinal;f0000000000000000;k6:nested;o2{k5:first;f3ff0000000000000;k6:second;f4000000000000000;}}",
+    "sha256": "48b3394121c34c232173f4ef91a6be67c8bf665cc351dd097963f1292db1bead"
+  },
+  {
+    "name": "same content different key order (b)",
+    "value": {
+      "nested": {
+        "first": 1,
+        "second": 2
+      },
+      "claimOrdinal": 0,
+      "chunkId": "c"
+    },
+    "encoding": "o3{k7:chunkId;s1:c;k12:claimOrdinal;f0000000000000000;k6:nested;o2{k5:first;f3ff0000000000000;k6:second;f4000000000000000;}}",
+    "sha256": "48b3394121c34c232173f4ef91a6be67c8bf665cc351dd097963f1292db1bead"
+  },
+  {
+    "name": "mixed nesting",
+    "value": {
+      "schema": "atlas.summary-claim.v1",
+      "claimText": "Queries with low-selectivity filters can return fewer results under HNSW."
+    },
+    "encoding": "o2{k9:claimText;s73:Queries with low-selectivity filters can return fewer results under HNSW.;k6:schema;s22:atlas.summary-claim.v1;}",
+    "sha256": "73b79b05b4348ea12c084ff248bd27651504ded712ab175e47790fc19ed7600f"
+  }
+]
