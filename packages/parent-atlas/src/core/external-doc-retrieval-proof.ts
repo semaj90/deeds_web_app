@@ -5,6 +5,15 @@ const id = z.string().min(1);
 const revision = z.string().min(1);
 const checksum = z.string().regex(/^[a-f0-9]{64}$/);
 
+export const externalDocRetrievalFilterSchema = z.object({
+  provider: id,
+  product: id,
+  product_version: id,
+  architecture: id.nullable(),
+  source_authority: z.enum(['OFFICIAL', 'COMMUNITY', 'THIRD_PARTY']),
+}).strict();
+export type ExternalDocRetrievalFilterV1 = z.infer<typeof externalDocRetrievalFilterSchema>;
+
 export const RETRIEVAL_PROOF_LANES = ['DENSE', 'BM25', 'HYBRID_RRF'] as const;
 
 export const externalDocRetrievalQueryFixtureSchema = z.object({
@@ -12,6 +21,7 @@ export const externalDocRetrievalQueryFixtureSchema = z.object({
   query_id: id,
   query_revision: revision,
   query_text: z.string().min(1),
+  document_filter: externalDocRetrievalFilterSchema,
   expected_relevant_chunk_ids: z.array(id).min(1),
   source_snapshot_revision: revision,
   notes: z.string().nullable().default(null),

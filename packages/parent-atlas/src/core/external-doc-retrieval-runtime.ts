@@ -8,6 +8,7 @@ import {
   externalDocRetrievalProofReceiptSchema,
   externalDocsCutoverGateSchema,
   type ExternalDocRetrievalFixtureSetV1,
+  type ExternalDocRetrievalFilterV1,
 } from './external-doc-retrieval-proof.js';
 import {
   externalDocsHybridProjectionReceiptSchema,
@@ -22,9 +23,9 @@ const checksum = z.string().regex(/^[a-f0-9]{64}$/);
 
 export interface ExternalDocRetrievalRuntimePort {
   embedSemantic768(queryText: string): Promise<number[]>;
-  queryDense(input: { queryVector: number[]; k: number }): Promise<string[]>;
-  queryBm25(input: { queryText: string; k: number }): Promise<string[]>;
-  queryHybridRrf(input: { queryText: string; queryVector: number[]; k: number; prefetchK: number }): Promise<string[]>;
+  queryDense(input: { queryVector: number[]; k: number; documentFilter: ExternalDocRetrievalFilterV1 }): Promise<string[]>;
+  queryBm25(input: { queryText: string; k: number; documentFilter: ExternalDocRetrievalFilterV1 }): Promise<string[]>;
+  queryHybridRrf(input: { queryText: string; queryVector: number[]; k: number; prefetchK: number; documentFilter: ExternalDocRetrievalFilterV1 }): Promise<string[]>;
 }
 
 export const externalDocRetrievalEvaluationBundleSchema = z.object({
@@ -149,9 +150,9 @@ export async function evaluateExternalDocRetrieval(input: {
   for (const query of fixture.queries) {
     const queryVector = validateSemantic768(await input.port.embedSemantic768(query.query_text), query.query_id);
     const [dense, bm25, hybrid] = await Promise.all([
-      input.port.queryDense({ queryVector, k }),
-      input.port.queryBm25({ queryText: query.query_text, k }),
-      input.port.queryHybridRrf({ queryText: query.query_text, queryVector, k, prefetchK }),
+      input.port.queryDense({ queryVector, k, documentFilter: query.document_filter }),
+      input.port.queryBm25({ queryText: query.query_text, k, documentFilter: query.document_filter }),
+      input.port.queryHybridRrf({ queryText: query.query_text, queryVector, k, prefetchK, documentFilter: query.document_filter }),
     ]);
     denseRankings[query.query_id] = uniqueRankedIds(dense, k);
     bm25Rankings[query.query_id] = uniqueRankedIds(bm25, k);

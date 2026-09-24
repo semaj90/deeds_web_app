@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runId": "openspec-workboard-run-2026-09-24T1546Z",
+  "createdAt": "2026-09-24T15:46:28Z",
+  "selectedChange": "parent-atlas-versioned-doc-intelligence",
+  "pivot": {
+    "from": "review of Parent Atlas Open Lanes TODO and temporal document/claim fabric status",
+    "to": "DOC-14 Neo4j/cuGraph documentation relationship projection",
+    "reason": "DOC-14 is open; existing graph projector dropped revision and evidence lineage even though the revision-bound fixture contract requires it."
+  },
+  "todoReview": {
+    "temporalDocumentClaimFabric": "CONTRACT_AND_BOUNDED_FIXTURE_PROVEN",
+    "meaning": "The SourceArtifact/CoordinateMap/Observation/KnowledgeClaim/RunManifest/TemporalDocumentIndex contract exists and its 13-test proof passed; this does not close downstream live indexing, graph, retrieval, cache, acceleration, or manifest gates.",
+    "productionPromotion": false
+  },
+  "doc14": {
+    "status": "OPEN_LIVE_RELATION_ADMISSION_MISSING",
+    "liveExportObserved": ["HAS_ONTOLOGY", "IN_DOMAIN", "USED_CONCEPT"],
+    "requiredRelationTypes": ["DOCUMENTED_BY", "REQUIRES", "SUPPORTS", "USES", "RELATED_TO"],
+    "fixtureProof": "DOC_14_RELATION_ADMISSION_FIXTURE_PROVEN",
+    "implementationFinding": "The existing Neo4j projector omitted sourceRef, sourceRevision, relationshipRevision, and evidenceRefs from projected binary edges and relation hubs.",
+    "changeMade": "Project those provenance fields on create and update; add spy-session tests for binary and n-ary projection paths.",
+    "liveNeo4jAdmission": false,
+    "canonicalAuthority": false
+  },
+  "verification": {
+    "focusedVitest": {"passed": 2, "failed": 0},
+    "openspecStrict": "PASS",
+    "scopedDiffCheck": "PASS",
+    "liveDatastoreQueries": 0
+  },
+  "filesChangedByThisPass": [
+    "sveltekit-frontend/src/lib/server/atlas/graph/relationship-kernel-neo4j-projector-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/graph/relationship-kernel-neo4j-projector-v1.spec.ts"
+  ],
+  "worktreePolicy": {
+    "openspecTasksLedgerEdited": false,
+    "concurrentChangesPreserved": true,
+    "containerRebuilds": 0,
+    "commits": 0,
+    "pushes": 0
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "filesystem": "this report and local code/test edits only"
+  },
+  "nextGate": "DOC_14_BOUNDED_DOCUMENT_RELATION_ADMISSION",
+  "nextGateBlocker": "No live documentation-relation producer/admission path and no live projection receipt for the five required relation types; do not synthesize or write graph edges to manufacture coverage."
+}

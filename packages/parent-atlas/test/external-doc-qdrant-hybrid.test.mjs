@@ -19,6 +19,11 @@ function point(chunkId = 'chunk-1') {
     chunk_id: chunkId,
     source_id: 'qdrant',
     source_revision: 'docs-r1',
+    provider: 'nvidia',
+    product: 'cuda-tile-ir',
+    product_version: '13.2',
+    architecture: 'ampere',
+    source_authority: 'OFFICIAL',
     document_checksum: h('a'),
     chunk_checksum: h('b'),
     domain_class: 'retrieval',
@@ -53,6 +58,9 @@ test('hybrid point carries dense, BM25 and staged observation routing payload to
     model: 'qdrant/bm25',
   });
   assert.equal(wire.payload.chunk_id, 'chunk-1');
+  assert.equal(wire.payload.product_version, '13.2');
+  assert.equal(wire.payload.architecture, 'ampere');
+  assert.equal(wire.payload.source_authority, 'OFFICIAL');
   assert.deepEqual(wire.payload.ast_observation_kinds, ['database_write']);
   assert.deepEqual(wire.payload.langextract_classes, ['algorithm']);
   assert.ok(wire.payload.tags.includes('ast=database_write'));

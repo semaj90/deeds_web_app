@@ -1,6 +1,6 @@
 {
   "schema": "atlas.openspec-progress-audit.v2",
-  "generatedAt": "2026-09-20T18:56:43.676Z",
+  "generatedAt": "2026-09-20T08:39:56.367Z",
   "summary": {
     "total": 9275,
     "proven": 5989,
@@ -17,10 +17,10 @@
     "directoryEdges": 82,
     "kmeansClusters": 12,
     "labeledFiles": 5000,
-    "fileLabels": 28,
-    "fanoutFiles": 956,
-    "fanoutReferences": 10889,
-    "fanoutUnresolved": 273,
+    "fileLabels": 24,
+    "fanoutFiles": 884,
+    "fanoutReferences": 10642,
+    "fanoutUnresolved": 261,
     "readinessProven": 4,
     "readinessWaiting": 5,
     "selectionEligible": 1885,
@@ -115631,5 +115631,5 @@
     "Human feedback and learned rankings remain shadow signals until separately evaluated and promoted."
   ],
   "writesPerformed": false,
-  "semanticChecksum": "9c63102826f7dc05a31abd9df60c434ef33c8050bb54c73976e846b1987f1ded"
+  "semanticChecksum": "db52075f437fa5b1bc7e88c69d0682b394c1c21d5369be0a1883b3de79128b76"
 }

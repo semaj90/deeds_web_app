@@ -1,14 +1,14 @@
 {
   "schema": "atlas.runtime-readiness.v1",
-  "generatedAt": "2026-09-20T18:57:22.098Z",
+  "generatedAt": "2026-09-20T08:40:23.457Z",
   "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
   "reportsDir": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\staging",
   "summary": {
-    "PROVEN": 5,
+    "PROVEN": 4,
     "READY": 0,
     "PARTIAL": 1,
     "WAITING": 5,
-    "UNPROVEN": 3,
+    "UNPROVEN": 4,
     "NOT_APPLICABLE": 0,
     "packetReady": false,
     "prefillReady": false,
@@ -88,11 +88,11 @@
     },
     {
       "key": "BITFROST_BUCKET_WARMING_PROVEN",
-      "state": "PROVEN",
-      "evidence": [
-        "report:bitfrost-cache-writer-census-v1.json"
+      "state": "UNPROVEN",
+      "evidence": [],
+      "blockers": [
+        "BITFROST_WARMING_RECEIPT_MISSING"
       ],
-      "blockers": [],
       "details": {}
     },
     {
@@ -196,5 +196,5 @@
     "Cache warmth never establishes canonical identity or promotion authority."
   ],
   "writesPerformed": false,
-  "semanticChecksum": "aaad9d4168cdc34ef004e1eec3fd002df8251a0f24946b6b16e35f9836e8b131"
+  "semanticChecksum": "86b2f59e0f262a004617bd052bdbeda92dec6883564bfc975ef5d596c9e3e293"
 }

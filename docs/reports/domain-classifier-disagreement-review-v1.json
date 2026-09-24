@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.domain-classifier-disagreement-review.v1",
+  "status": "DISAGREEMENTS_REVIEWED_NON_COMPARABLE",
+  "sourceReport": "docs/reports/domain-classifier-parity-v1.json",
+  "parityRevision": "ace-domain-classifier-parity-v1",
+  "reviewedAt": "2026-09-24",
+  "sourceRevisionReadback": {
+    "allSixMatchCurrentFiles": true,
+    "method": "sha256 of current UTF-8 source bytes equals sourceRevision in source report"
+  },
+  "finding": {
+    "classification": "MEASUREMENT_DESIGN_MISMATCH",
+    "detail": "The parity harness compares ACE's single-label keyword prediction with the taxonomy's primary label OR its general fallback. Taxonomy confidence is below its primary-label threshold for all six rows, so general means no taxonomy class was admitted, not an affirmative general-domain label. The harness also feeds entire source files as summary text and does not compare a reviewed common-label target.",
+    "decision": "Do not treat these six rows as ground-truth label disagreements. Preserve PARITY_REVIEW_REQUIRED; do not redirect callers, replace checkpoints, promote ontology labels, or admit training from this receipt."
+  },
+  "rows": [
+    { "sourceRef": "src/lib/server/ace/features/domain-classifier.ts", "aceLabel": "auth", "taxonomyLabel": "general", "taxonomyConfidence": 0.214, "review": "NON_COMPARABLE_TAXONOMY_FALLBACK" },
+    { "sourceRef": "src/lib/server/atlas/domain-taxonomy.ts", "aceLabel": "database", "taxonomyLabel": "general", "taxonomyConfidence": 0.139, "review": "NON_COMPARABLE_TAXONOMY_FALLBACK" },
+    { "sourceRef": "src/lib/server/search/qdrant-search.ts", "aceLabel": "cache", "taxonomyLabel": "general", "taxonomyConfidence": 0.407, "review": "NON_COMPARABLE_TAXONOMY_FALLBACK" },
+    { "sourceRef": "src/lib/server/atlas/semantic-signal-routing.ts", "aceLabel": "database", "taxonomyLabel": "general", "taxonomyConfidence": 0.228, "review": "NON_COMPARABLE_TAXONOMY_FALLBACK" },
+    { "sourceRef": "src/lib/server/ace/ace-context-manifest.ts", "aceLabel": "database", "taxonomyLabel": "general", "taxonomyConfidence": 0.211, "review": "NON_COMPARABLE_TAXONOMY_FALLBACK" },
+    { "sourceRef": "src/routes/api/atlas/domain-taxonomy/classify/+server.ts", "aceLabel": "auth", "taxonomyLabel": "general", "taxonomyConfidence": 0.327, "review": "NON_COMPARABLE_TAXONOMY_FALLBACK" }
+  ],
+  "followup": "Build a parity cohort with reviewed target labels and compare only normalized canonical classes; represent taxonomy abstention separately from a general class. Keep classifier promotion and training admission blocked until that cohort is independently approved.",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

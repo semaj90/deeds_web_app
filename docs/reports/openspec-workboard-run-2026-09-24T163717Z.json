@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T16:37:17Z",
+  "head": "e909640269",
+  "pivots": [
+    {
+      "from": "parent-atlas-search-classifier-sidecar",
+      "progress": "Qdrant/Postgres identity reconciliation measured; six classifier label mismatches reviewed as non-comparable taxonomy fallbacks",
+      "to": "parent-atlas-versioned-doc-intelligence",
+      "task": "DOC-15 agentic docs retrieval fan-out",
+      "outcome": "read-only verification of concurrent implementation and focused test/proof coverage; no source edits planned in this pivot",
+      "reason": "The existing DOC-15 adapter, specs, and report are already present as concurrent working-tree changes, making focused verification the next useful action without taking ownership of those edits.",
+      "priorRunReport": "docs/reports/openspec-workboard-run-2026-09-24T163030Z.json"
+    }
+  ],
+  "scope": {
+    "readOnly": true,
+    "candidateFiles": [
+      "packages/parent-atlas/src/core/external-doc-qdrant-hybrid.ts",
+      "packages/parent-atlas/src/core/external-doc-retrieval-proof.ts",
+      "packages/parent-atlas/src/core/external-doc-retrieval-runtime.ts",
+      "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-retrieval-port.ts",
+      "scripts/atlas/prove-doc-15-same-query-fanout-v1.mjs"
+    ],
+    "forbidden": ["datastore writes", "source edits to concurrent files", "container rebuilds", "Graphify"]
+  },
+  "verification": {
+    "parentAtlasPackageTypeScriptBuild": "PASS",
+    "parentAtlasFocusedTests": { "passed": 16, "failed": 0 },
+    "frontendFilterPortFocusedTests": { "passed": 3, "failed": 0 },
+    "productionCallsiteSearch": {
+      "result": "NO_PRODUCTION_CALLER_FOUND",
+      "detail": "createExternalDocRetrievalPort appears only in its module and its focused spec; evaluateExternalDocRetrieval appears in package tests only."
+    },
+    "relatedDoc14ProjectionProvenanceTest": {
+      "passed": 2,
+      "failed": 0,
+      "liveNeo4jWrites": 0,
+      "scope": "spy-backed binary and n-ary projector provenance/update behavior only; requested live documentation relation admission remains open"
+    },
+    "liveProjection": {
+      "external_programming_docs_768_points": 0,
+      "external_programming_docs_hybrid_768": "HTTP 404 per existing read-only receipt",
+      "readbackReceipt": "docs/reports/parent-atlas/doc-15-live-projection-readback-v1.json"
+    },
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "sourceEditsByThisPivot": 0
+  },
+  "result": "DOC_15_CONTRACT_AND_ADAPTER_TESTS_PROVEN_PRODUCTION_WIRING_AND_LIVE_REPLAY_OPEN",
+  "relatedGateStatus": {
+    "DOC-14": "projector provenance behavior focused tests pass 2/2; live admission of five documentation relation types remains open"
+  }
+}

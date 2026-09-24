@@ -38,14 +38,34 @@
       "detail": "design requires product/version/architecture filtering before semantic ranking"
     },
     {
+      "name": "document_filter_required_by_query_contract",
+      "passed": true,
+      "detail": "every retrieval fixture requires a strict version/authority filter"
+    },
+    {
+      "name": "filter_forwarded_to_all_executors",
+      "passed": true,
+      "detail": "the exact fixture filter is forwarded to dense, BM25 and hybrid executors"
+    },
+    {
+      "name": "projection_contains_filter_metadata",
+      "passed": true,
+      "detail": "hybrid projection point schema and payload carry filterable document identity and authority fields"
+    },
+    {
+      "name": "qdrant_filters_before_ranking",
+      "passed": true,
+      "detail": "Qdrant dense/BM25/hybrid requests apply exact document identity and authority filters before ranking"
+    },
+    {
       "name": "documentation_authority_boundary",
       "passed": true,
       "detail": "documentation promotion remains subordinate to canonical Postgres evidence"
     },
     {
-      "name": "fixture_version_filter",
+      "name": "fixture_version_architecture_authority_filter",
       "passed": true,
-      "detail": "bounded fixture excludes a different documentation version before fusion"
+      "detail": "bounded fixture excludes wrong version, architecture and source authority before fusion"
     },
     {
       "name": "fixture_semantic_dedup",
@@ -54,13 +74,13 @@
     }
   ],
   "fixture": {
-    "rows": 3,
+    "rows": 5,
     "admittedRows": 2,
     "dedupedStableKeys": [
       "doc:cuda:13.2:ampere:install"
     ]
   },
-  "inputChecksum": "e465737c1ce32ad9a383e3c393ef011d69c4fd7904e8a905e37d858757d1b72f",
+  "inputChecksum": "f1d5e597f0b9b9aa61b6a5398f6f34a399ab21fb42c901675c00926e0bead6f4",
   "policy": {
     "sameQueryFanout": true,
     "stableKeyDeduplication": true,

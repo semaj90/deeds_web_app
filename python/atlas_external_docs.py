@@ -577,10 +577,23 @@ def chunk_document(
     overlap_chars: int = 300,
     nlp: Callable[[str], tuple[tuple[Json, ...], tuple[Json, ...]]] | None = None,
     doc_coordinate: Any = None,
+    chunk_identity_version: str = "V1",
 ) -> tuple[ChunkRecord, ...]:
     if maximum_chars <= 0 or overlap_chars < 0 or overlap_chars >= maximum_chars:
         raise ValueError("INVALID_CHUNK_WINDOW")
-    from atlas_doc_coordinate import chunk_evidence_revision  # local: keeps this module importable without pydantic
+    if chunk_identity_version not in {"V1", "V2"}:
+        raise ValueError("UNSUPPORTED_DOC_CHUNK_IDENTITY_VERSION")
+    if chunk_identity_version == "V2" and (
+        doc_coordinate is None
+        or not getattr(doc_coordinate, "provider", None)
+        or not getattr(doc_coordinate, "product", None)
+        or not getattr(doc_coordinate, "product_version", None)
+    ):
+        raise ValueError("DOC_CHUNK_IDENTITY_V2_REQUIRES_VERSIONED_COORDINATE")
+    from atlas_doc_coordinate import (  # local: keeps this module importable without pydantic
+        chunk_evidence_revision,
+        external_doc_chunk_id_v2,
+    )
 
     normalized = _normalize_ws(text)
     document_checksum = _sha(normalized)
@@ -625,7 +638,6 @@ def chunk_document(
                 # codepoint boundaries always land on byte boundaries).
                 start_byte = len(normalized[:absolute_start].encode("utf-8"))
                 end_byte = start_byte + len(chunk_text.encode("utf-8"))
-                chunk_id = f"doc:{source_id}:{document_checksum[:16]}:{ordinal}"
                 # The PAGE coordinate is carried unchanged into every child chunk (heading/section stays chunk
                 # metadata in heading_path); the chunk's own identity is its span + bytes under that page revision.
                 chunk_evidence = None
@@ -634,6 +646,15 @@ def chunk_document(
                         page_evidence_revision=doc_coordinate.evidence_revision, ordinal=ordinal,
                         start_byte=start_byte, end_byte=end_byte, chunk_checksum=_sha(chunk_text),
                     )
+                if chunk_identity_version == "V2":
+                    # V2 prevents identical text at two explicitly versioned page coordinates from
+                    # colliding with the global chunk_id unique constraint. V1 remains byte-for-byte stable.
+                    chunk_id = external_doc_chunk_id_v2(
+                        source_id=source_id,
+                        chunk_evidence_revision=chunk_evidence,
+                    )
+                else:
+                    chunk_id = f"doc:{source_id}:{document_checksum[:16]}:{ordinal}"
                 code_blocks, api_signatures = extract_code_blocks_and_signatures(chunk_text)
                 chunks.append(ChunkRecord(
                     chunk_id=chunk_id,

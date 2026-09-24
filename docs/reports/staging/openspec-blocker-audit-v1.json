@@ -1,6 +1,6 @@
 {
   "schema": "atlas.openspec-blocker-audit.v1",
-  "generatedAt": "2026-09-20T09:23:52.949Z",
+  "generatedAt": "2026-09-20T08:41:28.591Z",
   "source": "docs/reports/openspec-workboard-v1.json",
   "policy": "READ_ONLY_BLOCKER_CLASSIFICATION_NO_TASK_OR_RUNTIME_MUTATION",
   "summary": {

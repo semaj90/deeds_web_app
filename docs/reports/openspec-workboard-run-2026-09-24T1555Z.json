@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runId": "openspec-workboard-run-2026-09-24T1555Z",
+  "createdAt": "2026-09-24T15:55:29Z",
+  "change": "parent-atlas-versioned-doc-intelligence",
+  "changeProgressBefore": { "complete": 42, "total": 48, "open": 6 },
+  "pivots": [
+    {
+      "from": "Parent Atlas Open Lanes TODO review",
+      "to": "DOC-14",
+      "reason": "Open graph-projection task had an existing projector that discarded relationship evidence lineage."
+    },
+    {
+      "from": "DOC-14",
+      "to": "DOC-15",
+      "reason": "DOC-14 live admission is not available from the current graph: all five requested relation types read back as zero."
+    },
+    {
+      "from": "DOC-15",
+      "to": "DOC-26",
+      "reason": "DOC-15's version-filter adapter is not called by the production SearchRuntime, and the dedicated Qdrant hybrid collection is absent/empty; DOC-26 already had an active integration candidate in the worktree."
+    }
+  ],
+  "review": {
+    "temporalFabric": "CONTRACT_ONLY_PROVEN",
+    "evidence": "13/13 bounded tests; source bytes are authoritative and envelopes are noncanonical.",
+    "doesNotProve": ["live temporal index", "downstream graph admission", "production retrieval wiring", "cache residency", "canonical promotion"]
+  },
+  "doc14": {
+    "projectionProvenance": "SPY_TESTED",
+    "focusedTests": { "passed": 2, "failed": 0 },
+    "liveAdmission": "OPEN",
+    "requiredLiveRelationTypesObserved": 0,
+    "datastoreWrites": 0
+  },
+  "doc15": {
+    "versionFilterContractAndAdapter": "FIXTURE_TESTED",
+    "productionSearchRuntimeCaller": false,
+    "qdrantDensePoints": 0,
+    "qdrantHybridCollection": "HTTP_404",
+    "liveFanout": "OPEN",
+    "datastoreWrites": 0
+  },
+  "doc26": {
+    "integrationCandidate": "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-versioned-recrawl-admission-v2.ts",
+    "improvement": "Fail closed unless every selected current-version chunk ID recomputes from the Python external_doc_chunk_id_v2 canonical formula.",
+    "pythonTests": { "passed": 21, "failed": 0 },
+    "typescriptTests": { "passed": 9, "failed": 0 },
+    "targetedTypeScript": "PASS using repository tsconfig options and only target roots plus ambient declarations",
+    "openspecStrict": "PASS",
+    "scopedDiffCheck": "PASS",
+    "livePlan": "NOT_RUN: no explicit previous/current manifest delta and versioned envelope pair is available in the existing pinned artifacts",
+    "canonicalApply": "NOT_RUN",
+    "priorVersionLiveReadback": "NOT_PROVEN"
+  },
+  "filesTouchedThisPass": [
+    "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-versioned-recrawl-admission-v2.ts",
+    "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-versioned-recrawl-v2.spec.ts"
+  ],
+  "worktreeAndRuntime": {
+    "openspecTasksLedgerEdited": false,
+    "concurrentChangesPreserved": true,
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "neo4jWrites": 0,
+    "containerRebuilds": 0,
+    "commits": 0,
+    "pushes": 0
+  },
+  "nextGate": "DOC_26_READ_ONLY_DELTA_PLAN_AND_PRIOR_VERSION_READBACK",
+  "status": "DOC_26_ADVANCED_NOT_CLOSED"
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T04:33:39Z",
+  "fromChange": "parent-atlas-versioned-doc-intelligence",
+  "toChange": "parent-atlas-versioned-doc-intelligence",
+  "fromTask": "DOC-26",
+  "toTask": "DOC-18",
+  "pivotGate": "DOC-26_TO_DOC-18",
+  "reason": "DOC-26's V2 chunk identity now reaches the envelope builder and admission handoff, but production delta-only source selection and live prior-version preservation readback remain unproven. Continuing to an untouched open task in the same OpenSpec change; no store mutation or container rebuild is authorized in this run.",
+  "fromTaskState": {
+    "status": "INTEGRATION_PARTIAL",
+    "evidence": [
+      "V2 identity is selected by manifest SourceConfig and propagated through the Python chunking/envelope path",
+      "V2 IDs pass the existing admission handoff",
+      "focused tests pass: Python 52/52, TypeScript 18/18",
+      "OpenSpec strict validation passes"
+    ],
+    "remaining": [
+      "production delta-only manifest/crawl selection",
+      "integrated canonical admission with prior-version readback"
+    ],
+    "writes": { "postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0 }
+  },
+  "toTaskState": {
+    "status": "OPEN_UNASSESSED",
+    "task": "DOC-18 centroid routing over external-document embeddings"
+  },
+  "constraints": {
+    "containerRebuildsUntilEnd": true,
+    "canonicalWrites": false,
+    "datastoreWrites": false,
+    "preserveConcurrentWorkingTreeEdits": true,
+    "noCommitOrPush": true
+  }
+}

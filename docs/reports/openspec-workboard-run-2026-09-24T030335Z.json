@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T03:03:35Z",
+  "fromChange": "parent-atlas-adaptive-dag-fabric",
+  "toChange": "parent-atlas-document-governance-master-index",
+  "pivotGate": "DAG-FETCH-01_TO_DOC-GOV-6.5",
+  "reason": "DAG-FETCH-01's pure planner and ACE identity regression fixtures are proven, but production integration cannot safely adapt SearchRuntime results to AceCardV2: the existing SearchRuntime ordinal normalizer intentionally has empty evidenceRefs and the ACE resolver requires exact evidence, source revisions, and complete feature rows. The only production LDR route is a separate legacy search/extract/synthesis owner. NATS-EVENT-01 is optional observability and explicitly operator-gated. Pivoting to the document-governance change's bounded alias/retrieval task for code-level progress without store mutation.",
+  "fromChangeState": {
+    "completedTasks": 11,
+    "totalTasks": 13,
+    "selectedGate": "DAG-FETCH-01",
+    "status": "FIXTURE_PROVEN_PRODUCTION_ADAPTER_BLOCKED",
+    "evidence": [
+      "local-research-circuit-v1.ts builds/deduplicates revision-qualified fetch plans before its injected search callback",
+      "search-runtime-candidate-normalizer-v1.ts creates CandidateOrdinalMapV1 but intentionally emits empty evidenceRefs",
+      "search-runtime-ace-resolver-v1.ts rejects incomplete evidence/feature sources rather than creating evidence",
+      "api/ldr/research uses legacy web-search-client orchestration and does not call the local research circuit"
+    ],
+    "noStoreWrites": true
+  },
+  "toChangeState": {
+    "change": "parent-atlas-document-governance-master-index",
+    "selectedTask": "6.5 bounded quick-retrieval keywords/topic aliases",
+    "openTasks": 13
+  },
+  "constraints": {
+    "containerRebuildsUntilEnd": true,
+    "canonicalWrites": false,
+    "datastoreWrites": false,
+    "preserveConcurrentWorkingTreeEdits": true,
+    "noCommitOrPush": true
+  }
+}

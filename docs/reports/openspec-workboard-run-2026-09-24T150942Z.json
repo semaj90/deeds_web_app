@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T15:09:42Z",
+  "fromChange": "parent-atlas-versioned-doc-intelligence",
+  "fromTask": "DOC-26",
+  "toChange": "Parent Atlas Open Lanes TODO (user attachment review; no OpenSpec task selected)",
+  "returnToChange": "parent-atlas-versioned-doc-intelligence",
+  "returnToTask": "DOC-26",
+  "pivotGate": "DOC26_VERSIONED_ADMISSION_COMPOSITION_TO_LEGACY_ROADMAP_REVIEW",
+  "reason": "User requested a review of the pasted Parent Atlas Open Lanes TODO while the DOC-26 continuation was in progress. Review is limited to identifying stale/unsupported status assertions against repository reports and current ownership rules; no unrelated lane was selected for implementation.",
+  "review": {
+    "artifact": "C:/Users/james/.codex/attachments/c679484c-38fd-4ce4-b37a-6c80161b1791/Pasted text.txt",
+    "classification": "MIXED_AGE_ROADMAP_NOT_CURRENT_AUTHORITY",
+    "findings": [
+      "The unqualified headline 'Production-ready at the directory level' is broader than the document's own unchecked lineage and readiness steps; treat as stale until a current source-ref-to-packet-to-projection readback is attached.",
+      "USED_CONCEPT 'complete' and 32,012-edge claim has no current dated readback in the TODO. The available verify-used-concept-edges.json is older, reports Atlas coverage 0%, and fails its gate; it cannot disprove a newer run, so classify the TODO claim as STALE_REQUIRES_REPLAY rather than current or false.",
+      "The TODO's XGBoost 'training-ready' wording is not current promotion proof: atlas-reranker-contract-v1.json reports pair corpus not compiled, hard negatives and leakage split not proven, and promotion blocked. The separate August training report is a historical evaluation receipt.",
+      "The cold-storage restore proof is DRY_RUN_READY with upload, restore, and manifest null; it does not prove restore verification or authorize a move/delete.",
+      "The roadmap mixes packet retrieval, external documents, retrieval executors, and infrastructure and has numbering gaps; split by canonical owner and label each status CURRENT, PROVEN_HISTORICAL, STALE_REQUIRES_REPLAY, or EXPERIMENTAL_CHALLENGER.",
+      "The pasted file terminates mid-sentence in its community-coverage section and has no reliable generated-at/revision field."
+    ],
+    "recommendedDisposition": "Preserve as historical roadmap input; create a dated current-state overlay and evidence links before using it to choose implementation work."
+  },
+  "doc26Continuation": {
+    "implementation": [
+      "Added external-doc-versioned-recrawl-admission-v2.ts to validate the Python delta checksum, bind selected V2 envelopes to exact previous/current manifest revisions, require exact prior envelope page-set coverage for version transitions, and compose prior/current readback with runResumableAdmissionV1.",
+      "Added run-external-doc-versioned-recrawl-v2.mts. Default mode is PLAN_ONLY; APPLY is separately guarded and routes missing pages only through admitExternalDocPage.",
+      "Extended build-external-doc-admission-envelopes-v1.py to accept current/prior manifests and explicit output paths, selecting the same safe delta sources and version-scoped artifact namespaces as the pipeline.",
+      "Added previousSourceId to product-version transition plans so renamed-source matches preserve the exact prior source lineage.",
+      "Added a Python-to-TypeScript stable-JSON checksum golden.",
+      "Added a package command and focused composition tests; no task ledger edit was made because tasks.md is concurrently modified."
+    ],
+    "remaining": [
+      "No current version-transition envelope pair or live two-version corpus canary has been supplied/run.",
+      "No live read-only prior-version preservation readback has been performed.",
+      "No canonical write was attempted; operator authorization remains required for APPLY.",
+      "The complete Python acquisition/artifact-generation-to-versioned-runner invocation has not yet been exercised end-to-end."
+    ],
+    "validation": {
+      "vitest": "23 passed across versioned recrawl and resumable admission suites",
+      "pythonTests": "12 passed in atlas_okf_docs_pipeline tests; 36 passed across the pipeline, manifest, and V2 identity suites",
+      "crossRuntimeDeltaChecksum": "Python stable JSON SHA-256 golden matches the TypeScript verifier",
+      "runnerHelp": "PASS",
+      "projectTypeScript": "Project tsc returned nonzero with no diagnostics matching the three new/touched files; standalone tsc invocation is blocked by project alias/type-definition configuration. Full Svelte check previously reported 32 workspace errors and 291 warnings in 117 files.",
+      "openspecStrict": "PASS",
+      "scopedDiffCheck": "PASS"
+    }
+  },
+  "constraints": {
+    "containerRebuilds": 0,
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "neo4jWrites": 0,
+    "graphifyRuns": 0,
+    "canonicalPromotion": false,
+    "taskLedgerModified": false,
+    "commitOrPush": false
+  },
+  "nextGate": "DOC_26_LIVE_READ_ONLY_VERSIONED_RECONCILIATION_WITH_PRIOR_VERSION_COHORT"
+}

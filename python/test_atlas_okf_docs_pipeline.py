@@ -1,29 +1,146 @@
 from __future__ import annotations
 
 import json
+from hashlib import sha256
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
 from atlas_external_docs import ChunkRecord, chunk_document
 from atlas_okf_docs_pipeline import (
+    PipelineManifest,
     SourceConfig,
     build_firecrawl_crawl_v2_request,
     build_qdrant_points,
     deterministic_qdrant_uuid,
     is_uuid,
     load_manifest,
+    main as pipeline_main,
     qdrant_payload_index_requests,
     qdrant_query_body,
     read_ldr_export_urls,
     preview_domain_ontology_admission,
+    plan_manifest_recrawl_delta_v1,
+    _sources_selected_by_recrawl_plan,
 )
 from parent_atlas_ontology.domain_mapping import mapping_revision
 
 
 class OkfDocsPipelineTests(unittest.TestCase):
+    @staticmethod
+    def _recrawl_source(
+        source_id: str = "pgvector",
+        *,
+        version: str = "0.8.0",
+        source_revision: str = "source-r1",
+        identity: str = "V1",
+        provider: str = "pgvector",
+        product: str = "pgvector",
+        pages: tuple[str, ...] = ("https://github.com/pgvector/pgvector",),
+    ) -> SourceConfig:
+        return SourceConfig(
+            source_id=source_id, source_revision=source_revision, title=source_id,
+            base_urls=(f"https://docs.example.test/{source_id}/",), allowed_domains=("docs.example.test",),
+            authority_class="EXTERNAL_DOCUMENTATION", default_fetcher="BEAUTIFULSOUP_HTTP",
+            output_namespace=f"docs/.okf/{source_id}", include_paths=(), exclude_paths=(),
+            maximum_pages=3, maximum_depth=1, follow_sitemap=False, pages=pages, ldr_export_files=(),
+            provider=provider, product=product, product_version=version,
+            version_qualification="EXACT_VERSION", chunk_identity_version=identity,
+        )
+
+    @staticmethod
+    def _recrawl_manifest(revision: str, *sources: SourceConfig) -> PipelineManifest:
+        return PipelineManifest(
+            manifest_revision=revision, workspace_revision="workspace-r1", source_snapshot_revision="snapshot-r1",
+            producer_revision="producer-r1", output_root=".", sources=tuple(sources),
+            qdrant_collection="external-docs", qdrant_url="http://127.0.0.1:6333", qdrant_api_key_env=None,
+            embedding_url="http://127.0.0.1:8081", embedding_model="embeddinggemma", low_rank=8,
+            kmeans_clusters=4, som_rows=2, som_columns=2,
+        )
+
+    def test_manifest_recrawl_plan_selects_only_added_or_explicitly_version_changed_sources(self) -> None:
+        unchanged = self._recrawl_source(source_id="unchanged", version="18", source_revision="same")
+        prior = self._recrawl_manifest(
+            "manifest-old",
+            unchanged,
+            self._recrawl_source(source_id="pgvector", version="0.8.0", source_revision="old"),
+            self._recrawl_source(source_id="removed", version="1.0", source_revision="old"),
+        )
+        current = self._recrawl_manifest(
+            "manifest-new",
+            unchanged,
+            self._recrawl_source(source_id="pgvector", version="0.9.0", source_revision="new", identity="V2"),
+            self._recrawl_source(source_id="added", version="1.0", source_revision="new"),
+        )
+
+        plan = plan_manifest_recrawl_delta_v1(prior, current)
+        self.assertTrue(plan["canAcquire"])
+        self.assertEqual(plan["selectedSourceIds"], ["pgvector", "added"])
+        self.assertEqual(
+            {row["sourceId"]: row["decision"] for row in plan["entries"]},
+            {
+                "unchanged": "UNCHANGED",
+                "pgvector": "PRODUCT_VERSION_CHANGED",
+                "added": "ADDED",
+                "removed": "REMOVED_RETAINED",
+            },
+        )
+        self.assertFalse(plan["canonicalAuthority"])
+        self.assertEqual(len(plan["planChecksum"]), 64)
+
+        selected, integrated_plan = _sources_selected_by_recrawl_plan(current, prior)
+        self.assertEqual([source.source_id for source in selected], ["pgvector", "added"])
+        self.assertTrue(selected[0].output_namespace.endswith("/versions/" + sha256(b"0.9.0").hexdigest()[:16]))
+        self.assertEqual(integrated_plan, plan)
+
+    def test_manifest_recrawl_rejects_version_change_without_v2_identity(self) -> None:
+        prior = self._recrawl_manifest("old", self._recrawl_source(version="0.8.0"))
+        current = self._recrawl_manifest("new", self._recrawl_source(version="0.9.0", source_revision="new"))
+        plan = plan_manifest_recrawl_delta_v1(prior, current)
+        self.assertFalse(plan["canAcquire"])
+        self.assertEqual(plan["selectedSourceIds"], [])
+        self.assertIn("VERSIONED_CHUNK_IDENTITY_V2_REQUIRED:pgvector", plan["blockers"])
+        with self.assertRaisesRegex(ValueError, "DOC_RECRAWL_DELTA_BLOCKED"):
+            _sources_selected_by_recrawl_plan(current, prior)
+
+    def test_manifest_recrawl_fails_closed_for_same_version_source_change_and_identity_replacement(self) -> None:
+        prior = self._recrawl_manifest("old", self._recrawl_source(version="0.8.0", source_revision="old"))
+        same_version_changed = self._recrawl_manifest(
+            "new", self._recrawl_source(version="0.8.0", source_revision="changed")
+        )
+        review = plan_manifest_recrawl_delta_v1(prior, same_version_changed)
+        self.assertFalse(review["canAcquire"])
+        self.assertIn("SAME_VERSION_SOURCE_CHANGE_REQUIRES_REVIEW:pgvector", review["blockers"])
+
+        replaced = self._recrawl_manifest(
+            "new", self._recrawl_source(version="0.8.0", source_revision="old", provider="other-provider")
+        )
+        conflict = plan_manifest_recrawl_delta_v1(prior, replaced)
+        self.assertFalse(conflict["canAcquire"])
+        self.assertIn("SOURCE_IDENTITY_CHANGED:pgvector", conflict["blockers"])
+
+    def test_plan_only_cli_emits_delta_without_entering_pipeline(self) -> None:
+        prior = self._recrawl_manifest("old", self._recrawl_source(version="0.8.0", source_revision="old"))
+        current = self._recrawl_manifest(
+            "new", self._recrawl_source(version="0.9.0", source_revision="new", identity="V2")
+        )
+        output = StringIO()
+        with patch("atlas_okf_docs_pipeline.load_manifest", side_effect=[current, prior]), \
+             patch("atlas_okf_docs_pipeline.discover_and_fetch", side_effect=AssertionError("PLAN_ONLY_FETCHED")), \
+             redirect_stdout(output):
+            result = pipeline_main([
+                "--manifest", "current.json", "--prior-manifest", "prior.json", "--plan-only"
+            ])
+        self.assertEqual(result, 0)
+        receipt = json.loads(output.getvalue())
+        self.assertTrue(receipt["canAcquire"])
+        self.assertEqual(receipt["selectedSourceIds"], ["pgvector"])
+
     def test_firecrawl_request_uses_manifest_bounds_and_disables_domain_expansion(self) -> None:
         source = SourceConfig(
             source_id="doc-03-test", source_revision="manifest:test", title="test",

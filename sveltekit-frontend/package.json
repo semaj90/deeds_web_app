@@ -13,6 +13,7 @@
     "compile:retrieval-proto": "pbjs -t static-module -w es6 --es6 -p ../proto -o src/lib/generated/proto/retrieval_pb.js ../proto/active/retrieval.proto && pbts -o src/lib/generated/proto/retrieval_pb.d.ts src/lib/generated/proto/retrieval_pb.js",
     "build": "vite build",
     "check": "svelte-check --tsconfig ./tsconfig.json",
+    "atlas:docs:versioned-recrawl:v2": "tsx scripts/atlas/run-external-doc-versioned-recrawl-v2.mts",
     "test": "vitest",
     "test:lane-contracts": "vitest run --config vitest.lane-contracts.config.ts",
     "atlas:agentic:file-compiler:validation-barrier:test": "vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/agentic-file-compiler/validation-barrier.spec.ts",

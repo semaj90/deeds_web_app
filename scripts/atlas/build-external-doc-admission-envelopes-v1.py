@@ -16,6 +16,7 @@ evidence is ExternalDocChunkEvidenceV1.chunk_evidence_revision. chunk_id is unch
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import hashlib
 import json
 import sys
@@ -57,7 +58,8 @@ def acquire(manifest) -> list[dict]:
             time.sleep(1)
         if pages:
             chunks = P.compile_chunks(pages, stanza_pipeline=None, stanza_model_revision="none", maximum_chars=MAX_CHARS,
-                                      overlap_chars=OVERLAP, coordinate_for=lambda page, source=source: P.build_page_coordinate(source, page))
+                                      overlap_chars=OVERLAP, coordinate_for=lambda page, source=source: P.build_page_coordinate(source, page),
+                                      chunk_identity_version=source.chunk_identity_version)
             P.write_source_artifacts(root, source, pages, chunks)
     return failures
 
@@ -100,7 +102,8 @@ def build(manifest, coords: dict) -> tuple[list[dict], dict]:
             )
             coordinate = P.build_page_coordinate(source, artifact)
             chunks = P.compile_chunks([artifact], stanza_pipeline=None, stanza_model_revision="none", maximum_chars=MAX_CHARS,
-                                      overlap_chars=OVERLAP, coordinate_for=lambda page, source=source: P.build_page_coordinate(source, page))
+                                      overlap_chars=OVERLAP, coordinate_for=lambda page, source=source: P.build_page_coordinate(source, page),
+                                      chunk_identity_version=source.chunk_identity_version)
             native_total += len(chunks)
             native_null += sum(1 for c in chunks if c.doc_coordinate is None)
             normalization_differs += 1 if _normalize_ws(text) != text else 0
@@ -140,31 +143,43 @@ def build(manifest, coords: dict) -> tuple[list[dict], dict]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--acquire", action="store_true")
+    parser.add_argument("--manifest", type=Path, default=MANIFEST, help="Current manifest (defaults to the pinned corpus manifest)")
+    parser.add_argument("--prior-manifest", type=Path, help="Prior manifest; selects only safe added/version-changed sources")
+    parser.add_argument("--coordinates", type=Path, default=COORDS, help="Manifest-coordinate sidecar")
+    parser.add_argument("--output", type=Path, default=ENVELOPES, help="Admission envelope output path")
+    parser.add_argument("--receipt", type=Path, default=RECEIPT, help="Builder receipt output path")
     args = parser.parse_args()
-    manifest = P.load_manifest(MANIFEST)
-    coords = json.loads(COORDS.read_text(encoding="utf-8"))
+    manifest = P.load_manifest(args.manifest)
+    prior_manifest = P.load_manifest(args.prior_manifest) if args.prior_manifest else None
+    coords = json.loads(args.coordinates.read_text(encoding="utf-8"))
     check_sidecar(manifest, coords)
-    failures = acquire(manifest) if args.acquire else []
-    envelopes, native = build(manifest, coords)
-    ENVELOPES.parent.mkdir(parents=True, exist_ok=True)
-    ENVELOPES.write_text(json.dumps(envelopes, sort_keys=True, ensure_ascii=False), encoding="utf-8")
-    RECEIPT.parent.mkdir(parents=True, exist_ok=True)
+    selected_sources, recrawl_plan = P._sources_selected_by_recrawl_plan(manifest, prior_manifest)
+    selected_manifest = replace(manifest, sources=selected_sources)
+    failures = acquire(selected_manifest) if args.acquire else []
+    envelopes, native = build(selected_manifest, coords)
+    output_path = args.output.resolve()
+    receipt_path = args.receipt.resolve()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(envelopes, sort_keys=True, ensure_ascii=False), encoding="utf-8")
+    receipt_path.parent.mkdir(parents=True, exist_ok=True)
     receipt = {
         "schema": "atlas.external-doc-admission-envelopes.v1",
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "manifestRevision": manifest.manifest_revision,
+        "priorManifestRevision": prior_manifest.manifest_revision if prior_manifest else None,
+        "recrawlPlan": recrawl_plan,
         "acquired": args.acquire,
         "acquisitionFailures": failures,
         "pages": len(envelopes),
         "chunks": sum(len(e["chunks"]) for e in envelopes),
         "envelopesDigest": "sha256:" + sha(stable(envelopes)),
-        "envelopesFile": str(ENVELOPES.relative_to(ROOT)).replace("\\", "/"),
+        "envelopesFile": str(output_path.relative_to(ROOT)).replace("\\", "/") if output_path.is_relative_to(ROOT) else str(output_path),
         "native": native,
         "coordinateSource": "manifest fields (provider/product/product_version/version_qualification/...) via atlas_okf_docs_pipeline.build_page_coordinate; sidecar mirrors and is checked for drift",
         "sampleEnvelopes": [{**e, "chunks": e["chunks"][:2]} for e in envelopes[:3]],
         "writes": {"postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0},
     }
-    RECEIPT.write_text(json.dumps(receipt, indent=2, ensure_ascii=False), encoding="utf-8")
+    receipt_path.write_text(json.dumps(receipt, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps({k: receipt[k] for k in ("pages", "chunks", "native", "acquisitionFailures", "envelopesDigest")}, indent=1))
     return 0
 

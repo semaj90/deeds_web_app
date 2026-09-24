@@ -15,7 +15,7 @@ payload-index, and query-plan construction without requiring external services.
 from __future__ import annotations
 
 import argparse
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
@@ -132,6 +132,144 @@ class PipelineManifest:
     kmeans_clusters: int
     som_rows: int
     som_columns: int
+
+
+def _recrawl_source_key(source: SourceConfig) -> tuple[str, str, str | None, tuple[str, ...]]:
+    """Stable manifest-side identity for comparing two versions of one source."""
+    if not source.provider or not source.product or not source.base_urls:
+        raise ValueError(f"DOC_RECRAWL_SOURCE_IDENTITY_INCOMPLETE:{source.source_id}")
+    return (
+        source.provider,
+        source.product,
+        source.architecture,
+        tuple(sorted(source.base_urls)),
+    )
+
+
+def plan_manifest_recrawl_delta_v1(
+    previous: PipelineManifest,
+    current: PipelineManifest,
+) -> Json:
+    """Compare manifests without fetching or writing; removed sources are retained, never pruned."""
+    previous_by_id = {source.source_id: source for source in previous.sources}
+    current_by_id = {source.source_id: source for source in current.sources}
+    if len(previous_by_id) != len(previous.sources) or len(current_by_id) != len(current.sources):
+        raise ValueError("DOC_RECRAWL_DUPLICATE_SOURCE_ID")
+
+    previous_by_key: dict[tuple[str, str, str | None, tuple[str, ...]], SourceConfig] = {}
+    for source in previous.sources:
+        key = _recrawl_source_key(source)
+        if key in previous_by_key:
+            raise ValueError("DOC_RECRAWL_AMBIGUOUS_PREVIOUS_SOURCE_KEY")
+        previous_by_key[key] = source
+
+    previous_matched: set[str] = set()
+    entries: list[Json] = []
+    selected: list[str] = []
+    blockers: list[str] = []
+    for source in current.sources:
+        key = _recrawl_source_key(source)
+        prior = previous_by_id.get(source.source_id)
+        if prior is None:
+            prior = previous_by_key.get(key)
+        if prior is None:
+            entries.append({"sourceId": source.source_id, "decision": "ADDED"})
+            selected.append(source.source_id)
+            continue
+
+        previous_matched.add(prior.source_id)
+        if _recrawl_source_key(prior) != key:
+            blockers.append(f"SOURCE_IDENTITY_CHANGED:{source.source_id}")
+            entries.append({"sourceId": source.source_id, "decision": "CONFLICT", "reason": "SOURCE_IDENTITY_CHANGED"})
+            continue
+
+        if prior.product_version != source.product_version:
+            if (
+                not prior.product_version
+                or not source.product_version
+                or prior.version_qualification not in {"EXACT_VERSION", "MAJOR_VERSION"}
+                or source.version_qualification not in {"EXACT_VERSION", "MAJOR_VERSION"}
+            ):
+                blockers.append(f"EXPLICIT_VERSION_TRANSITION_REQUIRED:{source.source_id}")
+                entries.append({"sourceId": source.source_id, "decision": "CONFLICT", "reason": "EXPLICIT_VERSION_TRANSITION_REQUIRED"})
+                continue
+            if source.chunk_identity_version != "V2":
+                blockers.append(f"VERSIONED_CHUNK_IDENTITY_V2_REQUIRED:{source.source_id}")
+                entries.append({"sourceId": source.source_id, "decision": "CONFLICT", "reason": "VERSIONED_CHUNK_IDENTITY_V2_REQUIRED"})
+                continue
+            entries.append({
+                "sourceId": source.source_id,
+                "decision": "PRODUCT_VERSION_CHANGED",
+                "previousSourceId": prior.source_id,
+                "fromProductVersion": prior.product_version,
+                "toProductVersion": source.product_version,
+                "chunkIdentityVersion": source.chunk_identity_version,
+            })
+            selected.append(source.source_id)
+            continue
+
+        # Same product version is not enough to infer that newly changed source scope/content
+        # can safely replace admitted rows. Defer it to an explicit same-version lifecycle gate.
+        changed_config = (
+            prior.source_revision != source.source_revision
+            or prior.pages != source.pages
+            or prior.base_urls != source.base_urls
+            or prior.include_paths != source.include_paths
+            or prior.exclude_paths != source.exclude_paths
+            or prior.maximum_depth != source.maximum_depth
+            or prior.maximum_pages != source.maximum_pages
+            or prior.follow_sitemap != source.follow_sitemap
+            or prior.default_fetcher != source.default_fetcher
+        )
+        if changed_config:
+            blockers.append(f"SAME_VERSION_SOURCE_CHANGE_REQUIRES_REVIEW:{source.source_id}")
+            entries.append({"sourceId": source.source_id, "decision": "REVIEW", "reason": "SAME_VERSION_SOURCE_CHANGE_REQUIRES_REVIEW"})
+        else:
+            entries.append({"sourceId": source.source_id, "decision": "UNCHANGED"})
+
+    removed = sorted(set(previous_by_id) - previous_matched)
+    entries.extend({"sourceId": source_id, "decision": "REMOVED_RETAINED"} for source_id in removed)
+    if blockers:
+        selected = []
+    payload: Json = {
+        "schema": "atlas.external-doc-manifest-recrawl-delta.v1",
+        "previousManifestRevision": previous.manifest_revision,
+        "currentManifestRevision": current.manifest_revision,
+        "entries": entries,
+        "selectedSourceIds": selected,
+        "retainedRemovedSourceIds": removed,
+        "blockers": blockers,
+        "canAcquire": not blockers,
+        "canonicalAuthority": False,
+    }
+    payload["planChecksum"] = _sha(_stable(payload))
+    return payload
+
+
+def _sources_selected_by_recrawl_plan(
+    manifest: PipelineManifest,
+    prior_manifest: PipelineManifest | None,
+) -> tuple[tuple[SourceConfig, ...], Json | None]:
+    if prior_manifest is None:
+        return manifest.sources, None
+    plan = plan_manifest_recrawl_delta_v1(prior_manifest, manifest)
+    if not plan["canAcquire"]:
+        raise ValueError("DOC_RECRAWL_DELTA_BLOCKED:" + ",".join(plan["blockers"]))
+    selected_ids = set(plan["selectedSourceIds"])
+    selected_sources: list[SourceConfig] = []
+    for source in manifest.sources:
+        if source.source_id not in selected_ids:
+            continue
+        entry = next(item for item in plan["entries"] if item["sourceId"] == source.source_id)
+        if entry["decision"] == "PRODUCT_VERSION_CHANGED":
+            # Keep local derived artifacts from the prior product version instead of reusing
+            # the source's ordinary output namespace.
+            version_key = _sha(source.product_version or "")[:16]
+            output_namespace = f"{source.output_namespace.rstrip('/')}/versions/{version_key}"
+            validate_okf_output_namespace(output_namespace)
+            source = replace(source, output_namespace=output_namespace)
+        selected_sources.append(source)
+    return tuple(selected_sources), plan
 
 
 @dataclass(frozen=True)
@@ -824,6 +962,7 @@ def write_source_artifacts(root: Path, source: SourceConfig, pages: Sequence[Pag
 def run_pipeline(
     manifest: PipelineManifest,
     *,
+    prior_manifest: PipelineManifest | None = None,
     enable_stanza: bool,
     enable_clusters: bool,
     write_qdrant: bool,
@@ -831,12 +970,25 @@ def run_pipeline(
     maximum_chars: int = 1600,
     overlap_chars: int = 200,
 ) -> Json:
+    selected_sources, recrawl_plan = _sources_selected_by_recrawl_plan(manifest, prior_manifest)
+    if not selected_sources:
+        return {
+            "schema": "atlas.okf-docs-pipeline-receipt.v1",
+            "status": "NO_MANIFEST_DELTA",
+            "manifest_revision": manifest.manifest_revision,
+            "source_receipts": [],
+            "page_count": 0,
+            "chunk_count": 0,
+            "recrawl_delta": recrawl_plan,
+            "canonical_authority": False,
+            "writes_performed": False,
+        }
     root = Path(manifest.output_root).resolve()
     stanza_pipeline = make_stanza_pipeline() if enable_stanza else None
     all_pages: list[PageArtifact] = []
     all_chunks: list[ChunkRecord] = []
     source_receipts: list[Json] = []
-    for source in manifest.sources:
+    for source in selected_sources:
         pages = discover_and_fetch(source)
         chunks = compile_chunks(
             pages,
@@ -923,6 +1075,8 @@ def run_pipeline(
         "smoke": smoke_receipt,
         "canonical_authority": False,
     }
+    if recrawl_plan is not None:
+        receipt["recrawl_delta"] = recrawl_plan
     receipt["receipt_checksum"] = _sha(_stable(receipt))
     receipt_root = root / "docs/.okf"
     receipt_root.mkdir(parents=True, exist_ok=True)
@@ -934,6 +1088,8 @@ def run_pipeline(
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Compile /docs/.okf external documentation into Parent Atlas retrieval artifacts")
     parser.add_argument("--manifest", required=True)
+    parser.add_argument("--prior-manifest", help="Compare against a prior manifest and process only safe source additions/version changes")
+    parser.add_argument("--plan-only", action="store_true", help="Print a read-only manifest delta plan; do not fetch or write artifacts")
     parser.add_argument("--stanza", action="store_true", help="Run Stanza POS/lemma/dependency extraction")
     parser.add_argument("--clusters", action="store_true", help="Run existing cuVS KMeans + deterministic SOM stages")
     parser.add_argument("--write-qdrant", action="store_true", help="Create payload indexes and upsert external_programming_docs_768")
@@ -943,8 +1099,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     manifest = load_manifest(args.manifest)
+    prior_manifest = load_manifest(args.prior_manifest) if args.prior_manifest else None
+    if args.plan_only:
+        if prior_manifest is None:
+            parser.error("--plan-only requires --prior-manifest")
+        if args.stanza or args.clusters or args.write_qdrant or args.smoke_query:
+            parser.error("--plan-only cannot be combined with execution/projection flags")
+        plan = plan_manifest_recrawl_delta_v1(prior_manifest, manifest)
+        print(json.dumps(plan, indent=2, sort_keys=True))
+        return 0 if plan["canAcquire"] else 2
     receipt = run_pipeline(
         manifest,
+        prior_manifest=prior_manifest,
         enable_stanza=args.stanza,
         enable_clusters=args.clusters,
         write_qdrant=args.write_qdrant,
