@@ -1,0 +1,142 @@
+{
+  "schema": "atlas.summary-candidate-persistence.v1",
+  "generatedAt": "2026-09-24T03:14:09.436Z",
+  "candidateCohortChecksum": "63e83c53bde93be1c9f759dcee00d002d510b6ea0b2d1c9a1b189a0825e93691",
+  "ceiling": 20,
+  "before": 0,
+  "after": 19,
+  "persisted": [
+    {
+      "candidateId": "sc:987738d7b1acea7888ff49a1f837b046deaf4e2530bb256a3d2fca717bf6dba5",
+      "analysisId": "eda:c3f267f8167a5e461cc052a0aa824aded986e6a10e08c9f194e9dd46689048a9",
+      "chunkId": "doc:bits-ui:6b3cf8151e01df1d:5"
+    },
+    {
+      "candidateId": "sc:beabc0461bdf860f3e51c54c8c105feebef99f0810e8cae4d9621ad342bcc3c7",
+      "analysisId": "eda:31723b38e0133372a9b67f9c578f0f44d77dc85e4e862b7ac6cb31ec436582f0",
+      "chunkId": "doc:bits-ui:679d17152be486da:0"
+    },
+    {
+      "candidateId": "sc:6e3b5c46e431ad829b7d64068de3b3510d8d7cae4cf46a42bad2d745a12efbdd",
+      "analysisId": "eda:18f9e1dc81ec13d0670818a428f5f8e416a74fd40de4f3c4e5017e3a0be5ab40",
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40"
+    },
+    {
+      "candidateId": "sc:5c15141ba392923616d72cbd78b8b2ea11c45bd4afd8d6d2e5714eb7681ee136",
+      "analysisId": "eda:9eeb5ec0fbe2d9e7f3b3001d64871516c3de9f7732db17337f08a55cc068c560",
+      "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0"
+    },
+    {
+      "candidateId": "sc:8070e4bf885e2f2198aa9644ac17b62ba86f2874cb2d0ca67f0d42cf63a39649",
+      "analysisId": "eda:3c370232ee560cae58c94b5f6bedf22e110c60ef39f5e5ab50cbe7b0942cfb16",
+      "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:4"
+    },
+    {
+      "candidateId": "sc:1450b7445de30a69c8434b5c9c693580f49523f8235979b1934fa029678ca983",
+      "analysisId": "eda:a0c0f1c7e8ffb265c5083c9b27259fcb6f011a7e646e6da61524a916512b81bb",
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0"
+    },
+    {
+      "candidateId": "sc:e056faec3661d81562b8aed577cd07b58e4749c4fdd283034e307c0122b5b111",
+      "analysisId": "eda:611258c8e79cb8c2b7295925645528b747a40704c0d119e89a5db90a29d1c67f",
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:9"
+    },
+    {
+      "candidateId": "sc:c1462b82ec83aa922457547c422376866bce90178aad5de933390474c6adc8d5",
+      "analysisId": "eda:a34f241288a3e4380bb4e070feffb86aaa099555d67d8a5155b0dbbf94fdff3d",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22"
+    },
+    {
+      "candidateId": "sc:da0b0285dde5b6e7723b055ce720d2888e67e5b761721dee7fc8eafd96cfafe8",
+      "analysisId": "eda:0444dd9b00581c539ec26a67cc9e8c7f39b873a923af7799f0f0efcf29fa6763",
+      "chunkId": "doc:pgvector:fe883c75f323441d:24"
+    },
+    {
+      "candidateId": "sc:aa465626900b45a43211d067581a07f0be633620ab8507e9ed6ec8c714144ce7",
+      "analysisId": "eda:3674d5fb5df8f1d8c3f8bf336d7cd9b4354495de85e9dfcb634b8c51858a5928",
+      "chunkId": "doc:pgvector:fe883c75f323441d:26"
+    },
+    {
+      "candidateId": "sc:dd50d1427ddc07b1e27cf7404ba49b1aa320c8e9ee872fb1c9e6cc861fa0371d",
+      "analysisId": "eda:ef148e213724b8598b61c345f22f6736a14a87ec35af89acb11b6878e734b7f0",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10"
+    },
+    {
+      "candidateId": "sc:048ba291e2b51128b95ef95e81f5363bbba63312cecd722e51e48454b558ea34",
+      "analysisId": "eda:7662509bb9ff469a35c28cd9b221073fc7c7a23bb40f657ff77e182e741bd2f6",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2"
+    },
+    {
+      "candidateId": "sc:47871c3e832071128a7d6f7a36e1ea494bdcd34cdd3f197f0045a62164f5453d",
+      "analysisId": "eda:52978eb2c783acdad80c88e5c9a08a907fd1c6ecab5bd520f2127682588161e2",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26"
+    },
+    {
+      "candidateId": "sc:ed31b8cab3c05a962d5d518f596b4f8cd9beb4e7eb8de9f23ccf7bfdb50a5c9b",
+      "analysisId": "eda:404f6358d86805a9ca56d68269222bd4562b7ac8ef442e885190ce8c85bbceb2",
+      "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:1"
+    },
+    {
+      "candidateId": "sc:a4035b1f7065076f1c0c765a6fe2c2447ebf8cb65158cacd2d331734c1384256",
+      "analysisId": "eda:0c4c842e69aad050d5f8d2825dd40def08151565857b81a600570db833231a09",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:1"
+    },
+    {
+      "candidateId": "sc:a9d7d85c54ac4a183d9c184b234d9e2d9bccff9dc599469797643119130270b9",
+      "analysisId": "eda:9c1458ed2293f4dffd5b3bc5c413757b8dc3934ebfcc31dc88e1767d285a2b53",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13"
+    },
+    {
+      "candidateId": "sc:465878325024b7a6b9ffec4961c3443110c2ff8afa8a36965cf224ec9231dff2",
+      "analysisId": "eda:f2ef4f78f4f62f6681c034b28530aef652eefbc4f090d9924849ff33e554ec93",
+      "chunkId": "doc:sveltekit:62e6dd9932a74b58:15"
+    },
+    {
+      "candidateId": "sc:b89a141b2a8a434129a5a3176e3064feaee076cd191c849e8de5f75bca447578",
+      "analysisId": "eda:064ac6eeb5359c53b88fe571d45eb766902f16267d08a8b55cc03cf2221515bd",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19"
+    },
+    {
+      "candidateId": "sc:b4627278caa41454e795a83091aa0b3413a38c233f890de7bdc8a6eb5f046518",
+      "analysisId": "eda:2dd98faef49b601efb4b1a806731596759fb7e8e02a55c92529f460f315cbf8e",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20"
+    }
+  ],
+  "alreadyPresent": [],
+  "refused": [],
+  "failures": [],
+  "insertCalls": 19,
+  "counts": {
+    "considered": 19,
+    "rejectedByAdmission": 0,
+    "admitted": 19,
+    "inserted": 19,
+    "alreadyPresent": 0,
+    "duplicateInInput": 0,
+    "ceilingDeferred": 0,
+    "staleRefused": 0,
+    "failed": 0,
+    "notAttempted": 0
+  },
+  "reconciles": true,
+  "duplicateLogicalAnalyses": 0,
+  "controlCandidatesPersisted": 0,
+  "rowsBefore": 0,
+  "readbackOk": true,
+  "committed": true,
+  "idempotence": {
+    "inserted": 0,
+    "alreadyPresent": 19,
+    "rowsAdded": 0,
+    "reconciles": true,
+    "idempotent": true
+  },
+  "modelCalls": 0,
+  "writes": {
+    "postgres": "COMMITTED",
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}
