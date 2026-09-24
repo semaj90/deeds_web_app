@@ -15,10 +15,15 @@ import os
 import threading
 import time
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 
 from fastapi import APIRouter, FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+from atlas_graph_runtime.graph_projection_manifest import (
+    build_bfs_path_receipt_v1,
+    graph_ordinal_checksum_from_manifest_v1,
+    validate_graph_projection_ordinal_checksum_v1,
+)
 
 try:  # imported lazily-safe so the main sidecar can still report degradation
     import cudf
@@ -95,9 +100,20 @@ class BFSRequest(BaseModel):
     projectionRevision: str | None = None
     projectionChecksum: str | None = None
     startNodeKey: str
-    depthLimit: int = Field(default=8, ge=0, le=64)
+    traversalMode: Literal["DEFAULT", "EXPANDED", "MAXIMUM"] = "DEFAULT"
+    depthLimit: int | None = Field(default=None, ge=0, le=4)
     expectedArtifactChecksum: str | None = None
     expectedGraphOrdinalMapChecksum: str | None = None
+
+    @model_validator(mode="after")
+    def enforce_bounded_depth_policy(self) -> "BFSRequest":
+        limit_by_mode = {"DEFAULT": 2, "EXPANDED": 3, "MAXIMUM": 4}
+        bound = limit_by_mode[self.traversalMode]
+        if self.depthLimit is None:
+            self.depthLimit = bound
+        elif self.depthLimit > bound:
+            raise ValueError(f"GRAPH_BFS_DEPTH_EXCEEDS_{self.traversalMode}_BOUND_{bound}")
+        return self
 
 
 class ComponentsRequest(BaseModel):
@@ -174,7 +190,7 @@ class ResidentGraph:
         self.producer_revision = str(manifest.get("producerRevision") or "unknown")
         self.workspace_revision = manifest.get("workspaceRevision")
         self.candidate_snapshot_revision = manifest.get("candidateSnapshotRevision")
-        self.graph_ordinal_map_checksum = manifest.get("ordinalMapChecksum") or manifest.get("graphOrdinalMapChecksum")
+        self.graph_ordinal_map_checksum = graph_ordinal_checksum_from_manifest_v1(manifest)
         self.graph_kind = str(manifest.get("graphKind") or "UNKNOWN")
         self.symmetrization_policy = str(manifest.get("symmetrizationPolicy") or "UNSPECIFIED")
         artifact_identity = {
@@ -249,6 +265,15 @@ class ResidentGraph:
         # topology need to remain in VRAM. This avoids paying VRAM for millions of
         # UTF-8 node keys merely to translate <=512 result rows.
         identity_host = identity_gpu.to_pandas()
+        if manifest.get("graphOrdinalMapChecksum") is not None:
+            ordinal_rows = [
+                {"graphOrdinal": int(row.gpu_node_id), "graphNodeKey": str(row.graph_node_key)}
+                for row in identity_host.sort_values("gpu_node_id").itertuples(index=False)
+            ]
+            try:
+                validate_graph_projection_ordinal_checksum_v1(manifest, ordinal_rows)
+            except ValueError as exc:
+                raise ValueError(str(exc)) from exc
         self.node_key_to_gpu_id = {
             str(row.graph_node_key): int(row.gpu_node_id)
             for row in identity_host.itertuples(index=False)
@@ -467,6 +492,16 @@ class ResidentGraph:
                 "predecessorGpuNodeId": None if predecessor < 0 else predecessor,
             })
         results.sort(key=lambda item: (item["distance"], item["gpuNodeId"]))
+        path_receipt = build_bfs_path_receipt_v1(
+            req.startNodeKey,
+            results,
+            int(req.depthLimit),
+            graph_revision=self.graph_revision,
+            projection_revision=self.projection_revision,
+            graph_ordinal_map_checksum=self.graph_ordinal_map_checksum,
+        )
+        path_by_ordinal = {path["gpuNodeId"]: path["pathGraphNodeKeys"] for path in path_receipt["paths"]}
+        results = [{**row, "pathGraphNodeKeys": path_by_ordinal[row["gpuNodeId"]]} for row in results]
         return {
             "schema": "atlas.graph-bfs-receipt.v1",
             "operation": "bfs",
@@ -477,11 +512,20 @@ class ResidentGraph:
             "artifactChecksum": self.artifact_checksum,
             "graphOrdinalMapChecksum": self.graph_ordinal_map_checksum,
             "startNodeKey": req.startNodeKey,
+            "traversalMode": req.traversalMode,
             "depthLimit": int(req.depthLimit),
             "renumbered": self.renumbered,
             "nodeCount": self.node_count,
             "edgeCount": self.edge_count,
             "results": results,
+            "pathReceipt": {
+                "schema": path_receipt["schema"],
+                "graphRevision": path_receipt["graphRevision"],
+                "projectionRevision": path_receipt["projectionRevision"],
+                "graphOrdinalMapChecksum": path_receipt["graphOrdinalMapChecksum"],
+                "pathCount": path_receipt["pathCount"],
+                "pathChecksum": path_receipt["pathChecksum"],
+            },
             "writesPerformed": False,
             "canonicalAuthority": False,
             "timings": {"kernelMs": round((time.perf_counter() - started) * 1000, 3)},
@@ -678,7 +722,11 @@ class GraphRuntimeManager:
             projection_checksum = artifact_checksum
         if req.expectedProjectionChecksum and req.expectedProjectionChecksum != projection_checksum:
             _fail("PROJECTION_CHECKSUM_MISMATCH", f"manifest {projection_checksum} != expected {req.expectedProjectionChecksum}")
-        ordinal_checksum = manifest.get("ordinalMapChecksum") or manifest.get("graphOrdinalMapChecksum")
+        try:
+            ordinal_checksum = graph_ordinal_checksum_from_manifest_v1(manifest)
+        except ValueError as exc:
+            code = str(exc)
+            _fail(code, "GraphProjectionArtifactV1 requires an unambiguous graph-ordinal checksum")
         if req.expectedGraphOrdinalMapChecksum and req.expectedGraphOrdinalMapChecksum != ordinal_checksum:
             _fail("GRAPH_ORDINAL_MAP_CHECKSUM_MISMATCH", "graph ordinal map checksum does not match resident manifest")
         if req.expectedWorkspaceRevision and req.expectedWorkspaceRevision != manifest.get("workspaceRevision"):

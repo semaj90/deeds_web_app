@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T16:31:22Z",
+  "objective": "Continue evidence-backed OpenSpec tasks; defer image/container rebuilds until safe local work is exhausted.",
+  "pivot": {
+    "change": "parent-atlas-nlp-sidecar-feature-compiler",
+    "fromTask": "3.2 spaCy live quality gate",
+    "toTask": "4.1 AST-conditioned SemanticCodeCard wiring",
+    "reason": "Task 3.2 remains blocked by model-quality/scope evidence, so work moved to an independent locally testable semantic-card consumer path."
+  },
+  "alsoCompleted": [
+    {
+      "task": "2.1 sidecar AstUnit evidence/schema alignment",
+      "result": "CLOSED after replay of the existing read-only audit",
+      "receipt": "docs/reports/nlp-sidecar-ast-schema-alignment-v1.json",
+      "proof": "7/7 checks; every live table column mapped or classified; source digest preserved; packet_key absent; canonicalAuthority=false; writesPerformed=false. Removed synthetic workspace_revision from audit input."
+    },
+    {
+      "task": "4.1 semantic card contract and wiring",
+      "result": "CLOSED at local producer/consumer contract level",
+      "proof": "Fixed UTF-8 byte/character slicing in line fallback, Tree-sitter snippet fallback, AstUnit line/module spans, and semantic-card excerpts. Malformed split-codepoint spans are rejected; bounded SemanticCodeCard pass retains AST, lexical, linguistic, and noncanonical status."
+    }
+  ],
+  "progress": {
+    "change": "parent-atlas-nlp-sidecar-feature-compiler",
+    "before": "84/142",
+    "after": "86/142",
+    "delta": "2 tasks reconciled/proven; 3.2 and 3.3 remain open"
+  },
+  "validation": {
+    "focusedPythonTests": "PASS: 13/13 across semantic-card UTF-8, source-revision, linguistic-scope, and AST-v2 CRLF tests",
+    "pythonSyntax": "PASS: sidecar v1/v2 and touched test modules compile",
+    "astSchemaAudit": "PASS: AST_UNIT_SCHEMA_ALIGNMENT_PROVEN, 7/7 checks, no persistent writes",
+    "openSpecStrict": "PASS: parent-atlas-nlp-sidecar-feature-compiler",
+    "scopedDiffCheck": "PASS"
+  },
+  "stillOpen": [
+    "3.2: simple live POS fixture is sensible, but reviewed quality and scoped comment/docstring-to-POS/dependency integration are not proven; emoji adversarial probe produced a false NOUN tag.",
+    "3.3: no PyTorch/CUDA/cuVS POS executor is present in the sidecar; no image rebuild attempted.",
+    "4.2/4.3: embedding-owner dispatch and live semantic_768 parity remain unproven and downstream of source/identity authority.",
+    "14.3a: canonical AST materialization remains blocked by source authority and operator-owned identity gates."
+  ],
+  "authority": {
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false
+  },
+  "mutations": {
+    "postgres": "none; schema read only",
+    "valkey": "none",
+    "qdrant": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "containers": "none",
+    "filesystem": [
+      "Corrected UTF-8 byte-offset handling in the existing sidecar producer/card assembler.",
+      "Added focused regressions for multibyte spans, malformed byte boundaries, and AST-to-card pass wiring.",
+      "Replayed the AST schema audit and reconciled OpenSpec tasks 2.1 and 4.1."
+    ]
+  },
+  "result": "AST_SCHEMA_AND_SEMANTIC_CARD_CONTRACTS_PROVEN_LIVE_PROMOTION_BLOCKED",
+  "nextGate": "SCOPED_COMMENT_DOCSTRING_TO_LINGUISTIC_OUTPUT_PROVEN; then choose another independent ready OpenSpec leaf if still blocked"
+}

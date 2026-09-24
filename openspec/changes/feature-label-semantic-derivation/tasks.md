@@ -8,10 +8,20 @@ canonical `feature_label`/`feature_id` until Phase 5, which is explicitly gated 
 
 - [x] Confirm all 11 fanout steps have both a `:dry` and apply-mode npm script — verified via
       `node -e` script-pair check against `sveltekit-frontend/package.json`, all 22 PASS.
-- [x] Confirm `atlas:phase8:fanout:dry:steps1-3` (`--apply-through=3`) runs steps 1–3 apply,
-      4–11 dry — verified live, `[phase8-fanout] complete in 81.0s` exit 0.
-- [ ] (Separate, deferred) Decide `graphify:daily:dry` naming — see proposal.md "Separate,
-      already-flagged concern". Not required to start Phase 1.
+- [x] (2026-09-24, read-only reconciliation) The historical live run of
+      `atlas:phase8:fanout:dry:steps1-3` with `--apply-through=3` is not the current command
+      contract. Today that alias delegates to `atlas:phase8:fanout:dry`, which passes
+      `--dry-run` and no `--apply-through`; `buildPhase8StepPlan(true, 0)` resolves 11/11 dry-plan
+      entries, all present in the package script registry and none containing an explicit
+      `--apply`. The LangExtract gate defaults to dry-run and exits before its materialization
+      loop. Static readback only; no fanout or Graphify command was executed.
+- [x] (2026-09-24, read-only reconciliation) Rechecked `graphify:daily:dry` without running it.
+      Its current chain uses `graphify:materialize:dry` (no `--apply`), explicit
+      `daily-graphify-cold-processing.mjs --dry-run`, `atlas:phase8:fanout:dry` (which passes
+      `--dry-run` and no `--apply-through`), and `atlas:qdrant:feature-map-sync` (which passes
+      `--dry-run`). A static assertion over the live package scripts passed 6/6 checks. The old
+      concern that this alias performs canonical writes is stale for the current definitions.
+      This is not a claim of zero filesystem/progress-receipt effects, and the command was not run.
 
 **Proof**: both already satisfied by prior session work; no action needed to unblock Phase 1.
 

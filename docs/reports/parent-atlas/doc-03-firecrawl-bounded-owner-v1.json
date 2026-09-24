@@ -1,13 +1,13 @@
 {
   "schema": "atlas.doc-03.firecrawl-bounded-owner-audit.v1",
   "gate": "DOC-03",
-  "status": "DOC_03_OWNER_BOUNDED_IMPLEMENTED_EXTERNAL_PROOF_OPEN",
+  "status": "DOC_03_LIVE_BOUNDED_CRAWL_PROVEN",
   "owner": "python/atlas_okf_docs_pipeline.py::firecrawl_crawl_v2",
   "captureOwner": "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
   "bounds": {
     "maximumPages": "manifest.maximum_pages -> Firecrawl.limit",
     "maximumDepth": "manifest.maximum_depth -> Firecrawl.maxDiscoveryDepth",
-    "followSitemap": "manifest.follow_sitemap -> Firecrawl.ignoreSitemap inverse",
+    "followSitemap": "manifest.follow_sitemap -> Firecrawl v2 sitemap=include|skip",
     "externalLinks": false,
     "subdomains": false
   },
@@ -21,15 +21,15 @@
       "pass": true
     },
     {
-      "name": "Firecrawl limit receives maximum_pages",
+      "name": "canonical request builder maps maximum_pages to Firecrawl limit",
       "pass": true
     },
     {
-      "name": "Firecrawl depth receives maximum_depth",
+      "name": "canonical request builder maps maximum_depth to Firecrawl depth",
       "pass": true
     },
     {
-      "name": "manifest sitemap policy maps to Firecrawl ignoreSitemap",
+      "name": "manifest sitemap policy maps to Firecrawl v2 sitemap enum",
       "pass": true
     },
     {
@@ -49,14 +49,19 @@
       "pass": true
     },
     {
-      "name": "live registration/API key proof is intentionally absent",
+      "name": "global MCP registration is not represented as repository-owned config",
+      "pass": true
+    },
+    {
+      "name": "live bounded-crawl receipt is valid and non-persistent",
       "pass": true
     }
   ],
-  "crawlerCalled": false,
-  "apiKeyRead": false,
+  "liveReceiptPath": "docs/reports/parent-atlas/doc-03-firecrawl-live-bounded-v1.json",
+  "crawlerCalled": true,
+  "apiKeyValueRecorded": false,
   "datastoreWrites": false,
   "canonicalPromotion": false,
-  "remainingBlocker": "Firecrawl registration/API key and live bounded-crawl readback are external prerequisites.",
-  "generatedAt": "2026-09-21T03:16:54.071Z"
+  "remainingBlocker": null,
+  "generatedAt": "2026-09-23T22:09:08.750Z"
 }

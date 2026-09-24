@@ -1,0 +1,1237 @@
+{
+  "schema": "atlas.openspec-duplicate-task-ids.v1",
+  "generatedAt": "2026-09-23T18:57:44.131Z",
+  "status": "REVIEW_REQUIRED",
+  "source": {
+    "taskFiles": 90,
+    "taskRows": 9490,
+    "openTaskRows": 3254,
+    "sourceFilesSha256": [
+      {
+        "source": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md",
+        "sha256": "6bfb5356110f159a5f7be7ec17b3506b5918a475fd4c745ad53318f992d74af7"
+      },
+      {
+        "source": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md",
+        "sha256": "4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc"
+      },
+      {
+        "source": "openspec/changes/atlas-feature-intelligence/tasks.md",
+        "sha256": "30fffe691b08f4608886c917731413d6fb79ade0668da8f4c401fd73f7fdc17f"
+      },
+      {
+        "source": "openspec/changes/codereview-inference-wiring-followup-aug22/tasks.md",
+        "sha256": "358fffb1d592a936100e87d1876d64d1ec5c83b982c6c8f97a970cb49bdffdcc"
+      },
+      {
+        "source": "openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md",
+        "sha256": "6830fa844c87c766a4c42966b06d5d40a0d27cc7f4b6c98ae84ea4a6f0232614"
+      },
+      {
+        "source": "openspec/changes/deep-audit-code-gates-aug22/tasks.md",
+        "sha256": "cdfb3c02e56b747d893bd15b35221d4411673eff5a9119fce6b2f189b8fa893d"
+      },
+      {
+        "source": "openspec/changes/docker-compose-duplication-remediation/tasks.md",
+        "sha256": "e996502be3936b179247221b7eb0e054e7e2df4255934853c0d3918e69258d0b"
+      },
+      {
+        "source": "openspec/changes/feature-label-semantic-derivation/tasks.md",
+        "sha256": "f64be5cf8f924da644e6a72dc20118ee8d81e948d620105d830ff9958c458d95"
+      },
+      {
+        "source": "openspec/changes/inference-wiring-deep-audit-aug22/tasks.md",
+        "sha256": "feee1c3fac8c589e172427a36bc4ef89399d1e3821f230679a16db9be50eb54a"
+      },
+      {
+        "source": "openspec/changes/local-llm-offload-ownership/tasks.md",
+        "sha256": "e042d4519cb08c1074fec75a5d473abd5a4bd6bc232b7bc171da4f1f864cc9bc"
+      },
+      {
+        "source": "openspec/changes/manual-migration-reconciliation/tasks.md",
+        "sha256": "783c41d7ada9fb322474872535be6d5b7bcde989a8b15c6a2f77198b389ce2d6"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
+        "sha256": "53716421fc50158224d2d6e9787c22a280494d4b14f4468dbe0aacf2e981c24c"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+        "sha256": "07547fd71c1e9428868042df3d332f29c37c5d79b04401e9c9eb06764570e9ff"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-adaptive-dag-fabric/tasks.md",
+        "sha256": "6abe2431cb42646bfbd547cd55f2b2d30f1e446b01df4acb9b1c4f2fefbf9831"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-agentic-completion/tasks.md",
+        "sha256": "1bae1bda12aa8af3ff823018d5a62100853e901376561db549e6d412c83bded4"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
+        "sha256": "ced27b209c49461e4b339fc32209acd60dff80b81c3c9fdfa54d84cd09d271af"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md",
+        "sha256": "c3d5c6ae5cd33457cb6132bee1a434953df340af5d851aaf55e0bddd0ea9cb1b"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-agentic-repair-fabric/tasks.md",
+        "sha256": "9177729bdd43daa3d0782e02ee3a35543d5f35bb005a6ef93ef4a4d584faefb5"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md",
+        "sha256": "50d5bdfc8864e8c2e0e3493665ceae12ce2ab854507879162dbe95e2ce4705b9"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/tasks.md",
+        "sha256": "52aa9927828aa5112aef328f4b7d1a96abfffcb7faa72175ba83df13d276a3e9"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-autoresearch-fabric/tasks.md",
+        "sha256": "c1dcff6d8638f219ed1819dc3cf052a42b104555befeb9d510815db73ecde404"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+        "sha256": "01d05d81cffe12814d1efac885a66924a4ca1aaa2f485e6346c89ba7df30237e"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/tasks.md",
+        "sha256": "640c21b7fa15ced56456c7278a0932c69c1c9400aad6d78d0293dcf8247d92d4"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+        "sha256": "944b248f0dd1551f46aa97a0ae85bcf66d0b71f7138da1e3d36398eb21787699"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/tasks.md",
+        "sha256": "d638c00d4cfebb47f22f4a9353212043365d8bf0e7b667102433442a2e86a66f"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-chunk-index-whole-file-hash/tasks.md",
+        "sha256": "98f6e0d9a127b51b8fa55ab57e275fb0b7ce102351623605c068a7031cdc758c"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+        "sha256": "9717990881b3b652f19a7a5eb0ff3c7457c43074136da23f1b35217568dfc194"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-compiler-semantic-graph-resolution/tasks.md",
+        "sha256": "ba0d171da01fbba1be578cbfdeb3f0a76dc1d01f08a5cfad609531340d634f0b"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md",
+        "sha256": "d504ccb8974438ec5d3353f0db6e01b5bda9ce81d3fa2d41dc25b0a950cc564b"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-deep-research-ingestion/tasks.md",
+        "sha256": "0c36287fe21b67498396356527551ced7b0f4128a1259d92403a05a8646c0c42"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+        "sha256": "44ce79ea95b95f243239e7f24867b32209281402278404fec3357218ad1cd3cf"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-error-embedding-768-migration/tasks.md",
+        "sha256": "9a306970b93967999714c6a02ee549e347e35414c15fd35d841f23d83b44838e"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-error-research-lane/tasks.md",
+        "sha256": "c2d84cdc79d0717abf13eebee87edfd1a7531a84343c2942b73e2c2a4600e7b6"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-gate2-chunk-lineage-convergence/tasks.md",
+        "sha256": "5b32f3955a33a5878d3f79008ab3000c255ab1938263abd5fb3c9a176fd5397e"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md",
+        "sha256": "a21c0b63ea733329735f1c962871c856e5a8eb42de102b4041e2616e55a973f7"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-gpu-graph-vector-substrate/tasks.md",
+        "sha256": "5d80d06ba32a935888a84053156409fa3e7927efdbbab39676c0505afe4d2d28"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
+        "sha256": "fbd6074dbaeaee381963114798c1126acdd45f311c00f99fba31507afc46f354"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md",
+        "sha256": "2ccfa20163cdff554f65a94fcb3529f1820cbc305d65f25f6c2971cb099362e3"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+        "sha256": "8f0ac7696d1f425b74307e765be60a4ddc22b3b1c151e48cf17650bcc7dab02e"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-graph-analysis-contract/tasks.md",
+        "sha256": "4dd41bc590034f27d6913f6e5be15317c43e6e3b44cad67111a42e12e29aa975"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-graph-pagerank-okf-fanout-hardening/tasks.md",
+        "sha256": "ad920ed1a9840456eda65beecf82a6bd6a841c2856e33fb84a9cc16ee537ee0e"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+        "sha256": "1b266b7da4e43081badc279b0cda959d03517d24953fbd6cc3e106ab8eda964c"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-graph-runtime-enhancement/tasks.md",
+        "sha256": "0ba35f31f8cb87a8d9c09628addeaa4a0a49384584ad89cb3b7f0be1e8e179d2"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-graph-runtime-python-consolidation/tasks.md",
+        "sha256": "c7aad46ef0d7253fd863197d2f4ac4b557164dc60d6e52b4a04e9020ae8218ff"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-graph-validation-fabric/tasks.md",
+        "sha256": "e05ee9fbb155423d2e163959a2a64fe41dc33b4a905ce1666f283d93cefc9705"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
+        "sha256": "e303929a513f3016b1f5b89d62650ae489301995cff1f293c36a365d922e1139"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-grounded-knowledge-fabric/tasks.md",
+        "sha256": "951f80cd4d503954cef294e31bed9c37170bee49a32f85c240dd8fe2c6c4d5a7"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md",
+        "sha256": "170e13a728d6e26b4721a59196ebb8d3181eb99b443cc4e6c96b01e064bebc0a"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-live-graph-proof/tasks.md",
+        "sha256": "e2184322549451d10a16eaeeb642b35b8e9c37cf2c75d2725a1777c4923b245a"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md",
+        "sha256": "ab49f16991dd47bd0f5d347d176d973b0b44aeb35f9f89b0625ce05ed95d8244"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-native-acceleration-cabi/tasks.md",
+        "sha256": "c74f5f4bf44242e8eaf9b164b29baa540b1db3e6abca8a456005e62dfd5ac988"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "sha256": "6d90d492a278e3feb037f217ac03280db5b9bd83635de1823f93ca47688ace24"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+        "sha256": "83abbc55048a81490c041a359dff368e041ebd419669f87370fadef2b895c166"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-observation-routing-fabric/tasks.md",
+        "sha256": "eb412378c9984c72a627a29037b8e097238afe390b266b64866be4a01c749f93"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
+        "sha256": "ec538eae38868e4e96e29c9891732829935ed089bc06c68fe0c9a7aa43a50f75"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
+        "sha256": "d2ef0a92b55de849d883b209a950d3a439b644d1928f81a1a8cd6b91bf155869"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+        "sha256": "255943ec161f94fb5ffb6b208afb16f87e673b182a0c49b313b71be7089b582f"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap/tasks.md",
+        "sha256": "cf98b665a88fe0e2542ff58b3b7600522a8e709ddece24755369097571e60808"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-opencode-replay-proof/tasks.md",
+        "sha256": "5bba751260923c9e6c013131787d718f2885ea1bef1e82128b1cf20094bb13ef"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-openspec-tasks-audit-fabric/tasks.md",
+        "sha256": "595a5a82d24a019c0af4aa7fd394defdf7b82afd46dac9d1c2b2c7d4b4713fa8"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-openspec-workstation-synthesis/tasks.md",
+        "sha256": "fb5368137a73a873fd67e018c8da6cb5adca9e544ae753a993a921f6f309dbbf"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-pass-fabric/tasks.md",
+        "sha256": "c617cb941d6b12c07145165f9e83a8280799ec0077f87ef76e61ae2a005659c4"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-pca-svd-representation-baseline/tasks.md",
+        "sha256": "d97329bd0edd03e3fd90fdc41504cd280130d5aedb56d3559b1b0a8aa53e551f"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-policy-routing-integration/tasks.md",
+        "sha256": "1c55a39ca7470268d537d34584480f61a19253e24aec66cbb4405418b16b308f"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+        "sha256": "bf0d8a5646921aadfdbcdee8b6c86005e57544442a86cdf2b2cb341a6e3c7e41"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-qdrant-structural-payload-enrichment/tasks.md",
+        "sha256": "f491fc2659b02f54664f66fa8a214ab2138447d9bf7aac2ab8ae9d4c93957124"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+        "sha256": "168b0fd55682a230b01f8e7e7cf075dc646145c1b75b31f0ccf41d2462249b60"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
+        "sha256": "314b1eb7ba50ae1d0c25ae1d9318918c8b9639cfaa279bc21a28330d43a1b6a4"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-retrieval-executor-compatibility-convergence/tasks.md",
+        "sha256": "596ff525a7a5cdccd0b96399bad33a36aa8522ac83bb8fe74268934dc8911d3f"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md",
+        "sha256": "6239e88453085c55b03645ea8f0191457ffc98addd0c056a6007c90a9d210363"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+        "sha256": "890ca916e225de6d88d8808baa04764629b145dfd4355a0c7a510c0d58d6b804"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+        "sha256": "bf94d75235feabdea9aaf52049bb368ae2f768d022d09a2efb7c27e621b2c2cd"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+        "sha256": "9a16c783adc06e69f00ded534d6a1a51d9cc28abcc16c75a33ec4aff787cab23"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-rpc-packet-registry-fabric/tasks.md",
+        "sha256": "72e2c8b4c5dac43da728d75a2498cf929b1b8b75787637bd5584b9cc9f34f691"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-rrf-fusion-consolidation/tasks.md",
+        "sha256": "11c034908a26fb61997fbff82dd337f8465524b0dbb301688d591a54db146d4e"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md",
+        "sha256": "1b53df0cdded1b6e95302fe541c08a318ae0b39162ba2041deca1b7755b30b1e"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md",
+        "sha256": "5532b2a6944b6e467ef2ad57efa2bef379c274401c274d14742d863aa33452b4"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md",
+        "sha256": "bf73aae55ec88b7fef592a622e273f4e0b8e4e39d155c00af31950a95b3b6f42"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md",
+        "sha256": "b21250ff30f016a7f316a847486586e6ca23593b297329c2e9bc9b0c116f4bc2"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+        "sha256": "be1dd4da28eac18da081e01bdca0b2b0b8fca97ca085820642fda7988feb7d57"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-topology-representation-admission/tasks.md",
+        "sha256": "3625b284ef75a8e5d11081934c12793f1cb8ac5cca3666ac54975e93b07ae79a"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+        "sha256": "20c00dd3cae4b59b885bca3a11379cd949b925148ea12e8ba2164b7fecadb29c"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-unified-symbol-ranking/tasks.md",
+        "sha256": "b46d5c8e2a11700ee28fbbce71e3dc67d36e8deb6b44a4f5d114f27f374c3d4d"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-unordered-execution-contract/tasks.md",
+        "sha256": "2e9663c3e0ec491ed7ba3a50505eba824157ee73a81ac83ad759afe20ad927f6"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md",
+        "sha256": "3d1f1ec15f37e4f88f08f7a60f0cfe17e2f0b67f9e036edcdf79fe55fc143b99"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
+        "sha256": "28c7df82efb4764e761fe7e3e6edf66052dc561f478df59f9314905bd97a17fe"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "sha256": "7a6b5a62f71917d15d9d22162b48205233b0cd3360f1610d6cb4d9432c660d66"
+      },
+      {
+        "source": "openspec/changes/parent-atlas-xgboost-cuda-runtime-proof/tasks.md",
+        "sha256": "69d15d8e978951577223cfdac7f142a27030869ad456fef89b21cc00efb73f4e"
+      },
+      {
+        "source": "openspec/changes/phase79-canonical-workflow-action-wiring/tasks.md",
+        "sha256": "bdcf4a27d8da98685204e98f50288ac7daf0a15ad2bc7352ce72862f9bc87c10"
+      },
+      {
+        "source": "openspec/changes/route-import-infra-isolation/tasks.md",
+        "sha256": "ee2c3a48641f611c634521db531e3239660177e7cd7ce6f7d2ffdb6d1a32ec54"
+      }
+    ],
+    "sourceSetSha256": "5173f36575af629e0f9074ad115db862574574a82b5b671761985649a2afcdfc",
+    "identityResolver": "scripts/atlas/lib/wfu-metadata.mjs::resolveDeclarations"
+  },
+  "summary": {
+    "duplicateIdGroups": 8,
+    "openAmbiguousRows": 27
+  },
+  "groups": [
+    {
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "id": "GRAPH-RESOLVE-06B",
+      "totalOccurrences": 54,
+      "openAmbiguousOccurrences": 10,
+      "occurrences": [
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 477,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:c4bcb64d1eb04e831f70e111347c0df839b2e62c0505f7edbc1da561494345bc",
+          "titleExcerpt": "GRAPH-RESOLVE-06B Bind the enrichment layer to a live authoritative LSP/compiler producer and prove target identity on the bounded unresolved-edge sample. Keep this gate split into offline snapshot/replay and later autho"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 478,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:c993de91879c313ec6f05b27157212590c19a4fa6b83fb546a7203026c85bbba",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.1 Export the current 111-source Tree-sitter snapshot read-only: 1,592 AST rows from 84 supported sources, 27 explicitly unsupported sources, stable snapshot checksum `sha256:1adb82b653cb4efcd1decad1bfa0"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 479,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:89daa2a8fc3a618e532397eacda32a2051d94d2124a1b2cbd322f6f7918e5e3d",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.2 Resolve the 440 current nominations against the frozen snapshot only, using the explicit `sveltekit-frontend/` namespace rule plus exact content hash, source revision, byte span, and upstream node ide"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 480,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:e2d7c0ac0f7202ba1769b4526b5ce0a3a7f0564c16ef5d16dae51ef808daa581",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3 Resolve the 353 tree-bound rows to the existing authoritative `stable_symbol_id` registry, then revision-qualify `symbol_version_id`; remain read-only and fail closed on missing or ambiguous registry "
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 481,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:34aa56acc711c387e9421667f9e4e149648476ec25f030dbfef09a5b7b254394",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3A Build a format-safe five-row canary adapter from the validated current registry-input plan. The adapter selects deterministic review-only rows and emits the legacy materializer-compatible fields with"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 482,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:57890d474e50bd643bb5719abb7a786d900f869acdb28c428e9f3f6bbc7848b7",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3B Add the explicitly guarded canary apply/readback adapter. It requires both `--apply` and `ATLAS_AUTHORIZE_SYMBOL_REGISTRY_CANARY=1`, limits input to exactly five rows, verifies field-level readback, "
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 483,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:794e72e8f0ddd6927be3ce03e71bdffa44f6b965458f4cd7e9c0443bf8eca2c0",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3C Add the read-only bridge from the corrected tree-bound/registry proof to the existing AST symbol-version materializer contract. It emits `CANONICAL` only for exact active registry-key matches, strips"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 484,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:d0fa624a0257a10e55caff5279ae62f33e90427ba73dda1ee35886e812570815",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3D Apply the explicitly authorized five-row symbol-version canary and independently replay the resolver. Result: `5` symbol versions and `5` projection rows inserted, then read-only proof confirmed `exa"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 485,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:383e1757e1ef594427f59592119d81e088f406b4e3856389686a3691198cfe04",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3E Apply the next explicitly authorized five-row unresolved registry canary and replay the registry proof. Result: `5` additional stable-symbol rows inserted and read back `5/5` with no mismatches; acti"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 486,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:f4ec21c411fbb90ad18f776fa39af9e77e4bd52627628c8e864796c7bb88acae",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3F Prepare the separate five-row symbol-version tranche read-only. The materializer now supports deterministic `--skip=N --limit=N` selection; dry-run `--skip=5 --limit=5` selected exactly `5` of `10` c"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 487,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:465e0dd165a790044b76a95a915dbfbfc1f20bb994fd93c05172c2ed2b6dda8c",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3G Apply the explicitly authorized second five-row symbol-version tranche with independent readback. Result: `5` attempted, `2` inserted, `3` already present, `5` projection rows refreshed, identity bri"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 488,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:6c871721baaa1a1ff174146eeb5bb286decabde7912b84f5ffbbdbcbcd19457b",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3H Complete the bounded ten-row symbol-version canary with independent readback. Replayed the first five deterministically: `5` attempted, `3` inserted, `2` already present, `5` projection rows refreshe"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 489,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:5183f3398e6df2727b6d1e29e895c81abec455c3589cde6fbb1ee34006bcd49c",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3I Refresh the registry reconciliation after the ten-row canary and prepare the next review-only tranche. The stale input-plan issue was detected before apply; after regeneration, counts are `exactCurre"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 490,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:420915e319b6e4ff1a0636f7a916ca3c9309b8311a080a4a36eb536928612b1d",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3J Apply the refreshed five-row registry canary and complete its bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `15` with `5"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 491,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:437b44224e9b289cae779ea21277f739cf60251a29d67ded5fa72c42a0b30e67",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3K Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `20` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 492,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:5fee6ac17cc8ead3a88e00e408d852e72bdc6ba164dd174a20766ebd754fbc5e",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3L Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `25` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 493,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:58a0e122e4abb656b1a67ed50cfbebe46c3aff8fbfd9b1a105febea649fbc2e9",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3M Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `30` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 494,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:42b2fa0e746be10de9d5ecc8afc763f3a1d49c29243ffbc4d56f663c86a7f6d3",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3N Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `35` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 495,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:d6bbcfee9899ae4032a450164e29141262a980b7dbdea36a1d4237d114036946",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3O Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `40` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 496,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:0a873c251d47a47d43fd56d5427d1de26077ad42a059d2ec1c6fc2eb8dde896f",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3P Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `45` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 497,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:8e7314faa923774f206aae9576a75c10f108f908e9fb775f0cdb602f5ae09553",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3Q Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `50` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 498,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:cc394771df46699eb997c9c1f680df88cd84a719a3cdd77310ff1ac387f001e7",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3R Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `55` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 499,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:cb0fad2bcff7c768cdd8f6d30a430bf8cf0f15086f6b4a85176be95736da8c33",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3S Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `60` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 500,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:c041cfc6e03bb25daf50dd438f4d0f9e1b908b15888063511b4e2681f3a0e6d3",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3T Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `65` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 501,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:6652008050f20ead44197bd7a364cb70ba19d92945def415b0f75493144d385f",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3U Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `70` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 502,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:93fbb885674f42a7862eb70159d090e44a7a05a26588f5b55660722f8b34b51f",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3V Apply the next refreshed five-row registry canary and complete bounded symbol-version materialization. Registry readback was `5/5`; the materializer processed the bounded canonical set of `75` with `"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 503,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:09497f886542f2ec23cdf03418bcfad04207c1e2700516c835765ffaeea8b79a",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3W Re-run the next five-row registry canary with the explicit materializer input and verify idempotence. Registry readback was `5/5` with `0` new rows; explicit materialization processed `75` canonical "
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 504,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:0f1c5ca853a1c588a062c1b378b2cc2abdfe779830e47cbe668cd09423a94c93",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3X Refresh the reconciliation plan, apply the next five genuinely unresolved registry entries, and materialize symbol versions with explicit nomination/resolution/snapshot inputs. Registry readback was "
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 505,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:80509d6150f68e899b337777566206812518e300763280dcd25e519a5607ab22",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.3Y Refresh the reconciliation plan, apply the next five genuinely unresolved registry entries, and materialize symbol versions with explicit nomination/resolution/snapshot inputs. Registry readback was "
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 506,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:d38f3579ee8c716c54e3a5f38b4a7cd13b05cdb1725b51a2c0e22fbb80b0a725",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.4A Prove the bounded current-producer artifact replay read-only: `440` nominations, `353` AST-bound resolutions, `5` exact registry/symbol-version identities, `0` identity failures, materializer readbac"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 507,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:07200622f57ccfbf3472b4e439dbc92e660c72e02d122f2171b913332cea9487",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.4B Prove the live `:8095` producer on the 23-nomination `llm-context-cache.ts` bounded sample. The exact Graphify namespace path is required for deterministic upstream IDs; live `treesitter-chunker 4.0."
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 508,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:0ecf066c3937e5bb9c5ef0a1ca0138455f10c33134670f2082014d3d21080d69",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.4C Prove the live `:8095` producer across the full current nomination cohort read-only. Fifty source files covering all `440` nominations passed source-content hash parity, exact byte-span matching, and"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 515,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:60f58237f5c15e31a2a25634da8375fe7b81d4407ae939adb95dd9826fee2900",
+          "titleExcerpt": "GRAPH-RESOLVE-06B.4 Bind the enriched identity result to the live bounded producer replay; no edge writes until 06B.3/06B.4 pass. **Closed 2026-09-05 (read-only):** after aligning the existing materializer with the canon"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 524,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "ownership-freeze-and-bounded-current-graph-proof-2026-08-28",
+          "taskRevision": "sha256:acce88f1ffb4a2dffd9e21d935fa457d4954e86e3dc43b7e2d221f4fbfe3ac42",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-CURRENT-COHORT-REBASE-01:** rebase the symbol-registry review against a plan whose `workspaceRevision` is admitted for the selected current source cohort, then require exact `inputPlanChecksum`, row"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 764,
+          "state": "OPEN",
+          "identityBasis": "DECLARED_ID_SECTION_QUALIFIED",
+          "sectionSlug": "current-status-reconciliation-2026-08-29",
+          "taskRevision": "sha256:044c6eebe7f49a865f3eb33c2af70aa6f36c74534f72d8300a64319cbb08c6c5",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B / current symbol-feature alignment** — remains open at the"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 890,
+          "state": "DONE",
+          "identityBasis": "DECLARED_ID_SECTION_QUALIFIED",
+          "sectionSlug": "graph-resolve-06b-3-read-only-registry-replay-2026-08-30",
+          "taskRevision": "sha256:02be3b6e80696df58b8569aa68bf1361a3f5d3f24fd0b581bd019d4def33b249",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-REPLAY** — current frozen-resolution input contains"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 923,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-registry-reconciliation-plan-2026-08-30",
+          "taskRevision": "sha256:e193644d5f7a15d8c291fe3bf20f8bdf2dfd2e0f3a41c9ad2719099675db310e",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-RECONCILIATION-PLAN** — read-only reconciliation"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 928,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-registry-reconciliation-plan-2026-08-30",
+          "taskRevision": "sha256:9706051f072ddc6b597e24c1f1599e0c96c540cc1e64cef2ae5d4d6929e5dbb8",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-REVIEW-CANARY** — generated a five-row canary from"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 933,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-registry-reconciliation-plan-2026-08-30",
+          "taskRevision": "sha256:8b564b400f0291f8cc530a5e7c302ea5f007d6067ebf3c63eb7708e829f63bb3",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-PROMOTION-REVIEW** — blocked pending explicit review"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 945,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-materializer-adapter-dry-run-2026-08-30",
+          "taskRevision": "sha256:f10c0bfdb9a7ad9cf3ff4c3aa52e81a7454815648019e68bd0c559ebf2c0c84a",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-MATERIALIZER-ADAPTER** — the existing symbol-version"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 953,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-materializer-adapter-dry-run-2026-08-30",
+          "taskRevision": "sha256:defcdee636780c56776b385a300c83ac54a7a50b08997ccf8dd61eea58d4702c",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-MATERIALIZER-APPLY** — not authorized or proven."
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 964,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-registry-input-audit-2026-08-30",
+          "taskRevision": "sha256:76683cf54c90306882fef5b2139e1cdc50d585a6063b2d6b8a8c3e952acf4e63",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-INPUT-AUDIT** — the `353`-row review input is"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 969,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-registry-input-audit-2026-08-30",
+          "taskRevision": "sha256:ea510a7e5f1cc1b766eda2881b561d08f851b50e23250901ba4889f1a03674f5",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-AUTHORIZED-APPLY** — still pending explicit review"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 978,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-apply-safety-check-2026-08-30",
+          "taskRevision": "sha256:031949ef82525b5e15c471a8f057cbae9d65564ed9d8221198a9f26e6fbd6b04",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-APPLY-DRY-RUN** — the existing five-row apply"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 982,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-apply-safety-check-2026-08-30",
+          "taskRevision": "sha256:2981b78b742e34e5a2136a8ecf36f8509cf357b229979bed0e02489164ed3263",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-APPLY** — remains gated by both the explicit"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 991,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-4-symbol-version-materializer-dry-run-2026",
+          "taskRevision": "sha256:570164e40f0feb3b082f7c79f99f97305c6a7f254de1ee04a36dec2b821582a2",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.4-MATERIALIZER-DRY-RUN** — the existing materializer"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 996,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-4-symbol-version-materializer-dry-run-2026",
+          "taskRevision": "sha256:76aa4bfe134b7b5062ac7ec569eff2301390a43d5db1706ddfab94ffc11952b8",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.4-APPLY-READBACK** — pending the five-row registry"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 1004,
+          "state": "DONE",
+          "identityBasis": "DECLARED_ID_SECTION_QUALIFIED",
+          "sectionSlug": "graph-resolve-06b-4-database-safety-readback-2026-08-30",
+          "taskRevision": "sha256:e0908a36511cc6636ed436211a812e21d0463b7d292ea59257ff5f7941001de3",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.4-NO-WRITE-READBACK** — after the canary and"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 1029,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-authorized-canary-apply-2026-08-30",
+          "taskRevision": "sha256:76df00c35b9225e2b49d15fe3f4b67e7d77286b7af72b41c9635e6e0b89ab738",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-AUTHORIZED-CANARY** — the explicitly authorized"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 1033,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-authorized-canary-apply-2026-08-30",
+          "taskRevision": "sha256:10fb92b2dd5343384b23c94ad98771951e7bdf56183ae63ae328e2ebf95df7bc",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.4-DOWNSTREAM-REFRESH** — after the insert, the adapter"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 1037,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-authorized-canary-apply-2026-08-30",
+          "taskRevision": "sha256:b30b2ff862f54054dd0720b1c5d14001888c8a37a8176f1c07486f154d7838b7",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.4-SYMBOL-VERSION-APPLY** — remains a separate bounded"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 1060,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-canary-symbol-version-boundary-2026-08-3",
+          "taskRevision": "sha256:2e0c11af63875ee71f351c143cf936a9643fe54e22864415257ccfbd76aa2b7b",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-CANARY-SELECTED** — the five authorized registry"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 1064,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-canary-symbol-version-boundary-2026-08-3",
+          "taskRevision": "sha256:e923cbcbb9ed1abe4d68da69b7cca0d23d95e3c1123136d4ec8ee52990ccd19e",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-SYMBOL-VERSION-DRY-RUN** — the existing materializer"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+          "line": 1068,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "graph-resolve-06b-3-canary-symbol-version-boundary-2026-08-3",
+          "taskRevision": "sha256:43f92b5ef58c15da83f187d8fa902fb4f053c214965ff3c31aa6c731b86f3f39",
+          "titleExcerpt": "**GRAPH-RESOLVE-06B.3-SYMBOL-VERSION-APPLY** — not authorized in this"
+        }
+      ]
+    },
+    {
+      "change": "parent-atlas-observation-routing-fabric",
+      "id": "ORF-2R",
+      "totalOccurrences": 2,
+      "openAmbiguousOccurrences": 1,
+      "occurrences": [
+        {
+          "source": "openspec/changes/parent-atlas-observation-routing-fabric/tasks.md",
+          "line": 117,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "proof-gates",
+          "taskRevision": "sha256:f305b0ac6dcba08f92418915b6ddc78dfa54aa295983b92bcdfab2595e77a411",
+          "titleExcerpt": "ORF-2R — Reconcile the exported `packages/parent-atlas` observation repository: it is currently an unused legacy writer targeting `candidate_id + workspace_revision` and a second `semantic_768` owner. Either adapt it to "
+        },
+        {
+          "source": "openspec/changes/parent-atlas-observation-routing-fabric/tasks.md",
+          "line": 118,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "proof-gates",
+          "taskRevision": "sha256:03e896014dbf537517b1d3d48a70cdf998ca0fa802ceba5f30e4ba186c8f55af",
+          "titleExcerpt": "ORF-2R.1 — Legacy repository now fails closed unless callers explicitly opt into `LEGACY_CANDIDATE_VECTOR_V1`; no caller was enabled."
+        }
+      ]
+    },
+    {
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "id": "CANONICAL-IDENTITY-V1-SPEC-01",
+      "totalOccurrences": 2,
+      "openAmbiguousOccurrences": 2,
+      "occurrences": [
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+          "line": 15866,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+          "taskRevision": "sha256:1b3b1f0d339c1362ee51029b9d517fd89caa42189430d59105dfd6ae444ff881",
+          "titleExcerpt": "CANONICAL-IDENTITY-V1-SPEC-01 (2026-09-21) — SPEC-ONLY DRAFT for operator sign-off; no code, schema or data changed. Purpose: one owner for canonical object identity that closes `parent-atlas-native-acceleration-cabi` P0"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+          "line": 15873,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+          "taskRevision": "sha256:152ef95b02f900e0a554ef8a7753d904f666f5a77d08937c97d9ca44b7d45c46",
+          "titleExcerpt": "CANONICAL-IDENTITY-V1-SPEC-01 REVISION (2026-09-21) — spec-only, folds operator-supplied refinements into the earlier draft entry; no code, schema or data change. Verified read-only against the cited owners: `sveltekit-f"
+        }
+      ]
+    },
+    {
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "id": "DAG-RUNTIME-01D",
+      "totalOccurrences": 3,
+      "openAmbiguousOccurrences": 2,
+      "occurrences": [
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+          "line": 1431,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "2-oak-dag-runtime-convergence",
+          "taskRevision": "sha256:b95d164f438bc85aef28db516feeee04dc4e3365abaadbe849026d9758b6d6e4",
+          "titleExcerpt": "DAG-RUNTIME-01D — **`BLOCKED_BY_01D.2`** (2026-09-02, status corrected — not merely"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+          "line": 1439,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "2-oak-dag-runtime-convergence",
+          "taskRevision": "sha256:ed095aa6616e810d494a204d7540a42d0f0b666c73908173fb00e0d789670388",
+          "titleExcerpt": "DAG-RUNTIME-01D.1 — Proved the registered lexical and semantic owners on a"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+          "line": 1445,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "2-oak-dag-runtime-convergence",
+          "taskRevision": "sha256:966111f4dbccda2d2c3f11a1ae50cd04d1b41f0e73e50c3607f2d4a44cb60e00",
+          "titleExcerpt": "DAG-RUNTIME-01D.2 — **`BLOCKED_REVISION_BUNDLE_UNPROVEN`** (2026-09-02, formalized). Run the"
+        }
+      ]
+    },
+    {
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "id": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-02",
+      "totalOccurrences": 3,
+      "openAmbiguousOccurrences": 3,
+      "occurrences": [
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+          "line": 15860,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+          "taskRevision": "sha256:0be46396b2aebaf2cf585e40a032b90ac0bd9032dbab49ccd01afff3d113d0e3",
+          "titleExcerpt": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-02 (2026-09-21) — migration DRAFT written, NOT APPLIED: `sveltekit-frontend/drizzle/manual/20260921_graphify_execution_authority_DRAFT.sql` (manual sidecar, not journaled; needs explicit"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+          "line": 15861,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+          "taskRevision": "sha256:e0e261837aaec1cb1ebfc7d6063d3c13b1514a52ca28ec6e7c306a23103e590d",
+          "titleExcerpt": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-02 REVISION (2026-09-21, after operator review; supersedes the single-file draft described above; still DRAFT, NOT APPLIED). Operator decisions recorded: UUIDv7 default approved; authori"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+          "line": 15863,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+          "taskRevision": "sha256:73a322e900f89b76e5dc5c8e0abfa07e4d53becddfc61634d41c5f28b264b363",
+          "titleExcerpt": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-02 STATUS BLOCK (2026-09-21, live-verified read-only immediately before recording): `status = DRAFT_REHEARSED_NOT_APPLIED`; `02A schemaApplied = false`; `02B legacyImportApplied = false`"
+        }
+      ]
+    },
+    {
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "id": "TOURNAMENT-FEATURES-01",
+      "totalOccurrences": 2,
+      "openAmbiguousOccurrences": 1,
+      "occurrences": [
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+          "line": 15845,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+          "taskRevision": "sha256:ef293d6ed2378bc2f78359e56f8af2f0369c47e3fdb0a5cdb2a8c8ef8d3c15cf",
+          "titleExcerpt": "TOURNAMENT-FEATURES-01 Define and populate real ranking features upstream (controller or adapter) from the signals above — a controller-contract change, so it needs its own decision; do not synthesize features inside the"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+          "line": 15848,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+          "taskRevision": "sha256:51904753b8b7f9249e7fe60af07cf5369d1147e0d9f8f99a8e78d3f2076c7140",
+          "titleExcerpt": "TOURNAMENT-FEATURES-01 attempt (2026-09-20): derived features from tasks.md text — dependency/cost NOT derivable (12 prerequisite edges over 2,298 tasks; no estimates); text-derived flags exist but are weak/unvalidated; "
+        }
+      ]
+    },
+    {
+      "change": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "id": "DAG-5A",
+      "totalOccurrences": 19,
+      "openAmbiguousOccurrences": 6,
+      "occurrences": [
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 424,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:b43c7599ed774aa073c6e32e1dfa526cbd4f386c52b379cc0ffe659a87638e62",
+          "titleExcerpt": "**DAG-5A feature-row contract** Added"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 429,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:1adb0b8b1115fe923f33ca9010f33948a05c6008b2c92e4405b22d1fa18dab12",
+          "titleExcerpt": "**DAG-5A SearchRuntime bridge** Added"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 434,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:ea0daf128bda92a6ace08643a2a8a56fd1e13bc2c9d442a662d037817720e0fd",
+          "titleExcerpt": "**DAG-5A existing matrix-owner bridge** Added"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 439,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:00ca56c1de360086486f5328cb4d4fccdb91c3e74a1eb89a48a6d676756b2067",
+          "titleExcerpt": "**DAG-5A read-only export harness** Added"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 445,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:b4acffffc48ef50eb4eec5d364164c54ec83d40f0d90187f7eaee6ea0480c44f",
+          "titleExcerpt": "**DAG-5A SearchRuntime producer binding** The final `FeatureEnvelope`"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 458,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:89c95a10ed3654da925398a442b4a76b31cbe6cec7a9d6e4b1467bda9d092563",
+          "titleExcerpt": "**DAG-5A producer reachability audit** Current repository search finds the"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 463,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:339ddf69c50663d6c8c02558f753de44a0241311b2f38f71ffe805bfb7530d6e",
+          "titleExcerpt": "**DAG-5A.1 SearchRuntime producer caller** Add one bounded caller where"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 467,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:5b2218753e992273d74d8087a95c1d37129252635722326110b237618145fd93",
+          "titleExcerpt": "**DAG-5A.1 producer function** Added"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 472,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:e86901df4a036aeb551efdde0e26506c037eb1733a66a0ecb812373140429df3",
+          "titleExcerpt": "**DAG-5A.1 Atlas adapter helper** Added"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 477,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:36bf5c6c0c83814600721ad571f7f3961729029f03eb4dcec472e16871d2268d",
+          "titleExcerpt": "**DAG-5A.1 projection result contract** The helper now returns accepted"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 481,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:15c7284481a0d36a016e234c3778db5a1080dc0aa54fd97aa65782a20739e62e",
+          "titleExcerpt": "**DAG-5A.1 owner-composition seam** Added the pure"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 485,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:1822d11674280cbff6a44fb5a03f394e1e6086a48610134323c14c7d1a9af168",
+          "titleExcerpt": "**DAG-5A.1 response composition helper** Added"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 489,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:0bcf8829c409d0ef4170cea41706a363fe7ee972e76d097ec710138ad17095cb",
+          "titleExcerpt": "**DAG-5A.2 lineage join** Require canonical ID/symbol version, workspace,"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 493,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:0b329a2147d7c5fc6e926fbdc46c5238a1f75feff141d49460977a89d8723392",
+          "titleExcerpt": "**DAG-5A.2 production path identified** The live path is"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 498,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:5395b61aeb9ee4642a59f2f2afc62fdf6b1bfb74c5c26a6c9e5758c6b2ed14af",
+          "titleExcerpt": "**DAG-5A.3 live artifact** Produce raw SearchRuntime rows, pass them"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 501,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:25f35d35705d4d7c1f7e8d2904bbd04c23e7054e4657fba31e54e26e539a0708",
+          "titleExcerpt": "**DAG-5A.3 harness emission contract** Extended the existing harness to"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 506,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:de1fe14ca29eb4d9752a1da9d78f6d93f9f9aeb2eaa162d3d8b50365cd9f55e7",
+          "titleExcerpt": "**DAG-5A adapter integration proof** Standard project Vitest now proves"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 510,
+          "state": "DONE",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:8ab83761820f1492cf34fd26d678d34fad809a01f9492b18c705d3b03ca5a786",
+          "titleExcerpt": "**DAG-5A focused regression proof** The adapter and DAG-5 tests pass"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 525,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:86e8b67203ebcd622ae06012578e34e7f451ff2d98eef9c68defb49b65ae6429",
+          "titleExcerpt": "**DAG-5A live feature compiler binding** Produce the real"
+        }
+      ]
+    },
+    {
+      "change": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "id": "DAG-5B",
+      "totalOccurrences": 2,
+      "openAmbiguousOccurrences": 2,
+      "occurrences": [
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 534,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:d2ac1b5a435dae7b43c182a955158c913f171066a4a6d17d55e1148b005aae9a",
+          "titleExcerpt": "**DAG-5B exact SearchRuntime baseline** Provide a revision-qualified"
+        },
+        {
+          "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+          "line": 537,
+          "state": "OPEN",
+          "identityBasis": "AMBIGUOUS_DECLARED_ID",
+          "sectionSlug": "dag-5-live-feature-matrix-and-exact-promotion",
+          "taskRevision": "sha256:a36bbe06fd89ce927a5119f1ad3125f91c00b7793f0caf59e6733ff63b307b7e",
+          "titleExcerpt": "**DAG-5B same-request oracle** Capture ordered exact IDs and QAS rows"
+        }
+      ]
+    }
+  ],
+  "authority": {
+    "canonicalAuthority": false,
+    "taskLedgersChanged": false,
+    "promotionAuthorized": false
+  },
+  "writes": {
+    "taskLedgers": 0,
+    "persistentStores": 0,
+    "reportFile": 1
+  }
+}

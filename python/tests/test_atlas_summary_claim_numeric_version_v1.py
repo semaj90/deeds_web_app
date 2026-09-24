@@ -41,6 +41,19 @@ def test_unqualified_numeric_values_do_not_become_version_assertions() -> None:
     assert validate_summary_claim_numeric_v1("The value is 18.4.", "The value is 18.4.")["status"] == "PASS"
 
 
+def test_sentence_punctuation_does_not_hide_numeric_mismatches() -> None:
+    source = "Set hnsw.ef_search = 40."
+    claim = "Set hnsw.ef_search = 400."
+    slot = validate_summary_claim_numeric_v1(source, claim)
+    assert slot == {
+        "status": "FAIL",
+        "sourceValues": ["40"],
+        "claimValues": ["400"],
+        "unsupportedValues": ["400"],
+    }
+    assert NumericSlotV1.model_validate(slot).model_dump() == slot
+
+
 
 def test_claimed_version_is_supported_by_the_same_exact_text_even_without_a_product_prefix_in_the_source() -> None:
     source = "the index is scanned. Starting with 0.8.0, you can enable iterative index scans, PostgreSQL 18.4 adds io_method."

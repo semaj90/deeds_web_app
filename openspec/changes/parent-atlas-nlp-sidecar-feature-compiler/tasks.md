@@ -229,7 +229,7 @@ tree-lineage work is closed.
 
 ## 2. Structural pass (NLP2)
 
-- [ ] 2.1 Wire `treesitter_chunk` pass to emit `AstUnit` records matching
+- [x] 2.1 Wire `treesitter_chunk` pass to emit `AstUnit` records matching
       `atlas_ast_nodes`' live schema exactly (field names verified via `\d
       atlas_ast_nodes` in this change's design.md — don't re-derive from
       scratch). Confirm no `packet_key` is ever written at this stage. **Schema
@@ -237,12 +237,17 @@ tree-lineage work is closed.
       mapped structural evidence fields and the revised audit now classifies
       the remaining database/canonical-writer fields rather than mislabeling
       them as sidecar omissions (`AST_UNIT_SCHEMA_ALIGNMENT_PROVEN`, review
-      required 0). `structural_key`, `repo_id`, workspace/parent identity,
+      required 0). Replayed 2026-09-23: all 23 live columns map or classify,
+      all 13 mapped evidence fields are present, source revision matches the
+      exact input digest, `packet_key` is absent, and `canonical_authority=false`.
+      The audit no longer supplies a synthetic workspace revision.
+      `structural_key`, `repo_id`, workspace/parent identity,
       normalized/source-content hashes, supersession, source-ref key, and
       database timestamps remain the responsibility of the existing canonical
       materializer; the sidecar remains evidence-only and no second AST writer
-      is introduced. The checkbox stays open because canonical materialization
-      itself is still source-authority gated. Receipt:
+      is introduced. This closes only the sidecar evidence-emission/schema
+      contract; canonical materialization remains source-authority gated under
+      14.3a. Receipt:
       `docs/reports/nlp-sidecar-ast-schema-alignment-v1.json`.
 - [x] 2.2 Live-verify against a real file: run the pass, inspect the
       `AstUnit` output, confirm `parser_revision`/`grammar_revision` are
@@ -257,16 +262,21 @@ tree-lineage work is closed.
 
 ## 3. Linguistic pass (NLP-adjacent, spaCy)
 
-- [ ] 3.1 Wire the `spacy` pass scoped to comments/docstrings/errors/query
+- [x] 3.1 Wire the `spacy` pass scoped to comments/docstrings/errors/query
       text only (per design.md D3) — explicitly exclude source identifiers
       from the input set. **Implementation corrected 2026-09-20:**
       `python/miniforge_nlp_sidecar.py` now masks code syntax while preserving
       comments, quoted/docstring text, and query-like strings; the pass records
-      `input_scope` and `input_hash`. Focused local tests pass, and the live
-      sidecar now reflects the source after a targeted restart: `/analyze`
-      reports `input_scope=comments_docstrings_strings_query_text`, preserves
-      source/ref revisions, and emits no source-symbol entity. The task remains
-      open pending the companion linguistic-output check in 3.2.
+      `input_scope` and `input_hash`. **Reverified 2026-09-23 without restart or
+      rebuild:** focused local tests pass 4/4, and live `/analyze` with
+      `passes=["linguistic"]` reports
+      `input_scope=comments_docstrings_strings_query_text`, an input hash, and
+      no entities in the linguistic-pass artifact. The overall response
+      separately retains its regex `CODE_SYMBOL` observation; that is not
+      linguistic-pass output and is intentionally not treated as promotion.
+      The request omitted source/workspace revisions, so generated `unknown`
+      identifiers remain diagnostic only. This closes input scoping/wiring,
+      not linguistic quality or identity promotion.
 - [ ] 3.2 Live-verify with one real docstring/comment example, confirm noun
       chunks / dependency edges come back sensible (not garbage on code
       tokens that slipped through the exclusion). **Partial runtime result
@@ -300,15 +310,51 @@ tree-lineage work is closed.
       **Runtime-process drift check (2026-09-21, read-only):** the running container has the repository mounted read-only and a fresh in-container import of `_spacy_pos_tags` returns `source=unavailable` with `modelInstalled=false`; the already-loaded HTTP worker still returns `source=spacy` with empty arrays. This indicates the worker process predates the fail-closed guard or has stale module state. A bounded sidecar restart is sufficient for revalidation; an image rebuild is not required for this diagnosis. No restart was performed in this audit.
       **Restart revalidation (2026-09-21):** restarted only `miniforge-nlp-sidecar` (no image rebuild, no data-store writes); health returned `healthy` and the same `/pos` fixture now returns `source=unavailable` with empty arrays. The fail-closed runtime behavior is therefore proven. Non-empty linguistic output remains open until the pinned `en_core_web_sm` model is present and produces annotations.
       **Model-source audit (2026-09-21, read-only):** `docker/miniforge-nlp-sidecar/Dockerfile` already declares the pinned official `en_core_web_sm-3.8.0` wheel after the `spacy==3.8.16` install, while the active image/runtime has no installed model. Compose mounts source and classifier data only; no spaCy model directory is mounted. This confirms the remaining gap is stale/unrebuilt image content, not an unpinned dependency or missing application wiring. Rebuild remains deferred.
+      **Live model refresh (2026-09-23, no restart/rebuild):** `/health` now
+      reports `en_core_web_sm` installed; after one `/pos` call it reports
+      `loaded=true`, `pos_ready=true`, and `spacy_pos=true`. `/pos` returns
+      nonempty tags and noun phrases, but the quality gate is not met: on
+      `The dog chased the red ball.` it classifies `red` as PROPN and emits no
+      ADJ; on a technical sentence it classifies `token` as ADJ and omits it
+      from the noun phrase. The response contract also has no dependency-edge
+      field, so that part of the requested proof is unavailable. Keep 3.2 open
+      for reviewed linguistic quality and dependency-edge evidence; model
+      availability alone is not completion. This supersedes the earlier
+      observation that the model was absent; no canonical writes occurred.
 - [ ] 3.3 **PA-NLP-001 PyTorch POS/token-classification challenger** — preserve the earlier Parent Atlas requirement as a separate executor of the linguistic-POS assertion lane. The current implementation remains spaCy/reference-only; no PyTorch POS model or live GPU POS endpoint is present in the current sidecar. When implemented, it must report model ID/revision, CUDA/device status, exact source-text offsets, versioned assertions, and an explicit CPU fallback; compare against the spaCy reference on one frozen, reviewed fixture. It must not replace Tree-sitter, invent source identity, or promote ontology/cache state. This task is intentionally open and does not block the spaCy reference contract from being proven independently.
 
 ## 4. AST-conditioned semantic card wiring (NLP3)
 
-- [ ] 4.1 Wire the `SemanticCodeCard` assembler (`AstUnit` + linguistic
+- [x] 4.1 Wire the `SemanticCodeCard` assembler (`AstUnit` + linguistic
       facts → bounded card text) per design.md's example shape. The schema
       already exists in `sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.ts`;
       this task is to connect the producer and consumers, not invent a new
-      representation.
+      representation. **Reverified/fixed 2026-09-23:** `_build_pass_results()`
+      emits both structural `AstUnit` evidence and semantic-card artifacts;
+      a focused fixture proves the card keeps the exact UTF-8 byte-grounded
+      excerpt, carries lexical/linguistic facts, and remains
+      `canonical_authority=false`. Fixed byte/character confusion in line-based
+      spans, Tree-sitter snippet fallback, AstUnit line coordinates/module
+      bounds, and semantic-card excerpt extraction. A span splitting a UTF-8
+      code point is rejected and cannot produce a card. This is contract/unit
+      proof only: it does not prove embedding dispatch, live `semantic_768`,
+      canonical promotion, or production source authority. A 2026-09-23
+      consumer census found no path from `semantic_cards` to the canonical
+      embedding executor. It also found the sidecar's semantic pass had been
+      synthesizing dense-cosine/KMeans/SOM/manifold/confidence values merely
+      from card presence; those unsupported features were removed. The pass
+      now reports `backend=semantic-card-builder`, empty measured features,
+      `embedding_status=NOT_RUN`, and an explicit warning. Task 4.2 remains
+      open until a revision-qualified card is passed to the existing canonical
+      embedding owner; task 4.3 remains open until live vector and independent
+      AstUnit readback are proven. The same audit found the event-hypergraph
+      builder deriving `workspace_revision` from `model_id`/`document_id`,
+      `packet_key` from `document_id`, and `representation_revision` from a
+      model label/default. It now returns `SKIPPED_LINEAGE` unless explicit
+      source ref/revision, workspace revision, and packet key are supplied;
+      the representation revision remains null until an embedding receipt
+      exists. Regression coverage proves skipped and explicitly-qualified
+      cases without persistent writes.
 - [ ] 4.2 Confirm the card is sent as embedding *input* to whatever service
       task 0.4 identified as the canonical `semantic_768` owner — do not
       re-implement embedding generation in this sidecar.
@@ -318,8 +364,22 @@ tree-lineage work is closed.
 
 ## 5. HMM sequence pass (NLP4)
 
-- [ ] 5.1 Define the discrete observation vocabulary (per design.md D4) and
+- [x] 5.1 Define the discrete observation vocabulary (per design.md D4) and
       an observation-builder that derives it from other passes' outputs.
+      **Proven 2026-09-23:** froze `atlas.route-observation.v1` and tested the
+      builder against structural chunks, extracted entities, import relations,
+      and semantic-card presence. Corrected earlier mislabeled observations
+      (`HIGH_SEMANTIC_MATCH`, `AST_CALL_EDGE_FOUND`, `RERANK_CONFIDENT`) to
+      evidence-named events and removed the false `PATCH_SUCCESS` derived only
+      from `extraction_mode=full`. With no evidence, it emits only
+      `REPAIR_AMBIGUOUS`. Focused test: `python/test_miniforge_nlp_sidecar_hmm_observations.py`.
+      The sequence pass now labels itself `observation-builder` with the
+      vocabulary revision and `inference_status=NOT_RUN`; it exposes only the
+      observation count, not synthetic confidence/topology features. The local
+      Python runtime and active sidecar container both lack `hmmlearn`, so 5.2
+      training/decoding and 5.3 live Viterbi proof remain open and unclaimed.
+      Focused HMM/sidecar regression set: 16/16; OpenSpec strict validation
+      passes.
 - [ ] 5.2 Wire `hmmlearn` `CategoricalHMM` — Baum-Welch (offline training)
       and Viterbi (online decoding), CPU-only. Confirm no GPU device is
       requested for this pass.
@@ -363,12 +423,27 @@ tree-lineage work is closed.
 
 ## 9. FeatureCompiler: pass results → ExperimentFeatureMatrix + control5 wiring (NLP7)
 
-- [ ] 9.1 Wire the compiler that takes a set of `AnalysisPassResult`s for
+- [x] 9.1 Wire the compiler that takes a set of `AnalysisPassResult`s for
       one candidate and produces one `ExperimentFeatureMatrix` row +
       optional `control5` summary, per design.md D6. Coordinate with
       `parent-atlas-retrieval-lod-algorithm-taxonomy` for the canonical
       column set — don't invent a second one. The TS contract already exists;
       this task is to complete the producer/consumer path around it.
+      **Producer/consumer wiring proven 2026-09-23:** the Python sidecar now
+      emits only pass evidence; its duplicate matrix/control builders were
+      removed. The existing shared TypeScript `compileExperimentFeatureMatrix`
+      is called by the SvelteKit sidecar client after strict snake/camel pass
+      normalization. It rejects malformed pass envelopes and compiles only
+      when packet, source, source revision, and workspace revision are explicit
+      and every pass matches them. The compiled matrix carries
+      `canonicalAuthority=false`; absent or mismatched lineage yields null
+      matrix/control5 with a diagnostic status. Unsupported synthetic scores
+      were removed from the Python pass outputs. Focused proof:
+      `miniforge-nlp-sidecar.spec.ts` + `nlp-feature-compiler.spec.ts` (9/9),
+      Python semantic/linguistic/HMM regressions (15/15), and Python syntax
+      compilation. This closes local producer/consumer wiring only; production
+      CandidateOrdinal/FeatureMatrix admission remains gated by current source
+      authority and the 14.3c cohort prerequisites.
 
 ## 10. LangExtract gating (NLP8)
 
@@ -1094,11 +1169,17 @@ cleared.
   **13,502/13,502 symbols coordinate-grounded (rate=1.0), 0 coordinate errors, 0 file failures**
   across the 300-file corpus. Receipt: `docs/reports/symbol-kind-smoke-fanout-v1.json`
   (`coverageAudit.coordinateGroundedRate`/`coordinateErrorFiles`).
-- [ ] `SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-01` (new follow-up, not started) — rerun the fan-out
-  audit against real `AtlasStructuralEvidenceChunk` output from the live `:8095` sidecar (not a
-  fresh tree-sitter walk with a pre-filtered node-type allowlist) to get the actual corpus-wide
-  UNKNOWN rate, i.e. the real number behind "~1,000 unknowns of 25k". This is what
-  `SYMBOL-KIND-COVERAGE-AUDIT-01` above deliberately stopped short of.
+- [ ] `SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-FULL-01` — extend the proven bounded
+  live-sidecar unknown-kind audit from its 300-file manifest to the intended full
+  current-source corpus before claiming a corpus-wide rate. The 300-file result
+  (`sveltekit-frontend/scripts/atlas/symbol-kind-live-sidecar-coverage-v1.mjs`,
+  `sveltekit-frontend/docs/reports/symbol-kind-live-sidecar-coverage-v1.json`)
+  is valid bounded evidence: 300/300 files succeeded, 8,832 chunks, 1,769 raw
+  UNKNOWN (20.03%), all export/import structural noise, 0 genuine unexplained;
+  `canonicalAuthority=false`, `writesPerformed=false`. It does not establish the
+  full ~25k-source corpus rate. Any broader run must freeze and checksum its
+  exact current-source file manifest, remain a diagnostic-only sidecar call, and
+  record failures rather than silently shrinking the cohort.
 - **Explicitly deferred, not wired (operator asked, answered honestly, not built without a clear
   go-ahead)**: simdjson (wrong tool for this file size -- plain `JSON.stringify`/`YAML.parse` is
   correct here), BitFrost/Redis-Valkey centroid writes (would require live-cache write authority
@@ -1751,3 +1832,23 @@ content). `npx openspec validate parent-atlas-nlp-sidecar-feature-compiler --str
 - [x] Found + fixed the `isExported` over-count bug before it was reused anywhere (2026-09-22,
   read-only script fix + rerun) — `exportedCount` corrected 4944 -> 464, `byScopeAndExported`
   cross-tab added. Zero writes to any data store.
+
+## SESSION-206k — sidecar linguistic span proof (2026-09-23, no rebuild)
+
+- Added a deterministic local regression test for the existing `/pos` response extension:
+  UTF-8 byte spans round-trip against the original text even with a four-byte emoji before
+  the phrase; the noun-phrase span and dependency-edge endpoints also slice to their declared
+  text. This proves the response/coordinate contract with a mocked spaCy-like document, not
+  model quality.
+- Live `/pos` on `The dog runs.` returned `dog=NOUN`, `runs=VERB`, noun phrase `The dog`, and
+  `det`/`nsubj` dependency edges with UTF-8 byte offsets; post-call `/health` then reported the
+  pinned model loaded and `pos_ready=true`. A separate adversarial live input prefixed with
+  `🙂` tagged the emoji as `NOUN`, so the model-quality gate remains open. This does not prove
+  comment-only extraction through `/analyze`, held-out linguistic accuracy, or PyTorch POS.
+- Task 2.1 was reconciled and closed separately after the AST schema-alignment audit replay
+  (seven checks PASS); this does not close 14.3a. Task 3.2 still needs reviewed linguistic
+  quality and evidence that scoped comment/docstring input reaches the intended POS/dependency
+  output. Task 3.3 remains blocked on the absent PyTorch/CUDA/CUVS capabilities; no model/image
+  rebuild was attempted.
+- Focused proof: `python -m pytest -q python/test_miniforge_nlp_sidecar_linguistic_scope.py`
+  — 5 passed. No DB, cache, vector, graph, or canonical writes.

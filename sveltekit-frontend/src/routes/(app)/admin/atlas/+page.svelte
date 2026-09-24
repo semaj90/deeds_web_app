@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { env as publicEnv } from '$env/dynamic/public';
 	import * as Bits from 'bits-ui';
-	import DocCorpusPanel from './DocCorpusPanel.svelte';
-	import type { DocIntelligenceStudioSnapshotV1, DocSearchResult } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
 	import type {
 		AtlasNode,
 		AtlasEdge,
@@ -14,6 +12,9 @@
 		AtlasWeightProfile,
 	} from '$lib/types/atlas.js';
 	import { NODE_COLORS, NODE_RADIUS } from '$lib/types/atlas.js';
+	import DocCorpusPanel from './DocCorpusPanel.svelte';
+	import type { DocIntelligenceStudioSnapshotV1, DocSearchResult } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
+	import { documentGovernanceSummaryV1Schema, type DocumentGovernanceSummaryV1 } from '$lib/types/document-governance-summary-v1.js';
 
 	type AdminCacheStats = {
 		timestamp: string;
@@ -62,22 +63,6 @@
 		sections: AtlasRuntimeRegistrySection[];
 	};
 
-	type DocumentGovernanceSummary = {
-		available: boolean;
-		totalDocuments: number;
-		openSpecChanges: number;
-		completedTasks: number;
-		totalTasks: number;
-		progressPercent: number | null;
-		archiveEligible: number;
-		conflicts: number;
-		etaMs: number | null;
-		etaConfidence: number | null;
-		registryChecksum: string | null;
-		supersessionEdges: number;
-		unresolvedSupersessionReferences: number;
-	};
-
 	type TaskPacketWorkflowStatus = {
 		mode: 'task' | 'queue' | 'next';
 		taskId: number | null;
@@ -107,7 +92,7 @@
 	type AtlasPageData = {
 		health: AtlasHealthStatus | null;
 		runtimeRegistry?: AtlasRuntimeRegistrySnapshot | null;
-		documentGovernance?: DocumentGovernanceSummary | null;
+		documentGovernance?: DocumentGovernanceSummaryV1 | null;
 		docsCorpus?: DocIntelligenceStudioSnapshotV1 | null;
 		docsSearch?: DocSearchResult | null;
 		docsQuery?: string;
@@ -122,14 +107,29 @@
 		embedModel?: string;
 		graniteDoclingModel?: string;
 		kvProfile?: string;
+		llmModelId?: string;
 	};
+	type GovernanceView = keyof DocumentGovernanceSummaryV1['documents'];
+	const governanceTabs: { key: GovernanceView; label: string }[] = [
+		{ key: 'current', label: 'Current' },
+		{ key: 'openSpec', label: 'OpenSpec' },
+		{ key: 'superseded', label: 'Superseded' },
+		{ key: 'archiveReady', label: 'Archive Ready' },
+		{ key: 'conflicts', label: 'Conflicts' },
+	];
 
 	let { data }: { data: AtlasPageData } = $props();
 
 	// ── Health & Collections ──────────────────────────────────────────────────
 	let health = $state<AtlasHealthStatus | null>(null);
 	let runtimeRegistry = $state<AtlasRuntimeRegistrySnapshot | null>(null);
-	let documentGovernance = $state<DocumentGovernanceSummary | null>(null);
+	let documentGovernance = $state<DocumentGovernanceSummaryV1 | null>(null);
+	let governanceView = $state<GovernanceView>('current');
+	let governanceFilter = $state('');
+	let governanceExpanded = $state<string[]>([]);
+	let governanceVisibleCount = $state(12);
+	let governanceRefreshing = $state(false);
+	let governanceError = $state('');
 	let cacheStats = $state<AdminCacheStats | null>(null);
 	let healthLoading = $state(false);
 	let workflowTaskId = $state('');
@@ -148,6 +148,33 @@
 		if (data.workflowStatus?.taskId != null) workflowTaskId = String(data.workflowStatus.taskId);
 		if (data.workflowStatus?.queueId) workflowQueueId = data.workflowStatus.queueId;
 	});
+
+	let governanceRows = $derived.by(() => {
+		const rows = documentGovernance?.documents[governanceView] ?? [];
+		const query = governanceFilter.trim().toLocaleLowerCase();
+		return rows.filter((row) => !query || [row.path, row.title ?? '', row.documentKind, row.status, ...row.topics, ...row.canonicalTopics]
+			.some((value) => value.toLocaleLowerCase().includes(query)));
+	});
+
+	async function refreshDocumentGovernance() {
+		if (governanceRefreshing) return;
+		governanceRefreshing = true;
+		governanceError = '';
+		try {
+			const response = await fetch('/api/admin/atlas/document-governance', { headers: { accept: 'application/json' } });
+			const parsed = documentGovernanceSummaryV1Schema.safeParse(await response.json());
+			if (!response.ok || !parsed.success || !parsed.data.available) {
+				governanceError = parsed.success ? parsed.data.error ?? `Registry refresh failed (${response.status})` : 'Registry response failed schema validation.';
+				return;
+			}
+			documentGovernance = parsed.data;
+			governanceVisibleCount = 12;
+		} catch (error) {
+			governanceError = error instanceof Error ? error.message : String(error);
+		} finally {
+			governanceRefreshing = false;
+		}
+	}
 
 	async function refreshHealth() {
 		healthLoading = true;
@@ -939,9 +966,14 @@
 						<p class="text-[0.68rem] text-[#a39f90] font-bold uppercase tracking-wider">// Document Governance</p>
 						<p class="mt-1 text-[0.62rem] text-[#5c594c] leading-relaxed">Generated registry for OpenSpec progress, document lineage, supersession, and archive readiness.</p>
 					</div>
-					<span class="px-2 py-1 border border-[#5c594c] bg-[#1c1b18] text-[0.6rem] font-bold uppercase tracking-wider text-[#d1cdb8]">
-						{documentGovernance?.available ? 'REGISTRY_READY' : 'REGISTRY_OFFLINE'}
-					</span>
+					<div class="flex items-center gap-2">
+						<span class="px-2 py-1 border border-[#5c594c] bg-[#1c1b18] text-[0.6rem] font-bold uppercase tracking-wider text-[#d1cdb8]">
+							{documentGovernance?.available ? 'REGISTRY_READY' : 'REGISTRY_OFFLINE'}
+						</span>
+						<button type="button" onclick={refreshDocumentGovernance} disabled={governanceRefreshing} class="px-2 py-1 border border-[#5c594c] text-[0.6rem] text-[#d1cdb8] disabled:opacity-50" aria-label="Refresh document governance">
+							{governanceRefreshing ? 'REFRESHING…' : 'REFRESH'}
+						</button>
+					</div>
 				</div>
 				{#if documentGovernance?.available}
 					<div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[0.65rem]">
@@ -952,9 +984,48 @@
 					</div>
 					<div class="space-y-1">
 						<div class="flex justify-between text-[0.62rem] text-[#a39f90] uppercase"><span>OpenSpec task progress</span><span>{documentGovernance.progressPercent == null ? 'UNAVAILABLE' : `${documentGovernance.progressPercent}%`}</span></div>
-						<div class="h-1.5 bg-[#34332c] overflow-hidden"><div class="h-full bg-[#8c9f7a] transition-all" style={`width: ${documentGovernance.progressPercent ?? 0}%`}></div></div>
-						<div class="text-[0.6rem] text-[#5c594c]">{documentGovernance.completedTasks}/{documentGovernance.totalTasks} tasks · {documentGovernance.supersessionEdges} explicit supersession edges · {documentGovernance.unresolvedSupersessionReferences} unresolved · ETA unavailable until a workflow receipt provides confidence.</div>
+						<Bits.Progress.Root value={documentGovernance.progressPercent} max={100} class="h-1.5 overflow-hidden bg-[#34332c]" aria-label="OpenSpec task completion">
+							<div class="h-full bg-[#8c9f7a] transition-all" style={`width: ${documentGovernance.progressPercent ?? 0}%`}></div>
+						</Bits.Progress.Root>
+						<div class="text-[0.6rem] text-[#5c594c]">{documentGovernance.completedTasks}/{documentGovernance.totalTasks} tasks · {documentGovernance.supersessionEdges} explicit supersession edges · {documentGovernance.unresolvedSupersessionReferences} unresolved · {documentGovernance.etaMs == null ? 'ETA unavailable' : `ETA ${Math.ceil(documentGovernance.etaMs / 60000)}m`}{documentGovernance.etaConfidence == null ? '' : ` · confidence ${(documentGovernance.etaConfidence * 100).toFixed(0)}%`}.</div>
 					</div>
+					<Bits.Tabs.Root bind:value={governanceView} class="space-y-2">
+						<Bits.Tabs.List class="flex flex-wrap gap-1 border-b border-[#3f3e37] pb-1">
+							{#each governanceTabs as tab (tab.key)}
+								<Bits.Tabs.Trigger value={tab.key} class="px-2 py-1 text-[0.58rem] uppercase text-[#a39f90] data-[state=active]:bg-[#8b9dbb] data-[state=active]:text-[#1c1b18]">
+									{tab.label} ({documentGovernance.documents[tab.key].length})
+								</Bits.Tabs.Trigger>
+							{/each}
+						</Bits.Tabs.List>
+						<Bits.Tabs.Content value={governanceView} class="space-y-2">
+							<label class="block text-[0.58rem] text-[#a39f90] uppercase" for="governance-filter">Filter visible records</label>
+							<input id="governance-filter" value={governanceFilter} oninput={(event) => { governanceFilter = (event.currentTarget as HTMLInputElement).value; governanceVisibleCount = 12; }} placeholder="path, title, topic" class="w-full bg-[#171613] border border-[#3f3e37] px-2 py-1 text-[0.65rem] text-[#efede4]" />
+							<p class="text-[0.58rem] text-[#5c594c]">Showing {Math.min(governanceRows.length, governanceVisibleCount)} of {governanceRows.length} matching records. Read-only projection; archive application is disabled.</p>
+							<Bits.Accordion.Root type="multiple" bind:value={governanceExpanded} class="space-y-1">
+								{#each governanceRows.slice(0, governanceVisibleCount) as row (row.documentId)}
+									<Bits.Accordion.Item value={row.documentId} class="border border-[#3f3e37] bg-[#23221c] px-2">
+										<Bits.Accordion.Header>
+											<Bits.Accordion.Trigger class="w-full py-2 text-left text-[0.62rem] text-[#d1cdb8] hover:text-[#efede4]">{row.title ?? row.path} <span class="text-[#777365]">· {row.status}</span></Bits.Accordion.Trigger>
+										</Bits.Accordion.Header>
+										<Bits.Accordion.Content class="space-y-2 pb-2 text-[0.58rem] text-[#a39f90]">
+											<p class="break-all">SOURCE: {row.path} · SHA-256 {row.sha256}</p>
+											{#if row.openSpec}<p>PROGRESS: {row.openSpec.completedTasks ?? '—'}/{row.openSpec.totalTasks ?? '—'} ({row.openSpec.progressPercent ?? '—'}%)</p>{/if}
+											<p>TOPICS: {row.topics.join(', ') || 'none declared'} · CANONICAL TOPICS: {row.canonicalTopics.join(', ') || 'none declared'}</p>
+											<p class="break-all">SUPERSEDES: {row.supersedes.join(', ') || 'none'} · SUPERSEDED BY: {row.supersededBy.join(', ') || 'none'}</p>
+											<p class="break-all">RECEIPTS: {row.receiptRefs.join(', ') || 'unavailable'} · CONTRADICTIONS: {row.contradictions.join('; ') || 'none recorded'}</p>
+											<p>ARCHIVE: {row.archiveEligible ? 'eligible (no apply authorization)' : `blocked: ${row.archiveBlockedReasons.join(', ') || 'not classified'}`}</p>
+										</Bits.Accordion.Content>
+									</Bits.Accordion.Item>
+								{:else}
+									<p class="border border-[#3f3e37] p-2 text-[0.62rem] text-[#777365]">No records are classified in this view.</p>
+								{/each}
+							</Bits.Accordion.Root>
+							{#if governanceRows.length > governanceVisibleCount}
+								<button type="button" onclick={() => governanceVisibleCount += 12} class="px-2 py-1 border border-[#5c594c] text-[0.6rem] text-[#d1cdb8]">SHOW 12 MORE</button>
+							{/if}
+						</Bits.Tabs.Content>
+					</Bits.Tabs.Root>
+					{#if governanceError}<p role="alert" class="text-[0.6rem] text-[#c25953]">{governanceError}</p>{/if}
 				{:else}
 					<div class="text-center py-3 border border-[#c25953]/25 bg-[#c25953]/5 text-[#c25953] text-[0.7rem] font-bold uppercase tracking-wider">Governance registry unavailable</div>
 				{/if}

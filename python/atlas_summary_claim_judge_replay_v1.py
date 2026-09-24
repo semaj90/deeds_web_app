@@ -24,12 +24,19 @@ LLAMA = "http://127.0.0.1:8090"
 
 
 def psql_row(chunk_id: str, revision: str) -> dict:
-    sql = ("SELECT row_to_json(x) FROM (SELECT c.chunk_id, c.evidence_revision, c.text, c.heading_path, p.title, p.product, p.product_version FROM atlas_external_doc_chunks c "
-           f"JOIN atlas_external_doc_pages p ON p.id = c.page_id WHERE c.chunk_id = '{chunk_id}' AND c.evidence_revision = '{revision}') x")
-    out = subprocess.run(["docker", "exec", "-i", "legal-ai-postgres", "psql", "-U", "legal_admin", "-d", "legal_ai_db", "-tA"], input=sql, capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
+    if not chunk_id or "\x00" in chunk_id or not re.fullmatch(r"sha256:[0-9a-f]{64}", revision):
+        raise ValueError("CHUNK_ID_OR_EVIDENCE_REVISION_INVALID")
+    # psql's :'var' form SQL-quotes variable values; never interpolate identity data into SQL.
+    sql = ("BEGIN TRANSACTION READ ONLY; "
+           "SELECT row_to_json(x) FROM (SELECT c.chunk_id, c.evidence_revision, c.text, c.heading_path, p.title, p.product, p.product_version FROM atlas_external_doc_chunks c "
+           "JOIN atlas_external_doc_pages p ON p.id = c.page_id WHERE c.chunk_id = :'chunk_id' AND c.evidence_revision = :'revision') x; ROLLBACK;")
+    out = subprocess.run(["docker", "exec", "-i", "legal-ai-postgres", "psql", "-X", "-v", "ON_ERROR_STOP=1", "-v", f"chunk_id={chunk_id}", "-v", f"revision={revision}", "-U", "legal_admin", "-d", "legal_ai_db", "-tA"], input=sql, capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
     if not out:
         raise RuntimeError(f"CHUNK_NOT_FOUND_AT_REVISION:{chunk_id}")
-    return json.loads(out)
+    row = json.loads(out)
+    if row.get("chunk_id") != chunk_id or row.get("evidence_revision") != revision:
+        raise RuntimeError("CHUNK_READBACK_IDENTITY_MISMATCH")
+    return row
 
 
 def claims_of(summary: str) -> list[str]:

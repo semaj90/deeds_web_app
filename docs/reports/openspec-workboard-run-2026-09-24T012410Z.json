@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T01:24:10Z",
+  "fromChange": {
+    "name": "parent-atlas-document-governance-master-index",
+    "progress": "52/64",
+    "result": "PAUSED_REMAINING_TASKS_UNDEFINED_OR_OPERATOR_GATED",
+    "evidence": "Current registry/TOC replay passed; task 10.2 reviewed against 4,846 records with zero conflicts or superseded candidates. Remaining contradiction semantics and quick-retrieval alias contract are not defined; archive canary requires authorization and candidates."
+  },
+  "toChange": {
+    "name": "parent-atlas-versioned-doc-intelligence",
+    "progressAtPivot": "41/48",
+    "selectedGate": "DOC-13",
+    "reason": "Inspect the open doc-symbol mutual-index task for a bounded, noncanonical implementation that can be proven without source-authority promotion, persistent writes, or container rebuilds."
+  },
+  "constraints": {
+    "containerRebuilds": "DEFERRED",
+    "canonicalPromotion": false,
+    "persistentWrites": 0,
+    "graphify": false,
+    "operatorGatesBypassed": false
+  }
+}

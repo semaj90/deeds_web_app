@@ -15,6 +15,7 @@ import type { RequestHandler } from './$types';
 import {
   ACPServiceRegistry,
   buildA2AAgentDescriptor,
+  listA2APeerTools,
   acpToolRegistry,
   negotiateQuicTransport,
   type A2AServicePort,
@@ -101,7 +102,7 @@ export const GET: RequestHandler = (event) => {
         quicEnabled: port.quicEnabled ?? true,
         altSvc: port.altSvc ?? 'h3=":443"; ma=3600',
       })) as A2AServicePort[],
-      tools: acpToolRegistry.listTools().map((tool) => ({
+      tools: listA2APeerTools(acpToolRegistry, agentDescriptor).map((tool) => ({
         id: tool.id,
         name: tool.name,
         description: tool.description,

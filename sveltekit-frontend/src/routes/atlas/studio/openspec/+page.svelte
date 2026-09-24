@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { invalidate } from '$app/navigation';
-  import { Progress, Tabs } from 'bits-ui';
+  import { Tabs } from 'bits-ui';
   import type { PageData } from './$types';
   import OpenSpecAwarenessPanel from '$lib/components/atlas/OpenSpecAwarenessPanel.svelte';
   import CapabilityCensusPanel from '$lib/components/atlas/CapabilityCensusPanel.svelte';
@@ -12,7 +12,7 @@
 
   const completionPercent = $derived(
     data.board.summary.total > 0
-      ? Math.round((data.board.summary.proven / data.board.summary.total) * 1000) / 10
+      ? Math.min(100, Math.max(0, Math.round((data.board.summary.proven / data.board.summary.total) * 1000) / 10))
       : 0
   );
 
@@ -81,9 +81,10 @@
       <div><p class="eyebrow">LEDGER COMPLETENESS · NOT SCHEDULER PRIORITY</p><h2>{completionPercent}% proven</h2></div>
       <span class:stale={data.board.freshness.stale} class="machine">{data.board.freshness.newestReport ?? 'no report'} · {formatAge(data.board.freshness.newestMtimeMs)}</span>
     </div>
-    <Progress.Root class="progress" value={completionPercent} max={100} aria-label={`${completionPercent}% ledger proven`}>
-      <div class="fill" style:width={`${completionPercent}%`}></div>
-    </Progress.Root>
+    <label class="progress-label" for="openspec-ledger-progress">Verified ledger progress · {completionPercent}%</label>
+    <progress id="openspec-ledger-progress" class="progress" value={completionPercent} max={100}>
+      {completionPercent}% proven
+    </progress>
   </section>
 
   <OpenSpecAwarenessPanel awareness={data.awareness} />
@@ -177,7 +178,7 @@
   :global(body){margin:0;background:#070d14;color:#eaf5ff;font-family:Inter,system-ui,sans-serif}:global(*){box-sizing:border-box}:global(:root){--line:#8bcfff25;--panel:#0d1824;--muted:#8399aa;--cyan:#4ae5ff;--green:#65ed83;--red:#ff8d98;--amber:#f2d46c;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   .board-shell{max-width:1680px;margin:auto;padding:24px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:18px}.eyebrow{margin:0;color:#7890a3;font:800 .65rem var(--mono);letter-spacing:.12em}.hero h1{font-size:clamp(2.4rem,5vw,5rem);line-height:.95;margin:.3rem 0}.lede{max-width:900px;color:#91a6b7}.hero-actions{display:flex;gap:8px;align-items:center}.hero-actions a{border:1px solid var(--line);border-radius:9px;background:#142334;color:#eaf5ff;padding:.65rem .8rem;text-decoration:none}.stream{font:700 .7rem var(--mono);color:var(--amber)}.stream.live{color:var(--green)}
   .summary{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:12px}.summary article,.panel,.notice{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#0e1a27,#0a141e)}.summary article{padding:13px}.summary small{display:block;color:var(--muted);font:.58rem var(--mono)}.summary strong{display:block;margin-top:5px;font-size:1.25rem}.summary .action-card{border-color:#4ae5ff55;box-shadow:inset 0 0 30px #4ae5ff08}
-  .panel{padding:16px;margin-bottom:12px}.panel-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.panel h2{margin:.15rem 0 .65rem}.machine{font:.68rem var(--mono);color:var(--muted)}.machine.stale{color:var(--amber)}.progress{height:8px;border-radius:999px;overflow:hidden;background:#142536}.fill{height:100%;background:linear-gradient(90deg,#2aa6ff,#56edbe)}.notice{padding:12px 14px;margin-bottom:12px}.notice.warn{border-color:#f2d46c55}.notice span{display:block;color:var(--muted);margin-top:4px}
+  .panel{padding:16px;margin-bottom:12px}.panel-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.panel h2{margin:.15rem 0 .65rem}.machine{font:.68rem var(--mono);color:var(--muted)}.machine.stale{color:var(--amber)}.progress-label{display:block;margin:0 0 6px;color:var(--muted);font:.68rem var(--mono)}.progress{display:block;width:100%;height:8px;border:0;border-radius:999px;overflow:hidden;background:#142536;appearance:none}.progress::-webkit-progress-bar{border-radius:999px;background:#142536}.progress::-webkit-progress-value{border-radius:999px;background:linear-gradient(90deg,#2aa6ff,#56edbe)}.progress::-moz-progress-bar{border-radius:999px;background:linear-gradient(90deg,#2aa6ff,#56edbe)}.notice{padding:12px 14px;margin-bottom:12px}.notice.warn{border-color:#f2d46c55}.notice span{display:block;color:var(--muted);margin-top:4px}
   .tab-list{display:flex;gap:7px;overflow:auto;margin:0 0 10px}.tab-list :global(button){border:1px solid var(--line);border-radius:9px;background:#101d2a;color:#a9bdcb;padding:.6rem .78rem;font:700 .7rem var(--mono);cursor:pointer}.tab-list :global(button[data-state='active']){color:#041219;background:var(--cyan);border-color:var(--cyan)}.tab-panel{min-height:380px}
   .task-list{display:grid;gap:7px}.task-list article{display:grid;grid-template-columns:max-content 1fr;gap:11px;align-items:start;padding:10px;border:1px solid #ffffff0c;border-radius:10px;background:#09131c}.task-list strong{display:block}.task-list small{color:var(--muted)}.state{font:700 .6rem var(--mono);padding:.28rem .38rem;border-radius:6px;border:1px solid var(--line)}.state.ok{color:var(--green)}.state.action{color:var(--cyan)}.state.warn{color:var(--amber)}.state.muted{color:var(--muted)}
   .blocker-grid,.topic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.blocker-grid article,.topic-grid article{padding:13px;border:1px solid #ffffff0c;border-radius:12px;background:#09131c}.blocker-grid h3{margin:.2rem 0}.blocker-grid p,.topic-grid p{color:#9aafbd}.blocker-grid small{display:block;color:var(--muted);margin-top:3px}.topic-head{display:flex;justify-content:space-between}.topic-grid small{color:var(--muted)}.chips{display:flex;flex-wrap:wrap;gap:5px}.chips span{font:.6rem var(--mono);padding:.25rem .35rem;border:1px solid var(--line);border-radius:5px;color:#a9bdcb}

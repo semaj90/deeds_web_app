@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runTimestamp": "2026-09-22T23:53:12Z",
+  "status": "IN_PROGRESS",
+  "pivot": {
+    "from": "parent-atlas-document-governance-master-index",
+    "to": "parent-atlas-deep-research-ingestion",
+    "reason": "The prior lane reached a natural reconciliation pause; deep-research ingestion had two locally testable open tasks and could advance without datastore writes or container rebuilds."
+  },
+  "workboardSnapshot": {
+    "changes": 88,
+    "tasks": 9457,
+    "checked": 6128,
+    "open": 3329,
+    "actionable": 2516,
+    "waiting": 756,
+    "superseded": 55,
+    "progressFraction": 0.6479856191181136,
+    "source": "docs/reports/openspec-workboard-v1.json",
+    "generatedAt": "2026-09-22T23:56:15.975Z"
+  },
+  "changeSnapshot": {
+    "name": "parent-atlas-deep-research-ingestion",
+    "schema": "spec-driven",
+    "complete": 5,
+    "total": 6,
+    "remaining": 1
+  },
+  "workThisRun": [
+    {
+      "item": "DISCOVERY-05 observedAt/TTL recency and fallback semantics",
+      "result": "IMPLEMENTED_TESTED_AND_BOUNDED_LIVE_REPLAY_PROVEN",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/retrieval/search-observation-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-observation-v1.spec.ts",
+        "docs/reports/deep-research-live-discovery-replay-v1.json"
+      ],
+      "tests": "23/23 focused observation and acquisition-routing tests passed; a 60-second TTL replay changed only freshness status and exposed no identity/revision fields.",
+      "liveReplay": "Existing agent-tool search owner returned explicit curated fallback with 2 results; snapshot checksummed; zero datastore writes."
+    },
+    {
+      "item": "DISCOVERY-04 acquired-content handoff",
+      "result": "REMAINS_OPEN_OWNER_BOUNDARY_IDENTIFIED",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/acquisition/conditional-fetch.ts",
+        "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-admission.ts",
+        "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md"
+      ],
+      "limitation": "The acquisition plane's sourceRevisionId/contentDigest and DOC-06A's versioned page/chunk admission receipt are separate owner contracts. No new bridge or live readback was claimed; running DOC-06A admission would create temporary Postgres rows, so it was not invoked under this zero-write tranche.",
+      "measuredMismatch": "AcquisitionResultV1.sourceRevisionId is UUID and contentDigest hashes raw fetched bytes; ExtractionResultV1 adds normalizedTextDigest. DOC-06A accepts a different sourceRevision and page contentHash, and its receipt carries neither acquisition ID nor acquisition digests. No resolver/binding establishes equivalence or maps parser spans across these contracts."
+    }
+  ],
+  "validation": {
+    "vitest": "23/23 passed",
+    "openspecStrict": "PASS: parent-atlas-deep-research-ingestion",
+    "scopedDiffCheck": "PASS",
+    "repoWideDiffCheck": "PREEXISTING_FAILURE: generated simd-bridge/cpp/build-x64-cuda/CMakeConfigureLog.yaml contains trailing whitespace; unrelated to this tranche"
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "containerRebuild": false
+  },
+  "nextSelection": {
+    "gate": "DISCOVERY-04_ACQUISITION_TO_VERSIONED_DOCUMENT_HANDOFF",
+    "safeNext": "Define and fixture-test a read-only bridge over the existing acquisition digest and DOC-06A byte-span/checksum receipt contracts; do not invoke admission until a separately bounded write authorization is present."
+  }
+}

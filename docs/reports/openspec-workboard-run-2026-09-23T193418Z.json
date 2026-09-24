@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T19:34:18Z",
+  "objective": "Continue evidence-backed OpenSpec completion; defer container rebuilds until the end.",
+  "activeChange": "parent-atlas-transport-memory-boundaries",
+  "pivotFromPreviousRun": {
+    "previousChange": "parent-atlas-workboard-feature-utility-fabric",
+    "previousProgress": "23/68",
+    "currentProgressBefore": "40/93",
+    "reason": "The WFU next item required source-owner adapters that were not yet wired; routed to the independent transport workboard's ready tasks."
+  },
+  "completedThisRun": {
+    "task": "HG-03",
+    "progressBefore": "40/93",
+    "progressAfter": "41/93",
+    "implementation": "workflow-action-adapters.ts preserves validated hyperedge relationship evidence, including participant tuples and relationship revisions, in workflow event metadata; packet_key remains the artifactRef and runId remains event identity.",
+    "tests": "5/5 passed: workflow-action-adapters and workflow-action-event",
+    "typecheck": "PASS: package TypeScript compiler",
+    "strictValidation": "PASS: parent-atlas-transport-memory-boundaries",
+    "diffCheck": "PASS"
+  },
+  "workboardSnapshot": {
+    "taskFiles": 93,
+    "checked": 6286,
+    "open": 3248,
+    "total": 9534,
+    "note": "Fresh recursive tasks.md checkbox recount after HG-03; global counts include concurrent edits in other changes, so the net global delta is not attributed solely to this task."
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0,
+    "containerRebuilds": 0,
+    "filesystem": "code/test/OpenSpec task/report edits only"
+  },
+  "patchTargets": [
+    "packages/parent-atlas/src/core/workflow-action-adapters.ts",
+    "packages/parent-atlas/test/workflow-action-adapters.test.mjs",
+    "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md"
+  ],
+  "nextGate": "GDS-04_READ_ONLY_EXECUTOR_PARITY_FEASIBILITY",
+  "nextAction": "Inspect the existing CPU and optional cuGraph comparison owners for one already-frozen graph snapshot; do not load/rebuild a GPU container or promote results."
+}

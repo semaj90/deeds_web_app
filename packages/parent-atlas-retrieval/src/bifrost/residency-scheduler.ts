@@ -55,6 +55,46 @@ export const ResidencyHintV1Schema = z.object({
 }).strict();
 export type ResidencyHintV1 = z.infer<typeof ResidencyHintV1Schema>;
 
+/** Descriptor-only warm-bucket references; never canonical document content. */
+export const HotBucketDescriptorV1Schema = z.object({
+  schema: z.literal('atlas.hot-bucket-descriptor.v1'),
+  bucketId: z.string().min(1),
+  workspaceRevision: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  candidateSnapshotChecksum: z.string().min(1),
+  representationRevision: z.string().min(1),
+  residencyPolicyRevision: z.string().min(1),
+  tier: ResidencyTierV1Schema,
+  candidateOrdinals: z.array(z.number().int().nonnegative()).max(10000),
+  docChunkIds: z.array(z.string().min(1)).max(10000),
+  conceptIds: z.array(z.string().min(1)).max(10000),
+  centroidIds: z.array(z.string().min(1)).max(4096),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+}).strict().superRefine((value, ctx) => {
+  if (value.candidateOrdinals.length === 0 && value.docChunkIds.length === 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['candidateOrdinals'], message: 'bucket must contain a bounded reference' });
+  }
+  if (new Set(value.candidateOrdinals).size !== value.candidateOrdinals.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['candidateOrdinals'], message: 'candidate ordinals must be unique' });
+  }
+  if (new Set(value.docChunkIds).size !== value.docChunkIds.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['docChunkIds'], message: 'document chunk references must be unique' });
+  }
+});
+export type HotBucketDescriptorV1 = z.infer<typeof HotBucketDescriptorV1Schema>;
+
+export function buildHotBucketDescriptorV1(
+  input: Omit<HotBucketDescriptorV1, 'schema' | 'canonicalAuthority' | 'writesPerformed'>,
+): HotBucketDescriptorV1 {
+  return HotBucketDescriptorV1Schema.parse({
+    ...input,
+    schema: 'atlas.hot-bucket-descriptor.v1',
+    canonicalAuthority: false,
+    writesPerformed: false,
+  });
+}
+
 export const ResidencySchedulerPlanV1Schema = z.object({
   schema: z.literal('atlas.residency-scheduler-plan.v1'),
   workspaceRevision: z.string().min(1),

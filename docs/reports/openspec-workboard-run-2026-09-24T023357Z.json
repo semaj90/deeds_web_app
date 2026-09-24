@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T02:33:57Z",
+  "fromChange": "parent-atlas-retrieval-lineage-dag-convergence",
+  "toChange": "parent-atlas-versioned-doc-intelligence",
+  "pivotGate": "VAL10B_SUMMARY_PERSISTENCE_ADMISSION_01",
+  "reason": "The fresh read-only source-authority plan still finds the DOC-13 target bytes mismatched and cannot safely advance without a new admitted source snapshot. The versioned-doc change has a bounded persistence-admission gap with local code/tests available to harden without database writes.",
+  "sourceAuthorityReadback": {
+    "status": "REPAIR_PLAN_PARTIAL_EXACT_BLOCKED",
+    "currentWorkspaceRevision": "sha256:accc50c4644a75fb21ad61e2790b9440722b9207f5c5b66bd01b075a0c6b1f4e",
+    "exactCurrentBindings": 23632,
+    "currentBindingMismatches": 816,
+    "excludedSubmoduleRows": 1086,
+    "unavailableSources": 8,
+    "canonicalAuthority": false,
+    "report": "docs/reports/current-source-authority-repair-plan-v1.json"
+  },
+  "workNow": {
+    "gate": "VAL10B_SUMMARY_PERSISTENCE_ADMISSION_01",
+    "result": "VAL10B_ADMISSION_GUARD_PARTIAL_PROVEN",
+    "report": "docs/reports/parent-atlas/val-10b-summary-persistence-admission-v1.json",
+    "databaseWrites": 0,
+    "modelCalls": 0,
+    "containerRebuilds": 0
+  },
+  "constraints": {
+    "noCanonicalPromotion": true,
+    "noSummaryApply": true,
+    "noGraphifyRun": true,
+    "noContainerRebuildsUntilEnd": true,
+    "preserveConcurrentWorkingTreeEdits": true
+  }
+}

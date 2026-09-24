@@ -117,3 +117,129 @@ def test_postgres_adapter_rejects_unbounded_traversal_inputs():
         oak.OakTraversalRequest(entity_id="concept:x", direction="ancestors", max_depth=5)
     with pytest.raises(ValidationError):
         oak.OakSearchRequest(query="contract", limit=101)
+
+
+def test_typed_assertion_request_is_strict_and_uses_only_known_predicates():
+    valid = oak.OakTypedAssertionRequest.model_validate({
+        "subject": "concept:hnsw", "predicate": "PART_OF",
+        "object": "concept:pgvector", "evidenceRef": "span:10-20",
+    })
+    assert valid.subject_concept_id == "concept:hnsw"
+    for payload in (
+        {"subject": "concept:hnsw", "predicate": "INVENTED", "object": "concept:pgvector", "evidenceRef": "span:10-20"},
+        {"subject": "concept:hnsw", "predicate": "PART_OF", "object": "concept:pgvector", "evidenceRef": ""},
+        {"subject": "concept:hnsw", "predicate": "PART_OF", "object": "concept:pgvector", "evidenceRef": "span:10-20", "claimText": "arbitrary prose"},
+    ):
+        with pytest.raises(ValidationError):
+            oak.OakTypedAssertionRequest.model_validate(payload)
+
+
+def test_postgres_typed_assertion_query_is_exact_bounded_and_read_only(monkeypatch):
+    adapter = oak.AtlasPostgresOntologyAdapter("postgresql://fixture/atlas")
+    calls = []
+    relation = {
+        "relation_id": "rel-1", "subject_concept_id": "concept:hnsw",
+        "predicate": "PART_OF", "object_concept_id": "concept:pgvector",
+        "confidence": 1.0, "extractor_version": "test-v1",
+    }
+
+    def fake_query(sql, params=()):
+        calls.append((sql, params))
+        return [relation]
+
+    monkeypatch.setattr(adapter, "_query", fake_query)
+    assert adapter.match_typed_assertion("concept:hnsw", "PART_OF", "concept:pgvector") == [relation]
+    sql, params = calls[0]
+    assert params == ("concept:hnsw", "PART_OF", "concept:pgvector")
+    assert "subject_concept_id = %s" in sql
+    assert "predicate = %s" in sql
+    assert "object_concept_id = %s" in sql
+    assert "LIMIT 2" in sql
+    assert "ILIKE" not in sql.upper()
+    assert not any(word in sql.upper() for word in ("INSERT", "UPDATE", "DELETE", "UPSERT"))
+
+
+def test_typed_assertion_route_reports_relation_match_without_claiming_source_verification(monkeypatch):
+    adapter = oak.AtlasPostgresOntologyAdapter("postgresql://fixture/atlas")
+    monkeypatch.setattr(oak, "_adapter", lambda: adapter)
+    monkeypatch.setattr(adapter, "match_typed_assertion", lambda *_: [{
+        "relation_id": "rel-1", "subject_concept_id": "concept:hnsw",
+        "predicate": "PART_OF", "object_concept_id": "concept:pgvector",
+        "confidence": 1.0, "extractor_version": "test-v1",
+    }])
+    request = oak.OakTypedAssertionRequest.model_validate({
+        "subject": "concept:hnsw", "predicate": "PART_OF",
+        "object": "concept:pgvector", "evidenceRef": "span:10-20",
+    })
+    result = oak.oak_check_typed_assertion(request)
+    assert result["status"] == "MATCHED"
+    assert result["sourceSpanVerification"] == "NOT_PERFORMED"
+    assert result["canonicalAuthority"] is False
+    assert result["writesPerformed"] is False
+    assert result["assertion"]["evidenceRef"] == "span:10-20"
+
+
+@pytest.mark.parametrize(("rows", "expected_status"), [([], "NOT_FOUND"), ([{}, {}], "AMBIGUOUS")])
+def test_typed_assertion_route_fails_closed_for_missing_or_ambiguous_relations(monkeypatch, rows, expected_status):
+    adapter = oak.AtlasPostgresOntologyAdapter("postgresql://fixture/atlas")
+    monkeypatch.setattr(oak, "_adapter", lambda: adapter)
+    monkeypatch.setattr(adapter, "match_typed_assertion", lambda *_: rows)
+    request = oak.OakTypedAssertionRequest.model_validate({
+        "subject": "concept:hnsw", "predicate": "PART_OF",
+        "object": "concept:pgvector", "evidenceRef": "span:10-20",
+    })
+    result = oak.oak_check_typed_assertion(request)
+    assert result["status"] == expected_status
+    assert result["matchedRelation"] is None
+    assert result["canonicalAuthority"] is False
+
+
+def test_typed_assertion_route_fails_closed_for_non_postgres_adapter(monkeypatch):
+    class FixtureAdapter:
+        pass
+
+    monkeypatch.setattr(oak, "_adapter", lambda: FixtureAdapter())
+    request = oak.OakTypedAssertionRequest.model_validate({
+        "subject": "concept:hnsw", "predicate": "PART_OF",
+        "object": "concept:pgvector", "evidenceRef": "span:10-20",
+    })
+    with pytest.raises(oak.HTTPException) as error:
+        oak.oak_check_typed_assertion(request)
+    assert error.value.status_code == 503
+    assert error.value.detail == "OAK_TYPED_ASSERTION_POSTGRES_ADAPTER_REQUIRED"
+
+
+def test_oaklib_traversal_route_reuses_obograph_interface_for_both_directions(monkeypatch):
+    calls = []
+
+    class FixtureOboGraphInterface:
+        def ancestors(self, entity_id, **kwargs):
+            calls.append(("ancestors", entity_id, kwargs))
+            return ["PARENT:1"]
+
+        def descendants(self, entity_id, **kwargs):
+            calls.append(("descendants", entity_id, kwargs))
+            return ["CHILD:1"]
+
+        def label(self, entity_id):
+            return f"label:{entity_id}"
+
+    adapter = FixtureOboGraphInterface()
+    monkeypatch.setattr(oak, "OboGraphInterface", FixtureOboGraphInterface)
+    monkeypatch.setattr(oak, "_adapter", lambda: adapter)
+
+    ancestors = oak.oak_traverse(oak.OakTraversalRequest(
+        entity_id="TERM:0", direction="ancestors", predicates=["is_a"], limit=5, max_depth=2,
+    ))
+    descendants = oak.oak_traverse(oak.OakTraversalRequest(
+        entity_id="TERM:0", direction="descendants", predicates=["part_of"], limit=5, max_depth=2,
+    ))
+
+    assert [node["entityId"] for node in ancestors["nodes"]] == ["PARENT:1"]
+    assert [node["entityId"] for node in descendants["nodes"]] == ["CHILD:1"]
+    assert calls == [
+        ("ancestors", "TERM:0", {"predicates": ["is_a"]}),
+        ("descendants", "TERM:0", {"predicates": ["part_of"]}),
+    ]
+    assert ancestors["canonicalAuthority"] is False
+    assert descendants["canonicalAuthority"] is False

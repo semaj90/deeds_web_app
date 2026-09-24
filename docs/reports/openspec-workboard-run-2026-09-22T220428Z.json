@@ -1,0 +1,317 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runTimestamp": "2026-09-22T23:43:00Z",
+  "status": "IN_PROGRESS",
+  "pivot": {
+    "from": "READ_ONLY_QUICK_HITS / OKF_V02_PROFILE_DECISION",
+    "to": "parent-atlas-document-governance-master-index",
+    "reason": "OKF repair requires an owner-defined v0.2 profile; continue independent OpenSpec implementation work instead of waiting on that decision."
+  },
+  "workboardSnapshot": {
+    "changes": 88,
+    "tasks": 9457,
+    "checked": 6127,
+    "open": 3330,
+    "actionable": 2517,
+    "source": "docs/reports/openspec-workboard-v1.json"
+  },
+  "changeSnapshot": {
+    "name": "parent-atlas-document-governance-master-index",
+    "schema": "spec-driven",
+    "complete": 33,
+    "total": 64,
+    "remaining": 31
+  },
+  "workThisRun": [
+    {
+      "item": "4.2 artifactRefs versus filesEdited semantics",
+      "result": "RESOLVED_FROM_EXISTING_OWNERS",
+      "evidence": [
+        "packages/parent-atlas/src/core/workflow-action-event.ts",
+        "sveltekit-frontend/src/lib/server/atlas/workflow/workflow-action-event-v1.ts",
+        "scripts/atlas/agentic-recommendation-workflow.mjs"
+      ]
+    },
+    {
+      "item": "6.2 Master TOC generation",
+      "result": "PARTIAL_GENERATOR_AND_REPLAY_PROVEN; TASK_REMAINS_OPEN",
+      "generator": "scripts/atlas/build-master-toc.mjs",
+      "registryChecksumAtPivot": "sha256:e7d9615d679361855d20e613b63a231e8236a6bdffb9b024e41fcfcdc1549654",
+      "records": 4712,
+      "openSpecTaskFiles": 93,
+      "archiveEligible": 0,
+      "remainingRequirement": "Generated TOC still needs explicit canonical-topic, experiment, and conflict presentation; no checkbox was closed for 6.2."
+    },
+    {
+      "item": "Master TOC instruction-file discovery performance",
+      "result": "OPTIMIZED",
+      "detail": "Replaced whole-repository recursive enumeration for CLAUDE.md/AGENTS.md discovery with ripgrep filename discovery; the existing TOC projections were regenerated and deterministic check passed."
+    },
+    {
+      "item": "5.2 supersession reference audit",
+      "result": "REFERENCE_CENSUS_IMPLEMENTED; LIVE_TARGET_SET_EMPTY",
+      "evidence": "The new exact-rg census covers old path, title, explicit topic IDs, document IDs, and replacement IDs. Fixture tests pass 4/4. The live registry has 0 superseded records and 0 explicit links, so it reports NO_SUPERSESSION_TARGETS rather than claiming a zero-reference scan."
+    },
+    {
+      "item": "Sidecar recovered syntax error envelope",
+      "result": "CODE_AND_FOCUSED_TEST_PROVEN_LIVE_REBUILD_PENDING",
+      "evidence": "7 focused Python tests passed; existing deployed service image was not rebuilt."
+    },
+    {
+      "item": "4.3 OpenSpec workflow receipt recorder",
+      "result": "CANONICAL_EVENT_VALIDATION_AND_TEMP_REPO_READBACK_PROVEN",
+      "evidence": "Both receipt smoke scripts passed; canonical event schema validated on apply, and an incomplete journal group was rejected without modifying the receipt ledger."
+    },
+    {
+      "item": "1.1 DocumentGovernanceRecordV1 schema and consumers",
+      "result": "IMPLEMENTED_AND_VALIDATED",
+      "evidence": [
+        "packages/parent-atlas/src/core/document-governance-record-v1.ts",
+        "packages/parent-atlas/test/document-governance-record-v1.test.mjs",
+        "scripts/atlas/build-master-toc.mjs",
+        "sveltekit-frontend/src/routes/api/admin/atlas/document-governance/+server.ts"
+      ],
+      "tests": "Package TypeScript compile; 4/4 schema tests; 4,712 generated records pass strict validation; Master TOC replay checksum matches; OpenSpec strict validation passes.",
+      "limitation": "Full Svelte check reports 35 errors and 291 warnings across 118 files; a second isolated scan was stopped due to the cost of repeating the repository-wide check. Route-specific type status was not established."
+    },
+    {
+      "item": "1.3 deterministic topic/status extraction audit",
+      "result": "IMPLEMENTED_FAIL_CLOSED_AND_PROVEN",
+      "evidence": [
+        "docs/.okf/schema.yaml",
+        "docs/okf/parent-atlas/*.md",
+        "openspec/changes/parent-atlas-document-governance-master-index/design.md"
+      ],
+      "detail": "Existing OKF frontmatter uses generic `status` values such as PROVEN, PARTIAL_PROVEN, and NOT_PROVEN; these are evidence states, not document lifecycle states. The extractor reads only dedicated governance fields and deterministic path conventions. Current corpus has 0 explicit topic claims/status overrides, 0 malformed frontmatters, and 34 generic OKF statuses correctly left unpromoted. Focused tests: 4/4."
+    },
+    {
+      "item": "1.4 canonical topic conflict validation",
+      "result": "FAIL_CLOSED_CONFLICT_BEHAVIOR_PROVEN",
+      "evidence": [
+        "scripts/atlas/document-governance-topic-conflicts-v1.mjs",
+        "scripts/atlas/document-governance-topic-conflicts-v1.test.mjs"
+      ],
+      "tests": "3/3; competing explicit canonical claims all become CONFLICT and no winner is selected. Current 4,712-record corpus has 0 explicit canonical claims, so no live conflict count is inferred."
+    },
+    {
+      "item": "2.1 CLAUDE instruction scope and inheritance",
+      "result": "PROVEN_SCOPE_IS_SEPARATE_FROM_SUPERSESSION",
+      "evidence": [
+        "scripts/atlas/document-governance-instruction-scope-v1.mjs",
+        "scripts/atlas/document-governance-instruction-scope-v1.test.mjs"
+      ],
+      "tests": "4/4; whole registry discovers 7 exact-basename CLAUDE files: 1 root, 6 with nearest-parent links, 0 ambiguous, and 0 inferred supersession edges."
+    },
+    {
+      "item": "2.2-2.5 ClaudeInstructionSupersessionPlanV1",
+      "result": "PROVEN_BOUNDED_READ_ONLY_PLAN; NO_SUPERSESSION_INFERRED",
+      "evidence": [
+        "scripts/atlas/document-governance-supersession-plan-v1.mjs",
+        "scripts/atlas/plan-claude-instruction-supersession-v1.mjs",
+        "scripts/atlas/plan-claude-instruction-supersession-v1.smoke.mjs",
+        "docs/reports/claude-instruction-supersession-plan-v1.json",
+        "docs/reports/document-supersession-audit-current-v1.json"
+      ],
+      "tests": "15/15 focused governance tests; smoke confirms all 7 source instruction files remained byte-identical. Registry/audit checksums agree. Dispositions: 1 CANONICAL_CURRENT, 6 SCOPED_SUPPORTING, 0 SUPERSEDED_CANDIDATE, 0 CONFLICT.",
+      "policy": "Only reciprocal explicit document-ID links are considered; scope and modification recency never imply supersession. The existing text-reference audit is not treated as directional authority."
+    },
+    {
+      "item": "3.1 OpenSpec binding and 3.4 closure gate",
+      "result": "BINDINGS_PROVEN; CLOSURE_FAILS_CLOSED",
+      "evidence": [
+        "scripts/atlas/document-governance-openspec-binding-v1.mjs",
+        "scripts/atlas/document-governance-openspec-binding-v1.test.mjs",
+        "scripts/atlas/validate-document-governance-index.mjs",
+        "docs/reports/document-governance-validation-current-v1.json"
+      ],
+      "tests": "5 binding/closure tests pass. Current registry has 93/93 task ledgers bound and 0 binding failures; 3,348 open tasks correctly keep closureEligible=false.",
+      "detail": "Replaced stale reads of flat kind/openspecChange/task-count fields with the current nested documentKind/openspec contract. Overall BLOCKED is the expected truthful status while tracked tasks remain open."
+    },
+    {
+      "item": "3.2 schema-aware OpenSpec lifecycle validation",
+      "result": "SCHEMA_DRIVEN_ARTIFACT_LIFECYCLE_PROVEN",
+      "evidence": [
+        "npx openspec status --change parent-atlas-document-governance-master-index",
+        "npx openspec validate parent-atlas-document-governance-master-index --strict"
+      ],
+      "detail": "The change declares schema spec-driven; the CLI reports exactly 4/4 required artifacts (proposal, design, specs, tasks) complete and strict validation passes. No extra artifact requirements were inferred."
+    },
+    {
+      "item": "3.5 fail-closed archive candidate gate",
+      "result": "RULE_PROVEN; NO_ARCHIVE_CANDIDATES_OR_WRITES",
+      "evidence": [
+        "scripts/atlas/document-governance-archive-gate-v1.mjs",
+        "scripts/atlas/document-governance-archive-gate-v1.test.mjs",
+        "scripts/atlas/validate-document-governance-index.mjs",
+        "docs/reports/document-governance-validation-current-v1.json"
+      ],
+      "tests": "5/5 archive-gate tests pass, covering a fully qualified candidate and rejection for active references, incomplete tasks, unresolved replacement, unproven reference scan, and missing exemption. Registry audit never trusts a record flag as an independently proven reference scan.",
+      "liveCensus": "0 SUPERSEDED records, 0 explicit supersededBy links, 0 archive flags; no archive operation attempted."
+    },
+    {
+      "item": "4.1 workflow receipt identity reconciliation",
+      "result": "CANONICAL_REVISION_QUALIFIED_IDEMPOTENCY_PROVEN",
+      "evidence": [
+        "packages/parent-atlas/src/core/workflow-action-event.ts",
+        "scripts/atlas/record-agentic-run-receipt.mjs",
+        "scripts/atlas/record-agentic-run-receipt.smoke.mjs",
+        "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md"
+      ],
+      "tests": "Smoke passes: same-revision replay is NO_OP, a new workflowRevision with the same action/sequence is separately recorded, and a changed payload at the same canonical coordinate is rejected.",
+      "detail": "Recorder de-duplication now uses the existing receipt coordinate workflowId/workflowRevision/actionId/sequence; runId remains event payload identity and conflicting reuse fails closed."
+    },
+    {
+      "item": "9.3-9.5 supersession/archive regression fixtures",
+      "result": "VERIFIED_AND_RECONCILED",
+      "evidence": [
+        "scripts/atlas/document-governance-supersession-plan-v1.test.mjs",
+        "scripts/atlas/document-governance-archive-gate-v1.test.mjs"
+      ],
+      "tests": "Future-dated scoped instruction remains supporting, unchecked OpenSpec tasks block archive, and an active reference blocks archive; all covered in the focused suite."
+    },
+    {
+      "item": "Document-governance deterministic registry/TOC replay",
+      "result": "PROVEN_TWO_IDENTICAL_REBUILDS",
+      "evidence": [
+        "docs/reports/document-governance-registry-v1.json",
+        "docs/MASTER-TOC.md"
+      ],
+      "checksums": {
+        "registrySha256": "94425e02750440625c1f22db6964f3618c3f1d5386a2f1d4a7e5a22c68f516ac",
+        "masterTocSha256": "b65c85fab9bba1d38d4a5a6462c650e69baeed45887515507e71a654b7efb6ba"
+      },
+      "smoke": "npm run atlas:docs:toc:replay-smoke",
+      "detail": "The persistent smoke runner invokes two canonical builds and asserts byte-identical registry and Master TOC outputs.",
+      "smoke": "npm run atlas:docs:toc:replay-smoke"
+    },
+    {
+      "item": "5.1-5.3 supersession reference discovery and replacement coverage",
+      "result": "READ_ONLY_CENSUS_IMPLEMENTED; LIVE_TARGETS_ABSENT; REPLACEMENT_GATE_PROVEN",
+      "evidence": [
+        "scripts/atlas/git-diff-supersedes-reconcile-production.mjs (read-only inspection only)",
+        "scripts/atlas/document-reference-census-v1.mjs",
+        "scripts/atlas/document-reference-census-v1.test.mjs",
+        "scripts/atlas/document-governance-archive-gate-v1.mjs",
+        "scripts/atlas/document-governance-archive-gate-v1.test.mjs",
+        "docs/reports/document-reference-census-v1.json"
+      ],
+      "tests": "Reference-census fixture 4/4; live registry has 0 SUPERSEDED records and 0 explicit supersession links, so the receipt reports NO_SUPERSESSION_TARGETS without claiming a zero-reference scan. Reciprocal replacement coverage remains fail-closed."
+    },
+    {
+      "item": "5.4 canonical/replacement source-link smoke",
+      "result": "PROVEN_BOUNDED",
+      "evidence": [
+        "scripts/atlas/document-governance-link-smoke-v1.mjs",
+        "scripts/atlas/document-governance-link-smoke-v1.test.mjs"
+      ],
+      "tests": "3/3; live registry verified 14 canonical documents by path and SHA-256, with 0 replacement links currently present."
+    },
+    {
+      "item": "5.6 archive report reason for empty candidate set",
+      "result": "PROVEN_NO_CANDIDATES_NO_WRITES",
+      "evidence": [
+        "scripts/atlas/document-governance-archive-gate-v1.mjs",
+        "scripts/atlas/document-governance-archive-gate-v1.test.mjs",
+        "docs/reports/document-governance-validation-current-v1.json"
+      ],
+      "tests": "6/6 archive-gate tests; report distinguishes an empty candidate set from eligible/blocked candidates and keeps archive writes disabled."
+    }
+  ],
+  "validation": {
+    "openSpecStrict": [
+      "parent-atlas-document-governance-master-index: PASS",
+      "parent-atlas-agentic-run-receipt-binding: PASS",
+      "parent-atlas-transport-memory-boundaries: PASS"
+    ],
+    "masterTocReplay": "PASS",
+    "documentGovernanceSchema": "4/4 focused tests; 4,711 generated records pass strict validation",
+    "documentGovernanceFrontmatter": "4/4 focused tests; fail-closed whole-registry replay pass",
+    "documentGovernanceTopicConflicts": "3/3 focused tests; whole-registry replay has 0 explicit claims and 0 conflicts",
+    "documentGovernanceInstructionScope": "4/4 focused tests; all 7 discovered CLAUDE files receive scoped/inheritance status",
+    "documentGovernanceSupersessionPlan": "4 dedicated plan cases plus 11 existing governance cases; 15/15 pass; source-preserving smoke passes for all 7 instruction files",
+    "documentSupersessionAuditCurrent": "PROVEN_BOUNDED; 16 textual reference candidates, 0 unresolved; not directional authority",
+    "documentGovernanceOpenSpecBinding": "93/93 task ledgers bound; 0 missing; 5 focused binding/closure tests passed",
+    "documentGovernanceClosure": "BLOCKED as designed; 3,330 unchecked tasks, closureEligible=false; no archive or document writes",
+    "documentGovernanceArchiveGate": "6/6 focused tests pass; live registry 0 candidates with NO_SUPERSESSION_OR_ARCHIVE_CANDIDATES and 0 archive writes",
+    "documentGovernanceReplay": "Persistent smoke runner passed; two consecutive registry/TOC builds had identical SHA-256 checksums",
+    "documentReferenceCensus": "4/4 tests; live status NO_SUPERSESSION_TARGETS",
+    "documentGovernanceRegistryRecords": "4,711 records; 93 OpenSpec task ledgers bound; archive candidates 0",
+    "documentGovernanceFocusedSuite": "33/33 Node tests passed",
+    "workflowReceiptIdentity": "Cross-revision collision fixed; isolated apply/replay/conflict smoke PASS",
+    "openSpecSchemaLifecycle": "spec-driven; 4/4 required artifacts present; strict validation PASS",
+    "svelteCheck": "35 errors and 291 warnings across 118 files; route-specific attribution not established",
+    "focusedPythonTests": "7 passed",
+    "vitestAdapterRun": "NOT_CONFIRMED; invocation did not complete within the session and is not counted as passing",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "nextSelection": "DOCUMENT_GOVERNANCE_5_5_CROSS_DOCUMENT_CONTRADICTION_AUDIT",
+  "blockedOrDeferred": [
+    "Document-governance 4.4/4.6: shared WorkflowActionEventV1 has no typed progress contract and no admitted receipt with workflowRevision/runId; keep progress rollup and checksum open until such an event exists.",
+    "Document-governance 5.2 live search has no target document because the registry has 0 superseded records/links; only fixture-level search behavior is proven until a target is explicitly nominated.",
+    "Document-governance 5.4 live replacement-link coverage is 0 because no explicit links exist; only the fail-closed fixture is exercised for replacement documents.",
+    "OKF v0.2 profile definition requires owner decision.",
+    "Sidecar typed errorTag live parity requires a later service rebuild and bounded probe.",
+    "Current source authority and canonical AST-symbol promotion remain blocked upstream."
+  ],
+  "dataStoreWrites": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false
+  },
+  "filesystemWrites": [
+    "docs/MASTER-TOC.md",
+    "docs/OPENSPEC-WORKBOARD.md",
+    "docs/reports/document-governance-registry-v1.json",
+    "docs/reports/document-supersession-audit-v1.json",
+    "docs/reports/document-supersession-audit-current-v1.json",
+    "docs/reports/document-reference-census-v1.json",
+    "docs/reports/claude-instruction-supersession-plan-v1.json",
+    "docs/reports/document-governance-validation-current-v1.json",
+    "docs/reports/openspec-workboard-run-2026-09-22T220428Z.json",
+    "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+    "docs/reports/openspec-workboard-v1.json",
+    "docs/reports/openspec-workboard-run-2026-09-22T220428Z.json",
+    "scripts/atlas/build-master-toc.mjs",
+    "scripts/atlas/audit-document-supersession-v1.mjs",
+    "scripts/atlas/document-governance-supersession-plan-v1.mjs",
+    "scripts/atlas/document-governance-supersession-plan-v1.test.mjs",
+    "scripts/atlas/plan-claude-instruction-supersession-v1.mjs",
+    "scripts/atlas/plan-claude-instruction-supersession-v1.smoke.mjs",
+    "scripts/atlas/document-governance-openspec-binding-v1.mjs",
+    "scripts/atlas/document-governance-openspec-binding-v1.test.mjs",
+    "scripts/atlas/validate-document-governance-index.mjs",
+    "scripts/atlas/document-governance-archive-gate-v1.mjs",
+    "scripts/atlas/document-governance-archive-gate-v1.test.mjs",
+    "scripts/atlas/document-reference-census-v1.mjs",
+    "scripts/atlas/document-reference-census-v1.test.mjs",
+    "scripts/atlas/document-governance-link-smoke-v1.mjs",
+    "scripts/atlas/document-governance-link-smoke-v1.test.mjs",
+    "scripts/atlas/document-governance-replay-v1.smoke.mjs",
+    "package.json",
+    "scripts/atlas/record-agentic-run-receipt.mjs",
+    "scripts/atlas/record-agentic-run-receipt.smoke.mjs",
+    "scripts/atlas/record-workflow-run-receipt.mjs",
+    "scripts/atlas/record-workflow-run-receipt.smoke.mjs",
+    "scripts/atlas/record-agentic-run-receipt.mjs",
+    "scripts/atlas/record-agentic-run-receipt.smoke.mjs",
+    "python/miniforge_nlp_sidecar_v2.py",
+    "python/test_miniforge_nlp_sidecar_v2_multiline_crlf.py",
+    "packages/parent-atlas/src/core/document-governance-record-v1.ts",
+    "packages/parent-atlas/test/document-governance-record-v1.test.mjs",
+    "packages/parent-atlas/package.json",
+    "scripts/atlas/document-governance-frontmatter-v1.mjs",
+    "scripts/atlas/document-governance-frontmatter-v1.test.mjs",
+    "scripts/atlas/document-governance-topic-conflicts-v1.mjs",
+    "scripts/atlas/document-governance-topic-conflicts-v1.test.mjs",
+    "scripts/atlas/document-governance-instruction-scope-v1.mjs",
+    "scripts/atlas/document-governance-instruction-scope-v1.test.mjs",
+    "sveltekit-frontend/src/routes/api/admin/atlas/document-governance/+server.ts",
+    "package.json",
+    "package-lock.json",
+    "openspec/changes/parent-atlas-document-governance-master-index/design.md",
+    "OpenSpec task ledgers"
+  ]
+}

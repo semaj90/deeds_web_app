@@ -2,7 +2,12 @@
   "schema": "atlas.doc-26.incremental-recrawl-fixture.v1",
   "gate": "DOC-26",
   "status": "DOC_26_INCREMENTAL_RECRAWL_FIXTURE_PROVEN",
-  "owner": "sveltekit-frontend/src/lib/server/atlas/acquisition/conditional-fetch.ts",
+  "decisionOwner": null,
+  "relatedOwners": [
+    "python/atlas_okf_docs_pipeline.py",
+    "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-admission.ts"
+  ],
+  "integrationStatus": "FIXTURE_ONLY_NOT_WIRED",
   "identityRule": "content bytes and explicit productVersion determine reuse; timestamps and validators do not create identity",
   "cases": [
     {
@@ -12,7 +17,8 @@
       "pass": true,
       "reason": "source bytes and revision are unchanged",
       "timestampOnlyDifference": true,
-      "priorRowsPreserved": false
+      "priorRowsPreserved": false,
+      "persistenceProof": "NOT_EXERCISED_BY_FIXTURE"
     },
     {
       "name": "changed-bytes-same-version",
@@ -21,7 +27,8 @@
       "pass": true,
       "reason": "canonical content identity changed",
       "timestampOnlyDifference": false,
-      "priorRowsPreserved": false
+      "priorRowsPreserved": false,
+      "persistenceProof": "NOT_EXERCISED_BY_FIXTURE"
     },
     {
       "name": "changed-product-version",
@@ -30,7 +37,8 @@
       "pass": true,
       "reason": "productVersion changed; preserve prior rows",
       "timestampOnlyDifference": false,
-      "priorRowsPreserved": true
+      "priorRowsPreserved": false,
+      "persistenceProof": "NOT_EXERCISED_BY_FIXTURE"
     }
   ],
   "incompleteMetadata": {
@@ -39,9 +47,20 @@
     "pass": true,
     "note": "Missing identity metadata must not silently reuse or overwrite a prior revision."
   },
+  "identityCompatibility": {
+    "currentChunkIdShape": "doc:{source_id}:{document_checksum[0:16]}:{ordinal}",
+    "productVersionChangesPageEvidenceRevision": true,
+    "productVersionChangesChunkEvidenceRevision": true,
+    "productVersionChangesChunkId": false,
+    "databaseChunkIdIsGloballyUnique": true,
+    "result": "DOC_26_BLOCKED_CHUNK_IDENTITY_COLLISION",
+    "proof": "python/test_atlas_doc_chunk_evidence.py::test_different_product_version_changes_page_and_child_chunk_evidence",
+    "nextGate": "DOC_CHUNK_IDENTITY_V2_OR_COMPATIBILITY_CONTRACT_REVIEW",
+    "note": "Do not change canonical chunk IDs in this fixture; a second version with identical bytes collides under the current global chunk_id uniqueness constraint."
+  },
   "writesPerformed": false,
   "crawlerCalled": false,
   "datastoreWrites": false,
   "canonicalPromotion": false,
-  "generatedAt": "2026-09-21T03:17:18.714Z"
+  "generatedAt": "2026-09-23T21:12:58.109Z"
 }

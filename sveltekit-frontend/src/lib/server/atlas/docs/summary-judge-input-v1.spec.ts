@@ -10,6 +10,7 @@ import {
 } from './summary-claim-validation-v1.js';
 import {
 	buildSummaryJudgeInputV1,
+	computeCanonicalChunkTextChecksumV1,
 	SUMMARY_JUDGE_INPUT_MAX_CHUNK_BYTES,
 	SUMMARY_JUDGE_INPUT_SCHEMA,
 	SummaryJudgeInputV1Schema,
@@ -23,6 +24,7 @@ const body: SummaryJudgeInputV1Body = {
 	chunkEvidenceRevision: 'sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a',
 	summaryOutputChecksum: '099b9e1d0ea636413f67312877aab4a7d1bcfc0c0fbf61936ab68630bfe8b872',
 	canonicalChunkText: 'PostgreSQL pgvector supports HNSW iterative scans for filtered search.',
+	canonicalChunkTextChecksum: computeCanonicalChunkTextChecksumV1('PostgreSQL pgvector supports HNSW iterative scans for filtered search.'),
 	promptVisibleMetadata: {
 		product: 'pgvector',
 		productVersion: '0.8.0',
@@ -83,6 +85,7 @@ describe('SummaryJudgeInputV1 (VAL-06 contract only)', () => {
 		const input = buildSummaryJudgeInputV1(buildInput());
 		expect(input.chunkEvidenceRevision).toBe(body.chunkEvidenceRevision);
 		expect(input.summaryOutputChecksum).toBe(body.summaryOutputChecksum);
+		expect(input.canonicalChunkTextChecksum).toBe(computeCanonicalChunkTextChecksumV1(body.canonicalChunkText));
 		expect(input.claim.claimOrdinal).toBe(0);
 		expect(input.deterministicFindings.sourceSpan.status).toBe('NO_CLAIMED_SPAN');
 		expect(input.canonicalAuthority).toBe(false);
@@ -101,7 +104,20 @@ describe('SummaryJudgeInputV1 (VAL-06 contract only)', () => {
 		expect(() => buildSummaryJudgeInputV1({ ...validInput, canonicalChunkRow: { ...validInput.canonicalChunkRow, chunk_id: 'different-chunk' } })).toThrow(/IDENTITY_MISMATCH/);
 		const built = buildSummaryJudgeInputV1(validInput);
 		expect(SummaryJudgeInputV1Schema.safeParse({ ...built, canonicalChunkText: 'changed' }).success).toBe(false);
+		expect(SummaryJudgeInputV1Schema.safeParse({ ...built, canonicalChunkTextChecksum: '0'.repeat(64) }).success).toBe(false);
 		expect(() => buildSummaryJudgeInputV1({ ...validInput, canonicalChunkRow: { ...validInput.canonicalChunkRow, text: '🧭'.repeat(SUMMARY_JUDGE_INPUT_MAX_CHUNK_BYTES) } })).toThrow();
+	});
+
+	it('requires deterministic validators to have run and source-span state to be final', () => {
+		const validation = buildInput().validation;
+		for (const field of ['technical', 'numeric', 'version'] as const) {
+			const input = buildSummaryJudgeInputV1(buildInput());
+			const invalid = { ...input, deterministicFindings: { ...input.deterministicFindings, [field]: { ...input.deterministicFindings[field], status: 'NOT_RUN' } } };
+			expect(SummaryJudgeInputV1Schema.safeParse(invalid).success).toBe(false);
+		}
+		const input = buildSummaryJudgeInputV1(buildInput());
+		expect(SummaryJudgeInputV1Schema.safeParse({ ...input, deterministicFindings: { ...input.deterministicFindings, sourceSpan: { status: 'NOT_RUN', spans: [] } } }).success).toBe(false);
+		expect(validation.sourceSpan.status).toBe('NO_CLAIMED_SPAN');
 	});
 
 	it('does not execute a model or make a decision', () => {

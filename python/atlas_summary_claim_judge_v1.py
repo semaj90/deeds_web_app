@@ -33,7 +33,7 @@ Transport = Callable[[list[dict[str, str]]], str]
 def validate_judge_input_v1(judge_input: dict[str, Any]) -> None:
     """Fail closed on anything other than the sealed, strict VAL-06 wire shape."""
     required = {
-        "schema", "chunkId", "chunkEvidenceRevision", "summaryOutputChecksum", "canonicalChunkText",
+        "schema", "chunkId", "chunkEvidenceRevision", "summaryOutputChecksum", "canonicalChunkText", "canonicalChunkTextChecksum",
         "promptVisibleMetadata", "claim", "deterministicFindings", "promptRevision", "canonicalAuthority", "judgeInputChecksum",
     }
     if not isinstance(judge_input, dict) or set(judge_input) != required:
@@ -44,11 +44,14 @@ def validate_judge_input_v1(judge_input: dict[str, Any]) -> None:
         raise ValueError("JUDGE_INPUT_CHUNK_ID_INVALID")
     if not re.fullmatch(r"sha256:[a-f0-9]{64}", str(judge_input["chunkEvidenceRevision"])):
         raise ValueError("JUDGE_INPUT_CHUNK_REVISION_INVALID")
-    for key in ("summaryOutputChecksum", "judgeInputChecksum"):
+    for key in ("summaryOutputChecksum", "canonicalChunkTextChecksum", "judgeInputChecksum"):
         if not re.fullmatch(r"[a-f0-9]{64}", str(judge_input[key])):
             raise ValueError("JUDGE_INPUT_CHECKSUM_INVALID")
     if not isinstance(judge_input["canonicalChunkText"], str) or not judge_input["canonicalChunkText"].strip() or len(judge_input["canonicalChunkText"].encode("utf-8")) > 32 * 1024:
         raise ValueError("JUDGE_INPUT_CHUNK_TEXT_INVALID")
+    expected_text_checksum = canonical_sha256_v1({"schema": "atlas.summary-judge-chunk-text.v1", "canonicalChunkText": judge_input["canonicalChunkText"]})
+    if judge_input["canonicalChunkTextChecksum"] != expected_text_checksum:
+        raise ValueError("JUDGE_INPUT_CHUNK_TEXT_CHECKSUM_MISMATCH")
     metadata = judge_input["promptVisibleMetadata"]
     if not isinstance(metadata, dict) or set(metadata) != {"product", "productVersion", "title", "headingPath"} or not isinstance(metadata["headingPath"], list):
         raise ValueError("JUDGE_INPUT_METADATA_INVALID")
@@ -74,6 +77,13 @@ def validate_judge_input_v1(judge_input: dict[str, Any]) -> None:
     for key, fields in slot_fields.items():
         if not isinstance(findings[key], dict) or set(findings[key]) != fields:
             raise ValueError("JUDGE_INPUT_FINDINGS_INVALID")
+    allowed_complete_statuses = {"PASS", "FAIL", "REVIEW"}
+    if any(findings[key]["status"] == "NOT_RUN" for key in ("technical", "numeric", "version")):
+        raise ValueError("JUDGE_INPUT_DETERMINISTIC_SLOT_NOT_RUN")
+    if any(findings[key]["status"] not in allowed_complete_statuses for key in ("technical", "numeric", "version")):
+        raise ValueError("JUDGE_INPUT_DETERMINISTIC_STATUS_INVALID")
+    if findings["sourceSpan"]["status"] not in {"VERIFIED", "REJECTED", "NO_CLAIMED_SPAN"}:
+        raise ValueError("JUDGE_INPUT_SOURCE_SPAN_STATE_INCOMPLETE")
     if canonical_sha256_v1({k: v for k, v in judge_input.items() if k != "judgeInputChecksum"}) != judge_input["judgeInputChecksum"]:
         raise ValueError("JUDGE_INPUT_SEAL_MISMATCH")
 
@@ -160,7 +170,7 @@ def build_judge_input_body_v1(*, row: dict[str, Any], expected_chunk_id: str, ex
         raise ValueError("REVISION_MISMATCH")
     return {
         "schema": "atlas.summary-judge-input.v1", "chunkId": row["chunk_id"], "chunkEvidenceRevision": row["evidence_revision"], "summaryOutputChecksum": summary_output_checksum,
-        "canonicalChunkText": row["text"], "promptVisibleMetadata": metadata,
+        "canonicalChunkText": row["text"], "canonicalChunkTextChecksum": canonical_sha256_v1({"schema": "atlas.summary-judge-chunk-text.v1", "canonicalChunkText": row["text"]}), "promptVisibleMetadata": metadata,
         "claim": {"claimOrdinal": claim_ordinal, "claimText": claim_text, "claimChecksum": claim_checksum_v1(claim_text)},
         "deterministicFindings": findings, "promptRevision": prompt_revision, "canonicalAuthority": False,
     }

@@ -1,0 +1,43 @@
+{
+  "schema": "parent-atlas.doc-16-context-manifest-composition.v1",
+  "generatedAt": "2026-09-23T21:02:04Z",
+  "gate": "DOC-16",
+  "status": "DOC_16_SYNTHETIC_CONTEXT_MANIFEST_COMPOSITION_PROVEN",
+  "fixtureOnly": true,
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "existingOwner": "sveltekit-frontend/src/lib/server/atlas/context/ace-context-manifest-admission-v1.ts::buildAceContextManifestAdmissionV1",
+  "composition": {
+    "input": "validated AceRepairPacketV1 descriptor",
+    "snapshot": "synthetic frozen CandidateFeatureSnapshotV1 with matching selected ordinal and evidence refs",
+    "assertions": [
+      "ContextManifest snapshot ID equals the descriptor candidateSnapshotRevision",
+      "ContextManifest ordinal map checksum equals the descriptor ordinal map checksum",
+      "ContextManifest evidence refs equal the descriptor evidence refs",
+      "admission canonicalAuthority remains false"
+    ]
+  },
+  "validation": {
+    "command": "npm exec vitest -- run src/lib/server/atlas/context/ace-context-manifest-admission-v1.spec.ts",
+    "testFiles": 1,
+    "passed": 5,
+    "failed": 0
+  },
+  "notProven": [
+    "current/live CandidateFeatureSnapshotV1 admission",
+    "real documentation-to-source revision authority",
+    "repair validator acceptance of a current diagnostic target",
+    "ACE cache or packet persistence",
+    "canonical promotion or mutation authorization"
+  ],
+  "nextGate": "DOC_16_CURRENT_SNAPSHOT_COMPOSITION_AND_REPAIR_VALIDATION",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "nats": 0,
+    "graphify": 0
+  }
+}

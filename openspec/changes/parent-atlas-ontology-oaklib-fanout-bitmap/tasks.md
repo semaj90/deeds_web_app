@@ -129,17 +129,16 @@
       an earlier same-day attempt to run this script was denied by the session's own auto-mode
       permission classifier as a "Modify Shared Resources" action — re-authorized and re-run
       successfully this turn, not bypassed.)
-- [ ] 3.4 **Reframed per the 3.1 finding above.** There is no live extractor write path to hook
-      into today. The correct Phase 2 deliverable is a reusable annotation helper —
-      `annotateFeatureOntologyTupleWithResolutionV1()` — that calls the Phase 1 resolver
-      (`resolveOntologyLabelV1`) on a candidate tuple's `object_id`/label and returns the
-      `resolved_concept_id`/`resolution_state` values ready to include in an INSERT, for
-      whichever producer runs next (most plausibly `atlas-current-source-ontology-v2` once
-      built, per the regeneration plan). Not yet implemented — depends on 3.3's authorization
-      (the columns must exist before the helper's output has anywhere real to land), and on
-      deciding whether to build it now (dormant, like `OntologyLinkedTupleV1` before it) or wait
-      until a concrete new producer is being written. Flagging both options rather than
-      guessing which the operator wants.
+- [x] 3.4 **Read-only annotation bridge implemented (2026-09-23).** The existing
+      `ontology-resolution-boundary-postgres.ts` owner now exports
+      `annotateFeatureOntologyTupleWithResolutionV1()`: it chooses an existing tuple label or
+      `objectId`, calls the Phase 1 resolver, and returns `resolvedConceptId` plus the bounded
+      `resolutionState`/ontology revision/match method for a future caller-owned INSERT. Blank,
+      ambiguous, unresolved, and unavailable results never receive a concept ID. Packet/source
+      fields are passthrough-only; this helper performs no INSERT, update, promotion, or identity
+      minting. The existing resolver spec now covers these adapter cases; focused Vitest is 9/9,
+      and targeted SvelteKit check reports 0 errors/2 warnings. No live extractor producer is
+      wired yet; that is not claimed here.
 - [ ] 3.5 Record a receipt (counts: total rows, newly-resolved rows, resolution-attempt failure
       rate) after the first live batch of new writes — read-only verification, not a promotion
       claim. Blocked on 3.3/3.4; no new writes exist yet to measure.
@@ -234,9 +233,9 @@
       specs/ontology-fanout-storage) as real tests, not just design-time checklist items.
       **Partial, honestly split — not both sides are provable yet.**
       `ontology-resolution-boundary`: real, proven. `sveltekit-frontend/src/lib/server/atlas/
-      ontology-resolution-boundary-postgres.spec.ts` exists and was re-run:
-      `npx vitest run .../ontology-resolution-boundary-postgres.spec.ts` → 6/6 tests pass
-      (2026-09-22 rerun). `ontology-fanout-storage`: **cannot be run as a real test yet, not
+      ontology-resolution-boundary-postgres.spec.ts` re-run on 2026-09-24 → 9/9 tests pass,
+      including the tuple-annotation adapter. The DB client is mocked; no live DB writes.
+      `ontology-fanout-storage`: **cannot be run as a real test yet, not
       attempted here** — every one of its 4 scenarios (unresolved-row exclusion, bitmap-scan
       plan, refresh cadence, admission-gate bypass) requires either resolved rows (0 exist,
       per 3.3/3.4/3.5 above) or the `OntologyFanoutAuthorityV1` admission table (confirmed by

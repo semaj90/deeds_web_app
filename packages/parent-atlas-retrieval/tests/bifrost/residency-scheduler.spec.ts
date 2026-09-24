@@ -3,11 +3,31 @@ import {
   MIN_GPU_ADMISSION_BYTES,
   RESIDENCY_RELEASE_SCORE,
   RESIDENCY_PROMOTE_SCORE,
+  buildHotBucketDescriptorV1,
   chooseResidencyTierV1,
   planResidencySchedulerV1,
 } from '../../src/bifrost/residency-scheduler';
 
 describe('revision-qualified residency scheduler', () => {
+  it('builds descriptor-only warm buckets and rejects empty references', () => {
+    const descriptor = buildHotBucketDescriptorV1({
+      bucketId: 'doc:cuda:13.2:ampere',
+      workspaceRevision: 'workspace:r1',
+      sourceRevision: 'source:r1',
+      candidateSnapshotChecksum: 'sha256:candidates',
+      representationRevision: 'semantic_768:v1',
+      residencyPolicyRevision: 'bitfrost-residency-policy:v1',
+      tier: 'WARM',
+      candidateOrdinals: [1, 7],
+      docChunkIds: ['chunk-a', 'chunk-b'],
+      conceptIds: ['concept:cuda'],
+      centroidIds: ['centroid:3'],
+    });
+    expect(descriptor.canonicalAuthority).toBe(false);
+    expect(descriptor.writesPerformed).toBe(false);
+    expect(() => buildHotBucketDescriptorV1({ ...descriptor, candidateOrdinals: [], docChunkIds: [] })).toThrow();
+  });
+
   it('bounds one query to three unique evidence branches and keeps semantic_768 executable', () => {
     const plan = planResidencySchedulerV1({
       workspaceRevision: 'workspace:r1',

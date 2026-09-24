@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T00:59:30Z",
+  "reason": "route-import-infra-isolation has one unchecked task that explicitly asks the operator whether to change chrrom/predictor.ts eager singleton behavior. Existing test/audit tasks are already complete; this behavior choice is not inferred.",
+  "sourceChange": {
+    "name": "route-import-infra-isolation",
+    "completed": 16,
+    "total": 17,
+    "remainingGate": "operator decision on chrrom/predictor.ts eager singleton"
+  },
+  "nextChange": {
+    "name": "parent-atlas-gpu-prellm-recommendation-v1",
+    "reason": "Near-complete change selected for a read-only inspection of remaining proof gates."
+  },
+  "mutationBoundary": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "containerRebuilds": "none"
+  }
+}

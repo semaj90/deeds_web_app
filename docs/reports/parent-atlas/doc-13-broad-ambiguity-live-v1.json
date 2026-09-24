@@ -1,0 +1,160 @@
+{
+  "schema": "parent-atlas.doc-13-broad-ambiguity-live.v1",
+  "gate": "DOC-13",
+  "status": "DOC_13_BROAD_AMBIGUITY_REPLAY_PROVEN",
+  "readOnly": true,
+  "transactionMode": "READ ONLY",
+  "sourceOwners": [
+    "atlas_symbol_registry",
+    "atlas_symbol_versions"
+  ],
+  "activeRevisionQualifiedRowsRead": 402,
+  "nameRevisionGroups": 859,
+  "ambiguousNameRevisionGroups": 20,
+  "resolverReplays": [
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 4,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 4,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 3,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 3,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 3,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 3,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 3,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 3,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 3,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 3,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 4,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 4,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 3,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 3,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 3,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 3,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    },
+    {
+      "sourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "symbolVersionCandidates": 2,
+      "resolverStatus": "AMBIGUOUS",
+      "resolverCandidateCount": 2,
+      "passed": true
+    }
+  ],
+  "syntheticDocumentationRevisionUsedOnlyForSchemaValidation": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "documentationRevisionComparedToCodeRevision": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

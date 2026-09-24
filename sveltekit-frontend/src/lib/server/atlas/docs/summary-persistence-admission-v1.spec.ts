@@ -6,12 +6,12 @@ import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
 import { evaluateSummaryPersistenceAdmissionV1, partitionByAdmissionV1, SUMMARY_PERSISTENCE_ADMISSION_SCHEMA } from './summary-persistence-admission-v1.js';
 
 const H = (c: string) => c.repeat(64);
-const candidate = { chunkId: 'doc:pgvector:fe883c75f323441d:22', chunkEvidenceRevision: `sha256:${H('b')}`, outputSha256: H('c') };
+	const candidate = { chunkId: 'doc:pgvector:fe883c75f323441d:22', chunkEvidenceRevision: `sha256:${H('b')}`, inputChecksum: H('d'), outputSha256: H('c') };
 const claim = (i: number, decision = 'ADMIT') => ({ claimOrdinal: i, claimChecksum: H('1'), validationId: `scv:${H('2')}`, validationChecksum: H('3'), decision, resolutionLayer: 'COMPOSITE', judgeInputChecksum: H('4') });
 function seal(patch: Record<string, unknown> = {}) {
 	const claims = (patch.claims as ReturnType<typeof claim>[] | undefined) ?? [claim(0), claim(1)];
 	const body = {
-		schema: SUMMARY_PERSISTENCE_ADMISSION_SCHEMA, chunkId: candidate.chunkId, chunkEvidenceRevision: candidate.chunkEvidenceRevision, summaryOutputSha256: candidate.outputSha256,
+		schema: SUMMARY_PERSISTENCE_ADMISSION_SCHEMA, chunkId: candidate.chunkId, chunkEvidenceRevision: candidate.chunkEvidenceRevision, summaryInputChecksum: candidate.inputChecksum, summaryOutputSha256: candidate.outputSha256,
 		summaryOutputChecksum: H('5'), splitterRevision: 'claims-of:sentence-regex-v1', claimCount: claims.length, claims,
 		wholeSummaryEligible: claims.length > 0 && claims.every((c) => c.decision === 'ADMIT'), resolverRevision: 'summary-claim-resolution:val-09-v1', validatorRevision: 'summary-claim-validator:val-10-replay-v1',
 		judgePromptRevision: 'summary-claim-judge-prompt:val-07-v1', judgeModelRevision: 'ornith-1.5-9b:hforf.gguf', canonicalAuthority: false, ...patch
@@ -20,8 +20,8 @@ function seal(patch: Record<string, unknown> = {}) {
 }
 
 describe('VAL10B cross-language seal parity (report sealed by python/atlas_summary_admission_v1.py)', () => {
-	const fx = JSON.parse(readFileSync(new URL('./__fixtures__/summary-persistence-admission-v1.fixture.json', import.meta.url), 'utf8')) as Record<'eligible' | 'ineligible', { summaryText: string; report: { chunkId: string; chunkEvidenceRevision: string } }>;
-	const cand = (k: 'eligible' | 'ineligible') => ({ chunkId: fx[k].report.chunkId, chunkEvidenceRevision: fx[k].report.chunkEvidenceRevision, outputSha256: createHash('sha256').update(fx[k].summaryText, 'utf8').digest('hex') });
+	const fx = JSON.parse(readFileSync(new URL('./__fixtures__/summary-persistence-admission-v1.fixture.json', import.meta.url), 'utf8')) as Record<'eligible' | 'ineligible', { summaryText: string; summaryInputChecksum: string; report: { chunkId: string; chunkEvidenceRevision: string } }>;
+	const cand = (k: 'eligible' | 'ineligible') => ({ chunkId: fx[k].report.chunkId, chunkEvidenceRevision: fx[k].report.chunkEvidenceRevision, inputChecksum: fx[k].summaryInputChecksum, outputSha256: createHash('sha256').update(fx[k].summaryText, 'utf8').digest('hex') });
 	it('verifies the Python seal and permits the all-ADMIT summary', () => {
 		expect(evaluateSummaryPersistenceAdmissionV1(cand('eligible'), fx.eligible.report)).toEqual({ eligible: true, reasons: [] });
 	});
@@ -46,6 +46,7 @@ describe('VAL10B summary persistence admission', () => {
 		expect(evaluateSummaryPersistenceAdmissionV1({ ...candidate, chunkId: 'doc:x:1' }, seal()).reasons).toContain('CHUNK_MISMATCH');
 		expect(evaluateSummaryPersistenceAdmissionV1({ ...candidate, chunkEvidenceRevision: `sha256:${H('9')}` }, seal()).reasons).toContain('REVISION_MISMATCH');
 		expect(evaluateSummaryPersistenceAdmissionV1({ ...candidate, outputSha256: H('d') }, seal()).reasons).toContain('OUTPUT_CHANGED');
+		expect(evaluateSummaryPersistenceAdmissionV1({ ...candidate, inputChecksum: H('e') }, seal()).reasons).toContain('INPUT_CHANGED');
 	});
 	it('rejects the whole summary when any claim is REJECT or REVIEW, or a claim is missing', () => {
 		expect(evaluateSummaryPersistenceAdmissionV1(candidate, seal({ claims: [claim(0), claim(1, 'REJECT')] })).reasons).toEqual(['CLAIM_REJECT']);

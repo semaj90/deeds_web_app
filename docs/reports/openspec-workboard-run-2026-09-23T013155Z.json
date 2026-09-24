@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T01:31:55Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "PROTO_02B_ACTIVE_SIDECAR_LIVE_HEALTH_AND_CALLER_SNAPSHOT",
+    "to": "MEM_03_BITFROST_REVISION_KEY_AND_FAIL_OPEN_CONTRACT",
+    "reason": "The Go gRPC health gap was resolved with live read-only Health RPCs, but full fleet operation/lifecycle coverage remains open. Pivot to the independent cache identity contract, where focused owners already expose a testable revision/fail-open seam."
+  },
+  "evidence": {
+    "revisionIdentityOwner": "sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.ts::buildAceBitfrostCacheKeyV1",
+    "revisionCoverage": ["workspaceRevision", "normalizationPolicyRevision", "graphRevision", "representationRevision"],
+    "failOpenOwner": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.ts::getOrWarmCacheAsideV1",
+    "failOpenCases": ["Valkey read error reconstructs through the supplied canonical-source callback", "Valkey write error leaves the reconstructed value available and returns it"],
+    "tests": {
+      "command": "cd sveltekit-frontend && vitest run src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.test.ts src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts --maxWorkers=1 --minWorkers=1",
+      "passed": 27,
+      "failed": 0
+    },
+    "scope": "Contract and fake-cache fixture proof; no live Valkey behavior or persisted cache hit is claimed.",
+    "canonicalWrites": false,
+    "promotionAuthorized": false
+  },
+  "validation": {
+    "openSpecStrict": "PASS",
+    "diffCheck": "PASS",
+    "jsonParse": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 38,
+    "open": 54,
+    "total": 92,
+    "delta": "MEM-03 closed with focused revision-key and cache read/write failure tests; PROTO-02B remains open."
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "containers": false,
+    "filesystem": true
+  },
+  "nextGate": "PROTO_02B_REMAINING_ACTIVE_SIDECAR_OPERATION_AND_LIFECYCLE_RECONCILIATION"
+}

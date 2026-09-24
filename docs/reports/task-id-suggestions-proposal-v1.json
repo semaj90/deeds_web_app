@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.task-id-suggestions-proposal.v1",
+  "generatedAt": "2026-09-23T19:25:05Z",
+  "gate": "WFU-NS-8D",
+  "result": "PROVEN_PROPOSAL_ONLY",
+  "mode": "READ_ONLY_SOURCE_CENSUS_WITH_ADVISORY_OUTPUTS",
+  "pivot": {
+    "fromChange": "parent-atlas-transport-memory-boundaries",
+    "fromProgressBeforePivot": "40/93",
+    "toChange": "parent-atlas-workboard-feature-utility-fabric",
+    "toProgressBefore": "22/68",
+    "toProgressAfter": "23/68"
+  },
+  "sourceSnapshot": {
+    "path": ".tmp/atlas/ns-8d-audit/openspec-workboard-v1.json",
+    "generatedAt": "2026-09-23T19:19:40.680Z",
+    "sha256": "7758f42e737a31da47c5ebb55c520cd6d85e3161579f49e9179c6498b0456d84",
+    "taskRows": 9490,
+    "openTasks": 3250,
+    "sourceTaskFiles": 90
+  },
+  "proposal": {
+    "producer": "scripts/atlas/suggest-task-ids-v1.mjs",
+    "jsonPath": ".tmp/atlas/ns-8d-audit/task-id-suggestions-v1.json",
+    "jsonSha256": "6b15b6166359dda41426cf25ccb3fcb0c4556b3d1ff1b774ccee9fb0b8b08b2a",
+    "patchPath": ".tmp/atlas/ns-8d-audit/task-id-suggestions-v1.patch",
+    "patchSha256": "41abf409ad1fb1286bbef633a9f6aec960e08104280ae56f3b974dcf8f4d44d2",
+    "candidates": 2007,
+    "suggested": 2007,
+    "filesAffected": 51,
+    "skippedDrift": 0,
+    "skippedSourceMissing": 0,
+    "tasksFilesEditedByProducer": 0,
+    "writesPerformedByProducer": false,
+    "applyCheck": "PASS: git apply --check --unidiff-zero",
+    "patchApplied": false,
+    "canonicalAuthority": false,
+    "promotionAuthorized": false
+  },
+  "validation": {
+    "producerSyntax": "PASS: node --check scripts/atlas/build-openspec-workboard-v1.mjs",
+    "openspecStrict": "PASS: parent-atlas-workboard-feature-utility-fabric",
+    "gitDiffCheck": "PASS: scoped files",
+    "liveDataStoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "operatorBoundary": "The suggestion patch is advisory and remains unapplied. Operator review/adoption of task IDs is a separate decision; this receipt proves the helper contract only."
+}

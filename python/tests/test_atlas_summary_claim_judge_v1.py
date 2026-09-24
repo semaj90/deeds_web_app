@@ -41,12 +41,24 @@ def test_input_seal_and_strict_shape_fail_closed_before_transport() -> None:
     for polluted in (
         {**TS_INPUT, "webResults": ["LEAK-WEB"]},
         {**TS_INPUT, "judgeInputChecksum": "0" * 64},
+        {**TS_INPUT, "canonicalChunkTextChecksum": "0" * 64},
         {**TS_INPUT, "claim": {**TS_INPUT["claim"], "claimText": "tampered"}},
     ):
         with pytest.raises(ValueError):
             validate_judge_input_v1(polluted)
         slot = judge_claim_v1(polluted, lambda _m: pytest.fail("transport must not run"), MODEL)
         assert slot["status"] == "JUDGE_ERROR" and slot["verdict"] is None
+
+
+def test_input_rejects_unrun_deterministic_slots_before_transport() -> None:
+    for name in ("technical", "numeric", "version"):
+        findings = {**TS_INPUT["deterministicFindings"], name: {**TS_INPUT["deterministicFindings"][name], "status": "NOT_RUN"}}
+        polluted = {**TS_INPUT, "deterministicFindings": findings}
+        with pytest.raises(ValueError, match="DETERMINISTIC_SLOT_NOT_RUN"):
+            validate_judge_input_v1(polluted)
+    findings = {**TS_INPUT["deterministicFindings"], "sourceSpan": {"status": "NOT_RUN", "spans": []}}
+    with pytest.raises(ValueError, match="SOURCE_SPAN_STATE_INCOMPLETE"):
+        validate_judge_input_v1({**TS_INPUT, "deterministicFindings": findings})
 
 
 @pytest.mark.parametrize("raw", [

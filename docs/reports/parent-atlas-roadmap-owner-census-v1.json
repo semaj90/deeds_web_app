@@ -1,0 +1,1396 @@
+{
+  "schema": "atlas.parent-atlas-roadmap-owner-census.v1",
+  "generatedAt": "2026-09-23T23:31:21.556820+00:00",
+  "gate": "ROADMAP_OWNER_CENSUS_01",
+  "worktrees": [
+    {
+      "worktree": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "branch": "refs/heads/main",
+      "coveredByMainRootSearch": false
+    },
+    {
+      "worktree": "C:\\Users\\james\\Videos\\deeds-integrate",
+      "branch": "refs/heads/integrate/pr-clean-batch-20260920",
+      "coveredByMainRootSearch": false
+    },
+    {
+      "worktree": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\merge-validation-20260912",
+      "branch": "DETACHED@3035675cea",
+      "coveredByMainRootSearch": true
+    },
+    {
+      "worktree": "C:\\Users\\james\\Videos\\deeds-web-app-dag-math-review",
+      "branch": "DETACHED@9974c5609b",
+      "coveredByMainRootSearch": false
+    },
+    {
+      "worktree": "C:\\Users\\james\\Videos\\deeds-web-app-semantic-768-alignment",
+      "branch": "refs/heads/codex/semantic-768-alignment",
+      "coveredByMainRootSearch": false
+    },
+    {
+      "worktree": "C:\\Users\\james\\Downloads",
+      "branch": null,
+      "coveredByMainRootSearch": false,
+      "kind": "extra-root"
+    },
+    {
+      "worktree": "C:\\Users\\james\\Desktop",
+      "branch": null,
+      "coveredByMainRootSearch": false,
+      "kind": "extra-root"
+    },
+    {
+      "worktree": "C:\\Users\\james\\Documents",
+      "branch": null,
+      "coveredByMainRootSearch": false,
+      "kind": "extra-root"
+    }
+  ],
+  "fingerprints": [
+    "lloyd_max_codebook",
+    "never reconstruct the key vector",
+    "Beta distribution.*shape changes with d",
+    "Reading \u2014 once per query step",
+    "Parent Atlas Open Lanes TODO"
+  ],
+  "searchTimeouts": [],
+  "excludedGlobs": [
+    "!node_modules",
+    "!.git",
+    "!.venv",
+    "!venv",
+    "!__pycache__",
+    "!*.gguf",
+    "!*.safetensors",
+    "!*.onnx",
+    "!*.parquet",
+    "!.next",
+    "!.svelte-kit",
+    "!target",
+    "!dist"
+  ],
+  "maxFilesize": "5M",
+  "matches": [
+    {
+      "path": "C:\\Users\\james\\Desktop\\Session-69-P3-Complete-Backup\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 989,
+      "sha256": "ca7d85a518a654716b37761b62b304c34ee427a8e20cdc47556ab3ec64e4c44e",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 68,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Desktop\\Session-69-P3-Complete-Backup\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 802,
+      "sha256": "09fe8e5359e1c761662e98aa38f33b93900e7822bcc2375c53bc6f68a9e2b48e",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 71,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Desktop\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 647,
+      "sha256": "303d298fccc8f31b1877b4efe5ed2e47514fef9d04e810026f5c22c771580840",
+      "fingerprintsPresent": [
+        "lloyd_max_codebook",
+        "never reconstruct the key vector",
+        "Beta distribution.*shape changes with d",
+        "Reading \u2014 once per query step",
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 62,
+      "matchedFingerprints": [
+        "Beta distribution.*shape changes with d",
+        "Parent Atlas Open Lanes TODO",
+        "Reading \u2014 once per query step",
+        "lloyd_max_codebook",
+        "never reconstruct the key vector"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\.tmp\\file-understanding-candidates.ndjson",
+      "lineCount": 804,
+      "sha256": "e5060e92456e7b05e7af5fdff1e8260de7d12c96e7e89880023fb96b80df0d12",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "USED_CONCEPT"
+      ],
+      "headingCount": 0,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\.tmp\\universal-repo-registry-inventory.json",
+      "lineCount": 39910,
+      "sha256": "0bca83d28fa89ccc11daa0b1fb9b6b9dcab25cb2765e9f071b867191b5fee92f",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "USED_CONCEPT"
+      ],
+      "headingCount": 0,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\packages\\atlas\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1300,
+      "sha256": "3f6d4d31207b30d214913ce57f489f4d4642fafed213b38e7eb1ca1bd17ec8e8",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 54,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1300,
+      "sha256": "ca58e847930631cd57c0bdffe41f7b4312cabee6374731e160cfa15f956827b6",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 54,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Downloads\\downparent-atlas-open-lanes-todo-updated.md",
+      "lineCount": 802,
+      "sha256": "c466cc6cbab9d7330d8134affa35b4e350510f87b0013a6f718cc760585fe377",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 71,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Downloads\\turboQuantPlayground-main.zip",
+      "lineCount": 10002,
+      "sha256": "d4cdfe9b69f0a7291f99a08ff8110209620886902d41e6b4996c56a88f876c95",
+      "fingerprintsPresent": [
+        "lloyd_max_codebook"
+      ],
+      "historicalSectionsPresent": [],
+      "headingCount": 0,
+      "matchedFingerprints": [
+        "lloyd_max_codebook"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-integrate\\docs\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 456,
+      "sha256": "dbb535bc0c70d913018743340f6a7d6d5212e714f97b0937a8236485cec911f6",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [],
+      "headingCount": 52,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-integrate",
+      "relativePath": "docs/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "250472dc84 2026-08-13 yes Added the expanded language and memory boundaries to: [openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md](C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\openspec\\\\",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-integrate\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 74,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-integrate",
+      "relativePath": "reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "5aab1eec35 2026-09-09 - sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts   - Reads the admitted workspace revision.   - Loads the sealed snapshot.   - Uses repository-qualifie",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-integrate\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-integrate",
+      "relativePath": "sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "b356898d84 2026-08-09 Consolidate Ollama chat/generate calls onto llama-server :8090; add graph analysis run/promotion contract",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-dag-math-review\\docs\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 456,
+      "sha256": "dbb535bc0c70d913018743340f6a7d6d5212e714f97b0937a8236485cec911f6",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [],
+      "headingCount": 52,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app-dag-math-review",
+      "relativePath": "docs/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "250472dc84 2026-08-13 yes Added the expanded language and memory boundaries to: [openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md](C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\openspec\\\\",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-dag-math-review\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1110,
+      "sha256": "1608c1940b5a155360b66c45ef45d322f47ae673a9d355c09fd75b5c3dbb8901",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app-dag-math-review",
+      "relativePath": "reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "f3507e37c9 2026-08-12 Appended, condensed as promised. Given context is now critical, I'm   stopping here for this session \u2014 everything is recorded in   openspec/changes/parent-atlas-code-ingestion-pi",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-dag-math-review\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app-dag-math-review",
+      "relativePath": "sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "b356898d84 2026-08-09 Consolidate Ollama chat/generate calls onto llama-server :8090; add graph analysis run/promotion contract",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-semantic-768-alignment\\docs\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 456,
+      "sha256": "dbb535bc0c70d913018743340f6a7d6d5212e714f97b0937a8236485cec911f6",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [],
+      "headingCount": 52,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app-semantic-768-alignment",
+      "relativePath": "docs/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "250472dc84 2026-08-13 yes Added the expanded language and memory boundaries to: [openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md](C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\openspec\\\\",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-semantic-768-alignment\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1110,
+      "sha256": "1608c1940b5a155360b66c45ef45d322f47ae673a9d355c09fd75b5c3dbb8901",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app-semantic-768-alignment",
+      "relativePath": "reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "f3507e37c9 2026-08-12 Appended, condensed as promised. Given context is now critical, I'm   stopping here for this session \u2014 everything is recorded in   openspec/changes/parent-atlas-code-ingestion-pi",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-semantic-768-alignment\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app-semantic-768-alignment",
+      "relativePath": "sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "b356898d84 2026-08-09 Consolidate Ollama chat/generate calls onto llama-server :8090; add graph analysis run/promotion contract",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\merge-validation-20260912\\docs\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 456,
+      "sha256": "dbb535bc0c70d913018743340f6a7d6d5212e714f97b0937a8236485cec911f6",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [],
+      "headingCount": 52,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\merge-validation-20260912",
+      "relativePath": "docs/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "250472dc84 2026-08-13 yes Added the expanded language and memory boundaries to: [openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md](C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\openspec\\\\",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\merge-validation-20260912\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 74,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\merge-validation-20260912",
+      "relativePath": "reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "5aab1eec35 2026-09-09 - sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts   - Reads the admitted workspace revision.   - Loads the sealed snapshot.   - Uses repository-qualifie",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\merge-validation-20260912\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\merge-validation-20260912",
+      "relativePath": "sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "b356898d84 2026-08-09 Consolidate Ollama chat/generate calls onto llama-server :8090; add graph analysis run/promotion contract",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 74,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\1e33de94123d0f2475b98e75b218033eb310622c5a6cef616c361a7dabebbd52.partial-27236\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 74,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/1e33de94123d0f2475b98e75b218033eb310622c5a6cef616c361a7dabebbd52.partial-27236/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1274,
+      "sha256": "e50e8874786fbec76037c5ce5955b9c4a8b849a381e5ec38fdbf3b368d0bd85a",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 74,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 74,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 74,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 74,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": ".tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "!! .tmp/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\6_30_26__todopt2.txt",
+      "lineCount": 377,
+      "sha256": "2ee52ccad865c7153411a0c99cfd0b581c87c793e81e732127a6d14d6a5dee38",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 20,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": "6_30_26__todopt2.txt",
+      "gitStatus": "!! 6_30_26__todopt2.txt",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\deeds_labs\\archive\\2026-09-12\\workspace-source-snapshot-9b61929b85a6c4e2\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 74,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "!! deeds_labs/archive/2026-09-12/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\deeds_labs\\archive\\2026-09-12\\workspace-source-snapshot-9b61929b85a6c4e2\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "!! deeds_labs/archive/2026-09-12/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\deeds_labs\\archive\\2026-09-12\\workspace-source-snapshot-c11d261f16a90ba8\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 74,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "!! deeds_labs/archive/2026-09-12/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\deeds_labs\\archive\\2026-09-12\\workspace-source-snapshot-c11d261f16a90ba8\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "!! deeds_labs/archive/2026-09-12/",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 456,
+      "sha256": "dbb535bc0c70d913018743340f6a7d6d5212e714f97b0937a8236485cec911f6",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [],
+      "headingCount": 52,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": "docs/reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "250472dc84 2026-08-13 yes Added the expanded language and memory boundaries to: [openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md](C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\openspec\\\\",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\python\\atlas_roadmap_owner_census_v1.py",
+      "lineCount": 139,
+      "sha256": "8410f9b223a9b7f9df79c297158a3f3b50b5c8cab8a5cacdedb8ef4965bad79c",
+      "fingerprintsPresent": [
+        "lloyd_max_codebook",
+        "never reconstruct the key vector",
+        "Beta distribution.*shape changes with d",
+        "Reading \u2014 once per query step",
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 0,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": "python/atlas_roadmap_owner_census_v1.py",
+      "gitStatus": "?? python/atlas_roadmap_owner_census_v1.py",
+      "lastCommit": null,
+      "inHead": false,
+      "tracked": false,
+      "matchedFingerprints": [
+        "Beta distribution.*shape changes with d",
+        "Parent Atlas Open Lanes TODO",
+        "Reading \u2014 once per query step",
+        "lloyd_max_codebook",
+        "never reconstruct the key vector"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1299,
+      "sha256": "91b203184e5e6ff05514197c62564cfe80067e980240d67f0abd10cba76ef5c1",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 75,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": "reports/parent-atlas-open-lanes-todo.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "806e31e2b7 2026-09-23 correct rrf-fuse known-issue (re-verified: rrfFuseDenseSparse still undefined; 6 more failures are RF6 contract drift); tag named roadmap sections",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "fingerprintsPresent": [
+        "Parent Atlas Open Lanes TODO"
+      ],
+      "historicalSectionsPresent": [
+        "Current Runtime Topology Order",
+        "Finish Order",
+        "Production-ready at the directory level",
+        "USED_CONCEPT"
+      ],
+      "headingCount": 73,
+      "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+      "relativePath": "sveltekit-frontend/6_12atlas-open-lanes-todo-updated.md",
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+      "lastCommit": "b356898d84 2026-08-09 Consolidate Ollama chat/generate calls onto llama-server :8090; add graph analysis run/promotion contract",
+      "inHead": true,
+      "tracked": true,
+      "matchedFingerprints": [
+        "Parent Atlas Open Lanes TODO"
+      ]
+    }
+  ],
+  "artifactA": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\reports\\parent-atlas-open-lanes-todo.md",
+    "lineCount": 1299,
+    "sha256": "91b203184e5e6ff05514197c62564cfe80067e980240d67f0abd10cba76ef5c1",
+    "fingerprintsPresent": [
+      "Parent Atlas Open Lanes TODO"
+    ],
+    "historicalSectionsPresent": [
+      "Current Runtime Topology Order",
+      "Finish Order",
+      "Production-ready at the directory level",
+      "USED_CONCEPT"
+    ],
+    "headingCount": 75,
+    "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+    "relativePath": "reports/parent-atlas-open-lanes-todo.md",
+    "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN",
+    "lastCommit": "806e31e2b7 2026-09-23 correct rrf-fuse known-issue (re-verified: rrfFuseDenseSparse still undefined; 6 more failures are RF6 contract drift); tag named roadmap sections",
+    "inHead": true,
+    "tracked": true
+  },
+  "artifactB": {
+    "path": "C:\\Users\\james\\Desktop\\parent-atlas-open-lanes-todo.md",
+    "lineCount": 647,
+    "sha256": "303d298fccc8f31b1877b4efe5ed2e47514fef9d04e810026f5c22c771580840",
+    "fingerprintsPresent": [
+      "lloyd_max_codebook",
+      "never reconstruct the key vector",
+      "Beta distribution.*shape changes with d",
+      "Reading \u2014 once per query step",
+      "Parent Atlas Open Lanes TODO"
+    ],
+    "historicalSectionsPresent": [
+      "Current Runtime Topology Order",
+      "Finish Order",
+      "Production-ready at the directory level",
+      "USED_CONCEPT"
+    ],
+    "headingCount": 62,
+    "matchedFingerprints": [
+      "Beta distribution.*shape changes with d",
+      "Parent Atlas Open Lanes TODO",
+      "Reading \u2014 once per query step",
+      "lloyd_max_codebook",
+      "never reconstruct the key vector"
+    ]
+  },
+  "openLanesTodoVariants": [
+    {
+      "path": "C:\\Users\\james\\Desktop\\Session-69-P3-Complete-Backup\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 989,
+      "sha256": "ca7d85a518a654716b37761b62b304c34ee427a8e20cdc47556ab3ec64e4c44e",
+      "tracked": null,
+      "gitStatus": null
+    },
+    {
+      "path": "C:\\Users\\james\\Desktop\\Session-69-P3-Complete-Backup\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 802,
+      "sha256": "09fe8e5359e1c761662e98aa38f33b93900e7822bcc2375c53bc6f68a9e2b48e",
+      "tracked": null,
+      "gitStatus": null
+    },
+    {
+      "path": "C:\\Users\\james\\Desktop\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 647,
+      "sha256": "303d298fccc8f31b1877b4efe5ed2e47514fef9d04e810026f5c22c771580840",
+      "tracked": null,
+      "gitStatus": null
+    },
+    {
+      "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\.tmp\\file-understanding-candidates.ndjson",
+      "lineCount": 804,
+      "sha256": "e5060e92456e7b05e7af5fdff1e8260de7d12c96e7e89880023fb96b80df0d12",
+      "tracked": null,
+      "gitStatus": null
+    },
+    {
+      "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\.tmp\\universal-repo-registry-inventory.json",
+      "lineCount": 39910,
+      "sha256": "0bca83d28fa89ccc11daa0b1fb9b6b9dcab25cb2765e9f071b867191b5fee92f",
+      "tracked": null,
+      "gitStatus": null
+    },
+    {
+      "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\packages\\atlas\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1300,
+      "sha256": "3f6d4d31207b30d214913ce57f489f4d4642fafed213b38e7eb1ca1bd17ec8e8",
+      "tracked": null,
+      "gitStatus": null
+    },
+    {
+      "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1300,
+      "sha256": "ca58e847930631cd57c0bdffe41f7b4312cabee6374731e160cfa15f956827b6",
+      "tracked": null,
+      "gitStatus": null
+    },
+    {
+      "path": "C:\\Users\\james\\Downloads\\downparent-atlas-open-lanes-todo-updated.md",
+      "lineCount": 802,
+      "sha256": "c466cc6cbab9d7330d8134affa35b4e350510f87b0013a6f718cc760585fe377",
+      "tracked": null,
+      "gitStatus": null
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-integrate\\docs\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 456,
+      "sha256": "dbb535bc0c70d913018743340f6a7d6d5212e714f97b0937a8236485cec911f6",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-integrate\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-integrate\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-dag-math-review\\docs\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 456,
+      "sha256": "dbb535bc0c70d913018743340f6a7d6d5212e714f97b0937a8236485cec911f6",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-dag-math-review\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1110,
+      "sha256": "1608c1940b5a155360b66c45ef45d322f47ae673a9d355c09fd75b5c3dbb8901",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-dag-math-review\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-semantic-768-alignment\\docs\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 456,
+      "sha256": "dbb535bc0c70d913018743340f6a7d6d5212e714f97b0937a8236485cec911f6",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-semantic-768-alignment\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1110,
+      "sha256": "1608c1940b5a155360b66c45ef45d322f47ae673a9d355c09fd75b5c3dbb8901",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app-semantic-768-alignment\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\merge-validation-20260912\\docs\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 456,
+      "sha256": "dbb535bc0c70d913018743340f6a7d6d5212e714f97b0937a8236485cec911f6",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\merge-validation-20260912\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\merge-validation-20260912\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\1e33de94123d0f2475b98e75b218033eb310622c5a6cef616c361a7dabebbd52.partial-27236\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1274,
+      "sha256": "e50e8874786fbec76037c5ce5955b9c4a8b849a381e5ec38fdbf3b368d0bd85a",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": false,
+      "gitStatus": "!! .tmp/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\6_30_26__todopt2.txt",
+      "lineCount": 377,
+      "sha256": "2ee52ccad865c7153411a0c99cfd0b581c87c793e81e732127a6d14d6a5dee38",
+      "tracked": false,
+      "gitStatus": "!! 6_30_26__todopt2.txt"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\deeds_labs\\archive\\2026-09-12\\workspace-source-snapshot-9b61929b85a6c4e2\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "tracked": false,
+      "gitStatus": "!! deeds_labs/archive/2026-09-12/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\deeds_labs\\archive\\2026-09-12\\workspace-source-snapshot-9b61929b85a6c4e2\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": false,
+      "gitStatus": "!! deeds_labs/archive/2026-09-12/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\deeds_labs\\archive\\2026-09-12\\workspace-source-snapshot-c11d261f16a90ba8\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1266,
+      "sha256": "5014de2b35b7615d7f52dd18294ec434a04c7ce7c27d228a9eded7a30431f3ce",
+      "tracked": false,
+      "gitStatus": "!! deeds_labs/archive/2026-09-12/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\deeds_labs\\archive\\2026-09-12\\workspace-source-snapshot-c11d261f16a90ba8\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": false,
+      "gitStatus": "!! deeds_labs/archive/2026-09-12/"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 456,
+      "sha256": "dbb535bc0c70d913018743340f6a7d6d5212e714f97b0937a8236485cec911f6",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\python\\atlas_roadmap_owner_census_v1.py",
+      "lineCount": 139,
+      "sha256": "8410f9b223a9b7f9df79c297158a3f3b50b5c8cab8a5cacdedb8ef4965bad79c",
+      "tracked": false,
+      "gitStatus": "?? python/atlas_roadmap_owner_census_v1.py"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\reports\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 1299,
+      "sha256": "91b203184e5e6ff05514197c62564cfe80067e980240d67f0abd10cba76ef5c1",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\6_12atlas-open-lanes-todo-updated.md",
+      "lineCount": 842,
+      "sha256": "f3181c5a45d3a8b2763699786f9251eb7112d59e0ffccffcfabb27e24e205651",
+      "tracked": true,
+      "gitStatus": "CLEAN_TRACKED_OR_UNKNOWN"
+    }
+  ],
+  "turboQuantFingerprintFiles": [
+    {
+      "path": "C:\\Users\\james\\Desktop\\parent-atlas-open-lanes-todo.md",
+      "lineCount": 647,
+      "fingerprints": [
+        "lloyd_max_codebook",
+        "never reconstruct the key vector",
+        "Beta distribution.*shape changes with d",
+        "Reading \u2014 once per query step",
+        "Parent Atlas Open Lanes TODO"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Downloads\\turboQuantPlayground-main.zip",
+      "lineCount": 10002,
+      "fingerprints": [
+        "lloyd_max_codebook"
+      ]
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\python\\atlas_roadmap_owner_census_v1.py",
+      "lineCount": 139,
+      "fingerprints": [
+        "lloyd_max_codebook",
+        "never reconstruct the key vector",
+        "Beta distribution.*shape changes with d",
+        "Reading \u2014 once per query step",
+        "Parent Atlas Open Lanes TODO"
+      ]
+    }
+  ],
+  "structuralComparison": {
+    "headingsOnlyInA": [
+      "10. Autoencoder / SOM / CUDA Kernels",
+      "4. Engram memory wiring (label kept for cross-reference; synthesis owner is Ornith `:8090`, Gemma4 = legacy compatibility label only)",
+      "8. HyperRAG Dense Search / Cache Hit Lane",
+      "Active GPU / Parser Lanes",
+      "Canonical Closure Update - 2026-06-19",
+      "Controlled Integration Ladder \u2014 Deferred Addendum",
+      "Current Closed / Open Split",
+      "Current proof state update",
+      "Current-State Overlay \u2014 2026-09-23 (supersedes older statements below where they conflict)",
+      "End-to-End Missing Features Plan",
+      "Event Fabric Priority",
+      "Event Plane",
+      "Finish Order \u2014 HISTORICAL_FINISH_ORDER (packet-centric, STALE_REQUIRES_REPLAY; superseded by the dependency order in the Current-State Overlay at the top)",
+      "HISTORICAL_RUNTIME_ORDER (undated snapshot; STALE_REQUIRES_REPLAY \u2014 was titled \"Current Runtime Topology Order\"; conflicts with sections that call Neo4j edge projection complete)",
+      "Known Issue \u2014 Orphaned Test: `tests/rrf-fuse.spec.ts` (found 2026-09-09, not fixed) `[CURRENT, re-verified 2026-09-23; original diagnosis corrected]`",
+      "P0 Proof Of Truth",
+      "P1 Runtime Reliability",
+      "P2 Operator Experience",
+      "P3 Research",
+      "Post-Frozen Phase 17-21 Audit - 2026-08-09"
+    ],
+    "headingsOnlyInB": [
+      "4. Engram / Gemma4 memory wiring",
+      "Current Runtime Topology Order",
+      "Finish Order",
+      "P0 - Directory Readiness",
+      "P1 - High ROI",
+      "P2 - Semantic Search Wiring",
+      "d must match the actual model head dimension"
+    ],
+    "sharedHeadings": 45,
+    "aHeadingCount": 75,
+    "bHeadingCount": 62
+  },
+  "classification": "UNCLASSIFIED_NEEDS_REVIEW",
+  "recommendedOwnerAction": "MERGE_REQUIRED_AFTER_OWNER_REVIEW",
+  "hierarchy": {
+    "gateAuthority": "OpenSpec tasks.md",
+    "proofAuthority": "revision-qualified receipts",
+    "roadmap": "one human-readable lane index",
+    "otherCopies": "generated projections or historical snapshots"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0,
+    "stores": 0
+  }
+}

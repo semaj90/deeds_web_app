@@ -91,5 +91,26 @@
     "readOnlyPostgresQueries": 2
   },
   "supersedes": "docs/reports/parent-atlas/summary-claim-validation-contract-v1.json (recorded 0 tests and referenced the discarded package-level duplicate; not proof)",
-  "next": "VAL-06 bounded judge input (exact chunk + claim + deterministic findings + prompt revision only; no web/Firecrawl/Qdrant/other chunks/ACE)"
+  "reverifiedAt": "2026-09-24T01:34:44Z",
+  "reverification": {
+    "VAL02B": "Python reproduced all 17 TypeScript golden canonical-hash vectors and independently recomputed claimChecksum, validationId, and validationChecksum for both canonical fixtures.",
+    "VAL05": "Revision-qualified UTF-8 span verifier tests passed; historical live-read-only exact ASCII/multibyte replay remains recorded above.",
+    "VAL08": {
+      "result": "FIXTURE_PROVEN_LIVE_RELATION_COHORT_EMPTY",
+      "receipt": "docs/reports/parent-atlas/val-08-oak-typed-assertion-adapter-v1.json",
+      "liveOntologyRelationRows": 0,
+      "sourceSpanVerification": "NOT_PERFORMED"
+    },
+    "tests": {
+      "pythonPytestValidationSpine": 75,
+      "pythonUnittestChecksumAndSealParity": 10,
+      "pythonOaKTypedAssertion": 15,
+      "typescriptVitest": 30,
+      "failures": 0
+    },
+    "openSpecStrict": "PASS (re-run 2026-09-24 after the current VAL-08 change)",
+    "persistentWrites": 0,
+    "containerRebuilds": 0
+  },
+  "next": "VAL-08 exact typed-relation evaluator is fixture-proven; live relation table has 0 rows and the existing container was not rebuilt. Remaining versioned-doc tasks are DOC-13/14/15/17/18/26; preserve their independent source-authority, projection, cache-write, and recrawl gates."
 }

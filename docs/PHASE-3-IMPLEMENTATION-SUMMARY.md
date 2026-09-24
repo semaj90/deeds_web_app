@@ -182,8 +182,8 @@ npm run atlas:phase3:smoke -- --verbose  # Verbose output
 ```json
 "atlas:som:chunks:dry": "node ../scripts/atlas/run-som-on-chunks.mjs --dry-run",
 "atlas:som:chunks:apply": "node ../scripts/atlas/run-som-on-chunks.mjs --apply",
-"atlas:kmeans384:dry": "wsl -d Ubuntu -- python3 .../kmeans-chunk-cluster-384.py --dry-run --k 128",
-"atlas:kmeans384:apply": "wsl -d Ubuntu -- python3 .../kmeans-chunk-cluster-384.py --apply --k 128"
+"atlas:kmeans:dry": "wsl -d Ubuntu -e bash -c '~/miniforge3/envs/atlas-rapids-cu13/bin/python scripts/atlas/kmeans-chunk-cluster.py --dry-run --k 128'",
+"atlas:kmeans:apply": "wsl -d Ubuntu -e bash -c '~/miniforge3/envs/atlas-rapids-cu13/bin/python scripts/atlas/kmeans-chunk-cluster.py --apply --k 128'"
 ```
 
 ---
@@ -232,7 +232,12 @@ npm run atlas:phase3:smoke -- --verbose  # Verbose output
 
 ---
 
-## Execution Roadmap
+## 768-Dimensional Execution Roadmap
+
+The canonical dense representation is `semantic_768`. The legacy `kmeans384` lane is
+retained only for historical comparison and is not part of the current Parent Atlas
+promotion path. KMeans/SOM remain derived challenger representations and must not run
+against unqualified source rows or become identity owners.
 
 ### Immediate (Day 1-2): Start cuVS Service
 
@@ -258,7 +263,7 @@ npm run atlas:phase3:smoke    # Check Gate 2 result
 
 # Gate 3-4: SOM & KMeans
 npm run atlas:som:audit       # Verify SOM grid fully populated
-npm run atlas:kmeans384:dry   # Preview KMeans clustering
+npm run atlas:kmeans:dry      # Preview semantic_768 KMeans clustering
 
 # Gate 5-6: Reranker features
 npm run atlas:reranker:features:extract  # Dry-run feature extraction
@@ -272,9 +277,10 @@ npm run atlas:phase3:smoke    # Run full smoke test (should be 5/6 or 6/6 passin
 npm run atlas:backfill:community-id  # If needed
 npm run atlas:extract-symbols         # Dry-run symbol extraction
 
-# Stage 3C: Build topology mappings
-npm run atlas:som:chunks:apply        # Apply SOM assignment
-npm run atlas:kmeans384:apply         # Apply KMeans clustering
+# Stage 3C: Build topology mappings (only after source authority is proven)
+npm run atlas:som:audit              # Read-only topology validation
+npm run atlas:kmeans:dry              # 768-dimensional dry-run only
+# Do not apply SOM/KMeans assignments until the source-authority gate is open.
 
 # Stage 3D: Extract and normalize features
 npm run atlas:reranker:features:apply # Apply feature extraction
@@ -289,7 +295,7 @@ npm run atlas:phase3:smoke            # Should show all gates passing
 
 | Gate | Component | Target | Status |
 |------|-----------|--------|--------|
-| 1 | GPU k-NN Service | Healthy, indexed points | ⏳ PENDING (cuVS service start) |
+| 1 | GPU k-NN Service | Healthy, indexed semantic_768 points | ⏳ PENDING (cuVS service start) |
 | 2 | Community_id Coverage | >95% | ✅ PASS (100%) |
 | 3 | SOM Grid | 100% packets assigned | ⏳ PARTIAL (infra ready) |
 | 4 | KMeans Clusters | >95% assigned | ⏳ PARTIAL (infra ready) |
@@ -310,11 +316,11 @@ DATABASE_URL=postgresql://...           # Postgres connection
 ```
 
 ### Embeddings Contract
-- **Dimension**: 384-dim canonical (from Phase 2)
-- **Storage**: Postgres `codebase_chunk_index.content_embedding`
-- **Vector DB**: Qdrant `codebase_chunks_768` (mirror)
+- **Dimension**: 768-dim canonical (`semantic_768`)
+- **Storage**: Postgres `codebase_chunk_index.content_embedding_768`
+- **Vector DB**: Qdrant `codebase_chunks_768` (rebuildable mirror)
 - **Metric**: Cosine distance
-- **Truncation**: 768-dim → 384-dim at embed time
+- **Legacy**: 384-dimensional artifacts remain historical/experimental and are not promoted
 
 ### Hardware Requirements
 - **GPU**: NVIDIA RTX 3060 Ti (8GB) minimum (CUDA 12.1)

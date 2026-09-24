@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T00:58:59Z",
+  "reason": "parent-atlas-gpu-prellm-recommendation-v1 has three deliberately open items: live wiring is explicitly deferred by its inert-capability design, real CuPy/cuGraph proof requires the absent WSL2 RAPIDS runtime, and V1/V2 classification retirement is an operator decision.",
+  "sourceChange": {
+    "name": "parent-atlas-gpu-prellm-recommendation-v1",
+    "completed": 34,
+    "total": 37,
+    "remainingGates": [
+      "7.1 candidate future wiring sequence is deferred",
+      "7.2 real WSL2 RAPIDS GPU execution unavailable in current Python environment",
+      "7.4 V1/V2 classification lineage retirement decision"
+    ]
+  },
+  "nextChange": {
+    "name": "parent-atlas-graph-runtime-python-consolidation",
+    "reason": "Inspect the four remaining tasks for bounded local proof or stale evidence that can be reconciled without service/data writes."
+  },
+  "mutationBoundary": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "containerRebuilds": "none"
+  }
+}

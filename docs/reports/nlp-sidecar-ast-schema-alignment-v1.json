@@ -1,6 +1,6 @@
 {
   "schema": "atlas.nlp-sidecar-ast-schema-alignment.v1",
-  "generatedAt": "2026-09-20T23:39:48.372Z",
+  "generatedAt": "2026-09-23T16:21:53.210Z",
   "endpoint": "http://127.0.0.1:8095/analyze",
   "table": "public.atlas_ast_nodes",
   "sourceRef": "scripts/atlas/audit-pgvector-schema.mjs",
@@ -91,6 +91,11 @@
       "id": "promotion-closed",
       "status": "PASS",
       "canonicalAuthority": false
+    },
+    {
+      "id": "packet-key-excluded-from-ast-unit",
+      "status": "PASS",
+      "packetKeyPresent": false
     }
   ],
   "observed": {
@@ -98,6 +103,7 @@
     "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0",
     "sourceRef": "scripts/atlas/audit-pgvector-schema.mjs",
     "sourceRevision": "sha256:ea54b36305cd06319a42753575b77052cbd388c1fa7cea5c2d4db4ef907c9fd0",
+    "packetKeyPresent": false,
     "unclassifiedTableFields": [],
     "classifiedTableFields": {
       "structural_key": "canonical_writer_derived_identity",

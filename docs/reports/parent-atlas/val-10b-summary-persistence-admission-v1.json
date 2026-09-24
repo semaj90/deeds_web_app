@@ -1,0 +1,74 @@
+{
+  "schema": "atlas.val-10b-summary-persistence-admission-proof.v1",
+  "gate": "VAL10B_SUMMARY_PERSISTENCE_ADMISSION_01",
+  "generatedAt": "2026-09-24",
+  "status": "VAL10B_ADMISSION_GUARD_PARTIAL_PROVEN",
+  "owner": {
+    "persistenceWriter": "sveltekit-frontend/scripts/atlas/summarize-external-doc-chunks-v1.mts",
+    "admissionEvaluator": "sveltekit-frontend/src/lib/server/atlas/docs/summary-persistence-admission-v1.ts",
+    "admissionProducer": "python/atlas_summary_admission_v1.py",
+    "canonicalChunkReadback": "python/atlas_summary_claim_judge_replay_v1.py::psql_row"
+  },
+  "proven": {
+    "writerUsesSealedAdmissionBeforeInsert": true,
+    "exactChunkIdAndRevisionBound": true,
+    "summaryInputChecksumBound": true,
+    "perClaimValidationLineageUsesWriterInputChecksum": true,
+    "exactSummaryUtf8Sha256Bound": true,
+    "admissionReportChecksumVerified": true,
+    "allClaimsMustAdmit": true,
+    "emptyOrMissingClaimSetRejected": true,
+    "canonicalAuthority": false,
+    "canonicalChunkReadUsesQuotedPsqlVariables": true,
+    "canonicalChunkReadTransaction": "READ ONLY",
+    "unsafeSqlInterpolation": false
+  },
+  "validation": {
+    "vitest": { "tests": 8, "passed": 8 },
+    "pythonPytest": { "tests": 55, "passed": 55 },
+    "targetedTypeScriptAdmissionEvaluator": "PASS",
+    "openspecStrict": "PASS",
+    "scopedDiffCheck": "PASS",
+    "workspaceSvelteCheck": {
+      "status": "FAILED_REPOSITORY_WIDE",
+      "errors": 32,
+      "warnings": 291,
+      "files": 117,
+      "attributionToTouchedFiles": "NOT_ESTABLISHED"
+    }
+  },
+  "notProven": [
+    "A live writer dry-run was not executed; it would call Ornith and persist a report.",
+    "No rollback canary or persistent apply was executed.",
+    "The writer recomputes admission for fresh generated summaries; it does not consume the frozen VAL-10 eligible-summary receipt as the persistence cohort.",
+    "The VAL-10 49-claim versus 51-claim replay cohort reconciliation remains a separate open decision."
+  ],
+  "cohortReconciliation": {
+    "olderReceipt": "docs/reports/summary-claim-validation-replay-v1.json",
+    "eligibleReceipt": "docs/reports/parent-atlas/val-10-summary-eligibility-replay-v1.json",
+    "exactChunkRevisionPairsMatched": 19,
+    "inputChecksumsEqual": 0,
+    "outputChecksumsEqual": 12,
+    "outputChecksumsDiffer": 7,
+    "claimSetEqualForMatchingOutputs": 12,
+    "claimCountMismatches": 2,
+    "authoritativeFrozenPersistableCohortSelected": false,
+    "reason": "The receipts bind different generation inputs and 7 summaries have different outputs; VAL-10 records checksums and claim evidence but not the exact summary text needed to submit the same proposal to the writer."
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0,
+    "modelCalls": 0,
+    "canonicalPromotion": false,
+    "containerRebuilds": 0
+  },
+  "workingTree": {
+    "baseCommit": "c029a82180",
+    "committed": false,
+    "pushed": false
+  },
+  "nextGate": "FREEZE_VAL10_COHORT_AND_PROVE_WRITER_INTEGRATION_WITHOUT_APPLY"
+}

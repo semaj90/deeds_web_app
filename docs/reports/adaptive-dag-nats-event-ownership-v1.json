@@ -1,0 +1,107 @@
+{
+  "schema": "parent-atlas.adaptive-dag-nats-event-ownership.v1",
+  "generatedAt": "2026-09-23T20:49:54Z",
+  "change": "parent-atlas-adaptive-dag-fabric",
+  "task": "NATS-EVENT-01",
+  "decision": "OPTIONAL_OBSERVABILITY_FOLLOWUP",
+  "executionDependency": false,
+  "taskClosed": false,
+  "canonicalAuthority": false,
+  "mutationAuthority": false,
+  "eventRole": "admin UI, audit, and agent observability projection only; never DAG job dispatch",
+  "eventKindsProposed": [
+    "atlas.workflow.requested",
+    "atlas.workflow.action.started",
+    "atlas.workflow.action.completed",
+    "atlas.workflow.action.failed",
+    "atlas.receipt.created",
+    "atlas.artifact.created",
+    "atlas.validation.passed",
+    "atlas.validation.failed"
+  ],
+  "owners": {
+    "workDispatch": {
+      "owner": "RabbitMQ",
+      "status": "active separate work queues; not replaced"
+    },
+    "durableWorkflowEvents": {
+      "owner": "PostgreSQL workflow_events and outbox_events",
+      "evidence": "workflow_events has event_id UUID, run_id, action_id, event_type, sequence_no, payload, occurred_at; unique (run_id, sequence_no); outbox has publication tracking",
+      "authority": "canonical durable event/audit state"
+    },
+    "transportEventStream": {
+      "owner": "existing Valkey stream helper",
+      "evidence": "publishEventIdempotent deduplicates producerId/eventId atomically; source comments state Postgres/outbox remains canonical",
+      "authority": "transport only"
+    },
+    "natsDeployment": {
+      "owner": "Docker Compose service nats in profile full",
+      "liveContainer": "legal-ai-nats",
+      "jetStreamEnabled": true,
+      "status": "running at observation time"
+    },
+    "otherNatsCode": {
+      "status": "Core NATS client/subscription/publish code exists for indexing, agent, and benchmark subjects; not evidence of the proposed JetStream workflow-event bridge"
+    }
+  },
+  "liveReadback": {
+    "source": "NATS monitoring endpoints /jsz and /varz",
+    "serverVersion": "2.14.2",
+    "streams": 0,
+    "consumers": 0,
+    "storageBytes": 0,
+    "memoryBytes": 0,
+    "connections": 0,
+    "messagesIn": 0,
+    "messagesOut": 0,
+    "readOnly": true
+  },
+  "candidateEnvelope": {
+    "body": "existing WorkflowActionEventV1; do not mint a competing workflow/action identity",
+    "stableTransportEventId": "reuse workflow_events.event_id from the durable source row/outbox; WorkflowActionEventV1 itself has no eventId field",
+    "partitionAndOrdering": "use existing runId/workflowId scope and persisted sequenceNo/sequence; preserve source order, do not infer order from timestamps",
+    "delivery": "at-least-once; consumers acknowledge only after idempotent side effects/readback",
+    "dedupe": "publish with the persisted event UUID as the transport dedupe ID where supported; retain consumer-side durable idempotency because broker dedupe windows are bounded",
+    "retentionAndReplay": "unresolved spec mismatch: current spec says WorkQueue retention, while independent audit consumers require replayable history. Keep Postgres canonical; decide bounded Limits retention versus WorkQueue consumption before provisioning. Durable consumers must have explicit names, ack policy, replay start, and idempotent projection receipts.",
+    "notDefinedOrProven": [
+      "PARENT_ATLAS_EVENTS stream config",
+      "subject-to-event schema mapping",
+      "transactional outbox-to-JetStream publisher",
+      "consumer identities and replay checkpoints",
+      "retention limits and deletion policy",
+      "live delivery, replay, duplicate, and readback proof"
+    ]
+  },
+  "fetchDedupeAudit": {
+    "owner": "local-research-circuit-v1.ts plus ace-card-selection-v2.ts",
+    "circuitBehavior": "deduplicates identical synthesized query strings and merges returned cards by cardId; search is still invoked per unique subquery",
+    "selectionBehavior": "selectAceCardsV2 forms an order-insensitive key from sourceRef, sourceRevision, and sorted unique evidenceRefs, then rejects a later distinct card with the same key",
+    "focusedTests": {
+      "command": "npm exec vitest -- run src/lib/server/atlas/context/ace-card-selection-v2.spec.ts src/lib/server/atlas/research/local-research-circuit-v1.spec.ts",
+      "result": "PASS",
+      "passed": 5,
+      "failed": 0
+    },
+    "requestedFetchInvariant": "not proven: one upstream fetch for equivalent parameter tuples, with distinct revisions/evidence sets remaining distinct",
+    "scopeFinding": "the currently added dedupe operates at ACE card selection and drops a distinct card; it is not an upstream fetch-operation coalescer",
+    "noCodeChanged": false,
+    "followupAudit": "docs/reports/adaptive-dag-fetch-coalescing-audit-v1.json"
+  },
+  "openSpec": {
+    "previouslyReportedProgress": "12/13",
+    "verifiedProgressAfterReconciliation": "11/13",
+    "checked": 11,
+    "open": 2,
+    "checkboxReopened": "DAG-FETCH-01; prior checked claim conflated card-selection dropping with pre-fetch request coalescing",
+    "strictValidation": "PASS"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "nats": 0,
+    "graphify": 0,
+    "containerRebuilds": 0
+  }
+}

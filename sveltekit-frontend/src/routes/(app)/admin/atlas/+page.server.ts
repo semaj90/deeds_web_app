@@ -2,6 +2,7 @@ import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { documentGovernanceSummaryV1Schema } from '$lib/types/document-governance-summary-v1.js';
 
 export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	if (!locals.user) throw redirect(303, '/login?redirect=/admin/atlas');
@@ -15,7 +16,11 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		.catch(() => null);
 
 	const documentGovernancePromise = fetch('/api/admin/atlas/document-governance')
-		.then(async (r) => (r.ok ? await r.json() : null))
+		.then(async (r) => {
+			if (!r.ok) return null;
+			const parsed = documentGovernanceSummaryV1Schema.safeParse(await r.json());
+			return parsed.success ? parsed.data : null;
+		})
 		.catch(() => null);
 
 	// Documentation Corpus panel: read-only snapshot + optional GET search (?docq=), rendered server-side (works without JS).

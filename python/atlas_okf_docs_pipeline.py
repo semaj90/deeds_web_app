@@ -112,6 +112,7 @@ class SourceConfig:
     language: str | None = None
     publisher: str | None = None
     unversioned_urls: tuple[str, ...] = ()
+    chunk_identity_version: str = "V1"
 
 
 @dataclass(frozen=True)
@@ -229,6 +230,7 @@ def load_manifest(path: str | Path) -> PipelineManifest:
             language=source.language,
             publisher=source.publisher,
             unversioned_urls=source.unversioned_urls,
+            chunk_identity_version=source.chunk_identity_version,
         )
         for source in validated.sources
     )
@@ -278,22 +280,18 @@ def _firecrawl_auth(api_key: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
 
-def firecrawl_crawl_v2(
-    source: SourceConfig,
-    *,
-    api_key: str,
-    poll_seconds: float = 2.0,
-    maximum_wait_seconds: int = 600,
-) -> tuple[PageArtifact, ...]:
-    """Run a bounded Firecrawl v2 crawl and return normalized page artifacts."""
-    root_url = source.base_urls[0]
-    body = {
-        "url": root_url,
+def build_firecrawl_crawl_v2_request(source: SourceConfig) -> Json:
+    """Build the bounded Firecrawl request from the canonical source manifest."""
+    if not source.base_urls:
+        raise ValueError("FIRECRAWL_SOURCE_BASE_URL_REQUIRED")
+    return {
+        "url": source.base_urls[0],
         "includePaths": list(source.include_paths),
         "excludePaths": list(source.exclude_paths),
         "maxDiscoveryDepth": source.maximum_depth,
         "limit": source.maximum_pages,
-        "ignoreSitemap": not source.follow_sitemap,
+        # Firecrawl v2 replaced the v1 ignoreSitemap boolean with this enum.
+        "sitemap": "include" if source.follow_sitemap else "skip",
         "crawlEntireDomain": False,
         "allowExternalLinks": False,
         "allowSubdomains": False,
@@ -305,6 +303,18 @@ def firecrawl_crawl_v2(
             "blockAds": True,
         },
     }
+
+
+def firecrawl_crawl_v2(
+    source: SourceConfig,
+    *,
+    api_key: str,
+    poll_seconds: float = 2.0,
+    maximum_wait_seconds: int = 600,
+) -> tuple[PageArtifact, ...]:
+    """Run a bounded Firecrawl v2 crawl and return normalized page artifacts."""
+    root_url = source.base_urls[0]
+    body = build_firecrawl_crawl_v2_request(source)
     submitted = _http_json(
         "https://api.firecrawl.dev/v2/crawl",
         method="POST",
@@ -457,6 +467,7 @@ def compile_chunks(
     maximum_chars: int,
     overlap_chars: int,
     coordinate_for: Callable[[PageArtifact], Any] | None = None,
+    chunk_identity_version: str = "V1",
 ) -> tuple[ChunkRecord, ...]:
     chunks: list[ChunkRecord] = []
     for page in pages:
@@ -477,6 +488,7 @@ def compile_chunks(
             overlap_chars=overlap_chars,
             nlp=nlp,
             doc_coordinate=coordinate_for(page) if coordinate_for else None,
+            chunk_identity_version=chunk_identity_version,
         ))
     return tuple(chunks)
 
@@ -833,6 +845,7 @@ def run_pipeline(
             maximum_chars=maximum_chars,
             overlap_chars=overlap_chars,
             coordinate_for=lambda page, source=source: build_page_coordinate(source, page),
+            chunk_identity_version=source.chunk_identity_version,
         )
         all_pages.extend(pages)
         all_chunks.extend(chunks)

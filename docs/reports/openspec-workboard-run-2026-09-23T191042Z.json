@@ -1,0 +1,68 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T19:10:42Z",
+  "pivot": {
+    "fromChange": "parent-atlas-workboard-feature-utility-fabric",
+    "fromProgress": { "complete": 22, "total": 68, "remaining": 46 },
+    "toChange": "parent-atlas-transport-memory-boundaries",
+    "toProgressBefore": { "complete": 38, "total": 93, "remaining": 55 },
+    "toProgressAfter": { "complete": 39, "total": 93, "remaining": 54 },
+    "reason": "Prior review found a concrete authenticated viewer-to-canonical-write dispatch defect at /api/acp/execute. This turn completed the authorized narrow repair proof before resuming broader workboard tasks."
+  },
+  "workboardSnapshot": {
+    "taskFiles": 93,
+    "completeTasks": 6223,
+    "totalTasks": 9442,
+    "openTasks": 3219,
+    "source": "recursive tasks.md checkbox recount from current checkout"
+  },
+  "selectedTask": {
+    "id": "A2A-04",
+    "statusAtStart": "OPEN",
+    "statusAfter": "VERIFIED_COMPLETE",
+    "result": "A2A_INVOCATION_AUTHORIZATION_PROVEN",
+    "evidence": "Viewer atlas.kanban.claim and atlas.kanban.block are denied before handlers; authorized read and admin dry-run controls reach handlers; unknown tool returns 404 with all registered handler spies at zero. Permission cache is mocked in the test."
+  },
+  "execution": {
+    "focusedTests": {
+      "a2aAuthorizationBoundary": "9/9 passed",
+      "openAiFacadeSuite": "17/17 passed",
+      "legacyNamedOrnithGenerator": "11/11 passed"
+    },
+    "strictValidation": {
+      "parent-atlas-transport-memory-boundaries": "PASS",
+      "inference-wiring-deep-audit-aug22": "PASS"
+    },
+    "diffCheck": "PASS",
+    "inferenceReplay": "Existing receipt remains INFERENCE_FACADE_READ_ONLY_LIVE_REPLAY_PROVEN (Ornith 1.5, HTTP 200); no new live generation was issued this turn.",
+    "scopeLimits": [
+      "A2A-05 AgentCard Bearer/session-cookie parity remains open.",
+      "workerId impersonation remains a separate authorization follow-up.",
+      "No container rebuild or data-store mutation was performed.",
+      "The legacy-named synthesis generator uses the shared runtime model resolver but directly calls llama-server; the separate bounded live receipt proves runChatCompletion facade replay, not convergence of that generator into the facade."
+    ],
+    "writes": {
+      "postgres": 0,
+      "valkey": 0,
+      "qdrant": 0,
+      "neo4j": 0,
+      "graphify": 0,
+      "canonicalAuthority": false,
+      "promotionAuthorized": false,
+      "containerRebuilds": 0
+    },
+    "filesChangedThisTranche": [
+      "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "openspec/changes/parent-atlas-transport-memory-boundaries/design.md",
+      "sveltekit-frontend/src/routes/api/acp/execute/authorization-boundary.spec.ts",
+      "docs/reports/a2a-direct-invocation-authorization-v1.json",
+      "docs/reports/openspec-workboard-run-2026-09-23T191042Z.json"
+    ],
+    "reviewedImplementation": [
+      "sveltekit-frontend/src/routes/api/acp/execute/+server.ts",
+      "sveltekit-frontend/src/lib/server/auth/tool-authorization.ts",
+      "sveltekit-frontend/src/lib/server/services/knowledge-search/acp-tool-permissions.ts"
+    ],
+    "nextGate": "Resume remaining actionable tasks in parent-atlas-transport-memory-boundaries without pivoting into A2A-05 or container rebuilds."
+  }
+}

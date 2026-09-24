@@ -65,6 +65,7 @@ export const AnalysisPassResultSchema = z
 		packetKey: z.string().min(1).nullable().default(null),
 		sourceRef: NonBlankStringSchema,
 		sourceRevision: NonBlankStringSchema,
+		workspaceRevision: z.string().min(1).nullable().default(null),
 		family: AnalysisPassFamilySchema,
 		passName: z.string().min(1),
 		passRevision: z.string().min(1),
@@ -266,6 +267,8 @@ export const ExperimentFeatureMatrixSchema = z
 		packetKey: z.string().min(1).nullable().default(null),
 		sourceRef: NonBlankStringSchema,
 		sourceRevision: NonBlankStringSchema,
+		workspaceRevision: z.string().min(1).nullable().default(null),
+		canonicalAuthority: z.literal(false).default(false),
 		featureRevision: z.string().min(1),
 		graphRevision: z.string().min(1).nullable().default(null),
 		representationRevision: z.string().min(1).nullable().default(null),
@@ -328,6 +331,7 @@ export interface CompileExperimentFeatureMatrixInput {
 	packetKey?: string | null;
 	sourceRef: string;
 	sourceRevision: string;
+	workspaceRevision?: string | null;
 	featureRevision?: string;
 	graphRevision?: string | null;
 	representationRevision?: string | null;
@@ -347,11 +351,23 @@ function assertFeatureMatrixPassLineage(
 	passResults: AnalysisPassResult[],
 	sourceRef: string,
 	sourceRevision: string,
+	workspaceRevision?: string | null,
+	packetKey?: string | null,
 ): void {
 	for (const passResult of passResults) {
 		if (passResult.sourceRef !== sourceRef || passResult.sourceRevision !== sourceRevision) {
 			throw new FeatureMatrixLineageMismatchError(
 				`Analysis pass ${passResult.passName} does not match feature-matrix lineage ${sourceRef}@${sourceRevision}`,
+			);
+		}
+		if (workspaceRevision !== undefined && passResult.workspaceRevision !== workspaceRevision) {
+			throw new FeatureMatrixLineageMismatchError(
+				`Analysis pass ${passResult.passName} does not match feature-matrix workspace revision ${workspaceRevision}`,
+			);
+		}
+		if (packetKey !== undefined && passResult.packetKey !== packetKey) {
+			throw new FeatureMatrixLineageMismatchError(
+				`Analysis pass ${passResult.passName} does not match feature-matrix packet ${packetKey}`,
 			);
 		}
 	}
@@ -413,7 +429,13 @@ export function compileExperimentFeatureMatrix(
 	const canonicalPassResultsSet = canonicalPassResults(input.passResults);
 	const sourceRef = input.sourceRef.trim();
 	const sourceRevision = input.sourceRevision.trim();
-	assertFeatureMatrixPassLineage(canonicalPassResultsSet, sourceRef, sourceRevision);
+	assertFeatureMatrixPassLineage(
+		canonicalPassResultsSet,
+		sourceRef,
+		sourceRevision,
+		input.workspaceRevision,
+		input.packetKey,
+	);
 	const structural = latestPass(canonicalPassResultsSet, 'structural');
 	const lexical = latestPass(canonicalPassResultsSet, 'lexical');
 	const semantic = latestPass(canonicalPassResultsSet, 'semantic');
@@ -431,6 +453,8 @@ export function compileExperimentFeatureMatrix(
 		packetKey,
 		sourceRef,
 		sourceRevision,
+		workspaceRevision: input.workspaceRevision ?? null,
+		canonicalAuthority: false,
 		featureRevision,
 		graphRevision: input.graphRevision ?? null,
 		representationRevision: input.representationRevision ?? null,

@@ -35,6 +35,8 @@ export interface WorkerStats {
 	avgProcessingMs: number;
 	lastProcessedAt: string | null;
 	isRunning: boolean;
+	readinessState: 'NOT_STARTED' | 'READY' | 'FAILED' | 'DISABLED';
+	startError: string | null;
 }
 
 /**
@@ -58,7 +60,9 @@ export abstract class QueueWorker<TMessage> {
 		dlqCount: 0,
 		avgProcessingMs: 0,
 		lastProcessedAt: null,
-		isRunning: false
+		isRunning: false,
+		readinessState: 'NOT_STARTED',
+		startError: null
 	};
 
 	private totalProcessingMs = 0;
@@ -80,15 +84,16 @@ export abstract class QueueWorker<TMessage> {
 			console.warn(`[Worker:${this.queue}] Already running`);
 			return;
 		}
+		if (this.stats.readinessState === 'DISABLED') return;
 
 		this.stopping = false;
+		this.stats.startError = null;
 
 		try {
 			const { rabbitmq } = await import('./rabbitmq-manager-fixed.js');
 
 			if (!rabbitmq) {
-				console.warn(`[Worker:${this.queue}] RabbitMQ manager not available`);
-				return;
+				throw new Error('RabbitMQ manager not available');
 			}
 
 			await rabbitmq.consume(this.queue, async (msg: unknown) => {
@@ -148,12 +153,24 @@ export abstract class QueueWorker<TMessage> {
 			});
 
 			this.stats.isRunning = true;
+			this.stats.readinessState = 'READY';
 			console.log(
 				`[Worker:${this.queue}] Started consuming (prefetch=${this.prefetch})`
 			);
 		} catch (err) {
+			this.stats.isRunning = false;
+			this.stats.readinessState = 'FAILED';
+			this.stats.startError = err instanceof Error ? err.message : String(err);
 			console.error(`[Worker:${this.queue}] Failed to start:`, err);
+			throw err;
 		}
+	}
+
+	/** Mark an intentionally unregistered consumer before startAll(). */
+	markDisabled(): void {
+		if (this.stats.isRunning) throw new Error(`Cannot disable running worker ${this.queue}`);
+		this.stats.readinessState = 'DISABLED';
+		this.stats.startError = null;
 	}
 
 	/**
@@ -163,6 +180,7 @@ export abstract class QueueWorker<TMessage> {
 	async stop(): Promise<{ drained: boolean; inFlight: number }> {
 		this.stopping = true;
 		this.stats.isRunning = false;
+		if (this.stats.readinessState === 'READY') this.stats.readinessState = 'NOT_STARTED';
 
 		const deadline = Date.now() + 5000;
 		while (this.inFlightCount > 0 && Date.now() < deadline) {
@@ -230,7 +248,9 @@ export interface RegistryStatus {
 	total: number;
 	running: number;
 	failed: number;
-	workers: Record<string, { running: boolean; stats: WorkerStats }>;
+	disabled: number;
+	state: 'NOT_STARTED' | 'READY' | 'DEGRADED' | 'FAILED' | 'DISABLED';
+	workers: Record<string, { running: boolean; state: WorkerStats['readinessState']; startError: string | null; stats: WorkerStats }>;
 }
 
 /**
@@ -240,7 +260,8 @@ export interface RegistryStatus {
 export class WorkerRegistry {
 	private workers: QueueWorker<unknown>[] = [];
 
-	register(worker: QueueWorker<unknown>): void {
+	register(worker: QueueWorker<unknown>, options: { enabled?: boolean } = {}): void {
+		if (options.enabled === false) worker.markDisabled();
 		this.workers.push(worker);
 	}
 
@@ -248,26 +269,31 @@ export class WorkerRegistry {
 	 * Start all registered workers. Partial failure is non-fatal.
 	 * Returns count of successfully started workers.
 	 */
-	async startAll(): Promise<{ started: number; failed: number; errors: string[] }> {
+	async startAll(): Promise<{ started: number; failed: number; disabled: number; state: RegistryStatus['state']; total: number; errors: string[] }> {
 		const errors: string[] = [];
-		const results = await Promise.allSettled(this.workers.map((w) => w.start()));
+		const enabledWorkers = this.workers.filter((worker) => worker.getStats().readinessState !== 'DISABLED');
+		const results = await Promise.allSettled(enabledWorkers.map((worker) => worker.start()));
 
 		let started = 0;
 		let failed = 0;
 
 		for (let i = 0; i < results.length; i++) {
 			const result = results[i];
-			if (result.status === 'fulfilled') {
+			const worker = enabledWorkers[i];
+			if (result.status === 'fulfilled' && worker?.getStats().readinessState === 'READY') {
 				started++;
 			} else {
 				failed++;
-				const queueName = (this.workers[i] as { queue: string }).queue;
-				const errMsg = result.reason instanceof Error ? result.reason.message : String(result.reason);
+				const queueName = worker?.queue ?? 'unknown';
+				const errMsg = result.status === 'rejected'
+					? result.reason instanceof Error ? result.reason.message : String(result.reason)
+					: worker?.getStats().startError ?? 'start resolved without consumer readiness';
 				errors.push(`${queueName}: ${errMsg}`);
 			}
 		}
 
-		return { started, failed, errors };
+		const status = this.getStatus();
+		return { started, failed, disabled: status.disabled, state: status.state, total: status.total, errors };
 	}
 
 	/**
@@ -286,7 +312,6 @@ export class WorkerRegistry {
 				timedOut++;
 			}
 		}
-
 		return { drained, timedOut };
 	}
 
@@ -294,19 +319,35 @@ export class WorkerRegistry {
 	 * Get status of all workers
 	 */
 	getStatus(): RegistryStatus {
-		const workerMap: Record<string, { running: boolean; stats: WorkerStats }> = {};
+		const workerMap: RegistryStatus['workers'] = {};
 		let running = 0;
 		let failed = 0;
+		let disabled = 0;
+		let notStarted = 0;
 
 		for (const worker of this.workers) {
 			const q = (worker as { queue: string }).queue;
 			const stats = worker.getStats();
-			workerMap[q] = { running: stats.isRunning, stats };
+			workerMap[q] = { running: stats.isRunning, state: stats.readinessState, startError: stats.startError, stats };
 			if (stats.isRunning) running++;
-			else failed++;
+			if (stats.readinessState === 'FAILED') failed++;
+			if (stats.readinessState === 'DISABLED') disabled++;
+			if (stats.readinessState === 'NOT_STARTED') notStarted++;
 		}
 
-		return { total: this.workers.length, running, failed, workers: workerMap };
+		const state: RegistryStatus['state'] = this.workers.length === 0 || notStarted === this.workers.length
+			? 'NOT_STARTED'
+			: running === this.workers.length
+				? 'READY'
+				: running > 0
+					? 'DEGRADED'
+					: failed > 0
+						? 'FAILED'
+						: disabled === this.workers.length
+							? 'DISABLED'
+							: 'DEGRADED';
+
+		return { total: this.workers.length, running, failed, disabled, state, workers: workerMap };
 	}
 }
 

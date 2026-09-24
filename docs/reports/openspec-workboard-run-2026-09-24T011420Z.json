@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T01:14:20Z",
+  "reason": "Returned to versioned-doc validation: VAL-03 omission was already non-gating in the current code and was independently verified by 41 Python and 17 SvelteKit tests; OpenSpec strict validation passed. VAL-08 remains blocked by the absent predicate-qualified OaK relation evaluator; VAL-10 apply remains separately authorization-gated.",
+  "sourceChange": {
+    "name": "parent-atlas-versioned-doc-intelligence",
+    "completed": 41,
+    "total": 48,
+    "verifiedThisPass": [
+      "claim-level technical omissions PASS while retained as coverage telemetry",
+      "invented/corrupted technical identifiers FAIL",
+      "41 focused Python tests pass",
+      "17 focused SvelteKit contract/judge-input tests pass",
+      "strict OpenSpec validation passes"
+    ]
+  },
+  "nextChange": {
+    "name": "agent-branch-review-fanout-ace-centroid-aug22",
+    "reason": "Three tasks remain; inspect whether any can be proven locally without worktree execution or cache/graph mutation."
+  },
+  "mutationBoundary": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "summaryApply": "none"
+  }
+}

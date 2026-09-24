@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T16:22:31Z",
+  "objective": "Continue evidence-backed OpenSpec tasks; defer container rebuilds until safe local work is exhausted.",
+  "pivot": {
+    "fromChange": "inference-wiring-deep-audit-aug22",
+    "toChange": "parent-atlas-nlp-sidecar-feature-compiler",
+    "reason": "The bounded inference live-replay gate was locally committed and proven; work moved to independent NLP sidecar evidence and schema-alignment tasks."
+  },
+  "selection": [
+    {
+      "task": "NLP 3.2 linguistic output contract",
+      "classification": "TEST_ONLY_AND_READ_ONLY_PROOF",
+      "result": "PARTIAL; remains open",
+      "evidence": "Live /pos on 'The dog runs.' returned dog=NOUN, runs=VERB, noun phrase 'The dog', dependency edges, and byte offsets. A preceding-emoji adversarial probe tagged the emoji as NOUN. Added a mock-backed regression proving UTF-8 byte spans for tokens, noun phrases, and dependency edges; scoped /analyze-to-POS wiring and reviewed quality remain unproven.",
+      "tests": "7 passed across linguistic-scope and AST-v2 CRLF test files"
+    },
+    {
+      "task": "AST 2.1 sidecar evidence/schema contract",
+      "classification": "STALE_ALREADY_DONE_AFTER_REPLAY",
+      "result": "CLOSED; canonical materialization remains blocked separately under 14.3a",
+      "evidence": "Replayed the existing schema audit against live Postgres schema and sidecar /analyze. Seven checks passed: live structural unit, mapped fields, complete field classification, matching input digest, canonical promotion false, packet_key absent, and no writes. Removed the non-digest synthetic workspace_revision from the audit payload.",
+      "receipt": "docs/reports/nlp-sidecar-ast-schema-alignment-v1.json"
+    }
+  ],
+  "progress": {
+    "change": "parent-atlas-nlp-sidecar-feature-compiler",
+    "before": "84/142",
+    "after": "85/142",
+    "delta": "1 stale task reconciled; 3.2 and 3.3 remain open"
+  },
+  "validation": {
+    "pythonFocusedTests": "PASS: 7/7",
+    "pythonSyntax": "PASS: changed and exercised Python modules compile",
+    "astSchemaAudit": "PASS: AST_UNIT_SCHEMA_ALIGNMENT_PROVEN, 7/7 checks, writesPerformed=false",
+    "openSpecStrict": "PASS: parent-atlas-nlp-sidecar-feature-compiler",
+    "scopedDiffCheck": "PASS"
+  },
+  "mutations": {
+    "postgres": "none; schema was read only",
+    "valkey": "none",
+    "qdrant": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "containers": "none",
+    "filesystem": [
+      "Added mock-backed UTF-8 POS span regression test.",
+      "Hardened the existing AST schema audit against synthetic workspace revisions and added an explicit packet_key absence check.",
+      "Reconciled task 2.1 and recorded current NLP evidence."
+    ]
+  },
+  "authority": {
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false
+  },
+  "result": "AST_UNIT_SCHEMA_PROVEN_LINGUISTIC_QUALITY_OPEN",
+  "nextGate": "SCOPED_COMMENT_DOCSTRING_TO_LINGUISTIC_OUTPUT_PROVEN"
+}

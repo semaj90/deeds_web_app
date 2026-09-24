@@ -34,7 +34,8 @@ type DocumentGovernanceStatus =
   | 'SUPERSEDED'
   | 'ARCHIVE_READY'
   | 'ARCHIVED'
-  | 'CONFLICT';
+  | 'CONFLICT'
+  | 'UNCLASSIFIED';
 
 interface DocumentGovernanceRecordV1 {
   schema: 'atlas.document-governance-record.v1';
@@ -46,6 +47,7 @@ interface DocumentGovernanceRecordV1 {
   topicIds: string[];
   documentKind:
     | 'CLAUDE_INSTRUCTIONS'
+    | 'AGENT_INSTRUCTIONS'
     | 'ARCHITECTURE'
     | 'OPENSPEC_PROPOSAL'
     | 'OPENSPEC_SPEC'
@@ -53,19 +55,28 @@ interface DocumentGovernanceRecordV1 {
     | 'OPENSPEC_TASKS'
     | 'REPORT'
     | 'RUNBOOK'
-    | 'HISTORICAL';
+    | 'HISTORICAL'
+    | 'DOCUMENT';
 
   status: DocumentGovernanceStatus;
+  topicOwnershipStatus: 'UNASSIGNED' | 'ASSIGNED' | 'CONFLICT';
   canonicalForTopics: string[];
 
   supersedes: string[];           // documentIds
   supersededBy: string[];         // documentIds
+  supersessionStatus: 'UNASSESSED' | 'DECLARED' | 'VALIDATED' | 'CONFLICT';
   supersessionReason?: string;
 
-  openspecChange?: string;
-  openspecTaskRefs?: string[];
+  openspec: {
+    change: string | null;
+    taskRefs: string[];
+    completedTasks: number | null;
+    totalTasks: number | null;
+    progressFraction: number | null;
+  };
 
   validation: {
+    status: 'NOT_CHECKED' | 'PARTIAL' | 'PASSED' | 'FAILED';
     linksChecked: boolean;
     referencesChecked: boolean;
     smokePassed: boolean;
@@ -74,7 +85,7 @@ interface DocumentGovernanceRecordV1 {
     receiptRefs: string[];
   };
 
-  workflow?: {
+  workflow: null | {
     workflowId?: string;
     actionId?: string;
     progressFraction?: number;
@@ -86,13 +97,12 @@ interface DocumentGovernanceRecordV1 {
   archive: {
     eligible: boolean;
     blockedReasons: string[];
-    archivedPath?: string;
+    archivedPath: string | null;
   };
-
-  discoveredAt: string;
-  updatedAt: string;
 }
 ```
+
+The deterministic repository projection does not synthesize discovery/update timestamps. Workflow details are `null` until a real event reference is bound; validation starts at `NOT_CHECKED`; topic and supersession assignments remain explicitly unassigned/unassessed until dedicated extractors and validators run.
 
 ## 3. Topic ownership
 
@@ -123,7 +133,8 @@ Each instruction file receives:
 ```text
 scopePath
 sha256
-parentInstructionFile?
+parentInstructionDocumentId
+parentScopeStatus
 canonicalTopics[]
 supersedes[]
 supersededBy[]

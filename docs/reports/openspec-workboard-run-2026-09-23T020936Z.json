@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T02:09:36Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-document-governance-master-index",
+  "selection": {
+    "from": "9.8 deterministic governance replay (closed with stable proof)",
+    "to": "9.1 governance unit-test coverage reconciliation",
+    "reason": "Existing focused tests appeared to cover the open task; running the bounded suite can prove whether the checkbox is stale without adding duplicate tests or owners."
+  },
+  "stateAtSelection": { "checked": 37, "open": 27, "total": 64 },
+  "guardrails": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "graphifyRefresh": false,
+    "containerRebuild": false,
+    "canonicalPromotion": false
+  },
+  "completed": [
+    "9.1 existing governance unit-test coverage verified; stale checkbox reconciled"
+  ],
+  "evidence": {
+    "command": "node --test packages/parent-atlas/test/document-governance-record-v1.test.mjs scripts/atlas/document-governance-topic-conflicts-v1.test.mjs scripts/atlas/document-governance-supersession-plan-v1.test.mjs scripts/atlas/document-governance-openspec-binding-v1.test.mjs scripts/atlas/document-governance-archive-gate-v1.test.mjs",
+    "tests": "22/22 PASS",
+    "coverage": ["strict schema and registry", "topic conflict fail-closed", "explicit supersession and digest drift", "task progress and closure blocking", "ETA absent", "archive eligibility and blockers"],
+    "registryChecksum": "b4992f84c8fd60cb5473c31ec75be0a97c5f8a6f528d3db6cee4f596ec674717",
+    "masterTocChecksum": "6f7b2f5e0cb127e5394c588d998d9936a4c786a9a15529426bd772ea8d85f13d",
+    "deterministicReplay": "PASS; two consecutive builds byte-identical",
+    "governanceValidator": { "status": "BLOCKED", "failures": 0, "closureBlockers": ["UNCHECKED_TASKS:3312"], "archiveEligible": 0, "writes": { "documents": 0, "archives": 0, "registry": 0 } },
+    "openSpecStrict": "PASS"
+  },
+  "openSpecProgress": { "change": "parent-atlas-document-governance-master-index", "checked": 38, "open": 26, "total": 64, "delta": "1 stale checkbox reconciled with 22/22 tests" },
+  "mutations": { "database": false, "qdrant": false, "valkey": false, "neo4j": false, "graphify": false, "containers": false, "filesystem": true },
+  "status": "COMPLETE",
+  "nextGate": "DOCUMENT_GOVERNANCE_9_6_API_SSR_TEST_COVERAGE"
+}

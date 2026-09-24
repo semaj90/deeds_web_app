@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.d.ts",
+    "src/lib/types/document-governance-summary-v1.ts",
+    "src/routes/api/admin/atlas/document-governance/+server.ts",
+    "src/routes/api/admin/atlas/document-governance/summary-v1.ts",
+    "src/routes/api/admin/atlas/document-governance/summary-v1.spec.ts",
+    "src/routes/(app)/admin/atlas/+page.server.ts",
+    "src/routes/(app)/admin/atlas/+page.svelte",
+    "src/routes/(app)/admin/atlas/governance-page-server.spec.ts",
+    "src/lib/server/atlas/ontology-resolution-boundary-postgres.ts",
+    "src/lib/server/atlas/ontology-resolution-boundary-postgres.spec.ts",
+    ".svelte-kit/ambient.d.ts",
+    ".svelte-kit/types/src/routes/(app)/admin/atlas/$types.d.ts"
+  ]
+}

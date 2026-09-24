@@ -33,7 +33,6 @@ const payload = {
   source_type: 'codebase',
   source_ref: SOURCE_RELATIVE,
   source_revision: sourceRevision,
-  workspace_revision: 'sha256:runtime-fixture-workspace-v1',
   language: 'javascript',
   passes: ['structural'],
 };
@@ -123,12 +122,16 @@ try {
   });
   check('source-revision-preserved', structural?.source_revision === sourceRevision);
   check('promotion-closed', unit?.canonical_authority === false, { canonicalAuthority: unit?.canonical_authority ?? null });
+  check('packet-key-excluded-from-ast-unit', Boolean(unit) && !Object.prototype.hasOwnProperty.call(unit, 'packet_key'), {
+    packetKeyPresent: Boolean(unit) && Object.prototype.hasOwnProperty.call(unit, 'packet_key'),
+  });
 
   report.observed = {
     astUnitCount: structural?.artifacts?.ast_units?.length ?? 0,
     providerRevision: body?.provider_revision ?? null,
     sourceRef: structural?.source_ref ?? null,
     sourceRevision: structural?.source_revision ?? null,
+    packetKeyPresent: Boolean(unit) && Object.prototype.hasOwnProperty.call(unit, 'packet_key'),
     unclassifiedTableFields,
     classifiedTableFields: tableFieldClassification,
     missingEvidenceFields,

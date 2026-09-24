@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sys
 from typing import Any, Callable
 
@@ -25,15 +26,19 @@ ADMISSION_SCHEMA = "atlas.summary-persistence-admission.v1"
 CLAIM_SPLITTER_REVISION = "claims-of:sentence-regex-v1"
 
 
-def admit_summary_v1(chunk_id: str, chunk_evidence_revision: str, summary_text: str, transport: Callable, model: dict[str, str]) -> dict[str, Any]:
+def admit_summary_v1(chunk_id: str, chunk_evidence_revision: str, summary_input_checksum: str, summary_text: str, transport: Callable, model: dict[str, str]) -> dict[str, Any]:
+    if not re.fullmatch(r"[0-9a-f]{64}", summary_input_checksum):
+        raise ValueError("SUMMARY_INPUT_CHECKSUM_INVALID")
     lineage: dict[str, Any] = {}
-    resolved = one_pass([{"chunkId": chunk_id, "chunkEvidenceRevision": chunk_evidence_revision, "summary": summary_text}], transport, model, lineage)
+    resolved = one_pass([{"chunkId": chunk_id, "chunkEvidenceRevision": chunk_evidence_revision, "summary": summary_text,
+                          "summaryInputChecksum": summary_input_checksum}], transport, model, lineage)
     claims = [{
         "claimOrdinal": c["claimOrdinal"], "claimChecksum": c["claimChecksum"], "validationId": c["validationId"], "validationChecksum": c["validationChecksum"],
         "decision": c["result"]["decision"], "resolutionLayer": c["resolutionLayer"], "judgeInputChecksum": lineage[c["validationId"]]["judgeInputChecksum"],
     } for c in resolved]
     body = {
         "schema": ADMISSION_SCHEMA, "chunkId": chunk_id, "chunkEvidenceRevision": chunk_evidence_revision,
+        "summaryInputChecksum": summary_input_checksum,
         "summaryOutputSha256": hashlib.sha256(summary_text.encode("utf-8")).hexdigest(), "summaryOutputChecksum": canonical_sha256_v1({"text": summary_text}),
         "splitterRevision": CLAIM_SPLITTER_REVISION, "claimCount": len(claims), "claims": claims,
         "wholeSummaryEligible": bool(claims) and all(c["decision"] == "ADMIT" for c in claims),
@@ -47,7 +52,7 @@ def main() -> int:
     payload = json.load(sys.stdin)
     model = resolve_model(LLAMA)
     transport = http_transport(LLAMA, model["id"])
-    reports = [admit_summary_v1(i["chunkId"], i["chunkEvidenceRevision"], i["summaryText"], transport, model) for i in payload["items"]]
+    reports = [admit_summary_v1(i["chunkId"], i["chunkEvidenceRevision"], i["summaryInputChecksum"], i["summaryText"], transport, model) for i in payload["items"]]
     json.dump({"reports": reports}, sys.stdout, ensure_ascii=False)
     return 0
 

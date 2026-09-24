@@ -12,7 +12,9 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const WORKSPACE_ROOT = path.resolve(REPO_ROOT, '..');
-const OUT_PATH = path.join(REPO_ROOT, 'docs', 'reports', 'symbol-canonical-writer-owner-v1.json');
+const OUT_PATH = process.env.SYMBOL_WRITER_OWNER_OUT
+  ? path.resolve(WORKSPACE_ROOT, process.env.SYMBOL_WRITER_OWNER_OUT)
+  : path.join(REPO_ROOT, 'docs', 'reports', 'symbol-canonical-writer-owner-v1.json');
 
 function grep(pattern, roots) {
   try {
@@ -24,6 +26,12 @@ function grep(pattern, roots) {
 }
 
 function main() {
+  const nominationSource = readFileSync(path.join(WORKSPACE_ROOT, 'packages', 'parent-atlas', 'src', 'core', 'structural-symbol.ts'), 'utf8');
+  const extractionSource = readFileSync(path.join(WORKSPACE_ROOT, 'packages', 'parent-atlas', 'src', 'core', 'structural-extraction-fabric.ts'), 'utf8');
+  const ownerSource = readFileSync(path.join(WORKSPACE_ROOT, 'packages', 'parent-atlas', 'src', 'core', 'symbol-registry-repository.ts'), 'utf8');
+  const upstreamFileIdPropagated = /upstream_file_id:\s*id/.test(nominationSource)
+    && /upstream_file_id:\s*chunk\.upstream_file_id/.test(extractionSource)
+    && /upstream_file_id/.test(ownerSource);
   const directWriters = grep(
     'INSERT INTO atlas_symbol_(registry|versions)|UPDATE atlas_symbol_(registry|versions)',
     ['sveltekit-frontend/src', 'sveltekit-frontend/scripts', 'packages', 'python', 'sveltekit-frontend/drizzle/manual'],
@@ -57,11 +65,13 @@ function main() {
     tablesWritten: ['atlas_symbol_registry', 'atlas_symbol_aliases', 'atlas_symbol_versions'],
     stableSymbolIdDerivation: 'sha256(language.toLowerCase(), kind, symbol_key) -- deterministic, no path-only/latest/fuzzy input',
     symbolVersionIdDerivation: 'sha256(stable_symbol_id, source_revision, upstream_node_id, declaration_hash) -- explicitly revision-qualified, never workspace-revision-substituted',
-    schemaCompatibility: 'EXACT_MATCH -- INSERT column lists verified byte-for-byte against live atlas_symbol_registry (stable_symbol_id, canonical_key, language, symbol_kind, canonical_name, canonical_qualified_name, created_from_nomination_id, created_from_source_ref, created_from_source_revision, registry_revision) and atlas_symbol_versions (symbol_version_id, stable_symbol_id, source_ref, source_revision, workspace_revision, upstream_node_id, upstream_symbol_id, upstream_chunk_id, qualified_name, declaration_hash, signature_normalized, byte_start, byte_end, parent_route, producer_revision).',
+    schemaCompatibility: 'EXACT_MATCH -- INSERT column lists verified byte-for-byte against live atlas_symbol_registry and atlas_symbol_versions, including propagated upstream_file_id.',
     safetyGate: 'promoteNomination() throws SYMBOL_PROMOTION_REQUIRES_EXPLICIT_ALLOW_CREATE unless allow_create=true is explicitly passed -- writes are not accidental.',
     identityRelianceOnForbiddenInputs: 'NONE -- no latest/HEAD/path-only/workspace:0/fuzzy-name identity found in stableSymbolId or symbolVersionId derivation.',
-    upstreamFileIdentityConsumption: 'NO_FILE_IDENTITY',
-    upstreamFileIdentityConsumptionNote: 'Reads nomination.source_ref/source_revision/upstream_node_id directly; does not consume a StableFileIdentityV1/upstream_file_id binding. This means it is currently a PATH_IDENTITY_ONLY consumer for file scoping, not yet wired to the S01-08K stable-file-identity chain -- a real, separate gap from the S01-08K blocker itself.',
+    upstreamFileIdentityConsumption: upstreamFileIdPropagated ? 'UPSTREAM_FILE_ID_PROPAGATED_STABLE_FILE_ADMISSION_OPEN' : 'NO_FILE_IDENTITY',
+    upstreamFileIdentityConsumptionNote: upstreamFileIdPropagated
+      ? 'upstream_file_id is now carried from the canonical structural chunk schema through nominations into atlas_symbol_versions; the value is not yet proven to be an S01-08K stableFileId because S01-08K has not been applied.'
+      : 'upstream_file_id is not carried through the canonical nomination/writer path.',
     callers,
     callersWiredToNpmScript: wiredToNpmScript,
     runtimeReachable: wiredToNpmScript.length > 0 ? 'NPM_SCRIPT_WIRED' : 'MANUAL_SCRIPT_INVOCATION_ONLY',
@@ -73,7 +83,7 @@ function main() {
   const result =
     conflicts.length > 0
       ? 'SYMBOL_CANONICAL_WRITER_CONFLICT'
-      : owner.upstreamFileIdentityConsumption === 'NO_FILE_IDENTITY'
+      : owner.upstreamFileIdentityConsumption !== 'S01_08K_STABLE_FILE_ADMITTED'
         ? 'SYMBOL_CANONICAL_WRITER_LINEAGE_BLOCKED'
         : 'SYMBOL_CANONICAL_WRITER_PROVEN';
 
@@ -87,14 +97,16 @@ function main() {
     schemaIncompatibleWriters,
     conflicts,
     upstreamFileIdentity: {
-      status: 'NOT_CONSUMED_BY_OWNER',
-      note: 'The canonical owner does not itself read StableFileIdentityV1/upstream_file_id -- it accepts source_ref/source_revision as caller-supplied nomination fields. This means clearing S01-08K alone does not automatically wire file identity into this writer -- the CALLER (native-structural-materializer.mts) would need to supply a stable-file-identity-derived source_ref/source_revision, which is a separate, not-yet-verified wiring question.',
+      status: upstreamFileIdPropagated ? 'UPSTREAM_FILE_ID_PROPAGATED_STABLE_FILE_ADMISSION_OPEN' : 'NOT_CONSUMED_BY_OWNER',
+      note: upstreamFileIdPropagated
+        ? 'The canonical path now preserves upstream_file_id, but S01-08K stable-file admission remains unapplied and therefore stable-file identity is not promoted.'
+        : 'The canonical owner does not consume upstream_file_id.',
     },
     writes: { postgres: 0, qdrant: 0, valkey: 0, neo4j: 0, graphifyRuns: 0 },
     canonicalAuthority: false,
     writesPerformed: false,
     result,
-    nextBlocker: result === 'SYMBOL_CANONICAL_WRITER_PROVEN' ? 'S01-08K_STABLE_FILE_IDENTITY_NOT_APPLIED' : 'SYMBOL_CANONICAL_WRITER_LINEAGE_BLOCKED -- owner does not yet consume file identity even if S01-08K is applied; caller-side wiring unverified',
+    nextBlocker: result === 'SYMBOL_CANONICAL_WRITER_PROVEN' ? 'S01-08K_STABLE_FILE_IDENTITY_NOT_APPLIED' : upstreamFileIdPropagated ? 'S01-08K_STABLE_FILE_IDENTITY_NOT_APPLIED -- upstream_file_id propagation is proven, stable-file admission is not' : 'SYMBOL_CANONICAL_WRITER_LINEAGE_BLOCKED',
   };
 
   writeFileSync(OUT_PATH, JSON.stringify(receipt, null, 2) + '\n', 'utf8');

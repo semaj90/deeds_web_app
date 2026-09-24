@@ -314,7 +314,7 @@ function runSingletonBootTasks(): void {
         .startAll()
         .then((stats) => {
           console.log(
-            `[Boot] Queue workers: ${stats.started}/${stats.started + stats.failed} started`
+            `[Boot] Queue workers: READY ${stats.started}/${stats.total}; registry=${stats.state}; FAILED=${stats.failed}; DISABLED=${stats.disabled}`
           );
           if (stats.errors.length > 0) {
             console.warn('[Boot] Queue worker errors:', stats.errors.join(', '));

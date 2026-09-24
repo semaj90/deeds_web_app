@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const reportPath = path.resolve(root, 'docs/reports/parent-atlas/doc-24-patch-proposal-fixture-v1.json');
-const baseText = 'const value = oldValue;\n';
-const proposedText = baseText.replace('oldValue', 'newValue');
+const baseText = 'export const value = "oldValue";\n';
+const proposedText = baseText.replace('"oldValue"', '"newValue"');
 const digest = (value) => `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
 const proposal = {
   schema: 'atlas.patch-proposal.v1',
@@ -15,7 +15,7 @@ const proposal = {
   sourceRef: 'src/example.ts',
   baseSourceRevision: digest(baseText),
   patchDigest: digest(proposedText),
-  hunks: [{ startByte: 14, endByte: 22, before: 'oldValue', after: 'newValue' }],
+  hunks: [{ startByte: 22, endByte: 30, before: 'oldValue', after: 'newValue' }],
   reasoningEvidenceRefs: ['diagnostic:example:1', 'ast-grep:replace-legacy-value:1'],
   analysisPassRefs: ['analysis-pass:doc-23-fixture'],
   modelRevision: 'ornith-1.5-9b',

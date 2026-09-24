@@ -1,0 +1,69 @@
+{
+  "schema": "atlas.doc-03.firecrawl-live-bounded-proof.v1",
+  "gate": "DOC-03",
+  "status": "DOC_03_LIVE_BOUNDED_CRAWL_PROVEN",
+  "mode": "LIVE_EXTERNAL_READ_NO_CORPUS_PERSISTENCE",
+  "source": {
+    "url": "https://docs.firecrawl.dev/",
+    "allowedDomain": "docs.firecrawl.dev",
+    "maximumPages": 3,
+    "maximumDepth": 1,
+    "followSitemap": false
+  },
+  "submittedRequest": {
+    "url": "https://docs.firecrawl.dev/",
+    "includePaths": [],
+    "excludePaths": [],
+    "maxDiscoveryDepth": 1,
+    "limit": 3,
+    "sitemap": "skip",
+    "crawlEntireDomain": false,
+    "allowExternalLinks": false,
+    "allowSubdomains": false,
+    "ignoreRobotsTxt": false,
+    "scrapeOptions": {
+      "formats": [
+        "markdown"
+      ],
+      "onlyMainContent": true,
+      "removeBase64Images": true,
+      "blockAds": true
+    }
+  },
+  "submittedRequestChecksum": "sha256:80e34ab42299a981dcaf2aaa0b7a5b3c234a77bb5cf9b4f5d7d66a316e2c30df",
+  "observed": {
+    "pageCount": 3,
+    "resolvedUrls": [
+      "https://docs.firecrawl.dev/",
+      "https://docs.firecrawl.dev/llms.txt",
+      "https://docs.firecrawl.dev/sdks/overview"
+    ],
+    "normalizedChecksums": [
+      "c61e6997a9df9e9de244e7b6e91a91c1c1ec4420f9a86814c6c55914204fb6c8",
+      "9a16d96784b15067be486cffc1b170ded6cb0a41eeefddb5aedb498b03a367ac",
+      "40d1bc36a5cdc7763e80f59251830e8cd2463d09c80e3ec2bfd47f75dc2b0af9"
+    ],
+    "failure": null
+  },
+  "checks": {
+    "pageCountNonzero": true,
+    "pageCountWithinLimit": true,
+    "requestLimitBound": true,
+    "requestDepthBound": true,
+    "requestSitemapBound": true,
+    "externalLinksDisabled": true,
+    "subdomainsDisabled": true,
+    "entireDomainDisabled": true,
+    "allResultsAllowedDomain": true,
+    "allResultsFirecrawlV2": true,
+    "crawlIdsPresent": true
+  },
+  "apiKeyRecorded": false,
+  "pageBodiesRecorded": false,
+  "corpusWritesPerformed": false,
+  "postgresWritesPerformed": false,
+  "qdrantWritesPerformed": false,
+  "neo4jWritesPerformed": false,
+  "valkeyWritesPerformed": false,
+  "canonicalPromotion": false
+}

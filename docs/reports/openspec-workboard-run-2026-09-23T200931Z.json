@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T20:13:27Z",
+  "runKind": "OPEN_SPEC_CHANGE_PIVOT_AND_TASK_PROOF",
+  "pivot": {
+    "fromChange": "parent-atlas-workboard-feature-utility-fabric",
+    "fromProgress": "27/69 complete",
+    "toChange": "parent-atlas-transport-memory-boundaries",
+    "toProgressBefore": "42/93 complete",
+    "reason": "WFU language-registry wiring lacks proven owner revision provenance and the sidecar owner file has concurrent edits; selected adjacent local batch-isolation work instead."
+  },
+  "selectedTask": {
+    "id": "CC-05",
+    "classification": "TEST_ONLY",
+    "result": "BATCH_FAILURE_ISOLATION_AND_CONCURRENCY_BOUND_PROVEN",
+    "receipt": "docs/reports/ast-batch-failure-isolation-v1.json",
+    "completed": true
+  },
+  "deferred": {
+    "task": "STRUCT-04 deployed typed-envelope parity",
+    "reason": "Current live receipt is from the pre-fix image; container rebuild/re-probe is intentionally deferred until the end of the broader workboard objective.",
+    "canonicalPromotion": false
+  },
+  "followOnVerifiedTask": {
+    "id": "A2A-04",
+    "result": "A2A_INVOCATION_AUTHORIZATION_PROVEN",
+    "alreadyCheckedBeforeReplay": true,
+    "freshFocusedTest": "PASS 9/9",
+    "receipt": "docs/reports/a2a-direct-invocation-authorization-v1.json",
+    "receiptAssertions": "Viewer claim 403/dispatch false/handler 0; second write 403/handler 0; permitted read handler 1; admin dry-run handler 1; unknown tool 404/no handlers; mirror metadata non-dispatchable; persistent writes 0.",
+    "openFollowUps": ["A2A-05 AgentCard Bearer/session authentication parity", "workerId authorization/impersonation"]
+  },
+  "validation": {
+    "graphifyBatchVitest": "PASS 3/3",
+    "sidecarTypedEnvelopePytest": "PASS 1; 1 deselected",
+    "a2aAuthorizationVitest": "PASS 9/9",
+    "a2aOpenSpecStrict": "PASS",
+    "a2aChangedPathDiffCheck": "PASS",
+    "containerRebuild": false,
+    "persistentWrites": 0
+  }
+}

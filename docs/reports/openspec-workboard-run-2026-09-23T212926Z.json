@@ -1,0 +1,42 @@
+{
+  "schema": "parent-atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T21:29:26Z",
+  "pivot": {
+    "from": "parent-atlas-versioned-doc-intelligence",
+    "fromProgress": "27/38",
+    "to": "parent-atlas-adaptive-dag-fabric",
+    "toProgress": "11/13",
+    "reason": "User redirected focus to the learning/deep-research circuit and clarified that fetch coalescing must occur before search, while ACE selection must preserve distinct cards."
+  },
+  "selectedGate": "DAG-FETCH-01",
+  "result": "Added a revision-qualified fetch plan to the existing local research circuit and fixture proofs for coalescing, payload reuse, revision separation, and selector identity preservation. Gate remains open because no production retrieval caller is wired to this circuit.",
+  "evidence": {
+    "fetchPlanOwner": "sveltekit-frontend/src/lib/server/atlas/research/local-research-circuit-v1.ts::buildResearchFetchPlanV1",
+    "fetchExecutorBoundary": "runLocalResearchCircuitV1 search callback receives normalized query plus workspace/candidate/ordinal revisions",
+    "focusedVitest": "8/8 passed across local-research-circuit-v1.spec.ts and ace-card-selection-v2.spec.ts",
+    "typecheck": "targeted TypeScript compilation passed with --types node",
+    "openspecStrict": "PASS",
+    "canonicalAuthority": false,
+    "productionCaller": "not found; fixture-only circuit integration"
+  },
+  "validation": {
+    "focusedVitest": "PASS: 8/8",
+    "targetedTypeScript": "PASS",
+    "openspecStrict": "PASS",
+    "scopedDiffCheck": "PASS"
+  },
+  "openItems": {
+    "DAG-FETCH-01": "Fixture-level request coalescing is proven; production fetch caller integration/readback remains open.",
+    "NATS-EVENT-01": "Optional shadow observability follow-up; no stream provisioned and no runtime change authorized.",
+    "LDR-runtime": "FastAPI/Pydantic, Postgres retrieval, EmbeddingGemma :8081, and Ornith :8090 remain separate owner-level gates; no rebuild or canonical population performed."
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "nats": 0,
+    "containersRebuilt": 0,
+    "canonicalAuthority": false
+  }
+}

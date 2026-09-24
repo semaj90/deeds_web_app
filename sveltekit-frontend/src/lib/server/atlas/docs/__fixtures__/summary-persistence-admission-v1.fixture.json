@@ -1,10 +1,12 @@
 {
   "eligible": {
     "summaryText": "pgvector supports HNSW iterative scans.",
+    "summaryInputChecksum": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
     "report": {
       "schema": "atlas.summary-persistence-admission.v1",
       "chunkId": "doc:pgvector:fe883c75f323441d:22",
       "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "summaryInputChecksum": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
       "summaryOutputSha256": "765fc8e5e6015873cd0645dd2d6e5314d5fadaa5865c69b2cbff76fa80edaa3e",
       "summaryOutputChecksum": "0b9210051b57574cd0bb0de2190c6fdd4548c2564efe54901290bc4bf4ed0e43",
       "splitterRevision": "claims-of:sentence-regex-v1",
@@ -26,15 +28,17 @@
       "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
       "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
       "canonicalAuthority": false,
-      "admissionChecksum": "ad22b97e1a08690df465ce71bdb12ac60c130b915c7059e84275667ee6a669da"
+      "admissionChecksum": "06e6c2599308ce527273156e090b38566f1a5a2a8a40f79ef2c90bcb8019acc6"
     }
   },
   "ineligible": {
     "summaryText": "pgvector supports HNSW iterative scans.",
+    "summaryInputChecksum": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
     "report": {
       "schema": "atlas.summary-persistence-admission.v1",
       "chunkId": "doc:pgvector:fe883c75f323441d:22",
       "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "summaryInputChecksum": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
       "summaryOutputSha256": "765fc8e5e6015873cd0645dd2d6e5314d5fadaa5865c69b2cbff76fa80edaa3e",
       "summaryOutputChecksum": "0b9210051b57574cd0bb0de2190c6fdd4548c2564efe54901290bc4bf4ed0e43",
       "splitterRevision": "claims-of:sentence-regex-v1",
@@ -56,7 +60,7 @@
       "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
       "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
       "canonicalAuthority": false,
-      "admissionChecksum": "9cf8134b5d97759291f02db3fafe7567316384f02282279361d24f5f3f3eaa28"
+      "admissionChecksum": "0bf9de7e8aab48b7bb13f60bdd7472826e063727c1ee44b775d60221e3f957d8"
     }
   }
 }

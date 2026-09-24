@@ -90,6 +90,32 @@ export const acpToA2aMigrationReceiptSchema = z.object({
 }).strict();
 export type AcpToA2aMigrationReceiptV1 = z.infer<typeof acpToA2aMigrationReceiptSchema>;
 
+/** A projection binding legacy ACP references to existing Atlas-owned records. */
+export const acpIdentityProjectionV1Schema = z.object({
+  schema: z.literal('atlas.acp-identity-projection.v1'),
+  ingressId: id,
+  external: z.object({
+    agentId: id,
+    runId: id,
+    sessionId: id.nullable(),
+    taskId: id,
+    actionId: id,
+  }).strict(),
+  atlas: z.object({
+    runId: id,
+    taskId: id,
+    actionId: id,
+    contextManifestChecksum: checksum,
+    executionReceiptId: id,
+    workflowEventChecksum: checksum,
+  }).strict(),
+  projectionChecksum: checksum,
+  graphIdentity: z.null(),
+  writesPerformed: z.literal(false),
+  canonicalAuthority: z.literal(false),
+}).strict();
+export type AcpIdentityProjectionV1 = z.infer<typeof acpIdentityProjectionV1Schema>;
+
 export const VALIDATED_WORKFLOW_TARGETS = [
   'A2A_REMOTE_AGENT',
   'KANBAN_TASK_BOARD',
@@ -365,6 +391,66 @@ export function buildParentAtlasStudioWorkflowProjection(input: Omit<z.input<typ
 export function buildAcpMigrationReceipt(input: Omit<z.input<typeof acpToA2aMigrationReceiptSchema>, 'schema' | 'migration_checksum' | 'canonical_authority'>): AcpToA2aMigrationReceiptV1 {
   const raw = { schema: 'atlas.acp-to-a2a-migration-receipt.v1' as const, ...input, canonical_authority: false as const };
   return acpToA2aMigrationReceiptSchema.parse({ ...raw, migration_checksum: agenticWorkflowChecksum(raw) });
+}
+
+/**
+ * Map external ACP IDs onto already-resolved Atlas task/run/action/context/receipt
+ * references. The task attempt and workflow event must agree on run and receipt;
+ * ACP IDs are retained only as external references. No IDs or graph identity are
+ * minted here, and this projection performs no persistence.
+ */
+export function buildAcpIdentityProjectionV1(input: {
+  ingress: z.input<typeof acpLegacyIngressSchema>;
+  externalTaskId: string;
+  externalActionId: string;
+  taskAttempt: { taskId: string; runId: string; executionReceiptId: string | null };
+  event: z.input<typeof workflowActionEventSchema>;
+  contextManifestChecksum: string;
+}): AcpIdentityProjectionV1 {
+  const ingress = acpLegacyIngressSchema.parse(input.ingress);
+  const event = workflowActionEventSchema.parse(input.event);
+  const taskAttempt = z.object({ taskId: id, runId: id, executionReceiptId: id }).passthrough().parse(input.taskAttempt);
+  const externalTaskId = id.parse(input.externalTaskId);
+  const externalActionId = id.parse(input.externalActionId);
+  const contextManifestChecksum = checksum.parse(input.contextManifestChecksum);
+
+  if (agenticWorkflowChecksum(ingress.payload) !== ingress.payload_checksum) {
+    throw new Error('ACP_IDENTITY_INGRESS_PAYLOAD_CHECKSUM_MISMATCH');
+  }
+  if (ingress.payload['task_id'] !== externalTaskId || ingress.payload['action_id'] !== externalActionId) {
+    throw new Error('ACP_IDENTITY_EXTERNAL_REFERENCE_MISMATCH');
+  }
+  if (taskAttempt.runId !== event.runId) throw new Error('ACP_IDENTITY_TASK_RUN_MISMATCH');
+  if (!event.receiptId || taskAttempt.executionReceiptId !== event.receiptId) {
+    throw new Error('ACP_IDENTITY_EXECUTION_RECEIPT_MISMATCH');
+  }
+
+  const raw = {
+    schema: 'atlas.acp-identity-projection.v1' as const,
+    ingressId: ingress.ingress_id,
+    external: {
+      agentId: ingress.acp_agent_id,
+      runId: ingress.acp_run_id,
+      sessionId: ingress.acp_session_id,
+      taskId: externalTaskId,
+      actionId: externalActionId,
+    },
+    atlas: {
+      runId: event.runId,
+      taskId: taskAttempt.taskId,
+      actionId: event.actionId,
+      contextManifestChecksum,
+      executionReceiptId: taskAttempt.executionReceiptId,
+      workflowEventChecksum: agenticWorkflowChecksum(event),
+    },
+    graphIdentity: null,
+    writesPerformed: false as const,
+    canonicalAuthority: false as const,
+  };
+  return acpIdentityProjectionV1Schema.parse({
+    ...raw,
+    projectionChecksum: agenticWorkflowChecksum(raw),
+  });
 }
 
 export function describeAgenticWorkflowControlPlane(): string {

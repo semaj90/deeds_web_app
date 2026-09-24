@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-authority-read-parity.v1",
-  "generatedAt": "2026-09-21T19:57:32.743Z",
+  "generatedAt": "2026-09-21T22:57:53.015Z",
   "mode": "READ_ONLY_LIVE_LOADER_READBACK",
   "transaction": "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY; ... ROLLBACK",
   "databaseError": null,

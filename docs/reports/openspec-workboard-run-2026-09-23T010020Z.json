@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T01:00:20Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "MEM_03_BITFROST_REVISION_AND_FAIL_OPEN_AUDIT",
+    "to": "STRUCT_02_STRUCTURAL_MEMORY_CARD_V1",
+    "reason": "MEM-03 has revision-varying key tests but no proven production caller or end-to-end fail-open readback; route around that runtime gate and implement the independent structural-card contract without store writes."
+  },
+  "implementation": {
+    "files": [
+      "packages/parent-atlas/src/core/structural-memory-card-v1.ts",
+      "packages/parent-atlas/src/index.ts",
+      "packages/parent-atlas/test/structural-memory-card-v1.test.mjs",
+      "openspec/changes/parent-atlas-transport-memory-boundaries/specs/transport-memory-boundaries/spec.md",
+      "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md"
+    ],
+    "contract": "StructuralMemoryCardV1",
+    "constraints": [
+      "Caller supplies canonical identity references; card builder does not mint IDs.",
+      "Tree-sitter node and chunk IDs remain provenance.",
+      "Source/workspace revisions, exact spans, typed relationship references, syntax state, producer and representation revisions are checksummed.",
+      "canonicalAuthority=false and writesPerformed=false are schema-enforced.",
+      "No database, Qdrant, Valkey, Neo4j, Graphify, or container mutations."
+    ]
+  },
+  "validation": {
+    "parentAtlasTypeScriptBuild": "PASS",
+    "focusedTests": "PASS 4/4",
+    "openSpecStrict": "PASS",
+    "diffCheck": "PASS",
+    "jsonParse": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 34,
+    "open": 58,
+    "total": 92,
+    "delta": "STRUCT-02 implemented and fixture-proven; MEM-03 remains open because the cache write/readback path is not shown to be production-wired and live Valkey proof is still gated."
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "containers": false
+  },
+  "nextGate": "STRUCT_07_BOUNDED_CST_TO_GIS_PACKET_TO_SEMANTIC_PROJECTION_PROOF"
+}

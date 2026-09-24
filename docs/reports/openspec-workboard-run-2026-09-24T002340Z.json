@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runId": "openspec-workboard-run-2026-09-24T002340Z",
+  "startedAt": "2026-09-24T00:23:40Z",
+  "repository": "C:/Users/james/Videos/deeds-web-app",
+  "pivot": {
+    "from": "parent-atlas-adaptive-dag-fabric / DAG-FETCH-01 fixture verification",
+    "to": "parent-atlas-versioned-doc-intelligence / DOC-19 cuVS exact executor baseline",
+    "reason": "Fixture-level fetch coalescing and card-identity tests pass, but the local research circuit has no production caller; wiring it into autonomous SearchRuntime or LDR would add an unapproved orchestration path. DOC-19 has an existing read-only executor harness and the canonical 852-vector document cohort, so its live baseline can be attempted without rebuilding containers or promoting a projection."
+  },
+  "before": {
+    "adaptiveDagFabric": {"complete": 11, "total": 13, "open": 2, "DAG_FETCH_fixtureTests": 8, "productionCallers": 0},
+    "versionedDocIntelligence": {"complete": 38, "total": 48, "open": 10},
+    "targetTask": "DOC-19"
+  },
+  "scope": {
+    "mode": "READ_ONLY_CUVS_EXACT_EXECUTOR_PROOF",
+    "canonicalCorpusWrites": 0,
+    "qdrantWrites": 0,
+    "neo4jWrites": 0,
+    "valkeyWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "DOC_19_EXACT_DOC_20_CAGRA_AND_DOC_21_IVFPQ_BENCHMARKS_PROVEN",
+  "after": {
+    "versionedDocIntelligence": {"complete": 41, "total": 48, "open": 7, "doc19": "VERIFIED_COMPLETE", "doc20": "VERIFIED_COMPLETE", "doc21": "VERIFIED_COMPLETE"},
+    "doc19": {
+      "receipt": "docs/reports/parent-atlas/doc-19-cuvs-external-doc-parity-v1.json",
+      "canonicalChunks": 852,
+      "embeddedRows": 852,
+      "dimensions": 768,
+      "queries": 3,
+      "topK": 10,
+      "exactSetParity": true,
+      "exactRankParity": true,
+      "maximumDistanceDelta": 1.1920928955078125e-7,
+      "runtime": "cuVS 26.08.00 / RTX 3060 Ti",
+      "invocation": "existing container CuPy/cuVS library; HTTP wrapper torchAvailable=false",
+      "canonicalAndProjectionWrites": 0,
+      "containerRebuilds": 0
+    },
+    "doc20": {
+      "receipt": "docs/reports/parent-atlas/doc-20-cagra-external-doc-recall-v1.json",
+      "queries": 64,
+      "topK": 20,
+      "itopkSizes": [64, 512],
+      "recallAt10": 1.0,
+      "recallAt20": 1.0,
+      "worstQueryRecallAt20": 1.0,
+      "promotion": false,
+      "canonicalAndProjectionWrites": 0,
+      "containerRebuilds": 0
+    },
+    "doc21": {
+      "receipt": "docs/reports/parent-atlas/doc-21-ivfpq-exact-refinement-v1.json",
+      "queries": 64,
+      "candidateK0": 80,
+      "finalK": 20,
+      "configurations": 2,
+      "candidatePoolRecallAt20": 1.0,
+      "refinedRecallAt20": 1.0,
+      "promotion": false,
+      "canonicalAndProjectionWrites": 0,
+      "containerRebuilds": 0
+    }
+  },
+  "nextOpenTasks": ["DOC-13", "DOC-14", "DOC-15", "DOC-17", "DOC-18", "DOC-26", "VAL-08"],
+  "notes": "The workboard captured 38/48 at pivot. Current OpenSpec progress after this tranche is 41/48; DOC-19, DOC-20, and DOC-21 are the tranche-attributed completions. Concurrent edits to other tasks were preserved. DOC-20/21 results are bounded executor benchmarks, not production promotion."
+}

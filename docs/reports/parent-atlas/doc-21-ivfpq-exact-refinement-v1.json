@@ -1,0 +1,1383 @@
+{
+  "schema": "atlas.doc-21.ivfpq-exact-refinement.v1",
+  "gate": "DOC-21",
+  "status": "DOC_21_IVFPQ_EXACT_REFINEMENT_BENCHMARK_PROVEN",
+  "sourceReceipt": "docs/reports/parent-atlas/doc-19-cuvs-external-doc-parity-v1.json",
+  "cohort": {
+    "rows": 852,
+    "dimensions": 768,
+    "artifactChecksum": "sha256:67f8c69b32e89df10bb7c7a1029ff66ef218eacf4e49817c2c8f1121c5900694",
+    "sourceCorpusChecksum": "sha256:55da114cc8860dfbe3f858c22d1d09d51e73d960a166f901bbd5d039329601a6",
+    "queryCount": 64,
+    "querySampling": "64 deterministic evenly spaced corpus vectors; self-hit excluded from exact-oracle comparison"
+  },
+  "pipeline": {
+    "stages": [
+      "IVF_PQ_CANDIDATE_GENERATION",
+      "EXACT_COSINE_RERANK"
+    ],
+    "candidateK0": 80,
+    "finalK": 20
+  },
+  "configs": [
+    {
+      "config": {
+        "nLists": 1,
+        "nProbes": 1,
+        "pqDim": 96,
+        "pqBits": 8
+      },
+      "candidateK0": 80,
+      "finalK": 20,
+      "candidatePoolRecallAt10": 1,
+      "candidatePoolRecallAt20": 1,
+      "candidateRankRecallAt10": 0.8812500000000001,
+      "candidateRankRecallAt20": 0.91171875,
+      "refinedRecallAt10": 1,
+      "refinedRecallAt20": 1,
+      "worstQueryRefinedRecallAt20": 1,
+      "exactCpuCudaSetParity": true,
+      "buildMs": 545.4068879989791,
+      "candidateSearchBatchMs": 93.59321000010823,
+      "queries": [
+        {
+          "queryOrdinal": 0,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 13,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 27,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 40,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.85,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 54,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 67,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 81,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 94,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 108,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.85,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 121,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 135,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 148,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 162,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 175,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 189,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 202,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.7,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 216,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 229,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 243,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.8,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 256,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 270,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.85,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 283,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 297,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 310,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 324,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 337,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 351,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 364,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.7,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 378,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.8,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 391,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.85,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 405,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 418,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 432,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 445,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 459,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 472,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 486,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.8,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 499,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 513,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.8,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 526,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 540,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 553,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 567,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 580,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.8,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 594,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.7,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 607,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 621,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 634,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.85,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 648,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 661,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.85,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 675,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 688,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.85,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 702,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 715,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 729,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 742,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 756,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 769,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.85,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 783,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 796,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 810,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 823,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 837,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 851,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        }
+      ]
+    },
+    {
+      "config": {
+        "nLists": 1,
+        "nProbes": 1,
+        "pqDim": 192,
+        "pqBits": 8
+      },
+      "candidateK0": 80,
+      "finalK": 20,
+      "candidatePoolRecallAt10": 1,
+      "candidatePoolRecallAt20": 1,
+      "candidateRankRecallAt10": 0.921875,
+      "candidateRankRecallAt20": 0.9546875000000001,
+      "refinedRecallAt10": 1,
+      "refinedRecallAt20": 1,
+      "worstQueryRefinedRecallAt20": 1,
+      "exactCpuCudaSetParity": true,
+      "buildMs": 1175.921551999636,
+      "candidateSearchBatchMs": 1.8087789976561908,
+      "queries": [
+        {
+          "queryOrdinal": 0,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 13,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 27,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 40,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 54,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 67,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 81,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 94,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 108,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 121,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 135,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 148,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 162,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 175,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 189,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 202,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 216,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 229,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 243,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 256,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 270,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 283,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 297,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 310,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 324,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 337,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 351,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 364,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 378,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 391,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 405,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 418,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 432,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 445,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 459,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 472,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 486,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 499,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 513,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 526,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 540,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 553,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 567,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 580,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 594,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 607,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 621,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 634,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 648,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 661,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 675,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 688,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 702,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 715,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 729,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 742,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 756,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 769,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 783,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 796,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 1,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 810,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.8,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 823,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 1,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 837,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.95,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        },
+        {
+          "queryOrdinal": 851,
+          "candidatePoolRecallAt10": 1,
+          "candidatePoolRecallAt20": 1,
+          "candidateRankRecallAt10": 0.9,
+          "candidateRankRecallAt20": 0.9,
+          "refinedRecallAt10": 1,
+          "refinedRecallAt20": 1,
+          "exactCpuCudaSetParity": true
+        }
+      ]
+    }
+  ],
+  "promotion": false,
+  "canonicalAuthority": false,
+  "logicalLaneVote": "NONE",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "canonicalCorpus": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0
+  },
+  "filesystem": {
+    "receipt": "docs/reports/parent-atlas/doc-21-ivfpq-exact-refinement-v1.json",
+    "writesAreNoncanonicalProofArtifacts": true
+  },
+  "errors": [],
+  "executor": {
+    "kind": "CUVS_IVF_PQ",
+    "version": "26.08.00",
+    "device": "NVIDIA GeForce RTX 3060 Ti",
+    "invocation": "existing atlas-gpu-8098 CuPy/cuVS runtime; no rebuild",
+    "httpApiProof": false
+  },
+  "oracle": "cuVS brute-force plus independent NumPy cosine",
+  "checks": {
+    "doc19ExactOracleProven": true,
+    "cohortChecksumBound": true,
+    "identityAndRevisionMapRetained": true,
+    "standaloneIvfPqCandidateGeneration": true,
+    "candidateCountK0": true,
+    "exactRefinementRuns": true,
+    "independentCpuAndCudaOracleSetParity": true,
+    "noPromotionOrLogicalLaneVote": true
+  }
+}

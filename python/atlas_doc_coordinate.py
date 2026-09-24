@@ -118,6 +118,27 @@ EXTERNAL_DOC_CHUNK_EVIDENCE_SCHEMA = "atlas.external-doc-chunk-evidence.v1"
 _SIMPLE_KEY = re.compile(r"^[a-z][A-Za-z0-9]*$")
 
 
+def external_doc_chunk_id_v2(*, source_id: str, chunk_evidence_revision: str) -> str:
+    """Return a version-scoped chunk identity without changing the legacy V1 chunk-id scheme.
+
+    V1 IDs are based on source id + document checksum + ordinal and therefore collide when
+    identical bytes are admitted under two product versions. V2 binds the exact chunk evidence
+    revision, which already includes the page/version revision, ordinal, UTF-8 span and chunk
+    checksum. Callers must not switch an existing corpus to V2 implicitly; admission integration
+    must explicitly select this contract and preserve existing V1 rows.
+    """
+    if not isinstance(source_id, str) or not source_id.strip():
+        raise ValueError("DOC_CHUNK_ID_V2_SOURCE_ID_REQUIRED")
+    if not isinstance(chunk_evidence_revision, str) or not re.fullmatch(r"sha256:[a-f0-9]{64}", chunk_evidence_revision):
+        raise ValueError("DOC_CHUNK_ID_V2_EVIDENCE_REVISION_INVALID")
+    digest = canonical_sha256_v1({
+        "schema": "atlas.external-doc-chunk-identity.v2",
+        "sourceId": source_id,
+        "chunkEvidenceRevision": chunk_evidence_revision,
+    })
+    return f"doc:v2:{digest}"
+
+
 def _length_prefixed(value: str) -> str:
     normalized = unicodedata.normalize("NFC", value)
     return f"{len(normalized.encode('utf-8'))}:{normalized}"

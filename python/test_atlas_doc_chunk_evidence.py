@@ -7,7 +7,7 @@ import json
 import pytest
 
 import atlas_okf_docs_pipeline as P
-from atlas_doc_coordinate import ExternalDocChunkEvidenceV1, build_doc_coordinate, canonical_encode_v1, chunk_evidence_revision
+from atlas_doc_coordinate import ExternalDocChunkEvidenceV1, build_doc_coordinate, canonical_encode_v1, chunk_evidence_revision, external_doc_chunk_id_v2
 from atlas_external_docs import _normalize_ws, _sha, chunk_document
 
 LONG_SECTION = "# Guide\n" + "\n".join(f"Paragraph {i} explains index tuning for halfvec and hnsw in some detail here." for i in range(40))
@@ -60,9 +60,46 @@ def test_different_product_version_changes_page_and_child_chunk_evidence():  # G
     a = _page_coordinate(LONG_SECTION, product_version="0.8")
     b = _page_coordinate(LONG_SECTION, product_version="0.9")
     assert a.evidence_revision != b.evidence_revision
-    revs_a = {c.chunk_evidence_revision for c in _chunks(LONG_SECTION, a)}
-    revs_b = {c.chunk_evidence_revision for c in _chunks(LONG_SECTION, b)}
+    chunks_a = _chunks(LONG_SECTION, a)
+    chunks_b = _chunks(LONG_SECTION, b)
+    revs_a = {c.chunk_evidence_revision for c in chunks_a}
+    revs_b = {c.chunk_evidence_revision for c in chunks_b}
     assert revs_a.isdisjoint(revs_b)
+    # Current chunk_id v1 omits product/page revision. The DB's global UNIQUE
+    # constraint therefore prevents storing identical bytes as two versions,
+    # despite their distinct page/chunk evidence revisions. Keep this visible
+    # until a separately reviewed identity-v2 contract is approved.
+    assert [c.chunk_id for c in chunks_a] == [c.chunk_id for c in chunks_b]
+
+
+def test_chunk_identity_v2_is_version_scoped_and_deterministic_without_changing_v1():
+    page_a = _page_coordinate(LONG_SECTION, product_version="0.8")
+    page_b = _page_coordinate(LONG_SECTION, product_version="0.9")
+    chunk_a = _chunks(LONG_SECTION, page_a)[0]
+    chunk_b = _chunks(LONG_SECTION, page_b)[0]
+
+    # Existing V1 IDs stay unchanged; a separately selected V2 ID binds the qualified evidence revision.
+    assert chunk_a.chunk_id == chunk_b.chunk_id
+    id_a = external_doc_chunk_id_v2(source_id="pgvector", chunk_evidence_revision=chunk_a.chunk_evidence_revision)
+    id_a_replay = external_doc_chunk_id_v2(source_id="pgvector", chunk_evidence_revision=chunk_a.chunk_evidence_revision)
+    id_b = external_doc_chunk_id_v2(source_id="pgvector", chunk_evidence_revision=chunk_b.chunk_evidence_revision)
+
+    assert id_a.startswith("doc:v2:")
+    assert id_a == id_a_replay
+    assert id_a != id_b
+
+
+@pytest.mark.parametrize(
+    "source_id,revision,error",
+    [
+        (" ", "sha256:" + "a" * 64, "DOC_CHUNK_ID_V2_SOURCE_ID_REQUIRED"),
+        ("pgvector", "workspace:0", "DOC_CHUNK_ID_V2_EVIDENCE_REVISION_INVALID"),
+        ("pgvector", "sha256:" + "A" * 64, "DOC_CHUNK_ID_V2_EVIDENCE_REVISION_INVALID"),
+    ],
+)
+def test_chunk_identity_v2_rejects_unqualified_inputs(source_id, revision, error):
+    with pytest.raises(ValueError, match=error):
+        external_doc_chunk_id_v2(source_id=source_id, chunk_evidence_revision=revision)
 
 
 def test_utf8_non_ascii_byte_spans_replay_identically():  # H

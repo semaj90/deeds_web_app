@@ -2010,10 +2010,12 @@ The ACP (Agent Control Plane) handles all memory, search, caching, and packet co
 5. Packet compaction (4,800 tokens instead of 18,800)
 6. Gemma4 synthesis (only now, with compact bundle; historical label for the live llama-server synthesis stage)
 
-**Memory Hierarchy** (like CPU caches):
-- Gemma4 ← L1 BitFrost Redis ← L2 Postgres JSONB ← L3 Qdrant ← L4 Neo4j ← L5 Filesystem ← L6 Internet
+**Current memory ownership (supersedes the historical cache hierarchy below):**
+- **Model KV prompt cache:** ephemeral reuse inside the active llama-server/model execution; not durable memory, canonical identity, or a source of truth.
+- **BitFrost/Valkey:** disposable hot residency and cache for revision/checksum-addressed evidence and context artifacts; never canonical identity or durable knowledge.
+- **PostgreSQL:** durable canonical packets, source/revision bindings, and semantic/evidence facts. Qdrant and Neo4j are rebuildable retrieval/graph projections; filesystem and Internet are source/evidence inputs, not additional memory tiers.
 
-**Workflows as Searchable Packets**: Capture every successful query as a workflow packet, embed it in Qdrant, and retrieve similar workflows instead of rebuilding from scratch.
+**Workflow retrieval note (derived projection only):** Searchable workflow packets may be projected to Qdrant from PostgreSQL-owned, revision-qualified records; Qdrant does not own durable workflow memory or canonical identity.
 
 **Key Win**: 75% token reduction, 80% latency reduction, Gemma4 focused on reasoning not search.
 

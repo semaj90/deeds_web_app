@@ -1,0 +1,72 @@
+{
+  "schema": "atlas.val-10.replay-cohort-reconciliation.v1",
+  "generatedAt": "2026-09-24T01:45:25Z",
+  "gate": "VAL10_REPLAY_COHORT_RECONCILIATION",
+  "status": "DISTINCT_REPLAY_COHORTS_CONFIRMED_CANONICAL_REPLAY_NOT_SELECTED",
+  "comparison": {
+    "eligibilityReplay": {
+      "path": "docs/reports/parent-atlas/val-10-summary-eligibility-replay-v1.json",
+      "claimCount": 49,
+      "decisions": { "ADMIT": 48, "REJECT": 1 },
+      "eligibleSummaryCount": 18,
+      "summaryPromptRevision": "summary-prompt:sha256:c0c3d8a4744d1c77ea3114ea8ad022251ba148b17e9158aa48e1ad43ff5a8004",
+      "summaryProducerRevision": "sha256:015a4211f117ec4ae7d5ff03cf63c01cfd3d1d929a44d12e66348517bfc4b02e"
+    },
+    "priorValidationReplay": {
+      "path": "docs/reports/summary-claim-validation-replay-v1.json",
+      "generatedAt": "2026-09-24T00:14:51.068366+00:00",
+      "gitHead": "f368835d276e2775f70bd15752cc964d7458daa6",
+      "claimCount": 51,
+      "decisions": { "ADMIT": 50, "REJECT": 1 },
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "model": { "id": "ornith-1.5-9b", "revision": "ornith-1.5-9b:hforf.gguf" }
+    },
+    "results": {
+      "revisionQualifiedChunkPairsInBoth": 19,
+      "sameChunkRevisionSet": true,
+      "summaryInputChecksumsEqual": 0,
+      "summaryOutputChecksumsEqual": 12,
+      "summaryOutputChecksumsDiffer": 7,
+      "claimCountEqualChunks": 17,
+      "claimCountDifferingChunks": [
+        {
+          "chunkId": "doc:bits-ui:679d17152be486da:0",
+          "eligibilityReplayClaims": 2,
+          "priorReplayClaims": 3
+        },
+        {
+          "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+          "eligibilityReplayClaims": 2,
+          "priorReplayClaims": 3
+        }
+      ]
+    }
+  },
+  "interpretation": {
+    "claimDrift": "The 2-claim total difference is localized to two Bits UI chunks whose summary output checksums also differ; this is not evidence of a splitter-only change.",
+    "canonicalReplaySelected": false,
+    "reason": "The receipts describe different summary cohorts. The 49-claim receipt is the current whole-summary eligibility proof; the 51-claim receipt is a distinct replay snapshot. The latter records no summary-generation revision sufficient to equate its outputs to the former.",
+    "claimSplitterRevision": "NOT_RECORDED_IN_ELIGIBILITY_RECEIPT"
+  },
+  "writerBoundary": {
+    "owner": "sveltekit-frontend/scripts/atlas/summarize-external-doc-chunks-v1.mts",
+    "currentBehavior": "Generates fresh summaries, constructs analysis envelopes, then inserts them in --apply mode.",
+    "eligibilityAdmission": "NOT_PRESENT_BEFORE_INSERT",
+    "sealMismatch": {
+      "pythonReplayInput": "canonicalSha256V1 of the structured model request",
+      "writerInput": "SHA-256 of promptRevision + newline + rendered user content",
+      "pythonReplayOutput": "canonicalSha256V1({text: summary})",
+      "writerOutput": "SHA-256 of raw summary UTF-8 bytes",
+      "consequence": "Existing replay eligibility cannot currently authorize the writer's newly generated envelopes by checksum equality."
+    },
+    "safeImplementationPrerequisite": "The persistence owner must consume the exact frozen summary and its full claim-resolution evidence, or the generation/replay/write path must be unified so one sealed candidate is validated and written without regeneration."
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "summaryPersistence": 0
+  },
+  "result": "VAL10B_NOT_IMPLEMENTED_RECEIPT_AND_WRITER_CONTRACT_MISMATCH"
+}

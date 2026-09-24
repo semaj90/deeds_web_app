@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runTimestamp": "2026-09-23T00:23:51Z",
+  "status": "IN_PROGRESS",
+  "pivot": {
+    "from": "parent-atlas-transport-memory-boundaries::MEM-02",
+    "to": "parent-atlas-transport-memory-boundaries::PROTO-01",
+    "reason": "MEM-01/MEM-02 contract reconciliation is complete at documentation/fixture scope. The next independent blocker-removal task is transport ownership; its static audit can proceed without rebuilding containers or changing runtime state."
+  },
+  "workboardSnapshot": {
+    "changes": 88,
+    "tasks": 9458,
+    "checked": 6129,
+    "open": 3329,
+    "actionable": 2516,
+    "waiting": 756,
+    "superseded": 55,
+    "source": "docs/reports/openspec-workboard-v1.json",
+    "generatedAt": "2026-09-23T00:06:20.418Z",
+    "freshness": "STALE_AGGREGATE_SNAPSHOT; generator write failed in preceding tranche and repository-wide counts are not reasserted"
+  },
+  "changeSnapshot": {
+    "name": "parent-atlas-transport-memory-boundaries",
+    "schema": "spec-driven",
+    "complete": 27,
+    "total": 90,
+    "remaining": 63
+  },
+  "workThisRun": [
+    {
+      "item": "PROTO-01 transport owner matrix static census",
+      "result": "PARTIAL_AUDIT_RECORDED; TASK_LEFT_OPEN",
+      "evidence": [
+        "docs/reports/parent-atlas-transport-owner-matrix-v1.json",
+        "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+        "sveltekit-frontend/src/routes/api/trpc/[...procedure]/+server.ts",
+        "services/go-retrieval-service/main.go",
+        "services/go-search-service/main.go",
+        "services/go-embedding-service/main.go",
+        "sveltekit-frontend/src/mcp/server.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/src/routes/api/ai/agent/+server.ts",
+        "packages/parent-atlas/src/core/a2a-wire-v1.ts",
+        "docs/reports/mcp-prefetch-duplicate-owner-v1.json"
+      ],
+      "measured": "One tRPC mount; three active Go service containers expose both HTTP and gRPC; MCP has multiple server surfaces and one already-proven same-registry tool duplicate; ACP has app HTTP routes but the package legacy-ingress contract has no runtime caller; an inline A2A route exists beside a separate package wire contract.",
+      "limitation": "Complete callers/registry overlap and protocol lifecycle were not established. Endpoint health was not probed; PROTO-01 remains open. No duplicate bus owner was removed or promoted."
+    }
+  ],
+  "validation": {
+    "strictOpenSpec": "PASS: parent-atlas-transport-memory-boundaries",
+    "auditJson": "PASS: both machine-readable reports parse",
+    "scopedDiffCheck": "PASS",
+    "runtimeMutation": "NONE",
+    "containerRebuild": "NOT_RUN; intentionally deferred until the end of the workboard tranche"
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "containerRebuild": false
+  },
+  "nextSelection": {
+    "gate": "PROTO_01_CALLER_AND_LIFECYCLE_RECONCILIATION",
+    "safeNext": "Continue the bounded static caller and registry-overlap audit; use live HTTP/gRPC/MCP probes only after confirming the exact endpoints and a bounded read-only probe path."
+  }
+}

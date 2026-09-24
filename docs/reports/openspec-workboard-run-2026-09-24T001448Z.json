@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runId": "openspec-workboard-run-2026-09-24T001448Z",
+  "startedAt": "2026-09-24T00:14:48Z",
+  "repository": "C:/Users/james/Videos/deeds-web-app",
+  "pivot": {
+    "from": "parent-atlas-versioned-doc-intelligence after VAL-10 read-only eligibility replay",
+    "to": "parent-atlas-deep-research-ingestion / DISCOVERY-04B live acquisition-to-admission readback",
+    "reason": "The remaining task has an existing savepoint canary wrapper that can execute the canonical DOC-06A SQL/readback inside a forced-rollback outer transaction, avoiding persistent admission writes."
+  },
+  "before": {
+    "openSpecProgress": {"change": "parent-atlas-deep-research-ingestion", "complete": 6, "total": 7, "open": 1},
+    "targetTask": "DISCOVERY-04B",
+    "concurrentTargetEdits": false
+  },
+  "scope": {
+    "mode": "LIVE_FETCH_AND_DOC06A_SAVEPOINT_CANARY",
+    "maximumPages": 1,
+    "persistentAdmissionWrites": 0,
+    "qdrantWrites": 0,
+    "neo4jWrites": 0,
+    "valkeyWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0
+  },
+  "blockedFinding": {
+    "task": "DISCOVERY-04B",
+    "reason": "The existing canary maps the writer's COMMIT to RELEASE SAVEPOINT, but admitExternalDocPage returns transactionCommitted=true and the handoff verifier treats that as a committed admission. A live fixture cannot be reported through that contract without correcting transaction semantics or obtaining a bounded persistent-write authorization.",
+    "datastoresWritten": false
+  },
+  "pivotedTo": "parent-atlas-adaptive-dag-fabric / DAG-FETCH-01",
+  "result": "PIVOTED_WITH_GATE_RECORDED"
+}

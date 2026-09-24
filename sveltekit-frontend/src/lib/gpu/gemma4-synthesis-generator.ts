@@ -1,22 +1,19 @@
 /**
- * Gemma4 Synthesis Generator
+ * Ornith Synthesis Generator
  * Stage 5 of Policy Orchestrator: Generate answer from ACE context
  *
  * Input: ACEContext with selected packets + evidence
  * Output: Synthesized answer with citations
- * Pattern: Gemma4 receives evidence bundle from ACE assembler, generates answer
+ * The loaded Ornith model receives the evidence bundle from the ACE assembler.
+ * The legacy `gemma4-synthesis-generator.ts` path and `synthesizeWithGemma4`
+ * export are retained for compatibility; inference is resolved through the
+ * shared Ornith runtime contract.
  */
 
 import type { DecomposedQuery } from './gemma4-policy-orchestrator';
 import type { ACEContext } from '../server/ace/types';
 import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
-import {
-  resolveLoadedLlamaModel,
-  LlamaServerUnreachableError,
-  LlamaServerNoModelError,
-  LlamaServerModelResponseInvalidError,
-} from '$lib/server/ai/llama-server-model-resolver.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 /**
  * ACEContext has no `selectedPackets`/`evidence`/`contextWindow` fields —
@@ -103,8 +100,9 @@ Content: ${packet.summary || packet.content || '(no details)'}
 }
 
 /**
- * Call Gemma4 (TurboQuant at :8090) to synthesize answer from ACE context
- * Fallback to Ollama if TurboQuant unavailable
+ * Call the configured llama-server (workstation default :8090, Ornith 1.5)
+ * to synthesize an answer from ACE context. The loaded `/v1/models` ID is
+ * sent as the OpenAI-compatible `model` field; Ollama is not the chat fallback.
  */
 export async function synthesizeWithGemma4(
   request: SynthesisRequest
@@ -132,33 +130,31 @@ export async function synthesizeWithGemma4(
     .replace('{EVIDENCE}', evidenceContext);
 
   try {
-    // Try TurboQuant first (faster, cached)
-    const turboQuantAnswer = await callTurboQuantSynthesis(
+    const llamaServerAnswer = await callLlamaServerStreamingSynthesis(
       systemPrompt,
       maxTokens,
       temperature
     );
 
-    if (turboQuantAnswer) {
-      return turboQuantAnswer;
+    if (llamaServerAnswer) {
+      return llamaServerAnswer;
     }
   } catch (err) {
-    console.warn('[Synthesis] TurboQuant failed, falling back to Ollama:', err);
+    console.warn('[Synthesis] llama-server streaming call failed; trying non-streaming on the same runtime:', err);
   }
 
   try {
-    // Fallback to Ollama
-    const ollamaAnswer = await callOllamaSynthesis(
+    const llamaServerAnswer = await callLlamaServerNonStreamingSynthesis(
       systemPrompt,
       maxTokens,
       temperature
     );
 
-    if (ollamaAnswer) {
-      return ollamaAnswer;
+    if (llamaServerAnswer) {
+      return llamaServerAnswer;
     }
   } catch (err) {
-    console.warn('[Synthesis] Ollama also failed, using fallback:', err);
+    console.warn('[Synthesis] llama-server non-streaming fallback failed:', err);
   }
 
   // Fallback: return structured response based on ACE context alone
@@ -166,31 +162,27 @@ export async function synthesizeWithGemma4(
 }
 
 /**
- * Call llama-server at :8090 (TurboQuant), streaming. Resolves the actually
- * loaded model via GET /v1/models first — never assumes the configured
- * model name is what's loaded, never sends a filesystem path hoping the
- * server will load it.
+ * Call the configured llama-server, streaming, through the shared runtime
+ * contract. The loaded model ID is discovered from GET /v1/models.
  */
-async function callTurboQuantSynthesis(
+async function callLlamaServerStreamingSynthesis(
   prompt: string,
   maxTokens: number,
   temperature: number
 ): Promise<SynthesisResponse | null> {
-  const TURBO_QUANT_URL = process.env.TURBO_QUANT_URL || 'http://127.0.0.1:8090';
-  const configuredModel = LLM_MODEL_ID;
   const timeout = 90_000; // 90s for thinking models
 
   try {
-    const { resolvedModel } = await resolveLoadedLlamaModel(TURBO_QUANT_URL, configuredModel);
+    const target = await resolveLlamaInferenceTarget();
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    const response = await fetch(`${TURBO_QUANT_URL}/v1/chat/completions`, {
+    const response = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: resolvedModel,
+        model: target.model,
         messages: [
           { role: 'system', content: 'You are a legal research synthesis assistant.' },
           { role: 'user', content: prompt }
@@ -206,47 +198,40 @@ async function callTurboQuantSynthesis(
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`TurboQuant HTTP ${response.status}`);
+      throw new Error(`llama-server HTTP ${response.status}`);
     }
 
     // Parse streaming response
     const answer = await parseStreamingResponse(response);
     return parseAndCiteSynthesis(answer);
   } catch (err) {
-    if (err instanceof LlamaServerUnreachableError || err instanceof LlamaServerNoModelError || err instanceof LlamaServerModelResponseInvalidError) {
-      console.warn(`[Synthesis] ${err.code}:`, err.message);
-    } else if (err instanceof Error && err.name === 'AbortError') {
-      console.warn('[Synthesis] TurboQuant timeout');
+    if (err instanceof Error && err.name === 'AbortError') {
+      console.warn('[Synthesis] llama-server streaming timeout');
     } else {
-      console.warn('[Synthesis] TurboQuant call failed:', err);
+      console.warn('[Synthesis] llama-server streaming call failed:', err);
     }
     return null;
   }
 }
 
 /**
- * Non-streaming fallback call to the same llama-server at :8090. Also
- * resolves the loaded model via GET /v1/models rather than the previous
- * try-each-hardcoded-name loop (MODEL_PREFERENCE), which never checked
- * what was actually loaded.
+ * Non-streaming fallback against the same configured llama-server and the
+ * same shared loaded-model policy as the streaming request.
  */
-async function callOllamaSynthesis(
+async function callLlamaServerNonStreamingSynthesis(
   prompt: string,
   maxTokens: number,
   temperature: number
 ): Promise<SynthesisResponse | null> {
-  const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-  const configuredModel = LLM_MODEL_ID;
-
   try {
-    const { resolvedModel } = await resolveLoadedLlamaModel(LLAMA_SERVER_URL, configuredModel);
+    const target = await resolveLlamaInferenceTarget();
 
     try {
-      const response = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
+      const response = await fetch(`${target.baseUrl}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: resolvedModel,
+          model: target.model,
           messages: [
             { role: 'system', content: 'You are a legal research synthesis assistant.' },
             { role: 'user', content: prompt }
@@ -272,17 +257,13 @@ async function callOllamaSynthesis(
       return null;
     }
   } catch (err) {
-    if (err instanceof LlamaServerUnreachableError || err instanceof LlamaServerNoModelError || err instanceof LlamaServerModelResponseInvalidError) {
-      console.warn(`[Synthesis] ${err.code}:`, err.message);
-    } else {
-      console.warn('[Synthesis] llama-server model resolution failed:', err);
-    }
+    console.warn('[Synthesis] llama-server model resolution failed:', err);
     return null;
   }
 }
 
 /**
- * Parse streaming response from TurboQuant
+ * Parse streaming response from llama-server
  */
 async function parseStreamingResponse(response: Response): Promise<string> {
   let assembled = '';
@@ -349,7 +330,7 @@ function parseAndCiteSynthesis(answerText: string): SynthesisResponse {
       relevance: 0.8 // Inferred from citation presence
     })),
     confidence: 0.85, // Moderate confidence for LLM synthesis
-    reasoning: 'Synthesized via Gemma4 with ACE evidence bundle'
+    reasoning: 'Synthesized via loaded Ornith model with ACE evidence bundle'
   };
 }
 

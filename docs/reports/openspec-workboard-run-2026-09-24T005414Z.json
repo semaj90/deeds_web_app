@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "startedAt": "2026-09-24T00:54:14Z",
+  "fromChange": "parent-atlas-adaptive-dag-fabric",
+  "fromProgress": {
+    "complete": 11,
+    "total": 13,
+    "remaining": 2
+  },
+  "pivotToChange": "parent-atlas-ontology-oaklib-fanout-bitmap",
+  "pivotToProgress": {
+    "complete": 33,
+    "total": 36,
+    "remaining": 3
+  },
+  "pivotReason": "DAG-FETCH-01 has deterministic fixture coverage but no production caller for its local circuit, so closure requires broader runtime integration; NATS-EVENT-01 is infrastructure-mutating. The ontology change has a bounded read-only receipt and scenario rerun that can be attempted independently; its explicit materialized-view apply remains untouched.",
+  "targetTasks": [
+    "17: read-only annotation bridge receipt",
+    "25: rerun capability scenarios"
+  ],
+  "operatorBlockedTaskDeferred": "23: apply the materialized view only with explicit authorization",
+  "containerRebuilds": 0,
+  "writesBeforePivot": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "source": 0
+  },
+  "status": "PIVOT_RECORDED_BEFORE_WORK"
+}

@@ -23,6 +23,7 @@ export const SummaryPersistenceAdmissionReportV1Schema = z.object({
 	schema: z.literal(SUMMARY_PERSISTENCE_ADMISSION_SCHEMA),
 	chunkId: z.string().min(1),
 	chunkEvidenceRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+	summaryInputChecksum: sha256HexSchema,
 	summaryOutputSha256: sha256HexSchema,
 	summaryOutputChecksum: sha256HexSchema,
 	splitterRevision: z.string().min(1),
@@ -39,10 +40,10 @@ export const SummaryPersistenceAdmissionReportV1Schema = z.object({
 export type SummaryPersistenceAdmissionReportV1 = z.infer<typeof SummaryPersistenceAdmissionReportV1Schema>;
 
 export type AdmissionReason =
-	| 'REPORT_MISSING' | 'REPORT_INVALID' | 'UNSEALED' | 'CHUNK_MISMATCH' | 'REVISION_MISMATCH' | 'OUTPUT_CHANGED'
+	| 'REPORT_MISSING' | 'REPORT_INVALID' | 'UNSEALED' | 'CHUNK_MISMATCH' | 'REVISION_MISMATCH' | 'INPUT_CHANGED' | 'OUTPUT_CHANGED'
 	| 'NO_CLAIMS' | 'CLAIM_COUNT_MISMATCH' | 'CLAIM_ORDINALS_NOT_CONTIGUOUS' | 'CLAIM_REJECT' | 'CLAIM_REVIEW' | 'CLAIM_NOT_ADMIT' | 'ELIGIBILITY_FLAG_INCONSISTENT';
 
-export interface AdmissionCandidate { chunkId: string; chunkEvidenceRevision: string; /** raw sha256 hex of the exact summary UTF-8 bytes the writer will insert */ outputSha256: string }
+export interface AdmissionCandidate { chunkId: string; chunkEvidenceRevision: string; inputChecksum: string; /** raw sha256 hex of the exact summary UTF-8 bytes the writer will insert */ outputSha256: string }
 export interface AdmissionVerdict { eligible: boolean; reasons: AdmissionReason[] }
 
 export function evaluateSummaryPersistenceAdmissionV1(candidate: AdmissionCandidate, reportInput: unknown): AdmissionVerdict {
@@ -55,6 +56,7 @@ export function evaluateSummaryPersistenceAdmissionV1(candidate: AdmissionCandid
 	const reasons = new Set<AdmissionReason>();
 	if (r.chunkId !== candidate.chunkId) reasons.add('CHUNK_MISMATCH');
 	if (r.chunkEvidenceRevision !== candidate.chunkEvidenceRevision) reasons.add('REVISION_MISMATCH');
+	if (r.summaryInputChecksum !== candidate.inputChecksum) reasons.add('INPUT_CHANGED');
 	if (r.summaryOutputSha256 !== candidate.outputSha256) reasons.add('OUTPUT_CHANGED');
 	if (r.claimCount === 0 || r.claims.length === 0) reasons.add('NO_CLAIMS');
 	if (r.claims.length !== r.claimCount) reasons.add('CLAIM_COUNT_MISMATCH');

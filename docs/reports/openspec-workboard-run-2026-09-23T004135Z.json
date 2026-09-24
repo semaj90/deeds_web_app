@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T00:41:35Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "A2A_02B_CANONICAL_TASK_RESOLVER_WIRING",
+    "to": "PROTO_04_OPTIONAL_TRPC_BOUNDARY",
+    "reason": "A2A runtime resolver wiring has no demonstrated runtime caller and needs separate integration evidence. The independent tRPC boundary can be documented now from the caller audit without runtime mutation."
+  },
+  "evidence": {
+    "transportMatrix": "docs/reports/parent-atlas-transport-owner-matrix-v1.json",
+    "tRPCMount": "SvelteKit server route mounts appRouter",
+    "inRepoClientFound": false,
+    "policy": "Optional typed application-local surface; dormant if no client; not identity, durable truth, cross-language compute, or workflow authority",
+    "runtimeChanged": false
+  },
+  "validation": {
+    "openSpecStrict": "PASS",
+    "jsonParse": "PASS",
+    "diffCheck": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 29,
+    "open": 62,
+    "total": 91,
+    "delta": "one optional-transport boundary task completed with a normative OpenSpec requirement"
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "runtimeRemoval": false
+  },
+  "nextGate": "PROTO_01_02_TRANSPORT_OWNER_AND_LIFECYCLE_RECONCILIATION"
+}

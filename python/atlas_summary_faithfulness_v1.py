@@ -28,7 +28,7 @@ TOKEN_RE = re.compile(r"`([^`\n]{2,80})`|([A-Za-z_$][\w$]*(?:[._-][\w$]+)+)|([A-
 VERSION_RE = re.compile(
     r"(?i)\b(?:v|version\s+|release\s+|postgresql\s+|postgres\s+|cuda\s+|python\s+|node(?:\.js)?\s+|pgvector\s+)(\d+(?:\.\d+){1,3}(?:[-+][\w.]+)?)"
 )
-NUMERIC_RE = re.compile(r"(?<![\w.])[-+]?\d+(?:,\d{3})*(?:\.\d+)?(?:\s?(?:%|ms|s|MB|GB))?(?![\w.])", re.IGNORECASE)
+NUMERIC_RE = re.compile(r"(?<![\w.])[-+]?\d+(?:,\d{3})*(?:\.\d+)?(?:\s?(?:%|ms|s|MB|GB))?(?!\w|\.\d)", re.IGNORECASE)
 
 
 def norm(t: str) -> str:

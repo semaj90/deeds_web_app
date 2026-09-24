@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.doc-26.chunk-identity-v2-contract-review.v1",
+  "generatedAt": "2026-09-24T01:51:45Z",
+  "gate": "DOC_CHUNK_IDENTITY_V2_OR_COMPATIBILITY_CONTRACT_REVIEW",
+  "result": "DOC_26_CHUNK_IDENTITY_V2_CONTRACT_FIXTURE_PROVEN_INTEGRATION_OPEN",
+  "evidence": {
+    "chunkIdV1": "doc:{source_id}:{document_checksum[0:16]}:{ordinal}",
+    "pageEvidenceRevisionIncludesProductVersion": true,
+    "chunkEvidenceRevisionIncludesPageRevisionOrdinalByteSpanAndChunkChecksum": true,
+    "databaseConstraints": {
+      "chunkIdUnique": true,
+      "chunkEvidenceRevisionUnique": true,
+      "source": "sveltekit-frontend/drizzle/manual/20260904_external_doc_intelligence_v1.sql"
+    },
+    "sameBytesDifferentProductVersion": {
+      "v1ChunkIdsEqual": true,
+      "chunkEvidenceRevisionsEqual": false
+    }
+  },
+  "decision": {
+    "selectedContract": "atlas.external-doc-chunk-identity.v2",
+    "algorithm": "doc:v2:{canonicalSha256V1({schema,sourceId,chunkEvidenceRevision})}",
+    "reason": "The exact chunk evidence revision already binds the page/version revision, ordinal, UTF-8 span, and chunk checksum. V2 derives a globally unique namespace from that qualified evidence while retaining the legacy V1 ID unchanged.",
+    "compatibility": "V1 remains the default/current materializer behavior. V2 is an explicit primitive only; no existing ID is rewritten and no live admission path selects V2 yet."
+  },
+  "proof": {
+    "owner": "python/atlas_doc_coordinate.py::external_doc_chunk_id_v2",
+    "pythonTest": "python/test_atlas_doc_chunk_evidence.py",
+    "focusedTests": { "passed": 19, "failed": 0 },
+    "crossRuntimeGolden": {
+      "sourceId": "pgvector",
+      "chunkEvidenceRevision": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "pythonId": "doc:v2:ea705e10d0c3c2a277392431c29151c82e7d7b302422308a896dd6e0ab48b145",
+      "typescriptId": "doc:v2:ea705e10d0c3c2a277392431c29151c82e7d7b302422308a896dd6e0ab48b145",
+      "equal": true
+    },
+    "checks": {
+      "deterministicReplay": true,
+      "sameBytesAcrossProductVersionsHaveDistinctV2Ids": true,
+      "invalidOrUnqualifiedRevisionRejected": true,
+      "legacyV1IdsUnchanged": true
+    }
+  },
+  "remainingForDoc26": [
+    "Select V2 only for the versioned recrawl admission path without changing existing V1 rows.",
+    "Wire the bounded delta plan through python/atlas_okf_docs_pipeline.py and the existing external-doc admission owner.",
+    "Prove prior product-version page/chunk rows remain readable and unchanged after a no-write fixture/reconciliation; any actual new-version write remains separately authorized."
+  ],
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "canonicalIdentityMigration": 0
+  },
+  "containerRebuilds": 0
+}

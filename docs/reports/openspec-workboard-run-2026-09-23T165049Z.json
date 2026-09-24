@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T16:50:49Z",
+  "objective": "Continue evidence-backed OpenSpec tasks; defer image/container rebuilds until safe local work is exhausted.",
+  "pivot": {
+    "change": "parent-atlas-nlp-sidecar-feature-compiler",
+    "fromTask": "4.2 semantic-card embedding handoff audit",
+    "toTask": "4.2 semantic-card and sidecar lineage boundary correction",
+    "reason": "The audit found two unsafe evidence claims in the same sidecar pass: synthetic semantic/routing scores and event identity fields derived from model/UI labels. Both could be corrected locally without embedding or persistence."
+  },
+  "progress": {
+    "change": "parent-atlas-nlp-sidecar-feature-compiler",
+    "before": "87/142",
+    "after": "87/142",
+    "delta": "No task checkbox closed; task 4.2 remains open pending actual canonical embedding dispatch."
+  },
+  "findings": [
+    {
+      "id": "SEMANTIC_CARD_EMBEDDING_NOT_WIRED",
+      "evidence": "The sidecar constructs semantic_cards, but no current consumer was found dispatching those cards to the existing semantic_768 embedding owner.",
+      "status": "OPEN"
+    },
+    {
+      "id": "SYNTHETIC_SEMANTIC_FEATURES",
+      "evidence": "The semantic pass emitted dense_cosine, KMeans/SOM/manifold distances, and semantic_confidence solely from whether cards existed.",
+      "status": "CORRECTED"
+    },
+    {
+      "id": "SIDECAR_EVENT_IDENTITY_COERCION",
+      "evidence": "Event hypergraph construction used model_id/document_id/default strings for workspace_revision, packet_key, and representation_revision.",
+      "status": "CORRECTED_FAIL_CLOSED"
+    }
+  ],
+  "implementation": [
+    "Semantic pass now identifies itself as semantic-card-builder v1, emits no fabricated measured features, and reports embedding_status=NOT_RUN plus SEMANTIC_768_EMBEDDING_NOT_RUN.",
+    "ExperimentFeatureMatrix representation_revision remains null without an embedding receipt, even if AnalyzeRequest.model_id is supplied.",
+    "Event hypergraph requires explicit source_ref, source_revision, workspace_revision, and packet_key; otherwise it returns status=SKIPPED_LINEAGE with no events.",
+    "Event hypergraph representation_revision is null until an embedding receipt exists."
+  ],
+  "validation": {
+    "focusedPythonTests": "PASS: 17/17 across semantic-card bytes/lineage, HMM observations, source revision, linguistic scope, and AST-v2 CRLF",
+    "pythonSyntax": "PASS: python -m py_compile python/miniforge_nlp_sidecar.py",
+    "openSpecStrict": "PASS: parent-atlas-nlp-sidecar-feature-compiler",
+    "scopedDiffCheck": "PASS for touched sidecar/OpenSpec files",
+    "repoWideDiffCheck": "NOT_CLEAN from unrelated whitespace in generated simd-bridge/CUDA build log; left unchanged"
+  },
+  "writes": {
+    "postgres": 0,
+    "valkey": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "canonicalAuthority": false,
+    "promotionAuthorized": false
+  },
+  "nextGate": "SEMANTIC_CARD_TO_CANONICAL_EMBEDDING_PLAN_WIRING_WITH_REVISION_LINEAGE"
+}

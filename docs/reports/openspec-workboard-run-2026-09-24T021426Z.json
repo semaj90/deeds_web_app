@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T02:14:26Z",
+  "fromChange": {
+    "name": "parent-atlas-versioned-doc-intelligence",
+    "progress": "42/48",
+    "result": "VAL-06A_CONTRACT_HARDENING_TESTED_VAL10B_OPEN",
+    "evidence": "VAL-06A checksum and deterministic-stage constraints were tightened and tested. The next durable-write gate remains open: current summary writer regenerates outputs instead of persisting a sealed eligible replay cohort. DOC-13.E also depends on source authority."
+  },
+  "toChange": {
+    "name": "parent-atlas-retrieval-lineage-dag-convergence",
+    "progressAtPivot": "768/1011",
+    "selectedGate": "CURRENT_SOURCE_AUTHORITY_FRESHNESS_FOR_DOC-13E",
+    "reason": "The sealed S01-07 authority receipt is dated 2026-09-21 and explicitly says workspace-revision derivation was not recomputed and working-tree bytes were not re-read. Its recorded drift census reports 720 changed bindings, 1,086 excluded nested-repository files, and 8 unavailable files. Revalidate the precise DOC-13 target source revision against an admissible current-source owner before treating the dependency as cleared."
+  },
+  "constraints": {
+    "containerRebuilds": "DEFERRED",
+    "canonicalPromotion": false,
+    "persistentWrites": 0,
+    "graphify": false,
+    "operatorGatesBypassed": false,
+    "priorUncommittedVAL06AChangesPreserved": true
+  }
+}

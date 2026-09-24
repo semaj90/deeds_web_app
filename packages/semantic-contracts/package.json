@@ -12,7 +12,8 @@
     "./domain-feature-packet": "./dist/domain-feature-packet.js",
     "./domain-prediction": "./dist/domain-prediction.js",
     "./ontology-proposal": "./dist/ontology-proposal.js",
-    "./canonical-hashing": "./dist/canonical-hashing.js"
+    "./canonical-hashing": "./dist/canonical-hashing.js",
+    "./feature-packet-v1": "./dist/feature-packet-v1.js"
   },
   "scripts": {
     "build": "tsc",

@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T01:11:56Z",
+  "reason": "Pivoting back to the current validation spine to reproduce the reported VAL-03 false-REVIEW behavior. The deterministic validators must not require a single claim to repeat every unrelated technical token from its source chunk; claim support and omission/coverage are distinct signals.",
+  "sourceChange": {
+    "name": "feature-label-semantic-derivation",
+    "completed": 3,
+    "total": 3
+  },
+  "nextChange": {
+    "name": "parent-atlas-versioned-doc-intelligence",
+    "progressAtLastMeasurement": {"completed": 41, "total": 48},
+    "gate": "VAL-03 claim-level technical-token findings; no summary apply"
+  },
+  "mutationBoundary": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "summaryApply": "not authorized and will not run"
+  }
+}

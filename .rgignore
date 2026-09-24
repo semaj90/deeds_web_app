@@ -111,3 +111,7 @@
 !.tmp/atlas/current-graphify-symbol-nominations-v1.jsonl
 !.tmp/atlas/current-graph-symbol-resolution-v1.jsonl
 !.tmp/knowledge-source-snapshot-live-v1.json
+
+# re-include gitignored >10 MB generated reports so plain rg from the repo root finds them (searchable != authoritative; regenerate before citing)
+!docs/reports/openspec-directory-graph-v1.json
+!docs/reports/openspec-file-labels-v1.json

@@ -83,14 +83,15 @@ Final result (both runs): `Test Files 4 passed (4)` / `Tests 12 passed (12)`, ~1
   RAPIDS/cuGraph GPU parity was not exercised by this suite and remains
   unaddressed).
 
-- [ ] **Not fixed, deliberately out of scope for this handoff**: the
-  `compute-pagerank-neo4j-v2.mjs` sequential-write pattern (270K un-batched
-  awaited Cypher calls) is a real, separate perf bug in that script
-  independent of the test-fixture issue. It only matters when the script is
-  invoked without `--fixture` against the full frozen snapshot (e.g., a real
-  production PageRank run, not this parity test). If that script is ever
-  meant to run against the full corpus, it needs `UNWIND`-based batched
-  writes before it's usable at that scale — flagged here, not fixed.
+- [x] **PageRank fixture ingestion bounded (2026-09-24, code/test proof only).**
+  `compute-pagerank-neo4j-v2.mjs` now defaults to the small parity fixture rather
+  than silently selecting the 162K-node frozen snapshot. The explicit large-input
+  path uses `UNWIND $rows` in batches of 1,000 for nodes and edges, grouping
+  relationships by an allowlisted type and rejecting unsupported types before
+  fixture writes. Four fake-session tests prove batching, preserved run/snapshot
+  qualification, edge mapping, and pre-write rejection. No Neo4j script execution,
+  live graph loading, PageRank projection, or datastore write was performed; live
+  throughput/parity remains outside this task's proof.
 
 ## Next steps (in priority order)
 

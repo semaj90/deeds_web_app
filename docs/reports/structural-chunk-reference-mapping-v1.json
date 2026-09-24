@@ -1,0 +1,66 @@
+{
+  "schema": "atlas.structural-chunk-reference-mapping.v1",
+  "generatedAt": "2026-09-23T01:10:40Z",
+  "status": "STATIC_CONTRACT_AUDIT_COMPLETE_RUNTIME_UNVERIFIED",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "replacementCandidate": false,
+  "reference": {
+    "project": "supermemoryai/code-chunk",
+    "basis": "Upstream README feature description previously reviewed under STRUCT-06; no package installation or runtime call was made.",
+    "localContractName": "StructuralChunkV1",
+    "localContractFound": false,
+    "reconciliation": "Use existing TreesitterChunkerChunkV1 plus structural nominations, structural-reference facts, per-source extraction receipts, and StructuralMemoryCardV1 as separate owners. Do not synthesize another canonical chunk schema."
+  },
+  "fieldMapping": [
+    {
+      "referenceField": "scope chain",
+      "localOwner": "TreesitterChunkerChunkV1.parent_route / parent_context",
+      "status": "MAPPED",
+      "authority": "upstream structural provenance only"
+    },
+    {
+      "referenceField": "entities",
+      "localOwner": "StructuralSymbolNominationV1 / FrameworkEntityNominationV1",
+      "status": "MAPPED_AS_NOMINATIONS",
+      "authority": "GIS owns canonical identity"
+    },
+    {
+      "referenceField": "signatures",
+      "localOwner": "StructuralSymbolNominationV1.signature_normalized",
+      "status": "PARTIAL",
+      "gap": "not a field on TreesitterChunkerChunkV1 itself"
+    },
+    {
+      "referenceField": "imports",
+      "localOwner": "TreesitterChunkerChunkV1.imports / xref_edges / StructuralReferenceFactV1",
+      "status": "MAPPED"
+    },
+    {
+      "referenceField": "siblings",
+      "localOwner": null,
+      "status": "ABSENT",
+      "gap": "Do not persist a separate sibling identity; derive bounded contextual neighbors only after source/GIS resolution."
+    },
+    {
+      "referenceField": "byte and line ranges",
+      "localOwner": "TreesitterChunkerChunkV1.byte_start/byte_end/start_line/end_line and StructuralMemoryCardV1.sourceSpan",
+      "status": "MAPPED"
+    },
+    {
+      "referenceField": "contextualized text",
+      "localOwner": null,
+      "status": "ABSENT_BY_DESIGN",
+      "gap": "Representation input may be added after GIS identity under CC-04; never use as identity."
+    },
+    {
+      "referenceField": "per-file errors",
+      "localOwner": "treesitter-chunker evidence adapter diagnostics and StructuralExtractionReceiptV1 per-source counts/diagnostics",
+      "status": "PARTIAL",
+      "gap": "Not a single batch result envelope joining successes and typed errors across many files; CC-05 owns batch isolation."
+    }
+  ],
+  "downstreamRule": "Only exact GIS-resolved identities may feed SemanticCard/representation construction; code-chunk IDs, contextualized text, and sibling relations cannot create identity or write Qdrant/Neo4j.",
+  "nextProof": "CC-02 fixed-corpus contextual-metadata benchmark; no runtime promotion before results."
+}

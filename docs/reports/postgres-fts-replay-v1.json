@@ -1,6 +1,6 @@
 {
   "schema": "atlas.postgres-fts-replay.v1",
-  "generatedAt": "2026-09-21T02:47:09.311Z",
+  "generatedAt": "2026-09-21T17:54:31.177Z",
   "mode": "READ_ONLY",
   "queryText": "Graphify retrieval",
   "writesPerformed": false,

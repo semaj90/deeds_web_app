@@ -9,6 +9,8 @@ import numpy as np
 
 from atlas_external_docs import ChunkRecord, chunk_document
 from atlas_okf_docs_pipeline import (
+    SourceConfig,
+    build_firecrawl_crawl_v2_request,
     build_qdrant_points,
     deterministic_qdrant_uuid,
     is_uuid,
@@ -22,6 +24,26 @@ from parent_atlas_ontology.domain_mapping import mapping_revision
 
 
 class OkfDocsPipelineTests(unittest.TestCase):
+    def test_firecrawl_request_uses_manifest_bounds_and_disables_domain_expansion(self) -> None:
+        source = SourceConfig(
+            source_id="doc-03-test", source_revision="manifest:test", title="test",
+            base_urls=("https://docs.example.test/root",), allowed_domains=("docs.example.test",),
+            authority_class="EXTERNAL_DOCUMENTATION", default_fetcher="FIRECRAWL_CRAWL",
+            output_namespace="docs/.okf/test", include_paths=("/root/**",), exclude_paths=("/private/**",),
+            maximum_pages=3, maximum_depth=1, follow_sitemap=False, pages=(), ldr_export_files=(),
+        )
+        request = build_firecrawl_crawl_v2_request(source)
+        self.assertEqual(request["limit"], source.maximum_pages)
+        self.assertEqual(request["maxDiscoveryDepth"], source.maximum_depth)
+        self.assertEqual(request["sitemap"], "skip")
+        self.assertFalse(request["crawlEntireDomain"])
+        self.assertFalse(request["allowExternalLinks"])
+        self.assertFalse(request["allowSubdomains"])
+        include_sitemap = build_firecrawl_crawl_v2_request(SourceConfig(
+            **{**source.__dict__, "follow_sitemap": True}
+        ))
+        self.assertEqual(include_sitemap["sitemap"], "include")
+
     def test_qdrant_id_is_deterministic_supported_uuid_projection(self) -> None:
         first = deterministic_qdrant_uuid("doc:qdrant:abc:0")
         second = deterministic_qdrant_uuid("doc:qdrant:abc:0")

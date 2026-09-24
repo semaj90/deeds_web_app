@@ -1096,3 +1096,8 @@ docs/reports/graphify-workspace-snapshot-binding-v1-rerun-*.json
 docs/reports/current-graphify-snapshot-binding-recheck-v1.json
 docs/reports/workspace-binding-cas-plan-v1.json
 docs/reports/workspace-source-snapshots/
+
+# >10 MB generated reports cannot enter git (pre-commit hook; CLAUDE.md large-file rule). They stay on disk, gitignored, and are searchable via .rgignore re-includes. Never deleted.
+docs/reports/openspec-directory-graph-v1.json
+docs/reports/openspec-file-labels-v1.json
+docs/reports/staging/

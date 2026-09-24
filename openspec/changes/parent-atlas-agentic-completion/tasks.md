@@ -12,7 +12,9 @@
 - [x] **AGENT-08A — Immutable repair request.** Bind every selected task to a checksummed plan-only request at the controller boundary; no queue or canonical writes.
 - [x] **AGENT-08 — Worker boundary.** Move long-running repair/tournament execution behind an immutable request and worker queue. Proven by the opt-in external worker, one live checksummed fixture publish, plan-only execution, ACK settlement, and queue readback at `0 ready / 0 unacknowledged`; no canonical writes or promotion.
 - [ ] **AGENT-09 — Tournament reuse.** Complete the existing graph-retrieval-proof three-candidate seam; do not create a second tournament owner.
+  **Partial, reverified 2026-09-23:** the existing planner replayed three fixture candidates twice with an identical canonical checksum (`.tmp/atlas/patch-tournament-replay-20260923T035721Z.json`); focused planner spec passed 5/5. This proves deterministic fixture planning only. The owner audit still reports candidate generation and isolated worktree static/focused execution as `MISSING_OR_NOT_WIRED`; no live three-candidate seam, candidate checks, or worker-produced ACE packet is proven. Keep open until an admitted source frame and separately authorized isolated candidate execution are available.
 - [ ] **AGENT-10 — Durable receipts.** Propose Drizzle-owned receipt history only after the read-only contract is accepted; keep it separate from LangGraph checkpoints.
+  **Read-only owner/schema recheck 2026-09-23:** existing durable owner is `outcome_ledger` via `agent-work-receipt-store-v1.ts`; live schema contains all 9 required columns and a unique `receipt_id` index, with 3 existing agent-work rows carrying receipt IDs/checksums. No writes occurred. Do not add a tournament table or infer policy acceptance from schema presence; tournament-specific use and a bounded authorized live write/readback remain open.
 
 ## Completion rule
 

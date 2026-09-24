@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.document.governance.validation.v1",
+  "registryChecksum": "94425e02750440625c1f22db6964f3618c3f1d5386a2f1d4a7e5a22c68f516ac",
+  "records": 4711,
+  "openSpecBindings": {
+    "status": "PROVEN_BOUNDED",
+    "taskLedgers": 93,
+    "boundTaskLedgers": 93,
+    "unboundTaskLedgers": 0,
+    "completedTasks": 6171,
+    "totalTasks": 9507,
+    "openTasks": 3336,
+    "incompleteTaskLedgers": 78,
+    "failures": []
+  },
+  "status": "BLOCKED",
+  "closureEligible": false,
+  "closureBlockers": [
+    "UNCHECKED_TASKS:3336"
+  ],
+  "archiveReview": {
+    "reviewedDocuments": 0,
+    "eligibleCandidates": 0,
+    "blockedCandidates": 0,
+    "noCandidateReason": "NO_SUPERSESSION_OR_ARCHIVE_CANDIDATES",
+    "results": [],
+    "writesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "archiveEligible": 0,
+  "failures": [],
+  "writes": {
+    "documents": 0,
+    "archives": 0,
+    "registry": 0
+  },
+  "generatedAt": "2026-09-22T23:44:13.613Z"
+}

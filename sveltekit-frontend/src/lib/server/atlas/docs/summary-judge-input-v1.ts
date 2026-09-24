@@ -20,6 +20,16 @@ const boundedChunkText = z.string().min(1).refine(
 	(value) => new TextEncoder().encode(value).byteLength <= SUMMARY_JUDGE_INPUT_MAX_CHUNK_BYTES,
 	`canonical chunk text exceeds ${SUMMARY_JUDGE_INPUT_MAX_CHUNK_BYTES} UTF-8 bytes`
 );
+const completedTechnicalSlot = TechnicalTokenSlotV1Schema.extend({ status: z.enum(['PASS', 'FAIL', 'REVIEW']) }).strict();
+const completedNumericSlot = NumericSlotV1Schema.extend({ status: z.enum(['PASS', 'FAIL', 'REVIEW']) }).strict();
+const completedVersionSlot = VersionSlotV1Schema.extend({ status: z.enum(['PASS', 'FAIL', 'REVIEW']) }).strict();
+const completedSourceSpanSlot = SourceSpanSlotV1Schema.extend({
+	status: z.enum(['VERIFIED', 'REJECTED', 'NO_CLAIMED_SPAN'])
+}).strict();
+
+export function computeCanonicalChunkTextChecksumV1(canonicalChunkText: string): string {
+	return canonicalSha256V1({ schema: 'atlas.summary-judge-chunk-text.v1', canonicalChunkText });
+}
 
 const baseShape = {
 	schema: z.literal(SUMMARY_JUDGE_INPUT_SCHEMA),
@@ -27,6 +37,7 @@ const baseShape = {
 	chunkEvidenceRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/),
 	summaryOutputChecksum: sha256HexSchema,
 	canonicalChunkText: boundedChunkText,
+	canonicalChunkTextChecksum: sha256HexSchema,
 	promptVisibleMetadata: z.object({
 		product: nonEmpty.nullable(),
 		productVersion: nonEmpty.nullable(),
@@ -39,16 +50,19 @@ const baseShape = {
 		claimChecksum: sha256HexSchema
 	}).strict(),
 	deterministicFindings: z.object({
-		technical: TechnicalTokenSlotV1Schema,
-		numeric: NumericSlotV1Schema,
-		version: VersionSlotV1Schema,
-		sourceSpan: SourceSpanSlotV1Schema
+		technical: completedTechnicalSlot,
+		numeric: completedNumericSlot,
+		version: completedVersionSlot,
+		sourceSpan: completedSourceSpanSlot
 	}).strict(),
 	promptRevision: explicitRevision,
 	canonicalAuthority: z.literal(false)
 };
 
 export const SummaryJudgeInputV1BodySchema = z.object(baseShape).strict().superRefine((value, ctx) => {
+	if (value.canonicalChunkTextChecksum !== computeCanonicalChunkTextChecksumV1(value.canonicalChunkText)) {
+		ctx.addIssue({ code: 'custom', message: 'canonicalChunkTextChecksum does not match exact chunk text', path: ['canonicalChunkTextChecksum'] });
+	}
 	if (value.claim.claimChecksum !== computeSummaryClaimChecksumV1(value.claim.claimText)) {
 		ctx.addIssue({ code: 'custom', message: 'claimChecksum does not match claimText', path: ['claim', 'claimChecksum'] });
 	}
@@ -59,6 +73,9 @@ export const SummaryJudgeInputV1Schema = z.object({
 	...baseShape,
 	judgeInputChecksum: sha256HexSchema
 }).strict().superRefine((value, ctx) => {
+	if (value.canonicalChunkTextChecksum !== computeCanonicalChunkTextChecksumV1(value.canonicalChunkText)) {
+		ctx.addIssue({ code: 'custom', message: 'canonicalChunkTextChecksum does not match exact chunk text', path: ['canonicalChunkTextChecksum'] });
+	}
 	if (value.claim.claimChecksum !== computeSummaryClaimChecksumV1(value.claim.claimText)) {
 		ctx.addIssue({ code: 'custom', message: 'claimChecksum does not match claimText', path: ['claim', 'claimChecksum'] });
 	}
@@ -99,6 +116,7 @@ export function buildSummaryJudgeInputV1(input: SummaryJudgeInputV1BuildInput): 
 		chunkEvidenceRevision: validation.chunkEvidenceRevision,
 		summaryOutputChecksum: validation.summaryOutputChecksum,
 		canonicalChunkText: chunk.text,
+		canonicalChunkTextChecksum: computeCanonicalChunkTextChecksumV1(chunk.text),
 		promptVisibleMetadata: input.promptVisibleMetadata,
 		claim: { claimOrdinal: validation.claimOrdinal, claimText: validation.claimText, claimChecksum: validation.claimChecksum },
 		deterministicFindings: {

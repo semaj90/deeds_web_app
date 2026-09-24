@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.doc-15-live-projection-readback.v1",
+  "gate": "DOC-15",
+  "observedAt": "2026-09-24T00:50:56Z",
+  "mode": "READ_ONLY_LIVE_SERVICE_AND_SOURCE_CONTRACT_AUDIT",
+  "qdrant": {
+    "external_programming_docs_768": {
+      "httpStatus": 200,
+      "status": "green",
+      "pointsCount": 0,
+      "vectorDimension": 768,
+      "canonicalAuthority": false
+    },
+    "external_programming_docs_hybrid_768": {
+      "httpStatus": 404,
+      "exists": false,
+      "canonicalAuthority": false
+    }
+  },
+  "projectionPayloadContract": {
+    "owner": "packages/parent-atlas/src/core/external-doc-qdrant-hybrid.ts::hybridWirePoint",
+    "includes": [
+      "chunk_id",
+      "source_id",
+      "source_revision",
+      "document_checksum",
+      "chunk_checksum",
+      "domain_class",
+      "ontology_classes",
+      "ast_observation_kinds",
+      "langextract_classes",
+      "tags",
+      "language",
+      "embedding_revision",
+      "producer_revision",
+      "canonical_authority"
+    ],
+    "missingPreRankFilterFields": [
+      "product",
+      "product_version",
+      "architecture"
+    ]
+  },
+  "result": "DOC_15_LIVE_FILTERED_FANOUT_BLOCKED_PROJECTION_ABSENT_AND_FILTER_METADATA_MISSING",
+  "canonicalAuthority": false,
+  "logicalLaneVotes": 0,
+  "promotionAuthorized": false,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "filesystemCorpus": 0
+  },
+  "nextGate": "METADATA_COMPLETE_EXTERNAL_DOC_PROJECTION_AUTHORIZATION_THEN_LIVE_FILTERED_FANOUT"
+}

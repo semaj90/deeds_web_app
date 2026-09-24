@@ -4,6 +4,7 @@
   "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
   "summaryOutputChecksum": "099b9e1d0ea636413f67312877aab4a7d1bcfc0c0fbf61936ab68630bfe8b872",
   "canonicalChunkText": "PostgreSQL pgvector supports HNSW iterative scans for filtered search.",
+  "canonicalChunkTextChecksum": "ed83061e6dc20f4f473e994afe723a5dd147af29238aa19268bc4500bce5df3c",
   "promptVisibleMetadata": {
     "product": "pgvector",
     "productVersion": "0.8.0",
@@ -49,5 +50,5 @@
   },
   "promptRevision": "summary-judge-prompt:val-06-v1",
   "canonicalAuthority": false,
-  "judgeInputChecksum": "76cee8a4d93cd4e829abf6127444f85ac187ce493044d4ec2a050717bb89399e"
+  "judgeInputChecksum": "5cf04863e53edec89e98f9ec310b4e0aa80681971f23f6c55b928a7d7aa663e7"
 }
