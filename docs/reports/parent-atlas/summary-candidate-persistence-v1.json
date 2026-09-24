@@ -138,5 +138,51 @@
     "valkey": 0,
     "neo4j": 0,
     "graphify": 0
+  },
+  "verification": {
+    "recordedAt": "2026-09-24",
+    "mutationHead": "490d35fe7e9250401356e4ca7e6cc9d24b323f54",
+    "preconditions": {
+      "headMatched": true,
+      "chunkCohortChecksum": "7121be8555c183d20533e07af95e9f03ae5482d60d869d466438dd6b8e21da45",
+      "candidateCohortChecksum": "63e83c53bde93be1c9f759dcee00d002d510b6ea0b2d1c9a1b189a0825e93691",
+      "candidates": 19,
+      "summaryRowsBefore": 0,
+      "identityVersion": "external-doc-chunk-id:v1"
+    },
+    "independentReadback": {
+      "connection": "separate psql session after COMMIT",
+      "rows": 19,
+      "chunkIdExact": "19/19",
+      "chunkEvidenceRevisionExact": "19/19",
+      "inputChecksumExact": "19/19",
+      "outputChecksumExact": "19/19",
+      "summaryTextExactUtf8": "19/19",
+      "analysisTypeSummary": "19/19",
+      "canonicalAuthorityFalse": "19/19",
+      "negativeControlPersisted": 0,
+      "mismatches": 0
+    },
+    "readbackClientNote": "A first comparison flagged 1 row because the Python client decoded the frozen JSON with the Windows cp1252 default (em-dash became mojibake). The database stores valid UTF-8 (e2 80 94); the UTF-8-forced comparison gave 19 rows / 0 mismatches. This was a readback-client decoding false positive, not a persistence defect.",
+    "idempotence": {
+      "secondPassInserted": 0,
+      "secondPassAlreadyPresent": 19,
+      "rowsAdded": 0,
+      "duplicateLogicalAnalyses": 0
+    },
+    "tests": {
+      "writerSpec": "14/14 passed",
+      "pythonCandidateTests": "6/6 passed",
+      "openspecValidateStrict": "valid"
+    },
+    "writes": {
+      "postgresSummaryRows": 19,
+      "qdrant": 0,
+      "valkey": 0,
+      "neo4j": 0,
+      "graphify": 0
+    },
+    "modelCalls": 0,
+    "authorization": "operator-authorized in their own words 2026-09-24; bounded to the frozen 19-candidate cohort via --apply-frozen"
   }
 }
