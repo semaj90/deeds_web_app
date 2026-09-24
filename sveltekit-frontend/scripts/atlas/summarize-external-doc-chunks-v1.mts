@@ -217,7 +217,7 @@ async function applyFrozenMode(canaryOnly = false): Promise<void> {
 		tamper = { changedByte: { refused: byte.persisted.length === 0, reasons: byte.refused[0]?.reasons, insertCalls: callsAfterByte }, changedRevision: { refused: rev.persisted.length === 0, reasons: rev.refused[0]?.reasons, insertCalls: calls - callsAfterByte } };
 	}
 	try {
-		const before = (await client.query('SELECT count(*)::int n FROM atlas_external_doc_analyses')).rows[0].n as number;
+		const before = (await client.query("SELECT count(*)::int n FROM atlas_external_doc_analyses WHERE analysis_type = 'SUMMARY'")).rows[0].n as number;
 		await client.query('BEGIN');
 		const deps: PersistenceDeps = {
 			chunkRevisionIsCurrent: async (chunkId, revision) => ((await client.query('SELECT 1 FROM atlas_external_doc_chunks WHERE chunk_id = $1 AND evidence_revision = $2', [chunkId, revision])).rowCount ?? 0) > 0,
@@ -225,6 +225,8 @@ async function applyFrozenMode(canaryOnly = false): Promise<void> {
 			now: () => new Date().toISOString()
 		};
 		const result = await persistEligibleSummaryCandidatesV1(items, SUMMARY_PERSISTENCE_POLICY_V1, deps, sample);
+		// idempotence, canary: apply the SAME frozen cohort again inside the same (never committed) transaction; nothing new may be inserted
+		const secondPass = canaryOnly ? await persistEligibleSummaryCandidatesV1(items, SUMMARY_PERSISTENCE_POLICY_V1, deps, sample) : null;
 		const ids = result.persisted.map((p) => p.analysisId);
 		const rb = (await client.query('SELECT analysis_id, chunk_id, chunk_evidence_revision, analysis_type, input_checksum, output_checksum, summary_text, canonical_authority FROM atlas_external_doc_analyses WHERE analysis_id = ANY($1::text[])', [ids])).rows;
 		const byCand = new Map((cohort.candidates as any[]).map((c) => [c.candidateId, c]));
@@ -232,24 +234,39 @@ async function applyFrozenMode(canaryOnly = false): Promise<void> {
 			const r = rb.find((x) => x.analysis_id === p.analysisId); const c = byCand.get(p.candidateId);
 			return !!r && !!c && r.chunk_id === c.chunkId && r.chunk_evidence_revision === c.chunkEvidenceRevision && r.analysis_type === 'SUMMARY' && r.input_checksum === c.inputChecksum && r.output_checksum === c.outputChecksum && sha(r.summary_text) === c.outputChecksum && r.canonical_authority === false;
 		});
-		const after = (await client.query('SELECT count(*)::int n FROM atlas_external_doc_analyses')).rows[0].n as number;
-		const ok = readbackOk && after - before === result.persisted.length;
+		const after = (await client.query("SELECT count(*)::int n FROM atlas_external_doc_analyses WHERE analysis_type = 'SUMMARY'")).rows[0].n as number;
+		const dupLogical = (await client.query(`SELECT count(*)::int n FROM (SELECT 1 FROM atlas_external_doc_analyses WHERE analysis_type = 'SUMMARY' GROUP BY chunk_evidence_revision, producer_id, producer_revision, model_revision, prompt_revision, input_checksum HAVING count(*) > 1) x`)).rows[0].n as number;
+		const controlChecksums: string[] = controlPath ? (readJson(controlPath).candidates as { outputChecksum: string }[]).map((c) => c.outputChecksum) : [];
+		const controlPersisted = controlChecksums.length ? (await client.query(`SELECT count(*)::int n FROM atlas_external_doc_analyses WHERE analysis_type = 'SUMMARY' AND output_checksum = ANY($1::text[])`, [controlChecksums])).rows[0].n as number : 0;
+		// the counts must reconcile exactly: every admitted candidate has one outcome, rows added = rows inserted, no duplicate logical analyses, no control persisted
+		const countsOk = result.reconciles && result.failures.length === 0 && after - before === result.counts.inserted && dupLogical === 0 && controlPersisted === 0
+			&& (!secondPass || (secondPass.counts.inserted === 0 && secondPass.counts.alreadyPresent === result.counts.inserted + result.counts.alreadyPresent && secondPass.reconciles));
+		const ok = readbackOk && countsOk;
 		// admission binding stored on the row must name the exact candidate and eligibility that were admitted
 		const admissionBound = result.persisted.every((p) => { const r = rb.find((x) => x.analysis_id === p.analysisId); const it = items.find((i) => (i.candidate as { candidateId: string }).candidateId === p.candidateId); return !!r && !!it; });
 		await client.query(canaryOnly ? 'ROLLBACK' : ok ? 'COMMIT' : 'ROLLBACK'); // the canary path has NO commit branch
+		// idempotence, real run: after the COMMIT apply the same frozen cohort again in a fresh transaction that is always rolled back; it must add nothing
+		let idempotence: { inserted: number; alreadyPresent: number; rowsAdded: number; reconciles: boolean; idempotent: boolean } | null = null;
+		if (!canaryOnly && ok) {
+			await client.query('BEGIN');
+			const again = await persistEligibleSummaryCandidatesV1(items, SUMMARY_PERSISTENCE_POLICY_V1, deps, sample);
+			const rowsNow = (await client.query("SELECT count(*)::int n FROM atlas_external_doc_analyses WHERE analysis_type = 'SUMMARY'")).rows[0].n as number;
+			await client.query('ROLLBACK');
+			idempotence = { inserted: again.counts.inserted, alreadyPresent: again.counts.alreadyPresent, rowsAdded: rowsNow - after, reconciles: again.reconciles, idempotent: again.counts.inserted === 0 && rowsNow === after };
+		}
 		let postRollback: { rowsAdded: number; idsStillPresent: number; independentConnection: boolean } | null = null;
 		if (canaryOnly) {
 			const other = await pool.connect(); // a different connection: sees only durable state
 			try {
-				const n = (await other.query('SELECT count(*)::int n FROM atlas_external_doc_analyses')).rows[0].n as number;
+				const n = (await other.query("SELECT count(*)::int n FROM atlas_external_doc_analyses WHERE analysis_type = 'SUMMARY'")).rows[0].n as number;
 				const still = (await other.query('SELECT count(*)::int n FROM atlas_external_doc_analyses WHERE analysis_id = ANY($1::text[])', [ids])).rows[0].n as number;
 				postRollback = { rowsAdded: n - before, idsStillPresent: still, independentConnection: true };
 			} finally { other.release(); }
 			const canaryReceipt = {
 				schema: 'atlas.summary-candidate-rollback-canary.v1', gate: 'VAL10B_ROLLBACK_CANARY', generatedAt: new Date().toISOString(), candidateCohortChecksum: cohort.candidateCohortChecksum, ceiling: sample,
 				writerInvoked: true, admissionPassed: result.persisted.length > 0 && result.refused.length === 0, insertExecuted: result.insertCalls > 0, insertCalls: result.insertCalls, inTransactionRows: rb.length,
-				inTransactionReadbackMatched: readbackOk && after - before === result.persisted.length && admissionBound, transactionOutcome: 'ROLLED_BACK_CANARY', durableCommitted: false,
-				postRollback, tamperCase: tamper, refused: result.refused, modelCalls: 0, writes: { postgres: 'ROLLED_BACK', qdrant: 0, valkey: 0, neo4j: 0, graphify: 0 }
+				inTransactionReadbackMatched: readbackOk && countsOk && admissionBound, transactionOutcome: 'ROLLED_BACK_CANARY', durableCommitted: false,
+				postRollback, tamperCase: tamper, refused: result.refused, counts: result.counts, reconciles: result.reconciles, secondPassCounts: secondPass?.counts ?? null, rowsBefore: before, rowsAfterInTransaction: after, duplicateLogicalAnalyses: dupLogical, controlCandidatesPersisted: controlPersisted, modelCalls: 0, writes: { postgres: 'ROLLED_BACK', qdrant: 0, valkey: 0, neo4j: 0, graphify: 0 }
 			};
 			const pass = canaryReceipt.writerInvoked && canaryReceipt.admissionPassed && canaryReceipt.insertExecuted && canaryReceipt.inTransactionReadbackMatched && postRollback!.rowsAdded === 0 && postRollback!.idsStillPresent === 0
 				&& !!tamper && tamper.changedByte.refused && tamper.changedByte.insertCalls === 0 && tamper.changedRevision.refused && tamper.changedRevision.insertCalls === 0;
@@ -258,10 +275,10 @@ async function applyFrozenMode(canaryOnly = false): Promise<void> {
 			if (!pass) process.exitCode = 1;
 			return;
 		}
-		const receipt = { schema: 'atlas.summary-candidate-persistence.v1', generatedAt: new Date().toISOString(), candidateCohortChecksum: cohort.candidateCohortChecksum, ceiling: sample, before, after: ok ? after : before, persisted: result.persisted, refused: result.refused, insertCalls: result.insertCalls, readbackOk, committed: ok, modelCalls: 0 };
+		const receipt = { schema: 'atlas.summary-candidate-persistence.v1', generatedAt: new Date().toISOString(), candidateCohortChecksum: cohort.candidateCohortChecksum, ceiling: sample, before, after: ok ? after : before, persisted: result.persisted, alreadyPresent: result.alreadyPresent, refused: result.refused, failures: result.failures, insertCalls: result.insertCalls, counts: result.counts, reconciles: result.reconciles, duplicateLogicalAnalyses: dupLogical, controlCandidatesPersisted: controlPersisted, rowsBefore: before, readbackOk, committed: ok, idempotence, modelCalls: 0, writes: { postgres: ok ? 'COMMITTED' : 'ROLLED_BACK', qdrant: 0, valkey: 0, neo4j: 0, graphify: 0 } };
 		writeReceipt('docs/reports/parent-atlas/summary-candidate-persistence-v1.json', receipt);
-		console.log(JSON.stringify({ committed: ok, persisted: result.persisted.length, refused: result.refused.length, readbackOk }, null, 2));
-		if (!ok) process.exitCode = 1;
+		console.log(JSON.stringify({ committed: ok, counts: result.counts, reconciles: result.reconciles, rowsBefore: before, rowsAfter: ok ? after : before, duplicateLogicalAnalyses: dupLogical, controlCandidatesPersisted: controlPersisted, readbackOk, idempotence }, null, 2));
+		if (!ok || (idempotence && !idempotence.idempotent)) process.exitCode = 1;
 	} finally { client.release(); await pool.end(); }
 }
 

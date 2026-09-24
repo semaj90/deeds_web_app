@@ -1,7 +1,7 @@
 {
   "schema": "atlas.summary-candidate-rollback-canary.v1",
   "gate": "VAL10B_ROLLBACK_CANARY",
-  "generatedAt": "2026-09-24T02:41:42.524Z",
+  "generatedAt": "2026-09-24T03:00:18.177Z",
   "candidateCohortChecksum": "63e83c53bde93be1c9f759dcee00d002d510b6ea0b2d1c9a1b189a0825e93691",
   "ceiling": 20,
   "writerInvoked": true,
@@ -34,6 +34,35 @@
     }
   },
   "refused": [],
+  "counts": {
+    "considered": 19,
+    "rejectedByAdmission": 0,
+    "admitted": 19,
+    "inserted": 19,
+    "alreadyPresent": 0,
+    "duplicateInInput": 0,
+    "ceilingDeferred": 0,
+    "staleRefused": 0,
+    "failed": 0,
+    "notAttempted": 0
+  },
+  "reconciles": true,
+  "secondPassCounts": {
+    "considered": 19,
+    "rejectedByAdmission": 0,
+    "admitted": 19,
+    "inserted": 0,
+    "alreadyPresent": 19,
+    "duplicateInInput": 0,
+    "ceilingDeferred": 0,
+    "staleRefused": 0,
+    "failed": 0,
+    "notAttempted": 0
+  },
+  "rowsBefore": 0,
+  "rowsAfterInTransaction": 19,
+  "duplicateLogicalAnalyses": 0,
+  "controlCandidatesPersisted": 0,
   "modelCalls": 0,
   "writes": {
     "postgres": "ROLLED_BACK",

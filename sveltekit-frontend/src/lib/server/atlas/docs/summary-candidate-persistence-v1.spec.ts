@@ -118,3 +118,47 @@ describe('VAL-10B writer admission (no durable write)', () => {
 		expect(r.refused.some((x) => x.reasons.includes('ABOVE_LIMIT_CEILING'))).toBe(true);
 	});
 });
+
+describe('VAL-10D counters, idempotence and reconciliation (stubbed, no durable write)', () => {
+	const ok = (n: number) => evidence(candidate({ inputChecksum: H(String(n)) }));
+	/** a conflict-aware stub mimicking INSERT ... ON CONFLICT (analysis_id) DO NOTHING */
+	function conflictAware() {
+		const table = new Map<string, ExternalDocAnalysisV1>();
+		const d: PersistenceDeps = { chunkRevisionIsCurrent: async () => true, insertAnalysis: async (row) => { if (table.has(row.analysisId)) return 0; table.set(row.analysisId, row); return 1; }, now: () => '2026-09-23T00:00:00.000Z' };
+		return { d, table };
+	}
+	it('counts every outcome exactly and reconciles: admitted = inserted + alreadyPresent + duplicates + ceiling + stale + failed + notAttempted', async () => {
+		const { d } = conflictAware();
+		const items = [ok(1), ok(2), ok(3), ok(2), evidence(candidate({ inputChecksum: H('7') }), ['ADMIT', 'REJECT'])];
+		const r = await persistEligibleSummaryCandidatesV1(items, policy, d, 2);
+		expect(r.counts).toMatchObject({ considered: 5, rejectedByAdmission: 1, admitted: 4, inserted: 2, alreadyPresent: 0, duplicateInInput: 1, ceilingDeferred: 1, staleRefused: 0, failed: 0, notAttempted: 0 });
+		expect(r.reconciles).toBe(true);
+	});
+	it('re-applying the SAME frozen cohort writes nothing new: every row is reported alreadyPresent', async () => {
+		const { d, table } = conflictAware();
+		const items = [ok(1), ok(2), ok(3)];
+		const first = await persistEligibleSummaryCandidatesV1(items, policy, d, 20);
+		const rowsAfterFirst = table.size;
+		const second = await persistEligibleSummaryCandidatesV1(items, policy, d, 20);
+		expect(first.counts.inserted).toBe(3);
+		expect(second.counts).toMatchObject({ inserted: 0, alreadyPresent: 3 });
+		expect(second.persisted).toEqual([]);
+		expect(table.size).toBe(rowsAfterFirst);
+		expect(first.reconciles && second.reconciles).toBe(true);
+	});
+	it('a stale chunk revision is counted, not written', async () => {
+		const stub = deps({ current: false });
+		const r = await persistEligibleSummaryCandidatesV1([ok(1)], policy, stub.d, 20);
+		expect(r.counts).toMatchObject({ staleRefused: 1, inserted: 0 });
+		expect(r.reconciles).toBe(true);
+	});
+	it('a mutation failure stops the run immediately: the failure is reported, the remainder is notAttempted, nothing after it is inserted', async () => {
+		let calls = 0;
+		const d: PersistenceDeps = { chunkRevisionIsCurrent: async () => true, now: () => '2026-09-23T00:00:00.000Z', insertAnalysis: async () => { calls += 1; if (calls === 2) throw new Error('boom'); return 1; } };
+		const r = await persistEligibleSummaryCandidatesV1([ok(1), ok(2), ok(3), ok(4)], policy, d, 20);
+		expect(calls).toBe(2);
+		expect(r.counts).toMatchObject({ inserted: 1, failed: 1, notAttempted: 2 });
+		expect(r.failures).toEqual([{ candidateId: candidate({ inputChecksum: H('2') }).candidateId, error: 'boom' }]);
+		expect(r.reconciles).toBe(true);
+	});
+});

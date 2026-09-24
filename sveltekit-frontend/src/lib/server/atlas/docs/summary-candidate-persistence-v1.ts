@@ -101,33 +101,81 @@ export interface PersistenceDeps {
 	insertAnalysis(row: ExternalDocAnalysisV1): Promise<number>;
 	now(): string;
 }
+export interface PersistenceCounts {
+	/** items handed to the writer */
+	considered: number;
+	/** refused by the admission gate (any PersistenceRefusal other than the ones counted below) */
+	rejectedByAdmission: number;
+	/** admitted = considered - rejectedByAdmission */
+	admitted: number;
+	inserted: number;
+	/** the row already existed (ON CONFLICT DO NOTHING returned 0): an idempotent no-op, not an error */
+	alreadyPresent: number;
+	/** admitted but the same candidate appeared twice in the input: written at most once */
+	duplicateInInput: number;
+	/** admitted but beyond the --limit ceiling (a ceiling, never a target) */
+	ceilingDeferred: number;
+	/** admitted but the chunk revision was no longer current at write time */
+	staleRefused: number;
+	/** the mutation boundary threw; the run stops immediately */
+	failed: number;
+	/** admitted candidates never attempted because an earlier failure stopped the run */
+	notAttempted: number;
+}
 export interface PersistenceResult {
+	/** rows actually inserted by this pass */
 	persisted: { candidateId: string; analysisId: string; chunkId: string }[];
+	/** rows that already existed (idempotent) */
+	alreadyPresent: { candidateId: string; analysisId: string; chunkId: string }[];
 	refused: { candidateId: string | null; reasons: PersistenceRefusal[] }[];
+	failures: { candidateId: string; error: string }[];
 	insertCalls: number;
+	counts: PersistenceCounts;
+	/** true iff every admitted candidate is accounted for by exactly one outcome */
+	reconciles: boolean;
+}
+
+/** admitted must equal the sum of its outcomes; considered must equal admitted + rejectedByAdmission. */
+export function reconcilePersistenceCountsV1(c: PersistenceCounts): boolean {
+	return c.admitted === c.inserted + c.alreadyPresent + c.duplicateInInput + c.ceilingDeferred + c.staleRefused + c.failed + c.notAttempted && c.considered === c.admitted + c.rejectedByAdmission;
 }
 
 /**
  * Persists the admitted candidates' exact text. `limit` is a CEILING (expected writes = admitted count, not the limit). All admission is decided before the first
- * insert; a candidate whose chunk revision is no longer current is refused before its insert.
+ * insert; a candidate whose chunk revision is no longer current is refused before its insert. Re-applying the same frozen cohort is idempotent: rows that already exist are
+ * reported as `alreadyPresent`, never re-inserted. A mutation failure stops the run and is reported exactly (the caller rolls the transaction back).
  */
 export async function persistEligibleSummaryCandidatesV1(items: Partial<FrozenSummaryEvidence>[], policy: SummaryPersistencePolicyV1, deps: PersistenceDeps, limit: number): Promise<PersistenceResult> {
-	const result: PersistenceResult = { persisted: [], refused: [], insertCalls: 0 };
+	const counts: PersistenceCounts = { considered: items.length, rejectedByAdmission: 0, admitted: 0, inserted: 0, alreadyPresent: 0, duplicateInInput: 0, ceilingDeferred: 0, staleRefused: 0, failed: 0, notAttempted: 0 };
+	const result: PersistenceResult = { persisted: [], alreadyPresent: [], refused: [], failures: [], insertCalls: 0, counts, reconciles: false };
 	const admitted: Extract<AdmissionDecision, { decision: 'MAY_PERSIST' }>[] = [];
 	for (const item of items) {
 		const decision = admitFrozenSummaryCandidateV1(item, policy);
-		if (decision.decision === 'MAY_PERSIST') admitted.push(decision); else result.refused.push({ candidateId: decision.candidateId, reasons: decision.reasons });
+		if (decision.decision === 'MAY_PERSIST') admitted.push(decision); else { result.refused.push({ candidateId: decision.candidateId, reasons: decision.reasons }); counts.rejectedByAdmission += 1; }
 	}
+	counts.admitted = admitted.length;
 	const seen = new Set<string>();
+	let written = 0; // rows inserted or already present count toward the ceiling
+	let stopped = false;
 	for (const a of admitted) {
-		if (result.persisted.length >= limit) { result.refused.push({ candidateId: a.candidate.candidateId, reasons: ['ABOVE_LIMIT_CEILING'] }); continue; }
-		if (seen.has(a.candidate.candidateId)) continue; // duplicate logical candidate: never written twice
+		if (stopped) { counts.notAttempted += 1; continue; }
+		if (seen.has(a.candidate.candidateId)) { counts.duplicateInInput += 1; continue; } // duplicate logical candidate: never written twice
 		seen.add(a.candidate.candidateId);
-		if (!(await deps.chunkRevisionIsCurrent(a.candidate.chunkId, a.candidate.chunkEvidenceRevision))) { result.refused.push({ candidateId: a.candidate.candidateId, reasons: ['STALE_CHUNK_REVISION'] }); continue; }
+		if (written >= limit) { result.refused.push({ candidateId: a.candidate.candidateId, reasons: ['ABOVE_LIMIT_CEILING'] }); counts.ceilingDeferred += 1; continue; }
+		if (!(await deps.chunkRevisionIsCurrent(a.candidate.chunkId, a.candidate.chunkEvidenceRevision))) { result.refused.push({ candidateId: a.candidate.candidateId, reasons: ['STALE_CHUNK_REVISION'] }); counts.staleRefused += 1; continue; }
 		const row = buildAnalysisRowFromCandidateV1(a, deps.now());
 		result.insertCalls += 1;
-		await deps.insertAnalysis(row);
-		result.persisted.push({ candidateId: a.candidate.candidateId, analysisId: row.analysisId, chunkId: row.chunkId });
+		try {
+			const inserted = await deps.insertAnalysis(row);
+			const entry = { candidateId: a.candidate.candidateId, analysisId: row.analysisId, chunkId: row.chunkId };
+			if (inserted > 0) { result.persisted.push(entry); counts.inserted += 1; } else { result.alreadyPresent.push(entry); counts.alreadyPresent += 1; }
+			written += 1;
+		} catch (e) {
+			result.failures.push({ candidateId: a.candidate.candidateId, error: e instanceof Error ? e.message : String(e) });
+			counts.failed += 1;
+			stopped = true; // do not continue after a mutation failure
+		}
 	}
+	result.reconciles = reconcilePersistenceCountsV1(counts);
 	return result;
 }
