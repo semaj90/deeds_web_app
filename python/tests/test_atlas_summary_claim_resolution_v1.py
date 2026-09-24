@@ -108,3 +108,13 @@ def test_telemetry_counts_decisions_and_resolving_layers() -> None:
     resolved = [resolve_and_seal_v1(clean()), resolve_and_seal_v1(with_(numeric={"status": "FAIL"})), resolve_and_seal_v1(with_(semantic={"verdict": "UNKNOWN"}))]
     t = layer_telemetry_v1(resolved)
     assert t == {"claims": 3, "byDecision": {"ADMIT": 1, "REJECT": 1, "REVIEW": 1}, "byLayer": {"COMPOSITE": 1, "NUMERIC": 1, "SEMANTIC": 1}}
+
+
+def test_required_ontology_assertion_without_evidence_reviews_but_not_applicable_never_blocks() -> None:
+    for status in ("NOT_RUN", "NOT_APPLICABLE"):
+        out = resolve_slots_v1(with_(ontology={"status": status}), ontology_required=True)
+        assert (out["decision"], out["resolutionLayer"]) == ("REVIEW", "ONTOLOGY")
+    passed = with_(ontology={"status": "PASS", "kernelRevision": "oak-kernel:r1"})
+    assert resolve_slots_v1(passed, ontology_required=True)["decision"] == "ADMIT"
+    assert resolve_slots_v1(with_(ontology={"status": "NOT_RUN"}))["decision"] == "ADMIT"  # default unchanged
+    assert resolve_slots_v1(with_(technical={"status": "FAIL"}, ontology={"status": "NOT_RUN"}), ontology_required=True)["decision"] == "REJECT"  # hard failures still win

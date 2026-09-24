@@ -22,8 +22,11 @@ DECISIVE_SUPPORT = {"SUPPORTED", "SUPPORTED_PARAPHRASE", "SUPPORTED_WITH_OMISSIO
 DECISIVE_REJECT = {"UNSUPPORTED_CLAIM", "CONTRADICTED"}
 
 
-def resolve_slots_v1(claim: dict[str, Any]) -> dict[str, Any]:
-    """Returns {decision, resolutionLayer, reasons[]} from the slots of a validation dict (any seal fields ignored)."""
+def resolve_slots_v1(claim: dict[str, Any], ontology_required: bool = False) -> dict[str, Any]:
+    """Returns {decision, resolutionLayer, reasons[]} from the slots of a validation dict (any seal fields ignored).
+
+    `ontology_required` is set by the caller when the claim asserts a typed relationship: an ontology slot that is then not PASS (NOT_RUN/NOT_APPLICABLE)
+    cannot be ADMITted (REVIEW/ONTOLOGY). Default False keeps VAL-08 from becoming a global bottleneck."""
     tech, num, ver = claim["technical"]["status"], claim["numeric"]["status"], claim["version"]["status"]
     span, ont, sem = claim["sourceSpan"]["status"], claim["ontology"]["status"], claim["semantic"]
     if tech == "FAIL":
@@ -41,6 +44,8 @@ def resolve_slots_v1(claim: dict[str, Any]) -> dict[str, Any]:
     incomplete = [name for name, status in (("TECHNICAL", tech), ("NUMERIC", num), ("VERSION", ver), ("SOURCE_SPAN", span)) if status == "NOT_RUN"]
     if span == "CLAIMED":
         incomplete.append("SOURCE_SPAN")
+    if ontology_required and ont != "PASS":
+        incomplete.append("ONTOLOGY")
     if incomplete:
         return {"decision": "REVIEW", "resolutionLayer": incomplete[0], "reasons": [f"DETERMINISTIC_LAYER_INCOMPLETE:{','.join(dict.fromkeys(incomplete))}"]}
     if sem["status"] != "JUDGED" or sem["verdict"] not in DECISIVE_SUPPORT:
@@ -49,9 +54,9 @@ def resolve_slots_v1(claim: dict[str, Any]) -> dict[str, Any]:
     return {"decision": "ADMIT", "resolutionLayer": "COMPOSITE", "reasons": [f"SEMANTIC_{sem['verdict']}", "DETERMINISTIC_LAYERS_CLEAN"]}
 
 
-def resolve_and_seal_v1(claim: dict[str, Any]) -> dict[str, Any]:
+def resolve_and_seal_v1(claim: dict[str, Any], ontology_required: bool = False) -> dict[str, Any]:
     """Applies the decision to a validation dict, re-seals it (claimChecksum/validationId/validationChecksum) and re-validates with the strict mirror."""
-    outcome = resolve_slots_v1(claim)
+    outcome = resolve_slots_v1(claim, ontology_required)
     body = {k: v for k, v in claim.items() if k not in ("validationId", "validationChecksum", "claimChecksum")}
     body["result"] = {"decision": outcome["decision"], "escalationRevision": ESCALATION_REVISION}
     body["resolutionLayer"] = outcome["resolutionLayer"]

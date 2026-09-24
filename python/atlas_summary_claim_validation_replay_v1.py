@@ -7,7 +7,9 @@ Persists nothing to Postgres/Qdrant/Valkey/Neo4j and stores no summaries.
 """
 from __future__ import annotations
 
+import hashlib
 import json
+import subprocess
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -15,7 +17,7 @@ from pathlib import Path
 from atlas_doc_coordinate import canonical_sha256_v1
 from atlas_summary_claim_judge_replay_v1 import LLAMA, claims_of, psql_row
 from atlas_summary_claim_judge_v1 import PROMPT_REVISION, build_judge_input_body_v1, http_transport, judge_claim_v1, resolve_model, seal_judge_input_v1
-from atlas_summary_claim_resolution_v1 import layer_telemetry_v1, resolve_and_seal_v1
+from atlas_summary_claim_resolution_v1 import ESCALATION_REVISION, layer_telemetry_v1, resolve_and_seal_v1
 from atlas_summary_claim_validation_v1 import SCHEMA, SummaryClaimValidation, seal_v1
 from atlas_summary_faithfulness_v1 import validate_summary_claim_numeric_v1, validate_summary_claim_technical_tokens_v1, validate_summary_claim_versions_v1
 
@@ -28,7 +30,19 @@ SLOT_FIELDS = {
 }
 
 
-def one_pass(items: list[dict], transport, model: dict) -> list[dict]:
+SPINE_MODULES = ["python/atlas_summary_claim_validation_v1.py", "python/atlas_summary_faithfulness_v1.py", "python/atlas_summary_claim_span_v1.py", "python/atlas_summary_claim_judge_v1.py",
+                 "python/atlas_summary_claim_resolution_v1.py", "python/atlas_summary_claim_validation_replay_v1.py", "python/atlas_doc_coordinate.py",
+                 "sveltekit-frontend/src/lib/server/atlas/docs/summary-claim-validation-v1.ts", "sveltekit-frontend/src/lib/server/atlas/docs/summary-judge-input-v1.ts"]
+
+
+def revisions() -> dict:
+    """Immutable identity of the code that produced the receipt: content sha256 per spine module (works uncommitted) + HEAD and whether each module is clean vs HEAD."""
+    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    dirty = set(subprocess.run(["git", "status", "--porcelain", "--"] + SPINE_MODULES, cwd=ROOT, capture_output=True, text=True).stdout.replace("\\", "/").split())
+    return {"gitHead": head, "modules": {m: {"sha256": hashlib.sha256((ROOT / m).read_bytes()).hexdigest(), "modifiedVsHead": m in dirty} for m in SPINE_MODULES}}
+
+
+def one_pass(items: list[dict], transport, model: dict, lineage: dict) -> list[dict]:
     resolved: list[dict] = []
     for item in items:
         row = psql_row(item["chunkId"], item["chunkEvidenceRevision"])
@@ -45,7 +59,8 @@ def one_pass(items: list[dict], transport, model: dict) -> list[dict]:
             findings = {**det, "sourceSpan": {"status": "NO_CLAIMED_SPAN", "spans": []}}
             body_in = build_judge_input_body_v1(row=row, expected_chunk_id=item["chunkId"], expected_revision=item["chunkEvidenceRevision"], summary_output_checksum=summary_checksum,
                                                 metadata=meta, claim_ordinal=ordinal, claim_text=claim, findings=findings)
-            sem = judge_claim_v1(seal_judge_input_v1(body_in), transport, model)
+            sealed_in = seal_judge_input_v1(body_in)
+            sem = judge_claim_v1(sealed_in, transport, model)
             body = {
                 "schema": SCHEMA, "chunkId": item["chunkId"], "chunkEvidenceRevision": item["chunkEvidenceRevision"], "analysisId": None,
                 "summaryInputChecksum": input_checksum, "summaryOutputChecksum": summary_checksum, "claimOrdinal": ordinal, "claimText": claim,
@@ -58,7 +73,9 @@ def one_pass(items: list[dict], transport, model: dict) -> list[dict]:
             }
             sealed = {**body, **seal_v1(body)}
             SummaryClaimValidation.model_validate(sealed)  # the composed pre-resolution object must itself be a valid sealed contract
-            resolved.append(resolve_and_seal_v1(sealed))
+            final = resolve_and_seal_v1(sealed)
+            lineage[final["validationId"]] = {"judgeInputChecksum": sealed_in["judgeInputChecksum"], "judgePromptRevision": sealed_in["promptRevision"]}
+            resolved.append(final)
     return resolved
 
 
@@ -67,8 +84,10 @@ def main() -> int:
     transport = http_transport(LLAMA, model["id"])
     src = json.loads((ROOT / "docs/reports/external-doc-summary-faithfulness-v1.json").read_text(encoding="utf-8"))
     t0 = time.perf_counter()
-    first = one_pass(src["items"], transport, model)
-    second = one_pass(src["items"], transport, model)
+    lin1: dict = {}
+    lin2: dict = {}
+    first = one_pass(src["items"], transport, model, lin1)
+    second = one_pass(src["items"], transport, model, lin2)
     by_id = {c["validationId"]: c for c in second}
     unstable = [{"validationId": c["validationId"], "claim": c["claimText"], "pass1": c["result"]["decision"], "pass2": by_id[c["validationId"]]["result"]["decision"],
                  "semantic1": c["semantic"]["verdict"], "semantic2": by_id[c["validationId"]]["semantic"]["verdict"]}
@@ -76,8 +95,33 @@ def main() -> int:
     judge_errors = sum(c["semantic"]["status"] == "JUDGE_ERROR" for c in first)
     admitted_with_det_fail = [c["validationId"] for c in first if c["result"]["decision"] == "ADMIT" and any(c[k]["status"] == "FAIL" for k in ("technical", "numeric", "version"))]
     unresolved = [c["validationId"] for c in first if c["resolutionLayer"] == "NOT_RESOLVED" or c["result"]["decision"] == "PENDING"]
+    rev = revisions()
+    rows = []
+    for c in first:
+        lin = lin1[c["validationId"]]
+        rows.append({
+            "chunkId": c["chunkId"], "chunkEvidenceRevision": c["chunkEvidenceRevision"], "summaryInputChecksum": c["summaryInputChecksum"], "summaryOutputChecksum": c["summaryOutputChecksum"],
+            "claimOrdinal": c["claimOrdinal"], "claimChecksum": c["claimChecksum"], "validationId": c["validationId"], "validationChecksum": c["validationChecksum"],
+            "judgeInputChecksum": lin["judgeInputChecksum"], "judgePromptRevision": lin["judgePromptRevision"], "judgeModelRevision": c["semantic"]["judgeModelRevision"],
+            "technical": c["technical"]["status"], "numeric": c["numeric"]["status"], "version": c["version"]["status"], "sourceSpan": c["sourceSpan"]["status"],
+            "semantic": c["semantic"]["verdict"] or c["semantic"]["status"], "ontology": c["ontology"]["status"],
+            "resolutionPolicyRevision": c["result"]["escalationRevision"], "resolutionLayer": c["resolutionLayer"], "finalDecision": c["result"]["decision"],
+            "reproducedInSecondPass": next((x["validationChecksum"] for x in second if x["validationId"] == c["validationId"]), None) == c["validationChecksum"],
+        })
+    sha = lambda v: isinstance(v, str) and len(v) == 64 and all(ch in "0123456789abcdef" for ch in v)
+    perClaim = {
+        "chunkRevisionQualified": all(r["chunkEvidenceRevision"].startswith("sha256:") for r in rows),
+        "summaryInputSealed": all(sha(r["summaryInputChecksum"]) for r in rows), "summaryOutputSealed": all(sha(r["summaryOutputChecksum"]) for r in rows),
+        "claimChecksumBound": all(sha(r["claimChecksum"]) for r in rows), "judgeInputSealed": all(sha(r["judgeInputChecksum"]) for r in rows),
+        "semanticResultBound": all(r["judgeModelRevision"] and r["judgePromptRevision"] for r in rows if r["semantic"] != "JUDGE_ERROR"),
+        "resolverRevisionBound": all(r["resolutionPolicyRevision"] == ESCALATION_REVISION for r in rows), "finalDecisionReproducible": all(r["reproducedInSecondPass"] for r in rows),
+    }
+    all_committed = not any(m["modifiedVsHead"] for m in rev["modules"].values())
     receipt = {
-        "schema": "atlas.summary-claim-validation-replay.v1", "generatedAt": datetime.now(timezone.utc).isoformat(), "gate": "VAL-10",
+        "schema": "atlas.summary-claim-validation-replay.v1", "generatedAt": datetime.now(timezone.utc).isoformat(), "gate": "VAL10_19_CHUNK_POST_RESOLUTION_ELIGIBILITY_REPLAY",
+        "resolutionPolicyRevision": ESCALATION_REVISION, "codeRevisions": rev, "codeCommittedAtGeneration": all_committed,
+        "cohort": {"chunks": len(src["items"]), "frozenFrom": "docs/reports/external-doc-summary-faithfulness-v1.json"}, "perClaimEligibility": perClaim,
+        "eligibilityReplayPassed": all(perClaim.values()) and not unstable and not unresolved and not admitted_with_det_fail and all_committed, "lineage": rows,
         "backend": {"kind": "llama-server (NOT Ollama)", "url": LLAMA, "resolvedModel": model, "promptRevision": PROMPT_REVISION},
         "validatorRevision": VALIDATOR_REVISION, "chunks": len(src["items"]), "claims": len(first), "elapsedSeconds": round(time.perf_counter() - t0),
         "telemetry": layer_telemetry_v1(first), "judgeErrors": judge_errors,
