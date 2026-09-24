@@ -1,15 +1,15 @@
 {
   "schema": "atlas.openspec-directory-graph.v1",
   "root": "C:\\Users\\james\\Videos\\deeds-web-app",
-  "generatedAt": "2026-09-20T08:39:46.789Z",
+  "generatedAt": "2026-09-20T19:00:45.908Z",
   "summary": {
     "files": 5000,
-    "directories": 672,
+    "directories": 669,
     "importEdges": 82,
     "crossDirectoryEdges": 9,
-    "treeNodeEvidenceFiles": 47,
-    "graphifyEvidenceFiles": 195,
-    "graphifyArtifacts": 210,
+    "treeNodeEvidenceFiles": 48,
+    "graphifyEvidenceFiles": 196,
+    "graphifyArtifacts": 212,
     "graphifyArtifactsSkipped": 0,
     "graphifyRelationEdges": 0,
     "openspecEvidenceFiles": 76
@@ -190,7 +190,7 @@
     },
     {
       "topic": "identity-lineage",
-      "count": 722
+      "count": 723
     },
     {
       "topic": "agent-protocols",
@@ -210,7 +210,7 @@
     },
     {
       "topic": "governance-promotion",
-      "count": 79
+      "count": 78
     },
     {
       "topic": "fusion-context-prefill",
@@ -241,7 +241,7 @@
     {
       "directory": "",
       "files": 460,
-      "bytes": 6064789,
+      "bytes": 6083634,
       "inboundEdges": 0,
       "outboundEdges": 0,
       "topics": [
@@ -301,8 +301,8 @@
     },
     {
       "directory": ".tmp",
-      "files": 412,
-      "bytes": 451632268,
+      "files": 414,
+      "bytes": 454136130,
       "inboundEdges": 0,
       "outboundEdges": 0,
       "topics": [
@@ -312,7 +312,7 @@
         },
         {
           "topic": "other",
-          "count": 91
+          "count": 93
         },
         {
           "topic": "semantic-ann",
@@ -1467,6 +1467,35 @@
       ]
     },
     {
+      "directory": ".tmp/atlas",
+      "files": 20,
+      "bytes": 13874381,
+      "inboundEdges": 0,
+      "outboundEdges": 0,
+      "topics": [
+        {
+          "topic": "identity-lineage",
+          "count": 16
+        },
+        {
+          "topic": "agent-workflow",
+          "count": 1
+        },
+        {
+          "topic": "chunk-ast-symbol",
+          "count": 1
+        },
+        {
+          "topic": "other",
+          "count": 1
+        },
+        {
+          "topic": "semantic-ann",
+          "count": 1
+        }
+      ]
+    },
+    {
       "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/cffi",
       "files": 20,
       "bytes": 337601,
@@ -1534,35 +1563,6 @@
         {
           "topic": "chunk-ast-symbol",
           "count": 19
-        }
-      ]
-    },
-    {
-      "directory": ".tmp/atlas",
-      "files": 19,
-      "bytes": 10725436,
-      "inboundEdges": 0,
-      "outboundEdges": 0,
-      "topics": [
-        {
-          "topic": "identity-lineage",
-          "count": 15
-        },
-        {
-          "topic": "agent-workflow",
-          "count": 1
-        },
-        {
-          "topic": "chunk-ast-symbol",
-          "count": 1
-        },
-        {
-          "topic": "other",
-          "count": 1
-        },
-        {
-          "topic": "semantic-ann",
-          "count": 1
         }
       ]
     },
@@ -11326,45 +11326,6 @@
           "count": 1
         }
       ]
-    },
-    {
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/rec",
-      "files": 1,
-      "bytes": 85,
-      "inboundEdges": 0,
-      "outboundEdges": 0,
-      "topics": [
-        {
-          "topic": "other",
-          "count": 1
-        }
-      ]
-    },
-    {
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/strings",
-      "files": 1,
-      "bytes": 85,
-      "inboundEdges": 0,
-      "outboundEdges": 0,
-      "topics": [
-        {
-          "topic": "other",
-          "count": 1
-        }
-      ]
-    },
-    {
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing",
-      "files": 1,
-      "bytes": 6493,
-      "inboundEdges": 0,
-      "outboundEdges": 0,
-      "topics": [
-        {
-          "topic": "governance-promotion",
-          "count": 1
-        }
-      ]
     }
   ],
   "graphify": {
@@ -11562,6 +11523,8 @@
       "docs/reports/graphify-symbol-extractor-v1-1789268064711.json",
       "docs/reports/graphify-symbol-extractor-v1-1789325136816.json",
       "docs/reports/graphify-symbol-extractor-v1-1789325171985.json",
+      "docs/reports/graphify-symbol-extractor-v1-1789927608484.json",
+      "docs/reports/graphify-symbol-extractor-v1-1789927649331.json",
       "docs/reports/graphify-task-candidates-receipt.json",
       "docs/reports/graphify-tournament-admission-v1.json",
       "docs/reports/graphify-workspace-manifest-completeness-latest.json",
@@ -76390,7 +76353,7 @@
       "path": ".tmp/atlas-nlp-analysis-smoke-v1.json",
       "directory": ".tmp",
       "extension": ".json",
-      "bytes": 12538,
+      "bytes": 12552,
       "primaryTopic": "identity-lineage",
       "secondaryTopics": [
         "chunk-ast-symbol",
@@ -76879,6 +76842,57 @@
       "graphifyEvidence": false
     },
     {
+      "path": ".tmp/atlas/ast-source-authority-cohort-v1.json",
+      "directory": ".tmp/atlas",
+      "extension": ".json",
+      "bytes": 219865,
+      "primaryTopic": "identity-lineage",
+      "secondaryTopics": [
+        "chunk-ast-symbol",
+        "semantic-ann",
+        "graph-topology",
+        "clustering-taxonomy",
+        "fusion-context-prefill",
+        "residency-cache",
+        "agent-protocols",
+        "human-feedback-rl",
+        "agent-workflow",
+        "governance-promotion",
+        "ui-admin",
+        "data-postgres"
+      ],
+      "concepts": [
+        "canonical identity",
+        "packet revision",
+        "workspace revision",
+        "source revision",
+        "registry",
+        "provenance",
+        "chunk",
+        "AST",
+        "CST",
+        "tree_node",
+        "Tree-sitter",
+        "AST-grep",
+        "symbol",
+        "span",
+        "semantic_768",
+        "embedding",
+        "Qdrant",
+        "cuVS",
+        "CAGRA",
+        "KNN"
+      ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": true,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": true
+    },
+    {
       "path": ".tmp/atlas/canary-supersession-plan-v1.json",
       "directory": ".tmp/atlas",
       "extension": ".json",
@@ -77221,7 +77235,7 @@
       "path": ".tmp/atlas/feature-ontology-tuples-t0-pre-resolution-v1.rehearsal.json",
       "directory": ".tmp/atlas",
       "extension": ".json",
-      "bytes": 10453081,
+      "bytes": 13382161,
       "primaryTopic": "other",
       "secondaryTopics": [],
       "concepts": [],
@@ -78236,6 +78250,40 @@
         "schema",
         "materialized read model"
       ],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/cache-a.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 1250174,
+      "primaryTopic": "other",
+      "secondaryTopics": [],
+      "concepts": [],
+      "graph": {
+        "inboundImports": 0,
+        "outboundImports": 0
+      },
+      "treeNodeEvidence": false,
+      "graphifyTreeNodeCount": 0,
+      "openspecEvidence": false,
+      "graphifyEvidence": false
+    },
+    {
+      "path": ".tmp/cache-b.json",
+      "directory": ".tmp",
+      "extension": ".json",
+      "bytes": 1253157,
+      "primaryTopic": "other",
+      "secondaryTopics": [],
+      "concepts": [],
       "graph": {
         "inboundImports": 0,
         "outboundImports": 0
@@ -83167,7 +83215,7 @@
       "path": ".tmp/knowledge-source-snapshot-live-v1.json",
       "directory": ".tmp",
       "extension": ".json",
-      "bytes": 145895,
+      "bytes": 146412,
       "primaryTopic": "identity-lineage",
       "secondaryTopics": [
         "chunk-ast-symbol",
@@ -120769,64 +120817,6 @@
       "graphifyEvidence": false
     },
     {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/rec/__init__.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/rec",
-      "extension": ".py",
-      "bytes": 85,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/strings/__init__.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/strings",
-      "extension": ".py",
-      "bytes": 85,
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
-      "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing/print_coercion_tables.py",
-      "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/testing",
-      "extension": ".py",
-      "bytes": 6493,
-      "primaryTopic": "governance-promotion",
-      "secondaryTopics": [],
-      "concepts": [
-        "OpenSpec",
-        "completion envelope",
-        "authorization",
-        "authority",
-        "promotion",
-        "invariant"
-      ],
-      "graph": {
-        "inboundImports": 0,
-        "outboundImports": 0
-      },
-      "treeNodeEvidence": false,
-      "graphifyTreeNodeCount": 0,
-      "openspecEvidence": false,
-      "graphifyEvidence": false
-    },
-    {
       "path": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy/version.py",
       "directory": ".tmp/langextract-1.6-probe/Lib/site-packages/numpy",
       "extension": ".py",
@@ -129809,10 +129799,10 @@
       "graphifyEvidence": false
     },
     {
-      "path": "claude.md",
+      "path": "CLAUDE.md",
       "directory": "",
       "extension": ".md",
-      "bytes": 336396,
+      "bytes": 354549,
       "primaryTopic": "other",
       "secondaryTopics": [],
       "concepts": [],
@@ -134944,7 +134934,7 @@
       "path": "package.json",
       "directory": "",
       "extension": ".json",
-      "bytes": 38534,
+      "bytes": 39226,
       "primaryTopic": "identity-lineage",
       "secondaryTopics": [
         "chunk-ast-symbol",
@@ -149228,5 +149218,5 @@
     "Taxonomy labels are deterministic navigation metadata and do not alter OpenSpec execution state."
   ],
   "writesPerformed": false,
-  "semanticChecksum": "c96fcffec4d96147bbfa9dec9d4969294af9050203806dc772ddc0dbb9b0b34e"
+  "semanticChecksum": "308087e8bddb49fd64c7dd0b4906cd443ae6bb97460833ce01388d50760cf363"
 }
