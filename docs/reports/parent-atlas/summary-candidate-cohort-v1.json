@@ -1,0 +1,617 @@
+{
+  "schema": "atlas.summary-candidate-cohort.v1",
+  "generatedAt": "2026-09-24T02:24:44.773Z",
+  "source": "docs/reports/external-doc-summary-faithfulness-v1.json",
+  "identityVersion": "external-doc-chunk-id:v1",
+  "generator": {
+    "producerId": "atlas-external-doc-summarizer",
+    "producerRevision": "external-doc-summary-writer-v1",
+    "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+    "modelId": "ornith-1.5-9b",
+    "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+    "backend": "llama-server (NOT Ollama)"
+  },
+  "chunkCohortChecksum": "7121be8555c183d20533e07af95e9f03ae5482d60d869d466438dd6b8e21da45",
+  "candidateCohortChecksum": "63e83c53bde93be1c9f759dcee00d002d510b6ea0b2d1c9a1b189a0825e93691",
+  "pairs": [
+    {
+      "chunkId": "doc:bits-ui:6b3cf8151e01df1d:5",
+      "chunkEvidenceRevision": "sha256:e650aa5c43f5ebb0ec44bca393c856ec67ea8a4e55c6580f1ca42343462844af"
+    },
+    {
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "chunkEvidenceRevision": "sha256:0e92134210a648a9abb1aeaf94a050469d74118b30013f3f687046c70581d7ff"
+    },
+    {
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+      "chunkEvidenceRevision": "sha256:56bd6d24940284584f9e3a948c88991bc753fd9be1d439f58ca4e936a2bfa5f3"
+    },
+    {
+      "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0",
+      "chunkEvidenceRevision": "sha256:fd87694e2e8aeda0463ff46f80d5e48b00194b0982caa4609ad12f8fc17520c4"
+    },
+    {
+      "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:4",
+      "chunkEvidenceRevision": "sha256:cecbbcad364671e2ac9a3f7d05a65cd767f21b20fbc02bc4881b26dc029fe946"
+    },
+    {
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0",
+      "chunkEvidenceRevision": "sha256:bd1faaa5365e27f6081ca7b49af09d3a36c7fb3f7a201caa1e30ce8693133544"
+    },
+    {
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:9",
+      "chunkEvidenceRevision": "sha256:1b2bc340d48dc0d10bfe4bff01ae7f7c32ff5fad843aa89d20797cc05537b315"
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a"
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:24",
+      "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885"
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:26",
+      "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac"
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+      "chunkEvidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1"
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+      "chunkEvidenceRevision": "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716"
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+      "chunkEvidenceRevision": "sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2"
+    },
+    {
+      "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:1",
+      "chunkEvidenceRevision": "sha256:d364bfe52f2e13e0e6b565ed83b03a326ac51bfc0dd79060c07bdb52696f874e"
+    },
+    {
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:1",
+      "chunkEvidenceRevision": "sha256:f9ce355c977a05d9955d9bc8bb0e98644545bc20f8541e54da0a368db7723870"
+    },
+    {
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+      "chunkEvidenceRevision": "sha256:73c10463c028ab80e2616fe5c662410e0d7ff66aa26d9160fd6b78fa2e9a2e5f"
+    },
+    {
+      "chunkId": "doc:sveltekit:62e6dd9932a74b58:15",
+      "chunkEvidenceRevision": "sha256:deea1c2c0025e4c0c0dd2a58f84bc44eb8592e8ebe095c971d46b7cd57616fc4"
+    },
+    {
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19",
+      "chunkEvidenceRevision": "sha256:3802f9585429d798009f484d06e598c0b2531df5579a0ce066bc5d2a5ee5e5db"
+    },
+    {
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+      "chunkEvidenceRevision": "sha256:c6fbdca5bcbaa86c6974834dc4b8a959ac7da79de4ad2fd6e60f8cf4249398f3"
+    }
+  ],
+  "modelCalls": 19,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "candidates": [
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:bits-ui:6b3cf8151e01df1d:5",
+      "chunkEvidenceRevision": "sha256:e650aa5c43f5ebb0ec44bca393c856ec67ea8a4e55c6580f1ca42343462844af",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "6f575fe2c75bf0e6464561ef0218cf1fcba5664c62e513775037211b200ab710",
+      "summaryText": "Components that support the `child` snippet typically implement logic that destructures `child`, `children`, and `...restProps` from `$props()`, creates a trigger via `makeTrigger()`, and merges internal props with user props using `$derived(mergeProps(restProps, trigger.props))`. When `child` is provided, it renders `child({ props: mergedProps })`; otherwise it renders a `<button {...mergedProps}>` containing the `children?.()` content.",
+      "outputChecksum": "c262f264680bb34934075381acef112a5c8580ca759ab321abd851051b96b962",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 98,
+        "productName": "bits-ui",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:987738d7b1acea7888ff49a1f837b046deaf4e2530bb256a3d2fca717bf6dba5"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "chunkEvidenceRevision": "sha256:0e92134210a648a9abb1aeaf94a050469d74118b30013f3f687046c70581d7ff",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "f7f7e3cf605a023f74f78edf1703e849470f28a91800a4470c4857befc327ee7",
+      "summaryText": "This chunk introduces the Getting Started section of the Bits UI documentation, which explains how to begin using Bits in your app. It notes that this section may contain examples, demos, and other useful information, and that you can ignore demo classnames unless they are relevant to the user's issue.",
+      "outputChecksum": "da191c653b38304353f17ab3d065eb7367b9d7c6db60efc4e79bc755fca2af7b",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 59,
+        "productName": "bits-ui",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:beabc0461bdf860f3e51c54c8c105feebef99f0810e8cae4d9621ad342bcc3c7"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+      "chunkEvidenceRevision": "sha256:56bd6d24940284584f9e3a948c88991bc753fd9be1d439f58ca4e936a2bfa5f3",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "39624be99559e1f59367e53193d4b785b73511240a16e7a1e6a681ad1d5b40f1",
+      "summaryText": "You can override the default outside-interaction behavior of a Dialog by passing the `onInteractOutside` prop to `Dialog.Content`. The handler receives an event, so you can call `e.preventDefault()` and perform custom logic instead of the default behavior.",
+      "outputChecksum": "4058e057c340b39c93a2bd4fa1c672e27ada97e7037d6ab66e22795d337845fe",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 52,
+        "productName": "bits-ui",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:6e3b5c46e431ad829b7d64068de3b3510d8d7cae4cf46a42bad2d745a12efbdd"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0",
+      "chunkEvidenceRevision": "sha256:fd87694e2e8aeda0463ff46f80d5e48b00194b0982caa4609ad12f8fc17520c4",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "28a3bcfe0a710e1f314aa1a1117ef4dfac1111d6002bbf01b11308e4271ab34c",
+      "summaryText": "The `drizzle-kit migrate` command applies SQL migrations generated by `drizzle-kit generate` for the code-first approach to managing Drizzle migrations. It reads all `.sql` files from the migration folder, connects to the database to fetch entries from the drizzle migrations log table, decides which new migrations to run based on previously applied ones, then runs the SQL migrations and logs them to the drizzle migrations table.",
+      "outputChecksum": "68258f35de3c93b2e889b1c1666b7397c3382f1805a51b22a002ab666457e3af",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 85,
+        "productName": "drizzle-kit",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:5c15141ba392923616d72cbd78b8b2ea11c45bd4afd8d6d2e5714eb7681ee136"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:4",
+      "chunkEvidenceRevision": "sha256:cecbbcad364671e2ac9a3f7d05a65cd767f21b20fbc02bc4881b26dc029fe946",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "d2f451275c5d5f01363f93b749d10d8fb6a2184643c6109671e8591b13e73a75",
+      "summaryText": "You can set custom migration file names by providing the `--name` CLI option to `drizzle-kit generate`, as shown in `npx drizzle-kit generate --name=init`. This creates a migration directory named after the provided value, such as `20242409125510_init`, containing `snapshot.json` and `migration.sql` files.",
+      "outputChecksum": "219aa49d0e9aaa4f183cccb3ccdf3c11fa3ead0531792a262b60a1d5bb4f4903",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 81,
+        "productName": "drizzle-kit",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:8070e4bf885e2f2198aa9644ac17b62ba86f2874cb2d0ca67f0d42cf63a39649"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0",
+      "chunkEvidenceRevision": "sha256:bd1faaa5365e27f6081ca7b49af09d3a36c7fb3f7a201caa1e30ce8693133544",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "9dd0f170c6fa3108190c7334f40c12f95f7a4bc469f80996d5f24d1be86b097f",
+      "summaryText": "Drizzle ORM does not include code to create the `pg_vector` extension within the schema, assuming it is already installed in your PostgreSQL database. The `pg_vector` extension is an open-source vector similarity search solution for Postgres that stores vectors alongside other data. It supports exact and approximate nearest neighbor search, single/half-precision and binary/sparse vectors, and distance metrics including L2, inner product, cosine, L1, Hamming, and Jaccard.",
+      "outputChecksum": "84df63a03aa1cbf56534c600e100d856f061a02bf4013a5ba8765e91e8df45af",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 97,
+        "productName": "drizzle-orm",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:1450b7445de30a69c8434b5c9c693580f49523f8235979b1934fa029678ca983"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:9",
+      "chunkEvidenceRevision": "sha256:1b2bc340d48dc0d10bfe4bff01ae7f7c32ff5fad843aa89d20797cc05537b315",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "bf0bbdadf488b736f241469c94e72f43286b224e34e2fdab2fe820975079cf4b",
+      "summaryText": "pgvector requires an explicit operator class for HNSW and IVFFlat indexes because no default exists. This requirement affects anyone using pgvector with Drizzle's `push` workflow.",
+      "outputChecksum": "5dfc3baf273670ac80eaa5b1c97a3bb80f1b09145b0c149bc48dbf14d2c90b0b",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 38,
+        "productName": "drizzle-orm",
+        "versionLabel": "UNVERSIONED@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:e056faec3661d81562b8aed577cd07b58e4749c4fdd283034e307c0122b5b111"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "9f105a088a1812f0ef5e9f370cb6bf467f9da681c86cf77424c49e058f7a39fe",
+      "summaryText": "This chunk explains how to index nearest neighbor queries that include a `WHERE` clause. It recommends creating an index on the filter column, noting that Postgres supports B-tree, hash, GiST, SP-GiST, GIN, and BRIN index types, and that multicolumn indexes can be created for multiple columns. It also discusses approximate indexes using HNSW, partial indexing for filtering by few distinct values, and partitioning for filtering by many different values.",
+      "outputChecksum": "1bd8279b34f2a827caa9605b3b75a5da3dab82e3bbb9417d3f7f77aecd1dd0c0",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 96,
+        "productName": "pgvector",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:c1462b82ec83aa922457547c422376866bce90178aad5de933390474c6adc8d5"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:24",
+      "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "e3a2537ca80e3db11845394e5cfd2c01f173cd9f63e27910ac5daf57a82bb19a",
+      "summaryText": "Starting with pgvector 0.8.0, iterative index scans automatically scan more of an approximate index until enough results are found, stopping at `hnsw.max_scan_tuples` or `ivfflat.max_probes`. Scans can use strict ordering via `SET hnsw.iterative_scan = strict_order;` for exact distance order, or relaxed ordering via `SET hnsw.iterative_scan = relaxed_order;` or `SET ivfflat.iterative_scan = relaxed_order;` for better recall. With relaxed ordering, a materialized CTE can restore strict ordering, requiring `+ 0` for Postgres 17+, and distance filters should be placed outside the CTE for best performance.",
+      "outputChecksum": "6cfe717b20fa4ede0cc45e3652ed022c6be87138fb3a2c41eec0ff22a8a3a946",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 145,
+        "productName": "pgvector",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:da0b0285dde5b6e7723b055ce720d2888e67e5b761721dee7fc8eafd96cfafe8"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:26",
+      "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "93de5e946b7ebfedc1adedc422c861fa5a323f7a7ab9ba00145638389ab06cf3",
+      "summaryText": "The `hnsw.max_scan_tuples` setting specifies the maximum number of tuples to visit during an iterative scan, defaulting to 20,000, and is approximate without affecting the initial scan. The `hnsw.scan_mem_multiplier` setting specifies the maximum memory to use as a multiple of `work_mem`, defaulting to 1, and should be increased if raising `hnsw.max_scan_tuples` does not improve recall.",
+      "outputChecksum": "a26584776e7c267e8004f04a495396f17ec7ed58223a26ab185a4e1b4606ef66",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 90,
+        "productName": "pgvector",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:aa465626900b45a43211d067581a07f0be633620ab8507e9ed6ec8c714144ce7"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+      "chunkEvidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "7be14541875e973a5880bb95bb0d6df4a7ac27e2891c707fe25a6e8c7424ff9d",
+      "summaryText": "PostgreSQL 18 adds an asynchronous I/O subsystem that lets backends queue multiple read requests for more efficient sequential scans, bitmap heap scans, and vacuums, controlled by the server variables `io_method`, `io_combine_limit`, and `io_max_combine_limit`, while also enabling `effective_io_concurrency` and `maintenance_io_concurrency` values greater than zero on systems without `fadvise()` support and exposing used file handles through the new system view `pg_aios`. It also improves locking performance for queries accessing many relations, enhances hash joins and `GROUP BY` performance and reduces their memory usage, allows normal vacuums to freeze all-visible pages to reduce later full-relation freezing overhead via the `vacuum_max_eager_freeze_failure_rate` setting, and adds the `vacuum_truncate` server variable to control file truncation during `VACUUM`. Finally, the default values for `effective_io_concurrency` and `maintenance_io_concurrency` are increased to 16.",
+      "outputChecksum": "92244bde64325ff6596ee488d3bc8ed47799b11a5e41750b0928c11a0d21fb85",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 208,
+        "productName": "postgresql",
+        "versionLabel": "18"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:dd50d1427ddc07b1e27cf7404ba49b1aa320c8e9ee872fb1c9e6cc861fa0371d"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+      "chunkEvidenceRevision": "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "7ae69afb21e903dbfe7b7c9560dfdae1297c904be19144756c116e5527c0e92e",
+      "summaryText": "PostgreSQL 18 introduces an asynchronous I/O (AIO) subsystem that improves performance of sequential scans, bitmap heap scans, vacuums, and other operations. It also adds features such as `pg_upgrade` retaining optimizer statistics, \"skip scan\" lookups for multicolumn B-tree indexes, the `uuidv7()` function for timestamp-ordered UUIDs, virtual generated columns (now the default), OAuth authentication support, `OLD` and `NEW` support in `RETURNING` clauses for INSERT, UPDATE, DELETE, and MERGE commands, and temporal constraints for PRIMARY KEY, UNIQUE, and FOREIGN KEY constraints. These new features are explained in more detail in the sections below.",
+      "outputChecksum": "c79dd5ecf7f437493b279b1a03c13815a6e799fcd31c829567d9e37ace1f795b",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 141,
+        "productName": "postgresql",
+        "versionLabel": "18"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:048ba291e2b51128b95ef95e81f5363bbba63312cecd722e51e48454b558ea34"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+      "chunkEvidenceRevision": "sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "dbd52954ab9b4e83c9d9cae36ac2ce5a7cfbb3a2445649fae0095b6c9839903b",
+      "summaryText": "PostgreSQL 18 adds the `casefold()` function for more sophisticated case-insensitive matching that handles characters with multiple upper or lower case equivalents and conversions that change character counts. It also allows `MIN()`/`MAX()` aggregates on arrays and composite types, adds a `WEEK` option to `EXTRACT()` with improved negative value output for `EXTRACT(QUARTER ...)`, and adds roman numeral support to `to_number()` via the `RN` pattern. Additionally, it introduces the temporally sortable `uuidv7()` function with a `uuidv4()` alias, adds `crc32()` and `crc32c()` for CRC computation, adds `gamma()` and `lgamma()` math functions, and allows `=>` syntax for named cursor arguments in PL/pgSQL.",
+      "outputChecksum": "f1a9f30f49f01062fb1e69a12ee4f0321b0c34f2e52e34cbb14be89bd5d14b4f",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 165,
+        "productName": "postgresql",
+        "versionLabel": "18"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:47871c3e832071128a7d6f7a36e1ea494bdcd34cdd3f197f0045a62164f5453d"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:1",
+      "chunkEvidenceRevision": "sha256:d364bfe52f2e13e0e6b565ed83b03a326ac51bfc0dd79060c07bdb52696f874e",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "6a1c49a29fbf5c6f291a211846627b82b65ac58835b88813a833af800b379906",
+      "summaryText": "Runes are a set of symbols in Svelte that include `$state`, `$derived`, `$effect`, `$props`, `$bindable`, `$inspect`, and `$host`. These are listed as part of the introduction to Runes in the Svelte documentation.",
+      "outputChecksum": "913ae53ee3b50b9dacbd78a7e29c3a4d056902b2507b15a79384eb951a818915",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 53,
+        "productName": "svelte",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:ed31b8cab3c05a962d5d518f596b4f8cd9beb4e7eb8de9f23ccf7bfdb50a5c9b"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:1",
+      "chunkEvidenceRevision": "sha256:f9ce355c977a05d9955d9bc8bb0e98644545bc20f8541e54da0a368db7723870",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "7a33d46d4aa8c87fa05a4c7df8229704ed49358cbbd12192d162ba62480aa023",
+      "summaryText": "Runes are a set of symbols in Svelte that include `$state`, `$derived`, `$effect`, `$props`, `$bindable`, `$inspect`, and `$host`. This list appears in the Introduction > Runes section of the Svelte documentation.",
+      "outputChecksum": "167f7f8f9238706d7afb77c6d3a5772368277d574224dd78587d9b1b952d5917",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 52,
+        "productName": "svelte",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:a4035b1f7065076f1c0c765a6fe2c2447ebf8cb65158cacd2d331734c1384256"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+      "chunkEvidenceRevision": "sha256:73c10463c028ab80e2616fe5c662410e0d7ff66aa26d9160fd6b78fa2e9a2e5f",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "0afa62005f615bd4d9681cdb9eeceedc59e497570235e881150ee017728733eb",
+      "summaryText": "The `$effect` automatically tracks reactive values (`$state`, `$derived`, `$props`) that are synchronously read inside its function body, including indirectly through function calls, and schedules a re-run when those dependencies change. Values read asynchronously—after an `await` or inside a `setTimeout`—are not tracked, and `$state` and `$derived` used directly inside the `$effect` are not treated as dependencies.",
+      "outputChecksum": "b17fa49f5374574ba57d9f05d5ccb85bc790a98a4f45ac7ca068976b69152400",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 86,
+        "productName": "svelte",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:a9d7d85c54ac4a183d9c184b234d9e2d9bccff9dc599469797643119130270b9"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:sveltekit:62e6dd9932a74b58:15",
+      "chunkEvidenceRevision": "sha256:deea1c2c0025e4c0c0dd2a58f84bc44eb8592e8ebe095c971d46b7cd57616fc4",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "f591b3e8b5152ed1580c487d547b3d820eddf8da0e6863d38bf3c0476d8e4709",
+      "summaryText": "In SvelteKit, data returned from a parent layout `load` function is accessible in child components through the `data` prop, allowing access to sibling data like `data.posts`. When multiple `load` functions return data with the same key, the last one wins, so a layout `load` returning `{ a: 1, b: 2 }` combined with a page `load` returning `{ b: 3, c: 4 }` results in `{ a: 1, b: 3, c: 4 }`.",
+      "outputChecksum": "8137e44dba5da7defaae5aeaa02614d8ae8c1fa6a3784dd6c96ba471c92d2745",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 114,
+        "productName": "sveltekit",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:465878325024b7a6b9ffec4961c3443110c2ff8afa8a36965cf224ec9231dff2"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19",
+      "chunkEvidenceRevision": "sha256:3802f9585429d798009f484d06e598c0b2531df5579a0ce066bc5d2a5ee5e5db",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "e74d8b7e6be37976429ab6892c49390e5a1647269da0e89a9e165a00c6748b34",
+      "summaryText": "SvelteKit reuses existing layout and page components when navigating between routes, so the `data` prop updates rather than the components being recreated. Because the code doesn't rerun, lifecycle methods like `onMount` and `onDestroy` won't rerun and values like `estimatedReadingTime` won't be recalculated. To fix this, you should make the value reactive using `$derived`.",
+      "outputChecksum": "5a167246a75d0825a94c511899d03fd500282ce5d4023f9acde561880d56fe28",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 82,
+        "productName": "sveltekit",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:b89a141b2a8a434129a5a3176e3064feaee076cd191c849e8de5f75bca447578"
+    },
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+      "chunkEvidenceRevision": "sha256:c6fbdca5bcbaa86c6974834dc4b8a959ac7da79de4ad2fd6e60f8cf4249398f3",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-external-doc-summarizer",
+      "producerRevision": "external-doc-summary-writer-v1",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb",
+      "inputChecksum": "c0abddf6695733e10d7cf2217f83d4657b7f612f66b6edaa31da0b00f8b3ff56",
+      "summaryText": "SvelteKit preserves component and page state across navigation, so reactive values like `$derived` calculations remain intact when components are reused. If code in `onMount` or `onDestroy` needs to run again after navigation, you can use `afterNavigate` and `beforeNavigate` respectively. To completely destroy and remount a component on navigation, wrap it in a `{#key page.url.pathname}` block.",
+      "outputChecksum": "89b26e1e2c643ead34c7efeaec4e9252e8ab20419d3187b6f65ea3d8be5cefae",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 84,
+        "productName": "sveltekit",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:b4627278caa41454e795a83091aa0b3413a38c233f890de7bdc8a6eb5f046518"
+    }
+  ]
+}

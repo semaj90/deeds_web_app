@@ -42,14 +42,18 @@ def revisions() -> dict:
     return {"gitHead": head, "modules": {m: {"sha256": hashlib.sha256((ROOT / m).read_bytes()).hexdigest(), "modifiedVsHead": m in dirty} for m in SPINE_MODULES}}
 
 
-def one_pass(items: list[dict], transport, model: dict, lineage: dict) -> list[dict]:
+def one_pass(items: list[dict], transport, model: dict, lineage: dict, judge=None, validator_revision: str = VALIDATOR_REVISION, reader=None) -> list[dict]:
+    """`judge(sealed_judge_input) -> semantic slot` defaults to the live Ornith judge; an injected judge lets a replay reuse FROZEN verdicts with no model call.
+    An item may carry `summaryInputChecksum` (the candidate's own input seal); otherwise the chunk-text digest is used."""
+    judge = judge or (lambda sealed: judge_claim_v1(sealed, transport, model))
+    read_chunk = reader or psql_row  # `reader(chunk_id, revision) -> row` reads the canonical chunk at that exact revision
     resolved: list[dict] = []
     for item in items:
-        row = psql_row(item["chunkId"], item["chunkEvidenceRevision"])
+        row = read_chunk(item["chunkId"], item["chunkEvidenceRevision"])
         summary_checksum = canonical_sha256_v1({"text": item["summary"]})
         meta = {"product": row["product"], "productVersion": row["product_version"], "title": row["title"], "headingPath": row["heading_path"] or []}
         source_text = row["text"] + "\n" + " ".join(str(v) for v in (row["product"], row["product_version"], row["title"]) if v)
-        input_checksum = canonical_sha256_v1({"chunkId": item["chunkId"], "chunkEvidenceRevision": item["chunkEvidenceRevision"], "text": row["text"]})
+        input_checksum = item.get("summaryInputChecksum") or canonical_sha256_v1({"chunkId": item["chunkId"], "chunkEvidenceRevision": item["chunkEvidenceRevision"], "text": row["text"]})
         for ordinal, claim in enumerate(claims_of(item["summary"])):
             det = {
                 "technical": validate_summary_claim_technical_tokens_v1(source_text, claim),
@@ -60,7 +64,7 @@ def one_pass(items: list[dict], transport, model: dict, lineage: dict) -> list[d
             body_in = build_judge_input_body_v1(row=row, expected_chunk_id=item["chunkId"], expected_revision=item["chunkEvidenceRevision"], summary_output_checksum=summary_checksum,
                                                 metadata=meta, claim_ordinal=ordinal, claim_text=claim, findings=findings)
             sealed_in = seal_judge_input_v1(body_in)
-            sem = judge_claim_v1(sealed_in, transport, model)
+            sem = judge(sealed_in)
             body = {
                 "schema": SCHEMA, "chunkId": item["chunkId"], "chunkEvidenceRevision": item["chunkEvidenceRevision"], "analysisId": None,
                 "summaryInputChecksum": input_checksum, "summaryOutputChecksum": summary_checksum, "claimOrdinal": ordinal, "claimText": claim,
@@ -69,7 +73,7 @@ def one_pass(items: list[dict], transport, model: dict, lineage: dict) -> list[d
                 "semantic": {f: sem[f] for f in ("status", "verdict", "citedSpans", "unsupportedFragment", "judgeModelId", "judgeModelRevision", "judgePromptRevision", "independenceClass")},
                 "ontology": {"status": "NOT_RUN", "kernelRevision": None, "assertions": []},
                 "result": {"decision": "PENDING", "escalationRevision": None}, "resolutionLayer": "NOT_RESOLVED",
-                "validatorRevision": VALIDATOR_REVISION, "canonicalAuthority": False,
+                "validatorRevision": validator_revision, "canonicalAuthority": False,
             }
             sealed = {**body, **seal_v1(body)}
             SummaryClaimValidation.model_validate(sealed)  # the composed pre-resolution object must itself be a valid sealed contract

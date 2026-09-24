@@ -6,7 +6,14 @@
  * Modes:
  *   (default)           DRY RUN: real Ornith calls on a bounded sample, validates every row against ExternalDocAnalysisV1, 0 database writes.
  *   --rollback-canary   inserts the sample rows inside ONE transaction, reads them back, then ROLLS BACK (proves the writer; leaves 0 rows).
- *   --apply --limit N   BOUNDED persistent write of N chunks (needs env ATLAS_DOC_SUMMARY_AUTHORIZED=I_AUTHORIZE_EXTERNAL_DOC_SUMMARIES). A full-corpus run additionally needs the explicit flag --all.
+ *   --freeze-candidates <out.json> --cohort <faithfulness.json>
+ *                       generates each cohort chunk's summary ONCE (the only model call in the persistence chain), freezes immutable SummaryCandidateV1 objects with cohort checksums. 0 database writes.
+ *   --admit-frozen <cohort.json> --eligibility <evaluation.json>
+ *                       pure same-candidate admission of the frozen evidence (MAY_PERSIST / PERSISTENCE_NOT_AUTHORIZED per candidate). No database connection, no model.
+ *                       Optional --control <control-cohort.json> --control-eligibility <evaluation.json> adds a NEGATIVE CONTROL that must be refused.
+ *   --apply-frozen <cohort.json> --eligibility <evaluation.json> --limit N
+ *                       BOUNDED persistent write of the admitted frozen candidates' EXACT text (needs env ATLAS_DOC_SUMMARY_AUTHORIZED=I_AUTHORIZE_EXTERNAL_DOC_SUMMARIES). --limit is a ceiling. Never calls the model.
+ *   plain --apply / --all   REMOVED: an apply that regenerates summaries would persist text the validation never saw (TOCTOU). It now fails with APPLY_REQUIRES_FROZEN_CANDIDATES.
  * ADMISSION (VAL10B_SUMMARY_PERSISTENCE_ADMISSION_01): in EVERY mode each generated summary is run through python/atlas_summary_admission_v1.py (canonical chunk re-read, deterministic checks,
  *   Ornith judge, VAL-09) and only summaries whose claims are ALL ADMIT and whose sealed report binds this exact chunk revision and this exact text hash are ever inserted. --limit is a ceiling, not a target.
  *   If the admission process fails, nothing is written.
@@ -15,10 +22,12 @@
 import 'dotenv/config';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Pool } from 'pg';
 import { partitionByAdmissionV1 } from '../../src/lib/server/atlas/docs/summary-persistence-admission-v1.js';
+import { persistEligibleSummaryCandidatesV1, admitFrozenSummaryCandidateV1, SUMMARY_PERSISTENCE_POLICY_V1, type PersistenceDeps } from '../../src/lib/server/atlas/docs/summary-candidate-persistence-v1.js';
+import { CHUNK_IDENTITY_VERSION_V1, buildSummaryCandidateV1, computeCandidateCohortChecksumV1, computeChunkCohortChecksumV1 } from '../../src/lib/server/atlas/docs/summary-candidate-v1.js';
 import { ExternalDocAnalysisV1Schema, externalDocAnalysisId, type ExternalDocAnalysisV1 } from '../../src/lib/server/atlas/docs/external-doc-intelligence-contracts-v1.js';
 
 const ROOT = resolve(import.meta.dirname, '..', '..', '..');
@@ -30,6 +39,14 @@ const canary = args.includes('--rollback-canary');
 const limIdx = args.indexOf('--limit');
 const sample = limIdx >= 0 ? Number(args[limIdx + 1]) : 3;
 const all = args.includes('--all');
+const argAfter = (flag: string): string | null => { const i = args.indexOf(flag); return i >= 0 && args[i + 1] && !args[i + 1]!.startsWith('--') ? args[i + 1]! : null; };
+const freezeOut = argAfter('--freeze-candidates');
+const admitFrozenPath = argAfter('--admit-frozen');
+const applyFrozenPath = argAfter('--apply-frozen');
+const cohortSource = argAfter('--cohort');
+const eligibilityPath = argAfter('--eligibility');
+const controlPath = argAfter('--control');
+const controlEligibilityPath = argAfter('--control-eligibility');
 
 const PRODUCER_ID = 'atlas-external-doc-summarizer';
 const PRODUCER_REVISION = 'external-doc-summary-writer-v1';
@@ -88,7 +105,7 @@ const INSERT = `INSERT INTO atlas_external_doc_analyses (analysis_id, chunk_id, 
 	input_checksum, output_checksum, summary_text, entities, relations, metadata, canonical_authority) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'[]','[]',$13,false) ON CONFLICT (analysis_id) DO NOTHING`;
 const params = (a: ExternalDocAnalysisV1) => [a.analysisId, a.chunkId, a.chunkEvidenceRevision, a.analysisType, a.producerId, a.producerRevision, a.modelId, a.modelRevision, a.promptRevision, a.inputChecksum, a.outputChecksum, a.summaryText, JSON.stringify(a.metadata)];
 
-function runAdmission(items: { chunkId: string; chunkEvidenceRevision: string; summaryText: string }[]): Map<string, unknown> {
+function runAdmission(items: { chunkId: string; chunkEvidenceRevision: string; summaryInputChecksum: string; summaryText: string }[]): Map<string, unknown> {
 	if (items.length === 0) return new Map();
 	const r = spawnSync('python', [resolve(ROOT, 'python/atlas_summary_admission_v1.py')], { cwd: resolve(ROOT, 'python'), input: JSON.stringify({ items }), encoding: 'utf8', timeout: 1_800_000, maxBuffer: 256 * 1024 * 1024, env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
 	if (r.error || r.status !== 0) throw new Error(`ADMISSION_PROCESS_FAILED:${r.error?.message ?? `exit ${r.status}: ${(r.stderr ?? '').slice(-300)}`}`);
@@ -96,7 +113,124 @@ function runAdmission(items: { chunkId: string; chunkEvidenceRevision: string; s
 	return new Map(reports.map((rep) => [`${rep.chunkId}|${rep.chunkEvidenceRevision}`, rep]));
 }
 
+interface Pair { chunkId: string; chunkEvidenceRevision: string }
+const readJson = (path: string) => JSON.parse(readFileSync(resolve(ROOT, path), 'utf8')) as any;
+const writeReceipt = (path: string, value: unknown) => writeFileSync(resolve(ROOT, path), JSON.stringify(value, null, 2) + '\n');
+const NO_WRITES = { postgres: 0, qdrant: 0, valkey: 0, neo4j: 0, graphify: 0 };
+const CHUNK_SQL = `SELECT c.chunk_id, c.evidence_revision, c.text, c.heading_path, p.title, p.product, p.product_version FROM atlas_external_doc_chunks c JOIN atlas_external_doc_pages p ON p.id = c.page_id WHERE c.chunk_id = $1 AND c.evidence_revision = $2`;
+
+/** generateSummaryCandidateV1: the ONLY place in the persistence chain that calls the model. Read-only database access; writes only the JSON file it is given. */
+async function freezeMode(): Promise<void> {
+	if (!freezeOut || !cohortSource) throw new Error('FREEZE_REQUIRES: --freeze-candidates <out.json> --cohort <faithfulness.json>');
+	if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not set');
+	const pairs: Pair[] = (readJson(cohortSource).items as Pair[]).map((i) => ({ chunkId: i.chunkId, chunkEvidenceRevision: i.chunkEvidenceRevision }));
+	const model = await resolveModel();
+	const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+	const client = await pool.connect();
+	const failures: string[] = [];
+	const candidates: ReturnType<typeof buildSummaryCandidateV1>[] = [];
+	let modelCalls = 0;
+	try {
+		for (const pair of pairs) {
+			const chunk = (await client.query(CHUNK_SQL, [pair.chunkId, pair.chunkEvidenceRevision])).rows[0] as Chunk | undefined;
+			if (!chunk) { failures.push(`${pair.chunkId}:CHUNK_NOT_FOUND_AT_REVISION`); continue; }
+			try {
+				modelCalls += 1;
+				const out = await summarize(chunk, model.modelId);
+				candidates.push(buildSummaryCandidateV1({
+					chunkId: chunk.chunk_id, chunkEvidenceRevision: chunk.evidence_revision, identityVersion: CHUNK_IDENTITY_VERSION_V1, producerId: PRODUCER_ID, producerRevision: PRODUCER_REVISION,
+					modelId: model.modelId, modelRevision: model.modelRevision, promptRevision: PROMPT_REVISION, inputChecksum: sha(`${PROMPT_REVISION}\n${userContent(chunk)}`), summaryText: out.text,
+					generationMetadata: { backend: 'llama-server', baseUrl: LLAMA, temperature: 0.2, seed: 1729, maxTokens: 300, finishReason: out.finish, completionTokens: out.tokens, productName: chunk.product || 'unknown', versionLabel: chunk.product_version || 'unknown' }
+				}));
+			} catch (e) { failures.push(`${pair.chunkId}:${e instanceof Error ? e.message : e}`); }
+		}
+	} finally { client.release(); await pool.end(); }
+	if (failures.length) { console.error(JSON.stringify({ result: 'FREEZE_FAILED', failures })); process.exitCode = 1; return; }
+	const cohort = {
+		schema: 'atlas.summary-candidate-cohort.v1', generatedAt: new Date().toISOString(), source: cohortSource, identityVersion: CHUNK_IDENTITY_VERSION_V1,
+		generator: { producerId: PRODUCER_ID, producerRevision: PRODUCER_REVISION, promptRevision: PROMPT_REVISION, modelId: model.modelId, modelRevision: model.modelRevision, backend: 'llama-server (NOT Ollama)' },
+		chunkCohortChecksum: computeChunkCohortChecksumV1(pairs), candidateCohortChecksum: computeCandidateCohortChecksumV1(candidates.map((c) => c.candidateId)), pairs, modelCalls, writes: NO_WRITES, candidates
+	};
+	writeReceipt(freezeOut, cohort);
+	console.log(JSON.stringify({ result: 'CANDIDATES_FROZEN', candidates: candidates.length, modelCalls, chunkCohortChecksum: cohort.chunkCohortChecksum, candidateCohortChecksum: cohort.candidateCohortChecksum }, null, 2));
+}
+
+function loadFrozen(cohortPath: string, evalPath: string) {
+	const cohort = readJson(cohortPath); const evaluation = readJson(evalPath);
+	const problems: string[] = [];
+	if (computeCandidateCohortChecksumV1(cohort.candidates.map((c: { candidateId: string }) => c.candidateId)) !== cohort.candidateCohortChecksum) problems.push('CANDIDATE_COHORT_CHECKSUM_MISMATCH');
+	if (computeChunkCohortChecksumV1(cohort.pairs) !== cohort.chunkCohortChecksum) problems.push('CHUNK_COHORT_CHECKSUM_MISMATCH');
+	if (evaluation.cohort?.candidateCohortChecksum !== cohort.candidateCohortChecksum) problems.push('EVALUATION_FOR_DIFFERENT_COHORT');
+	const byId = new Map<string, any>((evaluation.entries as any[]).map((e) => [e.candidateId, e]));
+	const items = (cohort.candidates as any[]).map((candidate) => { const e = byId.get(candidate.candidateId); return { candidate, claimSet: e?.claimSet, eligibility: e?.eligibility }; });
+	return { cohort, evaluation, items, problems };
+}
+
+/** A control candidate that MUST be refused; reported separately and never mixed into the authoritative cohort counts. */
+function negativeControl() {
+	if (!controlPath || !controlEligibilityPath) return null;
+	const { cohort, items, problems } = loadFrozen(controlPath, controlEligibilityPath);
+	const decisions = items.map((item) => admitFrozenSummaryCandidateV1(item, SUMMARY_PERSISTENCE_POLICY_V1));
+	const refused = decisions.filter((d) => d.decision === 'PERSISTENCE_NOT_AUTHORIZED');
+	return { candidateCohortChecksum: cohort.candidateCohortChecksum, cohortProblems: problems, candidates: decisions.length, refused: refused.length, mustBeRefused: refused.length === decisions.length,
+		decisions: decisions.map((d) => (d.decision === 'MAY_PERSIST' ? { candidateId: d.candidate.candidateId, decision: d.decision } : { candidateId: d.candidateId, decision: d.decision, reasons: d.reasons })) };
+}
+
+/** Pure admission of the frozen evidence: no database, no model. */
+function admitFrozenMode(): void {
+	if (!admitFrozenPath || !eligibilityPath) throw new Error('ADMIT_FROZEN_REQUIRES: --admit-frozen <cohort.json> --eligibility <evaluation.json>');
+	const { cohort, items, problems } = loadFrozen(admitFrozenPath, eligibilityPath);
+	const decisions = items.map((item) => admitFrozenSummaryCandidateV1(item, SUMMARY_PERSISTENCE_POLICY_V1));
+	const may = decisions.filter((d) => d.decision === 'MAY_PERSIST').length;
+	const receipt = { schema: 'atlas.summary-candidate-writer-admission.v1', gate: 'VAL10B_SAME_CANDIDATE_WRITER_ADMISSION', generatedAt: new Date().toISOString(), candidateCohortChecksum: cohort.candidateCohortChecksum, chunkCohortChecksum: cohort.chunkCohortChecksum,
+		cohortProblems: problems, candidates: decisions.length, mayPersist: may, notAuthorized: decisions.length - may,
+		decisions: decisions.map((d) => (d.decision === 'MAY_PERSIST' ? { candidateId: d.candidate.candidateId, chunkId: d.candidate.chunkId, decision: d.decision } : { candidateId: d.candidateId, decision: d.decision, reasons: d.reasons })),
+		negativeControl: negativeControl(), modelCalls: 0, databaseConnections: 0, writes: NO_WRITES, persistedSummaries: 0 };
+	writeReceipt('docs/reports/parent-atlas/summary-candidate-writer-admission-v1.json', receipt);
+	console.log(JSON.stringify({ candidates: receipt.candidates, mayPersist: may, notAuthorized: receipt.notAuthorized, cohortProblems: problems, negativeControl: receipt.negativeControl, modelCalls: 0, databaseConnections: 0 }, null, 2));
+	if (problems.length || (receipt.negativeControl && !receipt.negativeControl.mustBeRefused)) process.exitCode = 1;
+}
+
+/** persistEligibleSummaryCandidatesV1 wiring. NEVER calls the model. Needs authorization; NOT run in the freeze/admission tranche. */
+async function applyFrozenMode(): Promise<void> {
+	if (!applyFrozenPath || !eligibilityPath || limIdx < 0) throw new Error('APPLY_FROZEN_REQUIRES: --apply-frozen <cohort.json> --eligibility <evaluation.json> --limit N');
+	if (process.env.ATLAS_DOC_SUMMARY_AUTHORIZED !== AUTH) throw new Error(`SUMMARIES_NOT_AUTHORIZED: set ATLAS_DOC_SUMMARY_AUTHORIZED=${AUTH}`);
+	if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not set');
+	const { cohort, items, problems } = loadFrozen(applyFrozenPath, eligibilityPath);
+	if (problems.length) throw new Error(`FROZEN_COHORT_INCONSISTENT:${problems.join(',')}`);
+	const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+	const client = await pool.connect();
+	try {
+		const before = (await client.query('SELECT count(*)::int n FROM atlas_external_doc_analyses')).rows[0].n as number;
+		await client.query('BEGIN');
+		const deps: PersistenceDeps = {
+			chunkRevisionIsCurrent: async (chunkId, revision) => ((await client.query('SELECT 1 FROM atlas_external_doc_chunks WHERE chunk_id = $1 AND evidence_revision = $2', [chunkId, revision])).rowCount ?? 0) > 0,
+			insertAnalysis: async (row) => (await client.query(INSERT, params(row))).rowCount ?? 0,
+			now: () => new Date().toISOString()
+		};
+		const result = await persistEligibleSummaryCandidatesV1(items, SUMMARY_PERSISTENCE_POLICY_V1, deps, sample);
+		const ids = result.persisted.map((p) => p.analysisId);
+		const rb = (await client.query('SELECT analysis_id, chunk_id, chunk_evidence_revision, analysis_type, input_checksum, output_checksum, summary_text, canonical_authority FROM atlas_external_doc_analyses WHERE analysis_id = ANY($1::text[])', [ids])).rows;
+		const byCand = new Map((cohort.candidates as any[]).map((c) => [c.candidateId, c]));
+		const readbackOk = rb.length === ids.length && result.persisted.every((p) => {
+			const r = rb.find((x) => x.analysis_id === p.analysisId); const c = byCand.get(p.candidateId);
+			return !!r && !!c && r.chunk_id === c.chunkId && r.chunk_evidence_revision === c.chunkEvidenceRevision && r.analysis_type === 'SUMMARY' && r.input_checksum === c.inputChecksum && r.output_checksum === c.outputChecksum && sha(r.summary_text) === c.outputChecksum && r.canonical_authority === false;
+		});
+		const after = (await client.query('SELECT count(*)::int n FROM atlas_external_doc_analyses')).rows[0].n as number;
+		const ok = readbackOk && after - before === result.persisted.length;
+		await client.query(ok ? 'COMMIT' : 'ROLLBACK');
+		const receipt = { schema: 'atlas.summary-candidate-persistence.v1', generatedAt: new Date().toISOString(), candidateCohortChecksum: cohort.candidateCohortChecksum, ceiling: sample, before, after: ok ? after : before, persisted: result.persisted, refused: result.refused, insertCalls: result.insertCalls, readbackOk, committed: ok, modelCalls: 0 };
+		writeReceipt('docs/reports/parent-atlas/summary-candidate-persistence-v1.json', receipt);
+		console.log(JSON.stringify({ committed: ok, persisted: result.persisted.length, refused: result.refused.length, readbackOk }, null, 2));
+		if (!ok) process.exitCode = 1;
+	} finally { client.release(); await pool.end(); }
+}
+
 async function main(): Promise<void> {
+	if (apply || all) throw new Error('APPLY_REQUIRES_FROZEN_CANDIDATES: a plain --apply/--all would regenerate summaries the validation never saw; use --freeze-candidates, then --apply-frozen');
+	if (admitFrozenPath) { admitFrozenMode(); return; }
+	if (freezeOut) { await freezeMode(); return; }
+	if (applyFrozenPath) { await applyFrozenMode(); return; }
 	if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not set');
 	if (apply && !all && limIdx < 0) throw new Error('APPLY_REQUIRES_LIMIT: use --apply --limit N (bounded) or --apply --all (full corpus, separately authorized)');
 	if (apply && process.env.ATLAS_DOC_SUMMARY_AUTHORIZED !== AUTH) throw new Error(`SUMMARIES_NOT_AUTHORIZED: set ATLAS_DOC_SUMMARY_AUTHORIZED=${AUTH}`);
@@ -123,8 +257,8 @@ async function main(): Promise<void> {
 		}
 		// Admission gate: the writer enforces eligibility itself, on the exact in-memory text it is about to insert (no trust in a caller-supplied preflight).
 		const keyOf = (a: { chunkId: string; chunkEvidenceRevision: string }) => `${a.chunkId}|${a.chunkEvidenceRevision}`;
-		const reports = runAdmission(analyses.map((a) => ({ chunkId: a.chunkId, chunkEvidenceRevision: a.chunkEvidenceRevision, summaryText: a.summaryText ?? '' })));
-		const { admitted, rejected } = partitionByAdmissionV1(analyses.map((a) => ({ chunkId: a.chunkId, chunkEvidenceRevision: a.chunkEvidenceRevision, outputSha256: a.outputChecksum, analysis: a })), reports, keyOf);
+		const reports = runAdmission(analyses.map((a) => ({ chunkId: a.chunkId, chunkEvidenceRevision: a.chunkEvidenceRevision, summaryInputChecksum: a.inputChecksum, summaryText: a.summaryText ?? '' })));
+		const { admitted, rejected } = partitionByAdmissionV1(analyses.map((a) => ({ chunkId: a.chunkId, chunkEvidenceRevision: a.chunkEvidenceRevision, inputChecksum: a.inputChecksum, outputSha256: a.outputChecksum, analysis: a })), reports, keyOf);
 		const admittedAnalyses = admitted.map((c) => { const rep = reports.get(keyOf(c)) as { admissionChecksum: string; resolverRevision: string; claimCount: number; splitterRevision: string }; return { ...c.analysis, metadata: { ...c.analysis.metadata, admission: { admissionChecksum: rep.admissionChecksum, resolverRevision: rep.resolverRevision, claimCount: rep.claimCount, splitterRevision: rep.splitterRevision } } } as ExternalDocAnalysisV1; });
 		const admissionSummary = { evaluated: analyses.length, admitted: admittedAnalyses.length, rejected: rejected.map((x) => ({ chunkId: x.candidate.chunkId, chunkEvidenceRevision: x.candidate.chunkEvidenceRevision, reasons: x.reasons })), ceiling: apply ? sample : null };
 		let written = 0; let readbackOk: boolean | null = null; let afterRollback: number | null = null;
