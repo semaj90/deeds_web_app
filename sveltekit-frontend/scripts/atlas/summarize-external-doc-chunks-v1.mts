@@ -7,13 +7,18 @@
  *   (default)           DRY RUN: real Ornith calls on a bounded sample, validates every row against ExternalDocAnalysisV1, 0 database writes.
  *   --rollback-canary   inserts the sample rows inside ONE transaction, reads them back, then ROLLS BACK (proves the writer; leaves 0 rows).
  *   --apply --limit N   BOUNDED persistent write of N chunks (needs env ATLAS_DOC_SUMMARY_AUTHORIZED=I_AUTHORIZE_EXTERNAL_DOC_SUMMARIES). A full-corpus run additionally needs the explicit flag --all.
+ * ADMISSION (VAL10B_SUMMARY_PERSISTENCE_ADMISSION_01): in EVERY mode each generated summary is run through python/atlas_summary_admission_v1.py (canonical chunk re-read, deterministic checks,
+ *   Ornith judge, VAL-09) and only summaries whose claims are ALL ADMIT and whose sealed report binds this exact chunk revision and this exact text hash are ever inserted. --limit is a ceiling, not a target.
+ *   If the admission process fails, nothing is written.
  * Flags: --limit N (sample size, default 3). Run from sveltekit-frontend/:  npx tsx scripts/atlas/summarize-external-doc-chunks-v1.mts [--rollback-canary|--apply] [--limit N]
  */
 import 'dotenv/config';
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Pool } from 'pg';
+import { partitionByAdmissionV1 } from '../../src/lib/server/atlas/docs/summary-persistence-admission-v1.js';
 import { ExternalDocAnalysisV1Schema, externalDocAnalysisId, type ExternalDocAnalysisV1 } from '../../src/lib/server/atlas/docs/external-doc-intelligence-contracts-v1.js';
 
 const ROOT = resolve(import.meta.dirname, '..', '..', '..');
@@ -83,6 +88,14 @@ const INSERT = `INSERT INTO atlas_external_doc_analyses (analysis_id, chunk_id, 
 	input_checksum, output_checksum, summary_text, entities, relations, metadata, canonical_authority) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'[]','[]',$13,false) ON CONFLICT (analysis_id) DO NOTHING`;
 const params = (a: ExternalDocAnalysisV1) => [a.analysisId, a.chunkId, a.chunkEvidenceRevision, a.analysisType, a.producerId, a.producerRevision, a.modelId, a.modelRevision, a.promptRevision, a.inputChecksum, a.outputChecksum, a.summaryText, JSON.stringify(a.metadata)];
 
+function runAdmission(items: { chunkId: string; chunkEvidenceRevision: string; summaryText: string }[]): Map<string, unknown> {
+	if (items.length === 0) return new Map();
+	const r = spawnSync('python', [resolve(ROOT, 'python/atlas_summary_admission_v1.py')], { cwd: resolve(ROOT, 'python'), input: JSON.stringify({ items }), encoding: 'utf8', timeout: 1_800_000, maxBuffer: 256 * 1024 * 1024, env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
+	if (r.error || r.status !== 0) throw new Error(`ADMISSION_PROCESS_FAILED:${r.error?.message ?? `exit ${r.status}: ${(r.stderr ?? '').slice(-300)}`}`);
+	const reports = (JSON.parse(r.stdout) as { reports: { chunkId: string; chunkEvidenceRevision: string }[] }).reports;
+	return new Map(reports.map((rep) => [`${rep.chunkId}|${rep.chunkEvidenceRevision}`, rep]));
+}
+
 async function main(): Promise<void> {
 	if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not set');
 	if (apply && !all && limIdx < 0) throw new Error('APPLY_REQUIRES_LIMIT: use --apply --limit N (bounded) or --apply --all (full corpus, separately authorized)');
@@ -108,12 +121,18 @@ async function main(): Promise<void> {
 			try { analyses.push(toAnalysis(chunk, await summarize(chunk, model.modelId), model)); latencies.push(Date.now() - t0); if (apply && analyses.length % 50 === 0) console.error(`progress ${analyses.length}/${work.length}`); }
 			catch (e) { failures.push(`${chunk.chunk_id}:${e instanceof Error ? e.message : e}`); }
 		}
+		// Admission gate: the writer enforces eligibility itself, on the exact in-memory text it is about to insert (no trust in a caller-supplied preflight).
+		const keyOf = (a: { chunkId: string; chunkEvidenceRevision: string }) => `${a.chunkId}|${a.chunkEvidenceRevision}`;
+		const reports = runAdmission(analyses.map((a) => ({ chunkId: a.chunkId, chunkEvidenceRevision: a.chunkEvidenceRevision, summaryText: a.summaryText ?? '' })));
+		const { admitted, rejected } = partitionByAdmissionV1(analyses.map((a) => ({ chunkId: a.chunkId, chunkEvidenceRevision: a.chunkEvidenceRevision, outputSha256: a.outputChecksum, analysis: a })), reports, keyOf);
+		const admittedAnalyses = admitted.map((c) => { const rep = reports.get(keyOf(c)) as { admissionChecksum: string; resolverRevision: string; claimCount: number; splitterRevision: string }; return { ...c.analysis, metadata: { ...c.analysis.metadata, admission: { admissionChecksum: rep.admissionChecksum, resolverRevision: rep.resolverRevision, claimCount: rep.claimCount, splitterRevision: rep.splitterRevision } } } as ExternalDocAnalysisV1; });
+		const admissionSummary = { evaluated: analyses.length, admitted: admittedAnalyses.length, rejected: rejected.map((x) => ({ chunkId: x.candidate.chunkId, chunkEvidenceRevision: x.candidate.chunkEvidenceRevision, reasons: x.reasons })), ceiling: apply ? sample : null };
 		let written = 0; let readbackOk: boolean | null = null; let afterRollback: number | null = null;
 		if (canary || apply) {
 			await client.query('BEGIN');
-			for (const a of analyses) written += (await client.query(INSERT, params(a))).rowCount ?? 0;
-			const rb = (await client.query(`SELECT analysis_id, output_checksum, summary_text, canonical_authority FROM atlas_external_doc_analyses WHERE analysis_id = ANY($1::text[])`, [analyses.map((a) => a.analysisId)])).rows;
-			readbackOk = rb.length === analyses.length && rb.every((r) => analyses.some((a) => a.analysisId === r.analysis_id && a.outputChecksum === r.output_checksum && sha(r.summary_text) === r.output_checksum) && r.canonical_authority === false);
+			for (const a of admittedAnalyses) written += (await client.query(INSERT, params(a))).rowCount ?? 0;
+			const rb = (await client.query(`SELECT analysis_id, output_checksum, summary_text, canonical_authority FROM atlas_external_doc_analyses WHERE analysis_id = ANY($1::text[])`, [admittedAnalyses.map((a) => a.analysisId)])).rows;
+			readbackOk = rb.length === admittedAnalyses.length && rb.every((r) => admittedAnalyses.some((a) => a.analysisId === r.analysis_id && a.outputChecksum === r.output_checksum && sha(r.summary_text) === r.output_checksum) && r.canonical_authority === false);
 			if (!readbackOk) failures.push('READBACK_MISMATCH');
 			if (canary && !apply) { await client.query('ROLLBACK'); afterRollback = (await client.query('SELECT count(*)::int n FROM atlas_external_doc_analyses')).rows[0].n as number; if (afterRollback !== before) failures.push('ROLLBACK_NOT_CLEAN'); }
 			else if (!readbackOk) await client.query('ROLLBACK'); else await client.query('COMMIT'); // generation failures are reported (a rerun resumes them); only a readback mismatch aborts the write
@@ -121,7 +140,7 @@ async function main(): Promise<void> {
 		const mode = apply ? 'APPLY' : canary ? 'ROLLBACK_CANARY' : 'DRY_RUN';
 		const receipt = {
 			schema: 'atlas.external-doc-summary-writer.v1', generatedAt: new Date().toISOString(), mode, backend: { kind: 'llama-server (NOT Ollama)', url: LLAMA, ...model },
-			producer: { id: PRODUCER_ID, revision: PRODUCER_REVISION, promptRevision: PROMPT_REVISION }, analysesBefore: before, considered: work.length, generated: analyses.length, written, readbackOk, afterRollback,
+			producer: { id: PRODUCER_ID, revision: PRODUCER_REVISION, promptRevision: PROMPT_REVISION }, admission: admissionSummary, analysesBefore: before, considered: work.length, generated: analyses.length, admitted: admittedAnalyses.length, written, readbackOk, afterRollback,
 			medianLatencyMs: latencies.sort((a, b) => a - b)[Math.floor(latencies.length / 2)] ?? null, failures,
 			samples: analyses.slice(0, 3).map((a) => ({ chunkId: a.chunkId, chunkEvidenceRevision: a.chunkEvidenceRevision, analysisId: a.analysisId, summary: a.summaryText })),
 			writes: { postgres: apply ? { table: 'atlas_external_doc_analyses', rows: written } : canary ? 'ROLLED_BACK' : 0, qdrant: 0, valkey: 0, neo4j: 0, graphify: 0 },

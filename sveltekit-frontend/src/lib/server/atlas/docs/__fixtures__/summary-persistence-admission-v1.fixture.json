@@ -1,0 +1,62 @@
+{
+  "eligible": {
+    "summaryText": "pgvector supports HNSW iterative scans.",
+    "report": {
+      "schema": "atlas.summary-persistence-admission.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "summaryOutputSha256": "765fc8e5e6015873cd0645dd2d6e5314d5fadaa5865c69b2cbff76fa80edaa3e",
+      "summaryOutputChecksum": "0b9210051b57574cd0bb0de2190c6fdd4548c2564efe54901290bc4bf4ed0e43",
+      "splitterRevision": "claims-of:sentence-regex-v1",
+      "claimCount": 1,
+      "claims": [
+        {
+          "claimOrdinal": 0,
+          "claimChecksum": "37d03a909baafc881df33bab010c2f0948e176f536bb6d8606c0460c43ebadcd",
+          "validationId": "scv:fa9968680ac76e7cd4ba3e3407bb6ba50ee60070e871d3914c6fdcc10d8973ef",
+          "validationChecksum": "be9e4eab31ee96988b04c4ee39d451d9c82a22712fef346b208148413a42592b",
+          "decision": "ADMIT",
+          "resolutionLayer": "COMPOSITE",
+          "judgeInputChecksum": "7e7e41023a7dfcfd94b43003720b37bcf078e5e11d21ff7a2ba60d60a52d52d2"
+        }
+      ],
+      "wholeSummaryEligible": true,
+      "resolverRevision": "summary-claim-resolution:val-09-v1",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+      "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+      "canonicalAuthority": false,
+      "admissionChecksum": "ad22b97e1a08690df465ce71bdb12ac60c130b915c7059e84275667ee6a669da"
+    }
+  },
+  "ineligible": {
+    "summaryText": "pgvector supports HNSW iterative scans.",
+    "report": {
+      "schema": "atlas.summary-persistence-admission.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "summaryOutputSha256": "765fc8e5e6015873cd0645dd2d6e5314d5fadaa5865c69b2cbff76fa80edaa3e",
+      "summaryOutputChecksum": "0b9210051b57574cd0bb0de2190c6fdd4548c2564efe54901290bc4bf4ed0e43",
+      "splitterRevision": "claims-of:sentence-regex-v1",
+      "claimCount": 1,
+      "claims": [
+        {
+          "claimOrdinal": 0,
+          "claimChecksum": "37d03a909baafc881df33bab010c2f0948e176f536bb6d8606c0460c43ebadcd",
+          "validationId": "scv:fa9968680ac76e7cd4ba3e3407bb6ba50ee60070e871d3914c6fdcc10d8973ef",
+          "validationChecksum": "403103af8b39c237de9a7712f0fb7d96d751f4d48d63a2bdbb6311ee32e36e6a",
+          "decision": "REJECT",
+          "resolutionLayer": "SEMANTIC",
+          "judgeInputChecksum": "7e7e41023a7dfcfd94b43003720b37bcf078e5e11d21ff7a2ba60d60a52d52d2"
+        }
+      ],
+      "wholeSummaryEligible": false,
+      "resolverRevision": "summary-claim-resolution:val-09-v1",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+      "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+      "canonicalAuthority": false,
+      "admissionChecksum": "9cf8134b5d97759291f02db3fafe7567316384f02282279361d24f5f3f3eaa28"
+    }
+  }
+}
