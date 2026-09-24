@@ -30,8 +30,8 @@
 - [x] Accept existing bare or `sha256:` row-level input checksums while keeping generated artifact/output/set receipts strictly `sha256:` prefixed.
 - [x] Add `scripts/atlas/prove-current-repair-candidate-feature-matrix-v1.mts` against the existing frozen CandidateOrdinal/base-matrix artifacts.
 - [x] Fix the proof harness to accept the real frozen cohort's snapshot/checksum serialization without rewriting either coordinate.
-- [ ] Run focused Vitest on the workstation.
-- [ ] Run the current-cohort proof harness on the workstation and commit the resulting report only if the checked-in base manifest still matches.
+- [x] Run focused Vitest on the workstation. (2026-09-24: `repair-candidate-feature-matrix-v1`, `repair-feature-producer-v1`, `repair-feature-producer-persisted-v1` specs — 3 files, 20/20 pass.)
+- [x] Run the current-cohort proof harness on the workstation and commit the resulting report only if the checked-in base manifest still matches. (2026-09-24: `npx tsx ../scripts/atlas/prove-current-repair-candidate-feature-matrix-v1.mts` from `sveltekit-frontend/` → `REPAIR_CANDIDATE_FEATURE_MATRIX_CONTRACT_PROVEN`, 15 candidates, 25 base + 24 overlay features, basePlanePreserved=true, replayIdentical=true; regenerated `docs/reports/current-repair-candidate-feature-matrix-v1.json` is byte-identical to the checked-in copy and the base manifest is unmodified, so there is nothing new to commit. overlayPresenceCount=0: no live overlay producer yet — see RF-05.)
 
 ## RF-04 Tournament producer admission
 
@@ -55,6 +55,10 @@
 - [x] Reverify the full producer artifacts before propagating producer-set states into ContextManifest presence evidence.
 - [x] Add focused presence-evidence tests for conservative defaults, verified MRL `DERIVED` propagation, snapshot mismatch rejection, and carried-artifact tamper rejection.
 - [ ] Run the presence-evidence focused tests/workstation replay with the same candidate snapshot used by the repair matrix.
+      (2026-09-24, PARTIAL, left open: focused tests pass — `repair-feature-presence-evidence-v1.spec.ts` 4/4,
+      `ace-context-manifest.spec.ts` 9/9 — but they use a synthetic `SNAPSHOT` constant, not the frozen cohort snapshot;
+      the real-cohort harness replays identically but reports `overlayPresenceCount=0`, so no presence evidence has
+      been exercised against the real snapshot yet. Needs a live repair producer first — see "Recommended live producer order".)
 
 ### Recommended live producer order
 

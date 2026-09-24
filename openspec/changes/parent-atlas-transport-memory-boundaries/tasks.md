@@ -7,7 +7,7 @@
 - [ ] **PROTO-02B** Extend the owner/lifecycle matrix to all remaining active sidecars and verify each operation's runtime caller/protocol, without treating parallel interfaces as duplicate canonical owners.
 - [x] **PROTO-03** Declare gRPC the typed cross-language contract for native/polyglot compute, while permitting operation-specific HTTP health/compatibility/fallback routes under the same service owner. No app identity or fusion ownership transfers; contract added to the OpenSpec spec.
 - [x] **PROTO-04** Declare tRPC optional for demonstrated TypeScript application-local control surfaces. OpenSpec now states it is dormant capability without a client and cannot own identity, durable truth, cross-language compute, or workflow authority; the caller census found no in-repo tRPC client. Server mount remains unchanged.
-- [ ] **ACP-01** Define the Parent Atlas coding-agent ACP boundary for editor sessions, permissions, tool actions, patches, terminal output, and progress.
+- [x] **ACP-01** Define the Parent Atlas coding-agent ACP boundary for editor sessions, permissions, tool actions, patches, terminal output, and progress. Contract-only: the new transport-memory-boundaries requirement and design section keep editor/session/action IDs protocol-local; delegate permission to `tool-authorization.ts`; bind actions to caller-resolved task/run/workflow-event/receipt owners; treat patches as proposals; bound/redact terminal output; and project progress from existing workflow events/receipts. ACP remains legacy inbound only with outbound disabled; no runtime adoption is claimed. `openspec validate parent-atlas-transport-memory-boundaries --strict` passes.
 - [x] **ACP-02A** Add a strict projection-only mapping contract for checksummed ACP ingress task/action/session/run references to the existing Kanban task attempt and `WorkflowActionEventV1` run/action/receipt references, carrying a supplied ContextManifest checksum; mismatched run, receipt, external refs, or ingress checksum fail closed. Fixture-proven only; no ACP runtime wiring, ContextManifest readback, or canonical authority is claimed.
 - [ ] **ACP-02B** Wire the ACP ingress caller to resolve the canonical task attempt, ContextManifest checksum, and ExecutionReceipt from their existing owners, then prove a bounded end-to-end mapping/readback. ACP must not own graph identity.
       **Investigation done 2026-09-22, not wired — found the real "existing owners" for 2 of 3
@@ -19,23 +19,19 @@
         success, failure_kind, execution_receipt_id`) — column shape matches
         `buildAcpIdentityProjectionV1`'s `taskAttempt` input exactly (`taskId`, `runId`,
         `executionReceiptId`). Plain-text IDs both sides; no format conflict.
-      - **WorkflowActionEventV1 — real read pattern found, but a genuine UUID-vs-string identity
-        mismatch blocks using it as-is.** `action-writer.ts` (`writeActionAtomically`,
+      - **WorkflowActionEventV1 — canonical event IDs are UUIDs; ACP IDs remain external strings.**
+        `action-writer.ts` (`writeActionAtomically`,
         lines ~222-245) already does the exact read this task needs — `SELECT payload FROM
         workflow_events WHERE run_id = ? AND action_id = ? AND sequence_no = ?` — for its own
         internal readback verification, then validates via
         `canonical-action-write-adapter-v1.ts::validateCanonicalActionReadbackV1()`. But
         `prepareCanonicalActionWriteV1()` in that same adapter file **hard-requires
         `event.runId`/`event.actionId` to match a UUID regex**
-        (`CANONICAL_WORKFLOW_EVENT_RUN_ID_MUST_BE_UUID` / `..._ACTION_ID_MUST_BE_UUID`) — yet
-        ACP-02A's own fixture (`packages/parent-atlas/test/acp-identity-projection-v1.test.mjs`)
-        uses non-UUID string IDs (`runId: 'run:9'`, `actionId: 'action:canonical'`). A
-        `WorkflowActionEventV1` shaped like ACP-02A's fixture would be **rejected outright** by
-        the real canonical writer/reader path. This is a real blocker, not a cosmetic detail:
-        ACP-02B cannot "resolve... from their existing owners" until it's decided whether (a)
-        external ACP run/action IDs get translated into UUIDs before any `WorkflowActionEventV1`
-        is constructed, or (b) the canonical writer's UUID requirement is relaxed for this path,
-        or (c) some other reconciliation. Not decided here — flagging for the operator/next pass.
+        (`CANONICAL_WORKFLOW_EVENT_RUN_ID_MUST_BE_UUID` / `..._ACTION_ID_MUST_BE_UUID`). The
+        ACP identity projection fixture now uses UUID-form `runId`/`actionId` for the Atlas-owned
+        event and task attempt while keeping ACP external identifiers as distinct protocol-local
+        strings. No UUID translation or canonical writer relaxation was added; the earlier
+        mismatch was fixture-level, not a production-owner decision.
       - **ContextManifest checksum — no persisted lookup-by-run store found at all.**
         `buildContextManifestV2()` (`sveltekit-frontend/src/lib/server/atlas/graph/
         context-manifest-v2.ts`) is a pure function: given identity/revision inputs, it
@@ -45,7 +41,7 @@
         differently-scoped contract (`AtlasWorkflowSpecV1` in `agentic-file-compiler/contracts.ts`)
         carries a `contextManifestId` field, but that's an ID reference inside a different DAG-spec
         system, not confirmed to be the checksum store this task means — not chased further here.
-        **This is the real gap**: there is currently nothing to "resolve the ContextManifest
+        **This remains the real gap**: there is currently nothing to "resolve the ContextManifest
         checksum from its existing owner" by run/task ID; the checksum is only ever freshly
         computed from inputs the caller must already have, which may mean ACP-02B's phrasing needs
         revisiting rather than treating this as a missing implementation.

@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T20:55:26Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-graph-pagerank-okf-fanout-hardening",
+      "progress": "4/4 tasks complete; strict validation and all four fake-session batching tests pass; stale 2026-09-05 open-status prose was reconciled with the 2026-09-24 proof",
+      "to": "parent-atlas-gpu-prellm-recommendation-v1",
+      "task": "inspect the four remaining gates and identify safe code/test work that does not require rebuilding containers",
+      "outcome": "35/37 complete; strict validation passes. Recorded the decision to retain V1 as the current production owner and defer V2 promotion until lineage, parity, and cutover proof exist. No atlas-rapids-cu13 container is present and WSL Ubuntu lacks cupy/cugraph/nx_cugraph. Live wiring and GPU execution remain open; no container was rebuilt.",
+      "reason": "Next near-complete candidate already named in the user's supplied OpenSpec board excerpt; inspect gates and dependencies rather than following task count blindly."
+    }
+  ],
+  "scope": {
+    "readOnly": true,
+    "candidateFiles": [
+      "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
+      "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/proposal.md",
+      "docs/reports"
+    ],
+    "forbidden": [
+      "container rebuilds until the end-of-workboard tranche",
+      "GPU runtime mutation or promotion without proof",
+      "Graphify",
+      "unrelated OpenSpec changes"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "priorChangeProgress": "4/4",
+    "priorChangeStrictOpenSpec": "PASS",
+    "priorChangeFocusedTests": "4/4 PASS",
+    "gpuPrellmGate": "35_OF_37; V1_OWNER_DECISION_RECORDED; WIRING_AND_GPU_PROOF_OPEN",
+    "strictOpenSpec": "PASS",
+    "v1V2Decision": "RETAIN_V1_CURRENT_OWNER; V2_NOT_PROMOTED",
+    "gpuEnvironment": {
+      "atlasRapidsContainer": "NOT_PRESENT",
+      "wslUbuntu": "PRESENT",
+      "cupy": false,
+      "cugraph": false,
+      "nxCugraph": false
+    },
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "GPU_PRELLM_GATE_INSPECTION_PENDING"
+}

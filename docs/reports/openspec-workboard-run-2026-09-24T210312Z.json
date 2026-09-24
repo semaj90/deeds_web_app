@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T21:03:12Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "progress": "The existing 6,774-row reproducibility receipt is complete; the canary cannot be truthfully instantiated without an exact cohort manifest and sealed row checksums. LOD-02 strict snapshot remains 0 eligible.",
+      "to": "parent-atlas-agentic-repair-fabric",
+      "task": "recheck the single remaining gate against the current dirty lineage/repair evidence before deciding whether it is stale or actionable",
+      "outcome": "OpenSpec remains 37/38, strict validation passes. The current lineage receipt reports packetRevisionDerivableRows=0, packetRevisionUnqualifiedRows=16,554, candidateOrdinalEligibleRows=0, namespaceQualified=0, spanQualified=0, and fullyQualified=0. OAK :8095 and Go Retrieval :8100 both return HTTP 200 health responses; this proves service availability only, not source authority or a permitted repair execution. Focused agentic suite: 34 files / 101 tests passed.",
+      "reason": "This was previously classified as lineage/authorization blocked, but its relevant reports are modified in the current worktree; this is a targeted revalidation, not an unrelated board scan."
+    }
+  ],
+  "scope": {
+    "readOnly": true,
+    "candidateFiles": [
+      "openspec/changes/parent-atlas-agentic-repair-fabric/tasks.md",
+      "docs/reports/agentic-repair-fabric-v2-proof.json",
+      "docs/reports/current-lineage-closure-v1.json",
+      "docs/reports/parent-atlas-current-lineage-funnel-v1.json"
+    ],
+    "forbidden": [
+      "source or packet identity promotion",
+      "persistent mutation without owner authorization",
+      "container rebuilds",
+      "Graphify"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "lodReceiptPresent": true,
+    "lodCanaryBlocker": "EXACT_COHORT_MANIFEST_AND_SEALED_ROW_CHECKSUMS_MISSING",
+    "repairFabricInspection": "COMPLETE_BLOCKED_BY_LINEAGE_AND_AUTHORIZATION",
+    "repairFabricProgress": "37/38",
+    "repairFabricStrictOpenSpec": "PASS",
+    "oakHealth": "HTTP_200",
+    "goRetrievalHealth": "HTTP_200",
+    "packetRevisionDerivableRows": 0,
+    "packetRevisionUnqualifiedRows": 16554,
+    "candidateOrdinalEligibleRows": 0,
+    "namespaceQualifiedAstRows": 0,
+    "spanQualifiedAstRows": 0,
+    "fullyQualifiedLineageRows": 0,
+    "focusedAgenticTests": {
+      "testFiles": 34,
+      "passed": 101
+    },
+    "liveRepairExecution": "NOT_ATTEMPTED; no qualified source candidate or execution authorization",
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "AGENTIC_REPAIR_FABRIC_LIVE_EXECUTION_BLOCKED_BY_LINEAGE_AND_AUTHORIZATION"
+}

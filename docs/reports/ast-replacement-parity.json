@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas.ast.replacement.parity.v1",
-  "generatedAt": "2026-08-24T01:01:45.300Z",
+  "generatedAt": "2026-09-24T22:35:31.789Z",
   "repoRevision": "ast-replacement-parity-v1",
   "filesChecked": 6,
   "currentOwner": "sveltekit-frontend/src/lib/server/analysis/ast-grep-extractor.ts",

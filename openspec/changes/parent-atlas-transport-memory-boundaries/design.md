@@ -36,3 +36,11 @@ No data migration. Deploying this change only reduces the tools and methods adve
 ## Open Questions
 
 - Are there external peers depending on the existing broad discovery metadata? The local registry has no authoritative list of such consumers; the fail-closed default remains until measured.
+
+## ACP coding-agent boundary (contract only)
+
+- Editor/session/task/action IDs are protocol-local references. The adapter may project them only onto caller-resolved Atlas task attempts and `WorkflowActionEventV1` records; it never creates canonical task, packet, source, or graph identity.
+- `tool-authorization.ts` remains the permission decision owner. Discovery, ingress validation, or an ACP `AUTH_REQUIRED`/progress state is not dispatch authorization.
+- Patches are proposals. Durable application remains behind the existing repair admission/approval path and independent readback; this OpenSpec change does not wire an ACP patch executor.
+- Terminal output is bounded evidence and must be redacted before exposure; it cannot carry hidden reasoning, credentials, or become identity/authority. Progress is a projection of existing workflow events and receipts, not a second event ledger.
+- Runtime status remains legacy inbound ingress only, outbound ACP disabled, migration target A2A 1.0. No ACP client, server, editor integration, or live dispatch is claimed by this contract.

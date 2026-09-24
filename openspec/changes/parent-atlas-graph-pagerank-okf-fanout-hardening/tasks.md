@@ -93,15 +93,13 @@ Final result (both runs): `Test Files 4 passed (4)` / `Tests 12 passed (12)`, ~1
   live graph loading, PageRank projection, or datastore write was performed; live
   throughput/parity remains outside this task's proof.
 
-## Next steps (in priority order)
+## Historical next steps (as of the original handoff; status reconciled below)
 
-1. **Commit the 5 touched files** (see below) — they are still uncommitted
-   local changes on `main` as of this handoff.
-2. **If `compute-pagerank-neo4j-v2.mjs` is ever meant to run against the full
-   ~162K-node frozen snapshot in production** (not just this fixture test),
-   rewrite its node/edge ingestion to use batched `UNWIND $rows AS row
-   CREATE (...)` instead of one `session.run()` per row — this is a real,
-   separate, unaddressed perf bug.
+1. **Commit the 5 touched files** — historical handoff state; the later
+   2026-09-05 re-verification below records that this was completed.
+2. **Large-input PageRank ingestion** — the default-fixture and sequential-write
+   issues were addressed by the 2026-09-24 bounded-ingestion task below. Live
+   throughput/parity for a full snapshot remains unproven and is not run here.
 3. Decide on RAPIDS/cuGraph GPU PageRank parity — genuinely NOT_PROVEN in
    this repo (not addressed this session — Neo4j GDS parity specifically IS
    now proven, but that's a different lane from RAPIDS GPU).
@@ -110,7 +108,7 @@ Final result (both runs): `Test Files 4 passed (4)` / `Tests 12 passed (12)`, ~1
    session did for all 3 issues above — its file paths and specific claims
    do not necessarily reflect this repository's actual state.
 
-## Re-verification pass (2026-09-05, read-only)
+## Historical re-verification snapshot (2026-09-05, read-only; current status superseded 2026-09-24)
 
 - **"Next steps" item 1 (commit the 5 touched files) — DONE.** `git status --porcelain` on the 3
   files named below is clean; `git log` shows them committed. Not previously checked off as a
@@ -122,8 +120,9 @@ Final result (both runs): `Test Files 4 passed (4)` / `Tests 12 passed (12)`, ~1
   `graph_analysis_runs`/`graph_node_metrics` tables the Neo4j-GDS backend already writes, not a
   competing owner. This was a real, substantive fix to a previously-open decision, done in a
   different change/session than this handoff, not tracked back here until now.
-- **The one remaining open item (line 86, `compute-pagerank-neo4j-v2.mjs` sequential-write perf
-  bug) is STILL PRESENT, re-verified live, not fixed.** Read the current file directly: lines
+- At the time of this 2026-09-05 snapshot, the sequential-write issue in
+  `compute-pagerank-neo4j-v2.mjs` was believed to remain. The 2026-09-24 bounded-ingestion task
+  below supersedes that current-status conclusion. The historical inspection recorded that lines
   17-24 still default `--fixture` to the 486MB `graphify/frozen-graph-snapshot-v2.json` snapshot
   when no `--fixture` flag is passed; lines 76-101 still issue one `await session.run(...)` per
   node then one per edge inside a plain `for` loop — zero occurrences of `UNWIND` anywhere in the

@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T21:14:34Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-code-ingestion-pipeline",
+      "progress": "Strict OpenSpec passes at 23/35. Current source/packet lineage remains unqualified: 0 derivable packet revisions, 16,554 unqualified packet rows, and 0/128 exact source matches. GPH-02 single-contract ownership and GPH-17 integration owner are unresolved.",
+      "to": "parent-atlas-canonical-directory-ingestion-fabric",
+      "task": "inspect the exact remaining source-directory ingestion gate for read-only evidence or an existing-owner composition path",
+      "outcome": "inspection pending",
+      "reason": "Directory ingestion is the upstream source inventory/authority candidate for the observed source-binding gap; examine one gate only and do not write canonical state."
+    }
+  ],
+  "scope": {
+    "readOnlyUntilTaskClassification": true,
+    "candidateFiles": [
+      "openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/tasks.md",
+      "openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/proposal.md",
+      "openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/design.md",
+      "openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/specs"
+    ],
+    "forbidden": [
+      "canonical writes without authorized source-admission plan",
+      "synthetic workspace/source revisions",
+      "container rebuilds until end of workboard tranche",
+      "Graphify"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "codeIngestionProgress": "23/35",
+    "packetRevisionDerivableRows": 0,
+    "packetRevisionUnqualifiedRows": 16554,
+    "canonicalDirectoryInspection": "PENDING",
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "CANONICAL_DIRECTORY_INGESTION_INSPECTION_PENDING"
+}

@@ -1,8 +1,7 @@
 -- GRAPHIFY-EXECUTION-SOURCE-MEMBERSHIP-01 (2026-09-09)
 --
--- Derived, read-only view over the existing immutable, append-only Graphify execution ledger
--- (graphify_executions + graphify_execution_files -- both tables reject UPDATE/DELETE via
--- graphify_execution_files_reject_mutation() triggers). No new mutable table, no tombstone
+-- Derived, read-only view over the existing immutable Graphify execution membership ledger
+-- (graphify_executions + graphify_execution_file_membership_v2). No new mutable table, no tombstone
 -- column: "is this source_ref still current" is answered purely by comparing its most recent
 -- sighting against the latest COMPLETED execution for its workspace, matching the ledger's own
 -- append-only design rather than reintroducing a mutable active/tombstoned pattern.
@@ -21,19 +20,23 @@ WITH latest_completed_execution AS (
   SELECT DISTINCT ON (workspace_id) execution_id, workspace_id, workspace_revision, completed_at
   FROM graphify_executions
   WHERE status = 'COMPLETED'
-  ORDER BY workspace_id, completed_at DESC
+  ORDER BY workspace_id, completed_at DESC NULLS LAST, execution_id
 ),
 last_seen_per_source AS (
-  SELECT gef.source_ref, ge.workspace_id, gef.workspace_revision,
-         gef.execution_id AS last_seen_execution_id,
-         gef.code_source_revision AS last_seen_code_source_revision,
+  SELECT m.repository_id, m.source_ref, ge.workspace_id, m.workspace_revision,
+         m.execution_id AS last_seen_execution_id,
+         m.code_source_revision AS last_seen_code_source_revision,
          ge.completed_at AS last_seen_completed_at,
-         ROW_NUMBER() OVER (PARTITION BY gef.source_ref, ge.workspace_id ORDER BY ge.completed_at DESC) AS rn
-  FROM graphify_execution_files gef
-  JOIN graphify_executions ge ON ge.execution_id = gef.execution_id
+         ROW_NUMBER() OVER (
+           PARTITION BY m.repository_id, m.source_ref, ge.workspace_id
+           ORDER BY ge.completed_at DESC NULLS LAST, m.execution_id
+         ) AS rn
+  FROM graphify_execution_file_membership_v2 m
+  JOIN graphify_executions ge ON ge.execution_id = m.execution_id
   WHERE ge.status = 'COMPLETED'
 )
 SELECT
+  lsp.repository_id,
   lsp.source_ref,
   lsp.workspace_id,
   lsp.workspace_revision,

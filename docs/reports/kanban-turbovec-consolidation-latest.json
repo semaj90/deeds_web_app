@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T15:19:07.741Z",
+  "generatedAt": "2026-09-24T21:34:31.793Z",
   "inputs": {
     "boardPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\kanban-board.json",
     "featureLabelsPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\feature_labels.jsonl",
@@ -20,22 +20,28 @@
     "uniqueRecordCount": 6747,
     "scopedRecordCount": 6725,
     "embeddedCount": 6725,
-    "groupCount": 6516,
-    "consolidationCandidateGroups": 131,
-    "highOverlapGroups": 8,
+    "semanticEmbedding": {
+      "requestedBackend": "ollama",
+      "ollama": 6725,
+      "sveltekit": 0,
+      "deterministicFallback": 0,
+      "degraded": false
+    },
+    "groupCount": 6528,
+    "consolidationCandidateGroups": 118,
+    "highOverlapGroups": 6,
     "turbovecBackendCounts": {
-      "search-derived": 5,
-      "offline": 6720
+      "offline": 6725
     },
     "libtorchAvailable": true,
-    "libtorchGroupsScored": 131,
+    "libtorchGroupsScored": 118,
     "simdjson": {
       "hits": 141,
       "misses": 6626,
       "nativeParses": 1,
       "fallbackParses": 6625,
       "totalBytesParsed": 3957402,
-      "nativeTimeMs": 3.391200000000026,
+      "nativeTimeMs": 1.6085000000000491,
       "cacheBytes": 7815662,
       "cacheSize": 6626
     },
@@ -49,100 +55,43 @@
   ],
   "groups": [
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:90",
-      "recordCount": 7,
-      "openCount": 7,
-      "clusterIds": [
-        90,
-        107,
-        121
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:453",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:573",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:279",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:317",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:417",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:806"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred",
-        "Keep BM25 and LangExtract as the lexical/provenance enrichment pass before the final recommendation fusion.",
-        "Extend the distilled DDL/migration SQL to persist `alias_id` in the live task/profile path once the migration is scheduled"
-      ],
-      "topFeatureIds": [
-        "feature:todo:787ff44880ddd6be2d9388ce",
-        "feature:todo:3c3c2a5c203e7248dda320e2",
-        "feature:todo:ca478d3be8a7950ab5b26dd7",
-        "feature:todo:580c60d78636e391070bd061",
-        "feature:todo:851702bfd009e88acf89b080"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:453",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:573",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:279",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:317"
-      ],
-      "statuses": {
-        "todo": 7
-      },
-      "backendCounts": {
-        "offline": 7
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0022,
-        "pairCount": 21
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:5",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:39",
       "recordCount": 6,
       "openCount": 6,
       "clusterIds": [
-        5,
-        22,
-        36
+        39,
+        56,
+        70
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:260",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:278",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:290",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:876",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:299",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:817"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:452",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:510",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:450",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:788",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:815",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:875"
       ],
       "topTitles": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes.",
-        "Create `schema-encoder.wgsl` for client-side reranking of documents.",
-        "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route",
-        "Keep offline training and zero-copy handoff separate from the live retrieval path until benchmarks pass"
+        "Summarize docs with Gemma4 and persist the compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate.",
+        "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred"
       ],
       "topFeatureIds": [
-        "feature:todo:4f67c0fab5bbbbbd33051d65",
-        "feature:todo:2ace876ba56f2c0753161f4b",
-        "feature:todo:002df24db7233c4b96982982",
-        "feature:todo:c06a94c291be9d63d3e12179",
-        "feature:todo:f5ffd5e75b0e0ea6ae82d22f"
+        "feature:todo:f110c0ebab6f7b882bf8997c",
+        "feature:todo:d8ab6855119337da53bd1cb0",
+        "feature:todo:16f554676a7b623ce9880206",
+        "feature:todo:cba41628d9e42971e1bfd189",
+        "feature:todo:345a2ebee67a1aabc71e2f6f"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:260",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:278",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:290",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:876",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:299"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:452",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:510",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:450",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:788",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:815"
       ],
       "statuses": {
         "todo": 6
@@ -153,391 +102,307 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0085,
+        "cohesion": 0.8022,
         "pairCount": 15
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "lib:cluster:18",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:82",
       "recordCount": 5,
       "openCount": 5,
       "clusterIds": [
-        18,
-        35,
-        49
-      ],
-      "featureFamilies": [
-        "lib"
-      ],
-      "sourceRefs": [],
-      "topTitles": [
-        "lib › ambient-events › d › ts",
-        "lib › models",
-        "lib › uno-shortcuts › ts",
-        "lib › phase89-graph-visualizer › mjs",
-        "lib › composables"
-      ],
-      "topFeatureIds": [],
-      "topSourceRefs": [
-        "local:sveltekit-frontend/src/lib/ambient-events.d.ts#L1",
-        "local:sveltekit-frontend/src/lib/models/ChatSession.svelte.ts#L1",
-        "local:sveltekit-frontend/src/lib/uno-shortcuts.ts#L1",
-        "local:sveltekit-frontend/scripts/lib/phase89-graph-visualizer.mjs#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/composables/legal-data-runes.svelte.ts#L1"
-      ],
-      "statuses": {
-        "BACKLOG": 5
-      },
-      "backendCounts": {
-        "offline": 5
-      },
-      "priorityMax": 2,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0096,
-        "pairCount": 10
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:109",
-      "recordCount": 5,
-      "openCount": 5,
-      "clusterIds": [
-        12,
-        109,
-        126
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:450",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:868",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:875",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:280"
-      ],
-      "topTitles": [
-        "**Knowledge Graph Tool Lanes**",
-        "Define the OpenCode-facing bridge so research queries can flow through TRACE MCP / function-caller without bypassing `sourceRef` provenance.",
-        "Add a dedicated benchmark harness for JSON.parse vs simdjson vs Rust roundtrip",
-        "Do not treat the CUDA path as mandatory for the browser or startup lanes",
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "topFeatureIds": [
-        "feature:todo:1e95eb7b2c97aa52a6ec0308",
-        "feature:todo:16f554676a7b623ce9880206",
-        "feature:todo:a3b86bb63f937fceeb3bb021",
-        "feature:todo:c05219160d4f5b6d7cba09a1",
-        "feature:todo:039e09ca423789739c8c42c5"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:450",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:868",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:875",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:280"
-      ],
-      "statuses": {
-        "todo": 5
-      },
-      "backendCounts": {
-        "offline": 5
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0084,
-        "pairCount": 10
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:127",
-      "recordCount": 5,
-      "openCount": 5,
-      "clusterIds": [
-        16,
-        30,
-        127
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:90",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:418",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:419",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:778",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:381"
-      ],
-      "topTitles": [
-        "Track 1: .env audit + dead-config archival",
-        "RG-Atlas Persistence: stabilize directory-level metadata integration and keep it aligned with the atlas graph exports.",
-        "Knowledge Base Manager: expose TRACE MCP tools for OpenCode integration.",
-        "Promote validated offline outputs into the durable stores only after validation passes",
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "topFeatureIds": [
-        "feature:todo:dc13d165afeb65f00c87fe15",
-        "feature:todo:dd2f1f789d08e442f1733ead",
-        "feature:todo:bb7188da8e37c9d39482c279",
-        "feature:todo:6ebdce207d27de5f2c70d010",
-        "feature:todo:3b4cd1270af9b361cc0445b3"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:90",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:418",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:419",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:778",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:381"
-      ],
-      "statuses": {
-        "todo": 5
-      },
-      "backendCounts": {
-        "offline": 5
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0039,
-        "pairCount": 10
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:0",
-      "recordCount": 5,
-      "openCount": 5,
-      "clusterIds": [
-        0,
-        17,
-        31
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:236",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:279",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:394",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:573",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:778"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Duplicate system detection (two scripts/routes with overlapping sourceRefs)",
-        "Establish SharedArrayBuffer zero-copy structures for Web Worker communication."
-      ],
-      "topFeatureIds": [
-        "feature:todo:c3dab502e86cc90f236e9a48",
-        "feature:todo:580c60d78636e391070bd061",
-        "feature:todo:588615702ca05ecc061ca130",
-        "feature:todo:ca478d3be8a7950ab5b26dd7",
-        "feature:todo:6ebdce207d27de5f2c70d010"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:236",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:279",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:394",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:573",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:778"
-      ],
-      "statuses": {
-        "todo": 5
-      },
-      "backendCounts": {
-        "offline": 5
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0093,
-        "pairCount": 10
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:113",
-      "recordCount": 5,
-      "openCount": 5,
-      "clusterIds": [
-        2,
-        16,
+        82,
+        99,
         113
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:441",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:581",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:825",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:871",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:75",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:433",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:807",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:418",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:439"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Add Playwright test fixtures for auth + DB seeding",
+        "Add the export/import bridge that turns local SQLite research state into canonical backend rows before ACE packet generation.",
+        "Archive duplicate JSON-RPC 2.0 shim logic after the canonical handler is confirmed"
+      ],
+      "topFeatureIds": [
+        "feature:todo:c3913a6ae582b02ec6366094",
+        "feature:todo:a877e91eada4ba20c44f8b37",
+        "feature:todo:60b1a6d9622cfd4be3d92ea4",
+        "feature:todo:dd2f1f789d08e442f1733ead",
+        "feature:todo:0aa8e73629125ac4b069abd9"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:75",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:433",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:807",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:418",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:439"
+      ],
+      "statuses": {
+        "todo": 5
+      },
+      "backendCounts": {
+        "offline": 5
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.6769,
+        "pairCount": 10
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:42",
+      "recordCount": 5,
+      "openCount": 5,
+      "clusterIds": [
+        42,
+        59,
+        73
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:91",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:794",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:384",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:800",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:805"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Track 2: Docker CPU limits + Caddy memory bump",
+        "Add a read/query path for NES chrom packets and recent hits by `sourceRef` / `featureId` / `queryHash`"
+      ],
+      "topFeatureIds": [
+        "feature:todo:9289019adf7d2721550af764",
+        "feature:todo:d03cf5787e951fe5e6dad698",
+        "feature:todo:58e227fee8b87fb979c1d86c",
+        "feature:todo:312cb59ccc81c603bff431c2",
+        "feature:todo:9d706730404ce1b74ebc1ba0"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:91",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:794",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:384",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:800",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:805"
+      ],
+      "statuses": {
+        "todo": 5
+      },
+      "backendCounts": {
+        "offline": 5
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.8035,
+        "pairCount": 10
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:117",
+      "recordCount": 5,
+      "openCount": 5,
+      "clusterIds": [
+        6,
+        20,
+        117
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:279",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:431",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:808",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:80",
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:818"
       ],
       "topTitles": [
-        "Emit a parent-atlas feature-labeling report that includes missing todos, `feature_id`, `featureKey`, `source_ref`, and `sourceRefs` so the kanban/atlas sync can",
-        "**Phase 20 — Colab/A6000 training lane**",
-        "keep missing features and redundant features separated",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Establish SharedArrayBuffer zero-copy structures for Web Worker communication.",
+        "Recreate the `local-deep-research` container for GPU use when needed by bringing it up from the WSL2 GPU override path, then verify the host/container model bou",
+        "Archive deep Drizzle audit artifacts after the schema/migration plan is signed off"
+      ],
+      "topFeatureIds": [
+        "feature:todo:580c60d78636e391070bd061",
+        "feature:todo:242aeb4c8a2fd571a88fb8f6",
+        "feature:todo:60cac941e18861bbd047b035",
+        "feature:todo:211e484d8c9f1b5087925e91",
+        "feature:todo:38b232326e47610bd9b82f08"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:279",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:431",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:808",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:80",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:818"
+      ],
+      "statuses": {
+        "todo": 5
+      },
+      "backendCounts": {
+        "offline": 5
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.6708,
+        "pairCount": 10
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:78",
+      "recordCount": 5,
+      "openCount": 5,
+      "clusterIds": [
+        78,
+        95,
+        109
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:383",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:586",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:243",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:291",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:292"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Add deep_research test coverage for the future LLM orchestration lane before promoting any offline synthesis output into the live stack.",
+        "Exclude from startup (run only offline)"
+      ],
+      "topFeatureIds": [
+        "feature:todo:c7555bf2fd60736e3f31a778",
+        "feature:todo:d99af10b5a87018316f6a9a8",
+        "feature:todo:6ad7088a53bb671d7863d642",
+        "feature:todo:86ddf5ba1247b00bd1f4e72b",
+        "feature:todo:63f45279017c8d6d13ef35c9"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:383",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:586",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:243",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:291",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:292"
+      ],
+      "statuses": {
+        "todo": 5
+      },
+      "backendCounts": {
+        "offline": 5
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7572,
+        "pairCount": 10
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:64",
+      "recordCount": 5,
+      "openCount": 5,
+      "clusterIds": [
+        64,
+        81,
+        95
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:456",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:417",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:510",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:794",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:825"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Re-run the assistant-path comparison after each boundary change and record the result in `IMPLEMENTATION_STATUS.md`."
+      ],
+      "topFeatureIds": [
+        "feature:todo:998aaa3711147350851b1220",
+        "feature:todo:8ab2ccea68d3be232891bee5",
+        "feature:todo:d8ab6855119337da53bd1cb0",
+        "feature:todo:d03cf5787e951fe5e6dad698",
+        "feature:todo:62719d535d4e40d142460cfc"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:456",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:417",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:510",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:794",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:825"
+      ],
+      "statuses": {
+        "todo": 5
+      },
+      "backendCounts": {
+        "offline": 5
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.861,
+        "pairCount": 10
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:28",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [
+        28,
+        45,
+        59
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:583",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:871",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:808"
+      ],
+      "topTitles": [
+        "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats",
+        "Install Unsloth + PyTorch (`uv pip install unsloth --torch-backend=auto`)",
         "Keep CPU fallback paths available for dev and rollback",
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "topFeatureIds": [
-        "feature:todo:bf6c95f604835aeec202985b",
-        "feature:todo:50a08906ac2944f99ff97955",
-        "feature:todo:62719d535d4e40d142460cfc",
+        "feature:todo:a33b97f7501a9583a2e63c2b",
+        "feature:todo:57f67bd8348b2f120581c642",
         "feature:todo:08a60b305944064051beac3a",
-        "feature:todo:38b232326e47610bd9b82f08"
+        "feature:todo:60cac941e18861bbd047b035"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:441",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:581",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:825",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:583",
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:871",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:818"
-      ],
-      "statuses": {
-        "todo": 5
-      },
-      "backendCounts": {
-        "offline": 5
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0062,
-        "pairCount": 10
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:79",
-      "recordCount": 5,
-      "openCount": 5,
-      "clusterIds": [
-        79,
-        96,
-        110
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:454",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:548",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:814",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:581",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:582"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Document the WSL2 GPU override as optional deployment flavor only; default to host-side CUDA inference when it is already available.",
-        "Track 5C–5E: Model/GGUF cleanup",
-        "Unsloth + PyTorch install and validation"
-      ],
-      "topFeatureIds": [
-        "feature:todo:b04cb35f007d8bae79ba97ca",
-        "feature:todo:5ad7e6c3a6858eb25a409bb5",
-        "feature:todo:bcaa5532bc0ebd95d4c83621",
-        "feature:todo:50a08906ac2944f99ff97955",
-        "feature:todo:ec200c0104dbc7cef41b6374"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:454",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:548",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:814",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:581",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:582"
-      ],
-      "statuses": {
-        "todo": 5
-      },
-      "backendCounts": {
-        "offline": 5
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0087,
-        "pairCount": 10
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "lib:cluster:none",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [],
-      "featureFamilies": [
-        "lib"
-      ],
-      "sourceRefs": [],
-      "topTitles": [
-        "lib › icons",
-        "lib › shims",
-        "lib › agent",
-        "lib › shared"
-      ],
-      "topFeatureIds": [],
-      "topSourceRefs": [
-        "local:sveltekit-frontend/src/lib/icons/yorha/IconAiAssistant.svelte#L1",
-        "local:sveltekit-frontend/src/lib/icons/yorha/IconCitation.svelte#L1",
-        "local:sveltekit-frontend/src/lib/icons/yorha/IconEvidenceFile.svelte#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/shims/melt-ui-shim.ts#L1",
-        "local:sveltekit-frontend/src/lib/shims/commonjs-shim.js#L1"
-      ],
-      "statuses": {
-        "BACKLOG": 4
-      },
-      "backendCounts": {
-        "search-derived": 4
-      },
-      "priorityMax": 2,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0111,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:48",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [
-        48,
-        65,
-        79
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:504",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:452",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:809"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "`som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats",
-        "Clustering quality cleanup (deferred)"
-      ],
-      "topFeatureIds": [
-        "feature:todo:2aed3e03cc66e3e478a5479d",
-        "feature:todo:d95c5dcf45458befd109b456",
-        "feature:todo:f110c0ebab6f7b882bf8997c",
-        "feature:todo:db7ebe32c0763b6c28da28bc"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:504",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:452",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:809"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:808"
       ],
       "statuses": {
         "todo": 4
@@ -548,45 +413,145 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0096,
+        "cohesion": 0.7098,
         "pairCount": 6
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:56",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:66",
       "recordCount": 4,
       "openCount": 4,
       "clusterIds": [
-        56,
-        73,
-        87
+        66,
+        83,
+        97
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:526",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:300",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:455"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "`playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection",
+        "**Track C — Production Gap Remediation** (after DB audit)"
+      ],
+      "topFeatureIds": [
+        "feature:todo:322cf977b5fa41f902b9321b",
+        "feature:todo:ff90358d6e6879b2ad50bdc9",
+        "feature:todo:1c1c05a2ad42be0af8be0757",
+        "feature:todo:5d22b2b996d856b77506427c"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:526",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:300",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:455"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "offline": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7912,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:43",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [
+        43,
+        60,
+        74
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:80",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:546",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:573",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:584"
+      ],
+      "topTitles": [
+        "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route",
+        "Track 2: Docker CPU limits + Caddy memory bump",
+        "Extend the distilled DDL/migration SQL to persist `alias_id` in the live task/profile path once the migration is scheduled",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "topFeatureIds": [
+        "feature:todo:211e484d8c9f1b5087925e91",
+        "feature:todo:9f52e7400198785380b71be0",
+        "feature:todo:ca478d3be8a7950ab5b26dd7",
+        "feature:todo:a8329db04d9e038d5dbf0ad5"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:80",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:546",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:573",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:584"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "offline": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7379,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:7",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [
+        7,
+        24,
+        38
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:86",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:585",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:385",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:586"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:318",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:581",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:354"
       ],
       "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
         "Warm workspace-start plans",
-        "Export trained tagger/reranker artifacts"
+        "Keep `research_summaries` as the live canonical research table and finish the additive provenance/index migration before any dump/restore promotion to Postgres ",
+        "**Phase 20 — Colab/A6000 training lane**",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "topFeatureIds": [
         "feature:todo:f85f7b428819c0244985ab85",
-        "feature:todo:f6cac7bf75adc262479ce1db",
-        "feature:todo:e943964cdc2b8a8e54c32c20",
-        "feature:todo:d99af10b5a87018316f6a9a8"
+        "feature:todo:8a2d69cd56d9bffc15ecf138",
+        "feature:todo:50a08906ac2944f99ff97955",
+        "feature:todo:f9185997e91637153ceff9e9"
       ],
       "topSourceRefs": [
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:86",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:585",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:385",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:586"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:318",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:581",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:354"
       ],
       "statuses": {
         "todo": 4
@@ -597,7 +562,156 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0146,
+        "cohesion": 0.6744,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:60",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [
+        60,
+        77,
+        91
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:312",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:541",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:866",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55"
+      ],
+      "topTitles": [
+        "Wire `ast-grep` into the directory analysis pipeline for codebase pruning.",
+        "Warm workspace-start plans",
+        "Decide whether `simd-bridge-rs/` becomes the next canonical native add-on workspace or remains a staged canary",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "topFeatureIds": [
+        "feature:todo:0255cb3ad2d2cf33a3f9450c",
+        "feature:todo:f0f27b8fcc26eb849fe76242",
+        "feature:todo:7a16fad76ef24a827a57f242",
+        "feature:todo:787ff44880ddd6be2d9388ce"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:312",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:541",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:866",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "offline": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.6521,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:24",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [
+        24,
+        41,
+        55
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:316",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:451",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:822",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:823"
+      ],
+      "topTitles": [
+        "Keep the pruning lane offline-only; it should not become a startup dependency.",
+        "Store docs and large artifacts in SeaweedFS, not in the research container's local SQLite boundary.",
+        "verify schema drift against the moved feature folders",
+        "apply migration only after the repo is trimmed and the live schema is consistent"
+      ],
+      "topFeatureIds": [
+        "feature:todo:19b6bdabfc35748b3abe43b9",
+        "feature:todo:26b2bebdc5c285740e7bce4d",
+        "feature:todo:7bff888f19bae6332e81eb0a",
+        "feature:todo:e9ee98a5e46461a30b8c0a05"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:316",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:451",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:822",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:823"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "offline": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7458,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:112",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [
+        1,
+        15,
+        112
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:381",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:386",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:456",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:797"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Formalize the later compute lanes for PyTorch XGBoost reranking, SOM clustering collection, and Neo4j hypergraph merges against the same `sourceRef + feature_id",
+        "Use the Parent Atlas feature command atlas as the container manifest for later PyTorch / XGBoost / SOM / Neo4j lanes so the same sourceRef spine stays retrievab"
+      ],
+      "topFeatureIds": [
+        "feature:todo:3b4cd1270af9b361cc0445b3",
+        "feature:todo:ac2e7658372461b27dc6004c",
+        "feature:todo:998aaa3711147350851b1220",
+        "feature:todo:aaa4c01aaa9f761db1e77363"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:381",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:386",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:456",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:797"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "offline": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7512,
         "pairCount": 6
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
@@ -615,27 +729,27 @@
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:89",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:292",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:87",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:354"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:382",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:393",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:573",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:778"
       ],
       "topTitles": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "**Remaining Lower-Priority**",
-        "Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path"
+        "Keep the Postgres 18 indexing tables, Qdrant multi-query tags, and JSONB card packets aligned so semantic hash lookups stay stable across mirrors.",
+        "Preserve the existing `tools:ast-grep`, `index:ast`, `audit:directories`, and `graphify:dependency:audit` entrypoints as the core analysis surface."
       ],
       "topFeatureIds": [
-        "feature:todo:132472e27f5f5116545a7ccf",
-        "feature:todo:63f45279017c8d6d13ef35c9",
-        "feature:todo:5855fc827e386a10b01a26db",
-        "feature:todo:f9185997e91637153ceff9e9"
+        "feature:todo:f5cbbf3a1926a2e5e4776f9e",
+        "feature:todo:f8f730e399822268e0fc11d5",
+        "feature:todo:ca478d3be8a7950ab5b26dd7",
+        "feature:todo:6ebdce207d27de5f2c70d010"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:89",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:292",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:87",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:354"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:382",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:393",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:573",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:778"
       ],
       "statuses": {
         "todo": 4
@@ -646,94 +760,46 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0034,
+        "cohesion": 0.7607,
         "pairCount": 6
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:54",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:25",
       "recordCount": 4,
       "openCount": 4,
       "clusterIds": [
-        54,
-        71,
-        85
+        25,
+        42,
+        56
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:312",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:823",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:429",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:824"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:394",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:430",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:806",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:90"
       ],
       "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Wire `ast-grep` into the directory analysis pipeline for codebase pruning.",
-        "apply migration only after the repo is trimmed and the live schema is consistent"
-      ],
-      "topFeatureIds": [
-        "feature:todo:0255cb3ad2d2cf33a3f9450c",
-        "feature:todo:e9ee98a5e46461a30b8c0a05",
-        "feature:todo:647bb722ed21ed7cbc94072d",
-        "feature:todo:1f3fec88b4887714bff46565"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:312",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:823",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:429",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:824"
-      ],
-      "statuses": {
-        "todo": 4
-      },
-      "backendCounts": {
-        "offline": 4
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.007,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:35",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [
-        35,
-        52,
-        66
-      ],
-      "featureFamilies": [
+        "Use TurboVec-assisted directory summarization to fill gaps in directories that do not yet have `llms.md` / `agents.md` cards.",
+        "Compare the local-deep-research container against the repo's current OpenCode/Gemma4 function-calling path and document the exact role split.",
+        "Archive redundant async SvelteKit RPC wrappers once the JSON-RPC 2.0 path is the single canonical route",
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:318",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:818",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:80",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:794"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Keep `research_summaries` as the live canonical research table and finish the additive provenance/index migration before any dump/restore promotion to Postgres ",
-        "H4 write-enabled benchmark and FP16 accuracy comparison"
-      ],
       "topFeatureIds": [
-        "feature:todo:8a2d69cd56d9bffc15ecf138",
-        "feature:todo:38b232326e47610bd9b82f08",
-        "feature:todo:211e484d8c9f1b5087925e91",
-        "feature:todo:d03cf5787e951fe5e6dad698"
+        "feature:todo:588615702ca05ecc061ca130",
+        "feature:todo:5859a864610db3d6a2493463",
+        "feature:todo:2850678b92201182850900fb",
+        "feature:todo:dc13d165afeb65f00c87fe15"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:318",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:818",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:80",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:794"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:394",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:430",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:806",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:90"
       ],
       "statuses": {
         "todo": 4
@@ -744,93 +810,45 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0275,
+        "cohesion": 0.6552,
         "pairCount": 6
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:34",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:99",
       "recordCount": 4,
       "openCount": 4,
       "clusterIds": [
-        34,
-        51,
-        65
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:319",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:813",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:434"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Use the repo consolidation feature map to label ship-path, planned production, experimental, and archive-only files before trimming the repo to source, schemas,",
-        "high-RAM LLM tagging"
-      ],
-      "topFeatureIds": [
-        "feature:todo:c65d7d66dd23a8f1e78b18f0",
-        "feature:todo:be04de8dd8896a006f5c9e6e",
-        "feature:todo:787ff44880ddd6be2d9388ce",
-        "feature:todo:18afe17870a6d2d0f1856193"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:319",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:813",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:55",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:434"
-      ],
-      "statuses": {
-        "todo": 4
-      },
-      "backendCounts": {
-        "offline": 4
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0237,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:102",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [
-        5,
-        102,
-        119
+        2,
+        99,
+        116
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:417",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:261",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:456",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:826"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:821",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:433",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:824"
       ],
       "topTitles": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "AGENTS -> Qdrant Backfill: enrich vector payloads with AGENTS card metadata using a dry-run-safe path first."
+        "AGENTS -> Qdrant Backfill: enrich vector payloads with AGENTS card metadata using a dry-run-safe path first.",
+        "Deep Drizzle audit after consolidation and archiving"
       ],
       "topFeatureIds": [
         "feature:todo:8ab2ccea68d3be232891bee5",
-        "feature:todo:f93d30a30e773e2e83395aca",
-        "feature:todo:998aaa3711147350851b1220",
-        "feature:todo:518b7cb0495a940422645806"
+        "feature:todo:a903be5040b8ad037fa92752",
+        "feature:todo:a877e91eada4ba20c44f8b37",
+        "feature:todo:1f3fec88b4887714bff46565"
       ],
       "topSourceRefs": [
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:417",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:261",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:456",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:826"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:821",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:433",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:824"
       ],
       "statuses": {
         "todo": 4
@@ -841,93 +859,46 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0113,
+        "cohesion": 0.715,
         "pairCount": 6
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:44",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:29",
       "recordCount": 4,
       "openCount": 4,
       "clusterIds": [
-        44,
-        61,
-        75
+        29,
+        46,
+        60
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:440",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:433",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:535",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:545"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Expose the proposal timeline in the agentic controller UI via the read-only `/api/v1/agentic?action=timeline` path."
-      ],
-      "topFeatureIds": [
-        "feature:todo:d60e7fd1e58a9ac27398d940",
-        "feature:todo:a877e91eada4ba20c44f8b37",
-        "feature:todo:4c05231411f757965000cedb",
-        "feature:todo:eb4e3bee910b08b95e30ef0f"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:440",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:433",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:535",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:545"
-      ],
-      "statuses": {
-        "todo": 4
-      },
-      "backendCounts": {
-        "offline": 4
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0024,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:74",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [
-        74,
-        91,
-        105
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:429",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:800",
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:816",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:869",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:825"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:824"
       ],
       "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Inventory the current `local-deep-research` compose and note the current boundary: local SQLite state on the research side, canonical backend stores in the repo",
+        "Refresh the parent atlas using only the production-ready feature list after archive decisions are made",
         "export trained tagger / reranker artifacts",
-        "Wire the production native base image into CI so the runtime image and addon ABI stay pinned"
+        "Parent atlas refresh using only the production-ready feature list"
       ],
       "topFeatureIds": [
+        "feature:todo:647bb722ed21ed7cbc94072d",
+        "feature:todo:312cb59ccc81c603bff431c2",
         "feature:todo:895074946e4a263ef394fd48",
-        "feature:todo:3851354f3117385472fc7eb5",
-        "feature:todo:1e95eb7b2c97aa52a6ec0308",
-        "feature:todo:62719d535d4e40d142460cfc"
+        "feature:todo:1f3fec88b4887714bff46565"
       ],
       "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:429",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:800",
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:816",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:869",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:825"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:824"
       ],
       "statuses": {
         "todo": 4
@@ -938,44 +909,43 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0233,
+        "cohesion": 0.7134,
         "pairCount": 6
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:19",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:125",
       "recordCount": 4,
       "openCount": 4,
       "clusterIds": [
-        19,
-        36,
-        50
+        14,
+        28,
+        125
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:826",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:93",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:260",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:384"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:259",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:315",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:449",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:541"
       ],
       "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "re-run kanban-to-parent-atlas sync after archive decisions are made"
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "topFeatureIds": [
-        "feature:todo:518b7cb0495a940422645806",
-        "feature:todo:d8d7affddeaa909af27f7d69",
-        "feature:todo:4f67c0fab5bbbbbd33051d65",
-        "feature:todo:58e227fee8b87fb979c1d86c"
+        "feature:todo:0d3ab6734e763f3f7697cfc0",
+        "feature:todo:f9a4d5e77f03ab3edee38b79",
+        "feature:todo:36a520b68d772f80f148300f",
+        "feature:todo:f0f27b8fcc26eb849fe76242"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:826",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:93",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:260",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:384"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:259",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:315",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:449",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:541"
       ],
       "statuses": {
         "todo": 4
@@ -986,40 +956,87 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0005,
+        "cohesion": 0.9726,
         "pairCount": 6
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "lib:cluster:110",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:69",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [
+        69,
+        86,
+        100
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:261",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:526",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:535",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:870"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "topFeatureIds": [
+        "feature:todo:f93d30a30e773e2e83395aca",
+        "feature:todo:ff90358d6e6879b2ad50bdc9",
+        "feature:todo:4c05231411f757965000cedb",
+        "feature:todo:33e49c6bf3ce8231ba4f6402"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:261",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:526",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:535",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:870"
+      ],
+      "statuses": {
+        "todo": 4
+      },
+      "backendCounts": {
+        "offline": 4
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.9707,
+        "pairCount": 6
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "lib:cluster:48",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        13,
-        110,
-        127
+        48,
+        65,
+        79
       ],
       "featureFamilies": [
         "lib"
       ],
       "sourceRefs": [],
       "topTitles": [
-        "lib › metrics",
-        "lib › server",
-        "lib › machines"
+        "lib › icons",
+        "lib › upsert-validated › mjs",
+        "lib › utils"
       ],
       "topFeatureIds": [],
       "topSourceRefs": [
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/metrics/gpuMetricsBatcher.ts#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/server/authUtils.ts#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/server/chat/history-service.ts#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/server/chat/ssr-qlora-gpu-chat-assistant.ts#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/machines/aiAssistantMachine.minimal.ts#L1"
+        "local:sveltekit-frontend/src/lib/icons/yorha/IconAiAssistant.svelte#L1",
+        "local:sveltekit-frontend/src/lib/icons/yorha/IconCitation.svelte#L1",
+        "local:sveltekit-frontend/src/lib/icons/yorha/IconEvidenceFile.svelte#L1",
+        "local:scripts/lib/upsert-validated.mjs#L1",
+        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/utils/buffer-utils.ts#L1"
       ],
       "statuses": {
-        "TODO": 2,
-        "BACKLOG": 1
+        "BACKLOG": 2,
+        "TODO": 1
       },
       "backendCounts": {
         "offline": 3
@@ -1027,19 +1044,19 @@
       "priorityMax": 2,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0113,
+        "cohesion": 0.5294,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "lib:cluster:94",
+      "groupId": "lib:cluster:14",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        94,
-        111,
-        125
+        14,
+        31,
+        45
       ],
       "featureFamilies": [
         "lib"
@@ -1047,15 +1064,55 @@
       "sourceRefs": [],
       "topTitles": [
         "lib › logic",
-        "lib › phase72",
-        "lib › moogle"
+        "lib › canvas",
+        "lib › types"
       ],
       "topFeatureIds": [],
       "topSourceRefs": [
         "local:sveltekit-frontend/scripts/phase104-backups/src/lib/logic/HistoryManager.ts#L1",
         "local:sveltekit-frontend/scripts/phase104-backups/src/lib/logic/Report.ts#L1",
-        "local:sveltekit-frontend/src/lib/phase72/routeGraphAdapter.ts#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/moogle/stage6-production-orchestrator.ts#L1"
+        "local:sveltekit-frontend/src/lib/canvas/webgpu-shader-cache.ts#L1",
+        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/types/admin.ts#L1",
+        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/types/ai-assistant.ts#L1"
+      ],
+      "statuses": {
+        "BACKLOG": 2,
+        "TODO": 1
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.5963,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "lib:cluster:125",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        14,
+        28,
+        125
+      ],
+      "featureFamilies": [
+        "lib"
+      ],
+      "sourceRefs": [],
+      "topTitles": [
+        "lib › index › ts",
+        "lib › messaging",
+        "lib › phase89-cache › mjs"
+      ],
+      "topFeatureIds": [],
+      "topSourceRefs": [
+        "local:sveltekit-frontend/src/lib/index.ts#L1",
+        "local:sveltekit-frontend/src/lib/messaging/rabbitmq-xstate-integration.ts#L1",
+        "local:sveltekit-frontend/scripts/lib/phase89-cache.mjs#L1"
       ],
       "statuses": {
         "BACKLOG": 3
@@ -1066,74 +1123,33 @@
       "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0085,
+        "cohesion": 0.568,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "lib:cluster:43",
+      "groupId": "lib:cluster:90",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        43,
-        60,
-        74
+        90,
+        107,
+        121
       ],
       "featureFamilies": [
         "lib"
       ],
       "sourceRefs": [],
       "topTitles": [
-        "lib › upsert-validated › mjs",
-        "lib › redis-url › mjs",
-        "lib › state"
-      ],
-      "topFeatureIds": [],
-      "topSourceRefs": [
-        "local:scripts/lib/upsert-validated.mjs#L1",
-        "local:sveltekit-frontend/scripts/lib/redis-url.mjs#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/state/crewAIOrchestrationMachine.ts#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/state/evidence-processing-machine-corrupted.ts#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/state/evidence-processing-machine.ts#L1"
-      ],
-      "statuses": {
-        "BACKLOG": 2,
-        "TODO": 1
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 1,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0137,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "lib:cluster:116",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        5,
-        19,
-        116
-      ],
-      "featureFamilies": [
-        "lib"
-      ],
-      "sourceRefs": [],
-      "topTitles": [
-        "lib › env › server › ts",
-        "lib › messaging",
+        "lib › intent",
+        "lib › utils › ts",
         "lib › phase89-embed › mjs"
       ],
       "topFeatureIds": [],
       "topSourceRefs": [
-        "local:sveltekit-frontend/src/lib/env.server.ts#L1",
-        "local:sveltekit-frontend/src/lib/messaging/rabbitmq-xstate-integration.ts#L1",
+        "local:sveltekit-frontend/src/lib/intent/regex-intent.ts#L1",
+        "local:sveltekit-frontend/src/lib/utils.ts#L1",
         "local:sveltekit-frontend/scripts/lib/phase89-embed.mjs#L1"
       ],
       "statuses": {
@@ -1145,132 +1161,80 @@
       "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0244,
+        "cohesion": 0.6186,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:57",
+      "groupId": "lib:cluster:55",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        57,
-        74,
-        88
+        55,
+        72,
+        86
       ],
       "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        "lib"
       ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:22",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:234",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:870"
-      ],
+      "sourceRefs": [],
       "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "`attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores"
+        "lib › phase89-cuda-tags › mjs",
+        "lib › llms",
+        "lib › metrics"
       ],
-      "topFeatureIds": [
-        "feature:todo:f831f8496459630481b6f126",
-        "feature:todo:24b4111ad0e1777784a9bd1a",
-        "feature:todo:33e49c6bf3ce8231ba4f6402"
-      ],
+      "topFeatureIds": [],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:22",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:234",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:870"
+        "local:sveltekit-frontend/scripts/lib/phase89-cuda-tags.mjs#L1",
+        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/llms/types.ts#L1",
+        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/metrics/gpuMetricsBatcher.ts#L1"
       ],
       "statuses": {
-        "todo": 3
+        "BACKLOG": 3
       },
       "backendCounts": {
         "offline": 3
       },
-      "priorityMax": 0,
+      "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.014,
+        "cohesion": 0.5711,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:122",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:58",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        11,
-        25,
-        122
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:24",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:387",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:784"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats"
-      ],
-      "topFeatureIds": [
-        "feature:todo:a33b97f7501a9583a2e63c2b",
-        "feature:todo:864b06c9ae590874c8a97736",
-        "feature:todo:951f1337ba4de5a57686d986"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:24",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:387",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:784"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0254,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:63",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        63,
-        80,
-        94
+        58,
+        75,
+        89
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:28",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:541",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:439"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:545",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:871"
       ],
       "topTitles": [
         "Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of tru",
-        "Warm workspace-start plans",
+        "Track 1: .env audit + dead-config archival",
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "topFeatureIds": [
         "feature:todo:4ced48dea132da38f2ab7305",
-        "feature:todo:f0f27b8fcc26eb849fe76242",
-        "feature:todo:0aa8e73629125ac4b069abd9"
+        "feature:todo:eb4e3bee910b08b95e30ef0f",
+        "feature:todo:08a60b305944064051beac3a"
       ],
       "topSourceRefs": [
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:28",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:541",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:439"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:545",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:871"
       ],
       "statuses": {
         "todo": 3
@@ -1281,87 +1245,42 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0618,
+        "cohesion": 0.7793,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:21",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:61",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        21,
-        38,
-        52
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:49",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:28",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:278"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Clustering quality cleanup (deferred)"
-      ],
-      "topFeatureIds": [
-        "feature:todo:a11f763c236417569484b3e7",
-        "feature:todo:4ced48dea132da38f2ab7305",
-        "feature:todo:2ace876ba56f2c0753161f4b"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:49",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:28",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:278"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0367,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:28",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        28,
-        45,
-        59
+        61,
+        78,
+        92
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:71",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:382",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:586"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:434",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:778"
       ],
       "topTitles": [
         "**Track C — Production Gap Remediation** (after DB audit)",
-        "Keep the Postgres 18 indexing tables, Qdrant multi-query tags, and JSONB card packets aligned so semantic hash lookups stay stable across mirrors.",
-        "Exclude from startup (run only offline)"
+        "Emit a canonical ACE packet from the LDR bridge with preserved `sourceRefs`, then warm the shared Redis ACE packet cache for OpenCode reuse.",
+        "Promote validated offline outputs into the durable stores only after validation passes"
       ],
       "topFeatureIds": [
         "feature:todo:7c0dbd56784529c16e1cb60e",
-        "feature:todo:f5cbbf3a1926a2e5e4776f9e",
-        "feature:todo:d99af10b5a87018316f6a9a8"
+        "feature:todo:18afe17870a6d2d0f1856193",
+        "feature:todo:6ebdce207d27de5f2c70d010"
       ],
       "topSourceRefs": [
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:71",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:382",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:586"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:434",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:778"
       ],
       "statuses": {
         "todo": 3
@@ -1372,7 +1291,99 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.02,
+        "cohesion": 0.6272,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:115",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        4,
+        18,
+        115
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:89",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:809",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:260"
+      ],
+      "topTitles": [
+        "**Remaining Lower-Priority**",
+        "Archive stale or duplicate feature implementations after the parent atlas tags them as production-ready or redundant",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "topFeatureIds": [
+        "feature:todo:132472e27f5f5116545a7ccf",
+        "feature:todo:db7ebe32c0763b6c28da28bc",
+        "feature:todo:4f67c0fab5bbbbbd33051d65"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:89",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:809",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:260"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7254,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:44",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        44,
+        61,
+        75
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:93",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:813",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:585"
+      ],
+      "topTitles": [
+        "Track 5C–5E: Model/GGUF cleanup",
+        "high-RAM LLM tagging",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "topFeatureIds": [
+        "feature:todo:d8d7affddeaa909af27f7d69",
+        "feature:todo:be04de8dd8896a006f5c9e6e",
+        "feature:todo:f6cac7bf75adc262479ce1db"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:93",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:813",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:585"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.694,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
@@ -1390,23 +1401,344 @@
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:75",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:383",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:234",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:788",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:817"
+      ],
+      "topTitles": [
+        "Feature cluster grouping by `sourceRef` prefix",
+        "Recover or containerize the missing worker lanes required for the full offline path",
+        "keep the lane offline-only, not a startup dependency"
+      ],
+      "topFeatureIds": [
+        "feature:todo:24b4111ad0e1777784a9bd1a",
+        "feature:todo:cba41628d9e42971e1bfd189",
+        "feature:todo:37b37ade97d6ef135f3be736"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:234",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:788",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:817"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7206,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:48",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        48,
+        65,
+        79
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:235",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:582",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:585"
+      ],
+      "topTitles": [
+        "Stale feature detection (atlas entry exists, no recent git touch)",
+        "Support high-RAM LLM tagging",
+        "Export trained tagger/reranker artifacts"
+      ],
+      "topFeatureIds": [
+        "feature:todo:af15f2f3c8d9e6c470e05b29",
+        "feature:todo:ec200c0104dbc7cef41b6374",
+        "feature:todo:f6cac7bf75adc262479ce1db"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:235",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:582",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:585"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7212,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:126",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        15,
+        29,
+        126
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:236",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:548",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:382"
+      ],
+      "topTitles": [
+        "Duplicate system detection (two scripts/routes with overlapping sourceRefs)",
+        "Track 5C–5E: Model/GGUF cleanup",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "topFeatureIds": [
+        "feature:todo:c3dab502e86cc90f236e9a48",
+        "feature:todo:5ad7e6c3a6858eb25a409bb5",
+        "feature:todo:f5cbbf3a1926a2e5e4776f9e"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:236",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:548",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:382"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.6651,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:22",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        22,
+        39,
+        53
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:263",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:587",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:234"
+      ],
+      "topTitles": [
+        "Document the live 4x4 router matrix location and usage:",
+        "WebGPU optional only (do not require WebGPU)",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "topFeatureIds": [
+        "feature:todo:9ffab6bc4b9cd644239758c2",
+        "feature:todo:766413ce20ee852d0750e788",
+        "feature:todo:24b4111ad0e1777784a9bd1a"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:263",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:587",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:234"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.6654,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:76",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        76,
+        93,
+        107
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:278",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:292",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:822"
+      ],
+      "topTitles": [
+        "Create `schema-encoder.wgsl` for client-side reranking of documents.",
+        "Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "topFeatureIds": [
+        "feature:todo:2ace876ba56f2c0753161f4b",
+        "feature:todo:63f45279017c8d6d13ef35c9",
+        "feature:todo:7bff888f19bae6332e81eb0a"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:278",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:292",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:822"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.715,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:111",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        0,
+        14,
+        111
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:290",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:432",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:876"
+      ],
+      "topTitles": [
+        "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route",
+        "Align `local-deep-research` to an OpenAI-compatible `llama-server` endpoint when using `llama.cpp`; keep Hermes test-only unless it proves useful as a separate ",
+        "Keep offline training and zero-copy handoff separate from the live retrieval path until benchmarks pass"
+      ],
+      "topFeatureIds": [
+        "feature:todo:002df24db7233c4b96982982",
+        "feature:todo:325923e1f45a27e423516f44",
+        "feature:todo:c06a94c291be9d63d3e12179"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:290",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:432",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:876"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.6744,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:1",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        1,
+        18,
+        32
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:313",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:454",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:299"
+      ],
+      "topTitles": [
+        "Use directory-role analysis plus AST maps to separate missing features from redundant features.",
+        "Document the WSL2 GPU override as optional deployment flavor only; default to host-side CUDA inference when it is already available.",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "topFeatureIds": [
+        "feature:todo:a0a4835aaffa64c8919de261",
+        "feature:todo:b04cb35f007d8bae79ba97ca",
+        "feature:todo:f5ffd5e75b0e0ea6ae82d22f"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:313",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:454",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:299"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7046,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:45",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        45,
+        62,
+        76
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:419",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:504",
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:874"
       ],
       "topTitles": [
-        "Add Playwright test fixtures for auth + DB seeding",
-        "Add deep_research test coverage for the future LLM orchestration lane before promoting any offline synthesis output into the live stack.",
-        "Do not remove the JS fallback path until the Rust native path is benchmarked and canary-validated"
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Knowledge Base Manager: expose TRACE MCP tools for OpenCode integration."
       ],
       "topFeatureIds": [
-        "feature:todo:c3913a6ae582b02ec6366094",
-        "feature:todo:c7555bf2fd60736e3f31a778",
+        "feature:todo:bb7188da8e37c9d39482c279",
+        "feature:todo:d95c5dcf45458befd109b456",
         "feature:todo:c2ab8074caeb070184d46c20"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:75",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:383",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:419",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:504",
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:874"
       ],
       "statuses": {
@@ -1418,132 +1750,42 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0188,
+        "cohesion": 0.7459,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:65",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:67",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        65,
-        82,
-        96
+        67,
+        84,
+        98
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:80",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:570",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:815"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
-      ],
-      "topFeatureIds": [
-        "feature:todo:211e484d8c9f1b5087925e91",
-        "feature:todo:345f071ce68fa8162ef4bf2d",
-        "feature:todo:345a2ebee67a1aabc71e2f6f"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:80",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:570",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:815"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.013,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:26",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        26,
-        43,
-        57
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:91",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:243",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25"
-      ],
-      "topTitles": [
-        "Track 2: Docker CPU limits + Caddy memory bump",
-        "Retrieval hook inventory for Phase 11E:",
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "topFeatureIds": [
-        "feature:todo:9289019adf7d2721550af764",
-        "feature:todo:6ad7088a53bb671d7863d642",
-        "feature:todo:322cf977b5fa41f902b9321b"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:91",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:243",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0038,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:49",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        49,
-        66,
-        80
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:93",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:435",
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:450",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:548"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:542"
       ],
       "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Track 5C–5E: Model/GGUF cleanup"
+        "Expose tuple metadata on the exact-match cache read path so front-door hits return the same envelope they store.",
+        "Define the OpenCode-facing bridge so research queries can flow through TRACE MCP / function-caller without bypassing `sourceRef` provenance.",
+        "Warm legal/codebase summaries"
       ],
       "topFeatureIds": [
-        "feature:todo:d8d7affddeaa909af27f7d69",
+        "feature:todo:341f9d2bc50bbbc3a8ca69a3",
         "feature:todo:16f554676a7b623ce9880206",
-        "feature:todo:5ad7e6c3a6858eb25a409bb5"
+        "feature:todo:ca7e2a61d982eff86e61b461"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:93",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:435",
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:450",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:548"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:542"
       ],
       "statuses": {
         "todo": 3
@@ -1554,7 +1796,144 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.01,
+        "cohesion": 0.678,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:88",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        88,
+        105,
+        119
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:447",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:812",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:874"
+      ],
+      "topTitles": [
+        "Keep Qdrant as the default ANN service and treat cuVS/CAGRA as the future WSL2 experiment lane behind the same retrieval contract.",
+        "Phase 20 A6000 training lane",
+        "Do not remove the JS fallback path until the Rust native path is benchmarked and canary-validated"
+      ],
+      "topFeatureIds": [
+        "feature:todo:8e5eaf945282c9ba26406b26",
+        "feature:todo:81e57bc0d2fe676cd78238f2",
+        "feature:todo:c2ab8074caeb070184d46c20"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:447",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:812",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:874"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.6678,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:23",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        23,
+        40,
+        54
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:453",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:75"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Keep BM25 and LangExtract as the lexical/provenance enrichment pass before the final recommendation fusion."
+      ],
+      "topFeatureIds": [
+        "feature:todo:3c3c2a5c203e7248dda320e2",
+        "feature:todo:1e95eb7b2c97aa52a6ec0308",
+        "feature:todo:c3913a6ae582b02ec6366094"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:453",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:75"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7776,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:8",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        8,
+        25,
+        39
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:504",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:826",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:263"
+      ],
+      "topTitles": [
+        "Clustering quality cleanup (deferred)",
+        "re-run kanban-to-parent-atlas sync after archive decisions are made",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "topFeatureIds": [
+        "feature:todo:d95c5dcf45458befd109b456",
+        "feature:todo:518b7cb0495a940422645806",
+        "feature:todo:9ffab6bc4b9cd644239758c2"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:504",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:826",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:263"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.6753,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
@@ -1572,24 +1951,23 @@
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:259",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:784",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:435"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:529",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:419"
       ],
       "topTitles": [
-        "Wire `QueryRouter4x4` into `fetchACPKnowledgeResults` so retrieval can explore dynamically instead of using fixed lane defaults.",
-        "Confirm the live task mirror schema for `task_semantic_packets`",
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Seed legal canon chunks (legal PDF ingest pipeline)"
       ],
       "topFeatureIds": [
-        "feature:todo:0d3ab6734e763f3f7697cfc0",
-        "feature:todo:951f1337ba4de5a57686d986",
-        "feature:todo:341f9d2bc50bbbc3a8ca69a3"
+        "feature:todo:28992ba01871f873f4c05915",
+        "feature:todo:322cf977b5fa41f902b9321b",
+        "feature:todo:bb7188da8e37c9d39482c279"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:259",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:784",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:435"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:529",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:419"
       ],
       "statuses": {
         "todo": 3
@@ -1600,544 +1978,41 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0185,
+        "cohesion": 0.7913,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:106",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:123",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        9,
-        106,
+        12,
+        26,
         123
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:300",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:529",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:587"
-      ],
-      "topTitles": [
-        "Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema",
-        "Seed legal canon chunks (legal PDF ingest pipeline)",
-        "WebGPU optional only (do not require WebGPU)"
-      ],
-      "topFeatureIds": [
-        "feature:todo:1c1c05a2ad42be0af8be0757",
-        "feature:todo:28992ba01871f873f4c05915",
-        "feature:todo:766413ce20ee852d0750e788"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:300",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:529",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:587"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0122,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:70",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        70,
-        87,
-        101
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:316",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:794",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:510"
-      ],
-      "topTitles": [
-        "Keep the pruning lane offline-only; it should not become a startup dependency.",
-        "Add a read/query path for NES chrom packets and recent hits by `sourceRef` / `featureId` / `queryHash`",
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "topFeatureIds": [
-        "feature:todo:19b6bdabfc35748b3abe43b9",
-        "feature:todo:d03cf5787e951fe5e6dad698",
-        "feature:todo:d8ab6855119337da53bd1cb0"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:316",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:794",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:510"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0084,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:68",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        68,
-        85,
-        99
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:317",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:436",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23"
-      ],
-      "topTitles": [
-        "Audit PostgreSQL 17.6 vs 18 table/index drift and use the result to label canonical production tables vs experimental / archive-only tables.",
-        "Route agentic errors through a read-only proposal flow that launches parallel repair subagents before any patching is considered.",
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "topFeatureIds": [
-        "feature:todo:851702bfd009e88acf89b080",
-        "feature:todo:1bd33c5ca64b01df42e9fcac",
-        "feature:todo:2aed3e03cc66e3e478a5479d"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:317",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:436",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0101,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:24",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        24,
-        41,
-        55
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:355",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:433",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:455"
-      ],
-      "topTitles": [
-        "Expand Neo4j context trees from KAG / DAG hits so multi-hop traversals can reuse the same sourceRef spine.",
-        "Add the export/import bridge that turns local SQLite research state into canonical backend rows before ACE packet generation.",
-        "Emit a short comparison note for Gemma4 vs Hermes vs local-deep-research so the assistant path stays explicit."
-      ],
-      "topFeatureIds": [
-        "feature:todo:1967eedf615aa4f61bb9001b",
-        "feature:todo:a877e91eada4ba20c44f8b37",
-        "feature:todo:5d22b2b996d856b77506427c"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:355",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:433",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:455"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0017,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:107",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        10,
-        107,
-        124
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:387",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:775",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:869"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Project the Parent Atlas feature command atlas into `parent_atlas_jobs` and a Neo4j Cypher export so the containers become durable indexing packets instead of r"
-      ],
-      "topFeatureIds": [
-        "feature:todo:864b06c9ae590874c8a97736",
-        "feature:todo:31595ba6c0ff5254d39848b5",
-        "feature:todo:3851354f3117385472fc7eb5"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:387",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:775",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:869"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0295,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:108",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        11,
-        108,
-        125
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:429",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:570",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:807"
-      ],
-      "topTitles": [
-        "Inventory the current `local-deep-research` compose and note the current boundary: local SQLite state on the research side, canonical backend stores in the repo",
-        "Add `alias_id` to parent atlas profile payloads, task mirror payloads, and retrieval events once the live `task_semantic_packets` migration is applied",
-        "Archive duplicate JSON-RPC 2.0 shim logic after the canonical handler is confirmed"
-      ],
-      "topFeatureIds": [
-        "feature:todo:647bb722ed21ed7cbc94072d",
-        "feature:todo:345f071ce68fa8162ef4bf2d",
-        "feature:todo:60b1a6d9622cfd4be3d92ea4"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:429",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:570",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:807"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0006,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:11",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        11,
-        28,
-        42
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:432",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:867",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:541"
-      ],
-      "topTitles": [
-        "Align `local-deep-research` to an OpenAI-compatible `llama-server` endpoint when using `llama.cpp`; keep Hermes test-only unless it proves useful as a separate ",
-        "Scaffold or promote the `napi-rs` prototype API surface (`parse_batch`, `compute_centroids`, Tokio worker handoff)",
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "topFeatureIds": [
-        "feature:todo:325923e1f45a27e423516f44",
-        "feature:todo:fbc090d17b770f5c659e5d28",
-        "feature:todo:f0f27b8fcc26eb849fe76242"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:432",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:867",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:541"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0106,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:77",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        77,
-        94,
-        108
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:439",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:86",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:454"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Promote each proposal run into the engram registry (`memory_registry` + `engram_cards`) so the repair timeline is indexed as reusable memory, not just audit his"
-      ],
-      "topFeatureIds": [
-        "feature:todo:0aa8e73629125ac4b069abd9",
-        "feature:todo:f85f7b428819c0244985ab85",
-        "feature:todo:b04cb35f007d8bae79ba97ca"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:439",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:86",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:454"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0285,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:33",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        33,
-        50,
-        64
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:449",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:91",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:584"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Keep LangGraph optional as orchestration only; no direct DB/Qdrant writes from graph nodes."
-      ],
-      "topFeatureIds": [
-        "feature:todo:36a520b68d772f80f148300f",
-        "feature:todo:9289019adf7d2721550af764",
-        "feature:todo:a8329db04d9e038d5dbf0ad5"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:449",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:91",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:584"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0189,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:13",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        13,
-        30,
-        44
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:451",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:235",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:583"
-      ],
-      "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Store docs and large artifacts in SeaweedFS, not in the research container's local SQLite boundary."
-      ],
-      "topFeatureIds": [
-        "feature:todo:26b2bebdc5c285740e7bce4d",
-        "feature:todo:af15f2f3c8d9e6c470e05b29",
-        "feature:todo:57f67bd8348b2f120581c642"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:451",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:235",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:583"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0085,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:91",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        91,
-        108,
-        122
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:510",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:788",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:440"
-      ],
-      "topTitles": [
-        "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred",
-        "Recover or containerize the missing worker lanes required for the full offline path",
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "topFeatureIds": [
-        "feature:todo:d8ab6855119337da53bd1cb0",
-        "feature:todo:cba41628d9e42971e1bfd189",
-        "feature:todo:d60e7fd1e58a9ac27398d940"
-      ],
-      "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:510",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:788",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:440"
-      ],
-      "statuses": {
-        "todo": 3
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0306,
-        "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:38",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        38,
-        55,
-        69
-      ],
-      "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
-      ],
-      "sourceRefs": [
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:530",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:822",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:585"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:314",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:440"
       ],
       "topTitles": [
-        "Add Playwright test fixtures for auth + DB seeding",
-        "verify schema drift against the moved feature folders",
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Add Playwright test fixtures for auth + DB seeding"
       ],
       "topFeatureIds": [
         "feature:todo:82a8f6f34cd584027481e379",
-        "feature:todo:7bff888f19bae6332e81eb0a",
-        "feature:todo:f6cac7bf75adc262479ce1db"
+        "feature:todo:d5113512a1121e2900be4215",
+        "feature:todo:d60e7fd1e58a9ac27398d940"
       ],
       "topSourceRefs": [
         "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:530",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:822",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:585"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:314",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:440"
       ],
       "statuses": {
         "todo": 3
@@ -2148,41 +2023,41 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0154,
+        "cohesion": 0.7929,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:86",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:75",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        86,
-        103,
-        117
+        75,
+        92,
+        106
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:812",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:867",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:868"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:535",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:236",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:431"
       ],
       "topTitles": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Phase 20 A6000 training lane"
+        "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
       ],
       "topFeatureIds": [
-        "feature:todo:81e57bc0d2fe676cd78238f2",
-        "feature:todo:fbc090d17b770f5c659e5d28",
-        "feature:todo:a3b86bb63f937fceeb3bb021"
+        "feature:todo:4c05231411f757965000cedb",
+        "feature:todo:c3dab502e86cc90f236e9a48",
+        "feature:todo:242aeb4c8a2fd571a88fb8f6"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:812",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:867",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:868"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:535",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:236",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:431"
       ],
       "statuses": {
         "todo": 3
@@ -2193,41 +2068,41 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0054,
+        "cohesion": 0.8145,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:6",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:40",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        6,
-        23,
-        37
+        40,
+        57,
+        71
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:820",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:447",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:451"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:544",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:807",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:869"
       ],
       "topTitles": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "do not enable FP16 globally before the comparison is recorded"
+        "**Remaining Lower-Priority**"
       ],
       "topFeatureIds": [
-        "feature:todo:86664b89691c50d8e4f02a68",
-        "feature:todo:8e5eaf945282c9ba26406b26",
-        "feature:todo:26b2bebdc5c285740e7bce4d"
+        "feature:todo:d155181e742183f8dd1ebfb5",
+        "feature:todo:60b1a6d9622cfd4be3d92ea4",
+        "feature:todo:3851354f3117385472fc7eb5"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:820",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:447",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:451"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:544",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:807",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:869"
       ],
       "statuses": {
         "todo": 3
@@ -2238,41 +2113,42 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0138,
+        "cohesion": 0.8209,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:84",
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:62",
       "recordCount": 3,
       "openCount": 3,
       "clusterIds": [
-        84,
-        101,
-        115
+        62,
+        79,
+        93
       ],
       "featureFamilies": [
         "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:870",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:49",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:243"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:570",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:869",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:806"
       ],
       "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Add telemetry for parse latency, worker queue time, and GPU allocation metrics"
+        "Add `alias_id` to parent atlas profile payloads, task mirror payloads, and retrieval events once the live `task_semantic_packets` migration is applied",
+        "Wire the production native base image into CI so the runtime image and addon ABI stay pinned",
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
       ],
       "topFeatureIds": [
-        "feature:todo:33e49c6bf3ce8231ba4f6402",
-        "feature:todo:a11f763c236417569484b3e7",
-        "feature:todo:6ad7088a53bb671d7863d642"
+        "feature:todo:345f071ce68fa8162ef4bf2d",
+        "feature:todo:3851354f3117385472fc7eb5",
+        "feature:todo:2850678b92201182850900fb"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:870",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:49",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:243"
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:570",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:869",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:806"
       ],
       "statuses": {
         "todo": 3
@@ -2283,7 +2159,142 @@
       "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0278,
+        "cohesion": 0.6455,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:79",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        79,
+        96,
+        110
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:805",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:430"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Archive redundant Svelte 5 runes carry-logic layers once the feature folders are stable"
+      ],
+      "topFeatureIds": [
+        "feature:todo:9d706730404ce1b74ebc1ba0",
+        "feature:todo:2aed3e03cc66e3e478a5479d",
+        "feature:todo:5859a864610db3d6a2493463"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:805",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:430"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7415,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:15",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        15,
+        32,
+        46
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:814",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:383",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:823"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "Unsloth + PyTorch install and validation"
+      ],
+      "topFeatureIds": [
+        "feature:todo:bcaa5532bc0ebd95d4c83621",
+        "feature:todo:c7555bf2fd60736e3f31a778",
+        "feature:todo:e9ee98a5e46461a30b8c0a05"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:814",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:383",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:823"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.8106,
+        "pairCount": 3
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:12",
+      "recordCount": 3,
+      "openCount": 3,
+      "clusterIds": [
+        12,
+        29,
+        43
+      ],
+      "featureFamilies": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+      ],
+      "sourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:815",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:434",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:452"
+      ],
+      "topTitles": [
+        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+        "optional LoRA / QLoRA adapter training"
+      ],
+      "topFeatureIds": [
+        "feature:todo:345a2ebee67a1aabc71e2f6f",
+        "feature:todo:18afe17870a6d2d0f1856193",
+        "feature:todo:f110c0ebab6f7b882bf8997c"
+      ],
+      "topSourceRefs": [
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:815",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:434",
+        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:452"
+      ],
+      "statuses": {
+        "todo": 3
+      },
+      "backendCounts": {
+        "offline": 3
+      },
+      "priorityMax": 0,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.7828,
         "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."

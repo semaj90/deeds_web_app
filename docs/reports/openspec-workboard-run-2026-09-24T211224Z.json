@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T21:12:24Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-candidate-feature-execution-fabric",
+      "progress": "Strict validation passes at 185/276. Current lineage census fails first at EXECUTION_SOURCE_AUTHORITY with 0 CandidateOrdinal-eligible rows; QUERY-FEATURE-05 lacks a frozen known-good query/top-k baseline.",
+      "to": "parent-atlas-code-ingestion-pipeline",
+      "task": "inspect the source-ingestion authority prerequisites that feed the currently blocked candidate/source lineage join",
+      "outcome": "Strict validation passes at 23/35. Current cross-source lineage receipts still fail at EXECUTION_SOURCE_AUTHORITY: 0 packet revision derivable, 16,554 packet rows unqualified, 0/128 selected exact source matches, and 0 packet revision-qualified. Existing AST sidecar models provide spans/symbol observations/typed edges, but there is no single established cross-layer SymbolFact owner; GPH-02 and lifecycle/promotion gates remain open. Live persistence is not authorized by the evidence.",
+      "reason": "This is the upstream authority path implicated by the candidate feature failure boundary, not an unrelated workboard item."
+    }
+  ],
+  "scope": {
+    "readOnlyUntilTaskClassification": true,
+    "candidateFiles": [
+      "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+      "openspec/changes/parent-atlas-code-ingestion-pipeline/proposal.md",
+      "openspec/changes/parent-atlas-code-ingestion-pipeline/design.md",
+      "openspec/changes/parent-atlas-code-ingestion-pipeline/specs"
+    ],
+    "forbidden": [
+      "source identity invention",
+      "canonical promotion without current source binding",
+      "datastore writes",
+      "container rebuilds until end of workboard tranche",
+      "Graphify"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "candidateFeatureProgress": "185/276",
+    "candidateOrdinalEligibleRows": 0,
+    "candidateFeatureStrictOpenSpec": "PASS",
+    "codeIngestionInspection": "COMPLETE; SOURCE_AUTHORITY_JOIN_AND_GPH_OWNER_ACCEPTANCE_OPEN",
+    "codeIngestionProgress": "23/35",
+    "strictOpenSpec": "PASS",
+    "firstFailureBoundary": "EXECUTION_SOURCE_AUTHORITY",
+    "packetRevisionDerivableRows": 0,
+    "packetRowsUnqualified": 16554,
+    "selectedExactSources": 128,
+    "packetSourceRevisionMatches": 0,
+    "packetRevisionQualified": 0,
+    "canonicalWrites": 0,
+    "gph02": "NOT_CLOSED; no unified established SymbolFact owner to nominate without a new owner decision",
+    "gph17OwnerAcceptance": "OPEN",
+    "graphifyDailyRun": false,
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "CODE_INGESTION_WAITING_FOR_SOURCE_AUTHORITY_JOIN_AND_GRAPHIFY_OWNER_ACCEPTANCE"
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.packet-source-revision-repair-manifest.v2",
+  "checksumRecipe": "sorted-key-json-sha256-v1",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "targetTable": "atlas_packets",
+  "targetColumns": [
+    "source_revision",
+    "workspace_revision_key",
+    "lineage_binding_checksum",
+    "lineage_producer_revision"
+  ],
+  "beforeStateGuard": {
+    "sourceRevision": null,
+    "contentHash": null,
+    "workspaceRevisionKey": null,
+    "lineageBindingChecksum": null
+  },
+  "entryCount": 0,
+  "shards": [],
+  "accounting": {
+    "membershipTotal": 25542,
+    "inScope": 24456,
+    "outcomes": {
+      "MISSING_PACKET": 7350,
+      "IDEMPOTENT_MATCH": 16151,
+      "ADMITTED_SNAPSHOT_BYTES_DIFFER_FROM_CURRENT_WORKTREE": 844,
+      "LEGACY_CONTENT_HASH_UNQUALIFIED": 93,
+      "SOURCE_BYTES_MISSING": 8,
+      "IDENTITY_COLLISION": 10,
+      "OUT_OF_SCOPE_REPOSITORY": 1086,
+      "WORKSPACE_SCOPE_MISMATCH": 0
+    },
+    "outcomeSum": 25542,
+    "fullyAccounted": true
+  }
+}

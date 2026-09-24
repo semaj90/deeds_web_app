@@ -1,6 +1,9 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
+// GraphNodeKind is a semantic node taxonomy. GraphNodeKeyV1 is narrower: it
+// admits only identities with an established projection address. A node kind
+// does not gain a key prefix merely by appearing in that taxonomy.
 export const graphNodeKeyV1Schema = z.string().regex(/^(symbol|packet|chunk|occurrence):.+$/);
 export type GraphNodeKeyV1 = z.infer<typeof graphNodeKeyV1Schema>;
 

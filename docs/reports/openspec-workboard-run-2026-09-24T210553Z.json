@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T21:05:53Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-agentic-repair-fabric",
+      "progress": "Strict OpenSpec PASS; focused agentic tests 34 files/101 tests PASS; OAK and Go Retrieval health are HTTP 200; current lineage still has 0 fully qualified candidate rows, so live repair was not safe or authorized.",
+      "to": "parent-atlas-graph-runtime-enhancement",
+      "task": "inspect one remaining graph-runtime task for a bounded, non-mutating implementation/proof opportunity",
+      "outcome": "One open follow-up was stale: the tracked bundle already contains an idempotent codebase_file_path index declaration and SHOW INDEXES readback query (commit 400e6ee86a). Marked that task complete. Strict OpenSpec passed. Remaining direction options (docs-only/scaffold/implementation) are explicitly undecided; fresh Graphify is separately prohibited until the end-of-workboard tranche.",
+      "reason": "The previous gate is terminally blocked for this tranche by missing source lineage/authorization; continue toward the user's broader workboard objective with one explicitly recorded next change."
+    }
+  ],
+  "scope": {
+    "readOnlyUntilTaskClassification": true,
+    "candidateFiles": [
+      "openspec/changes/parent-atlas-graph-runtime-enhancement/tasks.md",
+      "openspec/changes/parent-atlas-graph-runtime-enhancement/proposal.md",
+      "openspec/changes/parent-atlas-graph-runtime-enhancement/design.md",
+      "openspec/changes/parent-atlas-graph-runtime-enhancement/specs"
+    ],
+    "forbidden": [
+      "Graphify",
+      "datastore writes",
+      "container rebuilds until end of workboard tranche",
+      "unrelated OpenSpec changes"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "previousGate": "AGENTIC_REPAIR_FABRIC_LIVE_EXECUTION_BLOCKED_BY_LINEAGE_AND_AUTHORIZATION",
+    "nextInspection": "COMPLETE; one stale checkbox reconciled",
+    "graphRuntimeProgress": "3/8",
+    "formalIndexTask": "COMPLETE_EXISTING_TRACKED_DECLARATION_VERIFIED",
+    "indexDdlExecuted": false,
+    "graphifyTask": "DEFERRED_BY_USER_UNTIL_END_OF_WORKBOARD_TRANCHE",
+    "remainingDirectionChoice": "OWNER_DECISION_REQUIRED_FOR_DOCS_ONLY_VS_SCAFFOLD_VS_GR0_GR3_IMPLEMENTATION",
+    "strictOpenSpec": "PASS",
+    "scopedDiffCheck": "PASS",
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "GRAPH_RUNTIME_STALE_INDEX_TASK_CLOSED; REMAINDER_WAITING_FOR_OWNER_DECISION_AND_GRAPHIFY_WINDOW"
+}

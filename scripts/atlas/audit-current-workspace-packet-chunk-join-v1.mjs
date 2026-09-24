@@ -74,7 +74,9 @@ try {
       SELECT DISTINCT g.source_ref, g.source_revision, g.workspace_revision,
              g.content_digest, p.packet_key, p.source_revision AS packet_source_revision,
              p.workspace_revision_key AS packet_workspace_revision,
-             p.content_hash AS packet_content_hash
+             p.content_hash AS packet_content_hash,
+             p.lineage_binding_checksum AS packet_lineage_binding_checksum,
+             p.lineage_producer_revision AS packet_lineage_producer_revision
       FROM graphify_exact g
       LEFT JOIN public.atlas_packets p
         ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref
@@ -96,6 +98,20 @@ try {
       (SELECT count(DISTINCT source_ref) FROM proven_lineage)::integer AS packet_chunk_exact_sources,
       (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL)::integer AS packet_source_rows,
       (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision)::integer AS packet_revision_matches,
+      (SELECT count(*) FROM (
+        SELECT source_ref
+        FROM packet_candidates
+        WHERE packet_key IS NOT NULL
+        GROUP BY source_ref
+        HAVING count(DISTINCT packet_key) = 1
+          AND count(DISTINCT source_revision) = 1
+          AND bool_or(
+            lower(packet_source_revision) = source_revision
+            AND lower(packet_workspace_revision) = workspace_revision
+            AND packet_lineage_binding_checksum IS NOT NULL
+            AND packet_lineage_producer_revision IS NOT NULL
+          )
+      ) exact_revision_qualified)::integer AS packet_revision_workspace_binding_matches,
       (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision AND lower(packet_content_hash) = content_digest AND packet_workspace_revision = workspace_revision)::integer AS packet_full_identity_matches,
       (SELECT count(*) FROM (SELECT source_ref FROM packet_candidates WHERE packet_key IS NOT NULL GROUP BY source_ref HAVING count(DISTINCT packet_key) > 1) ambiguous)::integer AS packet_ambiguous_sources,
       (SELECT count(DISTINCT p.source_ref) FROM graphify_exact g JOIN public.atlas_packets p ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref AND lower(btrim(p.content_hash)) = g.content_digest)::integer AS packet_content_matches,

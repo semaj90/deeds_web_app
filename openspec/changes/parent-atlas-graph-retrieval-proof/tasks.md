@@ -37,6 +37,26 @@
 ## GS1.10 - Separate identity contracts
 
 - [ ] Define separate contracts for `parse_node_id`, `symbol_id`, `symbol_version_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`.
+- [ ] GS1.10 STATIC RECONCILIATION (2026-09-24, read-only; no schema/data/code change, parent boxes deliberately NOT ticked).
+  Vocabulary/types: `PROVEN_EXISTING_IMPLEMENTATION` — `sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts`
+  defines branded types + interfaces for all seven (the "no live `parse_node_id`/`symbol_version_id` contract" text below is stale
+  on *definition*, still true on *population*). Cross-reference, do not duplicate: `CANONICAL-IDENTITY-V1` (lineage-dag-convergence,
+  `SPEC_DRAFT`; `packages/atlas-core/src/identity/canonical-identity-v1.ts`).
+  | id | owner / role | revision | authority vs projection | forbidden substitution |
+  |---|---|---|---|---|
+  | `parse_node_id` | `graph-identity-contracts.ts` (`tree-node-occurrence-v1.ts` = occurrence id, sha256 of sourceRef+sourceRevision+nodeType+bytes) — AST occurrence | yes | structural evidence | != `symbol_id`, != `symbol_version_id` |
+  | `symbol_id` | `graph-identity-contracts.ts`, `symbol-identity-audit-v1.ts` — logical symbol | no | logical authority | != revision-qualified occurrence |
+  | `symbol_version_id` | same + `symbol-revision-qualification-v1.ts` — symbol at a source revision | yes | authority | != `symbol_id` |
+  | `chunk_id` | `graph-identity-contracts.ts`, `canonicalChunkId` in CANONICAL-IDENTITY-V1 — retrieval chunk | yes (chunkerRevision) | mirror identity | never inferred from `packet_key` or a projection address |
+  | `packet_key` | `packet-identity-resolver.ts`, `PacketIdentityRefV1` (lifecycle explicitly UNDEFINED per PACKET-KEY-SINGLE-OWNER-CONVERGENCE-01) | not in type | join identity | never manufactured from a Qdrant id; not a `stableFileId` |
+  | `concept_id` | ontology tables (`atlas_ontology_concepts` per the schema tournament; `concept_records` from drizzle 0032 is a 0-row duplicate candidate) — UNVERIFIED which column is the key | no (intentional? NOT decided) | ontology identity, referenced only | not a graph/source identity |
+  | `graph_node_key` | `packages/parent-atlas/src/core/graph-node-key-v1.ts` (`^(symbol|packet|chunk|occurrence):.+$`), consumed by `graph-ordinal-map-v1.ts` | optional | PROJECTION address | never substitutes for `packet_key`, `chunk_id`, `symbol_id`, `symbol_version_id`, `parse_node_id` |
+  Findings: (a) `GraphNodeKind` in `graph-identity-contracts.ts` lists CONCEPT/DOCUMENT/PROCESS/PACKAGE/TEST/EXTERNAL_DOC but the
+  `graphNodeKeyV1Schema` regex only admits symbol|packet|chunk|occurrence prefixes — the two disagree; (b) `tree_node_id` = projection/
+  occurrence compatibility field, never canonical symbol identity; Qdrant point id / `qdrant_id` = projection address, != `packet_key`.
+  STILL OPEN (unchanged): live population (`atlas_tree_nodes` has no `symbol_id`/`symbol_version_id`; Neo4j/Qdrant writers still emit
+  `tree_node_id`; 23% tree-node to `feature_id` linkage), `concept_id` key owner + revisionless decision, allowed-join rules as code.
+  Status: ownership/join semantics `PARTIAL / PROOF_ONLY`; live population `BLOCKED_BY_LINEAGE`.
 - [ ] Keep `tree_node_id` as a provisional structural field until the separate contracts are proven live.
 - [ ] Do not relax `atlas_graph_nodes_v2_tree_node_unique` until the split identity model is implemented and tested.
 - [ ] Current evidence:

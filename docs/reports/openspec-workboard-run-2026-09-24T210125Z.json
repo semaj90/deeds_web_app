@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T21:01:25Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-agentic-file-compiler",
+      "progress": "AFC-05I is not an active compiler task; agentic-file-compiler strict validation passed and its remaining runtime/lineage gates are unchanged",
+      "to": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "task": "verify and continue the explicitly identified durable LOD-02 reproducibility evidence work",
+      "outcome": "existing LOD-02 receipt satisfies the durable-evidence prerequisite. No exact 6,774-row SemanticSnapshotManifest exists in the inspected report/artifact inventory; the available snapshot proofs are a 100-row incomplete candidate and a separate 55,169-row training snapshot. The canary contract requires a subject manifest ID and cohort checksums/ordered IDs that are not present in the receipt.",
+      "reason": "The handoff explicitly names this as the next tranche and requires a durable evidence receipt before constructing any noncanonical canary."
+    }
+  ],
+  "scope": {
+    "readOnlyAudit": true,
+    "candidateFiles": [
+      "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+      "docs/reports/parent-atlas/lod-02-representation-reproducibility-evidence-v1.json",
+      "sveltekit-frontend/src/lib/server/atlas/tensors/semantic-snapshot-reproducibility-canary-v1.ts"
+    ],
+    "forbidden": [
+      "atlas_representations promotion or update",
+      "PostgreSQL/Qdrant/Valkey/Neo4j writes",
+      "container rebuilds",
+      "Graphify"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "lodTaskProgress": "52/109",
+    "existingReceipt": "docs/reports/parent-atlas/lod-02-representation-reproducibility-evidence-v1.json",
+    "receiptStatus": "PROVEN_CURRENT_RUNTIME_REPRODUCIBILITY",
+    "cohortRows": 6774,
+    "withinOneFp16Ulp": 6774,
+    "strictSnapshotEligibleRows": 0,
+    "reproducibilityCanary": "contract exists; populated canary not built",
+    "exactCohortManifest": "NOT_FOUND",
+    "canaryRequiredFieldsMissingFromReceipt": [
+      "subjectSnapshotId for the exact 6,774-row cohort",
+      "sourceLineageChecksum",
+      "recipeEvidenceChecksum",
+      "orderedCanonicalIdsChecksum"
+    ],
+    "strictValidation": "PASS; change remains open",
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "LOD02_DURABLE_RECEIPT_PRESENT; CANARY_WAITING_FOR_EXACT_COHORT_MANIFEST_AND_SEALED_ROW_CHECKSUMS"
+}

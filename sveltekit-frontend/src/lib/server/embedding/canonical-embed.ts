@@ -1,8 +1,12 @@
 /**
  * Canonical embedding entrypoint.
  *
- * Prefers the local app embedding route for the canonical EmbeddingGemma lane,
- * then falls back to the local ONNX 768-dim lane when available.
+ * Uses the local app embedding route for the canonical EmbeddingGemma lane and
+ * fails closed (returns null) when it is unavailable. The local ONNX executor is
+ * NOT a canonical fallback: it is not in the semantic_768 space (2026-09-24 parity
+ * probe: mean-pooled last_hidden_state without the Dense projections ~0 cosine vs
+ * Ollama; QInt8 export with Dense ~0.537 vs fp32). Use tryEmbedOnnxChallenger()
+ * explicitly for challenger/proof work.
  * This module stays intentionally small so server routes can import it
  * without loading the entire embeddings stack at startup.
  */
@@ -13,7 +17,17 @@ import { validateSemantic768OutputV1 } from '../atlas/embedding/embedding-runtim
 export type CanonicalEmbeddingResult = {
   model: string;
   embedding: number[];
-  source: 'api-embed' | 'onnx-local';
+  source: 'api-embed';
+};
+
+/** Result of the explicit, non-canonical ONNX challenger executor. */
+export type OnnxChallengerEmbeddingResult = {
+  embedding: number[];
+  provider: 'onnx-local-cpu';
+  modelArtifactPath: string | null;
+  recipe: 'mean_pool_last_hidden_state_l2_no_dense';
+  canonicalAuthority: false;
+  promotionEligible: false;
 };
 
 export type Semantic768CanonicalResult = {
@@ -106,16 +120,19 @@ export async function tryEmbedCanonical(
       const response = await fetch(`${baseUrl}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // The route's schema only accepts 'embeddinggemma' | 'mock'; a tagged name such as
+        // 'embeddinggemma:latest' is rejected with 400.
         body: JSON.stringify({
           text,
-          model: opts?.model ?? 'embeddinggemma:latest',
+          model: opts?.model === 'mock' ? 'mock' : 'embeddinggemma',
         }),
         signal: opts?.signal ?? AbortSignal.timeout(opts?.timeoutMs ?? 10_000),
       });
 
       if (response.ok) {
         const data = await response.json() as { embedding?: number[]; model?: string };
-        if (Array.isArray(data.embedding) && data.embedding.length > 0) {
+        // The route answers an unauthenticated call with 200 + an all-zero vector; never accept it.
+        if (Array.isArray(data.embedding) && data.embedding.length > 0 && data.embedding.some((v) => v !== 0)) {
           return {
             model: data.model ?? opts?.model ?? 'embeddinggemma:latest',
             embedding: data.embedding,
@@ -128,21 +145,22 @@ export async function tryEmbedCanonical(
     // Local API route is best-effort.
   }
 
-  try {
-    const { tryEmbedOnnx, isOnnxEmbedAvailable } = await import('./onnx-embed.js');
-    if (await isOnnxEmbedAvailable()) {
-      const embedding = await tryEmbedOnnx(text);
-      if (embedding) {
-        return {
-          model: opts?.model ?? 'embeddinggemma-onnx',
-          embedding,
-          source: 'onnx-local',
-        };
-      }
-    }
-  } catch {
-    // Local ONNX lane is best-effort.
-  }
-
+  // CANONICAL_EMBEDDING_UNAVAILABLE: no ONNX, deterministic, or zero-vector fallback.
   return null;
+}
+
+/** Explicit ONNX challenger/proof executor. Never canonical, never promotion evidence. */
+export async function tryEmbedOnnxChallenger(text: string): Promise<OnnxChallengerEmbeddingResult | null> {
+  const { tryEmbedOnnx, isOnnxEmbedAvailable, getOnnxEmbedLocalModelPath } = await import('./onnx-embed.js');
+  if (!(await isOnnxEmbedAvailable())) return null;
+  const embedding = await tryEmbedOnnx(text);
+  if (!embedding) return null;
+  return {
+    embedding,
+    provider: 'onnx-local-cpu',
+    modelArtifactPath: getOnnxEmbedLocalModelPath(),
+    recipe: 'mean_pool_last_hidden_state_l2_no_dense',
+    canonicalAuthority: false,
+    promotionEligible: false,
+  };
 }

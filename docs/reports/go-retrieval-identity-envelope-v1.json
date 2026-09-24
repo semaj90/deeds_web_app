@@ -1,6 +1,6 @@
 {
   "schema": "atlas.go-retrieval-identity-envelope.v1",
-  "generatedAt": "2026-09-21T03:01:45.979Z",
+  "generatedAt": "2026-09-24T20:34:41.824Z",
   "baseUrl": "http://127.0.0.1:8100",
   "query": "PostgreSQL source revision",
   "limit": 3,
@@ -30,7 +30,7 @@
     "readiness_state": "READY_FULL",
     "redisConnected": true,
     "status": "healthy",
-    "timestamp": 1789959705902
+    "timestamp": 1790282078075
   },
   "resultCount": 3,
   "rows": [
@@ -59,11 +59,11 @@
     {
       "chunkId": null,
       "chunkIdKind": "MISSING",
-      "packetKey": "packet:85296781bd60",
-      "sourceRef": "sveltekit-frontend/src/lib/server/db/index-clean.ts",
-      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/db/index-clean.ts",
-      "contentHash": "8c0dd1aac9881528",
-      "representationId": "embeddinggemma_768_native_v1",
+      "packetKey": "ace:packet:4c56fd544344",
+      "sourceRef": "src/lib/server/db/schema-postgres.ts",
+      "canonicalSourceRef": "src/lib/server/db/schema-postgres.ts",
+      "contentHash": "c1d342be3a765fa4",
+      "representationId": null,
       "representationRevision": null,
       "sourceRevision": null
     }
@@ -102,7 +102,7 @@
     {
       "name": "representation-revision-binding",
       "status": "REVIEW_REQUIRED",
-      "detail": "2/3 representation ids lack a revision"
+      "detail": "1/3 representation ids lack a revision"
     },
     {
       "name": "chunk-id-shape",

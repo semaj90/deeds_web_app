@@ -1,0 +1,93 @@
+{
+  "schema": "atlas.packet-source-revision-rollback-shard.v1",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "ordinal": 0,
+  "entries": [
+    {
+      "packetKey": "ace:packet:0051e908c9be",
+      "sourceRef": "docs/architecture/phase8-query-optimization-taxonomy.md",
+      "restore": {
+        "sourceRevision": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null,
+        "lineageProducerRevision": null
+      },
+      "guardEquals": {
+        "sourceRevision": "sha256:3ca5d3c6d57114328d4347f8a4141bb5231bab3ccef86da45bd73f461a127b9c",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "03396edefdb2f097a3628beaf2fd3b553bf81fdc02a91552f9ba90b65ba3dc51",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "contentHashGuard": null
+    },
+    {
+      "packetKey": "ace:packet:014b1c91aa72",
+      "sourceRef": "scripts/agent/schema-agent-tracking.sql",
+      "restore": {
+        "sourceRevision": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null,
+        "lineageProducerRevision": null
+      },
+      "guardEquals": {
+        "sourceRevision": "sha256:25557b5b05ee2485877f9c80d2c1a658caa94b2fc7b61746dea065bfea03832d",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "72a0dfb3211fd9baf3083e9d38c0f951e50bc75e6475a7f5418ea6df9169269b",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "contentHashGuard": null
+    },
+    {
+      "packetKey": "ace:packet:02dae66923a3",
+      "sourceRef": "docs/LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md",
+      "restore": {
+        "sourceRevision": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null,
+        "lineageProducerRevision": null
+      },
+      "guardEquals": {
+        "sourceRevision": "sha256:b07d9637572f5fefd13dcfa2b2fe28b1c8ac295ef8356adae1c2eaf6c2ddfea6",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "0bf9180104fe42778700f7711de2bc25e598947300942da2facd106987069ec6",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "contentHashGuard": null
+    },
+    {
+      "packetKey": "ace:packet:04518e5714ed",
+      "sourceRef": "docs/GEMMA4-POLICY-ORCHESTRATOR-ARCHITECTURE.md",
+      "restore": {
+        "sourceRevision": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null,
+        "lineageProducerRevision": null
+      },
+      "guardEquals": {
+        "sourceRevision": "sha256:8933811f02a6f5eb02eea3ff69e488f83f837428a560b8e172dff484b5ec05d8",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "5d9ce3d11a71682286c8e03a20e4e1cfc1c91dbe2d935c2288b1531d591fb800",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "contentHashGuard": null
+    },
+    {
+      "packetKey": "ace:packet:04abe0bfe254",
+      "sourceRef": "scripts/agent/dag-reducer.mjs",
+      "restore": {
+        "sourceRevision": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null,
+        "lineageProducerRevision": null
+      },
+      "guardEquals": {
+        "sourceRevision": "sha256:5c8f353f871b180d8104212dc2a14d5d0c45d60d223f78674feb2fce68563c86",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "24941f12b789c06778b50a8133294e7d5846ec6470525f0a9b0ece3f2269592c",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "contentHashGuard": null
+    }
+  ]
+}

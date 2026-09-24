@@ -56,3 +56,22 @@ The system MUST expose only explicitly allowlisted read-only tools and methods i
 #### Scenario: A future tool or method is registered
 - **WHEN** a tool or RPC method is not present in the peer allowlist
 - **THEN** it remains available only through its existing internal owner and is not advertised to peer agents.
+
+### Requirement: ACP is a protocol-local editor-session projection, not an execution authority
+The system MUST keep ACP agent, session, task, and action identifiers protocol-local. An ACP ingress MAY be mapped to an existing Atlas task attempt and workflow action only after those records are resolved by their existing owners; ACP MUST NOT mint canonical source, packet, graph, or task identity. ACP is currently accepted only through the legacy ingress contract with outbound ACP disabled and migration target A2A 1.0; this requirement defines the boundary and does not claim live ACP runtime adoption.
+
+#### Scenario: An editor session submits an action
+- **WHEN** an ACP ingress carries a session/task/action reference
+- **THEN** the adapter preserves those values as external references and requires exact caller-resolved Atlas task-attempt, run, workflow-action, ContextManifest checksum, and ExecutionReceipt bindings before producing a projection.
+
+#### Scenario: A tool action is requested or permission is absent
+- **WHEN** an ACP-originated action is considered for dispatch
+- **THEN** the existing tool-authorization owner decides permission; missing or denied permission fails closed, and discovery metadata or ACP ingress alone never authorizes execution.
+
+#### Scenario: A patch or terminal output is returned
+- **WHEN** an editor agent proposes a patch or returns terminal output
+- **THEN** the patch remains a proposal until the existing authorized repair/apply path admits it and independently reads back the result; terminal output is bounded evidence, not identity or authorization, and must not expose credentials, hidden reasoning, prompts, or raw secret-bearing request data.
+
+#### Scenario: Progress is reported to the editor
+- **WHEN** an ACP-compatible surface reports action progress
+- **THEN** it projects existing workflow events and execution receipts; it does not create a parallel run/action ledger or treat external session IDs as canonical identity.

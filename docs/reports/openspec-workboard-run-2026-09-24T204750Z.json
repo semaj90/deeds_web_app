@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T20:47:50Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "ace-hyperrag-chr97-graphify-audit",
+      "progress": "7/7 decision/audit tasks complete; strict validation passes. ACE artifact ownership and AST-aware direction are documented, while production AST wiring remains lineage-gated.",
+      "to": "agent-branch-review-fanout-ace-centroid-aug22",
+      "task": "inspect the remaining gates and verify centroid/ACE input lineage against current receipts",
+      "outcome": "OpenSpec strict validation passes (17/20 tasks complete). Three gates remain: disposable repaired-schema ACE replay is deferred to the end-of-workboard infrastructure tranche; its fallback patch or Viterbi-mask follow-up is conditional on that replay; and merging the two reviewed agent branches remains an operator decision. No container was created and no branch was merged.",
+      "reason": "Last bounded close-first candidate explicitly named in the user's triage order; no assumption that old evidence remains current."
+    }
+  ],
+  "scope": {
+    "readOnly": true,
+    "candidateFiles": [
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/proposal.md",
+      "docs/reports"
+    ],
+    "forbidden": [
+      "centroid promotion without current candidate lineage",
+      "ACE writes",
+      "datastore mutation",
+      "container rebuilds",
+      "Graphify",
+      "unrelated OpenSpec changes"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "priorChangeProgress": "7/7",
+    "priorChangeStrictOpenSpec": "PASS",
+    "agentBranchReviewGate": "WAITING_FOR_END_INFRASTRUCTURE_PROOF_AND_OPERATOR_MERGE_DECISION",
+    "taskProgress": "17/20",
+    "strictOpenSpec": "PASS",
+    "remaining": {
+      "ACEReplay": "requires the disposable repaired-schema proof database; defer per user instruction to rebuild containers only at end",
+      "ConditionalFollowups": "3.3 or 3.4 depend on the ACE replay result",
+      "BranchMerge": "explicit operator decision required; no merge performed"
+    },
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "AGENT_BRANCH_REVIEW_GATE_INSPECTION_PENDING"
+}

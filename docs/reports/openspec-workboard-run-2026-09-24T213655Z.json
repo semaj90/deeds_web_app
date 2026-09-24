@@ -1,0 +1,99 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T21:36:55Z",
+  "selectedChain": "embed-fail-closed → graph-node-key-boundary → execution-source-authority-plan-only",
+  "pivots": [
+    {
+      "from": "execution-source-authority",
+      "to": "final validation and exact PLAN_ONLY authorization package",
+      "outcome": "terminal blocker classified; no subsequent OpenSpec task selected",
+      "reason": "Current evidence does not establish an actionable canonical mutation owner or exact target DML scope."
+    }
+  ],
+  "verification": {
+    "embedContractTests": "5/5 PASS",
+    "embedRouteTests": "7 PASS; 58 skipped by focused filter",
+    "graphNodeKeyTests": "4/4 PASS",
+    "parentAtlasPackageBuild": "PASS",
+    "parentAtlasGraphRetrievalProofStrict": "PASS",
+    "parentAtlasRetrievalLineageDagConvergenceStrict": "PASS",
+    "embedDiffCheck": "PASS",
+    "graphDiffCheck": "PASS",
+    "svelteCheck": "INCOMPLETE/TIMED_OUT; no diagnostics returned during bounded wait; focused tests and strict OpenSpec checks remain the scoped proof",
+    "nomicTestReview": "production route schema allows only embeddinggemma|mock; rejecting nomic matches the existing canonical schema"
+  },
+  "sourceAuthority": {
+    "status": "SOURCE_AUTHORITY_APPLY_AUTHORIZATION_REQUIRED_NOT_READY",
+    "readOnlyPlan": "docs/reports/current-source-authority-repair-plan-v1.json",
+    "planStatus": "REPAIR_PLAN_PARTIAL_EXACT_BLOCKED",
+    "ownerRunId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "ownerSelection": "CANONICAL_EXECUTION_FILE_MEMBERSHIP_V2",
+    "rowCount": 25542,
+    "currentBindingCount": 25426,
+    "inScopeRowCount": 24456,
+    "exactCurrentBindings": 23610,
+    "currentBindingMismatches": 838,
+    "excludedSubmoduleRows": 1086,
+    "sourceUnavailableRows": 8,
+    "canonicalAuthority": false,
+    "authorizationRequired": true,
+    "databaseWrites": 0,
+    "projectionWrites": 0,
+    "repairClass": "UNRESOLVED_OWNER_AND_TARGET_SCOPE; neither A nor B is currently authorizable",
+    "reason": "The plan compares canonical Graphify execution membership to a materialized current workspace and writes only a report. It does not identify target packet/source-binding DML, exact target rows, or a proven source-authority producer for those writes."
+  },
+  "lineageBaseline": {
+    "workspaceSourceRows": 52,
+    "packetQualifiedRows": 0,
+    "packetChunkQualifiedRows": 4,
+    "astQualifiedRows": 48,
+    "spanQualifiedRows": 0,
+    "candidateOrdinalEligibleRows": 0,
+    "afterApplyValues": null,
+    "note": "No apply was performed; the existing concurrently modified receipt was not overwritten or rerun."
+  },
+  "execution": {
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "neo4jWrites": 0,
+    "valkeyWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "applyExecuted": false
+  },
+  "sourceAuthorityWriterTrace": {
+    "status": "SOURCE_AUTHORITY_APPLY_AUTHORIZATION_REQUIRED",
+    "revisionDomain": "code_source_revision and atlas_workspace_source_bindings.source_revision both encode sha256 of exact UTF-8 source bytes; membership digest and binding content_digest agree in the sealed cohort",
+    "canonicalRepairOwner": "scripts/atlas/produce-current-packet-digest-bridge-v1.mjs; code-reviewed as read-only census plus separately gated exact-manifest repair",
+    "packetCreationPath": "scripts/atlas/register-orphaned-chunks.mjs; legacy/bulk path now requires capture-lineage evidence for apply and propagates the exact admitted revision",
+    "otherRuntimeWriterFamilies": [
+      "semantic-packet-writer.ts (strict admitted wrapper exists; generic API still permits null; no production caller found)",
+      "api/atlas/index-doc, unknown promotion executor, topology hierarchy, retrieval promote outbox, ACP materializer, HyperRAG materializer (separate packet insert owners; not unified by this change)"
+    ],
+    "staleReader": "graphify_current_source_membership_v1.sql reads graphify_execution_file_membership_v2 in the local definition; DRAFT replacement is NOT APPLIED",
+    "focusedTests": "Node 8/8; Vitest 27/27",
+    "strictOpenSpec": "PASS",
+    "readOnlyCensus": {
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "targetTable": "atlas_packets",
+      "candidateScopeRows": 24456,
+      "exactRepairManifestRows": 16151,
+      "manifestSha256": "0c341ac1b369b31b67af5c1d8834607d7c44b83912c9341a6a710e8149234ed3",
+      "otherClasses": {
+        "MISSING_PACKET": 7356,
+        "ADMITTED_SNAPSHOT_BYTES_DIFFER_FROM_CURRENT_WORKTREE": 838,
+        "LEGACY_CONTENT_HASH_UNQUALIFIED": 93,
+        "SOURCE_BYTES_MISSING": 8,
+        "IDENTITY_COLLISION": 10
+      },
+      "invalidManifestRows": 0,
+      "beforeState": "source_revision/content_hash/workspace_revision_key/lineage_binding_checksum all NULL for every manifest row",
+      "writesPerformed": false
+    },
+    "applyBoundary": "No database mutation performed. Per-batch CAS/readback and an inverse manifest are present, but inverse execution/rollback has not been independently proven; do not authorize yet.",
+    "graphifyRunRequired": false,
+    "databaseWrites": 0
+  },
+  "stopReason": "SOURCE_AUTHORITY_APPLY_AUTHORIZATION_REQUIRED; exact row manifest exists, but source writers remain plural and the inverse rollback procedure still needs independent proof."
+}

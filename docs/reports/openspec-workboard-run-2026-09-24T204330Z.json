@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T20:43:30Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "inference-wiring-deep-audit-aug22",
+      "progress": "55/55 tasks complete; strict validation passes; existing bounded live replay receipt proves model resolution to ornith-1.5-9b and zero attributable writes",
+      "to": "ace-hyperrag-chr97-graphify-audit",
+      "task": "inspect exact remaining task and current evidence; do not run Graphify",
+      "outcome": "Resolved the Graphify artifact distinction and recorded the operator direction that AST-aware ACE is desirable only through identity-qualified candidate/feature admission. Current normalizer still emits empty evidenceRefs and representationBindings, so production wiring remains a separate lineage-gated follow-up; no Graphify run or data write occurred.",
+      "reason": "Next bounded audit candidate explicitly named in the user's triage order."
+    }
+  ],
+  "scope": {
+    "readOnly": true,
+    "candidateFiles": [
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md",
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/proposal.md",
+      "docs/reports"
+    ],
+    "forbidden": [
+      "Graphify execution or refresh",
+      "canonical or projection writes",
+      "container rebuilds",
+      "unrelated OpenSpec changes"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "inferenceWiringProgress": "55/55",
+    "inferenceWiringStrictOpenSpec": "PASS",
+    "inferenceReplayResult": "INFERENCE_FACADE_READ_ONLY_LIVE_REPLAY_PROVEN",
+    "aceGraphifyGate": "AUDIT_DECISIONS_RECORDED_AST_WIRING_LINEAGE_GATED",
+    "aceGraphifyProgress": "7/7 decision/audit tasks complete",
+    "strictOpenSpec": "PASS",
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "ACE_HYPERRAG_AUDIT_INSPECTION_PENDING"
+}

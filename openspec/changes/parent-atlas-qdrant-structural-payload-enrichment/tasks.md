@@ -3,8 +3,23 @@
 - [ ] 1.1 Decide the exact `QdrantStructuralPayloadV1` field list — what subset of
       `AstGrepObservationV1` actually gets projected (node kind, symbol name, import/call edges,
       something narrower). This is a design decision, not a script.
-- [ ] 1.2 Check `openspec/specs/*` for any existing capability this would modify rather than add
+- [x] 1.2 Check `openspec/specs/*` for any existing capability this would modify rather than add
       to — the proposal currently assumes none exists; verify before treating that as final.
+      **Checked 2026-09-24 (read-only):** no existing spec defines a structural-payload capability
+      (root `openspec/specs/`: feature-evidence-graph, feature-registry, graph-node-identity,
+      retrieval-reconciliation, feature-state, kanban-materializer, repository-evidence-ingestion;
+      `sveltekit-frontend/openspec/specs/` has none either), so `atlas-qdrant-structural-payload`
+      is an ADD, not a MODIFY. It is, however, CONSTRAINED by
+      `atlas-retrieval-reconciliation` "Dense/vector projection": every point SHALL carry
+      canonical identity + projection revision, and a projection SHALL reuse the existing
+      `qdrant_id` / never create a second point identity — consistent with a `setPayload`-only
+      writer. Two conflicts to resolve under 1.1, not here: (a) `projection_revision` is absent from
+      `src/lib/server/atlas/qdrant-collection-contracts.ts` (see graphify-recovery-proof-ladder
+      L524 note), so the spec's projection-revision requirement is not yet met by the contract;
+      (b) that spec names `codebase_chunk_index.content_embedding_768` as the canonical content
+      vector, while root `CLAUDE.md` (2026-08-29/30) says `content_embedding` (55,169 rows) is
+      canonical and `content_embedding_768` is a smaller separate column — a spec/doc contradiction
+      to reconcile separately.
 - [x] 1.3 Confirm join key — **resolved 2026-09-12**. Practical join key is `source_ref`
       (`canonical_source_ref` in Qdrant payloads, ~96.4% of points per `canonicalIdFieldBreakdown`
       in `docs/reports/semantic-corpus-admission-v1.json`), matched against

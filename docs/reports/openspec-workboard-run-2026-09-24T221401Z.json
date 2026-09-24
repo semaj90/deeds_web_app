@@ -1,0 +1,259 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runId": "openspec-workboard-run-2026-09-24T221401Z",
+  "startedAt": "2026-09-24T21:55:00Z",
+  "updatedAt": "2026-09-24T23:00:28Z",
+  "mode": "EXPLICIT_MULTI_GATE_WORKBOARD_RUN",
+  "containerRebuilds": 0,
+  "datastoreWrites": 0,
+  "graphifyExecutions": 0,
+  "commits": 0,
+  "pivots": [
+    {
+      "from": "SOURCE_AUTHORITY_WRITER_TRACE",
+      "to": "parent-atlas-analysis-pass-ornith-adapter",
+      "reason": "Source-authority repair reached its documented durable-apply boundary; explicit broad workboard-run instruction permits selecting another task.",
+      "result": "OWNER_DECISION_REQUIRED",
+      "evidence": "Only task 3.3 remains; it requires an operator choice of canonical Engram bigram writer, a validated-lesson definition for recordWorkflowMemory, and reconciliation/retirement decision for sync-engram-memory.mjs. No change made to this OpenSpec task."
+    },
+    {
+      "from": "parent-atlas-analysis-pass-ornith-adapter",
+      "to": "parent-atlas-okf-knowledge-layers",
+      "reason": "Prior gate is blocked on explicit owner decisions; moved to another selected candidate under the authorized workboard run.",
+      "result": "BLOCKED_BY_UNDEFINED_PROFILE",
+      "evidence": "Read-only audit scanned 25 .okf files: 0 valid, 25 invalid; manifest declares three absent domains and one present undeclared domain. OKF v0.2 provenance/trust/lifecycle semantics are not defined, so no metadata was invented or repaired and OpenWiki was not installed."
+    },
+    {
+      "from": "parent-atlas-okf-knowledge-layers",
+      "to": "parent-atlas-graphify-recovery-proof-ladder",
+      "reason": "OKF repair requires an owner-defined v0.2 profile; moved to a bounded static ownership/receipt gate.",
+      "result": "PARTIAL_PROOF_WAITING_FOR_BOUNDED_INPUT_AND_APPLY_AUTHORIZATION",
+      "evidence": "Qdrant and graph manifest roles were distinguished; receipt contract was made strict and bounded; static fan-out inventory performed without Graphify or projection writes."
+    },
+    {
+      "from": "parent-atlas-transport-memory-boundaries:ACP-02B",
+      "to": "parent-atlas-agentic-completion:AGENT-10",
+      "reason": "ACP-02B still lacks a persisted ContextManifest lookup owner; selected AGENT-10, whose read-only contract prerequisite is complete and whose task calls for a proposal rather than a durable write.",
+      "result": "PROPOSAL_COMPLETE_DURABLE_IMPLEMENTATION_DEFERRED",
+      "evidence": "Existing Drizzle execution_runs/execution_journal_steps describe workflow execution/recovery, while LangGraph checkpoints are separate worker state. A separate append-only receipt-history owner is proposed; migration/writer/readback remain gated."
+    },
+    {
+      "from": "parent-atlas-agentic-completion:AGENT-09",
+      "to": "parent-atlas-graph-runtime-enhancement",
+      "reason": "AGENT-09 still lacks an admitted source frame and separately authorized isolated execution; pivoted to inspect an existing graph-runtime change.",
+      "result": "WAITING_ON_OWNER_CHOICE_AND_GRAPHIFY_APPLY_GATE",
+      "evidence": "Open tasks present mutually exclusive docs-only/scaffold/implement directions requiring human choice, plus a full Graphify refresh and freeze requiring an execution/apply gate. No Graphify run or projection write performed."
+    },
+    {
+      "from": "parent-atlas-graph-runtime-enhancement",
+      "to": "parent-atlas-graph-pagerank-okf-fanout-hardening",
+      "reason": "Graph-runtime items need owner selection and Graphify apply; selected a completed implementation change missing only its design artifact.",
+      "result": "OPEN_SPEC_ARTIFACT_RECONCILED",
+      "evidence": "Added design.md based on recorded implementation/task evidence; all implementation tasks were already checked. Current focused suite passes 15/15; OpenSpec strict passes and status now reports 4/4 artifacts."
+    },
+    {
+      "from": "parent-atlas-graph-runtime-enhancement",
+      "to": "parent-atlas-code-ingestion-pipeline:GPH-02",
+      "reason": "Graph-runtime work remains at an explicit owner-choice/Graphify-apply gate; selected the current code-ingestion contract-owner reconciliation as a bounded code/spec-only task.",
+      "result": "GPH_02_OWNER_MAP_RECONCILED",
+      "evidence": "Existing revision-qualified chunk, nomination, symbol-resolution/version, and reference-fact schemas were mapped in design.md; no duplicate contract or runtime code was introduced. Focused Node tests 10/10 and frontend normalizer tests 8/8 pass; OpenSpec strict and scoped diff checks pass."
+    },
+    {
+      "from": "parent-atlas-code-ingestion-pipeline:GPH-05/GPH-06",
+      "to": "parent-atlas-retrieval-lineage-dag-convergence:SOURCE_AUTHORITY",
+      "reason": "User selected the source→packet→chunk critical path. ADVANCEABLE is not SELECTED; code-ingestion lifecycle review is not scheduler-authorized and is now NOT_SELECTED.",
+      "result": "PACKET_QUALIFICATION_METRIC_CORRECTED_LIVE_READBACK_REQUIRED",
+      "evidence": "Focused V2 membership/repair tests pass 12/12. Offline verification passed for the 16,151-entry immutable apply manifest (9 shards) and its 16,151-entry inverse manifest. Existing apply receipt records 33/33 committed batches, 16,151 intended/applied, alreadyApplied=0, and readback=PASS per batch; this is receipt evidence, not a new live read. Inspection found the zero packetQualifiedRows metric was derived from a stricter legacy content-hash equality (known to use a different recipe) rather than the exact packet source-revision/workspace-key/provenance join. The audit now counts only a source with one packet key and one source revision, exact source_revision and workspace_revision_key, and non-null lineage_binding_checksum and lineage_producer_revision; legacy content-hash comparison remains separate. New focused tests pass 5/5; both audit scripts pass node --check; OpenSpec strict passes. The current live receipt still has an unaligned 52-row source cohort, packetChunkQualifiedRows=577, candidateOrdinalEligibleRows=0, and a repair-plan revision different from the applied manifest. Corrected SQL metric has not been rerun against PostgreSQL; no database operation was performed by this session."
+    }
+  ],
+  "schedulerPolicy": {
+    "rule": "ADVANCEABLE != SELECTED",
+    "selectedChange": "parent-atlas-retrieval-lineage-dag-convergence",
+    "selectedGate": "SOURCE_AUTHORITY_READBACK_RECONCILIATION",
+    "schedulerPermission": "SELECTED",
+    "otherAdvanceableChanges": "NOT_SELECTED"
+  },
+  "changes": {
+    "parent-atlas-analysis-pass-ornith-adapter": {
+      "tasksBefore": "24/25",
+      "status": "WAITING_OWNER_DECISION",
+      "filesChanged": false
+    },
+    "parent-atlas-okf-knowledge-layers": {
+      "tasksBefore": "36/41",
+      "status": "WAITING_PROFILE_OWNER_DECISION",
+      "filesChangedByThisRun": false,
+      "audit": {
+        "filesScanned": 25,
+        "valid": 0,
+        "invalid": 25,
+        "declaredDomainsMissing": 3,
+        "presentDomainsUndeclared": 1,
+        "classification": "OKF_V02_REVIEW_REQUIRED"
+      },
+      "reports": [
+        "docs/reports/okf-v02-bundle-audit-v1.json",
+        "docs/reports/okf-v02-bundle-audit-v1.md",
+        "docs/reports/okf-v02-bundle-audit-v1-20260924T220002Z.json",
+        "docs/reports/okf-v02-bundle-audit-v1-20260924T220002Z.md"
+      ],
+      "notes": "Audit was rerun with the correct .okf input and default report restored from the deterministic current audit. No OpenWiki install or schema repair."
+    },
+    "parent-atlas-graphify-recovery-proof-ladder": {
+      "tasksBefore": "1/9",
+      "tasksAfter": "4/9",
+      "completed": [
+        "Qdrant projection identity fields verified against existing contract; unsupported fields are not claimed as indexed authority.",
+        "Projection manifest owners layered by responsibility; conflicting receipt interface renamed to avoid duplicate schema identity.",
+        "Static fan-out scripts inventoried and classified.",
+        "PostgreSQL canonical ownership and rebuildable Qdrant/Neo4j projection boundary recorded."
+      ],
+      "remaining": [
+        "Produce a fan-out receipt from a bounded revision-qualified sample.",
+        "Prove dry-run against that sample.",
+        "Separately authorized bounded apply and readback.",
+        "Idempotence and later expansion gates."
+      ],
+      "validation": {
+        "receiptVitest": "3/3 PASS",
+        "manifestVitest": "13/13 PASS",
+        "qdrantContractVitest": "8/8 PASS",
+        "strictOpenSpec": "PASS",
+        "scopedDiffCheck": "PASS",
+        "frontendWideTypecheck": "INCOMPLETE/TIMED_OUT; no diagnostics observed during bounded wait"
+      },
+      "writes": 0,
+      "graphifyRun": false,
+      "receiptArtifact": "sveltekit-frontend/src/lib/server/atlas/graph/graph-projection-receipt-v1.ts"
+    },
+    "parent-atlas-native-acceleration-cabi": {
+      "selectedTask": "P0.1",
+      "status": "BLOCKED_BY_UPSTREAM_IDENTITY_OWNER",
+      "filesChanged": false,
+      "evidence": [
+        "hydrate-candidates.ts derives symbolVersionId from metadata packet_key or row id when no exact symbol-version identity exists.",
+        "stable-file identity audits report no active stableFileId linkage in the current source cohort.",
+        "P0.2 is the upstream canonical join task; the canonical identity pointer is explicitly SPEC_DRAFT."
+      ],
+      "reason": "A discriminated schema requiring stable_file_id and symbol_version_id cannot safely be wired while the producer lacks authoritative identities. Contract-only tightening would break current hydration or bless fabricated fallback identity."
+    },
+    "feature-label-semantic-derivation": {
+      "status": "TASKS_COMPLETE_CURRENT_CHECKOUT",
+      "tasks": "3/3 complete",
+      "strictOpenSpec": "PASS",
+      "artifactStatus": "design artifact absent from status output; strict validator accepts current change",
+      "filesChangedByThisRun": false,
+      "action": "No implementation work remained; not archived because archive was not requested."
+    },
+    "parent-atlas-transport-memory-boundaries": {
+      "tasksBefore": "43/93",
+      "tasksAfter": "44/93",
+      "completed": [
+        "ACP-01 coding-agent protocol boundary specified: external editor/session/task/action IDs remain protocol-local; permissions remain with tool-authorization; workflow event and receipt owners remain authoritative; patches remain proposals until admitted/read back; terminal output is bounded/redacted; progress projects existing workflow events/receipts."
+      ],
+      "validation": {
+        "strictOpenSpec": "PASS",
+        "focusedACPAndWorkflowTests": "14/14 PASS",
+        "scopedDiffCheck": "PASS"
+      },
+      "notClaimed": [
+        "live ACP runtime/client wiring",
+        "ACP-02B end-to-end task/context/receipt resolver readback",
+        "external editor integration"
+      ],
+      "followup": "Corrected ACP projection fixture canonical run/action IDs to UUIDs while leaving external ACP IDs protocol-local. Reclassified the mismatch as fixture-level; the canonical writer UUID rule remains unchanged. Focused tests still pass 14/14 and strict OpenSpec remains valid.",
+      "writes": 0
+    },
+    "parent-atlas-agentic-completion": {
+      "tasksBefore": "9/11",
+      "tasksAfter": "10/11",
+      "completed": [
+        "AGENT-10 Drizzle-owned append-only receipt-history proposal added after read-only contract acceptance.",
+        "LangGraph checkpoint state remains separate; optional checkpoint reference is external and noncanonical.",
+        "Schema creation, migration, writer/readback, and durable writes explicitly deferred to separate authorization."
+      ],
+      "remaining": [
+        "AGENT-09 reuse graph-retrieval-proof three-candidate isolated worktree seam; admitted source frame and separately authorized isolated candidate execution remain unavailable."
+      ],
+      "validation": {
+        "strictOpenSpec": "PASS",
+        "scopedDiffCheck": "PASS",
+        "tests": "SPEC/DESIGN-ONLY; no runtime code changed"
+      },
+      "writes": 0
+    },
+    "parent-atlas-graph-runtime-enhancement": {
+      "status": "WAITING_OWNER_DECISION_AND_APPLY_GATE",
+      "filesChangedByThisRun": false,
+      "openChoices": [
+        "docs-only",
+        "stub scaffolding",
+        "implement GR0-GR3"
+      ],
+      "applyGate": "Full Graphify refresh and revision freeze; not executed."
+    },
+    "parent-atlas-graph-pagerank-okf-fanout-hardening": {
+      "tasks": "4/4 already complete",
+      "artifactBefore": "3/4; design.md absent",
+      "artifactAfter": "4/4",
+      "fileAdded": "openspec/changes/parent-atlas-graph-pagerank-okf-fanout-hardening/design.md",
+      "validation": {
+        "focusedVitest": "15/15 PASS across 4 files",
+        "strictOpenSpec": "PASS",
+        "scopedDiffCheck": "PASS"
+      },
+      "limits": [
+        "No Graphify execution",
+        "No Neo4j/Qdrant/database write",
+        "No claim of RAPIDS/cuGraph GPU parity or live large-corpus throughput"
+      ]
+    },
+    "parent-atlas-code-ingestion-pipeline": {
+      "schedulerPermission": "NOT_SELECTED",
+      "tasksBefore": "23/35",
+      "tasksAfter": "26/35",
+      "tasksCompleted": [
+        "GPH-02",
+        "GPH-03",
+        "GPH-04"
+      ],
+      "artifactBefore": "design.md absent",
+      "artifactAfter": "4/4",
+      "filesChanged": [
+        "openspec/changes/parent-atlas-code-ingestion-pipeline/design.md",
+        "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+        "packages/parent-atlas/test/symbol-registry-identity-v1.test.mjs",
+        "docs/reports/ast-replacement-parity.json",
+        "docs/reports/ast-replacement-parity.md"
+      ],
+      "validation": {
+        "focusedNodeTests": "10/10 PASS across 3 files",
+        "symbolIdentityMockPoolTests": "3/3 PASS; TypeScript package build PASS",
+        "frontendNormalizerVitest": "8/8 PASS",
+        "boundedReplacementParity": "PROVEN; 6/6 fixtures, missing symbols 0, span mismatches 0, identity changes 0, malformed input isolated",
+        "strictOpenSpec": "PASS",
+        "scopedDiffCheck": "PASS"
+      },
+      "remaining": [
+        "GPH-05/06 legacy lifecycle and import guard",
+        "GPH-17+ production integration/receipt gates"
+      ],
+      "gateState": "WAITING_ON_LIFECYCLE_PRECONDITIONS_FOR_SUPERSEDED_IMPORT_GUARD",
+      "gateEvidence": "Legacy extractor remains MIGRATION_CANDIDATE; tasks explicitly defer SUPERSEDED state and its enforced import guard until replacement ownership acceptance. No lifecycle transition or guard activation performed.",
+      "limits": [
+        "Contract-owner mapping only; no runtime identity promotion",
+        "No Graphify execution or projection/database writes",
+        "Legacy implementation remains retained"
+      ],
+      "writes": 0
+    }
+  },
+  "nextGate": {
+    "selectedCandidate": "parent-atlas-retrieval-lineage-dag-convergence:SOURCE_AUTHORITY_READBACK_RECONCILIATION",
+    "schedulerPermission": "SELECTED",
+    "status": "CODE_PROVEN_LIVE_READBACK_REQUIRED",
+    "evidence": "16,151 packet updates are recorded as committed with per-batch PASS readbacks, and both frozen manifests verify offline. Packet qualification now has a strict code definition: unique packet key + exact source_revision + workspace_revision_key + non-null binding provenance; legacy content_hash parity is not canonical qualification. The existing current-lineage report is based on older upstream inputs and its bounded workspace-source cohort is misaligned. A fresh authorized/read-only DB evidence run is required to populate the corrected metric and establish current packet/chunk lineage. The selected gate remains open; do not proceed to Gate 2 or feature promotion.",
+    "filesChanged": true,
+    "rule": "Do not schedule by completion percentage. Continue only on the selected source-authority chain; no additional write, DDL, Graphify run, or unrelated change selection without its own authorization."
+  }
+}

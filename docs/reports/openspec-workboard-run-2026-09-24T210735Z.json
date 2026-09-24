@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T21:07:35Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-graph-runtime-enhancement",
+      "progress": "The stale index task is reconciled and strict validation passes. The remaining graph-runtime scope needs an explicit owner choice and includes a deferred full Graphify run.",
+      "to": "parent-atlas-gpu-runtime-abi-alignment",
+      "task": "inspect the five open ABI-alignment tasks for a bounded code/test gate that does not require container rebuilds",
+      "outcome": "The five remaining tasks are not safe to execute ahead of the change's frozen higher-priority requirements: real candidate ordinal/feature artifacts, sample-query evaluation, and current RAPIDS runtime census. Native bridge implementation is explicitly lowest priority; CPU/GPU spectral parity remains below 0.99 (best recorded ARI 0.88) and profiling tooling is missing. The schema has no populated GpuRuntimeAbiV1 receipt. Strict validation passes; no rebuild or GPU execution performed.",
+      "reason": "Explicitly listed near-complete OpenSpec change; inspect its exact remaining tasks before implementation."
+    }
+  ],
+  "scope": {
+    "readOnlyUntilTaskClassification": true,
+    "candidateFiles": [
+      "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md",
+      "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/proposal.md",
+      "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/design.md",
+      "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/specs"
+    ],
+    "forbidden": [
+      "container rebuilds until end of workboard tranche",
+      "GPU promotion without runtime evidence",
+      "datastore writes",
+      "Graphify"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "previousChangeProgress": "3/8",
+    "previousChangeRemaining": "owner decision and deferred Graphify task",
+    "gpuAbiAlignmentInspection": "COMPLETE; DEFERRED_BY_FROZEN_PRIORITY_ORDER",
+    "gpuAbiAlignmentProgress": "17/22",
+    "strictOpenSpec": "PASS",
+    "remainingTaskBlockers": {
+      "nativeCAbiNapiBridge": "LOWEST_PRIORITY_AFTER_CORPUS_ARTIFACTS_AND_CUTLASS",
+      "realGpuRuntimeReceipt": "NO_POPULATED_GPU_RUNTIME_ABI_RECEIPT; REQUIRED_REAL_TARGET DETAILS NOT RECONCILED",
+      "cpuGpuSpectralParity": "BEST_RECORDED_ARI_0.88_BELOW_0.99_GATE; NSYS_NCU_UNAVAILABLE"
+    },
+    "frozenPrerequisites": [
+      "CandidateOrdinalMapV1, CandidateFeatureColumnarV1, CandidateOrdinalSetV1",
+      "sample-query exact evaluation",
+      "WSL2 RAPIDS runtime re-census"
+    ],
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "GPU_ABI_ALIGNMENT_WAITING_FOR_FROZEN_HIGHER_PRIORITY_CORPUS_AND_RUNTIME_GATES"
+}

@@ -18,3 +18,13 @@ test('derives occurrence projection identity from exact source coordinates', () 
 test('does not use treeNodeId as identity', () => {
   assert.throws(() => deriveGraphNodeKeyV1({ treeNodeId: 'legacy-tree-id' }), /GRAPH_NODE_KEY_IDENTITY_INSUFFICIENT/);
 });
+
+test('keeps semantic node kinds separate from projection-address prefixes', async () => {
+  const { graphNodeKeyV1Schema } = await import('../dist/core/graph-node-key-v1.js');
+  for (const kind of ['concept', 'document', 'process', 'package', 'test', 'external_doc']) {
+    assert.equal(graphNodeKeyV1Schema.safeParse(`${kind}:id-1`).success, false);
+  }
+  for (const prefix of ['symbol', 'packet', 'chunk', 'occurrence']) {
+    assert.equal(graphNodeKeyV1Schema.safeParse(`${prefix}:id-1`).success, true);
+  }
+});

@@ -222,8 +222,10 @@
       algorithm matching Kerenidis–Prakash's quantum recommendation system
       without the claimed exponential speedup. Citation is correct; no
       correction needed. Read-only, no writes.
-- [ ] 7.4 Whether the V1 classification lineage should eventually be retired in favor of V2 is an
-      open operator question, explicitly not decided here (see design.md Open Questions).
+- [x] 7.4 Decision recorded 2026-09-24: retain V1 as the current production classification owner;
+      do not retire it or promote V2 yet. The live HyperRAG route imports V1 classifier/plan,
+      while V2 remains unwired and has no current parity/cutover receipt. Revisit only after
+      V2 identity/provenance and shadow parity are proven and a separate cutover is authorized.
 
 ## 8. Vitest bootstrap fixed, residency-scheduler defect now harness-confirmed — done
 

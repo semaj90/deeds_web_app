@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { REPO_ROOT } from './connection-config.mjs';
+import { currentRevisionQualifiedPacketCountV1 } from './lib/lineage-packet-qualification-v1.mjs';
 
 const root = REPO_ROOT;
 const reportPath = path.join(root, 'docs/reports/current-lineage-closure-v1.json');
@@ -43,6 +44,7 @@ const sourceAuthorityRepairPlan = loadReceipt(inputPaths.sourceAuthorityRepairPl
 const sourceEvidence = loadReceipt(inputPaths.sourceEvidence);
 const cohort = sourceCohort.counts ?? {};
 const join = packetChunkJoin.counts ?? {};
+const packetQualifiedRows = currentRevisionQualifiedPacketCountV1(join);
 const sourceDelta = sourceOwner.workspace?.admittedSnapshotDelta ?? null;
 
 const workspaceRevision = cohort.currentWorkspaceRevision ?? null;
@@ -102,7 +104,8 @@ const report = {
   packetRevisionOwner,
   funnel: {
     workspaceSourceRows: cohort.cohortRows ?? 0,
-    packetQualifiedRows: join.packet_full_identity_matches ?? 0,
+    packetQualifiedRows,
+    packetQualificationBasis: 'UNIQUE_PACKET_KEY_SOURCE_REVISION_WORKSPACE_KEY_AND_BINDING_PROVENANCE',
     packetChunkQualifiedRows: join.packet_chunk_exact_sources ?? 0,
     astQualifiedRows: sourceEvidence.astRevisionQualifiedRows ?? 0,
     spanQualifiedRows: sourceEvidence.evidenceSpanReady ?? 0,
@@ -114,8 +117,9 @@ const report = {
   },
   promotionFunnel: {
     workspaceSources: cohort.cohortRows ?? 0,
-    packetIdentityQualified: join.packet_full_identity_matches ?? 0,
+    packetIdentityQualified: packetQualifiedRows,
     packetRevisionQualified: join.packet_revision_matches ?? 0,
+    packetLegacyFullContentIdentityMatches: join.packet_full_identity_matches ?? 0,
     packetChunkCurrentQualified: join.packet_chunk_exact_sources ?? 0,
     packetAstCurrentQualified: 0,
     spanQualified: sourceEvidence.evidenceSpanReady ?? 0,
@@ -127,6 +131,7 @@ const report = {
     provenLineageSources: join.binding_proven_lineage_sources ?? 0,
     packetSourceRows: join.packet_source_rows ?? 0,
     packetRevisionMatches: join.packet_revision_matches ?? 0,
+    packetRevisionWorkspaceBindingMatches: packetQualifiedRows,
     packetContentMatches: join.packet_content_matches ?? 0,
     chunkFileContentMatches: join.chunk_file_content_matches ?? 0,
     authoritativeNamespaces: sourceEvidence.authoritativeNamespaces ?? 0,
@@ -140,7 +145,7 @@ const report = {
     ? 'EXECUTION_SOURCE_AUTHORITY'
     : packetRevisionOwner.status !== 'DERIVATION_OWNER_PROVEN' && packetRevisionOwner.status !== 'PACKET_REVISION_OWNER_PROVEN'
     ? 'PACKET_REVISION_OWNER'
-    : (join.packet_full_identity_matches ?? 0) === 0
+    : packetQualifiedRows === 0
       ? 'CURRENT_PACKET_IDENTITY'
       : (sourceEvidence.evidenceSpanReady ?? 0) === 0
         ? 'AST_SPAN_AUTHORITY'
@@ -150,7 +155,7 @@ const report = {
     workspaceRevisionMismatch: cohort.workspaceMismatchAfterSourceQualification ?? 0,
     packetRevisionOwner: packetRevisionOwner.status === 'DERIVATION_OWNER_PROVEN' || packetRevisionOwner.status === 'PACKET_REVISION_OWNER_PROVEN' ? 0 : 1,
     packetRevisionWriterAdoption: packetRevisionOwner.writerAdoption ? 0 : 1,
-    packetIdentityIncomplete: Math.max(0, (join.packet_source_rows ?? 0) - (join.packet_full_identity_matches ?? 0)),
+    packetIdentityIncomplete: Math.max(0, (join.packet_source_rows ?? 0) - packetQualifiedRows),
     authoritativeNamespaceMissing: sourceEvidence.authoritativeNamespaces === 0 ? 1 : 0,
     evidenceSpanMissing: sourceEvidence.evidenceSpanReady === 0 ? 1 : 0,
   },
@@ -189,6 +194,8 @@ const funnelReport = {
   selectedExecutionExactSources: join.graphify_exact_sources ?? 0,
   packetRows: join.packet_source_rows ?? 0,
   packetSourceRevisionMatches: join.packet_revision_matches ?? 0,
+  packetRevisionWorkspaceBindingMatches: packetQualifiedRows,
+  packetQualificationBasis: report.funnel.packetQualificationBasis,
   packetContentDigestMatches: join.packet_content_matches ?? 0,
   packetRevisionQualified: report.funnel.packetQualifiedRows,
   provenPacketChunkRows: report.funnel.packetChunkQualifiedRows,

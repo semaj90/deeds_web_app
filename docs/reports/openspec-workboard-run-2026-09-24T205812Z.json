@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T20:58:12Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-gpu-prellm-recommendation-v1",
+      "progress": "35/37 complete; strict validation passes; V1 remains the production classification owner; GPU runtime proof is unavailable until an existing RAPIDS environment is provisioned or restored",
+      "to": "parent-atlas-agentic-file-compiler",
+      "task": "inspect only the AFC-05I prerequisite named by the GPU-pre-LLM proof sequence and determine whether it is current/proven",
+      "outcome": "AFC-05I is not an active task in parent-atlas-agentic-file-compiler; no matching REDUCTION_POLICY_V1_PROVEN gate was found in active OpenSpec changes, scripts, or reports. The GPU change labels AFC-05I..05P as a candidate future sequence, not started.",
+      "reason": "The named prerequisite is future roadmap text rather than a currently executable OpenSpec task. The compiler change has separate open gates, but none is a valid substitute for AFC-05I."
+    }
+  ],
+  "scope": {
+    "readOnly": true,
+    "candidateFiles": [
+      "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
+      "openspec/changes/parent-atlas-agentic-file-compiler/specs",
+      "docs/reports"
+    ],
+    "forbidden": [
+      "production router cutover before parity",
+      "GPU/container rebuild before end-of-workboard tranche",
+      "Graphify",
+      "datastore writes",
+      "unrelated OpenSpec changes"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "gpuPrellmProgress": "35/37",
+    "gpuPrellmStrictOpenSpec": "PASS",
+    "v1V2Decision": "RETAIN_V1_CURRENT_OWNER",
+    "gpuPackagesAvailable": false,
+    "afc05iGate": "NOT_PRESENT_AS_ACTIVE_GATE",
+    "agenticFileCompiler": {
+      "progress": "24/34",
+      "strictOpenSpec": "PASS",
+      "remainingTasks": [
+        "AFC-04B production multi-turn graph execution",
+        "AFC-11 exact promotion to live retrieval owner",
+        "AFC-12 context-manifest persistence migration/compatibility",
+        "AFC-14/15 Mastra runtime and suspend/resume parity",
+        "AFC-16 filesystem mutation authorization",
+        "AFC-17 clean live typecheck/test receipt",
+        "AFC-18 incremental AST/semantic_768/graph refresh",
+        "AFC-19 CPU/GPU semantic parity",
+        "AFC-20 fake Mastra shim retirement after AFC-14/15"
+      ],
+      "notSubstitutedForAFC05I": true
+    },
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "AFC_05I_NOT_AN_ACTIVE_GATE; GPU_PRELLM_7_1_REMAINS_DEFERRED"
+}

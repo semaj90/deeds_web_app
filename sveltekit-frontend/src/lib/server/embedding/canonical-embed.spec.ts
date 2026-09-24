@@ -29,6 +29,58 @@ describe('tryEmbedCanonical', () => {
     expect(result?.embedding).toHaveLength(768);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it('sends a body the /api/embed route accepts ({ text, model: "embeddinggemma" }), even for a tagged model name', async () => {
+    let sentBody: Record<string, unknown> = {};
+    const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      sentBody = JSON.parse(String(init?.body));
+      return new Response(JSON.stringify({ embedding: new Array(768).fill(0.25) }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { tryEmbedCanonical } = await import('./canonical-embed.js');
+    await tryEmbedCanonical('semantic retrieval proof', {
+      baseUrl: 'http://127.0.0.1:5173',
+      model: 'embeddinggemma:latest',
+    });
+
+    expect(sentBody).toEqual({ text: 'semantic retrieval proof', model: 'embeddinggemma' });
+  });
+
+  it('fails closed when the canonical route fails: never an ONNX or pseudo vector', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 503 })));
+    const onnx = { isOnnxEmbedAvailable: vi.fn(async () => true), tryEmbedOnnx: vi.fn(async () => new Array(768).fill(0.1)) };
+    vi.doMock('./onnx-embed.js', () => onnx);
+    const { tryEmbedCanonical } = await import('./canonical-embed.js');
+    const result = await tryEmbedCanonical('x', { baseUrl: 'http://127.0.0.1:5173' });
+    expect(result).toBeNull();
+    expect(onnx.tryEmbedOnnx).not.toHaveBeenCalled();
+    vi.doUnmock('./onnx-embed.js');
+  });
+
+  it('rejects the route\'s unauthenticated 200 all-zero vector', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ embedding: new Array(768).fill(0) }), { status: 200 })));
+    const { tryEmbedCanonical } = await import('./canonical-embed.js');
+    expect(await tryEmbedCanonical('x', { baseUrl: 'http://127.0.0.1:5173' })).toBeNull();
+  });
+
+  it('keeps ONNX reachable only as an explicit, non-canonical challenger', async () => {
+    vi.doMock('./onnx-embed.js', () => ({
+      isOnnxEmbedAvailable: vi.fn(async () => true),
+      tryEmbedOnnx: vi.fn(async () => new Array(768).fill(0.1)),
+      getOnnxEmbedLocalModelPath: () => '/models/embeddinggemma_300m_onnx/model.onnx',
+    }));
+    vi.resetModules();
+    const { tryEmbedOnnxChallenger } = await import('./canonical-embed.js');
+    const result = await tryEmbedOnnxChallenger('x');
+    expect(result?.embedding).toHaveLength(768);
+    expect(result).toMatchObject({ canonicalAuthority: false, promotionEligible: false, provider: 'onnx-local-cpu' });
+    expect(result).not.toHaveProperty('representationId');
+    vi.doUnmock('./onnx-embed.js');
+  });
 });
 
 describe('embedSemantic768Canonical', () => {

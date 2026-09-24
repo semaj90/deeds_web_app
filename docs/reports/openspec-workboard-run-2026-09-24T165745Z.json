@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T16:57:45Z",
+  "head": "9950262810",
+  "pivots": [
+    {
+      "from": "parent-atlas-versioned-doc-intelligence",
+      "progress": "DOC-26 focused implementation/tests are proven; live transition plan lacks real inputs and remains open",
+      "to": "parent-atlas-code-ingestion-pipeline",
+      "task": "GPH-02 canonical Graphify contracts",
+      "outcome": "begin owner census and contract review; do not run Graphify or mutate canonical stores",
+      "reason": "The Deep Research remaining item requires an explicitly bounded canonical admission write. The PageRank change reports all tasks complete in current OpenSpec instructions; its remaining GPU parity note is separate follow-up prose. GPH-02 is an actual unchecked contract task and can be investigated without either blocked action."
+    }
+  ],
+  "scope": {
+    "readOnly": true,
+    "candidateFiles": [],
+    "forbidden": [
+      "Graphify execution",
+      "container rebuilds",
+      "PostgreSQL/Qdrant/Valkey/Neo4j writes",
+      "canonical identity promotion",
+      "task-ledger edits before owner review"
+    ]
+  },
+  "verification": {
+    "parentAtlasDeepResearchRemainingTask": "requires real DOC-06A admission write; not authorized or attempted",
+    "graphPagerankOpenSpecState": "all_done; remaining GPU parity text is follow-up prose, not an unchecked task",
+    "codeIngestionUncheckedItemsObserved": ["GPH-02", "GPH-03", "GPH-04", "GPH-05", "GPH-06", "GPH-17", "GPH-18", "GPH-19", "GPH-20", "GPH-21", "GPH-22", "GPH-35"]
+  },
+  "result": "PIVOT_RECORDED_GPH02_OWNER_CENSUS_PENDING",
+  "datastoreWrites": 0,
+  "containerRebuilds": 0,
+  "graphifyRuns": 0
+}

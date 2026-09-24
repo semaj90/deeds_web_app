@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-owner-reconciliation.v1",
-  "generatedAt": "2026-09-22T21:07:08.810Z",
+  "generatedAt": "2026-09-24T22:43:47.024Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "databaseWrites": 0,
@@ -11,17 +11,17 @@
     "root": "C:\\Users\\james\\Videos\\deeds-web-app",
     "gitRoot": "C:/Users/james/Videos/deeds-web-app",
     "gitCommonDir": ".git",
-    "headCommit": "06a02610e08a9442c8763cdec202dcc98b3c6ac8",
-    "headTree": "acc7b05812f32c9786a2c1f5bc5852d22ba41606",
+    "headCommit": "14bcc00f75b566d3a546d80fbd4112eaa2e95126",
+    "headTree": "5fbb43c332b79ff5446df9ce650c2ad45bd6002d",
     "hostname": "DESKTOP-Q18MPHM",
     "dirty": true,
-    "sourceCount": 25234,
-    "sourceRefChecksum": "sha256:4ec07e8d8d9f7c84442288c16ad59d9598b1e694edbd48f9c4c289833b928686",
+    "sourceCount": 25485,
+    "sourceRefChecksum": "sha256:7d9c84dc9a6d84eb1dffdbfebf35913839778872f4ea81a6ceb6537cc66e65e3",
     "inventoryPolicy": {
       "command": "git ls-files --cached --others --exclude-standard -z",
-      "trackedAtHeadCount": 29429,
-      "candidateCount": 25273,
-      "admittedCount": 25234,
+      "trackedAtHeadCount": 30007,
+      "candidateCount": 25524,
+      "admittedCount": 25485,
       "skippedCount": 39,
       "maxSourceBytes": 5242880,
       "generatedPrefixesExcluded": [
@@ -77,16 +77,16 @@
     "admittedSnapshotDelta": {
       "snapshotRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
       "snapshotSourceCount": 25542,
-      "currentSourceCount": 25234,
+      "currentSourceCount": 25485,
       "sharedSourceCount": 24448,
-      "currentOnlyCount": 786,
+      "currentOnlyCount": 1037,
       "admittedOnlyCount": 1094,
-      "sharedDigestMatchCount": 23711,
-      "sharedDigestMismatchCount": 737,
+      "sharedDigestMatchCount": 23604,
+      "sharedDigestMismatchCount": 844,
       "dispositionCounts": {
-        "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 23711,
-        "WORKTREE_BYTES_DRIFTED": 737,
-        "WORKTREE_ADDED_AFTER_SNAPSHOT": 786,
+        "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 23604,
+        "WORKTREE_BYTES_DRIFTED": 844,
+        "WORKTREE_ADDED_AFTER_SNAPSHOT": 1037,
         "MISSING_FROM_CURRENT_WORKTREE": 1094
       },
       "requiresSnapshotRefresh": true,
@@ -135,6 +135,7 @@
         "claude-mem/.windsurf/rules/claude-mem-context.md"
       ],
       "sharedDigestMismatchSample": [
+        ".claude/skills/drizzle-schema-review/SKILL.md",
         ".okf/index.md",
         "claude.md",
         "codex.md",
@@ -145,18 +146,17 @@
         "docker/image-synthesis/app.py",
         "docker/langgraph-synthesis/app.py",
         "docs/.okf/schema.yaml",
+        "docs/GAN-DEEP-AUDIT-GUIDE.md",
+        "docs/MASTER-TOC.md",
         "docs/OPENSPEC-WORKBOARD.md",
         "docs/PHASE-3-IMPLEMENTATION-SUMMARY.md",
         "docs/architecture/runtime-ownership-baseline.json",
         "docs/architecture/runtime-ownership-registry.json",
+        "docs/archive-manifest.json",
         "docs/graph/contract-error-map.json",
-        "docs/parent-atlas-workstation-todo.md",
-        "docs/vector-governance/pca-svd-representation-comparison-v1.json",
-        "memory/exports/mcp-health-probe.json",
-        "openspec/changes/atlas-feature-intelligence/tasks.md",
-        "openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md"
+        "docs/parent-atlas-workstation-todo.md"
       ],
-      "deltaChecksum": "sha256:a083786c945520dd50b84bfda6273444b72e5bdcd17e623a0e8664eefdddfdd7"
+      "deltaChecksum": "sha256:bc363ef0c1e4e8288ed4ec7b19be505846d3e880f105f60bc8dc6fedf9b25791"
     }
   },
   "currentExecutionCandidates": [
@@ -1341,5 +1341,5 @@
       }
     ]
   },
-  "checksum": "sha256:9c22765ac8c971b38dce9855687dad4c4f77fa91ccb2fa2c585bdaf59954b347"
+  "checksum": "sha256:a939d4c5bffba33cf31f6cb6b1ee137cbea6dc705281def66c825ae3fc262510"
 }

@@ -1571,6 +1571,192 @@ prerequisite. A prior status summary in this session stated `NESTED-TRAIN-02`/`N
 Current closure recheck (read-only, 2026-09-18): `scripts/atlas/audit-current-lineage-closure-v1.mjs` still returns `EXECUTION_SOURCE_AUTHORITY` with `workspaceSourceRows=52`, `packetQualifiedRows=0`, `packetChunkQualifiedRows=4`, `astQualifiedRows=48`, `spanQualifiedRows=0`, and `candidateOrdinalEligibleRows=0`. `writesPerformed=false`. This confirms the candidate-freeze and SOM gates remain downstream-blocked by current execution/source authority; the independent packet/chunk and AST counts are not a promotion funnel. Receipt: `docs/reports/current-lineage-closure-v1.json`.
 Explicit workspace/execution join recheck (read-only, 2026-09-18): admitted workspace `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc` plus execution `74d50c86-8194-45ea-8c3d-61aab737ef83` yielded `128` bindings, `4` proven lineage sources, `4` packet/chunk exact sources, `0` packet revision matches, and `0` full packet identity matches. This remains a source/packet authority failure, not a KNN/SOM executor failure; writes remained false.
   projection ownership, and migration baseline as independent blockers.
+  PROMOTION-01 READINESS (2026-09-24, read-only; datastore writes = 0; refreshed only
+  `docs/reports/current-lineage-closure-v1.json` and `parent-atlas-current-lineage-funnel-v1.json`, whose diff is limited to
+  regenerated evidence fields — `generatedAt`, workspace revision, binding counts, checksums; no status field changed): state
+  `BLOCKED_BY_SOURCE_AUTHORITY` — `EXECUTION_SOURCE_AUTHORITY`, workspaceSourceRows=52, packetQualifiedRows=0,
+  packetChunkQualifiedRows=4, astQualifiedRows=48, spanQualifiedRows=0, candidateOrdinalEligibleRows=0. Source lineage BLOCKED;
+  packet-to-chunk BLOCKED (waits on source lineage); graph identity PARTIAL (types proven, live `symbol_id`/`symbol_version_id`
+  population open — see graph-retrieval-proof GS1.10 note); feature layout, representation identity (canonical `SemanticSnapshotV1`
+  vs reproducibility canary) and ContextManifest binding NOT_YET_EVALUATED, downstream-wait. Not opened: Gate 2, feature layout,
+  representation, ContextManifest.
+  SOURCE-AUTHORITY ROOT CHECK (2026-09-24, read-only SELECTs only; no writes, no Graphify run). First boundary where the
+  revision-qualified identity disappears = the PACKET WRITE, not the Graphify producer:
+  (1) Producer is fine. After 2026-09-09 the Graphify coordinator writes per-file membership to
+  `graphify_execution_file_membership_v2` (execution_id, repository_id, repository_relative_path, source_ref,
+  workspace_revision, code_source_revision, content_hash, byte_length). Canonical execution `74d50c86`
+  (`canonical_authority=true`, workspace `sha256:e24bb971…`) has 25,542 rows there with revisions.
+  (2) Stale consumer: `graphify_current_source_membership_v1` still reads the LEGACY `graphify_execution_files`
+  (last written by `8bd073a7`, 2026-09-09, 24,139 rows); 21+ later COMPLETED executions — incl. `74d50c86` — have 0 rows
+  there, so the view reports 0 `active` rows. Repair = redefine the view over `..._membership_v2` (a DB view/migration
+  change — needs authorization; not done).
+  (3) The drop: all 61,718 `atlas_packets` rows have `source_revision IS NULL` (workspace_revision is populated on all).
+  17,398 packets match `74d50c86` membership on `source_ref` (same path format); 0 can match on
+  `(source_ref, source_revision)`. ~18 scripts/modules INSERT into `atlas_packets`; none of the bulk writers stamp a
+  revision. The governed writer that does already exists — `sveltekit-frontend/src/lib/server/atlas/identity/
+  packet-write-transaction-v1.ts` (guarded UPDATE of `source_revision` with optimistic concurrency + outbox + receipt) —
+  but has only been exercised by its disposable proof harness (`scripts/atlas/prove-packet-write-transaction-v1.mts`).
+  NEXT (needs explicit per-action write authorization; STOPPED here): apply the governed writer to the packets that match
+  canonical membership on `source_ref`, sourcing `source_revision` = `code_source_revision` from
+  `graphify_execution_file_membership_v2` for execution `74d50c86` (join on exact `source_ref` + execution scope, never
+  path-only across executions), dry-run first with a target list, rollback plan and readback; then rerun
+  `audit-current-lineage-closure-v1.mjs`. Do not manufacture revisions for the ~44k packets with no membership match.
+  FOLLOW-UP (same day, read-only): (a) Revision domains are equivalent: membership `code_source_revision` =
+  `'sha256:'||content_hash` on 25,542/25,542 rows, 0 malformed; recipe = `deriveCodeSourceRevisionV1` (exact UTF-8 bytes),
+  the same one `packet-write-decision-v1.ts` uses; spot-checked 2 files: membership `content_hash` = `sha256sum` of the
+  worktree file. (b) `atlas_packets.content_hash` is a DIFFERENT recipe (100/100 matched packets that carry one disagree
+  with the byte digest) — never use it to confirm or substitute a revision. `atlas_packets.workspace_revision` is the legacy
+  INTEGER; the SHA workspace identity belongs in `workspace_revision_key` (empty on all matched packets). (c) Existing owner
+  for this repair = `scripts/atlas/produce-current-packet-digest-bridge-v1.mjs` (`npm run atlas:packet:digest:producer:plan`):
+  reads V2 membership, re-hashes bytes, refuses unless digest + revision + binding checksum agree, default read-only, `--apply`
+  is a rollback canary, "durable promotion requires a separate explicit gate" (not built). Plan run (limit 500, execution
+  `74d50c86`): MISSING_PACKET 217, LEGACY_LINEAGE_FIELDS_MISSING (the updatable class) 249,
+  ADMITTED_SNAPSHOT_BYTES_DIFFER_FROM_CURRENT_WORKTREE 12, LEGACY_CONTENT_HASH_UNQUALIFIED 22, writesPerformed=false.
+  (d) Full SQL census for `74d50c86` (no byte re-hash): 17,398 packets match on `source_ref` (1 packet per ref), 17,298 have all
+  four lineage fields NULL (update candidates, still subject to the byte check), 100 legacy-hash-only (excluded), 0 already
+  qualified; 8,144 membership rows have no packet. Candidate set before-checksum = md5 of sorted packet_keys
+  `5beefb65cb135908a51c8588a3849bed` (17,298). (e) Stale readers of the legacy `graphify_execution_files`: the view
+  `graphify_current_source_membership_v1` and `register-orphaned-chunks.mjs` (writes `atlas_packet_chunk_lineage.source_revision`
+  from `gef`, line ~462). `audit-current-lineage-closure-v1.mjs` reads no DB — it aggregates ~10 reports; its
+  `workspaceSourceRows=52` is a bounded 52-row cohort (`cohortChecksum fd88703c…`, from `atlas_workspace_source_bindings`,
+  generated 2026-09-20), not a corpus count and not derived from the stale table.
+  STATUS: `SOURCE_AUTHORITY_APPLY_AUTHORIZATION_REQUIRED`. No packet write, no DDL, no Graphify run performed.
+  APPLY-GATE PREP (2026-09-24, code-only; datastore writes 0, DDL applies 0, Graphify runs 0, rollback canary NOT run):
+  (a) Existing owner `produce-current-packet-digest-bridge-v1.mjs` extended (no second producer): `--census` = read-only full
+  scan (no 500 cap; its per-row packet re-query now reuses the same REPEATABLE READ snapshot row) that freezes
+  `docs/reports/current-packet-digest-repair-manifest-v1.json` (17.6 MB, over the 10 MB commit limit — local artifact) and
+  `current-packet-digest-producer-v1.census.json`; `--apply-durable` = durable gate requiring `--manifest-sha256`,
+  `--batch-size` (1..1000) and `--confirm-durable-packet-source-revision-apply`: verifies manifest schema/scope/checksum, writes
+  an inverse manifest first, then per batch `BEGIN; SELECT ... FOR UPDATE; classify; CAS UPDATE (all four lineage fields NULL,
+  packet_key + source_ref); rowCount=1; readback; COMMIT`, aborting typed on TARGET_DRIFT / TARGET_MISSING /
+  COMPARE_AND_SET_FAILED / BATCH_READBACK_FAILED; re-run is idempotent (ALREADY_APPLIED). Pure helpers:
+  `scripts/atlas/lib/packet-source-revision-repair-v1.mjs` (checksum recipe `sorted-key-json-sha256-v1`); tests
+  `sveltekit-frontend/tests/atlas/packet-source-revision-repair-v1.spec.ts` 8/8.
+  (b) FULL BYTE-VERIFIED CENSUS, execution `74d50c86`, workspace `sha256:e24bb971…` (24s, writesPerformed=false):
+  EXACT_REPAIR_ELIGIBLE (LEGACY_LINEAGE_FIELDS_MISSING) 16,151; MISSING_PACKET = PACKET_ADMISSION_GAP 7,356 (separate, no packet
+  creation); ADMITTED_SNAPSHOT_BYTES_DIFFER_FROM_CURRENT_WORKTREE 838; LEGACY_CONTENT_HASH_UNQUALIFIED 93; IDENTITY_COLLISION 10;
+  SOURCE_BYTES_MISSING 8; ALREADY_QUALIFIED 0 (24,456 rows = repo:root scope). Target manifest SHA-256
+  `0c341ac1b369b31b67af5c1d8834607d7c44b83912c9341a6a710e8149234ed3` (recomputed independently; 0 internally inconsistent
+  entries). The earlier md5 `5beefb65…` (17,298 SQL candidates) is historical only. Target: `atlas_packets.{source_revision,
+  content_hash, workspace_revision_key, lineage_binding_checksum, lineage_producer_revision}`.
+  (c) Stale reader fixed: `register-orphaned-chunks.mjs` receipt path now joins `graphify_execution_file_membership_v2`
+  (superset: all 36 executions, incl. 8bd073a7's 24,139 rows) on exact `source_ref` + receipt `execution_id`; `evidenceSource`
+  label updated. Regression `tests/atlas/register-orphaned-chunks-membership-source.spec.ts` 3/3, proven to fail (2/3) on the
+  old code. Script not executed.
+  (d) View fix drafted, NOT applied: `sveltekit-frontend/drizzle/manual/20260924_graphify_current_source_membership_v1_on_v2_DRAFT.sql`
+  (same name/columns/types/semantics, source table swapped; column types verified identical). New body run as a plain SELECT:
+  25,545 rows, 25,542 active (current view: 0). Semantics flag: "active" = latest COMPLETED execution (`0dba1c0d`), not the
+  `canonical_authority` one (`74d50c86`, same workspace revision). Status `GRAPHIFY_CURRENT_SOURCE_MEMBERSHIP_V1_DDL_APPLY_AUTHORIZATION_REQUIRED`.
+  (e) `workspaceSourceRows=52` receipt preserved as-is (bounded cohort, not a corpus count).
+  APPLY PACKAGE FREEZE (2026-09-24, code + read-only census; writes 0, DDL 0, Graphify 0):
+  (1) Target columns narrowed to `source_revision, workspace_revision_key, lineage_binding_checksum, lineage_producer_revision`.
+  `content_hash` is NOT written (different historical recipe); it stays in the before-state guard (must be NULL). Test proves the
+  durable UPDATE's SET clause has no `content_hash` and the manifest verifier rejects any entry proposing one.
+  (2) Whole-execution accounting (sum = 25,542, fullyAccounted=true): LEGACY_LINEAGE_FIELDS_MISSING (EXACT_REPAIR_ELIGIBLE) 16,151;
+  MISSING_PACKET (PACKET_ADMISSION_GAP) 7,352; ADMITTED_SNAPSHOT_BYTES_DIFFER_FROM_CURRENT_WORKTREE 842; OUT_OF_SCOPE_REPOSITORY 1,086;
+  LEGACY_CONTENT_HASH_UNQUALIFIED 93; IDENTITY_COLLISION 10; SOURCE_BYTES_MISSING 8; WORKSPACE_SCOPE_MISMATCH 0. (4 rows moved
+  MISSING_PACKET -> bytes-differ vs the first census: the worktree is live.)
+  (3) New frozen manifest, sharded (9 shards, each ~2 MB, root 2.5 KB): `docs/reports/packet-source-revision-repair-v1/<root>/`, root
+  SHA-256 `e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3`, 0 internally inconsistent entries, independently
+  re-verified. Superseded (historical only): single-file `0c341ac1…` (included content_hash) and md5 `5beefb65…`.
+  (4) Durable gate now takes `--manifest-root-sha256`, verifies root + every shard before the first write, writes a sharded inverse
+  manifest, records per-batch ordinal / intended / applied / alreadyApplied / pre+post state SHA-256 / txid / readback /
+  cumulative count to `apply-receipt-<run>.json`, and ends `SOURCE_AUTHORITY_APPLY_COMPLETE` / `_PARTIAL` /
+  `_FAILED_NOTHING_COMMITTED`. Tests `packet-source-revision-repair-v1.spec.ts` 8/8.
+  (5) View: the canonical checked-in migration `sveltekit-frontend/drizzle/manual/graphify_current_source_membership_v1.sql`
+  (commit 9d525dd2ae, 2026-09-09) ALREADY reads `graphify_execution_file_membership_v2` and defines "current" = latest COMPLETED
+  execution — semantics settled, no owner decision needed. The LIVE view drifted from it (reads legacy). Fix = re-apply that
+  canonical file; the 2026-09-24 DRAFT is marked SUPERSEDED (kept, not deleted). Separate authorization from the packet repair.
+  (6) Not in this repair: the 7,352-row PACKET_ADMISSION_GAP, 842 changed-byte, 93 legacy-hash, 10 collision, 8 missing-file rows.
+  Status: `SOURCE_AUTHORITY_APPLY_AUTHORIZATION_REQUIRED`.
+- [ ] HANDOFF-2026-09-24-SOURCE-AUTHORITY (resume point after compaction; nothing below has been applied)
+  STATE: atlas_packets with source_revision = 0 / 61,718 (last verified before the freeze). No Postgres write, no DDL, no Graphify
+  run, no rollback canary in this session. The auto-mode permission classifier DENIED the durable apply and, later, even a read-only
+  psql readback — the operator must run the writes via `!` or add Bash allow rules; do not retry around the denial.
+  NEXT (in order, each a separate authorization): (1) optional small rollback canary; (2) durable apply —
+  `node scripts/atlas/produce-current-packet-digest-bridge-v1.mjs --apply-durable --workspace-revision
+  sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83
+  --manifest-root-sha256 e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3 --batch-size 500
+  --confirm-durable-packet-source-revision-apply` (repo root); (3) readback: count source_revision NOT NULL, spot-check vs shards,
+  read `apply-receipt-*.json` status (COMPLETE / PARTIAL / FAILED_NOTHING_COMMITTED), then rerun the lineage audits
+  (`audit-current-lineage-closure-v1.mjs` aggregates reports only — regenerate its upstream reports first) and check
+  packetQualifiedRows > 0; (4) view: re-apply the CANONICAL `sveltekit-frontend/drizzle/manual/graphify_current_source_membership_v1.sql`
+  (NOT the SUPERSEDED `20260924_..._on_v2_DRAFT.sql`); expect ~25,542 active.
+  STALE — DO NOT USE: manifest `0c341ac1…` / flag `--manifest-sha256` (included content_hash), md5 `5beefb65…`.
+  If the census is re-run, the root checksum will change (worktree is live) — re-freeze and use the new root.
+  OPEN QUESTIONS: (a) PACKET_ADMISSION_GAP 7,352 — needs the packet-identity owner (PacketRevisionOwnerV1 unresolved); the
+  producer refuses to mint packet_key from a path. (b) `sveltekit-frontend/tests/atlas/register-orphaned-chunks-membership-source.spec.ts`
+  was edited outside this session to expect `atlas_workspace_source_bindings` join + `PACKET_SOURCE_REVISION_REQUIRED` guard + an
+  `INSERT INTO atlas_packets (... source_revision ...)` path in `register-orphaned-chunks.mjs`; the script does NOT have those yet,
+  so that test currently fails — confirm owner before changing the script. (c) Identity collisions 10, changed-byte 842.
+  FILES CHANGED THIS SESSION (uncommitted): `scripts/atlas/produce-current-packet-digest-bridge-v1.mjs` (--census, --apply-durable),
+  `scripts/atlas/lib/packet-source-revision-repair-v1.mjs` (new), `scripts/atlas/register-orphaned-chunks.mjs` (v2 reader),
+  `sveltekit-frontend/tests/atlas/packet-source-revision-repair-v1.spec.ts` (8/8), `.../register-orphaned-chunks-membership-source.spec.ts`,
+  `sveltekit-frontend/drizzle/manual/20260924_graphify_current_source_membership_v1_on_v2_DRAFT.sql` (SUPERSEDED marker),
+  manifest dir `docs/reports/packet-source-revision-repair-v1/e254d42d…/` (9 shards ~2 MB + root).
+  RELATED, SAME SESSION (closed, not source authority): embedding path — `sveltekit-frontend/scripts/atlas/kanban-turbovec-consolidation.mts`
+  (+ `scripts/atlas/lib/embed-request-contract.mjs`, test `tests/atlas/embed-request-contract.spec.ts` 5/5): Ollama batches of 256,
+  retry only transient runner errors (`/tokenize ... refused`, network, 5xx) x3, SvelteKit fallback skipped >50 texts, report
+  `semanticEmbedding` block; two consecutive full runs 6,725/6,725 Ollama, 0 fallback, degraded=false.
+  `sveltekit-frontend/src/lib/server/embedding/canonical-embed.ts`: sends `model:'embeddinggemma'`, rejects all-zero vectors, NO ONNX
+  fallback (off-space; see parent-atlas-onnx-webgpu-embedding-promotion item 3), explicit `tryEmbedOnnxChallenger()`
+  (canonicalAuthority=false); `canonical-embed.spec.ts` 6/6. Temporary `/api/embed` debug logger was removed.
+  RESUME GUARD / CORRECTION (2026-09-24, supersedes "optional canary" above): the order is
+  SOURCE-REPAIR-ROLLBACK-01 (code-only) → packet-admission test/script reconciliation → REQUIRED small live apply+rollback
+  canary → durable apply → readback → lineage audit → canonical view DDL. Never apply the superseded DRAFT view SQL. Do not
+  re-census unless eligibility logic, target columns or the frozen target state change. A classifier denial is
+  LOCAL_EXECUTION_PERMISSION_BLOCKED, not missing user authorization. No Graphify run is required.
+  PROGRESS (same day):
+  - SOURCE_REPAIR_ROLLBACK_EXECUTOR_PROVEN_CODE_ONLY. `lib/packet-source-revision-repair-v1.mjs` gained
+    `buildInverseManifest`/`verifyInverseManifest` (schema, execution, workspace, inverseOf pinned in the hashed root, every shard),
+    `classifyRollbackTarget` (exact post-state → ROLLBACK, exact pre-state → ALREADY_RESTORED, else drift; content_hash guarded,
+    never written) and `executeCasBatches` (shared by apply and rollback: per-batch txn, FOR UPDATE, CAS write rowCount=1, readback,
+    typed partial). Apply now also requires `lineage_producer_revision IS NULL` so a rollback restores exactly (live: 0 non-null).
+    Producer: `--rollback-durable --inverse-root-sha256 … --confirm-durable-packet-source-revision-rollback`; `--max-entries N`
+    for canaries. Tests: `tests/atlas/packet-source-revision-rollback-v1.spec.ts` 10/10 + repair spec 8/8; removing the
+    content_hash guard makes the drift test fail (mutation check). The frozen root e254d42d… still verifies (16,151 entries,
+    9 shards, 25,542 membership rows fully accounted).
+  - Packet-admission test reconciled: no owner decision needed. The worktree `register-orphaned-chunks.mjs` (concurrent edit)
+    already reuses the existing owner `scripts/atlas/lib/packet-source-revision-admission-v1.mjs`
+    (`resolvePacketSourceRevisionV1`: exact binding + V2 membership + digest, fail-closed); spec 4/4 PASS. No second resolver.
+    This path owns the separate PACKET_ADMISSION_GAP (7,352); it does not touch the 16,151 historical cohort.
+  - LIVE CANARY PROVEN: 5 frozen entries applied (batch txid 6800223, readback PASS, 5 rows with revision, content_hash
+    checksum unchanged), rolled back via inverse root 0525aa51… (SOURCE_REPAIR_ROLLBACK_COMPLETE, 5 restored). Whole-table
+    lineage checksum before = after restoration = 16f45ce67113aead16a3522c8fe8607bc010fcd6032bfadcd9eadf398c92490d.
+  - DURABLE APPLY started with root e254d42d…, batch 500; inverse root bc247c0c2e16115f2f26bd1ebf832d71a59ec53b7a8bbb9a3daa0f361ddd4c91;
+    receipt `docs/reports/packet-source-revision-repair-v1/e254d42d…/apply-receipt-1790289515387-420.json`.
+  - SOURCE_AUTHORITY_APPLY_COMPLETE (APPLY_PROVEN): 16,151/16,151 committed, 33 batches of ≤500, 0 aborts, every batch readback
+    PASS. Full readback: exactly 16,151 rows carry lineage fields, all in the manifest, all 4 fields equal the frozen values,
+    manifest checksum = readback checksum 829b3a04…; whole-table content_hash checksum unchanged (a0e596a2…, 0 rows changed).
+    Rollback remains available via inverse root bc247c0c… (`--rollback-durable`).
+  - CANONICAL VIEW RE-APPLIED (APPLY_PROVEN, separate receipt `docs/reports/graphify-current-source-membership-v1-reapply/receipt.json`):
+    the checked-in file puts `repository_id` first, so `CREATE OR REPLACE` alone cannot apply it; ran DROP VIEW … RESTRICT (0
+    dependents verified) + the canonical file in one transaction. Now reads graphify_execution_file_membership_v2; 25,545 rows,
+    25,542 active (was 24,139 / 0 active), equal to the canonical query preview; latest completed execution 0dba1c0d. Pre-apply
+    definition saved for rollback. The SUPERSEDED DRAFT was not applied.
+  - LINEAGE AUDITS (measured, after regenerating upstream reports with the admitted scope): packet-chunk join
+    packet_revision_matches 0 → 16,151 (the revision-qualified packet movement). packet_full_identity_matches stays 0 because
+    that audit also requires `atlas_packets.content_hash` = source-byte digest, and the repair deliberately does not write
+    content_hash (different historical recipe). Closure: packetQualifiedRows 0 (sourced from packet_full_identity_matches),
+    packetChunkQualifiedRows 577, workspaceSourceRows 52 (bounded cohort bound to other workspace revisions).
+    DECISION REQUIRED (PACKET_CONTENT_IDENTITY_COLUMN): either the audit keys packet content identity on source_revision (which
+    is already sha256 of the exact bytes), or a separate authorized repair writes a source-byte digest to a column other
+    than the legacy content_hash. Not changed unilaterally; do not relax the gate by guessing.
+  - PACKET_ADMISSION_GAP (7,352): not started. `register-orphaned-chunks.mjs` mints packet_key from source_ref alone
+    (`packet:<sha256(source_ref)[:12]>`), which the directive forbids for this gap → PACKET_ADMISSION_OWNER_DECISION_REQUIRED
+    for the key recipe before any classification manifest can become writes.
+  - PACKET_ADMISSION_GAP classified + frozen (read-only census, 0 DB writes). Producer changes: (1) a binding whose
+    source_revision differs from the membership code_source_revision is now REVISION_MISMATCH (live: 0); (2) content_hash
+    is no longer part of the expected lineage identity, so the 16,151 repaired rows re-census as IDEMPOTENT_MATCH (live:
+    16,151; exact repair remaining 0); (3) `--census` classifies every packetless row with
+    `classifyAdmission` and freezes ADMISSION_READY into `docs/reports/packet-admission-v1/<root>/` with NO packet_key
+    (`packetKeyRecipe: UNDECIDED_PACKET_ADMISSION_OWNER_DECISION_REQUIRED`, `writesAuthorized: false`). Tests:
+    `tests/atlas/packet-admission-classification-v1.spec.ts` 4/4 (repair+rollback+admission 22/22).
+    Census 2026-09-24 (25,542 accounted): ADMISSION_READY 7,350 (prior gap 7,352; 2 moved to changed bytes by worktree
+    edits), WORKSPACE_BINDING_MISSING 0, REVISION_MISMATCH 0, SOURCE_BYTES_CHANGED 852 (844 differ + 8 missing; packet
+    presence not evaluated for these), IDENTITY_COLLISION 0 packetless (the 10 collisions are packeted rows, outside the
+    gap), PACKET_NOW_EXISTS 0, OUT_OF_SCOPE 1,086. Admission root 16ff03a9fa23ad31fcae3753089e0eda20000b79a183c1b3f13efc40b9e94c21.
+    Blocked on: packet_key recipe decision (and the PACKET_CONTENT_IDENTITY_COLUMN decision above for Gate2 counting).
 - [ ] PROMOTION-02 — Permit writes only through an explicit target list,
   rollback plan, readback receipt, and human authorization.
 

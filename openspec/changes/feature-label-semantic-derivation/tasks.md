@@ -130,10 +130,12 @@ distribution has been reviewed for false positives (`AMBIGUOUS` rate especially)
   one doesn't already exist as a queryable table — check `recommendation_log`/`semantic_signals`
   (phase109a schema, already live) before inventing a new table.
 
-## Re-verification pass (2026-09-05, read-only)
+## Historical re-verification snapshot (2026-09-05, read-only; superseded 2026-09-24)
 
-- **The one open item (line 13, `graphify:daily:dry` misleading name) is STILL PRESENT, re-verified
-  live.** `sveltekit-frontend/package.json`'s `graphify:daily:dry` script still runs
+- At the time of this 2026-09-05 snapshot, the one reported open item (line 13,
+  `graphify:daily:dry` misleading name) was believed to be present. The 2026-09-24 read-only
+  reconciliation above supersedes that current-status conclusion. The historical observation was
+  that `sveltekit-frontend/package.json`'s `graphify:daily:dry` script ran
   `graphify:validate && graphify:materialize:apply && daily-graphify-cold-processing.mjs --dry-run
   && atlas:phase8:fanout:dry:steps1-3 && atlas:qdrant:feature-map-sync` — `graphify:materialize:apply`
   is a real apply, and per this same file's own Phase 0 proof, `atlas:phase8:fanout:dry:steps1-3`

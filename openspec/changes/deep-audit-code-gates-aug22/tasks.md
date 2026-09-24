@@ -13,7 +13,7 @@
 ## 3. Fix mechanical/low-risk gate fails (once index is refreshed per 1.2)
 
 - [ ] 3.1 G16 (67 fails): `npm run audit:test-stubs --filter <path>` per failing route, or in bulk.
-- [ ] 3.2 G26 (4 fails): add `// @vitest-environment node` to `tests/routes/all-routes-page.test.ts`, `cache-stats.test.ts`, `codebase-tags-rename.test.ts`, `phase109-tag-chunks.test.ts`.
+- [x] 3.2 G26 (4 fails): add `// @vitest-environment node` to `tests/routes/all-routes-page.test.ts`, `cache-stats.test.ts`, `codebase-tags-rename.test.ts`, `phase109-tag-chunks.test.ts`. (2026-09-24 read-only verification: all 4 files already carry `// @vitest-environment node` as line 1 under `sveltekit-frontend/tests/routes/`; no code change made in this pass.)
 - [ ] 3.3 G14 (3 fails, all scratch files): decide whether to archive `sveltekit-frontend/temp_upload.svelte`, `test-errors-validation.svelte`, `test-errors.svelte` per repo's archive-not-delete convention, or confirm they're intentionally kept as manual test fixtures.
 
 ## 4. Fix gate fails needing per-file judgment

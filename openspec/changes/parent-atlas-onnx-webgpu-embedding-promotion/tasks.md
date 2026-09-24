@@ -40,6 +40,23 @@ decision. This change freezes the corrected validation order before any further 
       `batchEmbedOnnx()` uses the shared `EmbeddingContextPlanV1`/`semantic_768` validator;
       it reports the actual executor/provider used; it does not silently treat a WebGPU failure
       that fell back to WASM as a WebGPU success.
+      **Inspected 2026-09-24 (read-only, `src/lib/server/embedding/onnx-embed.ts`, 233 lines) — criteria NOT met, left open:**
+      (a) `isOnnxEmbedAvailable()` does load the session + tokenizer and checks `input_ids`/`attention_mask` inputs, so it is
+      more than a file-existence check — PASS. (b) `batchEmbedOnnx()` just loops `tryEmbedOnnx()`; it does not use
+      `EmbeddingContextPlanV1`; only the output goes through `validateSemantic768OutputV1` — FAIL. (c) Executor is hard-coded
+      CPU (`executionProviders: ['cpu']`); the trace reports `onnx-local-cpu`, so there is no WebGPU path here to mislabel —
+      the WebGPU challenger lives only in `services/embedding-onnx-webgpu/`. (d) **Correctness defect:** the local
+      `models/embeddinggemma_300m_onnx/model.onnx` outputs only `last_hidden_state`; this code mean-pools + L2-normalizes it
+      but never applies EmbeddingGemma's `2_Dense` (768→3072) / `3_Dense` (3072→768) projections. Measured this session:
+      that recipe gives cosine ≈ 0 against Ollama `embeddinggemma:latest`; even with the Dense layers applied the QInt8
+      export only reaches ≈ 0.537 against the fp32 checkpoint (tokenizer parity proven), while fp32 SentenceTransformers ↔
+      Ollama = 1.0000 on raw/no-prefix text. So any vector from this lane is off the `semantic_768` corpus space.
+      Reachability: `canonical-embed.ts::tryEmbedCanonical` falls back to this lane when `/api/embed` fails; it was
+      sending `model: 'embeddinggemma:latest'`, which the route rejects (400), so that fallback fired on every call —
+      fixed 2026-09-24 (sends `model: 'embeddinggemma'`; regression test in `canonical-embed.spec.ts` proven to fail before
+      the fix). A second ONNX-first `tryEmbedCanonical` in `src/lib/server/embeddings/ollama.ts` has no live importer.
+      The fallback itself still returns off-space vectors when `/api/embed` is down — disabling it is an embedding-lane
+      decision, not taken here.
 - [x] **4. Harden the standalone proof to fail closed.** Added
       `services/embedding-onnx-webgpu/prove-embeddinggemma-onnx-webgpu-only-v1.mjs` with
       `requestedProvider: 'webgpu'`, `fallbackAllowed: false`, artifact/input/vector checksums,

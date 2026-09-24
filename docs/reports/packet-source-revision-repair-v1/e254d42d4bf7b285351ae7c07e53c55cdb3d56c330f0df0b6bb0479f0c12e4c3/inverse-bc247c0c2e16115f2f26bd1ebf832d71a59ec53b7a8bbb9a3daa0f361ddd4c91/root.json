@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.packet-source-revision-rollback-manifest.v1",
+  "checksumRecipe": "sorted-key-json-sha256-v1",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "inverseOf": "e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3",
+  "targetTable": "atlas_packets",
+  "targetColumns": [
+    "source_revision",
+    "workspace_revision_key",
+    "lineage_binding_checksum",
+    "lineage_producer_revision"
+  ],
+  "entryCount": 16151,
+  "shards": [
+    {
+      "name": "shard-0000.json",
+      "sha256": "896e0861ac27e3c4aff4e83febc1de077a3f1243a7b52cf4714681d446a51e87",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0001.json",
+      "sha256": "8631183129fbbbc5ad54e4323bc84011c014ae05709dece807fad6eef3c5b398",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0002.json",
+      "sha256": "ce880fa5848069f4f85a5ebbd8b0fc7e98a1fec91769319bd29d538d0b656552",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0003.json",
+      "sha256": "039c3645fcc779c5c85e82329e555848988d4dbcd3d788cd04ae90b1e528ac91",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0004.json",
+      "sha256": "0f12b99f0c34628b9597807b763a9c2fdea580b6a1231a2665d78efc6ab25272",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0005.json",
+      "sha256": "51cdfa1ab5b4b4b5ca603cef9bb933bbcbfded863837c298b332a3b60a986a63",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0006.json",
+      "sha256": "7b68757488670b4183d83ed146b27b7f040d1fdda09319b36026045090d20e96",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0007.json",
+      "sha256": "ae930e4a14fa0f5c0ff1c63329d63aa5ccf5d4baa54a52e71472d48de050ad09",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0008.json",
+      "sha256": "bc29cfef6f175a9425ea32d7e284c88e98333de24239f8651760275d74f0e7d3",
+      "entryCount": 151
+    }
+  ]
+}

@@ -42,9 +42,11 @@ Not resolved yet. Three options, not mutually exclusive across gates:
       - **Neo4j Kernel 5.26.27** (`CALL dbms.components()`).
 - [x] Neither plugin is missing — GR0's infrastructure-risk branch does not apply. No jar
       placement, no Neo4j restart needed for GR2/GR3.
-- [ ] Formalize the already-live `codebase_file_path` index (created ad hoc in T22) into
-      `neo4j/01-required-indexes.cypher` (declarative, idempotent `CREATE INDEX ... IF NOT
-      EXISTS`) — still not done, small follow-up.
+- [x] Formalize the already-live `codebase_file_path` index in
+      `parent-atlas-graph-runtime-enhancement/neo4j/01-required-indexes.cypher`. Revalidated
+      the tracked file at commit `400e6ee86a`: it declares idempotent
+      `CREATE INDEX codebase_file_path IF NOT EXISTS FOR (n:CodebaseFile) ON (n.path)` and a
+      read-only `SHOW INDEXES` verification query. No live DDL was executed in this closeout.
 
 ## GR1 — Fresh, frozen graphify revision
 
