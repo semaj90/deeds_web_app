@@ -1,0 +1,138 @@
+{
+  "schema": "atlas.lod-02-representation-reproducibility-evidence.v1",
+  "generatedAt": "2026-09-24T16:52:21Z",
+  "gate": "LOD-02C",
+  "status": "PROVEN_CURRENT_RUNTIME_REPRODUCIBILITY",
+  "writesPerformed": false,
+  "writesPerformedNote": "This tranche and the measurements it records performed no PostgreSQL, Qdrant, Valkey or Neo4j writes. Ollama embedding requests were read-only measurements.",
+  "cohort": {
+    "rows": 6774,
+    "coverageClass": "REVISION_QUALIFIED_CANARY",
+    "definition": "atlas_packet_chunk_lineage rows joined to codebase_chunk_index by chunk_row_id where content_embedding IS NOT NULL",
+    "sourceLineageStatus": "PROVEN",
+    "sourceLineageDetail": {
+      "revisionStatus": "PROVEN",
+      "membershipStatus": "EXACT_SINGLE_MEMBER or EXACT_MULTI_MEMBER",
+      "distinctChunkRows": 6774,
+      "vectorColumn": "codebase_chunk_index.content_embedding",
+      "vectorType": "halfvec(768)"
+    }
+  },
+  "recipe": {
+    "status": "PROVEN",
+    "rowsResolved": 6774,
+    "metadataCorroborated": 6297,
+    "metadataRecovered": 477,
+    "metadataContradicted": 0,
+    "unresolved": 0,
+    "ambiguous": 0,
+    "measuredRecipes": {
+      "eg-task-prefix-v1": 6312,
+      "unprompted-v0": 462
+    },
+    "measuredRecipeDefinitions": {
+      "eg-task-prefix-v1": "title: {relative_path} | text: {content}  (document mode of formatEmbeddingGemmaInput)",
+      "unprompted-v0": "raw chunk content"
+    },
+    "identificationRule": "exactly one tested recipe reproduced the stored vector at cosine >= 0.995; top-1 to top-2 cosine margin >= 0.018 on every row",
+    "recipesTested": ["raw", "title_relative_path", "title_none", "title_basename"],
+    "recoveredNote": "477 rows carry no recipe claim (448 plain embeddinggemma:latest, 29 with a hash-valued embedding_version); their recipe is recovered by measurement only."
+  },
+  "reproducibility": {
+    "criterion": "FP16_ONE_ULP_RNE",
+    "scalarType": "fp16",
+    "roundingMode": "round-to-nearest-even",
+    "maxElementErrorUlp": 1,
+    "dimensions": 768,
+    "toleranceFrozenBeforeMeasurement": true,
+    "toleranceNote": "The 1-ulp per-element bound is derived from binary16 semantics. It replaces an earlier absolute 6.1e-5 bound that had been chosen after seeing the observed maximum and is not used.",
+    "rowsPassing": 6774,
+    "rowsFailing": 0,
+    "digestExactObserved": 6453,
+    "numericExactWithinOneUlp": 321,
+    "digestExactStableInvariant": false,
+    "digestExactReason": "Current-runtime output can vary by approximately one FP16 ULP with request and batch composition. Two rows that were not digest-exact in one pass were 0 ulp in a later pass. digestExactObserved is a single-pass observation and must not be treated as a frozen property of the population; FP16 equivalence within one ulp is the stable invariant.",
+    "measurementPasses": "Classification is composed from two measurement passes over the same cohort: a full pass (6,453 digest-exact, 321 not) and a second pass re-embedding only the 321 non-digest rows, all of which were within one ulp (319 at maximum one ulp, 2 at zero). The 6,453 were not re-measured in the second pass.",
+    "meanElementsDifferingPerNumericExactRow": 1,
+    "measurementModel": "CURRENT_RUNTIME",
+    "currentRuntime": {
+      "engine": "ollama",
+      "modelAlias": "embeddinggemma:latest",
+      "manifestDigest": "85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1",
+      "format": "gguf",
+      "quantization": "BF16",
+      "purpose": "REPRODUCIBILITY_MEASUREMENT_ONLY",
+      "historicalArtifactClaim": false
+    }
+  },
+  "evidenceDimensions": {
+    "historicalWriterEvidence": "SUBSTANTIALLY_IDENTIFIED",
+    "recipeEvidence": "PROVEN",
+    "currentRuntimeReproducibility": "PROVEN",
+    "historicalArtifactEvidence": "UNRESOLVED"
+  },
+  "representationEvidenceGrade": "CURRENT_RUNTIME_REPRODUCIBLE",
+  "representationEvidenceGradeSemantics": {
+    "HISTORICAL_ARTIFACT_EXACT": "historical execution is bound to an immutable model artifact digest",
+    "CURRENT_RUNTIME_REPRODUCIBLE": "current runtime reproduces stored vectors within the frozen numerical criterion; historical immutable artifact remains unavailable",
+    "ALIAS_ONLY": "only mutable model alias evidence exists",
+    "UNRESOLVED": "insufficient representation evidence"
+  },
+  "historicalWriter": {
+    "taggedEgTaskPrefixV1Cohort": {
+      "script": "scripts/atlas/reembed-corpus-document-prefix-v1.mjs",
+      "endpoint": "http://127.0.0.1:11434/api/embeddings",
+      "modelAlias": "embeddinggemma:latest",
+      "run": "2026-08-25T18:45:45Z to 2026-08-25T19:34:00Z",
+      "receipt": "docs/reports/atlas-corpus-reembed-document-prefix-v1-apply.json",
+      "recipeMatchesMeasured": true
+    },
+    "rawUnpromptedV0Cohort": {
+      "writer": "not established",
+      "note": "462 rows; no dated writer receipt located"
+    },
+    "qdrantBackfillLabelNote": "embedding_version 'qdrant-backfill-v1' on cohort rows originates from scripts/atlas/backfill-content-embedding-384.mjs (the retired 384-d lane). It is a stale label and is not evidence about the provenance of the 768-d content_embedding vectors."
+  },
+  "historicalReceiptConsistency": "WRITE_FLAG_CONTRADICTS_REPORTED_UPDATE_COUNT",
+  "historicalReceipt": {
+    "path": "docs/reports/atlas-corpus-reembed-document-prefix-v1-apply.json",
+    "date": "2026-08-25",
+    "processed": 52325,
+    "updatedRows": 52324,
+    "writesPerformedField": false,
+    "dryRun": false,
+    "modelDigestRecorded": false,
+    "alteredByThisTranche": false,
+    "note": "Preserved verbatim. The receipt reports 52,324 updated rows while also reporting writesPerformed=false and records no model digest. The recipe evidence above does not depend on that field."
+  },
+  "historicalArtifact": {
+    "modelAlias": "embeddinggemma:latest",
+    "immutableDigest": null,
+    "verified": false,
+    "existingOwnersChecked": [
+      "atlas_representations (semantic_768 revision, tokenizer and artifact digest fields are all 'unknown'; lifecycle CANDIDATE, verification UNVERIFIED)",
+      "atlas_vector_registry (alias-only, no row-level binding)",
+      "EmbeddingModelManifestV1 (schema only, zero live instances per docs/reports/sem768-admission-dry-01.json)",
+      "Ollama rotated server logs (begin after the 2026-08-25 run)"
+    ],
+    "circumstantialOnly": "On-disk Ollama manifest for embeddinggemma:latest is dated 2025-09-16 (API modified_at reports 2026-05-08; discrepancy unexplained), both before the run. Not treated as a historical receipt."
+  },
+  "strictSnapshot": {
+    "artifact": "SemanticSnapshotV1",
+    "eligibleRows": 0,
+    "blocker": "MODEL_REVISION_UNRESOLVED: no immutable historical model artifact digest is bound to the cohort; REPRESENTATION_EXACT = 0, MODEL_REVISION_EXACT = 0"
+  },
+  "reproducibilityCanary": {
+    "artifact": "SemanticSnapshotReproducibilityCanaryV1",
+    "built": false,
+    "eligibleRows": 6774,
+    "coverageClass": "REVISION_QUALIFIED_CURRENT_RUNTIME_REPRODUCIBLE",
+    "canonicalAuthority": false,
+    "promotionEligible": false,
+    "historicalModelArtifactVerified": false
+  },
+  "representationTables": {
+    "atlas_representations": "NOT_MODIFIED"
+  },
+  "measurementLedger": "Per-row measurement data was retained only in the session scratchpad and is not persisted by this receipt."
+}
