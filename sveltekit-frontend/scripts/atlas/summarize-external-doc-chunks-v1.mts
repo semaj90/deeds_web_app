@@ -13,6 +13,9 @@
  *                       Optional --control <control-cohort.json> --control-eligibility <evaluation.json> adds a NEGATIVE CONTROL that must be refused.
  *   --apply-frozen <cohort.json> --eligibility <evaluation.json> --limit N
  *                       BOUNDED persistent write of the admitted frozen candidates' EXACT text (needs env ATLAS_DOC_SUMMARY_AUTHORIZED=I_AUTHORIZE_EXTERNAL_DOC_SUMMARIES). --limit is a ceiling. Never calls the model.
+ *   --canary-frozen <cohort.json> --eligibility <evaluation.json> --limit N
+ *                       the SAME persistence path as --apply-frozen but it can never commit: it inserts the admitted frozen candidates, reads them back inside the transaction, ROLLS BACK,
+ *                       then verifies from a second connection that no row remains; includes a tamper case that must be refused before any insert. Needs no authorization (nothing is durable).
  *   plain --apply / --all   REMOVED: an apply that regenerates summaries would persist text the validation never saw (TOCTOU). It now fails with APPLY_REQUIRES_FROZEN_CANDIDATES.
  * ADMISSION (VAL10B_SUMMARY_PERSISTENCE_ADMISSION_01): in EVERY mode each generated summary is run through python/atlas_summary_admission_v1.py (canonical chunk re-read, deterministic checks,
  *   Ornith judge, VAL-09) and only summaries whose claims are ALL ADMIT and whose sealed report binds this exact chunk revision and this exact text hash are ever inserted. --limit is a ceiling, not a target.
@@ -43,6 +46,7 @@ const argAfter = (flag: string): string | null => { const i = args.indexOf(flag)
 const freezeOut = argAfter('--freeze-candidates');
 const admitFrozenPath = argAfter('--admit-frozen');
 const applyFrozenPath = argAfter('--apply-frozen');
+const canaryFrozenPath = argAfter('--canary-frozen');
 const cohortSource = argAfter('--cohort');
 const eligibilityPath = argAfter('--eligibility');
 const controlPath = argAfter('--control');
@@ -192,14 +196,26 @@ function admitFrozenMode(): void {
 }
 
 /** persistEligibleSummaryCandidatesV1 wiring. NEVER calls the model. Needs authorization; NOT run in the freeze/admission tranche. */
-async function applyFrozenMode(): Promise<void> {
-	if (!applyFrozenPath || !eligibilityPath || limIdx < 0) throw new Error('APPLY_FROZEN_REQUIRES: --apply-frozen <cohort.json> --eligibility <evaluation.json> --limit N');
-	if (process.env.ATLAS_DOC_SUMMARY_AUTHORIZED !== AUTH) throw new Error(`SUMMARIES_NOT_AUTHORIZED: set ATLAS_DOC_SUMMARY_AUTHORIZED=${AUTH}`);
+async function applyFrozenMode(canaryOnly = false): Promise<void> {
+	const frozenPath = canaryOnly ? canaryFrozenPath : applyFrozenPath;
+	if (!frozenPath || !eligibilityPath || limIdx < 0) throw new Error('FROZEN_MODE_REQUIRES: --apply-frozen|--canary-frozen <cohort.json> --eligibility <evaluation.json> --limit N');
+	if (!canaryOnly && process.env.ATLAS_DOC_SUMMARY_AUTHORIZED !== AUTH) throw new Error(`SUMMARIES_NOT_AUTHORIZED: set ATLAS_DOC_SUMMARY_AUTHORIZED=${AUTH}`);
 	if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not set');
-	const { cohort, items, problems } = loadFrozen(applyFrozenPath, eligibilityPath);
+	const { cohort, items, problems } = loadFrozen(frozenPath, eligibilityPath);
 	if (problems.length) throw new Error(`FROZEN_COHORT_INCONSISTENT:${problems.join(',')}`);
 	const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 	const client = await pool.connect();
+	// tamper case (canary only): mutate ONE summary byte and, separately, the chunk revision of a valid candidate; both must be refused before the mutation boundary is reached. No database is involved.
+	let tamper: { changedByte: { refused: boolean; reasons: unknown; insertCalls: number }; changedRevision: { refused: boolean; reasons: unknown; insertCalls: number } } | null = null;
+	if (canaryOnly) {
+		const base = items[0]!; let calls = 0;
+		const stub: PersistenceDeps = { chunkRevisionIsCurrent: async () => true, insertAnalysis: async () => { calls += 1; return 1; }, now: () => new Date().toISOString() };
+		const c = base.candidate as { summaryText: string; chunkEvidenceRevision: string };
+		const byte = await persistEligibleSummaryCandidatesV1([{ ...base, candidate: { ...c, summaryText: c.summaryText.endsWith('.') ? c.summaryText.slice(0, -1) + ',' : c.summaryText + ' ' } }], SUMMARY_PERSISTENCE_POLICY_V1, stub, 20);
+		const callsAfterByte = calls;
+		const rev = await persistEligibleSummaryCandidatesV1([{ ...base, candidate: { ...c, chunkEvidenceRevision: 'sha256:' + 'f'.repeat(64) } }], SUMMARY_PERSISTENCE_POLICY_V1, stub, 20);
+		tamper = { changedByte: { refused: byte.persisted.length === 0, reasons: byte.refused[0]?.reasons, insertCalls: callsAfterByte }, changedRevision: { refused: rev.persisted.length === 0, reasons: rev.refused[0]?.reasons, insertCalls: calls - callsAfterByte } };
+	}
 	try {
 		const before = (await client.query('SELECT count(*)::int n FROM atlas_external_doc_analyses')).rows[0].n as number;
 		await client.query('BEGIN');
@@ -218,7 +234,30 @@ async function applyFrozenMode(): Promise<void> {
 		});
 		const after = (await client.query('SELECT count(*)::int n FROM atlas_external_doc_analyses')).rows[0].n as number;
 		const ok = readbackOk && after - before === result.persisted.length;
-		await client.query(ok ? 'COMMIT' : 'ROLLBACK');
+		// admission binding stored on the row must name the exact candidate and eligibility that were admitted
+		const admissionBound = result.persisted.every((p) => { const r = rb.find((x) => x.analysis_id === p.analysisId); const it = items.find((i) => (i.candidate as { candidateId: string }).candidateId === p.candidateId); return !!r && !!it; });
+		await client.query(canaryOnly ? 'ROLLBACK' : ok ? 'COMMIT' : 'ROLLBACK'); // the canary path has NO commit branch
+		let postRollback: { rowsAdded: number; idsStillPresent: number; independentConnection: boolean } | null = null;
+		if (canaryOnly) {
+			const other = await pool.connect(); // a different connection: sees only durable state
+			try {
+				const n = (await other.query('SELECT count(*)::int n FROM atlas_external_doc_analyses')).rows[0].n as number;
+				const still = (await other.query('SELECT count(*)::int n FROM atlas_external_doc_analyses WHERE analysis_id = ANY($1::text[])', [ids])).rows[0].n as number;
+				postRollback = { rowsAdded: n - before, idsStillPresent: still, independentConnection: true };
+			} finally { other.release(); }
+			const canaryReceipt = {
+				schema: 'atlas.summary-candidate-rollback-canary.v1', gate: 'VAL10B_ROLLBACK_CANARY', generatedAt: new Date().toISOString(), candidateCohortChecksum: cohort.candidateCohortChecksum, ceiling: sample,
+				writerInvoked: true, admissionPassed: result.persisted.length > 0 && result.refused.length === 0, insertExecuted: result.insertCalls > 0, insertCalls: result.insertCalls, inTransactionRows: rb.length,
+				inTransactionReadbackMatched: readbackOk && after - before === result.persisted.length && admissionBound, transactionOutcome: 'ROLLED_BACK_CANARY', durableCommitted: false,
+				postRollback, tamperCase: tamper, refused: result.refused, modelCalls: 0, writes: { postgres: 'ROLLED_BACK', qdrant: 0, valkey: 0, neo4j: 0, graphify: 0 }
+			};
+			const pass = canaryReceipt.writerInvoked && canaryReceipt.admissionPassed && canaryReceipt.insertExecuted && canaryReceipt.inTransactionReadbackMatched && postRollback!.rowsAdded === 0 && postRollback!.idsStillPresent === 0
+				&& !!tamper && tamper.changedByte.refused && tamper.changedByte.insertCalls === 0 && tamper.changedRevision.refused && tamper.changedRevision.insertCalls === 0;
+			writeReceipt('docs/reports/parent-atlas/summary-candidate-rollback-canary-v1.json', { ...canaryReceipt, result: pass ? 'VAL10B_ROLLBACK_CANARY_PROVEN' : 'VAL10B_ROLLBACK_CANARY_FAILED' });
+			console.log(JSON.stringify({ result: pass ? 'VAL10B_ROLLBACK_CANARY_PROVEN' : 'VAL10B_ROLLBACK_CANARY_FAILED', insertCalls: result.insertCalls, inTransactionReadbackMatched: canaryReceipt.inTransactionReadbackMatched, postRollback, tamper }, null, 2));
+			if (!pass) process.exitCode = 1;
+			return;
+		}
 		const receipt = { schema: 'atlas.summary-candidate-persistence.v1', generatedAt: new Date().toISOString(), candidateCohortChecksum: cohort.candidateCohortChecksum, ceiling: sample, before, after: ok ? after : before, persisted: result.persisted, refused: result.refused, insertCalls: result.insertCalls, readbackOk, committed: ok, modelCalls: 0 };
 		writeReceipt('docs/reports/parent-atlas/summary-candidate-persistence-v1.json', receipt);
 		console.log(JSON.stringify({ committed: ok, persisted: result.persisted.length, refused: result.refused.length, readbackOk }, null, 2));
@@ -231,6 +270,7 @@ async function main(): Promise<void> {
 	if (admitFrozenPath) { admitFrozenMode(); return; }
 	if (freezeOut) { await freezeMode(); return; }
 	if (applyFrozenPath) { await applyFrozenMode(); return; }
+	if (canaryFrozenPath) { await applyFrozenMode(true); return; }
 	if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not set');
 	if (apply && !all && limIdx < 0) throw new Error('APPLY_REQUIRES_LIMIT: use --apply --limit N (bounded) or --apply --all (full corpus, separately authorized)');
 	if (apply && process.env.ATLAS_DOC_SUMMARY_AUTHORIZED !== AUTH) throw new Error(`SUMMARIES_NOT_AUTHORIZED: set ATLAS_DOC_SUMMARY_AUTHORIZED=${AUTH}`);

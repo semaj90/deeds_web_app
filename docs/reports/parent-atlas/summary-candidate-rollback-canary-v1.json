@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.summary-candidate-rollback-canary.v1",
+  "gate": "VAL10B_ROLLBACK_CANARY",
+  "generatedAt": "2026-09-24T02:41:42.524Z",
+  "candidateCohortChecksum": "63e83c53bde93be1c9f759dcee00d002d510b6ea0b2d1c9a1b189a0825e93691",
+  "ceiling": 20,
+  "writerInvoked": true,
+  "admissionPassed": true,
+  "insertExecuted": true,
+  "insertCalls": 19,
+  "inTransactionRows": 19,
+  "inTransactionReadbackMatched": true,
+  "transactionOutcome": "ROLLED_BACK_CANARY",
+  "durableCommitted": false,
+  "postRollback": {
+    "rowsAdded": 0,
+    "idsStillPresent": 0,
+    "independentConnection": true
+  },
+  "tamperCase": {
+    "changedByte": {
+      "refused": true,
+      "reasons": [
+        "SUMMARY_OUTPUT_CHECKSUM_MISMATCH"
+      ],
+      "insertCalls": 0
+    },
+    "changedRevision": {
+      "refused": true,
+      "reasons": [
+        "CANDIDATE_ID_MISMATCH"
+      ],
+      "insertCalls": 0
+    }
+  },
+  "refused": [],
+  "modelCalls": 0,
+  "writes": {
+    "postgres": "ROLLED_BACK",
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "result": "VAL10B_ROLLBACK_CANARY_PROVEN"
+}
