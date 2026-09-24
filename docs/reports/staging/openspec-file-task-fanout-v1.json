@@ -7,15 +7,15 @@
   ],
   "summary": {
     "linkedTaskFileReferences": 10889,
-    "uniquelyResolvedFiles": 957,
-    "inventoryExcludedReferences": 36,
+    "uniquelyResolvedFiles": 956,
+    "inventoryExcludedReferences": 38,
     "unresolvedReferencesNotProvenPresent": 273,
     "topicCounts": {
       "fusion-context-prefill": 2665,
-      "identity-lineage": 5096,
+      "identity-lineage": 4995,
       "residency-cache": 1073,
-      "governance-promotion": 1367,
-      "other": 55,
+      "governance-promotion": 1468,
+      "other": 53,
       "chunk-ast-symbol": 69,
       "agent-protocols": 30,
       "semantic-ann": 104,
@@ -7352,107 +7352,15 @@
       "changes": [
         "parent-atlas-nlp-sidecar-feature-compiler"
       ],
-      "primaryTopic": "identity-lineage",
-      "secondaryTopics": [
-        "chunk-ast-symbol",
-        "semantic-ann",
-        "graph-topology",
-        "clustering-taxonomy",
-        "fusion-context-prefill",
-        "residency-cache",
-        "agent-protocols",
-        "human-feedback-rl",
-        "agent-workflow",
-        "governance-promotion",
-        "ui-admin",
-        "data-postgres"
-      ],
+      "primaryTopic": "governance-promotion",
+      "secondaryTopics": [],
       "concepts": [
-        "canonical identity",
-        "packet revision",
-        "workspace revision",
-        "source revision",
-        "registry",
-        "provenance",
-        "chunk",
-        "AST",
-        "CST",
-        "tree_node",
-        "Tree-sitter",
-        "AST-grep",
-        "symbol",
-        "span",
-        "semantic_768",
-        "embedding",
-        "Qdrant",
-        "cuVS",
-        "CAGRA",
-        "KNN",
-        "reranker",
-        "Graphify",
-        "file relation",
-        "import graph",
-        "PageRank",
-        "PPR",
-        "Neo4j",
-        "cuGraph",
-        "hypergraph",
-        "KMeans",
-        "SOM",
-        "centroid",
-        "domain class",
-        "topic",
-        "concept",
-        "taxonomy",
-        "RRF",
-        "candidate cohort",
-        "ContextManifest",
-        "PromptPlan",
-        "prefill",
-        "synthesis",
-        "ACE",
-        "BitFrost",
-        "Redis",
-        "Valkey",
-        "KV cache",
-        "bucket warming",
-        "llama-server",
-        "ACP",
-        "A2A",
-        "MCP",
-        "gRPC",
-        "RabbitMQ",
-        "transport adapter",
-        "human in the loop",
-        "approval",
-        "feedback receipt",
-        "preference",
-        "reinforcement learning",
-        "PyTorch",
-        "scheduler",
-        "ranker",
-        "retry",
-        "blocker",
-        "receipt",
-        "error repair",
-        "workflow",
         "OpenSpec",
         "completion envelope",
         "authorization",
         "authority",
         "promotion",
-        "invariant",
-        "SvelteKit",
-        "SSR",
-        "SSE",
-        "Bits UI",
-        "Studio",
-        "admin",
-        "PostgreSQL 18",
-        "Drizzle ORM",
-        "pgvector",
-        "schema",
-        "materialized read model"
+        "invariant"
       ],
       "clusterId": null,
       "evidence": {
@@ -13395,7 +13303,7 @@
       "authority": "NAVIGATION_ONLY"
     },
     {
-      "file": ".claude/CLAUDE.md",
+      "file": "CLAUDE.md",
       "taskCount": 28,
       "taskIds": [
         "codereview-inference-wiring-followup-aug22:25",
@@ -13443,7 +13351,7 @@
       "primaryTopic": "other",
       "secondaryTopics": [],
       "concepts": [],
-      "clusterId": 1,
+      "clusterId": 11,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -18005,7 +17913,7 @@
         "CAGRA",
         "KNN"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": true,
@@ -19897,7 +19805,7 @@
         "Studio",
         "admin"
       ],
-      "clusterId": 10,
+      "clusterId": 0,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -20629,7 +20537,7 @@
         "schema",
         "materialized read model"
       ],
-      "clusterId": 8,
+      "clusterId": 0,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -22733,29 +22641,7 @@
       "primaryTopic": "other",
       "secondaryTopics": [],
       "concepts": [],
-      "clusterId": 1,
-      "evidence": {
-        "treeNodeEvidence": false,
-        "graphifyEvidence": false,
-        "openspecEvidence": false
-      },
-      "authority": "NAVIGATION_ONLY"
-    },
-    {
-      "file": "claude.md",
-      "taskCount": 2,
-      "taskIds": [
-        "parent-atlas-document-governance-master-index:13",
-        "parent-atlas-memory-architecture-freeze:240"
-      ],
-      "changes": [
-        "parent-atlas-document-governance-master-index",
-        "parent-atlas-memory-architecture-freeze"
-      ],
-      "primaryTopic": "other",
-      "secondaryTopics": [],
-      "concepts": [],
-      "clusterId": 1,
+      "clusterId": 11,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -24016,7 +23902,7 @@
         "Neo4j",
         "cuGraph"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -24068,7 +23954,7 @@
         "domain class",
         "topic"
       ],
-      "clusterId": 0,
+      "clusterId": 2,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -24355,7 +24241,7 @@
       "primaryTopic": "other",
       "secondaryTopics": [],
       "concepts": [],
-      "clusterId": 1,
+      "clusterId": 11,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -30262,7 +30148,7 @@
         "topic",
         "concept"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": true,
@@ -30314,7 +30200,7 @@
         "CAGRA",
         "KNN"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": true,
         "graphifyEvidence": true,
@@ -30349,7 +30235,7 @@
         "Studio",
         "admin"
       ],
-      "clusterId": 4,
+      "clusterId": 0,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -30369,7 +30255,7 @@
       "primaryTopic": "other",
       "secondaryTopics": [],
       "concepts": [],
-      "clusterId": 1,
+      "clusterId": 11,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -30462,7 +30348,7 @@
         "KV cache",
         "bucket warming"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -30507,7 +30393,7 @@
         "KV cache",
         "bucket warming"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -30553,7 +30439,7 @@
         "PPR",
         "Neo4j"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": true,
@@ -30602,7 +30488,7 @@
         "CAGRA",
         "KNN"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": true,
         "graphifyEvidence": true,
@@ -30651,7 +30537,7 @@
         "CAGRA",
         "KNN"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": true,
         "graphifyEvidence": true,
@@ -30705,7 +30591,7 @@
         "CAGRA",
         "KNN"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": true,
@@ -30757,7 +30643,7 @@
         "CAGRA",
         "KNN"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": true,
@@ -38050,7 +37936,7 @@
         "schema",
         "materialized read model"
       ],
-      "clusterId": 2,
+      "clusterId": 4,
       "evidence": {
         "treeNodeEvidence": false,
         "graphifyEvidence": false,
@@ -71816,6 +71702,10 @@
       "taskCount": 4
     },
     {
+      "file": "claude.md",
+      "taskCount": 2
+    },
+    {
       "file": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
       "taskCount": 2
     },
@@ -73400,7 +73290,17 @@
       ],
       "candidateFiles": [
         "docs/reports/openspec-execution-controller-v1.json",
-        "docs/reports/staging/openspec-execution-controller-v1.json"
+        "docs/reports/staging/.execution-controller-12204-1789926671229/openspec-execution-controller-v1.json",
+        "docs/reports/staging/.execution-controller-1648-1789926362189/openspec-execution-controller-v1.json",
+        "docs/reports/staging/.execution-controller-19028-1789928784825/openspec-execution-controller-v1.json",
+        "docs/reports/staging/.execution-controller-19576-1789896573419/openspec-execution-controller-v1.json",
+        "docs/reports/staging/.execution-controller-26052-1789897564519/openspec-execution-controller-v1.json",
+        "docs/reports/staging/.execution-controller-26272-1789929216540/openspec-execution-controller-v1.json",
+        "docs/reports/staging/.execution-controller-26532-1789926925463/openspec-execution-controller-v1.json",
+        "docs/reports/staging/.execution-controller-32136-1789929415383/openspec-execution-controller-v1.json",
+        "docs/reports/staging/.execution-controller-34468-1789926158284/openspec-execution-controller-v1.json",
+        "docs/reports/staging/.execution-controller-37644-1789896519792/openspec-execution-controller-v1.json",
+        "docs/reports/staging/.execution-controller-41960-1789896754212/openspec-execution-controller-v1.json"
       ]
     },
     {
@@ -74406,5 +74306,5 @@
     "clustersDoNotCreateDependencies": true,
     "sourceLineageFieldsAreNotTaskDependencies": true
   },
-  "semanticChecksum": "1ea7d9550fdb93ddeccbb96a47622275b46be07c1e420ad3e5fd42b08141c1d5"
+  "semanticChecksum": "9e47e52fb4d074e1a5bb6949e462766d19ecaaed6c6e59dc86606f96e9c31ddc"
 }

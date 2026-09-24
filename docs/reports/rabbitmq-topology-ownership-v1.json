@@ -1,0 +1,142 @@
+{
+  "schema": "atlas.rabbitmq-topology-ownership.v1",
+  "generatedAt": "2026-09-23T04:21:28.452Z",
+  "mode": "READ_ONLY_SOURCE_AUDIT",
+  "status": "TWO_ACTIVE_DISJOINT_STARTUP_DOMAINS; UNUSED_CORE_COPY_CONFLICTS_IF_ACTIVATED",
+  "owners": {
+    "legacyWorkload": {
+      "files": [
+        "sveltekit-frontend/src/hooks.server.ts",
+        "sveltekit-frontend/src/lib/server/queue/rabbitmq-xstate-integration.ts",
+        "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts"
+      ],
+      "startupPath": "hooks.server.ts -> startRabbitMQPipeline -> RabbitMQManager.initialize -> setupInfrastructure",
+      "exchanges": [
+        "analytics.events",
+        "audio.processing",
+        "cache.invalidation",
+        "codebase.indexing",
+        "dlx.dead-letter",
+        "document.processing",
+        "legal.media",
+        "media.processing",
+        "vector.updates"
+      ],
+      "queues": [
+        "ace.evaluate",
+        "analytics.track",
+        "audio.process",
+        "cache.invalidate",
+        "cards.refresh",
+        "chat.context",
+        "chat.document.embed",
+        "codebase.index",
+        "document.embed",
+        "error.embed",
+        "evidence.process",
+        "glyph.tile.rebuild",
+        "inference.log.flush",
+        "kb.ingest",
+        "knowledge.backfill",
+        "media.download",
+        "media.transcribe",
+        "qlora.distill",
+        "repair.workflow.run",
+        "synthesis.generate",
+        "vector.index"
+      ],
+      "purpose": "Existing document/cache/vector/analytics workload queues using simple-name queue and exchange taxonomy."
+    },
+    "eventFabric": {
+      "files": [
+        "sveltekit-frontend/src/hooks.server.ts",
+        "sveltekit-frontend/src/lib/server/workers/code-evidence-projection-worker.ts",
+        "sveltekit-frontend/src/lib/server/queue/topology.ts"
+      ],
+      "startupPath": "hooks.server.ts -> startEventFabricWorker -> declareTopology",
+      "exchanges": [
+        "atlas.events.v1",
+        "atlas.tasks.dlx.v1",
+        "atlas.tasks.v1"
+      ],
+      "queues": [
+        "atlas.q.agent.work",
+        "atlas.q.code.events",
+        "atlas.q.code.work",
+        "atlas.q.dlx",
+        "atlas.q.document.work",
+        "atlas.q.embedding.work",
+        "atlas.q.graph.work",
+        "atlas.q.retrieval.work",
+        "atlas.q.retry.agent",
+        "atlas.q.retry.code",
+        "atlas.q.retry.retrieval"
+      ],
+      "purpose": "Versioned atlas task and event topology; event traffic is explicitly separate from WorkCommand dispatch."
+    },
+    "atlasCoreCopy": {
+      "files": [
+        "packages/atlas-core/src/queue/topology.ts"
+      ],
+      "exchanges": [
+        "atlas.retry.10s.v1",
+        "atlas.retry.5m.v1",
+        "atlas.retry.60s.v1",
+        "atlas.tasks.dlx.v1",
+        "atlas.tasks.v1"
+      ],
+      "queues": [
+        "atlas.retry.10s.v1",
+        "atlas.retry.5m.v1",
+        "atlas.retry.60s.v1",
+        "atlas.tasks.failed.v1",
+        "atlas.worker.code-analysis.v1",
+        "atlas.worker.code-mutation.v1",
+        "atlas.worker.gpu.v1",
+        "atlas.worker.graph.v1",
+        "atlas.worker.opencode.v1",
+        "atlas.worker.retrieval.v1",
+        "atlas.worker.test.v1"
+      ],
+      "status": "UNREFERENCED_SOURCE_OWNER; DO NOT ACTIVATE WITHOUT RECONCILING DIVERGENT DECLARATION CONTRACTS",
+      "conflict": {
+        "sharedExchanges": [
+          "atlas.tasks.dlx.v1",
+          "atlas.tasks.v1"
+        ],
+        "sharedQueues": [],
+        "appDlxType": "direct",
+        "coreDlxType": "fanout",
+        "currentSourceCallerFound": false,
+        "callerSearchMatches": [],
+        "callerCensusScope": [
+          "packages",
+          "sveltekit-frontend/src",
+          "services",
+          "scripts"
+        ]
+      }
+    }
+  },
+  "findings": {
+    "activeStartupDeclarationCount": 2,
+    "activeExchangeOverlap": [],
+    "activeQueueOverlap": [],
+    "eventExchangeSemantics": {
+      "separateTaskAndEventExchanges": true,
+      "taskExchangeType": true,
+      "eventExchangeType": true
+    },
+    "assertions": {
+      "bothStartupPathsVerified": true,
+      "eventFabricSemanticsVerified": true,
+      "activeExchangeNamespacesDisjoint": true,
+      "activeQueueNamespacesDisjoint": true,
+      "unreferencedCoreDlxConflictVisible": true
+    }
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "brokerTouched": false,
+  "evidenceChecksum": "sha256:6b027d78862b38dce1476d6e1dda25c3c959bceacf553459c145b4aa819c48be"
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T01:06:03Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "STRUCT_02_STRUCTURAL_MEMORY_CARD_V1",
+    "to": "A2A_03_PEER_DISCOVERY_WRITE_BOUNDARY",
+    "reason": "The live peer-discovery owner advertises every ACP tool and complete service methods, including generic execution and mirror operations; this is an actionable security boundary independent of source-authority-gated structural promotion."
+  },
+  "evidence": {
+    "discoveryRoute": "sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts",
+    "descriptorOwner": "sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts::buildA2AAgentDescriptor",
+    "before": "Discovery exposed all registry tools and complete methods for each tool-backed service.",
+    "after": "Default-deny allowlist exposes identity:recover and retrieval Search/RRFFuse/Rerank only; the route filters registry tool records by descriptor tool IDs.",
+    "testCoverage": "The discovery tool-list helper used by the route is fixture-tested against write/mirror and unknown tool entries.",
+    "authorizationBoundary": "Metadata filtering only; admin route remains protected and actual RPC handlers still require their own authorization."
+  },
+  "implementation": {
+    "design": "openspec/changes/parent-atlas-transport-memory-boundaries/design.md",
+    "files": [
+      "sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts",
+      "sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts",
+      "sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.spec.ts",
+      "openspec/changes/parent-atlas-transport-memory-boundaries/proposal.md",
+      "openspec/changes/parent-atlas-transport-memory-boundaries/specs/transport-memory-boundaries/spec.md",
+      "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md"
+    ]
+  },
+  "validation": {
+    "focusedTests": "PASS 2/2",
+    "openSpecStrict": "PASS",
+    "diffCheck": "PASS",
+    "jsonParse": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 35,
+    "open": 57,
+    "total": 92,
+    "delta": "A2A-03 completed as a peer-discovery metadata boundary; no A2A execution, canonical storage, or write authority was added."
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "containers": false
+  },
+  "nextGate": "STRUCT_07_BOUNDED_CST_TO_GIS_PACKET_TO_SEMANTIC_PROJECTION_PROOF"
+}

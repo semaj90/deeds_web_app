@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.doc-26.chunk-id-compatibility-audit.v1",
+  "generatedAt": "2026-09-23T21:13:00Z",
+  "gate": "DOC-26",
+  "result": "DOC_26_BLOCKED_CHUNK_IDENTITY_COLLISION",
+  "readOnly": true,
+  "codeContract": {
+    "owner": "python/atlas_external_docs.py::chunk_document",
+    "chunkIdShape": "doc:{source_id}:{document_checksum[0:16]}:{ordinal}",
+    "chunkEvidenceRevisionIncludesPageEvidenceRevision": true
+  },
+  "databaseContract": {
+    "owner": "atlas_external_doc_chunks",
+    "constraint": "atlas_external_doc_chunks_chunk_id_uq",
+    "definition": "UNIQUE (chunk_id)"
+  },
+  "liveReadback": {
+    "database": "legal_ai_db",
+    "query": "SELECT count(*) FROM (SELECT c.chunk_id FROM atlas_external_doc_chunks c JOIN atlas_external_doc_pages p ON p.id=c.page_id GROUP BY c.chunk_id HAVING count(DISTINCT (p.provider,p.product,p.product_version,p.architecture)) > 1) x",
+    "crossVersionChunkIdGroups": 0,
+    "interpretation": "The collision is not currently observed in the admitted corpus; it is reproducible by construction for identical normalized bytes and ordinal under different product versions."
+  },
+  "fixtureProof": {
+    "test": "python/test_atlas_doc_chunk_evidence.py::test_different_product_version_changes_page_and_child_chunk_evidence",
+    "pageEvidenceRevisionsDiffer": true,
+    "chunkEvidenceRevisionsDiffer": true,
+    "chunkIdsDiffer": false
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "nextGate": "DOC_CHUNK_IDENTITY_V2_OR_COMPATIBILITY_CONTRACT_REVIEW"
+}

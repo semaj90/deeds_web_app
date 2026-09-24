@@ -76,10 +76,10 @@ zero-caller claim with a fresh grep (repo state moves).
         app + adds semantic512 routes on top) from the one actually deployed
         (`services/atlas-gpu-8098/app.py`); no name-collision risk, they're just two different
         FastAPI entrypoints and only one is wired into Docker today.
-- [ ] Add entries to `docs/architecture/runtime-ownership-registry.json` for the 4 files flagged
+- [x] Add entries to `docs/architecture/runtime-ownership-registry.json` for the 4 files flagged
       above (`atlas_subgraph_cugraph.py`, `atlas_rapids_community_sidecar.py`,
       `atlas_compute/cugraph_ppr.py`, `atlas_compute/graph_programs.py`) with classification +
-      evidence (caller-trace result) per file. **Correction (2026-09-22, see the re-run below):
+      evidence (caller-trace result) per file. **Correction (2026-09-23):
       only 3 of these 4 are actually zero/near-zero-caller — `graph_programs.py` has a real,
       currently-passing test exercising its API and should not be classified alongside the other
       3.** Fresh grep already run for the first two (2026-08-31): both show only their own
@@ -102,15 +102,22 @@ zero-caller claim with a fresh grep (repo state moves).
         `deterministic_bfs()` and `condense_and_lexicographically_sort()`. Re-ran that test live:
         `python -m pytest python/test_atlas_compute_graph_representation.py -q` → **4 passed**.
         Not dead, not near-zero-caller — has a real, currently-passing test exercising its actual
-        API. Should not be grouped with the other 3 zero/near-zero-caller files in the entry
-        above; it needs its own classification (test-proven, matching the T5 note below about
-        GR10 prior art) rather than folding into this batch.
-- [ ] For `atlas_compute/graph_programs.py` specifically: check `parent-atlas-graph-runtime-enhancement`
-      GR10 (semantic best-first, TypeScript, not yet started) before finalizing DEAD — if GR10 work
-      begins and this file's heapq-based traversal turns out to be relevant prior art, surface it
-      there rather than silently deleting.
-- [ ] Update `runtime-ownership-baseline.json` if any of these are judged pre-existing tolerated debt
-      rather than new violations (they predate this proposal, so baseline is the right bucket).
+        API. It is registered separately as `FIXTURE_ONLY`; GR10 is a distinct TypeScript semantic
+        best-first feature, not this Python BFS/topological-order helper.
+      - `atlas_subgraph_cugraph.py` is registered `DEAD` (read-only CLI, no caller/deployment hit).
+      - `atlas_rapids_community_sidecar.py` is registered `EXPERIMENT` (standalone bounded API,
+        no deployment hit; its implementation helper remains used by a frozen-fixture challenger).
+      - `atlas_compute/cugraph_ppr.py` is registered `DEAD`: package-import reachable via the eager
+        barrel, but its function/receipt have no functional caller or test use.
+      Registry entries preserve the deployed TypeScript/Neo4j-GDS canonical owner and make no
+      deletion or runtime change.
+- [x] For `atlas_compute/graph_programs.py`, compare against
+      `parent-atlas-graph-runtime-enhancement` GR10 before classification. GR10 is explicitly
+      semantic best-first in TypeScript; the Python helper implements deterministic BFS and SCC/DAG
+      ordering. It remains useful as `FIXTURE_ONLY` reference code, not DEAD and not a GR10 owner.
+- [x] Update `runtime-ownership-baseline.json` for these four pre-existing, noncanonical artifacts
+      (`DEAD`, `EXPERIMENT`, or `FIXTURE_ONLY`) so the ownership audit treats them as documented
+      existing state rather than newly introduced ownership violations.
 
 ## T2 — `parent_atlas_pagerank_reference.py` — human decision
 
@@ -158,16 +165,17 @@ zero-caller claim with a fresh grep (repo state moves).
 
 ## T4 — Package scaffold
 
-- [ ] Create `python/atlas_graph_runtime/` with `identity.py` (promoted from
-      `atlas_compute/typed_graph_runtime.py`, contracts only, no behavior change) and a `README.md`
+- [x] Create `python/atlas_graph_runtime/` with `contracts.py` (the `TypedGraphEdge`,
+      `GraphExecutionReceipt`, and `GraphBackend` declarations extracted from
+      `atlas_compute/typed_graph_runtime.py`, with no algorithm moved) and a `README.md`
       stating the hard rule from `proposal.md`'s Design section.
-- [ ] Add empty `cugraph_executor.py`, `networkx_executor.py`, `cuvs_executor.py`, `cuml_executor.py`
+- [x] Add empty `cugraph_executor.py`, `networkx_executor.py`, `cuvs_executor.py`, `cuml_executor.py`
       placeholders — docstring only, pointing at this proposal + the future gate (GR7) that
       populates them. No implementation in this pass.
-- [ ] Do NOT move or modify `atlas_compute/typed_graph_runtime.py`'s existing test files
+- [x] Do NOT move or modify `atlas_compute/typed_graph_runtime.py`'s existing test files
       (`test_typed_graph_runtime.py`, `test_atlas_compute_graph_representation.py`) — update their
-      imports only if/when the promotion in this task actually moves the module; if kept as a
-      re-export shim instead, no test changes needed.
+      imports only if/when required. Tests remained in place and their existing import paths are
+      preserved by the compatibility module; this tranche did not edit either test file.
 
 ## T5 — Follow-up audit scope (tracked, not resolved here)
 
@@ -176,9 +184,14 @@ zero-caller claim with a fresh grep (repo state moves).
       app and layers semantic512 routes on top of the graph routes) from the one Docker actually
       runs (`services/atlas-gpu-8098/app.py`). No name collision — just two separate entrypoints,
       only one wired into `docker-compose.gpu.yml` today.
-- [ ] `scripts/atlas/run_louvain_challenger_v1.py` — "challenger" naming suggests an A/B algorithm
-      comparison; check it doesn't collide with the already-settled Louvain/Leiden ownership in
-      `parent-atlas-graph-analysis-contract` before it's touched by anything.
+- [x] `scripts/atlas/run_louvain_challenger_v1.py` — audited 2026-09-23 against the settled
+      Louvain/Leiden production ownership in `parent-atlas-graph-analysis-contract`. It is a
+      read-only frozen-fixture challenger, not a second production owner: it imports and calls
+      `python/atlas_rapids_community.py::run_cugraph_partition` with `algorithm="louvain"`,
+      emits a comparison receipt, and does not write canonical graph or retrieval state. The
+      production TypeScript/Neo4j-GDS owner remains separate and unchanged. Fresh caller search
+      found only the explicit live-graph-proof task references; no runtime registration or
+      canonical writer caller. No execution, graph write, or promotion was performed.
 
 ## Cross-references
 
@@ -196,12 +209,35 @@ zero-caller claim with a fresh grep (repo state moves).
 The tensor-residency expansion workboard tracks shared dependencies without
 moving graph ownership here. This graph runtime owns only the graph side:
 
-- [ ] **GPU-EXP-14** GraphProjectionArtifactV1 with explicit `GraphOrdinal`,
-  graph revision, vertex checksum, edge checksum, and ordinal-map checksum.
+- [x] **GPU-EXP-14** GraphProjectionArtifactV1 with explicit `GraphOrdinal`,
+  graph revision, vertex checksum, edge checksum, and ordinal-map checksum. **PROVEN at
+  noncanonical artifact-builder/fixture scope (2026-09-23):** the builder emits
+  `atlas.graph-projection-artifact.v1`, keeps `candidateOrdinalMapChecksum` separate from
+  `graphOrdinalMapChecksum`, and the Python executor validates the latter against the dense
+  `(graphOrdinal, graphNodeKey)` rows. Temporary Parquet write/readback fixture retains an
+  isolated vertex and verifies the cross-language TypeScript checksum golden. Focused graph
+  suite: 16/16 passed. No current-source artifact was rebuilt or promoted. Audit also found the
+  old checked-in artifact labeled the candidate-map checksum as `ordinalMapChecksum`; its value
+  (`86fee5…`) does not match the recomputed graph map (`4319a5…`), so that ambiguous legacy
+  manifest now fails closed.
 - [ ] **GPU-EXP-15** bounded multi-hop traversal with predecessor/path receipt;
   depth policy is 2 normally, 3 expanded, 4 hard maximum.
+  Implementation progress (2026-09-23): the 8098 BFS request now encodes DEFAULT=2,
+  EXPANDED=3, MAXIMUM=4, validates requests against the selected bound, reconstructs node-key
+  paths from predecessor ordinals, and emits a checksummed noncanonical path receipt bound to
+  graph revision, projection revision, and the explicit graph-ordinal-map checksum. Missing or
+  malformed bindings fail closed. Unit coverage exercises policy rejection, predecessor-chain
+  validation, receipt checksum revision sensitivity, and runtime response propagation (20 focused
+  Python tests passed on 2026-09-23).
+  **Still open:** live traversal against one admitted frozen graph; `/v1/graph/resident` currently
+  reports `resident:null`, and the available old artifact has the checksum ambiguity recorded
+  under GPU-EXP-14. No synthetic graph was loaded into the live GPU service.
 - [ ] **GPU-EXP-16** NetworkX oracle → cuGraph executor parity, including any
-  internal renumbering translation and deterministic replay.
+  internal renumbering translation and deterministic replay. **Partial fixture proof (2026-09-23):**
+  the BFS adapter is tested against NetworkX shortest paths with deliberately permuted executor
+  ordinals; translated node-key paths match and replayed path checksums are identical. This uses a
+  fake cuGraph result frame and proves adapter mapping/determinism only, not cuGraph computation or
+  live parity. Full task remains open pending replay on the same admitted frozen graph artifact.
 
 GPU cache, HNSW, QLoRA, and 4D coordinate tasks remain owned by their existing
 OpenSpecs. A graph result is derived evidence and cannot become CandidateOrdinal,

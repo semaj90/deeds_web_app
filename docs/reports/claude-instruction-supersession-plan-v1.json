@@ -1,0 +1,156 @@
+{
+  "schema": "atlas.claude-instruction-supersession-plan.v1",
+  "status": "PROVEN_BOUNDED",
+  "inputs": {
+    "registryChecksum": "bed1835c472f62e56d6e830df44543b6243bfc76761aed8a58e0e9939d5f491f",
+    "supersessionAuditRegistryChecksum": "bed1835c472f62e56d6e830df44543b6243bfc76761aed8a58e0e9939d5f491f",
+    "supersessionAuditStatus": "PROVEN_BOUNDED",
+    "supersessionAuditEdgesAreDirectionalAuthority": false
+  },
+  "recencyPolicy": "IGNORED_NO_RECENCY_INFERENCE",
+  "records": [
+    {
+      "documentId": "doc:sha256:317ae893ef4add3af4928b72cae8408ac42a97cd487729dcf157d6ed0dbe44d2",
+      "path": ".claude/CLAUDE.md",
+      "registrySha256": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+      "currentSha256": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+      "topicClaims": {
+        "topicIds": [],
+        "canonicalForTopics": []
+      },
+      "supersedes": [],
+      "supersededBy": [],
+      "scope": {
+        "scopePath": ".claude",
+        "parentInstructionDocumentId": "doc:sha256:6ebdb617a8104a7756d0cf36578ab01103dc9f07e4dc6feb751296b9c402faf7",
+        "parentScopeStatus": "RESOLVED"
+      },
+      "contradictions": [],
+      "proposedDisposition": "SCOPED_SUPPORTING"
+    },
+    {
+      "documentId": "doc:sha256:6ebdb617a8104a7756d0cf36578ab01103dc9f07e4dc6feb751296b9c402faf7",
+      "path": "CLAUDE.md",
+      "registrySha256": "74b2bbba468fc4ab1dfaf481009af38d31bc6a84354fa416cadc4ab846f94b3e",
+      "currentSha256": "74b2bbba468fc4ab1dfaf481009af38d31bc6a84354fa416cadc4ab846f94b3e",
+      "topicClaims": {
+        "topicIds": [],
+        "canonicalForTopics": []
+      },
+      "supersedes": [],
+      "supersededBy": [],
+      "scope": {
+        "scopePath": ".",
+        "parentInstructionDocumentId": null,
+        "parentScopeStatus": "ROOT"
+      },
+      "contradictions": [],
+      "proposedDisposition": "CANONICAL_CURRENT"
+    },
+    {
+      "documentId": "doc:sha256:22ecf3afad1c1166dbd1e4fd4a49cd208229f24b29ea82816e7fb7f4feda07ff",
+      "path": "claude-mem/CLAUDE.md",
+      "registrySha256": "a6f297acd12563651041db4c4bce4c64cdc1d061664be11e6efe7ec7ec65239b",
+      "currentSha256": "a6f297acd12563651041db4c4bce4c64cdc1d061664be11e6efe7ec7ec65239b",
+      "topicClaims": {
+        "topicIds": [],
+        "canonicalForTopics": []
+      },
+      "supersedes": [],
+      "supersededBy": [],
+      "scope": {
+        "scopePath": "claude-mem",
+        "parentInstructionDocumentId": "doc:sha256:6ebdb617a8104a7756d0cf36578ab01103dc9f07e4dc6feb751296b9c402faf7",
+        "parentScopeStatus": "RESOLVED"
+      },
+      "contradictions": [],
+      "proposedDisposition": "SCOPED_SUPPORTING"
+    },
+    {
+      "documentId": "doc:sha256:c6dfd91aaec4a816933b6c5d99a8df01ad4b0f22f19cc027bda1e9a91d3c01c9",
+      "path": "llm/claude.md",
+      "registrySha256": "fdcdba7c73d75cb9a7149111b2619db0fffcd868b03d79fcba3b7f9a16d594f6",
+      "currentSha256": "fdcdba7c73d75cb9a7149111b2619db0fffcd868b03d79fcba3b7f9a16d594f6",
+      "topicClaims": {
+        "topicIds": [],
+        "canonicalForTopics": []
+      },
+      "supersedes": [],
+      "supersededBy": [],
+      "scope": {
+        "scopePath": "llm",
+        "parentInstructionDocumentId": "doc:sha256:6ebdb617a8104a7756d0cf36578ab01103dc9f07e4dc6feb751296b9c402faf7",
+        "parentScopeStatus": "RESOLVED"
+      },
+      "contradictions": [],
+      "proposedDisposition": "SCOPED_SUPPORTING"
+    },
+    {
+      "documentId": "doc:sha256:4432cb4575cfd5ad3a2d52ad0bf885766a929c253e572c310062936a495a9ded",
+      "path": "mcp-server-mcp/CLAUDE.md",
+      "registrySha256": "1707a63754580372a8ed67efa60530395613235944e6ae2e0d8b477da1e0ce71",
+      "currentSha256": "1707a63754580372a8ed67efa60530395613235944e6ae2e0d8b477da1e0ce71",
+      "topicClaims": {
+        "topicIds": [],
+        "canonicalForTopics": []
+      },
+      "supersedes": [],
+      "supersededBy": [],
+      "scope": {
+        "scopePath": "mcp-server-mcp",
+        "parentInstructionDocumentId": "doc:sha256:6ebdb617a8104a7756d0cf36578ab01103dc9f07e4dc6feb751296b9c402faf7",
+        "parentScopeStatus": "RESOLVED"
+      },
+      "contradictions": [],
+      "proposedDisposition": "SCOPED_SUPPORTING"
+    },
+    {
+      "documentId": "doc:sha256:7cfbb3e6741f660acacee097d92e5e48fb28dbc1affafb04b1134d4797abdf04",
+      "path": "sveltekit-frontend/.github/claude.md",
+      "registrySha256": "95ca700f3ccf7d2f1548d637ece78715b40e200e57019123032b42e79aacc6fd",
+      "currentSha256": "95ca700f3ccf7d2f1548d637ece78715b40e200e57019123032b42e79aacc6fd",
+      "topicClaims": {
+        "topicIds": [],
+        "canonicalForTopics": []
+      },
+      "supersedes": [],
+      "supersededBy": [],
+      "scope": {
+        "scopePath": "sveltekit-frontend/.github",
+        "parentInstructionDocumentId": "doc:sha256:37c8f53c144555d00bfe197fad791d128106c19f54629077c84e208eb31230c7",
+        "parentScopeStatus": "RESOLVED"
+      },
+      "contradictions": [],
+      "proposedDisposition": "SCOPED_SUPPORTING"
+    },
+    {
+      "documentId": "doc:sha256:37c8f53c144555d00bfe197fad791d128106c19f54629077c84e208eb31230c7",
+      "path": "sveltekit-frontend/claude.md",
+      "registrySha256": "4b9a0db385ebb893f196ae1032f6171642668a93aff6969d29e45ad94f7b0b14",
+      "currentSha256": "4b9a0db385ebb893f196ae1032f6171642668a93aff6969d29e45ad94f7b0b14",
+      "topicClaims": {
+        "topicIds": [],
+        "canonicalForTopics": []
+      },
+      "supersedes": [],
+      "supersededBy": [],
+      "scope": {
+        "scopePath": "sveltekit-frontend",
+        "parentInstructionDocumentId": "doc:sha256:6ebdb617a8104a7756d0cf36578ab01103dc9f07e4dc6feb751296b9c402faf7",
+        "parentScopeStatus": "RESOLVED"
+      },
+      "contradictions": [],
+      "proposedDisposition": "SCOPED_SUPPORTING"
+    }
+  ],
+  "summary": {
+    "CANONICAL_CURRENT": 1,
+    "SCOPED_SUPPORTING": 6,
+    "SUPERSEDED_CANDIDATE": 0,
+    "CONFLICT": 0
+  },
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false
+}

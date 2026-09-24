@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.ast.batch-failure-isolation.v1",
+  "generatedAt": "2026-09-23T20:09:31Z",
+  "gate": "CC-05",
+  "result": "BATCH_FAILURE_ISOLATION_AND_CONCURRENCY_BOUND_PROVEN",
+  "implementation": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-batch-v1.ts::runGraphifyStructuralBatchV1",
+  "proof": {
+    "test": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-batch-v1.spec.ts",
+    "command": "npm exec vitest -- run src/lib/server/atlas/indexing/graphify-structural-batch-v1.spec.ts",
+    "result": "PASS 3/3",
+    "fixture": {
+      "totalInputs": 4,
+      "processedFiles": 4,
+      "provenFiles": 2,
+      "recoveredFiles": 1,
+      "failedFiles": 1,
+      "peakConcurrentMaterializations": 1,
+      "isolatedFailurePass": true,
+      "neighboringValidFilesComplete": true,
+      "outputChecksumAsserted": true
+    }
+  },
+  "sidecarTypedEnvelope": {
+    "test": "python/test_miniforge_nlp_sidecar_v2_multiline_crlf.py::test_native_ast_evidence_tags_recovered_tree_sitter_errors",
+    "command": "python -m pytest python/test_miniforge_nlp_sidecar_v2_multiline_crlf.py -k tags_recovered_tree_sitter_errors -q",
+    "result": "PASS 1; 1 deselected",
+    "proves": "Current source maps fatal recovered Tree-sitter diagnostics to error_tag=ChunkingError and syntax_status=RECOVERED_WITH_ERRORS.",
+    "worktreeState": "Sidecar implementation and test are concurrent uncommitted changes; they were inspected and tested, not edited in this tranche."
+  },
+  "runtimeBoundary": {
+    "containerRebuilt": false,
+    "deployedImageParity": "OPEN; existing live receipt reflects pre-fix image with error_tag=null",
+    "canonicalPromotion": false
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0,
+    "persistentData": 0
+  }
+}

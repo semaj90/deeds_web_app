@@ -10,11 +10,28 @@ import {
 import {
   OntologyAncestorResultV1Schema,
   OntologyResolutionResultV1Schema,
+  type OntologyResolutionStateV1,
   type OntologyAncestorRequestV1,
   type OntologyAncestorResultV1,
   type OntologyResolutionRequestV1,
   type OntologyResolutionResultV1,
 } from './contracts/ontology-resolution-boundary-v1.js';
+
+export interface FeatureOntologyTupleResolutionAnnotationV1 {
+  schemaVersion: 'atlas.feature-ontology-tuple-resolution.v1';
+  label: string | null;
+  resolvedConceptId: string | null;
+  resolutionState: OntologyResolutionStateV1;
+  ontologyRevision: string | null;
+  matchMethod: 'concept_id' | 'canonical_label' | 'alias' | 'none' | null;
+}
+
+export interface FeatureOntologyTupleResolutionCandidateV1 {
+  objectId: string | null | undefined;
+  objectLabel?: string | null;
+  packetKey?: string;
+  sourceRef?: string;
+}
 
 /**
  * Phase 1 OAKLIB-equivalent resolution boundary
@@ -153,6 +170,45 @@ export async function resolveOntologyLabelV1(
       callerContext: request.callerContext,
     });
   }
+}
+
+/**
+ * Read-only bridge for future feature_ontology_tuples producers. It resolves
+ * only an existing tuple's object label/id and returns columns suitable for a
+ * caller-owned INSERT. It never writes, promotes, or creates lineage identity.
+ */
+export async function annotateFeatureOntologyTupleWithResolutionV1(
+  candidate: FeatureOntologyTupleResolutionCandidateV1,
+): Promise<FeatureOntologyTupleResolutionAnnotationV1> {
+  const label = candidate.objectLabel?.trim() || candidate.objectId?.trim() || null;
+  if (!label) {
+    return {
+      schemaVersion: 'atlas.feature-ontology-tuple-resolution.v1',
+      label: null,
+      resolvedConceptId: null,
+      resolutionState: 'UNRESOLVED',
+      ontologyRevision: null,
+      matchMethod: 'none',
+    };
+  }
+
+  const result = await resolveOntologyLabelV1({
+    schemaVersion: 'atlas.ontology-resolution-request.v1',
+    label,
+    callerContext: {
+      ...(candidate.packetKey ? { packetKey: candidate.packetKey } : {}),
+      ...(candidate.sourceRef ? { sourceRef: candidate.sourceRef } : {}),
+    },
+  });
+  const resolved = result.resolutionState === 'RESOLVED' && result.conceptId !== null;
+  return {
+    schemaVersion: 'atlas.feature-ontology-tuple-resolution.v1',
+    label,
+    resolvedConceptId: resolved ? result.conceptId : null,
+    resolutionState: resolved ? 'RESOLVED' : result.resolutionState === 'RESOLVED' ? 'UNRESOLVED' : result.resolutionState,
+    ontologyRevision: result.ontologyRevision,
+    matchMethod: resolved ? result.matchMethod : 'none',
+  };
 }
 
 /**

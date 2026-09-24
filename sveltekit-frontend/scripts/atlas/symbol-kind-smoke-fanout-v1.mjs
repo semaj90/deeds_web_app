@@ -178,7 +178,7 @@ function aggregateCoverage(perFileResults) {
     totalSymbols,
     sourceRevisionMatched: `${sourceRevisionMatchedFiles}/${filesParsed}`,
     spanWithinSourceBytes: `${spanWithinSourceBytesCount}/${totalSymbols}`,
-    envelopeAttached: `${envelopeAttachedCount}/${totalSymbols}`);
+    envelopeAttached: `${envelopeAttachedCount}/${totalSymbols}`,
     utf8RoundTripMatched: `${utf8RoundTripMatchedCount}/${totalSymbols}`,
     negativeLength: negativeLengthCount,
     outOfBounds: outOfBoundsCount,

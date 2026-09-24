@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T03:26:05Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "selection": {
+    "pivotChain": [
+      {
+        "from": "parent-atlas-analysis-pass-ornith-adapter",
+        "stateAtExit": { "checked": 24, "open": 1, "total": 25 },
+        "to": "parent-atlas-graph-runtime-python-consolidation",
+        "stateAtEntry": { "checked": 7, "open": 11, "total": 18 },
+        "reason": "Pivoted back to the graph-runtime OpenSpec for a locally actionable ownership audit and package-boundary work. The remaining Ornith item is an operator-owned decision; container rebuilds remain deferred."
+      }
+    ]
+  },
+  "guardrails": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false,
+    "graphifyRefresh": false,
+    "containerRebuild": false,
+    "canonicalPromotion": false,
+    "inferenceRequest": false
+  },
+  "result": {
+    "change": "parent-atlas-graph-runtime-python-consolidation",
+    "taskProgress": { "checked": 13, "open": 5, "total": 18, "deltaCheckedThisRun": 6 },
+    "ownershipReconciliation": {
+      "registryEntries": {
+        "python/atlas_subgraph_cugraph.py": "DEAD",
+        "python/atlas_rapids_community_sidecar.py": "EXPERIMENT",
+        "python/atlas_compute/cugraph_ppr.py": "DEAD",
+        "python/atlas_compute/graph_programs.py": "FIXTURE_ONLY"
+      },
+      "baselineUpdated": true,
+      "gr10Comparison": "GR10 is TypeScript semantic best-first; graph_programs.py provides test-covered Python BFS/SCC-DAG reference behavior and remains noncanonical.",
+      "ownershipAudit": { "status": "PASS", "capabilitiesChecked": 20, "violations": 0, "warnings": 36 }
+    },
+    "pythonPackageBoundary": {
+      "added": [
+        "python/atlas_graph_runtime/contracts.py",
+        "python/atlas_graph_runtime/README.md",
+        "python/atlas_graph_runtime/__init__.py",
+        "python/atlas_graph_runtime/cugraph_executor.py",
+        "python/atlas_graph_runtime/networkx_executor.py",
+        "python/atlas_graph_runtime/cuvs_executor.py",
+        "python/atlas_graph_runtime/cuml_executor.py"
+      ],
+      "compatibilityModule": "python/atlas_compute/typed_graph_runtime.py continues to expose its prior API and algorithms; only DTO definitions now import from the package.",
+      "identityOwner": "GraphNodeKeyV1/GraphOrdinalMapV1 remain in the existing TypeScript owner; Python creates neither.",
+      "existingTestsMovedOrEdited": false
+    },
+    "validation": {
+      "pythonFocusedTests": "9 passed",
+      "runtimeOwnershipAudit": "PASS; 0 violations",
+      "runtimeOwnershipAuditTests": "ALL CASES PASS",
+      "openSpecStrict": "PASS",
+      "touchedFileDiffCheck": "PASS"
+    },
+    "remaining": [
+      "T2 parent_atlas_pagerank_reference.py keep-or-archive decision remains explicitly operator-owned.",
+      "GPU-EXP-14 must reconcile existing GraphOrdinalMapV1, GraphOrdinalManifestV1, StructuralGraphSnapshotV1, and the Python graph-loader manifest; no duplicate GraphProjectionArtifactV1 owner should be added before parity is established.",
+      "GPU-EXP-15 bounded multi-hop predecessor/path receipt remains open.",
+      "GPU-EXP-16 deterministic NetworkX-to-cuGraph parity remains open and must use a frozen revision-qualified fixture."
+    ],
+    "externalStateWrites": { "postgres": false, "qdrant": false, "valkey": false, "neo4j": false, "graphify": false }
+  }
+}

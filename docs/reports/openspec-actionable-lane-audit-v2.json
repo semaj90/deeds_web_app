@@ -1,6 +1,6 @@
 {
   "schema": "atlas.openspec-actionable-lane-audit.v2",
-  "generatedAt": "2026-09-21T01:21:07.154Z",
+  "generatedAt": "2026-09-22T21:24:49.556Z",
   "source": {
     "actionable": "openspec-actionable-work-v1.json",
     "controller": "openspec-execution-controller-v1.json",

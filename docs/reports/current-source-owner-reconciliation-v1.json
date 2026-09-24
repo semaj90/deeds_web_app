@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-owner-reconciliation.v1",
-  "generatedAt": "2026-09-21T20:17:11.556Z",
+  "generatedAt": "2026-09-22T21:07:08.810Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "databaseWrites": 0,
@@ -11,17 +11,17 @@
     "root": "C:\\Users\\james\\Videos\\deeds-web-app",
     "gitRoot": "C:/Users/james/Videos/deeds-web-app",
     "gitCommonDir": ".git",
-    "headCommit": "07793026138592b0ab55e795b3440de232ac17f0",
-    "headTree": "712c39b7185553e790ee071d98b2543d2332c5a0",
+    "headCommit": "06a02610e08a9442c8763cdec202dcc98b3c6ac8",
+    "headTree": "acc7b05812f32c9786a2c1f5bc5852d22ba41606",
     "hostname": "DESKTOP-Q18MPHM",
     "dirty": true,
-    "sourceCount": 25161,
-    "sourceRefChecksum": "sha256:889386606b087e61fa5818117b9a552c2b86dfaf0296b76f7646c6b52b30a616",
+    "sourceCount": 25234,
+    "sourceRefChecksum": "sha256:4ec07e8d8d9f7c84442288c16ad59d9598b1e694edbd48f9c4c289833b928686",
     "inventoryPolicy": {
       "command": "git ls-files --cached --others --exclude-standard -z",
-      "trackedAtHeadCount": 29287,
-      "candidateCount": 25200,
-      "admittedCount": 25161,
+      "trackedAtHeadCount": 29429,
+      "candidateCount": 25273,
+      "admittedCount": 25234,
       "skippedCount": 39,
       "maxSourceBytes": 5242880,
       "generatedPrefixesExcluded": [
@@ -77,16 +77,16 @@
     "admittedSnapshotDelta": {
       "snapshotRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
       "snapshotSourceCount": 25542,
-      "currentSourceCount": 25161,
+      "currentSourceCount": 25234,
       "sharedSourceCount": 24448,
-      "currentOnlyCount": 713,
+      "currentOnlyCount": 786,
       "admittedOnlyCount": 1094,
-      "sharedDigestMatchCount": 23728,
-      "sharedDigestMismatchCount": 720,
+      "sharedDigestMatchCount": 23711,
+      "sharedDigestMismatchCount": 737,
       "dispositionCounts": {
-        "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 23728,
-        "WORKTREE_BYTES_DRIFTED": 720,
-        "WORKTREE_ADDED_AFTER_SNAPSHOT": 713,
+        "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 23711,
+        "WORKTREE_BYTES_DRIFTED": 737,
+        "WORKTREE_ADDED_AFTER_SNAPSHOT": 786,
         "MISSING_FROM_CURRENT_WORKTREE": 1094
       },
       "requiresSnapshotRefresh": true,
@@ -156,7 +156,7 @@
         "openspec/changes/atlas-feature-intelligence/tasks.md",
         "openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md"
       ],
-      "deltaChecksum": "sha256:3b6262ca70f264cb33be0fc440b023f9329b060ab7948082e58c626e88926785"
+      "deltaChecksum": "sha256:a083786c945520dd50b84bfda6273444b72e5bdcd17e623a0e8664eefdddfdd7"
     }
   },
   "currentExecutionCandidates": [
@@ -933,7 +933,7 @@
       "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
       "snapshotSourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
       "snapshotSourceContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
-      "observedAt": "2026-09-21T20:13:47.034Z"
+      "observedAt": "2026-09-21T22:53:47.662Z"
     },
     "qualifyingExecutionIds": [
       "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
@@ -1341,5 +1341,5 @@
       }
     ]
   },
-  "checksum": "sha256:e65e983de9860224f8737d55a80961bbb59aa8eb37ebb1a7a17219c153c0fb35"
+  "checksum": "sha256:9c22765ac8c971b38dce9855687dad4c4f77fa91ccb2fa2c585bdaf59954b347"
 }

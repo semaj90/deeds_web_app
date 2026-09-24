@@ -1,0 +1,84 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T04:21:28.452Z",
+  "objective": "Continue evidence-backed OpenSpec task execution; record pivots; avoid container rebuilds until other actionable tasks are exhausted.",
+  "pivot": {
+    "fromChange": "parent-atlas-retrieval-executor-compatibility-convergence",
+    "fromTask": "2.3 semantic pgvector exact-versus-HNSW replay",
+    "toChange": "parent-atlas-adaptive-dag-fabric",
+    "toTask": "RUNTIME-QUEUE-02 startup topology ownership boundary",
+    "reason": "Live PostgreSQL has 219998 embedded rows but zero source-revision-qualified vectors; the existing replay receipt confirms the same blocker, so repeating the replay cannot progress. The sole RRF task inspected was explicitly human sign-off. The topology boundary audit is independent, read-only, and local."
+  },
+  "sourceChange": {
+    "name": "parent-atlas-retrieval-executor-compatibility-convergence",
+    "before": "39/48",
+    "after": "39/48",
+    "task2_3": "BLOCKED_SOURCE_REVISION",
+    "liveEvidence": {
+      "embeddedRows": 219998,
+      "sourceRevisionQualifiedEmbeddedRows": 0,
+      "hnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+      "queryMode": "READ ONLY transaction"
+    }
+  },
+  "selectedChange": {
+    "name": "parent-atlas-adaptive-dag-fabric",
+    "before": "7/13",
+    "after": "12/13",
+    "completedThisRun": [
+      "RUNTIME-QUEUE-02: classified two live, disjoint startup topology domains; documented the unused conflicting atlas-core copy without activating or deleting it.",
+      "RUNTIME-QUEUE-03: fixed swallowed RabbitMQ consume-registration errors, added explicit worker/registry readiness states, and updated truthful boot reporting.",
+      "DAG-CONTRACT-01: reconciled the stale missing-contract claim against AdaptiveDagPlanV1 and kernel-bound planner/executor; verified typed contract and noncanonical policy with focused tests.",
+      "DAG-FETCH-01: added exact revision-qualified evidence identity deduplication in ACE selection so different card IDs cannot duplicate the same source/revision/evidence set.",
+      "LLAMA-SERVER-ORNITH-RUNTIME-OWNER-01: live /v1/models returned ornith-1.5-9b and a bounded chat completion using that ID returned READY; recorded as endpoint smoke, not quality parity."
+    ],
+    "remaining": [
+      "NATS-EVENT-01 shadow event stream (runtime/dependency decision required)",
+      "NATS-EVENT-01 shadow stream (requires operator authorization and a deployment/runtime owner; no NATS dependency/service found in active config)"
+    ]
+  },
+  "evidence": [
+    "scripts/atlas/audit-rabbitmq-topology-ownership-v1.mjs",
+    "docs/reports/rabbitmq-topology-ownership-v1.json",
+    "sveltekit-frontend/src/hooks.server.ts",
+    "sveltekit-frontend/src/lib/server/queue/queue-worker.ts",
+    "sveltekit-frontend/src/lib/server/queue/queue-worker-readiness.spec.ts",
+    "sveltekit-frontend/src/lib/server/queue/rabbitmq-xstate-integration.ts",
+    "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts",
+    "sveltekit-frontend/src/lib/server/queue/topology.ts",
+    "sveltekit-frontend/src/lib/server/workers/code-evidence-projection-worker.ts",
+    "packages/atlas-core/src/queue/topology.ts"
+  ],
+  "promotion": {
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false,
+    "brokerTouched": false
+  },
+  "mutations": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "rabbitmq": "none",
+    "containers": "none",
+    "filesystem": [
+      "Added read-only topology ownership audit script and report.",
+      "Updated adaptive DAG OpenSpec evidence for RUNTIME-QUEUE-02/03 and DAG-CONTRACT-01/DAG-FETCH-01.",
+      "Updated ACE card selection and regression test for evidence-identity deduplication.",
+      "Recorded live Ornith model identity and bounded completion probe in OpenSpec.",
+      "Added this timestamped workboard pivot receipt."
+    ]
+  },
+  "validation": {
+    "auditSyntax": "PASS",
+    "auditRun": "PASS; two active domains disjoint; unused core declaration conflict detected",
+    "focusedTests": "PASS: queue/event-fabric specs 16/16; queue-worker readiness 5/5; adaptive DAG contract/planner/executor 10 current-tree tests passed (root discovery also traversed archived snapshot copies); ACE selection/local research 5/5 from frontend root.",
+    "targetedTypecheck": "Not proven for ACE selector: standalone tsc was blocked by existing ambient type package error TS2688 (cannot find type definition file for 'three'); Vitest transpilation/execution passed. Earlier worker typecheck caveat remains.",
+    "openspecStrict": "PASS",
+    "targetedTypecheck": "No diagnostics in queue-worker.ts or queue-worker-readiness.spec.ts; broader selected roots had 15 existing diagnostics in hooks locals augmentation and imported files, none at the edited hook log line.",
+    "wholeWorktreeDiffCheck": "Has pre-existing trailing whitespace in generated simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml; unrelated and untouched.",
+    "changedTaskLedgerDiffCheck": "PASS"
+  },
+  "nextGate": "NATS-EVENT-01_OPERATOR_SCOPE_AND_DEPLOYMENT_OWNER"
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "parent-atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T17:07:56Z",
+  "change": "parent-atlas-nlp-sidecar-feature-compiler",
+  "tranche": "NLP7 FeatureCompiler producer-consumer wiring",
+  "progress": {
+    "before": { "complete": 87, "total": 142, "open": 55 },
+    "after": { "complete": 88, "total": 142, "open": 54 },
+    "checkboxesClosed": ["9.1"]
+  },
+  "implementation": {
+    "singleMatrixOwner": "sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.ts::compileExperimentFeatureMatrix",
+    "pythonEmitsPassEvidenceOnly": true,
+    "typescriptClientNormalizesAndCompiles": true,
+    "requiresExplicitPacketSourceSourceRevisionWorkspaceRevision": true,
+    "rejectsMalformedOrMismatchedPassLineage": true,
+    "canonicalAuthority": false,
+    "productionCandidateOrdinalAdmission": false
+  },
+  "validation": {
+    "vitest": { "passed": 9, "failed": 0, "files": 2 },
+    "pytest": { "passed": 15, "failed": 0, "files": 3 },
+    "pythonCompile": "PASS",
+    "openspecStrict": "PASS",
+    "gitDiffCheck": "PASS",
+    "svelteCheck": "FAIL_REPOSITORY_WIDE; 32 errors and 291 warnings in 117 files; filtered attribution rerun was stopped before producing output, so touched-file type status remains unproven"
+  },
+  "blockers": [
+    "Current source authority and packet-to-source cohort remain unproven; this local feature matrix is noncanonical.",
+    "Full Svelte diagnostics contain repository-wide errors; the filtered check produced no output before it was stopped, so touched-file type status remains unproven.",
+    "Canonical CandidateOrdinal/FeatureMatrix production admission remains blocked by 14.3c lineage prerequisites."
+  ],
+  "writes": {
+    "postgres": 0,
+    "valkey": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "graphify": 0,
+    "filesystem": "source, focused tests, OpenSpec evidence, and this report only"
+  },
+  "evidence": [
+    "sveltekit-frontend/src/lib/server/nlp/miniforge-nlp-sidecar.spec.ts",
+    "sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.spec.ts",
+    "python/test_miniforge_nlp_sidecar_semantic_card_bytes.py",
+    "python/test_miniforge_nlp_sidecar_linguistic_scope.py",
+    "python/test_miniforge_nlp_sidecar_hmm_observations.py",
+    "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md"
+  ]
+}

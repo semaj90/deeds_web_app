@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T16:38:15Z",
+  "objective": "Continue evidence-backed OpenSpec tasks; defer image/container rebuilds until safe local work is exhausted.",
+  "pivot": {
+    "change": "parent-atlas-nlp-sidecar-feature-compiler",
+    "fromTask": "4.1 AST-conditioned SemanticCodeCard wiring",
+    "toTask": "5.1 HMM observation vocabulary and evidence-backed builder",
+    "reason": "The UTF-8 semantic-card contract is closed at the local producer/consumer boundary; the HMM inference tasks are dependency-blocked, so the observation vocabulary is an independent safe proof leaf."
+  },
+  "progress": {
+    "change": "parent-atlas-nlp-sidecar-feature-compiler",
+    "before": "86/142",
+    "after": "87/142",
+    "delta": "1 evidence-backed task closed. OpenSpec's parsed task ledger is 142; raw checkbox count in the markdown is 148 because some historical/evidence notes also contain checkboxes."
+  },
+  "completed": [
+    {
+      "task": "5.1 HMM observation vocabulary/builder",
+      "result": "VERIFIED_COMPLETE at observation-construction boundary only",
+      "proof": "Versioned atlas.route-observation.v1 events are derived only from present structural/entity/import/card evidence; fabricated confidence, call-edge, and patch-success labels were removed. Sequence pass now reports backend=observation-builder, inference_status=NOT_RUN, and only observation_count.",
+      "tests": "16/16 focused Python sidecar tests passed, including HMM observation builder and sequence-pass receipt assertions.",
+      "receipt": "python/test_miniforge_nlp_sidecar_hmm_observations.py"
+    }
+  ],
+  "blocked": [
+    {
+      "task": "5.2 hmmlearn CategoricalHMM training and decoding",
+      "condition": "hmmlearn is absent from both the local Python runtime and active sidecar container.",
+      "classification": "BLOCKED_EXTERNAL_DEPENDENCY",
+      "action": "No package installation or image rebuild was attempted."
+    },
+    {
+      "task": "5.3 live Viterbi sequence proof",
+      "condition": "No admitted hmmlearn inference implementation/runtime; observation construction is not inference.",
+      "classification": "BLOCKED_UPSTREAM"
+    }
+  ],
+  "validation": {
+    "focusedPythonTests": "PASS: 16/16",
+    "pythonSyntax": "PASS: python -m py_compile python/miniforge_nlp_sidecar.py",
+    "openSpecStrict": "PASS: parent-atlas-nlp-sidecar-feature-compiler",
+    "scopedDiffCheck": "PASS for touched sidecar, test, and OpenSpec files",
+    "repoWideDiffCheck": "NOT_CLEAN: unrelated existing whitespace in simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml; preserved without modification"
+  },
+  "writes": {
+    "postgres": 0,
+    "valkey": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "canonicalAuthority": false,
+    "promotionAuthorized": false
+  },
+  "nextGate": "HMMLEARN_DEPENDENCY_ADMISSION_AND_CATEGORICAL_HMM_TRAINING_PROOF"
+}

@@ -1,6 +1,6 @@
 {
   "schema": "DockerReproducibilityAuditV1",
-  "generatedAt": "2026-09-10T23:44:10.533Z",
+  "generatedAt": "2026-09-22T21:23:59.142Z",
   "scope": "repository Dockerfiles and Python dependency manifests",
   "writesPerformed": false,
   "derivedReportWritten": true,
@@ -15,17 +15,109 @@
     "dockerAvailable": true,
     "activeContainers": [
       {
-        "containerId": "f66df30803e9",
+        "containerId": "7b8babadc233",
         "name": "miniforge-nlp-sidecar",
         "configuredImage": "deeds-miniforge-nlp-sidecar:latest",
-        "imageId": "sha256:ac902a295cbb5367caa58f6a5e778acdbcbc977b3fb0d29469068792dbd01a31",
-        "imageInspectionReference": "sha256:ac902a295cbb5367caa58f6a5e778acdbcbc977b3fb0d29469068792dbd01a31",
+        "imageId": "sha256:e9142f2f56effa9c1b8331beb8e6c6aaa40893da70ed71ba45866a4297544178",
+        "imageInspectionReference": "sha256:e9142f2f56effa9c1b8331beb8e6c6aaa40893da70ed71ba45866a4297544178",
         "state": "running",
         "healthStatus": "healthy",
-        "platform": null,
-        "imageInspectionError": "Command failed: docker image inspect sha256:ac902a295cbb5367caa58f6a5e778acdbcbc977b3fb0d29469068792dbd01a31",
-        "repoDigests": [],
-        "parityStatus": "IMAGE_INSPECTION_FAILED"
+        "platform": "linux/amd64",
+        "imageInspectionError": null,
+        "repoDigests": [
+          "deeds-miniforge-nlp-sidecar@sha256:e9142f2f56effa9c1b8331beb8e6c6aaa40893da70ed71ba45866a4297544178"
+        ],
+        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
+      },
+      {
+        "containerId": "22a808ad98d9",
+        "name": "legal-ai-langgraph",
+        "configuredImage": "deeds-web-app-langgraph-synthesis",
+        "imageId": "sha256:e092821b1df0aef73a3cd1f514eada7555589bcadb5b8c5b6416bc3602ff151a",
+        "imageInspectionReference": "sha256:e092821b1df0aef73a3cd1f514eada7555589bcadb5b8c5b6416bc3602ff151a",
+        "state": "running",
+        "healthStatus": "healthy",
+        "platform": "linux/amd64",
+        "imageInspectionError": null,
+        "repoDigests": [
+          "deeds-web-app-langgraph-synthesis@sha256:e092821b1df0aef73a3cd1f514eada7555589bcadb5b8c5b6416bc3602ff151a"
+        ],
+        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
+      },
+      {
+        "containerId": "a16dd4b130c2",
+        "name": "legal-ai-go-retrieval",
+        "configuredImage": "legal-ai-go-retrieval:latest",
+        "imageId": "sha256:51836f3931f0c3504998f8f9bd137c90ede607842acc23b41297576129868cc8",
+        "imageInspectionReference": "sha256:51836f3931f0c3504998f8f9bd137c90ede607842acc23b41297576129868cc8",
+        "state": "running",
+        "healthStatus": "healthy",
+        "platform": "linux/amd64",
+        "imageInspectionError": null,
+        "repoDigests": [
+          "legal-ai-go-retrieval@sha256:51836f3931f0c3504998f8f9bd137c90ede607842acc23b41297576129868cc8"
+        ],
+        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
+      },
+      {
+        "containerId": "5b69ab237263",
+        "name": "legal-ai-qdrant",
+        "configuredImage": "qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
+        "imageId": "sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
+        "imageInspectionReference": "sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
+        "state": "running",
+        "healthStatus": "healthy",
+        "platform": "linux/amd64",
+        "imageInspectionError": null,
+        "repoDigests": [
+          "qdrant/qdrant@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc"
+        ],
+        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
+      },
+      {
+        "containerId": "e01351195355",
+        "name": "legal-ai-valkey",
+        "configuredImage": "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+        "imageId": "sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+        "imageInspectionReference": "sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+        "state": "running",
+        "healthStatus": "healthy",
+        "platform": "linux/amd64",
+        "imageInspectionError": null,
+        "repoDigests": [
+          "valkey/valkey-bundle@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f"
+        ],
+        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
+      },
+      {
+        "containerId": "2187318f2993",
+        "name": "legal-ai-docling-vlm",
+        "configuredImage": "deeds-web-app-docling-vlm:latest",
+        "imageId": "sha256:16ece08cacb7b69ee8f370b22c563d63394c5e8fd00df2186293694beb1571ec",
+        "imageInspectionReference": "sha256:16ece08cacb7b69ee8f370b22c563d63394c5e8fd00df2186293694beb1571ec",
+        "state": "running",
+        "healthStatus": "healthy",
+        "platform": "linux/amd64",
+        "imageInspectionError": null,
+        "repoDigests": [
+          "deeds-web-app-docling-vlm@sha256:16ece08cacb7b69ee8f370b22c563d63394c5e8fd00df2186293694beb1571ec"
+        ],
+        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
+      },
+      {
+        "containerId": "be58377b4b83",
+        "name": "legal-ai-neo4j",
+        "configuredImage": "neo4j:5-community@sha256:22ec5cd05a8cbb372fc4bed5e384c30bc75fd92504c72be4462039761b105f61",
+        "imageId": "sha256:22ec5cd05a8cbb372fc4bed5e384c30bc75fd92504c72be4462039761b105f61",
+        "imageInspectionReference": "sha256:22ec5cd05a8cbb372fc4bed5e384c30bc75fd92504c72be4462039761b105f61",
+        "state": "running",
+        "healthStatus": "healthy",
+        "platform": "linux/amd64",
+        "imageInspectionError": null,
+        "repoDigests": [
+          "neo4j@sha256:22ec5cd05a8cbb372fc4bed5e384c30bc75fd92504c72be4462039761b105f61"
+        ],
+        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
       },
       {
         "containerId": "9942628c481d",
@@ -54,37 +146,6 @@
         "imageInspectionError": null,
         "repoDigests": [
           "atlas-neural-decoder@sha256:49eb1f4ab8361de06c382e63c9fd8f9bfce627b75732409cb3da93194263aa77"
-        ],
-        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
-      },
-      {
-        "containerId": "33579921ea1f",
-        "name": "legal-ai-go-retrieval",
-        "configuredImage": "legal-ai-go-retrieval:local-identity-v1",
-        "imageId": "sha256:56c2149bedd24096508414e567309450900c33d2490464b5060459de31c3180b",
-        "imageInspectionReference": "sha256:56c2149bedd24096508414e567309450900c33d2490464b5060459de31c3180b",
-        "state": "running",
-        "healthStatus": "healthy",
-        "platform": "linux/amd64",
-        "imageInspectionError": null,
-        "repoDigests": [
-          "deeds-web-app-go-retrieval-service@sha256:56c2149bedd24096508414e567309450900c33d2490464b5060459de31c3180b",
-          "legal-ai-go-retrieval@sha256:56c2149bedd24096508414e567309450900c33d2490464b5060459de31c3180b"
-        ],
-        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
-      },
-      {
-        "containerId": "b9e629155538",
-        "name": "legal-ai-qdrant",
-        "configuredImage": "qdrant/qdrant:v1.19.0",
-        "imageId": "sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
-        "imageInspectionReference": "sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
-        "state": "running",
-        "healthStatus": "healthy",
-        "platform": "linux/amd64",
-        "imageInspectionError": null,
-        "repoDigests": [
-          "qdrant/qdrant@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc"
         ],
         "parityStatus": "REGISTRY_DIGEST_OBSERVED"
       },
@@ -207,21 +268,6 @@
         "parityStatus": "REGISTRY_DIGEST_OBSERVED"
       },
       {
-        "containerId": "176e24440340",
-        "name": "legal-ai-valkey",
-        "configuredImage": "valkey/valkey-bundle:8.1.1",
-        "imageId": "sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
-        "imageInspectionReference": "sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
-        "state": "running",
-        "healthStatus": "healthy",
-        "platform": "linux/amd64",
-        "imageInspectionError": null,
-        "repoDigests": [
-          "valkey/valkey-bundle@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f"
-        ],
-        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
-      },
-      {
         "containerId": "fa509876a7ed",
         "name": "langfuse-server",
         "configuredImage": "langfuse/langfuse:3",
@@ -308,36 +354,6 @@
         "imageInspectionError": null,
         "repoDigests": [
           "couchdb@sha256:307a3f5276f64c0db28f226b7b5c180b8f2c851afa681cfb4fbb1b1fe7fd5587"
-        ],
-        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
-      },
-      {
-        "containerId": "2cb380dc4cd4",
-        "name": "legal-ai-neo4j",
-        "configuredImage": "neo4j:5-community",
-        "imageId": "sha256:937fbd163e302a5751dd329b719c1b05e2a4293af223d61b1aa17e3dea087709",
-        "imageInspectionReference": "sha256:937fbd163e302a5751dd329b719c1b05e2a4293af223d61b1aa17e3dea087709",
-        "state": "running",
-        "healthStatus": "healthy",
-        "platform": "linux/amd64",
-        "imageInspectionError": null,
-        "repoDigests": [
-          "neo4j@sha256:937fbd163e302a5751dd329b719c1b05e2a4293af223d61b1aa17e3dea087709"
-        ],
-        "parityStatus": "REGISTRY_DIGEST_OBSERVED"
-      },
-      {
-        "containerId": "025f9e36c2ef",
-        "name": "legal-ai-docling-vlm",
-        "configuredImage": "deeds-web-app-docling-vlm:latest",
-        "imageId": "sha256:ebcee0ea28269311ec96985bc828b4852b19d2cd4369b9c743a5e79e37e43980",
-        "imageInspectionReference": "sha256:ebcee0ea28269311ec96985bc828b4852b19d2cd4369b9c743a5e79e37e43980",
-        "state": "running",
-        "healthStatus": "healthy",
-        "platform": "linux/amd64",
-        "imageInspectionError": null,
-        "repoDigests": [
-          "deeds-web-app-docling-vlm@sha256:ebcee0ea28269311ec96985bc828b4852b19d2cd4369b9c743a5e79e37e43980"
         ],
         "parityStatus": "REGISTRY_DIGEST_OBSERVED"
       },
@@ -480,6 +496,2184 @@
       "buildBacked": false,
       "image": "rabbitmq:3-management-alpine",
       "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/claude-mem/docker-compose.e2e.yml",
+      "service": "server-beta-e2e",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "node:20-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/claude-mem/docker-compose.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "postgres:17-alpine@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/claude-mem/docker-compose.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey:8-alpine@sha256:d2e18f3410b6f616de1417f570fa55261af2898b9c5b2cfb6781ce2373ea43d1",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "atlas-gpu-8098",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "atlas-gpu-8098:26.08-cuda12-py3.13",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "atlas-neural-decoder",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "atlas-neural-decoder:torch2.13.0-cu132",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "atlas-gemma-rank",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "atlas-gemma-rank:torch2.13.0-cu132",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "legal-ai-gpu",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-gpu:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg18@sha256:2ba9ca5f2e7daa0f0e7723cba1ee9167bab54efd3640516a44ac1a928dd67e7a",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "legal-ai-go-retrieval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-go-retrieval:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey:8-alpine@sha256:d2e18f3410b6f616de1417f570fa55261af2898b9c5b2cfb6781ce2373ea43d1",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3.12-management-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/docker-compose.gpu.yml",
+      "service": "gpu-monitor",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nvidia/cuda:12.6.3-runtime-ubuntu22.04",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/langextract-optimized/docker-compose.override.yml",
+      "service": "langextract-optimized",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-langextract-optimized:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/miniforge-nlp-sidecar/docker-compose.yml",
+      "service": "miniforge-nlp-sidecar",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-miniforge-nlp-sidecar:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/omni-worker/docker-compose.omni.yml",
+      "service": "omni-worker",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-omni-worker:dev",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.dev.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg17",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.dev.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.dev.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.dev.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.production.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg17",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.production.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.production.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.production.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.production.yml",
+      "service": "searxng",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "searxng/searxng:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.production.yml",
+      "service": "seaweedfs-master",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.production.yml",
+      "service": "seaweedfs-volume",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.production.yml",
+      "service": "seaweedfs-filer",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.production.yml",
+      "service": "seaweedfs-s3",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.production.yml",
+      "service": "turboquant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "alpine:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.redis8-eval.yml",
+      "service": "redis8-eval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redis:8",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.redis8-eval.yml",
+      "service": "redisinsight",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redislabs/redisinsight:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.test.yml",
+      "service": "sveltekit",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-sveltekit:prod",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.test.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg16",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.test.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey:8-alpine@sha256:d2e18f3410b6f616de1417f570fa55261af2898b9c5b2cfb6781ce2373ea43d1",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.test.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.test.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.test.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3-management-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.test.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.test.yml",
+      "service": "couchdb",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "couchdb:3",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.vector.yml",
+      "service": "redis",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redis/redis-stack:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.vector.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector-pgsearch:pg18-local",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3-management-alpine@sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "seaweedfs-master",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "seaweedfs-volume",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "seaweedfs-filer",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "seaweedfs-s3",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "caddy",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "caddy:2.8-alpine@sha256:af32e97399febea808609119bb21544d0265c58a02836576e32a2d082c262c17",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "couchdb",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "couchdb:3.3@sha256:307a3f5276f64c0db28f226b7b5c180b8f2c851afa681cfb4fbb1b1fe7fd5587",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community@sha256:22ec5cd05a8cbb372fc4bed5e384c30bc75fd92504c72be4462039761b105f61",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "searxng",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "searxng/searxng:latest@sha256:2fb0fa85096fe6df5c3ab98ecb4d6e0ee2ef66b8fb96ce6fce0f75b51c4bd90a",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "nats",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nats:latest@sha256:c50b0a773c6c8d033cad54f7c53cb97fd6e09b3bfc1accda7cd4fa94e19e9ed9",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "bifrost",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-bifrost:git",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "docling-vlm",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-web-app-docling-vlm:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "image-synthesis",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-web-app-image-synthesis:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "langfuse-clickhouse",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "clickhouse/clickhouse-server@sha256:fa394da808cc53f76d0344429421d6c422a6ee85fe7450135c0e3cff4df9bcbb",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "langfuse-worker",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "langfuse/langfuse-worker:3@sha256:93207bd67d2e789ea55fa3d47eeba065dd6b1869187127ab24201784c52b96bc",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "langfuse-web",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "langfuse/langfuse:3@sha256:a27fe525f52984fa6d36fd34e8b8c6e5ae4af43f34134cafc833b467fa9580ae",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "tensorrt-llm",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nvcr.io/nvidia/tensorrt-llm/release:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker-compose.yml",
+      "service": "atlas-runner",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/infra/caddy/docker-compose.caddy.yml",
+      "service": "caddy-quic",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "caddy:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker/caddy/archived/docker-compose.caddy-only.yml",
+      "service": "caddy",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "caddy:2.8-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker/docker-compose.redis8-eval.yml",
+      "service": "redis8-eval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redis:8-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker/docker-compose.redis8-eval.yml",
+      "service": "agent-memory-api-eval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redislabs/agent-memory-server:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker/docker-compose.redis8-eval.yml",
+      "service": "agent-memory-mcp-eval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redislabs/agent-memory-server:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg16",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "ollama",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "ollama/ollama:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.full.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg18@sha256:2ba9ca5f2e7daa0f0e7723cba1ee9167bab54efd3640516a44ac1a928dd67e7a",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.full.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.full.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.full.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.full.yml",
+      "service": "ollama",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "ollama/ollama:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.full.yml",
+      "service": "tensorrt-llm",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nvcr.io/nvidia/tensorrt-llm/release:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.full.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3-management-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.full.yml",
+      "service": "couchdb",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "couchdb:3.3",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.light.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.light.yml",
+      "service": "caddy",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "caddy:2.8-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.phase89.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5.15.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/docker-compose.phase89.yml",
+      "service": "couchdb",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "couchdb:3.3.3",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/claude-mem/docker-compose.e2e.yml",
+      "service": "server-beta-e2e",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "node:20-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/claude-mem/docker-compose.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "postgres:17-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/claude-mem/docker-compose.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey:8-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "atlas-gpu-8098",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "atlas-gpu-8098:26.08-cuda12-py3.13",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "atlas-neural-decoder",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "atlas-neural-decoder:torch2.13.0-cu132",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "atlas-gemma-rank",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "atlas-gemma-rank:torch2.13.0-cu132",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "legal-ai-gpu",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-gpu:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg18",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "legal-ai-go-retrieval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-go-retrieval:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey:8-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3.12-management-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/docker-compose.gpu.yml",
+      "service": "gpu-monitor",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nvidia/cuda:12.6.3-runtime-ubuntu22.04",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/langextract-optimized/docker-compose.override.yml",
+      "service": "langextract-optimized",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-langextract-optimized:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/miniforge-nlp-sidecar/docker-compose.yml",
+      "service": "miniforge-nlp-sidecar",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-miniforge-nlp-sidecar:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/omni-worker/docker-compose.omni.yml",
+      "service": "omni-worker",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-omni-worker:dev",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.dev.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg17",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.dev.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.dev.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.dev.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.production.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg17",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.production.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.production.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.production.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.production.yml",
+      "service": "searxng",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "searxng/searxng:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.production.yml",
+      "service": "seaweedfs-master",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.production.yml",
+      "service": "seaweedfs-volume",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.production.yml",
+      "service": "seaweedfs-filer",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.production.yml",
+      "service": "seaweedfs-s3",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.production.yml",
+      "service": "turboquant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "alpine:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.redis8-eval.yml",
+      "service": "redis8-eval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redis:8",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.redis8-eval.yml",
+      "service": "redisinsight",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redislabs/redisinsight:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.test.yml",
+      "service": "sveltekit",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-sveltekit:prod",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.test.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg16",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.test.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey:8-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.test.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.test.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.test.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3-management-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.test.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.test.yml",
+      "service": "couchdb",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "couchdb:3",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.vector.yml",
+      "service": "redis",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redis/redis-stack:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.vector.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector-pgsearch:pg18-local",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3-management-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "seaweedfs-master",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "seaweedfs-volume",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "seaweedfs-filer",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "seaweedfs-s3",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "caddy",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "caddy:2.8-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "couchdb",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "couchdb:3.3",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "searxng",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "searxng/searxng:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "nats",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nats:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "bifrost",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-bifrost:git",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "docling-vlm",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-web-app-docling-vlm:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "image-synthesis",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-web-app-image-synthesis:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "langfuse-clickhouse",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "clickhouse/clickhouse-server",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "langfuse-worker",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "langfuse/langfuse-worker:3",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "langfuse-web",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "langfuse/langfuse:3",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "tensorrt-llm",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nvcr.io/nvidia/tensorrt-llm/release:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker-compose.yml",
+      "service": "atlas-runner",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "node:22-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/infra/caddy/docker-compose.caddy.yml",
+      "service": "caddy-quic",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "caddy:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker/caddy/archived/docker-compose.caddy-only.yml",
+      "service": "caddy",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "caddy:2.8-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker/docker-compose.redis8-eval.yml",
+      "service": "redis8-eval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redis:8-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker/docker-compose.redis8-eval.yml",
+      "service": "agent-memory-api-eval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redislabs/agent-memory-server:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker/docker-compose.redis8-eval.yml",
+      "service": "agent-memory-mcp-eval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redislabs/agent-memory-server:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg16",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.dev.yml",
+      "service": "ollama",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "ollama/ollama:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.full.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg18",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.full.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.full.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.full.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.full.yml",
+      "service": "ollama",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "ollama/ollama:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.full.yml",
+      "service": "tensorrt-llm",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nvcr.io/nvidia/tensorrt-llm/release:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.full.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3-management-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.full.yml",
+      "service": "couchdb",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "couchdb:3.3",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.light.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.light.yml",
+      "service": "caddy",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "caddy:2.8-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.phase89.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5.15.0",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/docker-compose.phase89.yml",
+      "service": "couchdb",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "couchdb:3.3.3",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/claude-mem/docker-compose.e2e.yml",
+      "service": "server-beta-e2e",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "node:20-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/claude-mem/docker-compose.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "postgres:17-alpine@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/claude-mem/docker-compose.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey:8-alpine@sha256:d2e18f3410b6f616de1417f570fa55261af2898b9c5b2cfb6781ce2373ea43d1",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "atlas-gpu-8098",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "atlas-gpu-8098:26.08-cuda12-py3.13",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "atlas-neural-decoder",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "atlas-neural-decoder:torch2.13.0-cu132",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "atlas-gemma-rank",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "atlas-gemma-rank:torch2.13.0-cu132",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "legal-ai-gpu",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-gpu:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg18@sha256:2ba9ca5f2e7daa0f0e7723cba1ee9167bab54efd3640516a44ac1a928dd67e7a",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "legal-ai-go-retrieval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-go-retrieval:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey:8-alpine@sha256:d2e18f3410b6f616de1417f570fa55261af2898b9c5b2cfb6781ce2373ea43d1",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3.12-management-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/docker-compose.gpu.yml",
+      "service": "gpu-monitor",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nvidia/cuda:12.6.3-runtime-ubuntu22.04",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/langextract-optimized/docker-compose.override.yml",
+      "service": "langextract-optimized",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-langextract-optimized:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/miniforge-nlp-sidecar/docker-compose.yml",
+      "service": "miniforge-nlp-sidecar",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-miniforge-nlp-sidecar:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/omni-worker/docker-compose.omni.yml",
+      "service": "omni-worker",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-omni-worker:dev",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.dev.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg17",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.dev.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.dev.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.dev.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.production.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg17",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.production.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.production.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.production.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community@sha256:937fbd163e302a5751dd329b719c1b05e2a4293af223d61b1aa17e3dea087709",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.production.yml",
+      "service": "searxng",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "searxng/searxng:latest@sha256:15275f138662b0eefd62c492a919b29c4662c42004efe4b1a245c92cc6d2fef1",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.production.yml",
+      "service": "seaweedfs-master",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:800b2115c63236e8bd0e5d572dc25dd493dc2feed08b54a2a269dc0101c9d94a",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.production.yml",
+      "service": "seaweedfs-volume",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:800b2115c63236e8bd0e5d572dc25dd493dc2feed08b54a2a269dc0101c9d94a",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.production.yml",
+      "service": "seaweedfs-filer",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:800b2115c63236e8bd0e5d572dc25dd493dc2feed08b54a2a269dc0101c9d94a",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.production.yml",
+      "service": "seaweedfs-s3",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:800b2115c63236e8bd0e5d572dc25dd493dc2feed08b54a2a269dc0101c9d94a",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.production.yml",
+      "service": "turboquant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "alpine:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.redis8-eval.yml",
+      "service": "redis8-eval",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redis:8",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.redis8-eval.yml",
+      "service": "redisinsight",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redislabs/redisinsight:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.test.yml",
+      "service": "sveltekit",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-sveltekit:prod",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.test.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector/pgvector:pg16",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.test.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey:8-alpine@sha256:d2e18f3410b6f616de1417f570fa55261af2898b9c5b2cfb6781ce2373ea43d1",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.test.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.test.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.test.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3-management-alpine",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.test.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.test.yml",
+      "service": "couchdb",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "couchdb:3",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.vector.yml",
+      "service": "redis",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "redis/redis-stack:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.vector.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "postgres",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "pgvector-pgsearch:pg18-local",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "rabbitmq",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "rabbitmq:3-management-alpine@sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "valkey",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "qdrant",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "minio",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "seaweedfs-master",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "seaweedfs-volume",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "seaweedfs-filer",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "seaweedfs-s3",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "caddy",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "caddy:2.8-alpine@sha256:af32e97399febea808609119bb21544d0265c58a02836576e32a2d082c262c17",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "couchdb",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "couchdb:3.3@sha256:307a3f5276f64c0db28f226b7b5c180b8f2c851afa681cfb4fbb1b1fe7fd5587",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "neo4j",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "neo4j:5-community@sha256:22ec5cd05a8cbb372fc4bed5e384c30bc75fd92504c72be4462039761b105f61",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "searxng",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "searxng/searxng:latest@sha256:2fb0fa85096fe6df5c3ab98ecb4d6e0ee2ef66b8fb96ce6fce0f75b51c4bd90a",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "nats",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nats:latest@sha256:c50b0a773c6c8d033cad54f7c53cb97fd6e09b3bfc1accda7cd4fa94e19e9ed9",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "bifrost",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "legal-ai-bifrost:git",
+      "pinStatus": "TAG_PINNED_ONLY",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "docling-vlm",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-web-app-docling-vlm:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "image-synthesis",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": true,
+      "image": "deeds-web-app-image-synthesis:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "BUILD_BACKED_LOCAL_IMAGE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "langfuse-clickhouse",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "clickhouse/clickhouse-server@sha256:fa394da808cc53f76d0344429421d6c422a6ee85fe7450135c0e3cff4df9bcbb",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "langfuse-worker",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "langfuse/langfuse-worker:3@sha256:93207bd67d2e789ea55fa3d47eeba065dd6b1869187127ab24201784c52b96bc",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "langfuse-web",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "langfuse/langfuse:3@sha256:a27fe525f52984fa6d36fd34e8b8c6e5ae4af43f34134cafc833b467fa9580ae",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "tensorrt-llm",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "nvcr.io/nvidia/tensorrt-llm/release:latest",
+      "pinStatus": "FLOATING_TAG",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker-compose.yml",
+      "service": "atlas-runner",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32",
+      "pinStatus": "DIGEST_PINNED",
+      "enforcementScope": "ARCHIVED_OR_FIXTURE"
+    },
+    {
+      "composeFile": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/infra/caddy/docker-compose.caddy.yml",
+      "service": "caddy-quic",
+      "scope": "ARCHIVED_OR_FIXTURE",
+      "buildBacked": false,
+      "image": "caddy:latest",
+      "pinStatus": "FLOATING_TAG",
       "enforcementScope": "ARCHIVED_OR_FIXTURE"
     },
     {
@@ -1427,38 +3621,38 @@
     "floatingBaseCount": 0,
     "tagPinnedOnlyBaseCount": 17,
     "buildArgSubstitutedBaseCount": 8,
-    "pythonManifestCount": 67,
-    "exactManifestCount": 15,
-    "structuredReviewManifestCount": 10,
+    "pythonManifestCount": 84,
+    "exactManifestCount": 16,
+    "structuredReviewManifestCount": 26,
     "looseManifestCount": 42,
     "containerScopedManifestCount": 7,
     "containerScopedLooseManifestCount": 0,
-    "removalScriptCount": 12,
-    "testOrEvalCleanupScriptCount": 3,
-    "operatorLifecycleCleanupScriptCount": 3,
-    "engineBuildOrRestartCleanupScriptCount": 3,
-    "reviewRequiredCleanupScriptCount": 2,
+    "removalScriptCount": 37,
+    "testOrEvalCleanupScriptCount": 10,
+    "operatorLifecycleCleanupScriptCount": 11,
+    "engineBuildOrRestartCleanupScriptCount": 9,
+    "reviewRequiredCleanupScriptCount": 4,
     "dependencyContractMismatchCount": 0,
-    "composeFileCount": 28,
-    "composeImageCount": 114,
-    "composeDigestPinnedImageCount": 45,
-    "composeFloatingImageCount": 31,
-    "composeTagPinnedOnlyImageCount": 38,
+    "composeFileCount": 80,
+    "composeImageCount": 356,
+    "composeDigestPinnedImageCount": 106,
+    "composeFloatingImageCount": 111,
+    "composeTagPinnedOnlyImageCount": 139,
     "composeBuildArgImageCount": 0,
     "currentComposeImageCount": 76,
     "currentComposeExternalImageCount": 76,
     "currentComposeDigestPinnedImageCount": 44,
     "currentComposeFloatingImageCount": 17,
     "currentComposeTagPinnedOnlyImageCount": 15,
-    "archivedComposeImageCount": 25,
-    "buildBackedComposeImageCount": 13,
-    "activeContainerCount": 25,
+    "archivedComposeImageCount": 231,
+    "buildBackedComposeImageCount": 49,
+    "activeContainerCount": 26,
     "runtimePythonCheckedContainerCount": 0,
     "runtimePythonInventoryCount": 0,
     "runtimePythonDependencyReviewCount": 0,
     "runtimeRequiredImportProbeFailureCount": 0,
-    "activeContainerRegistryDigestCount": 23,
-    "activeContainerImageInspectionFailureCount": 2
+    "activeContainerRegistryDigestCount": 25,
+    "activeContainerImageInspectionFailureCount": 1
   },
   "containers": [
     {
@@ -2020,9 +4214,9 @@
         {
           "stageIndex": 0,
           "stageName": null,
-          "image": "nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04@sha256:24c8e3581ea6330038b0d374920721983312627f8adbfcf390bdb4b399d280ed",
-          "resolvedImage": "nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04@sha256:24c8e3581ea6330038b0d374920721983312627f8adbfcf390bdb4b399d280ed",
-          "externalBase": "nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04@sha256:24c8e3581ea6330038b0d374920721983312627f8adbfcf390bdb4b399d280ed",
+          "image": "python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e",
+          "resolvedImage": "python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e",
+          "externalBase": "python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e",
           "inheritedFromStage": null,
           "platform": null,
           "pinStatus": "DIGEST_PINNED",
@@ -2030,10 +4224,9 @@
           "argumentEvidence": null
         }
       ],
-      "pipInstallStepCount": 4,
+      "pipInstallStepCount": 3,
       "pipInstallSteps": [
         "# pip-installed PyJWT 2.x tries to import them. Remove both, let pip install clean.",
-        "RUN pip install --break-system-packages --timeout 300 \\",
         "RUN pip install --break-system-packages cryptography PyJWT",
         "RUN pip install --no-cache-dir --break-system-packages \\"
       ],
@@ -2058,10 +4251,11 @@
           "argumentEvidence": null
         }
       ],
-      "pipInstallStepCount": 2,
+      "pipInstallStepCount": 3,
       "pipInstallSteps": [
         "RUN python -m pip install --upgrade \\",
-        "&& python -m pip install \\"
+        "&& python -m pip install \\",
+        "&& python -m pip install --no-cache-dir --no-deps \\"
       ],
       "destructivePackageSteps": [],
       "reproducibilityStatus": "REVIEW_REQUIRED"
@@ -3573,10 +5767,228 @@
       "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
     },
     {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.parent-atlas/skills/claim-verifier/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.parent-atlas/skills/file-repair/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.parent-atlas/skills/graph-evidence/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.parent-atlas/skills/semantic-search/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/python/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 2,
+      "looseRequirements": [
+        "requires = [\"setuptools>=68\", \"wheel\"]",
+        "requires-python = \">=3.13\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/turbovec/turbovec-python/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 5,
+      "looseRequirements": [
+        "requires = [\"maturin>=1.12,<2.0\"]",
+        "requires-python = \">=3.9\"",
+        "langchain = [\"langchain-core>=0.3\"]",
+        "llama-index = [\"llama-index-core>=0.11\"]",
+        "haystack = [\"haystack-ai>=2.0\"]"
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/.parent-atlas/skills/claim-verifier/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/.parent-atlas/skills/file-repair/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/.parent-atlas/skills/graph-evidence/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/.parent-atlas/skills/semantic-search/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/python/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 2,
+      "looseRequirements": [
+        "requires = [\"setuptools>=68\", \"wheel\"]",
+        "requires-python = \">=3.13\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/turbovec/turbovec-python/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 5,
+      "looseRequirements": [
+        "requires = [\"maturin>=1.12,<2.0\"]",
+        "requires-python = \">=3.9\"",
+        "langchain = [\"langchain-core>=0.3\"]",
+        "llama-index = [\"llama-index-core>=0.11\"]",
+        "haystack = [\"haystack-ai>=2.0\"]"
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/.parent-atlas/skills/claim-verifier/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/.parent-atlas/skills/file-repair/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/.parent-atlas/skills/graph-evidence/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
+      "manifest": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/.parent-atlas/skills/semantic-search/pyproject.toml",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 0,
+      "looseRequirementCount": 1,
+      "looseRequirements": [
+        "requires-python = \">=3.11\""
+      ],
+      "declarations": [],
+      "unresolvedDeclarationCount": 0,
+      "status": "PYPROJECT_REQUIRES_STRUCTURED_REVIEW"
+    },
+    {
       "manifest": "docker/atlas-gpu-8098/requirements.txt",
       "containerScoped": true,
       "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
-      "exactRequirementCount": 5,
+      "exactRequirementCount": 4,
       "looseRequirementCount": 0,
       "looseRequirements": [],
       "declarations": [
@@ -3594,10 +6006,6 @@
         },
         {
           "declaration": "pandas==3.0.5",
-          "classification": "EXACT_VERSION"
-        },
-        {
-          "declaration": "torch==2.7.1",
           "classification": "EXACT_VERSION"
         }
       ],
@@ -3820,12 +6228,12 @@
       "manifest": "docker/langgraph-synthesis/requirements.txt",
       "containerScoped": true,
       "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
-      "exactRequirementCount": 26,
+      "exactRequirementCount": 24,
       "looseRequirementCount": 0,
       "looseRequirements": [],
       "declarations": [
         {
-          "declaration": "langchain==1.2.3",
+          "declaration": "langchain==1.2.11",
           "classification": "EXACT_VERSION"
         },
         {
@@ -3837,11 +6245,19 @@
           "classification": "EXACT_VERSION"
         },
         {
-          "declaration": "langgraph==1.0.5",
+          "declaration": "langgraph==1.2.11",
           "classification": "EXACT_VERSION"
         },
         {
-          "declaration": "langgraph-checkpoint==3.0.1",
+          "declaration": "langgraph-checkpoint==4.2.0",
+          "classification": "EXACT_VERSION"
+        },
+        {
+          "declaration": "langgraph-checkpoint-postgres==3.1.2",
+          "classification": "EXACT_VERSION"
+        },
+        {
+          "declaration": "psycopg[binary,pool]==3.2.9",
           "classification": "EXACT_VERSION"
         },
         {
@@ -3873,23 +6289,7 @@
           "classification": "EXACT_VERSION"
         },
         {
-          "declaration": "numpy==2.4.3              # HMM Viterbi tagger (LegalHMM) — also required by torch",
-          "classification": "EXACT_VERSION"
-        },
-        {
-          "declaration": "sentence-transformers==3.4.1",
-          "classification": "EXACT_VERSION"
-        },
-        {
-          "declaration": "torch==2.7.0+cu128        # CUDA 12.8 — matches the Dockerfile install layer",
-          "classification": "EXACT_VERSION"
-        },
-        {
-          "declaration": "torchvision==0.22.0+cu128",
-          "classification": "EXACT_VERSION"
-        },
-        {
-          "declaration": "torchaudio==2.7.0+cu128",
+          "declaration": "numpy==2.4.3              # HMM Viterbi tagger (LegalHMM) and CPU reward diagnostic",
           "classification": "EXACT_VERSION"
         },
         {
@@ -4840,6 +7240,22 @@
       ],
       "unresolvedDeclarationCount": 4,
       "status": "LOOSE_OR_RANGE_REQUIREMENTS"
+    },
+    {
+      "manifest": "python/requirements-oaklib-adapter.txt",
+      "containerScoped": false,
+      "scopeEvidence": "DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN",
+      "exactRequirementCount": 1,
+      "looseRequirementCount": 0,
+      "looseRequirements": [],
+      "declarations": [
+        {
+          "declaration": "oaklib==0.7.4",
+          "classification": "EXACT_VERSION"
+        }
+      ],
+      "unresolvedDeclarationCount": 0,
+      "status": "EXACT_DIRECT_REQUIREMENTS"
     },
     {
       "manifest": "python/requirements-parent-atlas-graph.txt",
@@ -5850,6 +8266,231 @@
       ]
     },
     {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/claude-mem/evals/swebench/smoke-test.sh",
+      "operationClass": "TEST_OR_EVAL_CLEANUP",
+      "matches": [
+        "docker rm -f \"$CONTAINER_NAME\" >/dev/null 2>&1 || true"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/start-gpu-wsl.ps1",
+      "operationClass": "OPERATOR_LIFECYCLE_CLEANUP",
+      "matches": [
+        "docker rm $ContainerName",
+        "docker stop $ContainerName",
+        "docker stop $ContainerName",
+        "docker rm $ContainerName",
+        "docker rmi \"$ImageName`:$ImageTag\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/start-gpu-wsl.sh",
+      "operationClass": "OPERATOR_LIFECYCLE_CLEANUP",
+      "matches": [
+        "docker rm \"$CONTAINER_NAME\"",
+        "docker stop \"$CONTAINER_NAME\"",
+        "docker stop \"$CONTAINER_NAME\"",
+        "docker rm \"$CONTAINER_NAME\"",
+        "docker rmi \"$IMAGE_NAME:$IMAGE_TAG\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/prove-runtime-degradation.mjs",
+      "operationClass": "DIAGNOSTIC_ONLY",
+      "matches": [
+        "if (!stop.ok) throw new Error(`docker stop failed: ${stop.stderr}`);"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/build-trt-engine-in-container.sh",
+      "operationClass": "ENGINE_BUILD_OR_RESTART_CLEANUP",
+      "matches": [
+        "docker rm -f \"$CONTAINER_NAME\" 2>/dev/null || true",
+        "echo \"  docker rm -f $CONTAINER_NAME\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/start-triton.sh",
+      "operationClass": "ENGINE_BUILD_OR_RESTART_CLEANUP",
+      "matches": [
+        "docker rm -f \"$CONTAINER_NAME\" 2>/dev/null || true",
+        "docker rm -f \"$CONTAINER_NAME\" 2>/dev/null || true"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/start_infrastructure.sh",
+      "operationClass": "REVIEW_REQUIRED",
+      "matches": [
+        "docker rm \"$POSTGRES_CONTAINER\"",
+        "docker rm \"$REDIS_CONTAINER\"",
+        "docker rm \"$RABBITMQ_CONTAINER\"",
+        "docker rm \"$QDRANT_CONTAINER\"",
+        "docker stop \"$container\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/tests/test-production-deployment.sh",
+      "operationClass": "TEST_OR_EVAL_CLEANUP",
+      "matches": [
+        "docker stop $CONTAINER_NAME 2>/dev/null || true",
+        "docker rm $CONTAINER_NAME 2>/dev/null || true",
+        "docker stop $CONTAINER_NAME",
+        "docker rm $CONTAINER_NAME",
+        "docker stop $CONTAINER_NAME",
+        "docker rm $CONTAINER_NAME",
+        "echo \"To stop: docker stop $CONTAINER_NAME && docker rm $CONTAINER_NAME\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/scripts/setup-rabbitmq.ps1",
+      "operationClass": "OPERATOR_LIFECYCLE_CLEANUP",
+      "matches": [
+        "docker stop rabbitmq"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/sveltekit-frontend/scripts/test-dispatch-direct.mjs",
+      "operationClass": "TEST_OR_EVAL_CLEANUP",
+      "matches": [
+        "console.log('   Expected: DOWN (stopped via docker stop phase66-rabbitmq)');"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/triton-trt-llm/scripts/start-triton-trtllm-engine.sh",
+      "operationClass": "ENGINE_BUILD_OR_RESTART_CLEANUP",
+      "matches": [
+        "docker rm -f \"$CONTAINER_NAME\" 2>/dev/null || true",
+        "docker rm -f \"$CONTAINER_NAME\" 2>/dev/null || true"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/claude-mem/evals/swebench/smoke-test.sh",
+      "operationClass": "TEST_OR_EVAL_CLEANUP",
+      "matches": [
+        "docker rm -f \"$CONTAINER_NAME\" >/dev/null 2>&1 || true"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/start-gpu-wsl.ps1",
+      "operationClass": "OPERATOR_LIFECYCLE_CLEANUP",
+      "matches": [
+        "docker rm $ContainerName",
+        "docker stop $ContainerName",
+        "docker stop $ContainerName",
+        "docker rm $ContainerName",
+        "docker rmi \"$ImageName`:$ImageTag\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/docker/start-gpu-wsl.sh",
+      "operationClass": "OPERATOR_LIFECYCLE_CLEANUP",
+      "matches": [
+        "docker rm \"$CONTAINER_NAME\"",
+        "docker stop \"$CONTAINER_NAME\"",
+        "docker stop \"$CONTAINER_NAME\"",
+        "docker rm \"$CONTAINER_NAME\"",
+        "docker rmi \"$IMAGE_NAME:$IMAGE_TAG\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/scripts/atlas/prove-runtime-degradation.mjs",
+      "operationClass": "DIAGNOSTIC_ONLY",
+      "matches": [
+        "if (!stop.ok) throw new Error(`docker stop failed: ${stop.stderr}`);"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/scripts/build-trt-engine-in-container.sh",
+      "operationClass": "ENGINE_BUILD_OR_RESTART_CLEANUP",
+      "matches": [
+        "docker rm -f \"$CONTAINER_NAME\" 2>/dev/null || true",
+        "echo \"  docker rm -f $CONTAINER_NAME\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/scripts/start-triton.sh",
+      "operationClass": "ENGINE_BUILD_OR_RESTART_CLEANUP",
+      "matches": [
+        "docker rm -f \"$CONTAINER_NAME\" 2>/dev/null || true",
+        "docker rm -f \"$CONTAINER_NAME\" 2>/dev/null || true"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/scripts/start_infrastructure.sh",
+      "operationClass": "REVIEW_REQUIRED",
+      "matches": [
+        "docker rm \"$POSTGRES_CONTAINER\"",
+        "docker rm \"$REDIS_CONTAINER\"",
+        "docker rm \"$RABBITMQ_CONTAINER\"",
+        "docker rm \"$QDRANT_CONTAINER\"",
+        "docker stop \"$container\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/scripts/tests/test-production-deployment.sh",
+      "operationClass": "TEST_OR_EVAL_CLEANUP",
+      "matches": [
+        "docker stop $CONTAINER_NAME 2>/dev/null || true",
+        "docker rm $CONTAINER_NAME 2>/dev/null || true",
+        "docker stop $CONTAINER_NAME",
+        "docker rm $CONTAINER_NAME",
+        "docker stop $CONTAINER_NAME",
+        "docker rm $CONTAINER_NAME",
+        "echo \"To stop: docker stop $CONTAINER_NAME && docker rm $CONTAINER_NAME\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/scripts/setup-rabbitmq.ps1",
+      "operationClass": "OPERATOR_LIFECYCLE_CLEANUP",
+      "matches": [
+        "docker stop rabbitmq"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/sveltekit-frontend/scripts/test-dispatch-direct.mjs",
+      "operationClass": "TEST_OR_EVAL_CLEANUP",
+      "matches": [
+        "console.log('   Expected: DOWN (stopped via docker stop phase66-rabbitmq)');"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/triton-trt-llm/scripts/start-triton-trtllm-engine.sh",
+      "operationClass": "ENGINE_BUILD_OR_RESTART_CLEANUP",
+      "matches": [
+        "docker rm -f \"$CONTAINER_NAME\" 2>/dev/null || true",
+        "docker rm -f \"$CONTAINER_NAME\" 2>/dev/null || true"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/claude-mem/evals/swebench/smoke-test.sh",
+      "operationClass": "TEST_OR_EVAL_CLEANUP",
+      "matches": [
+        "docker rm -f \"$CONTAINER_NAME\" >/dev/null 2>&1 || true"
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/start-gpu-wsl.ps1",
+      "operationClass": "OPERATOR_LIFECYCLE_CLEANUP",
+      "matches": [
+        "docker rm $ContainerName",
+        "docker stop $ContainerName",
+        "docker stop $ContainerName",
+        "docker rm $ContainerName",
+        "docker rmi \"$ImageName`:$ImageTag\""
+      ]
+    },
+    {
+      "file": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/docker/start-gpu-wsl.sh",
+      "operationClass": "OPERATOR_LIFECYCLE_CLEANUP",
+      "matches": [
+        "docker rm \"$CONTAINER_NAME\"",
+        "docker stop \"$CONTAINER_NAME\"",
+        "docker stop \"$CONTAINER_NAME\"",
+        "docker rm \"$CONTAINER_NAME\"",
+        "docker rmi \"$IMAGE_NAME:$IMAGE_TAG\""
+      ]
+    },
+    {
       "file": "docker/langextract-optimized/build-and-run.bat",
       "operationClass": "REVIEW_REQUIRED",
       "matches": [
@@ -5959,5 +8600,5 @@
     "ACTIVE_IMAGE_REGISTRY_DIGEST_UNPROVEN",
     "DESTRUCTIVE_OPERATOR_SCRIPTS_PRESENT"
   ],
-  "checksum": "sha256:81d0f2c06db3a03b2e5682fc2cc0862455e83e133d5672b5e493e2fae4af49c6"
+  "checksum": "sha256:006ef000d089ec83ac1a845757d1e1189b8c604df59350dbf611704f4cb0b9d4"
 }

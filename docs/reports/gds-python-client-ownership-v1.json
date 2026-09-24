@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.gds-python-client-ownership.v1",
+  "generatedAt": "2026-09-23T19:38:00Z",
+  "gate": "GDS-01",
+  "result": "PYTHON_CLIENT_NOT_PRESENT_EXECUTOR_ONLY_BOUNDARY_CONFIRMED",
+  "classification": {
+    "pythonGraphDataScienceClient": "NOT_FOUND_IN_PRODUCTION_PYTHON_SOURCE_OR_PINNED_REQUIREMENTS",
+    "neo4jGraphDataScience": "GRAPH_ALGORITHM_EXECUTOR_THROUGH_EXISTING_TYPESCRIPT_GRAPH_ANALYSIS_OWNER",
+    "cuGraph": "OPTIONAL_GRAPH_ALGORITHM_EXECUTOR_THROUGH_EXISTING_ADAPTER",
+    "neo4j": "DERIVED_STRUCTURAL_GRAPH_PROJECTION",
+    "postgres": "CANONICAL_IDENTITY_AND_DURABLE_FACTS"
+  },
+  "evidence": [
+    {
+      "path": "python/requirements-atlas-live-graph.txt",
+      "finding": "No graphdatascience package declaration."
+    },
+    {
+      "path": "python/requirements-parent-atlas-graph.txt",
+      "finding": "No graphdatascience package declaration."
+    },
+    {
+      "path": "docker/atlas-gpu-8098/requirements.txt",
+      "finding": "No graphdatascience package declaration."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/graph/graph-analysis-runner.ts",
+      "finding": "Existing graph-analysis owner dispatches to Neo4j GDS by default or the explicitly selected cuGraph adapter; it owns analysis orchestration, not canonical source/symbol identity."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/graph/cugraph-pagerank-adapter.ts",
+      "finding": "cuGraph persists derived graph-analysis run/metric records through the existing Postgres projection tables; no identity ownership is introduced."
+    },
+    {
+      "path": "docs/architecture/runtime-ownership-registry.json",
+      "finding": "Records Neo4j GDS and cuGraph as graph-analysis backends; its status is used as owner classification, not as proof of current runtime health."
+    }
+  ],
+  "focusedTests": {
+    "command": "npm exec vitest -- run src/lib/server/graph/graph-analysis-runner.spec.ts src/lib/server/graph/cugraph-pagerank-adapter.spec.ts",
+    "result": "PASS 4/4",
+    "scope": "Mocked/unit adapter and dispatch behavior only; not live Neo4j/cuGraph parity or runtime availability."
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphLoadOrMutation": 0,
+    "containerRebuilds": 0
+  },
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "followUp": "GDS-04 remains open until Neo4j GDS and optional cuGraph are compared on the same admitted graph snapshot with parity and runtime receipts."
+}

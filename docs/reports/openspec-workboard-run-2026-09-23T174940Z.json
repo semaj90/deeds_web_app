@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T17:49:40Z",
+  "pivot": {
+    "fromChange": "parent-atlas-versioned-doc-intelligence",
+    "fromProgress": { "complete": 20, "total": 31, "remaining": 11 },
+    "toChange": "parent-atlas-workboard-feature-utility-fabric",
+    "toProgress": { "complete": 11, "total": 68, "remaining": 57 },
+    "reason": "The immediate DOC-03 task is already classified as externally blocked on Firecrawl registration/API-key availability and live crawl readback. Pivoted to an independent deterministic topic-identity contract whose existing implementation conflicts with the OpenSpec UUIDv8 and namespace/name[/version] requirements."
+  },
+  "workboardSnapshot": {
+    "changes": 96,
+    "completeTasks": 6166,
+    "totalTasks": 9399,
+    "openTasks": 3233,
+    "source": "openspec list --json, measured at pivot"
+  },
+  "selectedTask": {
+    "id": "WFU-01",
+    "statusAtPivot": "OPEN",
+    "observedDrift": "Existing topic identity helper derives UUIDv5 (SHA-1) from taxonomy revision and normalized display label; OpenSpec requires the shared UUIDv8 SHA-256 canonical-JSON helper and normalized namespace/name[/version] identity. No Postgres topic table or migration is present in the helper receipt."
+  },
+  "execution": {
+      "result": "WFU-01_VERIFIED_COMPLETE; WFU-03_VERIFIED_COMPLETE; WFU-04_EXACT_RESOLVER_FIXTURE_PROVEN_LIVE_JOIN_OPEN; WFU-04_REGISTRY_GAP_CENSUS_VERIFIED; WFU-06A_OWNERSHIP_CLASSIFICATION_VERIFIED; WFU-02_SCOPE_BLOCKER_RECORDED; WFU-05_OKF_MANIFEST_AND_PREDICATE_GAP_RECORDED",
+    "progressAfter": { "complete": 16, "total": 68, "remaining": 52 },
+    "lastMeasuredAt": "2026-09-23T18:18:17Z",
+    "workboardAfter": { "changes": 96, "completeTasks": 6173, "totalTasks": 9399, "openTasks": 3226, "attributableCheckedTasksSincePivot": 5, "otherConcurrentCheckedTasksObservedSinceLastMeasurement": 2 },
+    "evidence": {
+      "focusedTests": "topic identities — 7/7 passed; Parent Atlas keyword evidence + AST tree-node resolver + structural query planner/executor — 6/6 passed; package TypeScript build passed; runtime ownership registry audit — all cases passed",
+      "readOnlyAudit": "npm run atlas:docs:topic-identities — 16 topics, 16 unique UUIDv8 topic IDs, 0 duplicate topic IDs, 0 duplicate title IDs, writesPerformed=false",
+      "liveRegistryCoverage": "read-only Postgres query — atlas_callable_search=285 rows; atlas_ast_nodes=11,273; 191 callable rows lack tree_node_id, only 9 rows exactly join by tree_node_id; callable projection is unsafe as a general AST resolver",
+      "astTreeNodeResolution": "exact-only path+source_revision+byte-span resolver fixture-proven; live read-only census found 98/11,273 AST rows with sha256 source revision and 0 duplicate exact location keys among those 98; no real current extracted observation join was established",
+      "topicDomainTableOwnership": "read-only exact count and source-owner census for all 12 R2 topic/domain tables; 2 scoped canonical owners, 2 adapters, 4 active backend/read models, and legacy/unwired surfaces classified as DEAD without deletion; domain_class owner decision remains open",
+      "languageRegistryCensus": "read-only Postgres parser_language values: typescript 9,526; svelte 1,477; markdown 150; sql 37; json 20; javascript 63; Node/Python parser vocabularies and extension-derived document labels differ, so WFU-02 remains open pending a split content-language/parser-grammar contract",
+      "openspecValidation": "npx openspec validate parent-atlas-workboard-feature-utility-fabric --strict — valid after WFU-06A classification",
+      "diffCheck": "git diff --check on changed files — passed",
+      "nextGate": "WFU-04_AST_GREP_TREE_NODE_RESOLUTION; resolve only with an exact source-revision/span join, not atlas_callable_search name matching"
+    },
+    "identityBoundary": {
+      "canonicalAuthority": false,
+      "promotionAuthorized": false,
+      "postgresTopicTable": "NOT_CREATED",
+      "drizzleMigration": "NOT_APPLIED"
+    }
+  },
+    "patchTargets": [
+      "packages/parent-atlas/src/core/keyword-evidence-v1.ts",
+      "packages/parent-atlas/src/core/ast-grep-tree-node-resolution-v1.ts",
+      "packages/parent-atlas/src/index.ts",
+      "packages/parent-atlas/test/keyword-evidence-v1.test.mjs",
+      "packages/parent-atlas/test/ast-grep-tree-node-resolution-v1.test.mjs",
+      "docs/reports/ast-grep-tree-node-resolution-v1.json",
+      "docs/reports/wfu-topic-domain-table-ownership-v1.json",
+      "docs/architecture/runtime-ownership-registry.json",
+      "sveltekit-frontend/src/lib/server/atlas/knowledge/topic-identity-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/knowledge/topic-identity-v1.spec.ts",
+    "scripts/atlas/audit-topic-identity-readiness-v1.ts",
+    "docs/reports/topic-identity-readiness-v1.json",
+    "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md"
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "containerRebuilds": 0
+}

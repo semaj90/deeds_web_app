@@ -14,8 +14,14 @@ import { blockHash, parseWfu, resolveDeclarations, sectionSlug, sha256, stripWfu
 // Repo root is owned by this script's location, not by process.cwd() (running from scripts/atlas wrote to a nonexistent scripts/atlas/docs path).
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const changesRoot = join(root, 'openspec', 'changes');
-const reportPath = join(root, 'docs', 'reports', 'openspec-workboard-v1.json');
-const markdownPath = join(root, 'docs', 'OPENSPEC-WORKBOARD.md');
+// Optional output overrides allow isolated audits to build a fresh snapshot
+// without replacing the shared projection while another session edits it.
+const reportPath = process.argv[2]
+  ? resolve(root, process.argv[2])
+  : join(root, 'docs', 'reports', 'openspec-workboard-v1.json');
+const markdownPath = process.argv[3]
+  ? resolve(root, process.argv[3])
+  : join(root, 'docs', 'OPENSPEC-WORKBOARD.md');
 
 const progressBar = (fraction) => {
   if (fraction == null) return '[----------]';

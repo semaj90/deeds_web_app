@@ -1,0 +1,62 @@
+{
+  "schema": "parent-atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T17:18:36Z",
+  "pivot": {
+    "from": "parent-atlas-nlp-sidecar-feature-compiler",
+    "fromProgress": { "complete": 88, "total": 142, "open": 54 },
+    "to": "parent-atlas-versioned-doc-intelligence",
+    "reason": "The NLP 9.1 local compiler wiring tranche was validated; continue with an independent source/document identity gate without rebuilding containers."
+  },
+  "consideredAndSkipped": {
+    "change": "parent-atlas-deep-research-ingestion",
+    "progress": { "complete": 6, "total": 7, "open": 1 },
+    "openTask": "DISCOVERY-04B",
+    "classification": "BLOCKED_OPERATOR_AUTHORIZATION",
+    "reason": "Requires a bounded live DOC-06A PostgreSQL admission write; the task explicitly requires separate authorization, so no admission was attempted."
+  },
+  "changeProgress": {
+    "before": { "complete": 16, "total": 31, "open": 15 },
+    "after": { "complete": 16, "total": 31, "open": 15 },
+    "checkboxesClosed": []
+  },
+  "work": {
+    "task": "DOC-13 documentation-to-symbol mutual index",
+    "classification": "SAFETY_CORRECTION_AND_READ_ONLY_PROOF; TASK_REMAINS_OPEN",
+    "finding": "The prior matching path could compare a documentation evidenceSpan.sourceRevision to atlas_symbol_versions.source_revision. The revisions identify different artifacts. Exact joins now require a separate explicit targetSourceRevision; the live extracted ApiRuleV1 does not provide it and is correctly unresolved.",
+    "liveStatus": "LIVE_EXTRACTION_CODE_REVISION_UNBOUND",
+    "activeRevisionQualifiedRegistryRowsRead": 402,
+    "fullCohortDuplicateNameRevisionCandidates": 4,
+    "canonicalAuthority": false,
+    "promotionAuthorized": false
+  },
+  "validation": {
+    "nodeSyntaxChecks": "PASS",
+    "nodeTests": { "passed": 5, "failed": 0 },
+    "fixtureProof": "READ_ONLY_PROVEN",
+    "liveReadOnlyProof": "LIVE_EXTRACTION_CODE_REVISION_UNBOUND",
+    "openspecStrict": "PASS",
+    "gitDiffCheck": "PASS"
+  },
+  "blockers": [
+    "DOC-13: the documentation extraction contract has no explicit code target source revision bound to the current authoritative source frame.",
+    "DOC-13 downstream index admission remains separate and was not performed.",
+    "DISCOVERY-04B remains blocked on explicit authorization for a bounded PostgreSQL admission write."
+  ],
+  "writes": {
+    "postgres": 0,
+    "valkey": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "graphify": 0,
+    "filesystem": "DOC-13 helper/tests, read-only proof receipts, OpenSpec evidence, and this workboard run report"
+  },
+  "evidence": [
+    "scripts/atlas/lib/doc-symbol-mutual-index-v1.mjs",
+    "scripts/atlas/doc-symbol-mutual-index-v1.test.mjs",
+    "scripts/atlas/prove-doc-symbol-mutual-index-v1.mjs",
+    "scripts/atlas/prove-doc-symbol-mutual-index-live-v1.mjs",
+    "docs/reports/parent-atlas/doc-13-symbol-mutual-index-v1.json",
+    "docs/reports/parent-atlas/doc-13-symbol-mutual-index-live-v1.json",
+    "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md"
+  ]
+}

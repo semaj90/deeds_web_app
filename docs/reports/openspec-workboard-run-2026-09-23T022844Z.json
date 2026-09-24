@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T02:28:44Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-document-governance-master-index",
+  "selection": {
+    "from": "7.1-7.4 shortlist experiment lifecycle now receipt-backed and explicitly noncanonical",
+    "to": "8.3/9.7 targeted Svelte page-data typecheck",
+    "reason": "The full workspace check was stopped after exceeding 5.6 GiB without diagnostics. svelte-check supports a dedicated tsconfig include list, so a narrow check may safely verify only the governance API, SSR loader, and page boundary."
+  },
+  "stateAtSelection": { "checked": 44, "open": 20, "total": 64 },
+  "guardrails": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "graphifyRefresh": false,
+    "containerRebuild": false,
+    "canonicalPromotion": false,
+    "memoryBoundedTargetedCheck": true
+  },
+  "status": "COMPLETE_WITH_PROJECTION_RECONCILIATION_PENDING",
+  "result": {
+    "targetedSvelteCheck": {
+      "command": "svelte-check --workspace . --tsconfig ./tsconfig.parent-atlas-document-governance-check.json --threshold error",
+      "errors": 0,
+      "warnings": 2,
+      "status": "PASS"
+    },
+    "focusedTests": { "apiAndSchema": "6/6 PASS", "ssr": "2/2 PASS" },
+    "openSpecProgress": { "checked": 45, "open": 19, "total": 64 },
+    "fullWorkspaceCheck": "NOT_PROVEN; prior run stopped for memory safety",
+    "projectionCheck": "MASTER_TOC_CHECK_FAILED; generated registry/TOC have large pre-existing concurrent diffs and were not overwritten",
+    "llmModelIdClarification": "Admin page uses llmModelId as model-lab display data. Runtime completion callers send the OpenAI-compatible model field; runtime-contract.ts treats GET /v1/models loaded-model resolution as inference authority."
+  }
+}

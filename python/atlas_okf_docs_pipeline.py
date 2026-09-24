@@ -278,22 +278,18 @@ def _firecrawl_auth(api_key: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
 
-def firecrawl_crawl_v2(
-    source: SourceConfig,
-    *,
-    api_key: str,
-    poll_seconds: float = 2.0,
-    maximum_wait_seconds: int = 600,
-) -> tuple[PageArtifact, ...]:
-    """Run a bounded Firecrawl v2 crawl and return normalized page artifacts."""
-    root_url = source.base_urls[0]
-    body = {
-        "url": root_url,
+def build_firecrawl_crawl_v2_request(source: SourceConfig) -> Json:
+    """Build the bounded Firecrawl request from the canonical source manifest."""
+    if not source.base_urls:
+        raise ValueError("FIRECRAWL_SOURCE_BASE_URL_REQUIRED")
+    return {
+        "url": source.base_urls[0],
         "includePaths": list(source.include_paths),
         "excludePaths": list(source.exclude_paths),
         "maxDiscoveryDepth": source.maximum_depth,
         "limit": source.maximum_pages,
-        "ignoreSitemap": not source.follow_sitemap,
+        # Firecrawl v2 replaced the v1 ignoreSitemap boolean with this enum.
+        "sitemap": "include" if source.follow_sitemap else "skip",
         "crawlEntireDomain": False,
         "allowExternalLinks": False,
         "allowSubdomains": False,
@@ -305,6 +301,18 @@ def firecrawl_crawl_v2(
             "blockAds": True,
         },
     }
+
+
+def firecrawl_crawl_v2(
+    source: SourceConfig,
+    *,
+    api_key: str,
+    poll_seconds: float = 2.0,
+    maximum_wait_seconds: int = 600,
+) -> tuple[PageArtifact, ...]:
+    """Run a bounded Firecrawl v2 crawl and return normalized page artifacts."""
+    root_url = source.base_urls[0]
+    body = build_firecrawl_crawl_v2_request(source)
     submitted = _http_json(
         "https://api.firecrawl.dev/v2/crawl",
         method="POST",

@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T02:03:15Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-document-governance-master-index",
+  "selection": {
+    "from": "8.3 typed SSR page-data contract (partial; full Svelte check stopped for resource safety)",
+    "to": "9.8 deterministic governance validation replay",
+    "reason": "The replay machinery is locally executable and its recent transient divergence should be separated from stable generator behavior using the documented validator and repeated check commands."
+  },
+  "stateAtSelection": {
+    "checked": 36,
+    "open": 28,
+    "total": 64,
+    "nextTask": "9.8"
+  },
+  "guardrails": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "graphifyRefresh": false,
+    "containerRebuild": false,
+    "canonicalPromotion": false
+  },
+  "completed": [
+    "9.8 deterministic registry/TOC replay and read-only check (validator reports open-work blockers honestly)"
+  ],
+  "evidence": {
+    "registryChecksum": "477a511978b42cb5bb8a51f9f9e217cd71f73496a1ddb3b93a35f8b043e00eb5",
+    "masterTocChecksum": "1e5634ca6b0a1707c59d8c871d31003a6ca8bdfc69d75326ee24fff6428180cb",
+    "replay": "PASS; two consecutive builds byte-identical",
+    "checkMode": "PASS twice; same registry checksum 477a511978b42cb5bb8a51f9f9e217cd71f73496a1ddb3b93a35f8b043e00eb5",
+    "governanceValidator": {
+      "status": "BLOCKED",
+      "failures": 0,
+      "closureBlockers": ["UNCHECKED_TASKS:3318"],
+      "archiveEligible": 0,
+      "writes": { "documents": 0, "archives": 0, "registry": 0 }
+    },
+    "transientIssues": [
+      "One earlier check caught a concurrent OpenSpec task-file change; after it settled, repeated checks matched.",
+      "One replay retry hit a transient Windows write-open error with 19.2 GiB free and no competing generator process; registry remained readable and the retry passed."
+    ]
+  },
+  "validation": {
+    "governanceSummaryRouteTests": "PASS 6/6",
+    "summaryContractTypecheck": "PASS",
+    "fullSvelteCheck": "STOPPED_FOR_RESOURCE_SAFETY at approximately 5.6 GiB; no diagnostics emitted",
+    "canonicalGovernanceReplay": "PASS",
+    "readOnlyCheckTwice": "PASS",
+    "canonicalOpenSpecStrict": "PASS"
+  },
+  "openSpecProgress": {
+    "change": "parent-atlas-document-governance-master-index",
+    "checked": 37,
+    "open": 27,
+    "total": 64,
+    "deltaThisPivot": "1 task closed (9.8); 8.3 remains open pending safe page-level typecheck"
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "containers": false,
+    "filesystem": true
+  },
+  "status": "PARTIAL",
+  "nextGate": "DOCUMENT_GOVERNANCE_9_1_TEST_COVERAGE_RECONCILIATION"
+}

@@ -32,7 +32,7 @@ describe('AceBitfrostCacheIdentityV1', () => {
     );
 	});
 
-	it('changes identity when model, source, or packet revision changes', () => {
+  it('changes identity when model, source, or packet revision changes', () => {
 		const revisioned = {
 			...base,
 			modelRevision: 'model:r1',
@@ -45,6 +45,19 @@ describe('AceBitfrostCacheIdentityV1', () => {
 			buildAceBitfrostCacheKeyV1({ ...revisioned, packetRevision: 'packet:r2' }),
 		);
 	});
+
+  it('changes the BitFrost key across workspace, policy, graph, and representation revisions', () => {
+    const revisioned = { ...base, workspaceRevision: 'workspace:r1' };
+    const key = buildAceBitfrostCacheKeyV1(revisioned);
+    for (const field of [
+      'workspaceRevision',
+      'normalizationPolicyRevision',
+      'graphRevision',
+      'representationRevision',
+    ] as const) {
+      expect(buildAceBitfrostCacheKeyV1({ ...revisioned, [field]: `${revisioned[field]}:next` })).not.toBe(key);
+    }
+  });
 
   it('keeps representation families distinct at equal dimensions', () => {
     expect(buildAceBitfrostCacheKeyV1(base)).not.toBe(

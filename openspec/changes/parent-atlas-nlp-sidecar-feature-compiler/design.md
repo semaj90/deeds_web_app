@@ -219,6 +219,13 @@ CPU-only: the state space is tiny relative to embedding/graph/rerank
 workloads, and GPU residency for HMM inference would contend with those
 larger jobs for no benefit.
 
+The sidecar's initial producer vocabulary is versioned as
+`atlas.route-observation.v1`: `STRUCTURAL_CHUNK_PRESENT`,
+`ENTITY_EVIDENCE_FOUND`, `IMPORT_RELATIONSHIP_FOUND`,
+`SEMANTIC_CARD_BUILT`, and `REPAIR_AMBIGUOUS`. Observations describe outputs
+actually present; request mode alone must never imply `PATCH_SUCCEEDED` or
+another execution outcome.
+
 **Alternatives considered**: feed continuous embeddings into a
 Gaussian-emission HMM (rejected — loses interpretability of the route state,
 and the discrete-observation approach is both cheaper and more directly

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.openspec-step-burndown.v1",
-  "generatedAt": "2026-09-21T22:39:21.305Z",
+  "generatedAt": "2026-09-21T23:01:51.736Z",
   "source": {
     "schema": "atlas.openspec.workboard.v1",
     "workboard": "docs/reports/openspec-workboard-v1.json",

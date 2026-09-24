@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T00:50:49Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "PROTO_02B_FLEET_TRANSPORT_CALLER_INVENTORY",
+    "to": "STRUCT_06_CODE_CHUNK_REFERENCE_EVALUATION",
+    "reason": "Continue around the unresolved fleet-wide transport inventory using an independent structural-reference audit that can be concluded without service, database, or corpus mutation."
+  },
+  "outcome": {
+    "completed": [
+      {
+        "task": "STRUCT-06",
+        "status": "VERIFIED_REFERENCE_ONLY",
+        "classification": "EXPERIMENTAL_CONTEXT_ENRICHER_CANDIDATE",
+        "upstreamEvidence": "https://github.com/supermemoryai/code-chunk",
+        "findings": [
+          "Upstream describes AST-aware chunks with scope/import/sibling context, byte and line ranges, streaming, and per-file errors.",
+          "Its example derives IDs from filepath plus chunk ordinal and demonstrates vector-store upsert; neither identity nor write behavior is adopted.",
+          "No local StructuralChunkV1 definition was found; CC-01 remains open pending contract reconciliation.",
+          "Package was not installed and no runtime benchmark or Parent Atlas integration was claimed."
+        ]
+      },
+      {
+        "task": "STRUCT-01",
+        "status": "VERIFIED_EXISTING_OWNER",
+        "evidence": "sveltekit-frontend/src/lib/server/atlas/language/canonical-structural-observation-v2.ts and its focused spec",
+        "test": "5/5 passed via Vitest with archived and .tmp snapshot trees excluded",
+        "boundary": "Named-CST observation only; canonicalWritesAllowed=false; no canonical CAST owner added."
+      }
+    ],
+    "stillOpen": [
+      "STRUCT-02: richer StructuralMemoryCard contract is not fully represented by one owner.",
+      "CC-01: no local StructuralChunkV1 contract was found.",
+      "Vitest repository-root discovery includes archived/.tmp snapshots; broad invocation hit EMFILE or missing generated SvelteKit config, so focused runs must exclude those trees."
+    ]
+  },
+  "validation": {
+    "openSpecStrict": "PASS",
+    "diffCheck": "PASS",
+    "runtimeTest": "NOT_RUN_REFERENCE_REVIEW_ONLY",
+    "structuralFocusedTest": "PASS 5/5",
+    "jsonParse": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 33,
+    "open": 59,
+    "total": 92,
+    "delta": "STRUCT-06 reference classification and STRUCT-01 existing named-CST projection reconciled; focused structural spec 5/5. STRUCT-02 and CC-01 remain open."
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "dependencyInstall": false
+  },
+  "nextGate": "CC_01_DEFINE_OR_RECONCILE_STRUCTURAL_CHUNK_V1_BEFORE_ADAPTER_BENCHMARK"
+}

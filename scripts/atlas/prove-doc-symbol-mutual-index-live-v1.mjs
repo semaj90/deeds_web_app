@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import dotenv from 'dotenv';
+import { matchApiRuleToSymbols } from './lib/doc-symbol-mutual-index-v1.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 dotenv.config({ path: path.resolve(root, 'sveltekit-frontend/.env') });
@@ -17,35 +18,6 @@ dotenv.config({ path: path.resolve(root, 'sveltekit-frontend/.env.local'), overr
 const reportPath = path.resolve(root, 'docs/reports/parent-atlas/doc-13-symbol-mutual-index-live-v1.json');
 const connectionString = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const checksum = (value) => `sha256:${createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
-
-function matchApiRuleToSymbols(rule, rows) {
-  const apiSymbol = String(rule.apiSymbol ?? '').trim();
-  const documentationSourceRevision = String(rule.evidenceSpan?.sourceRevision ?? rule.sourceRevision ?? '').trim();
-  const targetSourceRevision = String(rule.targetSourceRevision ?? '').trim();
-  if (!apiSymbol || !documentationSourceRevision) return { status: 'UNRESOLVED', reason: 'INCOMPLETE_DOCUMENT_PROVENANCE' };
-  const named = rows.filter((row) => [row.canonical_qualified_name, row.canonical_name, row.canonical_key]
-    .filter(Boolean).includes(apiSymbol));
-  // Documentation and code are different source artifacts. Never compare a
-  // documentation sourceRevision to a symbol-version sourceRevision.
-  const revisionRows = targetSourceRevision
-    ? named.filter((row) => row.source_revision === targetSourceRevision)
-    : named;
-  if (revisionRows.length === 0) {
-    return named.length > 0 ? { status: 'STALE_CODE_SOURCE', candidateCount: named.length } : { status: 'UNRESOLVED', reason: 'SYMBOL_NOT_FOUND' };
-  }
-  if (revisionRows.length > 1) return { status: 'AMBIGUOUS', candidateCount: revisionRows.length };
-  const row = revisionRows[0];
-  return {
-    status: 'MATCHED_DOCUMENTATION_SYMBOL',
-    stableSymbolId: row.stable_symbol_id,
-    symbolVersionId: row.symbol_version_id,
-    sourceRef: row.source_ref,
-    documentationSourceRevision,
-    codeSourceRevision: row.source_revision,
-    workspaceRevision: row.workspace_revision,
-    registryRevision: row.registry_revision,
-  };
-}
 
 const report = {
   schema: 'parent-atlas.doc-13-symbol-mutual-index-live.v1',
@@ -58,6 +30,7 @@ const report = {
   query: null,
   sample: null,
   match: null,
+  negativeMatrix: null,
   evidence: [],
 };
 
@@ -77,10 +50,16 @@ try {
       JOIN public.atlas_symbol_versions v
         ON v.stable_symbol_id = r.stable_symbol_id
      WHERE r.status = 'active'
+       AND v.source_revision ~ '^sha256:[0-9a-f]{64}$'
+       AND v.workspace_revision ~ '^sha256:[0-9a-f]{64}$'
      ORDER BY r.canonical_key, v.source_ref, v.symbol_version_id
-     LIMIT 200
   `);
-  report.query = { tables: ['atlas_symbol_registry', 'atlas_symbol_versions'], rowsRead: result.rowCount };
+  report.query = {
+    tables: ['atlas_symbol_registry', 'atlas_symbol_versions'],
+    rowsRead: result.rowCount,
+    filter: 'active registry rows with sha256 source_revision and workspace_revision',
+    canonicalWrites: false,
+  };
   if (result.rowCount === 0) {
     report.evidence.push('ACTIVE_SYMBOL_VERSION_REGISTRY_EMPTY');
   } else {
@@ -119,44 +98,79 @@ try {
     report.match = rules.length
       ? { extractedRule: rules[0], join: matchApiRuleToSymbols(rules[0], result.rows) }
       : { status: 'UNRESOLVED', reason: 'NO_API_RULE_EXTRACTED' };
-    if (rules.length && report.match.join?.status === 'MATCHED_DOCUMENTATION_SYMBOL') {
+    if (rules.length) {
       const matchedRule = rules[0];
-      const matchedCodeRevision = report.match.join.codeSourceRevision;
       const stale = matchApiRuleToSymbols({
         ...matchedRule,
-        targetSourceRevision: 'sha256:stale-code-revision',
+        targetSourceRevision: `sha256:${'c'.repeat(64)}`,
       }, result.rows);
       const unmapped = matchApiRuleToSymbols({
         ...matchedRule,
         apiSymbol: `${matchedRule.apiSymbol}.missing`,
       }, result.rows);
-      const nameCounts = new Map();
+      const exactRevisionNameCounts = new Map();
       for (const candidate of result.rows) {
         for (const name of [candidate.canonical_qualified_name, candidate.canonical_name, candidate.canonical_key].filter(Boolean)) {
-          const list = nameCounts.get(name) ?? [];
-          if (!list.some((existing) => existing.symbol_version_id === candidate.symbol_version_id)) list.push(candidate);
-          nameCounts.set(name, list);
+          const key = `${name}\u0000${candidate.source_revision}`;
+          const list = exactRevisionNameCounts.get(key) ?? { name, sourceRevision: candidate.source_revision, rows: [] };
+          if (!list.rows.some((existing) => existing.symbol_version_id === candidate.symbol_version_id)) list.rows.push(candidate);
+          exactRevisionNameCounts.set(key, list);
         }
       }
-      const ambiguousName = [...nameCounts.entries()].find(([, candidates]) => candidates.length > 1);
-      const ambiguous = ambiguousName
-        ? matchApiRuleToSymbols({ ...matchedRule, apiSymbol: ambiguousName[0] }, result.rows)
-        : { status: 'NOT_OBSERVED', reason: 'NO_DUPLICATE_NAME_IN_READ_SAMPLE' };
+      const ambiguousGroup = [...exactRevisionNameCounts.values()].find((group) => group.rows.length > 1);
+      const ambiguous = ambiguousGroup
+        ? matchApiRuleToSymbols({
+          ...matchedRule,
+          apiSymbol: ambiguousGroup.name,
+          targetSourceRevision: ambiguousGroup.sourceRevision,
+        }, result.rows)
+        : { status: 'NOT_OBSERVED', reason: 'NO_DUPLICATE_NAME_AND_REVISION_GROUP' };
+      const name = String(matchedRule.apiSymbol ?? '').trim();
+      const registryCandidate = result.rows.find((candidate) =>
+        [candidate.canonical_qualified_name, candidate.canonical_name, candidate.canonical_key]
+          .filter(Boolean).includes(name),
+      );
+      const explicitRevisionControl = registryCandidate
+        ? matchApiRuleToSymbols({
+          ...matchedRule,
+          targetSourceRevision: registryCandidate.source_revision,
+        }, result.rows)
+        : { status: 'UNRESOLVED', reason: 'NO_MATCHING_REGISTRY_NAME' };
+      const missingCodeRevision = matchApiRuleToSymbols({
+        ...matchedRule,
+        targetSourceRevision: undefined,
+      }, result.rows);
       report.negativeMatrix = {
         staleCodeRevision: { status: stale.status, expected: 'STALE_CODE_SOURCE', passed: stale.status === 'STALE_CODE_SOURCE' },
         unmappedSymbol: { status: unmapped.status, expected: 'UNRESOLVED', passed: unmapped.status === 'UNRESOLVED' },
         ambiguousLiveName: {
-          name: ambiguousName?.[0] ?? null,
+          name: ambiguousGroup?.name ?? null,
+          exactCodeSourceRevision: ambiguousGroup?.sourceRevision ?? null,
           status: ambiguous.status,
-          expected: ambiguousName ? 'AMBIGUOUS' : 'NOT_OBSERVED',
-          passed: ambiguousName ? ambiguous.status === 'AMBIGUOUS' : ambiguous.status === 'NOT_OBSERVED',
+          candidateCount: ambiguousGroup?.rows.length ?? 0,
+          expected: ambiguousGroup ? 'AMBIGUOUS' : 'NOT_OBSERVED',
+          passed: ambiguousGroup ? ambiguous.status === 'AMBIGUOUS' : ambiguous.status === 'NOT_OBSERVED',
         },
-        matchedCodeRevision,
+        explicitRevisionControl: {
+          status: explicitRevisionControl.status,
+          expected: 'MATCHED',
+          passed: explicitRevisionControl.status === 'MATCHED',
+          evidenceClass: 'registry-backed resolver control; not asserted to originate in documentation extraction',
+        },
+        missingCodeRevision: {
+          status: missingCodeRevision.status,
+          reason: missingCodeRevision.reason,
+          expectedReason: 'TARGET_CODE_SOURCE_REVISION_MISSING',
+          passed: missingCodeRevision.reason === 'TARGET_CODE_SOURCE_REVISION_MISSING',
+        },
       };
-      report.evidence.push('LIVE_NEGATIVE_MATRIX_READ_ONLY');
+      report.evidence.push('LIVE_SYMBOL_REVISION_FILTERED_COHORT', 'LIVE_NEGATIVE_MATRIX_READ_ONLY');
     }
-    report.evidence.push('READ_ONLY_EXACT_NAME_AND_SOURCE_REVISION_JOIN');
-    if (report.match.join?.status === 'MATCHED_DOCUMENTATION_SYMBOL') report.status = 'LIVE_DOC_EXTRACTION_SYMBOL_JOIN_PROVEN';
+    report.evidence.push('DOCUMENTATION_AND_CODE_REVISIONS_KEPT_SEPARATE');
+    if (report.match.join?.status === 'MATCHED') report.status = 'LIVE_DOC_EXTRACTION_SYMBOL_JOIN_PROVEN';
+    else if (report.match.join?.reason === 'TARGET_CODE_SOURCE_REVISION_MISSING') {
+      report.status = 'LIVE_EXTRACTION_CODE_REVISION_UNBOUND';
+    }
   }
 } catch (error) {
   report.status = 'BLOCKED_REGISTRY_QUERY';

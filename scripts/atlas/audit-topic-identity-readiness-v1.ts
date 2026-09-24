@@ -15,18 +15,22 @@ const reportsDir = process.argv[2] ?? path.resolve(cwd, 'docs/reports');
 const inputPath = process.argv[3] ?? path.join(reportsDir, 'openspec-topic-clusters-v1.json');
 const outputPath = process.argv[4] ?? path.join(reportsDir, 'topic-identity-readiness-v1.json');
 
+async function main(): Promise<void> {
 const input = JSON.parse(fs.readFileSync(inputPath, 'utf8')) as {
 	topics?: TopicCluster[];
 	counts?: Record<string, number>;
 };
 const topics = Array.isArray(input.topics) ? input.topics : [];
 const sourceRevision = checksum({ inputPath: path.relative(cwd, inputPath), input });
-const identities = topics
-	.map((cluster) => {
+
+const identities = (await Promise.all(topics
+	.map(async (cluster) => {
 		const label = String(cluster.topic ?? '').trim();
 		if (!label) return null;
-		const identity = deriveTopicIdentityV1({
+		const identity = await deriveTopicIdentityV1({
 			label,
+			namespace: 'openspec',
+			name: label,
 			taxonomyRevision: TOPIC_TAXONOMY_REVISION,
 			sourceRef: `${path.relative(cwd, inputPath)}#topic/${encodeURIComponent(label)}`,
 			sourceRevision,
@@ -37,7 +41,7 @@ const identities = topics
 			changeCount: Array.isArray(cluster.changes) ? cluster.changes.length : 0,
 		};
 	})
-	.filter((identity): identity is NonNullable<typeof identity> => Boolean(identity))
+	)).filter((identity): identity is NonNullable<typeof identity> => Boolean(identity))
 	.sort((a, b) => a.normalizedLabel.localeCompare(b.normalizedLabel));
 
 const topicIds = new Set(identities.map((identity) => identity.topicId));
@@ -73,3 +77,9 @@ const output = {
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(output, null, 2)}\n`);
 console.log(JSON.stringify({ schema: output.schema, status: output.status, ...output.summary, writesPerformed: false }, null, 2));
+}
+
+void main().catch((error: unknown) => {
+	console.error(error);
+	process.exitCode = 1;
+});

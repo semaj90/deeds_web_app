@@ -1,22 +1,15 @@
 {
   "schema": "atlas.document.supersession.audit.v1",
-  "registryChecksum": "266dd94c980363d35e9d4b48c53970276a032905cc295f22206599ab8e27e1be",
+  "registryChecksum": "987aa51bc757d355f245b7ea03f5781b4a3953da4e4c8ee74892e4ac6c188e0f",
   "status": "PROVEN_BOUNDED",
-  "explicitEdges": 20,
+  "explicitEdges": 16,
   "unresolvedReferences": 0,
   "ephemeralReferences": 2,
   "edges": [
     {
-      "from": "claude.md",
+      "from": "CLAUDE.md",
       "to": "docs/archive-manifest.json",
-      "line": 67,
-      "replacementExists": true,
-      "ephemeral": false
-    },
-    {
-      "from": "claude.md",
-      "to": "docs/architecture/phase-101-completion-plan.md",
-      "line": 3679,
+      "line": 184,
       "replacementExists": true,
       "ephemeral": false
     },
@@ -63,20 +56,6 @@
       "ephemeral": false
     },
     {
-      "from": "docs/architecture/phase-101-completion-plan.md",
-      "to": ".tmp/superseded-score-candidates.json",
-      "line": 30,
-      "replacementExists": true,
-      "ephemeral": false
-    },
-    {
-      "from": "docs/architecture/phase-101-completion-plan.md",
-      "to": ".tmp/superseded-score-candidates.json",
-      "line": 56,
-      "replacementExists": true,
-      "ephemeral": false
-    },
-    {
       "from": "docs/atlas/parent-atlas-table-of-contents.md",
       "to": "docs/reports/spec-supersedes-check.md",
       "line": 11,
@@ -84,65 +63,58 @@
       "ephemeral": false
     },
     {
-      "from": "docs/atlas/parent-atlas-table-of-contents.md",
-      "to": "docs/reports/original-superseded-score-2026-06-02.md",
-      "line": 49,
+      "from": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+      "to": "docs/reports/parent-atlas-pr-reconciliation-v1.json",
+      "line": 835,
       "replacementExists": true,
       "ephemeral": false
     },
     {
-      "from": "openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md",
-      "to": "openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md",
-      "line": 36,
+      "from": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "to": "docs/reports/graphify-authority-read-parity-v1.json",
+      "line": 15880,
       "replacementExists": true,
       "ephemeral": false
     },
     {
-      "from": "openspec/changes/parent-atlas-document-governance-master-index/specs/document-governance/spec.md",
-      "to": "docs/MASTER-TOC.md",
-      "line": 97,
+      "from": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "to": "docs/reports/symbol-revision-placeholder-repair-preview-v1.json",
+      "line": 15966,
       "replacementExists": true,
       "ephemeral": false
     },
     {
-      "from": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "to": "docs/MASTER-TOC.md",
-      "line": 50,
+      "from": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "to": "docs/reports/current-source-authority-cohort-v1.json",
+      "line": 15966,
       "replacementExists": true,
       "ephemeral": false
     },
     {
-      "from": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
-      "to": "sveltekit-frontend/openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
-      "line": 396,
+      "from": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "to": "docs/reports/symbol-revision-repair-manifest-v1.json",
+      "line": 15975,
       "replacementExists": true,
       "ephemeral": false
     },
     {
-      "from": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
-      "to": "sveltekit-frontend/openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
-      "line": 396,
+      "from": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "to": "docs/reports/symbol-revision-placeholder-repair-manifest-v1.json",
+      "line": 15975,
       "replacementExists": true,
       "ephemeral": false
     },
     {
-      "from": "openspec/changes/session-159-followup-tasks.md",
-      "to": ".vscode/tasks.json",
-      "line": 103,
+      "from": "openspec/changes/parent-atlas-search-classifier-sidecar/proposal.md",
+      "to": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+      "line": 120,
       "replacementExists": true,
       "ephemeral": false
     },
     {
-      "from": "openspec/changes/session-159-followup-tasks.md",
-      "to": "docs/reports/TURBOVEC-STATUS-SESSION-74.md",
-      "line": 103,
-      "replacementExists": true,
-      "ephemeral": false
-    },
-    {
-      "from": "sveltekit-frontend/CLAUDE.md",
+      "from": "sveltekit-frontend/claude.md",
       "to": "sveltekit-frontend/docs/architecture/agent-surface-decision-matrix.md",
-      "line": 1052,
+      "line": 1079,
       "replacementExists": true,
       "ephemeral": false
     }

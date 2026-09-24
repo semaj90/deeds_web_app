@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.taxonomy-forest-invariants.v1",
+  "generatedAt": "2026-09-23T18:43:14.851Z",
+  "status": "PROVEN",
+  "source": {
+    "database": "legal_ai_db",
+    "relations": [
+      "taxonomy_nodes",
+      "taxonomy_edges"
+    ],
+    "transaction": "READ ONLY; rolled back"
+  },
+  "contract": {
+    "parentKeyRelation": "BRANCHING_FOREST",
+    "typedRelations": "DIRECTED_ACYCLIC_GRAPH; multiple parents are measured and reported, not rejected as a forest violation",
+    "rationale": "taxonomy_nodes.parent_key encodes one parent per node; taxonomy_edges encode typed semantic relations and measured multi-parent targets",
+    "canonicalAuthority": false
+  },
+  "invariants": {
+    "nodeCount": 5527,
+    "uniqueNodeCount": 5527,
+    "rootCount": 1,
+    "duplicateNodeKeyCount": 0,
+    "missingParentCount": 0,
+    "cycleStartCount": 0,
+    "maxParentChainLength": 4,
+    "typedRelationMultiParentCounts": {
+      "INHERITS_FROM": 8,
+      "IS_A": 8,
+      "PART_OF": 408
+    },
+    "typedRelationDag": {
+      "INHERITS_FROM": {
+        "nodeCount": 51,
+        "edgeCount": 43,
+        "isDag": true,
+        "multiParentTargetCount": 8
+      },
+      "IS_A": {
+        "nodeCount": 5009,
+        "edgeCount": 5008,
+        "isDag": true,
+        "multiParentTargetCount": 8
+      },
+      "PART_OF": {
+        "nodeCount": 36544,
+        "edgeCount": 57751,
+        "isDag": true,
+        "multiParentTargetCount": 408
+      }
+    },
+    "isBranchingForest": true,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

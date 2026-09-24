@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
+import hashlib
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class WebSearchResultV1(BaseModel):
@@ -29,6 +30,35 @@ class WebSearchEnvelopeV1(BaseModel):
     results: list[WebSearchResultV1] = Field(default_factory=list, max_length=50)
     canonical_authority: bool = False
     writes_performed: bool = False
+
+
+class FetchedResearchDocumentV1(BaseModel):
+    """Bounded fetched-page evidence; not an admitted source revision."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=False)
+
+    schema_: Literal["atlas.fetched-research-document.v1"] = Field(
+        default="atlas.fetched-research-document.v1", alias="schema"
+    )
+    query: str = Field(min_length=1, max_length=4096)
+    url: str = Field(min_length=1, max_length=4096)
+    resolved_url: str = Field(min_length=1, max_length=4096)
+    title: str = Field(min_length=1, max_length=512)
+    fetcher: Literal["BEAUTIFULSOUP_HTTP", "FIRECRAWL_V2"]
+    normalized_text: str = Field(min_length=1, max_length=2_000_000)
+    normalized_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
+    canonical_authority: Literal[False] = False
+    writes_performed: Literal[False] = False
+
+    @classmethod
+    def checksum_for(cls, text: str) -> str:
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+    @model_validator(mode="after")
+    def checksum_matches_content(self) -> "FetchedResearchDocumentV1":
+        if self.checksum_for(self.normalized_text) != self.normalized_checksum:
+            raise ValueError("FETCHED_DOCUMENT_CHECKSUM_MISMATCH")
+        return self
 
 
 class ParameterArtifactV1(BaseModel):

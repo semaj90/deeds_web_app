@@ -1,0 +1,127 @@
+{
+  "schema": "atlas.document.supersession.audit.v1",
+  "registryChecksum": "bed1835c472f62e56d6e830df44543b6243bfc76761aed8a58e0e9939d5f491f",
+  "status": "PROVEN_BOUNDED",
+  "explicitEdges": 16,
+  "unresolvedReferences": 0,
+  "ephemeralReferences": 2,
+  "edges": [
+    {
+      "from": "CLAUDE.md",
+      "to": "docs/archive-manifest.json",
+      "line": 184,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "docs/AGENTIC-TASK-CLAIM-SAFEGUARDS.md",
+      "to": "docs/reports/supersedes-audit.json",
+      "line": 92,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "docs/AGENTIC-TASK-CLAIM-SAFEGUARDS.md",
+      "to": "docs/reports/supersedes-audit.json",
+      "line": 282,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "docs/AGENTIC-TASK-CLAIM-SAFEGUARDS.md",
+      "to": "docs/reports/supersedes-audit.json",
+      "line": 368,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "docs/PHASE-85-IMPLEMENTATION-STATUS.md",
+      "to": ".tmp/phase85-supersedes-decisions.json",
+      "line": 35,
+      "replacementExists": false,
+      "ephemeral": true
+    },
+    {
+      "from": "docs/PHASE-85-STATUS-TRACKER.md",
+      "to": ".tmp/phase85-supersedes-decisions.json",
+      "line": 58,
+      "replacementExists": false,
+      "ephemeral": true
+    },
+    {
+      "from": "docs/SESSION-84-SUMMARY-P0P1-COMPLETE-GAPS-IDENTIFIED.md",
+      "to": "docs/reports/SESSION-84-STEP-5A-GIT-DIFF-SUPERSEDES.md",
+      "line": 49,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "docs/atlas/parent-atlas-table-of-contents.md",
+      "to": "docs/reports/spec-supersedes-check.md",
+      "line": 11,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+      "to": "docs/reports/parent-atlas-pr-reconciliation-v1.json",
+      "line": 835,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "to": "docs/reports/graphify-authority-read-parity-v1.json",
+      "line": 15880,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "to": "docs/reports/symbol-revision-placeholder-repair-preview-v1.json",
+      "line": 15966,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "to": "docs/reports/current-source-authority-cohort-v1.json",
+      "line": 15966,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "to": "docs/reports/symbol-revision-repair-manifest-v1.json",
+      "line": 15975,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "to": "docs/reports/symbol-revision-placeholder-repair-manifest-v1.json",
+      "line": 15975,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "openspec/changes/parent-atlas-search-classifier-sidecar/proposal.md",
+      "to": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+      "line": 120,
+      "replacementExists": true,
+      "ephemeral": false
+    },
+    {
+      "from": "sveltekit-frontend/claude.md",
+      "to": "sveltekit-frontend/docs/architecture/agent-surface-decision-matrix.md",
+      "line": 1079,
+      "replacementExists": true,
+      "ephemeral": false
+    }
+  ],
+  "writes": {
+    "documents": 0,
+    "archives": 0
+  },
+  "note": "No supersession state was inferred or changed by this audit. Missing .tmp references are classified as ephemeral historical outputs and are not treated as replacement documents."
+}

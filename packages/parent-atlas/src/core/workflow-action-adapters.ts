@@ -131,6 +131,10 @@ export function acePacketToWorkflowArtifact(input: {
       packet_revision: packet.packet_revision,
       source_ref: packet.envelope.source_ref,
       source_revision: packet.envelope.source_revision ?? null,
+      // Keep the complete, schema-validated n-ary evidence when crossing into
+      // the workflow event. Relationship participants/revisions are evidence
+      // payload, not new workflow or packet identities.
+      hyperedge_evidence: packet.hypergraph.relationship_evidence.map((relationship) => ({ ...relationship })),
       source_snapshot_revision: packet.hypergraph.lineage.source_snapshot_revision,
       relationship_projection_revision: packet.hypergraph.lineage.relationship_projection_revision ?? null,
       graph_snapshot_revision: packet.hypergraph.lineage.graph_snapshot_revision ?? null,

@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.wfu-btree-gin-decision.v1",
+  "generatedAt": "2026-09-23T18:29:11Z",
+  "status": "BTREE_GIN_NOT_NEEDED_FOR_CURRENT_CONTRACT",
+  "readOnly": true,
+  "livePostgres": {
+    "database": "legal_ai_db",
+    "extensions": {
+      "btree_gin": null,
+      "pg_trgm": "1.6",
+      "vector": "0.8.3"
+    },
+    "topicSearchOwner": "NO_PERSISTED_TOPIC_SEARCH_RELATION_IDENTIFIED",
+    "relevantExistingIndexExample": {
+      "table": "atlas_ontology_concepts",
+      "indexes": [
+        "idx_atlas_ontology_concepts_aliases USING gin (aliases)",
+        "idx_atlas_ontology_concepts_namespace USING btree (namespace)",
+        "idx_atlas_ontology_concepts_type USING btree (concept_type)"
+      ]
+    },
+    "transaction": "BEGIN READ ONLY ... ROLLBACK"
+  },
+  "decision": "Do not install btree_gin. Separate indexes are sufficient for planner-selected bitmap combinations; no measured query currently demonstrates a need for mixed multicolumn GIN.",
+  "limitations": [
+    "No topic/domain FTS query plan was evaluated because the canonical topic search relation is not established.",
+    "This does not prove BitmapAnd is selected or that AIO improves a workload.",
+    "WFU-07's representative EXPLAIN/pg_aios proof remains open."
+  ],
+  "mutations": { "postgres": 0, "extensionInstall": false, "indexDDL": false }
+}

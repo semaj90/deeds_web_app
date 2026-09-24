@@ -1,9 +1,10 @@
 {
   "schema": "atlas.a2a-direct-invocation-authorization.v1",
   "gate": "A2A-04",
-  "generatedAt": "2026-09-23T00:00:00Z",
+  "generatedAt": "2026-09-23T19:08:52Z",
   "mode": "READ_ONLY / NON_MUTATING",
-  "scopeNote": "Traces whether an authenticated caller can invoke an unadvertised mutating ACP/A2A tool directly by name, bypassing A2A-03's discovery-descriptor allowlist. Does NOT reopen or modify A2A-03's own record beyond cross-reference. Does not broaden discovery, does not add authorization, does not change canonical identity ownership.",
+  "scopeNote": "A2A-04 before/after receipt. Historical audit fields and exploit evidence describe PRE_FIX_BASELINE; postFix is the current repaired behavior. Does NOT reopen or modify A2A-03's own record beyond cross-reference. Does not broaden discovery or change canonical identity ownership.",
+  "baselineScope": "PRE_FIX_BASELINE fields are retained as historical evidence; use result and postFix for current status.",
   "entrypoints": [
     {
       "path": "sveltekit-frontend/src/routes/.well-known/agent.json/+server.ts",
@@ -22,6 +23,7 @@
     },
     {
       "path": "sveltekit-frontend/src/routes/api/acp/execute/+server.ts",
+      "scope": "PRE_FIX_BASELINE",
       "role": "Generic ACP tool-dispatch endpoint (admin-console-internal; NOT advertised in agent.json)",
       "authenticationOwner": "session cookie only (`if (!locals.user) return 401`) -- no role/permission distinction",
       "authorizationOwner": "NONE -- no call to tool-authorization.ts's checkToolAccess()/toolAuthorizationGuard() anywhere in this file",
@@ -44,9 +46,11 @@
     }
   ],
   "dispatchChain": {
+    "scope": "PRE_FIX_BASELINE",
     "unguardedPath": "peer/caller request -> POST /api/acp/execute -> AUTHENTICATION (locals.user truthy, any role) -> [NO AUTHORIZATION STEP] -> CAPABILITY_RESOLUTION (getACPToolSchema, raw registry lookup) -> DISPATCH (executeACPTool) -> HANDLER (TOOLS[name].handler)",
     "guardedPath (comparison)": "peer/caller request -> POST /api/acp/rpc or /api/agent/execute -> AUTHENTICATION (requireAdmin / requireUser) -> AUTHORIZATION (toolAuthorizationGuard -> checkToolAccess against atlasToolRegistry, role-scoped permission set) -> DISPATCH -> HANDLER",
-    "boundaryClassification": {
+  "boundaryClassification": {
+    "scope": "PRE_FIX_BASELINE",
       "authentication": "present on all 3 execute-style routes (locals.user or requireAdmin/requireUser)",
       "authorization": "PRESENT on /api/acp/rpc and /api/agent/execute (tool-authorization.ts); ABSENT on /api/acp/execute",
       "discoveryFilter": "present only on GET /api/acp/service-ports (A2A-03) and .well-known/agent.json's `skills[]` list -- neither is consulted by POST /api/acp/execute's dispatch path",
@@ -232,13 +236,16 @@
     "recommendation": "NOT IMPLEMENTED THIS PASS, per explicit instruction. The fix would be architecturally trivial (wire checkToolAccess/toolAuthorizationGuard into /api/acp/execute the same way /api/agent/execute already does, reusing atlasToolRegistry rather than inventing a parallel permission model) -- but that is a runtime-behavior change, and this task's scope is read-only audit only. Flagged as the fix path for whenever implementation is separately authorized: do NOT introduce a second capability registry or A2A-specific permission model; extend the existing owner."
   },
   "externalReachabilityCaveat": {
-    "finding": "The AgentCard (.well-known/agent.json) claims `authentication.schemes: ['Bearer']`, but hooks.server.ts (repo-wide auth entrypoint) contains ZERO Bearer-token handling -- `locals.user` is populated only from a session cookie (`auth_session`) or DEV_BYPASS_AUTH. A genuine external, cookie-less A2A peer therefore cannot authenticate to /api/ai/agent OR /api/acp/execute today; both currently require a browser-style session.",
-    "implication": "This is a real, separate documentation/implementation mismatch (the AgentCard advertises an auth scheme the server does not implement) -- it is NOT a mitigating security control. It means today's actual exposure of the /api/acp/execute gap is to any AUTHENTICATED SAME-APP USER (any role), not yet to arbitrary external cross-organization A2A peers. If/when Bearer-token auth is implemented to match the AgentCard's claim, the /api/acp/execute gap would become externally peer-reachable immediately, since nothing else stands between authentication and dispatch on that route.",
+    "scope": "PRE_FIX_BASELINE; AgentCard authentication-contract discrepancy remains a separate A2A-05 follow-up.",
+    "finding": "At the time of the baseline audit, the AgentCard (.well-known/agent.json) advertised `authentication.schemes: ['Bearer']`, while hooks.server.ts populated locals.user from a session cookie or DEV_BYPASS_AUTH. This did not mitigate the same-app authorization defect; A2A-04 now adds authorization after authentication.",
+    "implication": "Bearer/session-cookie parity remains a separate documentation/runtime contract issue. The pre-fix statement that the route had no authorization step is historical and is not the current route behavior; current behavior is recorded under postFix.",
     "doNotTreatAsSafe": true
   },
-  "result": "A2A_PEER_WRITE_EXPOSURE_UNGUARDED",
-  "resultRationale": "A concrete, source-traced and test-confirmed unguarded dispatch path exists: POST /api/acp/execute accepts any registered ACP tool name (including several real Postgres-mutating tools not advertised by A2A-03's discovery descriptor or the AgentCard's skills list) from any session-authenticated caller regardless of role, with zero authorization check before the handler runs. This matches the audit's own definition of a blocker (dispatch reached, handler invoked, for an unadvertised write-capable method, with no independent authorization gate). Scoped precisely: today's actual caller population is same-app authenticated users, not yet true external A2A peers, because Bearer-token authentication (which the AgentCard claims) is unimplemented -- but that is a coincidental mitigation, not a security control, and does not change the classification.",
+  "beforeFixResult": "A2A_PEER_WRITE_EXPOSURE_UNGUARDED",
+  "result": "A2A_INVOCATION_AUTHORIZATION_PROVEN",
+  "resultRationale": "The pre-fix audit proved an authenticated viewer could invoke atlas.kanban.claim (handler count 1). The repaired route now checks the existing permission grant and tool-specific required permission before dispatch. The post-fix spy-backed suite proves viewer writes are denied with handler count 0, allowed reads and an admin dry-run still dispatch, unknown tools remain 404, and no durable mutation is performed. See postFix for current evidence; beforeFixResult preserves the historical vulnerability verdict.",
   "tests": {
+    "scope": "PRE_FIX_BASELINE",
     "added": [
       "sveltekit-frontend/src/routes/api/acp/execute/authorization-boundary.spec.ts (7 tests, updated this pass: +3 -- spy-backed handlerInvocationCount, positive read control, mirror-sync-specific check)"
     ],
@@ -250,6 +257,7 @@
     "parent-atlas-transport-memory-boundaries": "PASS -- Change is valid"
   },
   "writes": {
+    "scope": "PRE_FIX_BASELINE",
     "postgres": 0,
     "qdrant": 0,
     "valkey": 0,
@@ -296,7 +304,57 @@
     "handlerInvoked": true,
     "result": "Resolves normally through the SAME dispatcher (/api/acp/execute) used for the blocked case -- proves the defect is a missing authorization gate, not a broken/rejecting-everything dispatcher (which would have falsely made the system look safe)."
   },
-  "authenticationOwner": "session cookie only (event.cookies.get(\"auth_session\") -> hooks.server.ts -> locals.user); no Bearer-token handling exists anywhere despite the AgentCard advertising Bearer auth",
-  "authorizationOwner": "ABSENT on POST /api/acp/execute (the route this audit targets). The existing, correct owner for this role is sveltekit-frontend/src/lib/server/auth/tool-authorization.ts (checkToolAccess/toolAuthorizationGuard against atlasToolRegistry) -- already used correctly by /api/acp/rpc and /api/agent/execute, not wired into /api/acp/execute.",
-  "dispatchOwner": "executeACPTool() / getACPToolSchema() in sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts -- raw TOOLS[name] lookup, no authorization checkpoint"
+  "authenticationOwner": "PRE_FIX_BASELINE: session cookie only (event.cookies.get(\"auth_session\") -> hooks.server.ts -> locals.user); Bearer/session contract mismatch remains tracked separately by A2A-05.",
+  "authorizationOwner": "PRE_FIX_BASELINE: absent on POST /api/acp/execute. CURRENT: toolAuthorizationGuard() and hasPermission() from sveltekit-frontend/src/lib/server/auth/tool-authorization.ts, with required permission facts from acp-tool-permissions.ts; see postFix.",
+  "dispatchOwner": "executeACPTool() / getACPToolSchema() in sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts -- raw TOOLS[name] lookup, no authorization checkpoint (pre-fix baseline; see postFix)",
+  "postFix": {
+    "generatedAt": "2026-09-23T19:08:52Z",
+    "authorizationOwner": "toolAuthorizationGuard() and hasPermission() in sveltekit-frontend/src/lib/server/auth/tool-authorization.ts; required-permission facts are supplied by acp-tool-permissions.ts and unknown/missing entries fail closed to code:write",
+    "dispatchChain": "authenticated user -> Zod input/tool validation -> getACPToolSchema -> existing permission-grant owner -> required permission check -> executeACPTool only on ALLOW -> handler",
+    "viewerKanbanClaim": {
+      "authorized": false,
+      "httpStatus": 403,
+      "dispatchReached": false,
+      "handlerInvocationCount": 0
+    },
+    "secondCanonicalWriteControl": {
+      "tool": "atlas.kanban.block",
+      "authorized": false,
+      "httpStatus": 403,
+      "dispatchReached": false,
+      "handlerInvocationCount": 0
+    },
+    "authorizedReadControl": {
+      "tool": "openspec:workboard_recommend",
+      "authorized": true,
+      "httpStatus": 200,
+      "dispatchReached": true,
+      "handlerInvocationCount": 1
+    },
+    "privilegedDryRunControl": {
+      "tool": "atlas.kanban.claim",
+      "role": "admin",
+      "authorized": true,
+      "httpStatus": 200,
+      "dispatchReached": true,
+      "handlerInvocationCount": 1,
+      "dryRun": true
+    },
+    "unknownTool": {
+      "status": 404,
+      "dispatchReached": false,
+      "registeredHandlerInvocationCount": 0
+    },
+    "mirrorMetadata": {
+      "dispatchable": false,
+      "ids": ["mirror:sync_qdrant", "mirror:sync_neo4j"],
+      "result": "not registered in ACPToolRegistry.TOOLS; 404 before dispatch"
+    },
+    "authCache": "tool-authorization-cache adapter mocked in the route test; no real Valkey grant write from proof",
+    "focusedTests": "sveltekit-frontend/src/routes/api/acp/execute/authorization-boundary.spec.ts — 9/9 passed",
+    "persistentWrites": 0,
+    "A2A05": "OPEN — AgentCard Bearer/session-cookie contract mismatch remains separate",
+    "workerId": "OPEN FOLLOW-UP — authorization/impersonation; not canonical identity forgery",
+    "result": "A2A_INVOCATION_AUTHORIZATION_PROVEN"
+  }
 }

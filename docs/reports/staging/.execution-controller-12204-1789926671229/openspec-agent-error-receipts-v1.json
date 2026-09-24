@@ -1,0 +1,7 @@
+{
+  "schema": "atlas.openspec-agent-error-receipts.v1",
+  "generatedAt": "2026-09-20T17:51:11.459Z",
+  "policy": "RETRY_ONLY_WHEN_IMPLEMENTATION_OR_RELEVANT_RECEIPT_REVISION_CHANGES",
+  "receipts": [],
+  "writesPerformed": false
+}

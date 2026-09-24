@@ -4,14 +4,14 @@
   "status": "DOC_24_PATCH_PROPOSAL_FIXTURE_PROVEN",
   "proposal": {
     "schema": "atlas.patch-proposal.v1",
-    "proposalId": "patch-proposal:sha256:470b00916faf0a8e33d5b87abf9ffdf52286fc834ebd7bbf6600df545baf3e7d",
+    "proposalId": "patch-proposal:sha256:6d2fff8b213c3ead309d1e65945c97b47529d43d4c7583405189a1690f7b5ea6",
     "sourceRef": "src/example.ts",
-    "baseSourceRevision": "sha256:e2e846d0811ba3ca2ff75fcc41f163648e3e136dc4bc32c073b9e10543c77c61",
-    "patchDigest": "sha256:da333ac861170a3fb29ac9a1dfedbbc45a16f497574da9c5917a413c5282b239",
+    "baseSourceRevision": "sha256:3adaa8790114d5ab0c840315146872d8d8956ff3b244ffddb1136d44b3f509bb",
+    "patchDigest": "sha256:caee8c4cb55d167e7305c0b1e130fb8de22b3847831d10e6337403a4066d7a99",
     "hunks": [
       {
-        "startByte": 14,
-        "endByte": 22,
+        "startByte": 22,
+        "endByte": 30,
         "before": "oldValue",
         "after": "newValue"
       }

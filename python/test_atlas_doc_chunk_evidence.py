@@ -60,9 +60,16 @@ def test_different_product_version_changes_page_and_child_chunk_evidence():  # G
     a = _page_coordinate(LONG_SECTION, product_version="0.8")
     b = _page_coordinate(LONG_SECTION, product_version="0.9")
     assert a.evidence_revision != b.evidence_revision
-    revs_a = {c.chunk_evidence_revision for c in _chunks(LONG_SECTION, a)}
-    revs_b = {c.chunk_evidence_revision for c in _chunks(LONG_SECTION, b)}
+    chunks_a = _chunks(LONG_SECTION, a)
+    chunks_b = _chunks(LONG_SECTION, b)
+    revs_a = {c.chunk_evidence_revision for c in chunks_a}
+    revs_b = {c.chunk_evidence_revision for c in chunks_b}
     assert revs_a.isdisjoint(revs_b)
+    # Current chunk_id v1 omits product/page revision. The DB's global UNIQUE
+    # constraint therefore prevents storing identical bytes as two versions,
+    # despite their distinct page/chunk evidence revisions. Keep this visible
+    # until a separately reviewed identity-v2 contract is approved.
+    assert [c.chunk_id for c in chunks_a] == [c.chunk_id for c in chunks_b]
 
 
 def test_utf8_non_ascii_byte_spans_replay_identically():  # H

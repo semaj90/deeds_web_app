@@ -340,6 +340,7 @@ class AnalysisPassResult(BaseModel):
     packet_key: Optional[str] = None
     source_ref: str
     source_revision: str
+    workspace_revision: Optional[str] = None
     family: Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded", "classify"]
     pass_name: str
     pass_revision: str
@@ -430,6 +431,16 @@ class HMMObservation(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+HMM_OBSERVATION_VOCABULARY_REVISION_V1 = "atlas.route-observation.v1"
+HMM_OBSERVATION_VOCABULARY_V1 = frozenset({
+    "STRUCTURAL_CHUNK_PRESENT",
+    "ENTITY_EVIDENCE_FOUND",
+    "IMPORT_RELATIONSHIP_FOUND",
+    "SEMANTIC_CARD_BUILT",
+    "REPAIR_AMBIGUOUS",
+})
+
+
 class Control5(BaseModel):
     lexical_confidence: Optional[float] = None
     semantic_confidence: Optional[float] = None
@@ -471,6 +482,8 @@ class ExperimentFeatureMatrix(BaseModel):
 
 
 class EventHypergraphPayload(BaseModel):
+    status: Literal["BUILT", "SKIPPED_LINEAGE"] = "BUILT"
+    warnings: list[str] = Field(default_factory=list)
     events: list[dict[str, Any]] = Field(default_factory=list)
     ontology_event_tuples: list[dict[str, Any]] = Field(default_factory=list)
     event_breadth_features: Optional[dict[str, Any]] = None
@@ -803,6 +816,32 @@ class PosTagRequest(BaseModel):
     text: str
 
 
+class LinguisticTokenAssertion(BaseModel):
+    text: str
+    lemma: str
+    pos: str
+    tag: str
+    dependency: str
+    start_byte: int
+    end_byte: int
+
+
+class LinguisticTextSpan(BaseModel):
+    text: str
+    start_byte: int
+    end_byte: int
+
+
+class LinguisticDependencyEdge(BaseModel):
+    dependent_text: str
+    dependent_start_byte: int
+    dependent_end_byte: int
+    head_text: str
+    head_start_byte: int
+    head_end_byte: int
+    relation: str
+
+
 class PosTagResponse(BaseModel):
     nouns: list[str]
     proper_nouns: list[str]
@@ -812,6 +851,15 @@ class PosTagResponse(BaseModel):
     lemmas: list[str]
     noun_phrases: list[str]
     source: Literal["spacy", "unavailable"]
+    token_assertions: list[LinguisticTokenAssertion] = Field(default_factory=list)
+    noun_phrase_spans: list[LinguisticTextSpan] = Field(default_factory=list)
+    dependency_edges: list[LinguisticDependencyEdge] = Field(default_factory=list)
+    dependency_parser_available: bool = False
+    coordinate_basis: Literal["UTF8_BYTES"] = "UTF8_BYTES"
+
+
+def _utf8_byte_offset(text: str, character_offset: int) -> int:
+    return len(text[:character_offset].encode("utf-8"))
 
 
 def _spacy_pos_tags(text: str) -> PosTagResponse:
@@ -848,6 +896,23 @@ def _spacy_pos_tags(text: str) -> PosTagResponse:
             nouns=[], proper_nouns=[], verbs=[], adjectives=[], adverbs=[],
             lemmas=[], noun_phrases=[], source="unavailable",
         )
+    try:
+        dependency_parser_available = bool(doc.has_annotation("DEP"))
+    except Exception:
+        dependency_parser_available = False
+    token_assertions = []
+    for token in doc:
+        char_start = int(token.idx)
+        char_end = char_start + len(token.text)
+        token_assertions.append(LinguisticTokenAssertion(
+            text=token.text,
+            lemma=token.lemma_ or token.text,
+            pos=token.pos_ or "",
+            tag=token.tag_ or "",
+            dependency=token.dep_ or "",
+            start_byte=_utf8_byte_offset(text, char_start),
+            end_byte=_utf8_byte_offset(text, char_end),
+        ))
     nouns = sorted({tok.text for tok in doc if tok.pos_ == "NOUN"})
     proper_nouns = sorted({tok.text for tok in doc if tok.pos_ == "PROPN"})
     verbs = sorted({tok.text for tok in doc if tok.pos_ == "VERB"})
@@ -855,14 +920,42 @@ def _spacy_pos_tags(text: str) -> PosTagResponse:
     adverbs = sorted({tok.text for tok in doc if tok.pos_ == "ADV"})
     lemmas = sorted({tok.lemma_ for tok in doc if tok.pos_ in ("NOUN", "VERB", "ADJ")})
     try:
-        noun_phrases = sorted({chunk.text for chunk in doc.noun_chunks})
+        chunks = list(doc.noun_chunks)
+        noun_phrases = sorted({chunk.text for chunk in chunks})
+        noun_phrase_spans = [LinguisticTextSpan(
+            text=chunk.text,
+            start_byte=_utf8_byte_offset(text, int(chunk.start_char)),
+            end_byte=_utf8_byte_offset(text, int(chunk.end_char)),
+        ) for chunk in chunks]
     except Exception:
         # noun_chunks requires a parser component; the blank("en") fallback in
         # _lazy_spacy() has none -- degrade to empty rather than raising.
         noun_phrases = []
+        noun_phrase_spans = []
+    dependency_edges = []
+    if dependency_parser_available:
+        for token in doc:
+            head = token.head
+            if head is token or not token.dep_:
+                continue
+            dependent_start = int(token.idx)
+            head_start = int(head.idx)
+            dependency_edges.append(LinguisticDependencyEdge(
+                dependent_text=token.text,
+                dependent_start_byte=_utf8_byte_offset(text, dependent_start),
+                dependent_end_byte=_utf8_byte_offset(text, dependent_start + len(token.text)),
+                head_text=head.text,
+                head_start_byte=_utf8_byte_offset(text, head_start),
+                head_end_byte=_utf8_byte_offset(text, head_start + len(head.text)),
+                relation=token.dep_,
+            ))
     return PosTagResponse(
         nouns=nouns, proper_nouns=proper_nouns, verbs=verbs, adjectives=adjectives,
         adverbs=adverbs, lemmas=lemmas, noun_phrases=noun_phrases, source="spacy",
+        token_assertions=token_assertions,
+        noun_phrase_spans=noun_phrase_spans,
+        dependency_edges=dependency_edges,
+        dependency_parser_available=dependency_parser_available,
     )
 
 
@@ -1239,7 +1332,20 @@ def _line_span_to_offsets(text: str, start_line: int, end_line: int) -> tuple[in
     if end_line >= len(lines):
         end_index = len(text)
 
-    return start_index, max(start_index, end_index)
+    start_byte = len(text[:start_index].encode("utf-8"))
+    end_byte = len(text[:max(start_index, end_index)].encode("utf-8"))
+    return start_byte, max(start_byte, end_byte)
+
+
+def _slice_utf8_bytes(text: str, start_byte: int, end_byte: int) -> str:
+    """Slice source by authoritative UTF-8 byte offsets, rejecting invalid spans."""
+    source_bytes = text.encode("utf-8")
+    if start_byte < 0 or end_byte < start_byte or end_byte > len(source_bytes):
+        raise ValueError("UTF-8 byte span is outside the source buffer")
+    try:
+        return source_bytes[start_byte:end_byte].decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("UTF-8 byte span splits a code point") from exc
 
 
 def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
@@ -1288,7 +1394,10 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
 
                 snippet = _chunk_field(item, "text", "content", "snippet")
                 if snippet is None:
-                    snippet = text[start_byte:end_byte]
+                    try:
+                        snippet = _slice_utf8_bytes(text, start_byte, end_byte)
+                    except ValueError:
+                        continue
                 snippet = str(snippet).strip()
                 if not snippet:
                     continue
@@ -1327,7 +1436,10 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
         end = int(getattr(node, "end_byte", 0))
         if end <= start:
             continue
-        snippet = text[start:end].strip()
+        try:
+            snippet = _slice_utf8_bytes(text, start, end).strip()
+        except ValueError:
+            continue
         if not snippet:
             continue
         chunks.append(
@@ -1592,8 +1704,7 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
         symbol = chunk.symbol or f"chunk_{idx}"
         start = max(0, int(chunk.start))
         end = max(start, int(chunk.end))
-        lines_before = text[:start].splitlines()
-        line_start = len(lines_before) + 1
+        line_start = text.encode("utf-8")[:start].count(b"\n") + 1
         line_end = line_start + max(0, chunk.text.count("\n"))
         ast_units.append(
             AstUnit(
@@ -1637,7 +1748,7 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
                 node_kind="module",
                 qualified_symbol=None,
                 byte_start=0,
-                byte_end=len(text),
+                byte_end=len(text.encode("utf-8")),
                 line_start=1,
                 line_end=max(1, text.count("\n") + 1),
                 parent_symbol=None,
@@ -1675,7 +1786,12 @@ def _build_semantic_cards(
     source_revision = req.source_revision or "unknown"
 
     for idx, unit in enumerate(ast_units[:20]):
-        excerpt = text[unit.byte_start : unit.byte_end].strip()[:5000] or unit.node_kind
+        try:
+            excerpt = _slice_utf8_bytes(text, unit.byte_start, unit.byte_end).strip()[:5000]
+        except ValueError:
+            # A malformed byte span cannot contribute source text to a derived card.
+            continue
+        excerpt = excerpt or unit.node_kind
         symbol = unit.qualified_symbol or unit.tree_node_id
         role = "structural-boundary" if unit.node_kind else "unknown"
         invariants = []
@@ -1725,19 +1841,19 @@ def _build_hmm_observations(
 
     tokens: list[tuple[str, float, str]] = []
     if chunks:
-        tokens.append(("EXACT_SYMBOL_FOUND", 1.0, "structural"))
+        tokens.append(("STRUCTURAL_CHUNK_PRESENT", 1.0, "structural"))
     if entities:
-        tokens.append(("HIGH_SEMANTIC_MATCH", 0.8, "lexical"))
+        tokens.append(("ENTITY_EVIDENCE_FOUND", 0.8, "entity_extraction"))
     if any(rel.predicate == "imports" for rel in relationships):
-        tokens.append(("AST_CALL_EDGE_FOUND", 0.7, "structural"))
+        tokens.append(("IMPORT_RELATIONSHIP_FOUND", 0.7, "structural"))
     if semantic_cards:
-        tokens.append(("RERANK_CONFIDENT", 0.6, "semantic"))
-    if req.extraction_mode == "full":
-        tokens.append(("PATCH_SUCCESS", 0.4, "grounded"))
+        tokens.append(("SEMANTIC_CARD_BUILT", 0.6, "semantic"))
     if not tokens:
         tokens.append(("REPAIR_AMBIGUOUS", 0.2, "sequence"))
 
     for idx, (observation, weight, source_pass) in enumerate(tokens[:20]):
+        if observation not in HMM_OBSERVATION_VOCABULARY_V1:
+            raise ValueError(f"Observation is not in {HMM_OBSERVATION_VOCABULARY_REVISION_V1}: {observation}")
         observations.append(
             HMMObservation(
                 request_id=req.document_id or req.packet_key or _digest_parts(text)[:16],
@@ -1757,88 +1873,6 @@ def _build_hmm_observations(
     return observations
 
 
-def _build_control5(
-    pass_results: list[AnalysisPassResult],
-) -> Optional[Control5]:
-    def latest_value(family: str, *keys: str) -> Optional[float]:
-        for result in reversed(pass_results):
-            if result.family != family:
-                continue
-            for key in keys:
-                value = result.features.get(key)
-                if isinstance(value, (int, float)) and not isinstance(value, bool):
-                    return float(value)
-        return None
-
-    control5 = Control5(
-        lexical_confidence=latest_value("lexical", "lexical_confidence", "bm25"),
-        semantic_confidence=latest_value("semantic", "semantic_confidence", "dense_cosine"),
-        structural_confidence=latest_value("structural", "structural_confidence", "ast_match"),
-        topological_confidence=latest_value("sequence", "topological_confidence", "hop_distance"),
-        execution_confidence=latest_value("sequence", "execution_confidence", "historical_execution_success"),
-    )
-    if any(value is not None for value in control5.model_dump().values()):
-        return control5
-    return None
-
-
-def _build_experiment_feature_matrix(
-    req: AnalyzeRequest,
-    pass_results: list[AnalysisPassResult],
-    control5: Optional[Control5],
-) -> ExperimentFeatureMatrix:
-    def latest_value(family: str, *keys: str) -> Optional[float]:
-        for result in reversed(pass_results):
-            if result.family != family:
-                continue
-            for key in keys:
-                value = result.features.get(key)
-                if isinstance(value, (int, float)) and not isinstance(value, bool):
-                    return float(value)
-        return None
-
-    source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.source_revision or "unknown"
-    candidate_id = req.packet_key or req.document_id or source_ref
-    features = {}
-    for result in pass_results:
-        for key, value in result.features.items():
-            if isinstance(value, (int, float, bool)) or value is None:
-                features[f"{result.family}.{result.pass_name}.{key}"] = value
-
-    return ExperimentFeatureMatrix(
-        request_id=req.document_id or req.packet_key or _digest_parts(req.text)[:16],
-        candidate_id=candidate_id,
-        packet_key=req.packet_key,
-        source_ref=source_ref,
-        source_revision=source_revision,
-        feature_revision="nlp-feature-compiler-v1",
-        graph_revision=None,
-        representation_revision=req.model_id,
-        dense_cosine=latest_value("semantic", "dense_cosine", "semantic_confidence"),
-        bm25=latest_value("lexical", "bm25", "lexical_confidence"),
-        rrf=latest_value("rerank", "rrf", "reranker_score"),
-        ast_match=latest_value("structural", "ast_match", "structural_confidence"),
-        pagerank=latest_value("sequence", "pagerank"),
-        cheirank=latest_value("sequence", "cheirank"),
-        community_affinity=latest_value("sequence", "community_affinity"),
-        hop_distance=latest_value("sequence", "hop_distance"),
-        kmeans_distance=latest_value("semantic", "kmeans_distance"),
-        som_distance=latest_value("semantic", "som_distance"),
-        manifold_distance=latest_value("semantic", "manifold_distance"),
-        cross_encoder_score=latest_value("rerank", "cross_encoder_score"),
-        mixedbread_score=latest_value("rerank", "mixedbread_score"),
-        historical_execution_success=latest_value("sequence", "historical_execution_success"),
-        test_impact=latest_value("structural", "test_impact"),
-        reranker_score=latest_value("rerank", "reranker_score"),
-        control5=control5,
-        features=features,
-        pass_count=len(pass_results),
-        input_hash=_digest_parts(req.text, req.source_ref, source_revision, req.packet_key, req.model_id),
-        output_hash=_digest_parts(pass_results, control5),
-    )
-
-
 def _build_event_hypergraph(
     req: AnalyzeRequest,
     text: str,
@@ -1852,11 +1886,20 @@ def _build_event_hypergraph(
     control5: Optional[Control5],
     experiment_feature_matrix: Optional[ExperimentFeatureMatrix],
 ) -> EventHypergraphPayload:
-    source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.source_revision or "unknown"
-    workspace_revision = req.model_id or req.document_id or "unknown"
+    # Event rows carry identity/revision columns, so they must not be filled
+    # from UI/request/model labels. Without the explicit lineage tuple, return
+    # a typed skip instead of fabricating a packet or workspace identity.
+    if not all((req.source_ref, req.source_revision, req.workspace_revision, req.packet_key)):
+        return EventHypergraphPayload(
+            status="SKIPPED_LINEAGE",
+            warnings=["SOURCE_PACKET_WORKSPACE_LINEAGE_REQUIRED"],
+        )
+
+    source_ref = req.source_ref
+    source_revision = req.source_revision
+    workspace_revision = req.workspace_revision
     observed_at = datetime.utcnow().isoformat() + "Z"
-    packet_key = req.packet_key or req.document_id or source_ref
+    packet_key = req.packet_key
 
     events: list[dict[str, Any]] = []
 
@@ -1879,7 +1922,9 @@ def _build_event_hypergraph(
             "tree_node_id": metadata.get("tree_node_id"),
             "workspace_revision": workspace_revision,
             "source_revision": source_revision,
-            "representation_revision": req.model_id or "semantic-768-v1",
+            # A model label is not a vector representation revision. No
+            # representation is recorded until an embedding receipt exists.
+            "representation_revision": None,
             "producer_id": "miniforge-nlp-sidecar",
             "producer_revision": _package_version("langextract") or "sidecar-v1",
             "canonicalizer_revision": "event-canonicalizer-v1",
@@ -2298,8 +2343,17 @@ def _build_pass_results(
     if not requested and not req.grounded_extraction_required:
         return [], [], [], [], None, None
 
-    source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.source_revision or "unknown"
+    # Pass results are revision-qualified evidence. Do not substitute a UI
+    # document label or sentinel when source authority was not supplied.
+    if (
+        not req.source_ref
+        or not req.source_revision
+        or req.source_revision.strip().lower() in {"unknown", "workspace:0"}
+    ):
+        return [], [], [], [], None, None
+
+    source_ref = req.source_ref
+    source_revision = req.source_revision
     now = datetime.utcnow().isoformat() + "Z"
     ast_units = _build_ast_units(req, text, chunks, req.language or "unknown") if "structural" in requested else []
     semantic_cards = _build_semantic_cards(req, text, ast_units, entities, features) if "semantic" in requested else []
@@ -2326,6 +2380,7 @@ def _build_pass_results(
                 packet_key=req.packet_key,
                 source_ref=source_ref,
                 source_revision=source_revision,
+                workspace_revision=req.workspace_revision,
                 family=family,  # type: ignore[arg-type]
                 pass_name=pass_name,
                 pass_revision=f"{pass_name}-v1",
@@ -2353,8 +2408,6 @@ def _build_pass_results(
             "cpu",
             {
                 "ast_units": len(ast_units),
-                "structural_confidence": 1.0 if ast_units else 0.2,
-                "ast_match": 1.0 if ast_units else 0.0,
             },
             {"ast_units": [unit.model_dump() for unit in ast_units]},
         )
@@ -2366,10 +2419,7 @@ def _build_pass_results(
             "regex",
             "v1",
             "cpu",
-            {
-                "lexical_confidence": 0.75 if concepts else 0.25,
-                "bm25": 0.6 if concepts else 0.15,
-            },
+            {"concept_count": len(concepts)},
             {"concepts": concepts[:50]},
         )
 
@@ -2382,9 +2432,7 @@ def _build_pass_results(
             "spacy" if SPACY_AVAILABLE else "regex",
             _package_version("spacy") or "unknown",
             "cpu",
-            {
-                "linguistic_confidence": 0.7 if linguistic_entities else 0.2,
-            },
+            {"entity_count": len(linguistic_entities)},
             {
                 "entities": [entity.model_dump() for entity in linguistic_entities],
                 "input_scope": "comments_docstrings_strings_query_text" if _is_code(req.source_type, text) else "full_text",
@@ -2396,36 +2444,32 @@ def _build_pass_results(
         add_pass(
             "semantic",
             "semantic_card",
-            "embeddinggemma" if req.model_id else "local-card",
-            req.model_id or "semantic-768-v1",
+            "semantic-card-builder",
+            "semantic-card-v1",
             "cpu",
+            {},
             {
-                "semantic_confidence": 0.8 if semantic_cards else 0.3,
-                "dense_cosine": 0.8 if semantic_cards else 0.3,
-                "kmeans_distance": 0.4 if semantic_cards else 0.9,
-                "som_distance": 0.35 if semantic_cards else 0.9,
-                "manifold_distance": 0.32 if semantic_cards else 0.9,
+                "semantic_cards": [card.model_dump() for card in semantic_cards],
+                "embedding_status": "NOT_RUN",
             },
-            {"semantic_cards": [card.model_dump() for card in semantic_cards]},
+            warnings=["SEMANTIC_768_EMBEDDING_NOT_RUN"],
         )
 
     if "sequence" in requested:
         add_pass(
             "sequence",
             "hmm_observations",
-            "hmmlearn" if any(obs.observation for obs in observations) else "heuristic",
-            "v1",
+            "observation-builder",
+            HMM_OBSERVATION_VOCABULARY_REVISION_V1,
             "cpu",
             {
-                "topological_confidence": 0.5 if observations else 0.1,
-                "execution_confidence": 0.6 if observations else 0.1,
-                "historical_execution_success": 0.55 if observations else 0.0,
-                "hop_distance": 1.0 if observations else 0.0,
-                "pagerank": 0.0,
-                "cheirank": 0.0,
-                "community_affinity": 0.0,
+                "observation_count": float(len(observations)),
             },
-            {"observations": [obs.model_dump() for obs in observations]},
+            {
+                "vocabulary_revision": HMM_OBSERVATION_VOCABULARY_REVISION_V1,
+                "inference_status": "NOT_RUN",
+                "observations": [obs.model_dump() for obs in observations],
+            },
         )
 
     if "rerank" in requested:
@@ -2435,11 +2479,7 @@ def _build_pass_results(
             "sentence-transformers",
             "ms-marco-MiniLM-L6-v2",
             "cpu",
-            {
-                "cross_encoder_score": 0.0,
-                "mixedbread_score": 0.0,
-                "reranker_score": 0.0,
-            },
+            {},
             {"todo": "reranker backend stays in the canonical TS contract for this slice"},
             status="skipped",
             warnings=["reranker backend not invoked in default NLP pass compiler"],
@@ -2453,9 +2493,7 @@ def _build_pass_results(
             "langextract" if LANGEXTRACT_AVAILABLE else "unavailable",
             _package_version("langextract") or "unknown",
             "external",
-            {
-                "grounded_confidence": 0.6 if LANGEXTRACT_AVAILABLE else 0.0,
-            },
+            {},
             {"grounded_only": bool(LANGEXTRACT_AVAILABLE and req.grounded_extraction_required)},
             status=grounded_status,
             warnings=[] if LANGEXTRACT_AVAILABLE else ["LangExtract unavailable; grounded extraction skipped"],
@@ -2475,9 +2513,9 @@ def _build_pass_results(
             warnings=classify_warnings,
         )
 
-    control5 = _build_control5(pass_results)
-    matrix = _build_experiment_feature_matrix(req, pass_results, control5) if pass_results else None
-    return pass_results, ast_units, semantic_cards, observations, control5, matrix
+    # Matrix/control summaries have one implementation in the shared TS
+    # compiler. Python returns producer pass evidence only.
+    return pass_results, ast_units, semantic_cards, observations, None, None
 
 
 def _torch_summary(text: str) -> dict[str, Any]:

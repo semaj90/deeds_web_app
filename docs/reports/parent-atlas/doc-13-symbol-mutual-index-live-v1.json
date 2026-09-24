@@ -1,7 +1,7 @@
 {
   "schema": "parent-atlas.doc-13-symbol-mutual-index-live.v1",
   "gate": "DOC-13",
-  "status": "LIVE_DOC_EXTRACTION_SYMBOL_JOIN_PROVEN",
+  "status": "LIVE_EXTRACTION_CODE_REVISION_UNBOUND",
   "readOnly": true,
   "writesPerformed": false,
   "canonicalAuthority": false,
@@ -14,15 +14,17 @@
       "atlas_symbol_registry",
       "atlas_symbol_versions"
     ],
-    "rowsRead": 200
+    "rowsRead": 402,
+    "filter": "active registry rows with sha256 source_revision and workspace_revision",
+    "canonicalWrites": false
   },
   "sample": {
     "canonicalKey": "symbol-key:00b5064f2e1c5387769e68e90eacfba819f34966",
     "canonicalName": "classifyPacketTask",
     "canonicalQualifiedName": "classifyPacketTask",
     "sourceRef": "packages/atlas-core/src/policy-task-router.ts",
-    "sourceRevision": "workspace:0",
-    "workspaceRevision": "workspace:0",
+    "sourceRevision": "sha256:e90bf59ea8b5700b3de484cc4f560d850e92d594d9930af22996b34e05f3ec1d",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
     "registryRevision": "promotion:ast-nominations:v1",
     "symbolVersionId": "symbol-version:b6e205825e35704467ca92c41fb0a3f777b01d903a699faa6ecb52f9bcedfd23"
   },
@@ -47,25 +49,11 @@
       "canonicalAuthority": false
     },
     "join": {
-      "status": "MATCHED_DOCUMENTATION_SYMBOL",
-      "stableSymbolId": "stable-symbol:53f511eaa2e2caed42d250dd4f56ad9e3974777752245627782f22f12ba22fc2",
-      "symbolVersionId": "symbol-version:b6e205825e35704467ca92c41fb0a3f777b01d903a699faa6ecb52f9bcedfd23",
-      "sourceRef": "packages/atlas-core/src/policy-task-router.ts",
-      "documentationSourceRevision": "sha256:920b0cc5650502c5d64b0d199f131c056e73c23c36f1aab9d8f7d6b3f451dfed",
-      "codeSourceRevision": "workspace:0",
-      "workspaceRevision": "workspace:0",
-      "registryRevision": "promotion:ast-nominations:v1"
+      "status": "UNRESOLVED",
+      "reason": "TARGET_CODE_SOURCE_REVISION_MISSING",
+      "candidateCount": 1,
+      "matches": []
     }
-  },
-  "evidence": [
-    "LIVE_NEGATIVE_MATRIX_READ_ONLY",
-    "READ_ONLY_EXACT_NAME_AND_SOURCE_REVISION_JOIN"
-  ],
-  "extraction": {
-    "statusCode": 200,
-    "modelId": "ornith-1.5-9b",
-    "apiRuleCount": 1,
-    "canonicalAuthority": false
   },
   "negativeMatrix": {
     "staleCodeRevision": {
@@ -79,12 +67,36 @@
       "passed": true
     },
     "ambiguousLiveName": {
-      "name": "constructor",
+      "name": "import { describe, expect, it } from 'vitest';",
+      "exactCodeSourceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
       "status": "AMBIGUOUS",
+      "candidateCount": 4,
       "expected": "AMBIGUOUS",
       "passed": true
     },
-    "matchedCodeRevision": "workspace:0"
+    "explicitRevisionControl": {
+      "status": "MATCHED",
+      "expected": "MATCHED",
+      "passed": true,
+      "evidenceClass": "registry-backed resolver control; not asserted to originate in documentation extraction"
+    },
+    "missingCodeRevision": {
+      "status": "UNRESOLVED",
+      "reason": "TARGET_CODE_SOURCE_REVISION_MISSING",
+      "expectedReason": "TARGET_CODE_SOURCE_REVISION_MISSING",
+      "passed": true
+    }
   },
-  "reportChecksum": "sha256:a9a776d7ccc1039e20fb2a6d49ae03fcde5791a1acc723ff6612eda4ccf3e397"
+  "evidence": [
+    "LIVE_SYMBOL_REVISION_FILTERED_COHORT",
+    "LIVE_NEGATIVE_MATRIX_READ_ONLY",
+    "DOCUMENTATION_AND_CODE_REVISIONS_KEPT_SEPARATE"
+  ],
+  "extraction": {
+    "statusCode": 200,
+    "modelId": "ornith-1.5-9b",
+    "apiRuleCount": 1,
+    "canonicalAuthority": false
+  },
+  "reportChecksum": "sha256:0e3fb0bf14d334f178358dba71de5e92aeef90fcd86802e4f4fcd0eddd9fb2a8"
 }

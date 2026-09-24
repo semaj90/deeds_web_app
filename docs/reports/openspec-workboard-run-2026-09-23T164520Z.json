@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T16:45:20Z",
+  "objective": "Continue evidence-backed OpenSpec tasks; defer image/container rebuilds until safe local work is exhausted.",
+  "pivot": {
+    "change": "parent-atlas-nlp-sidecar-feature-compiler",
+    "fromTask": "5.1 HMM observation builder",
+    "toTask": "4.2 semantic-card embedding handoff",
+    "reason": "HMM training is blocked by missing hmmlearn; the independent semantic-card-to-embedding boundary was statically auditable and revealed synthetic vector/ranking features that could be safely removed."
+  },
+  "progress": {
+    "change": "parent-atlas-nlp-sidecar-feature-compiler",
+    "before": "87/142",
+    "after": "87/142",
+    "delta": "No additional checkbox closed. OpenSpec task parser remains authoritative; 4.2 is partially implemented but unproven and stays open."
+  },
+  "completed": [
+    {
+      "task": "4.2 semantic-card embedding boundary audit",
+      "result": "PARTIAL; no dispatch path found, task remains open",
+      "evidence": "Sidecar builds semantic_cards as artifacts but no code path was found sending them to the existing semantic_768 embedding owner. A separate code read confirmed the embedding runtime accepts a revisioned EmbeddingContextPlanV1; no card-to-plan caller exists."
+    },
+    {
+      "task": "Remove unsupported synthetic semantic features",
+      "result": "IMPLEMENTED_AND_TESTED",
+      "evidence": "Semantic pass now reports backend=semantic-card-builder, version=semantic-card-v1, empty features, artifacts.embedding_status=NOT_RUN, and SEMANTIC_768_EMBEDDING_NOT_RUN warning. It no longer fabricates dense_cosine, KMeans/SOM/manifold distances, or semantic confidence from card presence."
+    }
+  ],
+  "blockers": [
+    {
+      "gate": "SEARCH/SEMANTIC_768_OWNER_AND_LINEAGE_QUALIFIED_CARD_INPUT",
+      "condition": "No existing semantic-card embedding handoff was found; the canonical embedding request must preserve source/workspace revisions and must not call a persistence path without its existing eligibility gate.",
+      "classification": "BLOCKED_UPSTREAM"
+    },
+    {
+      "gate": "SEMANTIC_CODE_CARD_LIVE_VECTOR_AND_AST_READBACK",
+      "condition": "Requires a real eligible function/card, embedding output, and independent AstUnit query/readback; not proven by the local card fixture.",
+      "classification": "BLOCKED_BY_LINEAGE_AND_LIVE_PROOF"
+    }
+  ],
+  "validation": {
+    "focusedPythonTests": "PASS: 16/16 across semantic-card UTF-8, HMM observations, source revision, linguistic scope, and AST-v2 CRLF",
+    "pythonSyntax": "PASS: python -m py_compile python/miniforge_nlp_sidecar.py",
+    "openSpecStrict": "PASS: parent-atlas-nlp-sidecar-feature-compiler",
+    "scopedDiffCheck": "PASS for touched sidecar/OpenSpec files",
+    "repoWideDiffCheck": "NOT_CLEAN from unrelated whitespace in generated simd-bridge/CUDA build log; left unchanged"
+  },
+  "writes": {
+    "postgres": 0,
+    "valkey": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "canonicalAuthority": false,
+    "promotionAuthorized": false
+  },
+  "nextGate": "SEMANTIC_CARD_TO_CANONICAL_EMBEDDING_PLAN_WIRING_WITH_REVISION_LINEAGE"
+}

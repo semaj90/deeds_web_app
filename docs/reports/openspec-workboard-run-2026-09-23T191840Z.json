@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T19:18:40Z",
+  "pivot": {
+    "fromChange": "parent-atlas-transport-memory-boundaries",
+    "fromProgress": { "complete": 40, "total": 93, "remaining": 53 },
+    "toChange": "parent-atlas-workboard-feature-utility-fabric",
+    "toProgress": { "complete": 22, "total": 68, "remaining": 46 },
+    "reason": "Return to the already-started NS-8D advisory task. The shared workboard snapshot is stale, so regenerate it into isolated scratch output and verify suggestions without applying them or overwriting concurrent edits."
+  },
+  "workboardSnapshot": {
+    "taskFiles": 93,
+    "completeTasks": 6226,
+    "totalTasks": 9442,
+    "openTasks": 3216,
+    "source": "recursive tasks.md checkbox recount immediately before pivot"
+  },
+  "selectedTask": {
+    "id": "NS-8D",
+    "statusAtStart": "OPEN",
+    "scope": "read-only task-ID suggestions and a reviewable patch; no task ledger application",
+    "writePolicy": "isolated generated artifacts under .tmp/atlas/ns-8d-audit; shared workboard projections are not overwritten"
+  },
+  "execution": {
+    "result": "IN_PROGRESS",
+    "writes": {
+      "postgres": 0,
+      "valkey": 0,
+      "qdrant": 0,
+      "neo4j": 0,
+      "graphify": 0,
+      "canonicalAuthority": false,
+      "promotionAuthorized": false,
+      "containerRebuilds": 0
+    },
+    "nextGate": "FRESH_WORKBOARD_SNAPSHOT_AND_ID_SUGGESTIONS_PROVEN_WITHOUT_LEDGER_EDITS"
+  }
+}

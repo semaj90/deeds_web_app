@@ -1,6 +1,6 @@
 {
   "schema": "atlas.symbol-wire-01-utf8-grounding.v1",
-  "generatedAt": "2026-09-22T20:22:01.500Z",
+  "generatedAt": "2026-09-22T21:01:51.181Z",
   "corpusManifestUsed": {
     "workspaceRevision": "1ec451233a652de4fe081dcd7aa0feb541e081ae",
     "corpusSize": 300,
@@ -24,6 +24,7 @@
     "totalSymbols": 13502,
     "sourceRevisionMatched": "300/300",
     "spanWithinSourceBytes": "13502/13502",
+    "envelopeAttached": "13502/13502",
     "utf8RoundTripMatched": "13502/13502",
     "negativeLength": 0,
     "outOfBounds": 0,

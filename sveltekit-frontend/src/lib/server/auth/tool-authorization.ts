@@ -148,6 +148,20 @@ export async function toolAuthorizationGuard(event: RequestEvent): Promise<Permi
 }
 
 /**
+ * Generic permission-membership check, decoupled from atlasToolRegistry's
+ * own tool set. Reused by other tool universes (e.g. ACPToolRegistry.ts's
+ * ACP tools, whose names don't exist in atlasToolRegistry) that still want
+ * to check the SAME PermissionGrant produced by derivePermissionGrant() /
+ * toolAuthorizationGuard() above -- the role→permission derivation logic
+ * (the actual authorization brain) is never duplicated; only a tool→
+ * required-permission fact for a different tool set lives elsewhere,
+ * exactly as atlasToolRegistry already keeps this fact for its own 6 tools.
+ */
+export function hasPermission(grant: PermissionGrant, required: AtlasToolPermission): boolean {
+  return grant.permissions.has(required);
+}
+
+/**
  * Validate tool name format before authorization check
  * Prevents invalid/malicious tool names from reaching the registry
  */

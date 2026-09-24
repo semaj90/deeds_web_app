@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T22:50:23Z",
+  "pivot": {
+    "from": "External-document acquisition and semantic executor review",
+    "to": "parent-atlas-versioned-doc-intelligence / Phase V validation spine",
+    "reason": "The next locally executable, non-write work is to freeze and prove the summary claim validation contract before any judge, OaK, summary persistence, or promotion path."
+  },
+  "previousChangeSnapshot": {
+    "change": "parent-atlas-versioned-doc-intelligence",
+    "progressAtStartOfRun": "29/48",
+    "basis": "OpenSpec apply instructions read at start of this implementation pass"
+  },
+  "selectedChange": {
+    "change": "parent-atlas-versioned-doc-intelligence",
+    "schema": "spec-driven",
+    "progressAtEndOfRun": "33/48",
+    "remaining": 15,
+    "scope": "VAL-01 through VAL-05 plus stale DOC-16 task reconciliation; VAL-05 implementation is present but its task remains open pending canonical same-revision byte readback"
+  },
+  "workThisRun": {
+    "verifiedComplete": [
+      "VAL-01: aligned the existing SvelteKit Zod owner and fixture; no duplicate package contract retained.",
+      "VAL-02: strict Pydantic v2 wire mirror round-trips the TypeScript fixture exactly and does not derive TypeScript-owned checksums.",
+      "VAL-03: deterministic technical-token slot reuses the established token analyzer; unsupported/corrupted tokens fail and omissions review.",
+      "VAL-04: exact numeric and named-version validators are separate and preserve version strings without numeric coercion.",
+      "DOC-16: reconciled the stale open checkbox after rerunning the existing strict AceRepairPacketV1 fixture test; package typecheck is being rerun. Live ACE composition/admission remains open."
+    ],
+    "implementedButOpen": [
+      "VAL-05 UTF-8 byte-span verifier: synthetic UTF-8 boundary tests pass; the task remains open until a canonical chunk/revision is independently read and replayed through it."
+    ],
+    "focusedProof": {
+      "zodVitest": "13/13 passed",
+      "pythonPydanticAndDeterministicValidators": "17/17 passed",
+      "aceRepairPacketTest": "9/9 passed",
+      "parentAtlasPackageTypecheck": "npx tsc -p packages/parent-atlas/tsconfig.json --noEmit passed",
+      "pythonSyntaxCompilation": "passed",
+      "projectTypecheck": "full svelte-check was stopped after prolonged no-output; not claimed as passed; focused Vitest compiled and passed the touched Zod owner/tests",
+      "openspecStrict": "passed after the VAL-04/VAL-05 ledger updates and DOC-16 checkbox reconciliation"
+    }
+  },
+  "blockers": [
+    {
+      "id": "VAL-05_CANONICAL_CHUNK_READBACK",
+      "condition": "No same-revision canonical chunk bytes have yet been replayed through the new span verifier.",
+      "nextProof": "Read one admitted chunk and its evidence revision without writes; verify an exact span and checksum, plus a negative mismatch case."
+    },
+    {
+      "id": "VAL-07_MODEL_JUDGE",
+      "condition": "No judge execution is in scope until the bounded input contract and deterministic validators are frozen."
+    },
+    {
+      "id": "SUMMARY_PERSISTENCE_AND_FAITHFULNESS",
+      "condition": "No persistent summary rows or bounded apply authorization were performed."
+    }
+  ],
+  "liveState": {
+    "postgresWrites": 0,
+    "valkeyWrites": 0,
+    "qdrantWrites": 0,
+    "neo4jWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "modelCalls": 0
+  },
+  "nextGate": "VAL_05_CANONICAL_UTF8_SPAN_READBACK"
+}

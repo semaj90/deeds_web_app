@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runId": "openspec-workboard-run-2026-09-24T002340Z",
+  "startedAt": "2026-09-24T00:23:40Z",
+  "repository": "C:/Users/james/Videos/deeds-web-app",
+  "pivot": {
+    "from": "parent-atlas-adaptive-dag-fabric / DAG-FETCH-01 fixture verification",
+    "to": "parent-atlas-versioned-doc-intelligence / DOC-19 cuVS exact executor baseline",
+    "reason": "Fixture-level fetch coalescing and card-identity tests pass, but the local research circuit has no production caller; wiring it into autonomous SearchRuntime or LDR would add an unapproved orchestration path. DOC-19 has an existing read-only executor harness and the canonical 852-vector document cohort, so its live baseline can be attempted without rebuilding containers or promoting a projection."
+  },
+  "before": {
+    "adaptiveDagFabric": {"complete": 11, "total": 13, "open": 2, "DAG_FETCH_fixtureTests": 8, "productionCallers": 0},
+    "versionedDocIntelligence": {"complete": 38, "total": 48, "open": 10},
+    "targetTask": "DOC-19"
+  },
+  "scope": {
+    "mode": "READ_ONLY_CUVS_EXACT_EXECUTOR_PROOF",
+    "canonicalCorpusWrites": 0,
+    "qdrantWrites": 0,
+    "neo4jWrites": 0,
+    "valkeyWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "IN_PROGRESS"
+}

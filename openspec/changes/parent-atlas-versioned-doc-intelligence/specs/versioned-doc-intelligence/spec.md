@@ -102,3 +102,68 @@ callers/callees, validation commands) — not the full documentation corpus or f
 - **WHEN** an `AceRepairPacketV1` is assembled for one specific error
 - **THEN** the packet contains only the evidence relevant to that error, not the entire indexed
   corpus
+
+### Requirement: Summary claim validation is strict, revision-qualified derived evidence
+
+Each `SummaryClaimValidationV1` SHALL identify the exact canonical external-document chunk
+evidence revision and the input/output summary checksums from which one claim was extracted.
+Claim content checksums SHALL use the shared canonical JSON hashing owner; execution-local
+`claimOrdinal` SHALL NOT participate in canonical source or claim identity. Validator outputs SHALL
+use typed deterministic, semantic, source-span, and ontology slots. A claimed source span is only
+structurally recorded here and MUST be independently verified against canonical UTF-8 chunk bytes
+before it can support an admission decision. The envelope SHALL remain derived and noncanonical;
+this contract does not implement a verdict algorithm or execute a semantic/OaK judge.
+
+At the individual-claim level, the technical-token validator MUST fail invented or corrupted
+technical identifiers. Omission of other identifiers present in the source chunk MUST remain
+observable in `missingTechnicalTokens` but MUST NOT by itself fail or route that individual claim
+to review; summary-wide coverage is a separate signal.
+
+#### Scenario: Malformed or unqualified validation evidence fails closed
+
+- **GIVEN** a summary claim validation envelope with an empty identity, placeholder revision,
+  malformed checksum/span, unknown field, or unsupported verdict
+- **WHEN** the envelope is parsed by the TypeScript contract
+- **THEN** validation fails without coercion or canonical promotion
+
+#### Scenario: Claim ordinal does not affect claim content checksum
+
+- **GIVEN** the same claim text emitted at different execution-local ordinals
+- **WHEN** the canonical claim checksum is computed
+- **THEN** both checksums are identical, while changing the claim text changes the checksum
+
+#### Scenario: Summary judge input is limited to one exact chunk and one claim
+
+- **GIVEN** a checksum-sealed deterministic claim-validation artifact and a chunk row read back by
+  both `chunkId` and `chunkEvidenceRevision`
+- **WHEN** `SummaryJudgeInputV1` is built
+- **THEN** the builder rejects any row whose identity/revision differs and freezes only the exact
+  chunk text (bounded to 32 KiB UTF-8), prompt-visible product/version/title/heading metadata, the
+  single claim, its summary output checksum, prompt revision, and the technical/numeric/version/
+  source-span findings
+- **AND** the strict contract rejects web results, neighboring chunks, Qdrant, ACE history, model
+  execution fields, and all other unknown context; it performs no retrieval, inference, or final
+  admission decision
+
+#### Scenario: Semantic judge evaluates one sealed claim through the resolved synthesis model
+
+- **GIVEN** a valid sealed `SummaryJudgeInputV1` and a runtime-resolved model ID listed by the
+  existing llama-server model endpoint
+- **WHEN** the VAL-07 adapter sends its bounded request
+- **THEN** the request uses that exact model ID and contains only the one canonical chunk, one
+  claim, allowlisted metadata, deterministic findings, and frozen prompt revision
+- **AND** an invalid response or transport failure produces `JUDGE_ERROR`, never a support verdict
+- **AND** semantic output is evidence only; it does not verify byte spans or compute admission
+- **AND** no retrieval, OaK call, analysis-row write, or durable store mutation occurs
+
+#### Scenario: Deterministic claim resolution preserves validator precedence
+
+- **GIVEN** a sealed claim envelope containing technical, numeric, version, source-span, semantic,
+  and optional typed-ontology findings
+- **WHEN** the VAL-09 resolver derives the final claim result
+- **THEN** deterministic hard failures, rejected spans, and explicit semantic contradiction reject
+- **AND** semantic evidence cannot override a deterministic hard failure
+- **AND** unrun, partial, judge-error, unverified-span, or unresolved typed-ontology evidence routes
+  to review
+- **AND** only passing deterministic findings plus a supported semantic verdict admit
+- **AND** the result is re-sealed derived evidence and never canonical authority

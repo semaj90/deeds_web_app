@@ -10,10 +10,12 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
-import type {
-  AnalysisPassResult,
-  Control5,
-  ExperimentFeatureMatrix,
+import {
+  AnalysisPassResultSchema,
+  compileExperimentFeatureMatrix,
+  type AnalysisPassResult,
+  type Control5,
+  type ExperimentFeatureMatrix,
 } from '$lib/server/analysis/nlp-feature-compiler.js';
 
 export type NlpSourceType =
@@ -242,6 +244,67 @@ async function readJson(response: Response): Promise<unknown> {
   }
 }
 
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function field(record: Record<string, unknown>, snake: string, camel: string): unknown {
+  return record[camel] ?? record[snake];
+}
+
+function normalizePassResult(value: unknown): AnalysisPassResult | null {
+  const raw = asRecord(value);
+  if (!raw) return null;
+  const evidence = Array.isArray(raw.evidence)
+    ? raw.evidence.map((item) => {
+        const span = asRecord(item);
+        if (!span) return item;
+        return {
+          sourceRef: field(span, 'source_ref', 'sourceRef'),
+          sourceRevision: field(span, 'source_revision', 'sourceRevision'),
+          packetKey: field(span, 'packet_key', 'packetKey'),
+          startByte: field(span, 'start_byte', 'startByte'),
+          endByte: field(span, 'end_byte', 'endByte'),
+          startLine: field(span, 'start_line', 'startLine'),
+          endLine: field(span, 'end_line', 'endLine'),
+          confidence: span.confidence,
+          excerpt: span.excerpt,
+          kind: span.kind,
+        };
+      })
+    : [];
+  const parsed = AnalysisPassResultSchema.safeParse({
+    requestId: field(raw, 'request_id', 'requestId'),
+    packetKey: field(raw, 'packet_key', 'packetKey'),
+    sourceRef: field(raw, 'source_ref', 'sourceRef'),
+    sourceRevision: field(raw, 'source_revision', 'sourceRevision'),
+    workspaceRevision: field(raw, 'workspace_revision', 'workspaceRevision'),
+    family: raw.family,
+    passName: field(raw, 'pass_name', 'passName'),
+    passRevision: field(raw, 'pass_revision', 'passRevision'),
+    backend: raw.backend,
+    backendVersion: field(raw, 'backend_version', 'backendVersion'),
+    device: raw.device,
+    inputHash: field(raw, 'input_hash', 'inputHash'),
+    outputHash: field(raw, 'output_hash', 'outputHash'),
+    startedAt: field(raw, 'started_at', 'startedAt'),
+    completedAt: field(raw, 'completed_at', 'completedAt'),
+    status: raw.status,
+    features: raw.features,
+    artifacts: raw.artifacts,
+    evidence,
+    warnings: raw.warnings,
+  });
+  return parsed.success ? parsed.data : null;
+}
+
+function isUsableRevision(value: string | undefined): value is string {
+  const normalized = value?.trim();
+  return Boolean(normalized && !['unknown', 'workspace:0'].includes(normalized.toLowerCase()));
+}
+
 export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpSidecarClient {
   const url = resolveBaseUrl(baseUrl);
 
@@ -313,6 +376,46 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
         capabilities?: Partial<NlpAnalyzeResponse['capabilities']>;
       };
 
+      const rawPassResults = Array.isArray(raw.pass_results) ? raw.pass_results : [];
+      const normalizedPassResults = rawPassResults.map(normalizePassResult);
+      const passResultsValid = normalizedPassResults.every(
+        (passResult): passResult is AnalysisPassResult => passResult !== null,
+      );
+      const passResults = passResultsValid ? normalizedPassResults : [];
+      const hasExplicitLineage = Boolean(
+        req.packetKey && req.sourceRef && isUsableRevision(req.sourceRevision) &&
+        isUsableRevision(req.workspaceRevision),
+      );
+      let compiled: ReturnType<typeof compileExperimentFeatureMatrix> | null = null;
+      let featureMatrixStatus:
+        | 'COMPILED'
+        | 'NO_PASS_RESULTS'
+        | 'SKIPPED_MISSING_EXPLICIT_LINEAGE'
+        | 'SKIPPED_INVALID_PASS_RESULTS'
+        | 'SKIPPED_LINEAGE_MISMATCH' = 'NO_PASS_RESULTS';
+
+      if (rawPassResults.length > 0 && !passResultsValid) {
+        featureMatrixStatus = 'SKIPPED_INVALID_PASS_RESULTS';
+      } else if (passResults.length > 0 && !hasExplicitLineage) {
+        featureMatrixStatus = 'SKIPPED_MISSING_EXPLICIT_LINEAGE';
+      } else if (passResults.length > 0) {
+        try {
+          compiled = compileExperimentFeatureMatrix({
+            requestId: req.documentId ?? req.packetKey,
+            packetKey: req.packetKey,
+            sourceRef: req.sourceRef!,
+            sourceRevision: req.sourceRevision!,
+            workspaceRevision: req.workspaceRevision,
+            passResults,
+          });
+          featureMatrixStatus = 'COMPILED';
+        } catch {
+          featureMatrixStatus = 'SKIPPED_LINEAGE_MISMATCH';
+        }
+      }
+      const metadata = (raw.metadata ?? {}) as Record<string, unknown>;
+      metadata.experiment_feature_matrix_status = featureMatrixStatus;
+
       return {
         document_id: raw.document_id ?? req.documentId ?? req.packetKey ?? `doc-${Date.now()}`,
         provider_revision: typeof raw.provider_revision === 'string' ? raw.provider_revision : undefined,
@@ -334,9 +437,9 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           classification_helper: Boolean(raw.capabilities?.classification_helper),
         },
         classification_proposal: (raw.classification_proposal ?? null) as Record<string, unknown> | null,
-        pass_results: Array.isArray(raw.pass_results) ? raw.pass_results : [],
-        control5: (raw.control5 ?? null) as Control5 | null,
-        experiment_feature_matrix: (raw.experiment_feature_matrix ?? null) as ExperimentFeatureMatrix | null,
+        pass_results: passResults,
+        control5: compiled?.control5 ?? null,
+        experiment_feature_matrix: compiled?.matrix ?? null,
         event_hypergraph: (raw.event_hypergraph ?? null) as Record<string, unknown> | null,
         processing_time_ms: Number(raw.processing_time_ms ?? Date.now() - start),
       };

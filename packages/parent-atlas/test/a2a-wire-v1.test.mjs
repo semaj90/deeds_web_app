@@ -13,6 +13,7 @@ import {
 const event = {
   schema: 'atlas.workflow-action.v1',
   workflowId: 'wf-1',
+  runId: 'run-1',
   workflowRevision: 3,
   sequence: 9,
   actionId: 'action-1',
@@ -63,6 +64,7 @@ test('A2A AgentInterface uses core v1 binding tokens and version syntax', () => 
 test('Workflow event projects into actual A2A Task shape and oneof stream responses', () => {
   const projected = workflowEventToA2aWire({
     event,
+    taskAttempt: { taskId: 'atlas-task-1', runId: 'run-1', executionReceiptId: 'receipt-1' },
     task_id: 'task-1',
     context_id: 'context-1',
     timestamp: '2026-08-19T20:00:00Z',
@@ -73,11 +75,14 @@ test('Workflow event projects into actual A2A Task shape and oneof stream respon
   assert.equal(projected.task.contextId, 'context-1');
   assert.equal(projected.task.status.state, 'TASK_STATE_COMPLETED');
   assert.equal(projected.task.metadata.atlasWorkflowId, 'wf-1');
+  assert.equal(projected.task.metadata.atlasTaskId, 'atlas-task-1');
+  assert.equal(projected.task.metadata.atlasRunId, 'run-1');
   assert.equal(projected.task.metadata.canonicalAuthority, false);
   assert.equal(projected.task.artifacts.length, 1);
   assert.equal(projected.task.artifacts[0].artifactId, 'artifact-1');
   assert.equal(projected.receipt.protocol_version, '1.0');
   assert.equal(projected.receipt.protocol_release, '1.0.0');
+  assert.equal(projected.receipt.atlas_task_id, 'atlas-task-1');
 
   for (const response of projected.streamResponses) {
     const members = ['task', 'message', 'statusUpdate', 'artifactUpdate'].filter((key) => response[key] !== undefined);
@@ -113,6 +118,7 @@ test('AUTH_REQUIRED is interrupted state and never authorization evidence', () =
       artifactRefs: [],
       metadata: { a2a_interruption: 'auth_required' },
     },
+    taskAttempt: { taskId: 'atlas-task-1', runId: 'run-1', executionReceiptId: null },
     task_id: 'task-auth',
     context_id: 'context-1',
     producer_revision: 'adapter-r1',
@@ -120,4 +126,21 @@ test('AUTH_REQUIRED is interrupted state and never authorization evidence', () =
   assert.equal(blocked.task.status.state, 'TASK_STATE_AUTH_REQUIRED');
   assert.equal(blocked.task.metadata.atlasReceiptId, null);
   assert.equal(blocked.task.metadata.canonicalAuthority, false);
+});
+
+test('A2A projection fails closed when resolved task attempt run or receipt disagrees', () => {
+  assert.throws(() => workflowEventToA2aWire({
+    event,
+    taskAttempt: { taskId: 'atlas-task-1', runId: 'other-run', executionReceiptId: 'receipt-1' },
+    task_id: 'task-1',
+    context_id: 'context-1',
+    producer_revision: 'adapter-r1',
+  }), /A2A_TASK_ATTEMPT_RUN_MISMATCH/);
+  assert.throws(() => workflowEventToA2aWire({
+    event,
+    taskAttempt: { taskId: 'atlas-task-1', runId: 'run-1', executionReceiptId: 'other-receipt' },
+    task_id: 'task-1',
+    context_id: 'context-1',
+    producer_revision: 'adapter-r1',
+  }), /A2A_TASK_ATTEMPT_RECEIPT_MISMATCH/);
 });

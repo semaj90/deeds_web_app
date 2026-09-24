@@ -1019,12 +1019,29 @@ read-only or contract-first until their stated proof exists.
   pressure — a materially different and still-open test.
 - [ ] **GPU-EXP-13** Reconcile semantic HNSW/pgvector/Qdrant executors against
   one CandidateOrdinal universe; HNSW remains an ANN executor, not a new lane.
-- [ ] **GPU-EXP-14** Build a revision-qualified `GraphProjectionArtifactV1`
-  with vertex/edge checksums and an explicit `GraphOrdinal` mapping.
+- [x] **GPU-EXP-14** Build a revision-qualified `GraphProjectionArtifactV1`
+  with vertex/edge checksums and an explicit `GraphOrdinal` mapping. **PROVEN at
+  noncanonical artifact-builder/fixture scope (2026-09-23)** by
+  `python/tests/test_graph_projection_artifact_builder.py` and
+  `python/tests/test_graph_projection_manifest.py`: separate candidate-vs-graph ordinal
+  checksums, dense explicit ordinal mapping, isolated-vertex retention, and Python readback
+  validation against the TypeScript GraphOrdinalMapV1 checksum encoding. No current-source
+  artifact was rebuilt or promoted; see `parent-atlas-graph-runtime-python-consolidation`
+  GPU-EXP-14 for the owning proof and legacy-manifest correction.
 - [ ] **GPU-EXP-15** Prove bounded multi-hop traversal on the frozen graph;
   default depth <=2, expansion <=3, hard maximum <=4, with predecessors/paths.
+  Runtime policy and path-receipt implementation are covered by
+  `python/tests/test_atlas_rapids_graph_runtime.py` and
+  `python/tests/test_graph_projection_manifest.py`; receipt checksum binds graph revision,
+  projection revision, and explicit graph-ordinal-map checksum, and rejects missing bindings.
+  Focused suite passed 20 tests on 2026-09-23. Live frozen-graph execution remains open:
+  8098 reports no resident graph, and the existing artifact is rejected for ambiguous ordinal
+  checksum. No graph was loaded into the live GPU process.
 - [ ] **GPU-EXP-16** Run NetworkX CPU graph parity first, then cuGraph parity;
-  internal renumbering must not escape the projection adapter.
+  internal renumbering must not escape the projection adapter. A bounded fixture compares the
+  adapter's deliberately permuted executor ordinals against NetworkX paths and deterministic
+  receipt replay; its fake cuGraph frame does not prove actual cuGraph parity. Full frozen-artifact
+  NetworkX/cuGraph replay remains open.
 - [ ] **GPU-EXP-17** Define `TopologyCoordinate4V1` only as derived metadata,
   bound to graph/projection/ordinal revisions; it cannot mint identity or votes.
 - [ ] **GPU-EXP-18** Evaluate 4D manifold/SOM expansions against held-out graph

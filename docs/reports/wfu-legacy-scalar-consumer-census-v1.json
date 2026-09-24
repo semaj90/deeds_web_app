@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.wfu-legacy-scalar-consumer-census.v1",
+  "generatedAt": "2026-09-23T19:57:54Z",
+  "gate": "WFU_LEGACY_SCALAR_RETIREMENT_CENSUS",
+  "result": "LEGACY_SCALARS_STILL_CONSUMED_KEEP_OPEN",
+  "scope": "Read-only source census; no runtime behavior changes and no store writes.",
+  "fields": {
+    "remainingRequiredGates": {
+      "adapterProducer": "scripts/atlas/adapt-openspec-controller-to-ranker-v3.mjs",
+      "legacyDefault": 999,
+      "consumer": "Same adapter deterministic task sorter",
+      "consumerBehavior": "Ascending gate count participates in stable task ordering."
+    },
+    "estimatedMinutes": {
+      "adapterProducer": "scripts/atlas/adapt-openspec-controller-to-ranker-v3.mjs",
+      "legacyDefault": 15,
+      "consumer": "Same adapter deterministic task sorter",
+      "consumerBehavior": "Ascending estimate participates in stable task ordering."
+    },
+    "lowRankScore": {
+      "adapterProducer": "scripts/atlas/adapt-openspec-controller-to-ranker-v3.mjs",
+      "legacyDefault": 0.5,
+      "consumer": "scripts/atlas/build-openspec-challenger-tournament-v1.mjs::scoreOf",
+      "consumerBehavior": "Fallback score field is recognized when reading challenger rows."
+    },
+    "pythonLowRankChallenger": {
+      "path": "python/build_low_rank_task_recommendation_v2.py",
+      "classification": "COMPATIBILITY_GUARD_NOT_LEGACY_SCALAR_CONSUMER",
+      "evidence": "The producer documentation says it consumes featureVector.features, excludes placeholder lowRankScore and advisory selection from features, and marks deterministic goalRank leakage. Its feature list includes qualified estimatedMinutes/remainingRequiredGates only through WorkboardFeatureVectorV1 cells."
+    },
+    "rankerV2": {
+      "path": "scripts/atlas/adapt-openspec-controller-to-ranker-v2.mjs",
+      "classification": "LEGACY_PRODUCER",
+      "evidence": "Retains defaults for remainingRequiredGates=999, estimatedMinutes=15, and lowRankScore=0.5."
+    }
+  },
+  "retirementDecision": {
+    "safeToRemove": false,
+    "reason": "Defaults still influence deterministic ordering and the tournament parser still accepts lowRankScore. Remove only after consumers migrate to qualified feature cells and replay proves ordering/selection compatibility.",
+    "taskCheckboxClosed": false
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "persistentWrites": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

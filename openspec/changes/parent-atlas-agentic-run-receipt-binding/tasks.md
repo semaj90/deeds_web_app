@@ -79,8 +79,9 @@ reads/writes `WorkflowActionEventV1` events, not a separate receipt type.
       appends/creates a `## Run Receipts` section in `openspec/changes/<openspecChange>/tasks.md`
       (human-readable bullet), and appends the raw event JSON to
       `openspec/changes/<openspecChange>/receipts.jsonl` (machine-readable ledger — one
-      `WorkflowActionEventV1` per line, not a separate receipt shape). Idempotent on
-      `(workflowId, actionId, sequence)` — the event's own identity triple, not a new key.
+      `WorkflowActionEventV1` per line, not a separate receipt shape). Idempotent on the canonical
+      receipt coordinate `(workflowId, workflowRevision, actionId, sequence)`; conflicting payload
+      under the same coordinate fails closed.
 - [x] Dry-run mode (`--dry-run`) prints the planned diff without writing — this repo's convention
       for any script that mutates files under `openspec/`.
 - [x] Smoke-tested against an isolated non-production OpenSpec change directory — confirmed the

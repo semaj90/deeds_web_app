@@ -117,3 +117,39 @@ def test_postgres_adapter_rejects_unbounded_traversal_inputs():
         oak.OakTraversalRequest(entity_id="concept:x", direction="ancestors", max_depth=5)
     with pytest.raises(ValidationError):
         oak.OakSearchRequest(query="contract", limit=101)
+
+
+def test_oaklib_traversal_route_reuses_obograph_interface_for_both_directions(monkeypatch):
+    calls = []
+
+    class FixtureOboGraphInterface:
+        def ancestors(self, entity_id, **kwargs):
+            calls.append(("ancestors", entity_id, kwargs))
+            return ["PARENT:1"]
+
+        def descendants(self, entity_id, **kwargs):
+            calls.append(("descendants", entity_id, kwargs))
+            return ["CHILD:1"]
+
+        def label(self, entity_id):
+            return f"label:{entity_id}"
+
+    adapter = FixtureOboGraphInterface()
+    monkeypatch.setattr(oak, "OboGraphInterface", FixtureOboGraphInterface)
+    monkeypatch.setattr(oak, "_adapter", lambda: adapter)
+
+    ancestors = oak.oak_traverse(oak.OakTraversalRequest(
+        entity_id="TERM:0", direction="ancestors", predicates=["is_a"], limit=5, max_depth=2,
+    ))
+    descendants = oak.oak_traverse(oak.OakTraversalRequest(
+        entity_id="TERM:0", direction="descendants", predicates=["part_of"], limit=5, max_depth=2,
+    ))
+
+    assert [node["entityId"] for node in ancestors["nodes"]] == ["PARENT:1"]
+    assert [node["entityId"] for node in descendants["nodes"]] == ["CHILD:1"]
+    assert calls == [
+        ("ancestors", "TERM:0", {"predicates": ["is_a"]}),
+        ("descendants", "TERM:0", {"predicates": ["part_of"]}),
+    ]
+    assert ancestors["canonicalAuthority"] is False
+    assert descendants["canonicalAuthority"] is False

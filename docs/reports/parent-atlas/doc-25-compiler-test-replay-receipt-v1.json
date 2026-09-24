@@ -1,23 +1,85 @@
 {
   "schema": "atlas.doc-25-compiler-test-replay-receipt.v1",
   "gate": "DOC-25",
-  "status": "DOC_25_VALIDATION_RECEIPT_FIXTURE_PROVEN",
+  "status": "DOC_25_LIVE_ISOLATED_PATCH_COMPILER_TEST_REPLAY_PROVEN",
+  "proofMode": "SYNTHETIC_FIXTURE_ONLY",
+  "repositoryRevision": "032757da2859e2d5e8a5e22a6964a9fecd3bf272",
+  "worktreeDirty": true,
   "proposalRef": "docs/reports/parent-atlas/doc-24-patch-proposal-fixture-v1.json",
+  "proposalReceiptChecksum": "sha256:86d6aa4821a871761ee42912b9950257b9768c9cd00c27a33fbef768262f6799",
+  "sourceRef": "src/example.ts",
+  "baseSourceRevision": "sha256:3adaa8790114d5ab0c840315146872d8d8956ff3b244ffddb1136d44b3f509bb",
+  "patchedSourceChecksum": "sha256:caee8c4cb55d167e7305c0b1e130fb8de22b3847831d10e6337403a4066d7a99",
+  "isolatedWorkspace": {
+    "created": true,
+    "cleanedAfterRun": true,
+    "persistentSourceModified": false
+  },
   "validationChecks": [
     {
-      "name": "patch-proposal-script-syntax",
+      "name": "proposal-and-base-revision-admission",
       "status": "PASS",
       "exitCode": 0
     },
     {
-      "name": "versioned-doc-openspec-validation",
+      "name": "proposal-patch-digest",
       "status": "PASS",
       "exitCode": 0
+    },
+    {
+      "name": "typescript-compile-and-typecheck",
+      "argv": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\node_modules\\typescript\\bin\\tsc",
+        "--strict",
+        "--noEmitOnError",
+        "--target",
+        "ES2022",
+        "--module",
+        "commonjs",
+        "--outDir",
+        "dist",
+        "src/example.ts"
+      ],
+      "status": "PASS",
+      "exitCode": 0,
+      "stdoutChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compiled-output-behavior-test",
+      "argv": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--test",
+        "test/example.test.cjs"
+      ],
+      "status": "PASS",
+      "exitCode": 0,
+      "stdoutChecksum": "sha256:0a422bfce517280f08c10ecbdc44119cc7e83aa790494ad65f27055f212c69b4",
+      "stderrChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "versioned-doc-openspec-validation",
+      "argv": [
+        "C:\\WINDOWS\\system32\\cmd.exe",
+        "/d",
+        "/s",
+        "/c",
+        "npx openspec validate parent-atlas-versioned-doc-intelligence --type change --strict --json --no-interactive"
+      ],
+      "status": "PASS",
+      "exitCode": 0,
+      "stdoutChecksum": "sha256:bfc845cdef8cfda6af31a77700c8dd41319a450e21b253299377447127bded34",
+      "stderrChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
-  "validationChecksum": "sha256:15a8cfc60bac8552cac4e00ec0f3751e36d279414ca43b5a40bc78366fe92b92",
+  "validationChecksum": "sha256:cfb79661e79f42213c342412cd91776b563d528b27b53db362aae72c3ff373e3",
   "patchApplied": false,
+  "isolatedFixturePatchApplied": true,
   "mutationAuthorized": false,
+  "canonicalAuthority": false,
   "writesPerformed": false,
-  "nextGate": "DOC_25_LIVE_ISOLATED_PATCH_REPLAY"
+  "ephemeralWritesPerformed": true,
+  "persistentWritesPerformed": false,
+  "nextGate": "DOC_23_LIVE_AST_GREP_EXECUTION_AND_DIFF_VALIDATION"
 }

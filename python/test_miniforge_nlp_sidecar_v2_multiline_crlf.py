@@ -66,3 +66,43 @@ def test_native_ast_evidence_remaps_multiline_lf_relative_span_once(monkeypatch)
     remap_diagnostics = [item for item in response.diagnostics if 'LF_' in item and 'REMAP' in item]
     assert len(remap_diagnostics) == 1
     assert not any(item.startswith('ChunkingError:') for item in response.diagnostics)
+
+
+def test_native_ast_evidence_tags_recovered_tree_sitter_errors(monkeypatch):
+    source = 'function ok() {}'
+    raw = SimpleNamespace(
+        content=source,
+        byte_start=0,
+        byte_end=len(source.encode('utf-8')),
+        start_line=1,
+        end_line=1,
+        node_type='function_declaration',
+        symbol='ok',
+        name='ok',
+        node_id='node:ok',
+        file_id='file:example',
+        symbol_id='symbol:ok',
+        chunk_id='chunk:ok',
+        parent_route=['module'],
+        parent_context='module',
+        metadata={},
+    )
+    monkeypatch.setattr(sidecar_v2.legacy, 'TREESITTER_CHUNKER_AVAILABLE', True)
+    monkeypatch.setattr(sidecar_v2, '_raw_chunk_file', lambda *_args: ([raw], True))
+    monkeypatch.setattr(
+        sidecar_v2.legacy,
+        '_syntax_diagnostics',
+        lambda *_args: ['Tree-sitter ERROR at line 1, column 8: ERROR'],
+    )
+
+    req = sidecar_v2.legacy.AstChunkRequest(
+        source=source,
+        language='typescript',
+        filePath='src/example.ts',
+        sourceRevision='sha256:test',
+    )
+    response = sidecar_v2._native_ast_evidence(req)
+
+    assert response.chunks
+    assert response.error_tag == 'ChunkingError'
+    assert response.syntax_status == 'RECOVERED_WITH_ERRORS'

@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.topology-oaklib-owner.v1",
+  "generatedAt": "2026-09-23T18:51:30Z",
+  "status": "OAK_TRAVERSAL_OWNER_REUSED_NETWORKX_ADAPTER_NOT_PRESENT",
+  "owner": {
+    "path": "python/atlas_oak_kernel.py",
+    "postgresAdapter": "AtlasPostgresOntologyAdapter.traverse",
+    "oaklibAdapterContract": "OboGraphInterface.ancestors / descendants",
+    "route": "oak_traverse",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "runtimeProbe": {
+    "oaklibVersion": "0.7.4",
+    "networkxVersion": "3.3",
+    "networkxAdapterImplementation": false,
+    "networkxBridgeUtility": "oaklib.utilities.graph.networkx_bridge (conversion/transformation helper; not a registered adapter)"
+  },
+  "validation": {
+    "focusedTest": "python -m pytest python/test_atlas_oak_kernel.py -q",
+    "passed": 9,
+    "failed": 0,
+    "newSpyProof": "Both ancestor and descendant route directions call the OboGraphInterface methods with their requested predicates."
+  },
+  "result": "Keep OAK/Postgres traversal behind atlas_oak_kernel.py; do not add a NetworkX adapter or duplicate traversal owner.",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

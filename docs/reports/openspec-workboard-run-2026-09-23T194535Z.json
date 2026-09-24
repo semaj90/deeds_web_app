@@ -1,0 +1,105 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T20:04:43Z",
+  "runKind": "CHANGE_PIVOT_AND_ACTIONABLE_TASK_SELECTION",
+  "previousChange": {
+    "change": "inference-wiring-deep-audit-aug22",
+    "openSpecProgress": "55/55 complete",
+    "evidence": {
+      "focusedFacadeTests": "17/17 passed in this run",
+      "strictValidation": "passed in this run",
+      "liveReplayReceipt": "docs/reports/inference-facade-read-only-live-replay-v1.json",
+      "scopeBoundary": "bounded read-only replay is proven; ordinary full-facade synthesis and its durable persistence path are not claimed"
+    }
+  },
+  "pivot": {
+    "toChange": "parent-atlas-workboard-feature-utility-fabric",
+    "reason": "inference OpenSpec reports all tasks complete; continue with an independent, locally auditable workboard task rather than reopening the bounded replay gate",
+    "containerRebuilds": "deferred until the end of the broader workboard objective"
+  },
+  "workboard": {
+    "selectedChangeProgress": {
+      "change": "parent-atlas-workboard-feature-utility-fabric",
+      "complete": 27,
+      "total": 69,
+      "open": 42,
+      "deltaThisRun": 3,
+      "source": "openspec instructions apply --change output after TOPO-01, TOPO-02, and native progress closure"
+    },
+    "candidateTournament": [
+      {
+        "task": "TOPO-01",
+        "class": "READ_ONLY_PROOF",
+        "state": "SELECTED",
+        "reason": "ownership census can be performed against existing code and registry; no canonical/store writes are necessary"
+      },
+      {
+        "task": "WFU language-owner adapter wiring",
+        "class": "IMPLEMENTABLE_AFTER_PLANNING",
+        "state": "DEFERRED",
+        "reason": "the change has no design.md and OpenSpec directs design instructions before creating that artifact; owner vocabulary contracts also need source tracing"
+      },
+      {
+        "task": "WFU-04b exact ast-grep observation resolution",
+        "class": "BLOCKED_UPSTREAM",
+        "state": "DEFERRED",
+        "reason": "task evidence says current ast-grep observations and admitted AST snapshot cover disjoint files"
+      },
+      {
+        "task": "NS-9 metadata adoption",
+        "class": "BLOCKED_OPERATOR",
+        "state": "DEFERRED",
+        "reason": "broad task-ledger edits/adoption remain a separate operator-owned decision"
+      }
+    ],
+    "selectedTask": "TOPO-01",
+      "completedTasks": ["TOPO-01", "TOPO-02"],
+    "proof": "docs/reports/wfu-topology-ownership-v1.json",
+    "followOnQuickHit": {
+      "task": "WFU-12 native progress semantics",
+      "result": "NATIVE_PROGRESS_LABEL_AND_BOUNDS_PROVEN",
+      "proof": "docs/reports/wfu-studio-progress-native-v1.json",
+      "completed": true
+    },
+    "followOnConsumerCensus": {
+      "task": "Retire adapter legacy scalar fields",
+      "result": "LEGACY_SCALARS_STILL_CONSUMED_KEEP_OPEN",
+      "proof": "docs/reports/wfu-legacy-scalar-consumer-census-v1.json",
+      "completed": false,
+      "reason": "The v3 adapter still sorts by defaulted remainingRequiredGates and estimatedMinutes; the tournament reader still recognizes lowRankScore. Removing these now could change deterministic order or compatibility behavior."
+    },
+    "followOnTournamentSmoke": {
+      "task": "TOURNAMENT-02 / TOURNAMENT-03",
+      "result": "DETERMINISTIC_AND_NONAUTHORITATIVE_REPLAY_PROVEN",
+      "proof": "python/test_atlas_compute.py::AtlasComputeReferenceTests.test_task_recommendation_is_deterministic_and_non_authoritative",
+      "validation": "1 passed, 14 deselected",
+      "completed": true,
+      "checkboxDelta": 0,
+      "note": "The combined task checkbox was already checked but only labeled partially covered; the evidence note now reflects the exact test assertion coverage."
+    },
+    "languageRegistryDesign": {
+      "artifact": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/design.md",
+      "result": "OWNER_BOUNDARY_AND_READ_ONLY_INTEGRATION_DESIGNED",
+      "taskCheckboxClosed": false,
+      "reason": "WFU-02 still needs owner-native vocabulary exports, revision provenance, and a consumer; this design does not claim those are implemented or wired."
+    },
+    "validation": {
+      "runtimeOwnershipAudit": "PASS; 0 violations",
+      "focusedTests": { "node": "19/19", "vitest": "9/9", "python": "5/5" },
+      "svelteCompile": "PASS; zero warnings",
+      "openspecStrict": "PASS",
+      "diffCheck": "PASS",
+      "jsonParse": "PASS"
+    },
+    "followOnValidation": {
+      "openspecStrict": "PASS: parent-atlas-workboard-feature-utility-fabric",
+      "changedPathDiffCheck": "PASS",
+      "repositoryWideDiffCheck": "BLOCKED_BY_UNRELATED_GENERATED_CMAKE_LOG_TRAILING_WHITESPACE: simd-bridge/cpp/build-x64-cuda/CMakeConfigureLog.yaml; left untouched",
+      "jsonParse": "PASS: all four tranche receipts"
+    },
+    "canonicalWrites": false,
+    "databaseWrites": false,
+    "projectionWrites": false,
+    "containerRebuilds": false
+  }
+}

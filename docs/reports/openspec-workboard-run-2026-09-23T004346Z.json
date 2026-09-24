@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T00:43:46Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "PROTO_02_LIVE_HTTP_GRPC_PROBE",
+    "to": "TURBOVEC_NAPI_ADAPTER_EXPORT_COMPATIBILITY_AUDIT",
+    "reason": "Both HTTP and gRPC passed read-only health probes, but N-API's active adapter points to a missing module path and requests a method absent from the verified crate exports. This concrete incompatibility is the highest-value local PROTO-02 finding to record before any owner selection."
+  },
+  "evidence": {
+    "httpHealth": "PASS; 327820 indexed, dim=64, bits=4",
+    "grpcHealth": "PASS; 327820 indexed, dim=64, bits=4",
+    "napiExportAudit": "Rust crate exports verified 5/5; no searchAnn export",
+    "napiAdapter": "Loads nonexistent sveltekit-frontend/src/lib/gpu/turbovec-napi/index.js and expects searchAnn",
+    "adapterBehavior": "Fails closed when nativeModule is unavailable",
+    "nativeCodeChanged": false
+  },
+  "validation": {
+    "napiExportAudit": "PASS_5_OF_5_CRATE_EXPORTS",
+    "openSpecStrict": "PASS",
+    "jsonParse": "PASS",
+    "diffCheck": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 29,
+    "open": 62,
+    "total": 91,
+    "delta": "no task closed; PROTO-02 blocker evidence refined"
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "runtimeRemoval": false
+  },
+  "nextGate": "TURBOVEC_SEARCH_BACKEND_SINGLE_OWNER_AND_NATIVE_API_CONTRACT"
+}

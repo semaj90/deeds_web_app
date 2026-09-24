@@ -143,5 +143,12 @@ test('ACE packet artifact event aggregates relationship evidence and lineage', (
   assert.equal(event.kind, 'artifact');
   assert.deepEqual(event.evidenceRefs.sort(), ['evidence:e1', 'evidence:e2']);
   assert.ok(event.resourceRefs.some((row) => row.resource_id === 'relationship:r1'));
+  assert.deepEqual(event.metadata.hyperedge_evidence[0].participants, [
+    { entity_type: 'symbol', entity_id: 'symbol:s1', role: 'caller' },
+  ]);
+  assert.equal(event.metadata.hyperedge_evidence[0].relationship_revision, 'rel-r1');
+  assert.equal(event.runId, identity.runId);
+  assert.deepEqual(event.artifactRefs, ['packet:p1']);
+  assert.ok(!event.artifactRefs.includes(event.runId));
   assert.equal(event.metadata.semantic_projection_revision, 'semantic-proj-r1');
 });

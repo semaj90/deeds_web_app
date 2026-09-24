@@ -66,45 +66,19 @@
   `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts`,
   `sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts`, and
   `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.spec.ts`.
-- [ ] **A2A-04** `A2A_PEER_WRITE_EXPOSURE_UNGUARDED` — direct-invocation authorization audit run
-  2026-09-23 (read-only, non-mutating). **Found a real blocker, not proof of safety — stays open.**
-  Traced the actual external A2A entrypoint: `.well-known/agent.json` advertises only
-  `POST /api/ai/agent` (whose LLM tool-calling loop is correctly scoped to a separate, read-only
-  `GEMMA4_ALLOWED_TOOLS` allowlist — DB mutation is explicitly "reserved for future", not exposed).
-  But a SEPARATE, unadvertised, admin-console-internal route, `POST /api/acp/execute`, accepts any
-  ACP tool name and dispatches it (`getACPToolSchema` → `executeACPTool` → `TOOLS[name].handler()`)
-  with **only `if (!locals.user)` session-presence auth — no role/permission check, no call into
-  the existing `tool-authorization.ts` capability owner that its sibling routes (`/api/acp/rpc`,
-  `/api/agent/execute`) correctly use.** Confirmed live via a focused test suite
-  (`authorization-boundary.spec.ts`, 7/7 pass, no real mutation — every mutating-tool case uses
-  `dryRun:true`, which the traced handler (`atlas.kanban.claim`) returns from *before* touching
-  Postgres): a non-admin (`role: 'viewer'`) authenticated caller successfully dispatches
-  `atlas.kanban.claim` — a real `CANONICAL_WRITE` tool never advertised by A2A-03's discovery
-  descriptor or the AgentCard's skills list, with a **spy-backed `handlerInvocationCount === 1`**
-  assertion (`vi.spyOn(TOOLS['atlas.kanban.claim'], 'handler')`) — a direct call-count proof, not
-  just a response-shape inference; a correctly-authorized system would show `0`. A positive read
-  control (`openspec:workboard_recommend`, `canonicalAuthority:false`) resolves normally through
-  the same dispatcher, proving the gap is a missing authorization gate, not a broken dispatcher.
-  Unknown tool names ARE correctly rejected (404) before dispatch. **Mirror-sync specific check**
-  (the exact `mirror:sync_qdrant`/`mirror:sync_neo4j` ids A2A-03 tagged `mirror`): these are SAFE —
-  they exist only as descriptor metadata in `acp-grpc-quic-bridge.ts`, never registered in
-  `ACPToolRegistry.TOOLS`, so they 404 before dispatch exactly like an unknown method (their nearest
-  related function, `executeTraversalRpc`, is an explicit stub). The real, live blocker is
-  `atlas.kanban.claim`/`block`/`complete`/`create_child` — genuine `CANONICAL_WRITE` tools, not
-  tagged `mirror`, but reachable through the identical unguarded dispatch path; any future
-  `mirror:*` tool registered in the same `TOOLS` object would inherit the same gap. Peer-supplied
-  `taskId` resolves against an existing row (does not mint fake authority); `workerId` is a
-  narrower, non-blocking impersonation risk, not canonical-identity forgery. Separate caveat, not a
-  mitigation: the AgentCard claims Bearer-token auth, but
-  `hooks.server.ts` implements none — so today's actual exposure is to any authenticated same-app
-  user, not yet arbitrary external peers; if Bearer auth is ever implemented to match the AgentCard,
-  this gap becomes externally peer-reachable immediately. **Fix path identified, not implemented
-  this pass** (explicitly out of this read-only audit's scope): wire `/api/acp/execute` through the
-  existing `tool-authorization.ts` owner (`checkToolAccess`/`toolAuthorizationGuard` against
-  `atlasToolRegistry`) the same way `/api/agent/execute` already does — reuse the existing owner,
-  do not build a second capability registry. Evidence:
-  `docs/reports/a2a-direct-invocation-authorization-v1.json`,
-  `sveltekit-frontend/src/routes/api/acp/execute/authorization-boundary.spec.ts`.
+- [x] **A2A-04 — `A2A_INVOCATION_AUTHORIZATION_PROVEN` (2026-09-23).** Preserved the before-fix
+  `A2A_PEER_WRITE_EXPOSURE_UNGUARDED` finding and added post-fix proof in
+  `docs/reports/a2a-direct-invocation-authorization-v1.json`. `POST /api/acp/execute` now resolves
+  the registered tool, obtains the grant through the existing `toolAuthorizationGuard()` owner,
+  checks its required permission, and dispatches only on ALLOW; absent permission-map entries
+  fail closed to `code:write`. Spy-backed suite passes 9/9: viewer `atlas.kanban.claim` and
+  `atlas.kanban.block` each return 403 with handler count 0; viewer read control reaches its handler
+  exactly once; admin `claim` dry-run reaches exactly once; unknown tools return 404 with all
+  registered handler spies at zero; mirror sync IDs remain unregistered/404. The permission-cache
+  adapter is mocked in this suite, and write handlers are denied or run in dry-run, so proof causes
+  no durable writes. A2A-05 Bearer/session authentication parity and workerId impersonation remain
+  separate open follow-ups. No packet identity, source authority, Graphify, container, or data-store
+  migration work is included in this gate.
 - [x] **MEM-01** Freeze the three-memory taxonomy: ephemeral llama KV prompt cache, disposable BitFrost/Valkey residency, and PostgreSQL durable canonical memory. Qdrant/Neo4j are rebuildable projections, not memory authorities; CLAUDE.md's historical linear hierarchy has been explicitly superseded. Documentation contract only; no runtime-state claim.
 - [x] **MEM-02** Keep `ContextManifest` as the reproducible model-context boundary; KV cache reuse is an optimization and never durable truth. `ContextManifestV2` preserves the existing V1 payload and deterministically checksums context/revision inputs (`context-manifest-v2.ts` and its focused spec); llama prompt reuse is marked `ephemeral` in `context-prompt-streamer.ts`. Contract-level proof only; live llama-server KV persistence behavior is not claimed.
 - [x] **MEM-03** Prove revision-qualified BitFrost keys and fail-open behavior across workspace, policy, graph, and representation revisions. `buildAceBitfrostCacheKeyV1` identity test now asserts a distinct key for each of those four revision changes; the existing cache-aside suite proves reconstruction after Valkey read failure and returning reconstructed canonical data when the cache write fails. Focused suites pass 27/27. Contract/fixture proof only; no live Valkey readback or cache write is claimed. Evidence: `sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.test.ts`, `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts`.
@@ -119,14 +93,14 @@
 - [ ] **CC-02** Benchmark contextual structural metadata against the current treesitter-chunker evidence on a fixed corpus; record symbol localization and repair-localization Recall@10/MRR without changing identity.
 - [x] **CC-03** Classify code-chunk as `EXPERIMENTAL_CONTEXT_ENRICHER` or `REPLACEMENT_CANDIDATE`; it must not become a second canonical Graphify/GIS/SearchRuntime owner. Decision: `EXPERIMENTAL_CONTEXT_ENRICHER` only; no local dependency or runtime integration was found, and its output remains downstream of existing GIS identity. Replacement/promotion is not proposed; usefulness awaits the fixed-corpus CC-02 benchmark, while `CC-01` schema reconciliation remains open. Evidence: STRUCT-06 upstream reference review and scoped source search (no package/import/caller).
 - [ ] **CC-04** Feed code-chunk-style context into the existing SemanticCard compiler only after GIS identity assignment; contextualized text is representation input, never identity.
-- [ ] **CC-05** Prove batch failure isolation and bounded concurrency: one file may return `ChunkingError` while other files complete and the Graphify receipt counts each result.
+- [x] **CC-05 PROVEN (2026-09-23, local deterministic fixture).** Extended `graphify-structural-batch-v1.spec.ts` to run four entries through the existing batch owner: two `PROVEN` neighbors, one `RECOVERED_WITH_ERRORS` carrying `ChunkingError`, and one thrown `ChunkingError` mapped to `FAILED`. The fixture asserts peak concurrent materializations = 1, `totalInputs=4`, `processedFiles=4`, `provenFiles=2`, `recoveredFiles=1`, `failedFiles=1`, and `isolatedFailurePass=true`, with output checksums. Focused Vitest passes 3/3. The sidecar v2 typed-envelope regression separately passes 1/1 in the current source tree. No persistent writes or container rebuild; deployed-image `error_tag` parity remains a separate open runtime gate under STRUCT-04.
 - [ ] **HG-01** Map process/repair/execution n-ary events to the existing hypergraph owner using event provenance, not duplicate binary graph truth.
 - [ ] **HG-02** Keep hypergraph expansion after canonical retrieval as additional evidence; SearchRuntime remains the only candidate fusion owner.
-- [ ] **HG-03** Preserve hyperedge participants, task/run IDs, revisions, selected packets, tests, and receipts without promoting event IDs to packet identity.
+- [x] **HG-03 PROVEN (2026-09-23, fixture contract).** `acePacketToWorkflowArtifact()` now carries the schema-validated `relationship_evidence` records—including participant tuples and relationship revisions—inside workflow metadata, while workflow/run IDs remain event identity and `artifactRefs` continues to use the packet's own `packet_key`. The focused workflow-adapter test asserts participant/revision preservation and explicitly checks `runId` is not a packet artifact ID. Retrieval receipt adaptation separately retains `receiptId`, run/task identity, revisions, and selected candidate IDs as metadata/evidence rather than canonical packet resources. No durable writes or identity promotion.
 - [ ] **MEM-04** Define a CAST-like `TaskScene` episodic record around request/task/workspace revision, actors, evidence, actions, outcome, `ContextManifest`, `RLMTrace`, and `ExecutionReceipt`; reserve CAST-like for episodic memory.
 - [ ] **MEM-05** Model temporal semantic relationships as provenance-owned `UPDATES`, `EXTENDS`, and `DERIVES` observations while preserving superseded history.
 - [ ] **MEM-06** Keep semantic, episodic, and procedural memory separate: Atlas packets/graph, TaskScene/RLMTrace/receipts, and ACE playbooks/policy revisions; BitFrost/Valkey remains cache only.
-- [ ] **SIMD-05** Benchmark simdjson only on metadata JSON/JSONL paths such as receipts, snapshots, and traces; retain Zod/Pydantic/TypeScript schemas as semantic authorities.
+- [x] **SIMD-05 — metadata parser benchmark complete (2026-09-23, no promotion).** Extended the existing `scripts/bench/json-parse-bench.mjs` with a metadata-only mode restricted to `docs/reports` JSON/JSONL/NDJSON, checksum-bearing inputs, required native-vs-`JSON.parse` deep parity, and an explicit output path. Receipt `docs/reports/parent-atlas-simdjson-metadata-benchmark-v1.json`: the 331-row semantic-contract NDJSON has 331/331 direct native parity; all rows are below the existing 1 KiB fast-path threshold, so actual fast-path native calls are 0 and measured median ratio is 1.00×. The 27,496-byte A2A audit receipt also passes parity but the current native-wrapper path is slower in the 200-iteration bounded run (median 0.45× vs `JSON.parse`). No evidence supports expanding simdjson use; Zod/Pydantic/TypeScript semantic validators remain unchanged and authoritative. This is a benchmark result only, not parser promotion or production-path integration.
 - [ ] **TV-01** Restrict TurboVec to the canonical `semantic_768` representation and its own exact oracle.
 - [ ] **TV-02** Map TurboVec stable external IDs/ordinals back to canonical Atlas identity; never promote TurboVec local IDs to packet identity.
 - [ ] **TV-03** Prove TurboVec filtering parity with the canonical `SearchFilter` contract.
@@ -135,7 +109,7 @@
 - [ ] **TV-06A** Prove `TURBOVEC_EXECUTION_OWNER_PROVEN`: select one live transport and classify HTTP, gRPC, Rust N-API, and spawned CLI paths as primary, compatibility, deprecated, or rollback before building a TurboVec index.
 - [ ] **GRAPH-01** Prove bounded graph expansion: seed cap, explicit max depth, per-seed neighbor limit, visited canonical packet dedupe, final candidate cap, and fail-open behavior. Graph expansion supplies evidence only; it must not become a standalone ranking or fusion owner.
 - [ ] **GRAPH-02** Prove vector-seed expansion: semantic top-K canonical symbols → depth-limited typed edges → canonical-ID dedupe; PageRank remains a feature and hypergraph events remain additional evidence.
-- [ ] **GDS-01** Classify the Python `graphdatascience` client as a graph-algorithm executor only; Neo4j remains the structural graph projection and Postgres remains canonical truth.
+- [x] **GDS-01 PROVEN (2026-09-23, owner classification only).** No Python `graphdatascience` client is present in the checked production Python sources or pinned graph requirements. The active Neo4j GDS path is owned by the existing TypeScript `graph-analysis-runner`; optional cuGraph is a separate executor behind that owner. Neo4j remains a derived graph projection and PostgreSQL remains canonical identity/durable truth. Focused dispatch/adapter tests pass 4/4. This is static owner classification plus mocked unit proof only; no live runtime or cross-executor parity is claimed (GDS-04 remains open). Receipt: `docs/reports/gds-python-client-ownership-v1.json`.
 - [ ] **GDS-02** Run revision-qualified PageRank/community algorithms from the canonical Neo4j projection and emit derived feature records keyed by `symbol_version_id`/`workspace_revision`.
 - [ ] **GDS-03** Prove derived graph features enter `FeatureMatrixRow`/`RetrievalFeatureRow` without becoming a second ranker, embedding component, or RRF lane.
 - [ ] **GDS-04** Keep CPU Neo4j GDS and optional cuGraph comparisons on the same graph snapshot; record parity and runtime without promoting either implementation to identity ownership.

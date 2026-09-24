@@ -17,6 +17,7 @@ class FakeRedis {
   strings = new Map<string, string>();
   zsets = new Map<string, Map<string, number>>();
   failGet = false;
+  failSet = false;
 
   async get(key: string): Promise<string | null> {
     if (this.failGet) throw new Error('FAKE_REDIS_GET_FAILURE');
@@ -24,6 +25,7 @@ class FakeRedis {
   }
 
   async set(key: string, value: string, _ex: 'EX', _ttl: number): Promise<'OK'> {
+    if (this.failSet) throw new Error('FAKE_REDIS_SET_FAILURE');
     this.strings.set(key, value);
     return 'OK';
   }
@@ -254,6 +256,22 @@ describe('getOrWarmCacheAsideV1', () => {
       60,
     );
     expect(result.source).toBe('reconstructed');
+  });
+
+  it('returns canonical reconstruction when cache warming fails', async () => {
+    const redis = new FakeRedis();
+    redis.failSet = true;
+    const result = await getOrWarmCacheAsideV1(
+      redis as unknown as Redis,
+      'k',
+      async () => ({ v: 'fresh' }),
+      (v) => JSON.stringify(v),
+      (raw) => JSON.parse(raw),
+      60,
+    );
+    expect(result.source).toBe('reconstructed');
+    expect(result.value).toEqual({ v: 'fresh' });
+    expect(redis.strings.has('k')).toBe(false);
   });
 });
 
