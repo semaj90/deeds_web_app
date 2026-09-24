@@ -1,0 +1,4152 @@
+{
+  "schema": "atlas.summary-claim-validation-replay.v1",
+  "generatedAt": "2026-09-24T00:07:56.841262+00:00",
+  "gate": "VAL-10",
+  "backend": {
+    "kind": "llama-server (NOT Ollama)",
+    "url": "http://127.0.0.1:8090",
+    "resolvedModel": {
+      "id": "ornith-1.5-9b",
+      "revision": "ornith-1.5-9b:hforf.gguf"
+    },
+    "promptRevision": "summary-claim-judge-prompt:val-07-v1"
+  },
+  "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+  "chunks": 19,
+  "claims": 51,
+  "elapsedSeconds": 129,
+  "telemetry": {
+    "claims": 51,
+    "byDecision": {
+      "ADMIT": 50,
+      "REJECT": 1
+    },
+    "byLayer": {
+      "COMPOSITE": 50,
+      "TECHNICAL": 1
+    }
+  },
+  "judgeErrors": 0,
+  "criteria": {
+    "everyClaimResolvedWithLayer": true,
+    "zeroAdmitWithDeterministicFail": true,
+    "judgeErrorsZeroOrRoutedToReview": true,
+    "secondReplayIdentical": true,
+    "eachObjectValidatesWithPythonMirror": true,
+    "eachObjectValidatesWithZod": true
+  },
+  "unresolved": [],
+  "admittedWithDeterministicFail": [],
+  "unstableBetweenPasses": [],
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "persistedSummaries": 0,
+  "objects": [
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:bits-ui:6b3cf8151e01df1d:5",
+      "chunkEvidenceRevision": "sha256:e650aa5c43f5ebb0ec44bca393c856ec67ea8a4e55c6580f1ca42343462844af",
+      "analysisId": null,
+      "summaryInputChecksum": "8249a3b654f8fb17a382ec0a37e042e78d477a45cd646ffdbd442c4e02eb6df9",
+      "summaryOutputChecksum": "0a40e9cbfc214ee33b83a18aa922339af274ae104f9f8891119e87194cde1be2",
+      "claimOrdinal": 0,
+      "claimText": "Components supporting the `child` snippet typically implement logic that destructures `child`, `children`, and other props from `$props()`, creates a trigger via `makeTrigger()`, and merges internal props with user props using `$derived(mergeProps(restProps, trigger.props))`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "bits-ui",
+          "child",
+          "trigger.props"
+        ],
+        "claimTokens": [
+          "$derived(mergeProps(restProps, trigger.props))",
+          "$props()",
+          "child",
+          "children",
+          "makeTrigger()"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "dcb6be287dd500472709dc429f369b04ccba093aee4036d2d323020acef08216",
+      "validationId": "scv:3cab8a80cbc97e7a3fbaec8a5122397ab8417c2cf5eb593b317e8aaa6e3fb99e",
+      "validationChecksum": "804ab05f748c93fbbac5e3d6fcc150639d87371edcedbec613ab2ca380cdac80"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:bits-ui:6b3cf8151e01df1d:5",
+      "chunkEvidenceRevision": "sha256:e650aa5c43f5ebb0ec44bca393c856ec67ea8a4e55c6580f1ca42343462844af",
+      "analysisId": null,
+      "summaryInputChecksum": "8249a3b654f8fb17a382ec0a37e042e78d477a45cd646ffdbd442c4e02eb6df9",
+      "summaryOutputChecksum": "0a40e9cbfc214ee33b83a18aa922339af274ae104f9f8891119e87194cde1be2",
+      "claimOrdinal": 1,
+      "claimText": "When `child` is present, it renders `child` with the merged props; otherwise, it renders a `<button>` with the merged props and the rendered `children`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "bits-ui",
+          "child",
+          "trigger.props"
+        ],
+        "claimTokens": [
+          "<button>",
+          "child",
+          "children"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "trigger.props"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "a5ba61ad73795e1a958da2321d06958b4dfc57571a02bed068e78fc7af5d283c",
+      "validationId": "scv:07bcd2b3517645d910e7a4f2a98489396fef6e78bf811307b6ad52480377066c",
+      "validationChecksum": "ca72ad98dd4550c2301d9b4b7908178c4091e73c88d9668ba9b142f5bf34487e"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "chunkEvidenceRevision": "sha256:0e92134210a648a9abb1aeaf94a050469d74118b30013f3f687046c70581d7ff",
+      "analysisId": null,
+      "summaryInputChecksum": "9c08fc0e24f352bb568a8435ece736b6ae33ebf0eec96504c42bb9ea1db1d570",
+      "summaryOutputChecksum": "76c2f552ec256e8d425a8e4ee574de4672c714630e751758c4c8d2d5637fec86",
+      "claimOrdinal": 0,
+      "claimText": "This chunk introduces the Getting Started section of the Bits UI documentation, which explains how to begin using Bits in your app.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "bits-ui"
+        ],
+        "claimTokens": [],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "a4e6a93fa43ef95ea0036cc3a7abfe3b691303e7ac1fe75d25f4c028520d7de5",
+      "validationId": "scv:bb04e059ba00342eb23e5560ccf8a006d8f003a6f97674e28d3761b97c3b93c5",
+      "validationChecksum": "a862cfebefaf044080dd3e90104aa52370af08ac56a1f947ef4b47a2ca0f75e4"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "chunkEvidenceRevision": "sha256:0e92134210a648a9abb1aeaf94a050469d74118b30013f3f687046c70581d7ff",
+      "analysisId": null,
+      "summaryInputChecksum": "9c08fc0e24f352bb568a8435ece736b6ae33ebf0eec96504c42bb9ea1db1d570",
+      "summaryOutputChecksum": "76c2f552ec256e8d425a8e4ee574de4672c714630e751758c4c8d2d5637fec86",
+      "claimOrdinal": 1,
+      "claimText": "It notes that this section may contain examples, demos, and other useful information related to a specific part of Bits UI.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "bits-ui"
+        ],
+        "claimTokens": [],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "2725216b5d13244670cbd6d61f093aba1a909762434b8554e4a1383343cd971b",
+      "validationId": "scv:1593e1758717764f0ab9cef2d2b74af2fc96326e030c7e778629e0e6271ae51c",
+      "validationChecksum": "2a895c0778902eb407e9a4d5a3cc24dd87d82c066e06f4550629a997240faa1a"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "chunkEvidenceRevision": "sha256:0e92134210a648a9abb1aeaf94a050469d74118b30013f3f687046c70581d7ff",
+      "analysisId": null,
+      "summaryInputChecksum": "9c08fc0e24f352bb568a8435ece736b6ae33ebf0eec96504c42bb9ea1db1d570",
+      "summaryOutputChecksum": "76c2f552ec256e8d425a8e4ee574de4672c714630e751758c4c8d2d5637fec86",
+      "claimOrdinal": 2,
+      "claimText": "When helping users, you can ignore the classnames applied to the demos unless they are relevant to the user's issue.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "bits-ui"
+        ],
+        "claimTokens": [],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "b00a53323f56ad062defb6df265c1b5dad589c72f350f65017d013704d663da9",
+      "validationId": "scv:525a666cbeb79ead06bee91f72d491162a9e3247834a468bfb3f28a56311c350",
+      "validationChecksum": "bfb08c72474f874e2b38d2da1bd7a7dc4edc6dbeff8a442f4d77bb97308e436e"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+      "chunkEvidenceRevision": "sha256:56bd6d24940284584f9e3a948c88991bc753fd9be1d439f58ca4e936a2bfa5f3",
+      "analysisId": null,
+      "summaryInputChecksum": "781292e34d9cdb4878b97b7df63e67e18c13f24618f74429c8ba74a3cbd576c1",
+      "summaryOutputChecksum": "691a77116e82941ddf60256861d071d36ec846c63eeadf992c29d467d1dba7bf",
+      "claimOrdinal": 0,
+      "claimText": "You can override the default outside-interaction behavior of a Dialog by passing the `onInteractOutside` prop to `Dialog.Content`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "Dialog.Content",
+          "bits-ui",
+          "e.preventDefault",
+          "onInteractOutside"
+        ],
+        "claimTokens": [
+          "Dialog.Content",
+          "onInteractOutside",
+          "outside-interaction"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "e.preventDefault"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "6ceeb148093b207fb75638c5488abc4240511548710674054e9af7defb47acfe",
+      "validationId": "scv:cba829ca48c04dbcbbb92226d399d18e785ed3bb22e0c784d45e87223bf45fc2",
+      "validationChecksum": "074d6dfb245e2a2b682d53f6e355ad6530c317fe90c715f232aabca325b84b88"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+      "chunkEvidenceRevision": "sha256:56bd6d24940284584f9e3a948c88991bc753fd9be1d439f58ca4e936a2bfa5f3",
+      "analysisId": null,
+      "summaryInputChecksum": "781292e34d9cdb4878b97b7df63e67e18c13f24618f74429c8ba74a3cbd576c1",
+      "summaryOutputChecksum": "691a77116e82941ddf60256861d071d36ec846c63eeadf992c29d467d1dba7bf",
+      "claimOrdinal": 1,
+      "claimText": "The handler receives an event, so you can call `e.preventDefault()` to stop the default action and run your own logic instead.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "Dialog.Content",
+          "bits-ui",
+          "e.preventDefault",
+          "onInteractOutside"
+        ],
+        "claimTokens": [
+          "e.preventDefault()"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "onInteractOutside"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "3038777a6bf7a0cdfc26129779809feef1155905920a43e66492f4e7b532e9da",
+      "validationId": "scv:f663417ceca4479a3d9470decdae8646de6a817302006dfde47db1c65273653a",
+      "validationChecksum": "4c59b54c6a0fd13fc13bb28c15bc287528fd7a0246142e5e17a185949c5ecbd3"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+      "chunkEvidenceRevision": "sha256:56bd6d24940284584f9e3a948c88991bc753fd9be1d439f58ca4e936a2bfa5f3",
+      "analysisId": null,
+      "summaryInputChecksum": "781292e34d9cdb4878b97b7df63e67e18c13f24618f74429c8ba74a3cbd576c1",
+      "summaryOutputChecksum": "691a77116e82941ddf60256861d071d36ec846c63eeadf992c29d467d1dba7bf",
+      "claimOrdinal": 2,
+      "claimText": "This lets you define custom behavior when users interact outside the Dialog content.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "Dialog.Content",
+          "bits-ui",
+          "e.preventDefault",
+          "onInteractOutside"
+        ],
+        "claimTokens": [],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "e.preventDefault",
+          "onInteractOutside"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "5a84eea0a3db7beaaeef1beb198cd70982e1d16ef189c7b0f29a50bd03485b34",
+      "validationId": "scv:1797090e3468140935b5eaa960412f9d8467bf6870dec36c6d86bcfc46df30be",
+      "validationChecksum": "9626f8fbd4b16dd0fb653b796615af08e7667dac863e326b6e05503e8d26a7a1"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0",
+      "chunkEvidenceRevision": "sha256:fd87694e2e8aeda0463ff46f80d5e48b00194b0982caa4609ad12f8fc17520c4",
+      "analysisId": null,
+      "summaryInputChecksum": "c1dd470b51548c55f0f610818dd08700b692ce32a1cbad1c8c59c50cc264f3ec",
+      "summaryOutputChecksum": "8d6d42008d8a4a4f40e0aa0fe74de9660e337e3dfd96002176ff7ed92820244d",
+      "claimOrdinal": 0,
+      "claimText": "The `drizzle-kit migrate` command applies SQL migrations generated by `drizzle-kit generate` for the code-first approach to managing Drizzle migrations.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "_delicate_professor_xavie",
+          "_premium_mister_fear",
+          "drizzle-kit",
+          "drizzle-kit generate",
+          "drizzle-kit migrate",
+          "migrate",
+          "migration.sql",
+          "sql"
+        ],
+        "claimTokens": [
+          "code-first",
+          "drizzle-kit generate",
+          "drizzle-kit migrate"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "_delicate_professor_xavie",
+          "_premium_mister_fear"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "3",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "6a84d3044be5c1ce2862c60560a1a3a560d2e02368f21a06f1d9ba2831f0fa98",
+      "validationId": "scv:a7701231011a3a5ab2c243f6ec9292ed214afbaa1e2f716b6e4b6aae839a1202",
+      "validationChecksum": "5672f63127e40d02aa671c7716d23eab0dbd4a62f51162b8a77e7f4052e80ca9"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0",
+      "chunkEvidenceRevision": "sha256:fd87694e2e8aeda0463ff46f80d5e48b00194b0982caa4609ad12f8fc17520c4",
+      "analysisId": null,
+      "summaryInputChecksum": "c1dd470b51548c55f0f610818dd08700b692ce32a1cbad1c8c59c50cc264f3ec",
+      "summaryOutputChecksum": "8d6d42008d8a4a4f40e0aa0fe74de9660e337e3dfd96002176ff7ed92820244d",
+      "claimOrdinal": 1,
+      "claimText": "It reads all `.sql` files from the migration folder, connects to the database to fetch entries from the drizzle migrations log table, decides which new migrations to run based on previously applied ones, then runs the SQL migrations and logs them to the drizzle migrations table.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "_delicate_professor_xavie",
+          "_premium_mister_fear",
+          "drizzle-kit",
+          "drizzle-kit generate",
+          "drizzle-kit migrate",
+          "migrate",
+          "migration.sql",
+          "sql"
+        ],
+        "claimTokens": [
+          "sql"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "_delicate_professor_xavie",
+          "_premium_mister_fear"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "3",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "ffd2510313809b3c7d25f4a1b17caf3a0c47270002cbb6e3b46c70c206bed829",
+      "validationId": "scv:99fcee2568353a8a5d7b185a59a9901156f5006215a8bcc54e1a71e67f4816d3",
+      "validationChecksum": "4d5736075b2908354a6fab7c04c52c947ab30eda43d02060cbb50b530a25c6ec"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:4",
+      "chunkEvidenceRevision": "sha256:cecbbcad364671e2ac9a3f7d05a65cd767f21b20fbc02bc4881b26dc029fe946",
+      "analysisId": null,
+      "summaryInputChecksum": "17e7c49cbe6a470f100360de3abe84ac616c7c7090dbc0979902133811db15fe",
+      "summaryOutputChecksum": "c54f01ce50cbf38bd60e6eb9a76558e0c5ba3946d0db33c2ced6c713c7268e2f",
+      "claimOrdinal": 0,
+      "claimText": "You can set custom migration file names by providing the `--name` CLI option to `drizzle-kit generate`, as shown in `npx drizzle-kit generate --name=init`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "--name",
+          "CURRENT_UPSTREAM",
+          "drizzle-kit",
+          "generate",
+          "migration.sql",
+          "snapshot.json"
+        ],
+        "claimTokens": [
+          "--name",
+          "drizzle-kit generate",
+          "npx drizzle-kit generate --name=init"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "migration.sql",
+          "snapshot.json"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "68b92455449feac3f48350d315198bea6f905e6640bf1b2ecb38c9c331804d1d",
+      "validationId": "scv:a2e863f3a34e9eac55390c3f3dbe027c252ea0175f5f2b55523687854a059634",
+      "validationChecksum": "7e12087b1c5c93dd5862f0de1849440daf91733c5b5b4db9b903c486f11c1eb6"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:4",
+      "chunkEvidenceRevision": "sha256:cecbbcad364671e2ac9a3f7d05a65cd767f21b20fbc02bc4881b26dc029fe946",
+      "analysisId": null,
+      "summaryInputChecksum": "17e7c49cbe6a470f100360de3abe84ac616c7c7090dbc0979902133811db15fe",
+      "summaryOutputChecksum": "c54f01ce50cbf38bd60e6eb9a76558e0c5ba3946d0db33c2ced6c713c7268e2f",
+      "claimOrdinal": 1,
+      "claimText": "This creates a migration folder named after the provided value, such as `20242409125510_init`, containing `snapshot.json` and `migration.sql` files.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "--name",
+          "CURRENT_UPSTREAM",
+          "drizzle-kit",
+          "generate",
+          "migration.sql",
+          "snapshot.json"
+        ],
+        "claimTokens": [
+          "20242409125510_init",
+          "migration.sql",
+          "snapshot.json"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "5911a4c9cad6adaaa0c9efdef6f9d74fe1dd9234917fd55b4bbb027cc0fca3d0",
+      "validationId": "scv:3063b2e9dca2f7af3d27a4ca8d9593b1ea41c794d8908be1acd73f52a02092ea",
+      "validationChecksum": "2de95973c8653af1770fecf645b40fea6fac837e1b9e09117720f2f1e22dc543"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0",
+      "chunkEvidenceRevision": "sha256:bd1faaa5365e27f6081ca7b49af09d3a36c7fb3f7a201caa1e30ce8693133544",
+      "analysisId": null,
+      "summaryInputChecksum": "fb85a6f8358dd18293f88acaf5541881b4e88b5767197335b1534924cace2fcd",
+      "summaryOutputChecksum": "375cd668709d2649bfa25019d750dec70063a2eec565f872a9cbd829211b480b",
+      "claimOrdinal": 0,
+      "claimText": "Drizzle ORM does not provide code to create the `pg_vector` extension within the schema, assuming it is already installed in your PostgreSQL database.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "drizzle-orm",
+          "half-precision",
+          "open-source",
+          "pg_vector",
+          "single-precision"
+        ],
+        "claimTokens": [
+          "pg_vector"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "0f92fc914c629a2db625e18486975b0c7ed54b8305e9d2595c9af0c129f2f73a",
+      "validationId": "scv:c0df257f93fa07373f92c4ad5a648225eb69ca1c314cd2661fdd106134a25c34",
+      "validationChecksum": "abb5b492b25b3d3cb61c3e2c9da4c7004577fa00733e56f882c9622ceb57c5f8"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0",
+      "chunkEvidenceRevision": "sha256:bd1faaa5365e27f6081ca7b49af09d3a36c7fb3f7a201caa1e30ce8693133544",
+      "analysisId": null,
+      "summaryInputChecksum": "fb85a6f8358dd18293f88acaf5541881b4e88b5767197335b1534924cace2fcd",
+      "summaryOutputChecksum": "375cd668709d2649bfa25019d750dec70063a2eec565f872a9cbd829211b480b",
+      "claimOrdinal": 1,
+      "claimText": "The `pg_vector` extension is an open-source vector similarity search solution for Postgres that stores vectors alongside your other data.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "drizzle-orm",
+          "half-precision",
+          "open-source",
+          "pg_vector",
+          "single-precision"
+        ],
+        "claimTokens": [
+          "open-source",
+          "pg_vector"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "5b9810622b8133c9429ea26aaa38e77f3a54692d592fe9bd61ae08a669fda533",
+      "validationId": "scv:22e677753613d67b5e4b38e33d1b98ea5c44aadd9340367af48ac3954a198cac",
+      "validationChecksum": "3ba720ade053531117925aeb41c31d85630832b8d005a5577af5b76c3bf0538b"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0",
+      "chunkEvidenceRevision": "sha256:bd1faaa5365e27f6081ca7b49af09d3a36c7fb3f7a201caa1e30ce8693133544",
+      "analysisId": null,
+      "summaryInputChecksum": "fb85a6f8358dd18293f88acaf5541881b4e88b5767197335b1534924cace2fcd",
+      "summaryOutputChecksum": "375cd668709d2649bfa25019d750dec70063a2eec565f872a9cbd829211b480b",
+      "claimOrdinal": 2,
+      "claimText": "It supports exact and approximate nearest neighbor search across single-precision, half-precision, binary, and sparse vectors, with distance metrics including L2, inner product, cosine, L1, Hamming, and Jaccard.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "drizzle-orm",
+          "half-precision",
+          "open-source",
+          "pg_vector",
+          "single-precision"
+        ],
+        "claimTokens": [
+          "half-precision",
+          "single-precision"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "pg_vector"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "6f1ede73c0079da75ccb71c0196a4bacffa18b215d37e52d52f538cc505f9cbe",
+      "validationId": "scv:a6189f040f05b10900a5de17bf55b65d4e846cb7d3e2092042e6868507fc5b91",
+      "validationChecksum": "b606b723832b34b4e08feb3a4b4fd9c55c484627e3be58237028d1cf9cca0bf5"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:9",
+      "chunkEvidenceRevision": "sha256:1b2bc340d48dc0d10bfe4bff01ae7f7c32ff5fad843aa89d20797cc05537b315",
+      "analysisId": null,
+      "summaryInputChecksum": "3d3d4a05da7ab77c10bedc629599c0506311d7e6df1c6f88b96ee25c85c20a4a",
+      "summaryOutputChecksum": "b54d8105ffabc25f89cf66c662662d7a6f95bb1c81a219e6cc885443e543291e",
+      "claimOrdinal": 0,
+      "claimText": "pgvector requires an explicit operator class for HNSW and IVFFlat indexes because no default exists.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "drizzle-kit",
+          "drizzle-orm",
+          "drizzle-team",
+          "push"
+        ],
+        "claimTokens": [],
+        "missingTechnicalTokens": [],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23",
+          "5792"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "068cf03b5fe862d504fde9d6498f400cc0222e9a870e7f997683af75eae75e1c",
+      "validationId": "scv:021a8fda717115fea7fe2f35b82cf4615292bdcbc7b3e4f549fcaf853e419aac",
+      "validationChecksum": "bed7b014bbb73b096a46976b04c3ab4df678826f35e329e73a06b6d6a9b91a50"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:9",
+      "chunkEvidenceRevision": "sha256:1b2bc340d48dc0d10bfe4bff01ae7f7c32ff5fad843aa89d20797cc05537b315",
+      "analysisId": null,
+      "summaryInputChecksum": "3d3d4a05da7ab77c10bedc629599c0506311d7e6df1c6f88b96ee25c85c20a4a",
+      "summaryOutputChecksum": "b54d8105ffabc25f89cf66c662662d7a6f95bb1c81a219e6cc885443e543291e",
+      "claimOrdinal": 1,
+      "claimText": "This requirement affects anyone using pgvector with Drizzle's `push` workflow.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "drizzle-kit",
+          "drizzle-orm",
+          "drizzle-team",
+          "push"
+        ],
+        "claimTokens": [
+          "push"
+        ],
+        "missingTechnicalTokens": [],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23",
+          "5792"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "ca6bce25e248bdb748f592bb66e250dcb50b94639274521a651ecf6890642cfb",
+      "validationId": "scv:154625c3cfddac65e875d6069a9ecb2d70b65322f536b6d54374d05a6b2fc226",
+      "validationChecksum": "055611f878ad690a2edbb4bbb6f3e88012959401a6e313235b2e8954f3cbe1c1"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "analysisId": null,
+      "summaryInputChecksum": "a58924123d5e3a305180eaf09d17e55f6d2f9e0e08d97d484c84a6b4cf577ce0",
+      "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+      "claimOrdinal": 0,
+      "claimText": "This chunk explains how to index nearest neighbor queries that include a `WHERE` clause.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "B-tree",
+          "CURRENT_UPSTREAM",
+          "Open-source",
+          "SP-GiST",
+          "WHERE",
+          "category_id",
+          "hnsw.ef_search",
+          "hnsw.iterative_scan",
+          "location_id",
+          "strict_order",
+          "vector_l2_ops"
+        ],
+        "claimTokens": [
+          "WHERE"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "hnsw.ef_search",
+          "hnsw.iterative_scan"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "123",
+          "3",
+          "1",
+          "2",
+          "5",
+          "10%",
+          "40",
+          "4",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "f62f1ff1cfeef00ea797f65c37855686dcb13d2e1232985fdf07768cb5fc79f3",
+      "validationId": "scv:477d0c2289feaebf845be2ebea0d84bbd7b6b13dd9b560c01a18fb5f408ba4cf",
+      "validationChecksum": "83908b223aed01c7ceec86fb6676f70c471ffa76aa962ec26e7e4e686a738582"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "analysisId": null,
+      "summaryInputChecksum": "a58924123d5e3a305180eaf09d17e55f6d2f9e0e08d97d484c84a6b4cf577ce0",
+      "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+      "claimOrdinal": 1,
+      "claimText": "It recommends creating an index on the filter column, noting that Postgres supports B-tree, hash, GiST, SP-GiST, GIN, and BRIN index types, and that multicolumn indexes can cover multiple columns.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "B-tree",
+          "CURRENT_UPSTREAM",
+          "Open-source",
+          "SP-GiST",
+          "WHERE",
+          "category_id",
+          "hnsw.ef_search",
+          "hnsw.iterative_scan",
+          "location_id",
+          "strict_order",
+          "vector_l2_ops"
+        ],
+        "claimTokens": [
+          "B-tree",
+          "SP-GiST"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "hnsw.ef_search",
+          "hnsw.iterative_scan"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "123",
+          "3",
+          "1",
+          "2",
+          "5",
+          "10%",
+          "40",
+          "4",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "3fdeab111632b87024b296cf29421fe2b71512f22980b56367312de9472b6ed5",
+      "validationId": "scv:60d012f9a148ae4ee651d74535f86fca6b7736907777cb13d429eaed05aa4933",
+      "validationChecksum": "d73430ef2c51c601e59fbc56c673bcc5cd87be8f67f0761d1f5d9347ee55b1f3"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "analysisId": null,
+      "summaryInputChecksum": "a58924123d5e3a305180eaf09d17e55f6d2f9e0e08d97d484c84a6b4cf577ce0",
+      "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+      "claimOrdinal": 2,
+      "claimText": "For low-selectivity filters, exact indexes work well, but approximate indexes like HNSW may perform better, with filtering applied after the index scan.",
+      "technical": {
+        "status": "FAIL",
+        "sourceTokens": [
+          "B-tree",
+          "CURRENT_UPSTREAM",
+          "Open-source",
+          "SP-GiST",
+          "WHERE",
+          "category_id",
+          "hnsw.ef_search",
+          "hnsw.iterative_scan",
+          "location_id",
+          "strict_order",
+          "vector_l2_ops"
+        ],
+        "claimTokens": [
+          "low-selectivity"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "hnsw.ef_search",
+          "hnsw.iterative_scan"
+        ],
+        "unexpectedTechnicalTokens": [
+          "low-selectivity"
+        ]
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "123",
+          "3",
+          "1",
+          "2",
+          "5",
+          "10%",
+          "40",
+          "4",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "UNSUPPORTED_CLAIM",
+        "citedSpans": [],
+        "unsupportedFragment": "low-selectivity",
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "REJECT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "TECHNICAL",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "620257a51058d0a9431a08461531e885761a1825f05b9744a7bcd14358c0fde4",
+      "validationId": "scv:2f5e4dadce25469df02714d315cfc8bc35bb11827aa52c6be8f6e1a48701c972",
+      "validationChecksum": "9e91fabe4e85226c5bc0c0afd806d4ad535577ca92024d4967a316312abdbed9"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "analysisId": null,
+      "summaryInputChecksum": "a58924123d5e3a305180eaf09d17e55f6d2f9e0e08d97d484c84a6b4cf577ce0",
+      "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+      "claimOrdinal": 3,
+      "claimText": "To handle cases where few rows match, you can enable iterative index scans by setting `hnsw.iterative_scan = strict_order`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "B-tree",
+          "CURRENT_UPSTREAM",
+          "Open-source",
+          "SP-GiST",
+          "WHERE",
+          "category_id",
+          "hnsw.ef_search",
+          "hnsw.iterative_scan",
+          "location_id",
+          "strict_order",
+          "vector_l2_ops"
+        ],
+        "claimTokens": [
+          "hnsw.iterative_scan = strict_order"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "hnsw.ef_search"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "123",
+          "3",
+          "1",
+          "2",
+          "5",
+          "10%",
+          "40",
+          "4",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "a5526c72ba7708b41804075e3a980e6819632d6b0602600ef1bb6dcd7323b46a",
+      "validationId": "scv:79c910e5e4d0ef277ac156a5781ed0782fe8609cf0cb4df99ed09579ac0295b1",
+      "validationChecksum": "cccc4113edf4764493ed485236fe256b43f902c7b13d32705fb0ed68a3ed43f5"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "analysisId": null,
+      "summaryInputChecksum": "a58924123d5e3a305180eaf09d17e55f6d2f9e0e08d97d484c84a6b4cf577ce0",
+      "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+      "claimOrdinal": 4,
+      "claimText": "For filtering by a few distinct values, partial indexing is suggested, while partitioning is recommended when filtering by many different values.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "B-tree",
+          "CURRENT_UPSTREAM",
+          "Open-source",
+          "SP-GiST",
+          "WHERE",
+          "category_id",
+          "hnsw.ef_search",
+          "hnsw.iterative_scan",
+          "location_id",
+          "strict_order",
+          "vector_l2_ops"
+        ],
+        "claimTokens": [],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "hnsw.ef_search",
+          "hnsw.iterative_scan"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "123",
+          "3",
+          "1",
+          "2",
+          "5",
+          "10%",
+          "40",
+          "4",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "1845d0f74c07050d3d129efb70c30d9cff0a70a66d23a9e6ab12447a0989920d",
+      "validationId": "scv:930a5ab6e5c993f7ac978b8a92bfcb7ad731c9e7bba76f51ce445439709f0ec3",
+      "validationChecksum": "5b9f1b0cc4457b9913191ee5293f1137b61e05ed2106520fad86889ed95ceb6a"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:24",
+      "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+      "analysisId": null,
+      "summaryInputChecksum": "05f0f485b3552a7443d26a0ff1b525f05fa6b2c1f2b442a3b8bf807af242491a",
+      "summaryOutputChecksum": "e93e88c753f8d9ca5b7119cf7886ad902cb3d4588eff4a18fd30a7247c2fa2ba",
+      "claimOrdinal": 0,
+      "claimText": "Starting with pgvector 0.8.0, iterative index scans automatically scan more of an approximate index until enough results are found, bounded by `hnsw.max_scan_tuples` or `ivfflat.max_probes`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "+ 0",
+          "CURRENT_UPSTREAM",
+          "Open-source",
+          "category_id",
+          "hnsw.iterative_scan",
+          "hnsw.max_scan_tuples",
+          "ivfflat.iterative_scan",
+          "ivfflat.max_probes",
+          "nearest_results",
+          "relaxed_order",
+          "relaxed_results",
+          "strict_order"
+        ],
+        "claimTokens": [
+          "hnsw.max_scan_tuples",
+          "ivfflat.max_probes"
+        ],
+        "missingTechnicalTokens": [
+          "hnsw.iterative_scan",
+          "ivfflat.iterative_scan"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "1",
+          "2",
+          "3",
+          "123",
+          "5",
+          "0",
+          "17",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [
+          "0.8.0"
+        ],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "3b0b2f9de2c1c49b9f6b468dfa836ab7260c5ed87433b2c0bfcf4be56b8f1f72",
+      "validationId": "scv:4b2850db3e9ac50f8cbe4518a7768297da6dc05953bb0573839ecd1f51205066",
+      "validationChecksum": "ed4acc7c53a32fcbfba9c2d0304a7c04c58d13de45a1ab04f82658f2538576b9"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:24",
+      "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+      "analysisId": null,
+      "summaryInputChecksum": "05f0f485b3552a7443d26a0ff1b525f05fa6b2c1f2b442a3b8bf807af242491a",
+      "summaryOutputChecksum": "e93e88c753f8d9ca5b7119cf7886ad902cb3d4588eff4a18fd30a7247c2fa2ba",
+      "claimOrdinal": 1,
+      "claimText": "Scans can use strict ordering via `SET hnsw.iterative_scan = strict_order;` for exact distance order, or relaxed ordering via `SET hnsw.iterative_scan = relaxed_order;` or `SET ivfflat.iterative_scan = relaxed_order;` for better recall.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "+ 0",
+          "CURRENT_UPSTREAM",
+          "Open-source",
+          "category_id",
+          "hnsw.iterative_scan",
+          "hnsw.max_scan_tuples",
+          "ivfflat.iterative_scan",
+          "ivfflat.max_probes",
+          "nearest_results",
+          "relaxed_order",
+          "relaxed_results",
+          "strict_order"
+        ],
+        "claimTokens": [
+          "SET hnsw.iterative_scan = relaxed_order",
+          "SET hnsw.iterative_scan = strict_order",
+          "SET ivfflat.iterative_scan = relaxed_order"
+        ],
+        "missingTechnicalTokens": [
+          "hnsw.max_scan_tuples"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "1",
+          "2",
+          "3",
+          "123",
+          "5",
+          "0",
+          "17",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "5379765e1f80c2a9e8ce1f6176e6d99714239eb374c6d7312a71bb2f7bda6635",
+      "validationId": "scv:01b0f93814d3f3ae624aa9fd0b12aa17e5248613acac7d235f573b98c22c89b9",
+      "validationChecksum": "ed1d972f642dc897fa147237aedb913ccae257d37979d439ac96b6c486b15ecb"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:24",
+      "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+      "analysisId": null,
+      "summaryInputChecksum": "05f0f485b3552a7443d26a0ff1b525f05fa6b2c1f2b442a3b8bf807af242491a",
+      "summaryOutputChecksum": "e93e88c753f8d9ca5b7119cf7886ad902cb3d4588eff4a18fd30a7247c2fa2ba",
+      "claimOrdinal": 2,
+      "claimText": "With relaxed ordering, a materialized CTE can restore strict ordering, requiring `+ 0` for Postgres 17+, and distance filters should be placed outside the CTE for best performance.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "+ 0",
+          "CURRENT_UPSTREAM",
+          "Open-source",
+          "category_id",
+          "hnsw.iterative_scan",
+          "hnsw.max_scan_tuples",
+          "ivfflat.iterative_scan",
+          "ivfflat.max_probes",
+          "nearest_results",
+          "relaxed_order",
+          "relaxed_results",
+          "strict_order"
+        ],
+        "claimTokens": [
+          "+ 0"
+        ],
+        "missingTechnicalTokens": [
+          "hnsw.iterative_scan",
+          "hnsw.max_scan_tuples",
+          "ivfflat.iterative_scan"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "1",
+          "2",
+          "3",
+          "123",
+          "5",
+          "0",
+          "17",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [
+          "0",
+          "17"
+        ],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "601d2ee35b13bd98a3d66df9db0992a288d461e632db3a9512f9e25779d6e085",
+      "validationId": "scv:626b3e1cacf5eea7da86d9b0a1763355b66dbbc2a29a89ebdaf0f4b1b4df595c",
+      "validationChecksum": "f8ab6ade5502ab15ef08e5d1e85b50f2cfe8e01389efd71dac36e225129843d1"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:26",
+      "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+      "analysisId": null,
+      "summaryInputChecksum": "5193491bdb3581cb03e27ad477cc3eafb9c8444f8365a5658ec1bd8565f95352",
+      "summaryOutputChecksum": "4b202ffb13ae7c3abaa887bf99608b054e502f1d10aba65f49476c4c2401d44b",
+      "claimOrdinal": 0,
+      "claimText": "The `hnsw.max_scan_tuples` setting specifies the maximum number of tuples to visit during an iterative scan, defaulting to 20,000, and is approximate without affecting the initial scan.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "Open-source",
+          "hnsw.max_scan_tuples",
+          "hnsw.scan_mem_multiplier",
+          "work_mem"
+        ],
+        "claimTokens": [
+          "hnsw.max_scan_tuples"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "hnsw.scan_mem_multiplier"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "20,000",
+          "20000",
+          "1",
+          "2",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [
+          "20,000"
+        ],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "c17d18d44b8e51a0787469913f3ee80b5b97a6fab5ee96fb6362d5a7a49c6c65",
+      "validationId": "scv:37b38cb84cac08d5fb1a7401822b5c58fe72a2ac24351c8530d887923535e0cb",
+      "validationChecksum": "e9a5d05bb75e85c00b6f178db492ca75a49a0568bbba273ec87d3b91ef28dd2e"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:26",
+      "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+      "analysisId": null,
+      "summaryInputChecksum": "5193491bdb3581cb03e27ad477cc3eafb9c8444f8365a5658ec1bd8565f95352",
+      "summaryOutputChecksum": "4b202ffb13ae7c3abaa887bf99608b054e502f1d10aba65f49476c4c2401d44b",
+      "claimOrdinal": 1,
+      "claimText": "The `hnsw.scan_mem_multiplier` setting specifies the maximum memory to use as a multiple of `work_mem`, defaulting to 1, and should be increased if raising `hnsw.max_scan_tuples` does not improve recall.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "Open-source",
+          "hnsw.max_scan_tuples",
+          "hnsw.scan_mem_multiplier",
+          "work_mem"
+        ],
+        "claimTokens": [
+          "hnsw.max_scan_tuples",
+          "hnsw.scan_mem_multiplier",
+          "work_mem"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "20,000",
+          "20000",
+          "1",
+          "2",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [
+          "1"
+        ],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "fec79897a9e56ba758c6eff9e256617af0235956eff9698fec97b3da6ec03262",
+      "validationId": "scv:0b3f0c92e5918605ae253c6370bddf087d7e310fc014c496c45811e77660cde5",
+      "validationChecksum": "686a2bedcf0c88f8d95df74f07d67617a5bb255c71b1f2d22fac97bd6dea7f89"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+      "chunkEvidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1",
+      "analysisId": null,
+      "summaryInputChecksum": "d1b96472bac3dae95af611576606db757112ea8220d6e12cc52a088c9805a765",
+      "summaryOutputChecksum": "f54a18efe8828fc41d14008ee30801e7f2a1baa3a368cf48672f918f602048bc",
+      "claimOrdinal": 0,
+      "claimText": "PostgreSQL 18 adds an asynchronous I/O subsystem that lets backends queue multiple read requests for more efficient sequential scans, bitmap heap scans, and vacuums, controlled by the server variables `io_method`, `io_combine_limit`, and `io_max_combine_limit`, while also enabling `effective_io_concurrency` and `maintenance_io_concurrency` values greater than zero on systems without `fadvise()` support and exposing file handles through the new system view `pg_aios`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "E.6",
+          "EXCEPT",
+          "GROUP BY",
+          "all-visible",
+          "effective_io_concurrency",
+          "fadvise()",
+          "full-relation",
+          "io_combine_limit",
+          "io_max_combine_limit",
+          "io_method",
+          "maintenance_io_concurrency",
+          "per-table",
+          "pg_aios",
+          "storage-level",
+          "vacuum_max_eager_freeze_failure_rate",
+          "vacuum_truncate"
+        ],
+        "claimTokens": [
+          "effective_io_concurrency",
+          "fadvise()",
+          "io_combine_limit",
+          "io_max_combine_limit",
+          "io_method",
+          "maintenance_io_concurrency",
+          "pg_aios"
+        ],
+        "missingTechnicalTokens": [
+          "vacuum_max_eager_freeze_failure_rate"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "16",
+          "18"
+        ],
+        "claimValues": [
+          "18"
+        ],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "29e127248fba7d83a62079aefa98d3081ca7295b9667dffd70f7305518701a22",
+      "validationId": "scv:fa16611103d2ad9b634a2db7e4f69378d40593b17964dbec90b6f70cb053d244",
+      "validationChecksum": "4ab37f82776dbb78603e813f9a6fe062de5d402fd54b3eb5ab2fc004db0c1a6f"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+      "chunkEvidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1",
+      "analysisId": null,
+      "summaryInputChecksum": "d1b96472bac3dae95af611576606db757112ea8220d6e12cc52a088c9805a765",
+      "summaryOutputChecksum": "f54a18efe8828fc41d14008ee30801e7f2a1baa3a368cf48672f918f602048bc",
+      "claimOrdinal": 1,
+      "claimText": "It also improves locking performance for queries accessing many relations, enhances hash joins and `GROUP BY` performance and reduces their memory usage, allows normal vacuums to freeze all-visible pages to reduce later full-relation freezing overhead via the `vacuum_max_eager_freeze_failure_rate` setting, and adds the `vacuum_truncate` server variable to control file truncation during `VACUUM`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "E.6",
+          "EXCEPT",
+          "GROUP BY",
+          "all-visible",
+          "effective_io_concurrency",
+          "fadvise()",
+          "full-relation",
+          "io_combine_limit",
+          "io_max_combine_limit",
+          "io_method",
+          "maintenance_io_concurrency",
+          "per-table",
+          "pg_aios",
+          "storage-level",
+          "vacuum_max_eager_freeze_failure_rate",
+          "vacuum_truncate"
+        ],
+        "claimTokens": [
+          "GROUP BY",
+          "VACUUM",
+          "all-visible",
+          "full-relation",
+          "vacuum_max_eager_freeze_failure_rate",
+          "vacuum_truncate"
+        ],
+        "missingTechnicalTokens": [
+          "effective_io_concurrency",
+          "maintenance_io_concurrency"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "16",
+          "18"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "8c7f4d61f09ad9fbba3f6e8e3cf034d3faaf347d216c40bbbb69268452c5bfbe",
+      "validationId": "scv:a6f82cbe60a2de2429c2033a35658c9f4d7ebd5662a5ee7445bc4361c3e572b3",
+      "validationChecksum": "cf20bb14eb81b4fe2f2d0103e90162b851b2906d57ffdadec570cea67cc104ad"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+      "chunkEvidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1",
+      "analysisId": null,
+      "summaryInputChecksum": "d1b96472bac3dae95af611576606db757112ea8220d6e12cc52a088c9805a765",
+      "summaryOutputChecksum": "f54a18efe8828fc41d14008ee30801e7f2a1baa3a368cf48672f918f602048bc",
+      "claimOrdinal": 2,
+      "claimText": "Finally, the default values for `effective_io_concurrency` and `maintenance_io_concurrency` are increased to 16.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "E.6",
+          "EXCEPT",
+          "GROUP BY",
+          "all-visible",
+          "effective_io_concurrency",
+          "fadvise()",
+          "full-relation",
+          "io_combine_limit",
+          "io_max_combine_limit",
+          "io_method",
+          "maintenance_io_concurrency",
+          "per-table",
+          "pg_aios",
+          "storage-level",
+          "vacuum_max_eager_freeze_failure_rate",
+          "vacuum_truncate"
+        ],
+        "claimTokens": [
+          "effective_io_concurrency",
+          "maintenance_io_concurrency"
+        ],
+        "missingTechnicalTokens": [
+          "vacuum_max_eager_freeze_failure_rate"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "16",
+          "18"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "35b53ad8b7934205051e754edacc8314ccb9ca59fa3b7c9dfb9cce6d2d303a95",
+      "validationId": "scv:e4a881337b4babcbf87596c426435bcb74d03924072960228a495b536102c311",
+      "validationChecksum": "3b630b539e7045be58936792c83975d67578d95cf4e4e98d1bbe08297d2418ba"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+      "chunkEvidenceRevision": "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716",
+      "analysisId": null,
+      "summaryInputChecksum": "51b22c60c1410422c5fce1b9218963c0f0380aa5a8711e5f022e1497cd840065",
+      "summaryOutputChecksum": "2fb523e1481cbd5ca89779a6a2f31048853755557016308a9bfadfc78f541288",
+      "claimOrdinal": 0,
+      "claimText": "PostgreSQL 18 introduces an asynchronous I/O (AIO) subsystem that improves performance of sequential scans, bitmap heap scans, vacuums, and other operations.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "B-tree",
+          "E.6",
+          "NEW",
+          "OLD",
+          "RETURNING",
+          "pg_upgrade",
+          "timestamp-ordered",
+          "uuidv7()"
+        ],
+        "claimTokens": [],
+        "missingTechnicalTokens": [
+          "E.6",
+          "pg_upgrade"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "18"
+        ],
+        "claimValues": [
+          "18"
+        ],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "1e04fa509f60ae87a96ecb25695cf7f196d114effa82d93229569ce673d71a8c",
+      "validationId": "scv:02151f8801d270bfa96e062497ca87926d629f12b7bc95124b3443645e1fa188",
+      "validationChecksum": "2a2a5c58ca00753841949b8b9f8d1eac5a61bec13471a5e3dab05b4bb35c3ae2"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+      "chunkEvidenceRevision": "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716",
+      "analysisId": null,
+      "summaryInputChecksum": "51b22c60c1410422c5fce1b9218963c0f0380aa5a8711e5f022e1497cd840065",
+      "summaryOutputChecksum": "2fb523e1481cbd5ca89779a6a2f31048853755557016308a9bfadfc78f541288",
+      "claimOrdinal": 1,
+      "claimText": "It also adds features such as `pg_upgrade` retaining optimizer statistics, \"skip scan\" lookups for multicolumn B-tree indexes, a `uuidv7()` function for timestamp-ordered UUIDs, virtual generated columns (now the default), OAuth authentication support, `OLD` and `NEW` support in `RETURNING` clauses for INSERT, UPDATE, DELETE, and MERGE commands, and temporal constraints for PRIMARY KEY, UNIQUE, and FOREIGN KEY constraints.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "B-tree",
+          "E.6",
+          "NEW",
+          "OLD",
+          "RETURNING",
+          "pg_upgrade",
+          "timestamp-ordered",
+          "uuidv7()"
+        ],
+        "claimTokens": [
+          "B-tree",
+          "NEW",
+          "OLD",
+          "RETURNING",
+          "pg_upgrade",
+          "timestamp-ordered",
+          "uuidv7()"
+        ],
+        "missingTechnicalTokens": [
+          "E.6"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "18"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "ab75456335a48f95d80bd8dee060b2a2090372f98d92eb0c63669ebcb9378035",
+      "validationId": "scv:2ea6f9a52188a017b07227d7f3465349588798ef2c0744a97091141a1321208d",
+      "validationChecksum": "10b48f1dca75558168fa701f25badc6881cfae9f4ec285baf0f8fb4679d67148"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+      "chunkEvidenceRevision": "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716",
+      "analysisId": null,
+      "summaryInputChecksum": "51b22c60c1410422c5fce1b9218963c0f0380aa5a8711e5f022e1497cd840065",
+      "summaryOutputChecksum": "2fb523e1481cbd5ca89779a6a2f31048853755557016308a9bfadfc78f541288",
+      "claimOrdinal": 2,
+      "claimText": "These new features are explained in more detail in the sections below.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "B-tree",
+          "E.6",
+          "NEW",
+          "OLD",
+          "RETURNING",
+          "pg_upgrade",
+          "timestamp-ordered",
+          "uuidv7()"
+        ],
+        "claimTokens": [],
+        "missingTechnicalTokens": [
+          "E.6",
+          "pg_upgrade"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "18"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "2aafa7a5748cdfc1ca391e913044d8fb7ff3263db04a1791b07a551cb72ffcaf",
+      "validationId": "scv:7486fae11b977bd43f653be585298e0a9a53bfc263e068723d43fec59520ffcb",
+      "validationChecksum": "65a1f34af3500c386ebb6c19746b54d640d914d3cbe838d29af8141a24ad91c3"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+      "chunkEvidenceRevision": "sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2",
+      "analysisId": null,
+      "summaryInputChecksum": "ca99b8f8d4e7f94814a8b12cdd242a4b19e21b20ef9d40067509c6247dc6ee55",
+      "summaryOutputChecksum": "d38dfd59360906d5016d94449f3b6b0a8eba4a5f4c9352e8965a6c49015851e3",
+      "claimOrdinal": 0,
+      "claimText": "PostgreSQL 18 adds the `casefold()` function for more sophisticated case-insensitive matching that handles characters with multiple upper or lower case equivalents and conversions that change character counts.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "=>",
+          "E.6",
+          "EXTRACT()",
+          "EXTRACT(QUARTER ...)",
+          "MAX()",
+          "MIN()",
+          "RN",
+          "UUID",
+          "WEEK",
+          "case-insensitive",
+          "casefold()",
+          "crc32()",
+          "crc32c()",
+          "gamma()",
+          "i.e",
+          "lgamma()",
+          "regexp_count()",
+          "regexp_instr()",
+          "regexp_like()",
+          "regexp_match[es]()",
+          "regexp_replace()",
+          "regexp_split_to_array()",
+          "regexp_split_to_table()",
+          "regexp_substr()",
+          "to_number()",
+          "uuidv4()",
+          "uuidv7()"
+        ],
+        "claimTokens": [
+          "case-insensitive",
+          "casefold()"
+        ],
+        "missingTechnicalTokens": [
+          "EXTRACT(QUARTER ...)",
+          "regexp_split_to_array()",
+          "regexp_split_to_table()"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "7",
+          "4",
+          "18"
+        ],
+        "claimValues": [
+          "18"
+        ],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "7effc8f0d35c17220f7e7a7ff89caddb73c9dd167139217481e0a36f5b30e951",
+      "validationId": "scv:c9ca0a21fb5e785e517a2875234925d0635b0ef33d301c1a72f8ffdb2d4c417d",
+      "validationChecksum": "7d40c1f44f9a59c01cb9a6499a0346501a278a3abd69ac5a1714b83f3047edfb"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+      "chunkEvidenceRevision": "sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2",
+      "analysisId": null,
+      "summaryInputChecksum": "ca99b8f8d4e7f94814a8b12cdd242a4b19e21b20ef9d40067509c6247dc6ee55",
+      "summaryOutputChecksum": "d38dfd59360906d5016d94449f3b6b0a8eba4a5f4c9352e8965a6c49015851e3",
+      "claimOrdinal": 1,
+      "claimText": "It also allows `MIN()`/`MAX()` aggregates on arrays and composite types, adds a `WEEK` option to `EXTRACT()` with improved negative value output for `EXTRACT(QUARTER ...)`, and adds roman numeral support to `to_number()` via the `RN` pattern.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "=>",
+          "E.6",
+          "EXTRACT()",
+          "EXTRACT(QUARTER ...)",
+          "MAX()",
+          "MIN()",
+          "RN",
+          "UUID",
+          "WEEK",
+          "case-insensitive",
+          "casefold()",
+          "crc32()",
+          "crc32c()",
+          "gamma()",
+          "i.e",
+          "lgamma()",
+          "regexp_count()",
+          "regexp_instr()",
+          "regexp_like()",
+          "regexp_match[es]()",
+          "regexp_replace()",
+          "regexp_split_to_array()",
+          "regexp_split_to_table()",
+          "regexp_substr()",
+          "to_number()",
+          "uuidv4()",
+          "uuidv7()"
+        ],
+        "claimTokens": [
+          "EXTRACT()",
+          "EXTRACT(QUARTER ...)",
+          "MAX()",
+          "MIN()",
+          "RN",
+          "WEEK",
+          "to_number()"
+        ],
+        "missingTechnicalTokens": [
+          "regexp_split_to_array()",
+          "regexp_split_to_table()"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "7",
+          "4",
+          "18"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "d2c9722c5bc67c8475a6b4461c18868fd51a1dd1143843c032a9277cb84790b7",
+      "validationId": "scv:c840aa0b3716da495683dc892bde1b54b8e8c49db5ce76f40cf354c83fdf6252",
+      "validationChecksum": "b97d1335210341577d326c99c377e89473131382cd23d8178a1c2b0ae1a532bb"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+      "chunkEvidenceRevision": "sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2",
+      "analysisId": null,
+      "summaryInputChecksum": "ca99b8f8d4e7f94814a8b12cdd242a4b19e21b20ef9d40067509c6247dc6ee55",
+      "summaryOutputChecksum": "d38dfd59360906d5016d94449f3b6b0a8eba4a5f4c9352e8965a6c49015851e3",
+      "claimOrdinal": 2,
+      "claimText": "Additionally, it introduces the temporally sortable `uuidv7()` function with a `uuidv4()` alias, adds `crc32()` and `crc32c()` for CRC computation, adds `gamma()` and `lgamma()` math functions, allows `=>` syntax for named cursor arguments in PL/pgSQL, and permits named arguments for various `regexp_*()` functions.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "=>",
+          "E.6",
+          "EXTRACT()",
+          "EXTRACT(QUARTER ...)",
+          "MAX()",
+          "MIN()",
+          "RN",
+          "UUID",
+          "WEEK",
+          "case-insensitive",
+          "casefold()",
+          "crc32()",
+          "crc32c()",
+          "gamma()",
+          "i.e",
+          "lgamma()",
+          "regexp_count()",
+          "regexp_instr()",
+          "regexp_like()",
+          "regexp_match[es]()",
+          "regexp_replace()",
+          "regexp_split_to_array()",
+          "regexp_split_to_table()",
+          "regexp_substr()",
+          "to_number()",
+          "uuidv4()",
+          "uuidv7()"
+        ],
+        "claimTokens": [
+          "=>",
+          "crc32()",
+          "crc32c()",
+          "gamma()",
+          "lgamma()",
+          "regexp_*()",
+          "uuidv4()",
+          "uuidv7()"
+        ],
+        "missingTechnicalTokens": [
+          "EXTRACT(QUARTER ...)",
+          "regexp_split_to_array()",
+          "regexp_split_to_table()"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "7",
+          "4",
+          "18"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "902c2a13198dbed8f9d1dbe64d37c0760d0b3fb88f5912ae6d61c372de8dc006",
+      "validationId": "scv:dca3a7554e8b382bed55443fa4266c081ba72530a5fc69bcca64ba5c5d3e6d4b",
+      "validationChecksum": "ff92fcae0effb0c70b43dca05e6b8528721ab26c9d476c62e628ce1eab4f4ef9"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:1",
+      "chunkEvidenceRevision": "sha256:d364bfe52f2e13e0e6b565ed83b03a326ac51bfc0dd79060c07bdb52696f874e",
+      "analysisId": null,
+      "summaryInputChecksum": "2dcb5ee18f495fec79b35dfe71ac539d9f57e4266890c02cb09db46afe25cf21",
+      "summaryOutputChecksum": "580959365a79f24ee79e845df53d431f547f558da9f453be1561f9aef96ed6cc",
+      "claimOrdinal": 0,
+      "claimText": "This chunk lists the Svelte runes, which are `$state`, `$derived`, `$effect`, `$props`, `$bindable`, `$inspect`, and `$host`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "claimTokens": [
+          "$bindable",
+          "$derived",
+          "$effect",
+          "$host",
+          "$inspect",
+          "$props",
+          "$state"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "91e28fa18fc8b2e588814aba13c0e54d46e9ff094c38785198d1a3c733a272a8",
+      "validationId": "scv:8bd192c94257491dd6faabf0de0e76d6551e33fead4d72c62293f67b0939d632",
+      "validationChecksum": "7b8f73adb32566aa4c6d45f697ecf4e48492da4c81394a85a1519cd83118eca5"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:1",
+      "chunkEvidenceRevision": "sha256:d364bfe52f2e13e0e6b565ed83b03a326ac51bfc0dd79060c07bdb52696f874e",
+      "analysisId": null,
+      "summaryInputChecksum": "2dcb5ee18f495fec79b35dfe71ac539d9f57e4266890c02cb09db46afe25cf21",
+      "summaryOutputChecksum": "580959365a79f24ee79e845df53d431f547f558da9f453be1561f9aef96ed6cc",
+      "claimOrdinal": 1,
+      "claimText": "It appears in the Introduction > Runes section of the Svelte docs page about `$props`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "claimTokens": [
+          "$props"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "6f1814a922713cca0a633cc90eb5c87f46ea649592e79e9c043a5f35f8356d22",
+      "validationId": "scv:e418e0a07a299e4c2bfa3e2472cc49c95a87aee14765a81eb0d716d3195383a2",
+      "validationChecksum": "58b52b5baa893c3e833dce97555dc81320b1529c64249a757f7dbc6bd63b6664"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:1",
+      "chunkEvidenceRevision": "sha256:f9ce355c977a05d9955d9bc8bb0e98644545bc20f8541e54da0a368db7723870",
+      "analysisId": null,
+      "summaryInputChecksum": "cb1093c9b070bf1fd936fddc4222d2707d4f738f2dc41935f2a8046a4d5cb4d1",
+      "summaryOutputChecksum": "ad91d520f5204c5995f8d991d7f5c7838175d5c5f9dbe1c86542a94252313e63",
+      "claimOrdinal": 0,
+      "claimText": "Runes are a set of symbols in Svelte that include `$state`, `$derived`, `$effect`, `$props`, `$bindable`, `$inspect`, and `$host`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "claimTokens": [
+          "$bindable",
+          "$derived",
+          "$effect",
+          "$host",
+          "$inspect",
+          "$props",
+          "$state"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "c309f271c7fafe55e8c494fde9c3c86331a1a82f66cf8d7449363cd62a8c223c",
+      "validationId": "scv:8b333f86413e7f165537d7162bd04d99dd28ea0b62172789e28b9ef54ddd1a26",
+      "validationChecksum": "1a56da4ebcd768c3f203144c03768f0ae6449d90a45015012e25693e50a63132"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:1",
+      "chunkEvidenceRevision": "sha256:f9ce355c977a05d9955d9bc8bb0e98644545bc20f8541e54da0a368db7723870",
+      "analysisId": null,
+      "summaryInputChecksum": "cb1093c9b070bf1fd936fddc4222d2707d4f738f2dc41935f2a8046a4d5cb4d1",
+      "summaryOutputChecksum": "ad91d520f5204c5995f8d991d7f5c7838175d5c5f9dbe1c86542a94252313e63",
+      "claimOrdinal": 1,
+      "claimText": "These are listed as part of the introduction to runes in the Svelte documentation.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "claimTokens": [],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "88ae23e46b9719825aa6eea14ad53c26a9e630de12423d99137530fd49c8a5fb",
+      "validationId": "scv:606529f9411741396091fcc9015a71456856233c6d3a5d3f4f74222a288c3cc9",
+      "validationChecksum": "8db0c5ec0c6b0afe171fb5de93fd60b71b3c93e991b5290fa697cf89a036249e"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+      "chunkEvidenceRevision": "sha256:73c10463c028ab80e2616fe5c662410e0d7ff66aa26d9160fd6b78fa2e9a2e5f",
+      "analysisId": null,
+      "summaryInputChecksum": "a040f9e22abcf7d13871c9b340b8be6936cda86678dd7891550ef270a8796d84",
+      "summaryOutputChecksum": "3d52a7b49027ec8eb319f65a00311ccf46f80104a0273c954fa415d10e223f01",
+      "claimOrdinal": 0,
+      "claimText": "The `$effect` automatically tracks reactive values (`$state`, `$derived`, `$props`) that are synchronously read inside its function body and schedules a re-run when they change.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "$derived",
+          "$effect",
+          "$props",
+          "$state",
+          "CURRENT_UPSTREAM",
+          "await",
+          "color",
+          "console.log",
+          "i.e",
+          "re-run",
+          "server-side",
+          "setTimeout",
+          "size",
+          "svelte.dev"
+        ],
+        "claimTokens": [
+          "$derived",
+          "$effect",
+          "$props",
+          "$state",
+          "re-run"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "console.log",
+          "setTimeout"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "72f79aa3b012dedbcc855bda413fe3c58ad54b1cdb3e488ec2abde8240d07973",
+      "validationId": "scv:71c614b510188a41f76268e97ab3b0cbaa88b062dafd526519d7ff997cc41cbf",
+      "validationChecksum": "a23891a293bd5b917e139bb95f23498baab4755652111603bd8e83272f3db707"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+      "chunkEvidenceRevision": "sha256:73c10463c028ab80e2616fe5c662410e0d7ff66aa26d9160fd6b78fa2e9a2e5f",
+      "analysisId": null,
+      "summaryInputChecksum": "a040f9e22abcf7d13871c9b340b8be6936cda86678dd7891550ef270a8796d84",
+      "summaryOutputChecksum": "3d52a7b49027ec8eb319f65a00311ccf46f80104a0273c954fa415d10e223f01",
+      "claimOrdinal": 1,
+      "claimText": "Values read asynchronously—after an `await` or inside a `setTimeout`—are not tracked, and `$state`/`$derived` used directly inside the `$effect` are not treated as dependencies.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "$derived",
+          "$effect",
+          "$props",
+          "$state",
+          "CURRENT_UPSTREAM",
+          "await",
+          "color",
+          "console.log",
+          "i.e",
+          "re-run",
+          "server-side",
+          "setTimeout",
+          "size",
+          "svelte.dev"
+        ],
+        "claimTokens": [
+          "$derived",
+          "$effect",
+          "$state",
+          "await",
+          "setTimeout"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "console.log"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "502ddaa31e9f5474b9aae898125a975808fc122db2eae5d831be1d6967c9c611",
+      "validationId": "scv:663c68b726b07c7f3a91e53a5e9c039276156b0e67b5c64a413957e86eeada3e",
+      "validationChecksum": "21e270fe18a5794bb4816ecf0d7ee37185526ce11b20a6d933ab20eb5b904afe"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+      "chunkEvidenceRevision": "sha256:73c10463c028ab80e2616fe5c662410e0d7ff66aa26d9160fd6b78fa2e9a2e5f",
+      "analysisId": null,
+      "summaryInputChecksum": "a040f9e22abcf7d13871c9b340b8be6936cda86678dd7891550ef270a8796d84",
+      "summaryOutputChecksum": "3d52a7b49027ec8eb319f65a00311ccf46f80104a0273c954fa415d10e223f01",
+      "claimOrdinal": 2,
+      "claimText": "The effect runs after the DOM is updated, does not run during server-side rendering, and any returned cleanup function is called before the effect re-runs or when the component unmounts.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "$derived",
+          "$effect",
+          "$props",
+          "$state",
+          "CURRENT_UPSTREAM",
+          "await",
+          "color",
+          "console.log",
+          "i.e",
+          "re-run",
+          "server-side",
+          "setTimeout",
+          "size",
+          "svelte.dev"
+        ],
+        "claimTokens": [
+          "re-runs",
+          "server-side"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "console.log",
+          "setTimeout"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "8ab0795b8325764943f8f982edbd10e7c809074d231cdc42dfb406ce9f61a888",
+      "validationId": "scv:05ac3b13e8f337fb70e246ff14fda65deba340e921c816f8579eb9dee11e6c76",
+      "validationChecksum": "130994e139c628e74bc523ceef2f6d4a86fec9dd1f48268fdba8778074cc7de1"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:sveltekit:62e6dd9932a74b58:15",
+      "chunkEvidenceRevision": "sha256:deea1c2c0025e4c0c0dd2a58f84bc44eb8592e8ebe095c971d46b7cd57616fc4",
+      "analysisId": null,
+      "summaryInputChecksum": "71be12d2865bc33ce1495a09e700cc46cd32e8e4e72157ab013803c8fbd4d4df",
+      "summaryOutputChecksum": "01268111ce9a15cf05ed2ec16cc22abf4b735e7acaf59e962f92c251aae8fe84",
+      "claimOrdinal": 0,
+      "claimText": "In SvelteKit, layout `load` functions can provide data to child pages, which is accessible via the `data` prop in the page component.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "data.post.content",
+          "data.post.title",
+          "data.posts",
+          "data.posts.findIndex",
+          "load",
+          "next.slug",
+          "next.title",
+          "page.params.slug",
+          "post.slug",
+          "{ a: 1, b: 2 }",
+          "{ a: 1, b: 3, c: 4 }",
+          "{ b: 3, c: 4 }"
+        ],
+        "claimTokens": [
+          "data",
+          "load"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "data.post.content",
+          "data.posts.findIndex"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "876ef79bbe54bdb4af774d323136fdf03df96fb02cff931dcea03006bbccf607",
+      "validationId": "scv:9b42a8e720feffd411f64d60a390c4677fa2bfb219fd5bf4250f20f41a7839a3",
+      "validationChecksum": "47f6f3188706e1f43686ea16061649d01b6dda550629eee45698f8daa19f4de0"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:sveltekit:62e6dd9932a74b58:15",
+      "chunkEvidenceRevision": "sha256:deea1c2c0025e4c0c0dd2a58f84bc44eb8592e8ebe095c971d46b7cd57616fc4",
+      "analysisId": null,
+      "summaryInputChecksum": "71be12d2865bc33ce1495a09e700cc46cd32e8e4e72157ab013803c8fbd4d4df",
+      "summaryOutputChecksum": "01268111ce9a15cf05ed2ec16cc22abf4b735e7acaf59e962f92c251aae8fe84",
+      "claimOrdinal": 1,
+      "claimText": "When multiple `load` functions return data with the same key, the last one wins, so a layout `load` returning `{ a: 1, b: 2 }` combined with a page `load` returning `{ b: 3, c: 4 }` results in `{ a: 1, b: 3, c: 4 }`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "data.post.content",
+          "data.post.title",
+          "data.posts",
+          "data.posts.findIndex",
+          "load",
+          "next.slug",
+          "next.title",
+          "page.params.slug",
+          "post.slug",
+          "{ a: 1, b: 2 }",
+          "{ a: 1, b: 3, c: 4 }",
+          "{ b: 3, c: 4 }"
+        ],
+        "claimTokens": [
+          "load",
+          "{ a: 1, b: 2 }",
+          "{ a: 1, b: 3, c: 4 }",
+          "{ b: 3, c: 4 }"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "data.post.content",
+          "data.posts.findIndex"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "a38c07d4b13488f7342f46e1554ac53948bc7eb6b085dd8a78448267d817ea6f",
+      "validationId": "scv:944f05e40ba3558bc73498ea3ec20a5dfd69437d36b3bbd8dfc34e228ba36ad8",
+      "validationChecksum": "e8386edbd5e94e9426f091405ad4461e6d37636e7de75f98213c1630f564b802"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19",
+      "chunkEvidenceRevision": "sha256:3802f9585429d798009f484d06e598c0b2531df5579a0ce066bc5d2a5ee5e5db",
+      "analysisId": null,
+      "summaryInputChecksum": "f743952068439799beebf92a6dbc5ea27781b044bac07d1af8fe96b9f8da702d",
+      "summaryOutputChecksum": "d228b515443fe3ada8c1a880c7f8f003ff3b654faa0fdee34e03d7bb507fa91e",
+      "claimOrdinal": 0,
+      "claimText": "SvelteKit reuses existing layout and page components when navigating between routes, so the `data` prop updates rather than the components being recreated.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "/blog/my-long-post",
+          "/blog/my-short-post",
+          "CURRENT_UPSTREAM",
+          "Math.round",
+          "data",
+          "data.content",
+          "data.content.split",
+          "data.title",
+          "estimatedReadingTime",
+          "onDestroy",
+          "onMount"
+        ],
+        "claimTokens": [
+          "data"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "data.content.split",
+          "estimatedReadingTime"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "250",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "420d0dbeee9f63ef74cbba42a569b6bd5af6d96953ebc8001fe2340572758c30",
+      "validationId": "scv:9f17d8ef505ad2790ecbc3a5b22b022a5951e9c086309d39d5561bfc5db664da",
+      "validationChecksum": "91d6ea1de1ae1f5d8a1aae59bd0979bd4a3fbb2e55d2dc0f0cd2d7f34d25cba6"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19",
+      "chunkEvidenceRevision": "sha256:3802f9585429d798009f484d06e598c0b2531df5579a0ce066bc5d2a5ee5e5db",
+      "analysisId": null,
+      "summaryInputChecksum": "f743952068439799beebf92a6dbc5ea27781b044bac07d1af8fe96b9f8da702d",
+      "summaryOutputChecksum": "d228b515443fe3ada8c1a880c7f8f003ff3b654faa0fdee34e03d7bb507fa91e",
+      "claimOrdinal": 1,
+      "claimText": "Because the code doesn't rerun, lifecycle methods like `onMount` and `onDestroy` won't rerun and values like `estimatedReadingTime` won't be recalculated.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "/blog/my-long-post",
+          "/blog/my-short-post",
+          "CURRENT_UPSTREAM",
+          "Math.round",
+          "data",
+          "data.content",
+          "data.content.split",
+          "data.title",
+          "estimatedReadingTime",
+          "onDestroy",
+          "onMount"
+        ],
+        "claimTokens": [
+          "estimatedReadingTime",
+          "onDestroy",
+          "onMount"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "data.content.split"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "250",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "0c0d3c51abf294ba71d3be41fff1d91b93d0cdb85662e459d1027ba7184f27fa",
+      "validationId": "scv:c425ed41a1475e5fb8d548aeac30ed1b63d85387c499b1c68aed8707d509f96e",
+      "validationChecksum": "0fadf0e88de42ab1f47185390e8fddf32ff40e864736d94060feafb62f4348db"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19",
+      "chunkEvidenceRevision": "sha256:3802f9585429d798009f484d06e598c0b2531df5579a0ce066bc5d2a5ee5e5db",
+      "analysisId": null,
+      "summaryInputChecksum": "f743952068439799beebf92a6dbc5ea27781b044bac07d1af8fe96b9f8da702d",
+      "summaryOutputChecksum": "d228b515443fe3ada8c1a880c7f8f003ff3b654faa0fdee34e03d7bb507fa91e",
+      "claimOrdinal": 2,
+      "claimText": "To fix this, you need to make the value reactive using `$derived`.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "/blog/my-long-post",
+          "/blog/my-short-post",
+          "CURRENT_UPSTREAM",
+          "Math.round",
+          "data",
+          "data.content",
+          "data.content.split",
+          "data.title",
+          "estimatedReadingTime",
+          "onDestroy",
+          "onMount"
+        ],
+        "claimTokens": [
+          "$derived"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "data.content.split",
+          "estimatedReadingTime"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "250",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "ecef5e35f726ebc9f97ef294dd3597681f693eea92125d683fd72c1efb876d97",
+      "validationId": "scv:13613f73c7c8fc7dc559928da4e7c70097c94e2e8757d3a05e755d8779670582",
+      "validationChecksum": "28fd8bc0f8e27b7baa0b98481d78f4e8b8db4e83d8e68a576f29dd43c034f8c4"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+      "chunkEvidenceRevision": "sha256:c6fbdca5bcbaa86c6974834dc4b8a959ac7da79de4ad2fd6e60f8cf4249398f3",
+      "analysisId": null,
+      "summaryInputChecksum": "5da6a186a0f059f35c3ad754ae2655a7c7985ca35767395c1436298d7b96247c",
+      "summaryOutputChecksum": "a7b56bf7e658c9c78744348c355a9e4a5a9c40794bdecf0b5aa165a6ead77665",
+      "claimOrdinal": 0,
+      "claimText": "In SvelteKit, component and page state is preserved across navigation, so you can keep values reactive using `$derived` and reuse components to maintain state like sidebar scroll position.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "data.content.split",
+          "data.title",
+          "onDestroy",
+          "onMount",
+          "page.url.pathname"
+        ],
+        "claimTokens": [
+          "$derived"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "data.content.split",
+          "page.url.pathname"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "250",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "011f6aad095e7cdf144cc062458d8dc1faf989954ca56592f1fa01eddf71095a",
+      "validationId": "scv:69adfd3768ad8634b043a1001c529a8f1c473e6af417af1cc0fc04f87c9d2692",
+      "validationChecksum": "0813a7ba90a5154797ea311c6717d701e9f521c5efbdfd0a1ded286601def8e1"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+      "chunkEvidenceRevision": "sha256:c6fbdca5bcbaa86c6974834dc4b8a959ac7da79de4ad2fd6e60f8cf4249398f3",
+      "analysisId": null,
+      "summaryInputChecksum": "5da6a186a0f059f35c3ad754ae2655a7c7985ca35767395c1436298d7b96247c",
+      "summaryOutputChecksum": "a7b56bf7e658c9c78744348c355a9e4a5a9c40794bdecf0b5aa165a6ead77665",
+      "claimOrdinal": 1,
+      "claimText": "If your code in `onMount` or `onDestroy` needs to run again after navigation, use `afterNavigate` and `beforeNavigate` respectively.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "data.content.split",
+          "data.title",
+          "onDestroy",
+          "onMount",
+          "page.url.pathname"
+        ],
+        "claimTokens": [
+          "afterNavigate",
+          "beforeNavigate",
+          "onDestroy",
+          "onMount"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "data.content.split",
+          "page.url.pathname"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "250",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "ad602123f1f18f84144c5129da12aee5dc2adb664b9744bd58499c5e59b8ccc5",
+      "validationId": "scv:7bd52bd4cb8e8a1e690a6333995ab917fc4fa9505c7e2f83570c5100b44d3a5d",
+      "validationChecksum": "a2d2421a86deee7d52690073f6d6d1df09b9ef3cb46d258d48d5693eb219be26"
+    },
+    {
+      "schema": "atlas.summary-claim-validation.v1",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+      "chunkEvidenceRevision": "sha256:c6fbdca5bcbaa86c6974834dc4b8a959ac7da79de4ad2fd6e60f8cf4249398f3",
+      "analysisId": null,
+      "summaryInputChecksum": "5da6a186a0f059f35c3ad754ae2655a7c7985ca35767395c1436298d7b96247c",
+      "summaryOutputChecksum": "a7b56bf7e658c9c78744348c355a9e4a5a9c40794bdecf0b5aa165a6ead77665",
+      "claimOrdinal": 2,
+      "claimText": "To completely destroy and remount a component on navigation, wrap it in a `{#key page.url.pathname}` block.",
+      "technical": {
+        "status": "PASS",
+        "sourceTokens": [
+          "CURRENT_UPSTREAM",
+          "data.content.split",
+          "data.title",
+          "onDestroy",
+          "onMount",
+          "page.url.pathname"
+        ],
+        "claimTokens": [
+          "{#key page.url.pathname}"
+        ],
+        "missingTechnicalTokens": [
+          "CURRENT_UPSTREAM",
+          "data.content.split"
+        ],
+        "unexpectedTechnicalTokens": []
+      },
+      "numeric": {
+        "status": "PASS",
+        "sourceValues": [
+          "250",
+          "2026",
+          "09",
+          "23"
+        ],
+        "claimValues": [],
+        "unsupportedValues": []
+      },
+      "version": {
+        "status": "PASS",
+        "sourceVersions": [],
+        "claimVersions": [],
+        "unsupportedVersions": []
+      },
+      "sourceSpan": {
+        "status": "NO_CLAIMED_SPAN",
+        "spans": []
+      },
+      "semantic": {
+        "status": "JUDGED",
+        "verdict": "SUPPORTED",
+        "citedSpans": [],
+        "unsupportedFragment": null,
+        "judgeModelId": "ornith-1.5-9b",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+      },
+      "ontology": {
+        "status": "NOT_RUN",
+        "kernelRevision": null,
+        "assertions": []
+      },
+      "result": {
+        "decision": "ADMIT",
+        "escalationRevision": "summary-claim-resolution:val-09-v1"
+      },
+      "resolutionLayer": "COMPOSITE",
+      "validatorRevision": "summary-claim-validator:val-10-replay-v1",
+      "canonicalAuthority": false,
+      "claimChecksum": "1e68ab95d80135b5d47964358f4104b46a07c26f6b2afad1bd94ce200b19288e",
+      "validationId": "scv:277ee574cf6123981d53cae8bd72d2199eb881b7198b7fd29527eb8cc9e6bd1d",
+      "validationChecksum": "0de33fd97dc990db1cca054da795f7cc7a2f8f7910ad6d2c1481797d324fb83e"
+    }
+  ],
+  "tsChecksumParity": {
+    "objects": 51,
+    "zodOk": 51,
+    "zodBad": 0,
+    "sealMismatch": 0,
+    "method": "SummaryClaimValidationV1Schema.safeParse + sealSummaryClaimValidationV1 recomputed over each object body"
+  },
+  "status": "VAL-10 criteria met on the 19-chunk/51-claim sample; EXTERNAL_DOC_SUMMARY_FAITHFULNESS_PROVEN NOT claimed for the full corpus (852 chunks); no summaries persisted"
+}

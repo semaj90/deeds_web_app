@@ -132,10 +132,13 @@ def http_transport(llama_url: str, model: str, timeout: int = 120, on_response: 
 def judge_claim_v1(judge_input: dict[str, Any], transport: Transport, model: dict[str, str]) -> dict[str, Any]:
     """Returns a VAL-01 `semantic` slot dict (validated against the Pydantic mirror). Never raises for model/transport/parse failures."""
     empty = {"verdict": None, "citedSpans": [], "unsupportedFragment": None, "judgeModelId": None, "judgeModelRevision": None, "judgePromptRevision": None, "independenceClass": None}
-    try:
-        parsed = parse_output(transport(build_messages(judge_input)))
-    except Exception:  # transport/timeout/HTTP errors are recorded as unknown, never as a pass
-        parsed = None
+    parsed = None
+    for attempt in range(2):  # ONE retry, transport-level failures only (timeout/HTTP); a parse failure is deterministic at temperature 0 and is never retried
+        try:
+            parsed = parse_output(transport(build_messages(judge_input)))
+            break
+        except Exception:  # still recorded as unknown, never as a pass
+            parsed = None
     if parsed is None:
         return SemanticSlot.model_validate({"status": "JUDGE_ERROR", **empty}).model_dump()
     slot = {"status": "JUDGED", "verdict": parsed["verdict"], "citedSpans": [], "unsupportedFragment": parsed["unsupportedFragment"],

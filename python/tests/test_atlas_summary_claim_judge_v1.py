@@ -88,3 +88,25 @@ def test_model_gate_requires_ornith_listed_by_the_server_and_never_ollama_or_oth
     unlisted = {"/props": {"model_alias": "ornith-1.5-9b"}, "/v1/models": {"data": [{"id": "other"}]}}
     with pytest.raises(RuntimeError):
         resolve_model("http://x", lambda p: unlisted[p])
+
+
+def test_one_retry_on_transport_failure_but_never_on_parse_failure_and_never_a_pass_after_two_failures() -> None:
+    calls = {"n": 0}
+
+    def flaky(_m):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise TimeoutError("transient")
+        return '{"verdict":"SUPPORTED","unsupportedFragment":null}'
+    assert judge_claim_v1(TS_INPUT, flaky, MODEL)["verdict"] == "SUPPORTED" and calls["n"] == 2
+
+    garbage = {"n": 0}
+
+    def bad(_m):
+        garbage["n"] += 1
+        return "garbage"
+    assert judge_claim_v1(TS_INPUT, bad, MODEL)["status"] == "JUDGE_ERROR" and garbage["n"] == 1  # parse failure: parsed None, no exception, so no retry
+
+    def dead(_m):
+        raise TimeoutError("down")
+    assert judge_claim_v1(TS_INPUT, dead, MODEL)["status"] == "JUDGE_ERROR"
