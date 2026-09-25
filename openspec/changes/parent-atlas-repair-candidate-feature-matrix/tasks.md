@@ -139,3 +139,26 @@ Numbering note: an external plan called these CEI-19/21/22/23, which collide wit
 - [ ] **SUM-04** 12-row canary apply, atomic 12/12 for this first proof (prevalidate all 12, one transaction, readback + recompute summaryDigest, ROLLBACK on any difference). Receipt must show requested 12, prevalidated 12, admitted 12, updated 12 and zeros for unexpected_existing, identity_changed, source_revision_changed, input_digest_changed, contamination_blocked, readback_digest_mismatch, summary_hash_mutated, qdrant_writes, embedding_writes, graph_writes, cache_writes. Needs explicit operator approval (DB write). Later batches use per-row dispositions.
 - [ ] **SUM-05** Admitted summary -> EmbeddingGemma (this is CEI-16b): read `summary_text` only where provenance.status = ADMITTED, current sourceRevision and summaryDigest verify, then `guard-pre-embedding-enrichment-v1`; no `summary || content_text || ''` fallback anywhere in the new path (no admitted summary = BLOCKED_NO_ADMITTED_SUMMARY); a source-content embedding is a separate named representation with its own input digest.
 - [ ] **SUM-06** Summary-semantic canary: admitted summary -> EmbeddingGemma -> representation_revision -> exact digest/readback. Only then do ACE3 sections for those 12 rows become CURRENT.
+
+## HANDOFF 2026-09-25 (read this first)
+
+State: read-only census + local artifacts + contracts + guards. **No PostgreSQL, Valkey or Qdrant writes and no model calls were made by this work.** Memory note: `~/.claude/projects/C--Users-james-Videos-deeds-web-app/memory/project_summary_embedding_lineage_2026-09-25.md`. Commit `70eabb08d1` on branch `handoff/summary-enrichment-lineage-20260925` (also pushed to main by fast-forward).
+
+Regenerate local artifacts (gitignored under `.tmp/`; checksums are in the docs/reports receipts). Scope args for the lineage audit: workspace revision `sha256:e24bb971...9acc`, execution `74d50c86-8194-45ea-8c3d-61aab737ef83`.
+1. `node scripts/atlas/audit-current-workspace-ast-lineage-v1.mjs --workspace-revision ... --execution-id ... --membership-checksum ... --repair-root-sha256 ... --emit-rows .tmp/atlas/current-ast-capability-rows-v1.ndjson`
+2. `node scripts/atlas/build-current-enriched-index-shards-v1.mjs --workspace-revision ... --execution-id ...` then `node scripts/atlas/join-ast-state-into-enriched-shards-v1.mjs`
+3. `node scripts/atlas/build-candidate-feature-matrix-v1.mjs`, `node scripts/atlas/compose-ace-packets-v3.mjs`
+4. Checks: `node scripts/atlas/smoke-validate-enriched-index-v1.mjs` (SMOKE_FAIL on the placeholder detector is the expected state), `node scripts/atlas/guard-pre-embedding-enrichment-v1.mjs --all`, `node scripts/atlas/audit-enrichment-readiness-v1.mjs`, `node --test scripts/atlas/lib/summary-quality-v1.test.mjs`
+5. Package tests: from `packages/parent-atlas` run `node ../../node_modules/typescript/lib/tsc.js -p tsconfig.json` then `node --test test/ace-packet-v3.test.mjs test/ace-packet-v3-admission.test.mjs test/ace-hypergraph-packet.test.mjs` (21 pass). `npx tsc` fails under the workspace config.
+
+Headline facts: revision-qualified cohort 15,732 of 24,456; embed-allowed 3,295; 54,774 packets carry one shared placeholder vector from a single 2026-07-20/21 run of `phase106-stage4-embedding-backfill.mjs`; the 07-04 summaries come from `.tmp/gemma4-summaries-5k.ndjson` and about 88% echo prompt scaffold; CURRENT semantic/topology sections in composed ACE packets = 0 by design.
+
+Next, in order:
+1. SUM-02 (code-only): chunk-summary admission writer on `codebase_chunk_index.summary_text` + `summary_provenance`, replay-tested without Ornith or the database; consumes the frozen `OrnithSummaryProposalV1` envelope and `evaluateSummaryAdmissionV1`. Coordinate with the parallel session (Codex) that owns the 12-row Ornith proposal canary and the additive migration draft `drizzle/manual/20260925_codebase_chunk_summary_provenance_v1.sql`.
+2. SUM-04: 12-row atomic canary apply. **Needs explicit operator approval (first database write).**
+3. SUM-05 / CEI-16b: admitted summary -> EmbeddingGemma through the guard; then SUM-06 semantic canary and representation_revision; only then do ACE3 sections become CURRENT.
+4. CEI-20 remainder: rename the frontend startup wrapper; decide scheduling (Task Scheduler) for production `graphify:daily` and for the hourly maintenance steps that no longer run on folder open.
+5. ACE3-03..08, 12: Valkey writer using `AceBitfrostCacheIdentityV1`, centroid artifacts, residency, ContextManifest, PromptPlan, hypergraph integration, end-to-end replay.
+6. Read-only NDJSON exporter with metadata carryload (Node pg cursor + Zod); labels for the golden relevance queue (0 of 1,287 graded) before any cosine/top-k selection; RAPIDS/cuVS/PageRank work only after per-summary vectors and a graph_revision exist.
+
+Not committed (belongs to the parallel session, still in the working tree): large-corpus scripts, workboard planner/controller edits, miniforge sidecar and graphify-langgraph-pipeline edits, docs/reports workboard files. Open risks: `phase7-rabbitmq-summary-queue.mjs:235` discards the sanitizer's `.safe`; `atlas-gpu-8098` runs a RAPIDS 26.08 CUDA-12 image that duplicates the proven WSL2 environment.
