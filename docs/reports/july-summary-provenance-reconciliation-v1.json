@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.july-summary-provenance-reconciliation.v1",
+  "gate": "JULY_SUMMARY_PROVENANCE_RECONCILIATION_01",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "regenerated": false,
+  "scope": {
+    "universe": "all atlas_packets with a packet summary, a 2026-07-04 gemma4_offline layer row, same-ref July-era chunk summary, or a non-placeholder embedding",
+    "currentCohortExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+  },
+  "globalEmbedded": 61659,
+  "manifestRows": 10086,
+  "manifestPath": ".tmp/atlas/july-summary-provenance-v1/manifest-20260925T211326Z.ndjson",
+  "manifestSha256": "32f4a3a4238c0a1b85a59921e4a06c0100f9de93ba52a312dfdce6c57763674b",
+  "placeholderRule": "embedding vector shared by >1% of all embedded packets",
+  "intersections": {
+    "packetsWithSummary": 6886,
+    "realEmbedding": 6883,
+    "placeholderEmbedding": 3202,
+    "july4LayerPackets": 3060,
+    "realAndSummary": 6883,
+    "realAndJuly4Layer": 3058,
+    "realAndSummaryAndJuly4Layer": 3058,
+    "realAndChunkSummaries": 1,
+    "placeholderAndSummary": 2,
+    "placeholderAndJuly4Layer": 2,
+    "placeholderAndChunkSummaries": 3200,
+    "realWithoutAnySummary": 0
+  },
+  "revisionClasses": {
+    "JULY_SUMMARY_EXACT_CURRENT_REVISION": 3635,
+    "JULY_SUMMARY_REVISION_UNKNOWN": 6451
+  },
+  "embeddingClasses": {
+    "JULY_EMBEDDING_REAL": 6883,
+    "JULY_EMBEDDING_PLACEHOLDER": 3202,
+    "NO_EMBEDDING": 1
+  },
+  "embeddingByStatus": {
+    "JULY_EMBEDDING_REAL|status=success|eligible=false|versioned=true|digest=false": 5682,
+    "JULY_EMBEDDING_REAL|status=success|eligible=false|versioned=false|digest=false": 1201,
+    "JULY_EMBEDDING_PLACEHOLDER|status=success|eligible=false|versioned=false|digest=false": 3199,
+    "JULY_EMBEDDING_PLACEHOLDER|status=success|eligible=false|versioned=true|digest=false": 3,
+    "NO_EMBEDDING|status=pending|eligible=false|versioned=false|digest=true": 1
+  },
+  "embeddingDates": {
+    "real": {
+      "Mon Jul 20": 4463,
+      "Tue Jul 21": 2420
+    },
+    "placeholder": {
+      "Tue Jul 21": 6,
+      "Mon Jul 20": 3196
+    }
+  },
+  "summaryHashSemantics": {
+    "hashEqualsSha256OfCurrentSummary": {
+      "null": 6886
+    }
+  },
+  "packetSummaryVsJuly4Layer": {
+    "false": 2672,
+    "true": 388
+  },
+  "notProven": [
+    "exact writer of atlas_packets.summary for these rows",
+    "that embeddings were generated from these summaries (no embedding-input record found in row data)",
+    "go-retrieval indexing input (see go-retrieval trace)"
+  ],
+  "generatedAt": "2026-09-25T21:13:26.040Z",
+  "findings": {
+    "realEmbeddingsAlignWithPacketSummaries": "All 6,883 packets holding a non-placeholder embedding (globally, of 61,659 embedded) have a packet summary (0 real embeddings without a summary). This is the strongest link found: real vector <=> summary-bearing packet.",
+    "july4LayerCoverage": "Only 3,058 of those 6,883 (44%) are in the 2026-07-04 gemma4_offline layer; 3,825 got summaries from another source. Of 3,060 July-4 layer packets, packet.summary equals the layer text on only 388.",
+    "embeddingRunDate": "embedding_timestamp is 2026-07-20 (4,463 real, 3,196 placeholder) and 2026-07-21 (2,420 real, 6 placeholder): embeddings came from a run about 16 days AFTER the July-4 summaries, and placeholders came from the SAME run (fallback path), not a later one.",
+    "placeholderPath": "3,200 placeholder-embedding packets in this universe carry only July-era chunk summaries (chunk_summaries>0, no packet summary): the packet embedding step saw no packet summary and stored the shared vector while chunk summaries existed on the same source_ref, never propagated.",
+    "flagsUnreliable": "embedding_eligible=false on every embedded packet (real and placeholder), embedding_digest absent everywhere, packet.summary_hash null on all; none of them can distinguish real from placeholder.",
+    "revision": "Of 10,086 manifest packets, 3,635 carry a source_revision equal to the current cohort revision; 6,451 have no revision. 0 stale, 0 conflicting.",
+    "goRetrieval": "go-retrieval-classifier (hybrid.go) reads atlas_packets.summary via Postgres full-text at query time; no separate summary export/index artifact found. The 8100 retrieval facade source was not located in this pass."
+  },
+  "hypothesisUpdate": "Real embeddings were built on 2026-07-20/21 from the packet summary text present then; placeholders are that same run's fallback for packets without a packet summary. Still unproven: the embedding input text (no record), and the writer of atlas_packets.summary."
+}

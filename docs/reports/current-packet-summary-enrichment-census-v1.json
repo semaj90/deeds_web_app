@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.current-packet-summary-enrichment-census.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "scope": {
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+  },
+  "joinBasis": "BYTE_EXACT_source_ref_ONLY_NOT_CANONICAL_IDENTITY",
+  "normalizationUsed": false,
+  "pathFallbackUsed": false,
+  "cohort": {
+    "identities": 24456,
+    "distinct_source_refs": 24456
+  },
+  "atlasPackets": {
+    "cohort_refs_with_packet": 16543,
+    "packet_rows": 16543,
+    "missing_packet_key": 0,
+    "distinct_packet_keys": 16543,
+    "with_summary": 3740,
+    "with_source_revision": 16151,
+    "source_revision_equals_admitted": 16151,
+    "source_revision_conflict": 0,
+    "summary_without_revision": 110,
+    "with_domain": 16543,
+    "with_community": 16493,
+    "with_kmeans": 16493,
+    "with_som_cell": 16395,
+    "with_embedding": 16493,
+    "with_pagerank": 16543
+  },
+  "codebaseChunks": {
+    "cohort_refs_with_chunks": 20015,
+    "chunk_rows": 180081,
+    "with_summary": 1111,
+    "with_semantic_768": 10277,
+    "with_latent_256": 10277,
+    "with_source_revision": 0,
+    "source_revision_equals_admitted": 0,
+    "source_revision_conflict": 0,
+    "workspace_revision_equals_scope": 0,
+    "summary_without_revision": 1111,
+    "with_domain": 180072,
+    "with_kmeans": 9843,
+    "with_som_bmu": 7714,
+    "with_ast_facts": 1466
+  },
+  "sampleRefs": {
+    "cohort": [
+      "2-CONTEXT.md",
+      "724_agents.md",
+      "ACE-BITFROST-WORKER-INTEGRATION.md"
+    ],
+    "atlasPackets": [
+      "",
+      "$lib/utils/file-reader.ts",
+      "1"
+    ],
+    "codebaseChunks": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "rules": [
+    "summary present != revision-qualified",
+    "embedding present != canonical identity",
+    "AST absent != indexing failure",
+    "cluster present != identity"
+  ],
+  "generatedAt": "2026-09-25T20:26:58.225Z"
+}

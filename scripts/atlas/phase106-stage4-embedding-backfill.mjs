@@ -20,6 +20,13 @@
  *   - Permanent (dimension, norm, hash): create Mastra task, do NOT write to Postgres
  */
 
+// HISTORICAL / NONCANONICAL (CEI-19b): this script embedded `summary || payload.text || ''`, so packets with no text all
+// received the same empty-string vector (54,774 packets, 2026-07-20/21). It defaults to APPLY. Refuse unless knowingly
+// overridden; new embedding work must consume guard-pre-embedding-enrichment-v1.mjs EMBED_ALLOWED keys instead.
+if (process.env.PHASE106_HISTORICAL_BACKFILL_ALLOW !== '1') {
+  console.error('phase106-stage4-embedding-backfill is retired (CEI-19b): it writes a shared vector for packets with no text. Use scripts/atlas/guard-pre-embedding-enrichment-v1.mjs. Set PHASE106_HISTORICAL_BACKFILL_ALLOW=1 only to reproduce history.');
+  process.exit(78);
+}
 import pg from 'pg';
 import fetch from 'node-fetch';
 import crypto from 'crypto';

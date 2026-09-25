@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.ace-packets-v3-composition.v1",
+  "mode": "LOCAL_ARTIFACTS_ONLY",
+  "databaseWrites": 0,
+  "valkeyWrites": 0,
+  "qdrantWrites": 0,
+  "llmCalls": 0,
+  "composed": 15732,
+  "skippedNotRevisionQualified": 8724,
+  "verifyFailures": 0,
+  "cacheAdmissionMisses": 0,
+  "sectionStatus": {
+    "embedding:HINT": 3294,
+    "embedding:PENDING": 12438,
+    "evidence:CURRENT": 15732,
+    "residency:PENDING": 15732,
+    "semantic:HINT": 15732,
+    "source:CURRENT": 15732,
+    "summary:HINT": 3295,
+    "summary:PENDING": 12437,
+    "topology:HINT": 15732
+  },
+  "currentSemanticOrTopology": 0,
+  "whyNotCurrent": [
+    "representation_revision does not exist (legacy 0), so no embedding can be CURRENT",
+    "som_revision absent, so topology stays HINT",
+    "summary text is not admitted (no input digest; July summaries are scaffold-contaminated)",
+    "residency has not been computed (PENDING)",
+    "no hypergraph relationship evidence attached (base.hypergraph = null)"
+  ],
+  "manifest": ".tmp\\atlas\\ace-packets-v3\\20260925T220337Z\\manifest.json",
+  "rootSha256": "2f3d4e0bdf76ab4953000ae795f5a02a5fee46cc0b98d1557e23defa33692056",
+  "generatedAt": "2026-09-25T22:03:43.032Z"
+}

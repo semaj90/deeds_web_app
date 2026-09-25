@@ -1,0 +1,185 @@
+{
+  "schema": "atlas.current-workspace-ast-lineage.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "graphifyRun": false,
+  "supersedes": [
+    "current-workspace-ast-lineage-v1-9f68bf6c11a87807.json",
+    "current-workspace-ast-lineage-v1-fede11c6dc0b8cfa.json",
+    "current-workspace-ast-lineage-v1-4c8e8e8ca950cb6f.json",
+    "current-workspace-ast-lineage-v1-7769e7076aa61f15.json"
+  ],
+  "scope": {
+    "repositoryId": "repo:root",
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "v2MembershipChecksum": "sha256:59b3f07ead8d796fbef31da5946b2bc0fd678fa6ab175d10df0d49361a16ff81",
+    "packetRepairRoot": "e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3"
+  },
+  "identityJoin": {
+    "candidateKey": "exact normalized repository_relative_path to atlas_ast_nodes.relative_path",
+    "rootTransform": "strip the one leading sveltekit-frontend/ segment from the membership repository-relative path",
+    "canonicalQualificationAlsoRequires": [
+      "workspace_id exact match",
+      "source_revision exact match",
+      "source_content_hash equals membership content_hash"
+    ],
+    "fuzzyOrPrefixMatchUsed": false,
+    "sourceRefAloneUsed": false
+  },
+  "denominators": {
+    "currentSourcePopulation": 24456,
+    "astObservedPopulation": 2076,
+    "revisionQualifiedAstPopulation": 10,
+    "missingAstEvidence": 22380,
+    "staleOrWrongRevisionAstEvidence": 3,
+    "observedSourcesMissingWorkspaceBinding": 2058,
+    "observedSourcesMissingAstRevision": 2063,
+    "allSourcesClassifiedExactlyOnce": true,
+    "classifiedSources": 24456
+  },
+  "classifications": {
+    "AST_EVIDENCE_ABSENT": 22380,
+    "AST_REVISION_MISSING": 5,
+    "AST_REVISION_QUALIFIED": 10,
+    "AST_STALE_OTHER_REVISION": 3,
+    "AST_WORKSPACE_BINDING_MISSING": 2058,
+    "AST_SOURCE_MISMATCH": 0,
+    "AST_WORKSPACE_MISMATCH": 0
+  },
+  "capabilityCensus": {
+    "schema": "atlas.current-file-analysis-capability-census.v1",
+    "derivedOnly": true,
+    "identityOwner": false,
+    "denominator": {
+      "membershipRowsRepoRoot": 24456,
+      "distinctSourceIdentities": 24456,
+      "duplicateMembershipRows": 0
+    },
+    "outcomes": {
+      "NOT_AST_ELIGIBLE": 9638,
+      "ELIGIBLE_PARSER_UNAVAILABLE": 2743,
+      "ELIGIBLE_NOT_TRAVERSED": 10903,
+      "TRAVERSED_PARSE_FAILED": 0,
+      "PARSED_NOT_REVISION_QUALIFIED": 1162,
+      "REVISION_QUALIFIED_AST": 10,
+      "SYMBOL_RESOLVED": 0
+    },
+    "outcomesReconcile": true,
+    "reasonsByOutcome": {
+      "NOT_AST_ELIGIBLE": {
+        "NON_CODE_EXTENSION_md": 7912,
+        "NON_CODE_EXTENSION_json": 1597,
+        "NON_CODE_EXTENSION_toml": 12,
+        "NON_CODE_EXTENSION_yml": 27,
+        "NON_CODE_EXTENSION_yaml": 78,
+        "NON_CODE_EXTENSION_jsonl": 11,
+        "NON_CODE_EXTENSION_psm1": 1
+      },
+      "ELIGIBLE_NOT_TRAVERSED": {
+        "NO_AST_ROWS": 10903
+      },
+      "ELIGIBLE_PARSER_UNAVAILABLE": {
+        "NO_PROVIDER_FOR_ps1": 301,
+        "NO_PROVIDER_FOR_sh": 99,
+        "NO_PROVIDER_FOR_go": 22,
+        "NO_PROVIDER_FOR_rs": 10,
+        "NO_PROVIDER_FOR_sql": 655,
+        "NO_PROVIDER_FOR_py": 578,
+        "NO_PROVIDER_FOR_proto": 101,
+        "NO_PROVIDER_FOR_h": 3,
+        "NO_PROVIDER_FOR_cpp": 16,
+        "NO_PROVIDER_FOR_java": 1,
+        "NO_PROVIDER_FOR_c": 10,
+        "NO_PROVIDER_FOR_cc": 14,
+        "NO_PROVIDER_FOR_svelte": 932,
+        "NO_PROVIDER_FOR_hpp": 1
+      },
+      "PARSED_NOT_REVISION_QUALIFIED": {
+        "AST_WORKSPACE_BINDING_MISSING": 1162
+      }
+    },
+    "astEligibleWithWiredProvider": 12075,
+    "revisionQualifiedOfWiredEligible": 10,
+    "notMeasured": {
+      "TRAVERSED_PARSE_FAILED": "no parse-failure ledger consulted",
+      "SYMBOL_RESOLVED": "symbol resolution not joined in this audit"
+    },
+    "providers": {
+      "wiredProviderLanguages": [
+        "typescript",
+        "tsx",
+        "javascript",
+        "jsx"
+      ],
+      "wiredProviderOwner": "node-tree-sitter-ast-provider.ts",
+      "note": "Eligibility above follows the wired provider only; observedProducers shows which producers actually wrote atlas_ast_nodes rows for this cohort, including legacy chunk-index-v1 rows for svelte/sql/json/proto and extractor rows for md/json."
+    },
+    "observedProducers": [
+      {
+        "parserName": "tree-sitter",
+        "parserVersion": "chunk-index-v1",
+        "grammarVersion": null,
+        "parserLanguage": "typescript",
+        "distinctSources": 1137
+      },
+      {
+        "parserName": "tree-sitter",
+        "parserVersion": "chunk-index-v1",
+        "grammarVersion": null,
+        "parserLanguage": "svelte",
+        "distinctSources": 844
+      },
+      {
+        "parserName": "tree-sitter",
+        "parserVersion": "chunk-index-v1",
+        "grammarVersion": null,
+        "parserLanguage": "sql",
+        "distinctSources": 37
+      },
+      {
+        "parserName": "tree-sitter",
+        "parserVersion": "chunk-index-v1",
+        "grammarVersion": null,
+        "parserLanguage": "javascript",
+        "distinctSources": 22
+      },
+      {
+        "parserName": "tree-sitter",
+        "parserVersion": "chunk-index-v1",
+        "grammarVersion": null,
+        "parserLanguage": "json",
+        "distinctSources": 14
+      },
+      {
+        "parserName": "ast-grep-napi",
+        "parserVersion": "0.44.0",
+        "grammarVersion": null,
+        "parserLanguage": "typescript",
+        "distinctSources": 10
+      },
+      {
+        "parserName": "markdown-symbol-extractor",
+        "parserVersion": "source-text-encoding-01",
+        "grammarVersion": null,
+        "parserLanguage": "markdown",
+        "distinctSources": 6
+      },
+      {
+        "parserName": "json-symbol-extractor",
+        "parserVersion": "source-text-encoding-01",
+        "grammarVersion": null,
+        "parserLanguage": "json",
+        "distinctSources": 1
+      }
+    ]
+  },
+  "gate": {
+    "name": "CURRENT_WORKSPACE_LINEAGE",
+    "status": "BLOCKED",
+    "blocker": "CURRENT_AST_EVIDENCE_INCOMPLETE_OR_UNBOUND"
+  },
+  "generatedAt": "2026-09-25T20:00:26.468Z",
+  "reportSha256": "9ba271c8f19afea5d057d69cf56f97fde9bf93b0577bbe37052a087531ebbc49"
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "atlas.current-enriched-index-shards.v1",
+  "mode": "READ_ONLY_DB_LOCAL_SHARDS",
+  "databaseWrites": 0,
+  "valkeyWrites": 0,
+  "llmCalls": 0,
+  "scope": {
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+  },
+  "manifestPath": ".tmp\\atlas\\current-enriched-index-shards-v1\\20260925T202948Z\\manifest.json",
+  "rootSha256": "36838a25e26633e337af7d676a14dfda824258ab4e0c6b3f0782ff5f4e8281ba",
+  "records": 24456,
+  "lineageStates": {
+    "IDENTITY_UNRESOLVED": 2720,
+    "REVISION_QUALIFIED": 15732,
+    "REVISION_MISSING": 392,
+    "REVISION_HASH_CONFLICT": 419,
+    "LEGACY_ONLY": 5193
+  },
+  "noPacketByExtension": {
+    "ts": 3005,
+    "md": 1646,
+    "mjs": 1553,
+    "mts": 491,
+    "py": 457,
+    "json": 349,
+    "sql": 212,
+    "yaml": 65,
+    "ps1": 43,
+    "sh": 20,
+    "svelte": 20,
+    "go": 12,
+    "js": 8,
+    "proto": 7,
+    "cpp": 6,
+    "yml": 5,
+    "toml": 5,
+    "cjs": 3,
+    "c": 2,
+    "cc": 2,
+    "h": 1,
+    "java": 1
+  },
+  "astEligibility": {
+    "NOT_ELIGIBLE": 9638,
+    "ELIGIBLE": 14818
+  },
+  "revisionQualifiedWithSummary": 3295,
+  "revisionQualifiedWithoutSummary": 12437,
+  "packetSha256": {
+    "matchesAdmitted": 3222,
+    "differs": 477,
+    "absent": 20757
+  },
+  "notes": [
+    "astState is NOT_JOINED_IN_THIS_PASS for eligible files; see current-workspace-ast-lineage-v1 receipts",
+    "summary text is not copied into shards; length and hash only",
+    "exact source_ref join; not canonical identity by itself",
+    "packet.content_hash is a different-scope hash (0/100 match) and is ignored; packet.sha256 is the whole-file hash and gates REVISION_QUALIFIED when present"
+  ],
+  "generatedAt": "2026-09-25T20:29:48.478Z",
+  "revisionHashConflictResolution": {
+    "checkedAt": "2026-09-25T20:32:31.854Z",
+    "population": 419,
+    "method": "sha256 of on-disk file bytes vs admitted membership hash vs packet.sha256 (read-only)",
+    "diskEqualsAdmitted": 419,
+    "diskEqualsPacketSha256": 0,
+    "diskEqualsNeither": 0,
+    "missingOnDisk": 0,
+    "writerRevision": "current-packet-digest-bridge-v1 (all 419)",
+    "conclusion": "admitted hash and packet source_revision agree with disk; packet.sha256 is the stale side. Packet summary/embedding derivation currency is NOT established.",
+    "stateKept": "REVISION_HASH_CONFLICT (not promoted to REVISION_QUALIFIED)"
+  }
+}

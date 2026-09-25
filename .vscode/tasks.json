@@ -2010,7 +2010,8 @@
     {
       "label": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
       "type": "shell",
-      "command": "node scripts/startup/run-graphify-daily-startup.mjs",
+      "command": "npm run graphify:daily:dry",
+      "detail": "CEI-20: was the frontend maintenance wrapper (sveltekit-frontend/scripts/startup/run-graphify-daily-startup.mjs). Now the canonical graphify:daily family in READ-ONLY dry-run mode; production apply is a deliberate manual npm run graphify:daily (root wrapper: admission then apply chain).",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend",
         "env": {

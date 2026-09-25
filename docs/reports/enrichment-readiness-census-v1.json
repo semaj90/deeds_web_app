@@ -1,0 +1,121 @@
+{
+  "schema": "atlas.enrichment-readiness-census.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "scope": "ALL atlas_packets (not only the current admitted cohort)",
+  "packets": 61718,
+  "fieldCoverage": {
+    "ident": {
+      "count": 61717,
+      "fraction": 1
+    },
+    "has_rev": {
+      "count": 16151,
+      "fraction": 0.2617
+    },
+    "has_sha": {
+      "count": 4715,
+      "fraction": 0.0764
+    },
+    "has_ws_key": {
+      "count": 16151,
+      "fraction": 0.2617
+    },
+    "has_summary": {
+      "count": 6886,
+      "fraction": 0.1116
+    },
+    "has_keywords": {
+      "count": 7034,
+      "fraction": 0.114
+    },
+    "has_domain": {
+      "count": 61718,
+      "fraction": 1
+    },
+    "has_concepts": {
+      "count": 58360,
+      "fraction": 0.9456
+    },
+    "has_used_concepts": {
+      "count": 8,
+      "fraction": 0.0001
+    },
+    "has_entities": {
+      "count": 0,
+      "fraction": 0
+    },
+    "emb_real": {
+      "count": 6883,
+      "fraction": 0.1115
+    },
+    "emb_placeholder": {
+      "count": 54776,
+      "fraction": 0.8875
+    },
+    "has_emb_version": {
+      "count": 53109,
+      "fraction": 0.8605
+    },
+    "has_repr_rev": {
+      "count": 1,
+      "fraction": 0
+    },
+    "has_comm": {
+      "count": 61660,
+      "fraction": 0.9991
+    },
+    "has_km": {
+      "count": 61660,
+      "fraction": 0.9991
+    },
+    "has_som": {
+      "count": 58365,
+      "fraction": 0.9457
+    },
+    "has_pr": {
+      "count": 61718,
+      "fraction": 1
+    }
+  },
+  "levelsCumulative": {
+    "L1_LINEAGE": 15732,
+    "L1+L2_TEXT": 2669,
+    "L1..L3_CLASSIFY": 2669,
+    "L1..L4_EMBED_OK": 0,
+    "L1..L5_PROJECT": 0
+  },
+  "firstUnmetLevel": {
+    "L1": 45986,
+    "L2": 13063,
+    "L3": 0,
+    "L4": 2669,
+    "L5": 0,
+    "allMet": 0
+  },
+  "placeholderEmbedding": {
+    "withoutSummary": 54774,
+    "withSummary": 2
+  },
+  "embedAllowedPackets": 3295,
+  "summaryWithoutRevision": 3256,
+  "shaRevisionConflicts": 419,
+  "sourceRefForms": {
+    "repo_root_form": 19956,
+    "frontend_relative_form": 12178,
+    "blank": 1
+  },
+  "contract": {
+    "L1_LINEAGE": "packet_key, source_ref, source_revision (whole-file hash by construction); packet.sha256, when present, must agree with it (sha256 alone is not required: it is populated on only 7.6% of packets)",
+    "L2_TEXT": "non-empty summary (FTS GIN idx_atlas_packets_summary_fts) + keywords",
+    "L3_CLASSIFY": "domain_class + concept_ids",
+    "L4_EMBED_OK": "real non-shared embedding + embedding_version + non-legacy representation_revision; only reachable after L1+L2",
+    "L5_PROJECT": "community_id + kmeans + SOM cell + pagerank (projection metadata, never identity)"
+  },
+  "preEmbeddingGate": {
+    "rule": "EmbeddingGemma fan-out and graph creation consume only packets with L1+L2(+L3) met; others are recorded as embedding_blocked with the first unmet level, never given a default/shared vector",
+    "existingFailure": "a shared placeholder vector was stored for packets with no summary (July 20-21 run), making embedding presence meaningless",
+    "wiring": "not yet wired; graphify-langgraph-pipeline.mjs has uncommitted edits by another session, so the gate is specified as a task, not patched here"
+  },
+  "generatedAt": "2026-09-25T21:38:10.742Z"
+}
