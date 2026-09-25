@@ -13,7 +13,7 @@ const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(env),
   max: 1,
   connectionTimeoutMillis: 5000,
-  query_timeout: 120000,
+  query_timeout: 135000, // must exceed statement_timeout so the handled server-side 57014 fires first
   lock_timeout: 5000,
   statement_timeout: 120000,
 });
@@ -112,7 +112,26 @@ try {
             AND packet_lineage_producer_revision IS NOT NULL
           )
       ) exact_revision_qualified)::integer AS packet_revision_workspace_binding_matches,
+      (SELECT count(*) FROM (
+        SELECT source_ref
+        FROM packet_candidates
+        WHERE packet_key IS NOT NULL
+        GROUP BY source_ref
+        HAVING count(DISTINCT packet_key) = 1
+          AND count(DISTINCT source_revision) = 1
+          AND bool_or(
+            lower(packet_source_revision) = source_revision
+            AND lower(packet_workspace_revision) = workspace_revision
+            AND packet_lineage_binding_checksum IS NOT NULL
+            AND packet_lineage_producer_revision IS NOT NULL
+          )
+      ) exact_full_canonical)::integer AS packet_full_canonical_identity_matches,
       (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision AND lower(packet_content_hash) = content_digest AND packet_workspace_revision = workspace_revision)::integer AS packet_full_identity_matches,
+      -- PACKET_AUDIT_SEMANTICS: canonical identity is source_revision; content_hash is legacy diagnostic evidence only.
+      -- Named metrics (packet_revision_matches and packet_revision_workspace_binding_matches above keep their legacy keys).
+      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision)::integer AS packet_revision_identity_matches,
+      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_workspace_revision) = workspace_revision AND packet_lineage_binding_checksum IS NOT NULL AND packet_lineage_producer_revision IS NOT NULL)::integer AS packet_workspace_binding_matches,
+      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(btrim(packet_content_hash)) = content_digest)::integer AS packet_legacy_content_hash_matches,
       (SELECT count(*) FROM (SELECT source_ref FROM packet_candidates WHERE packet_key IS NOT NULL GROUP BY source_ref HAVING count(DISTINCT packet_key) > 1) ambiguous)::integer AS packet_ambiguous_sources,
       (SELECT count(DISTINCT p.source_ref) FROM graphify_exact g JOIN public.atlas_packets p ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref AND lower(btrim(p.content_hash)) = g.content_digest)::integer AS packet_content_matches,
       (SELECT count(DISTINCT source_ref) FROM proven_lineage WHERE file_content_hash IS NOT NULL AND lower(btrim(file_content_hash)) = content_digest)::integer AS chunk_file_content_matches

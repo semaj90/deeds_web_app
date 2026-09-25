@@ -4,7 +4,8 @@ import { CODE_SOURCE_REVISION_SCHEMA } from './code-source-revision-v1.js';
 
 const sha256 = z.string().regex(/^[a-f0-9]{64}$/);
 const sourceRevision = z.string().regex(/^sha256:[a-f0-9]{64}$/);
-const sourceRef = z.string().min(1).superRefine((value, ctx) => {
+/** Exported so packet-key-v2.ts reuses this owner's source_ref contract instead of re-deriving one. */
+export const workspaceSourceRefV1Schema = z.string().min(1).superRefine((value, ctx) => {
   const normalized = value.replace(/\\/g, '/');
   if (normalized.startsWith('/') || /^[A-Za-z]:\//.test(normalized) || normalized.split('/').includes('..')) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'sourceRef must be repository-relative and traversal-free' });
@@ -13,6 +14,7 @@ const sourceRef = z.string().min(1).superRefine((value, ctx) => {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'sourceRef must be a physical repository path, not an import alias' });
   }
 });
+const sourceRef = workspaceSourceRefV1Schema;
 const gitObjectFormatSchema = z.enum(['sha1', 'sha256']);
 
 function gitOidSchema(format: 'sha1' | 'sha256') {

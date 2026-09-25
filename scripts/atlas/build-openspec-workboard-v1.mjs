@@ -10,6 +10,7 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from '
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { blockHash, parseWfu, resolveDeclarations, sectionSlug, sha256, stripWfuComment, summarizeDeclared, taskBlock } from './lib/wfu-metadata.mjs';
+import { buildProgramGates, buildProgramHierarchy, buildProgramWorkPackages, buildSelectedChainOverlay, classifyGateState, classifyProgramTask, computeCompletionTracking, isValidSchedulerSelection, mutationClass, PROGRAM_MILESTONES, PROGRAM_WAVES, schedulerPermission } from './lib/openspec-program-plan-v1.mjs';
 
 // Repo root is owned by this script's location, not by process.cwd() (running from scripts/atlas wrote to a nonexistent scripts/atlas/docs path).
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -22,6 +23,27 @@ const reportPath = process.argv[2]
 const markdownPath = process.argv[3]
   ? resolve(root, process.argv[3])
   : join(root, 'docs', 'OPENSPEC-WORKBOARD.md');
+// The prior artifact at the output path is the baseline for completion tracking (read before it is overwritten).
+const previousWorkboard = (() => {
+  if (!existsSync(reportPath)) return null;
+  try {
+    const parsed = JSON.parse(readFileSync(reportPath, 'utf8'));
+    return parsed?.schema === 'atlas.openspec.workboard.v1' && Array.isArray(parsed.taskInventory) ? parsed : null;
+  } catch {
+    return null;
+  }
+})();
+const controllerPath = join(root, 'docs', 'reports', 'openspec-execution-controller-v1.json');
+const controllerReport = existsSync(controllerPath) ? JSON.parse(readFileSync(controllerPath, 'utf8')) : null;
+const controllerByTaskKey = new Map((controllerReport?.allTasks ?? []).map((task) => [task.taskKey, task]));
+const selectionArg = process.argv.find((arg) => arg.startsWith('--selection-file='));
+const selectionFile = selectionArg ? resolve(root, selectionArg.slice('--selection-file='.length)) : null;
+const schedulerSelection = selectionFile && existsSync(selectionFile)
+  ? JSON.parse(readFileSync(selectionFile, 'utf8'))
+  : null;
+if (selectionFile && !isValidSchedulerSelection(schedulerSelection)) {
+  throw new Error('INVALID_EXPLICIT_SCHEDULER_SELECTION: expected atlas.openspec-scheduler-selection.v1 with permission=SELECTED and taskKeys[]');
+}
 
 const progressBar = (fraction) => {
   if (fraction == null) return '[----------]';
@@ -91,7 +113,7 @@ for (const file of taskFiles) {
     const block = taskBlock(lines, index);
     const wfu = parseWfu(block.join('\n'));
     const text = stripWfuComment(match[2].trim());
-    tasks.push({
+    const task = {
       taskKey: `${change}:${index + 1}`,
       change,
       source: pathOf(file),
@@ -112,14 +134,56 @@ for (const file of taskFiles) {
       eta: classifyKind(text) === 'INVARIANT'
         ? { status: 'NOT_APPLICABLE', method: 'PERMANENT_ACCEPTANCE_INVARIANT' }
         : { status: 'UNKNOWN', method: 'NO_RECEIPT_LINKED_THROUGHPUT' },
-    });
+    };
+    const program = classifyProgramTask(task);
+    const wave = program.wave;
+    const waveDefinition = wave == null ? null : PROGRAM_WAVES.find((item) => item.id === wave);
+    task.program = {
+      wave,
+      waveTitle: waveDefinition?.title ?? null,
+      classification: program.classification,
+      matchedRule: program.matchedRule,
+      milestone: waveDefinition?.milestone ?? null,
+      gate: waveDefinition?.exitGate ?? 'UNCLASSIFIED_REVIEW_REQUIRED',
+      gateId: wave == null ? null : `GATE-WAVE-${String(wave).padStart(2, '0')}`,
+      workPackageKey: null,
+    };
+    const controllerTask = controllerByTaskKey.get(task.taskKey);
+    const controllerCurrent = Boolean(controllerTask && controllerTask.blockHash === task.blockHash);
+    task.controllerState = controllerCurrent ? controllerTask.controller?.state : 'STALE_CONTROLLER_RECEIPT';
+    task.controllerBlockerKey = controllerCurrent ? controllerTask.controller?.blockerKey ?? null : null;
+    task.gateState = classifyGateState(task);
+    task.mutationClass = mutationClass(task);
+    tasks.push(task);
   });
 }
 
 resolveDeclarations(tasks);
+for (const task of tasks) {
+  task.selectionKey = task.logicalTaskKey ?? task.stableKey;
+  task.schedulerPermission = schedulerPermission(task, schedulerSelection);
+  task.owner = task.change;
+  task.ownerScope = 'OPENSPEC_CHANGE_ONLY_NOT_CANONICAL_RUNTIME_OWNER';
+  task.canonicalOwner = null;
+  task.dependsOn = task.declared?.dependsOn ?? null;
+  task.unlocks = null;
+  task.runtimeDependencies = null;
+  task.artifactOutputs = null;
+  task.proofReceipt = null;
+  task.criticalPathRank = null; // Wave is a provisional grouping, not measured dependency rank.
+  task.fanoutCount = null;
+  task.writeRisk = null;
+  task.proofLevel = null;
+  task.mutationClassBasis = 'CONSERVATIVE_TEXT_HEURISTIC_REQUIRES_OWNER_REVIEW';
+}
 const declaredMetadata = summarizeDeclared(tasks);
 
 const openTasks = tasks.filter((task) => task.state === 'OPEN');
+if (schedulerSelection) {
+  const taskKeys = new Set(tasks.map((task) => task.selectionKey));
+  const unknownKeys = schedulerSelection.taskKeys.filter((key) => !taskKeys.has(key));
+  if (unknownKeys.length) throw new Error(`UNKNOWN_STABLE_SELECTION_KEY: ${unknownKeys.join(',')}`);
+}
 const completedTasks = tasks.length - openTasks.length;
 const actionableTasks = openTasks.filter((task) => task.executionState === 'ACTIONABLE');
 const waitingTasks = openTasks.filter((task) => task.executionState === 'WAITING_ON_DEPENDENCY');
@@ -132,13 +196,65 @@ const frontierTasks = [...byPriority.reduce((frontier, task) => {
 }, new Map()).values()]
   .sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
 const invariants = tasks.filter((task) => task.kind === 'INVARIANT').map((task) => ({ taskKey: task.taskKey, change: task.change, source: task.source, line: task.line, text: task.text, state: task.state, lastUpdatedAt: task.lastUpdatedAt, timestampMethod: task.timestampMethod, eta: task.eta }));
-const workPackages = [
-  { id: 'P10-A', title: 'Migration ledger reconciliation', gates: ['migration baseline', 'owner manifest', 'pre-apply guard'], dependsOn: [], state: 'BLOCKED' },
-  { id: 'P10-B', title: 'Canonical candidate identity', gates: ['feature identity', 'packet identity', 'CandidateOrdinal'], dependsOn: ['P10-A'], state: 'OPEN' },
-  { id: 'P10-C', title: 'Symbol lineage', gates: ['stableSymbolId', 'symbolVersionId', 'treeNodeId'], dependsOn: ['P10-B'], state: 'OPEN' },
-  { id: 'P10-D', title: 'Lexical identity', gates: ['source revision', 'FTS identity', 'cross-store lineage'], dependsOn: ['P10-B'], state: 'OPEN' },
-  { id: 'P10-E', title: 'Top-K cross-store readback', gates: ['CandidateTopKV1', 'Qdrant parity', 'Go retrieval parity'], dependsOn: ['P10-C', 'P10-D'], state: 'OPEN' },
-];
+const waveWorkPackages = PROGRAM_WAVES.map((wave) => {
+  const members = tasks.filter((task) => task.state === 'OPEN' && task.program.wave === wave.id);
+  return {
+    id: `WAVE-${String(wave.id).padStart(2, '0')}`,
+    gateId: `GATE-WAVE-${String(wave.id).padStart(2, '0')}`,
+    title: wave.title,
+    milestone: wave.milestone,
+    gates: [wave.exitGate],
+    dependsOn: wave.dependsOnWaveIds.map((id) => `WAVE-${String(id).padStart(2, '0')}`),
+    dependsOnWaveIds: wave.dependsOnWaveIds,
+    prerequisiteExitGates: wave.dependsOnWaveIds.map((id) => PROGRAM_WAVES.find((item) => item.id === id).exitGate),
+    taskCount: members.length,
+    taskKeys: members.map((task) => task.taskKey),
+    actionableCount: members.filter((task) => task.gateState === 'READY').length,
+    waitingCount: members.filter((task) => task.gateState !== 'READY').length,
+    schedulerPermission: 'NOT_SELECTED',
+    state: members.length ? 'PLANNED_NOT_SELECTED' : 'NO_OPEN_TASKS',
+  };
+});
+const reviewQueueTasks = tasks.filter((task) => task.state === 'OPEN' && task.program.wave == null);
+const reviewQueue = {
+  id: 'UNCLASSIFIED_REVIEW',
+  title: 'Unclassified task mapping review',
+  milestone: null,
+  gates: ['UNCLASSIFIED_REVIEW_REQUIRED'],
+  dependsOn: [],
+  taskCount: reviewQueueTasks.length,
+  taskKeys: reviewQueueTasks.map((task) => task.taskKey),
+  actionableCount: 0,
+  waitingCount: reviewQueueTasks.length,
+  schedulerPermission: 'NOT_SELECTED',
+  state: 'REVIEW_REQUIRED',
+};
+const workPackages = buildProgramWorkPackages(openTasks);
+const programGates = buildProgramGates(PROGRAM_WAVES, workPackages);
+const hierarchy = buildProgramHierarchy(tasks, workPackages);
+const workPackageById = new Map(workPackages.map((workPackage) => [workPackage.id, workPackage]));
+for (const task of tasks) {
+  const hierarchyMetadata = task.hierarchy;
+  const packageId = task.state === 'OPEN' ? task.program?.workPackageKey ?? null : null;
+  const workPackage = packageId ? workPackageById.get(packageId) : null;
+  const declaredDependencies = hierarchyMetadata?.declaredDependencies ?? [];
+  const inheritedDependencies = hierarchyMetadata?.inheritedDependencies ?? [];
+  const effectiveDependencies = hierarchyMetadata?.effectiveDependencies ?? [...new Set([...declaredDependencies, ...inheritedDependencies])];
+  task.primaryProgramId = hierarchyMetadata?.primaryProgramId ?? null;
+  task.secondaryProgramIds = hierarchyMetadata?.secondaryProgramIds ?? [];
+  task.milestoneId = task.program?.milestone ?? null;
+  task.waveId = task.program?.wave ?? null;
+  task.changeGateId = hierarchyMetadata?.changeGateId ?? null;
+  task.workPackageId = workPackage?.id ?? null;
+  task.declaredDependencies = declaredDependencies;
+  task.inheritedDependencies = inheritedDependencies;
+  task.effectiveDependencies = effectiveDependencies;
+  task.dependsOn = effectiveDependencies;
+  task.unlocks = null;
+}
+const selectedChainOverlay = buildSelectedChainOverlay(hierarchy.changeGates);
+const generatedAt = new Date().toISOString();
+const completionTracking = computeCompletionTracking({ previous: previousWorkboard, tasks, generatedAt });
 const changes = [...new Set(tasks.map((task) => task.change))].sort().map((change) => {
   const rows = tasks.filter((task) => task.change === change);
   const done = rows.filter((task) => task.state === 'DONE').length;
@@ -233,28 +349,25 @@ const criticalFrontierTasks = promotionCriticalRank.flatMap((rank) => {
   return selected ? [selected] : [];
 });
 const parallelFrontierTasks = frontierTasks.filter((task) => !criticalChangeNames.has(task.change));
-const executionSteps = [
-  { id: 'STEP-01', title: 'Identity and source authority', priorities: [10], dependsOn: [], gate: 'Exact identity, source, symbol, and revision ownership' },
-  { id: 'STEP-02', title: 'Eligibility and provenance', priorities: [20], dependsOn: ['STEP-01'], gate: 'Canonical eligibility, readback, and lineage proofs' },
-  { id: 'STEP-03', title: 'Runtime and retrieval', priorities: [30], dependsOn: ['STEP-02'], gate: 'Embedding, Qdrant, Go Retrieval, and fusion execution' },
-  { id: 'STEP-04', title: 'Feature and structural context', priorities: [40], dependsOn: ['STEP-03'], gate: 'AST/CST, LSP, ontology, feature fabric, and ContextManifest' },
-  { id: 'STEP-05', title: 'Workflow and receipts', priorities: [50], dependsOn: ['STEP-04'], gate: 'Agent execution, NATS/JetStream, validation, and receipts' },
-  { id: 'STEP-06', title: 'Governance and operations', priorities: [60], dependsOn: ['STEP-05'], gate: 'Admin, Kanban, documents, supersession, and archive' },
-  { id: 'STEP-07', title: 'Unclassified supporting work', priorities: [70], dependsOn: ['STEP-01'], gate: 'Review and attach each task to an upstream gate' },
-  { id: 'STEP-08', title: 'Benchmarks and challengers', priorities: [80], dependsOn: ['STEP-03', 'STEP-04'], gate: 'Evaluation, GPU challengers, topology, and Ewin Tang' },
-].map((step) => {
-  const rows = tasks.filter((task) => step.priorities.includes(task.priority));
+const executionSteps = PROGRAM_WAVES.map((wave, index) => {
+  const rows = tasks.filter((task) => task.program.wave === wave.id);
   const done = rows.filter((task) => task.state === 'DONE').length;
-  const openRows = rows.filter((task) => task.executionState === 'ACTIONABLE');
+  const openRows = rows.filter((task) => task.state === 'OPEN');
   return {
-    ...step,
+    id: `WAVE-${String(wave.id).padStart(2, '0')}`,
+    wave: wave.id,
+    milestone: wave.milestone,
+    title: wave.title,
+    dependsOn: index > 0 ? [`WAVE-${String(index - 1).padStart(2, '0')}`] : [],
+    gate: wave.exitGate,
     total: rows.length,
     completed: done,
     open: rows.length - done,
     progressFraction: rows.length ? done / rows.length : null,
     progressBar: progressBar(rows.length ? done / rows.length : null),
     taskKeys: rows.map((task) => task.taskKey),
-    nextOpenTasks: openRows.slice(0, 5).map((task) => ({ taskKey: task.taskKey, change: task.change, source: task.source, line: task.line, lane: task.lane, text: task.text })),
+    schedulerPermission: 'NOT_SELECTED',
+    recommendedTasksOnly: openRows.slice(0, 5).map((task) => ({ taskKey: task.taskKey, change: task.change, source: task.source, line: task.line, lane: task.lane, text: task.text, gateState: task.gateState, schedulerPermission: task.schedulerPermission })),
   };
 });
 const buildIndex = (field) => Object.fromEntries(
@@ -396,10 +509,43 @@ const consolidationCandidates = (() => {
 
 const result = {
   schema: 'atlas.openspec.workboard.v1',
-  generatedAt: new Date().toISOString(),
+  hierarchyContractVersion: 'v2',
+  generatedAt,
   source: 'openspec/changes/*/tasks.md',
   summary: { completedTasks, openTasks: openTasks.length, actionableTasks: actionableTasks.length, waitingTasks: waitingTasks.length, supersededTasks: supersededTasks.length, totalTasks: tasks.length, progressFraction: tasks.length ? completedTasks / tasks.length : null, progressBar: progressBar(tasks.length ? completedTasks / tasks.length : null), eta: { status: 'UNKNOWN', method: 'NO_RECEIPT_LINKED_THROUGHPUT' } },
-  ordering: 'WORK_PACKAGES_THEN_CHANGE_FRONTIERS; WAITING_AND_SUPERSEDED_EXCLUDED_FROM_NEXT_TASKS; ONE_FRONTIER_PER_CHANGE; PRIORITY_THEN_LAST_UPDATED_DESC; INVARIANTS_SEPARATE; SOURCE_REF_AND_REVISION_INDEXED_WHEN_DECLARED',
+  schedulerPolicy: {
+    rule: 'READY_NEVER_IMPLIES_SELECTED; COMPLETION_PERCENTAGE_NEVER_IMPLIES_PRIORITY; ONLY_EXPLICIT_SELECTION_FILE_GRANTS_SELECTION_PERMISSION',
+    selectionSource: selectionFile ? pathOf(selectionFile) : null,
+    selectedTaskCount: tasks.filter((task) => task.schedulerPermission === 'SELECTED').length,
+    recommendedTasksAreAdvisory: true,
+  },
+  controllerEvidence: {
+    path: pathOf(controllerPath),
+    generatedAt: controllerReport?.generatedAt ?? null,
+    role: 'READINESS_CLASSIFICATION_ONLY_NOT_SELECTION_AUTHORITY',
+    matchedCurrentTaskCount: tasks.filter((task) => task.controllerState !== 'STALE_CONTROLLER_RECEIPT').length,
+    staleOrMissingTaskCount: tasks.filter((task) => task.controllerState === 'STALE_CONTROLLER_RECEIPT').length,
+  },
+  ordering: 'PROGRAM_WAVE_THEN_MILESTONE_THEN_WORK_PACKAGE; READINESS_AND_SCHEDULER_PERMISSION_ARE_INDEPENDENT; WORKBOARD_RANKS_ARE_ADVISORY_ONLY; NO_SELECTION_BY_COMPLETION_PERCENTAGE',
+  implementationProgram: {
+    schema: 'atlas.openspec-implementation-program.v1',
+    authority: 'ADVISORY_PLAN_ONLY',
+    milestones: PROGRAM_MILESTONES,
+    waves: waveWorkPackages,
+    gates: programGates,
+    workPackages,
+    reviewQueue,
+    programs: hierarchy.programs,
+    changeGates: hierarchy.changeGates,
+    hierarchyReview: hierarchy.hierarchyReview,
+    hierarchyPolicy: hierarchy.hierarchyPolicy,
+    selectedChainOverlay,
+    leafTaskCount: openTasks.length,
+    assignedLeafTaskCount: workPackages.reduce((sum, item) => sum + item.taskCount, 0),
+    reviewLeafTaskCount: reviewQueue.taskCount,
+    schedulerPermissionDefault: 'NOT_SELECTED',
+    dependencies: 'WAVE_EDGES_ARE_DECLARED; LEAF_DEPENDENCIES_ONLY_WHERE_TASK_LEDGER_DECLARES_THEM',
+  },
   indexing: {
     sourceRef: buildIndex('declaredSourceRef'),
     sourceRevision: buildIndex('declaredSourceRevision'),
@@ -424,9 +570,12 @@ const result = {
   invariants,
   changes,
   changeExecutionSummary,
+  completionTracking,
   taskInventory: tasks,
   sourceFileHashes,
   declaredMetadata,
+  selectedTasks: tasks.filter((task) => task.schedulerPermission === 'SELECTED'),
+  recommendedTasks: criticalFrontierTasks.slice(0, 20),
   nextTasks: criticalFrontierTasks.slice(0, 20),
   parallelFrontierTasks: parallelFrontierTasks.slice(0, 50),
   actionableTasks: byPriority.slice(0, 200),
@@ -446,25 +595,28 @@ const markdown = [
   '- Planning reconciliation does not prove runtime convergence, authorize cache/datastore writes, or advance current source/cohort admission.', '',
   `Overall progress: ${result.summary.progressBar} ${completedTasks}/${tasks.length} tasks`,
   `Execution states: ${actionableTasks.length} actionable; ${waitingTasks.length} waiting on dependencies; ${supersededTasks.length} superseded/historical; ${invariants.length} invariants.`,
+  `Scheduler permission: ${result.schedulerPolicy.selectedTaskCount} explicitly selected; READY/actionable rows are not selected automatically.`,
   `Change states: ${changeExecutionSummary.complete} complete; ${changeExecutionSummary.advanceable} advanceable; ${changeExecutionSummary.mixed} mixed actionable/waiting; ${changeExecutionSummary.waitingOrHistorical} waiting/historical; ${changeExecutionSummary.reviewRequired} review required.`,
   'ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.', '',
-  '## P10 dependency work packages', '',
-  ...workPackages.map((item) => `- **${item.id}** ${item.title} — ${item.state}; depends on ${item.dependsOn.join(', ') || 'none'}; gates: ${item.gates.join(', ')}`), '',
+  '## Execution program waves', '',
+  ...waveWorkPackages.map((item) => `- **${item.id}** ${item.title} — ${item.state}; depends on ${item.dependsOn.join(', ') || 'none'}; gates: ${item.gates.join(', ')}; leaves: ${item.taskCount}`),
+  `- **${reviewQueue.id}** ${reviewQueue.title} — ${reviewQueue.state}; leaves: ${reviewQueue.taskCount}.`,
+  `- Provisional bounded work packages: ${workPackages.length}; assigned open leaf tasks: ${workPackages.reduce((sum, item) => sum + item.taskCount, 0)}; unclassified leaves are review-only.`, '',
   '## Promotion-critical dependency rank', '',
   '- This rank identifies the authority gates that actually unblock promotion; task counts remain navigation metrics only.',
   ...promotionCriticalRank.map((item) => `- **${item.rank}.** [${item.change}](openspec/changes/${item.change}/) ${item.progressBar} ${item.completed}/${item.total} complete; ${item.open} open — depends on ${item.dependsOn.join(', ') || 'none'}; gate: ${item.gate}; blocker: ${item.blocker}`), '',
   '## Dependency-ordered execution steps', '',
   ...executionSteps.map((item) => `- **${item.id}** ${item.progressBar} ${item.completed}/${item.total} complete; ${item.open} open — ${item.title}; depends on ${item.dependsOn.join(', ') || 'none'}; gate: ${item.gate}`), '',
-  '### Next bounded tasks by step', '',
+  '### Advisory task samples by wave (not selected for execution)', '',
   ...executionSteps.flatMap((item) => [
     `**${item.id}**`,
-    ...item.nextOpenTasks.map((task) => `- ${task.taskKey} — ${task.lane}; ${task.text} (${task.source}:${task.line})`),
+    ...item.recommendedTasksOnly.map((task) => `- ${task.taskKey} — ${task.gateState}; NOT_SELECTED; ${task.lane}; ${task.text} (${task.source}:${task.line})`),
     '',
   ]),
   '## Permanent acceptance invariants', '',
   ...invariants.map((item) => `- **INVARIANT** [${item.change}](${item.source}#L${item.line}) ${item.text} — last updated ${item.lastUpdatedAt} (${item.timestampMethod}); ETA N/A`), '',
   '## Critical-path change frontiers', '',
-  '- One frontier item is shown per promotion-critical change. The full actionable inventory and parallel frontiers are in `openspec-workboard-v1.json`.',
+  '- Frontier rows are advisory recommendations only. `schedulerPermission=SELECTED` is granted only from an explicit selection file; READY/ADVANCEABLE never selects work.',
   ...criticalFrontierTasks.slice(0, 20).map((task) => `- [ ] **P${task.priority}** [${task.change}](${task.source}#L${task.line}) ${task.text} — lane ${task.lane}; last updated ${task.lastUpdatedAt} (${task.timestampMethod}); ETA UNKNOWN`), '',
   '## Parallel proof frontiers', '',
   ...parallelFrontierTasks.slice(0, 50).map((task) => `- [ ] **P${task.priority}** [${task.change}](${task.source}#L${task.line}) ${task.text} — lane ${task.lane}; last updated ${task.lastUpdatedAt} (${task.timestampMethod}); ETA UNKNOWN`), '',

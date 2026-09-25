@@ -1,0 +1,130 @@
+{
+  "schema": "atlas.packet-key-v2-legacy-population-census.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "generatedAt": "2026-09-25T04:42:05.697Z",
+  "atlasPacketsTotal": 61718,
+  "classes": {
+    "NO_MEMBERSHIP_IN_ANY_EXECUTION": 44256,
+    "NON_FILE_KIND:rpc_method": 61,
+    "V2_DERIVABLE": 17399,
+    "V2_DERIVABLE_STORAGE_V1_12HEX": 17301,
+    "V2_DERIVABLE_STORAGE_ACE_PREFIX": 98,
+    "NON_FILE_KIND:cluster-summary": 1,
+    "SOURCE_REF_REJECTED:SOURCE_REF_VIOLATES_UPSTREAM_CONTRACT": 1
+  },
+  "v2": {
+    "derivableRows": 17399,
+    "distinctV2Keys": 17399,
+    "canonicalCollisions": 0,
+    "collisionSamples": []
+  },
+  "gate": "NO_PACKET_KEY_CANONICAL_COLLISION",
+  "expectedAliasRows": 17301,
+  "aliasCoverage": {
+    "v1StorageRowsAliasedByNewKind": 17301,
+    "acePrefixRowsResolveViaExistingAceAliasThenNewKind": 98,
+    "otherStorageRows": 0,
+    "notInSourceMembershipLegacyOnly": 44256,
+    "nonFileKinds": 62
+  },
+  "unresolvedExamples": {
+    "NO_MEMBERSHIP_IN_ANY_EXECUTION": [
+      "crates/turbovec-napi/target/release/.fingerprint/reborrow-5de3938cacff0e1f/lib-reborrow.json",
+      "llama-cpp-turboquant-gemma4/ggml/src/ggml-cpu/cmake/FindSIMD.cmake",
+      ".python311/lib/tcl8.6/init.tcl",
+      "neschrom97/cards/de15e2c4e5ff7daa.json",
+      ".error-brain/backups/2025-12-16T22-27-26-744Z_C"
+    ]
+  },
+  "aliasOwner": {
+    "table": "public.atlas_packet_identity_aliases",
+    "ownerDdl": "sveltekit-frontend/drizzle/manual/atlas_packet_identity_aliases.sql",
+    "resolver": "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts::resolveCanonicalPacketKey",
+    "columns": [
+      {
+        "column_name": "alias_key",
+        "data_type": "text",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "canonical_packet_key",
+        "data_type": "text",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "alias_kind",
+        "data_type": "text",
+        "is_nullable": "NO"
+      },
+      {
+        "column_name": "producer_id",
+        "data_type": "text",
+        "is_nullable": "YES"
+      },
+      {
+        "column_name": "producer_revision",
+        "data_type": "text",
+        "is_nullable": "YES"
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "NO"
+      }
+    ],
+    "constraints": [
+      {
+        "conname": "atlas_packet_identity_aliases_alias_key_not_null",
+        "contype": "n",
+        "def": "NOT NULL alias_key"
+      },
+      {
+        "conname": "atlas_packet_identity_aliases_alias_kind_not_null",
+        "contype": "n",
+        "def": "NOT NULL alias_kind"
+      },
+      {
+        "conname": "atlas_packet_identity_aliases_canonical_packet_key_fkey",
+        "contype": "f",
+        "def": "FOREIGN KEY (canonical_packet_key) REFERENCES atlas_packets(packet_key)"
+      },
+      {
+        "conname": "atlas_packet_identity_aliases_canonical_packet_key_not_null",
+        "contype": "n",
+        "def": "NOT NULL canonical_packet_key"
+      },
+      {
+        "conname": "atlas_packet_identity_aliases_created_at_not_null",
+        "contype": "n",
+        "def": "NOT NULL created_at"
+      },
+      {
+        "conname": "atlas_packet_identity_aliases_pkey",
+        "contype": "p",
+        "def": "PRIMARY KEY (alias_key)"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX atlas_packet_identity_aliases_pkey ON public.atlas_packet_identity_aliases USING btree (alias_key)",
+      "CREATE INDEX idx_atlas_packet_identity_aliases_canonical ON public.atlas_packet_identity_aliases USING btree (canonical_packet_key)"
+    ],
+    "triggers": [],
+    "kinds": [
+      {
+        "alias_kind": "PREFIX_DIVERGENCE_ACE_PACKET",
+        "n": 3294
+      }
+    ],
+    "inboundForeignKeys": [],
+    "existingAliasRows": 3294,
+    "aliasByKind": {
+      "PREFIX_DIVERGENCE_ACE_PACKET": 3294
+    },
+    "sourceKeyUniqueness": true,
+    "targetKeyUniqueness": false,
+    "activeInactiveSemantics": "none (no status/valid-to column)",
+    "reverseLookup": true,
+    "canPointAtKeysNotStoredInAtlasPackets": false
+  }
+}

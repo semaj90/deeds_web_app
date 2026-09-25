@@ -1,0 +1,292 @@
+{
+  "schema": "atlas.packet-key-owner-decision.v1",
+  "gate": {
+    "result": "PACKET_KEY_ALIAS_DDL_APPLY_AUTHORIZATION_REQUIRED",
+    "nextGate": "ALIAS_DDL_AUTHORIZATION_THEN_ADMISSION_APPLY_AUTHORIZATION",
+    "receipt": "docs/reports/packet-key-v2-admission-gate-v1.json",
+    "manifestRootSha256": "6d8fc6e36d36d9de3c70868671a47b37dde3dfd07319bb2a99c628a901069f6a",
+    "manifest": "docs/reports/packet-key-v2-admission-v1/6d8fc6e36d36d9de3c70868671a47b37dde3dfd07319bb2a99c628a901069f6a/",
+    "supersedesManifest": "14b73680764a86af143b602043f59aa0dac4630cce934dcfff94ee72e655cdad (kept as history)",
+    "preflight": "docs/reports/packet-key-v2-admission-preflight-v1.json"
+  },
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "verdict": "PACKET_KEY_ALIAS_DDL_APPLY_AUTHORIZATION_REQUIRED",
+  "verdictReason": "Alias-kind extension selected (no atlas_packets.packet_key_v2 column). PacketKeyV2 owner, alias kernel/resolver, legacy-population collision census, and the re-frozen 7,350-entry manifest are proven read-only. The alias DDL is prepared and NOT applied.",
+  "requiredInvariants": [
+    "packet_key = stable logical packet identity; source_revision = version identity; changing only source_revision must not change packet_key",
+    "source_ref alone is insufficient",
+    "path alone is insufficient",
+    "Qdrant point IDs forbidden",
+    "GraphNodeKey forbidden",
+    "latest/current inference forbidden"
+  ],
+  "priorEvidenceReused": [
+    "docs/reports/packet-key-single-owner-convergence-v1.json",
+    "docs/reports/packet-key-single-owner-convergence-v2-addendum.json",
+    "docs/reports/packet-key-lifecycle-contract-v1.json",
+    "docs/reports/packet-registry-writer-ownership-01b-mutation-census-v1.json"
+  ],
+  "liveCensusReverifiedThisRun": {
+    "table": "atlas_packets",
+    "totalRows": 61718,
+    "distinctPacketKeys": 61718,
+    "distinctSourceRefs": 61718,
+    "refsWithMultipleKeys": 0,
+    "shapes": {
+      "packet:<12hex>": 58362,
+      "ace:packet:<12hex>": 3294,
+      "hex16 (rpc_method)": 61,
+      "other": 1,
+      "hex64": 0,
+      "pkt:": 0,
+      "nes:": 0
+    },
+    "repositoryIdColumn": "populated per row with what is effectively a unique UUID (not a shared repository identity); NULL on 3,353 rows",
+    "workspaceIdColumn": "holds top-level directory names (docs, sveltekit-frontend, scripts, ...), not a workspace identity",
+    "consequence": "The live key and table carry no usable repository or packet-kind scoping."
+  },
+  "repositoryScopingEvidence": {
+    "execution": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "repositoriesInExecution": {
+      "repo:root": 24456,
+      "repo:claude-mem": 763,
+      "repo:mcp-server-mcp": 192,
+      "repo:turbovec": 86,
+      "repo:sites/parent-atlas-gateboard": 22,
+      "repo:models/embeddinggemma_300m": 13,
+      "repo:granite-docling-258M": 10
+    },
+    "sourceRefsUnderMultipleRepositories": 0,
+    "sourceRefsDifferingOnlyByCaseOrSlash": 0,
+    "reading": "No cross-repository source_ref collision exists today. The repository-scoping requirement is a design risk (seven repositories share one key space), not a present breakage."
+  },
+  "producerInventory": [
+    {
+      "id": "A",
+      "classification": "CANONICAL_RUNTIME_OWNER (de facto, dominant live writer)",
+      "path": "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs (inline sha256 helper)",
+      "formula": "'packet:' + sha256(source_ref).slice(0,12)",
+      "inputFields": [
+        "source_ref"
+      ],
+      "repositoryScoping": "none",
+      "packetKindScoping": "none",
+      "sourceRefSemantics": "raw string, no normalization in the formula",
+      "sourceRevisionBehavior": "invariant (no revision input)",
+      "productionCallers": "CLI script; audits reference it; formula duplicated in backfill-summary-layers-from-chunks.mjs (join only)",
+      "persistedRows": 58362,
+      "invariantStatus": {
+        "revisionInvariant": true,
+        "sourceRefAloneInsufficient": "VIOLATED",
+        "collisionPolicy": "DEFECT: 48-bit truncation, ON CONFLICT (packet_key) DO NOTHING drops silently",
+        "sharedModule": "none"
+      }
+    },
+    {
+      "id": "A-alias",
+      "classification": "COMPATIBILITY",
+      "path": "atlas_packet_identity_aliases + packet-identity-resolver.ts::resolveCanonicalPacketKey",
+      "formula": "ace:packet:<12hex> aliased to packet:<12hex> (same hash, wrong historical prefix)",
+      "persistedRows": 3294,
+      "productionCallers": "lexical-pass-executor-v1.ts, packet-write-decision-v1.ts, atlas-core canonical-identity-v1.ts, scripts"
+    },
+    {
+      "id": "B",
+      "classification": "LEGACY / NOT_YET_PROVEN (self-declared)",
+      "path": "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-builder.ts::computePacketKey",
+      "formula": "sha256(source_ref|tree_node_id|title_id) hex64",
+      "inputFields": [
+        "source_ref",
+        "tree_node_id",
+        "title_id"
+      ],
+      "repositoryScoping": "none",
+      "packetKindScoping": "none (node grain)",
+      "sourceRevisionBehavior": "invariant",
+      "productionCallers": "code-feature-registry-enqueue, source-pos-concept-packet, analysis/worker, phase89-workflow, mcp-tool-implementations, semantic-packet-writer (writer throws PACKET_KEY_MISMATCH_CANONICAL_RESOLUTION if both schemes supplied)",
+      "persistedRows": 0,
+      "openQuestion": "packet grain (file vs AST node) unresolved; header says do not adopt"
+    },
+    {
+      "id": "C",
+      "classification": "COMPATIBILITY (self-declared), DEAD/ORPHAN in production",
+      "path": "sveltekit-frontend/src/lib/server/atlas/identity/compute-packet-key.ts::computePacketKey",
+      "formula": "pkt:<workspaceId>:sha256('pkt:v1:'+workspaceId+':'+lower(source_ref)+':'+semanticAnchor)[:32]",
+      "inputFields": [
+        "workspaceId",
+        "source_ref",
+        "semanticAnchor"
+      ],
+      "repositoryScoping": "workspaceId (tenant id, not a repository identity)",
+      "packetKindScoping": "semanticAnchor (grain per anchor)",
+      "sourceRefSemantics": "lower-cased and slash-normalized (case-folds distinct files)",
+      "sourceRevisionBehavior": "invariant",
+      "productionCallers": "none (spec only)",
+      "persistedRows": 0
+    },
+    {
+      "id": "D",
+      "classification": "BACKFILL/MIGRATION",
+      "path": "scripts/atlas/register-orphaned-chunks.mjs",
+      "formula": "same as A",
+      "persistedRows": "codebase_chunk source_kind rows; 7,350 admission candidates would use it as-is",
+      "note": "This is the current PACKET_ADMISSION producer, and it mints from source_ref alone."
+    },
+    {
+      "id": "E",
+      "classification": "LEGACY",
+      "paths": [
+        "compute-missing-packet-keys.mjs (md5 ref+feature)",
+        "backfill-atlas-source-refs*.mjs (sha256 ref:packetId)",
+        "ingest-qdrant-to-atlas-packets.mjs (ref:content_hash)",
+        "packet-materializer-lib.mjs (nes:slug:sha8)",
+        "index-function-packets.mjs (function:ref hex16)",
+        "packetize-proto-rpc-tools.mjs (rpc hex16, separate domain)"
+      ],
+      "persistedRows": "0 for codebase-file identity except the 61 rpc hex16 rows"
+    },
+    {
+      "id": "F",
+      "classification": "TEST_ONLY",
+      "path": "packet-key-dominant-scheme.spec.ts (frozen characterization of A)"
+    }
+  ],
+  "migrationImpact": {
+    "keepA": "Zero migration. Extract A into one shared module with a collision-reject receipt. Does NOT satisfy 'source_ref alone insufficient'.",
+    "newRepoScopedKey": "New key over (repository identity, normalized source_ref, packet kind) at full digest width. The 61,718 existing packet:<12hex> keys stay valid via atlas_packet_identity_aliases (additive alias rows, no PK/FK mutation); new admissions use the new key. Qdrant payloads, Redis/BitFrost keys, atlas_packet_registry_projections FKs, and atlas_packet_chunk_lineage all reference the old key and keep resolving through the resolver. Two live schemes coexist until a migration is separately authorized.",
+    "adoptCWithFixes": "pkt:<workspaceId>:... needs a real repository identity instead of workspaceId, no lower-casing, and a decision on semanticAnchor grain before it can be used."
+  },
+  "decisionsNeeded": [
+    "Is repository identity part of packet identity? (Directive says yes; the existing lifecycle contract says source_ref only.)",
+    "Which repository identity is canonical: graphify repository_id ('repo:root'), atlas_workspace_source_bindings.repo_id ('deeds-web-app'), or a new one?",
+    "Packet kind scope: is file-grain (one packet per source_ref) confirmed as the packet grain, or node-grain?",
+    "Accept an alias-based coexistence of the existing 61,718 keys with the new key for the 7,350 admissions?"
+  ],
+  "notDone": [
+    "7,350 packets not admitted",
+    "no datastore writes",
+    "no DDL",
+    "no Graphify run",
+    "no alias rows written"
+  ],
+  "supersededVerdict": "PACKET_ADMISSION_OWNER_DECISION_REQUIRED",
+  "decisionsSettled": {
+    "recordedFrom": "operator direction in session, 2026-09-24",
+    "repositoryIdentityIsPartOfPacketIdentity": true,
+    "repositoryAuthority": "graphify_execution_file_membership_v2.repository_id (NOT atlas_packets.repository_id or workspace_id)",
+    "packetGrainForThisCohort": "SOURCE_FILE only; SYMBOL/NODE packets need their own packet_kind and identity contract",
+    "legacyKeys": "compatibility aliases only (legacy -> PacketKeyV2); no second canonical scheme; no mass re-keying in this tranche",
+    "contract": {
+      "inputs": [
+        "repository_scope",
+        "canonical_source_ref",
+        "packet_kind"
+      ],
+      "excludes": [
+        "source_revision",
+        "workspace_revision",
+        "qdrant_id",
+        "graph_node_key",
+        "ordinal",
+        "latest",
+        "current"
+      ],
+      "derivation": "packet:UUIDv5(PACKET_AGGREGATE_NAMESPACE_V1, \"packet:v2\" NUL repository_scope NUL canonical_source_ref NUL packet_kind)",
+      "textForm": "packet:<uuid>, distinguishable from legacy packet:<12hex>; existing validators accept the packet: prefix"
+    }
+  },
+  "repositoryScopeStability": {
+    "gate": "REPOSITORY_SCOPE_STABILITY_PROVEN",
+    "status": "PROVEN_WITHIN_V2_MEMBERSHIP_LABELS",
+    "evidence": {
+      "executionsWithMembership": 36,
+      "distinctRepositoryIds": 7,
+      "repoRoot": {
+        "executions": 36,
+        "workspaceRevisions": 21,
+        "rows": 339119
+      },
+      "otherRepositories": "6 repositories, each in 11 executions / 8 workspace revisions",
+      "sourceRefsUnderMultipleRepositoryIdsAcrossAllExecutions": 0
+    },
+    "caveat": "Proves the repository_id labels are stable and mutually exclusive across executions; it cannot prove a label maps to one physical repository beyond that."
+  },
+  "implementation": {
+    "files": [
+      "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts",
+      "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-legacy-alias-v1.ts",
+      "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.spec.ts",
+      "sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts (exports workspaceSourceRefV1Schema; behavior unchanged)",
+      "scripts/atlas/build-packet-key-v2-admission-manifest-v1.mts"
+    ],
+    "tests": "12/12 packet-key-v2.spec.ts; 9/9 workspace-source-binding-v1.spec.ts",
+    "datastoreWrites": 0,
+    "barrelExport": "not added",
+    "legacyFormula": "legacyPacketKeyV1() now lives only in packet-key-legacy-alias-v1.ts; packet-key-v2.ts exports nothing legacy and validates source_ref against the upstream contract without normalizing it"
+  },
+  "openBeforeAdmission": [
+    "authorize and apply the alias-kind DDL (then apply the 17,399 alias rows separately)",
+    "authorize the 7,350-row admission apply against manifest root 6d8fc6e3…",
+    "confirm repository-scope authority for graphify membership repository_id",
+    "decide the legacy register-orphaned-chunks path (still mints legacy keys)"
+  ],
+  "admissionManifest": {
+    "sourceEvidenceModified": false,
+    "sourceEntries": 7350,
+    "accounted": 7350,
+    "uniquePacketKeysV2": 7350,
+    "rejections": 0,
+    "PACKET_NOW_EXISTS": 0,
+    "legacyKeyConflicts": 0,
+    "repositoryScope": "repo:root",
+    "writesAuthorized": false
+  },
+  "aliasModel": {
+    "selected": "alias-kind extension",
+    "rejected": "atlas_packets.packet_key_v2 column (would leave every packet with two identity columns)",
+    "kind": "PACKET_KEY_V1_STORAGE_TO_V2",
+    "direction": "legacy storage key -> PacketKeyV2 only",
+    "physicalStorage": "atlas_packets.packet_key stays legacy for historical rows; new admissions store PacketKeyV2 directly",
+    "resolver": "resolvePacketKeyResolutionV2 (same module as resolveCanonicalPacketKey; returns canonicalPacketKey + storagePacketKey + resolutionSource + aliasEvidenceVersion). resolveCanonicalPacketKey still returns the storage key and is documented as such.",
+    "ddl": {
+      "prepared": "sveltekit-frontend/drizzle/manual/20260925_atlas_packet_identity_alias_v1_storage_to_v2_PREPARED.sql",
+      "rollback": "sveltekit-frontend/drizzle/manual/20260925_atlas_packet_identity_alias_v1_storage_to_v2_ROLLBACK.sql",
+      "applied": false,
+      "validatedAgainstLiveDb": false,
+      "changes": [
+        "drop FK canonical_packet_key -> atlas_packets(packet_key)",
+        "kind-aware guard trigger on the alias table (preserves the stored-canonical rule for the ACE kind)",
+        "guard trigger on atlas_packets replacing the FK delete/rename protection",
+        "partial unique index: one storage alias per V2 canonical key",
+        "CHECK alias_key <> canonical_packet_key"
+      ],
+      "existingRowImpact": "0 rows changed; 3,294 existing aliases untouched",
+      "expectedNewAliasRows": 17399,
+      "expectedNewAliasBreakdown": {
+        "packet:<12hex>": 17301,
+        "ace:packet:<12hex>": 98
+      }
+    }
+  },
+  "legacyPopulationCensus": {
+    "receipt": "docs/reports/packet-key-v2-legacy-population-census-v1.json",
+    "atlasPacketsTotal": 61718,
+    "v2Derivable": 17399,
+    "canonicalCollisions": 0,
+    "notInSourceMembership": 44256,
+    "nonFileKinds": 62,
+    "finding": "Repository scope (and so PacketKeyV2) is derivable for only 28% of the historical population. The 44,256 packets absent from every Graphify execution (build outputs, vendored python, neschrom97 cards, external repos) keep legacy-only identity until they enter revision-qualified membership; they are not aliased and no canonical identity is invented for them."
+  },
+  "repositoryScopeAuthority": {
+    "status": "VERIFY",
+    "note": "Stability of the seven membership labels is proven. Whether graphify_execution_file_membership_v2.repository_id is the canonical repository-scope contract, rather than a Graphify-local label, has not been confirmed by its owner."
+  },
+  "admissionWriter": {
+    "file": "scripts/atlas/register-orphaned-chunks.mjs",
+    "change": "code-only V2 preflight mode (--packet-key-v2-manifest-root=...); reads the frozen manifest, re-classifies against live state, reports drift, no INSERT; --apply requires applied DDL plus an authorization receipt bound to the manifest root and is otherwise refused",
+    "sharedRules": "scripts/atlas/lib/packet-key-v2-admission-v1.mjs (8 tests)",
+    "onConflictDoNothingOnV2Path": false,
+    "legacyPathUnchanged": "the pre-existing legacy path still mints packet:<12hex> and is not part of this tranche"
+  }
+}

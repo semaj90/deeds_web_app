@@ -18,7 +18,12 @@
     "packet_chunk_exact_sources": 577,
     "packet_source_rows": 16554,
     "packet_revision_matches": 16151,
+    "packet_revision_workspace_binding_matches": 16151,
+    "packet_full_canonical_identity_matches": 16151,
     "packet_full_identity_matches": 0,
+    "packet_revision_identity_matches": 16151,
+    "packet_workspace_binding_matches": 16151,
+    "packet_legacy_content_hash_matches": 0,
     "packet_ambiguous_sources": 0,
     "packet_content_matches": 0,
     "chunk_file_content_matches": 577

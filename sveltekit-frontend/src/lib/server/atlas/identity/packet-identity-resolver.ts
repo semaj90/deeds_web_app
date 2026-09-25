@@ -28,6 +28,7 @@
 import { db } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { eq, sql } from 'drizzle-orm';
+import type { PacketKeyResolutionV2 } from './packet-key-resolution-v2.js';
 
 export class PacketIdentityUnresolvedError extends Error {
 	constructor(public readonly inputKey: string) {
@@ -130,3 +131,33 @@ export async function resolvePacketKeyForWrite(
 	);
 }
 
+
+/**
+ * Alias-backed PacketKeyV2 resolution (same owner as resolveCanonicalPacketKey; pure kernel in packet-key-resolution-v2.ts).
+ *
+ * NOTE: `resolveCanonicalPacketKey` above returns the PHYSICAL STORAGE key that joins against atlas_packets today. It does
+ * not return canonical logical identity. Canonical consumers must use `canonicalPacketKey` from this function; the SQL/FK
+ * compatibility paths may use `storagePacketKey` only to reach historical physical rows.
+ */
+export async function resolvePacketKeyResolutionV2(inputKey: string): Promise<PacketKeyResolutionV2> {
+	const { resolvePacketKeyResolutionCoreV2 } = await import('./packet-key-resolution-v2.js');
+	return resolvePacketKeyResolutionCoreV2(inputKey, {
+		async storedKeyExists(key) {
+			const rows = await db.select({ packetKey: atlasPackets.packetKey }).from(atlasPackets).where(eq(atlasPackets.packetKey, key)).limit(1);
+			return rows.length > 0;
+		},
+		async aliasByKey(aliasKey) {
+			const result = await db.execute<{ canonical_packet_key: string; alias_kind: string }>(sql`
+				SELECT canonical_packet_key, alias_kind FROM atlas_packet_identity_aliases WHERE alias_key = ${aliasKey} LIMIT 1
+			`);
+			const row = result.rows?.[0];
+			return row ? { canonicalPacketKey: row.canonical_packet_key, aliasKind: row.alias_kind } : null;
+		},
+		async aliasesByCanonical(canonicalPacketKey, aliasKind) {
+			const result = await db.execute<{ alias_key: string }>(sql`
+				SELECT alias_key FROM atlas_packet_identity_aliases WHERE canonical_packet_key = ${canonicalPacketKey} AND alias_kind = ${aliasKind} LIMIT 2
+			`);
+			return (result.rows ?? []).map((row) => row.alias_key);
+		},
+	});
+}

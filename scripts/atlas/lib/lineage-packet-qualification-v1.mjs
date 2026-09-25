@@ -5,6 +5,6 @@
  * provenance before it supplies this count.
  */
 export function currentRevisionQualifiedPacketCountV1(joinCounts) {
-	const count = joinCounts?.packet_revision_workspace_binding_matches;
+	const count = joinCounts?.packet_full_canonical_identity_matches ?? joinCounts?.packet_revision_workspace_binding_matches;
 	return Number.isSafeInteger(count) && count >= 0 ? count : 0;
 }

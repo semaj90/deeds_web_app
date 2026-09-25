@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-lineage-closure.v1",
-  "generatedAt": "2026-09-24T22:46:28.058Z",
+  "generatedAt": "2026-09-25T04:24:45.713Z",
   "mode": "READ_ONLY_EVIDENCE_COMPOSITION",
   "scope": {
     "sourceCohortRows": 52,
@@ -49,7 +49,8 @@
   },
   "funnel": {
     "workspaceSourceRows": 52,
-    "packetQualifiedRows": 0,
+    "packetQualifiedRows": 16151,
+    "packetQualificationBasis": "UNIQUE_PACKET_KEY_SOURCE_REVISION_WORKSPACE_KEY_AND_BINDING_PROVENANCE",
     "packetChunkQualifiedRows": 577,
     "astQualifiedRows": 48,
     "spanQualifiedRows": 0,
@@ -61,8 +62,9 @@
   },
   "promotionFunnel": {
     "workspaceSources": 52,
-    "packetIdentityQualified": 0,
+    "packetIdentityQualified": 16151,
     "packetRevisionQualified": 16151,
+    "packetLegacyFullContentIdentityMatches": 0,
     "packetChunkCurrentQualified": 577,
     "packetAstCurrentQualified": 0,
     "spanQualified": 0,
@@ -74,6 +76,11 @@
     "provenLineageSources": 577,
     "packetSourceRows": 16554,
     "packetRevisionMatches": 16151,
+    "packetRevisionWorkspaceBindingMatches": 16151,
+    "packet_revision_identity_matches": 16151,
+    "packet_workspace_binding_matches": 16151,
+    "packet_legacy_content_hash_matches": 0,
+    "packet_full_canonical_identity_matches": 16151,
     "packetContentMatches": 0,
     "chunkFileContentMatches": 577,
     "authoritativeNamespaces": 0,
@@ -89,7 +96,7 @@
     "workspaceRevisionMismatch": 52,
     "packetRevisionOwner": 0,
     "packetRevisionWriterAdoption": 1,
-    "packetIdentityIncomplete": 16554,
+    "packetIdentityIncomplete": 403,
     "authoritativeNamespaceMissing": 1,
     "evidenceSpanMissing": 1
   },
@@ -114,5 +121,5 @@
     "CONTENT_DIGEST_MISSING": 16454,
     "CONTENT_DIGEST_MISMATCH": 20
   },
-  "reportChecksum": "c69e24f90dca76fbae9b402ac3951f1af8fdb4f625a9702313c9df03dbe5861a"
+  "reportChecksum": "1598e3f3e0b4b24374c74ff807ee6edf539029adbe7f3d68ff21e832c0d0a660"
 }
