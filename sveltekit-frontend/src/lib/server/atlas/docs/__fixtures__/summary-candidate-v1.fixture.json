@@ -1,0 +1,81 @@
+{
+  "candidate": {
+    "schema": "atlas.summary-candidate.v1",
+    "chunkId": "doc:pgvector:fe883c75f323441d:22",
+    "chunkEvidenceRevision": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "identityVersion": "external-doc-chunk-id:v1",
+    "producerId": "atlas-external-doc-summarizer",
+    "producerRevision": "external-doc-summary-writer-v1",
+    "modelId": "ornith-1.5-9b",
+    "modelRevision": "ornith-1.5-9b@hforf.gguf@b1",
+    "promptRevision": "external-doc-summary-prompt-v1@sha256:x",
+    "inputChecksum": "1111111111111111111111111111111111111111111111111111111111111111",
+    "summaryText": "pgvector supports HNSW iterative scans. It adds hnsw.iterative_scan.",
+    "outputChecksum": "8a36bafe9e3f01c9050350d8829afba64898ec923a007330ae9bb3cba99564b8",
+    "generationMetadata": {
+      "backend": "llama-server",
+      "baseUrl": "http://127.0.0.1:8090",
+      "temperature": 0.2,
+      "seed": 1729,
+      "maxTokens": 300,
+      "finishReason": "stop",
+      "completionTokens": 30,
+      "productName": "pgvector",
+      "versionLabel": "0.8"
+    },
+    "canonicalAuthority": false,
+    "candidateId": "sc:c643ea97b9ec2402f4cf69cf59b675c2a2a21b0fa28df66a4674959325cd9270"
+  },
+  "claimSet": {
+    "schema": "atlas.summary-claim-set.v1",
+    "candidateId": "sc:c643ea97b9ec2402f4cf69cf59b675c2a2a21b0fa28df66a4674959325cd9270",
+    "extractorRevision": "claims-of:sentence-regex-v1",
+    "claimList": [
+      {
+        "claimOrdinal": 0,
+        "claimText": "pgvector supports HNSW iterative scans.",
+        "claimChecksum": "37d03a909baafc881df33bab010c2f0948e176f536bb6d8606c0460c43ebadcd"
+      },
+      {
+        "claimOrdinal": 1,
+        "claimText": "It adds hnsw.iterative_scan.",
+        "claimChecksum": "5763704626e5046af27390da5856bf253aaa11774111af89721aca54eec7ee31"
+      }
+    ],
+    "claimSetChecksum": "15ccdc0fe331ea467e12192bc7480732dde16c2741496c465731b639eeb32785"
+  },
+  "eligibility": {
+    "schema": "atlas.summary-eligibility.v1",
+    "candidateId": "sc:c643ea97b9ec2402f4cf69cf59b675c2a2a21b0fa28df66a4674959325cd9270",
+    "claimSetChecksum": "15ccdc0fe331ea467e12192bc7480732dde16c2741496c465731b639eeb32785",
+    "validationContractRevision": "summary-claim-validator:val-10-candidate-v1",
+    "spineRevision": "9999999999999999999999999999999999999999999999999999999999999999",
+    "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+    "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+    "resolverPolicyRevision": "summary-claim-resolution:val-09-v1",
+    "resolutions": [
+      {
+        "claimOrdinal": 0,
+        "claimChecksum": "37d03a909baafc881df33bab010c2f0948e176f536bb6d8606c0460c43ebadcd",
+        "validationId": "scv:2222222222222222222222222222222222222222222222222222222222222222",
+        "validationChecksum": "3333333333333333333333333333333333333333333333333333333333333333",
+        "judgeInputChecksum": "4444444444444444444444444444444444444444444444444444444444444444",
+        "decision": "ADMIT",
+        "resolutionLayer": "COMPOSITE"
+      },
+      {
+        "claimOrdinal": 1,
+        "claimChecksum": "5763704626e5046af27390da5856bf253aaa11774111af89721aca54eec7ee31",
+        "validationId": "scv:2222222222222222222222222222222222222222222222222222222222222222",
+        "validationChecksum": "3333333333333333333333333333333333333333333333333333333333333333",
+        "judgeInputChecksum": "4444444444444444444444444444444444444444444444444444444444444444",
+        "decision": "ADMIT",
+        "resolutionLayer": "COMPOSITE"
+      }
+    ],
+    "eligible": true,
+    "eligibilityChecksum": "90590b8eb6dd4124e1a78783dbbd592c3a33daad2c515873ba1e97abfb07db15"
+  },
+  "chunkCohortChecksum": "4f54becfff44fec2979f989ac849cd53bf782674218f7085f0f3663df902d468",
+  "candidateCohortChecksum": "d3812a05c9e261f6ac92382ca961df12152059a93f69d45c5f5a62997a5810b8"
+}

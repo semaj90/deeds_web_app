@@ -1,0 +1,108 @@
+{
+  "schema": "atlas.go-retrieval-dense-lineage.v1",
+  "generatedAt": "2026-09-21T03:03:44.390Z",
+  "mode": "LIVE_READ_ONLY",
+  "baseUrl": "http://127.0.0.1:8100",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false,
+  "healthStatus": 200,
+  "health": {
+    "dependencies": {
+      "embedding_service": {
+        "connected": true,
+        "required": true
+      },
+      "postgres": {
+        "connected": true,
+        "required": true
+      },
+      "qdrant": {
+        "connected": true,
+        "required": true
+      },
+      "redis": {
+        "connected": true,
+        "required": false
+      }
+    },
+    "embeddingServiceUp": true,
+    "pgvectorConnected": true,
+    "qdrantConnected": true,
+    "readiness_state": "READY_FULL",
+    "redisConnected": true,
+    "status": "healthy",
+    "timestamp": 1789959824424
+  },
+  "searchStatus": 200,
+  "search": {
+    "chunks": [
+      {
+        "file_path": "sveltekit-frontend/src/lib/server/db/index-clean.ts",
+        "kind": "const",
+        "tags": [
+          "sveltekit-frontend.index-clean",
+          "sveltekit",
+          "frontend.index",
+          "clean",
+          "frontend",
+          "index",
+          "packet",
+          "85296781bd60"
+        ],
+        "score": 0.5,
+        "packet_key": "packet:85296781bd60",
+        "source_ref": "sveltekit-frontend/src/lib/server/db/index-clean.ts",
+        "canonical_source_ref": "sveltekit-frontend/src/lib/server/db/index-clean.ts",
+        "content_hash": "8c0dd1aac9881528",
+        "representation_id": "semantic_768"
+      },
+      {
+        "file_path": "src/routes/(app)/admin/codebase-viewer/+page.server.ts",
+        "tags": [
+          "codebase-viewer",
+          "codebase",
+          "viewer",
+          "packet",
+          "4cae3db56507"
+        ],
+        "score": 0.5,
+        "packet_key": "ace:packet:4cae3db56507",
+        "source_ref": "src/routes/(app)/admin/codebase-viewer/+page.server.ts",
+        "canonical_source_ref": "src/routes/(app)/admin/codebase-viewer/+page.server.ts",
+        "content_hash": "71d86dd5718d1f46"
+      },
+      {
+        "file_path": "src/lib/server/db/schema-postgres.ts",
+        "kind": "table-def",
+        "tags": [
+          "schema-postgres",
+          "schema",
+          "postgres",
+          "packet",
+          "4c56fd544344"
+        ],
+        "score": 0.33333334,
+        "packet_key": "ace:packet:4c56fd544344",
+        "source_ref": "src/lib/server/db/schema-postgres.ts",
+        "canonical_source_ref": "src/lib/server/db/schema-postgres.ts",
+        "content_hash": "c1d342be3a765fa4"
+      }
+    ],
+    "total_ms": 7,
+    "representation_used": "semantic_768"
+  },
+  "coverage": {
+    "chunk_rows": 274465,
+    "qdrant_rows": 274465,
+    "proven_lineage_rows": 7421,
+    "fully_qualified_rows": 0
+  },
+  "checks": {
+    "health": "PASS",
+    "boundedDenseSearch": "PASS",
+    "adapterMode": "EXACT_QDRANT_ID_PROVEN_LINEAGE_ONLY",
+    "canonicalPromotion": "BLOCKED_UNTIL_FULLY_QUALIFIED"
+  },
+  "status": "GO_RETRIEVAL_DENSE_LINEAGE_ADAPTER_PROVEN_DATA_BLOCKED"
+}

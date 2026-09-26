@@ -26,6 +26,8 @@ import {
 } from './event-hypergraph-contract.js';
 import { buildRecommendationPolicyResults, type RecommendationPolicyResult } from '$lib/server/analytics/recommendation-policy.js';
 
+const NonBlankStringSchema = z.string().trim().min(1);
+
 const EvidenceSpanSchema = z
 	.object({
 		sourceRef: z.string().min(1),
@@ -61,8 +63,9 @@ export const AnalysisPassResultSchema = z
 	.object({
 		requestId: z.string().min(1),
 		packetKey: z.string().min(1).nullable().default(null),
-		sourceRef: z.string().min(1),
-		sourceRevision: z.string().min(1),
+		sourceRef: NonBlankStringSchema,
+		sourceRevision: NonBlankStringSchema,
+		workspaceRevision: z.string().min(1).nullable().default(null),
 		family: AnalysisPassFamilySchema,
 		passName: z.string().min(1),
 		passRevision: z.string().min(1),
@@ -262,8 +265,10 @@ export const ExperimentFeatureMatrixSchema = z
 		requestId: z.string().min(1),
 		candidateId: z.string().min(1),
 		packetKey: z.string().min(1).nullable().default(null),
-		sourceRef: z.string().min(1),
-		sourceRevision: z.string().min(1),
+		sourceRef: NonBlankStringSchema,
+		sourceRevision: NonBlankStringSchema,
+		workspaceRevision: z.string().min(1).nullable().default(null),
+		canonicalAuthority: z.literal(false).default(false),
 		featureRevision: z.string().min(1),
 		graphRevision: z.string().min(1).nullable().default(null),
 		representationRevision: z.string().min(1).nullable().default(null),
@@ -312,15 +317,60 @@ export interface CompileEventHypergraphBundleInput {
 	experimentFeatureMatrix?: ExperimentFeatureMatrix | null;
 }
 
+export class HypergraphLineageUnavailableError extends Error {
+	readonly code = 'HYPERGRAPH_LINEAGE_UNAVAILABLE' as const;
+
+	constructor(message: string) {
+		super(message);
+		this.name = 'HypergraphLineageUnavailableError';
+	}
+}
+
 export interface CompileExperimentFeatureMatrixInput {
 	requestId?: string;
 	packetKey?: string | null;
 	sourceRef: string;
 	sourceRevision: string;
+	workspaceRevision?: string | null;
 	featureRevision?: string;
 	graphRevision?: string | null;
 	representationRevision?: string | null;
 	passResults: AnalysisPassResult[];
+}
+
+export class FeatureMatrixLineageMismatchError extends Error {
+	readonly code = 'FEATURE_MATRIX_LINEAGE_MISMATCH' as const;
+
+	constructor(message: string) {
+		super(message);
+		this.name = 'FeatureMatrixLineageMismatchError';
+	}
+}
+
+function assertFeatureMatrixPassLineage(
+	passResults: AnalysisPassResult[],
+	sourceRef: string,
+	sourceRevision: string,
+	workspaceRevision?: string | null,
+	packetKey?: string | null,
+): void {
+	for (const passResult of passResults) {
+		if (passResult.sourceRef !== sourceRef || passResult.sourceRevision !== sourceRevision) {
+			throw new FeatureMatrixLineageMismatchError(
+				`Analysis pass ${passResult.passName} does not match feature-matrix lineage ${sourceRef}@${sourceRevision}`,
+			);
+		}
+		if (workspaceRevision !== undefined && passResult.workspaceRevision !== workspaceRevision) {
+			throw new FeatureMatrixLineageMismatchError(
+				`Analysis pass ${passResult.passName} does not match feature-matrix workspace revision ${workspaceRevision}`,
+			);
+		}
+		if (packetKey !== undefined && passResult.packetKey !== packetKey) {
+			throw new FeatureMatrixLineageMismatchError(
+				`Analysis pass ${passResult.passName} does not match feature-matrix packet ${packetKey}`,
+			);
+		}
+	}
 }
 
 function latestPass(
@@ -377,6 +427,15 @@ export function compileExperimentFeatureMatrix(
 ): { matrix: ExperimentFeatureMatrix; control5: Control5 } {
 	const requestId = input.requestId ?? randomUUID();
 	const canonicalPassResultsSet = canonicalPassResults(input.passResults);
+	const sourceRef = input.sourceRef.trim();
+	const sourceRevision = input.sourceRevision.trim();
+	assertFeatureMatrixPassLineage(
+		canonicalPassResultsSet,
+		sourceRef,
+		sourceRevision,
+		input.workspaceRevision,
+		input.packetKey,
+	);
 	const structural = latestPass(canonicalPassResultsSet, 'structural');
 	const lexical = latestPass(canonicalPassResultsSet, 'lexical');
 	const semantic = latestPass(canonicalPassResultsSet, 'semantic');
@@ -385,8 +444,6 @@ export function compileExperimentFeatureMatrix(
 	const grounded = latestPass(canonicalPassResultsSet, 'grounded');
 
 	const control5 = deriveControl5(input.passResults);
-	const sourceRef = input.sourceRef;
-	const sourceRevision = input.sourceRevision;
 	const featureRevision = input.featureRevision ?? 'nlp-feature-compiler-v1';
 	const packetKey = input.packetKey ?? null;
 
@@ -396,6 +453,8 @@ export function compileExperimentFeatureMatrix(
 		packetKey,
 		sourceRef,
 		sourceRevision,
+		workspaceRevision: input.workspaceRevision ?? null,
+		canonicalAuthority: false,
 		featureRevision,
 		graphRevision: input.graphRevision ?? null,
 		representationRevision: input.representationRevision ?? null,
@@ -450,9 +509,19 @@ function firstNonEmpty(...values: Array<string | null | undefined>): string {
 }
 
 export function compileEventHypergraphBundle(input: CompileEventHypergraphBundleInput): EventHypergraphBundle {
-	const packetKey = input.packetKey ?? input.requestId;
+	const packetKey = input.packetKey?.trim() || null;
 	const sourceRevision = input.sourceRevision;
-	const workspaceRevision = input.workspaceRevision ?? sourceRevision;
+	const workspaceRevision = input.workspaceRevision?.trim() || null;
+	if (!packetKey) {
+		throw new HypergraphLineageUnavailableError(
+			'Canonical packetKey is required; requestId cannot become packet identity.',
+		);
+	}
+	if (!workspaceRevision) {
+		throw new HypergraphLineageUnavailableError(
+			'Canonical workspaceRevision is required; sourceRevision cannot become workspace identity.',
+		);
+	}
 	const observedAt = new Date().toISOString();
 	const events: AtlasEvent[] = [];
 

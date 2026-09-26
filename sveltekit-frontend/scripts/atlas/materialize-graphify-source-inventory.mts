@@ -27,6 +27,15 @@ const producerRevision = 'atlas.graphify-source-inventory-writer.2026-08-22.v2';
 const parserContractVersion = 'graphify.parser.v0.1';
 const extractionContractVersion = 'graphify.extractor.v0.1';
 
+// This legacy materializer upserts on the logical workspace snapshot key and
+// can therefore reuse a prior run_id. Durable execution ownership now belongs
+// to graphify-daily-coordinator-v1.ts, which creates a fresh execution identity
+// for every attempt. Keep this script available for read-only planning, but
+// fail closed rather than allowing the retired apply path to relabel history.
+if (apply) {
+  throw new Error('GRAPHIFY_LEGACY_SOURCE_INVENTORY_APPLY_RETIRED_USE_GRAPHIFY_DAILY_COORDINATOR_V1');
+}
+
 if (apply && process.env.ATLAS_GRAPHIFY_SOURCE_INVENTORY_APPLY !== '1') {
   throw new Error('GRAPHIFY_SOURCE_INVENTORY_APPLY_CONFIRMATION_REQUIRED');
 }

@@ -48,6 +48,16 @@ const VERBOSE    = argv.includes('--verbose');
 const DRY_RUN    = !APPLY;
 const LIMIT_ARG  = (() => { const a = argv.find(x => x.startsWith('--limit=')); return a ? parseInt(a.split('=')[1], 10) : Infinity; })();
 
+// TurboVec IDs are projection IDs, not canonical identity. Keep the fallback
+// deterministic so a rerun cannot create a different point for the same packet.
+// The packet key remains in payload for readback; this numeric ID is only an
+// executor-facing compatibility value.
+function deterministicProjectionId(packetKey) {
+  const digest = createHash('sha256').update(String(packetKey)).digest();
+  const value = digest.readUInt32BE(0) & 0x7fffffff;
+  return value === 0 ? 1 : value;
+}
+
 // ── Service URLs ──────────────────────────────────────────────────────────────
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_URL    = process.env.REDIS_URL    || 'redis://127.0.0.1:6379';
@@ -253,7 +263,7 @@ async function main() {
         }
 
         turbovecPoints.push({
-          id: parseInt(row.packet_key.slice(0, 8), 16) || Math.random() * 2147483647,
+          id: parseInt(row.packet_key.slice(0, 8), 16) || deterministicProjectionId(row.packet_key),
           vector: encoded64,
           payload: {
             packet_key: row.packet_key,
@@ -263,6 +273,8 @@ async function main() {
             som_cluster: clusterKey,
             som_x: x,
             som_y: y,
+            projection_id_role: 'TURBOVEC_PROJECTION_ONLY',
+            canonical_authority: false,
           },
         });
         turbovecReady++;

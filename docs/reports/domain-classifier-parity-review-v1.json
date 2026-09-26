@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.domain-classifier-parity-review.v1",
+  "status": "REVIEWED_NO_PROMOTION",
+  "sourceReceipt": "docs/reports/domain-classifier-parity-v1.json",
+  "authority": "HUMAN_REVIEW_REQUIRED_FOR_PROMOTION",
+  "writesPerformed": false,
+  "aceCallerChanged": false,
+  "checkpointChanged": false,
+  "trainingDatasetWritten": false,
+  "reviewSummary": {
+    "rowsReviewed": 6,
+    "exactMatches": 0,
+    "disagreements": 6,
+    "taxonomyFallbacks": 6,
+    "promotionDecision": "REJECTED_PENDING_LABEL_POLICY_RECONCILIATION"
+  },
+  "findings": [
+    {
+      "sourceRef": "src/lib/server/ace/features/domain-classifier.ts",
+      "aceLabel": "auth",
+      "taxonomyLabel": "general",
+      "finding": "ACE fine-grained auth rule matched; taxonomy confidence fell below the primary-domain threshold on the broad implementation file.",
+      "disposition": "REVIEWED_KEEP_SEPARATE"
+    },
+    {
+      "sourceRef": "src/lib/server/atlas/domain-taxonomy.ts",
+      "aceLabel": "database",
+      "taxonomyLabel": "general",
+      "finding": "ACE database rule matched; the taxonomy source file contains several competing domain vocabularies and therefore fell back to general.",
+      "disposition": "REVIEWED_KEEP_SEPARATE"
+    },
+    {
+      "sourceRef": "src/lib/server/search/qdrant-search.ts",
+      "aceLabel": "cache",
+      "taxonomyLabel": "general",
+      "finding": "ACE cache rule matched; taxonomy confidence was distributed across retrieval/cache/network terms below the promotion threshold.",
+      "disposition": "REVIEWED_KEEP_SEPARATE"
+    },
+    {
+      "sourceRef": "src/lib/server/atlas/semantic-signal-routing.ts",
+      "aceLabel": "database",
+      "taxonomyLabel": "general",
+      "finding": "ACE database rule matched; taxonomy broad-source scoring did not establish a single canonical primary domain.",
+      "disposition": "REVIEWED_KEEP_SEPARATE"
+    },
+    {
+      "sourceRef": "src/lib/server/ace/ace-context-manifest.ts",
+      "aceLabel": "database",
+      "taxonomyLabel": "general",
+      "finding": "ACE database rule matched; taxonomy fallback is expected while context-manifest evidence mixes agent, retrieval, cache, and persistence vocabulary.",
+      "disposition": "REVIEWED_KEEP_SEPARATE"
+    },
+    {
+      "sourceRef": "src/routes/api/atlas/domain-taxonomy/classify/+server.ts",
+      "aceLabel": "auth",
+      "taxonomyLabel": "general",
+      "finding": "ACE auth rule matched; taxonomy broad route content did not meet its confidence and score thresholds.",
+      "disposition": "REVIEWED_KEEP_SEPARATE"
+    }
+  ],
+  "nextGate": "Define an operator-approved label hierarchy and bounded classification fixture before any caller migration, checkpoint replacement, or training admission.",
+  "canonicalAuthority": false
+}

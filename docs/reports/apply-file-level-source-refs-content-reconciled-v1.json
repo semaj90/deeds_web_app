@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.apply-file-level-source-refs-content-reconciled.v1",
+  "generatedAt": "2026-09-13T03:52:07.124Z",
+  "apply": true,
+  "admittedWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+  "ownerRunWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+  "admittedRootSources": 24205,
+  "counts": {
+    "notInGraph": 460,
+    "contentMismatch": 376,
+    "alreadyPresent": 117,
+    "candidateInserts": 23252
+  },
+  "committed": true,
+  "insertedCount": 23252,
+  "readbackCount": 23252,
+  "status": "FILE_LEVEL_SOURCE_REFS_INSERT_AND_READBACK_PROVEN"
+}

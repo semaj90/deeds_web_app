@@ -44,6 +44,22 @@ export const oakDagContextBuildInputSchema = z.object({
   options: z.record(z.string(), z.unknown()),
 }).strict();
 
+/** Parameter references owned by the bounded OAK DAG input validators. */
+export const OAK_DAG_PARAMETER_SCHEMA_REFS = {
+  TOP_K: 'param:top-k',
+  TOKEN_BUDGET: 'param:token-budget',
+} as const;
+
+/** Search bounds match the existing bounded Qdrant/semantic input contract. */
+export const oakDagTopKParameterSchema = z.object({
+  topK: z.number().int().min(1).max(100),
+}).strict();
+
+/** The model-specific context ceiling is owned by the downstream context plan. */
+export const oakDagTokenBudgetParameterSchema = z.object({
+  tokenBudget: z.number().int().positive(),
+}).strict();
+
 export const OAK_DAG_OWNER_INPUT_SCHEMA_IDS = {
   AST_SCAN: 'atlas.oak-dag-ast-scan-input.v1',
   AST_EVIDENCE: 'atlas.oak-dag-ast-evidence-input.v1',

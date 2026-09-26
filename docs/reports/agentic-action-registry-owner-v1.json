@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.agentic-action-registry-owner-audit.v1",
+  "source": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\atlas\\agentic\\agentic-action-registry-v1.ts",
+    "checksum": "sha256:cd66eaec18ca7e5c0e8fee9024b93bb631e7b11b7dc2e4356eff9d19895b1a43",
+    "exportedRegistry": "AGENTIC_ACTION_REGISTRY_V1_SEED"
+  },
+  "census": {
+    "actionCount": 13,
+    "uniqueActionCount": 13,
+    "duplicateActionIds": [],
+    "actionIds": [
+      "APPLY_SOURCE_PATCH",
+      "AST_EXPAND",
+      "AWAIT_OPERATOR",
+      "BM25_SEARCH",
+      "HYPERGRAPH_EXPAND",
+      "OAK_RESOLVE",
+      "RETRY_WITH_MORE_CONTEXT",
+      "RG_EXACT_SEARCH",
+      "RUN_TESTS",
+      "RUN_TYPECHECK",
+      "SEMANTIC_SEARCH",
+      "STOP_BLOCKED",
+      "STOP_SUCCESS"
+    ],
+    "mutationActionIds": [
+      "APPLY_SOURCE_PATCH"
+    ]
+  },
+  "ownerDecision": {
+    "storageOwner": "CODE_DEFINED",
+    "status": "NOT_REQUIRED_AT_CURRENT_SCALE",
+    "postgresTable": false,
+    "bm25SearchIndex": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "rationale": [
+      "The registry is a bounded 13-action seed used by typed lookup/filter helpers.",
+      "The current change does not require external action discovery, persistence, or full-text action search.",
+      "Moving it to PostgreSQL now would create a second owner without a migration, readback, or caller requirement."
+    ],
+    "revisitWhen": [
+      "An admitted requirement needs operator-managed action discovery or BM25 search.",
+      "The registry needs durable audit/history independent of the source release.",
+      "The registry grows beyond a bounded code-defined catalog and a replacement owner is explicitly authorized."
+    ]
+  },
+  "safety": {
+    "decisionScope": "AR-02.1",
+    "runtimeBehaviorChanged": false,
+    "databaseWrites": false,
+    "migrationRequired": false,
+    "promotionAuthorized": false
+  }
+}

@@ -1,6 +1,7 @@
 import { Client } from 'pg';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
+import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 import {
@@ -25,6 +26,24 @@ const DATABASE_URL = process.env.DATABASE_URL?.trim();
 const WORKSPACE_ID = process.env.ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID?.trim() ?? '';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const fullMode = process.argv.includes('--full');
+if (fullMode) {
+  // BLOCKED (2026-09-13, GRAPHIFY-STRUCTURAL-CODE-CANARY-02 finding): --full changes
+  // SOURCE_SELECTION/INVENTORY membership to ALL snapshot sources (24,205+), but AST_PARSE/
+  // STRUCTURAL_EXTRACT still only ever test ONE source (`structuralBinding = bindings.find(...)
+  // ?? bindings[0]`, unchanged by --full). A --full run would mark `status: COMPLETED` after
+  // structurally proving exactly 1/24,205 sources -- a large membership count labeled COMPLETED
+  // with no corresponding structural proof, which is misleading, not a "full Graphify run".
+  // Do not remove this block without first making structural materialization iterate every
+  // selected source (or accepting a materially different, honestly-labeled completion contract).
+  throw new Error(
+    'GRAPHIFY_COORDINATOR_CANARY_FULL_MODE_BLOCKED: --full membership selection is real, but ' +
+    'AST_PARSE/STRUCTURAL_EXTRACT still test only 1 source regardless of membership size -- a ' +
+    '24k-membership run would falsely read as a proven full structural pass. Use --source-ref=<path> ' +
+    '(GRAPHIFY-STRUCTURAL-CODE-CANARY-02, built 2026-09-13, see below) to target an explicit, ' +
+    'sealed-snapshot code source instead until structural materialization is made to iterate the ' +
+    'full selection.',
+  );
+}
 const limitArg = process.argv.find((arg) => arg.startsWith('--limit='))?.slice('--limit='.length);
 const requestedLimit = Number(limitArg ?? process.env.GRAPHIFY_CANARY_SOURCE_LIMIT ?? '3');
 if (!fullMode && (!Number.isInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > 50)) {
@@ -84,7 +103,40 @@ const rootRepositoryHead = snapshot.repositories.find((repository) => repository
 if (!rootRepositoryHead || !/^[0-9a-f]{40}$/i.test(rootRepositoryHead)) {
   throw new Error('GRAPHIFY_COORDINATOR_CANARY_ROOT_REPOSITORY_HEAD_MISSING');
 }
-const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(0, requestedLimit);
+// GRAPHIFY-STRUCTURAL-CODE-CANARY-02: first-class `--source-ref=<path>` CLI flag. Supersedes the
+// ad hoc ATLAS_GRAPHIFY_CANARY_SOURCE_REFS env-var override used earlier this session -- that
+// override is no longer read. Repeatable (pass --source-ref=<a> --source-ref=<b> ... for more
+// than one). Every value is validated against the SEALED SNAPSHOT's real repo:root sources
+// (`rootSources`, loaded from the admitted workspace-revision's snapshot file above) -- it is
+// never treated as an arbitrary filesystem path, and never read from disk before that lookup
+// succeeds. Structural materialization is TypeScript-compiler-based (AST_PARSE/STRUCTURAL_EXTRACT
+// always run with `language: 'typescript'`), so each resolved source must also carry a code file
+// extension; a markdown/json/text sourceRef reaching --source-ref is a caller error, not silently
+// accepted and structurally no-op'd. The FIRST --source-ref value becomes the structural
+// (AST_PARSE/STRUCTURAL_EXTRACT) sample, same as element [0] of the default slice would be. Never
+// applies in --full mode (which is itself blocked above).
+const CODE_SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs']);
+const sourceRefArgs = process.argv
+  .filter((arg) => arg.startsWith('--source-ref='))
+  .map((arg) => arg.slice('--source-ref='.length).trim())
+  .filter(Boolean);
+const explicitSourceRefs = sourceRefArgs.length > 0 ? sourceRefArgs : null;
+if (explicitSourceRefs && fullMode) {
+  throw new Error('GRAPHIFY_COORDINATOR_CANARY_SOURCE_REF_NOT_VALID_WITH_FULL');
+}
+const selectedSnapshotSources = fullMode
+  ? snapshot.sources
+  : explicitSourceRefs
+  ? explicitSourceRefs.map((ref) => {
+      const found = rootSources.find((source) => source.sourceRef === ref);
+      if (!found) throw new Error(`GRAPHIFY_COORDINATOR_CANARY_SOURCE_REF_NOT_FOUND_IN_SEALED_SNAPSHOT:${ref}`);
+      const ext = ref.slice(ref.lastIndexOf('.')).toLowerCase();
+      if (!CODE_SOURCE_EXTENSIONS.has(ext)) {
+        throw new Error(`GRAPHIFY_COORDINATOR_CANARY_SOURCE_REF_NOT_A_CODE_SOURCE:${ref}`);
+      }
+      return found;
+    })
+  : rootSources.slice(0, requestedLimit);
   const expectedCount = selectedSnapshotSources.length;
   if (expectedCount === 0) throw new Error('GRAPHIFY_COORDINATOR_CANARY_NO_ROOT_SNAPSHOT_SOURCES');
   const selectedBindings = selectedSnapshotSources.map((source, index) => ({
@@ -200,9 +252,17 @@ const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(
     [executionId],
   );
   const row = readback.rows[0];
+  const readbackOk = row?.status === 'COMPLETED' && row?.completed_at
+    && Number(row.file_count) === expectedCount && Number(row.completed_stage_count) === 5;
   const report = {
-    gate: 'GRAPHIFY-DAILY-COORDINATOR-01',
-    status: row?.status === 'COMPLETED' && row?.completed_at && Number(row.file_count) === expectedCount && Number(row.completed_stage_count) === 5 ? (fullMode ? 'PROVEN_CURRENT_WORKSPACE_SOURCE_SELECTION' : 'PROVEN_COMMITTED_BOUNDED_CANARY') : 'READBACK_FAILED',
+    gate: explicitSourceRefs ? 'GRAPHIFY-STRUCTURAL-CODE-CANARY-02' : 'GRAPHIFY-DAILY-COORDINATOR-01',
+    status: !readbackOk
+      ? 'READBACK_FAILED'
+      : fullMode
+      ? 'PROVEN_CURRENT_WORKSPACE_SOURCE_SELECTION'
+      : explicitSourceRefs
+      ? 'PROVEN_STRUCTURAL_CODE_CANARY'
+      : 'PROVEN_COMMITTED_BOUNDED_CANARY',
     executionId,
     workspaceRevision: row?.workspace_revision ?? null,
     workspaceRevisionSource: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT',
@@ -211,6 +271,12 @@ const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(
     sourceSelectionChecksum: selection.outputChecksum,
     inventoryInputChecksum: inventory.inputChecksum,
     inventoryOutputChecksum: inventory.outputChecksum,
+    // Structural (AST_PARSE/STRUCTURAL_EXTRACT) proof is per-run always exactly ONE source --
+    // structuralSourceRef names it explicitly. When explicitSourceRefs has more than one entry,
+    // membership/inventory cover all of them but only requestedSourceRefs[0] gets structural
+    // proof this run -- requestedSourceRefs makes that scope visible instead of implying every
+    // selected source was structurally proven (the exact honesty gap --full had at 24k scale).
+    requestedSourceRefs: explicitSourceRefs ?? null,
     structuralSourceRef: structuralBinding.sourceRef,
     structuralProviderStatus: materialization.status,
     structuralProvenanceStatus: materialization.provenanceReadiness.status,
@@ -224,7 +290,10 @@ const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(
     writesPerformed: true,
   };
   await mkdir(resolve(process.cwd(), '..', 'docs', 'reports'), { recursive: true });
-  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  // Sync write, not fs/promises writeFile: async fs.promises.open on Windows intermittently
+  // throws a bare "UNKNOWN: unknown error" against this exact path (observed live, reproducible
+  // across repeat runs) while a synchronous write to the same path succeeds every time.
+  writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify(report));
 } finally {
   if (locked) await releaseCoordinatorLock(client);

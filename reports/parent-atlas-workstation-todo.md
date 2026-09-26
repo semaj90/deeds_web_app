@@ -226,20 +226,64 @@ T6c is complete as an experiment and must not be reopened as if KMeans still nee
 7. Do not start AE, RRF, Neo4j projection, or GA8/GA9 promotion from this lane.
 8. Do not silently substitute 384-dimensional vectors; future compressed latents must be separately revisioned experiments.
 
-## Phase 3 canonical 768-dim note
+## Phase 3 canonical 768-dim note (frozen, terminology-refined 2026-09-14)
 
-Phase 3 uses the frozen `semantic_768` representation everywhere in the live path.
-`384`-dim references are legacy or derived lanes only; they do not become canonical writers,
-canonical retrieval truth, or new owner boundaries.
+`semantic_768` is the canonical retrieval representation truth. `latent_256` is a derived
+physical routing representation, not a second retrieval truth. The GPU memory admission
+tranche (stages A-F, complete) does not change this ownership model: the residency wrapper it
+added has no production caller yet, so none of that work promotes a latent representation or
+touches semantic ownership.
 
-- Stage 3B: community_id propagation and AST symbol extraction.
-- Stage 3C: SOM 20×20 as a separate 400-cell topology experiment over `semantic_768`.
-- Stage 3D: reranker feature preparation from packet evidence.
-latent_256
-`latent_64` is legacy routing compatibility only. Any future latent compression work should be a
-separately revisioned experiment, with `latent_128` the more plausible candidate if one is needed.
-The phrase `kmeans 20x20` is not the correct terminology; KMeans uses `K ∈ {64, 128, 256}` and SOM
-is the separate 20×20 topology experiment.
+Representation hierarchy:
+
+- `semantic_768` — **CANONICAL RETRIEVAL REPRESENTATION**. Qdrant / cuVS / CAGRA / TurboVec
+  executors are one logical semantic lane, one semantic fusion vote. Everything else derives
+  from this and is separately revisioned.
+- `latent_256` — **DERIVED PHYSICAL ROUTING REPRESENTATION**. Topology clustering / residency
+  routing features. Never canonical retrieval identity. Optional, derived, experimental.
+- `latent_128` — plausible future compression experiment. Separately revisioned. Promote only
+  from measured utility, never by default.
+- `latent_64` — legacy routing compatibility only. Not canonical. Not a new writer. Not a new
+  retrieval lane.
+
+Better phrasing going forward (avoids "everywhere" being misread as "convert AST/PageRank/
+community evidence into 768 dimensions"): Phase 3 uses `semantic_768` as the frozen canonical
+dense representation from which all dense derived/topology/compression experiments originate.
+Structural, graph, lexical, and AST evidence retain their own native representations and join
+by canonical candidate identity — they are not projected into 768-dim space.
+
+Explicit stage breakdown:
+
+- **Stage 3A**: `semantic_768` frozen canonical input.
+- **Stage 3B**: `community_id` propagation, AST symbol extraction, exact identity/revision
+  binding.
+- **Stage 3C**: two independent topology challengers — KMeans (`K ∈ {64, 128, 256}`, centroid
+  routing experiment) and SOM (20×20, 400 topology cells, independent topology experiment).
+  `"kmeans 20x20"` is invalid terminology in any future task/doc — a 20×20 grid describes SOM
+  topology, not a KMeans cluster-count parameter.
+- **Stage 3D**: `CandidateFeatureSnapshot` preparation — semantic relevance, lexical relevance,
+  AST affinity, graph authority, community/topology features as optional reranker inputs.
+  Preserve the distinction candidate identity / semantic representation / derived topology /
+  reranker feature ABI — the reranker's feature projection consumes these signals, it does not
+  own their meaning (`RERANKER_OWNS_FEATURE_MEANING: false`).
+- **Stage 3E**: ablation evaluation — Recall@K, MRR, NDCG, latency, routing usefulness. No
+  additional semantic vote is introduced at this stage.
+
+Frozen invariants:
+
+```
+SEMANTIC_768_CANONICAL           = true
+SEMANTIC_EXECUTOR_VOTE_COUNT     = 1
+LATENT_256_CANONICAL_RETRIEVAL   = false
+LATENT_128_PROMOTED              = false
+LATENT_64_CANONICAL              = false
+KMEANS_GRID_20X20                = false
+SOM_GRID                         = 20x20
+SOM_CELL_COUNT                   = 400
+TOPOLOGY_CREATES_IDENTITY        = false
+TOPOLOGY_CREATES_RRF_VOTE        = false
+RERANKER_OWNS_FEATURE_MEANING    = false
+```
 
 ## Separate lane: Kafka / CDC / Rust sidecar analysis
 
@@ -396,3 +440,188 @@ warning.
 - Optional sidecars stay opt-in until transport matches are confirmed.
 - Redis 8 stays isolated as an eval lane.
 - Engram ingestion stays deferred until the transport and importer path is stable.
+
+## Phase 18 owned-reranker progress metadata — 2026-09-14
+
+This is a scope-limited progress indicator for the six gates required before an owned
+XGBoost/LightGBM reranker can be trained or promoted. It is not canonical task completion;
+the owning OpenSpec ledger and receipts remain authoritative.
+
+| Gate | State | Progress | Priority |
+|---|---|---:|---|
+| Live candidate-feature adapter | Contract proven; live caller missing | 50% | P0 |
+| Real revision-qualified capture | Missing | 0% | P0 |
+| Explicit relevance labels | Missing | 0% | P0 |
+| Admitted training corpus | Missing | 0% | P0 |
+| Model artifact + held-out quality receipt | Missing | 0% | P0 |
+| Sidecar promotion receipt | Missing | 0% | P0 |
+
+```text
+phase18TrainingPromotionReadiness = 0 / 6 gates = 0%
+contractFoundation = PROVEN_BOUNDED
+marcoMixedbread = COMPATIBILITY_ONLY_OPT_IN
+activeOwnedReranker = NOT_AUTHORIZED
+```
+
+The 0% value is deliberately limited to training/promotion readiness; it does not mean the
+reranker contracts, default-off guard, feature-ABI admission, or fail-closed tests are absent.
+The existing Kanban `completionScore`/`rankScore` utility remains prioritization metadata and
+must not replace this gate-based receipt.
+
+Current P0 sequence:
+
+1. Produce one real revision-qualified candidate bundle from the existing retrieval boundary.
+2. Attach explicit human or admitted evaluation labels without reusing workflow success or
+   synthetic trace outcomes.
+3. Resolve the 16-column sidecar ABI through an explicit checksummed projection from the
+   server-owned candidate feature snapshot.
+4. Admit a leakage-free corpus and perform held-out training/evaluation.
+5. Replay the selected artifact through the sidecar, then issue an independent promotion
+   receipt before changing `XGBOOST_RERANK_MODE`.
+
+No model training, sidecar activation, cache warming, reranker promotion, or datastore write
+was performed for this update.
+
+## Architecture correction — candidate funnel and model ABI — 2026-09-14
+
+The legacy Python sidecar's sixteen columns describe feature width; they do not describe
+candidate count. The server-owned `CandidateFeatureSnapshotV1` remains the semantic feature
+owner. A future `XGBOOST-FEATURE-PROJECTION-V2` must explicitly map that schema to an
+admitted model ABI with derivation revisions, evidence references, null policy, and checksum.
+The legacy names remain compatibility-only until that mapping is proven.
+
+The planned evaluation funnel is separately tracked as retrieval 128 → identity/RRF 64 →
+feature rows 32 → context 8–16. PageRank/PPR, community, topology, and executor-specific
+signals remain derived feature evidence; they do not create identity or additional semantic
+votes. Arrow IPC plus logical checksum/mmap is the intended training artifact boundary; CSV
+is diagnostic only. The first owned model remains supervised LambdaMART/rank-NDCG with
+query-group splits, not reinforcement learning.
+
+```text
+modelAbiProjectionV2                 CONTRACT PROVEN; LIVE MAPPING MISSING
+candidateFunnelReceipt               MISSING
+revisionQualifiedArrowCorpus         MISSING
+explicitRelevanceLabels             MISSING
+ownedArtifactAndHeldOutQuality       MISSING
+dailyGraphifyProgressBridge          MISSING
+agenticRepairVerticalReplay          MISSING
+phase18TrainingPromotionReadiness    0 / 6 = 0%
+```
+
+Schema audit status: `CandidateFeatureRowV1.sourceRef` is now explicit and nullable at the
+observational layer, while XGBoost ranking-row construction rejects null source references.
+The corresponding regression test is included in the focused suite; this proves schema
+alignment only, not live candidate capture or training-corpus admission.
+
+## Trace/Karpathy consumer admission — 2026-09-14
+
+The unified trace consumer now bypasses cached cartridges unless they carry a complete
+revision-qualified envelope. Bare Karpathy values, timestamp-derived revisions, fixed
+freshness defaults, and unqualified topology/hotness values are not admitted into the
+production blend. The dry-run fixture remains diagnostic-only.
+
+```text
+karpathy producer input guards       PRESENT
+trace consumer qualification         PARTIAL / SOURCE UPDATED
+qualified Redis envelope producer    MISSING
+live cache readback                  MISSING
+current graph/source revision proof  BLOCKED
+promotion authority                  NOT AUTHORIZED
+```
+
+This is consumer-safety progress, not evidence that the Karpathy/PageRank lane is current.
+The next proof is a read-only replay using a real admitted revision bundle and immediate
+readback; no cache warming, Qdrant, PostgreSQL, graph, or model writes are implied.
+
+## Agentic repair architecture priority board — 2026-09-14
+
+External review of the agentic repair architecture (Phase 78/79, WorkflowActionEventV1,
+LangGraph, Mastra, HMM classifier) produced a priority board of P0/P1/P2 gaps. Two items
+worked this session; the rest of the board (REPAIR-CONTEXT-CURRENTNESS-01,
+REPAIR-MUTATION-OWNER-BINDING-01, REPAIR-DURABLE-WORKFLOW-01, REPAIR-HITL-APPROVAL-01,
+REPAIR-TARGETED-VALIDATION-01, REPAIR-WORKFLOW-EVENTS-01, AGENTIC-REPAIR-CANARY-01, HMM
+classifier correction, Mastra/Paperclip shim cleanup, XGBoost label capture) remains
+unstarted -- recorded here, not implemented.
+
+- **WORKFLOW-ACTION-SCHEMA-OWNER-01**: DONE. Full OpenSpec change at
+  `openspec/changes/workflow-action-schema-owner-01/` (validated, all tasks checked).
+  `packages/parent-atlas/src/core/workflow-action-event.ts` is now the canonical
+  `WorkflowActionEventV1` owner; the three sveltekit-frontend definitions (UI/Kanban,
+  agentic-file-compiler, context-tool-dag) are adapters with round-trip tests. 45+ tests
+  passing. A real regression (non-exhaustive `switch` in `temporal-action-workflow-adapter.ts`)
+  was found and fixed as part of this.
+
+- **PHASE78-LIVE-PROPOSAL-NO-PERSIST-01**: PARTIAL_PROVEN. Receipt:
+  `docs/reports/phase78-live-proposal-no-persist-v1.json`. Investigating this gate surfaced 8
+  real, previously-unknown bugs across `scripts/phase78-cluster-errors.mts`,
+  `scripts/phase78-generate-suggestions.mts`, and `src/lib/db/schema/cutlass.ts` -- this
+  clustering pipeline had apparently never run successfully end-to-end against this database
+  before this session. All 8 fixed and verified live (real 148-error embedding + clustering run
+  approved and executed; `error_clusters` and `error_events.cluster_id` are now really
+  populated). The gate still stops short of a real Ornith call: the one cluster K-means produced
+  has no source-mappable file path (a bundled runtime stack trace, not a compile error) --
+  a legitimate data-quality dead end, not a bug. Next real test: re-run against an error with a
+  resolvable file path, or tune K-means for more/smaller clusters.
+  **Known unresolved duplicate, not chased**: `src/lib/server/db/schema/error_events.ts`
+  declares a SECOND, separate `errorEventsTable` for the same physical table as the one fixed in
+  `cutlass.ts` -- whoever touches this area next should reconcile which is canonical before
+  extending either.
+  `--live-no-persist` flag added to `phase78-generate-suggestions.mts` as the permanent proof
+
+## CURRENT-STRUCTURAL-LINEAGE-01: chunk/file hash contract split, live progress, and a stale-snapshot correction -- 2026-09-15
+
+Full evidence trail: `openspec/changes/parent-atlas-chunk-index-whole-file-hash/tasks.md` (sibling
+change, now functionally complete, all 6 sections done) and
+`openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md` (owning change, multiple
+dated entries this session). This is a summary pointer, not a duplicate ledger.
+
+- **Root cause of the packet<->chunk exact-join failure, found by reading writer source, not
+  inferred from data shape**: `codebase_chunk_index.content_hash` is chunk-scoped (hash of one
+  chunk's text, sometimes truncated to 16 hex chars by a separate writer), while
+  `graphify_files`/`graphify_execution_file_membership_v2.content_hash` is whole-file-scoped. Two
+  independent, stacked mismatches, not one bug.
+- **Fix, additive only**: added `file_content_hash` (whole-file, untruncated SHA-256) plus
+  `content_hash_scope`/`content_hash_algorithm`/`content_hash_length`/`content_hash_version`
+  metadata columns to `codebase_chunk_index`. Never redefines or overwrites the existing
+  `content_hash` column's chunk-scoped meaning. Migration applied and readback-verified.
+  `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` kept in sync (verified, zero drift).
+- **Writer fixed for new rows going forward**: `scripts/atlas/index-full-repo-for-search.mjs`'s
+  `upsertPostgres()` now writes `file_content_hash` (reusing the whole-file `sha256` it already
+  computed but never persisted) plus its own confirmed `content_hash` metadata contract
+  (`chunk`/`sha256`/`64`/`1`). **Not yet proven live**: a background full-repo re-index job
+  launched earlier this session loaded the pre-fix code into memory before the edit landed, so
+  every row it inserts still has the new metadata columns at `0` populated -- confirmed by direct
+  count (`content_hash_scope`/`algorithm`/`length`/`version` all `0` rows, out of `175,328` total).
+  This will only be resolved once that job finishes and a fresh pass runs with the fixed code.
+- **Idempotent backfill closes the `file_content_hash` gap in the meantime**: repeatedly re-ran
+  `scripts/atlas/backfill-codebase-chunk-index-file-content-hash-v1.mjs --apply`
+  (`WHERE file_content_hash IS NULL` only, safe to run concurrently with the still-running
+  re-index job) across several cycles this session. `file_content_hash` population climbed
+  `52,154 -> 69,815 -> ... -> 165,052+` populated rows as the table itself grew
+  `55,853 -> 175,328+` total rows.
+- **Live gate movement (informational join only, never the primary gate)**: re-running
+  `scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs --repository-id repo:root`
+  after each backfill cycle, `exactChunkMatchesViaFileHash` climbed
+  `0 -> 894 -> 6,709 -> 7,810 -> 8,115 -> 9,680 -> 10,401 -> 11,173` (46.2% of the `24,185`-row
+  denominator at last check). The **primary** `content_hash`-based gate this session's percentages
+  never touch stayed `0` exact matches throughout, by design -- the file-hash join is corroborating
+  evidence for lineage, never a substitute canonical-identity mechanism. This distinction is now
+  encoded directly in the audit script's own report output (`proofContracts` field), not just in
+  prose.
+- **Correction, operator-prompted**: the `24,185`-row denominator every percentage above is
+  measured against is **not the current repository** -- it is a frozen Graphify execution snapshot
+  from `2026-09-10` (5 days stale as of this writing). Today's live full-repo re-index scanned
+  `28,770` files just now, a real, unexplained gap of `4,585` files (~19%) the admitted snapshot
+  never enumerated. Every percentage cited above is coverage against a stale population, not the
+  live one -- true current coverage is unknown and likely somewhat lower. **This reinforces, not
+  supersedes, the still-open Graphify execution-owner ambiguity** (two equivalent qualifying
+  executions never resolved) as the real next unblocking move -- a fresh admitted execution would
+  replace this stale snapshot with a live one.
+- **Stage-3 (`CandidateOrdinalMapV1` 15->128 scaling) re-investigated, confirmed genuinely
+  double-blocked, not stale**: even with today's real progress on the file-hash join, scaling to
+  128 rows remains blocked by (a) this gate's primary `content_hash` proof (still `0`) and,
+  independently, (b) graph revision ownership (a wholly separate, untouched blocker --
+  `docs/reports/current-graphify-run-owner-v1.json` confirms `runCount: 0, completedOwnerCount: 0`
+  for the currently-expected workspace revision). Neither gate was closed this session; stage 3
+  correctly remains un-started.
+  mode for this gate (real Ornith call, zero `error_suggestions`/JSONL persistence).

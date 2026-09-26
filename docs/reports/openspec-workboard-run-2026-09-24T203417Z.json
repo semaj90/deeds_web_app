@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T20:36:29Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "progress": "LOD-02 reproducibility receipt already exists in HEAD; strict OpenSpec validation passes; historical model artifact remains unresolved and no canonical snapshot is eligible",
+      "to": "parent-atlas-agentic-repair-fabric",
+      "task": "classify remaining live repair-fabric gate",
+      "outcome": "inspect current bounded read-only evidence; do not execute a repair or promote retrieval results",
+      "reason": "The user-provided handoff names this one-open change as the next inspection candidate. Its remaining checkbox combines Go Retrieval identity, OAK evidence, live repair execution, and ContextManifest/PromptPlan adoption; the dated evidence should be checked before treating the ledger as current."
+    }
+  ],
+  "scope": {
+    "readOnly": true,
+    "candidateFiles": [
+      "scripts/atlas/audit-go-retrieval-identity-envelope-v1.mjs",
+      "docs/reports/agentic-repair-fabric-v2-proof.json",
+      "docs/reports/go-retrieval-identity-envelope-v1.json"
+    ],
+    "forbidden": [
+      "live repair execution",
+      "canonical data mutation",
+      "cache or graph writes",
+      "container rebuilds",
+      "Graphify",
+      "task-ledger rewrite"
+    ]
+  },
+  "verification": {
+    "lodReceiptCommitted": true,
+    "lodStrictOpenSpec": "PASS",
+    "lodStrictSnapshotEligibleRows": 0,
+    "agenticRepairExistingReceipt": "contract proof only; 25 tests, no tools executed, promotion unauthorized",
+    "agenticRepairPriorLiveEvidenceDate": "2026-09-21",
+    "freshReadOnlyRuntimeAudit": {
+      "goRetrieval": {
+        "health": "READY_FULL",
+        "boundedSearch": "HTTP 200, limit 3",
+        "missingChunkId": 3,
+        "missingSourceRevision": 3,
+        "missingRepresentationRevision": 1,
+        "status": "IDENTITY_ENVELOPE_REVIEW_REQUIRED",
+        "receipt": "docs/reports/go-retrieval-identity-envelope-v1.json"
+      },
+      "oak": {
+        "health": "reachable",
+        "mode": "READ_ONLY_SHADOW",
+        "canonicalAuthority": false,
+        "boundedSearchQuery": "TypeScript error",
+        "matches": 0
+      },
+      "focusedContractProof": {
+        "passedFiles": 8,
+        "passedTests": 25,
+        "toolsExecuted": false,
+        "writesPerformed": false,
+        "receipt": "docs/reports/agentic-repair-fabric-v2-proof.json"
+      }
+    }
+  },
+  "result": "AGENTIC_REPAIR_GATE_NOT_STALE_BLOCKED_BY_LINEAGE_AND_SEPARATE_ROUTE_AUTHORIZATION",
+  "datastoreWrites": 0,
+  "containerRebuilds": 0,
+  "graphifyRuns": 0
+}

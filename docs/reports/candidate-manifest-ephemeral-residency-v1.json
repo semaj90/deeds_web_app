@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.candidate-manifest-ephemeral-residency-receipt.v1",
+  "status": "CANDIDATE_MANIFEST_EPHEMERAL_CONTRACT_PROVEN",
+  "implementation": "sveltekit-frontend/src/lib/server/retrieval/candidate-manifest-v1.ts",
+  "test": "sveltekit-frontend/src/lib/server/retrieval/candidate-manifest-v1.spec.ts",
+  "residency": "IN_MEMORY_REQUEST_SCOPE",
+  "persistentTopKTable": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "cachePromotion": false,
+  "allowedLaterCache": ["ACE", "Valkey"],
+  "requiredCacheBinding": ["candidateSetChecksum", "workspaceRevision", "rankingRevision"]
+}

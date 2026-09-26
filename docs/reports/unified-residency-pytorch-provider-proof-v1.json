@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.unified-residency-pytorch-provider-proof.v1",
+  "status": "EXISTING_EXECUTOR_SMOKE_PROVEN",
+  "environment": {
+    "host": "WSL2 Ubuntu",
+    "pythonEnvironment": "/home/james/.venvs/atlas-cutile-cu132",
+    "gpu": "NVIDIA GeForce RTX 3060 Ti"
+  },
+  "tests": {
+    "passed": 6,
+    "failed": 0,
+    "command": "python -m unittest parent_atlas_tensor.test_gpu_tile_cache parent_atlas_tensor.test_gpu_resident_executor"
+  },
+  "observed": ["CUDA materialization", "readback verification", "lease release", "LRU tile eviction"],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "unifiedDescriptorHandoff": false,
+  "promotionEligible": false,
+  "openGates": ["descriptorToPythonProviderHandoff", "measuredVramPressure", "sameCorpusParity"]
+}

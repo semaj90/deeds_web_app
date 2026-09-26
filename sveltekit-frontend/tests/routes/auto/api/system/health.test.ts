@@ -108,7 +108,7 @@ describe('src/routes/api/system/health/+server.ts', () => {
   it('turboQuant failure does not degrade overall status', async () => {
     // Mock turboQuant fetch failure
     globalFetch.mockImplementation(async (url: string) => {
-      if (url.includes('8080')) return { ok: false };
+      if (url.includes('8090')) return { ok: false };
       return { ok: true, json: () => Promise.resolve({ result: { points_count: 100 } }) };
     });
 

@@ -6,7 +6,12 @@ const ROOT = resolve(import.meta.dirname, '../..');
 const DATABASE_URL = process.env.DATABASE_URL?.trim()
   ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const admissionPath = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
-const reportPath = resolve(ROOT, 'docs/reports/graphify-snapshot-native-readback-v1.json');
+const reportArgIndex = process.argv.indexOf('--report');
+const reportPath = resolve(ROOT, reportArgIndex >= 0 && process.argv[reportArgIndex + 1]
+  ? process.argv[reportArgIndex + 1]
+  : 'docs/reports/graphify-snapshot-native-readback-v1.json');
+const executionArgIndex = process.argv.indexOf('--execution-id');
+const requestedExecutionId = executionArgIndex >= 0 ? process.argv[executionArgIndex + 1] : null;
 
 type SnapshotSource = {
   repositoryId: string;
@@ -39,14 +44,22 @@ async function main() {
   let execution: Record<string, unknown> | undefined;
   let members: Array<Record<string, unknown>> = [];
   try {
-    const executions = await pool.query(
-      `SELECT execution_id, workspace_revision, status, started_at, completed_at
-         FROM public.graphify_executions
-        WHERE workspace_revision = $1 AND status IN ('COMPLETED', 'COMPLETED_REUSED')
-        ORDER BY completed_at DESC NULLS LAST, execution_id DESC
-        LIMIT 2`,
-      [admission.workspaceRevision ?? null],
-    );
+    const executions = requestedExecutionId
+      ? await pool.query(
+        `SELECT execution_id, workspace_revision, status, started_at, completed_at
+           FROM public.graphify_executions
+          WHERE execution_id = $1 AND workspace_revision = $2
+            AND status IN ('COMPLETED', 'COMPLETED_REUSED')`,
+        [requestedExecutionId, admission.workspaceRevision ?? null],
+      )
+      : await pool.query(
+        `SELECT execution_id, workspace_revision, status, started_at, completed_at
+           FROM public.graphify_executions
+          WHERE workspace_revision = $1 AND status IN ('COMPLETED', 'COMPLETED_REUSED')
+          ORDER BY completed_at DESC NULLS LAST, execution_id DESC
+          LIMIT 2`,
+        [admission.workspaceRevision ?? null],
+      );
     if (executions.rows.length !== 1) {
       if (executions.rows.length === 0) blockers.push('NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT');
       else blockers.push('MULTIPLE_TERMINAL_EXECUTIONS_MATCH_ADMITTED_SNAPSHOT');

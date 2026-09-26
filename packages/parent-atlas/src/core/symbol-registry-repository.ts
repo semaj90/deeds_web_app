@@ -188,15 +188,15 @@ export function createSymbolRegistryRepository(pool: Pool) {
           await client.query(`
             INSERT INTO atlas_symbol_versions (
               symbol_version_id, stable_symbol_id, source_ref, source_revision,
-              workspace_revision, upstream_node_id, upstream_symbol_id,
+              workspace_revision, upstream_file_id, upstream_node_id, upstream_symbol_id,
               upstream_chunk_id, qualified_name, declaration_hash,
               signature_normalized, byte_start, byte_end, parent_route,
               producer_revision
-            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb,$15)
+            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb,$16)
             ON CONFLICT (symbol_version_id) DO NOTHING
           `, [symbolVersionId, stableSymbolId, nomination.source_ref, nomination.source_revision,
-            nomination.workspace_revision, nomination.upstream_node_id,
-            nomination.upstream_symbol_id ?? null, nomination.upstream_chunk_id,
+            nomination.workspace_revision, nomination.upstream_file_id,
+            nomination.upstream_node_id, nomination.upstream_symbol_id ?? null, nomination.upstream_chunk_id,
             nomination.qualified_name, nomination.declaration_hash,
             nomination.signature_normalized ?? null, nomination.byte_start, nomination.byte_end,
             JSON.stringify(nomination.parent_route), input.producer_revision]);
@@ -214,6 +214,7 @@ export function createSymbolRegistryRepository(pool: Pool) {
         source_ref: nomination.source_ref,
         source_revision: nomination.source_revision,
         workspace_revision: nomination.workspace_revision,
+        upstream_file_id: nomination.upstream_file_id,
         upstream_node_id: nomination.upstream_node_id,
         upstream_symbol_id: nomination.upstream_symbol_id,
         upstream_chunk_id: nomination.upstream_chunk_id,

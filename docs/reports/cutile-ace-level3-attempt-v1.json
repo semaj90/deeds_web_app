@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.cutile-ace-level3.attempt.v1",
+  "test": "CUTILE-ACE-01-LEVEL3",
+  "date": "2026-09-14",
+  "read_only": true,
+  "canonical_production_data_touched": false,
+  "canonical_production_data_mutated": false,
+  "RESULT": "BLOCKED_TOOLCHAIN_VERSION_SKEW",
+  "summary": "A real fused cuda::tiles kernel (GlyphScoreV1 + ResidencySortKeyV1 packing in one __tile_global__ kernel) was written and its C++ frontend compiles with ZERO errors against WSL2's genuine CUDA 13.3 cuda_tile.h (4064 lines, real cuda::tiles C++20 API, not a stub). Device-code generation is blocked by a real, confirmed cross-version incompatibility between the only two available cuTile toolchain components in this environment.",
+  "environment_findings": {
+    "header_source": {
+      "path": "/home/james/miniforge3/envs/atlas-rapids-cu13/targets/x86_64-linux/include/crt/cuda_tile.h",
+      "cuda_version": "13.3",
+      "lines": 4064,
+      "status": "real cuda::tiles C++20-concepts API, confirmed live (not the 60-line stub found in Windows-native CUDA 13.0)"
+    },
+    "backend_source": {
+      "path": "/home/james/.venvs/atlas-cutile-cu132/lib/python3.14/site-packages/nvidia/cu13/bin/tileiras",
+      "cuda_version": "13.2",
+      "package": "nvidia-cuda-tileiras (pip)",
+      "status": "the ONLY tileiras (Tile IR optimizing assembler / backend compiler) binary found anywhere on this WSL2 filesystem -- searched exhaustively. atlas-rapids-cu13's own nvcc has no bundled tileiras despite expecting one."
+    },
+    "correction_to_prior_handoff_note": "next_steps/active/2026-09-14_gpu-mini-fabric-cutile-level3-and-tests.md and this session's own initial assumption both treated 'WSL2 has cuda_tile.h' as equivalent to 'WSL2 can compile cuTile device code'. This is FALSE -- the header (frontend type system) and the tileiras backend compiler are split across two independently-versioned installations (conda CUDA 13.3 vs pip CUDA 13.2) that were never verified to interoperate before this attempt."
+  },
+  "real_compile_errors_found_and_fixed": [
+    {
+      "error": "calling a __tile__ function from a __host__ function is not allowed",
+      "cause": "tried factoring a shared helper (bid()-wrapping) into a plain function outside tile-kernel context",
+      "fix": "not applicable to final kernel (removed the offending factoring)"
+    },
+    {
+      "error": "calling a __tile__ function ... from a __device__ function is not allowed",
+      "cause": "tried factoring popcount SWAR logic into a separate __device__ helper function -- cuda::tiles builtin operators (&, >>, +, -, *) may ONLY be called from directly within a __global__/__tile_global__ tile-kernel body, never from an ordinary __device__ helper",
+      "fix": "inlined the SWAR popcount algorithm via a macro instead of a function"
+    },
+    {
+      "error": "identifier \"popcount\" is undefined",
+      "cause": "cuda::tiles has no popcount builtin at all (confirmed via grep against the full 4064-line header -- zero matches)",
+      "fix": "implemented standard SWAR bit-count manually using tile arithmetic/bitwise operators, which the header DOES define"
+    },
+    {
+      "error": "calling a __tile__ function ... from a __global__ function is not allowed",
+      "cause": "used plain __global__ as the kernel qualifier for a kernel body containing tile operations",
+      "fix": "the correct tile-kernel entry-point qualifier is __tile_global__, NOT __global__ -- confirmed by reading host_defines.h's own macro definitions (__tile_global__ expands to __location__(tile_global), a distinct attribute from __location__(global))"
+    },
+    {
+      "error": "accessing gridDim/blockDim/blockIdx/threadIdx/warpSize is unsupported in tile code",
+      "cause": "used blockIdx.x directly inside a __tile_global__ kernel",
+      "fix": "cuda::tiles::bid() (returns uint3) is the tile-code-native equivalent of blockIdx, confirmed against the header's own bid() definition at cuda_tile.h:1783"
+    },
+    {
+      "error": "a non-__tile__ variable (\"GLYPH_SCORE_W_PAGERANK\") cannot be used in tile code",
+      "cause": "LEVEL 2's convention of __device__ __constant__ uint32_t weight constants is illegal to reference from tile code",
+      "fix": "changed to plain constexpr uint32_t compile-time literals, which tile code accepts and which still satisfies design.md Decision 1's 'weights are named constants' requirement"
+    }
+  ],
+  "backend_blocker_detail": {
+    "symptom": "nvcc's internal tileiras invocation (`tileiras --host-arch=x86_64 --host-os=linux -arch=sm_86 <file>.tilebc -o <file>.tile.cubin`) fails with `error: invalid GPU architecture: 86`, even though sm_86 is confirmed present in tileiras' own embedded architecture string table (verified via `strings tileiras | grep sm_`).",
+    "isolation_steps_taken": [
+      "confirmed tileiras itself works standalone (--version succeeds, exit 0)",
+      "confirmed tileiras's LLVM-cl::opt-style arg parser requires the full flag spelling --gpu-name=sm_86, not the abbreviated -arch=sm_86 nvcc passes by default -- fixed this via manual invocation",
+      "re-ran tileiras manually with the corrected --gpu-name=sm_86 flag directly against the REAL .tilebc nvcc's cicc (CUDA 13.3) generated for this kernel -- STILL fails with the identical 'invalid GPU architecture: 86' error",
+      "conclusion: the failure is not a CLI flag-naming mismatch (which would have been fixed by the --gpu-name= correction) -- it is that CUDA 13.3's cicc embeds the target architecture inside the .tilebc bytecode itself in a format (bare '86') that CUDA 13.2's tileiras cannot parse, independent of what is passed on tileiras' own command line. This is a genuine Tile-IR intermediate-representation version-skew between the 13.3 frontend and 13.2 backend, not a flag or environment-path issue."
+    ],
+    "conclusion": "the WSL2 atlas-rapids-cu13 (CUDA 13.3) frontend and the only available atlas-cutile-cu132 (CUDA 13.2) backend tileiras are NOT interoperable for this kernel. A matched-version tileiras for CUDA 13.3 (or a matched-version cuda_tile.h + cicc for CUDA 13.2) would be required to complete device-code generation. Neither was located anywhere on this filesystem in this session -- this is a real, not merely inconvenient, blocker."
+  },
+  "not_attempted": [
+    "installing a CUDA-13.3-matched nvidia-cuda-tileiras pip package -- pip's own network path inside this WSL2 shell hit an unrelated, unexplained 'C:/Program Files/...: No such file or directory' error on invocation (root cause not investigated further -- out of scope for this attempt, flagged as its own open item below)",
+    "runtime execution of the fused kernel (blocked entirely by the compile-time backend failure above -- no binary was ever produced)",
+    "exact-match verification against the CPU oracles (scripts/atlas/ace-radix-01/glyph-score-v1.mjs, generateAceRadix01FixtureV1()'s packedKeys) -- moot until a binary exists"
+  ],
+  "next_steps": [
+    "Diagnose the WSL2 pip/tileiras 'C:/Program Files/...: No such file or directory' error (env-var or wrapper-script pollution from Windows interop) before attempting any further package installs in this environment.",
+    "If diagnosed and fixed, search for (or request) a CUDA-13.3-matched nvidia-cuda-tileiras pip wheel and install it INTO atlas-rapids-cu13 specifically (not a new environment) -- per this repo's DEPENDENCY-CAPABILITY-GUARD-01 rule, record CAPABILITY/CURRENT_OWNER/AVAILABLE/MINIMAL_NEW_DEPENDENCY before installing.",
+    "Alternative: check whether NVIDIA ships a standalone CUDA 13.3 cuTile toolkit component (outside conda/pip) that bundles a matched cicc+tileiras pair.",
+    "Once a matched frontend/backend pair exists, retry compiling native/cutile-ace-level3/glyph_fused_tile.cu unchanged -- the C++ kernel source itself is believed complete and correct (0 frontend errors), only the backend toolchain is blocking."
+  ]
+}

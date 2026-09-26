@@ -1,0 +1,817 @@
+{
+  "schema": "atlas.doc-corpus-studio-smoke.v1",
+  "generatedAt": "2026-09-23T16:29:34.316Z",
+  "repoVersions": {
+    "drizzleOrm": "0.45.2",
+    "drizzleKit": "0.31.10",
+    "pg": "^8.0.0"
+  },
+  "runtimeVersions": {
+    "postgres": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "pgvector": "0.8.3"
+  },
+  "localCorpus": {
+    "sourceCount": 7,
+    "pageCount": 22,
+    "capturedAt": "2026-09-23T16:17:03.711059Z",
+    "staleSources": [],
+    "missingSources": [],
+    "coverage": [
+      {
+        "group": "drizzle",
+        "status": "CAPTURED_CURRENT",
+        "bestQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "captures": 4
+      },
+      {
+        "group": "pgvector",
+        "status": "CAPTURED_CURRENT",
+        "bestQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "captures": 1
+      },
+      {
+        "group": "postgresql18",
+        "status": "CAPTURED_CURRENT",
+        "bestQualification": "MAJOR_VERSION_PIN",
+        "runtimeCompatibility": "MATCH",
+        "captures": 4
+      }
+    ],
+    "sources": [
+      {
+        "sourceId": "firecrawl",
+        "sourceUrl": "https://docs.firecrawl.dev/api-reference/introduction",
+        "title": "Introduction - Firecrawl Docs",
+        "provenance": "DEV_CORPUS",
+        "authorityClass": "GENERATED",
+        "capturedAt": "2026-08-24T06:06:21.617Z",
+        "contentChecksum": "17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+        "versionQualification": "UNVERSIONED",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/dev/raw/firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "bits-ui",
+        "sourceUrl": "https://bits-ui.com/docs/components/dialog",
+        "title": "Dialog - Bits UI",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:45.575546Z",
+        "contentChecksum": "ca1345389afe0ab11f41446be13e5ff474a538364f923af90fab09598cb0daf5",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-components-dialog.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "bits-ui",
+        "sourceUrl": "https://bits-ui.com/docs/getting-started",
+        "title": "Getting Started - Bits UI",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:45.572975Z",
+        "contentChecksum": "f15bebf06ed8bb3e13c3b4ab6007670718f170f5f70399a8de33a3b1becfcddd",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-getting-started.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "bits-ui",
+        "sourceUrl": "https://bits-ui.com/docs/migration-guide",
+        "title": "Migration Guide - Bits UI",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:45.574103Z",
+        "contentChecksum": "c2518c9dc5ebcc35dfdca2f5e7d0dd3df3f22e9dc83fbd5ac1075732d9c0756f",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-migration-guide.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-orm",
+        "sourceUrl": "https://github.com/drizzle-team/drizzle-orm/issues/5792",
+        "title": "drizzle-kit push generates HNSW index DDL without operator class, causing migration failure on pgvector · Issue #5792 · drizzle-team/drizzle-orm · GitHub",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "SECONDARY_ISSUE_EVIDENCE",
+        "capturedAt": "2026-09-23T16:16:53.323872Z",
+        "contentChecksum": "76051f71087829d11fa39a8739f92b937efc20eb878ff26796dbeeb58e38a3af",
+        "versionQualification": "UNVERSIONED",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/drizzle-orm/raw/github.com-drizzle-team-drizzle-orm-issues-5792.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-orm",
+        "sourceUrl": "https://orm.drizzle.team/docs/column-types",
+        "title": "Drizzle ORM - PostgreSQL column types",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:53.319052Z",
+        "contentChecksum": "f27096bceb1d33d3be63cb5272221f43c6fe6b5c829ec43c03ddff275addfba1",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-column-types.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-orm",
+        "sourceUrl": "https://orm.drizzle.team/docs/extensions",
+        "title": "Drizzle ORM - PostgreSQL extensions",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:53.322591Z",
+        "contentChecksum": "2818bc8b5cb33a06deb22fa757ccfd5eb3c1f8b31f1a9b1dd71a54c7ab464c73",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-extensions.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-orm",
+        "sourceUrl": "https://orm.drizzle.team/docs/guides/vector-similarity-search",
+        "title": "Drizzle ORM - Vector similarity search with pgvector extension",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:53.321489Z",
+        "contentChecksum": "9a561cf18bb00c628cabc53bce582f76059f54610ec4d9b0cf23dc434485aa65",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-guides-vector-similarity-search.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "drizzle-orm",
+        "sourceUrl": "https://orm.drizzle.team/docs/indexes-constraints",
+        "title": "Drizzle ORM - Indexes & Constraints",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:53.320428Z",
+        "contentChecksum": "a0275b2bbace1d14aa515a5ea226d23220af10a90cc4e4d90556d08e1f0068d8",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-indexes-constraints.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "pgvector",
+        "sourceUrl": "https://github.com/pgvector/pgvector",
+        "title": "GitHub - pgvector/pgvector: Open-source vector similarity search for Postgres · GitHub",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:17:03.711059Z",
+        "contentChecksum": "0c83b105aa0b232c58563b1d65b35e5f8c5185f281ad329991d0ea548a611e11",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/pgvector/raw/github.com-pgvector-pgvector.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "postgresql-18",
+        "sourceUrl": "https://www.postgresql.org/docs/18/indexes-bitmap-scans.html",
+        "title": "PostgreSQL: Documentation: 18: 11.5. Combining Multiple Indexes",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:17:01.700196Z",
+        "contentChecksum": "24d9f452d20b88e0ff3b0591731474894795049abed48a104c530b1aaff2a5be",
+        "versionQualification": "MAJOR_VERSION_PIN",
+        "runtimeCompatibility": "MATCH",
+        "markdownPath": "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-indexes-bitmap-scans.html.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "postgresql-18",
+        "sourceUrl": "https://www.postgresql.org/docs/18/release-18.html",
+        "title": "PostgreSQL: Documentation: 18: E.6. Release 18",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:17:01.697859Z",
+        "contentChecksum": "38d5e74bafb89df87b15449d01a95562158ba1c3740b7a1cb8dd58f0d8e07efc",
+        "versionQualification": "MAJOR_VERSION_PIN",
+        "runtimeCompatibility": "MATCH",
+        "markdownPath": "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-release-18.html.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "postgresql-18",
+        "sourceUrl": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+        "title": "PostgreSQL: Documentation: 18: 19.4. Resource Consumption",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:17:01.699315Z",
+        "contentChecksum": "70d86642ca56e9b0ee731082d7c4f370a06d0bdfe325ccf8ea4231eaa301b073",
+        "versionQualification": "MAJOR_VERSION_PIN",
+        "runtimeCompatibility": "MATCH",
+        "markdownPath": "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-runtime-config-resource.html.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "postgresql-18",
+        "sourceUrl": "https://www.postgresql.org/docs/18/using-explain.html",
+        "title": "PostgreSQL: Documentation: 18: 14.1. Using EXPLAIN",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:17:01.701153Z",
+        "contentChecksum": "c80bd7e95d17f8aeb2d0a091ef40c6c51a5dd32d16bbd3d7efc2d72305fd2c2e",
+        "versionQualification": "MAJOR_VERSION_PIN",
+        "runtimeCompatibility": "MATCH",
+        "markdownPath": "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-using-explain.html.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "svelte5-runes",
+        "sourceUrl": "https://svelte.dev/docs/svelte/$derived",
+        "title": "$derived • Svelte Docs",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:41.630945Z",
+        "contentChecksum": "e97be291833c4b24e3247519c674d02f49bc1407f3474fc197b82928c2710a62",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-derived.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "svelte5-runes",
+        "sourceUrl": "https://svelte.dev/docs/svelte/$effect",
+        "title": "$effect • Svelte Docs",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:41.632146Z",
+        "contentChecksum": "d2e8fdfc7ca499e99ffee874a976e36b9926a450dd5188220ebc51c3f2280e83",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-effect.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "svelte5-runes",
+        "sourceUrl": "https://svelte.dev/docs/svelte/$props",
+        "title": "$props • Svelte Docs",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:41.633227Z",
+        "contentChecksum": "9189f3a0ee6101f0b665d133078cd2e10c8acf3b9b2bf8ecf5a930513380c9a5",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-props.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "svelte5-runes",
+        "sourceUrl": "https://svelte.dev/docs/svelte/$state",
+        "title": "$state • Svelte Docs",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:41.629689Z",
+        "contentChecksum": "8a6054a43ac58a455f12fdc8d5f51a1703c2b6451809b86e6b50d0b473f0d536",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-state.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "sveltekit",
+        "sourceUrl": "https://svelte.dev/docs/kit/hooks",
+        "title": "Hooks • SvelteKit Docs",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:36.475681Z",
+        "contentChecksum": "bb672e1469003d6379429364607e4ff559bf14905584bb7ce096feeea1e05447",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-hooks.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "sveltekit",
+        "sourceUrl": "https://svelte.dev/docs/kit/load",
+        "title": "Loading data • SvelteKit Docs",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:36.471310Z",
+        "contentChecksum": "3802ee9392148968511337d820f29c0f38870b79b4f18aabb730a4161fe744bc",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-load.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "sveltekit",
+        "sourceUrl": "https://svelte.dev/docs/kit/page-options",
+        "title": "Page options • SvelteKit Docs",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:36.472852Z",
+        "contentChecksum": "1885d5fd301e265429372994253de18ab08479f485f7452a173c095c7cea8771",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-page-options.md",
+        "fileExists": true,
+        "checksumMatches": true
+      },
+      {
+        "sourceId": "sveltekit",
+        "sourceUrl": "https://svelte.dev/docs/kit/state-management",
+        "title": "State management • SvelteKit Docs",
+        "provenance": "PINNED_CAPTURE",
+        "authorityClass": "OFFICIAL_PRIMARY",
+        "capturedAt": "2026-09-23T16:16:36.474146Z",
+        "contentChecksum": "9b58ac2b35ba7df1e89c4047aa7a5b99d0393021d88c2554078f241eab9fc295",
+        "versionQualification": "CURRENT_UPSTREAM",
+        "runtimeCompatibility": "UNKNOWN",
+        "markdownPath": "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-state-management.md",
+        "fileExists": true,
+        "checksumMatches": true
+      }
+    ]
+  },
+  "postgresCorpus": {
+    "pageCount": 0,
+    "chunkCount": 0,
+    "ftsAvailable": true,
+    "vectorColumnAvailable": true,
+    "indexes": [
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_api_signatures_gin",
+        "accessMethod": "gin",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE INDEX aedc_api_signatures_gin ON public.atlas_external_doc_chunks USING gin (api_signatures)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_domain_tags_gin",
+        "accessMethod": "gin",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE INDEX aedc_domain_tags_gin ON public.atlas_external_doc_chunks USING gin (domain_tags)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_embedding_hnsw",
+        "accessMethod": "hnsw",
+        "operatorClass": "vector_cosine_ops",
+        "predicate": null,
+        "definition": "CREATE INDEX aedc_embedding_hnsw ON public.atlas_external_doc_chunks USING hnsw (content_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_fts_gin",
+        "accessMethod": "gin",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE INDEX aedc_fts_gin ON public.atlas_external_doc_chunks USING gin (search_vector)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_heading_path_gin",
+        "accessMethod": "gin",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE INDEX aedc_heading_path_gin ON public.atlas_external_doc_chunks USING gin (heading_path)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_page_id_ordinal",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE INDEX aedc_page_id_ordinal ON public.atlas_external_doc_chunks USING btree (page_id, ordinal)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_symbols_gin",
+        "accessMethod": "gin",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE INDEX aedc_symbols_gin ON public.atlas_external_doc_chunks USING gin (symbols)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "atlas_external_doc_chunks_chunk_id_uq",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE UNIQUE INDEX atlas_external_doc_chunks_chunk_id_uq ON public.atlas_external_doc_chunks USING btree (chunk_id)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "atlas_external_doc_chunks_evidence_revision_uq",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE UNIQUE INDEX atlas_external_doc_chunks_evidence_revision_uq ON public.atlas_external_doc_chunks USING btree (evidence_revision)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "atlas_external_doc_chunks_pkey",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE UNIQUE INDEX atlas_external_doc_chunks_pkey ON public.atlas_external_doc_chunks USING btree (id)"
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "aedp_product_version_arch",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE INDEX aedp_product_version_arch ON public.atlas_external_doc_pages USING btree (product, product_version, architecture)"
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "aedp_provider_product",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE INDEX aedp_provider_product ON public.atlas_external_doc_pages USING btree (provider, product)"
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "aedp_url_trgm",
+        "accessMethod": "gin",
+        "operatorClass": "gin_trgm_ops",
+        "predicate": null,
+        "definition": "CREATE INDEX aedp_url_trgm ON public.atlas_external_doc_pages USING gin (url gin_trgm_ops)"
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "atlas_external_doc_pages_evidence_revision_uq",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE UNIQUE INDEX atlas_external_doc_pages_evidence_revision_uq ON public.atlas_external_doc_pages USING btree (evidence_revision)"
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "atlas_external_doc_pages_identity_uq",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE UNIQUE INDEX atlas_external_doc_pages_identity_uq ON public.atlas_external_doc_pages USING btree (provider, product, product_version, url)"
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "atlas_external_doc_pages_pkey",
+        "accessMethod": "btree",
+        "operatorClass": null,
+        "predicate": null,
+        "definition": "CREATE UNIQUE INDEX atlas_external_doc_pages_pkey ON public.atlas_external_doc_pages USING btree (id)"
+      }
+    ],
+    "status": "EMPTY"
+  },
+  "requiredTermCoverage": [
+    {
+      "term": "halfvec",
+      "totalHits": 54,
+      "tokenSplitHits": 2,
+      "sources": {
+        "drizzle-orm": 17,
+        "pgvector": 37
+      }
+    },
+    {
+      "term": "halfvec_cosine_ops",
+      "totalHits": 2,
+      "tokenSplitHits": 0,
+      "sources": {
+        "drizzle-orm": 2
+      }
+    },
+    {
+      "term": "vector_cosine_ops",
+      "totalHits": 12,
+      "tokenSplitHits": 0,
+      "sources": {
+        "drizzle-orm": 9,
+        "pgvector": 3
+      }
+    },
+    {
+      "term": "hnsw.iterative_scan",
+      "totalHits": 0,
+      "tokenSplitHits": 3,
+      "sources": {}
+    },
+    {
+      "term": "strict_order",
+      "totalHits": 2,
+      "tokenSplitHits": 0,
+      "sources": {
+        "pgvector": 2
+      }
+    },
+    {
+      "term": "relaxed_order",
+      "totalHits": 2,
+      "tokenSplitHits": 0,
+      "sources": {
+        "pgvector": 2
+      }
+    },
+    {
+      "term": "hnsw.max_scan_tuples",
+      "totalHits": 2,
+      "tokenSplitHits": 1,
+      "sources": {
+        "pgvector": 2
+      }
+    },
+    {
+      "term": "hnsw.scan_mem_multiplier",
+      "totalHits": 0,
+      "tokenSplitHits": 1,
+      "sources": {}
+    },
+    {
+      "term": "io_method",
+      "totalHits": 3,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 3
+      }
+    },
+    {
+      "term": "effective_io_concurrency",
+      "totalHits": 5,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 5
+      }
+    },
+    {
+      "term": "maintenance_io_concurrency",
+      "totalHits": 3,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 3
+      }
+    },
+    {
+      "term": "pg_aios",
+      "totalHits": 1,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 1
+      }
+    },
+    {
+      "term": "bitmap heap",
+      "totalHits": 16,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 16
+      }
+    },
+    {
+      "term": "uuidv7",
+      "totalHits": 2,
+      "tokenSplitHits": 0,
+      "sources": {
+        "postgresql-18": 2
+      }
+    },
+    {
+      "term": "drizzle-kit",
+      "totalHits": 10,
+      "tokenSplitHits": 0,
+      "sources": {
+        "drizzle-orm": 10
+      }
+    },
+    {
+      "term": "operator class",
+      "totalHits": 10,
+      "tokenSplitHits": 0,
+      "sources": {
+        "drizzle-orm": 9,
+        "postgresql-18": 1
+      }
+    }
+  ],
+  "aioCapability": {
+    "ioMethod": "worker",
+    "pgAiosAvailable": true
+  },
+  "bitmapCapability": {
+    "plannerCanGenerateBitmap": true,
+    "plannerSelectedBitmap": true,
+    "aioRelevant": true,
+    "ioMethod": "worker",
+    "fixtures": [
+      {
+        "name": "codebase_chunk_index.semantic_tags GIN containment",
+        "nodeTypes": [
+          "Bitmap Heap Scan",
+          "Bitmap Index Scan"
+        ]
+      },
+      {
+        "name": "atlas_external_doc_chunks.domain_tags GIN containment",
+        "nodeTypes": [
+          "Seq Scan"
+        ]
+      }
+    ]
+  },
+  "catalogParity": [
+    {
+      "table": "atlas_external_doc_pages",
+      "declaredSource": null,
+      "declaredType": null,
+      "liveType": null,
+      "dimensions": null,
+      "typeParity": null,
+      "indexes": []
+    },
+    {
+      "table": "atlas_external_doc_chunks",
+      "declaredSource": "drizzle/manual/20260904_external_doc_intelligence_v1.sql",
+      "declaredType": "vector(768)",
+      "liveType": "vector(768)",
+      "dimensions": "768",
+      "typeParity": true,
+      "indexes": [
+        {
+          "name": "aedc_domain_tags_gin",
+          "accessMethod": "gin",
+          "operatorClass": null,
+          "predicate": null
+        },
+        {
+          "name": "aedc_embedding_hnsw",
+          "accessMethod": "hnsw",
+          "operatorClass": "vector_cosine_ops",
+          "predicate": null
+        },
+        {
+          "name": "aedc_fts_gin",
+          "accessMethod": "gin",
+          "operatorClass": null,
+          "predicate": null
+        }
+      ]
+    },
+    {
+      "table": "codebase_chunk_index",
+      "declaredSource": "src/lib/server/db/schema-postgres.ts",
+      "declaredType": "halfvec(768)",
+      "liveType": "halfvec(768)",
+      "dimensions": "768",
+      "typeParity": true,
+      "indexes": [
+        {
+          "name": "codebase_chunk_index_content_hnsw",
+          "accessMethod": "hnsw",
+          "operatorClass": "halfvec_cosine_ops",
+          "predicate": null
+        },
+        {
+          "name": "codebase_chunk_index_summary_hnsw",
+          "accessMethod": "hnsw",
+          "operatorClass": "halfvec_cosine_ops",
+          "predicate": null
+        },
+        {
+          "name": "idx_codebase_chunk_bm25_search",
+          "accessMethod": "gin",
+          "operatorClass": null,
+          "predicate": null
+        },
+        {
+          "name": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "accessMethod": "hnsw",
+          "operatorClass": "vector_cosine_ops",
+          "predicate": null
+        },
+        {
+          "name": "idx_codebase_chunk_embedding_model_normalized",
+          "accessMethod": "btree",
+          "operatorClass": null,
+          "predicate": "((embedding_model IS NOT NULL) AND (embedding_normalized = true))"
+        },
+        {
+          "name": "idx_codebase_chunk_error_embedding_latent64_hnsw",
+          "accessMethod": "hnsw",
+          "operatorClass": "vector_cosine_ops",
+          "predicate": "(error_embedding_latent_64 IS NOT NULL)"
+        },
+        {
+          "name": "idx_codebase_chunk_error_embedding_latent_128_hnsw",
+          "accessMethod": "hnsw",
+          "operatorClass": "halfvec_cosine_ops",
+          "predicate": "(error_embedding_latent_128 IS NOT NULL)"
+        },
+        {
+          "name": "idx_codebase_chunk_error_embedding_latent_256_checkpoint_revisi",
+          "accessMethod": "btree",
+          "operatorClass": null,
+          "predicate": "(error_embedding_latent_256_checkpoint_revision IS NOT NULL)"
+        },
+        {
+          "name": "idx_codebase_chunk_error_embedding_latent_256_hnsw",
+          "accessMethod": "hnsw",
+          "operatorClass": "halfvec_cosine_ops",
+          "predicate": "(error_embedding_latent_256 IS NOT NULL)"
+        },
+        {
+          "name": "idx_codebase_chunk_error_embedding_latent_valid",
+          "accessMethod": "btree",
+          "operatorClass": null,
+          "predicate": null
+        },
+        {
+          "name": "idx_codebase_chunk_index_error_embedding_hnsw",
+          "accessMethod": "hnsw",
+          "operatorClass": "halfvec_cosine_ops",
+          "predicate": null
+        },
+        {
+          "name": "idx_codebase_chunk_latent_valid",
+          "accessMethod": "btree",
+          "operatorClass": null,
+          "predicate": null
+        },
+        {
+          "name": "idx_codebase_chunk_summary_embedding_384_hnsw",
+          "accessMethod": "hnsw",
+          "operatorClass": "vector_cosine_ops",
+          "predicate": null
+        },
+        {
+          "name": "idx_codebase_chunk_summary_embedding_ivfflat",
+          "accessMethod": "ivfflat",
+          "operatorClass": "halfvec_cosine_ops",
+          "predicate": null
+        }
+      ]
+    }
+  ],
+  "ftsSmoke": {
+    "status": "NOT_RUN",
+    "reason": "DOC_CORPUS_POSTGRES_EMPTY or Postgres unavailable"
+  },
+  "localSearchSmoke": {
+    "query": "io_method",
+    "mode": "LOCAL_LEXICAL",
+    "postgresNote": null,
+    "hits": 2,
+    "badges": [
+      "REFERENCE_ONLY"
+    ]
+  },
+  "validation": {
+    "status": "PARTIAL",
+    "issues": [
+      {
+        "code": "DOC_CORPUS_POSTGRES_EMPTY",
+        "detail": "atlas_external_doc_* has 0 admitted rows"
+      }
+    ]
+  },
+  "studio": {
+    "ssr": "PROVEN_BY_VITEST_SPEC:DocCorpusPanel.ssr.spec.ts",
+    "route": "/admin/atlas",
+    "searchEndpoint": "/api/admin/atlas/docs-corpus/search"
+  },
+  "authority": {
+    "canonical": "POSTGRES",
+    "localCorpusCanonical": false,
+    "qdrantCanonical": false
+  },
+  "result": "DOC_CORPUS_POSTGRES_EMPTY",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

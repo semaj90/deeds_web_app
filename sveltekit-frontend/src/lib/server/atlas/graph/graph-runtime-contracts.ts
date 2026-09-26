@@ -40,8 +40,8 @@ export interface GraphDeltaV1 {
   evidenceRefs: string[];
 }
 
-export interface GraphProjectionReceiptV1 {
-  schema: 'atlas.graph-projection-receipt.v1';
+export interface GraphRuntimeProjectionReceiptV1 {
+  schema: 'atlas.graph-runtime-projection-receipt.v1';
   snapshotId: string;
   topologyHash: string;
   producerRevision: string;

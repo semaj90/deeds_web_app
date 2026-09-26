@@ -1,0 +1,137 @@
+{
+  "schema": "atlas.large-corpus-enrichment-census.v1",
+  "status": "LARGE_CORPUS_ENRICHMENT_CENSUS_PROVEN",
+  "generatedAt": "2026-09-25T20:03:34.707Z",
+  "mode": "READ_ONLY_STREAMING_CENSUS",
+  "artifacts": [
+    {
+      "path": ".tmp/mapreduce-full-v5.ndjson",
+      "role": "PRIMARY_METADATA_CORPUS",
+      "bytes": 805352974,
+      "modifiedAtUtc": "2026-06-12T12:37:58.277Z",
+      "sha256": "9ed6d8d3e28f6b0453d75f305b67586ef9dc70cfac05b97825f6763916a42664",
+      "records": 5000,
+      "blankLines": 0,
+      "malformedLines": 0,
+      "nonObjectRecords": 0,
+      "fieldPresent": {
+        "packet_key": 0,
+        "packetKey": 0,
+        "canonical_id": 0,
+        "stableKey": 5000,
+        "stable_key": 0,
+        "id": 0,
+        "source_ref": 0,
+        "sourceRef": 0,
+        "filePath": 5000,
+        "contentHash": 5000,
+        "source_revision": 0,
+        "workspace_revision": 0,
+        "summary": 0,
+        "summary_text": 0,
+        "packet_context": 0,
+        "embedding": 0
+      },
+      "uniqueValues": {
+        "stableKey": 5000,
+        "stable_key": 0,
+        "id": 0,
+        "source_ref": 0,
+        "sourceRef": 0,
+        "packet_key": 0,
+        "packetKey": 0
+      },
+      "duplicateRows": {
+        "stableKey": 0,
+        "stable_key": 0,
+        "id": 0,
+        "source_ref": 0,
+        "sourceRef": 0,
+        "packet_key": 0,
+        "packetKey": 0
+      },
+      "embeddingDimensionCounts": {},
+      "schemaFingerprints": [
+        {
+          "sha256": "d524ccf352cce2274fe0a97173e0dc75534743ea22e668023834eb21444e1d64",
+          "fieldCount": 19,
+          "count": 5000
+        }
+      ]
+    },
+    {
+      "path": "sveltekit-frontend/tmp/codebase_chunks_768-embeddings.ndjson",
+      "role": "REPRESENTATION_CORPUS",
+      "bytes": 739230455,
+      "modifiedAtUtc": "2026-06-05T02:40:31.481Z",
+      "sha256": "6474990e4914d53dfb05ed261313bba44f97b56d9de261e75941fb34ba7b9db5",
+      "records": 76261,
+      "blankLines": 0,
+      "malformedLines": 0,
+      "nonObjectRecords": 0,
+      "fieldPresent": {
+        "packet_key": 0,
+        "packetKey": 0,
+        "canonical_id": 0,
+        "stableKey": 0,
+        "stable_key": 0,
+        "id": 76261,
+        "source_ref": 76241,
+        "sourceRef": 0,
+        "filePath": 0,
+        "contentHash": 0,
+        "source_revision": 0,
+        "workspace_revision": 0,
+        "summary": 0,
+        "summary_text": 0,
+        "packet_context": 0,
+        "embedding": 76261
+      },
+      "uniqueValues": {
+        "stableKey": 0,
+        "stable_key": 0,
+        "id": 76261,
+        "source_ref": 61738,
+        "sourceRef": 0,
+        "packet_key": 0,
+        "packetKey": 0
+      },
+      "duplicateRows": {
+        "stableKey": 0,
+        "stable_key": 0,
+        "id": 0,
+        "source_ref": 14503,
+        "sourceRef": 0,
+        "packet_key": 0,
+        "packetKey": 0
+      },
+      "embeddingDimensionCounts": {
+        "768": 76261
+      },
+      "schemaFingerprints": [
+        {
+          "sha256": "30dac6f837c08a33d5af213f64f45af0bf72745f3c818555245582ede9b322b4",
+          "fieldCount": 5,
+          "count": 76261
+        }
+      ]
+    }
+  ],
+  "selection": {
+    "primaryMetadataCorpus": ".tmp/mapreduce-full-v5.ndjson",
+    "representationCorpus": "sveltekit-frontend/tmp/codebase_chunks_768-embeddings.ndjson",
+    "canonicalEnrichmentReady": false,
+    "blocker": "CURRENT_SOURCE_IDENTITY_AND_REVISION_JOIN_REQUIRED",
+    "reason": "Neither artifact carries source_revision or workspace_revision. The metadata corpus also has no packet_key, source_ref, or summary; the embedding corpus is representation-only and contains repeated source_ref values."
+  },
+  "execution": {
+    "readOnly": true,
+    "parallelArtifactScans": true,
+    "modelCalls": 0,
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "neo4jWrites": 0,
+    "valkeyWrites": 0,
+    "graphifyRuns": 0
+  }
+}

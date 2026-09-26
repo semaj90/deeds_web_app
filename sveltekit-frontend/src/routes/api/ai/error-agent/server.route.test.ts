@@ -4,10 +4,48 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   runWorkflowLoopLangGraph: vi.fn(),
+  controller: {
+    allTasks: [{ taskKey: 'action:2', change: 'safe-contract', line: 2, text: 'add deterministic receipt test', priority: 20, controller: { state: 'ACTIONABLE' } }],
+    completionEnvelopes: [{
+      goalId: 'fixture-goal',
+      revision: 'controller-v1',
+      requiredGates: [{ gateId: 'FIXTURE_GATE', status: 'PROVEN_CURRENT' }],
+      explicitlyNotRequired: [],
+      allowedFallbacks: [],
+      scopeBudget: { maxNewBlockersPerAttempt: 0, maxNewOwners: 0, architectureExpansionAllowed: false },
+    }],
+    checksum: 'sha256:controller',
+    reportPath: 'fixture',
+    writesPerformed: false,
+  },
+  selection: {
+    taskKey: 'action:2',
+    change: 'safe-contract',
+    line: 2,
+    text: 'add deterministic receipt test',
+    priority: 20,
+    controllerState: 'ACTIONABLE',
+    blockerKey: null,
+    requiredReceipts: [],
+    smokeProfile: 'controller-report',
+    completionEnvelopeRevision: 'controller-v1',
+    controllerReportChecksum: 'sha256:controller',
+    selectionReason: 'fixture',
+    evidenceHash: 'sha256:evidence',
+  },
 }));
 
 vi.mock('$lib/server/ai/error-agent/workflow-loop-langgraph.js', () => ({
   runWorkflowLoopLangGraph: (...args: unknown[]) => mocks.runWorkflowLoopLangGraph(...args),
+}));
+
+vi.mock('$lib/server/ai/error-agent/openspec-controller.js', () => ({
+  readOpenSpecControllerReport: () => mocks.controller,
+  selectOpenSpecTask: () => mocks.selection,
+  failureFingerprint: () => 'sha256:fingerprint',
+  retrySuppressed: () => false,
+  runAllowlistedSmokeProfile: async () => ({ profile: 'controller-report', passed: true, command: 'fixture-smoke', outputSummary: 'ok', writesPerformed: false }),
+  reconcileOpenSpecSelection: () => 'REVIEW_REQUIRED',
 }));
 
 describe('/api/ai/error-agent', () => {
@@ -72,6 +110,23 @@ describe('/api/ai/error-agent', () => {
       smoke: { passed: true, command: 'npm test', outputSummary: 'ok' },
       logged: true,
     });
+  });
+
+  it('returns stable unauthorized JSON without a session or explicit dev bypass', async () => {
+    const { POST } = await import('./+server.js');
+    const response = await POST({ request: new Request('http://localhost/api/ai/error-agent', { method: 'POST', body: '{}' }), locals: {} } as any);
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toMatchObject({ ok: false, result: null, selection: null, error: { code: 'UNAUTHORIZED' } });
+  });
+
+  it('rejects a body userId that differs from the authenticated session', async () => {
+    const { POST } = await import('./+server.js');
+    const response = await POST({
+      request: new Request('http://localhost/api/ai/error-agent', { method: 'POST', body: JSON.stringify({ query: 'x', hmmErrorClass: 'unknown', userId: 'other' }) }),
+      locals: { user: { id: 'session-user' } },
+    } as any);
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toMatchObject({ ok: false, error: { code: 'USER_ID_MISMATCH' } });
   });
 
   it('passes workstation provenance fields through to the workflow loop', async () => {

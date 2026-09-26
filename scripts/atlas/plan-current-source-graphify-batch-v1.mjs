@@ -19,9 +19,11 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const COHORT = resolve(ROOT, 'docs/reports/current-source-projection-cohort-v1.json');
 const OBSERVATION = resolve(ROOT, 'docs/reports/workspace-source-binding-observation.json');
 const LIFECYCLE = resolve(ROOT, 'docs/reports/graphify-lifecycle-entrypoint-v1.json');
+const ADMISSION = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const REPORT = resolve(ROOT, 'docs/reports/current-source-graphify-batch-plan-v1.json');
 const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
 const limit = parseGraphifyBatchLimitV1(limitArg?.slice('--limit='.length));
+const useAdmittedSnapshot = process.argv.includes('--admitted-snapshot');
 
 const clean = (value) => {
   const text = String(value ?? '').trim().replaceAll('\\', '/');
@@ -35,18 +37,37 @@ const cohort = JSON.parse(readFileSync(COHORT, 'utf8'));
 const observation = JSON.parse(readFileSync(OBSERVATION, 'utf8'));
 let lifecycle = null;
 try { lifecycle = JSON.parse(readFileSync(LIFECYCLE, 'utf8')); } catch { lifecycle = null; }
-const workspaceRevision = clean(lifecycle?.workspaceRevision ?? observation.record?.workspaceRevision ?? observation.workspaceRevision);
+let admission = null;
+let snapshot = null;
+if (useAdmittedSnapshot) {
+  admission = JSON.parse(readFileSync(ADMISSION, 'utf8'));
+  if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true || admission.writesPerformed === true) {
+    throw new Error('ADMITTED_SNAPSHOT_NOT_READ_ONLY_ADMITTED');
+  }
+  const manifestPath = resolve(ROOT, String(admission.manifestPath ?? ''));
+  snapshot = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  if (snapshot.snapshotRevision !== admission.snapshotRevision || !Array.isArray(snapshot.sources) || snapshot.sources.length === 0) {
+    throw new Error('ADMITTED_SNAPSHOT_MANIFEST_MISMATCH');
+  }
+}
+const workspaceRevision = clean(useAdmittedSnapshot
+  ? admission.workspaceRevision
+  : lifecycle?.workspaceRevision ?? observation.record?.workspaceRevision ?? observation.workspaceRevision);
 if (!workspaceRevision?.startsWith('sha256:')) throw new Error('CURRENT_SOURCE_GRAPHIFY_PLAN_INVALID_WORKSPACE_REVISION');
 
-const bindings = Array.isArray(lifecycle?.sourceBindings) && lifecycle.sourceBindings.length > 0
-  ? lifecycle.sourceBindings.map((binding) => ({ ...binding, workspaceRevision: binding.workspaceRevision ?? workspaceRevision }))
-  : (Array.isArray(observation.bindings) ? observation.bindings : []);
+const bindings = useAdmittedSnapshot
+  ? snapshot.sources.map((binding) => ({ ...binding, workspaceRevision }))
+  : Array.isArray(lifecycle?.sourceBindings) && lifecycle.sourceBindings.length > 0
+    ? lifecycle.sourceBindings.map((binding) => ({ ...binding, workspaceRevision: binding.workspaceRevision ?? workspaceRevision }))
+    : (Array.isArray(observation.bindings) ? observation.bindings : []);
 const bindingByRef = new Map(bindings.map((binding) => [clean(binding.sourceRef), binding]));
-const sourceRows = (Array.isArray(lifecycle?.sourceBindings) && lifecycle.sourceBindings.length > 0
+const sourceRows = (useAdmittedSnapshot
   ? bindings.map((row) => clean(row.sourceRef))
-  : (Array.isArray(cohort.cohort) ? cohort.cohort : [])
-    .filter((row) => row.eligibleCurrentSource === true)
-    .map((row) => clean(row.relativePath)))
+  : (Array.isArray(lifecycle?.sourceBindings) && lifecycle.sourceBindings.length > 0
+    ? bindings.map((row) => clean(row.sourceRef))
+    : (Array.isArray(cohort.cohort) ? cohort.cohort : [])
+      .filter((row) => row.eligibleCurrentSource === true)
+      .map((row) => clean(row.relativePath))))
   .filter(Boolean)
   .sort();
 const uniqueSourceRefs = [...new Set(sourceRows)];
@@ -135,7 +156,11 @@ const report = {
   scope: 'BOUNDED_RECORDED_BINDING_COMPARISON',
   writes: { postgres: false, graphify: false, qdrant: false, neo4j: false, valkey: false },
   workspaceRevision,
-  inputSource: lifecycle?.sourceBindings?.length ? 'docs/reports/graphify-lifecycle-entrypoint-v1.json' : 'docs/reports/workspace-source-binding-observation.json',
+  snapshotRevision: useAdmittedSnapshot ? clean(admission.snapshotRevision) : null,
+  sourceSelectionChecksum: useAdmittedSnapshot ? clean(admission.sourceSelectionChecksum) : null,
+  inputSource: useAdmittedSnapshot
+    ? 'docs/reports/workspace-revision-tournament-admission-v1.json -> admitted snapshot manifest'
+    : lifecycle?.sourceBindings?.length ? 'docs/reports/graphify-lifecycle-entrypoint-v1.json' : 'docs/reports/workspace-source-binding-observation.json',
   cohortReport: 'docs/reports/current-source-projection-cohort-v1.json',
   cohortEligibleSources: uniqueSourceRefs.length,
   requestedLimit: limit,

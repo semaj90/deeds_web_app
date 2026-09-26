@@ -13,7 +13,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import http from 'http';
 
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-const MODEL = 'gemma4-rotorquant:latest';
+const MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const INPUT_FILE = '.opencode/recommendations/tasks.ndjson';
 const OUTPUT_FILE = '.opencode/recommendations/tasks-with-improved-titles.ndjson';
 

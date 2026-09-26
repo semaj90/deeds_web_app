@@ -1,5 +1,4 @@
 import { db } from '@/lib/server/db/client'; // Assuming db client is available
-import { PrismaClient } from '@prisma/client'; // Using Prisma as a placeholder for DB interaction
 import { getConnection } from '@/lib/server/db/connection-pool'; // Placeholder for state connection
 
 /**

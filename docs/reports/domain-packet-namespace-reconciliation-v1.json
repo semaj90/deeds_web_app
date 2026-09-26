@@ -1,0 +1,795 @@
+{
+  "schema": "atlas.domain-packet-namespace-reconciliation.v1",
+  "generatedAt": "2026-09-16T16:51:54.886Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "admissionReport": "docs/reports/domain-classifier-cohort-admission-v1.json",
+  "identityIndex": null,
+  "counts": {
+    "PACKET_MISSING": 13,
+    "SINGLE_UNQUALIFIED_CANDIDATE": 9,
+    "DUPLICATE_NAMESPACES_UNQUALIFIED": 13
+  },
+  "promotionEligibleGroups": 0,
+  "groups": [
+    {
+      "packetIndexUuidV5": "33188899-d209-54d4-a0ae-0c1e19639720",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/DispatcherMiddlewareDependencies.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "11f7a68c-a2ca-56b1-a305-e9bd8ce14956",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/ace-context-assembler.ts"
+      ],
+      "namespaces": [
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:8a6483339793",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-context-assembler.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_UNQUALIFIED"
+      ],
+      "status": "SINGLE_UNQUALIFIED_CANDIDATE",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "1dedcfeb-8b11-5468-8199-9de64590c2c9",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/consumer/packet-consumer-pipeline.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "09c87d7b-0280-5b4d-a6c6-92568727d68a",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/contracts/internal-program-ref.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "78f2a2f2-a488-5db7-84ef-a9c07ee42c46",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/contracts/semantic-rpc-envelope.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "d363cd78-f304-52c0-9278-910796c19298",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/error-fingerprint.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:9622d85a9c9e",
+          "sourceRef": "src/lib/server/ace/error-fingerprint.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:312df385c83a",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/error-fingerprint.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "e88298f6-b270-54a0-a807-47b2adbdd0b8",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/error-kag-writer.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:167c9cb89e3d",
+          "sourceRef": "src/lib/server/ace/error-kag-writer.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:d2adbb975590",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/error-kag-writer.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "cec7170a-1b7f-5b7e-bdbb-fcb8b1b7bdef",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/feature-context-cache.ts"
+      ],
+      "namespaces": [
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:acadd33cbd24",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/feature-context-cache.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_UNQUALIFIED"
+      ],
+      "status": "SINGLE_UNQUALIFIED_CANDIDATE",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "3c363c7c-7259-5cf6-bb8c-67bb3d1deb7e",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/hermes-packet-consumer.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "841f71f6-a03d-54db-ba97-0d0005285565",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/identity-contract.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "9b206747-1645-5125-8182-c2eddcecccb0",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/intent-synthesis-reward.ts"
+      ],
+      "namespaces": [
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:458981995c94",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/intent-synthesis-reward.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_UNQUALIFIED"
+      ],
+      "status": "SINGLE_UNQUALIFIED_CANDIDATE",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "4e67d073-1bbc-5e88-bf92-20a0dc68848c",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/intent-synthesis.ts"
+      ],
+      "namespaces": [
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:48fdfdee96ca",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/intent-synthesis.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_UNQUALIFIED"
+      ],
+      "status": "SINGLE_UNQUALIFIED_CANDIDATE",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "b3e9da86-06f9-5372-b12d-d98e9bd8f8e2",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:d9c0bd0babd0",
+          "sourceRef": "src/lib/server/ace/kag-dag-runner.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:1a556bef807b",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "268647cd-f350-59bb-9669-270e06b6f197",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/multi-lane-retrieval.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:a869825b5ab4",
+          "sourceRef": "src/lib/server/ace/multi-lane-retrieval.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:fe9e6c68faf0",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/multi-lane-retrieval.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "d2a745d3-32bc-5068-9104-e88a86ac1810",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/ngram-retrieval.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:b13be7653881",
+          "sourceRef": "src/lib/server/ace/ngram-retrieval.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:ffa00673e2d0",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/ngram-retrieval.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "aaefe0bf-7ad8-5f11-a61e-a285dfd77515",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/ranking/packet-feature-matrix.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "14413e0c-0a57-552f-af32-a6d1abace0af",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:fd64e09ebb04",
+          "sourceRef": "src/lib/server/ace/retrieval-lanes.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:24bd0d1109b6",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "24bfafc9-0459-5506-8f58-1892e8d67888",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/search-router.ts"
+      ],
+      "namespaces": [
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:49e0dd6f7f1e",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/search-router.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "CONTENT_DIGEST_MISMATCH"
+      ],
+      "status": "SINGLE_UNQUALIFIED_CANDIDATE",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "09669b36-c000-5f01-9ad5-acd049844410",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/state/index.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "90d08d3e-0416-5962-b662-684b9a443641",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/tokenizer/token-accountant.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "82a9828e-ad7c-5894-9df5-3b5cb8bdb856",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/transport/inbox-outbox.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "07691ab3-7b1b-5a4b-9f45-9f546a272915",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/transport/index.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "8a4f9f35-fa1b-5c94-977d-956a0a2ce687",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/vector/ace-packet-vector.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "37cbee2c-5735-5b29-b8eb-19fe75e6fb8a",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/vector/turbovec-interpolation.ts"
+      ],
+      "namespaces": [],
+      "packetCandidates": [],
+      "sourceStatuses": [
+        "PACKET_MISSING"
+      ],
+      "status": "PACKET_MISSING",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "684d4098-e79d-5454-b33a-c7d026e8e546",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/admin/ai-chat-context.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:0d48507a1f86",
+          "sourceRef": "src/lib/server/admin/ai-chat-context.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:5a070fe8721e",
+          "sourceRef": "sveltekit-frontend/src/lib/server/admin/ai-chat-context.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "3e99f106-b0b3-5f80-967b-30a579d5072f",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/admin/ai-chat-service.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:61995e98a577",
+          "sourceRef": "src/lib/server/admin/ai-chat-service.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:2617e9d800e6",
+          "sourceRef": "sveltekit-frontend/src/lib/server/admin/ai-chat-service.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "00152d6f-91e3-5e8b-85f0-35a0c4bc90ec",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/admin/retrieval-analytics-service.ts"
+      ],
+      "namespaces": [
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:2644df2ff393",
+          "sourceRef": "sveltekit-frontend/src/lib/server/admin/retrieval-analytics-service.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_UNQUALIFIED"
+      ],
+      "status": "SINGLE_UNQUALIFIED_CANDIDATE",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "a8c851d5-4092-567a-ab98-1ec015c9553c",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/agent-executor.ts"
+      ],
+      "namespaces": [
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:987bd02fa735",
+          "sourceRef": "sveltekit-frontend/src/lib/server/agent-executor.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_UNQUALIFIED"
+      ],
+      "status": "SINGLE_UNQUALIFIED_CANDIDATE",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "464441e6-0b54-52c0-8417-9810aec3972e",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/agents/trace-subagent-orchestrator.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:56625606a245",
+          "sourceRef": "src/lib/server/agents/trace-subagent-orchestrator.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:0908ec85fe57",
+          "sourceRef": "sveltekit-frontend/src/lib/server/agents/trace-subagent-orchestrator.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "563b4e78-a8a2-542b-9262-fe90fdf11697",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ai/execution-transition-memory.ts"
+      ],
+      "namespaces": [
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:4d1e1aad6419",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/execution-transition-memory.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_UNQUALIFIED"
+      ],
+      "status": "SINGLE_UNQUALIFIED_CANDIDATE",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "9a7bda79-c7b6-5ee9-915e-0f3bd2301b27",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:40731123a24d",
+          "sourceRef": "src/lib/server/ai/gemma4-agent.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:a3ac5bb79fbf",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "1a6b3ce3-8132-515a-a9cb-db6ee1b01f30",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ai/hypergraph-store.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:0da0d470dead",
+          "sourceRef": "src/lib/server/ai/hypergraph-store.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:5d30c88c5ea9",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/hypergraph-store.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "0d3ed1eb-055d-59cc-b75b-2d365a06fb76",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ai/information-gain-validator.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:9fd86400e898",
+          "sourceRef": "src/lib/server/ai/information-gain-validator.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:ee294b370059",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/information-gain-validator.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "c3a38bbf-d8fe-5dec-8b20-80f3fd5bf23b",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ai/intent-ranker.ts"
+      ],
+      "namespaces": [
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:54113533d121",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/intent-ranker.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_UNQUALIFIED"
+      ],
+      "status": "SINGLE_UNQUALIFIED_CANDIDATE",
+      "canonicalPromotionEligible": false
+    },
+    {
+      "packetIndexUuidV5": "04353036-dbdc-558e-adf3-88d5b9d72438",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ai/kv-context-controller.ts"
+      ],
+      "namespaces": [
+        "ace",
+        "packet"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:06b22fce5bbd",
+          "sourceRef": "src/lib/server/ai/kv-context-controller.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:f25994e5ae49",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/kv-context-controller.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "sourceStatuses": [
+        "PACKET_DUPLICATE_UNQUALIFIED"
+      ],
+      "status": "DUPLICATE_NAMESPACES_UNQUALIFIED",
+      "canonicalPromotionEligible": false
+    }
+  ]
+}

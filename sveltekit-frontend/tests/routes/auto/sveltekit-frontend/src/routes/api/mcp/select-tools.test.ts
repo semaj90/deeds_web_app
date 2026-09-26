@@ -39,7 +39,7 @@ describe('src/routes/api/mcp/select-tools/+server.ts', () => {
     }
 
     it('400 — rejects invalid input shape', async () => {
-      const resp = await handler({ request: makeReq({ top_k: 0 }), locals: {}, url: makeUrl(), params: {} });
+      const resp = await handler({ request: makeReq({ top_k: 0 }), locals: { user: { id: "1" } }, url: makeUrl(), params: {} });
       expect(resp.status).toBe(400);
       const data = await resp.json();
       expect(data.error).toBe('Invalid request');
@@ -59,14 +59,14 @@ describe('src/routes/api/mcp/select-tools/+server.ts', () => {
           } as Response;
         }
 
-        if (String(url).includes('/collections/codebase_chunks_768/points/search')) {
+        if (String(url).includes('/collections/codebase_chunks_768/points/query')) {
           const body = init?.body ? JSON.parse(String(init.body)) : {};
           expect(body.vector?.name).toBe('content');
           return {
             ok: true,
             status: 200,
             json: async () => ({
-              result: [
+              result: { points: [
                 {
                   score: 0.92,
                   payload: {
@@ -83,11 +83,11 @@ describe('src/routes/api/mcp/select-tools/+server.ts', () => {
                     ontology: ['knowledge_base'],
                   },
                 },
-              ],
+              ] },
             }),
             text: async () =>
               JSON.stringify({
-                result: [
+                result: { points: [
                   {
                     score: 0.92,
                     payload: {
@@ -104,7 +104,7 @@ describe('src/routes/api/mcp/select-tools/+server.ts', () => {
                       ontology: ['knowledge_base'],
                     },
                   },
-                ],
+                ] },
               }),
           } as Response;
         }
@@ -114,7 +114,7 @@ describe('src/routes/api/mcp/select-tools/+server.ts', () => {
 
       const resp = await handler({
         request: makeReq({ query: 'tool search for retrieval', top_k: 2, bootstrap: true, domain: 'code' }),
-        locals: {},
+        locals: { user: { id: "1" } },
         url: makeUrl(),
         params: {},
       });
@@ -156,7 +156,7 @@ describe('src/routes/api/mcp/select-tools/+server.ts', () => {
 
       const resp = await handler({
         request: makeReq({ query: 'unclear request', top_k: 3 }),
-        locals: {},
+        locals: { user: { id: "1" } },
         url: makeUrl(),
         params: {},
       });

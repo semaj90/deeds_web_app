@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.ast-source-parity-disposition.v1",
+  "generatedAt": "2026-09-20T08:17:06.961Z",
+  "gate": "AST_SOURCE_AUTHORITY_PARITY",
+  "input": {
+    "source": ".tmp/knowledge-source-snapshot-live-v1.json",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "sourceCount": 24456,
+    "registryStatus": "CURRENT_SNAPSHOT_PROVEN",
+    "worktreeFingerprintParity": false,
+    "declaredMismatchCount": 645,
+    "declaredMissingCount": 8,
+    "mismatchReferenceCount": 645,
+    "missingReferenceCount": 8,
+    "issueSampleCount": 500,
+    "declaredIssueCount": 653
+  },
+  "evidence": {
+    "completeMismatchReferences": true,
+    "issueArrayIsSampleOnly": true,
+    "mismatchReferenceChecksum": "e5d0b8190f14c6838448eb714539230017bd3992d664dd09e6c0bc656d1e77c0",
+    "missingReferenceChecksum": "9b5775377abc11cfb954e13b969b73a8ca4e861f9e850373e8bb8ecbb3f31d7c"
+  },
+  "disposition": "WAITING_ON_CURRENT_WORKTREE_PARITY",
+  "blockers": [
+    "CURRENT_WORKTREE_PARITY"
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "checksum": "2c7f60acddd4b766e9d1b00af67a4bca59db779ed5576245a738fc70b22efc38"
+}

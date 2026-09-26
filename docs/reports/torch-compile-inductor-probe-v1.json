@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.compile-triton-probe.v1",
+  "status": "TORCH_COMPILE_BLOCKED_TOOLCHAIN",
+  "device": "cpu",
+  "torchVersion": "2.8.0+cu128",
+  "cudaAvailable": true,
+  "cudaVersion": "12.8",
+  "candidateCount": 256,
+  "dimension": 768,
+  "topK": 16,
+  "eager": {
+    "valid": true,
+    "meanMs": 0.15677998065948487,
+    "topIndicesChecksum": "e8ee8ee9d40f5cdcd5793c22852b032f1e39eee6129ed821598a14b1ecbf26bc"
+  },
+  "torchCompile": {
+    "attempted": true,
+    "backend": "inductor",
+    "parity": null,
+    "indexParity": null,
+    "errorClass": "MISSING_CLANG_CL_TOOLCHAIN",
+    "error": "InductorError: torch.compile requires clang-cl on this Windows environment."
+  },
+  "triton": {
+    "attempted": false,
+    "available": false,
+    "reason": "BOUNDED_CPU_PROBE"
+  },
+  "groupedMm": {
+    "attempted": false,
+    "reason": "BLOCKED_NO_EXPLICIT_MODEL_MOE"
+  },
+  "canonicalAuthority": false,
+  "canonicalWrites": false,
+  "onlineTrainingAllowed": false,
+  "writesPerformed": false,
+  "nextGate": "CLANG_CL_OR_SUPPORTED_WINDOWS_INDUCTOR_TOOLCHAIN"
+}

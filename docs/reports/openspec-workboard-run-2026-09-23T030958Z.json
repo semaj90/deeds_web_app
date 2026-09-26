@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T03:09:58Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "selection": {
+    "pivotChain": [
+      {
+        "from": "parent-atlas-ontology-oaklib-fanout-bitmap",
+        "stateAtExit": { "checked": 33, "open": 3, "total": 36 },
+        "reason": "Remaining tasks require an admitted live batch, explicit authorization, or actual live fanout rows; fixture-only evidence cannot close them."
+      },
+      {
+        "to": "parent-atlas-graph-runtime-python-consolidation",
+        "stateAtEntry": { "checked": 6, "open": 12, "total": 18 },
+        "reason": "Selected the locally executable read-only Louvain challenger ownership audit, task 5 follow-up."
+      },
+      {
+        "to": "parent-atlas-analysis-pass-ornith-adapter",
+        "stateAtEntry": { "checked": 24, "open": 1, "total": 25 },
+        "reason": "User requested correction of the synthesis generator to the actual llama-server :8090 Ornith runtime; existing task 3.3 is independently marked as human-decision-required and remains open."
+      }
+    ]
+  },
+  "guardrails": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false,
+    "graphifyRefresh": false,
+    "containerRebuild": false,
+    "canonicalPromotion": false,
+    "inferenceRequest": false
+  },
+  "result": {
+    "graphRuntimeLouvainAudit": {
+      "task": "scripts/atlas/run_louvain_challenger_v1.py ownership classification",
+      "classification": "READ_ONLY_FROZEN_FIXTURE_CHALLENGER",
+      "evidence": [
+        "The script calls python/atlas_rapids_community.py::run_cugraph_partition with algorithm=louvain and writes only its requested comparison receipt when explicitly run.",
+        "Repository-wide reference search found only this change's proposal/tasks and the historical live-graph-proof task; no runtime registration or canonical writer caller.",
+        "The settled TypeScript/Neo4j-GDS Louvain/Leiden production owner remains separate."
+      ],
+      "taskProgress": { "checked": 7, "open": 11, "total": 18 }
+    },
+    "ornithSynthesisGenerator": {
+      "file": "sveltekit-frontend/src/lib/gpu/gemma4-synthesis-generator.ts",
+      "runtime": "shared LLM_BASE_URL and resolveLlamaInferenceTarget() contract; default workstation endpoint :8090",
+      "liveModelReadback": { "endpoint": "GET http://127.0.0.1:8090/v1/models", "modelId": "ornith-1.5-9b" },
+      "completionRequest": "POST {baseUrl}/v1/chat/completions with the resolved ID in JSON field model; no llmModelId request field",
+      "compatibility": "Legacy module path and synthesizeWithGemma4 export retained; implementation and user-facing synthesis metadata identify the loaded Ornith runtime.",
+      "regressionTest": { "file": "sveltekit-frontend/src/lib/gpu/gemma4-synthesis-generator.test.ts", "result": "11/11 PASS; proves loaded model is sent as model on :8090 and fallback remains on the same server/model" },
+      "targetedTypecheck": { "scope": "generator, focused test, and transitive TypeScript imports with .svelte-kit/ambient.d.ts", "diagnostics": 0, "result": "PASS" },
+      "analysisPassProgress": { "checked": 24, "open": 1, "total": 25 },
+      "openTask": "3.3 remains operator-decision-required; no storage deletion or owner selection made."
+    },
+    "openSpecValidation": {
+      "parent-atlas-graph-runtime-python-consolidation": "PASS",
+      "parent-atlas-analysis-pass-ornith-adapter": "PASS"
+    },
+    "workspaceChecks": {
+      "touchedFileDiffCheck": "PASS",
+      "repositoryWideDiffCheck": "NOT_CLEAN: unrelated generated simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml contains trailing whitespace; file was not modified by this tranche."
+    }
+  }
+}

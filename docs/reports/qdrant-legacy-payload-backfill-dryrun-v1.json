@@ -1,0 +1,100 @@
+{
+  "schema": "atlas.qdrant-legacy-payload-backfill-dryrun.v1",
+  "generatedAt": "2026-09-12T19:39:21.504Z",
+  "mode": "DRY_RUN_NO_MUTATION",
+  "admittedWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+  "ownerCollection": "codebase_chunks_768",
+  "readOnlyInvariants": {
+    "writesPerformed": false,
+    "qdrantModified": false,
+    "postgresModified": false
+  },
+  "pointsScanned": 109776,
+  "alreadyValidWorkspaceRevision": 30,
+  "wouldBePatched": 109746,
+  "unresolvableCanonicalId": 0,
+  "canonicalIdFieldBreakdown": {
+    "canonical_source_ref": 105730,
+    "canonical_id": 576,
+    "packet_key": 3440
+  },
+  "samplePatchPreview": [
+    {
+      "pointId": 1,
+      "canonicalId": "1",
+      "resolvedVia": "canonical_source_ref",
+      "currentWorkspaceRevision": null,
+      "wouldSetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "pointId": 2,
+      "canonicalId": "sveltekit-frontend/src/AGENTS.md",
+      "resolvedVia": "canonical_source_ref",
+      "currentWorkspaceRevision": null,
+      "wouldSetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "pointId": 3,
+      "canonicalId": "src/AGENTS.md",
+      "resolvedVia": "canonical_source_ref",
+      "currentWorkspaceRevision": null,
+      "wouldSetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "pointId": 4,
+      "canonicalId": "src/AGENTS.md",
+      "resolvedVia": "canonical_source_ref",
+      "currentWorkspaceRevision": null,
+      "wouldSetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "pointId": 5,
+      "canonicalId": "sveltekit-frontend/src/hooks.server.ts",
+      "resolvedVia": "canonical_source_ref",
+      "currentWorkspaceRevision": null,
+      "wouldSetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "pointId": 6,
+      "canonicalId": "src/hooks.server.ts",
+      "resolvedVia": "canonical_source_ref",
+      "currentWorkspaceRevision": null,
+      "wouldSetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "pointId": 7,
+      "canonicalId": "src/hooks.server.ts",
+      "resolvedVia": "canonical_source_ref",
+      "currentWorkspaceRevision": null,
+      "wouldSetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "pointId": 8,
+      "canonicalId": "src/hooks.server.ts",
+      "resolvedVia": "canonical_source_ref",
+      "currentWorkspaceRevision": null,
+      "wouldSetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "pointId": 9,
+      "canonicalId": "src/hooks.server.ts",
+      "resolvedVia": "canonical_source_ref",
+      "currentWorkspaceRevision": null,
+      "wouldSetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    },
+    {
+      "pointId": 10,
+      "canonicalId": "src/hooks.server.ts",
+      "resolvedVia": "canonical_source_ref",
+      "currentWorkspaceRevision": null,
+      "wouldSetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
+    }
+  ],
+  "postgresBindingCheck": {
+    "admittedWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+    "admittedRevisionBindingCount": 0,
+    "grounded": false
+  },
+  "status": "BLOCKED_ON_UNGROUNDED_REVISION",
+  "explanation": "The patch shown above is computed for visibility only. It assigns workspace_revision=sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf to 109746 points, but that revision has ZERO rows in atlas_workspace_source_bindings for repo_id=deeds-web-app -- there is no Postgres-side source binding to justify writing this value onto these points. Executing this patch as-is would write false provenance, not just stale-but-honest metadata. Do not execute until either (a) Graphify is run end-to-end and produces real bindings for this revision (P0 in next_steps/active/2026-09-12_promotion-board-real-work.md), or (b) a different, actually-bound revision is chosen as the assignment target and re-justified."
+}

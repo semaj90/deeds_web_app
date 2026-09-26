@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "startedAt": "2026-09-24T00:52:43Z",
+  "fromChange": "parent-atlas-versioned-doc-intelligence",
+  "fromProgress": {
+    "complete": 41,
+    "total": 48,
+    "remaining": 7
+  },
+  "pivotToChange": "parent-atlas-adaptive-dag-fabric",
+  "pivotReason": "The remaining validation/doc tasks require an external OaK predicate evaluator, explicit Valkey/Qdrant/Neo4j projection authorization, or unresolved source/version identity policy. The adaptive DAG change has a local fetch-coalescing correctness task that can be proven without infrastructure writes.",
+  "targetTask": "DAG-FETCH-01",
+  "otherOpenTaskDeferred": {
+    "id": "NATS-EVENT-01",
+    "reason": "JetStream stream/consumer creation is an infrastructure mutation and is not needed for fetch-coalescing correctness."
+  },
+  "containerRebuilds": 0,
+  "writesBeforePivot": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "source": 0
+  },
+  "status": "PIVOT_RECORDED_BEFORE_WORK"
+}

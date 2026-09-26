@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T02:11:53Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-document-governance-master-index",
+  "selection": {
+    "from": "9.1 governance test coverage reconciled and proven 22/22",
+    "to": "9.6 admin API and SSR test coverage",
+    "reason": "The API handler has a live-registry unit test; the next uncovered leaf is the authenticated SSR loader boundary, which can be tested with local fetch fixtures without contacting services."
+  },
+  "stateAtSelection": { "checked": 38, "open": 26, "total": 64 },
+  "guardrails": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "graphifyRefresh": false,
+    "containerRebuild": false,
+    "canonicalPromotion": false
+  },
+  "completed": ["9.6 API/SSR tests for the Parent Atlas governance summary"],
+  "evidence": {
+    "apiRouteTests": "PASS 6/6",
+    "ssrLoaderTests": "PASS 2/2",
+    "combinedFocusedTests": "PASS 8/8",
+    "ssrCases": ["validates governance API payload before returning page data", "unauthenticated request redirects to login"],
+    "registryChecksum": "63d7006a417c236b0e41e22612be6768ec63fc4336534142a981e6ef049592fa",
+    "masterTocChecksum": "a1930ad0dcdff78b624af5e53fe19c7de57abe39e70c6caa774a7f574788bfcb",
+    "deterministicReplay": "PASS; two consecutive builds byte-identical",
+    "governanceValidator": { "status": "BLOCKED", "failures": 0, "closureBlockers": ["UNCHECKED_TASKS:3307"], "archiveEligible": 0, "writes": { "documents": 0, "archives": 0, "registry": 0 } },
+    "openSpecStrict": "PASS"
+  },
+  "openSpecProgress": { "change": "parent-atlas-document-governance-master-index", "checked": 39, "open": 25, "total": 64, "delta": "1 task closed with 8/8 focused API/SSR tests" },
+  "mutations": { "database": false, "qdrant": false, "valkey": false, "neo4j": false, "graphify": false, "containers": false, "filesystem": true },
+  "status": "COMPLETE",
+  "nextGate": "DOCUMENT_GOVERNANCE_9_7_FOCUSED_ADMIN_VALIDATION"
+}

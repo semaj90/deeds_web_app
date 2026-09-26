@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T01:15:25Z",
+  "reason": "The agent-branch-review change's remaining items are conditional on restoring a disposable proof DB and running the ACE replay, then either applying an operator-defined fallback or wiring capabilities; branch merge is also explicitly operator-owned. None is a safe local checkbox closure.",
+  "sourceChange": {
+    "name": "agent-branch-review-fanout-ace-centroid-aug22",
+    "completed": 17,
+    "total": 20,
+    "remainingGates": [
+      "3.3 conditional ACE fail-open patch only if the gated 3.2 replay fails",
+      "3.4 downstream MCP Viterbi capability wiring only if 3.2 succeeds",
+      "4.3 operator decision on merging the remaining ace-centroid branch"
+    ]
+  },
+  "nextChange": {
+    "name": "parent-atlas-document-governance-master-index",
+    "reason": "Inspect its remaining documentation/workboard tasks for stale evidence that can be read-only reconciled without running Graphify or mutating stores."
+  },
+  "mutationBoundary": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "containerRebuilds": "none"
+  }
+}

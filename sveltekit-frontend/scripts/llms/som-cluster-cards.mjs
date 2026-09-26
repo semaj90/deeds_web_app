@@ -44,6 +44,7 @@ import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from 'redis';
+import { llamaChat } from '../../../scripts/atlas/lib/llama-inference.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..', '..');
@@ -53,7 +54,7 @@ const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
 const COUCHDB_PASS = process.env.COUCHDB_PASSWORD ?? 'deeds123';
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
-const LLM_MODEL = process.env.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest';
+const LLM_MODEL = process.env.GEMMA4_MODEL ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 const NVME_DIR = resolve(ROOT, 'memory/agents-dag');
 const REDIS_TTL = 3600; // 1h hot cache
@@ -180,15 +181,7 @@ function bmuFor(vec, som) {
 
 async function llmSummarise(text) {
 	const prompt = `Summarise the following codebase directory cluster in 100 words or less. Focus on: what these directories share (tags/features), what they collectively implement, and any architecture patterns.\n\n${text.slice(0, 4000)}\n\nSummary:`;
-	const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model: LLM_MODEL, prompt, stream: false, options: { temperature: 0.2, num_predict: 200 } }),
-		signal: AbortSignal.timeout(60_000),
-	});
-	if (!res.ok) throw new Error(`Ollama HTTP ${res.status}`);
-	const data = await res.json();
-	return String(data.response ?? '').trim();
+	return String((await llamaChat(prompt, { maxTokens: 200, temperature: 0.2, timeoutMs: 60_000 })) ?? '').trim();
 }
 
 function aggregateCluster(members) {

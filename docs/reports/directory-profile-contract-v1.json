@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.directory-profile-contract-proof.v1",
+  "status": "DIRECTORY_PROFILE_CONTRACT_PROVEN_LIVE_SNAPSHOT_PENDING",
+  "change": "parent-atlas-retrieval-logic-convergence",
+  "tasks": {
+    "DIRECTORY-PROFILE-01": "PROVEN",
+    "DIRECTORY-PROFILE-02": "PROVEN",
+    "DIRECTORY-PROFILE-03": "WAITING_ON_SEALED_ADMITTED_SNAPSHOT"
+  },
+  "evidence": {
+    "implementation": "sveltekit-frontend/src/lib/server/retrieval/chunk-retrieval-profile-v1.ts",
+    "tests": "sveltekit-frontend/src/lib/server/retrieval/chunk-retrieval-profile-v1.spec.ts",
+    "testFilesPassed": 1,
+    "testsPassed": 11,
+    "directoryIdentity": "UUIDv5(repositoryId, workspaceRevision, normalizedDirectoryPath)",
+    "weakPrior": "bounded <= 0.03; independentLane=false; exactSymbolOrIdentifierMatch protects score"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false,
+  "liveCorpusProof": false,
+  "nextGate": "SEALED_ADMITTED_SNAPSHOT_DIRECTORY_AGGREGATE_REPLAY"
+}

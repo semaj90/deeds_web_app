@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.agentic-checkpoint-binding-audit.v1",
+  "sourceChecksums": {
+    "localWorkflowEvent": "sha256:17fa66df77b9f1119138ac0201f8a0534b1af11ee209548558bffbb3b05ff306",
+    "canonicalWorkflowEvent": "sha256:ba0b2609302f9e430bbc1704a80f09beca71809b318fbbc1d9da3fd716ab90f4",
+    "executionCoordinates": "sha256:effe83d3acbfb0592ff2d27562eeb9aa85dd338cff3f21a2b3feb898968ba11e",
+    "replayProof": "sha256:8769eeffde128dfd9cc77fa6ccc7977732c8c44773b6361d99b00ecca3387ca2"
+  },
+  "identityOwner": {
+    "workflowActionEvent": true,
+    "canonicalIdentityOwner": "workflow_action_event",
+    "identityFields": [
+      "workflowId",
+      "workflowRevision",
+      "actionId",
+      "sequence",
+      "attempt",
+      "parentActionId"
+    ]
+  },
+  "coordinateOwner": {
+    "present": true,
+    "fields": [
+      "framework",
+      "orchestrationRuntime",
+      "checkpointProvider",
+      "actionExecutor",
+      "transport"
+    ],
+    "checksumField": "coordinatesChecksum"
+  },
+  "evidenceBinding": {
+    "evidenceRefsPresent": true,
+    "artifactRefsPresent": true,
+    "checkpointReferenceFieldPresent": false,
+    "checkpointChecksumFieldPresent": false
+  },
+  "proofStatus": {
+    "resumeRetryFixtureExists": true,
+    "sameWorkflowActionIdentityAcrossCheckpointResume": "NOT_PROVEN",
+    "mismatchedCheckpointCoordinateRejection": "NOT_PROVEN",
+    "mutationAuthorizationPreserved": "NOT_PROVEN",
+    "status": "NOT_PROVEN"
+  },
+  "decision": {
+    "newRunSchemaIntroduced": false,
+    "canonicalWritesAllowed": false,
+    "databaseWrites": false,
+    "nextGate": "DEFINE_ADDITIVE_CHECKPOINT_BINDING_ON_EXISTING_WORKFLOW_EVENT"
+  }
+}

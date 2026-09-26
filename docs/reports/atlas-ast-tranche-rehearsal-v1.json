@@ -1,0 +1,132 @@
+{
+  "schema": "atlas.ast-canary-apply.v1",
+  "generatedAt": "2026-09-20T18:30:33.410Z",
+  "mode": "REHEARSAL_ROLLBACK",
+  "limit": 30000,
+  "bindings": {
+    "parserName": "ast-grep-napi",
+    "grammarVersion": null,
+    "sourceTextEncodingRevision": "SOURCE-TEXT-ENCODING-01",
+    "offsetBasis": "UTF8_PARSER_BUFFER_V1",
+    "lineBasis": "ONE_BASED_STORAGE",
+    "identityConvention": "file(ROOT)->declaration(parent=file)->method(parent=class)"
+  },
+  "steps": {
+    "proof": {
+      "candidatesInput": ".tmp\\atlas\\ast-declaration-candidates-current-v1.jsonl",
+      "gates": {
+        "AST_BF_11_PATH_POLICY": "PASS",
+        "AST_BF_12_COLLISION": "PASS_WITH_EXCLUSIONS",
+        "AST_BF_13_SCOPE": "PASS",
+        "AST_BF_14_PARENT_PLAN": "PASS_WITH_DEFERRED",
+        "AST_BF_15_LINEAGE": "PASS_PARTIAL",
+        "AST_BF_16_REPLAY": "PASS"
+      },
+      "canaryEligibleRows": 21530
+    },
+    "cohort": {
+      "path": ".tmp\\atlas\\ast-source-authority-cohort-v1.json",
+      "safeToStampChecksum": "sha256:59aa02a64a9df7442ecf3a1eb3fbb6eec88ff54376257728aee79f77b98bbcbc",
+      "cohortFiles": 3041,
+      "eligibleRowsBefore": 21530,
+      "eligibleRowsInCohort": 21505,
+      "rowsOutsideCohortDropped": 25
+    },
+    "generationColumnBefore": false,
+    "migrationRehearsal": {
+      "file": "sveltekit-frontend\\drizzle\\manual\\20260920_atlas_ast_nodes_generation.sql",
+      "appliedInsideTransaction": true,
+      "columnVisibleInsideTxn": true
+    },
+    "nameCollisionGuard": {
+      "deferredRows": 161,
+      "collidingGroups": 52,
+      "extraRowsThatWouldHaveBeenSkipped": 109,
+      "kinds": [
+        "method"
+      ],
+      "sample": [
+        {
+          "path": "src/lib/gpu/gpu-compute-pipeline.ts",
+          "kind": "method",
+          "qualifiedSymbol": "destroy",
+          "rows": 2
+        },
+        {
+          "path": "src/lib/gpu/markdown-processor.ts",
+          "kind": "method",
+          "qualifiedSymbol": "initialize",
+          "rows": 4
+        },
+        {
+          "path": "src/lib/gpu/markdown-processor.ts",
+          "kind": "method",
+          "qualifiedSymbol": "destroy",
+          "rows": 4
+        },
+        {
+          "path": "src/lib/gpu/policy-reranker-bridge.ts",
+          "kind": "method",
+          "qualifiedSymbol": "constructor",
+          "rows": 3
+        },
+        {
+          "path": "src/lib/gpu/policy-reranker-bridge.ts",
+          "kind": "method",
+          "qualifiedSymbol": "score",
+          "rows": 3
+        }
+      ],
+      "status": "DEFERRED_PENDING_QUALIFIED_SYMBOL_CONVENTION"
+    },
+    "selection": {
+      "eligibleRows": 21505,
+      "usableRows": 21226,
+      "droppedUnresolvableParent": 118,
+      "droppedNameCollision": 161,
+      "externalParentsExisting": 716,
+      "filesPicked": 2903,
+      "rowsPicked": 21226,
+      "includesTwoPhaseFile": true,
+      "twoPhaseFile": "src/lib/ai/base64-fp32-quantizer.ts"
+    },
+    "writeTimeDigestCheck": {
+      "filesChecked": 2903,
+      "skippedDiverged": [],
+      "skippedMissing": [],
+      "skippedNoRawRef": [],
+      "filesRemaining": 2903
+    },
+    "before": {
+      "existingRows": 11273
+    },
+    "writeConflicts": [],
+    "write": {
+      "inserted": 21226,
+      "expectedRows": 21226,
+      "skippedByConflict": 0,
+      "writerVsProofIdMismatch": 0
+    },
+    "readback": {
+      "parity": {
+        "treeNodeId": "21226/21226",
+        "note": "per-field mismatches listed in sampleMismatches"
+      },
+      "persistentRowsAdded": 0,
+      "rowsRead": 21226,
+      "fieldMismatches": 0,
+      "sampleMismatches": [],
+      "orphanParents": 0,
+      "rowsInTableInsideTxn": 32499
+    },
+    "constraintCheck": "PASS (SET CONSTRAINTS ALL IMMEDIATE)",
+    "after": {
+      "rowsInTable": 11273,
+      "persisted": false,
+      "expectedRowsInTable": 11273,
+      "generationColumnAfter": false
+    }
+  },
+  "errors": [],
+  "status": "REHEARSAL_PROVEN"
+}

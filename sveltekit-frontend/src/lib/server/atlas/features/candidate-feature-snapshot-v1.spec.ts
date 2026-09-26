@@ -5,7 +5,11 @@ import {
   materializeCandidateOrdinalMap,
   resolveCanonicalCandidateByOrdinal,
 } from './canonical-candidate-v1.js';
-import { materializeCandidateFeatureSnapshot, selectCandidateFeatureRows } from './candidate-feature-snapshot-v1.js';
+import {
+  admitCurrentCandidateFeatureSnapshotV1,
+  materializeCandidateFeatureSnapshot,
+  selectCandidateFeatureRows,
+} from './candidate-feature-snapshot-v1.js';
 
 function identities() {
   return [
@@ -257,6 +261,53 @@ describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
       .toThrow('EXECUTOR_IDENTITY_SUBSTITUTION_REJECTED:qdrantPointId');
     expect(() => assertExecutorIdIsNotCanonicalIdentity({ canonicalId: 'gpu:9', gpuNodeId: 'gpu:9' }))
       .toThrow('EXECUTOR_IDENTITY_SUBSTITUTION_REJECTED:gpuNodeId');
+  });
+});
+
+describe('admitCurrentCandidateFeatureSnapshotV1', () => {
+  it('returns a typed blocked result without a snapshot when lineage is unavailable', () => {
+    const map = materializeCandidateOrdinalMap({
+      candidates: identities(),
+      candidateSnapshotRevision: 'candidate:s1',
+      workspaceRevision: 'workspace:1',
+      producerRevision: 'test:v1',
+    });
+    const result = admitCurrentCandidateFeatureSnapshotV1({
+      ordinalMap: map,
+      rows: [],
+      featureRevision: 'feature:1',
+      producerRevision: 'test:v1',
+      sourceRevisionSetChecksum: 'a'.repeat(64),
+      candidateSetChecksum: 'b'.repeat(64),
+      sourceChunkCohortStatus: 'UNAVAILABLE',
+      semanticCohortStatus: 'UNAVAILABLE',
+      graphFeatureStatus: 'UNAVAILABLE',
+    });
+    expect(result.status).toBe('BLOCKED_LINEAGE');
+    expect(result.snapshot).toBeNull();
+    expect(result.writesPerformed).toBe(false);
+  });
+
+  it('does not admit a matrix until semantic and graph gates are admitted', () => {
+    const map = materializeCandidateOrdinalMap({
+      candidates: identities(),
+      candidateSnapshotRevision: 'candidate:s1',
+      workspaceRevision: 'workspace:1',
+      producerRevision: 'test:v1',
+    });
+    const result = admitCurrentCandidateFeatureSnapshotV1({
+      ordinalMap: map,
+      rows: [],
+      featureRevision: 'feature:1',
+      producerRevision: 'test:v1',
+      sourceRevisionSetChecksum: 'a'.repeat(64),
+      candidateSetChecksum: 'b'.repeat(64),
+      sourceChunkCohortStatus: 'REVISION_QUALIFIED',
+      semanticCohortStatus: 'BLOCKED',
+      graphFeatureStatus: 'ADMITTED',
+    });
+    expect(result.status).toBe('BLOCKED_SEMANTIC');
+    expect(result.snapshot).toBeNull();
   });
 });
 

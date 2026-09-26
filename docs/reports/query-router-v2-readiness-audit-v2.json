@@ -1,0 +1,107 @@
+{
+  "schema": "atlas.query-router-v2-readiness-audit.v1",
+  "generatedAt": "2026-09-19T06:58:12.844Z",
+  "mode": "READ_ONLY_NO_TRAINING_NO_RETRIEVAL_WRITES",
+  "status": "BLOCKED_MISSING_REVISION_QUALIFIED_CORPUS",
+  "contractsPresent": true,
+  "pythonReady": true,
+  "entrypointsReady": true,
+  "labeledCorpus": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\data\\atlas-ml\\query-router-labels-v2.jsonl",
+    "present": false,
+    "requiredFor": [
+      "ROUTE-04",
+      "ROUTE-05"
+    ],
+    "qualification": "revision-qualified non-toy labels with query/label/embedding/representation revisions"
+  },
+  "materializedSource": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\data\\atlas-ml\\query-router-source-v2.jsonl",
+    "present": false,
+    "producedBy": "materialize-query-router-source-v2.mts",
+    "requiredBefore": [
+      "ROUTE-04",
+      "ROUTE-05"
+    ]
+  },
+  "files": [
+    {
+      "relativePath": "src/lib/server/atlas/classification/query-router-dataset-v2.ts",
+      "exists": true,
+      "sha256": "2886fdc008dc2b465febb337ec5f0d653add934f3373b9601ecadfedc02aeaa9"
+    },
+    {
+      "relativePath": "src/lib/server/atlas/classification/retrieval-router-tensor-manifest-v2.ts",
+      "exists": true,
+      "sha256": "49fd7b39d2230eaab024f65d5cbe622b0093210d15532a919b821b7af5fb017c"
+    },
+    {
+      "relativePath": "src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
+      "exists": true,
+      "sha256": "d2ec103f60c5e5583f7d6eb2bc670dde9a9dc13f489d040d0dc463ec17943948"
+    },
+    {
+      "relativePath": "src/lib/server/atlas/classification/query-router-v2-integration.spec.ts",
+      "exists": true,
+      "sha256": "71118dd65ed6d8eb71247fbff76dfb03c32647a884542f4f1549f0d7efcd9dd4"
+    },
+    {
+      "relativePath": "scripts/atlas/build-query-router-dataset-v2.mts",
+      "exists": true,
+      "sha256": "73ac92fee88930ec0ff1da16cea98811ec73235f27f136fab06923b4ffa7f457"
+    },
+    {
+      "relativePath": "scripts/atlas/train-query-router-pytorch-v2.py",
+      "exists": true,
+      "sha256": "68998eeab887bcc8b564014b596cb09c5adaaab740166b6947ba0d6685bcfd49"
+    },
+    {
+      "relativePath": "scripts/atlas/train-query-router-xgboost-v2.py",
+      "exists": true,
+      "sha256": "ba446d12fc8fd208913ccc02d2ed71cbf41a6f6da109b18e86b03e1c9b9b9f8d"
+    },
+    {
+      "relativePath": "scripts/atlas/compare-query-router-v2.py",
+      "exists": true,
+      "sha256": "83ac67ef33edff746526407b30bc391be13679f5b24698594fa7aff3b319e146"
+    }
+  ],
+  "python": {
+    "numpy": {
+      "available": true,
+      "version": "2.2.6",
+      "error": null
+    },
+    "torch": {
+      "available": true,
+      "version": "2.8.0+cu128",
+      "error": null
+    },
+    "xgboost": {
+      "available": true,
+      "version": "3.2.0",
+      "error": null
+    }
+  },
+  "entrypoints": {
+    "pytorchHelp": {
+      "pass": true,
+      "output": "usage: train-query-router-pytorch-v2.py [-h] --dataset DATASET\r\n                                        [--output-dir OUTPUT_DIR]\r\n                                        [--epochs EPOCHS]\r\n                                        [--batch-size BATCH_SIZE] [--lr LR]\r\n                                        [--seed SEED]\r\n                                        [--device {auto,cpu,cuda}]\r\n\r\noptions:\r\n  -h, --help            show this help message and exit\r\n  --dataset DATASET\r\n  --output-dir OUTPUT_DIR\r\n  --epochs EPOCHS\r\n  --batch-size BATCH_SIZE\r\n  --lr LR\r\n  --seed SEED\r\n  --device {auto,cpu,cuda}",
+      "error": null
+    },
+    "xgboostHelp": {
+      "pass": true,
+      "output": "usage: train-query-router-xgboost-v2.py [-h] --dataset DATASET\r\n                                        [--output-dir OUTPUT_DIR]\r\n                                        [--seed SEED]\r\n\r\noptions:\r\n  -h, --help            show this help message and exit\r\n  --dataset DATASET\r\n  --output-dir OUTPUT_DIR\r\n  --seed SEED",
+      "error": null
+    },
+    "compareHelp": {
+      "pass": true,
+      "output": "usage: compare-query-router-v2.py [-h] --pytorch-receipt PYTORCH_RECEIPT\r\n                                  --xgboost-receipt XGBOOST_RECEIPT\r\n                                  [--output OUTPUT]\r\n                                  [--min-domain-accuracy MIN_DOMAIN_ACCURACY]\r\n                                  [--min-operation-accuracy MIN_OPERATION_ACCURACY]\r\n\r\noptions:\r\n  -h, --help            show this help message and exit\r\n  --pytorch-receipt PYTORCH_RECEIPT\r\n  --xgboost-receipt XGBOOST_RECEIPT\r\n  --output OUTPUT\r\n  --min-domain-accuracy MIN_DOMAIN_ACCURACY\r\n  --min-operation-accuracy MIN_OPERATION_ACCURACY",
+      "error": null
+    }
+  },
+  "trainingExecuted": false,
+  "retrievalOwnerChanged": false,
+  "canonicalWritesAllowed": false,
+  "nextRequirement": "PROVIDE_REVISION_QUALIFIED_LABELED_QUERY_CORPUS"
+}

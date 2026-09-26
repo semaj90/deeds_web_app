@@ -1,0 +1,125 @@
+{
+  "schema": "atlas.current-lineage-closure.v1",
+  "generatedAt": "2026-09-25T04:24:45.713Z",
+  "mode": "READ_ONLY_EVIDENCE_COMPOSITION",
+  "scope": {
+    "sourceCohortRows": 52,
+    "packetChunkJoinLimit": 128,
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+  },
+  "workspaceAuthority": {
+    "status": "ADMITTED",
+    "revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "cohortAligned": false,
+    "source": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT"
+  },
+  "executionAuthority": {
+    "status": "APPLIED_AND_READ_BACK",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "readbackVerified": true,
+    "lifecycleOwner": "NOT_PROVEN_BY_LIFECYCLE_AUDIT"
+  },
+  "sourceProducerAuthority": {
+    "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
+    "ownerDecision": "CURRENT_EXECUTION_OWNER_CANDIDATE",
+    "safeToPromote": false,
+    "writesPerformed": false,
+    "repairPlanStatus": "REPAIR_PLAN_PARTIAL_EXACT_BLOCKED",
+    "repairPlanWorkspaceRevision": "sha256:98914c394f4112963080857b5cbef21058cbe4cc9ac60ed4afffb05b808704ce",
+    "repairPlanExactCurrentBindingCount": 23610,
+    "repairPlanAuthorizationRequired": true,
+    "worktreeSnapshotDelta": {
+      "requiresSnapshotRefresh": true,
+      "currentOnlyCount": 1037,
+      "admittedOnlyCount": 1094,
+      "sharedDigestMismatchCount": 844,
+      "deltaChecksum": "sha256:bc363ef0c1e4e8288ed4ec7b19be505846d3e880f105f60bc8dc6fedf9b25791"
+    }
+  },
+  "packetRevisionOwner": {
+    "status": "DERIVATION_OWNER_PROVEN",
+    "ownerKind": "DERIVED",
+    "derivationRevision": "packet-revision-v1",
+    "writerAdoption": false,
+    "canonicalAuthority": false,
+    "writerVerdict": "PACKET_WRITER_CURRENT_LINEAGE_NOT_PROVEN",
+    "sourceRevisionColumn": "PRESENT_BUT_UNPOPULATED",
+    "nextGate": "PACKET-DIGEST-BRIDGE-ADMISSION-01"
+  },
+  "funnel": {
+    "workspaceSourceRows": 52,
+    "packetQualifiedRows": 16151,
+    "packetQualificationBasis": "UNIQUE_PACKET_KEY_SOURCE_REVISION_WORKSPACE_KEY_AND_BINDING_PROVENANCE",
+    "packetChunkQualifiedRows": 577,
+    "astQualifiedRows": 48,
+    "spanQualifiedRows": 0,
+    "candidateOrdinalEligibleRows": 0
+  },
+  "independentEvidenceCounts": {
+    "historicalProvenPacketChunkRows": 577,
+    "revisionQualifiedAstRows": 48
+  },
+  "promotionFunnel": {
+    "workspaceSources": 52,
+    "packetIdentityQualified": 16151,
+    "packetRevisionQualified": 16151,
+    "packetLegacyFullContentIdentityMatches": 0,
+    "packetChunkCurrentQualified": 577,
+    "packetAstCurrentQualified": 0,
+    "spanQualified": 0,
+    "candidateOrdinalEligible": 0
+  },
+  "supportingCounts": {
+    "sourceRevisionQualifiedRows": 52,
+    "currentWorkspaceMatchedRows": 0,
+    "provenLineageSources": 577,
+    "packetSourceRows": 16554,
+    "packetRevisionMatches": 16151,
+    "packetRevisionWorkspaceBindingMatches": 16151,
+    "packet_revision_identity_matches": 16151,
+    "packet_workspace_binding_matches": 16151,
+    "packet_legacy_content_hash_matches": 0,
+    "packet_full_canonical_identity_matches": 16151,
+    "packetContentMatches": 0,
+    "chunkFileContentMatches": 577,
+    "authoritativeNamespaces": 0,
+    "evidenceSpanReady": 0,
+    "digestBridgeSampledMembershipRows": 128,
+    "digestBridgeCanonicalMatches": 0,
+    "digestBridgeMissingPackets": 70,
+    "digestBridgeMissingPacketDigests": 58
+  },
+  "firstFailureBoundary": "EXECUTION_SOURCE_AUTHORITY",
+  "unresolvedByReason": {
+    "executionSourceAuthority": 1,
+    "workspaceRevisionMismatch": 52,
+    "packetRevisionOwner": 0,
+    "packetRevisionWriterAdoption": 1,
+    "packetIdentityIncomplete": 403,
+    "authoritativeNamespaceMissing": 1,
+    "evidenceSpanMissing": 1
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "inputReceipts": {
+    "sourceCohort": "docs/reports/current-source-cohort-lineage-v1.json",
+    "executionOwner": "docs/reports/current-graphify-execution-owner-decision-v1.json",
+    "packetChunkJoin": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+    "packetWriter": "docs/reports/packet-writer-lineage-v1.json",
+    "packetRevisionOwner": "docs/reports/packet-revision-owner-v1.json",
+    "packetIdentityReconciliation": "docs/reports/current-packet-chunk-identity-reconciliation-v1.json",
+    "packetDigestBridge": "docs/reports/current-packet-digest-bridge-v1.json",
+    "sourceOwner": "docs/reports/current-source-owner-reconciliation-v1.json",
+    "sourceAuthorityRepairPlan": "docs/reports/current-source-authority-repair-plan-v1.json",
+    "sourceEvidence": "docs/reports/current-source-evidence-hydration-v1.json"
+  },
+  "packetRevisionDerivableRows": 16151,
+  "packetRevisionUnqualifiedRows": 16554,
+  "packetRevisionUnqualifiedByReason": {
+    "PACKET_MISSING": 7902,
+    "CONTENT_DIGEST_MISSING": 16454,
+    "CONTENT_DIGEST_MISMATCH": 20
+  },
+  "reportChecksum": "1598e3f3e0b4b24374c74ff807ee6edf539029adbe7f3d68ff21e832c0d0a660"
+}

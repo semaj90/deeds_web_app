@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.retrieval-deferred-surfaces.v1",
+  "gate": "DEFERRED_RETRIEVAL_SURFACES",
+  "generatedAt": "2026-09-19T16:49:14.499Z",
+  "mode": "READ_ONLY",
+  "status": "DEFERRED_SURFACES_PROVEN",
+  "rows": [
+    {
+      "task": "DEFER-TRACE-MCP-01",
+      "surface": "TRACE_MCP_EXPANSION",
+      "evidence": [
+        "scripts/atlas/audit-trace-disabled-search-tools-v1.mjs",
+        "docs/reports/trace-disabled-search-tools-v1.json"
+      ],
+      "disposition": "DEFERRED_NON_BLOCKING",
+      "releaseWhen": "retrieval profile/ranking/pagination ownership is closed",
+      "evidencePresent": [
+        "scripts/atlas/audit-trace-disabled-search-tools-v1.mjs",
+        "docs/reports/trace-disabled-search-tools-v1.json"
+      ],
+      "evidenceComplete": true,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "task": "DEFER-VIBRETI-01",
+      "surface": "HMM_VIBRETI_REPAIR_CHALLENGER",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/retrieval/hmm-tool-selector.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.ts"
+      ],
+      "disposition": "CHALLENGER_ONLY",
+      "releaseWhen": "deterministic retrieval owner and evaluation explicitly admit this lane",
+      "evidencePresent": [
+        "sveltekit-frontend/src/lib/server/retrieval/hmm-tool-selector.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.ts"
+      ],
+      "evidenceComplete": true,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "task": "DEFER-QUERY-NLP-01",
+      "surface": "QUERY_NLP_SIDECAR_EXPANSION",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/retrieval/analyze-this-coordinator.ts"
+      ],
+      "disposition": "DEFERRED_NON_BLOCKING",
+      "releaseWhen": "new query-sidecar endpoint has an explicit owner and evidence contract",
+      "evidencePresent": [
+        "sveltekit-frontend/src/lib/server/retrieval/analyze-this-coordinator.ts"
+      ],
+      "evidenceComplete": true,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    }
+  ],
+  "authority": {
+    "runtimeEnablementChanged": false,
+    "canonicalAuthorityChanged": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false
+  },
+  "nextGate": "RETRIEVAL_OWNERSHIP_01"
+}

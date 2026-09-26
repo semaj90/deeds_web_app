@@ -575,7 +575,7 @@ async function main() {
 
       const synthesis = await probeOpenAICompatibleChat(
         (ENV.TURBOQUANT_BASE_URL ?? ENV.TURBOQUANT_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, ''),
-        ENV.ROTORQUANT_CHAT_MODEL ?? ENV.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf',
+        ENV.ROTORQUANT_CHAT_MODEL ?? ENV.GEMMA4_MODEL ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
         [
           {
             role: 'system',

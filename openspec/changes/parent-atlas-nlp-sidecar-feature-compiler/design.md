@@ -188,11 +188,17 @@ canonical structural contract (rejected — ties the whole downstream pipeline
 to one third-party package's API surface; the explicit point of separating
 "contract" from "current producer" is to make that swap possible later).
 
-### D3 — Linguistic pass (spaCy) scoped to natural language only
+### D3 — Linguistic pass scoped to natural language only
 
-spaCy (POS tagging, lemmatization, dependency parsing, noun chunks, entities)
-runs only over comments, docstrings, error messages, README/spec text, and
-user query text — never over source identifiers/tokens. Tree-sitter already
+The linguistic assertion contract runs only over comments, docstrings, error
+messages, README/spec text, and user query text — never over source
+identifiers/tokens. spaCy with the pinned English model is the current CPU
+reference executor for POS tagging, lemmatization, dependency parsing, noun
+chunks, and entities. A separately versioned PyTorch GPU POS/token-classifier
+may be admitted later as a challenger for token-level POS assertions, with
+the same exact text offsets and a CPU fallback. It does not replace Tree-sitter
+structural evidence and does not automatically become the owner of lemmas,
+noun chunks, dependency parsing, or canonical identity. Tree-sitter already
 knows `rerankCandidates` is a function identifier; running an English POS
 tagger against it adds nothing and risks nonsense output (an English parser
 has no model for camelCase code tokens).
@@ -212,6 +218,13 @@ PATCH_SUCCEEDED, PATCH_FAILED`, etc.) — never raw 768-dim vectors. Kept
 CPU-only: the state space is tiny relative to embedding/graph/rerank
 workloads, and GPU residency for HMM inference would contend with those
 larger jobs for no benefit.
+
+The sidecar's initial producer vocabulary is versioned as
+`atlas.route-observation.v1`: `STRUCTURAL_CHUNK_PRESENT`,
+`ENTITY_EVIDENCE_FOUND`, `IMPORT_RELATIONSHIP_FOUND`,
+`SEMANTIC_CARD_BUILT`, and `REPAIR_AMBIGUOUS`. Observations describe outputs
+actually present; request mode alone must never imply `PATCH_SUCCEEDED` or
+another execution outcome.
 
 **Alternatives considered**: feed continuous embeddings into a
 Gaussian-emission HMM (rejected — loses interpretability of the route state,

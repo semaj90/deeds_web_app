@@ -80,3 +80,4 @@ export {
 
 // Canonical hashing
 export { canonicalHashJSON, verifyCanonicalHash } from './canonical-hashing.js';
+export { FeaturePacketV1Schema, buildFeaturePacketV1, type FeaturePacketV1 } from './feature-packet-v1.js';

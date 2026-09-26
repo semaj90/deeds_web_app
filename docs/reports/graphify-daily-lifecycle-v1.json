@@ -1,18 +1,17 @@
 {
   "schema": "atlas.graphify-daily-snapshot-native-open.v1",
   "gate": "GRAPHIFY-SNAPSHOT-NATIVE-OPEN-01",
-  "status": "SNAPSHOT_NATIVE_EXECUTION_COMPLETED",
-  "executionId": "14667026-459c-4a99-b3c2-c20b739a6e0d",
-  "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
-  "snapshotRevision": "sha256:9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5",
-  "selectedSourceCount": 25271,
-  "membershipV2Count": 25271,
-  "selectionChecksum": "sha256:889d6a1457a73e5c42b6d650bbd012e214d1ea7d6838a453558b612ed4df22de",
-  "inventoryOutputChecksum": "sha256:055dceb855ad2df18834302d03d010a40f4ccf1d80742c0b515e49ba1f36a0ec",
-  "terminalStatus": "COMPLETED",
+  "status": "SNAPSHOT_NATIVE_EXECUTION_OPENED",
+  "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "selectedSourceCount": 25542,
+  "membershipV2Count": 25542,
+  "selectionChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+  "inventoryOutputChecksum": "sha256:9f2af3d3da8137a568913f3ea2fe113583d6afba72d59c20aa9a9a4214ad1bb5",
+  "terminalStatus": "RUNNING",
   "canonicalAuthority": false,
   "writesPerformed": true,
   "legacyExecutionEvidenceMutated": false,
-  "projectionsWritten": false,
-  "completedAt": "2026-09-10T22:46:18.691Z"
+  "projectionsWritten": false
 }

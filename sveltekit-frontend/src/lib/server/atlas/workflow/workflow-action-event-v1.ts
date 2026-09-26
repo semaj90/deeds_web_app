@@ -87,6 +87,12 @@ export interface WorkflowActionEventV1 {
   };
   evidenceRefs?: string[];
   artifactRefs?: string[];
+  /** Optional accounting metadata for OpenSpec/agent run receipts. */
+  tokensUsed?: number;
+  /** Source files changed by the run; distinct from generated artifactRefs. */
+  filesEdited?: string[];
+  /** OpenSpec change that owns the run receipt, when applicable. */
+  openspecChange?: string;
   startedAt?: string;
   emittedAt: string;
   finishedAt?: string;
@@ -127,6 +133,17 @@ export function validateWorkflowActionEvent(event: WorkflowActionEventV1): Workf
   if (!event.dagNodeId.trim()) errors.push('dagNodeId is required');
   if (!Number.isInteger(event.attempt) || event.attempt < 0) errors.push('attempt must be a non-negative integer');
   if (!event.operation.trim()) errors.push('operation is required');
+  if (event.tokensUsed !== undefined && (!Number.isInteger(event.tokensUsed) || event.tokensUsed < 0)) {
+    errors.push('tokensUsed must be a non-negative integer');
+  }
+  if (event.filesEdited !== undefined) {
+    if (!Array.isArray(event.filesEdited) || event.filesEdited.some((value) => typeof value !== 'string' || !value.trim())) {
+      errors.push('filesEdited entries must be non-empty strings');
+    }
+  }
+  if (event.openspecChange !== undefined && (!event.openspecChange.trim() || event.openspecChange.includes('..'))) {
+    errors.push('openspecChange must be a non-empty safe change name');
+  }
 
   const progress = event.progress;
   if (progress) {
@@ -158,6 +175,141 @@ export function validateWorkflowActionEvent(event: WorkflowActionEventV1): Workf
   }
 
   return { ok: errors.length === 0, errors };
+}
+
+// ── WORKFLOW-ACTION-SCHEMA-OWNER-01: canonical adapter ─────────────────────────
+//
+// This local WorkflowActionEventV1 stays the UI/Kanban-facing type (state, operation,
+// progress, target, visual). It no longer independently claims the
+// 'atlas.workflow-action.v1' schema identity as its own contract -- that identity is owned
+// by `workflowActionEventSchema` in `@deeds/parent-atlas/core/workflow-action-event`. These
+// two functions are the explicit adapter boundary between this local shape and the canonical
+// one, per design.md Decision 2.
+//
+// `WORKFLOW_EVENT_KINDS` here intentionally does NOT include every canonical `kind` value
+// (it lacks 'cancelled', 'suspended', 'resumed', 'validated', 'materialized') -- rather than
+// silently coerce an unrepresentable canonical kind to a wrong local one, conversion throws.
+// Widening this local enum is a separate decision for whoever wires a real UI/Kanban
+// consumer of those kinds, not assumed here.
+
+import type {
+  WorkflowActionEventV1 as CanonicalWorkflowActionEventV1,
+} from '@deeds/parent-atlas/core/workflow-action-event';
+
+export interface ToCanonicalExtrasV1 {
+  producerRevision: string;
+  /** Runtime-owned identity; never derive this from workflowId or actionId. */
+  runId: string;
+  /** Required by the canonical schema for completed events. */
+  receiptId?: string;
+  /** Required by the canonical schema for failed events. */
+  errorCode?: string;
+  toolId?: string;
+}
+
+export interface FromCanonicalExtrasV1 {
+  emittedAt: string;
+}
+
+export function toCanonicalWorkflowActionEvent(
+  local: WorkflowActionEventV1,
+  extras: ToCanonicalExtrasV1,
+): CanonicalWorkflowActionEventV1 {
+  if (local.kind === 'completed' && !extras.receiptId) {
+    throw new Error('WORKFLOW_CANONICAL_RECEIPT_REQUIRED');
+  }
+  if (local.kind === 'failed' && !extras.errorCode) {
+    throw new Error('WORKFLOW_CANONICAL_ERROR_CODE_REQUIRED');
+  }
+
+  return {
+    schema: 'atlas.workflow-action.v1',
+    workflowId: local.workflowId,
+    workflowRevision: local.workflowRevision,
+    runId: extras.runId,
+    sequence: local.sequence,
+    actionId: local.actionId,
+    parentActionId: local.parentActionId,
+    dagNodeId: local.dagNodeId,
+    attempt: local.attempt,
+    lane: local.lane,
+    transport: local.transport,
+    kind: local.kind,
+    resourceRefs: [],
+    evidenceRefs: local.evidenceRefs ?? [],
+    artifactRefs: local.artifactRefs ?? [],
+    startedAt: local.startedAt,
+    completedAt: local.finishedAt,
+    receiptId: extras.receiptId,
+    errorCode: extras.errorCode,
+    toolId: extras.toolId,
+    metadata: {
+      state: local.state,
+      operation: local.operation,
+      ...(local.progress === undefined ? {} : { progress: local.progress }),
+      ...(local.target === undefined ? {} : { target: local.target }),
+      ...(local.visual === undefined ? {} : { visual: local.visual }),
+      ...(local.target?.canonicalId === undefined ? {} : { canonicalIds: [local.target.canonicalId] }),
+      ...(local.tokensUsed === undefined ? {} : { tokensUsed: local.tokensUsed }),
+      ...(local.filesEdited === undefined ? {} : { filesEdited: local.filesEdited }),
+      ...(local.openspecChange === undefined ? {} : { openspecChange: local.openspecChange }),
+    },
+    producerRevision: extras.producerRevision,
+  };
+}
+
+type CanonicalUiMetadataV1 = {
+  state?: WorkflowActionState;
+  operation?: string;
+  progress?: WorkflowProgressV1;
+  target?: WorkflowActionEventV1['target'];
+  visual?: WorkflowActionEventV1['visual'];
+  tokensUsed?: number;
+  filesEdited?: string[];
+  openspecChange?: string;
+};
+
+export function fromCanonicalWorkflowActionEvent(
+  canonical: CanonicalWorkflowActionEventV1,
+  extras: FromCanonicalExtrasV1,
+): WorkflowActionEventV1 {
+  if (!(WORKFLOW_EVENT_KINDS as readonly string[]).includes(canonical.kind)) {
+    throw new Error(
+      `WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_UI_SHAPE: '${canonical.kind}' has no equivalent in this local WorkflowActionEventV1's WORKFLOW_EVENT_KINDS`,
+    );
+  }
+  if (canonical.transport && !(WORKFLOW_TRANSPORTS as readonly string[]).includes(canonical.transport)) {
+    throw new Error(
+      `WORKFLOW_ACTION_EVENT_TRANSPORT_NOT_REPRESENTABLE_IN_UI_SHAPE: '${canonical.transport}' has no equivalent in this local WorkflowActionEventV1's WORKFLOW_TRANSPORTS (e.g. 'mcp' is canonical-only)`,
+    );
+  }
+  const metadata = canonical.metadata as CanonicalUiMetadataV1;
+  return {
+    schema: 'atlas.workflow-action.v1',
+    workflowId: canonical.workflowId,
+    workflowRevision: canonical.workflowRevision,
+    sequence: canonical.sequence,
+    actionId: canonical.actionId,
+    parentActionId: canonical.parentActionId,
+    dagNodeId: canonical.dagNodeId,
+    attempt: canonical.attempt,
+    lane: canonical.lane,
+    transport: canonical.transport as WorkflowTransport | undefined,
+    kind: canonical.kind as WorkflowEventKind,
+    state: metadata.state ?? 'running',
+    operation: metadata.operation ?? '',
+    progress: metadata.progress,
+    target: metadata.target,
+    evidenceRefs: canonical.evidenceRefs,
+    artifactRefs: canonical.artifactRefs,
+    tokensUsed: typeof metadata.tokensUsed === 'number' ? metadata.tokensUsed : undefined,
+    filesEdited: Array.isArray(metadata.filesEdited) ? metadata.filesEdited : undefined,
+    openspecChange: typeof metadata.openspecChange === 'string' ? metadata.openspecChange : undefined,
+    startedAt: canonical.startedAt,
+    emittedAt: extras.emittedAt,
+    finishedAt: canonical.completedAt,
+    visual: metadata.visual,
+  };
 }
 
 export function workflowProgressFraction(event: Pick<WorkflowActionEventV1, 'progress' | 'state'>): number | null {

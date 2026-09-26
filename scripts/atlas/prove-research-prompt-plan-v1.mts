@@ -1,3 +1,11 @@
+/**
+ * TODO (stage-13 review, 2026-09-15): last run status was PROMPT_PLAN_EXTERNAL_REPLAY_PROVEN,
+ * nextGate ORNITH_EXTERNAL_EVIDENCE_SYNTHESIS_REPLAY. Note this script's data source is
+ * `chunks_web_search` (external research evidence), a DIFFERENT candidate population from the
+ * lineage-qualified 15-row canary that stages 8/13's other proofs use -- this is an
+ * intentionally separate lane (external research, not codebase lineage), not a duplicate
+ * candidate source. Do not conflate its readiness with the codebase-lineage chain's blockers.
+ */
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { compileContext, type ContextCandidate } from '../../sveltekit-frontend/src/lib/server/ace/context-compiler.parent-atlas.js';

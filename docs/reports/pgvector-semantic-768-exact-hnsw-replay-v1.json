@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.pgvector-semantic-768-exact-hnsw-replay.v1",
+  "generatedAt": "2026-09-18T17:44:27.290Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "representation": "semantic_768",
+  "column": "public.codebase_chunk_index.content_embedding",
+  "index": {
+    "indexname": "codebase_chunk_index_content_hnsw",
+    "indexdef": "CREATE INDEX codebase_chunk_index_content_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+  },
+  "filter": {
+    "sourceRevision": null,
+    "workspaceRevision": null,
+    "applied": false,
+    "reason": "Exact/HNSW parity requires a revision-qualified semantic_768 cohort; no source_revision-bound vector is currently available."
+  },
+  "exact": null,
+  "hnsw": null,
+  "recallAtK": null,
+  "status": "BLOCKED_NO_SOURCE_REVISION"
+}

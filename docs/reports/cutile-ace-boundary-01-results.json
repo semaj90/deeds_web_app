@@ -1,0 +1,69 @@
+{
+  "schema": "atlas.cutile-ace-boundary-01.result.v1",
+  "test": "CUTILE-ACE-BOUNDARY-01",
+  "date": "2026-09-14",
+  "read_only": true,
+  "canonical_production_data_touched": false,
+  "canonical_production_data_mutated": false,
+  "RESULT": "DRY_RUN_PROVEN",
+  "summary": "Proves the LEVEL 3 Python kernel's signed-int32-division workaround (ct.floordiv on unsigned tiles hits a real backend limitation, worked around by casting to int32 before dividing) is mathematically safe for the ACTUAL admitted field contract, not merely empirically unproblematic for random seeded values. The real bound: pagerankQuantized and recency are declared/sampled as uint16 (max 65535, per fixture-v1.mjs's own docstring), nowhere near INT32_MAX (2147483647) -- so the int32 cast can never wrap for any value these fields can actually hold. Also closes the separately-recorded 'CUDA boundary-value tests not pursued' gap for LEVEL 2's exact-match proof, which previously only covered the seeded-random fixture.",
+  "fixture": {
+    "generator": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+    "n": 26,
+    "coverage": [
+      "pagerankQuantized boundary sweep: 0, 1, 256, 257, 258, 65535 (with recency held at baseline)",
+      "recency boundary sweep: 0, 1, 256, 257, 258, 65535 (with pagerankQuantized held at baseline)",
+      "pagerankQuantized and recency at opposite extremes simultaneously (0/65535 and 65535/0)",
+      "featureBits at 0x0000 and 0xffff independently",
+      "flags at 0x0000 and 0xffff independently",
+      "lod at its declared uint8 bounds (0, 255)",
+      "residency at its declared uint8 bounds (0, 255)",
+      "projectionOrdinal at its declared uint32 bounds (0, 4294967295)",
+      "all-zero glyph (every field 0)",
+      "all-max glyph (every field at its declared maximum)"
+    ]
+  },
+  "field_contract_established": {
+    "pagerankQuantized": "uint16 (0..65535) -- per fixture-v1.mjs docstring and native/cutile-ace-level2/glyph_kernels_bench.cu's PackedGlyphInputV1 struct declaring it uint16_t",
+    "recency": "uint16 (0..65535) -- same source",
+    "conclusion": "65535 is 32,767x smaller than INT32_MAX (2147483647). Casting either field to int32 before dividing by 257 can never overflow or sign-wrap for any value the field is contractually permitted to hold. The workaround comment in glyph_fused_tile.py ('all operands here are non-negative') was true but incomplete -- this report freezes the exact bound (uint16, not merely 'non-negative') that makes the safety claim provable rather than assumed."
+  },
+  "per_lane_results": [
+    {
+      "lane": "cpu_oracle",
+      "source": "scripts/atlas/ace-radix-01/glyph-score-v1.mjs + fixture-v1.mjs::packGlyphKeyV1",
+      "role": "reference (not compared against itself)"
+    },
+    {
+      "lane": "level2_cuda_c_simt",
+      "source": "native/cutile-ace-level2/glyph_kernels_bench.cu (unfused CUDA C++, CUDA 13.0, this host's RTX 3060 Ti)",
+      "glyphScoreV1ExactMatch": true,
+      "residencyKeyPackV1ExactMatch": true,
+      "RESULT": "DRY_RUN_PROVEN"
+    },
+    {
+      "lane": "level3_python_cuda_tile",
+      "source": "native/cutile-ace-level3/glyph_fused_tile.py (fused cuTile, cuda_tile==1.5.0, WSL2 atlas-cutile-cu132 venv, this host's RTX 3060 Ti sm_86)",
+      "glyphScoreV1ExactMatch": true,
+      "residencyKeyPackV1ExactMatch": true,
+      "RESULT": "DRY_RUN_PROVEN"
+    }
+  ],
+  "gate": {
+    "criterion": "All 3 lanes (CPU oracle vs LEVEL 2 CUDA C++ vs LEVEL 3 Python cuTile) must exactly match at every boundary-value glyph, including the all-zero and all-max cases",
+    "n": 26,
+    "all_exact_match": true,
+    "RESULT": "DRY_RUN_PROVEN"
+  },
+  "capability_ladder_status": {
+    "level1_cub_oracle": "PROVEN (docs/reports/ace-radix-01-results.json)",
+    "level2_cuda_c_simt": "DRY_RUN_PROVEN, now including explicit boundary-value coverage (this report)",
+    "level3_python_cuda_tile_fused": "DRY_RUN_PROVEN, now including explicit boundary-value coverage AND a proven-safe range for the signed-division workaround (this report)",
+    "level3_cuda_tile_cpp": "PROVEN_BLOCKED (BLOCKED_TOOLCHAIN_VERSION_SKEW, docs/reports/cutile-ace-level3-attempt-v1.json) -- not reopened; closed per this repo's own audit-close discipline until a matched CUDA-13.3 tileiras appears",
+    "note": "The GPU-primitive LEVEL 1-2-3 capability ladder for this specific glyph-scoring/residency-key-packing capability is now genuinely complete, with an explicit range proof rather than an assumed one."
+  },
+  "not_attempted": [
+    "Level 2 vs Level 3 latency/throughput performance comparison -- correctness only, still no performance claim",
+    "Reopening the CUDA-13.3/13.2 tileiras toolchain skew -- deliberately left closed"
+  ]
+}

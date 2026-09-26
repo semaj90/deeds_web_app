@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.neural-decoder-prefill-live-shadow-proof.v1",
+  "requestId": "live-shadow-20260911",
+  "decoderUrl": "http://127.0.0.1:8121",
+  "run1": {
+    "cacheStatus": "MISS",
+    "decoderInvocations": 1,
+    "decoderOutputChecksum": "8da92dac11a1dee00896ef499cd2ab130366fe194f290c5e36ed7f938ab1ccc0",
+    "decoderQualifiedPrefillIdentityChecksum": "7e09921b5885b3826d2436272fa74414977da52c768ddfb5172dc2377f1d3b4e"
+  },
+  "run2": {
+    "cacheStatus": "HIT",
+    "decoderInvocations": 0,
+    "decoderOutputChecksum": "8da92dac11a1dee00896ef499cd2ab130366fe194f290c5e36ed7f938ab1ccc0",
+    "decoderQualifiedPrefillIdentityChecksum": "7e09921b5885b3826d2436272fa74414977da52c768ddfb5172dc2377f1d3b4e"
+  },
+  "replay": {
+    "decoderOutputChecksumEqual": true,
+    "decoderQualifiedPrefillIdentityChecksumEqual": true,
+    "statusFieldsExpectedToDiffer": true,
+    "temporaryCacheKeyDeleted": true
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "LIVE_SHADOW_CALLER_PROVEN"
+}

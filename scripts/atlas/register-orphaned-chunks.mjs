@@ -51,7 +51,7 @@
  *
  * --graphify-snapshot-receipt=<path> (added the same session) further hardens
  * --capture-lineage: when passed, lineage membership is sourced exclusively from
- * the immutable graphify_execution_files ledger for the receipt's proven
+ * the immutable graphify_execution_file_membership_v2 ledger for the receipt's proven
  * execution_id, never from graphify_files at all. --capture-lineage without this
  * flag still uses the corrected-but-still-legacy-bridge LATERAL join above for
  * backward-compatible diagnostic use; see the CLI validation below for the exact
@@ -69,6 +69,8 @@ import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path      from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveBoundedPacketSourceRevisionV1, resolvePacketSourceRevisionV1 } from './lib/packet-source-revision-admission-v1.mjs';
+import { assertApplyAuthorized, classifyV2AdmissionLiveState, loadPacketKeyV2AdmissionManifest } from './lib/packet-key-v2-admission-v1.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -98,7 +100,7 @@ const SOURCE_REFS_ALLOWLIST = SOURCE_REFS_FILE_ARG
 
 // GRAPHIFY-REVISION-TIEBREAK-FIX-01 / CURRENT-SOURCE-SNAPSHOT-RESOLVE-01 hardening
 // (2026-09-05): when --capture-lineage is combined with this flag, lineage
-// membership is sourced exclusively from the immutable graphify_execution_files
+// membership is sourced exclusively from the immutable graphify_execution_file_membership_v2
 // ledger for the receipt's proven execution_id -- never from graphify_files, not
 // even via the corrected legacy-bridge join above. Fails closed on any missing,
 // invalid, or unproven receipt. Without this flag, --capture-lineage still uses
@@ -181,6 +183,14 @@ if (APPLY && CAPTURE_LINEAGE && !SOURCE_REFS_ALLOWLIST && !GRAPHIFY_SNAPSHOT_REC
 
 if (APPLY && CAPTURE_LINEAGE && SOURCE_REFS_ALLOWLIST && !BOUNDED_LINEAGE_RECEIPT) {
   throw new Error('BOUNDED_LINEAGE_RECEIPT_REQUIRED: bounded --source-refs-file applies require --bounded-lineage-snapshot-receipt=<path>');
+}
+
+if (APPLY && !CAPTURE_LINEAGE) {
+  throw new Error('PACKET_SOURCE_REVISION_REQUIRED: packet apply requires --capture-lineage and exact admitted source membership');
+}
+
+if (APPLY && GRAPHIFY_SNAPSHOT_RECEIPT && !/^sha256:[a-f0-9]{64}$/i.test(GRAPHIFY_SNAPSHOT_RECEIPT.workspaceRevision ?? '')) {
+  throw new Error('GRAPHIFY_SNAPSHOT_WORKSPACE_REVISION_REQUIRED');
 }
 
 if (REQUIRE_LINEAGE && !CAPTURE_LINEAGE) {
@@ -316,12 +326,59 @@ function assertBoundedLineageReceipt() {
   }
 }
 
+// ── PacketKeyV2 admission (preflight only) ───────────────────────────────────
+// Keys come from a frozen manifest produced by the TypeScript PacketKeyV2 owner
+// (scripts/atlas/build-packet-key-v2-admission-manifest-v1.mts); this script never derives a key from source_ref on this path.
+// It re-classifies every entry against LIVE state and reports drift. There is NO ON CONFLICT DO NOTHING here and NO INSERT in this tranche.
+const V2_MANIFEST_ROOT_ARG = process.argv.find(a => a.startsWith('--packet-key-v2-manifest-root='));
+const V2_AUTH_ARG = process.argv.find(a => a.startsWith('--apply-authorization='));
+
+async function runPacketKeyV2Preflight(pool) {
+  const rootSha = V2_MANIFEST_ROOT_ARG.split('=')[1];
+  const dir = path.join(ROOT, 'docs', 'reports', 'packet-key-v2-admission-v1', rootSha);
+  const { entries } = loadPacketKeyV2AdmissionManifest(dir, rootSha);
+  const ddlApplied = (await pool.query("SELECT 1 FROM pg_trigger WHERE tgname = 'trg_atlas_packet_identity_alias_guard'")).rowCount === 1;
+  if (APPLY) {
+    const authorizationReceipt = V2_AUTH_ARG ? JSON.parse(readFileSync(path.resolve(ROOT, V2_AUTH_ARG.split('=').slice(1).join('=')), 'utf8')) : null;
+    assertApplyAuthorized({ authorizationReceipt, manifestRootSha256: rootSha, aliasKindDdlApplied: ddlApplied });
+    throw new Error('PACKET_KEY_V2_APPLY_NOT_IMPLEMENTED_IN_THIS_TRANCHE: preflight only; the plain INSERT (buildV2PacketInsert) is wired only after authorization and readback design');
+  }
+  const refs = entries.map(e => e.canonicalSourceRef);
+  const v2Keys = entries.map(e => e.packetKeyV2);
+  const legacyKeys = entries.map(e => e.legacyCompatibilityKey.key);
+  const q = async (text, param) => (await pool.query(text, [param])).rows;
+  const storedV2 = new Map((await q('SELECT packet_key, source_ref FROM atlas_packets WHERE packet_key = ANY($1::text[])', v2Keys)).map(r => [r.packet_key, r.source_ref]));
+  const storedLegacy = new Map((await q('SELECT packet_key, source_ref FROM atlas_packets WHERE packet_key = ANY($1::text[])', legacyKeys)).map(r => [r.packet_key, r.source_ref]));
+  const bySourceRef = new Map();
+  for (const r of await q('SELECT packet_key, source_ref FROM atlas_packets WHERE source_ref = ANY($1::text[])', refs)) bySourceRef.set(r.source_ref, [...(bySourceRef.get(r.source_ref) ?? []), r.packet_key]);
+  const aliasByV2 = new Map();
+  for (const r of await q("SELECT alias_key, canonical_packet_key FROM atlas_packet_identity_aliases WHERE canonical_packet_key = ANY($1::text[]) AND alias_kind = 'PACKET_KEY_V1_STORAGE_TO_V2'", v2Keys)) aliasByV2.set(r.canonical_packet_key, [...(aliasByV2.get(r.canonical_packet_key) ?? []), r.alias_key]);
+  const counts = {};
+  const drift = [];
+  for (const entry of entries) {
+    const verdict = classifyV2AdmissionLiveState({ sourceRef: entry.canonicalSourceRef, packetKeyV2: entry.packetKeyV2, legacyKey: entry.legacyCompatibilityKey.key, live: {
+      v2StoredFor: storedV2.get(entry.packetKeyV2) ?? null, aliasedStorageKeys: aliasByV2.get(entry.packetKeyV2) ?? [], existingStorageKeys: bySourceRef.get(entry.canonicalSourceRef) ?? [], legacyStoredFor: storedLegacy.get(entry.legacyCompatibilityKey.key) ?? null } });
+    counts[verdict.status] = (counts[verdict.status] ?? 0) + 1;
+    if (verdict.status !== entry.status) drift.push({ sourceRef: entry.canonicalSourceRef, manifestStatus: entry.status, liveStatus: verdict.status, code: verdict.code });
+  }
+  const receipt = { schema: 'atlas.packet-key-v2-admission-preflight.v1', mode: 'READ_ONLY_PREFLIGHT', writesPerformed: false, generatedAt: new Date().toISOString(),
+    manifestRootSha256: rootSha, entryCount: entries.length, liveCounts: counts, driftFromManifest: drift.length, driftSamples: drift.slice(0, 20), aliasKindDdlApplied: ddlApplied,
+    result: drift.length === 0 && !counts.IDENTITY_CONFLICT && !counts.PACKET_KEY_CANONICAL_COLLISION ? (ddlApplied ? 'PREFLIGHT_CLEAN' : 'PREFLIGHT_CLEAN_ALIAS_DDL_NOT_APPLIED') : 'PREFLIGHT_DRIFT_OR_CONFLICT' };
+  writeFileSync(path.join(ROOT, 'docs', 'reports', 'packet-key-v2-admission-preflight-v1.json'), JSON.stringify(receipt, null, 2) + '\n');
+  console.log(JSON.stringify(receipt, null, 2));
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
   console.log(`\n═══ Chunk Registration ${DRY_RUN ? '(DRY_RUN)' : '(APPLY)'} ═══\n`);
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 3 });
+
+  if (V2_MANIFEST_ROOT_ARG) {
+    try { await runPacketKeyV2Preflight(pool); } finally { await pool.end(); }
+    return;
+  }
 
   if (CAPTURE_LINEAGE) {
     const { rows } = await pool.query(`
@@ -443,13 +500,19 @@ async function main() {
             chunk_row_id: chunk.chunkRowId,
             workspace_id: BOUNDED_LINEAGE_RECEIPT.parsed.workspaceId,
             source_revision: binding.sourceRevision,
+            source_ref_binding: binding.sourceRef,
+            workspace_revision: BOUNDED_LINEAGE_RECEIPT.parsed.workspaceRevisionAtCapture,
+            content_digest: binding.contentDigest,
+            binding_checksum: binding.bindingChecksum ?? binding.checksum,
           });
           lineageBySourceRef.set(binding.sourceRef, list);
         }
       }
     } else if (CAPTURE_LINEAGE && GRAPHIFY_SNAPSHOT_RECEIPT) {
       // Receipt-driven path: membership is read exclusively from the immutable
-      // graphify_execution_files ledger for the receipt's proven execution_id --
+      // graphify_execution_file_membership_v2 ledger for the receipt's proven execution_id
+      // (the legacy graphify_execution_files table stopped being written after 2026-09-09;
+      // v2 carries every execution, including the older ones) --
       // graphify_files is not consulted at all here, so its mutability and the
       // now-fixed (but still legacy) tie-break are entirely bypassed.
       const sourceRefs = toRegister.map(row => row.source_ref);
@@ -459,16 +522,35 @@ async function main() {
           cci.chunk_id AS canonical_chunk_id,
           MIN(cci.id::text) AS chunk_row_id,
           ge.workspace_id::text AS workspace_id,
-          NULLIF(BTRIM(gef.code_source_revision::text), '') AS source_revision
+          gef.execution_id::text AS execution_id,
+          gef.repository_id,
+          gef.workspace_revision,
+          NULLIF(BTRIM(gef.code_source_revision::text), '') AS code_source_revision,
+          NULLIF(BTRIM(gef.code_source_revision::text), '') AS source_revision,
+          gef.content_hash,
+          b.repo_id AS binding_repository_id,
+          b.source_revision AS binding_source_revision,
+          b.binding_checksum
         FROM codebase_chunk_index cci
-        JOIN graphify_execution_files gef
+        JOIN graphify_execution_file_membership_v2 gef
           ON gef.source_ref = cci.relative_path AND gef.execution_id = $2::uuid
         JOIN graphify_executions ge ON ge.execution_id = gef.execution_id
+        LEFT JOIN atlas_workspace_source_bindings b
+          ON b.canonical_source_ref = gef.source_ref
+         AND b.workspace_revision = gef.workspace_revision
+         AND b.source_revision = gef.code_source_revision
+         AND regexp_replace(BTRIM(b.content_digest), '^sha256:', '', 'i')
+             = regexp_replace(BTRIM(gef.content_hash), '^sha256:', '', 'i')
         WHERE cci.relative_path = ANY($1::text[])
+          AND gef.repository_id = 'repo:root'
+          AND gef.workspace_revision = $3
+          AND ge.workspace_revision = $3
           AND NULLIF(BTRIM(cci.chunk_id::text), '') IS NOT NULL
-        GROUP BY cci.relative_path, cci.chunk_id, ge.workspace_id, gef.code_source_revision
+        GROUP BY cci.relative_path, cci.chunk_id, ge.workspace_id, gef.execution_id,
+                 gef.repository_id, gef.workspace_revision, gef.code_source_revision, gef.content_hash,
+                 b.repo_id, b.source_revision, b.binding_checksum
         ORDER BY cci.relative_path, cci.chunk_id
-      `, [sourceRefs, GRAPHIFY_SNAPSHOT_RECEIPT.executionId]);
+      `, [sourceRefs, GRAPHIFY_SNAPSHOT_RECEIPT.executionId, GRAPHIFY_SNAPSHOT_RECEIPT.workspaceRevision]);
 
       for (const row of lineageRows) {
         const list = lineageBySourceRef.get(row.source_ref) ?? [];
@@ -510,7 +592,7 @@ async function main() {
 
     const lineageStats = {
       enabled: CAPTURE_LINEAGE,
-      evidenceSource: GRAPHIFY_SNAPSHOT_RECEIPT ? 'graphify_execution_files' : (CAPTURE_LINEAGE ? 'graphify_files_legacy_bridge' : null),
+      evidenceSource: GRAPHIFY_SNAPSHOT_RECEIPT ? 'graphify_execution_file_membership_v2' : (CAPTURE_LINEAGE ? 'graphify_files_legacy_bridge' : null),
       snapshotReceiptExecutionId: GRAPHIFY_SNAPSHOT_RECEIPT?.executionId ?? null,
       sourceRefsWithNamespace: 0,
       sourceRefsWithoutNamespace: 0,
@@ -518,6 +600,42 @@ async function main() {
       membershipsWritten: 0,
       membershipsSkipped: 0,
     };
+
+    const admittedSourceRevisionByRef = new Map();
+    if (APPLY && CAPTURE_LINEAGE) {
+      for (const registration of toRegister) {
+        const candidates = lineageBySourceRef.get(registration.source_ref) ?? [];
+        const sourceRevision = BOUNDED_LINEAGE_RECEIPT
+          ? resolveBoundedPacketSourceRevisionV1({
+              sourceRef: registration.source_ref,
+              workspaceRevision: BOUNDED_LINEAGE_RECEIPT.parsed.workspaceRevisionAtCapture,
+              rows: candidates.map((row) => ({
+                sourceRef: row.source_ref_binding,
+                sourceRevision: row.source_revision,
+                workspaceRevision: row.workspace_revision,
+                contentDigest: row.content_digest,
+                bindingChecksum: row.binding_checksum,
+              })),
+            })
+          : resolvePacketSourceRevisionV1({
+              sourceRef: registration.source_ref,
+              executionId: GRAPHIFY_SNAPSHOT_RECEIPT.executionId,
+              workspaceRevision: GRAPHIFY_SNAPSHOT_RECEIPT.workspaceRevision,
+              rows: candidates.map((row) => ({
+                source_ref: row.source_ref,
+                execution_id: row.execution_id,
+                repository_id: row.repository_id,
+                workspace_revision: row.workspace_revision,
+                code_source_revision: row.code_source_revision,
+                content_hash: row.content_hash,
+                binding_repository_id: row.binding_repository_id,
+                binding_source_revision: row.binding_source_revision,
+                binding_checksum: row.binding_checksum,
+              })),
+            });
+        admittedSourceRevisionByRef.set(registration.source_ref, sourceRevision);
+      }
+    }
 
     if (DRY_RUN) {
       console.log(`\n(Dry-run) Would register ${toRegister.length} chunks:`);
@@ -544,9 +662,7 @@ async function main() {
 
     if (CAPTURE_LINEAGE) {
       // The opt-in lineage path is per-source transactional: packet creation
-      // and its complete real membership set commit together. Sources without
-      // graphify_files namespace authority retain the legacy packet behavior,
-      // but receive no fabricated lineage row.
+      // and its exact admitted source-revision memberships commit together.
       let registered = 0;
       let skipped = 0;
       for (const registration of toRegister) {
@@ -563,10 +679,10 @@ async function main() {
         try {
           await client.query('BEGIN');
           const packetResult = await client.query(
-            `INSERT INTO atlas_packets (packet_id, packet_key, source_ref, directory_path, feature_id, domain_class, source_kind, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now())
+            `INSERT INTO atlas_packets (packet_id, packet_key, source_ref, source_revision, directory_path, feature_id, domain_class, source_kind, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())
              ON CONFLICT (packet_key) DO NOTHING`,
-            [`packet_${createHash('sha256').update(registration.packet_key).digest('hex').slice(0, 24)}`, registration.packet_key, registration.source_ref, registration.directory_path, registration.feature_id, registration.domain_class, registration.source_kind],
+            [`packet_${createHash('sha256').update(registration.packet_key).digest('hex').slice(0, 24)}`, registration.packet_key, registration.source_ref, admittedSourceRevisionByRef.get(registration.source_ref), registration.directory_path, registration.feature_id, registration.domain_class, registration.source_kind],
           );
           registered += packetResult.rowCount ?? 0;
           if (namespace) {

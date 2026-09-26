@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T00:39:31Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "A2A_02A_PROJECTION_MAPPING_CONTRACT",
+    "to": "A2A_02B_CANONICAL_TASK_RESOLVER_WIRING",
+    "reason": "The projection-only mapping contract is now implemented and fixture-proven. Runtime resolver wiring remains a separate gate because no adapter caller or canonical task-attempt readback path has been demonstrated."
+  },
+  "evidence": {
+    "owner": "packages/parent-atlas/src/core/a2a-wire-v1.ts",
+    "tests": "15 focused Node tests passed across a2a-wire-v1 and agentic-workflow-control-plane",
+    "build": "Parent Atlas package TypeScript build passed",
+    "failClosedCases": ["task-attempt run mismatch", "task-attempt receipt mismatch"],
+    "identity": "A2A task/context IDs remain protocol-local; Atlas task/run refs and provenance are projections only",
+    "canonicalResolverReadback": "NOT_PROVEN",
+    "canonicalAuthority": false
+  },
+  "validation": {
+    "packageTypeScriptBuild": "PASS",
+    "focusedNodeTests": "PASS_15_OF_15",
+    "openSpecStrict": "PASS",
+    "jsonParse": "PASS",
+    "diffCheck": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 28,
+    "open": 63,
+    "total": 91,
+    "delta": "one contract-level subtask checked; original runtime readback remains open"
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "runtimeRemoval": false
+  },
+  "nextGate": "A2A_TASK_ID_TO_CANONICAL_TASK_ATTEMPT_RESOLVER_PROOF"
+}

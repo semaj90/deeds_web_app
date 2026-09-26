@@ -1,0 +1,58 @@
+{
+  "schema": "parent-atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T21:02:04Z",
+  "pivot": {
+    "from": "parent-atlas-adaptive-dag-fabric",
+    "fromProgress": "11/13",
+    "to": "parent-atlas-versioned-doc-intelligence",
+    "toProgress": "27/38",
+    "reason": "DAG-FETCH requires a new pre-fetch plan boundary, while NATS-EVENT is optional and awaits operator scope; moved to the next open task with a reusable bounded audit and no runtime writes."
+  },
+  "selectedGate": "DOC-03 Firecrawl bounded crawler owner audit",
+  "result": "DOC-03 bounded owner audit 10/10; live crawl remains externally gated. Continued to DOC-16 and implemented its strict descriptor-only contract; DOC-16 remains open for live composition and repair validation.",
+  "evidence": {
+    "owner": "python/atlas_okf_docs_pipeline.py::firecrawl_crawl_v2",
+    "captureOwner": "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
+    "checksPassed": 10,
+    "checksFailed": 0,
+    "manifestPageDepthAndSitemapBounds": "pass",
+    "externalLinksAndSubdomains": "disabled",
+    "domainScopeValidation": "pass",
+    "firecrawlApiKeyConfiguration": "declared, but live registration/key was not inspected",
+    "crawlerCalled": false,
+    "canonicalWrites": 0
+  },
+  "validation": {
+    "nodeCheck": "PASS",
+    "ownerAudit": "PASS: 10/10",
+    "openspecStrict": "PASS for adaptive-DAG tranche",
+    "focusedVitest": "PASS: 6/6 adaptive-DAG tests",
+    "diffCheck": "scoped edits PASS; whole-worktree check is noisy due unrelated generated build-log trailing whitespace"
+  },
+  "openItems": {
+    "DOC-03": "external prerequisite: Firecrawl registration/API key and live bounded-crawl readback",
+    "DAG-FETCH-01": "open: no FetchParameterPlanV1 owner/call boundary; only selection-preservation tests exist",
+    "NATS-EVENT-01": "open optional observability followup; JetStream enabled service has no PARENT_ATLAS_EVENTS stream",
+    "DOC-16": "strict runtime contract + fixture wired and proven; live ACE composition, ContextManifest admission, and repair validation remain open"
+  },
+  "doc16Progress": {
+    "contractSchema": "implemented and exported through @deeds/parent-atlas/core/ace-repair-packet-v1",
+    "tests": "9/9",
+    "packageTypecheck": "PASS",
+    "fixtureProof": "DOC_16_ACE_PACKET_FIXTURE_PROVEN",
+    "contextManifestFixture": "DOC_16_SYNTHETIC_CONTEXT_MANIFEST_COMPOSITION_PROVEN; focused tests 5/5; canonicalAuthority=false",
+    "contextManifestReceipt": "docs/reports/parent-atlas/doc-16-context-manifest-composition-v1.json",
+    "taskCheckboxClosed": false
+  },
+  "workboardSourceNote": "The generated docs/OPENSPEC-WORKBOARD.md is stale for these changes (it reports 16/31 for versioned-doc intelligence and 7/13 for adaptive DAG); direct task-file checkbox counts were used instead.",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "nats": 0,
+    "graphify": 0,
+    "containerRebuilds": 0,
+    "filesystem": "reports only; audit receipt regenerated"
+  }
+}

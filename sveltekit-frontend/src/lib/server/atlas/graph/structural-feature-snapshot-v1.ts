@@ -4,6 +4,12 @@ export const StructuralFeatureRowV1Schema = z.object({
 	candidateOrdinal: z.number().int().nonnegative(),
 	canonicalId: z.string().min(1),
 	graphAuthority: z.number().finite().nullable(),
+	/** Derived metrics are nullable until the matching graph projection is proven. */
+	pageRank: z.number().finite().nullable().default(null),
+	personalizedPageRank: z.number().finite().nullable().default(null),
+	hitsAuthority: z.number().finite().nullable().default(null),
+	hitsHub: z.number().finite().nullable().default(null),
+	cheiRank: z.number().finite().nullable().default(null),
 	queryProximity: z.number().finite().nullable(),
 	communityId: z.number().int().nullable(),
 	neighborhoodOverlap: z.number().finite().nullable(),

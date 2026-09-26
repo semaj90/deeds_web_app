@@ -1,0 +1,127 @@
+{
+  "schema": "atlas.feature-registry-disposable-postgres-proof.v1",
+  "status": "DISPOSABLE_POSTGRES_PROVEN",
+  "startedAt": "2026-09-14T00:33:30.079Z",
+  "completedAt": "2026-09-14T00:33:33.582Z",
+  "safety": {
+    "disposableContainer": true,
+    "dockerVolumeAttached": false,
+    "hostPortPublished": false,
+    "databaseUrlRead": false,
+    "liveDatabaseTargeted": false,
+    "productionWrites": false,
+    "transactionRolledBack": true,
+    "containerRemovedByDefault": true
+  },
+  "runtime": {
+    "image": "postgres:18",
+    "postgresVersion": "18.6 (Debian 18.6-1.pgdg13+2)",
+    "readinessAttempts": 4,
+    "proofDatabase": "atlas_feature_registry_proof"
+  },
+  "ownership": {
+    "drizzleSchema": "sveltekit-frontend/src/lib/server/db/schema/feature-registry.ts",
+    "baseMigration": "sveltekit-frontend/drizzle/0024_nebulous_mongoose.sql",
+    "additiveMigration": "sveltekit-frontend/drizzle/0025_yellow_tony_stark.sql",
+    "conclusion": "0024+0025 together match the current feature_registry Drizzle shape; no new shape migration is required solely to add summary/chunk_ids/tags/retry_queries."
+  },
+  "sourceChecksums": {
+    "migration0024": "03db1687887dc2bfe2256f29e3636ca2739b7db2f35d8a5e68674336f29ce17e",
+    "migration0025": "f6733d1fc9a7f1f670992cc110935fd022399fff4333dca5dbc142d89e6d17e7",
+    "scopedDdl": "ae891caeb1d47e1ad6573b59c746b575a95e298b0878efccfc14d6ff3a3e9f44"
+  },
+  "verification": {
+    "columns": [
+      [
+        "id",
+        "uuid",
+        "NO"
+      ],
+      [
+        "feature_key",
+        "text",
+        "NO"
+      ],
+      [
+        "title",
+        "text",
+        "NO"
+      ],
+      [
+        "description",
+        "text",
+        "YES"
+      ],
+      [
+        "status",
+        "text",
+        "NO"
+      ],
+      [
+        "source_refs",
+        "jsonb",
+        "NO"
+      ],
+      [
+        "code_refs",
+        "jsonb",
+        "NO"
+      ],
+      [
+        "test_refs",
+        "jsonb",
+        "NO"
+      ],
+      [
+        "cluster_id",
+        "integer",
+        "YES"
+      ],
+      [
+        "trust_tier",
+        "text",
+        "YES"
+      ],
+      [
+        "last_verified_at",
+        "timestamp with time zone",
+        "YES"
+      ],
+      [
+        "summary",
+        "text",
+        "YES"
+      ],
+      [
+        "chunk_ids",
+        "jsonb",
+        "NO"
+      ],
+      [
+        "tags",
+        "jsonb",
+        "NO"
+      ],
+      [
+        "retry_queries",
+        "jsonb",
+        "NO"
+      ]
+    ],
+    "indexes": [
+      [
+        "feature_registry_feature_key_unique",
+        "CREATE UNIQUE INDEX feature_registry_feature_key_unique ON public.feature_registry USING btree (feature_key)"
+      ],
+      [
+        "feature_registry_pkey",
+        "CREATE UNIQUE INDEX feature_registry_pkey ON public.feature_registry USING btree (id)"
+      ]
+    ],
+    "transactionProof": {
+      "readback": "READBACK|proof-28180-mu0iexnj|implemented|proof",
+      "residue": "RESIDUE|0"
+    }
+  },
+  "remainingBlocker": "Live migration-ledger/baseline reconciliation remains required before any local feature_registry apply. This proof does not authorize drizzle-kit migrate."
+}

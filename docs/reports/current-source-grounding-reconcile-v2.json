@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.current-source-grounding-reconcile.v2",
+  "generatedAt": "2026-09-13T00:00:00.000Z",
+  "mode": "READ_ONLY",
+  "activeWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+  "activeWorkspaceRevisionSource": "docs/reports/workspace-revision-tournament-admission-v1.json (status: WORKSPACE_REVISION_TOURNAMENT_ADMITTED, authority: true, generatedAt: 2026-09-11T15:10:37.412Z) -- the canonical patch-tournament admission receipt, not inferred from whichever table had the largest count.",
+  "reportedAceCount": 23369,
+  "reportedAceCountSource": "parent-atlas-ace-rlm-bitfrost-integration/tasks.md, 'P0 breakthrough' section, 2026-09-13, apply-admitted-workspace-source-bindings-content-reconciled-v1.json readbackCount",
+  "reportedLineageCount": 23252,
+  "reportedLineageCountSource": "parent-atlas-retrieval-lineage-dag-convergence/tasks.md, 'Source-reference materializer incident update', 2026-09-12, apply-file-level-source-refs-content-reconciled-v1.json insertedCount",
+  "liveTotalBindingsForActiveRevision": 23369,
+  "liveBindingsOtherRevisions": [
+    { "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9", "count": 111, "note": "pre-existing, unrelated to this session's work; not counted toward the active revision" }
+  ],
+  "sourceRevisionQualifiedCount": 23369,
+  "contentDigestQualifiedCount": 23369,
+  "distinctCanonicalSourceRefCount": 23369,
+  "identityCardinalityViolations": 0,
+  "distinctProducerRevisionsForActiveWorkspace": 1,
+  "discrepancyExplained": true,
+  "discrepancyExplanation": "23,252 (reportedLineageCount) is the insertedCount into atlas_source_refs from one script run. 23,369 (reportedAceCount) is the readbackCount from atlas_workspace_source_bindings after a second, cascading script run picked up those newly-created source_refs (23,252 new + 117 already-bound = 23,369). Both numbers are correct; they measure different tables at different points in one pipeline, not conflicting counts. Verified directly against both apply receipts' raw JSON, not re-derived.",
+  "qualifyingTerminalExecutionId": null,
+  "qualifyingTerminalExecutionSearch": {
+    "table": "graphify_executions",
+    "filter": "workspace_revision = activeWorkspaceRevision",
+    "rowsFound": 6,
+    "rows": [
+      { "executionId": "cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc", "status": "COMPLETED", "canonicalAuthority": false, "triggerKind": "CURRENT_WORKSPACE_SOURCE_SELECTION" },
+      { "executionId": "5013de19-7bed-4703-bd6b-1684b19e2aaf", "status": "COMPLETED", "canonicalAuthority": false, "triggerKind": "BOUNDED_COMMITTED_CANARY" },
+      { "executionId": "c531a1b0-c932-482f-8a21-5d067f504a13", "status": "COMPLETED", "canonicalAuthority": false, "triggerKind": "BOUNDED_COMMITTED_CANARY" },
+      { "executionId": "24c421a1-28b1-431d-ac09-2793ed807ca6", "status": "COMPLETED", "canonicalAuthority": false, "triggerKind": "BOUNDED_COMMITTED_CANARY" },
+      { "executionId": "3ded0ce6-cd8c-419f-96c9-49984824c956", "status": "COMPLETED", "canonicalAuthority": false, "triggerKind": "BOUNDED_COMMITTED_CANARY" },
+      { "executionId": "b337f94c-850b-44b5-99a7-ba6a6cfaeedf", "status": "COMPLETED", "canonicalAuthority": false, "triggerKind": "BOUNDED_COMMITTED_CANARY" }
+    ],
+    "canonicalAuthorityTrueCount": 0
+  },
+  "status": "TERMINAL_EXECUTION_MISSING",
+  "statusReason": "Population (A) and identity (B) both fully proven for the correct, canonically-admitted workspace revision: 23,369/23,369 bindings carry source_revision and content_digest, 23,369 distinct canonical_source_ref (zero cardinality violations), zero workspace-revision mismatch, zero count discrepancy. The sole remaining gap is currentness (C): all 6 graphify_executions rows for this revision are COMPLETED but canonical_authority=false (5 BOUNDED_COMMITTED_CANARY + 1 CURRENT_WORKSPACE_SOURCE_SELECTION) -- no qualifying terminal execution exists yet. Do not promote to CURRENT_SOURCE_AUTHORITY_PROVEN until one does.",
+  "writesPerformed": false
+}

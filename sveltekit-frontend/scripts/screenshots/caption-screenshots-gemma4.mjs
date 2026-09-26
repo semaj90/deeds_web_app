@@ -48,7 +48,7 @@ const LIMIT     = parseInt(
 
 const OLLAMA_URL     = process.env.OLLAMA_BASE_URL ?? process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
 const TURBOQUANT_URL = process.env.TURBOQUANT_URL  ?? 'http://127.0.0.1:8090';
-const VLM_MODEL      = process.env.VLM_MODEL   ?? 'gemma4-rotorquant:latest';
+const VLM_MODEL      = process.env.VLM_MODEL   ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const EMBED_MODEL    = process.env.EMBED_MODEL ?? 'embeddinggemma:latest';
 const DB_URL         = process.env.DATABASE_URL;
 

@@ -517,16 +517,24 @@ async function upsertPostgres(pool, chunk, embedding) {
         content, content_embedding_768,
         domain, tags, metadata,
         language, extension, embedding_model, embedding_dimension, content_hash,
+        file_content_hash, content_hash_scope, content_hash_algorithm,
+        content_hash_length, content_hash_version,
         line_start, line_end, indexed_at, updated_at)
      VALUES ($1, $2, $3, $3, $4, $5::halfvec(768),
              $6, $7::jsonb, $8::jsonb,
              $9, $10, $11, $12, $13,
-             $14, $15, NOW(), NOW())
+             $14, $15, $16, $17, $18,
+             $19, $20, NOW(), NOW())
      ON CONFLICT (qdrant_id) DO UPDATE SET
        content           = EXCLUDED.content,
        source_ref       = EXCLUDED.source_ref,
        content_embedding_768 = EXCLUDED.content_embedding_768,
        content_hash      = EXCLUDED.content_hash,
+       file_content_hash = EXCLUDED.file_content_hash,
+       content_hash_scope = EXCLUDED.content_hash_scope,
+       content_hash_algorithm = EXCLUDED.content_hash_algorithm,
+       content_hash_length = EXCLUDED.content_hash_length,
+       content_hash_version = EXCLUDED.content_hash_version,
        domain            = EXCLUDED.domain,
        tags              = EXCLUDED.tags,
        metadata          = EXCLUDED.metadata,
@@ -545,6 +553,18 @@ async function upsertPostgres(pool, chunk, embedding) {
       EMBED_MODEL,
       768,
       chunk.content_hash,
+      // file_content_hash: whole-file sha256(text), already computed once per file as
+      // chunk.file_hash (see processFile) -- same formula the backfill/parity-proof scripts
+      // use (sha256 of the file's real bytes). Written per parent-atlas-chunk-index-whole-file-hash
+      // task 5.1 so NEW rows from this writer no longer depend on the one-time backfill.
+      chunk.file_hash ?? null,
+      // content_hash metadata: this writer's content_hash is chunk-scoped, full (unsliced)
+      // sha256 hex -- confirmed by reading this file's own contentHash formula (task 1.2 audit),
+      // never inferred from the hash string's length alone.
+      'chunk',
+      'sha256',
+      64,
+      1,
       chunk.line_start ?? null,
       chunk.line_end ?? null,
     ]

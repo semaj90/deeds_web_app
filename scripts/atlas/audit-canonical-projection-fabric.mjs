@@ -93,6 +93,8 @@ async function main() {
       'atlas_tree_nodes',
       'graphify_symbols',
       'graphify_files',
+      'atlas_symbol_registry',
+      'atlas_symbol_versions',
       'codebase_chunk_index',
       'atlas_topology_index',
       'atlas_ontology_concepts',
@@ -179,12 +181,33 @@ async function main() {
       const { rows } = await q(`SELECT COUNT(*)::int AS n FROM graphify_symbols;`);
       graphifySymbolsRowCount = rows[0].n;
     }
+    // Additive (2026-09-13): atlas_symbol_registry/atlas_symbol_versions are what
+    // symbol-reconciliation-writer-v1.mts actually populates from graphify_symbols -- report
+    // their coverage alongside the raw graphify_symbols count rather than replacing it, since
+    // graphify_symbols having rows does not by itself mean any of them have been reconciled into
+    // the canonical registry yet (that step is revision-gated and may lag behind extraction).
+    let atlasSymbolRegistryRowCount = null;
+    let atlasSymbolVersionsRowCount = null;
+    if (existing.has('atlas_symbol_registry')) {
+      const { rows } = await q(`SELECT COUNT(*)::int AS n FROM atlas_symbol_registry;`);
+      atlasSymbolRegistryRowCount = rows[0].n;
+    }
+    if (existing.has('atlas_symbol_versions')) {
+      const { rows } = await q(`SELECT COUNT(*)::int AS n FROM atlas_symbol_versions;`);
+      atlasSymbolVersionsRowCount = rows[0].n;
+    }
     const symbolsResolved = {
       graphify_symbols_exists: existing.has('graphify_symbols'),
       graphify_symbols_row_count: graphifySymbolsRowCount,
-      verdict: graphifySymbolsRowCount > 0 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
+      atlas_symbol_registry_exists: existing.has('atlas_symbol_registry'),
+      atlas_symbol_registry_row_count: atlasSymbolRegistryRowCount,
+      atlas_symbol_versions_exists: existing.has('atlas_symbol_versions'),
+      atlas_symbol_versions_row_count: atlasSymbolVersionsRowCount,
+      verdict: atlasSymbolRegistryRowCount > 0
+        ? 'PARTIAL_PROVEN'
+        : graphifySymbolsRowCount > 0 ? 'EXTRACTED_NOT_RECONCILED' : 'NOT_PROVEN',
       note: existing.has('graphify_symbols')
-        ? `Table exists (columns: symbol_id, file_id, stable_symbol_key, symbol_kind, qualified_name, parent_symbol_id, start/end byte+row, signature_text, source_text_hash, ast_fingerprint, metadata) but is EMPTY (0 rows). Corrects the 2026-09-08 latent-representation-identity audit, which reported this table absent — it exists as schema but has never been populated by a writer; no canonical SymbolVersionV1 registry has real data yet either way.`
+        ? `graphify_symbols has ${graphifySymbolsRowCount} rows (populated 2026-09-13 by scripts/atlas/graphify-symbol-extractor-v1.mts -- the "canonical Graphify extractor" the table's own migration comment called for, previously nothing wrote to it). atlas_symbol_registry has ${atlasSymbolRegistryRowCount ?? 0} rows -- the reconciliation step (scripts/atlas/symbol-reconciliation-writer-v1.mts) is revision-gated separately and stays BLOCKED_ON_UNGROUNDED_REVISION for the admitted workspace revision regardless of how many graphify_symbols rows exist, so a nonzero graphify_symbols count does not by itself imply registry coverage.`
         : 'graphify_symbols does not exist live. No canonical SymbolVersionV1 registry exists; atlas_tree_nodes/atlas_ast_nodes are provisional structural inventories, not a symbol version authority.',
     };
 

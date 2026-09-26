@@ -1,0 +1,101 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "startedAt": "2026-09-24T15:23:57Z",
+  "fromTask": "DOC-26",
+  "pivotTo": "REVIEW_USER_PASTED_PARENT_ATLAS_OPEN_LANES_TODO",
+  "reason": "User asked to continue the review and inspect the attached Parent Atlas Open Lanes TODO. DOC-26 implementation was not continued during this review; its open live two-version readback gate remains unchanged.",
+  "scope": "Parent Atlas TODO review and DOC-15 retrieval-filter contract wiring; no live corpus or datastore mutation",
+  "findings": {
+    "temporalDocumentClaimFabric": {
+      "contractOwner": "packages/parent-atlas/src/core/temporal-indexing-fabric.ts",
+      "proof": "docs/reports/temporal-document-claim-fabric-v1.json",
+      "status": "CONTRACT_AND_FIXTURE_PROVEN",
+      "testsPassed": 13,
+      "generatedAt": "2026-09-21T03:15:18.614Z",
+      "liveSnapshotAdmission": false,
+      "canonicalPromotion": false,
+      "downstreamDocGates": "remain independently gated"
+    },
+    "pastedTodo": {
+      "status": "STALE_MIXED_AGE_AND_TRUNCATED",
+      "issues": [
+        "The headline 'Production-ready at the directory level' overstates readiness and conflicts with narrower lane-level proof requirements.",
+        "Claims of 32,012 USED_CONCEPT edges, a five-stage ANN cascade, and an operational merged packet spine are not established as current by the attached text; they need dated receipts and owner/readback evidence.",
+        "Training-ready XGBoost gates do not establish a production reranker or authorization to train/promote it.",
+        "The file ends mid-sentence at the community coverage audit, so it is not a complete actionable TODO.",
+        "The pasted document mixes packet retrieval, external-document retrieval, projections, caches, and execution claims without dated authority/status labels."
+      ],
+      "recommendedTreatment": "Use as historical research input; replace its status header with a dated overlay sourced from current receipts, and separate canonical owner, proven state, open gate, and challenger lanes. Do not treat its commands as authorization for writes or destructive cold-storage actions."
+    },
+    "doc15": {
+      "status": "CODE_CONTRACT_ADVANCED_LIVE_GATE_OPEN",
+      "evidence": [
+        "docs/reports/parent-atlas/doc-15-same-query-fanout-v1.json",
+        "docs/reports/parent-atlas/doc-15-live-projection-readback-v1.json"
+      ],
+      "reason": "The shared retrieval fixture now requires exact provider/product/product_version/architecture/source_authority selectors; hybrid point payload schema carries these fields; the external-doc Qdrant adapter applies the filter to dense, BM25, and both hybrid prefetches before ranking. This does not yet wire an external-document branch into production SearchRuntime/hybridSearch. A live projection/fanout readback is also unavailable: the prior read-only census reports the hybrid collection missing and the source collection empty.",
+      "focusedTests": {
+        "parentAtlasNodeTests": "16/16 passed",
+        "svelteKitAdapterVitest": "3/3 passed",
+        "parentAtlasTypeScriptBuild": "passed"
+      },
+      "projectWideSvelteCheck": "failed from Node heap exhaustion near 4 GB; no targeted diagnostic was produced",
+      "openspecStrict": "passed",
+      "ownerProof": "12/12 bounded code/fixture checks passed; live fanout and filtered projection readback remain false",
+      "diffCheck": "passed",
+      "writesPerformed": false,
+      "remainingGate": "Wire the filtered adapter into the existing production retrieval owner with canonical PostgreSQL join-back; then populate/verify a metadata-complete projection under its separately authorized bounded process and run same-query filtered live replay."
+    },
+    "doc13": {
+      "status": "OPEN_TARGET_CODE_REVISION_BINDING",
+      "evidence": [
+        "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md#DOC-13",
+        "docs/reports/parent-atlas/doc-13-symbol-mutual-index-live-v1.json",
+        "docs/reports/current-source-authority-cohort-v1.json",
+        "sveltekit-frontend/src/lib/server/atlas/identity/symbol-revision-qualification-v1.ts"
+      ],
+      "verified": "The existing sealed source cohort is marked CURRENT_SOURCE_AUTHORITY_PROVEN, but its receipt is from 2026-09-21 and reports working-tree drift (720 changed sources, 1,086 excluded nested-repository sources, 8 unavailable). DOC-13's live extraction proof remains LIVE_EXTRACTION_CODE_REVISION_UNBOUND: the extracted ApiRule has a documentation revision but no target code revision; the resolver correctly fails closed instead of comparing documentation and code revisions.",
+      "nextSafeImplementation": "Extend the existing exact-name symbol join only by deriving a target code revision from a unique symbol-version row whose (sourceRef, sourceRevision, workspaceRevision, contentDigest) passes loadBindingProvenanceV1/qualifySymbolVersionRevisionsV1. Preserve AMBIGUOUS/UNRESOLVED on non-unique or unbound candidates. Do not use latest or current-working-tree substitution.",
+      "writesPerformed": false
+    }
+  },
+  "pivots": [
+    {
+      "at": "2026-09-24T15:23:57Z",
+      "from": "DOC-26",
+      "to": "REVIEW_USER_PASTED_PARENT_ATLAS_OPEN_LANES_TODO",
+      "reason": "User requested review of the pasted Open Lanes TODO."
+    },
+    {
+      "at": "2026-09-24T15:30:00Z",
+      "from": "TODO_REVIEW",
+      "to": "DOC-15",
+      "reason": "The external-doc retrieval adapter lacked required version/architecture/authority filtering."
+    },
+    {
+      "at": "2026-09-24T15:35:27Z",
+      "from": "DOC-15",
+      "to": "DOC-13_OPEN_GATE_REVIEW",
+      "reason": "DOC-15 code/contract work is tested, but its live Qdrant projection is empty/missing; inspected the next open task in the same OpenSpec change and preserved its target-revision blocker without altering its ledger."
+    }
+  ],
+  "pivotCountThisRun": 1,
+  "openSpecLedgerEdited": false,
+  "filesChangedByThisRun": [
+    "packages/parent-atlas/src/core/external-doc-retrieval-proof.ts",
+    "packages/parent-atlas/src/core/external-doc-qdrant-hybrid.ts",
+    "packages/parent-atlas/src/core/external-doc-retrieval-runtime.ts",
+    "packages/parent-atlas/test/external-doc-retrieval-proof.test.mjs",
+    "packages/parent-atlas/test/external-doc-retrieval-runtime.test.mjs",
+    "packages/parent-atlas/test/external-doc-qdrant-hybrid.test.mjs",
+    "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-retrieval-port.ts",
+    "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-retrieval-port.spec.ts",
+    "scripts/atlas/prove-doc-15-same-query-fanout-v1.mjs",
+    "docs/reports/parent-atlas/doc-15-same-query-fanout-v1.json",
+    "docs/reports/openspec-workboard-run-2026-09-24T152357Z.json"
+  ],
+  "containerRebuilds": 0,
+  "datastoreWrites": 0,
+  "commit": null,
+  "push": false
+}

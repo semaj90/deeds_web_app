@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { Editor } from '@tiptap/core';
 import Placeholder from '@tiptap/extension-placeholder';
 import StarterKit from '@tiptap/starter-kit';
@@ -112,7 +113,7 @@ const res = await fetch('/api/chat', {
 	method: 'POST',
 	headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-		model: 'gemma4-legal:latest',
+		model: SERVER_CHAT_MODEL,
 		prompt: contextPrompt,
 		stream: false,
 		options: { temperature: 0.7, num_predict: 512 }

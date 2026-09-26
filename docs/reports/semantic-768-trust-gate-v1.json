@@ -1,0 +1,261 @@
+{
+  "schema": "atlas.semantic-768-trust-gate.v1",
+  "generatedAt": "2026-09-19T09:25:32.858Z",
+  "status": "SEMANTIC_768_DIMENSION_PROVEN_ACTIVE_LINEAGE_REMAINING",
+  "contract": {
+    "representationId": "semantic_768",
+    "dimensions": 768,
+    "model": "embeddinggemma:latest",
+    "activeReaderCollection": "codebase_chunks_768_v2",
+    "canonicalStore": "PostgreSQL",
+    "canonicalAuthority": false
+  },
+  "evidence": {
+    "embedding": {
+      "reachable": true,
+      "status": 200,
+      "model": "embeddinggemma:latest",
+      "dimension": 768,
+      "dimensionProven": true
+    },
+    "qdrant": {
+      "activeCollection": {
+        "name": "codebase_chunks_768_v2",
+        "reachable": true,
+        "status": 200,
+        "vectors": [
+          {
+            "name": "content",
+            "size": 768
+          },
+          {
+            "name": "error",
+            "size": 768
+          },
+          {
+            "name": "signature",
+            "size": 768
+          }
+        ],
+        "dimension768": true,
+        "dimension384": false
+      },
+      "legacyCollections": [
+        {
+          "name": "codebase_chunks_384",
+          "reachable": true,
+          "status": 200,
+          "vectors": [
+            {
+              "name": "content",
+              "size": 384
+            }
+          ],
+          "dimension768": false,
+          "dimension384": true
+        },
+        {
+          "name": "codebase_chunks_384_hybrid",
+          "reachable": true,
+          "status": 200,
+          "vectors": [
+            {
+              "name": "content",
+              "size": 384
+            }
+          ],
+          "dimension768": false,
+          "dimension384": true
+        }
+      ]
+    },
+    "postgres": {
+      "reachable": true,
+      "canonicalColumnPresent": true,
+      "canonicalSampleDimension": 768,
+      "canonical768Proven": true,
+      "columns": [
+        {
+          "table_name": "ace_chunks",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "ace_error_embeddings",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "atlas_class_search_index_v1",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "atlas_concepts",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "atlas_embeddings_384",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "atlas_embeddings_64_latent",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "atlas_embeddings_768",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "atlas_feature_embeddings",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "atlas_packets",
+          "column_name": "content_embedding_384"
+        },
+        {
+          "table_name": "atlas_packets",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "atlas_relationship_embeddings",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "atlas_summary_layers",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "canonical_chunks",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "case_embeddings",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "chat_embeddings",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "code_retrieval_chunks",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "codebase_chunk_index",
+          "column_name": "content_embedding_768"
+        },
+        {
+          "table_name": "codebase_chunk_index_backup",
+          "column_name": "content_embedding_384"
+        },
+        {
+          "table_name": "community_reports",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "community_reports_leiden",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "content_embeddings",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "document_embeddings",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "embedded_summaries",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "embedding_cache",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "evidence",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "evidence_vectors",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "fixer_patterns",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "legal_chunks",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "legal_glossary",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "nes_chrom_packets",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "parent_atlas_vectors",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "phase89_embeddings",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "raw_error_embeddings",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "research_summaries",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "statute_chunks",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "tool_registry",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "user_embeddings",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "warden_chunks",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "whisper_segments",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "workspace_notes",
+          "column_name": "embedding"
+        }
+      ]
+    },
+    "activeRetrieval384References": 6,
+    "activeReader384References": 0,
+    "legacy384Explicit": true,
+    "activeReaderUses384": false
+  },
+  "interpretation": {
+    "dimensionParity": true,
+    "legacy384Status": "EXPLICIT_LEGACY_REFERENCE_ONLY",
+    "collectionOwnerReconciliation": "ACTIVE_READER_OWNER_PROVEN_DIMENSION_ONLY",
+    "remainingGates": [
+      "source_revision_and_packet_lineage_coverage",
+      "qdrant_payload_lineage_readback",
+      "L1_L2_PRECOMPUTED_VECTOR_CACHE_DIMENSION_READBACK",
+      "active_collection_owner_reconciliation"
+    ]
+  },
+  "writesPerformed": false,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "valkeyWrites": false,
+  "canonicalAuthority": false
+}

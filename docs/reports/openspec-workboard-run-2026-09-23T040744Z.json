@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T04:07:44Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "selection": {
+    "pivotFrom": "parent-atlas-agentic-completion",
+    "pivotTo": "inference-wiring-deep-audit-aug22",
+    "previousPivotRun": "docs/reports/openspec-workboard-run-2026-09-23T040301Z.json",
+    "stateAtEntry": { "checked": 53, "open": 2, "total": 55 },
+    "reason": "Agentic-completion remainder requires admitted live candidate execution and operator acceptance. Pivoted to two near-identical live inference-facade gates to revalidate their mocks and test whether a live request can run without unapproved cache or memory writes."
+  },
+  "result": {
+    "change": "inference-wiring-deep-audit-aug22",
+    "taskProgress": { "checked": 53, "open": 2, "total": 55, "deltaCheckedThisRun": 0 },
+    "focusedValidation": {
+      "openaiFacadeVitest": "15/15 PASS; mocked suite only",
+      "loadedModelReadOnlyProbe": { "modelId": "ornith-1.5-9b", "ownedBy": "llamacpp", "endpoint": "GET /v1/models" },
+      "facadePostAttempted": false
+    },
+    "liveFacadeGate": {
+      "status": "BLOCKED_UNSAFE_SIDE_EFFECTS_UNPROVEN",
+      "reason": "runChatCompletion has no proven no-side-effect replay option. Its code path performs cache/metrics activity and can persist user memory; a live request was not sent.",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "nextProof": "Add or identify a bounded live replay path that proves cache, metrics, memory, database and tool writes are disabled, or obtain separate authorization for its exact side effects."
+    },
+    "remainingOtherChangesReviewed": {
+      "parent-atlas-deep-research-ingestion": {
+        "progress": { "checked": 6, "open": 1, "total": 7 },
+        "blocker": "DISCOVERY-04B requires real DOC-06A admission in a bounded fixture; no admission write was authorized or performed."
+      },
+      "parent-atlas-agentic-completion": {
+        "progress": { "checked": 9, "open": 2, "total": 11 },
+        "agent09": "Fixture replay and 5/5 planner tests passed; live candidate generation and isolated worktree execution remain missing/unwired.",
+        "agent10": "Live read-only audit found the existing outcome_ledger receipt schema and 3 receipt rows; tournament policy acceptance and authorized tournament readback remain open."
+      }
+    },
+    "validation": {
+      "runReportJson": "PASS",
+      "inferenceOpenSpecStrict": "PASS",
+      "gitDiffCheck": "PASS scoped"
+    },
+    "containerRebuild": "deferred",
+    "externalStateWrites": {
+      "postgres": false,
+      "qdrant": false,
+      "valkey": false,
+      "neo4j": false,
+      "graphify": false,
+      "llamaServerChatCompletion": false
+    },
+    "filesystem": {
+      "durableChanges": [
+        "openspec/changes/inference-wiring-deep-audit-aug22/tasks.md",
+        "docs/reports/openspec-workboard-run-2026-09-23T040744Z.json"
+      ],
+      "scratchReports": [
+        ".tmp/atlas/patch-tournament-replay-20260923T035721Z.json",
+        ".tmp/atlas/agentic-receipt-live-schema-20260923T040222Z.json"
+      ]
+    }
+  }
+}

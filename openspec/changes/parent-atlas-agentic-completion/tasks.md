@@ -1,0 +1,21 @@
+# Parent Atlas Agentic Completion & Error-Fixing Runtime
+
+## Planning / proof status
+
+- [x] **AGENT-01 — Controller adapter.** Read the full execution-controller task population and select only current `ACTIONABLE` tasks.
+- [x] **AGENT-02 — Authentication boundary.** Require session identity; allow development bypass only with the explicit environment flag.
+- [x] **AGENT-03 — Completion-envelope validation.** Bind goal, revision, required gates, fallbacks, scope budget, and checksum to selection.
+- [x] **AGENT-04 — Smoke-profile allowlist.** Reject arbitrary request commands and execute only server-owned bounded profiles.
+- [x] **AGENT-05 — GAN receipt.** Emit `created`, `wired`, `proven`, `done`, proof references, and `promotionAuthorized=false`.
+- [x] **AGENT-06 — Read-only integration proof.** Controller selection → LangGraph → smoke → receipt → reconciliation passes without task or canonical-store writes.
+- [x] **AGENT-07 — OKF freshness audit.** Validate claim/source/evidence revisions and checksums without installing OpenWiki or promoting claims.
+- [x] **AGENT-08A — Immutable repair request.** Bind every selected task to a checksummed plan-only request at the controller boundary; no queue or canonical writes.
+- [x] **AGENT-08 — Worker boundary.** Move long-running repair/tournament execution behind an immutable request and worker queue. Proven by the opt-in external worker, one live checksummed fixture publish, plan-only execution, ACK settlement, and queue readback at `0 ready / 0 unacknowledged`; no canonical writes or promotion.
+- [ ] **AGENT-09 — Tournament reuse.** Complete the existing graph-retrieval-proof three-candidate seam; do not create a second tournament owner.
+  **Partial, reverified 2026-09-23:** the existing planner replayed three fixture candidates twice with an identical canonical checksum (`.tmp/atlas/patch-tournament-replay-20260923T035721Z.json`); focused planner spec passed 5/5. This proves deterministic fixture planning only. The owner audit still reports candidate generation and isolated worktree static/focused execution as `MISSING_OR_NOT_WIRED`; no live three-candidate seam, candidate checks, or worker-produced ACE packet is proven. Keep open until an admitted source frame and separately authorized isolated candidate execution are available.
+- [x] **AGENT-10 — Durable receipts.** Proposed Drizzle-owned append-only completion receipt history after AGENT-06/08 read-only contract acceptance. The spec/design separate receipt checksums, lifecycle status, proof references, and bounded/redacted metadata from `execution_runs`/`execution_journal_steps` and LangGraph checkpoint payloads; `thread_id` remains an optional external reference only. Table creation, migration, writer/readback, and all durable writes remain a separately reviewed/authorized tranche. OpenSpec strict validation passes.
+  **Read-only owner/schema recheck 2026-09-23:** existing durable owner is `outcome_ledger` via `agent-work-receipt-store-v1.ts`; live schema contains all 9 required columns and a unique `receipt_id` index, with 3 existing agent-work rows carrying receipt IDs/checksums. No writes occurred. Do not add a tournament table or infer policy acceptance from schema presence; tournament-specific use and a bounded authorized live write/readback remain open.
+
+## Completion rule
+
+The first tranche is complete when AGENT-01 through AGENT-08A remain proven by focused tests and current receipts. AGENT-08 through AGENT-10 are explicitly deferred and cannot be inferred complete from the current API smoke.

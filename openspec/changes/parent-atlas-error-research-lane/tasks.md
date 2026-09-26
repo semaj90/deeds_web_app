@@ -1,6 +1,6 @@
 # Parent Atlas — Error Research Lane (ER0–ER13)
 
-**Status**: ER0–ER6 built 2026-08-12 | **Blocked**: `error_logs` not migrated live
+**Status**: ER0–ER6 built 2026-08-12 | **Partially unblocked 2026-09-16**: `error_logs` now live; `error_research_context` (needed for ER5) still not migrated — see below
 
 ## Ownership (frozen — do not collapse into one table)
 
@@ -97,6 +97,24 @@ fix).
   `resolveRabbitMqUrl` precedence contract) — active in a separate,
   concurrently-edited lane (`sveltekit-frontend/src/lib/server/queue/*`,
   `integration-events.ts`, `event-fabric.ts`). Do not touch from this change.
+
+## Blocker partially resolved (2026-09-16, re-verified live)
+
+`error_logs` now exists live — confirmed via a fresh `information_schema.tables` query, not
+assumed from memory. Per session notes (2026-09-15), it was lost (likely a Docker volume rebuild)
+and restored by re-applying the idempotent `sveltekit-frontend/drizzle/manual/0041_p1_error_logs_table.sql`
+— a **different** file from the `drizzle/0036_swift_mac_gargan.sql` journaled migration the
+2026-09-05 root-cause note below points at; both apparently create the same table, but only 0041
+is confirmed as what's actually live now. **The other four lane tables are still absent**
+(`error_research_context`, `error_fix_plan`, `fix_attempt`, `verification_receipt` — re-checked
+live, zero rows returned for all four). This narrows, but does not clear, the blocker below:
+ER0–ER4 could now read/write `error_logs` for real, but **ER5 (persist `error_research_context`
+receipt) is still blocked** on that table's own migration
+(`drizzle/manual/error_research_context.sql`, on disk since 2026-08-12, never applied) — the same
+out-of-ledger-migration problem the 2026-09-05 note describes, now confirmed to still apply to at
+least this one remaining table. Do not hand-apply `error_research_context.sql` outside the
+`manual-migration-reconciliation` baseline decision, for the same reason already given below.
+`ERROR_RESEARCH_CONTEXT_PROVEN` remains not-run.
 
 ## Blocker re-verified + root-caused (2026-09-05, read-only)
 

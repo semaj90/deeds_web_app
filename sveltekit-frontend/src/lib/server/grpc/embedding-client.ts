@@ -821,7 +821,7 @@ export async function generateEmbeddings(
   // WebGPU/DirectML/CPU ONNX inference over any Ollama-backed path, keeping Ollama/GGUF
   // as fallback only if ONNX is unavailable or fails. Was "Tier 5" (last resort); network
   // tiers below are now the fallback chain, tried in the same relative order as before.
-  if (!newVectors && isOnnxEmbedAvailable()) {
+  if (!newVectors && await isOnnxEmbedAvailable()) {
     const onnxStart = performance.now();
     try {
       const onnxVectors = await batchEmbedOnnx(uncachedTexts);
@@ -863,7 +863,7 @@ export async function generateEmbeddings(
         durationMs: Math.round(performance.now() - onnxStart),
       });
     }
-  } else if (!newVectors && !isOnnxEmbedAvailable()) {
+  } else if (!newVectors && !(await isOnnxEmbedAvailable())) {
     attempts.push({
       transport: 'onnx-local',
       status: 'skipped',

@@ -20,6 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
@@ -27,18 +28,13 @@ const ROOT = path.resolve(__dir, '../..');
 const argv = process.argv.slice(2);
 const JSON_OUT = argv.includes('--json');
 
-function loadEnv() {
-  const e = { ...process.env };
-  const p = path.join(ROOT, '.env');
-  if (fs.existsSync(p)) {
-    for (const line of fs.readFileSync(p, 'utf8').split('\n')) {
-      const m = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
-      if (m && !e[m[1]]) e[m[1]] = m[2].replace(/^["']|["']$/g, '');
-    }
-  }
-  return e;
-}
-const env = loadEnv();
+// Was a hand-rolled loadEnv() reading only root .env (missed sveltekit-frontend/.env,
+// .env.local, and any inherited-but-malformed process.env.DATABASE_URL), and a pool
+// fallback with no `password` field at all -- caused a live
+// "SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string" failure
+// (found 2026-09-15). Replaced with this repo's canonical env/connection resolver,
+// already used correctly by every other scripts/atlas/*.mjs script.
+const env = loadRepoEnv();
 
 const SCHEMA_GLOB_ROOTS = [
   path.join(ROOT, 'sveltekit-frontend', 'src', 'lib', 'server', 'db'),
@@ -132,9 +128,7 @@ async function main() {
   console.log(`  Focus columns (${FOCUS_COLS.join('/')}): ${focusDecls.length} declarations`);
 
   // Connect to live DB
-  const pool = new pg.Pool(env.DATABASE_URL || env.PG_URL
-    ? { connectionString: env.DATABASE_URL || env.PG_URL }
-    : { host: '127.0.0.1', port: 5434, user: 'legal_admin', database: 'legal_ai_db' });
+  const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env) });
 
   let live;
   try {

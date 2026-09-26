@@ -76,11 +76,26 @@ async function main() {
   );
   const overlapExists = identityColumnsWrittenByToolIdentityRecover.length > 0;
 
+  const classifyColumns = (columns) => ({
+    intendedByOperator: columns,
+    existsLive: columns.filter((column) => colNames.has(column)),
+    missingLive: columns.filter((column) => !colNames.has(column)),
+  });
   const columnClassification = {
-    HARD_CANONICAL: { intendedByOperator: ['packet_key', 'source_ref', 'source_revision', 'workspace_revision'], existsLive: ['packet_key', 'source_ref', 'workspace_revision'], missingLive: ['source_revision'] },
-    STRUCTURAL_IDENTITY: { intendedByOperator: ['tree_node_id', 'symbol_version_id'], existsLive: ['tree_node_id'], missingLive: ['symbol_version_id'] },
-    DERIVED_CLASSIFICATION: { intendedByOperator: ['feature_id', 'feature_label', 'title_id', 'domain_class'], existsLive: ['feature_id', 'feature_label', 'title_id', 'domain_class'], missingLive: [] },
+    HARD_CANONICAL: classifyColumns(['packet_key', 'source_ref', 'source_revision', 'workspace_revision']),
+    STRUCTURAL_IDENTITY: classifyColumns(['tree_node_id', 'symbol_version_id']),
+    DERIVED_CLASSIFICATION: classifyColumns(['feature_id', 'feature_label', 'title_id', 'domain_class']),
   };
+
+  const sourceRevisionSchemaFinding = sourceRevisionExists
+    ? {
+        title: 'source_revision EXISTS in the live atlas_packets table, but caller adoption is incomplete',
+        detail: 'A direct information_schema.columns query confirms source_revision exists live alongside workspace_revision, representation_revision, content_hash, and lineage_version. The schema prerequisite is therefore present; current packet promotion remains blocked because the discovered writers do not all accept and persist exact admitted source/content lineage, and the live packet cohort still contains legacy or missing digest evidence.',
+      }
+    : {
+        title: 'source_revision DOES NOT EXIST in the live atlas_packets table',
+        detail: 'The live schema is missing source_revision. A schema decision or explicitly approved equivalent contract is required before enforcing source-revision-qualified packet writes.',
+      };
 
   const report = {
     schema: 'atlas.packet-write-revision-contract.v1',
@@ -100,8 +115,7 @@ async function main() {
     overlapExists,
     identityColumnsWrittenByToolIdentityRecover,
     loadBearingSchemaFindings: {
-      title: 'source_revision DOES NOT EXIST in the live atlas_packets table',
-      detail: 'The Drizzle schema file (sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts:76) declares `sourceRevision: text(\'source_revision\')`, but a direct information_schema.columns query against the live database confirms this column does not exist live (query for it raises `column "source_revision" does not exist`). This is schema/DB drift matching this repo\'s own extensively documented history (CLAUDE.md Drizzle Safety Rule section). CONSEQUENCE: the operator\'s entire revision-contract design (CanonicalPacketWriteV1.sourceRevision, expectedCurrentSourceRevision, STALE_REVISION rejection) cannot be implemented as literally specified against the live table today -- it requires either (a) a schema migration to add source_revision first, or (b) a deliberate decision to use a different existing column (workspace_revision + content_hash jointly) as the revision-qualification evidence instead, and rename the concept accordingly. Not a blocker on defining the CONTRACT TYPES now, but IS a blocker on writing any code that enforces expectedCurrentSourceRevision against a column that does not exist.',
+      ...sourceRevisionSchemaFinding,
       revisionColumnGroundTruth,
       constraintsFound: constraints.rows,
       packetKeyHasLiveUniqueConstraint: constraints.rows.some((r) => r.def === 'UNIQUE (packet_key)'),
@@ -112,11 +126,15 @@ async function main() {
       interpretation: 'distinct_workspace_revisions=1 across 61,718 rows means every row shares the identical workspace_revision value (the schema default, 0) -- the column exists and is NOT NULL, but has never actually been incremented/exercised in this dataset. content_hash is 99.4% NULL (61,365/61,718) and lineage_version is 99.997% NULL (61,716/61,718) -- both exist as columns but are effectively unused. None of the three live revision-adjacent columns (workspace_revision, content_hash, lineage_version) currently carries real, populated revision evidence at scale. identity_lane: 58,365 canonical / 0 recoverable / the remainder default (\'qdrant_chunk\', the column\'s default value, meaning identity_lane was never explicitly set for those rows either) -- toolIdentityRecover has apparently been invoked for at most 58,365 rows historically (or those rows reached \'canonical\' via a different path; this audit does not distinguish which without a timestamped write-history table, which does not exist).',
     },
     packetKeyIdentitySemantics: sourceRevisionExists ? 'UNPROVEN' : 'LOGICAL_STABLE_ACROSS_REVISIONS_BY_NECESSITY',
-    packetKeyIdentitySemanticsReasoning: 'With no source_revision column and a live UNIQUE(packet_key) constraint, the schema currently permits at most ONE row per packet_key regardless of how many times its source content changes -- there is no schema-level mechanism to hold multiple revision-qualified rows for the same logical packet_key. packet_key is therefore LOGICAL_STABLE_ACROSS_REVISIONS by construction (one row per key, mutated in place), NOT revision-bound, until/unless a schema change introduces a composable (packet_key, source_revision) identity or an explicit version-history side table.',
+    packetKeyIdentitySemanticsReasoning: sourceRevisionExists
+      ? 'source_revision exists live, so the schema prerequisite for revision-qualified packet evidence is present. The packet_key uniqueness rule still requires the writer/readback contract to prove whether revisions are updated in place or represented through a separate version/history surface.'
+      : 'With no source_revision column and a live UNIQUE(packet_key) constraint, the schema currently permits at most ONE row per packet_key regardless of how many times its source content changes -- there is no schema-level mechanism to hold multiple revision-qualified rows for the same logical packet_key.',
     columnClassification,
     nextFindings: [
       'toolIdentityRecover accepts source_ref/feature_id as required input but never uses them -- resolve whether this is a bug (should compare-and-repair) or dead parameters (should be removed from the Zod schema) before building PacketIdentityRepairV1 around it.',
-      'source_revision does not exist live -- decide schema migration vs. redefinition of revision evidence onto workspace_revision+content_hash before implementing CanonicalPacketWriteV1/expectedCurrentSourceRevision literally as specified.',
+      sourceRevisionExists
+        ? 'source_revision exists live; prove that the canonical writer supplies it from exact admitted source evidence and that all current packet writers use the same contract.'
+        : 'source_revision does not exist live -- decide schema migration vs. redefinition of revision evidence onto workspace_revision+content_hash before implementing CanonicalPacketWriteV1/expectedCurrentSourceRevision literally as specified.',
       'workspace_revision has never been incremented in this dataset (1 distinct value across 61,718 rows) -- any admission rule requiring "workspaceRevision current" needs a real writer that increments it, which does not currently exist either; this is a second dormant-mechanism finding, same shape as the writer-ownership gaps already closed.',
       'content_hash is 99.4% NULL -- cannot yet serve as expectedContentChecksum for optimistic-concurrency guards at meaningful coverage without a backfill.',
     ],
@@ -124,19 +142,23 @@ async function main() {
       overlapExists,
       sourceRevisionColumnExistsLive: sourceRevisionExists,
       packetKeyHasLiveUniqueConstraint: constraints.rows.some((r) => r.def === 'UNIQUE (packet_key)'),
-      packetKeyIdentitySemanticsProven: !sourceRevisionExists,
+      packetKeyIdentitySemanticsProven: false,
       revisionInputsProven: false,
       allLiveCallersRevisionQualified: false,
       conflictPolicySafe: !overlapExists,
       mutationPathsRevisionGuarded: false,
     },
     overallVerdict: 'PARTIAL_PROVEN',
-    overallVerdictReasoning: 'The specific ownership-conflict question is answered NO with direct evidence (conflictPolicySafe=true, packetKeyIdentitySemanticsProven=true by necessity). But revisionInputsProven, allLiveCallersRevisionQualified, and mutationPathsRevisionGuarded are all false because the column the whole revision-qualification design depends on (source_revision) does not exist live -- these cannot be proven true until that schema gap is resolved one way or another. Not NOT_PROVEN (the core question this gate was reopened to answer has a real, direct answer) and not BLOCKED (no external dependency prevents the schema decision) -- PARTIAL_PROVEN is accurate.',
-    nextGate: 'Schema decision required before PACKET_WRITE_TRANSACTION_01: either (a) migrate atlas_packets to add source_revision, or (b) formally redefine the revision-qualification contract onto workspace_revision + content_hash and document that redefinition before writing PacketWriteDecisionV1.',
+    overallVerdictReasoning: sourceRevisionExists
+      ? 'The ownership-conflict question is answered NO and the live schema prerequisite is present. The gate remains PARTIAL_PROVEN because the discovered writers do not all accept and persist exact admitted source/content lineage, the live cohort is dominated by historical/default workspace values and null content hashes, and current packet/chunk reconciliation has zero canonical content_hash matches.'
+      : 'The ownership-conflict question is answered NO, but the live schema prerequisite is absent. The gate remains PARTIAL_PROVEN until the schema contract is resolved and caller adoption is proven.',
+    nextGate: 'PACKET-DIGEST-BRIDGE-ADMISSION-01',
   };
 
   fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
-  fs.writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  const reportTempPath = `${REPORT_PATH}.${process.pid}.tmp`;
+  fs.writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  fs.renameSync(reportTempPath, REPORT_PATH);
   console.log(JSON.stringify({
     status: 'PACKET_WRITE_REVISION_CONTRACT_READ_ONLY_COMPLETE',
     primaryAnswer: report.primaryAnswer,

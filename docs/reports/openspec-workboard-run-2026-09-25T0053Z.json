@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T00:57:51Z",
+  "pivot": {
+    "from": "parent-atlas-retrieval-lineage-dag-convergence",
+    "to": "parent-atlas-workboard-feature-utility-fabric",
+    "reason": "The selected source-to-packet chain reached an explicit owner decision: packet-key identity for the missing-packet cohort and the qualification role of the legacy packet content_hash are not settled by the current canonical owner. Continued with the user-authorized workboard program wiring rather than inventing identity semantics or applying data."
+  },
+  "sourceAuthorityCheckpoint": {
+    "durablePacketRevisionRepair": "historical task receipt reports 16151 rows applied and read back; not re-queried in this turn",
+    "packetAdmissionGap": "current checked-in census artifact reports 7350 missing-packet candidates and does not freeze packet_key",
+    "packetIdentityOwner": "UNRESOLVED; register-orphaned-chunks uses source_ref-derived legacy packet key, which is not accepted as authority for this cohort",
+    "packetContentIdentity": "OWNER_DECISION_REQUIRED; PacketRevisionV1 is noncanonical/fixture-only and the audit still uses legacy content_hash equality",
+    "currentLineageClosure": "not rerun; no claim of current live database readback",
+    "datastoreWritesThisTurn": 0
+  },
+  "programPlan": {
+    "openTaskCount": 3224,
+    "uniqueTaskKeys": 3224,
+    "selectedTaskCount": 0,
+    "waveCount": 11,
+    "milestoneCount": 7,
+    "textMapped": 2194,
+    "changeFallbackReview": 501,
+    "unclassifiedReviewQueue": 529,
+    "declaredDependencies": 4,
+    "missingDependencyDeclarations": 3220,
+    "notes": [
+      "Unclassified tasks no longer silently fall into Wave 0; they have null wave and remain in a dedicated review queue.",
+      "atlas-feature-intelligence change fallback is Wave 5 and remains explicitly review-classified.",
+      "Wave prerequisite edges carry prerequisite exit gates; dependent waves require current proof receipts and still do not select leaf tasks.",
+      "Program ordering remains advisory until task-level dependency and canonical-owner evidence is supplied.",
+      "No workboard task was selected or marked complete by the generator."
+    ],
+    "report": "docs/reports/openspec-implementation-program-v1.json",
+    "markdown": "docs/reports/openspec-implementation-program-v1.md"
+  },
+  "validation": {
+    "focusedNodeTests": "37/37 PASS",
+    "packetAdmissionVitest": "12/12 PASS",
+    "javascriptSyntax": "PASS",
+    "openspecStrict": "PASS",
+    "scopedDiffCheck": "PASS",
+    "containersRebuilt": 0,
+    "graphifyRuns": 0,
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "neo4jWrites": 0
+  },
+  "likely_cause": "The initial program classifier assigned unmapped tasks to Wave 0, making unknown work look like control-plane priority; source-authority continuation separately remains gated on canonical packet identity decisions.",
+  "evidence": [
+    "docs/reports/openspec-implementation-program-v1.json",
+    "docs/reports/current-packet-digest-producer-v1.census.json",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+    "sveltekit-frontend/src/lib/server/atlas/identity/packet-revision-v1.ts",
+    "scripts/atlas/lib/packet-source-revision-admission-v1.mjs",
+    "scripts/atlas/register-orphaned-chunks.mjs"
+  ],
+  "patch_targets": [
+    "scripts/atlas/lib/openspec-program-plan-v1.mjs",
+    "scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+    "scripts/atlas/build-openspec-implementation-program-v1.mjs",
+    "docs/reports/openspec-implementation-program-v1.json",
+    "docs/reports/openspec-implementation-program-v1.md"
+  ],
+  "safe_next_command": "node scripts/atlas/build-openspec-implementation-program-v1.mjs .tmp/codex-openspec-workboard-v1.json docs/reports/openspec-implementation-program-v1.json docs/reports/openspec-implementation-program-v1.md docs/reports/openspec-execution-controller-v1.json",
+  "smoke_command": "node --test scripts/atlas/lib/openspec-program-plan-v1.test.mjs scripts/atlas/lib/graphify-dry-run-metrics-v1.test.mjs scripts/atlas/lib/wfu-metadata.test.mjs scripts/atlas/audit-openspec-step-burndown-v1.test.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T0053Z.json"
+}

@@ -1,0 +1,194 @@
+{
+  "schema": "atlas.ast-authority-gap-derivation.v1",
+  "generatedAt": "2026-09-20T20:08:52.074Z",
+  "governedImplementation": "PARTIAL_READ_ONLY_AUDIT",
+  "canonicalDataAuthority": "NOT_PROVEN",
+  "summary": {
+    "gates": 12,
+    "proven": 1,
+    "open": 4,
+    "blocked": 7
+  },
+  "gates": [
+    {
+      "id": "AST-AUTH-01 CURRENT_SOURCE_AUTHORITY_PROVEN",
+      "status": "OPEN",
+      "missing": [
+        "KNOW-09 status BLOCKED (worktree fingerprint parity false; 653 mismatches, 8 missing)",
+        "current frame sha256:6f25dd8c… is not the admitted frame sha256:e24bb971… (admission needs authorization)",
+        "1059 stale-graph CURRENT_BINDING_MISMATCH rows",
+        "14 SOURCE_UNAVAILABLE (git-deleted; needs tombstone class)"
+      ],
+      "evidence": {
+        "know09Status": "BLOCKED",
+        "planStatus": "REPAIR_PLAN_PARTIAL_EXACT_BLOCKED",
+        "planCounts": {
+          "SOURCE_UNAVAILABLE": 14,
+          "EXACT_CURRENT_BINDING": 22685,
+          "CURRENT_BINDING_MISMATCH": 1059
+        },
+        "admittedRev": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "planRev": "sha256:6f25dd8c9b3b24a4af64a492c81a729624c00c78da061f05f540d95adb670839"
+      },
+      "blockedBy": []
+    },
+    {
+      "id": "AST-AUTH-02 CURRENT_CANDIDATES_REGENERATED",
+      "status": "BLOCKED_BY_AST-AUTH-01",
+      "missing": [
+        "candidates stamped sha256:e24bb971… but current frame is sha256:6f25dd8c…; regenerate after admission"
+      ],
+      "evidence": {
+        "candidateRows": 24971,
+        "candidateFiles": 3043
+      },
+      "blockedBy": [
+        "AST-AUTH-01"
+      ]
+    },
+    {
+      "id": "AST-AUTH-03 SEPT_V2_HASH_AND_COORDINATE_CONTRACT",
+      "status": "PROVEN",
+      "missing": [],
+      "evidence": {
+        "filesSingleDigest": "3043/3043",
+        "digestEqualsBinding": "3043/3043",
+        "migrationDrafted": true,
+        "migrationApplied": false
+      },
+      "blockedBy": []
+    },
+    {
+      "id": "AST-AUTH-04 CURRENT_AUTHORITY_CANARY",
+      "status": "BLOCKED_BY_AST-AUTH-01/02",
+      "missing": [
+        "ast_generation column not applied (migration drafted + rollback-rehearsed only)",
+        "0 persisted sept_v2 rows",
+        "unambiguous apply approval (operator)"
+      ],
+      "evidence": {
+        "septV2Rows": 0,
+        "rehearsal": "REHEARSAL_PROVEN"
+      },
+      "blockedBy": [
+        "AST-AUTH-01",
+        "AST-AUTH-02"
+      ]
+    },
+    {
+      "id": "AST-AUTH-05 CURRENT_AST_READBACK",
+      "status": "BLOCKED_BY_AST-AUTH-04",
+      "missing": [
+        "persisted canary readback (generation/revision/workspace/hash/span mismatches all 0)"
+      ],
+      "evidence": {},
+      "blockedBy": [
+        "AST-AUTH-04"
+      ]
+    },
+    {
+      "id": "SIDE METHOD_SYMBOL_QUALIFICATION",
+      "status": "OPEN",
+      "missing": [
+        "161 method rows collide on bare names; class-qualifying leaves 55 (need a deterministic disambiguator); convention undecided"
+      ],
+      "evidence": {
+        "eligibleRows": 21505,
+        "bareNameCollisionRows": 161,
+        "afterClassQualificationRows": 55
+      },
+      "blockedBy": []
+    },
+    {
+      "id": "SIDE LEGACY_AST_QUARANTINE",
+      "status": "OPEN",
+      "missing": [
+        "11273 rows are legacy/untagged (ast_generation NULL or column absent); 11175 have NULL source_revision — must stay non-authoritative"
+      ],
+      "evidence": {
+        "astRows": 11273,
+        "astRowsNullRevision": 11175
+      },
+      "blockedBy": []
+    },
+    {
+      "id": "SIDE SOM_REVISION",
+      "status": "OPEN",
+      "missing": [
+        "58365 of 58365 SOM-assigned packets have NULL som_revision (needs a fresh versioned SOM run; cannot be derived)"
+      ],
+      "evidence": {
+        "somAssigned": 58365,
+        "somRevisionNonNull": 0
+      },
+      "blockedBy": []
+    },
+    {
+      "id": "ONTOLOGY-01 SYMBOL_TO_ONTOLOGY_BINDING",
+      "status": "BLOCKED_BY_AST-AUTH-05",
+      "missing": [
+        "authoritative sept_v2 AST/symbol rows to bind"
+      ],
+      "evidence": {},
+      "blockedBy": [
+        "AST-AUTH-05"
+      ]
+    },
+    {
+      "id": "ONTOLOGY-02 FEATURE_ONTOLOGY_TUPLES_RESOLVED",
+      "status": "BLOCKED_BY_ONTOLOGY-01",
+      "missing": [
+        "tuple resolution: UNRESOLVED:539124"
+      ],
+      "evidence": {
+        "ontologyTuples": [
+          "UNRESOLVED:539124"
+        ]
+      },
+      "blockedBy": [
+        "ONTOLOGY-01"
+      ]
+    },
+    {
+      "id": "FEATURE-01 REVISION_QUALIFIED_FEATURE_MATRIX",
+      "status": "BLOCKED_BY_ONTOLOGY-02",
+      "missing": [
+        "no CandidateFeatureMatrix table/artifact (feature_matrix tables: 0)",
+        "no frozen CandidateOrdinalMap"
+      ],
+      "evidence": {
+        "fanoutAceIdentity": "BLOCKED"
+      },
+      "blockedBy": [
+        "ONTOLOGY-02"
+      ]
+    },
+    {
+      "id": "AUTHORITY-01 CANONICAL_AUTHORITY_PROMOTION",
+      "status": "BLOCKED_BY_FEATURE-01",
+      "missing": [
+        "all upstream gates; canonicalAuthority is derived from qualified input, never flipped"
+      ],
+      "evidence": {
+        "governedAuditStatus": "PARTIAL_READ_ONLY_AUDIT",
+        "governedAuthority": {
+          "canonicalAuthority": false,
+          "writesPerformed": false,
+          "taskLedgerMutation": false,
+          "databaseMutation": false,
+          "vectorStoreMutation": false,
+          "cachePromotion": false,
+          "worktreeCreation": false,
+          "candidateExecution": false,
+          "automaticMerge": false,
+          "training": false
+        }
+      },
+      "blockedBy": [
+        "FEATURE-01"
+      ]
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

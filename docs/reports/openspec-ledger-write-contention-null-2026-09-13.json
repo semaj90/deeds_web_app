@@ -1,0 +1,12 @@
+{
+  "schema": "parent-atlas.openspec-ledger-write-null.v1",
+  "status": "NULL_RESULT_LEDGER_WRITE_CONTENTION",
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "attemptedSection": "SOURCE-SELECTION-AUTHORITY-ALIGNMENT-RECHECK-2026-09-13",
+  "result": null,
+  "writePerformed": false,
+  "runtimeMutationPerformed": false,
+  "reason": "Shared tasks.md was concurrently edited and rejected the append; no force-write was attempted.",
+  "receiptPreserved": "docs/reports/source-selection-authority-alignment-v1.json",
+  "nextAction": "Retry ledger append when writable; continue read-only authority audits meanwhile."
+}

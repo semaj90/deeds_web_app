@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.external-doc-summary-writer.v1",
+  "generatedAt": "2026-09-23T21:28:49.578Z",
+  "mode": "ROLLBACK_CANARY",
+  "backend": {
+    "kind": "llama-server (NOT Ollama)",
+    "url": "http://127.0.0.1:8090",
+    "modelId": "ornith-1.5-9b",
+    "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7"
+  },
+  "producer": {
+    "id": "atlas-external-doc-summarizer",
+    "revision": "external-doc-summary-writer-v1",
+    "promptRevision": "external-doc-summary-prompt-v1@sha256:0a0ad1dc8ca62272901f0858243da78a736b81fe5f4e55a9d222a79eaf7486bb"
+  },
+  "analysesBefore": 0,
+  "considered": 5,
+  "generated": 5,
+  "written": 5,
+  "readbackOk": true,
+  "afterRollback": 0,
+  "medianLatencyMs": 1684,
+  "failures": [],
+  "samples": [
+    {
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "chunkEvidenceRevision": "sha256:0e92134210a648a9abb1aeaf94a050469d74118b30013f3f687046c70581d7ff",
+      "analysisId": "eda:31723b38e0133372a9b67f9c578f0f44d77dc85e4e862b7ac6cb31ec436582f0",
+      "summary": "This chunk introduces the Getting Started section of the Bits UI documentation, which explains how to begin using Bits in your app. It notes that this section may contain examples, demos, and other useful information related to a specific part of Bits UI. When helping users, you can ignore the classnames applied to the demos unless they are relevant to the user's issue."
+    },
+    {
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:13",
+      "chunkEvidenceRevision": "sha256:3c332dfaa97d2ef20abb0a46a55594fcd18132799d46b952697f20e52fb78b88",
+      "analysisId": "eda:afbd4fafe9fe867eb28bfcaacb235007fce45a5f7d51447352f10ab9eabc616e",
+      "summary": "The provided chunk contains no type information."
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:67",
+      "chunkEvidenceRevision": "sha256:082a6a164ef96ff7fb62c8da5e6725b5470f14358379062f23ca1e6086e60ecc",
+      "analysisId": "eda:470808967abddaa0794ef45e79f932eb166f40a297fd48c72cbd264d4e9623b9",
+      "summary": "The `hamming_distance(bit, bit)` function returns the Hamming distance as a double precision value and was added in version 0.7.0. The `jaccard_distance(bit, bit)` function returns the Jaccard distance as a double precision value and was also added in version 0.7.0."
+    }
+  ],
+  "writes": {
+    "postgres": "ROLLED_BACK",
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "result": "EXTERNAL_DOC_SUMMARY_WRITER_ROLLBACK_PROVEN"
+}

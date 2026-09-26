@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T04:37:53Z",
+  "fromChange": "parent-atlas-ontology-oaklib-fanout-bitmap",
+  "toChange": "route-import-infra-isolation",
+  "fromTask": "3.5 / 4.6 / 6.1",
+  "toTask": "15",
+  "pivotGate": "OAK_AUTHORIZATION_GATES_TO_CHRROM_SINGLETON_OPERATOR_REVIEW",
+  "reason": "Ontology/fanout remaining tasks require live annotation writes or explicit authorization for migration. The route-import change's sole remaining task was inspected; it is explicitly an operator decision because chrrom/predictor.ts eager initialization may be intentional production warm-start behavior. No code change was made pending that owner decision.",
+  "fromTaskState": {
+    "change": "parent-atlas-ontology-oaklib-fanout-bitmap",
+    "openTasks": ["3.5", "4.6", "6.1"],
+    "blockingConditions": [
+      "first live annotation write has not occurred",
+      "materialized-view/index migration requires explicit human authorization",
+      "fanout capability scenarios depend on admitted data or the migration"
+    ],
+    "writesPerformed": false
+  },
+  "toTaskState": {
+    "change": "route-import-infra-isolation",
+    "selectedTask": "15",
+    "status": "OPERATOR_DECISION_REQUIRED",
+    "question": "Whether to change chrrom/predictor.ts eager singleton initialization; the task warns this may be intentional for production warm-start behavior."
+  },
+  "constraints": {
+    "containerRebuildsUntilEnd": true,
+    "canonicalWrites": false,
+    "datastoreWrites": false,
+    "preserveConcurrentWorkingTreeEdits": true,
+    "noCommitOrPush": true
+  }
+}

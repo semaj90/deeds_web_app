@@ -1,0 +1,25 @@
+{
+  "schema": "ParentAtlasQueryRouter154FixtureV1",
+  "generatedAt": "2026-09-17T23:21:09.302Z",
+  "status": "FIXTURE_PLUMBING_PROVEN",
+  "evidenceClass": "FIXTURE_ONLY",
+  "query": "trace the current Graphify packet to chunk and AST lineage",
+  "queryFeatureRevision": "atlas.query-feature-projection.v1",
+  "classificationRepresentationId": "classification_mrl_128",
+  "classificationModelExecuted": false,
+  "classificationMrl128Checksum": "7a7c537ed718dd2c45e81a660e85cc510e28b2a98005fe3cbd8df1a35fdbe438",
+  "deterministic26Checksum": "71b0533bc95677360fe8e597c8deb0d01a8111f8ca5e0b71ba9eaafcfc186edb",
+  "tensorRevision": "atlas.query-router-tensor.v1",
+  "tensorWidth": 154,
+  "tensorChecksum": "83385dd2cb84af0b9ef1193c4237fba6cb58a12d7deff58cfd42197f9bec3b3a",
+  "checks": {
+    "width154": true,
+    "finite": true,
+    "classificationL2Normalized": true,
+    "featureWidth26": true
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "canonicalWritesAllowed": false,
+  "nextRequirement": "REAL_REVISION_QUALIFIED_CLASSIFICATION_MRL_128_EXECUTION_AND_PARITY"
+}

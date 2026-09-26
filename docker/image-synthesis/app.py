@@ -44,8 +44,10 @@ from pydantic import BaseModel
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
+# Ollama is embeddings-only (EmbeddingGemma). Chat/synthesis goes to llama-server (Ornith 1.5).
 OLLAMA_URL     = os.environ.get("OLLAMA_URL",     "http://host.docker.internal:11434")
-LLM_MODEL      = os.environ.get("LLM_MODEL",      "gemma4-legal:latest")
+LLAMA_SERVER_URL = os.environ.get("LLAMA_SERVER_URL", "http://host.docker.internal:8090/v1").rstrip("/")
+LLM_MODEL      = os.environ.get("LLM_MODEL",      "ornith-1.5-9b")
 
 # Wan2.1-1.3B (primary video) — Alibaba, Apache 2.0, ~6GB VRAM fp16
 WAN_MODEL_ID   = os.environ.get("WAN_MODEL_ID",   "Wan-AI/Wan2.1-T2V-1.3B")
@@ -310,7 +312,7 @@ async def build_video_prompt(scene: ScenePrompt, style: str) -> str:
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(
-                f"{OLLAMA_URL}/api/chat",
+                f"{LLAMA_SERVER_URL}/chat/completions",
                 json={
                     "model": LLM_MODEL,
                     "messages": [
@@ -318,13 +320,15 @@ async def build_video_prompt(scene: ScenePrompt, style: str) -> str:
                         {"role": "user", "content": user},
                     ],
                     "stream": False,
-                    "options": {"temperature": 0.4, "num_predict": 200},
+                    "temperature": 0.4,
+                    "max_tokens": 200,
                 },
             )
             resp.raise_for_status()
-            return resp.json()["message"]["content"].strip()
+            msg = resp.json()["choices"][0]["message"]
+            return (msg.get("content") or msg.get("reasoning_content") or "").strip()
     except Exception as e:
-        print(f"⚠️ Ollama prompt expansion failed ({e}), using template")
+        print(f"⚠️ llama-server prompt expansion failed ({e}), using template")
         parts = [scene.what, scene.how]
         if scene.location:
             parts.append(f"at {scene.location}")

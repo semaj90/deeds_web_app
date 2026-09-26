@@ -1,0 +1,76 @@
+{
+  "schema": "atlas.cagra-ann-benchmark-receipts.v1",
+  "generatedAt": "2026-09-19T06:35:55.699Z",
+  "status": "BENCHMARK_RECEIPTS_CONSOLIDATED_CHALLENGER_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false,
+  "executor": "cuVS CAGRA",
+  "benchmarks": {
+    "semantic768Historical": {
+      "sourceReport": "gpu-mini-fabric-01-graph-ann-03-semantic-768.json",
+      "corpusRows": 55169,
+      "dimensions": 768,
+      "recallAt1": 0.984375,
+      "recallAt8": 1,
+      "recallAt16": 0.999512,
+      "exactOracleAgreement": 0.999268,
+      "buildMs": 1944.894,
+      "searchMsTotal": 5398.326,
+      "identityManifest": "bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0",
+      "vramRecorded": false,
+      "loadCostRecorded": false,
+      "explicitNeighborOverlapRecorded": false
+    },
+    "buildIsolation": {
+      "sourceReport": "gpu-mini-fabric-01-graph-ann-02-build-isolation.json",
+      "corpusRows": 65536,
+      "dimensions": 64,
+      "variants": [
+        {
+          "name": "ivf_pq",
+          "recallAt1": 1,
+          "recallAt16": 0.839111,
+          "buildMs": 797.782,
+          "searchMsTotal": 29.737,
+          "peakVramMiB": 6510
+        },
+        {
+          "name": "nn_descent",
+          "recallAt1": 1,
+          "recallAt16": 0.998047,
+          "buildMs": 1046.856,
+          "searchMsTotal": 5.37,
+          "peakVramMiB": 6526
+        }
+      ]
+    },
+    "tinyRuntime": {
+      "sourceReport": "gpu-knn-cagra-runtime-proof.json",
+      "corpusRows": 3,
+      "dimensions": 768,
+      "recallAt3": [
+        1,
+        1,
+        1
+      ],
+      "identityParity": true,
+      "exactMs": [
+        5.45,
+        2.57,
+        2.75
+      ],
+      "cagraMs": [
+        2598.05,
+        2434.7,
+        2243.47
+      ]
+    }
+  },
+  "missingForAnn04": [
+    "semantic_768 explicit neighbor-overlap receipt",
+    "semantic_768 load-cost receipt",
+    "semantic_768 peak-VRAM receipt"
+  ],
+  "interpretation": "Receipts are retained by fixture and representation. No result authorizes current-corpus ANN promotion or an additional semantic vote."
+}

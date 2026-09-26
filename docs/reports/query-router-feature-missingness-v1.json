@@ -1,0 +1,12 @@
+{
+  "schema": "atlas.query-router-feature-missingness-proof.v1",
+  "generatedAt": "2026-09-18T00:38:20.919Z",
+  "status": "ROUTE_FEATURE_ORDER_AND_MISSINGNESS_PROVEN",
+  "featureRevision": "atlas.query-feature-projection.v1",
+  "featureCount": 26,
+  "manifestRevision": "atlas.retrieval-router-tensor.v2",
+  "measuredAbsence": "FINITE_ZERO",
+  "unavailableFeaturePolicy": "REJECT_MISSING_FIELD",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

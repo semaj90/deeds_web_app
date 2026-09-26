@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.onnx-cpu-webgpu-parity.v1",
+  "generatedAt": "2026-09-17T22:41:58.559Z",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "modelPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\embeddinggemma_300m_onnx\\model.onnx",
+  "modelChecksum": "sha256:e416365eaf7224cd490c508ea3b42f10855332dd8317015d2344577f73788772",
+  "tokenizerChecksum": "sha256:6852f8d561078cc0cebe70ca03c5bfdd0d60a45f9d2e0e1e4cc05b68e9ec329e",
+  "requestedProviders": [
+    "cpu",
+    "webgpu"
+  ],
+  "representationId": "semantic_768",
+  "dimensions": 768,
+  "input": {
+    "renderedInput": "task: search result | query: WebGPU semantic retrieval parity probe",
+    "tokenCount": 15
+  },
+  "providers": {
+    "cpu": {
+      "actualProvider": "cpu",
+      "outputName": "last_hidden_state",
+      "dimensions": 768,
+      "normalized": true
+    },
+    "webgpu": {
+      "actualProvider": "webgpu",
+      "outputName": "last_hidden_state",
+      "dimensions": 768,
+      "normalized": true
+    }
+  },
+  "parity": {
+    "cosine": 0.9894528117091977,
+    "meanAbsDelta": 0.00410733686286117,
+    "maxAbsDelta": 0.020430386066436768,
+    "vectorChecksums": {
+      "cpu": "sha256:49cffd02e8784990200a81d16c5730dbd9a44e52a4954f8013fb7b5c9441220c",
+      "webgpu": "sha256:dda59a59c0aab5881cf540746497b76096025799012b9a158ac7d5bc6f7ae1e8"
+    },
+    "sameInput": true
+  },
+  "status": "PARITY_OBSERVED_UNADMITTED",
+  "errors": []
+}

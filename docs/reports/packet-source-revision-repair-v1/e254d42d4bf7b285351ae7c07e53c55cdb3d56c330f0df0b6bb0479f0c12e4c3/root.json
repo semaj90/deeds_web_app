@@ -1,0 +1,83 @@
+{
+  "schema": "atlas.packet-source-revision-repair-manifest.v2",
+  "checksumRecipe": "sorted-key-json-sha256-v1",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "targetTable": "atlas_packets",
+  "targetColumns": [
+    "source_revision",
+    "workspace_revision_key",
+    "lineage_binding_checksum",
+    "lineage_producer_revision"
+  ],
+  "beforeStateGuard": {
+    "sourceRevision": null,
+    "contentHash": null,
+    "workspaceRevisionKey": null,
+    "lineageBindingChecksum": null
+  },
+  "entryCount": 16151,
+  "shards": [
+    {
+      "name": "shard-0000.json",
+      "sha256": "2e44ece83aa5904a4ff324298e4aa7bd846e490b987b42153100e592028e36c6",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0001.json",
+      "sha256": "7538c1e0a84337a07c74346958b9136cd7bd56b1bc5608ca1ef6170bd3843b09",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0002.json",
+      "sha256": "37d50eb06905204f838d4a399f242fa69f951cdeb049b3fc7620ba2567631ca6",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0003.json",
+      "sha256": "671fdee9f2dc5a5bbe273ba36bd8131e1b3cb20dfa71b7057cb6353f49c4c0b9",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0004.json",
+      "sha256": "e0aa71f0d450f235d83c3b215726f9b7639f4160b7bf844a3679a13647692f63",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0005.json",
+      "sha256": "0680846c12e7811ca1f6c96ba3d40ce812b8a49b699b5cc259cbabce2ce51af2",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0006.json",
+      "sha256": "d06987f380a370587e506d6e4c3b7ebd0f5b6a05bc703071ee406b94ea014209",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0007.json",
+      "sha256": "6054d86846cee1e24198b59d5358af3ceaf41a551807a7cf05d4a91e080bc4a1",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0008.json",
+      "sha256": "471ce7cad2fc33221a10665e9710fbcf082c1582ee4ce95d87caea6ba4f1c0ff",
+      "entryCount": 151
+    }
+  ],
+  "accounting": {
+    "membershipTotal": 25542,
+    "inScope": 24456,
+    "outcomes": {
+      "MISSING_PACKET": 7352,
+      "LEGACY_LINEAGE_FIELDS_MISSING": 16151,
+      "ADMITTED_SNAPSHOT_BYTES_DIFFER_FROM_CURRENT_WORKTREE": 842,
+      "LEGACY_CONTENT_HASH_UNQUALIFIED": 93,
+      "SOURCE_BYTES_MISSING": 8,
+      "IDENTITY_COLLISION": 10,
+      "OUT_OF_SCOPE_REPOSITORY": 1086,
+      "WORKSPACE_SCOPE_MISMATCH": 0
+    },
+    "outcomeSum": 25542,
+    "fullyAccounted": true
+  }
+}

@@ -15,6 +15,7 @@ import {
   HMMObservationSchema,
   ExperimentFeatureMatrixSchema,
   compileEventHypergraphBundle,
+  HypergraphLineageUnavailableError,
   compileExperimentFeatureMatrix,
 } from './nlp-feature-compiler.js';
 import { createModelAnalysisSidecarClient } from './model-analysis-sidecar.js';
@@ -485,6 +486,30 @@ describe('analysis contracts', () => {
     expect(eventBundle.recommendationPolicyResults[0]?.receipt.payload.decisionId).toBe(
       eventBundle.recommendationPolicyResults[0]?.decisionId,
     );
+  });
+
+  it('fails closed instead of promoting requestId to packet identity', () => {
+    expect(() =>
+      compileEventHypergraphBundle({
+        requestId: 'req:missing-packet',
+        sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+        sourceRevision: 'source-v1',
+        workspaceRevision: 'workspace-v1',
+        passResults: [],
+      }),
+    ).toThrow(HypergraphLineageUnavailableError);
+  });
+
+  it('fails closed instead of promoting sourceRevision to workspace identity', () => {
+    expect(() =>
+      compileEventHypergraphBundle({
+        requestId: 'req:missing-workspace',
+        packetKey: 'packet:1',
+        sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+        sourceRevision: 'source-v1',
+        passResults: [],
+      }),
+    ).toThrow(HypergraphLineageUnavailableError);
   });
 
   it('falls back to the local model path when the sidecar is unavailable', async () => {

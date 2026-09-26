@@ -16,11 +16,12 @@
 
 import fetch from 'node-fetch';
 import fs from 'fs';
+import { llamaChat } from '../../../scripts/atlas/lib/llama-inference.mjs';
 
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const NEO4J_URL = process.env.NEO4J_URL || 'http://localhost:7474';
-const GEMMA4_MODEL = 'gemma4-rotorquant:latest';
+const GEMMA4_MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const BATCH_SIZE = 500;
 
 // LangGraph-style state machine
@@ -151,22 +152,11 @@ Provide:
 
   console.log(`🤖 Synthesizing batch ${batchIndex}...`);
 
-  const response = await fetch(`${OLLAMA_URL}/api/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: GEMMA4_MODEL,
-      prompt,
-      stream: false,
-      temperature: 0.3,
-    }),
-  });
-
-  const data = await response.json();
+  const text = await llamaChat(prompt, { maxTokens: 1024, temperature: 0.3 }); // llama-server (Ornith 1.5); Ollama is embeddings-only
   return {
     batch_id: `batch_${batchIndex}`,
     packet_count: batch.length,
-    synthesis: data.response || 'No response',
+    synthesis: text || 'No response',
     timestamp: new Date().toISOString()
   };
 }

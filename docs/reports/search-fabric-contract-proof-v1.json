@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.search-fabric-contract-proof.v1",
+  "status": "SEARCH_FABRIC_CONTRACT_PROVEN",
+  "queryPlan": {
+    "schema": "atlas.query-plan.v1",
+    "checksum": "a15ba9f03e4072edf5f18c2b698490262a835423d2637dd029e6023955f611ab",
+    "replayChecksum": "a15ba9f03e4072edf5f18c2b698490262a835423d2637dd029e6023955f611ab",
+    "deterministicReplay": true,
+    "workspaceRevisionBound": "sha256:fixture-frame"
+  },
+  "keywordBundle": {
+    "schema": "atlas.keyword-bundle.v1",
+    "exactCount": 6,
+    "normalizedCount": 6,
+    "expandedCount": 6
+  },
+  "queryUnderstanding": {
+    "schema": "atlas.query-understanding.v1",
+    "identifierCount": 1,
+    "pathCount": 0,
+    "ftsCount": 6,
+    "trigramCount": 4,
+    "semanticRepresentation": "semantic_768",
+    "producerRevision": "atlas.query-understanding.v1"
+  },
+  "authority": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false,
+    "sourcePromotionAttempted": false
+  },
+  "limitations": [
+    "This proof validates only deterministic query planning and keyword decomposition.",
+    "Postgres FTS, pgvector parity, source admission, and canonical promotion are separate gates."
+  ]
+}

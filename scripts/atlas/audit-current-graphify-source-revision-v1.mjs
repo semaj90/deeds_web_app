@@ -7,7 +7,10 @@ import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
 const root = REPO_ROOT;
-const requestedRunId = process.env.ATLAS_GRAPHIFY_RUN_ID?.trim() || null;
+const runIdArgIndex = process.argv.indexOf('--run-id');
+const requestedRunId = process.env.ATLAS_GRAPHIFY_RUN_ID?.trim()
+  || (runIdArgIndex >= 0 ? process.argv[runIdArgIndex + 1]?.trim() : null)
+  || null;
 const reportPath = path.join(root, 'docs/reports/current-graphify-source-revision-v1.json');
 const digest = (bytes) => `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
 const safePath = (sourceRef) => {
@@ -19,23 +22,9 @@ const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(proc
 let rows = [];
 let databaseError = null;
 let runId = requestedRunId;
-let runSelection = requestedRunId ? 'EXPLICIT_ENV' : 'COMPLETED_BOUND_OWNER_BY_FILE_COUNT';
+let runSelection = requestedRunId ? 'EXPLICIT_RUN_ID' : 'EXPLICIT_RUN_ID_REQUIRED';
 try {
-  if (!runId) {
-    const owner = await pool.query(`
-      SELECT gf.last_seen_run_id AS run_id, COUNT(*)::int AS file_count,
-             MAX(gr.completed_at) AS completed_at
-        FROM public.graphify_files gf
-        JOIN public.graphify_runs gr ON gr.run_id = gf.last_seen_run_id
-       WHERE gr.status = 'COMPLETED'
-       GROUP BY gf.last_seen_run_id
-       HAVING COUNT(*) > 0
-       ORDER BY COUNT(*) DESC, MAX(gr.completed_at) DESC, gf.last_seen_run_id
-       LIMIT 1
-    `);
-    runId = owner.rows[0]?.run_id ?? null;
-    if (!runId) runSelection = 'NO_COMPLETED_BOUND_OWNER';
-  }
+  if (!runId) throw new Error('EXPLICIT_GRAPHIFY_RUN_ID_REQUIRED');
   if (!runId) throw new Error('SOURCE_AUTHORITY_UNAVAILABLE: no completed Graphify execution owns file observations');
   const run = await pool.query('SELECT status FROM public.graphify_runs WHERE run_id = $1', [runId]);
   if (run.rows[0]?.status !== 'COMPLETED') {
@@ -92,5 +81,15 @@ const report = {
         : 'SOURCE_BYTES_MATCH_CONTENT_HASH',
 };
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+// Reports are frequently read by the workstation/status process while this
+// audit is running. Replace through a process-unique sibling so readers never
+// observe a partial JSON document and Windows does not fail on a direct
+// truncate/write race.
+const reportTempPath = `${reportPath}.${process.pid}.${Date.now()}.tmp`;
+try {
+  fs.writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  fs.renameSync(reportTempPath, reportPath);
+} finally {
+  try { fs.unlinkSync(reportTempPath); } catch {}
+}
 console.log(JSON.stringify({ schema: report.schema, status: report.status, runId, runSelection, rowCount: report.rowCount, counts, sourceRevisionPresent: report.sourceRevisionPresent, reportPath }, null, 2));

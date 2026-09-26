@@ -5,7 +5,7 @@
  * and Drizzle/ast-grep wiring. It performs no writes or migrations.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -263,5 +263,7 @@ await auditDrizzle();
 await pool.end();
 
 mkdirSync(dirname(reportPath), { recursive: true });
-writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const reportTempPath = `${reportPath}.${process.pid}.${Date.now()}.tmp`;
+writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+renameSync(reportTempPath, reportPath);
 console.log(JSON.stringify({ reportPath, findings: report.findings, report }, null, 2));

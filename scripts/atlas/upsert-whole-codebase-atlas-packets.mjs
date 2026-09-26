@@ -19,6 +19,7 @@ import crypto from 'crypto';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { buildRipgrepExcludeArgs, exclusionPolicyChecksum, WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION } from './lib/whole-codebase-source-exclusions.mjs';
 
 const { Pool } = pg;
 
@@ -31,24 +32,18 @@ const args = process.argv.slice(2);
 const dryRun = !args.includes('--apply');
 const verbose = args.includes('--verbose');
 
-const EXCLUDE_PATTERNS = [
-  '.git',
-  'node_modules',
-  '.svelte-kit',
-  '.vite',
-  'dist',
-  'build',
-  'coverage',
-  '.cache',
-  '.pytest_cache',
-  '__pycache__',
-  'models',
-  '.opencode',
-  'deeds_labs',
-  '.claude',
-  '.venv',
-  'venv',
-];
+// This historical writer has no admitted workspace/source revision or exact
+// source-byte digest contract. Keep its inventory useful, but quarantine its
+// mutation path until it is replaced by the canonical packet writer.
+if (!dryRun) {
+  console.error(JSON.stringify({
+    status: 'PACKET_WRITER_QUARANTINED',
+    reason: 'REVISION_QUALIFIED_CANONICAL_PACKET_WRITER_REQUIRED',
+    writesPerformed: false,
+    safeToApply: false,
+  }));
+  process.exit(2);
+}
 
 function sha256(str) {
   return crypto.createHash('sha256').update(str).digest('hex');
@@ -68,7 +63,7 @@ function determineFeatureId(source_ref) {
  * Scan repo and extract packets
  */
 async function extractWholeCodebasePackets() {
-  const excludeArgs = EXCLUDE_PATTERNS.map(p => `--glob=!${p}`).join(' ');
+  const excludeArgs = buildRipgrepExcludeArgs();
 
   try {
     const cmd = `rg --files -uuu ${excludeArgs}`;
@@ -197,6 +192,8 @@ async function upsertPackets(pool, packets) {
 async function generateReports(packets, result) {
   const jsonReport = {
     generated_at: new Date().toISOString(),
+    exclusion_policy_revision: WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION,
+    exclusion_policy_checksum: exclusionPolicyChecksum(),
     summary: {
       total_packets: packets.length,
       upserted: result.success,

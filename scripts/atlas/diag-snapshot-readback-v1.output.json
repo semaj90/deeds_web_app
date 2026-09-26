@@ -1,0 +1,72 @@
+{
+  "status": "SNAPSHOT_READBACK_BLOCKED",
+  "sourceCount": 25542,
+  "exactMatches": 25239,
+  "violationCounts": {
+    "SOURCE_BYTES_CHANGED": 295,
+    "SOURCE_FILE_MISSING": 8
+  },
+  "totalViolations": 303,
+  "sampleViolations": [
+    {
+      "sourceRef": "claude.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "docs/.okf/schema.yaml",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "docs/parent-atlas-workstation-todo.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "openspec/changes/atlas-feature-intelligence/tasks.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "openspec/changes/manual-migration-reconciliation/tasks.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "openspec/changes/parent-atlas-graph-validation-fabric/tasks.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "openspec/changes/workflow-action-schema-owner-01/.openspec.yaml",
+      "code": "SOURCE_FILE_MISSING"
+    },
+    {
+      "sourceRef": "openspec/changes/workflow-action-schema-owner-01/design.md",
+      "code": "SOURCE_FILE_MISSING"
+    },
+    {
+      "sourceRef": "openspec/changes/workflow-action-schema-owner-01/proposal.md",
+      "code": "SOURCE_FILE_MISSING"
+    },
+    {
+      "sourceRef": "openspec/changes/workflow-action-schema-owner-01/specs/workflow-action-event-identity/spec.md",
+      "code": "SOURCE_FILE_MISSING"
+    }
+  ]
+}

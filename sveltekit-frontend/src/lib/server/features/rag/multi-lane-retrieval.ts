@@ -4,9 +4,11 @@ import type { Pool } from 'pg';
 import { lookupErrorFingerprint, extractSymbols, findSimilarErrors } from '$lib/server/ace/error-fingerprint.js';
 import { multiTextRecall, type NgramHit } from '$lib/server/ace/ngram-retrieval.js';
 import { extractFilePaths } from '$lib/server/ace/error-fingerprint.js';
-import { aceTopkKey } from '$lib/server/ace/cache-keys.js';
+import { aceTopkKey, aceTopkRevisionedKeyV1, type RetrievalCacheIdentityV1 } from '$lib/server/ace/cache-keys.js';
+import { admitRevisionedAceTopRetrievalEntry, type AceTopRetrievalCacheEntry } from '$lib/server/cache/ace-top-retrieval-cache.js';
 import { readLatestQdrantClusterTags, scoreClusterRelevance } from '$lib/server/ace/cluster-tags-cache.js';
 import { scoreCandidate } from '$lib/server/kb/rerank-weight-loader.js';
+import type { HypergraphFusionEvidenceV1 } from '$lib/server/atlas/retrieval/hypergraph-retrieval-v1.js';
 
 export interface MultiLaneQuery {
 	text: string;
@@ -15,6 +17,12 @@ export interface MultiLaneQuery {
 	skipVectorLane?: boolean;
 	filePath?: string;
 	symbols?: string[];
+	/** Optional server-admitted identity; absent callers remain legacy/degraded. */
+	retrievalCacheIdentity?: RetrievalCacheIdentityV1;
+	/** Optional n-ary evidence. It is admitted only with all three expected revisions. */
+	hypergraphEvidence?: readonly HypergraphFusionEvidenceV1[];
+	hypergraphSourceRevision?: string;
+	hypergraphQueryRevision?: string;
 }
 
 export interface LaneResult {
@@ -22,6 +30,8 @@ export interface LaneResult {
 	hits: MultiLaneHit[];
 	latencyMs: number;
 	cacheHit: boolean;
+	/** Legacy/unqualified cache evidence is observable but never fused as current. */
+	degraded?: boolean;
 	skipped?: boolean;
 	skipReason?: string;
 }
@@ -37,6 +47,8 @@ export interface MultiLaneHit {
 	priorFix?: string;
 	/** Karpathy blend score from Redis gpu:karpathy:scores (added by cartridge enrichment) */
 	pagerank?: number;
+	/** Derived n-ary evidence; never an additional retrieval vote. */
+	hypergraphEvidence?: Pick<HypergraphFusionEvidenceV1, 'relationCount' | 'entityCount' | 'evidenceRefCount' | 'structuralScore' | 'projectionHash'>;
 }
 
 export interface MultiLaneSynthesis {
@@ -186,8 +198,39 @@ async function runGraphLane(redis: Redis, query: MultiLaneQuery): Promise<LaneRe
 	return { lane: 'graph', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
 }
 
-async function runAceCacheLane(redis: Redis, queryHash: string): Promise<LaneResult> {
+async function runAceCacheLane(
+	redis: Redis,
+	queryHash: string,
+	retrievalCacheIdentity?: RetrievalCacheIdentityV1,
+	topK = 20,
+): Promise<LaneResult> {
 	const t0 = Date.now();
+	if (retrievalCacheIdentity) {
+		if (retrievalCacheIdentity.queryHash !== queryHash) {
+			return { lane: 'ace_cache', hits: [], latencyMs: Date.now() - t0, cacheHit: false };
+		}
+		const rawRevisioned = await redis.get(aceTopkRevisionedKeyV1(retrievalCacheIdentity)).catch(() => null);
+		let entry: ReturnType<typeof admitRevisionedAceTopRetrievalEntry> = null;
+		if (rawRevisioned) {
+			try {
+				entry = admitRevisionedAceTopRetrievalEntry(
+					JSON.parse(rawRevisioned) as AceTopRetrievalCacheEntry,
+					retrievalCacheIdentity,
+					topK,
+				);
+			} catch {
+				entry = null;
+			}
+		}
+		const hits = (entry?.results ?? []).map((result) => ({
+			id: result.id,
+			text: result.snippet ?? '',
+			score: result.score,
+			filePath: result.sourceRef,
+			lane: 'ace_cache' as const,
+		}));
+		return { lane: 'ace_cache', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
+	}
 	const cacheKey = aceTopkKey(queryHash);
 	const raw = await redis.get(cacheKey).catch(() => null);
 	const latencyMs = Date.now() - t0;
@@ -218,7 +261,9 @@ async function runAceCacheLane(redis: Redis, queryHash: string): Promise<LaneRes
 				lane: 'ace_cache',
 			}));
 
-		return { lane: 'ace_cache', hits, latencyMs, cacheHit: true };
+		// Preserve legacy cache readability for diagnostics, but do not let an
+		// unqualified entry become a current retrieval vote.
+		return { lane: 'ace_cache', hits, latencyMs, cacheHit: true, degraded: true };
 	} catch {
 		return { lane: 'ace_cache', hits: [], latencyMs, cacheHit: false };
 	}
@@ -390,15 +435,58 @@ const LANE_WEIGHT: Record<string, number> = {
  */
 const RRF_K = 60;
 
-export function mergeAndRank(lanes: LaneResult[]): MultiLaneHit[] {
+export interface FusionOptionsV1 {
+	/**
+	 * Evidence-only fusion contract. NLP/LangExtract/Ornith/PyTorch classifiers,
+	 * Naive Bayes/logistic/XGBoost rankers, `.okf` lookup validation, BM25/FTS,
+	 * PageRank and HyperGraphRAG all remain producers of observations or ranking
+	 * features. HyperGraphRAG n-ary API adoption may attach revision-qualified
+	 * relation context to an already retrieved candidate, but it must not invent
+	 * pairwise edges, create candidates, add a retrieval vote, or promote identity.
+	 * The canonical candidate/packet/source owner and the final admission gate
+	 * remain outside this function; missing or mismatched revisions are ignored.
+	 */
+	hypergraphEvidence?: readonly HypergraphFusionEvidenceV1[];
+	expectedWorkspaceRevision?: string;
+	expectedSourceRevision?: string;
+	expectedQueryRevision?: string;
+	/** Maximum additive derived-evidence adjustment; defaults to 0.05. */
+	maxHypergraphBoost?: number;
+}
+
+export function mergeAndRank(lanes: LaneResult[], options: FusionOptionsV1 = {}): MultiLaneHit[] {
 	const scoreAcc = new Map<string, number>();
 	const best = new Map<string, MultiLaneHit>();
+	const hypergraphByCandidate = new Map<string, HypergraphFusionEvidenceV1>();
+	const revisionsQualified = Boolean(
+		options.expectedWorkspaceRevision && options.expectedSourceRevision && options.expectedQueryRevision,
+	);
+	if (revisionsQualified) {
+		for (const evidence of options.hypergraphEvidence ?? []) {
+			if (
+				evidence.workspaceRevision === options.expectedWorkspaceRevision &&
+				evidence.sourceRevision === options.expectedSourceRevision &&
+				evidence.queryRevision === options.expectedQueryRevision
+			) {
+				hypergraphByCandidate.set(evidence.candidateId, evidence);
+			}
+		}
+	}
 
 	for (const lane of lanes) {
+		if (lane.degraded) continue;
 		const weight = LANE_WEIGHT[lane.lane] ?? 0.5;
-		// Lane hits are already in best-first order coming from each lane.
-		// rank is 1-based: index 0 → rank 1.
-		lane.hits.forEach((hit, idx) => {
+		// One logical lane contributes one vote per candidate. Some legacy
+		// executors return the same id more than once; collapse those duplicates
+		// before assigning ranks so executor fan-out cannot inflate RRF.
+		const uniqueHits = new Map<string, MultiLaneHit>();
+		for (const hit of lane.hits) {
+			const existing = uniqueHits.get(hit.id);
+			if (!existing || hit.score > existing.score) uniqueHits.set(hit.id, hit);
+		}
+		const rankedHits = [...uniqueHits.values()].sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+		rankedHits.forEach((hit, idx) => {
+			// rank is 1-based: index 0 → rank 1.
 			const rank = idx + 1;
 			const contribution = weight / (RRF_K + rank);
 			scoreAcc.set(hit.id, (scoreAcc.get(hit.id) ?? 0) + contribution);
@@ -410,8 +498,28 @@ export function mergeAndRank(lanes: LaneResult[]): MultiLaneHit[] {
 	}
 
 	return Array.from(best.values())
-		.map((hit) => ({ ...hit, score: scoreAcc.get(hit.id) ?? hit.score }))
-		.sort((a, b) => b.score - a.score);
+		.map((hit) => {
+			const evidence = hypergraphByCandidate.get(hit.id);
+			if (!evidence) return { ...hit, score: scoreAcc.get(hit.id) ?? hit.score };
+			const maxBoost = Math.max(0, Math.min(options.maxHypergraphBoost ?? 0.05, 0.25));
+			const quality = Math.max(0, Math.min(1,
+				0.5 * evidence.structuralScore +
+				0.25 * Math.min(evidence.evidenceRefCount / 4, 1) +
+				0.25 * Math.min(evidence.entityCount / 8, 1),
+			));
+			return {
+				...hit,
+				score: (scoreAcc.get(hit.id) ?? hit.score) + maxBoost * quality,
+				hypergraphEvidence: {
+					relationCount: evidence.relationCount,
+					entityCount: evidence.entityCount,
+					evidenceRefCount: evidence.evidenceRefCount,
+					structuralScore: evidence.structuralScore,
+					projectionHash: evidence.projectionHash,
+				},
+			};
+		})
+		.sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
 }
 
 /**
@@ -782,7 +890,7 @@ export async function multiLaneSearch(
 			runHashLane(redis, pool, query),
 			runSparseLane(pool, query),
 			runGraphLane(redis, query),
-			runAceCacheLane(redis, queryHash),
+			runAceCacheLane(redis, queryHash, query.retrievalCacheIdentity, query.topK ?? 20),
 			runSymbolLane(redis, query),
 			runDenseLane(query, embedding),
 			runTopologyLane(query),
@@ -852,7 +960,12 @@ export async function multiLaneSearch(
 
 	lanes.push(resolvedHash, resolvedSparse, resolvedGraph, resolvedAceCache, resolvedSymbol, resolvedDense, resolvedTopology, resolvedWiki, resolvedError, resolvedTask, resolvedResearch, resolvedWebSearch, resolvedSummary);
 
-	const rrfMerged = mergeAndRank(lanes);
+	const rrfMerged = mergeAndRank(lanes, {
+		hypergraphEvidence: query.hypergraphEvidence,
+		expectedWorkspaceRevision: query.retrievalCacheIdentity?.workspaceRevision,
+		expectedSourceRevision: query.hypergraphSourceRevision,
+		expectedQueryRevision: query.hypergraphQueryRevision,
+	});
 	// Optional cross-encoder rerank pass (gated behind MULTILANE_CROSS_ENCODER_ENABLED).
 	// Returns null on flag-off OR rerank failure → fall back to RRF order.
 	const reranked = await maybeCrossEncoderRerank(query.text, rrfMerged, {

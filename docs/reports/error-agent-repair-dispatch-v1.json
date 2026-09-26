@@ -1,0 +1,88 @@
+{
+  "schema": "atlas.error-agent-repair-dispatch-audit.v1",
+  "status": "CONTRACT_PROVEN_PLAN_ONLY",
+  "queue": "atlas.error-agent.repair.v1",
+  "requestIntegrity": "CHECKSUM_AND_WORKFLOW_INPUT_VERIFIED",
+  "defaultDispatch": "NOT_DISPATCHED",
+  "routeIntegration": "WIRED_PLAN_ONLY",
+  "workflowInputBinding": "CHECKSUM_BOUND",
+  "explicitPublisherPath": "FOCUSED_TEST_PROVEN",
+  "workerConsumer": "RABBITMQ_REGISTRATION_PROVEN_BOUNDED",
+  "semanticValidation": "SMOKE_PROFILE_AND_WORKFLOW_CLASS_VALIDATED",
+  "publisherWorkerLifecycle": "FIXTURE_PROVEN",
+  "livePublisherWorkerLifecycle": "PROVEN_PLAN_ONLY",
+  "workerShutdown": "SIGINT_SIGTERM_GRACEFUL_CLOSE_WIRED",
+  "liveControllerReconciliation": "PROVEN_READ_ONLY_WAITING_ON_DEPENDENCY",
+  "liveControllerReconciliationRule": "current report re-read after smoke; unresolved envelope gates remain waiting and never promote the worker request",
+  "receiptPersistenceOwner": "AgentWorkReceiptV1",
+  "receiptPersistenceStore": "recordAgentWorkReceiptV1",
+  "receiptPersistenceBinding": "PURE_ADAPTER_AND_MOCK_STORE_HANDOFF_PROVEN_LIVE_PERSISTENCE_DEFERRED",
+  "receiptHandoffProof": {
+    "adapter": "mapErrorAgentExecutionReceiptToAgentWorkReceiptV1",
+    "store": "recordAgentWorkReceiptV1",
+    "insertAcknowledgement": "PROVEN_WITH_INJECTED_STORE",
+    "identicalReplay": "PROVEN_WITH_INJECTED_STORE",
+    "checksumConflict": "PROVEN_WITH_INJECTED_STORE",
+    "liveDatabaseWrite": false,
+    "proofRef": "sveltekit-frontend/src/lib/server/ai/error-agent/execution-receipt-agent-work-persistence.integration.spec.ts"
+  },
+  "consumerAcknowledgement": "FOCUSED_TEST_PROVEN",
+  "publisherConfirm": "NOT_PROVEN",
+  "canonicalWritesAllowed": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false,
+  "proofRefs": [
+    "sveltekit-frontend/src/lib/server/ai/error-agent/repair-dispatch.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/error-agent/repair-request.spec.ts",
+    "docs/reports/governed-error-agent-validation-v1.json"
+  ],
+  "nextGate": "AGENT-09-TOURNAMENT_REUSE_OR_AGENT-10-DURABLE_RECEIPTS",
+  "openSpecProgress": {
+    "change": "parent-atlas-agentic-completion",
+    "complete": 9,
+    "total": 11,
+    "remaining": 2
+  },
+  "workerCommand": "npm run atlas:error-agent:worker",
+  "liveSmokeCommand": "npx tsx scripts/workers/error-agent-repair-live-smoke.ts",
+  "workerEnableFlag": "ERROR_AGENT_WORKER_ENABLED=true",
+  "brokerEndpoint": "amqp://127.0.0.1:5673",
+  "runtimeProbe": {
+    "status": "STARTED_THEN_STOPPED",
+    "queue": "atlas.error-agent.repair.v1",
+    "queueDeclaration": "ASSERTED_BY_EXISTING_RABBITMQ_ADAPTER",
+    "enqueuedMessages": 0,
+    "repairExecutions": 0,
+    "writesPerformed": false
+  },
+  "fixtureLifecycle": {
+    "publisherToWorker": true,
+    "acknowledged": true,
+    "nacked": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false,
+    "proofRef": "sveltekit-frontend/src/lib/server/ai/error-agent/repair-pipeline.integration.spec.ts"
+  },
+  "liveFixtureLifecycle": {
+    "status": "SMOKE_PASSED",
+    "messagesPublished": 1,
+    "messagesExecuted": 1,
+    "acknowledgement": "WORKER_EXECUTOR_COMPLETED",
+    "requestChecksum": "sha256:0333d27aea9e370fb970b5ed4cccc01375a5017058d32ceffaa62e532d1db377",
+    "executionReceiptChecksum": "sha256:c4c28be58b179d634c33e24bd2b9e4b7523ca827bf2b840e6ffcbffc86edf0fc",
+    "controllerReconciliation": "WAITING_ON_DEPENDENCY",
+    "selectionMode": "BLOCKED_TRANSPORT_FIXTURE",
+    "selectedTaskKey": null,
+    "controllerBeforeChecksum": "sha256:65738a073a7f5c72177e08b0d7d170bca8a409c92baea314c1cf90db657e43ab",
+    "controllerAfterChecksum": "sha256:8324b716b116c1b98d11fed01578ac61d637aae75137ceae1fb87971d937a416",
+    "brokerSettlement": "ACK_CONFIRMED_QUEUE_0_READY_0_UNACKNOWLEDGED",
+    "canonicalWritesAllowed": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false,
+    "proofRefs": [
+      "sveltekit-frontend/scripts/workers/error-agent-repair-live-smoke.ts",
+      "controller:sha256:live-worker-fixture",
+      "task:fixture:live-worker-transport"
+    ]
+  }
+}

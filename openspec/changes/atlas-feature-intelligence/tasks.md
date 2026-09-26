@@ -91,19 +91,19 @@ must remain derived and `liveImplementationMembership = UNPROVEN`.
 - [x] FI-16G Define a dependency-injected second-stage hypergraph fusion facade over existing first-stage candidates.
 - [x] FI-16G2 Add query-conditioned relationship selection using semantic relevance, PPR, relation/extraction confidence, evidence coverage and expected relation type. **Test written; execution proof pending.**
 - [x] FI-16G3 Accept first-stage `family=relationship` candidates through an exact canonical relationship resolver hook; add PostgreSQL `findCanonicalRelationshipsByIds()` helper.
-- [ ] FI-16H Wire `HyperRagFusionService` to the Parent Atlas package and expose the N-ary facade on the live search/API path. **Root package links `@deeds/parent-atlas`; frontend live import/adoption remains unproven.**
-- [ ] FI-16I Add query-conditioned PPR executor over relationship/incidence candidates and write revisioned receipts. **CPU reference executor/receipt written; cuGraph/Neo4j parity + live receipt pending.**
-- [ ] FI-16J Add dynamic SQL hyperedge construction from canonical shared-entity/evidence joins and promotion review. **`atlas_evidence_entities`, event-hyperedge view, bounded SQL neighborhood function and TS reader written; extractor/backfill/apply/promotion workflow pending.**
+- [ ] FI-16H Wire `HyperRagFusionService` to the Parent Atlas package and expose the N-ary facade on the live search/API path. **The HyperRAG API now has an explicit `useGraph=true` read-only bridge through `@deeds/parent-atlas`, the PostgreSQL feature-intelligence repository, and the existing fusion boundary. It admits only exact current canonical hits and reports unavailable/degraded results without changing primary retrieval. Live production relationship rows and end-to-end API readback remain unproven.**
+- [ ] FI-16I Add query-conditioned PPR executor over relationship/incidence candidates and write revisioned receipts. **The existing deterministic CPU PPR executor is now injectable into the HyperGraph fusion facade and its receipt is returned with the fusion result; cuGraph/Neo4j parity and live current-corpus receipt remain pending.**
+- [ ] FI-16J Add dynamic SQL hyperedge construction from canonical shared-entity/evidence joins and promotion review. **`atlas_evidence_entities`, event-hyperedge view, bounded SQL neighborhood function, TS reader, and a pure fail-closed promotion-review receipt are written; extractor/backfill, live evidence review, canonical materializer, and live readback remain pending. Dynamic candidates remain `promotable=false` and `writes_performed=false`.**
 - [x] FI-16K Add executable ACE hypergraph packet fixture covering canonical entity seed + direct relationship candidate + typed evidence chain + sufficient-context synthesis gate. **Test source written; not executed in this connector session.**
-- [ ] FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged. **Explicit optional `aceHypergraph` input and revision fail-closed guard are wired; Parent Atlas build and 5/5 hypergraph tests pass; focused SvelteKit runtime proof remains pending.**
+- [ ] FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged. **Explicit optional `aceHypergraph` input and revision fail-closed guard are wired; the live HyperRAG API now exposes additive facade payloads through the same package boundary. Focused packet materialization and live DB readback remain pending.**
 - [ ] FI-16M Add retrieval-action receipt for every `NEED_* -> DAG action -> new evidence -> sufficiency re-evaluation` loop.
 
 ## P1 — Retrieval reconciliation
 
 - [ ] FI-17 Materialize Qdrant feature/evidence/relationship points with canonical IDs, revisions, domains and embedding metadata. **Postgres relationship vector(768)+HNSW surface written; Qdrant/CAGRA projection pending.**
 - [ ] FI-18 Add logical-lane candidate adapter for lexical/BM25, AST, semantic, graph and low-rank association.
-- [ ] FI-19 Enforce one vote per logical lane regardless of executor count. **`CandidateFabricV1` and ACE payload encode `semantic_lane_votes = 1`; existing runtime fusion still needs adoption proof.**
-- [ ] FI-20 Add degraded-identity observability and exact promotion before fusion.
+- [x] FI-19 Enforce one vote per logical lane regardless of executor count. **`CandidateFabricV1` and ACE payload encode `semantic_lane_votes = 1`; `mergeAndRank()` now collapses duplicate IDs within each lane before assigning RRF ranks. Focused multi-lane tests pass.**
+- [ ] FI-20 Add degraded-identity observability and exact promotion before fusion. **The new n-ary fusion input is fail-closed on workspace/source/query revision mismatch and can only enrich an existing hit; full canonical identity adoption across all live lanes remains open.**
 - [ ] FI-21 Add SVD/randomized-low-rank/leverage-sampling candidate generation over a revisioned feature/evidence matrix; never promote relations without evidence inspection.
 - [ ] FI-21B Add exact multi-view rerank after future MUVERA/FDE candidate nomination; FDE/ANN is nomination only, original views remain rerank/evidence inputs.
 
@@ -136,13 +136,55 @@ must remain derived and `liveImplementationMembership = UNPROVEN`.
 ## Acceptance gates
 
 - [ ] Canonical identity survives path/cluster/projection changes in live Postgres readback.
+      **Investigated 2026-09-22, read-only, live Postgres — result is SPLIT: cluster/projection
+      axis PROVEN, path axis DISPROVEN. Not marking this gate met.**
+      - **Found the real live formula, not assumed**: sampled `atlas_packets.packet_key` against
+        several candidate hash formulas. `computePacketKey(source_ref, tree_node_id, title_id)`
+        (`packet-key-builder.ts`, a full 64-hex SHA256) does NOT match any live row (0/10
+        sampled) — confirms this session's earlier SESSION-200 finding that it's a separate,
+        rarely-used scheme. The actual dominant live formula is
+        `'packet:' + SHA256(source_ref).slice(0, 12)` (from
+        `scripts/atlas/packet-chunk-lineage-canary-01.mts:44`) — verified **500/500 (100%)** on a
+        random sample from the `packet:%`-prefixed population. Live population split:
+        `58,362/61,718` (94.6%) use this `packet:` form, `3,294` (5.3%) use `ace:packet:` form
+        (the Session-200-fixed `PREFIX_DIVERGENCE_ACE_PACKET` typo cohort, same underlying hash),
+        `62` use some other form (not characterized here).
+      - **Cluster/projection axis: PROVEN.** The live formula's only input is `source_ref` — it
+        does not incorporate `cluster_id`, `som_cluster`, `kmeans_cluster`, `community_id`, or
+        any embedding/representation value, so those cannot mathematically affect `packet_key`.
+        Confirmed at the write-path level too: every cluster-reassignment `UPDATE atlas_packets`
+        found (`scripts/atlas/backfill-som-cluster-direct.mjs`,
+        `scripts/atlas/kmeans-multi-k-experiment.mjs`) targets rows via
+        `WHERE packet_key = $1`/`WHERE atlas_packets.packet_key = data.key` and only ever `SET`s
+        the cluster column — `packet_key` itself is never in any cluster-reassignment `SET`
+        clause. Cluster/projection changes cannot mutate identity, by construction and by every
+        live write path checked.
+      - **Path axis: DISPROVEN — this is a real, negative finding, not glossed over.** Because
+        the live formula IS `SHA256(source_ref)`, `packet_key` is a direct, deterministic function
+        of the path itself. A file rename/move changes `source_ref`, which changes the recomputed
+        hash, which means the row created for the new path gets a **different** `packet_key` than
+        the old one — there is no live mechanism that recognizes "this is the same logical file
+        under a new path." Checked the one identity-alias mechanism that exists
+        (`resolveCanonicalPacketKey()`, `packet-identity-resolver.ts`) — it only resolves an
+        exact existing `packet_key` string or a literal pre-inserted `alias_key` row; nothing
+        computes or tracks a rename relationship generally. The only live alias rows
+        (`atlas_packet_identity_aliases`, `alias_kind = 'PREFIX_DIVERGENCE_ACE_PACKET'`, 3,294
+        rows) are a one-time prefix-typo fix, not a path-rename tracker.
+      - **Conclusion**: this acceptance gate as written ("survives path/cluster/projection
+        changes") is not met by the live system — 2 of 3 named axes hold, the path axis does
+        not, and no compensating mechanism exists today. This is consistent with (and gives
+        concrete live-data teeth to) the still-open `stableFileId` design question recorded in
+        `CANONICAL-IDENTITY-V1-SPEC-01` (`parent-atlas-retrieval-lineage-dag-convergence/tasks.md`)
+        — a `stableFileId` layer, if built, is exactly what would need to survive path changes
+        where `packet_key` (as currently derived) does not. Not building that here — read-only
+        investigation only, no writes performed.
 - [ ] Neo4j/NetworkX/cuGraph/Qdrant records round-trip to canonical feature/evidence/relationship IDs.
 - [x] Recursive same-entity-type relationships can have multiple participants but degree 1.
 - [x] Relationship degree is distinct from cardinality and graph node degree.
-- [ ] Pairwise graph projection of an N-ary fact reconstructs the original canonical relationship ID in executed tests/parity receipts. **Test written; not executed in this connector session.**
-- [ ] Incidence projection retains one relationship node plus every typed participant role in executed parity proof.
-- [ ] Query-conditioned fanout selects the highest supported relation rather than relationship-ID order. **Test written; not executed.**
-- [ ] CPU incidence-PPR is deterministic and cuGraph/Neo4j PPR matches within a declared tolerance. **CPU test written; cross-backend execution pending.**
+- [x] Pairwise graph projection of an N-ary fact reconstructs the original canonical relationship ID in executed tests/parity receipts. Executed 2026-09-22: `node --test packages/parent-atlas/test/hypergraph-retrieval.test.mjs` -> `pairwise projection is reversible and normalizes relationship mass` PASS (5/5 in file).
+- [x] Incidence projection retains one relationship node plus every typed participant role in executed parity proof. Same run, same file: `incidence projection preserves one relationship node and all typed participants` PASS.
+- [x] Query-conditioned fanout selects the highest supported relation rather than relationship-ID order. Executed 2026-09-22: `node --test packages/parent-atlas/test/ace-hypergraph-packet.test.mjs` -> `query-conditioned fanout selects higher-scoring relationship instead of alphabetical id` PASS (4/4 in file).
+- [ ] CPU incidence-PPR is deterministic and cuGraph/Neo4j PPR matches within a declared tolerance. **Half proven, not fully closed**: executed 2026-09-22, `node --test packages/parent-atlas/test/hypergraph-ppr.test.mjs` -> `incidence PPR is deterministic and favors relationships reachable from the query seed` PASS -- proves CPU-side determinism only. The cuGraph/Neo4j cross-backend tolerance comparison this line also requires is not covered by this test (no GPU/Neo4j execution in this pass) and remains open.
 - [ ] Dynamic SQL hyperedges cannot enter canonical relationship tables without promotion review.
 - [ ] ACE packet construction produces canonical relationship IDs, typed participant roles, evidence refs, chain lineage and a sufficient-context decision. **End-to-end fixture written; execution pending.**
 - [ ] A checked markdown task alone cannot produce `VERIFIED`.
@@ -151,3 +193,45 @@ must remain derived and `liveImplementationMembership = UNPROVEN`.
 - [ ] SVD/low-rank/manifold/SO(4) derived signals cannot directly create canonical relationships.
 - [ ] Sufficient-context gate prevents synthesis when required entity/relation/evidence classes are missing, stale or contradictory.
 - [ ] Current Kanban can be reconstructed from a pinned repository + evidence revision.
+
+## 2026-09-15 — Runtime fusion adoption slice
+
+- **Fusion boundary updated:** `sveltekit-frontend/src/lib/server/features/rag/multi-lane-retrieval.ts`
+  now collapses duplicate IDs within each logical lane before assigning RRF ranks,
+  uses deterministic score/ID tie-breaking, and accepts optional HyperGraphRAG
+  evidence only when workspace/source/query revisions all match. N-ary evidence
+  is a bounded additive enrichment of an existing hit; it cannot create a hit or
+  contribute another retrieval vote.
+- **N-ary projection added:** `buildHypergraphFusionEvidenceV1()` in
+  `sveltekit-frontend/src/lib/server/atlas/retrieval/hypergraph-retrieval-v1.ts`
+  derives candidate-local relation/entity/evidence counts from intact n-ary
+  relations and preserves the projection checksum.
+- **Focused proof:** multi-lane fusion 5/5 and HyperGraphRAG retrieval 6/6
+  passed; strict OpenSpec validation and scoped diff check passed.
+- **Still open:** FI-16H live relationship-row/readback proof, FI-16I live
+  PPR/backend parity, FI-16J extraction/backfill/promotion, FI-16L focused
+  SvelteKit packet materialization, and FI-20 repository-wide canonical identity
+  admission. No database, cache, Qdrant, Neo4j, or GPU writes were performed.
+- **2026-09-15 dynamic hyperedge review boundary:** added
+  `reviewDynamicHyperedgePromotionV1()` in
+  `packages/parent-atlas/src/core/dynamic-hyperedge-sql.ts`. It requires the
+  admitted source snapshot and reviewed evidence references, emits deterministic
+  review checksums, and can only return `READY_FOR_EXPLICIT_MATERIALIZATION`;
+  it cannot authorize, persist, or convert a dynamic relationship into a
+  canonical relationship. Focused tests pass; live extractor/backfill and
+  canonical materializer remain blocked.
+- **2026-09-15 follow-up:** added
+  `sveltekit-frontend/src/lib/server/atlas/integration/hyperrag-fusion-runtime-adapter-v1.ts`
+  and its focused tests. The API invokes this adapter only when the caller
+  explicitly supplies `useGraph=true` and an admitted `workspaceRevision`.
+  Stale, degraded, or missing-identity hits are rejected; n-ary results are
+  additive metadata and never new hits or RRF votes.
+- **PPR follow-up:** the facade now optionally executes the existing CPU
+  incidence-PPR owner before query-conditioned relationship ranking and returns
+  its revisioned receipt. No GPU/Neo4j execution or persistence was added.
+- **Pipeline comment:** NLP/LangExtract/Ornith/PyTorch and Naive Bayes/logistic/XGBoost
+  outputs, `.okf` lookup validation, BM25 and PageRank are evidence/ranking inputs.
+  HyperRAG n-ary adoption may annotate existing candidates with exact-revision
+  relation context; it cannot mint IDs, invent pairwise edges, add votes, or
+  authorize promotion.
+- [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).

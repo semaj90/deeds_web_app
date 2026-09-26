@@ -76,7 +76,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					? { must: [{ key: 'routePath', match: { value: routePath } }] }
 					: undefined;
 
-				const results = await qdrant.client.search(DIAG_COLLECTION, {
+				const results = await qdrant.search(DIAG_COLLECTION, {
 					vector: { name: 'diagnosis', vector: queryEmbedding },
 					limit,
 					score_threshold: scoreThreshold,

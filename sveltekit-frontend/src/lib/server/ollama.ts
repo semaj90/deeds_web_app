@@ -3,8 +3,8 @@
  *
  * Exports:
  *   - getOllamaEndpoint(): string — resolve Ollama URL from env
- *   - generateText(prompt): string — simple chat (non-streaming)
- *   - callOllamaChat(system, user): string — system+user chat with logging
+ *   - generateText(prompt): string — llama-server chat (non-streaming)
+ *   - callOllamaChat(system, user): string — legacy API name; llama-server owner
  *   - bifrostChat(messages, model, options): string — OpenAI-format call via Bifrost gateway
  *   - checkOllamaHealth(): boolean — health probe via /api/tags
  *   - listAvailableModels(): string[] — available model names
@@ -17,6 +17,7 @@
 // Keys are populated after ENV is imported below (see ── Config ──).
 // Callers use VLM_MODELS.embedding for embeddings ONLY.
 // Callers use VLM_MODELS.legal / .gemma4 / .tool for synthesis → routed to llama-server :8090.
+// The gemma4 key is retained only as a compatibility alias; it is not an Ollama chat model.
 export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4' | 'tool', string> = {
   /** EmbeddingGemma model (Ollama :11434, native semantic_768) */
   embedding: 'embeddinggemma:latest',
@@ -108,7 +109,10 @@ export function getOllamaGenerationEndpoint(): string {
   return CHAT_BASE_URL;
 }
 
-const OLLAMA_BASE_URL = CHAT_BASE_URL;
+// Ollama-owned URL is embeddings/health only. Chat compatibility requests are
+// intercepted or sent directly to CHAT_BASE_URL (:8090) and never use Ollama
+// as an inference owner.
+const OLLAMA_BASE_URL = EMBED_BASE_URL;
 // Model selection source of truth is ROTORQUANT_MODEL_PATH (via runtime-contract.ts),
 // never a separately-set chat-model env var. See llm/runtime-contract.ts.
 const CHAT_MODEL = LLM_MODEL_ID;
@@ -1562,7 +1566,7 @@ function sanitizeModelOutput(text: string): string {
   return cleaned;
 }
 
-// ── Chat Functions (merged from ollama-service.ts) ──────────────────────
+// ── Chat Functions (llama-server :8090; legacy Ollama-compatible API names) ──
 
 export async function generateText(prompt: string): Promise<string> {
   // Route through Bifrost gateway when enabled (gets semantic caching)
@@ -1582,7 +1586,7 @@ export async function generateText(prompt: string): Promise<string> {
     model: CHAT_MODEL,
     messages: [{ role: 'user', content: prompt }],
     stream: false,
-    keep_alive: getChatModelKeepAlive(),
+    max_tokens: 2048,
   };
 
   return traceLLM(
@@ -1592,7 +1596,7 @@ export async function generateText(prompt: string): Promise<string> {
       const content = await ollamaBreaker.call(() =>
         retry(
           async () => {
-            const res = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
+            const res = await fetch(`${CHAT_BASE_URL}/v1/chat/completions`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(body),
@@ -1601,14 +1605,14 @@ export async function generateText(prompt: string): Promise<string> {
 
             if (!res.ok) {
               const text = await res.text().catch(() => '');
-              console.error('[ollama] /api/chat error:', res.status, text.slice(0, 200));
-              throw new Error(`Ollama chat failed: ${res.status}`);
+              console.error('[llama-server] /v1/chat/completions error:', res.status, text.slice(0, 200));
+              throw new Error(`llama-server chat failed: ${res.status}`);
             }
 
             // GPU-accelerated JSON parsing via simdjson (5× faster for large LLM responses)
             const rawText = await res.text();
-            const data = fastJsonParse<{ message?: { content: string } }>(rawText);
-            return data.message?.content ?? '';
+            const data = fastJsonParse<{ choices?: Array<{ message?: { content?: string } }> }>(rawText);
+            return data.choices?.[0]?.message?.content ?? '';
           },
           { maxAttempts: 2, baseDelayMs: 500, isRetryable: retryPredicates.networkOrServer }
         )
@@ -1627,7 +1631,7 @@ export async function callOllamaChat(
   // Route through Bifrost gateway when enabled (gets semantic caching)
   if (ENV.BIFROST_ENABLED) {
     return traceLLM(
-      'ollama-chat',
+      'llama-server-chat',
       { model: CHAT_MODEL, prompt: userPrompt.slice(0, 500) },
       async (gen) => {
         const content = await bifrostChat(
@@ -1650,26 +1654,21 @@ export async function callOllamaChat(
       { role: 'user', content: userPrompt },
     ],
     stream: false,
-    keep_alive: getChatModelKeepAlive(),
+    max_tokens: options?.num_predict ?? 2048,
   };
-  if (options?.format) body.format = options.format;
-  if (options?.num_predict || options?.temperature !== undefined) {
-    body.options = {
-      ...(options.num_predict ? { num_predict: options.num_predict } : {}),
-      ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
-    };
-  }
+  if (options?.format) body.response_format = { type: 'json_object' };
+  if (options?.temperature !== undefined) body.temperature = options.temperature;
 
   const startTime = Date.now();
 
   return traceLLM(
-    'ollama-chat',
+    'llama-server-chat',
     { model: CHAT_MODEL, prompt: userPrompt.slice(0, 500) },
     async (gen) => {
       const content = await ollamaBreaker.call(() =>
         retry(
           async () => {
-            const res = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
+            const res = await fetch(`${CHAT_BASE_URL}/v1/chat/completions`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(body),
@@ -1680,31 +1679,31 @@ export async function callOllamaChat(
 
             if (!res.ok) {
               const text = await res.text().catch(() => '');
-              console.error('[ollama] /api/chat error:', res.status, text.slice(0, 200));
-              throw new Error(`Ollama chat failed: ${res.status}`);
+              console.error('[llama-server] /v1/chat/completions error:', res.status, text.slice(0, 200));
+              throw new Error(`llama-server chat failed: ${res.status}`);
             }
 
             // GPU-accelerated JSON parsing via simdjson (5× faster for large LLM responses)
             const rawText = await res.text();
             const data = fastJsonParse<{
-              message?: { content: string };
+              choices?: Array<{ message?: { content?: string } }>;
               prompt_eval_count?: number;
               eval_count?: number;
             }>(rawText);
-            const result = data.message?.content ?? '';
-            console.log(`[ollama] Chat completed in ${duration}ms (${result.length} chars)`);
+            const result = data.choices?.[0]?.message?.content ?? '';
+            console.log(`[llama-server] Chat completed in ${duration}ms (${result.length} chars)`);
 
             // Fire-and-forget token tracking (covers all callOllamaChat callers)
             import('$lib/server/ai/token-tracker.js')
               .then(({ trackTokenUsage }) => {
                 trackTokenUsage({
-                  endpoint: 'callOllamaChat',
+                  endpoint: 'llama-server-chat',
                   model: CHAT_MODEL,
                   promptTokens: data.prompt_eval_count ?? 0,
                   completionTokens: data.eval_count ?? 0,
                   durationMs: duration,
                   cached: false,
-                  metadata: { chatTemplate: 'gemma' },
+                  metadata: { provider: 'llama-server', chatModel: CHAT_MODEL },
                 });
               })
               .catch(() => {

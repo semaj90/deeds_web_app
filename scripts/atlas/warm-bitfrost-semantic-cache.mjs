@@ -38,13 +38,7 @@ async function pickLedgerTable() {
       select table_name
       from information_schema.tables
       where table_schema = 'public'
-        and table_name in ('atlas_higher_hop_index', 'atlas_feature_packets', 'atlas_codebase_packets', 'atlas_packets')
-      order by case table_name
-        when 'atlas_higher_hop_index' then 1
-        when 'atlas_feature_packets' then 2
-        when 'atlas_codebase_packets' then 3
-        else 4
-      end
+        and table_name = 'atlas_packets'
       limit 1
     `),
     ['table_name'],
@@ -159,6 +153,18 @@ async function main() {
     ? `nullif(btrim(coalesce(${whereCandidates.join(', ')})::text), '') is not null`
     : 'true';
   const featureClause = columnSet.has('feature_id') ? "nullif(btrim(feature_id::text), '') is not null" : 'false';
+  const lineageColumns = ['source_revision', 'workspace_revision', 'canonical_source_ref'];
+  const missingLineageColumns = lineageColumns.filter((name) => !columnSet.has(name));
+  if (missingLineageColumns.length > 0) {
+    throw new Error(`BITFROST_WARM_SOURCE_LINEAGE_COLUMNS_MISSING:${missingLineageColumns.join(',')}`);
+  }
+  const lineageClause = `
+      nullif(btrim(source_revision::text), '') is not null
+      and lower(btrim(source_revision::text)) not in ('0', 'workspace:0')
+      and nullif(btrim(workspace_revision::text), '') is not null
+      and lower(btrim(workspace_revision::text)) not in ('0', 'workspace:0')
+      and nullif(btrim(canonical_source_ref::text), '') is not null
+    `;
   const sql = `
     select
       ${col('packet_key')},
@@ -171,7 +177,9 @@ async function main() {
       ${col('community_id')},
       ${col('community_source')},
       ${col('community_confidence')},
-      ${col('som_cluster')},
+      ${col('som_cell_x')},
+      ${col('som_cell_y')},
+      ${col('som_cluster', 'legacy_som_cluster')},
       ${col('cluster_id')},
       ${col('centroid_id')},
       ${col('qdrant_point_id')},
@@ -190,10 +198,11 @@ async function main() {
       ${col('ledger_type')},
       ${col('metadata')}
     from public.${sourceTable}
-    where ${sourceClause} and ${featureClause}
+    where ${sourceClause} and ${featureClause} and ${lineageClause}
     order by
       ${columnSet.has('community_id') ? 'community_id asc nulls last,' : ''}
-      ${columnSet.has('som_cluster') ? 'som_cluster asc nulls last,' : ''}
+      ${columnSet.has('som_cell_x') ? 'som_cell_x asc nulls last,' : ''}
+      ${columnSet.has('som_cell_y') ? 'som_cell_y asc nulls last,' : ''}
       ${columnSet.has('identity_confidence') ? 'identity_confidence desc nulls last,' : ''}
       ${columnSet.has('packet_key') ? 'packet_key asc' : '1'}
       ${LIMIT > 0 ? `limit ${LIMIT}` : ''}
@@ -210,7 +219,9 @@ async function main() {
     'community_id',
     'community_source',
     'community_confidence',
-    'som_cluster',
+    'som_cell_x',
+    'som_cell_y',
+    'legacy_som_cluster',
     'cluster_id',
     'centroid_id',
     'qdrant_point_id',
@@ -239,7 +250,9 @@ async function main() {
     community_id: normalizeText(row.community_id),
     community_source: normalizeText(row.community_source),
     community_confidence: normalizeText(row.community_confidence),
-    som_cluster: normalizeText(row.som_cluster),
+    som_cell_x: normalizeText(row.som_cell_x),
+    som_cell_y: normalizeText(row.som_cell_y),
+    legacy_som_cluster: normalizeText(row.legacy_som_cluster),
     cluster_id: normalizeText(row.cluster_id),
     centroid_id: normalizeText(row.centroid_id),
     qdrant_point_id: normalizeText(row.qdrant_point_id),
@@ -278,7 +291,9 @@ async function main() {
     const communityId = String(packetFieldValue(row, 'community_id') ?? row.community_id ?? '').trim();
     const communitySource = String(packetFieldValue(row, 'community_source') ?? row.community_source ?? '').trim();
     const communityConfidence = String(packetFieldValue(row, 'community_confidence') ?? row.community_confidence ?? '').trim();
-    const somCluster = String(packetFieldValue(row, 'som_cluster') ?? packetFieldValue(row, 'cluster_id') ?? row.som_cluster ?? row.cluster_id ?? '').trim();
+    const somCellX = toOptionalNumber(packetFieldValue(row, 'som_cell_x') ?? row.som_cell_x);
+    const somCellY = toOptionalNumber(packetFieldValue(row, 'som_cell_y') ?? row.som_cell_y);
+    const somCell = somCellX !== null && somCellY !== null ? `${somCellX}:${somCellY}` : null;
     const clusterId = String(packetFieldValue(row, 'cluster_id') ?? row.cluster_id ?? '').trim();
     const centroidId = String(packetFieldValue(row, 'centroid_id') ?? row.centroid_id ?? '').trim();
     const qdrantPointId = String(packetFieldValue(row, 'qdrant_point_id') ?? row.qdrant_point_id ?? '').trim();
@@ -304,12 +319,15 @@ async function main() {
     ).trim();
     const topology = buildTopologyEnvelope({
       ...row,
-      som_cell: packetFieldValue(row, 'som_cluster') ?? row.som_cluster ?? null,
+      som_cell: somCell,
     });
     const centroidKeys = deriveCentroidKeys({
       ...row,
-      som_cell: packetFieldValue(row, 'som_cluster') ?? row.som_cluster ?? null,
+      som_cell: somCell,
     });
+    const validCentroidKeys = Object.fromEntries(
+      Object.entries(centroidKeys).map(([name, key]) => [name, key && !/:$/.test(key) ? key : null]),
+    );
 
     const base = {
       packet_key: packetKey,
@@ -324,7 +342,9 @@ async function main() {
       community_id: toOptionalNumber(communityId),
       community_source: communitySource || null,
       community_confidence: toOptionalNumber(communityConfidence),
-      som_cluster: toOptionalNumber(somCluster),
+      som_cell: somCell,
+      som_cell_x: somCellX,
+      som_cell_y: somCellY,
       cluster_id: toOptionalNumber(clusterId),
       centroid_id: centroidId || null,
       content_hash: contentHash || null,
@@ -342,16 +362,16 @@ async function main() {
       metadata,
       tags: Array.isArray(tags) ? tags : [],
       topology,
-      centroid_keys: centroidKeys,
+      centroid_keys: validCentroidKeys,
     };
     plans.push(
       {
-        key: `bifrost:sem:packet:${packetKey}`,
+        key: `bifrost:warm:v1:packet:${packetKey}`,
         ttl: 86400,
         value: base,
       },
       {
-        key: `bifrost:sem:feature:${featureId}`,
+        key: `bifrost:warm:v1:feature:${featureId}`,
         ttl: 86400,
         value: {
           feature_id: featureId,
@@ -360,7 +380,7 @@ async function main() {
           source_ref_key: sourceRefKey || null,
           canonical_source_ref: canonicalSourceRef || null,
           community_id: base.community_id,
-          som_cluster: base.som_cluster,
+          som_cell: base.som_cell,
           cluster_id: base.cluster_id,
           centroid_id: base.centroid_id,
           qdrant_point_id: qdrantPointId || null,
@@ -389,7 +409,9 @@ async function main() {
           feature_id: featureId,
           feature_label: featureLabel,
           community_id: base.community_id,
-          som_cluster: base.som_cluster,
+          som_cell: base.som_cell,
+          som_cell_x: base.som_cell_x,
+          som_cell_y: base.som_cell_y,
           cluster_id: base.cluster_id,
           centroid_id: base.centroid_id,
           qdrant_point_id: qdrantPointId || null,
@@ -417,7 +439,9 @@ async function main() {
           feature_label: featureLabel,
           source_ref: sourceRef,
           community_id: base.community_id,
-          som_cluster: base.som_cluster,
+          som_cell: base.som_cell,
+          som_cell_x: base.som_cell_x,
+          som_cell_y: base.som_cell_y,
           lineage_version: lineageVersion || null,
         },
       },
@@ -443,34 +467,34 @@ async function main() {
           centroid_keys: centroidKeys,
         },
       }] : []),
-      ...(centroidKeys.kmeans_centroid_key ? [{
-        key: centroidKeys.kmeans_centroid_key,
+      ...(validCentroidKeys.kmeans_centroid_key ? [{
+        key: validCentroidKeys.kmeans_centroid_key,
         ttl: 7200,
         value: {
           packet_key: packetKey,
-          kmeans_cluster: clusterId || somCluster || null,
+          kmeans_cluster: clusterId || null,
           source_ref: sourceRef,
-          centroid_keys: centroidKeys,
+          centroid_keys: validCentroidKeys,
         },
       }] : []),
-      ...(centroidKeys.som_centroid_key ? [{
-        key: centroidKeys.som_centroid_key,
+      ...(validCentroidKeys.som_centroid_key ? [{
+        key: validCentroidKeys.som_centroid_key,
         ttl: 7200,
         value: {
           packet_key: packetKey,
-          som_cluster: somCluster || null,
+          som_cell: base.som_cell,
           source_ref: sourceRef,
-          centroid_keys: centroidKeys,
+          centroid_keys: validCentroidKeys,
         },
       }] : []),
-      ...(centroidKeys.community_centroid_key ? [{
-        key: centroidKeys.community_centroid_key,
+      ...(validCentroidKeys.community_centroid_key ? [{
+        key: validCentroidKeys.community_centroid_key,
         ttl: 7200,
         value: {
           packet_key: packetKey,
           community_id: communityId || null,
           source_ref: sourceRef,
-          centroid_keys: centroidKeys,
+          centroid_keys: validCentroidKeys,
         },
       }] : []),
       {
@@ -501,8 +525,8 @@ async function main() {
     },
     summary: {
       candidateRows: rows.length,
-      packetKeysPlanned: plans.filter((plan) => plan.key.startsWith('bifrost:sem:packet:')).length,
-      featureKeysPlanned: plans.filter((plan) => plan.key.startsWith('bifrost:sem:feature:')).length,
+      packetKeysPlanned: plans.filter((plan) => plan.key.startsWith('bifrost:warm:v1:packet:')).length,
+      featureKeysPlanned: plans.filter((plan) => plan.key.startsWith('bifrost:warm:v1:feature:')).length,
       aceKeysPlanned: plans.filter((plan) => plan.key.startsWith('ace:')).length,
       appliedWrites: 0,
       failures: 0,
@@ -514,11 +538,13 @@ async function main() {
       feature_id: plan.value.feature_id ?? null,
       feature_label: plan.value.feature_label ?? null,
       community_id: plan.value.community_id ?? null,
-      som_cluster: plan.value.som_cluster ?? null,
+      som_cell: plan.value.som_cell ?? null,
     })),
     nextSafeAction: APPLY_REQUESTED
       ? 'Warm writes have been requested; rerun the audit to confirm hot cache families exist.'
-      : 'Review the dry-run plan, then rerun with --apply to materialize the hot Bitfrost families.',
+      : plans.length === 0
+        ? 'No lineage-qualified packets were admitted; do not apply. Resolve source/workspace authority, then rerun the guarded dry-run.'
+        : 'Review the dry-run plan; apply remains separately gated and is not authorized by this report.',
   };
 
   if (APPLY_REQUESTED) {

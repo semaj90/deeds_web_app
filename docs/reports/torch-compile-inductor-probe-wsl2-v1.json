@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.compile-triton-probe.v1",
+  "status": "TORCH_COMPILE_INDUCTOR_PARITY_PROVEN_WSL2_CHALLENGER",
+  "device": "cuda",
+  "cudaAvailable": true,
+  "cudaVersion": "13.2",
+  "torchVersion": "2.14.0+cu132",
+  "computeCapability": [8, 6],
+  "candidateCount": 2048,
+  "dimension": 768,
+  "topK": 32,
+  "eager": {
+    "meanMs": 0.19791840016841888,
+    "topIndicesChecksum": "faa0c598375922a84e042946df7aed85cc300c385f9eef77b008c925d62d0fe7"
+  },
+  "torchCompile": {
+    "attempted": true,
+    "available": true,
+    "backend": "inductor",
+    "parity": true,
+    "indexParity": true,
+    "maxAbsError": 2.9802322387695312e-08,
+    "meanMs": 0.5218481995165348,
+    "error": null
+  },
+  "triton": {
+    "attempted": true,
+    "available": true,
+    "kernel": "weighted_row_dot_v1",
+    "parity": true,
+    "maxAbsError": 3.814697265625e-06,
+    "meanMs": 0.042425400018692015,
+    "tritonVersion": "3.8.0"
+  },
+  "groupedMm": {
+    "attempted": false,
+    "reason": "MODEL_MOE_TOPOLOGY_NOT_EXPLICIT"
+  },
+  "canonicalAuthority": false,
+  "canonicalWrites": false,
+  "onlineTrainingAllowed": false,
+  "writesPerformed": false,
+  "environment": "WSL2:/home/james/.venvs/atlas-cutile-cu132",
+  "promotion": "CHALLENGER_ONLY"
+}

@@ -20,7 +20,7 @@ const pool = new pg.Pool({ connectionString: dbUrl });
 
 // Gemma4 endpoint (llama-server)
 const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090/v1/chat/completions';
-const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 async function callGemma4(prompt: string): Promise<string> {
   try {

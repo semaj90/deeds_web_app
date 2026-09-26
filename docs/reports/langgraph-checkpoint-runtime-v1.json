@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.langgraph-checkpoint-runtime.v1",
+  "service": "docker/langgraph-synthesis",
+  "chatOwner": "llama-server",
+  "chatEndpoint": "http://host.docker.internal:8090/v1",
+  "embeddingOwner": "ollama",
+  "embeddingEndpoint": "http://host.docker.internal:11434",
+  "checkpoint": {
+    "package": "langgraph-checkpoint-postgres",
+    "version": "3.0.2",
+    "compatibleWith": {
+      "langgraph": "1.0.5",
+      "langgraph-checkpoint": "3.0.1"
+    },
+    "defaultEnabled": false,
+    "automaticSetupDefault": false,
+    "threadIdRequiredWhenEnabled": true,
+    "schema": "public",
+    "readinessStatuses": [
+      "disabled",
+      "ready",
+      "ready_existing",
+      "setup_required",
+      "unavailable"
+    ]
+  },
+  "verification": {
+    "pythonSyntax": true,
+    "containerBuild": true,
+    "disabledImportSmoke": true,
+    "unreachableDatabaseFailsClosed": true,
+    "composeConfig": true,
+    "openSpecStrict": true,
+    "writesPerformed": false,
+    "databaseSetupPerformed": false,
+    "runtimeStarted": false
+  },
+  "authority": {
+    "canonicalSourceAuthority": false,
+    "canonicalPacketAuthority": false,
+    "redisCacheRole": "node-output-cache-only",
+    "postgresCheckpointRole": "optional-thread-replay-only"
+  }
+}

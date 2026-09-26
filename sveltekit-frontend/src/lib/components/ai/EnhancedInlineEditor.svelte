@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 	import { tick } from 'svelte';
 
 	function debounce<T extends (...args: any[]) => any>(fn: T, delay: number): T {
@@ -10,7 +11,7 @@
 	let {
 		value = $bindable(''),
 		placeholder = 'Start typing to get AI suggestions...',
-		aiModel = 'gemma4-legal',
+		aiModel = SERVER_CHAT_MODEL,
 		enableAutoComplete = true,
 		enableGrammarCheck = true,
 		enableSemanticSuggestions = true,

@@ -1,0 +1,135 @@
+{
+  "schema": "atlas.summary-candidate-writer-admission.v1",
+  "gate": "VAL10B_SAME_CANDIDATE_WRITER_ADMISSION",
+  "generatedAt": "2026-09-24T02:34:09.524Z",
+  "candidateCohortChecksum": "63e83c53bde93be1c9f759dcee00d002d510b6ea0b2d1c9a1b189a0825e93691",
+  "chunkCohortChecksum": "7121be8555c183d20533e07af95e9f03ae5482d60d869d466438dd6b8e21da45",
+  "cohortProblems": [],
+  "candidates": 19,
+  "mayPersist": 19,
+  "notAuthorized": 0,
+  "decisions": [
+    {
+      "candidateId": "sc:987738d7b1acea7888ff49a1f837b046deaf4e2530bb256a3d2fca717bf6dba5",
+      "chunkId": "doc:bits-ui:6b3cf8151e01df1d:5",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:beabc0461bdf860f3e51c54c8c105feebef99f0810e8cae4d9621ad342bcc3c7",
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:6e3b5c46e431ad829b7d64068de3b3510d8d7cae4cf46a42bad2d745a12efbdd",
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:5c15141ba392923616d72cbd78b8b2ea11c45bd4afd8d6d2e5714eb7681ee136",
+      "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:8070e4bf885e2f2198aa9644ac17b62ba86f2874cb2d0ca67f0d42cf63a39649",
+      "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:4",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:1450b7445de30a69c8434b5c9c693580f49523f8235979b1934fa029678ca983",
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:e056faec3661d81562b8aed577cd07b58e4749c4fdd283034e307c0122b5b111",
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:9",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:c1462b82ec83aa922457547c422376866bce90178aad5de933390474c6adc8d5",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:da0b0285dde5b6e7723b055ce720d2888e67e5b761721dee7fc8eafd96cfafe8",
+      "chunkId": "doc:pgvector:fe883c75f323441d:24",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:aa465626900b45a43211d067581a07f0be633620ab8507e9ed6ec8c714144ce7",
+      "chunkId": "doc:pgvector:fe883c75f323441d:26",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:dd50d1427ddc07b1e27cf7404ba49b1aa320c8e9ee872fb1c9e6cc861fa0371d",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:048ba291e2b51128b95ef95e81f5363bbba63312cecd722e51e48454b558ea34",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:47871c3e832071128a7d6f7a36e1ea494bdcd34cdd3f197f0045a62164f5453d",
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:ed31b8cab3c05a962d5d518f596b4f8cd9beb4e7eb8de9f23ccf7bfdb50a5c9b",
+      "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:1",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:a4035b1f7065076f1c0c765a6fe2c2447ebf8cb65158cacd2d331734c1384256",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:1",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:a9d7d85c54ac4a183d9c184b234d9e2d9bccff9dc599469797643119130270b9",
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:465878325024b7a6b9ffec4961c3443110c2ff8afa8a36965cf224ec9231dff2",
+      "chunkId": "doc:sveltekit:62e6dd9932a74b58:15",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:b89a141b2a8a434129a5a3176e3064feaee076cd191c849e8de5f75bca447578",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19",
+      "decision": "MAY_PERSIST"
+    },
+    {
+      "candidateId": "sc:b4627278caa41454e795a83091aa0b3413a38c233f890de7bdc8a6eb5f046518",
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+      "decision": "MAY_PERSIST"
+    }
+  ],
+  "negativeControl": {
+    "candidateCohortChecksum": "5713db798d682742ada1431989e1463837988dd1fea1115410e2c34127e09f5e",
+    "cohortProblems": [],
+    "candidates": 1,
+    "refused": 1,
+    "mustBeRefused": true,
+    "decisions": [
+      {
+        "candidateId": "sc:d8682b7baa1bd3865d0c5d3cde8e200287d24c69a04a94c5775a1f3d07c8da86",
+        "decision": "PERSISTENCE_NOT_AUTHORIZED",
+        "reasons": [
+          "CLAIM_REJECT",
+          "NOT_ELIGIBLE"
+        ]
+      }
+    ]
+  },
+  "modelCalls": 0,
+  "databaseConnections": 0,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "persistedSummaries": 0
+}

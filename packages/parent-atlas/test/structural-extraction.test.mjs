@@ -86,6 +86,7 @@ test('treesitter-chunker IDs remain upstream provenance and do not mint canonica
 
   assert.equal(result.chunks[0].upstream_symbol_id, 'symbol-1');
   assert.equal(result.symbol_nominations[0].upstream_symbol_id, 'symbol-1');
+  assert.equal(result.symbol_nominations[0].upstream_file_id, 'file-1');
   assert.equal(result.receipt.canonical_identity_created, false);
   assert.equal(result.ast_grep_observations[0].canonical_authority, false);
   assert.equal(result.langextract_observations[0].canonical_authority, false);

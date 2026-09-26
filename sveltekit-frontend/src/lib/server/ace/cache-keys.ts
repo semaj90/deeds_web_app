@@ -23,6 +23,7 @@ export interface RetrievalCacheIdentityV1 {
 	candidateSnapshotRevision: string;
 	ordinalMapChecksum: string;
 	representationRevision: string;
+	featureRevision: string;
 	retrievalPolicyRevision: string;
 	contextPolicyRevision: string;
 	graphRevision?: string | null;
@@ -37,6 +38,7 @@ export const aceTopkRevisionedKeyV1 = (identity: RetrievalCacheIdentityV1): stri
 		candidateSnapshotRevision: identity.candidateSnapshotRevision,
 		ordinalMapChecksum: identity.ordinalMapChecksum,
 		representationRevision: identity.representationRevision,
+		featureRevision: identity.featureRevision,
 		retrievalPolicyRevision: identity.retrievalPolicyRevision,
 		contextPolicyRevision: identity.contextPolicyRevision,
 		graphRevision: identity.graphRevision ?? null,

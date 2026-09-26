@@ -1,6 +1,6 @@
 {
   "schema": "atlas.atlas-packets-content-hash-backfill.v1",
-  "generatedAt": "2026-09-08T02:07:15.144Z",
+  "generatedAt": "2026-09-15T23:52:18.740Z",
   "mode": "DRY_RUN",
   "limit": 1000,
   "status": "DRY_RUN_COMPLETE",
@@ -16,13 +16,13 @@
     },
     "CH_BF_02": {
       "name": "UNAMBIGUOUS_SELECTION_DETERMINISTIC",
-      "proven": false,
+      "proven": true,
       "orderBy": [
         "packet_key"
       ],
-      "selectedCount": 0,
+      "selectedCount": 1000,
       "requestedLimit": 1000,
-      "selectionChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "selectionChecksum": "a1fbaf28123e8573e54f6f73ce1ffe1304daff7f848cdb2c7526530b15d51209",
       "joinDefinition": "atlas_packets.source_ref = codebase_chunk_index.source_ref, count(DISTINCT codebase_chunk_index.content_hash) = 1, atlas_packets.content_hash IS NULL"
     },
     "CH_BF_03": {
@@ -44,9 +44,9 @@
       "reason": "SKIPPED_DRY_RUN"
     }
   },
-  "selectionChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "selectionChecksum": "a1fbaf28123e8573e54f6f73ce1ffe1304daff7f848cdb2c7526530b15d51209",
   "counts": {
-    "selected": 0,
+    "selected": 1000,
     "updated": 0,
     "alreadyPopulated": 0,
     "readbackMatched": 0

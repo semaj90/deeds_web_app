@@ -1,0 +1,613 @@
+{
+  "schema": "atlas.postgres-index-capability.v1",
+  "generatedAt": "2026-09-21T02:00:21.346Z",
+  "server": {
+    "version": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "ioMethod": "worker",
+    "effectiveIoConcurrency": "16",
+    "ioWorkers": "3",
+    "extensions": [
+      "pg_trgm 1.6",
+      "vector 0.8.3"
+    ]
+  },
+  "tables": {
+    "atlas_symbol_registry": {
+      "exists": true,
+      "rows": 10504,
+      "missingColumns": [],
+      "indexes": [
+        "atlas_symbol_registry_pkey [btree] lead=stable_symbol_id bitmap=true",
+        "atlas_symbol_registry_canonical_key_key [btree] lead=canonical_key bitmap=true",
+        "idx_atlas_symbol_registry_kind [btree] lead=language bitmap=true",
+        "idx_atlas_symbol_registry_name [btree] lead=canonical_name bitmap=true"
+      ],
+      "capabilities": [
+        {
+          "name": "canonical_key exact",
+          "column": "canonical_key",
+          "am": "btree",
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "atlas_symbol_registry_canonical_key_key",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": true
+        },
+        {
+          "name": "canonical_name lookup",
+          "column": "canonical_name",
+          "am": "btree",
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "idx_atlas_symbol_registry_name",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": true
+        },
+        {
+          "name": "name fuzzy (trigram)",
+          "column": "canonical_name",
+          "am": "gin",
+          "opclass": "gin_trgm_ops",
+          "optional": true,
+          "status": "OPTIONAL_ABSENT"
+        }
+      ]
+    },
+    "atlas_symbol_versions": {
+      "exists": true,
+      "rows": 479,
+      "missingColumns": [],
+      "indexes": [
+        "idx_atlas_symbol_versions_source [btree] lead=source_ref bitmap=true",
+        "atlas_symbol_versions_pkey [btree] lead=symbol_version_id bitmap=true",
+        "atlas_symbol_versions_stable_symbol_id_source_revision_decl_key [btree] lead=stable_symbol_id bitmap=true",
+        "idx_atlas_symbol_versions_symbol_revision [btree] lead=stable_symbol_id bitmap=true",
+        "idx_atlas_symbol_versions_upstream_node [btree] lead=upstream_node_id bitmap=true",
+        "idx_atlas_symbol_versions_upstream_symbol [btree,partial] lead=upstream_symbol_id bitmap=true",
+        "idx_atlas_symbol_versions_packet_ordinal [btree,partial] lead=packet_key bitmap=true"
+      ],
+      "capabilities": [
+        {
+          "name": "source_ref lookup",
+          "column": "source_ref",
+          "am": "btree",
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "idx_atlas_symbol_versions_source",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": true
+        },
+        {
+          "name": "source_revision filter",
+          "column": "source_revision",
+          "am": "btree",
+          "status": "MISSING_INDEX"
+        },
+        {
+          "name": "stable_symbol_id join",
+          "column": "stable_symbol_id",
+          "am": "btree",
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "atlas_symbol_versions_stable_symbol_id_source_revision_decl_key",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": true
+        },
+        {
+          "name": "qualified_name lookup",
+          "column": "qualified_name",
+          "am": "btree",
+          "status": "MISSING_INDEX"
+        }
+      ]
+    },
+    "atlas_ast_nodes": {
+      "exists": true,
+      "rows": 11273,
+      "missingColumns": [],
+      "indexes": [
+        "atlas_ast_nodes_pkey [btree] lead=tree_node_id bitmap=true",
+        "atlas_ast_nodes_repo_id_relative_path_node_kind_qualified_s_key [btree] lead=repo_id bitmap=true",
+        "idx_aan_relative_path [btree] lead=relative_path bitmap=true",
+        "idx_aan_node_kind [btree] lead=node_kind bitmap=true",
+        "idx_aan_qualified_symbol [btree,partial] lead=qualified_symbol bitmap=true",
+        "idx_atlas_ast_nodes_parent [btree,partial] lead=parent_tree_node_id bitmap=true",
+        "idx_atlas_ast_nodes_source_content_hash [btree] lead=source_content_hash bitmap=true",
+        "idx_atlas_ast_nodes_language [btree] lead=parser_language bitmap=true",
+        "idx_atlas_ast_nodes_source_revision [btree,partial] lead=source_revision bitmap=true"
+      ],
+      "capabilities": [
+        {
+          "name": "relative_path lookup",
+          "column": "relative_path",
+          "am": "btree",
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "idx_aan_relative_path",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": true
+        },
+        {
+          "name": "source_revision filter",
+          "column": "source_revision",
+          "am": "btree",
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "idx_atlas_ast_nodes_source_revision",
+          "partial": true,
+          "indexScan": true,
+          "bitmapScan": true
+        },
+        {
+          "name": "source_content_hash lookup",
+          "column": "source_content_hash",
+          "am": "btree",
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "idx_atlas_ast_nodes_source_content_hash",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": true
+        },
+        {
+          "name": "node_kind filter",
+          "column": "node_kind",
+          "am": "btree",
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "idx_aan_node_kind",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": true
+        },
+        {
+          "name": "ast_generation filter",
+          "column": "ast_generation",
+          "am": "btree",
+          "optional": true,
+          "status": "NOT_APPLICABLE_COLUMN_ABSENT"
+        }
+      ]
+    },
+    "atlas_packets": {
+      "exists": true,
+      "rows": 61718,
+      "missingColumns": [],
+      "indexes": [
+        "idx_atlas_packets_workspace_revision [btree] lead=workspace_revision bitmap=true",
+        "idx_atlas_packets_representation_revision [btree] lead=representation_revision bitmap=true",
+        "idx_atlas_packets_embedding_digest [btree] lead=embedding_digest bitmap=true",
+        "atlas_packets_pkey [btree] lead=packet_id bitmap=true",
+        "atlas_packets_packet_key_key [btree] lead=packet_key bitmap=true",
+        "idx_atlas_packets_packet_key [btree] lead=packet_key bitmap=true",
+        "idx_atlas_packets_som_cluster [btree] lead=som_cluster bitmap=true",
+        "idx_atlas_packets_som_index [btree] lead=som_index bitmap=true",
+        "idx_atlas_packets_neo4j_node_id [btree,partial] lead=neo4j_node_id bitmap=true",
+        "idx_atlas_packets_extracted_entities [gin] lead=extracted_entities bitmap=true",
+        "idx_atlas_packets_bm25_indexed_at [btree] lead=bm25_indexed_at bitmap=true",
+        "idx_atlas_packets_source_feature [btree] lead=source_ref bitmap=true",
+        "idx_atlas_packets_community_id [btree] lead=community_id bitmap=true",
+        "idx_atlas_packets_source_kind [btree] lead=source_kind bitmap=true",
+        "idx_atlas_packets_packet_ulid [btree] lead=packet_ulid bitmap=true",
+        "idx_atlas_packets_title_id [btree] lead=title_id bitmap=true",
+        "idx_atlas_packets_canonical_source_ref [btree] lead=canonical_source_ref bitmap=true",
+        "idx_atlas_packets_page_rank_score [btree] lead=page_rank_score bitmap=true",
+        "idx_atlas_packets_kmeans_cluster_id [btree] lead=kmeans_cluster_id bitmap=true",
+        "idx_atlas_packets_routing_hints [gin] lead=routing_hints bitmap=true",
+        "idx_atlas_packets_tags_gin [gin] lead=tags bitmap=true",
+        "idx_atlas_packets_packet_key_idx [btree] lead=packet_key bitmap=true",
+        "idx_atlas_packets_identity_compound_idx [btree] lead=packet_key bitmap=true",
+        "idx_packets_used_concepts_gin [gin] lead=used_concepts bitmap=true",
+        "idx_atlas_packets_repository_id [btree] lead=repository_id bitmap=true",
+        "idx_atlas_packets_directory_id [btree] lead=directory_id bitmap=true",
+        "idx_atlas_packets_file_id [btree] lead=file_id bitmap=true",
+        "idx_atlas_packets_module_id [btree] lead=module_id bitmap=true",
+        "idx_atlas_packets_symbol_id [btree] lead=symbol_id bitmap=true",
+        "idx_atlas_packets_type [btree] lead=packet_type bitmap=true",
+        "idx_atlas_packets_ontology_gin [gin] lead=packet_ontology bitmap=true",
+        "idx_packets_feature_envelope [gin] lead=feature_envelope bitmap=true",
+        "idx_atlas_packets_som_cell [btree] lead=som_cell_x bitmap=true",
+        "idx_atlas_packets_ast_score [btree] lead=ast_score bitmap=true",
+        "idx_latent_64_not_null [hash,partial] lead=packet_id bitmap=true",
+        "idx_atlas_packets_source_ref [btree] lead=source_ref bitmap=true",
+        "idx_atlas_packets_source_ref_key [btree] lead=source_ref_key bitmap=true",
+        "idx_atlas_packets_feature_id [btree] lead=feature_id bitmap=true",
+        "idx_atlas_packets_file_path [btree] lead=file_path bitmap=true",
+        "idx_atlas_packets_file_path_trgm [gin] lead=file_path bitmap=true",
+        "idx_atlas_packets_metadata_gin [gin] lead=metadata bitmap=true",
+        "idx_atlas_packets_payload_gin [gin] lead=payload bitmap=true",
+        "idx_atlas_packets_permissions_gin_pathops [gin] lead=permissions bitmap=true",
+        "idx_atlas_packets_topology_gin_pathops [gin] lead=topology bitmap=true",
+        "idx_atlas_packets_vectors_gin_pathops [gin] lead=vectors bitmap=true",
+        "idx_atlas_packets_concept_ids [gin] lead=concept_ids bitmap=true",
+        "idx_atlas_packets_tags [gin] lead=tags bitmap=true",
+        "idx_atlas_packets_summary_fts [gin] lead=expr bitmap=true",
+        "idx_atlas_packets_qdrant_point_id [btree] lead=qdrant_point_id bitmap=true",
+        "idx_atlas_packets_identity_lane [btree] lead=identity_lane bitmap=true",
+        "idx_atlas_packets_redis_centroid_key [btree,partial] lead=redis_centroid_key bitmap=true",
+        "idx_atlas_packets_embedding_status [btree,partial] lead=embedding_status bitmap=true",
+        "idx_atlas_packets_keywords [gin] lead=keywords bitmap=true",
+        "idx_atlas_packets_error_pattern [btree] lead=error_pattern bitmap=true",
+        "idx_atlas_packets_feature_group_id [btree] lead=feature_group_id bitmap=true",
+        "idx_atlas_packets_domain_class [btree] lead=domain_class bitmap=true",
+        "idx_atlas_packets_taxonomy_level [btree] lead=taxonomy_level bitmap=true",
+        "idx_atlas_packets_bm25_terms [gin] lead=bm25_terms bitmap=true",
+        "idx_atlas_packets_metadata_gin_pathops [gin] lead=metadata bitmap=true",
+        "idx_atlas_packets_payload_gin_pathops [gin] lead=payload bitmap=true",
+        "idx_atlas_packets_envelope_fts [gin] lead=expr bitmap=true",
+        "idx_atlas_packets_source_ref_idx [btree] lead=source_ref bitmap=true",
+        "idx_atlas_packets_feature_id_idx [btree] lead=feature_id bitmap=true",
+        "idx_atlas_packets_feature_label_idx [btree] lead=feature_label bitmap=true",
+        "idx_atlas_packets_community_id_idx [btree] lead=community_id bitmap=true",
+        "idx_atlas_packets_community_source_idx [btree] lead=community_source bitmap=true",
+        "idx_atlas_packets_community_confidence_idx [btree] lead=community_confidence bitmap=true",
+        "idx_atlas_packets_lineage_version_idx [btree] lead=lineage_version bitmap=true",
+        "idx_atlas_packets_ledger_type_idx [btree] lead=ledger_type bitmap=true",
+        "idx_atlas_packets_domain_class_idx [btree] lead=domain_class bitmap=true",
+        "idx_atlas_packets_som_index_idx [btree] lead=som_index bitmap=true",
+        "idx_atlas_packets_kmeans_cluster_idx [btree] lead=kmeans_cluster bitmap=true",
+        "idx_atlas_packets_chunk_id [btree] lead=chunk_id bitmap=true",
+        "idx_atlas_packets_hierarchy [btree] lead=repository_id bitmap=true",
+        "atlas_packets_domain_unclassified_idx [btree,partial] lead=packet_key bitmap=true",
+        "idx_atlas_packets_community_boost [btree] lead=community_boost bitmap=true",
+        "idx_atlas_packets_rerank_features [gin] lead=rerank_features bitmap=true",
+        "idx_atlas_packets_pagerank_score [btree] lead=pagerank_score bitmap=true",
+        "idx_atlas_packets_som_distance [btree] lead=som_distance bitmap=true",
+        "idx_atlas_packets_tree_node_id [btree] lead=tree_node_id bitmap=true",
+        "idx_atlas_packets_domain_memberships [gin] lead=domain_memberships bitmap=true",
+        "idx_atlas_packets_primary_domain [btree,partial] lead=primary_domain bitmap=true",
+        "idx_atlas_packets_domain_confidence [btree,partial] lead=domain_confidence bitmap=true",
+        "idx_packets_source_feature_multi_hop [btree] lead=source_ref bitmap=true",
+        "atlas_packets_metadata_gin_idx [gin] lead=metadata bitmap=true",
+        "idx_atlas_packets_feature_id_composite [btree] lead=feature_id bitmap=true",
+        "idx_packets_centroid_cache [btree,partial] lead=feature_id bitmap=true",
+        "idx_atlas_packets_payload_path [gin] lead=payload bitmap=true",
+        "idx_atlas_packets_source_revision [btree,partial] lead=source_revision bitmap=true",
+        "atlas_packets_workspace_representation_idx [btree,partial] lead=workspace_revision bitmap=true",
+        "idx_atlas_packets_workspace_revision_key_source [btree,partial] lead=workspace_revision_key bitmap=true",
+        "idx_atlas_packets_lineage_binding_checksum [btree,partial] lead=lineage_binding_checksum bitmap=true"
+      ],
+      "capabilities": [
+        {
+          "name": "packet_key exact",
+          "column": "packet_key",
+          "am": "btree",
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "atlas_packets_packet_key_key",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": true
+        },
+        {
+          "name": "source_ref lookup",
+          "column": "source_ref",
+          "am": "btree",
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "idx_atlas_packets_source_feature",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": true
+        },
+        {
+          "name": "domain_class filter",
+          "column": "domain_class",
+          "am": "btree",
+          "optional": true,
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "idx_atlas_packets_domain_class",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": true
+        }
+      ]
+    },
+    "codebase_chunk_index": {
+      "exists": true,
+      "rows": 274465,
+      "missingColumns": [],
+      "indexes": [
+        "idx_codebase_chunk_index_metadata_packet_key [btree] lead=expr bitmap=true",
+        "idx_codebase_chunk_index_metadata_tree_node_id [btree] lead=expr bitmap=true",
+        "idx_codebase_chunk_index_output_meta_tree_node_id [btree] lead=expr bitmap=true",
+        "idx_codebase_chunk_summary_embedding_384_hnsw [hnsw] lead=summary_embedding_384 bitmap=false",
+        "idx_codebase_chunk_embedding_model_normalized [btree,partial] lead=embedding_model bitmap=true",
+        "idx_codebase_chunk_summary_null [btree,partial] lead=summary bitmap=true",
+        "idx_codebase_chunk_source_ref [btree] lead=source_ref bitmap=true",
+        "idx_codebase_chunk_latent64_hnsw [hnsw,partial] lead=latent_64 bitmap=false",
+        "idx_codebase_chunk_bm25_search [gin] lead=search_vector bitmap=true",
+        "idx_cci_kmeans_cluster [btree,partial] lead=kmeans_cluster bitmap=true",
+        "idx_cci_kmeans384_cluster [btree,partial] lead=kmeans384_cluster bitmap=true",
+        "idx_codebase_chunk_content_embedding_768_hnsw [hnsw] lead=content_embedding_768 bitmap=false",
+        "idx_codebase_chunk_latent_256_hnsw [hnsw,partial] lead=latent_256 bitmap=false",
+        "idx_codebase_chunk_latent_256_checkpoint_revision [btree,partial] lead=latent_256_checkpoint_revision bitmap=true",
+        "codebase_chunk_index_pkey [btree] lead=id bitmap=true",
+        "codebase_chunk_index_chunk_id_idx [btree] lead=chunk_id bitmap=true",
+        "codebase_chunk_index_cluster_summary_gin [gin] lead=cluster_summary bitmap=true",
+        "codebase_chunk_index_content_hnsw [hnsw] lead=content_embedding bitmap=false",
+        "codebase_chunk_index_domain_idx [btree] lead=domain bitmap=true",
+        "codebase_chunk_index_extension_idx [btree] lead=extension bitmap=true",
+        "codebase_chunk_index_gpu_cluster_idx [btree] lead=gpu_cluster bitmap=true",
+        "codebase_chunk_index_language_idx [btree] lead=language bitmap=true",
+        "codebase_chunk_index_metadata_gin [gin] lead=metadata bitmap=true",
+        "codebase_chunk_index_path_idx [btree] lead=relative_path bitmap=true",
+        "codebase_chunk_index_qdrant_id_unique [btree] lead=qdrant_id bitmap=true",
+        "codebase_chunk_index_semantic_tags_gin [gin] lead=semantic_tags bitmap=true",
+        "codebase_chunk_index_som_bmu_idx [btree] lead=som_bmu_row bitmap=true",
+        "codebase_chunk_index_som_cluster_idx [btree] lead=som_cluster bitmap=true",
+        "codebase_chunk_index_summary_hnsw [hnsw] lead=summary_embedding bitmap=false",
+        "codebase_chunk_index_tags_idx [gin] lead=tags bitmap=true",
+        "idx_codebase_chunk_metadata_gin [gin] lead=metadata bitmap=true",
+        "idx_codebase_chunk_semantic_tags_gin [gin] lead=semantic_tags bitmap=true",
+        "idx_codebase_chunk_summary_embedding_ivfflat [ivfflat] lead=summary_embedding bitmap=false",
+        "idx_codebase_chunk_tags_gin [gin] lead=tags bitmap=true",
+        "idx_codebase_chunk_encoder_id [btree] lead=encoder_id bitmap=true",
+        "idx_codebase_chunk_latent_valid [btree] lead=latent_embedding_valid bitmap=true",
+        "codebase_chunk_index_centroid_idx [btree] lead=centroid_id bitmap=true",
+        "codebase_chunk_index_routing_tier_idx [btree] lead=routing_tier bitmap=true",
+        "idx_codebase_chunk_pgsearch_bm25 [bm25] lead=id bitmap=true",
+        "idx_codebase_chunk_index_error_embedding_hnsw [hnsw] lead=error_embedding bitmap=false",
+        "idx_codebase_chunk_error_embedding_latent_256_hnsw [hnsw,partial] lead=error_embedding_latent_256 bitmap=false",
+        "idx_codebase_chunk_error_embedding_latent64_hnsw [hnsw,partial] lead=error_embedding_latent_64 bitmap=false",
+        "idx_codebase_chunk_error_embedding_latent_256_checkpoint_revisi [btree,partial] lead=error_embedding_latent_256_checkpoint_revision bitmap=true",
+        "idx_codebase_chunk_error_embedding_latent_valid [btree] lead=error_embedding_latent_valid bitmap=true",
+        "idx_codebase_chunk_latent_128_hnsw [hnsw,partial] lead=latent_128 bitmap=false",
+        "idx_codebase_chunk_error_embedding_latent_128_hnsw [hnsw,partial] lead=error_embedding_latent_128 bitmap=false",
+        "idx_codebase_chunk_index_file_content_hash [btree,partial] lead=source_ref bitmap=true",
+        "idx_codebase_chunk_index_workspace_source_lineage [btree,partial] lead=workspace_revision bitmap=true",
+        "idx_codebase_chunk_index_source_revision [btree,partial] lead=source_revision bitmap=true",
+        "idx_codebase_chunk_index_representation_revision [btree,partial] lead=representation_revision bitmap=true",
+        "idx_codebase_chunk_index_lineage_checksum [btree,partial] lead=lineage_binding_checksum bitmap=true"
+      ],
+      "capabilities": [
+        {
+          "name": "semantic_768 ANN",
+          "column": "content_embedding",
+          "am": "hnsw",
+          "vector": true,
+          "status": "INDEX_CAPABILITY_PROVEN",
+          "index": "codebase_chunk_index_content_hnsw",
+          "partial": false,
+          "indexScan": true,
+          "bitmapScan": false,
+          "note": "ANN index: no bitmap scans by design; kept separate from the B-tree/GIN bitmap layer"
+        }
+      ]
+    }
+  },
+  "fixtures": [
+    {
+      "id": "ast_by_path_kind",
+      "tables": [
+        "atlas_ast_nodes"
+      ],
+      "expectedIndexedColumns": [
+        "relative_path",
+        "node_kind"
+      ],
+      "defaultPlan": {
+        "nodes": [
+          "Limit",
+          "Index Scan"
+        ],
+        "bitmapHeap": false,
+        "bitmapAnd": false,
+        "bitmapOr": false,
+        "indexScan": true,
+        "seqScan": false,
+        "sharedHit": 0,
+        "sharedRead": 4,
+        "planRows": 1,
+        "actualRows": 0,
+        "executionMs": 0.922,
+        "settings": {}
+      },
+      "plannerSelectedBitmap": false,
+      "bitmapProbe": {
+        "nodes": [
+          "Limit",
+          "Bitmap Heap Scan",
+          "Bitmap Index Scan"
+        ],
+        "bitmapHeap": true,
+        "bitmapAnd": false,
+        "bitmapOr": false,
+        "indexScan": false,
+        "seqScan": false,
+        "sharedHit": 4,
+        "sharedRead": 0,
+        "planRows": 1,
+        "actualRows": 0,
+        "executionMs": 0.124,
+        "settings": {
+          "enable_seqscan": "off",
+          "enable_indexscan": "off",
+          "enable_indexonlyscan": "off"
+        },
+        "bitmapPlanGeneratable": true
+      },
+      "verdict": "PLANNER_CHOSE_INDEX_SCAN_NOT_A_FAILURE"
+    },
+    {
+      "id": "symbol_version_by_source",
+      "tables": [
+        "atlas_symbol_versions"
+      ],
+      "expectedIndexedColumns": [
+        "source_ref",
+        "source_revision"
+      ],
+      "defaultPlan": {
+        "nodes": [
+          "Limit",
+          "Bitmap Heap Scan",
+          "Bitmap Index Scan"
+        ],
+        "bitmapHeap": true,
+        "bitmapAnd": false,
+        "bitmapOr": false,
+        "indexScan": false,
+        "seqScan": false,
+        "sharedHit": 3,
+        "sharedRead": 3,
+        "planRows": 4,
+        "actualRows": 23,
+        "executionMs": 0.922,
+        "settings": {}
+      },
+      "plannerSelectedBitmap": true,
+      "bitmapProbe": {
+        "nodes": [
+          "Limit",
+          "Bitmap Heap Scan",
+          "Bitmap Index Scan"
+        ],
+        "bitmapHeap": true,
+        "bitmapAnd": false,
+        "bitmapOr": false,
+        "indexScan": false,
+        "seqScan": false,
+        "sharedHit": 6,
+        "sharedRead": 0,
+        "planRows": 4,
+        "actualRows": 23,
+        "executionMs": 0.06,
+        "settings": {
+          "enable_seqscan": "off",
+          "enable_indexscan": "off",
+          "enable_indexonlyscan": "off"
+        },
+        "bitmapPlanGeneratable": true
+      },
+      "verdict": "PLANNER_SELECTED_BITMAP_FOR_FIXTURE"
+    },
+    {
+      "id": "packets_domain_source",
+      "tables": [
+        "atlas_packets"
+      ],
+      "expectedIndexedColumns": [
+        "domain_class",
+        "source_ref"
+      ],
+      "defaultPlan": {
+        "nodes": [
+          "Limit",
+          "Bitmap Heap Scan",
+          "Bitmap Index Scan"
+        ],
+        "bitmapHeap": true,
+        "bitmapAnd": false,
+        "bitmapOr": false,
+        "indexScan": false,
+        "seqScan": false,
+        "sharedHit": 140,
+        "sharedRead": 2382,
+        "planRows": 51,
+        "actualRows": 7,
+        "executionMs": 44.571,
+        "settings": {}
+      },
+      "plannerSelectedBitmap": true,
+      "bitmapProbe": {
+        "nodes": [
+          "Limit",
+          "Bitmap Heap Scan",
+          "Bitmap Index Scan"
+        ],
+        "bitmapHeap": true,
+        "bitmapAnd": false,
+        "bitmapOr": false,
+        "indexScan": false,
+        "seqScan": false,
+        "sharedHit": 2522,
+        "sharedRead": 0,
+        "planRows": 51,
+        "actualRows": 7,
+        "executionMs": 4.679,
+        "settings": {
+          "enable_seqscan": "off",
+          "enable_indexscan": "off",
+          "enable_indexonlyscan": "off"
+        },
+        "bitmapPlanGeneratable": true
+      },
+      "verdict": "PLANNER_SELECTED_BITMAP_FOR_FIXTURE"
+    },
+    {
+      "id": "packets_domain_source_exact",
+      "tables": [
+        "atlas_packets"
+      ],
+      "expectedIndexedColumns": [
+        "domain_class",
+        "source_ref"
+      ],
+      "defaultPlan": {
+        "nodes": [
+          "Limit",
+          "Index Scan"
+        ],
+        "bitmapHeap": false,
+        "bitmapAnd": false,
+        "bitmapOr": false,
+        "indexScan": true,
+        "seqScan": false,
+        "sharedHit": 0,
+        "sharedRead": 4,
+        "planRows": 1,
+        "actualRows": 1,
+        "executionMs": 1.464,
+        "settings": {}
+      },
+      "plannerSelectedBitmap": false,
+      "bitmapProbe": {
+        "nodes": [
+          "Limit",
+          "Bitmap Heap Scan",
+          "Bitmap Index Scan"
+        ],
+        "bitmapHeap": true,
+        "bitmapAnd": false,
+        "bitmapOr": false,
+        "indexScan": false,
+        "seqScan": false,
+        "sharedHit": 4,
+        "sharedRead": 0,
+        "planRows": 1,
+        "actualRows": 1,
+        "executionMs": 0.053,
+        "settings": {
+          "enable_seqscan": "off",
+          "enable_indexscan": "off",
+          "enable_indexonlyscan": "off"
+        },
+        "bitmapPlanGeneratable": true
+      },
+      "verdict": "PLANNER_CHOSE_INDEX_SCAN_NOT_A_FAILURE"
+    }
+  ],
+  "aio": {
+    "pgMajor": 18,
+    "ioMethod": "worker",
+    "capability": "PG18_AIO_CAPABLE",
+    "pgAiosInFlightNow": 0,
+    "executionObservation": "NOT_OBSERVED (zero in-flight handles is not a failure; needs a cold, I/O-heavy fixture)"
+  },
+  "verdicts": {
+    "PG18-SCHEMA-01": "PROVEN",
+    "PG18-INDEX-02": "GAPS",
+    "PG18-PLAN-03": "PROVEN (plans captured as JSON)",
+    "PG18-AIO-04": "PG18_AIO_CAPABLE; NOT_OBSERVED",
+    "PG18-BITMAP-05": "BITMAP_PLAN_GENERATABLE (4/4 fixtures); planner-selected in 2/4; BitmapAnd combining shown: false",
+    "PGVECTOR-06": "capability only: HNSW INDEX_CAPABILITY_PROVEN; iterative_scan supported true; parity NOT_RUN"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "pgvector": {
+    "version": "0.8.3",
+    "iterativeScanSupported": true,
+    "hnswIterativeScanSetting": "unset (vector extension not loaded in this session)",
+    "exactVsHnswParityFixture": "NOT_RUN (PGVECTOR-06 needs a frozen filtered fixture and exact oracle)"
+  },
+  "gaps": [
+    "atlas_symbol_versions.source_revision (source_revision filter: MISSING_INDEX)",
+    "atlas_symbol_versions.qualified_name (qualified_name lookup: MISSING_INDEX)"
+  ]
+}

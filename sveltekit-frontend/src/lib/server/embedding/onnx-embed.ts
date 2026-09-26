@@ -72,9 +72,16 @@ export function getOnnxEmbedLocalModelPath(): string | null {
   return localModel()?.modelPath ?? null;
 }
 
-export function isOnnxEmbedAvailable(): boolean {
-  if (_unavailable) return false;
-  return localModel() !== null;
+export async function isOnnxEmbedAvailable(): Promise<boolean> {
+  if (_unavailable || localModel() === null) return false;
+  try {
+    const [session, tokenizer] = await Promise.all([getSession(), getTokenizer()]);
+    const inputNames = new Set<string>(session?.inputNames ?? []);
+    return inputNames.has('input_ids') && inputNames.has('attention_mask') && Boolean(tokenizer);
+  } catch {
+    _unavailable = true;
+    return false;
+  }
 }
 
 async function getSession(): Promise<any> {

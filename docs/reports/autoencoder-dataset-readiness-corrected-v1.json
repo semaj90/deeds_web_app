@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.autoencoder-dataset-readiness-corrected.v1",
+  "generatedAt": "2026-09-13T00:00:00.000Z",
+  "mode": "READ_ONLY_ANALYZE",
+  "bug": "scripts/atlas/autoencoder-dataset-readiness.mjs queried codebase_chunk_index.content_embedding_768 (legacy, near-empty column, 1,386/55,853 rows) instead of content_embedding (canonical embeddinggemma column, 55,169/55,853 rows populated per CLAUDE.md's Embedding Dimensions Policy). This produced a false '2.5% embedding coverage' reading in every prior SEMANTIC_768_CURRENT_COHORT_INCOMPLETE audit entry.",
+  "verifiedLiveColumnCounts": {
+    "codebase_chunk_index_total": 55853,
+    "content_embedding_populated": 55169,
+    "content_embedding_768_populated": 1386
+  },
+  "fix": "Renamed all 6 occurrences of content_embedding_768 -> content_embedding in the script (2 SQL queries + JS destructuring). No schema change, no data write -- query-target correction only.",
+  "before": {
+    "embeddingCoveragePct": 2.5,
+    "note": "wrong column"
+  },
+  "after": {
+    "identityCoverage": { "has_packet_key": "100.0%", "has_feature_id": "100.0%", "has_domain_class": "100.0%", "has_tree_node": "99.9%", "has_concepts": "94.6%" },
+    "topologyCoverage": { "has_som": "99.9%", "has_pagerank": "99.9%", "has_community": "99.9%", "has_kcore": "16.6%" },
+    "featureCoverage": { "has_ast": "20.3%", "has_lexical": "100.0%", "has_entities": "19.4%", "has_used_concepts": "96.5%" },
+    "embeddingCoverage": { "has_embedding": "98.8%", "has_summary": "72.2%" }
+  },
+  "readinessGates": {
+    "featureCoverageThreshold": 80,
+    "featureCoverageActual": 20.3,
+    "featureCoverageMet": false,
+    "topologyCoverageThreshold": 50,
+    "topologyCoverageActual": 99.9,
+    "topologyCoverageMet": true,
+    "embeddingCoverageThreshold": 70,
+    "embeddingCoverageActual": 98.8,
+    "embeddingCoverageMet": true
+  },
+  "conclusion": "Embedding coverage and topology coverage gates are both actually satisfied (were previously misreported as failing on embeddings due to the wrong-column bug). The sole genuine remaining blocker for AE training readiness is feature/AST coverage at 20.3% (needs ast_symbols populated on 4x more atlas_packet_features rows to cross the 80% threshold) -- this is real, unverified-elsewhere-as-a-bug, unchanged by this fix. AST coverage was independently verified live (12,497/61,660 = 20.27%) and matches the script's own reported figure exactly, so no similar bug exists in that measurement.",
+  "writesPerformed": false
+}

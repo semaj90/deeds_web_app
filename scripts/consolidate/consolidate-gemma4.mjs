@@ -12,6 +12,7 @@
  *   .tmp/consolidation-summaries.json (Gemma4 reasoning for each merge)
  */
 
+import { llamaChat } from '../atlas/lib/llama-inference.mjs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -104,19 +105,8 @@ Keep your response CONCISE (under 150 words).
 Format as JSON: { "reasoning": "...", "risks": [...], "approach": "...", "confidence": 0.95, "warnings": [...] }
 `;
 
-    const response = await fetch('http://127.0.0.1:11434/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf',
-        prompt,
-        stream: false,
-        options: { temperature: 0.3, num_predict: 200 }
-      })
-    });
-
-    const data = await response.json();
-    const responseText = data.response || '';
+    // llama-server (Ornith 1.5) via the shared helper; Ollama is embeddings-only.
+    const responseText = await llamaChat(prompt, { maxTokens: 200, temperature: 0.3 });
 
     // Extract JSON from response
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);

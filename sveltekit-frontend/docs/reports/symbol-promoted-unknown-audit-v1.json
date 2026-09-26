@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.symbol-promoted-unknown-audit.v1",
+  "generatedAt": "2026-09-22T20:24:24.759Z",
+  "observationSource": "TREE_SITTER_DECLARATION_NODE_TYPES_ONLY_STRUCTURALLY_CANNOT_PRODUCE_RAW_UNKNOWN",
+  "corpusComposition": {
+    "wire01CorpusSize": 300,
+    "knownRegisteredFilesAdded": [
+      "src/lib/server/ace/llm-context-cache.ts",
+      "src/lib/server/services/error-analysis/CacheService.ts",
+      "src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "src/lib/server/services/error-analysis/EscalationService.ts",
+      "src/lib/server/services/error-analysis/FixSynthesizer.ts"
+    ],
+    "totalFilesRequested": 306
+  },
+  "filesParsed": 306,
+  "filesFailed": 0,
+  "totalObservations": 13795,
+  "rawUnknownObservations": 0,
+  "rawUnknownRate": 0,
+  "resolutionClassification": {
+    "EXACT": 85,
+    "REGISTRY_MISSING": 13502,
+    "AMBIGUOUS": 0,
+    "REVISION_MISMATCH": 0,
+    "SPAN_MISMATCH": 208,
+    "NAME_OR_SIGNATURE_MISMATCH": 0,
+    "UNRESOLVED_OTHER": 0
+  },
+  "exactResolvedObservations": 85,
+  "exactResolvedUnknownObservations": 0,
+  "promotedUnknown": {
+    "observationLevelCount": 0,
+    "distinctSymbolVersionCount": 0,
+    "distinctStableSymbolCount": 0,
+    "registryRowCount": 0
+  },
+  "inverseAnomalies": {
+    "observationUnknownRegistryTyped": {
+      "count": 0,
+      "note": "Observation classified UNKNOWN but exact-matched registry identity has a real structural kind -- likely producer/normalizer drift, not registry pollution.",
+      "samples": []
+    },
+    "typedObservationToUnknownRegistry": {
+      "count": 0,
+      "note": "Observation classified as a known structural kind but exact-matched registry row is itself symbol_kind=UNKNOWN -- potentially more serious than chunk-boundary noise.",
+      "samples": []
+    }
+  },
+  "limitations": [
+    "Parent-evidence (parent_route) is NOT evaluated as part of EXACT resolution -- neither this producer's synthetic observations nor the current comparison carry usable parent_route data on both sides. Disclosed, not fabricated as a passing check.",
+    "NAME_OR_SIGNATURE_MISMATCH is only evaluated when both the observation and the matched registry row carry a name -- absence on either side does not count as a mismatch."
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "overallVerdict": "SYMBOL_PROMOTED_UNKNOWN_AUDIT_PROVEN",
+  "notes": [
+    "85 observations resolved EXACT; the canonical pollution count is 0 distinct registry rows (NOT 0 raw UNKNOWN observations -- those numbers are genuinely different, per the worked example in the review that scoped this audit)."
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.postgres-fts-identity-replay.v1",
+  "generatedAt": "2026-09-19T02:25:20.463Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "query": "packet identity",
+  "queryConfiguration": "english",
+  "sourceRevision": null,
+  "indexContract": {
+    "searchVector": true,
+    "sourceRevision": true,
+    "workspaceRevision": true,
+    "contentHash": true,
+    "ginIndexes": 1
+  },
+  "firstReplay": null,
+  "secondReplay": null,
+  "replayStable": false,
+  "status": "BLOCKED_NO_SOURCE_REVISION"
+}

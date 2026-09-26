@@ -120,4 +120,71 @@ describe('compileExperimentFeatureMatrix', () => {
 			}),
 		).toThrow(/duplicate analysis pass result/i);
 	});
+
+	it('fails closed for blank source identity or source revision', () => {
+		for (const field of ['sourceRef', 'sourceRevision'] as const) {
+			const input = {
+				requestId: 'req:1',
+				sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+				sourceRevision: 'source-v1',
+				passResults,
+				[field]: '   ',
+			};
+
+			expect(() => compileExperimentFeatureMatrix(input)).toThrow();
+		}
+	});
+
+	it('rejects pass results from a different source identity or revision', () => {
+		for (const mismatch of [
+			{ sourceRef: 'src/other.ts', sourceRevision: 'source-v1' },
+			{ sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts', sourceRevision: 'source-v2' },
+		]) {
+			const mismatched = { ...passResults[0], ...mismatch };
+
+			expect(() =>
+				compileExperimentFeatureMatrix({
+					requestId: 'req:1',
+					sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+					sourceRevision: 'source-v1',
+					passResults: [mismatched, ...passResults.slice(1)],
+				}),
+			).toThrow(/does not match feature-matrix lineage/i);
+		}
+	});
+
+	it('binds the experiment matrix to workspace and packet lineage without granting authority', () => {
+		const qualifiedPasses = passResults.map((passResult) => ({
+			...passResult,
+			workspaceRevision: 'workspace-v1',
+		}));
+		const compiled = compileExperimentFeatureMatrix({
+			requestId: 'req:qualified',
+			packetKey: 'packet:1',
+			sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+			sourceRevision: 'source-v1',
+			workspaceRevision: 'workspace-v1',
+			passResults: qualifiedPasses,
+		});
+
+		expect(compiled.matrix.packetKey).toBe('packet:1');
+		expect(compiled.matrix.workspaceRevision).toBe('workspace-v1');
+		expect(compiled.matrix.canonicalAuthority).toBe(false);
+
+		expect(() => compileExperimentFeatureMatrix({
+			packetKey: 'packet:1',
+			sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+			sourceRevision: 'source-v1',
+			workspaceRevision: 'workspace-v2',
+			passResults: qualifiedPasses,
+		})).toThrow(/workspace revision/i);
+
+		expect(() => compileExperimentFeatureMatrix({
+			packetKey: 'packet:other',
+			sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+			sourceRevision: 'source-v1',
+			workspaceRevision: 'workspace-v1',
+			passResults: qualifiedPasses,
+		})).toThrow(/packet/i);
+	});
 });

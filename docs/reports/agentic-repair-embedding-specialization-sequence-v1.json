@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.agentic-repair-embedding-specialization-sequence.v1",
+  "task": "T18-73",
+  "status": "SEQUENCING_RECONCILED",
+  "authority": "PLANNING_ONLY",
+  "writesPerformed": false,
+  "quantizationPerformed": false,
+  "qdrantMutationPerformed": false,
+  "canonicalRepresentationChanged": false,
+  "sequence": [
+    "semantic_768_contract_and_lineage",
+    "similarity_or_derived_projection_proof",
+    "frozen_embedding_snapshot",
+    "quantization_challenger_and_recall_validation",
+    "promotion_only_after_explicit_readback"
+  ],
+  "owner": {
+    "canonicalRepresentation": "semantic_768",
+    "representationOwner": "parent-atlas-semantic-768-canonical-contract",
+    "derivedViews": ["latent_64", "latent_128", "RFF", "TurboVec-prefilter"],
+    "quantizationOwner": "not admitted by this audit"
+  },
+  "artifacts": [
+    { "path": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/proposal.md", "lineCount": 718, "sha256": "3cb1b24eb1b67703a3df82c3b52cf378f31147b6e6615cc54a1e146fef60b591" },
+    { "path": "openspec/changes/parent-atlas-semantic-768-canonical-contract/proposal.md", "lineCount": 509, "sha256": "d5148b07676ac4baccd89e19249d2f742b4b4405f6b3ceb48694778f2b8a5533" },
+    { "path": "packages/semantic-contracts/src/vector-manifest.ts", "lineCount": 374, "sha256": "9526dadda67e13f0e09b13e973b8e133738fe6bbe889d2146f8155c3e3fffb15" },
+    { "path": "scripts/agent/turbovec-search-memory.mjs", "lineCount": 249, "sha256": "089a0fa9ff16b9b1a9a6c294fbced4c30a51aa43937f0f45128ddc9caec9054e" }
+  ],
+  "notes": [
+    "TurboVec remains a semantic prefilter/challenger and does not replace the canonical vector owner.",
+    "TurboQuant or any vector quantization must wait for a frozen semantic_768 matrix and explicit recall/rescore evidence.",
+    "No new embedding specialization or Qdrant collection was created."
+  ]
+}

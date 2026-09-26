@@ -213,6 +213,57 @@ export type CanonicalCandidateIdentityInput = Omit<
 >;
 
 /**
+ * The only cohort shape admitted to the current structural/semantic spine.
+ * Historical observations may remain nullable elsewhere, but an ordinal map
+ * for the current source -> packet -> chunk frame must be explicitly bound.
+ */
+export const revisionQualifiedSourceChunkCohortV1Schema = z.object({
+  status: z.literal('REVISION_QUALIFIED'),
+  workspaceRevision: revision,
+  candidateSnapshotRevision: revision,
+  sourceRevisionSetChecksum: z.string().min(1),
+  candidates: z.array(canonicalCandidateV1Schema).min(1),
+}).strict().superRefine((cohort, ctx) => {
+  cohort.candidates.forEach((candidate, index) => {
+    if (candidate.workspaceRevision !== cohort.workspaceRevision) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['candidates', index, 'workspaceRevision'], message: 'WORKSPACE_REVISION_MISMATCH' });
+    }
+    if (candidate.candidateSnapshotRevision !== cohort.candidateSnapshotRevision) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['candidates', index, 'candidateSnapshotRevision'], message: 'CANDIDATE_SNAPSHOT_REVISION_MISMATCH' });
+    }
+    if (candidate.packetKey === null) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['candidates', index, 'packetKey'], message: 'PACKET_IDENTITY_REQUIRED' });
+    }
+    if (candidate.sourceRef === null) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['candidates', index, 'sourceRef'], message: 'SOURCE_REF_REQUIRED' });
+    }
+  });
+});
+
+export type RevisionQualifiedSourceChunkCohortV1 = z.infer<typeof revisionQualifiedSourceChunkCohortV1Schema>;
+
+/**
+ * Materialize ordinals only from a current, revision-qualified source/chunk
+ * cohort. This is an admission boundary, not an authority claim: the result
+ * remains a deterministic derived coordinate map and never performs I/O.
+ */
+export function materializeRevisionQualifiedSourceChunkOrdinalMapV1(input: {
+  cohort: RevisionQualifiedSourceChunkCohortV1 | null | undefined;
+  producerRevision: string;
+}): CandidateOrdinalMapV1 {
+  if (!input.cohort) throw new Error('CURRENT_SOURCE_CHUNK_COHORT_UNAVAILABLE');
+  const cohort = revisionQualifiedSourceChunkCohortV1Schema.parse(input.cohort);
+  if (!input.producerRevision) throw new Error('ORDINAL_MAP_PRODUCER_REVISION_REQUIRED');
+
+  return materializeCandidateOrdinalMap({
+    candidates: cohort.candidates.map(({ schema: _schema, candidateOrdinal: _ordinal, candidateSnapshotRevision: _snapshot, ...candidate }) => candidate),
+    candidateSnapshotRevision: cohort.candidateSnapshotRevision,
+    workspaceRevision: cohort.workspaceRevision,
+    producerRevision: input.producerRevision,
+  });
+}
+
+/**
  * Dense ordinals are assigned only after deterministic canonical ordering.
  * They are execution coordinates scoped to candidateSnapshotRevision and never
  * substitute for canonicalId/packetKey/treeNodeId/symbolVersionId.

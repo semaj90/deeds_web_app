@@ -78,7 +78,7 @@ export async function tryEmbedCanonical(
 ): Promise<OllamaEmbedResult | null> {
   try {
     const { tryEmbedOnnx, isOnnxEmbedAvailable } = await import('../embedding/onnx-embed.js');
-    if (isOnnxEmbedAvailable()) {
+    if (await isOnnxEmbedAvailable()) {
       const embedding = await tryEmbedOnnx(text);
       if (embedding) {
         return {

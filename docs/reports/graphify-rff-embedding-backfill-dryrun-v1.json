@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.graphify-rff-embedding-backfill.v1",
+  "generatedAt": "2026-09-12T17:32:59.820Z",
+  "apply": false,
+  "signatureOnly": false,
+  "model": "embeddinggemma:latest",
+  "scope": {
+    "sinceHours": 720,
+    "limit": 10,
+    "batchSize": 8
+  },
+  "status": "DRY_RUN",
+  "selected": 10,
+  "errorEmbedded": 0,
+  "signatureEmbedded": 0,
+  "written": 0,
+  "errors": [],
+  "schemaColumns": {
+    "error_embedding": "halfvec(768)",
+    "signature_embedding": "halfvec(768)"
+  },
+  "sample": [
+    {
+      "id": "5237fa0a-6550-420a-867d-62f170aae5df",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "a9d560f8-646d-4ce0-8cfa-4ca5a154b346",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "8b803eff-1535-44dc-906f-d8a0cc2199b3",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "5fcc3550-1be8-4e75-9e9a-bbff9f7e62b0",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "d32c3353-2cbd-4215-b03c-6aaf3a2a1f65",
+      "sourceRef": "simd-bridge/cpp/build_som_cache.sh",
+      "missingError": true,
+      "missingSignature": true
+    }
+  ]
+}

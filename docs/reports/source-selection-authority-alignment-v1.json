@@ -1,20 +1,20 @@
 {
   "schema": "atlas.source-selection-authority-alignment.v1",
-  "status": "BLOCKED_AUTHORITY_ALIGNMENT",
+  "status": "READY_FOR_REVIEW",
   "readOnly": true,
   "artifacts": {
     "batchPlan": {
       "path": "docs/reports/current-source-graphify-batch-plan-v1.json",
       "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
       "selectedSourceCount": 5,
-      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
-      "selectionChecksum": "6e3df0dce6fab8c3577b30a3cc7a335828a708133a0172d9fcfaaf624d01c7c3"
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "selectionChecksum": "b83b2616f6192a59dad0a5d658a4d96dfc72796d4cd7f114c29aac23e5099df9"
     },
     "registryPlan": {
       "path": "docs/reports/current-source-registry-reconciliation-plan-v1.json",
-      "status": "REGISTRY_RECONCILIATION_EMPTY",
-      "selectedSourceCount": 0,
-      "selectionChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      "status": "REGISTRY_RECONCILIATION_PLAN_READY",
+      "selectedSourceCount": 30,
+      "selectionChecksum": "e532c6a8432f333b51ac9d7c9105ea3e1f4b898727c369c175acec5d56667208"
     },
     "projectionCohort": {
       "path": "docs/reports/current-source-projection-cohort-v1.json",
@@ -31,11 +31,11 @@
   },
   "comparison": {
     "batchRows": 5,
-    "registryRows": 0,
+    "registryRows": 30,
     "projectionRows": 52,
     "sharedRefs": 0,
     "workspaceRevisionMismatches": 0,
-    "registryAdmissionReady": false
+    "registryAdmissionReady": true
   },
   "decision": "DO_NOT_APPLY",
   "requiredAction": "ONE_SOURCE_SELECTION_OWNER_MUST_EMIT_CURRENT_NAMESPACE_SOURCE_REVISION_AND_WORKSPACE_REVISION_SET",
@@ -48,5 +48,5 @@
     "valkey": 0,
     "sourceFiles": 0
   },
-  "reportChecksum": "sha256:c75b8950c838c0b21573447f5ff5559cf82d4e3c0ca07e188616bb52960e4d4d"
+  "reportChecksum": "sha256:200b4d856609c50eedf92851e683885aff8ee336b4a48bf4072fab6b514e6e69"
 }

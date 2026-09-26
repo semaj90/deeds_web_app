@@ -31,6 +31,20 @@ const APPLY = argv.includes('--apply');
 const VERBOSE = argv.includes('--verbose');
 const DRY_RUN = !APPLY;
 
+// This Rust-export synchronizer has no admitted workspace revision or
+// canonical source-digest bridge. Preserve its read-only inventory path, but
+// fail closed before any canonical packet mutation can be attempted.
+if (APPLY) {
+  console.error(JSON.stringify({
+    status: 'PACKET_WRITER_QUARANTINED',
+    reason: 'REVISION_QUALIFIED_CANONICAL_PACKET_WRITER_REQUIRED',
+    writer: 'sync-parent-atlas-packets-to-postgres',
+    writesPerformed: false,
+    safeToApply: false
+  }));
+  process.exit(2);
+}
+
 const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const NDJSON_PATH = path.join(ROOT, '.tmp/parent_atlas_packets/parent-atlas-packets.ndjson');
 

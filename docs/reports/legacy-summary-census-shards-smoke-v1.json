@@ -1,0 +1,122 @@
+{
+  "schema": "atlas.parallel-shard-smoke.v1",
+  "dir": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\legacy-summary-census-shards-v1\\20260926T062323Z",
+  "shards": 9,
+  "concurrency": 8,
+  "status": "PASS",
+  "passed": 9,
+  "failed": 0,
+  "totals": {
+    "rows": 40306,
+    "badJson": 0,
+    "missingRequired": 0,
+    "duplicateKeysWithinShard": 0,
+    "summaries": 0,
+    "summariesClean": 0
+  },
+  "elapsedMs": 358,
+  "perShard": [
+    {
+      "file": "census-shard-00001.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "census-shard-00002.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "census-shard-00003.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "census-shard-00004.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "census-shard-00005.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "census-shard-00006.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "census-shard-00007.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "census-shard-00008.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "census-shard-00009.ndjson",
+      "rows": 306,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    }
+  ],
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0
+}

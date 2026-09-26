@@ -32,6 +32,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadSymbolRevisionQualificationV1 } from './lib/load-symbol-revision-qualification-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DATABASE_URL = process.env.DATABASE_URL
@@ -100,6 +101,8 @@ async function main() {
     uniqueCandidatesAfterDedup: uniqueCandidates.length,
     offset: OFFSET,
     rowsAttempted: 0,
+    rowsRejectedUnqualifiedRevision: 0,
+    rejections: [],
     rowsInserted: 0,
     rowsAlreadyRegistered: 0,
     sample: uniqueCandidates.slice(OFFSET, OFFSET + 5).map(([canonicalKey, row]) => ({
@@ -123,7 +126,17 @@ async function main() {
   const batch = uniqueCandidates.slice(OFFSET, OFFSET + LIMIT);
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
   try {
+    const q = await loadSymbolRevisionQualificationV1();
+    const provenanceMap = await q.loadBindingProvenanceV1(pool, batch.map(([, r]) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));
     for (const [canonicalKey, row] of batch) {
+      // S01-10B: LogicalSymbolRegistryAdmissionV1. No NULL/sentinel exists for the NOT NULL revision columns, so an unqualified
+      // nomination writes NO canonical row. Record and continue; never convert or substitute.
+      const verdict = q.admitLogicalSymbolRegistryV1({ sourceRef: row.source_ref, createdFromSourceRevision: row.source_revision, registryRevision: REGISTRY_REVISION, provenance: q.provenanceForV1(provenanceMap, row.source_ref, row.source_revision) });
+      if (!verdict.admitted) {
+        report.rowsRejectedUnqualifiedRevision++;
+        if (report.rejections.length < 50) report.rejections.push({ canonicalKey, reasons: verdict.reasons });
+        continue;
+      }
       report.rowsAttempted++;
       const stableSymbolId = stableSymbolIdFor(canonicalKey);
       try {

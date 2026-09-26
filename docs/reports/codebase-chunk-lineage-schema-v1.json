@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.codebase-chunk-lineage-schema.v1",
+  "mode": "READ_ONLY_PLAN",
+  "migration": "drizzle/manual/20260916_codebase_chunk_index_lineage.sql",
+  "expectedColumns": [
+    "workspace_revision",
+    "source_revision",
+    "representation_revision",
+    "lineage_binding_checksum",
+    "lineage_producer_revision"
+  ],
+  "expectedIndexes": [
+    "idx_codebase_chunk_index_workspace_source_lineage",
+    "idx_codebase_chunk_index_source_revision",
+    "idx_codebase_chunk_index_representation_revision",
+    "idx_codebase_chunk_index_lineage_checksum"
+  ],
+  "before": {
+    "columns": [
+      {
+        "column_name": "lineage_binding_checksum",
+        "data_type": "text",
+        "is_nullable": "YES"
+      },
+      {
+        "column_name": "lineage_producer_revision",
+        "data_type": "text",
+        "is_nullable": "YES"
+      },
+      {
+        "column_name": "representation_revision",
+        "data_type": "text",
+        "is_nullable": "YES"
+      },
+      {
+        "column_name": "source_revision",
+        "data_type": "text",
+        "is_nullable": "YES"
+      },
+      {
+        "column_name": "workspace_revision",
+        "data_type": "text",
+        "is_nullable": "YES"
+      }
+    ],
+    "indexes": [
+      {
+        "indexname": "idx_codebase_chunk_index_lineage_checksum",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_lineage_checksum ON public.codebase_chunk_index USING btree (lineage_binding_checksum) WHERE (lineage_binding_checksum IS NOT NULL)"
+      },
+      {
+        "indexname": "idx_codebase_chunk_index_representation_revision",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_representation_revision ON public.codebase_chunk_index USING btree (representation_revision) WHERE (representation_revision IS NOT NULL)"
+      },
+      {
+        "indexname": "idx_codebase_chunk_index_source_revision",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_source_revision ON public.codebase_chunk_index USING btree (source_revision) WHERE (source_revision IS NOT NULL)"
+      },
+      {
+        "indexname": "idx_codebase_chunk_index_workspace_source_lineage",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_workspace_source_lineage ON public.codebase_chunk_index USING btree (workspace_revision, source_ref) WHERE ((workspace_revision IS NOT NULL) AND (source_ref IS NOT NULL))"
+      }
+    ]
+  },
+  "missingColumns": [],
+  "missingIndexes": [],
+  "writesPerformed": false,
+  "safeToApply": false,
+  "status": "SCHEMA_ALREADY_ALIGNED"
+}

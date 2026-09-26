@@ -811,6 +811,63 @@ Next gate: current source lineage and representation-owner reconciliation.
 
 Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
 
+### SEMANTIC-CORPUS-ADMISSION-REVISION-SOURCE-FIX-2026-09-13
+
+- [x] Removed the stale hard-coded workspace revision from the read-only
+      semantic admission auditor.
+- [x] The auditor now requires and validates the authoritative
+      `workspace-revision-tournament-admission-v1.json` receipt before querying
+      Qdrant or PostgreSQL.
+- [x] Re-ran against admitted revision `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+- [x] Current result remains blocked: `109,776` owner candidates,
+      `5,730` duplicate canonical IDs, `109,746` missing source revisions,
+      `30` mixed workspace revisions, and no admitted source bindings.
+- [ ] Reconcile the legacy projection against the exact current
+      source/packet/chunk cohort before changing eligibility or payloads.
+
+Status: `SEMANTIC_CORPUS_ADMISSION_BLOCKED_CURRENT_RECEIPT_BOUND`;
+authority=false; writesPerformed=false. This correction changes only audit
+currentness and does not authorize vector, Qdrant, GPU, latent, or database
+writes.
+
+Evidence: `scripts/atlas/audit-semantic-corpus-admission-v1.mjs`;
+`docs/reports/workspace-revision-tournament-admission-v1.json`;
+`docs/reports/semantic-corpus-admission-v1.json`.
+
+### SEMANTIC-CORPUS-ADMISSION-RECHECK-2026-09-14
+
+- [x] Reran the read-only semantic corpus admission audit.
+- [x] Confirmed `109776` legacy candidates but only `10995` canonical IDs;
+  `5730` duplicate canonical IDs remain.
+- [x] Confirmed `109746` candidates lack source revision, with `30` mixed
+  workspace revisions and `16` mixed representation revisions.
+- [ ] Reconcile the legacy projection against the sealed current
+  source/packet/chunk cohort; do not repair duplicate IDs or synthesize
+  revisions.
+
+Status: `SEMANTIC_CORPUS_ADMISSION_BLOCKED`; `admittedRevisionHasAnyBindings=true`.
+Evidence: `docs/reports/semantic-corpus-admission-v1.json`.
+No vector, Qdrant, GPU, latent, or database writes occurred.
+
+### SEMANTIC-768-OWNER-RECHECK-2026-09-14
+
+- [x] Reran the live read-only writer census; `18` writer/reference surfaces
+  remain discoverable.
+- [x] Fixed the Windows report-write race by replacing the stable report via
+  a per-process temporary file and atomic rename; `node --check` and the live
+  rerun both passed.
+- [x] Confirmed the three relevant populations remain split:
+  `atlas_packets.embedding` `61659/61718`, halfvec `content_embedding`
+  `55169/55853`, and vector `content_embedding_768` `1386/55853`.
+- [ ] Reconcile one source/revision-qualified representation owner against the
+  admitted packet/chunk cohort before changing eligibility or filling vectors.
+
+Status: `OWNER_NOT_PROVEN`; `writesPerformed=false`.
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
+
+The report-write fix changes audit reliability only; it does not change writer
+ownership or authorize vector/projection mutation.
+
 ### SEMANTIC-768-ACTIVE-CONTRACT-DIAGNOSTIC — 2026-09-11
 
 - [x] Confirmed the active logical contract: `semantic_768`, native 768D,
@@ -1090,3 +1147,37 @@ and the live EmbeddingGemma output, then resolve canonical writer ownership.
       performed.
 
 Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
+
+### SEMANTIC-768-TRUNCATION-AND-384-CENSUS — 2026-09-19 (read-only)
+
+**Truncation contract.** EmbeddingGemma MRL truncations are 768 (canonical), 512, 256, 128 only.
+384 is not a valid size. Derived lanes are produced only from an indexed, validated 768 source.
+
+| Lane | Location (live) | Rows/points | Note |
+|---|---|---|---|
+| 768 canonical | PG `codebase_chunk_index.content_embedding` halfvec(768) + HNSW m16/ef200 | 55,169 | Qdrant `codebase_chunks_768` = 328,348 pts (docs said 109,776; unexplained growth) |
+| 512 | Qdrant `codebase_chunks_512` only | 53,380 | no PG column |
+| 256 / 128 | PG `latent_256`/`latent_128` halfvec + HNSW | 55,169 | autoencoder/slice-derived, NOT MRL of 768 |
+| MRL 512/256/128 error lanes | Qdrant `error_embedding_mrl_*` | 20 each | smoke scale |
+
+**384 census (retired lane, data still present).**
+`atlas_packets.content_embedding_384` 58,109/61,718 rows, written 2026-07-21..09-08 by
+`scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs` (model alias `embeddinggemma-384` on :8081,
+`VECTOR_DIM=384`; alias meaning unverified). `packet_vector_bundles.content_vector` 4,047/15,652,
+first-384-dims slice of 768 (`populate-packet-vector-bundles.mjs`), renormalization unverified.
+`codebase_chunk_index.summary_embedding_384` 10/274,465. All other 384 columns hold 0 rows.
+`atlas_packets.embedding` (768) is populated on 61,659 rows but stores no model name
+(`embedding_version` is a hash / NULL), so EmbeddingGemma provenance is not provable from the table.
+
+- [x] Freeze the writer set with a guard test:
+      `sveltekit-frontend/src/lib/server/atlas/embedding-384-writers.guard.spec.ts` (5 known writers).
+- [x] `hnsw.iterative_scan=relaxed_order` already set on the app pool (`db/client.ts:100`);
+      `adminPool` and standalone scripts do not set it.
+- [ ] Prove `atlas_packets.embedding` was produced by EmbeddingGemma (writer read or sample re-embed).
+- [ ] Decide per writer: migrate or archive `phase-17`, `populate-packet-vector-bundles`,
+      `rebuild-gemma4-summaries-384`, `restore-qdrant-384-from-postgres`, `backfill-content-embedding-384`.
+- [ ] Archive (with manifest) the 0-row 384 columns; decide the 58,109-row column separately.
+
+No column, index, embedding, or Qdrant write was performed. Do not overwrite `atlas_packets.embedding`
+from any retargeted 384 writer.
+- [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).

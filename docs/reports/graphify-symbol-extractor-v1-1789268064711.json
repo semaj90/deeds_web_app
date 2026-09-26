@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T02:54:24.711Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 5,
+  "workspaceIdFilter": "625743d2-092b-4fa8-abe0-9dc094920c80",
+  "workspaceRevisionFilter": "sha256:2adaa35194e054f1381acbb82af2025e23a5596a881fa6e6d68528d4b8533b74",
+  "workspaceRevisionCount": 0,
+  "workspaceRevisionMismatchCount": 0,
+  "candidatesConsidered": 0,
+  "skippedUnsupported": 0,
+  "byFileKind": {},
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 0,
+  "totalSymbolsInserted": null,
+  "plan": []
+}

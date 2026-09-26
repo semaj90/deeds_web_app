@@ -6,21 +6,18 @@
   "extensions": [
     ".ts"
   ],
-  "limit": 300,
-  "candidateFileCount": 2855,
-  "fileCount": 35,
-  "skippedNoLabelCount": 265,
-  "fileSetChecksum": "sha256:3ed153dd3b583221ae6bc3444b49e065ea97bbbeb3275df29cd57cf4a0fccd59",
-  "labelSetChecksum": "sha256:970eb6b7c980d856e76a160c7950b90a82bc532d5e64d37393aca274950be7e1",
+  "limit": 100,
+  "candidateFileCount": 3231,
+  "fileCount": 13,
+  "skippedNoLabelCount": 87,
+  "fileSetChecksum": "sha256:7712d13299b2468a40279b353cf8f47fc4e1a56996a199297eaee8acc5d87cfa",
+  "labelSetChecksum": "sha256:e11e0028c75dd9d82d1392a5c9fb129fac2ebacdb8d0b314b365b7bd8d64ff0f",
   "labelDistribution": {
-    "agent": 4,
-    "ui": 17,
-    "cache": 3,
-    "retrieval": 9,
-    "auth": 1,
-    "database": 1
+    "agent": 1,
+    "ui": 11,
+    "cache": 1
   },
-  "generatedAt": "2026-09-03T18:02:00.962Z",
+  "generatedAt": "2026-09-19T02:47:48.401Z",
   "rows": [
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/DispatcherMiddlewareDependencies.ts",
@@ -133,204 +130,6 @@
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts",
       "contentChecksum": "sha256:e88177dc89d062195c03f6efdd5d1b6f98239c16d97170207111c9acf30e0d6d",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "ui",
-      "classificationConfidence": 1,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/multi-lane-retrieval.ts",
-      "contentChecksum": "sha256:91cffbc7b171fbe21ba6b57ec7948cf1ecb88bc5b964255998f62e39b8e7206c",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "retrieval",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ngram-retrieval.ts",
-      "contentChecksum": "sha256:5704d5e9edcec962a64c8897fa793f3040d8295b97e01fc0f64d51fc85140d56",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "retrieval",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-      "contentChecksum": "sha256:f1b3e49f4ed6af16feb2e590387eb54d83c744bed59097f630ead905410ffb51",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "retrieval",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts",
-      "contentChecksum": "sha256:6bee78133eae5223e970ad04d06f0f3ec4197020478aaba66cd58333ff5d3a20",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "retrieval",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/search-router.ts",
-      "contentChecksum": "sha256:2b6dc58aa08a93f778bf36cd3bc7971fff5ad735b0e3ffb96fda288d1ef22d9a",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "retrieval",
-      "classificationConfidence": 0.645,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/state/index.ts",
-      "contentChecksum": "sha256:682f13aa7b06ca198804b4e1f94282ebf41eb4c01288d052c4c5cfa2e686c824",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "ui",
-      "classificationConfidence": 0.764,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/tokenizer/token-accountant.ts",
-      "contentChecksum": "sha256:6744f495c3eb6de116a3bb5a834689b0cb9271ec50bd5b3ea6c31c3376d82c18",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "auth",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/transport/inbox-outbox.ts",
-      "contentChecksum": "sha256:0c7abb4d306955d52e4a785a4fd2b1e63f555dc8fd009cb178353e0dda0f4c36",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "database",
-      "classificationConfidence": 0.713,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/transport/index.ts",
-      "contentChecksum": "sha256:a44a58cfcbdc17301569960f8db862c3e5219ee9105937eb8e102af9bb954c5b",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "ui",
-      "classificationConfidence": 1,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/vector/ace-packet-vector.ts",
-      "contentChecksum": "sha256:d7ef44943ab1bb86afcc0956d9a9469816c3cd8de973b460e92f9a6f13485b9d",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "retrieval",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/vector/turbovec-interpolation.ts",
-      "contentChecksum": "sha256:7e355397af72f890e772fac66bfd66365749481993035fe3df627117907643c7",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "retrieval",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/admin/ai-chat-context.ts",
-      "contentChecksum": "sha256:80bebdf651eefb8d0b1c03297b6f8ee13ece0832a803bbe6226c359750d75238",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "ui",
-      "classificationConfidence": 1,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/admin/ai-chat-service.ts",
-      "contentChecksum": "sha256:9f880f20745409b8d70d3bda89de38593221cfc59eac935274e8361e8e356e34",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "ui",
-      "classificationConfidence": 1,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/admin/retrieval-analytics-service.ts",
-      "contentChecksum": "sha256:bde26e38e979172d7c7092d228448fc96db2cdd336979fd561ae628498933799",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "retrieval",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/agent-executor.ts",
-      "contentChecksum": "sha256:d678333b24a47521a1a145fba508ff3c8a479e3b74e2972e4d58b747b23cfbf1",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "agent",
-      "classificationConfidence": 0.774,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/agents/trace-subagent-orchestrator.ts",
-      "contentChecksum": "sha256:3b2c4c1aef978a743090a8661641d4961761bafeeeec8e0db38682c1bf728a89",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "agent",
-      "classificationConfidence": 0.795,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/execution-transition-memory.ts",
-      "contentChecksum": "sha256:1efccbc3e5f0b7f682fa2af6f84a3c7f95958b8630791beb7207e67aef463390",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "cache",
-      "classificationConfidence": 0.647,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
-      "contentChecksum": "sha256:9703c37c8beeea2e4192118d7f6fe5a4266186191b4f2ca264d020b650a9783f",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "agent",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/hypergraph-store.ts",
-      "contentChecksum": "sha256:949146773b1eb40bc7d11d20475fb7194fc8b7ce802e1bdfb8b403e67e0ae22d",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "cache",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/information-gain-validator.ts",
-      "contentChecksum": "sha256:a40beb39d95bd233fb4c44e69cf6ec057305f6803b0102b854b6c62ab9593372",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "ui",
-      "classificationConfidence": 1,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/intent-ranker.ts",
-      "contentChecksum": "sha256:f7c6d50964d422f004352a6c0ca4757ac9199c3a29c1c8d1cacbeb639abdf542",
-      "sourceRevision": null,
-      "sourceAuthorityStatus": "PARTIAL",
-      "weakLabel": "retrieval",
-      "classificationConfidence": 0.564,
-      "classifierVersion": "parent-atlas-domain-taxonomy-v1"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/kv-context-controller.ts",
-      "contentChecksum": "sha256:77a54583621615c391a839ccfd02eb7e06adbd0174ae336106aa006de5c4d1ef",
       "sourceRevision": null,
       "sourceAuthorityStatus": "PARTIAL",
       "weakLabel": "ui",

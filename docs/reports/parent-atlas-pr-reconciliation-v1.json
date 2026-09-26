@@ -1,0 +1,90 @@
+{
+  "schema": "atlas.parent-atlas-pr-reconciliation.v1",
+  "generatedAt": "2026-09-20",
+  "method": "PRs treated as candidate implementations, not a merge queue. Only files ABSENT from the working tree were imported (git show, never overwrite). Tracked files with no local edits received the PR's additive patch. No PR branch was merged into main or into the working tree. An isolated worktree (deeds-integrate, branch integrate/pr-clean-batch-20260920) holds a throwaway merge of #89/#90/#91/#98 used only as a comparison corpus.",
+  "prs": [
+    {
+      "number": 89, "title": "promotion-owner collision reconciliation", "classification": "USEFUL_NEW_CONTRACT",
+      "filesAdopted": ["scripts/atlas/reconcile-promotion-critical-owners-v2.mjs", "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks-20260912-owner-collision-reconcile-v2.md"],
+      "filesRejected": ["reconcile-promotion-critical-owners-v1.mjs and tasks-...-v1.md (historical, superseded by v2 within the PR)"],
+      "equivalentCurrentOwners": [],
+      "tests": [{ "name": "node scripts/atlas/reconcile-promotion-critical-owners-v2.mjs", "result": "ran read-only, exit 0, writesPerformed=false, nextGate=REVIEW_PROMOTION_CRITICAL_OWNER_BLOCKERS, all five readiness flags false" }],
+      "authorityImpact": "none; ownership status is kept separate from evidence status",
+      "writesPerformed": false
+    },
+    {
+      "number": 90, "title": "Valkey idempotent authority event fabric", "classification": "USEFUL_NEW_CONTRACT",
+      "filesAdopted": ["queue/valkey-event-stream.ts", "queue/valkey-event-stream.spec.ts", "scripts/atlas/prove-valkey-authority-event-fabric.mts"],
+      "filesRebased": ["queue/event-fabric.ts (additive: authority.audit.completed type, optional revision-qualified envelope fields, authority payload schema)", "queue/event-fabric-analytics-projection.ts", "queue/event-fabric-dispatch.spec.ts", "workers/code-evidence-projection-worker.ts"],
+      "cacheIdentityReconciliation": "Prefixes atlas:events:v1 and atlas:event-dedupe:* have no other owner in src/ or scripts/ and do not overlap AceBitfrostCacheIdentityV1 (atlas:bitfrost:v1:*), PacketSemanticCacheIdentityV2 (bifrost:sem:*) or bitfrost:summary:*. Dedupe keys carry a 24h PX TTL. The module takes an injected client (none created at import) and has no live caller yet.",
+      "caveat": "XADD has no MAXLEN/MINID trim, so the atlas:events:v1 stream is unbounded. Live Valkey runs maxmemory-policy noeviction (2 GiB), so an unbounded stream would eventually reject writes. Add an approximate MAXLEN (or MINID by age) before any producer is wired. Not changed here because it alters the PR contract and nothing publishes yet.",
+      "note": "The four modified files were clean against HEAD locally, so the PR patch applied without touching concurrent edits. The proof script was NOT run (it may touch Valkey); the spec uses a fake and left no keys.",
+      "equivalentCurrentOwners": [],
+      "tests": [{ "name": "valkey-event-stream.spec.ts + event-fabric-dispatch.spec.ts", "result": "9/9 passed" }],
+      "authorityImpact": "none; event != mutation authorization; Valkey remains transport",
+      "writesPerformed": false
+    },
+    {
+      "number": 91, "title": "Graphify symbol projection replacement lane", "classification": "ADOPT_WITH_REBASE",
+      "filesAdopted": ["indexing/graphify-symbol-projection-v1.ts (+spec)", "indexing/graphify-symbol-projection-preflight-v1.ts (+spec)", "indexing/graphify-symbol-writer-v1.ts (+spec)", "docs/plans/graphify-symbol-projection-e2e-plan-2026-09-12.md"],
+      "filesRebased": ["graphify-symbol-projection-preflight-v1.ts: structural-evidence schema changed from .strict() to .strip(). It is a narrow view of the live GraphifyStructuralIntelligenceReceipt, which main now extends with 10 keys (schema, sourceVersionAnchor, parserSourceRevisionToken, five counts, diagnostics). Without this all 8 preflight tests failed with ZodError unrecognized_keys."],
+      "equivalentCurrentOwners": [],
+      "tests": [{ "name": "projection + preflight + writer specs", "result": "21/21 passed after rebase (preflight was 0/8 before)" }],
+      "authorityImpact": "writer stays gated: canonicalAuthority=false, writesAllowed=false until an admitted source frame exists",
+      "writesPerformed": false
+    },
+    {
+      "number": 98, "title": "packet digest bridge and readback planner", "classification": "PARTIALLY_SUPERSEDED",
+      "filesAdopted": ["identity/packet-digest-bridge-v1.ts (+spec)", "identity/current-packet-digest-readback-v1.ts (+spec)"],
+      "filesSuperseded": ["scripts/atlas/plan-current-packet-digest-bridge-v1.mts (main already has the newer .mjs planner and producer plus docs/reports/current-packet-digest-bridge-v1.json)"],
+      "filesRejected": ["identity/index.ts export edit (local file may carry concurrent edits; export deliberately not added)"],
+      "equivalentCurrentOwners": ["scripts/atlas/plan-current-packet-digest-bridge-v1.mjs", "scripts/atlas/produce-current-packet-digest-bridge-v1.mjs"],
+      "tests": [{ "name": "packet-digest-bridge-v1.spec.ts + current-packet-digest-readback-v1.spec.ts", "result": "13/13 passed" }],
+      "authorityImpact": "none; pure contracts, writesPerformed=false",
+      "writesPerformed": false
+    },
+    {
+      "number": 97, "title": "packet/chunk lineage migration ownership (stack tip of #93-#97)", "classification": "PARTIALLY_ADOPTED",
+      "filesAdopted": ["scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs", "scripts/atlas/audit-current-packet-chunk-lineage-deployment-v1.mjs", "scripts/atlas/audit-packet-chunk-lineage-migration-owner-v1.mjs"],
+      "filesSuperseded": ["9 conflicting files (frame selector, source exclusions, hygiene audit, run-owner audit, snapshot-authority audit, join audit, tournament audit, selector test, upsert script): main already has newer hardened versions (e.g. 48b1efabbf, ac972611ac)"],
+      "equivalentCurrentOwners": ["scripts/atlas/lib/current-workspace-frame-selector-v1.mjs", "scripts/atlas/lib/whole-codebase-source-exclusions.mjs", "scripts/atlas/audit-canonical-source-inventory-hygiene-v1.mts"],
+      "tests": [
+        { "name": "lineage-bridge audit (READ ONLY txn)", "result": "0 of 25,271 current members have an exact packet-chunk bridge; all 25,271 are CURRENT_SOURCE_BINDING_MISSING; 577 members have exact proven lineage but none bridge to a current binding" },
+        { "name": "lineage-deployment audit (READ ONLY txn)", "result": "LINEAGE_DEPLOYMENT_PRESENT, 7,421 rows all PROVEN, nextGate CURRENT-PACKET-CHUNK-LINEAGE-BRIDGE-01" },
+        { "name": "migration-owner audit (READ ONLY txn)", "result": "blockers: SIDECAR_MANIFEST_REGISTRATION_MISSING, LIVE_DRIZZLE_LEDGER_EMPTY, HISTORICAL_PROOF_NOT_BOUND_TO_CURRENT_SQL_CHECKSUM" }
+      ],
+      "authorityImpact": "audit only; no migration applied or registered",
+      "writesPerformed": false
+    },
+    { "number": 96, "title": "current packet/chunk authority wrapper", "classification": "STACK_MEMBER_SUPERSEDED_BY_97_AND_MAIN", "filesAdopted": [], "note": "Its unique new files are contained in #97; its edits to existing files conflict with newer main owners.", "writesPerformed": false },
+    { "number": 95, "title": "current revision selector convergence", "classification": "STACK_MEMBER_SUPERSEDED_BY_97_AND_MAIN", "filesAdopted": [], "note": "main already has current-workspace-frame-selector-v1.mjs (hardened). The five-level precedence contract in the brief still needs a dedicated comparison against that owner before any change.", "writesPerformed": false },
+    { "number": 94, "title": "current packet/chunk lineage bridge", "classification": "STACK_MEMBER_ADOPTED_VIA_97", "filesAdopted": ["audit-current-packet-chunk-lineage-bridge-v1.mjs (via #97 tip)"], "writesPerformed": false },
+    { "number": 93, "title": "source inventory admission binding", "classification": "PARTIALLY_LANDED", "filesAdopted": [], "equivalentCurrentOwners": ["scripts/atlas/audit-canonical-source-inventory-hygiene-v1.mts", "scripts/atlas/lib/canonical-source-inventory-hygiene-v1.mts"], "writesPerformed": false },
+    { "number": 92, "title": "rich chunk / semantic authority spine", "classification": "PARKED_EXTRACT_ONLY", "filesAdopted": [], "note": "45 commits, 37 files, touches semantic/retrieval authority while source authority is unresolved. Not inspected file by file in this tranche.", "writesPerformed": false },
+    { "number": 37, "title": "Graphify revision authority v2 writer gate", "classification": "HISTORICAL_REFERENCE", "filesAdopted": [], "note": "Predates current source-authority contracts; conflicts; writer not installed.", "writesPerformed": false }
+  ],
+  "additionalWork": {
+    "langExtractUtf8Grounding": {
+      "owner": "packages/parent-atlas/src/core/langextract-grounding-adapter.ts (extended, no second owner)",
+      "added": "groundLangExtractUtf8SpansV1 + LANGEXTRACT_OFFSET_BASES + UTF8_PARSER_BUFFER_V1",
+      "bugFound": "the existing adaptGroundedLangExtract slices source_text by JS UTF-16 units while LangExtract char_interval counts Python code points; they diverge on astral characters. The old function is unchanged and still has that weakness on such text; the new function makes the basis explicit.",
+      "tests": "packages/parent-atlas/test/langextract-utf8-grounding.test.mjs, 11 new tests; with the existing compat test 13/13 pass after tsc build",
+      "notDone": "the new function is not yet wired into graphify-structural-intelligence-adapter.ts, and it takes a parser buffer as input rather than calling scripts/atlas/lib/source-text-envelope.mjs directly (a TS package should not import a repo-root .mjs script)"
+    }
+  },
+  "currentAuthority": {
+    "canonicalAuthority": false,
+    "currentSourceAuthority": "NOT_PROVEN (lineage bridge audit: 0/25,271 exact current bridge members)",
+    "ddlApplied": false,
+    "schemaMigrations": "UNAPPLIED (ast_generation, ontology alters, packet/chunk lineage registration)"
+  },
+  "remainingBlockers": [
+    "CURRENT_SOURCE_AUTHORITY_PROVEN: current frame not admitted; 25,271 members lack a current source binding",
+    "packet/chunk lineage migration not registered (sidecar manifest missing, Drizzle ledger empty, proof not bound to current SQL checksum)",
+    "#95 revision-selector precedence needs comparison against main's frame selector",
+    "#92 not reviewed for isolated missing contracts",
+    "new UTF-8 grounding function not wired into the structural adapter"
+  ],
+  "mutations": { "postgres": "none (only READ ONLY transactions)", "valkey": "none", "qdrant": "none", "graphify": "none", "git": "no commit, no merge into main, no push; new files and four additive patches are uncommitted in the working tree" },
+  "nextGate": "CURRENT_SOURCE_AUTHORITY_PROVEN"
+}

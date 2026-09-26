@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.openspec.ledger-write-contention-null.v1",
+  "generatedAt": "2026-09-13T21:55:00.000Z",
+  "result": null,
+  "writePerformed": false,
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "attemptedUpdate": "CURRENT-MEMBERSHIP-BRIDGE-CENSUS-2026-09-13",
+  "reason": "Concurrent ledger edits prevented a safe append; write was not forced.",
+  "evidencePreserved": "docs/reports/selected-membership-bridge-v1.json",
+  "destructiveOperations": false
+}

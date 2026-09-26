@@ -1,0 +1,74 @@
+{
+  "schema": "atlas.summary-routing-payload-run.v1",
+  "mode": "READ_ONLY",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "repositoryId": "deeds-web-app",
+  "limit": null,
+  "chunkRowIdFilter": null,
+  "shardPath": ".tmp/atlas/summary-routing-payloads-v1/payloads-20260926T054124Z.ndjson",
+  "shardSha256": "sha256:cb3282c11a5a76e718458830178a56a303117d0766112e5aaf4c8102091b457b",
+  "tally": {
+    "rows": 6732,
+    "invalid": 0,
+    "jobsEligible": 0,
+    "byState": {
+      "HINT": 1274,
+      "MISSING": 5458
+    },
+    "bySource": {
+      "LEGACY_CHUNK_SUMMARY": 553,
+      "NONE": 5458,
+      "PACKET_SUMMARY": 708,
+      "SUMMARY_LAYER": 13
+    },
+    "vector": {
+      "available": 0,
+      "legacyUnbound": 553,
+      "legacy384": 0
+    },
+    "routing": {
+      "domain": 6732,
+      "community": 6298,
+      "cluster": 6298,
+      "som": 5168,
+      "pagerank": 6732
+    },
+    "multiPacketChunks": 0
+  },
+  "invalidSamples": [],
+  "readOnlyGuard": {
+    "populations": {
+      "st": {
+        "before": 0,
+        "after": 0,
+        "unchanged": true
+      },
+      "se": {
+        "before": 1160,
+        "after": 1160,
+        "unchanged": true
+      },
+      "packets": {
+        "before": 61718,
+        "after": 61718,
+        "unchanged": true
+      },
+      "layers": {
+        "before": 18437,
+        "after": 18437,
+        "unchanged": true
+      }
+    },
+    "pass": true,
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "modelCalls": 0
+  },
+  "notes": [
+    "summary_embedding_meta not applied: no vector can be bound; all existing vectors are legacyUnbound",
+    "structural evidence not wired: structuralEvidenceAvailable=false everywhere",
+    "som_revision is null on packets: SOM cell is a routing HINT, not revision-qualified"
+  ],
+  "generatedAt": "2026-09-26T05:41:28.492Z"
+}

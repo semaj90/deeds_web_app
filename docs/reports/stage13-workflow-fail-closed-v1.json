@@ -1,0 +1,16 @@
+{
+  "reportVersion": "stage13-workflow-fail-closed-v1",
+  "status": "SCAFFOLD_GUARD_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "guards": [
+    "DISCOVER cannot advance without canonical identity discovery",
+    "VALIDATE cannot advance to COMPLETE without an independent validation receipt",
+    "RECOVER is non-terminal and cannot masquerade as completion"
+  ],
+  "tests": { "passed": 5, "failed": 0 },
+  "durableWriter": {
+    "mockedTransactionTestsPassed": 11,
+    "liveDatabaseReadback": "OPEN"
+  }
+}

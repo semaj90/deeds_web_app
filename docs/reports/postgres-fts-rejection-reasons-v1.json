@@ -1,6 +1,6 @@
 {
   "schema": "atlas.postgres-fts-rejection-reasons.v1",
-  "generatedAt": "2026-09-05T05:51:35.555Z",
+  "generatedAt": "2026-09-19T02:25:09.172Z",
   "readOnly": true,
   "databaseWrites": false,
   "queries": [
@@ -22,46 +22,55 @@
     "PACKET_NOT_CANONICAL": "A candidate packet exists but lacks required canonical fields."
   },
   "counts": {
-    "UNRESOLVED_BRIDGE": 354,
-    "BRIDGE_EXACT_BOUND": 11,
-    "AMBIGUOUS_BRIDGE": 1,
-    "HASH_EXACT_BOUND": 4,
-    "HASH_SCOPE_MISMATCH": 3
+    "UNRESOLVED_BRIDGE": 263,
+    "MISSING_PACKET_SOURCE_REF": 52,
+    "HASH_SCOPE_MISMATCH": 136,
+    "BRIDGE_EXACT_BOUND": 10,
+    "AMBIGUOUS_BRIDGE": 1
   },
   "byQuery": [
     {
       "query": "IngestionJobStatus",
       "counts": {
         "UNRESOLVED_BRIDGE": 13,
+        "MISSING_PACKET_SOURCE_REF": 4,
+        "HASH_SCOPE_MISMATCH": 8,
         "BRIDGE_EXACT_BOUND": 2
       }
     },
     {
       "query": "GpuConfig",
       "counts": {
+        "MISSING_PACKET_SOURCE_REF": 4,
         "UNRESOLVED_BRIDGE": 32,
+        "HASH_SCOPE_MISMATCH": 14,
         "BRIDGE_EXACT_BOUND": 1
       }
     },
     {
       "query": "SystemStatus",
       "counts": {
+        "UNRESOLVED_BRIDGE": 83,
         "AMBIGUOUS_BRIDGE": 1,
-        "UNRESOLVED_BRIDGE": 68,
-        "BRIDGE_EXACT_BOUND": 4,
-        "HASH_EXACT_BOUND": 3
+        "MISSING_PACKET_SOURCE_REF": 1,
+        "BRIDGE_EXACT_BOUND": 3,
+        "HASH_SCOPE_MISMATCH": 12
       }
     },
     {
       "query": "ErrorPatchLogInsert",
       "counts": {
         "UNRESOLVED_BRIDGE": 38,
+        "MISSING_PACKET_SOURCE_REF": 4,
+        "HASH_SCOPE_MISMATCH": 1,
         "BRIDGE_EXACT_BOUND": 1
       }
     },
     {
       "query": "extractLegalEntities",
       "counts": {
+        "MISSING_PACKET_SOURCE_REF": 4,
+        "HASH_SCOPE_MISMATCH": 38,
         "UNRESOLVED_BRIDGE": 5,
         "BRIDGE_EXACT_BOUND": 1
       }
@@ -69,25 +78,29 @@
     {
       "query": "CourtroomScene",
       "counts": {
+        "MISSING_PACKET_SOURCE_REF": 4,
         "BRIDGE_EXACT_BOUND": 1,
+        "HASH_SCOPE_MISMATCH": 3,
         "UNRESOLVED_BRIDGE": 4
       }
     },
     {
       "query": "embedding search",
       "counts": {
-        "UNRESOLVED_BRIDGE": 96,
-        "HASH_SCOPE_MISMATCH": 3,
+        "HASH_SCOPE_MISMATCH": 35,
+        "UNRESOLVED_BRIDGE": 56,
+        "MISSING_PACKET_SOURCE_REF": 8,
         "BRIDGE_EXACT_BOUND": 1
       }
     },
     {
       "query": "packet identity",
       "counts": {
-        "UNRESOLVED_BRIDGE": 99,
-        "HASH_EXACT_BOUND": 1
+        "MISSING_PACKET_SOURCE_REF": 43,
+        "HASH_SCOPE_MISMATCH": 25,
+        "UNRESOLVED_BRIDGE": 32
       }
     }
   ],
-  "uniqueChunkCount": 373
+  "uniqueChunkCount": 462
 }

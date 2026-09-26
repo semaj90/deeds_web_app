@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.summary-hint-topk-comparison.v1",
+  "status": "CHALLENGER_MEASURED",
+  "canonicalAuthority": false,
+  "retrievalVoteAdded": false,
+  "artifactDir": ".tmp/atlas/legacy-summary-hint-embedding-v1/20260926T063122Z",
+  "rows": 800,
+  "dim": 768,
+  "queries": 100,
+  "k": 10,
+  "oracle": {
+    "implementation": "turbovec-napi hintExactCosineTopk (rayon, f64 accumulate)",
+    "jsReferenceAgreement": "20/20",
+    "ms": 15
+  },
+  "challengers": [
+    {
+      "bits": 2,
+      "status": "OK",
+      "recallAtK": 0.862,
+      "top1Agreement": 0.79,
+      "buildPlusSearchMs": 206
+    },
+    {
+      "bits": 3,
+      "status": "OK",
+      "recallAtK": 0.909,
+      "top1Agreement": 0.86,
+      "buildPlusSearchMs": 437
+    },
+    {
+      "bits": 4,
+      "status": "OK",
+      "recallAtK": 0.944,
+      "top1Agreement": 0.92,
+      "buildPlusSearchMs": 516
+    }
+  ],
+  "caveat": "Unlabelled artifact set; measures quantization fidelity vs exact cosine, not relevance. Queries are rows of the same set (self dropped).",
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0,
+  "generatedAt": "2026-09-26T06:31:50.050Z"
+}

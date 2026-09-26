@@ -1,0 +1,74 @@
+{
+  "schema": "atlas.external-doc-canary-admission.v1",
+  "gate": "DOC-CANARY-ADMISSION-01",
+  "mode": "APPLY_ROLLBACK",
+  "generatedAt": "2026-09-23T19:13:01.376Z",
+  "plan": [
+    {
+      "sourceId": "bits-ui",
+      "url": "https://bits-ui.com/docs/child-snippet",
+      "chunks": 17
+    },
+    {
+      "sourceId": "drizzle-kit",
+      "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+      "chunks": 10
+    },
+    {
+      "sourceId": "drizzle-orm",
+      "url": "https://github.com/drizzle-team/drizzle-orm/issues/5792",
+      "chunks": 19
+    }
+  ],
+  "expectedChunks": 46,
+  "baseline": {
+    "pages": 0,
+    "chunks": 0
+  },
+  "inside": {
+    "pages": 3,
+    "chunks": 46
+  },
+  "afterRollback": {
+    "pages": 0,
+    "chunks": 0
+  },
+  "ftsToken": "snippet",
+  "ftsHits": 13,
+  "readback": [
+    {
+      "url": "https://bits-ui.com/docs/child-snippet",
+      "chunksReadBack": 17,
+      "expected": 17
+    },
+    {
+      "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+      "chunksReadBack": 10,
+      "expected": 10
+    },
+    {
+      "url": "https://github.com/drizzle-team/drizzle-orm/issues/5792",
+      "chunksReadBack": 19,
+      "expected": 19
+    }
+  ],
+  "failures": [],
+  "admissionReceipts": [
+    {
+      "pageEvidenceRevision": "sha256:bfc6e23d83ef71c6b9e8f1170a14cb91af493ccfbdedc0891c01041c6e89c5c2",
+      "chunkCount": 17
+    },
+    {
+      "pageEvidenceRevision": "sha256:605e30cd452761cc3e8a84d299718c1bc2bc68ffd097acbae8104457ecbd3eff",
+      "chunkCount": 10
+    },
+    {
+      "pageEvidenceRevision": "sha256:550d68370f81eae46c7f0d52c6e4d149d90fbe428316a7eef3f9edd583e82eba",
+      "chunkCount": 19
+    }
+  ],
+  "writes": {
+    "postgres": "ROLLED_BACK"
+  },
+  "result": "DOC_CANARY_ADMISSION_ROLLBACK_PROVEN"
+}

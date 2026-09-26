@@ -1,0 +1,138 @@
+{
+  "schema": "atlas.symbol-kind-live-sidecar-coverage.v1",
+  "generatedAt": "2026-09-22T20:18:11.361Z",
+  "status": "COMPLETE",
+  "sidecarUrl": "http://127.0.0.1:8095",
+  "sidecarHealth": {
+    "status": "ok",
+    "model": "ornith-1.5-9b",
+    "runtime": {
+      "pythonExecutable": "/usr/local/bin/python",
+      "pythonVersion": "3.13.15",
+      "environmentType": "system-python"
+    },
+    "capabilities": {
+      "spacy": true,
+      "spacy_pos": true,
+      "langextract": true,
+      "tree_sitter": true,
+      "treesitter_chunker": true,
+      "ast_grep": true,
+      "torch": false,
+      "networkx": true,
+      "nx_cugraph": false,
+      "cugraph": false,
+      "cuvs": false,
+      "cupy": false,
+      "classification_helper": true
+    },
+    "capabilityDetails": {
+      "spacy_model": {
+        "package": "en_core_web_sm",
+        "installed": true,
+        "loaded": false,
+        "pos_ready": false
+      },
+      "networkx": {
+        "installed": true,
+        "active": true,
+        "owner": "entity_graph_metrics",
+        "scope": "per_document_entity_graph"
+      },
+      "nx_cugraph": {
+        "installed": false,
+        "active": false,
+        "owner": null
+      },
+      "rapids_graph_executor": {
+        "available": false,
+        "runtime": null,
+        "owner": "external_wsl2_rapids_executor",
+        "note": "The CPU NLP sidecar does not probe or own the external RAPIDS runtime."
+      }
+    },
+    "imports": {
+      "langextract": {
+        "available": true,
+        "version": "1.6.0",
+        "modulePath": "/usr/local/lib/python3.13/site-packages/langextract/__init__.py",
+        "importVerified": true,
+        "editableSource": null,
+        "beautifulsoup4": {
+          "available": true,
+          "version": "4.15.0",
+          "modulePath": null,
+          "importVerified": true
+        }
+      },
+      "treesitterChunker": {
+        "available": true,
+        "version": "4.0.0",
+        "modulePath": "/usr/local/lib/python3.13/site-packages/chunker/__init__.py",
+        "moduleName": "chunker",
+        "importVerified": true,
+        "fixtureVerified": false
+      },
+      "treeSitterLanguagePack": {
+        "available": true,
+        "version": "0.9.0",
+        "importVerified": true
+      },
+      "astGrepPy": {
+        "available": true,
+        "version": "0.45.3",
+        "importVerified": true
+      }
+    },
+    "timestamp": 1790108251435,
+    "contract": "provenance-v2"
+  },
+  "corpusManifestUsed": {
+    "workspaceRevision": "1ec451233a652de4fe081dcd7aa0feb541e081ae",
+    "corpusSize": 300
+  },
+  "filesRequested": 300,
+  "filesOk": 300,
+  "filesFailed": 0,
+  "totalChunks": 8832,
+  "knownKind": 7063,
+  "unknownKind": 1769,
+  "unknownRate": 0.200294384057971,
+  "unknownStructuralNoise": 1769,
+  "unknownGenuine": 0,
+  "unknownGenuineRate": 0,
+  "knownByKind": {
+    "VARIABLE": 4210,
+    "FUNCTION": 2219,
+    "TYPE": 171,
+    "INTERFACE": 240,
+    "METHOD": 197,
+    "CLASS": 26
+  },
+  "unknownByRawKind": [
+    {
+      "kind": "export",
+      "count": 932
+    },
+    {
+      "kind": "import",
+      "count": 837
+    }
+  ],
+  "unknownByRawNodeType": [
+    {
+      "node_type": "export_statement",
+      "count": 932
+    },
+    {
+      "node_type": "import_statement",
+      "count": 837
+    }
+  ],
+  "unknownGenuineSamples": [],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "notes": [
+    "This is the REAL raw UNKNOWN measurement -- unlike SYMBOL-WIRE-01, chunks are NOT pre-filtered to a known-good node-type allowlist. unknownStructuralNoise counts chunk-boundary/container kinds (export_statement, import_statement, program, etc.) that deliberately stay UNKNOWN by design (per the review: do not turn these into symbol identities merely to reduce UNKNOWN). unknownGenuine is everything else -- the number worth investigating if the normalizer needs to learn a new mapping."
+  ]
+}

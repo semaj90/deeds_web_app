@@ -8,6 +8,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadSymbolRevisionQualificationV1 } from './lib/load-symbol-revision-qualification-v1.mjs';
 import { normalizeAstNodeKind } from './lib/ast-source-ref-key.mjs';
 import { deriveSymbolVersionIdV1 } from '../../packages/parent-atlas/dist/core/identity-v1.js';
 
@@ -97,6 +98,8 @@ async function main() {
     limit: LIMIT,
     selectedCandidates: selectedRows.length,
     rowsAttempted: 0,
+    rowsRejectedUnqualifiedRevision: 0,
+    rejections: [],
     rowsInserted: 0,
     rowsAlreadyPresent: 0,
     projectionRowsUpserted: 0,
@@ -129,10 +132,19 @@ async function main() {
       [stableIds],
     );
     const activeIds = new Set(active.rows.map((row) => row.stable_symbol_id));
+    const q = await loadSymbolRevisionQualificationV1();
+    const provenanceMap = await q.loadBindingProvenanceV1(pool, batch.map((r) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));
     await pool.query('BEGIN');
     for (const row of batch) {
       const resolution = resolutionByNomination.get(row.nomination_id);
       if (!activeIds.has(resolution.stable_symbol_id)) continue;
+      // S01-10B: versions are revision-bound; both revisions must be sha256-qualified. Record and continue, never convert.
+      const verdict = q.qualifySymbolVersionRevisionsV1({ sourceRef: row.source_ref, sourceRevision: row.source_revision, workspaceRevision: row.workspace_revision, provenance: q.provenanceForV1(provenanceMap, row.source_ref, row.source_revision) });
+      if (!verdict.admitted) {
+        report.rowsRejectedUnqualifiedRevision++;
+        if (report.rejections.length < 50) report.rejections.push({ nominationId: row.nomination_id, reasons: verdict.reasons });
+        continue;
+      }
       report.rowsAttempted++;
       const symbolVersionId = deriveSymbolVersionIdV1({
         stableSymbolId: resolution.stable_symbol_id,

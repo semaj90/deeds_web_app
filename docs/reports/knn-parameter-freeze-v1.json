@@ -11,22 +11,6 @@
   "semanticSnapshotSource": "python/atlas_compute/gpu_mini_fabric/fixtures/semantic-768-real-frozen-node-keys.json",
   "semanticSnapshotRows": 55169,
   "queryPopulationIntersectionCount": 0,
-  "identityDomainAudit": {
-    "semanticSnapshotKeyOwner": "codebase_chunk_index.id",
-    "candidateMapIdentityExamples": ["proto:*", "packet:*"],
-    "directCanonicalIdJoinValid": false,
-    "resolution": "Use a semantic snapshot bound to the admitted candidate map, or define a separately named semantic candidate cohort with its own ordinal admission. Do not infer the join.",
-    "postgresEnrichment": {
-      "snapshotRows": 55169,
-      "chunkIdPresent": 55169,
-      "contentHashPresent": 55169,
-      "sourceRefPresent": 52380,
-      "repoIdPresent": 38969,
-      "sourceRefMissing": 2789,
-      "readOnly": true
-    },
-    "nextAdmission": "SEMANTIC_CANDIDATE_COHORT_V1; reject rows without authoritative source_ref rather than fabricating identity."
-  },
   "parameters": {
     "topK": 10,
     "distanceMetric": "cosine",

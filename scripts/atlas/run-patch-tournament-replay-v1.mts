@@ -8,15 +8,15 @@ import { fileURLToPath } from 'node:url';
 import { buildPatchTournamentPlan } from '../../sveltekit-frontend/src/lib/server/agent/patch-tournament.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const REPORT = resolve(ROOT, 'docs/reports/patch-tournament-replay-v1.json');
+const REPORT = resolve(ROOT, process.env.ATLAS_TOURNAMENT_REPLAY_REPORT ?? 'docs/reports/patch-tournament-replay-v1.json');
 const fixtureRevision = 'fixture-only-unbound-workspace-revision';
 const fixture = {
   objective: 'bounded replay fixture', workspaceId: 'fixture-workspace', workspaceRevision: fixtureRevision,
   baseBranch: 'fixture-base', compileError: 'fixture compile error',
   candidates: [
-    { candidateId: 'candidate-a', branchName: 'fixture/a', worktreePath: 'fixture/a', patchSummary: 'minimal repair', compileError: 'fixture compile error', touchedFiles: ['fixture.ts'], staticChecks: [{ name: 'syntax', passed: true }], focusedTests: [{ name: 'fixture', passed: true }], evidenceRefs: ['fixture:evidence:a'], riskSignals: [] },
-    { candidateId: 'candidate-b', branchName: 'fixture/b', worktreePath: 'fixture/b', patchSummary: 'broader repair', compileError: 'fixture compile error', touchedFiles: ['fixture.ts', 'other.ts'], staticChecks: [{ name: 'syntax', passed: true }], focusedTests: [{ name: 'fixture', passed: true }], evidenceRefs: ['fixture:evidence:b'], riskSignals: ['broader-scope'] },
-    { candidateId: 'candidate-c', branchName: 'fixture/c', worktreePath: 'fixture/c', patchSummary: 'failing repair', compileError: 'fixture compile error', touchedFiles: ['fixture.ts'], staticChecks: [{ name: 'syntax', passed: false }], focusedTests: [{ name: 'fixture', passed: false }], evidenceRefs: [], riskSignals: [] },
+    { candidateId: 'candidate-a', runId: 'fixture-run-a', sourceRevision: 'fixture-source-revision-1', patchDigest: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', branchName: 'fixture/a', worktreePath: 'fixture/a', patchSummary: 'minimal repair', compileError: 'fixture compile error', touchedFiles: ['fixture.ts'], staticChecks: [{ name: 'syntax', passed: true }], focusedTests: [{ name: 'fixture', passed: true }], evidenceRefs: ['fixture:evidence:a'], riskSignals: [] },
+    { candidateId: 'candidate-b', runId: 'fixture-run-b', sourceRevision: 'fixture-source-revision-1', patchDigest: 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', branchName: 'fixture/b', worktreePath: 'fixture/b', patchSummary: 'broader repair', compileError: 'fixture compile error', touchedFiles: ['fixture.ts', 'other.ts'], staticChecks: [{ name: 'syntax', passed: true }], focusedTests: [{ name: 'fixture', passed: true }], evidenceRefs: ['fixture:evidence:b'], riskSignals: ['broader-scope'] },
+    { candidateId: 'candidate-c', runId: 'fixture-run-c', sourceRevision: 'fixture-source-revision-1', patchDigest: 'sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', branchName: 'fixture/c', worktreePath: 'fixture/c', patchSummary: 'failing repair', compileError: 'fixture compile error', touchedFiles: ['fixture.ts'], staticChecks: [{ name: 'syntax', passed: false }], focusedTests: [{ name: 'fixture', passed: false }], evidenceRefs: [], riskSignals: [] },
   ],
 } as const;
 const canonicalize = (plan: any) => ({

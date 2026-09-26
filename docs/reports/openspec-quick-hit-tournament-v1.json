@@ -1,0 +1,127 @@
+{
+  "schema": "atlas.openspec-quick-hit-tournament.v1",
+  "generatedAt": "2026-09-22",
+  "status": "PLANNING_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "sourceReports": {
+    "workboard": "docs/reports/openspec-workboard-v1.json",
+    "actionableAudit": "docs/reports/openspec-actionable-lane-audit-v2.json",
+    "implementationOrder": "docs/reports/openspec-implementation-order-v1.json",
+    "challengerTournament": "docs/reports/openspec-challenger-tournament-v1.json",
+    "actionableSemanticChecksum": "sha256:0caa5af77b5c526ce6f5e4acaf66b0ac82e2201c7b979ec3e7892293ac7ff4277",
+    "challengerSemanticChecksum": "sha256:fcf2dddf37672f28bf7f70e1f569f867ba910a2323f499ec6766b480a223c242"
+  },
+  "workboard": {
+    "changes": 88,
+    "tasks": 9451,
+    "open": 3359,
+    "controllerActionable": 2272,
+    "declaredDependencyWaiting": 567,
+    "canonicalAuthorizationWaiting": 212
+  },
+  "selectionPolicy": {
+    "laneIsNotExecutor": true,
+    "excludeCanonicalPromotion": true,
+    "excludeDatabaseWrites": true,
+    "excludeVectorOrCacheWrites": true,
+    "excludeGraphifyRefresh": true,
+    "excludeOperatorApproval": true,
+    "preferExistingOwner": true,
+    "requireFocusedProof": true
+  },
+  "rounds": [
+    {
+      "round": 0,
+      "name": "AUTHORITY_HOLD",
+      "state": "BLOCKED",
+      "reason": "Current source frame is not admitted: 492 content mismatches and 8 missing worktree sources.",
+      "taskFamilies": [
+        "CURRENT_SOURCE_AUTHORITY_PROVEN",
+        "S01-08K stable-file population",
+        "AST exact symbol promotion",
+        "CandidateOrdinal freeze",
+        "canonical pgvector/Qdrant admission"
+      ],
+      "action": "Do not execute; refresh or explicitly admit a source frame first."
+    },
+    {
+      "round": 1,
+      "name": "READ_ONLY_QUICK_HITS",
+      "state": "READY_FOR_BOUNDED_EXECUTION",
+      "items": [
+        {
+          "id": "QH-01",
+          "taskKey": "parent-atlas-transport-memory-boundaries:21",
+          "status": "PROVEN",
+          "action": "Add the missing Tree-sitter MISSING-syntax fixture and focused proof.",
+          "lane": "IDENTITY_AUTHORITY",
+          "why": "The ERROR path is proven; this is a bounded fixture gap with no canonical write.",
+          "proof": "docs/reports/ast-failure-isolation-proof.json: 4/4 live cases passed; malformed ERROR and missing-delimiter MISSING diagnostics both recovered with RECOVERED_WITH_ERRORS; typed error_tag remains separately open"
+        },
+        {
+          "id": "QH-02",
+          "taskKey": "parent-atlas-document-governance-master-index:23",
+          "status": "PROVEN",
+          "action": "Verify the task-ledger parser exposes completedTasks, totalTasks, and progressFraction.",
+          "lane": "GOVERNANCE_PROOF",
+          "why": "Read-only workboard contract validation; no runtime or authority mutation.",
+          "proof": "build-master-toc.mjs owner plus direct source-to-registry parity: 7/64 and progressFraction 0.109375"
+        },
+        {
+          "id": "QH-03",
+          "taskKey": "parent-atlas-okf-knowledge-layers:74",
+          "status": "BLOCKED_SPEC_UNDEFINED",
+          "action": "Run the existing OKF v0.2 validation against current files and record failures.",
+          "lane": "GOVERNANCE_PROOF",
+          "why": "Validation-only and independent of canonical symbol promotion.",
+          "proof": "docs/reports/okf-v02-bundle-audit-v1.json: 25 files scanned, 0 valid, 25 invalid; manifest drift recorded; no writes. The owning task explicitly records that the v0.2 profile fields are not specified locally, so repair would require a new contract decision."
+        },
+        {
+          "id": "QH-04",
+          "taskKey": "parent-atlas-nlp-sidecar-feature-compiler:436",
+          "status": "PROVEN_READ_ONLY_CENSUS",
+          "action": "Refresh the compose image provenance census without changing images or runtime.",
+          "lane": "GOVERNANCE_PROOF",
+          "why": "The task is a stale inventory statement; refresh is read-only and useful for GPU/runtime blockers.",
+          "proof": "docs/reports/docker-reproducibility-v1.json: 53 Dockerfiles, 80 Compose files, 76 current external images, 44 digest-pinned, 17 floating, 15 tag-only, 26 active containers; no writes"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "name": "POST_AUTHORITY_PROOFS",
+      "state": "WAITING",
+      "items": [
+        "PostgreSQL FTS revision-qualified replay",
+        "pgvector exact versus HNSW parity",
+        "filtered HNSW iterative-scan proof",
+        "AST-symbol cohort alignment",
+        "CandidateOrdinalMap and FeatureMatrix freeze"
+      ],
+      "releaseCondition": "CURRENT_SOURCE_AUTHORITY_PROVEN and a non-empty revision-qualified candidate cohort"
+    },
+    {
+      "round": 3,
+      "name": "OPERATOR_OR_RUNTIME_GATED",
+      "state": "HOLD",
+      "items": [
+        "S01-08K stable-file population",
+        "persistent AST canary",
+        "Valkey descriptor readback",
+        "DDL/index changes",
+        "Graphify refresh",
+        "Qdrant or pgvector backfill",
+        "GPU executor promotion"
+      ],
+      "releaseCondition": "Exact operator authorization plus current source/revision receipt"
+    }
+  ],
+  "nextSelection": "OKF_V02_PROFILE_DECISION",
+  "nextGate": "QUICK_HIT_ROUND_1_RECORDED",
+  "notes": [
+    "The tournament is a selection aid, not a second workboard authority.",
+    "A task remains open until its own receipt satisfies the owning OpenSpec.",
+    "No task is promoted merely because the challenger rank is high."
+  ]
+}

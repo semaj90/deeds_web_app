@@ -44,7 +44,7 @@ const QDRANT_URL  = process.env.QDRANT_URL  ?? 'http://127.0.0.1:6333';
 const OLLAMA_URL  = process.env.OLLAMA_URL  ?? 'http://127.0.0.1:11434';
 const DB_URL      = process.env.DATABASE_URL ?? '';
 const EMBED_MODEL = process.env.EMBED_MODEL ?? 'embeddinggemma:latest';
-const LLM_MODEL   = process.env.LLM_MODEL   ?? 'gemma4-rotorquant:latest';
+const LLM_MODEL   = process.env.LLM_MODEL   ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const COLLECTION  = 'codebase_chunks_768';
 const CACHE_TTL   = 6 * 3600;
 

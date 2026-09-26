@@ -391,7 +391,7 @@ if (process.argv.includes('--resolve-imports')) {
   })().catch(err=>{ console.error(err); process.exit(1); });
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url) || process.argv[1].endsWith('build-ast-topology-dry-run.mjs')) {
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   if (!process.argv.includes('--resolve-imports')) {
     main().catch(err => { console.error(err); process.exit(1); });
   }

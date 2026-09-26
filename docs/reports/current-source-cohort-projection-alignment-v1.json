@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-cohort-projection-alignment.v1",
-  "generatedAt": "2026-09-10T17:30:45.866Z",
+  "generatedAt": "2026-09-18T01:34:38.114Z",
   "mode": "READ_ONLY",
   "inputs": {
     "lineage": "docs/reports/current-source-cohort-lineage-v1.json",

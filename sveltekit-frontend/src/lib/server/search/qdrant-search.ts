@@ -384,7 +384,7 @@ function assertCanonicalSemantic768Query(embedding: number[]): void {
 export async function searchQdrantCodeStrictV1(
   embedding: number[],
   limit = 10,
-  options: CodebaseAnnSearchOptions & { collection?: string } = {},
+  options: CodebaseAnnSearchOptions & { collection?: string; topoClass?: string } = {},
 ): Promise<QdrantCodeResult[]> {
   assertCanonicalSemantic768Query(embedding);
   if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
@@ -394,6 +394,7 @@ export async function searchQdrantCodeStrictV1(
   return backend.search({
     embedding,
     limit,
+    topoClass: options.topoClass,
     collection: options.collection ?? QDRANT_SEMANTIC_COLLECTION,
     options: { ...options, exactVectorSearch: options.exactVectorSearch ?? true },
     strict: true,

@@ -7,8 +7,15 @@ import { fileURLToPath } from 'node:url';
 
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const repoRoot = resolve(appRoot, '..');
-const reportJson = resolve(repoRoot, 'docs/reports/query-router-v2-readiness-audit.json');
-const reportMd = resolve(repoRoot, 'docs/reports/query-router-v2-readiness-audit.md');
+function arg(name: string, fallback: string): string {
+  const index = process.argv.indexOf(name);
+  return index >= 0 && process.argv[index + 1] ? process.argv[index + 1] : fallback;
+}
+
+const reportJson = resolve(repoRoot, arg('--report-json', 'docs/reports/query-router-v2-readiness-audit.json'));
+const reportMd = resolve(repoRoot, arg('--report-md', 'docs/reports/query-router-v2-readiness-audit.md'));
+const labeledCorpusPath = resolve(appRoot, 'data/atlas-ml/query-router-labels-v2.jsonl');
+const materializedSourcePath = resolve(appRoot, 'data/atlas-ml/query-router-source-v2.jsonl');
 
 const requiredFiles = [
   'src/lib/server/atlas/classification/query-router-dataset-v2.ts',
@@ -74,10 +81,14 @@ const entrypoints = {
 const contractsPresent = files.every((row) => row.exists);
 const pythonReady = python.numpy.available && python.torch.available && python.xgboost.available;
 const entrypointsReady = Object.values(entrypoints).every((row) => row.pass);
-const status = contractsPresent && pythonReady && entrypointsReady
+const labeledCorpusPresent = existsSync(labeledCorpusPath);
+const materializedSourcePresent = existsSync(materializedSourcePath);
+const status = contractsPresent && pythonReady && entrypointsReady && labeledCorpusPresent
   ? 'READY_FOR_FROZEN_CORPUS_EVAL'
   : contractsPresent
-    ? 'BLOCKED_RUNTIME_DEPENDENCY'
+    ? !labeledCorpusPresent
+      ? 'BLOCKED_MISSING_REVISION_QUALIFIED_CORPUS'
+      : 'BLOCKED_RUNTIME_DEPENDENCY'
     : 'BLOCKED_MISSING_CONTRACT';
 
 const report = {
@@ -88,6 +99,18 @@ const report = {
   contractsPresent,
   pythonReady,
   entrypointsReady,
+  labeledCorpus: {
+    path: labeledCorpusPath,
+    present: labeledCorpusPresent,
+    requiredFor: ['ROUTE-04', 'ROUTE-05'],
+    qualification: 'revision-qualified non-toy labels with query/label/embedding/representation revisions',
+  },
+  materializedSource: {
+    path: materializedSourcePath,
+    present: materializedSourcePresent,
+    producedBy: 'materialize-query-router-source-v2.mts',
+    requiredBefore: ['ROUTE-04', 'ROUTE-05'],
+  },
   files,
   python,
   entrypoints,
@@ -95,8 +118,10 @@ const report = {
   retrievalOwnerChanged: false,
   canonicalWritesAllowed: false,
   nextRequirement: status === 'READY_FOR_FROZEN_CORPUS_EVAL'
-    ? 'REVISION_QUALIFIED_LABELED_QUERY_CORPUS'
-    : 'SATISFY_REPORTED_BLOCKERS',
+    ? 'RUN_FROZEN_CORPUS_EVAL'
+    : !labeledCorpusPresent
+      ? 'PROVIDE_REVISION_QUALIFIED_LABELED_QUERY_CORPUS'
+      : 'SATISFY_REPORTED_BLOCKERS',
 };
 
 mkdirSync(dirname(reportJson), { recursive: true });
@@ -109,6 +134,8 @@ writeFileSync(reportMd, [
   `- contracts present: ${contractsPresent}`,
   `- Python runtime ready: ${pythonReady}`,
   `- trainer/comparator entrypoints ready: ${entrypointsReady}`,
+  `- revision-qualified labeled corpus present: ${labeledCorpusPresent}`,
+  `- materialized router source present: ${materializedSourcePresent}`,
   '- training executed: false',
   '- retrieval owner changed: false',
   '',

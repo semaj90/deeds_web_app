@@ -110,7 +110,7 @@ if (values.help) {
 // Parse options
 const batchSize = values['batch-size'] ? parseInt(values['batch-size'], 10) : 5;
 const delay = values.delay ? parseInt(values.delay, 10) : 1000;
-const model = values.model || process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
+const model = values.model || process.env.GEMMA4_MODEL || (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const domain = values.domain;
 const dryRun = values['dry-run'] || false;
 const apiUrl = values.url || 'http://localhost:5173';

@@ -171,7 +171,7 @@ async function main() {
       feature_type:      'sae_latent',
       version:           AE_VERSION,
       qdrant_collection: COLLECTION,
-      qdrant_point_id:   qdrantPointId ?? `synthetic:${packetKey}`,
+      qdrant_point_id:   qdrantPointId,
       embed_dim:         EMBED_DIM,
       priority,
       status:            hasPt ? 'pending' : 'error',

@@ -1,0 +1,940 @@
+{
+  "schema": "atlas.symbol-producer-ownership.v1",
+  "gate": "S01-10",
+  "generatedAt": "2026-09-22T00:01:03.921Z",
+  "inputs": {
+    "census": "docs/reports/symbol-revision-producer-census-v1.json",
+    "censusReceiptChecksum": "sha256:d524f0d57440318f61fd8bf62c846d785e0d9968156e49d83220f3b6b48165ab",
+    "staticScan": {
+      "filesScanned": 9382,
+      "codeFilesScanned": 8958
+    }
+  },
+  "writersByTarget": {
+    "symbol_registry": [
+      "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+      "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+      "scripts/atlas/prove-feature-intelligence-database.mjs"
+    ],
+    "symbol_versions": [
+      "scripts/atlas/materialize-ast-symbol-versions.mjs"
+    ],
+    "symbol_aliases": [],
+    "packet_hierarchy": [
+      "sveltekit-frontend/scripts/atlas/backfill-unified-id-hierarchy.mjs"
+    ],
+    "packets_file_id": [
+      "scripts/atlas/register-orphaned-chunks.mjs",
+      "sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.ts",
+      "sveltekit-frontend/scripts/atlas/backfill-unified-id-hierarchy.mjs"
+    ],
+    "graphify_files": [
+      "scripts/atlas/graphify-symbol-extractor-v1.mts",
+      "scripts/atlas/smoke-graphify-symbol-lane-v1.mjs",
+      "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
+      "sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts"
+    ],
+    "graphify_symbols": [
+      "scripts/atlas/graphify-symbol-extractor-v1.mts",
+      "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-writer-v1.ts"
+    ]
+  },
+  "writerCount": 12,
+  "writers": [
+    {
+      "file": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+      "writesTargets": [
+        "symbol_registry"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [],
+      "referencedByOtherFilesCount": 0,
+      "transaction": {
+        "begin": true,
+        "commit": true,
+        "rollback": true
+      },
+      "readbackVerification": true,
+      "dryRunDefault": true,
+      "revisionSourceLines": [
+        {
+          "line": 100,
+          "text": "created_from_source_ref, created_from_source_revision, registry_revision, status)"
+        },
+        {
+          "line": 105,
+          "text": "row.qualified_name, row.nomination_id, row.source_ref, row.source_revision,"
+        },
+        {
+          "line": 115,
+          "text": "created_from_source_ref, created_from_source_revision, registry_revision, status"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+      "writesTargets": [
+        "symbol_registry"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [],
+      "referencedByOtherFilesCount": 0,
+      "transaction": {
+        "begin": false,
+        "commit": false,
+        "rollback": false
+      },
+      "readbackVerification": false,
+      "dryRunDefault": true,
+      "revisionSourceLines": [
+        {
+          "line": 55,
+          "text": "// `symbol-key:${sha256({sourceRef, sourceRevision, kind, name, startByte,"
+        },
+        {
+          "line": 135,
+          "text": "created_from_source_revision, registry_revision, status"
+        },
+        {
+          "line": 148,
+          "text": "row.source_revision,"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 56,
+          "text": "// endByte}).slice(0,40)}` — already unique per exact declaration"
+        }
+      ],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "scripts/atlas/prove-feature-intelligence-database.mjs",
+      "writesTargets": [
+        "symbol_registry"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [],
+      "referencedByOtherFilesCount": 0,
+      "transaction": {
+        "begin": true,
+        "commit": false,
+        "rollback": true
+      },
+      "readbackVerification": true,
+      "dryRunDefault": false,
+      "revisionSourceLines": [
+        {
+          "line": 97,
+          "text": "gates.SYMBOL_REGISTRY_NATIVE_PROVENANCE = ['upstream_node_id','upstream_symbol_id','upstream_chunk_id','source_revision','declaration_hash'].every((name) => symbolCols.ha"
+        },
+        {
+          "line": 161,
+          "text": "await client.query(`INSERT INTO atlas_evidence(evidence_id,evidence_kind,source_ref,source_revision,evidence_revision,producer_revision,confidence,payload,search_text) VA"
+        },
+        {
+          "line": 162,
+          "text": "await client.query(`INSERT INTO atlas_evidence_entities(evidence_id,entity_type,entity_id,role,source_ref,source_revision,extraction_revision,confidence) VALUES ($1,'symb"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "writesTargets": [
+        "symbol_versions"
+      ],
+      "runtimeEntrypoints": [
+        {
+          "package": "sveltekit-frontend/package.json",
+          "scripts": [
+            "atlas:features:ast-symbol-versions:dry",
+            "atlas:features:ast-symbol-versions:apply"
+          ]
+        }
+      ],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [],
+      "referencedByOtherFilesCount": 0,
+      "transaction": {
+        "begin": true,
+        "commit": true,
+        "rollback": true
+      },
+      "readbackVerification": false,
+      "dryRunDefault": true,
+      "revisionSourceLines": [
+        {
+          "line": 71,
+          "text": "// candidate.sourceRevision is the content-hash evidence revision."
+        },
+        {
+          "line": 72,
+          "text": "graphifySourceRevision: node.graphifySourceRevision ?? node.sourceRevision,"
+        },
+        {
+          "line": 85,
+          "text": "const revisionQualifiedRows = rows.filter((row) => row.source_revision && row.workspace_revision);"
+        },
+        {
+          "line": 93,
+          "text": "missingSourceRevision: rows.filter((row) => !row.source_revision).length,"
+        },
+        {
+          "line": 94,
+          "text": "missingWorkspaceRevision: rows.filter((row) => !row.workspace_revision).length,"
+        },
+        {
+          "line": 109,
+          "text": "&& comparableRevision(node.graphifySourceRevision) === comparableRevision(row.source_revision)"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 72,
+          "text": "graphifySourceRevision: node.graphifySourceRevision ?? node.sourceRevision,"
+        }
+      ],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": [
+        {
+          "line": 146,
+          "text": "upstream_node_id, upstream_file_id, upstream_symbol_id, upstream_chunk_id,"
+        }
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/scripts/atlas/backfill-unified-id-hierarchy.mjs",
+      "writesTargets": [
+        "packet_hierarchy",
+        "packets_file_id"
+      ],
+      "runtimeEntrypoints": [
+        {
+          "package": "sveltekit-frontend/package.json",
+          "scripts": [
+            "atlas:backfill:unified-id-hierarchy:dry",
+            "atlas:backfill:unified-id-hierarchy:apply",
+            "atlas:backfill:unified-id-hierarchy:limit"
+          ]
+        }
+      ],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [
+        "scripts/atlas/audit-stable-file-identity-owner-v1.mts",
+        "sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts",
+        "sveltekit-frontend/scripts/atlas/packet-chunk-lineage-backfill-scope-01.mts"
+      ],
+      "referencedByOtherFilesCount": 3,
+      "transaction": {
+        "begin": false,
+        "commit": false,
+        "rollback": false
+      },
+      "readbackVerification": false,
+      "dryRunDefault": true,
+      "revisionSourceLines": [],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 19,
+          "text": "import { randomUUID } from 'node:crypto';"
+        },
+        {
+          "line": 58,
+          "text": "repository_id: randomUUID(),"
+        },
+        {
+          "line": 59,
+          "text": "directory_id: randomUUID(),"
+        },
+        {
+          "line": 60,
+          "text": "file_id: randomUUID(),"
+        },
+        {
+          "line": 61,
+          "text": "module_id: randomUUID(),"
+        },
+        {
+          "line": 62,
+          "text": "symbol_id: randomUUID(),"
+        }
+      ],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": true,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "scripts/atlas/register-orphaned-chunks.mjs",
+      "writesTargets": [
+        "packets_file_id"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [
+        "scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts",
+        "sveltekit-frontend/scripts/atlas/packet-chunk-lineage-canary-01.mts",
+        "sveltekit-frontend/scripts/atlas/packet-chunk-lineage-contract-01a.mts"
+      ],
+      "referencedByOtherFilesCount": 4,
+      "transaction": {
+        "begin": true,
+        "commit": true,
+        "rollback": true
+      },
+      "readbackVerification": false,
+      "dryRunDefault": true,
+      "revisionSourceLines": [
+        {
+          "line": 46,
+          "text": "* via `ORDER BY workspace_revision DESC, code_source_revision DESC` -- sorting"
+        },
+        {
+          "line": 112,
+          "text": "// `status`/`executionId`/`workspaceRevision`, NOT nested under a `sourceSnapshot`"
+        },
+        {
+          "line": 141,
+          "text": "workspaceRevision: parsed.workspaceRevision ?? null,"
+        },
+        {
+          "line": 142,
+          "text": "workspaceRevisionRecordChecksum: parsed.workspaceRevisionRecordChecksum ?? null,"
+        },
+        {
+          "line": 445,
+          "text": "source_revision: binding.sourceRevision,"
+        },
+        {
+          "line": 462,
+          "text": "NULLIF(BTRIM(gef.code_source_revision::text), '') AS source_revision"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 141,
+          "text": "workspaceRevision: parsed.workspaceRevision ?? null,"
+        },
+        {
+          "line": 142,
+          "text": "workspaceRevisionRecordChecksum: parsed.workspaceRevisionRecordChecksum ?? null,"
+        },
+        {
+          "line": 143,
+          "text": "workspaceOriginRuntimeRevision: parsed.workspaceOriginRuntimeRevision ?? null,"
+        },
+        {
+          "line": 161,
+          "text": "if (!Array.isArray(parsed.targetSourceRefs) || parsed.targetSourceRefs.length === 0 || !Array.isArray(parsed.bindings)) {"
+        },
+        {
+          "line": 220,
+          "text": "const base = sourceRef.split('/').pop()?.replace(/\\.\\w+$/, '') || 'unknown';"
+        },
+        {
+          "line": 247,
+          "text": "const lower = (sourceRef || '').toLowerCase();"
+        }
+      ],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.ts",
+      "writesTargets": [
+        "packets_file_id"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": false,
+      "referencedByOtherFiles": [
+        "scripts/atlas/audit-dormant-writer-admission-v1.mjs",
+        "scripts/atlas/audit-mutation-site-census-v1.mjs",
+        "scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts"
+      ],
+      "referencedByOtherFilesCount": 4,
+      "transaction": {
+        "begin": false,
+        "commit": false,
+        "rollback": false
+      },
+      "readbackVerification": false,
+      "dryRunDefault": false,
+      "revisionSourceLines": [],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 29,
+          "text": "import { randomUUID } from 'node:crypto';"
+        },
+        {
+          "line": 190,
+          "text": "repository_id: randomUUID(),"
+        },
+        {
+          "line": 191,
+          "text": "directory_id: randomUUID(),"
+        },
+        {
+          "line": 192,
+          "text": "file_id: randomUUID(),"
+        },
+        {
+          "line": 193,
+          "text": "module_id: randomUUID(),"
+        },
+        {
+          "line": 194,
+          "text": "symbol_id: randomUUID(),"
+        }
+      ],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": true,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "scripts/atlas/graphify-symbol-extractor-v1.mts",
+      "writesTargets": [
+        "graphify_files",
+        "graphify_symbols"
+      ],
+      "runtimeEntrypoints": [
+        {
+          "package": "sveltekit-frontend/package.json",
+          "scripts": [
+            "graphify:symbols:extract"
+          ]
+        }
+      ],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [
+        "scripts/atlas/audit-ast-hash-grain-classification-v1.mjs",
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "scripts/atlas/lib/atlas-ast-nodes-writer.mjs",
+        "scripts/atlas/lib/lsp-client.mjs",
+        "scripts/atlas/lib/source-text-envelope.mjs",
+        "scripts/atlas/smoke-graphify-symbol-lane-v1.mjs",
+        "scripts/graphify/lib/ts-ast-extractor.mjs"
+      ],
+      "referencedByOtherFilesCount": 7,
+      "transaction": {
+        "begin": true,
+        "commit": true,
+        "rollback": true
+      },
+      "readbackVerification": false,
+      "dryRunDefault": true,
+      "revisionSourceLines": [
+        {
+          "line": 73,
+          "text": "const workspaceRevisionFilter = opt('--workspace-revision', '');"
+        },
+        {
+          "line": 95,
+          "text": "if (apply && !workspaceRevisionFilter) {"
+        },
+        {
+          "line": 317,
+          "text": "if (workspaceRevisionFilter) {"
+        },
+        {
+          "line": 318,
+          "text": "queryParams.push(workspaceRevisionFilter);"
+        },
+        {
+          "line": 319,
+          "text": "workspaceClause += ` AND workspace_revision = $${queryParams.length}`;"
+        },
+        {
+          "line": 325,
+          "text": "workspace_revision: string | null;"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 374,
+          "text": "workspaceRevisionMatches: !workspaceRevisionFilter || row.workspace_revision === workspaceRevisionFilter,"
+        },
+        {
+          "line": 393,
+          "text": "workspaceRevisionMatches: !workspaceRevisionFilter || row.workspace_revision === workspaceRevisionFilter,"
+        },
+        {
+          "line": 411,
+          "text": "workspaceRevisionMatches: !workspaceRevisionFilter || row.workspace_revision === workspaceRevisionFilter,"
+        },
+        {
+          "line": 525,
+          "text": "workspaceIdFilter: workspaceIdFilter || null,"
+        },
+        {
+          "line": 526,
+          "text": "workspaceRevisionFilter: workspaceRevisionFilter || null,"
+        }
+      ],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "scripts/atlas/smoke-graphify-symbol-lane-v1.mjs",
+      "writesTargets": [
+        "graphify_files"
+      ],
+      "runtimeEntrypoints": [
+        {
+          "package": "sveltekit-frontend/package.json",
+          "scripts": [
+            "smoke:graphify:symbols"
+          ]
+        }
+      ],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [],
+      "referencedByOtherFilesCount": 0,
+      "transaction": {
+        "begin": false,
+        "commit": false,
+        "rollback": false
+      },
+      "readbackVerification": false,
+      "dryRunDefault": false,
+      "revisionSourceLines": [
+        {
+          "line": 34,
+          "text": ".update(`${row.repoId}:${row.workspaceRevision}:${row.sourceRef}:${row.sourceRevision}:${row.contentDigest}:${row.byteLength}:${row.producerRevision}`, 'utf8')"
+        },
+        {
+          "line": 74,
+          "text": "//    synthetic revision only. content_digest/source_revision are derived from the real"
+        },
+        {
+          "line": 77,
+          "text": "const sourceRevision = `sha256:${createHash('sha256').update(`${row.source_ref}:${row.content_hash}`).digest('hex')}`;"
+        },
+        {
+          "line": 81,
+          "text": "workspaceRevision: SYNTHETIC_REVISION,"
+        },
+        {
+          "line": 83,
+          "text": "sourceRevision,"
+        },
+        {
+          "line": 94,
+          "text": "(repo_id, workspace_revision, canonical_source_ref, source_revision,"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
+      "writesTargets": [
+        "graphify_files"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": false,
+      "referencedByOtherFiles": [
+        "scripts/atlas/graphify-daily-lifecycle-complete-v1.mjs",
+        "scripts/atlas/graphify-daily-lifecycle-file-inventory-v1.mjs",
+        "scripts/atlas/graphify-daily-lifecycle-open-v1.mjs",
+        "scripts/atlas/graphify-daily-snapshot-native-complete-run-v1.mts",
+        "scripts/atlas/prove-graphify-open-bind-complete-lifecycle-v1.mjs",
+        "scripts/atlas/prove-graphify-run-completion-primitive-v1.mjs"
+      ],
+      "referencedByOtherFilesCount": 6,
+      "transaction": {
+        "begin": true,
+        "commit": true,
+        "rollback": true
+      },
+      "readbackVerification": true,
+      "dryRunDefault": false,
+      "revisionSourceLines": [
+        {
+          "line": 4,
+          "text": "workspaceRevisionRecordV1Schema,"
+        },
+        {
+          "line": 20,
+          "text": "workspaceRevision: contentRevision,"
+        },
+        {
+          "line": 33,
+          "text": "sourceRevision: contentRevision,"
+        },
+        {
+          "line": 68,
+          "text": "if (binding.workspaceRevision !== record.workspaceRevision) {"
+        },
+        {
+          "line": 71,
+          "text": "if (binding.sourceRevision !== `sha256:${binding.contentDigest}`) {"
+        },
+        {
+          "line": 109,
+          "text": "const record = workspaceRevisionRecordV1Schema.parse(input.record);"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 292,
+          "text": "if (normalizeSourceRef(persistedFile.source_ref) !== binding.sourceRef || String(persistedFile.source_revision) !== legacySourceRevision) {"
+        },
+        {
+          "line": 536,
+          "text": "if (persisted.workspace_revision !== null || String(persisted.status) !== 'RUNNING') {"
+        }
+      ],
+      "revisionShapeValidation": true,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts",
+      "writesTargets": [
+        "graphify_files"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [
+        "sveltekit-frontend/scripts/atlas/prove-graphify-revision-owner-v2.mts"
+      ],
+      "referencedByOtherFilesCount": 1,
+      "transaction": {
+        "begin": true,
+        "commit": true,
+        "rollback": true
+      },
+      "readbackVerification": true,
+      "dryRunDefault": true,
+      "revisionSourceLines": [
+        {
+          "line": 78,
+          "text": "workspaceRevision: origin.record.workspaceRevision,"
+        },
+        {
+          "line": 86,
+          "text": "codeSourceRevision: binding.sourceRevision,"
+        },
+        {
+          "line": 92,
+          "text": "workspaceRevisionOwner: 'WorkspaceRevisionRecordV1',"
+        },
+        {
+          "line": 93,
+          "text": "sourceRevisionOwner: 'CodeSourceRevisionV1',"
+        },
+        {
+          "line": 94,
+          "text": "workspaceRevisionTableColumn: 'graphify_runs.workspace_revision',"
+        },
+        {
+          "line": 97,
+          "text": "codeSourceRevisionTableColumn: 'graphify_files.code_source_revision',"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 21,
+          "text": "const limit = Math.max(1, Math.min(5000, Number(process.env.ATLAS_GRAPHIFY_SOURCE_LIMIT ?? (requestedSource ? 1 : 100))));"
+        },
+        {
+          "line": 24,
+          "text": "process.env.ATLAS_GRAPHIFY_SOURCE_INVENTORY_PLAN_OUT ?? 'docs/reports/graphify-source-inventory-plan.json',"
+        },
+        {
+          "line": 70,
+          "text": "if (selected.length === 0) throw new Error(`GRAPHIFY_SOURCE_INVENTORY_SELECTION_EMPTY:${requestedSource ?? limit}`);"
+        },
+        {
+          "line": 113,
+          "text": "if (!workspaceId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(workspaceId)) {"
+        }
+      ],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-writer-v1.ts",
+      "writesTargets": [
+        "graphify_symbols"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": false,
+      "referencedByOtherFiles": [],
+      "referencedByOtherFilesCount": 0,
+      "transaction": {
+        "begin": true,
+        "commit": true,
+        "rollback": true
+      },
+      "readbackVerification": true,
+      "dryRunDefault": false,
+      "revisionSourceLines": [
+        {
+          "line": 28,
+          "text": "workspaceRevision: nonEmpty,"
+        },
+        {
+          "line": 30,
+          "text": "sourceRevision: nonEmpty,"
+        },
+        {
+          "line": 114,
+          "text": "workspaceRevision: batch.workspaceRevision,"
+        },
+        {
+          "line": 116,
+          "text": "sourceRevision: batch.sourceRevision,"
+        },
+        {
+          "line": 158,
+          "text": "`SELECT file_id, workspace_id, workspace_revision, source_ref, content_hash,"
+        },
+        {
+          "line": 159,
+          "text": "code_source_revision, byte_length, last_seen_run_id"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [],
+      "revisionShapeValidation": true,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    }
+  ],
+  "labelOwners": {
+    "promotion:ast-nominations:v1": {
+      "column": "atlas_symbol_registry.registry_revision",
+      "filesContainingLabel": [
+        "scripts/atlas/promote-ast-symbols-to-registry.mjs"
+      ],
+      "uniqueFile": "scripts/atlas/promote-ast-symbols-to-registry.mjs"
+    },
+    "atlas-current-tree-bound-symbol-canary-v1": {
+      "column": "atlas_symbol_registry.registry_revision",
+      "filesContainingLabel": [
+        "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs"
+      ],
+      "uniqueFile": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs"
+    },
+    "atlas-ast-symbol-version-materializer-v1": {
+      "column": "atlas_symbol_versions.producer_revision",
+      "filesContainingLabel": [
+        "scripts/atlas/materialize-ast-symbol-versions.mjs"
+      ],
+      "uniqueFile": "scripts/atlas/materialize-ast-symbol-versions.mjs"
+    },
+    "symbol-reconciliation-writer-v1": {
+      "column": "atlas_symbol_versions.producer_revision",
+      "filesContainingLabel": [
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "scripts/atlas/smoke-graphify-symbol-lane-v1.mjs",
+        "scripts/atlas/symbol-reconciliation-writer-v1.mts"
+      ],
+      "uniqueFile": null
+    }
+  },
+  "populations": {
+    "A_placeholderRegistrySymbols": {
+      "rows": 10220,
+      "value": "workspace:0",
+      "producerLabel": "promotion:ast-nominations:v1",
+      "status": "PROVEN",
+      "producer": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+      "basis": "label \"promotion:ast-nominations:v1\" occurs in exactly one code file, and that file writes symbol_registry",
+      "promoteScriptIsOwner": "PROVEN: it is the only file carrying the registry_revision label of these rows and it writes atlas_symbol_registry. It does NOT itself create the `workspace:0` value (no literal or fallback in it): it passes through its input row, so the script is the WRITER of record, and the placeholder value originated upstream in the input artifact."
+    },
+    "B_workspacePlaceholderVersions": {
+      "rows": 200,
+      "value": "workspace:0 (source and workspace)",
+      "producerLabel": "atlas-ast-symbol-version-materializer-v1",
+      "status": "PROVEN",
+      "producer": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "basis": "label \"atlas-ast-symbol-version-materializer-v1\" occurs in exactly one code file, and that file writes symbol_versions"
+    },
+    "C_gitCommitOidVersions": {
+      "rows": 85,
+      "value": "Git commit id 1bb240fb...",
+      "producerLabel": "atlas-ast-symbol-version-materializer-v1",
+      "status": "PROVEN",
+      "producer": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "basis": "label \"atlas-ast-symbol-version-materializer-v1\" occurs in exactly one code file, and that file writes symbol_versions",
+      "note": "the value itself is a Git commit id; the materializer passed it through from its input"
+    },
+    "D_totalUnqualifiedVersions": {
+      "rows": 285,
+      "producerLabel": "atlas-ast-symbol-version-materializer-v1",
+      "status": "PROVEN",
+      "producer": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "basis": "label \"atlas-ast-symbol-version-materializer-v1\" occurs in exactly one code file, and that file writes symbol_versions",
+      "note": "A+B/C are disjoint by source shape; total = B + C"
+    },
+    "E_gitCommitOidRegistrySymbols": {
+      "rows": 90,
+      "value": "Git commit id 1bb240fb...",
+      "producerLabel": "atlas-current-tree-bound-symbol-canary-v1",
+      "status": "PROVEN",
+      "producer": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+      "basis": "label \"atlas-current-tree-bound-symbol-canary-v1\" occurs in exactly one code file, and that file writes symbol_registry"
+    },
+    "F_qualifiedRows": {
+      "versions": 194,
+      "registry": 194,
+      "producerLabel": "symbol-reconciliation-writer-v1",
+      "status": "UNKNOWN",
+      "producer": null,
+      "basis": "label \"symbol-reconciliation-writer-v1\" found in 3 files: scripts/atlas/audit-canonical-projection-fabric.mjs, scripts/atlas/smoke-graphify-symbol-lane-v1.mjs, scripts/atlas/symbol-reconciliation-writer-v1.mts"
+    }
+  },
+  "writerClassification": [
+    {
+      "file": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+      "classification": "LEGACY_UNQUALIFIED",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+      "classification": "PLACEHOLDER_WRITER",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "scripts/atlas/prove-feature-intelligence-database.mjs",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "classification": "PLACEHOLDER_WRITER",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "sveltekit-frontend/scripts/atlas/backfill-unified-id-hierarchy.mjs",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "scripts/atlas/register-orphaned-chunks.mjs",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.ts",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "scripts/atlas/graphify-symbol-extractor-v1.mts",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "scripts/atlas/smoke-graphify-symbol-lane-v1.mjs",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-writer-v1.ts",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    }
+  ],
+  "currentCanonicalWriter": null,
+  "packetFileIdBackfillPaths": [
+    "scripts/atlas/register-orphaned-chunks.mjs",
+    "sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.ts",
+    "sveltekit-frontend/scripts/atlas/backfill-unified-id-hierarchy.mjs"
+  ],
+  "upstreamFileIdWriters": [
+    {
+      "file": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "lines": [
+        {
+          "line": 146,
+          "text": "upstream_node_id, upstream_file_id, upstream_symbol_id, upstream_chunk_id,"
+        }
+      ]
+    }
+  ],
+  "safety": {
+    "databaseWrites": 0,
+    "databaseAccess": false,
+    "persistentWrites": 0,
+    "registryWrites": 0,
+    "schemaChanges": 0,
+    "graphifyRun": false,
+    "readerCutover": false,
+    "upstreamFileIdModified": 0,
+    "stableFileIdInvented": false
+  },
+  "limits": [
+    "static scan: liveness of a writer is not proven, only whether it is referenced by a package script or another file",
+    "the exact origin of the `workspace:0` value in the 2026-08-24 input artifact is not recoverable"
+  ],
+  "receiptChecksum": "sha256:47ac4261104de10c88013184b9489a556ca7b189a0524d6264ec1523aa078a04",
+  "versionedReceipt": "docs/reports/symbol-producer-ownership-v1.47ac4261104d.json"
+}

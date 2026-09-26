@@ -22,12 +22,21 @@ describe('miniforge-nlp-sidecar', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: any, init?: any) => {
       const url = String(input);
       if (url.endsWith('/health')) {
-        return new Response(JSON.stringify({ status: 'ok', model: 'miniforge-nlp-sidecar', capabilities: { spacy: true } }), { status: 200 });
+        return new Response(JSON.stringify({
+          status: 'ok',
+          model: 'miniforge-nlp-sidecar',
+          capabilities: { spacy: true, spacy_pos: false },
+          capabilityDetails: { spacy_model: { installed: false, loaded: false, pos_ready: false } },
+        }), { status: 200 });
       }
       if (url.endsWith('/analyze')) {
         const body = JSON.parse(String(init?.body ?? '{}'));
         expect(body.passes).toEqual(['structural', 'semantic', 'sequence']);
         expect(body.grounded_extraction_required).toBe(true);
+        expect(body.source_revision).toBe('sha256:source-rev-1');
+        expect(body.workspace_revision).toBe('sha256:workspace-rev-1');
+        expect(body.source_namespace).toBe('src');
+        expect(body.tree_node_id).toBe('tree:hello');
         return new Response(JSON.stringify({
           document_id: 'doc-1',
           provider_revision: 'parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.44.0',
@@ -39,7 +48,15 @@ describe('miniforge-nlp-sidecar', () => {
           chunks: [],
           features: [],
           metadata: {},
-          capabilities: { spacy: true, langextract: true, tree_sitter: true, ast_grep: true, torch: false },
+          capabilities: { spacy: true, langextract: true, tree_sitter: true, ast_grep: true, torch: false, classification_helper: true },
+          classification_proposal: {
+            schema: 'atlas.nlp-classification-proposal.v1',
+            sourceRef: 'src/example.ts',
+            sourceRevision: 'sha256:source-rev-1',
+            workspaceRevision: 'sha256:workspace-rev-1',
+            canonicalAuthority: false,
+            writesPerformed: false,
+          },
           pass_results: [],
           control5: null,
           experiment_feature_matrix: null,
@@ -61,12 +78,20 @@ describe('miniforge-nlp-sidecar', () => {
 
     const health = await client.health();
     expect(health.ready).toBe(true);
+    expect(health.capabilities?.spacy).toBe(true);
+    expect(health.capabilities?.spacy_pos).toBe(false);
+    expect(health.capabilityDetails?.spacy_model?.pos_ready).toBe(false);
 
     const analysis = await client.analyze({
       text: 'export function hello() { return 1; }',
       sourceType: 'codebase',
       extractionMode: 'full',
       documentId: 'doc-1',
+      sourceRef: 'src/example.ts',
+      sourceRevision: 'sha256:source-rev-1',
+      workspaceRevision: 'sha256:workspace-rev-1',
+      sourceNamespace: 'src',
+      treeNodeId: 'tree:hello',
       passes: ['structural', 'semantic', 'sequence'],
       groundedExtractionRequired: true,
     });
@@ -76,7 +101,81 @@ describe('miniforge-nlp-sidecar', () => {
     expect(Array.isArray(analysis.entities)).toBe(true);
     expect(analysis.event_hypergraph?.events).toEqual([]);
     expect(analysis.event_hypergraph?.recommendation_feature_rows).toEqual([]);
+    expect(analysis.capabilities.classification_helper).toBe(true);
+    expect(analysis.classification_proposal?.sourceRevision).toBe('sha256:source-rev-1');
+    expect(analysis.classification_proposal?.canonicalAuthority).toBe(false);
     expect(fetchSpy).toHaveBeenCalled();
+  });
+
+  it('normalizes sidecar pass evidence and compiles one noncanonical matrix only with explicit lineage', async () => {
+    const now = '2026-09-23T12:00:00.000Z';
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify({
+      document_id: 'doc-fixture',
+      source_type: 'codebase',
+      extraction_mode: 'full',
+      entities: [], relationships: [], concepts: [], chunks: [], features: [],
+      metadata: {},
+      capabilities: { spacy: false, langextract: false, tree_sitter: true, ast_grep: true, torch: false },
+      pass_results: [{
+        request_id: 'request-fixture',
+        packet_key: 'packet-fixture',
+        source_ref: 'src/fixture.ts',
+        source_revision: 'sha256:source-fixture',
+        workspace_revision: 'sha256:workspace-fixture',
+        family: 'structural',
+        pass_name: 'treesitter_chunk',
+        pass_revision: 'treesitter_chunk-v1',
+        backend: 'tree-sitter',
+        backend_version: '1',
+        device: 'cpu',
+        input_hash: 'sha256:input-fixture',
+        output_hash: 'sha256:output-fixture',
+        started_at: now,
+        completed_at: now,
+        status: 'succeeded',
+        features: { ast_units: 2 },
+        artifacts: {}, evidence: [], warnings: [],
+      }],
+      // A Python-side matrix is deliberately ignored; TS is the sole compiler.
+      experiment_feature_matrix: { candidate_id: 'untrusted-python-matrix' },
+      control5: { structural_confidence: 0.99 },
+    }), { status: 200 }));
+
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+    const aligned = await client.analyze({
+      text: 'export const fixture = 1;', documentId: 'request-fixture',
+      packetKey: 'packet-fixture', sourceRef: 'src/fixture.ts',
+      sourceRevision: 'sha256:source-fixture', workspaceRevision: 'sha256:workspace-fixture',
+    });
+
+    expect(aligned.pass_results).toHaveLength(1);
+    expect(aligned.experiment_feature_matrix).toMatchObject({
+      packetKey: 'packet-fixture', sourceRef: 'src/fixture.ts',
+      sourceRevision: 'sha256:source-fixture', workspaceRevision: 'sha256:workspace-fixture',
+      canonicalAuthority: false, ast_match: null,
+    });
+    expect(aligned.control5?.structural_confidence).toBeNull();
+    expect(aligned.metadata.experiment_feature_matrix_status).toBe('COMPILED');
+
+    const mismatched = await client.analyze({
+      text: 'export const fixture = 1;', documentId: 'request-fixture',
+      packetKey: 'packet-fixture', sourceRef: 'src/fixture.ts',
+      sourceRevision: 'sha256:source-fixture', workspaceRevision: 'sha256:other-workspace',
+    });
+    expect(mismatched.experiment_feature_matrix).toBeNull();
+    expect(mismatched.control5).toBeNull();
+    expect(mismatched.metadata.experiment_feature_matrix_status).toBe('SKIPPED_LINEAGE_MISMATCH');
+
+    const unqualified = await client.analyze({
+      text: 'export const fixture = 1;', documentId: 'request-fixture',
+      sourceRef: 'src/fixture.ts', sourceRevision: 'sha256:source-fixture',
+      workspaceRevision: 'sha256:workspace-fixture',
+    });
+    expect(unqualified.experiment_feature_matrix).toBeNull();
+    expect(unqualified.control5).toBeNull();
+    expect(unqualified.metadata.experiment_feature_matrix_status)
+      .toBe('SKIPPED_MISSING_EXPLICIT_LINEAGE');
   });
 
   it('validates the atlas structural evidence endpoint without promoting upstream ids', async () => {

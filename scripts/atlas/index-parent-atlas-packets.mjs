@@ -27,6 +27,20 @@ const APPLY = process.argv.includes('--apply');
 const VERBOSE = process.argv.includes('--verbose');
 const REPORT_PATH = 'docs/reports/parent-atlas-packets-manifest.json';
 
+// This historical manifest indexer predates the admitted workspace/source
+// revision contract. Keep its inventory mode available, but never allow it to
+// mutate the canonical packet table with unqualified identities.
+if (APPLY) {
+  console.error(JSON.stringify({
+    status: 'PACKET_WRITER_QUARANTINED',
+    reason: 'REVISION_QUALIFIED_CANONICAL_PACKET_WRITER_REQUIRED',
+    writer: 'index-parent-atlas-packets',
+    writesPerformed: false,
+    safeToApply: false
+  }));
+  process.exit(2);
+}
+
 function sha256First16(s) {
   return crypto.createHash('sha256').update(String(s)).digest('hex').slice(0, 16);
 }

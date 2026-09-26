@@ -1,0 +1,104 @@
+{
+  "schema": "atlas.bitfrost-sim-01.residency-gate-result.v1",
+  "test": "BITFROST-SIM-01",
+  "read_only": true,
+  "canonical_production_data_touched": false,
+  "canonical_production_data_mutated": false,
+  "graph_fixture": {
+    "schema": "atlas.gpu-mini-fabric.graph-fixture.v1",
+    "num_nodes": 10000,
+    "num_edges": 50000,
+    "seed": 20260901,
+    "graph_snapshot_checksum": "cd29db1e8a171e966d977d619342ae2d301570ec084fb07f2723eeb120df6bd5"
+  },
+  "query_sequence_fixture": {
+    "schema": "atlas.bitfrost-sim-01.query-sequence-fixture.v1",
+    "trace_length": 4000,
+    "locality_probability": 0.6,
+    "seed": 20260914,
+    "graph_snapshot_checksum": "cd29db1e8a171e966d977d619342ae2d301570ec084fb07f2723eeb120df6bd5",
+    "locality_trace_checksum": "fdb3f21de790a41b784956428ef481292c5b45fb1e2648a6f286e6ead38cc555",
+    "control_trace_checksum": "9b875a8b539b439891921aa1c477fc4d7b51733be3a49b4a760a53251fb6c6ed"
+  },
+  "residency_config": {
+    "hot_capacity": 100,
+    "warm_capacity": 500,
+    "recency_decay": 0.98
+  },
+  "utility_score_mode": {
+    "locality_trace_result": {
+      "eviction_mode": "utility-score",
+      "total_queries": 4000,
+      "hitRate": 0.6145,
+      "precisionOfPrefetch": 0.5878969742435609,
+      "bytesPromoted": 3015120,
+      "bytesWasted": 1979104,
+      "promotionLatency": 9.834,
+      "evictionRate": 4.85825,
+      "queryLatencyDelta": 9.2545,
+      "lod_byte_size_table": {
+        "identity": 32,
+        "glyph": 16,
+        "latent64": 256,
+        "latent128": 512,
+        "semantic768": 3072,
+        "structural": 8192,
+        "source": 16384,
+        "prompt_ready": 32768
+      }
+    },
+    "control_trace_result": {
+      "eviction_mode": "utility-score",
+      "total_queries": 4000,
+      "hitRate": 0.08025,
+      "precisionOfPrefetch": 0.0010005002501250625,
+      "bytesPromoted": 1961936,
+      "bytesWasted": 1569232,
+      "promotionLatency": 9.7985,
+      "evictionRate": 5.34425,
+      "queryLatencyDelta": 1.25775,
+      "lod_byte_size_table": {
+        "identity": 32,
+        "glyph": 16,
+        "latent64": 256,
+        "latent128": 512,
+        "semantic768": 3072,
+        "structural": 8192,
+        "source": 16384,
+        "prompt_ready": 32768
+      }
+    },
+    "lift": 0.53425,
+    "min_locality_lift_threshold": 0.03
+  },
+  "lru_baseline_mode": {
+    "note": "Reference baseline for the future SOM-CACHE-01 4-way tournament; not a pass/fail condition of this change.",
+    "locality_trace_result": {
+      "eviction_mode": "lru",
+      "total_queries": 4000,
+      "hitRate": 0.61475,
+      "precisionOfPrefetch": 0.5888972243060765,
+      "bytesPromoted": 2535664,
+      "bytesWasted": 1786688,
+      "promotionLatency": 9.8485,
+      "evictionRate": 4.878,
+      "queryLatencyDelta": 9.25325,
+      "lod_byte_size_table": {
+        "identity": 32,
+        "glyph": 16,
+        "latent64": 256,
+        "latent128": 512,
+        "semantic768": 3072,
+        "structural": 8192,
+        "source": 16384,
+        "prompt_ready": 32768
+      }
+    }
+  },
+  "gate": {
+    "criterion": "hitRate(locality, utility-score) - hitRate(control, utility-score) >= MIN_LOCALITY_LIFT",
+    "observed_lift": 0.53425,
+    "threshold": 0.03,
+    "RESULT": "PASS"
+  }
+}

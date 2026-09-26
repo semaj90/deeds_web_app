@@ -1,0 +1,363 @@
+{
+  "schema": "atlas.trace-disabled-search-tools.v1",
+  "gate": "TRACE-DISABLED-SEARCH-TOOLS-REINTEGRATION-01",
+  "generatedAt": "2026-09-14T19:38:32.708Z",
+  "mode": "READ_ONLY",
+  "optionalRegistriesEnabled": false,
+  "endpoint": "http://127.0.0.1:8788/mcp",
+  "families": [
+    {
+      "family": "codebase",
+      "source": "sveltekit-frontend/src/mcp/codebase_tools.ts",
+      "tools": [
+        "codebase.rg_search",
+        "codebase.awk_analyze"
+      ],
+      "sourceExists": true,
+      "liveTools": [],
+      "disabledTools": [
+        "codebase.rg_search",
+        "codebase.awk_analyze"
+      ],
+      "reEnablePrerequisites": [
+        "explicit operator review",
+        "dependency health proof",
+        "schema/identity regression tests",
+        "bounded live readback"
+      ]
+    },
+    {
+      "family": "research",
+      "source": "sveltekit-frontend/src/mcp/research_tools.ts",
+      "tools": [
+        "research.web_search",
+        "research.synthesize",
+        "research.deep_analyze"
+      ],
+      "sourceExists": true,
+      "liveTools": [],
+      "disabledTools": [
+        "research.web_search",
+        "research.synthesize",
+        "research.deep_analyze"
+      ],
+      "reEnablePrerequisites": [
+        "explicit operator review",
+        "dependency health proof",
+        "schema/identity regression tests",
+        "bounded live readback"
+      ]
+    },
+    {
+      "family": "bifrost",
+      "source": "sveltekit-frontend/src/mcp/bifrost_tools.ts",
+      "tools": [
+        "trace.bifrost_dispatch"
+      ],
+      "sourceExists": true,
+      "liveTools": [],
+      "disabledTools": [
+        "trace.bifrost_dispatch"
+      ],
+      "reEnablePrerequisites": [
+        "explicit operator review",
+        "dependency health proof",
+        "schema/identity regression tests",
+        "bounded live readback"
+      ]
+    },
+    {
+      "family": "rg-atlas",
+      "source": "sveltekit-frontend/src/mcp/rg_atlas_tools.ts",
+      "tools": [
+        "kb.rg_atlas_search"
+      ],
+      "sourceExists": true,
+      "liveTools": [],
+      "disabledTools": [
+        "kb.rg_atlas_search"
+      ],
+      "reEnablePrerequisites": [
+        "explicit operator review",
+        "dependency health proof",
+        "schema/identity regression tests",
+        "bounded live readback"
+      ]
+    }
+  ],
+  "liveToolCount": 176,
+  "readOnlyProbe": {
+    "tool": "kb.trace_search",
+    "status": "ERROR",
+    "resultItems": 1
+  },
+  "kagSearchReadback": {
+    "tool": "trace.kag_search",
+    "status": "RESPONDED",
+    "returnedItems": 3,
+    "items": [
+      {
+        "keys": [
+          "content",
+          "file_path",
+          "graph_authority_score",
+          "headline",
+          "language",
+          "lexical_score",
+          "stable_key",
+          "symbol_kind",
+          "symbol_name",
+          "tags",
+          "topo_class"
+        ],
+        "keyGrain": "DISCOVERY_FILE_SYMBOL",
+        "canonicalChunkId": null,
+        "packetKey": null,
+        "workspaceRevision": null,
+        "sourceRevision": null,
+        "hasCanonicalChunkId": false,
+        "hasPacketKey": false,
+        "hasWorkspaceRevision": false,
+        "hasSourceRevision": false,
+        "hasIdentityEnvelope": false,
+        "authorityStatus": null
+      },
+      {
+        "keys": [
+          "content",
+          "file_path",
+          "graph_authority_score",
+          "headline",
+          "language",
+          "lexical_score",
+          "stable_key",
+          "symbol_kind",
+          "symbol_name",
+          "tags",
+          "topo_class"
+        ],
+        "keyGrain": "DISCOVERY_FILE_SYMBOL",
+        "canonicalChunkId": null,
+        "packetKey": null,
+        "workspaceRevision": null,
+        "sourceRevision": null,
+        "hasCanonicalChunkId": false,
+        "hasPacketKey": false,
+        "hasWorkspaceRevision": false,
+        "hasSourceRevision": false,
+        "hasIdentityEnvelope": false,
+        "authorityStatus": null
+      },
+      {
+        "keys": [
+          "content",
+          "file_path",
+          "graph_authority_score",
+          "headline",
+          "language",
+          "lexical_score",
+          "stable_key",
+          "symbol_kind",
+          "symbol_name",
+          "tags",
+          "topo_class"
+        ],
+        "keyGrain": "DISCOVERY_FILE_SYMBOL",
+        "canonicalChunkId": null,
+        "packetKey": null,
+        "workspaceRevision": null,
+        "sourceRevision": null,
+        "hasCanonicalChunkId": false,
+        "hasPacketKey": false,
+        "hasWorkspaceRevision": false,
+        "hasSourceRevision": false,
+        "hasIdentityEnvelope": false,
+        "authorityStatus": null
+      }
+    ]
+  },
+  "staticIdentityEnvelope": {
+    "sourcePath": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+    "implementationPresent": false,
+    "envelopeFieldPresent": false,
+    "exactPacketLookupPresent": true,
+    "sourceRevisionLookupPresent": false,
+    "workspaceRevisionLookupPresent": false
+  },
+  "identityEnvelopeGate": {
+    "implementationStatus": "SOURCE_IMPLEMENTATION_MISSING",
+    "liveStatus": "LIVE_ENVELOPE_MISSING",
+    "promotionReady": false
+  },
+  "dependencyReadback": {
+    "tool": "trace.system_health",
+    "status": "RESPONDED",
+    "health": {
+      "ok": false,
+      "degraded": true,
+      "checkedAt": "2026-09-14T19:38:32.647Z",
+      "services": [
+        {
+          "name": "mcp",
+          "url": "http://127.0.0.1:8788/health",
+          "ok": true,
+          "status": 200,
+          "latencyMs": 8
+        },
+        {
+          "name": "ollama_embed",
+          "url": "http://localhost:11434/api/tags",
+          "ok": true,
+          "status": 200,
+          "latencyMs": 8
+        },
+        {
+          "name": "bifrost",
+          "url": "http://127.0.0.1:3040/health",
+          "ok": true,
+          "status": 200,
+          "latencyMs": 6
+        },
+        {
+          "name": "turboquant",
+          "url": "http://127.0.0.1:8090/health",
+          "ok": true,
+          "status": 200,
+          "latencyMs": 6
+        },
+        {
+          "name": "topology_search",
+          "url": "http://127.0.0.1:8101/health",
+          "ok": false,
+          "status": null,
+          "latencyMs": 3,
+          "error": "fetch failed"
+        },
+        {
+          "name": "go_retrieval",
+          "url": "http://127.0.0.1:8100/health",
+          "ok": true,
+          "status": 200,
+          "latencyMs": 10
+        },
+        {
+          "name": "rerank",
+          "url": "undefined/health",
+          "ok": false,
+          "status": null,
+          "latencyMs": 0,
+          "error": "Failed to parse URL from undefined/health"
+        },
+        {
+          "name": "qdrant",
+          "url": "http://127.0.0.1:6333/collections",
+          "ok": true,
+          "status": 200,
+          "latencyMs": 20
+        },
+        {
+          "name": "neo4j",
+          "ok": true,
+          "status": "ok",
+          "latencyMs": 2
+        },
+        {
+          "name": "postgres",
+          "ok": true,
+          "status": "ok",
+          "latencyMs": 4
+        },
+        {
+          "name": "redis",
+          "ok": true,
+          "status": "ok",
+          "latencyMs": 3
+        }
+      ],
+      "notes": [
+        "Port 8788: TRACE MCP tool gateway",
+        "Port 11434: Ollama (embeddings + fast gen)",
+        "Port 8090: Reranker (Optimized llama-server)",
+        "Port 8080: TurboQuant (Long-context llama-server)",
+        "Port 3040: Bifrost dispatcher"
+      ]
+    }
+  },
+  "disabledSearchTools": [
+    "codebase.rg_search",
+    "codebase.awk_analyze",
+    "research.web_search",
+    "research.synthesize",
+    "research.deep_analyze",
+    "trace.bifrost_dispatch",
+    "kb.rg_atlas_search"
+  ],
+  "liveToolSchemaAudit": [
+    {
+      "family": "codebase",
+      "name": "codebase.rg_search",
+      "live": false,
+      "hasInputSchema": false,
+      "schemaType": null,
+      "schemaKeys": [],
+      "schemaFingerprint": null
+    },
+    {
+      "family": "codebase",
+      "name": "codebase.awk_analyze",
+      "live": false,
+      "hasInputSchema": false,
+      "schemaType": null,
+      "schemaKeys": [],
+      "schemaFingerprint": null
+    },
+    {
+      "family": "research",
+      "name": "research.web_search",
+      "live": false,
+      "hasInputSchema": false,
+      "schemaType": null,
+      "schemaKeys": [],
+      "schemaFingerprint": null
+    },
+    {
+      "family": "research",
+      "name": "research.synthesize",
+      "live": false,
+      "hasInputSchema": false,
+      "schemaType": null,
+      "schemaKeys": [],
+      "schemaFingerprint": null
+    },
+    {
+      "family": "research",
+      "name": "research.deep_analyze",
+      "live": false,
+      "hasInputSchema": false,
+      "schemaType": null,
+      "schemaKeys": [],
+      "schemaFingerprint": null
+    },
+    {
+      "family": "bifrost",
+      "name": "trace.bifrost_dispatch",
+      "live": false,
+      "hasInputSchema": false,
+      "schemaType": null,
+      "schemaKeys": [],
+      "schemaFingerprint": null
+    },
+    {
+      "family": "rg-atlas",
+      "name": "kb.rg_atlas_search",
+      "live": false,
+      "hasInputSchema": false,
+      "schemaType": null,
+      "schemaKeys": [],
+      "schemaFingerprint": null
+    }
+  ],
+  "writesPerformed": false,
+  "status": "DISABLED_SEARCH_TOOLS_AUDITED",
+  "firstBlocker": "OPTIONAL_REGISTRIES_DISABLED_BY_POLICY"
+}

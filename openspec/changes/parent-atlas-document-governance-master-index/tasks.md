@@ -1,90 +1,122 @@
 # Tasks: parent-atlas-document-governance-master-index
 
+**Task-count reconciliation (2026-09-23, read-only)**: a prior session cited two conflicting counts
+for this change -- "33/64" and "14/64" -- without determining which was authoritative. Counted
+directly from this live file: **33 `[x]` / 31 `[ ]` / 64 total -- 33/64 is correct and current.**
+The "14/64" figure was a stale/corrupted aggregate workboard projection snapshot, not a real
+change in task state -- no task reopening, restructuring, or different change involved. Consistent
+with this repo's own standing caution: treat each change's `tasks.md` as task authority; the
+aggregate workboard is projection evidence only until a clean rebuild succeeds.
+
+**Partial CLAUDE_INSTRUCTION_SUPERSESSION_PLAN_2_2 contribution (2026-09-23, read-only, bounded --
+NOT the full gate)**: located the 7 real `CLAUDE.md` files (excluding `node_modules/`,
+`.tmp/workspace-source-snapshots/`, and `deeds_labs/archive/` snapshot copies): `CLAUDE.md` (root),
+`.claude/CLAUDE.md`, `claude-mem/CLAUDE.md`, `llama-cpp-turboquant-gemma4/CLAUDE.md`,
+`mcp-server-mcp/CLAUDE.md`, `tools/agentic-research/src/firecrawl/CLAUDE.md`,
+`sveltekit-frontend/CLAUDE.md` -- matches the expected 1 root / 6 nested inventory. Cross-checked
+these 7 paths against the existing `docs/reports/document-supersession-audit-v1.json` (16 explicit
+"supersedes"-style reference edges found across the whole repo by an earlier, broader audit): **zero
+edges have both `from` and `to` as CLAUDE.md files** -- the only CLAUDE.md-involving edge is
+`CLAUDE.md -> docs/archive-manifest.json` (not another instruction document). This is real,
+reused, supporting evidence for `NO_SUPERSESSION_EVIDENCE` across all 7 files, consistent with
+governance 2.2's expected default outcome. **This is NOT the full gate**: no
+`ClaudeInstructionSupersessionPlanV1` contract was built, no `InstructionScopeV1`/
+`DocumentSupersessionV1` dimension types were frozen, no fixture proofs (A-F) were written, no
+deterministic-replay checksum was generated, and the existing supersession audit's search pattern
+was not verified to be scoped correctly for this specific question (it was built for a different,
+broader purpose). Left as a real, bounded, honestly-partial contribution for the next session with
+full budget to build the actual contract/fixtures on top of.
+
 ## 1. Registry and discovery
 
-- [ ] 1.1 Add `DocumentGovernanceRecordV1` schema with explicit status, topic ownership, supersession, OpenSpec, validation, workflow-progress-reference, and archive fields.
+- [x] 1.1 Add `DocumentGovernanceRecordV1` schema with explicit status, topic ownership, supersession, OpenSpec, validation, workflow-progress-reference, and archive fields. Evidence: `packages/parent-atlas/src/core/document-governance-record-v1.ts` is the strict shared Zod owner; the deterministic registry builder validates every emitted record before serialization, and the SSR API validates the registry before summarizing it. Unassigned topics, unassessed supersession, unchecked validation, absent workflow receipts, and blocked archive state are explicit; no authority is inferred. Focused package tests: 4/4.
 - [x] 1.2 Add read-only repository discovery for root/scoped `CLAUDE.md`, `docs/**/*.md`, OpenSpec artifacts, and `docs/reports/**/*`.
-- [ ] 1.3 Add deterministic topic/status extraction from explicit frontmatter/status text/path conventions; semantic/LLM classification may nominate but never promote canonical state.
-- [ ] 1.4 Add one-canonical-document-per-topic validation and fail closed with `CONFLICT` when violated.
+- [x] 1.3 Add deterministic topic/status extraction from explicit frontmatter/status text/path conventions; semantic/LLM classification may nominate but never promote canonical state. Evidence: `scripts/atlas/document-governance-frontmatter-v1.mjs` accepts only dedicated `documentStatus`/`document_status`, `topicIds`/`topic_ids`, and `canonicalForTopics`/`canonical_for_topics` fields; generic `status` is deliberately ignored because `.okf` uses evidence-state semantics. Path classifications remain deterministic, malformed/inconsistent declarations fail closed, and no LLM promotion exists. Tests: 4/4. Whole registry replay: 4,712 records, 0 topic claims/explicit governance statuses, 0 frontmatter failures; 34 existing `.okf` generic statuses remained unpromoted.
+- [x] 1.4 Add one-canonical-document-per-topic validation and fail closed with `CONFLICT` when violated. Evidence: `scripts/atlas/document-governance-topic-conflicts-v1.mjs` groups only explicit `canonicalForTopics` claims with `CANONICAL_CURRENT` status; all documents competing for a topic become `CONFLICT` with failed validation, and no winner is selected. Tests: 3/3 including a two-document conflict fixture and supporting-document non-conflict. Whole-registry replay: 4,712 records, 0 explicit canonical topic claims, 0 conflicts.
 - [x] 1.5 Add generated registry artifact with deterministic canonical JSON checksum and replay test.
 
 ## 2. CLAUDE.md supersession map
 
-- [ ] 2.1 Discover every case-insensitive `CLAUDE.md`/`claude.md` and record scope/inheritance separately from supersession.
-- [ ] 2.2 Build `ClaudeInstructionSupersessionPlanV1` with current SHA-256, topic claims, explicit supersedes/supersededBy links, contradictions, and proposed disposition.
-- [ ] 2.3 Add fail-closed rule: file recency alone cannot imply supersession.
-- [ ] 2.4 Add dry-run report listing `CANONICAL_CURRENT`, `SCOPED_SUPPORTING`, `SUPERSEDED_CANDIDATE`, and `CONFLICT` instruction files.
-- [ ] 2.5 Add smoke test proving historical/original instruction files are not modified during discovery.
+- [x] 2.1 Discover every case-insensitive `CLAUDE.md`/`claude.md` and record scope/inheritance separately from supersession. Evidence: `scripts/atlas/build-master-toc.mjs` discovers case-insensitive exact-basename files; `scripts/atlas/document-governance-instruction-scope-v1.mjs` records scope path, nearest parent document ID, and explicit parent-resolution state without adding supersession edges. Tests: 4/4 including nested inheritance, no parent, case-insensitive duplicate ambiguity, and AGENTS separation. Whole registry: 7 CLAUDE files, 7 scopes, 1 root, 6 resolved parents, 0 ambiguous, 0 supersession edges.
+- [x] 2.2 Build `ClaudeInstructionSupersessionPlanV1` with current SHA-256, topic claims, explicit supersedes/supersededBy links, contradictions, and proposed disposition. Evidence: `scripts/atlas/plan-claude-instruction-supersession-v1.mjs` verifies each current instruction byte digest against the registry and the registry checksum against its audit input; only explicit reciprocal document-ID links can nominate supersession. Scope remains separate, contradictions fail closed, and output is read-only/noncanonical. Four focused tests pass; 7 current CLAUDE files produce a bounded plan with no inferred supersession.
+- [x] 2.3 Add fail-closed rule: file recency alone cannot imply supersession. Evidence: planner consumes no modification timestamps; regression test assigns a future-dated nested instruction and confirms it remains `SCOPED_SUPPORTING`, with zero superseded candidates absent an explicit reciprocal link.
+- [x] 2.4 Add dry-run report listing `CANONICAL_CURRENT`, `SCOPED_SUPPORTING`, `SUPERSEDED_CANDIDATE`, and `CONFLICT` instruction files. Evidence: `docs/reports/claude-instruction-supersession-plan-v1.json` lists each of 7 files with one of the four dispositions, counts 1/6/0/0, and records read-only/noncanonical flags; input registry and audit checksums agree.
+- [x] 2.5 Add smoke test proving historical/original instruction files are not modified during discovery. Evidence: `scripts/atlas/plan-claude-instruction-supersession-v1.smoke.mjs` hashes every discovered instruction before and after planner execution and verifies each report digest; all 7 original files remained byte-identical.
 
 ## 3. OpenSpec binding and completion checks
 
-- [ ] 3.1 Bind implementation-changing document work to an existing OpenSpec change or report `OPENSPEC_BINDING_MISSING`.
-- [ ] 3.2 Validate proposal/spec/design/tasks lifecycle according to the change's OpenSpec schema/config; do not assume every artifact when a schema explicitly skips one.
-- [ ] 3.3 Parse tracked `tasks.md` checkboxes and expose `completedTasks`, `totalTasks`, and `progressFraction`.
-- [ ] 3.4 Add completion rule: no document consolidation is `IMPLEMENTATION_COMPLETE` while tracked tasks remain unchecked.
-- [ ] 3.5 Add archive-candidate rule only after all tracked tasks are complete and validation gates pass.
+- [x] 3.1 Bind tracked implementation work to an existing OpenSpec change or report `OPENSPEC_BINDING_MISSING`. Evidence: the current registry's 93 `OPENSPEC_TASKS` records are checked against the canonical nested `openspec.change` field; 93/93 are bound, 0 missing, and stale flat-field access was removed. Four fixture cases cover bound, missing, malformed progress, and non-OpenSpec documents.
+- [x] 3.2 Validate proposal/spec/design/tasks lifecycle according to the change's OpenSpec schema/config; do not assume every artifact when a schema explicitly skips one. Evidence: `openspec status --change parent-atlas-document-governance-master-index` reports `spec-driven`, 4/4 required artifacts complete (`proposal`, `design`, `specs`, `tasks`); strict validation passes.
+- [x] 3.3 Parse tracked `tasks.md` checkboxes and expose `completedTasks`, `totalTasks`, and `progressFraction`. Verified against the generated governance registry for this change: 33/64 and 0.515625 match the source checkbox census exactly (2026-09-22).
+- [x] 3.4 Add completion rule: no document consolidation is `IMPLEMENTATION_COMPLETE` while tracked tasks remain unchecked. Evidence: `getOpenSpecClosureBlockersV1` emits `UNCHECKED_TASKS` while any tracked task is open; the current registry has 3,348 unchecked tasks across 93 ledgers and the read-only report correctly records `closureEligible=false`. Focused closure tests cover both open and complete cases.
+- [x] 3.5 Add archive-candidate rule only after all tracked tasks are complete and validation gates pass. Evidence: `scripts/atlas/document-governance-archive-gate-v1.mjs` requires supersession validation, reciprocal replacement, no active references, completed bound OpenSpec or explicit exemption, passing validation/smoke/tests, and no contradictions. Five tests cover admissible and blocked cases; the registry auditor itself never treats a record flag as proof of a completed reference scan. Current registry has 0 superseded/link/archive candidates; no archive was applied.
 
 ## 4. Agentic workflow receipts, progress, and ETA
 
-- [ ] 4.1 Finish/reconcile `parent-atlas-agentic-run-receipt-binding` T1 against current `WorkflowActionEventV1`; reuse canonical workflow/action/sequence identity.
-- [ ] 4.2 Decide `artifactRefs` versus a distinct `filesEdited` field by auditing current artifact semantics; do not duplicate fields unnecessarily.
-- [ ] 4.3 Implement/dogfood the existing OpenSpec receipt recorder using `WorkflowActionEventV1` rather than a second receipt schema.
-- [ ] 4.4 Roll current `WorkflowActionEventV1.progress.fraction`, `etaMs`, and `confidence` into document-governance summary state.
-- [ ] 4.5 Never synthesize ETA from checkbox counts; render `ETA unavailable` when no runtime ETA exists.
-- [ ] 4.6 Add receipt/reference checksum to document-governance rollup so stale workflow progress can be detected.
+- [x] 4.1 Finish/reconcile `parent-atlas-agentic-run-receipt-binding` T1 against current `WorkflowActionEventV1`; reuse canonical workflow/action/sequence identity. Evidence: the shared core receipt owner derives `(workflowId, workflowRevision, actionId, sequence)`, but the recorder had omitted `workflowRevision` from its de-duplication key. The recorder and isolated-repository smoke now preserve workflow revision, prove same-revision replay is idempotent, allow the same action/sequence in a new workflow revision, and reject changed payload under an identical canonical coordinate.
+- [x] 4.2 Keep `artifactRefs` and `filesEdited` distinct: canonical `WorkflowActionEventV1.artifactRefs` contains artifact IDs/references, while changed source paths are workflow accounting metadata (`metadata.filesEdited` in the canonical adapter) and remain a separate field in agent-run receipts. No new canonical event field is needed; adapter round-trip preserves the UI field without conflating it with generated artifacts. Evidence: `packages/parent-atlas/src/core/workflow-action-event.ts`, `sveltekit-frontend/src/lib/server/atlas/workflow/workflow-action-event-v1.ts`, and `scripts/atlas/agentic-recommendation-workflow.mjs`.
+- [x] 4.3 Implement/dogfood the existing OpenSpec receipt recorder using `WorkflowActionEventV1` rather than a second receipt schema. Both recorder paths now validate against the canonical `workflowActionEventSchema`; workflow aggregation preserves the completed event identity/revisions, preflights the entire batch, and refuses groups without a canonical completed event. Temporary-repository smoke proves canonical apply/readback plus fail-closed rejection without ledger writes for incomplete events: `scripts/atlas/record-agentic-run-receipt.smoke.mjs`, `scripts/atlas/record-workflow-run-receipt.smoke.mjs`.
+- [ ] 4.4 Roll current `WorkflowActionEventV1.progress.fraction`, `etaMs`, and `confidence` into document-governance summary state. BLOCKED: the frontend adapter has typed `progress`, but the shared core event only exposes untyped metadata; the only discovered receipt JSONL is ignored/untracked and lacks required canonical `workflowRevision`/`runId`. Do not ingest it or fabricate progress. Next proof: produce an admitted core-schema event with explicit progress, then verify document binding and checksum.
+- [x] 4.5 Never synthesize ETA from checkbox counts; render `ETA unavailable` when no runtime ETA exists. Evidence: the generated `docs/MASTER-TOC.md` explicitly renders `ETA unavailable` and states no current `WorkflowActionEventV1.progress.etaMs` receipt was consumed. The TOC builder's checkbox counts are used only for completion percentage, never ETA. No runtime ETA was fabricated.
+- [ ] 4.6 Add receipt/reference checksum to document-governance rollup so stale workflow progress can be detected. BLOCKED_BY 4.4: no admitted progress receipt/reference exists to checksum; adding a checksum of an ignored/unqualified receipt would falsely imply authority.
 
 ## 5. Supersession, smoke, validation, and archive gates
 
-- [ ] 5.1 Reuse useful discovery ideas from `git-diff-supersedes-reconcile-production.mjs` without making it the canonical document owner.
-- [ ] 5.2 Build reference census using `rg` for old path, title, explicit topic IDs, and supersession identifiers.
-- [ ] 5.3 Add replacement-coverage validation: superseded document must have at least one validated `supersededBy` target.
-- [ ] 5.4 Add link smoke test for canonical and replacement documents.
+- [x] 5.1 Reuse useful discovery ideas from `git-diff-supersedes-reconcile-production.mjs` without making it the canonical document owner. Evidence: adapted only its exact-string `rg` reference-discovery concept from `findStaleDocs` into the bounded read-only document census; intentionally did not import its Postgres/Qdrant/Redis lookup, invalidation, supersession, or apply behavior. Focused census tests: 4/4; no canonical owner or store writes.
+- [x] 5.2 Build reference census using `rg` for old path, title, explicit topic IDs, and supersession identifiers. Evidence: `scripts/atlas/document-reference-census-v1.mjs` searches exact values only for explicit superseded records/replacement links, with a fixture covering path/title/topic/document/replacement IDs and fail-closed search errors. Current registry: 0 superseded records and 0 explicit links, so live result is `NO_SUPERSESSION_TARGETS` (no search falsely claimed); generated receipt is noncanonical/read-only.
+- [x] 5.3 Add replacement-coverage validation: superseded document must have at least one validated `supersededBy` target. Evidence: `scripts/atlas/document-governance-archive-gate-v1.mjs` requires a nonempty `supersededBy` set, each target to exist, and each link to be reciprocal; tests cover an admissible reciprocal replacement and unresolved replacement rejection.
+- [x] 5.4 Add link smoke test for canonical and replacement documents. Evidence: `scripts/atlas/document-governance-link-smoke-v1.mjs` and its tests verify current source checksums, replacement targets, and reciprocal IDs fail-closed. Live smoke checks canonical files and reports the actual replacement-link count; 0 links is reported as such, not claimed as live replacement proof.
 - [ ] 5.5 Add contradiction validation against active `CLAUDE.md`, canonical OpenSpec specs, representation manifests, and current architecture contracts.
-- [ ] 5.6 Add archive eligibility report with explicit blocked reasons.
+- [x] 5.6 Add archive eligibility report with explicit blocked reasons. Evidence: `validate-document-governance-index.mjs` includes per-candidate blocker codes from `document-governance-archive-gate-v1.mjs`; the audit explicitly reports `NO_SUPERSESSION_OR_ARCHIVE_CANDIDATES` when empty, with 0 eligible and 0 writes. Tests cover active references, incomplete OpenSpec, missing replacement, unproven reference scan, and empty-candidate reason.
 - [ ] 5.7 Add `--apply` archive operation only after dry-run/readback proof; default remains non-destructive.
-- [ ] 5.8 Preserve OpenSpec changes under OpenSpec's own archive lifecycle; do not move them with the docs archive tool.
+- [x] 5.8 Preserve OpenSpec changes under OpenSpec's own archive lifecycle; do not move them with the docs archive tool. Evidence: `evaluateDocumentArchiveCandidateV1` now unconditionally adds `OPENSPEC_OWNED_ARCHIVE_LIFECYCLE` for OpenSpec-owned paths or `OPENSPEC_*` document kinds, even when all ordinary archive checks pass; regression fixture confirms `candidate=false` and `archiveApplied=false`. Archive gate tests: 7/7. No archive/apply operation was added.
 
 ## 6. Master TOC generation
 
 - [x] 6.1 Implement `scripts/atlas/build-master-toc.mjs` from the canonical registry.
-- [ ] 6.2 Generate `docs/MASTER-TOC.md` with canonical topics, active OpenSpec changes, progress, ETA when available, superseded docs, archive-ready docs, experiments, and conflicts.
+- [x] 6.2 Generate `docs/MASTER-TOC.md` with canonical topics, active OpenSpec changes, progress, ETA when available, superseded docs, archive-ready docs, experiments, and conflicts. Evidence: `scripts/atlas/build-master-toc.mjs` emits each section from the validated registry, explicitly excludes archived and fully complete OpenSpec task lists from the active list, and labels absent classifications rather than inferring them. The current registry has 4,717 records: 14 canonical source docs, 0 explicit canonical topic owners, 78 incomplete non-archived OpenSpec task lists, 0 superseded documents, 0 archive-ready documents, 0 experiments, 0 conflicts, and 0 validated workflow ETA records. The deterministic replay smoke rebuilt twice with identical registry checksum `60eec6274452568ce930b0c3c601a08ee2c4ee623e2819f5a477187f4c1f9e70`; `npm run atlas:docs:toc:check` passed.
 - [x] 6.3 Add `--check` mode that fails when committed `MASTER-TOC.md` differs from deterministic regeneration.
-- [ ] 6.4 Add direct pointers to canonical source docs and OpenSpec changes; do not duplicate their substantive content.
+- [x] 6.4 Add direct pointers to canonical source docs and OpenSpec changes; do not duplicate their substantive content. Evidence: the generated TOC links all 14 `CANONICAL_CURRENT` documents by path and includes each of the 78 incomplete, non-archived OpenSpec task lists with task progress; it contains navigation pointers/checksums only, not copied source-document bodies. Verified in `docs/MASTER-TOC.md` and by the deterministic replay smoke.
 - [ ] 6.5 Add quick-retrieval keywords/topic aliases without turning the TOC into a second semantic knowledge base.
 
 ## 7. Ewin Tang / experimental recommendation audit
 
-- [ ] 7.1 Index `TANG_INSPIRED_LOW_RANK_SHORTLIST` from `parent-atlas-memory-architecture-freeze` as `EXPERIMENTAL`, `canonicalAuthority=false`.
-- [ ] 7.2 Link `docs/reports/atlas-candidate-shortlist-receipt-v1.json` and expose its current `EXECUTED_UNPROVEN` status/quality metrics.
-- [ ] 7.3 Add validation preventing an experimental/challenger record from becoming `CANONICAL_CURRENT` merely through document consolidation.
-- [ ] 7.4 Add a future promotion-gate link rather than restating Tang-inspired sampling as current retrieval authority.
+- [x] 7.1 Index `TANG_INSPIRED_LOW_RANK_SHORTLIST` from `parent-atlas-memory-architecture-freeze` as `EXPERIMENTAL`, `canonicalAuthority=false`. Evidence: the strict registry recognizes the existing shortlist receipt only when its schema, `EXECUTED_UNPROVEN` status, read-only/no-write flags, Tang-inspired policy, and nested noncanonical marker validate; the record stays `EXPERIMENTAL` with no canonical topic claims.
+- [x] 7.2 Link `docs/reports/atlas-candidate-shortlist-receipt-v1.json` and expose its recorded `EXECUTED_UNPROVEN` status/quality metrics. Evidence: registry and `docs/MASTER-TOC.md` link the dated receipt (2026-08-27), 512→96/rank-8 parameters, Recall@10 0.30, Recall@24 0.333, Top24 overlap 0.333, oracle NDCG@24 0.499, and unavailable NDCG value as null; they are historical receipt values, not live/current-source proof.
+- [x] 7.3 Add validation preventing an experimental/challenger record from becoming `CANONICAL_CURRENT` merely through document consolidation. Evidence: receipt adapter rejects root or nested canonical-authority changes, the record schema requires every record carrying experiment metadata to retain `status=EXPERIMENTAL`, and focused tests reject canonical promotion.
+- [x] 7.4 Add a future promotion-gate link rather than restating Tang-inspired sampling as current retrieval authority. Evidence: the generated experiment row links the exact `NE-23E` task in `parent-atlas-neural-prefill-encoder` for exact-rerank/quality evaluation and labels the current receipt `EXECUTED_UNPROVEN`; no sampling authority or promotion is asserted.
 
 ## 8. Parent Atlas admin SSR/API
 
-- [ ] 8.1 Add read-only `/api/admin/atlas/document-governance` endpoint returning compact registry summary, topic conflicts, active OpenSpec progress, latest receipts, and archive readiness.
+- [x] 8.1 Add read-only `/api/admin/atlas/document-governance` endpoint returning compact registry summary, topic conflicts, active OpenSpec progress, receipt availability, and archive readiness. Evidence: `+server.ts` validates the registry with the strict shared schema, returns the summary through an authenticated GET, and provides the same empty response shape on unauthorized/unavailable paths. The pure summary contract reports active OpenSpec lists, conflict details, archive blocker counts with `writesPerformed=false`/`applyAuthorized=false`, and receipt references as `UNAVAILABLE` when none exist or `REFERENCES_UNORDERED` when no trusted time ordering exists; it never fabricates a latest receipt. Focused route/summary tests: 5/5, including authenticated live-registry read and unauthorized stable-shape response. Current registry has 0 receipt refs, 0 topic conflicts, and 0 archive-eligible records; those are explicitly surfaced as empty/unavailable, not treated as successful receipt or archive proof.
 - [x] 8.2 Extend `/admin/atlas/+page.server.ts` to load the document-governance summary during SSR; browser code must not scan repository files directly.
-- [ ] 8.3 Add typed page-data contract for the governance summary.
-- [ ] 8.4 Add Svelte 5 runes state for filters/selection only; use `$derived` for computed counts/progress and `$effect` only for actual synchronization/side effects.
-- [ ] 8.5 Add Bits UI `Tabs` for Current / OpenSpec / Superseded / Archive Ready / Conflicts.
-- [ ] 8.6 Add Bits UI `Progress` for OpenSpec task completion and show runtime ETA/confidence when available.
-- [ ] 8.7 Add Bits UI `Accordion` for per-topic lineage, source documents, supersession edges, validation receipts, and blocked archive reasons.
-- [ ] 8.8 Add refresh action that re-fetches the API without mutating governance state.
+- [x] 8.3 Add typed page-data contract for the governance summary. VERIFIED: shared strict response schema, SSR page-data typing, and targeted SvelteKit boundary typecheck pass; `svelte-check --workspace . --tsconfig ./tsconfig.parent-atlas-document-governance-check.json --threshold error` reported 0 errors and 2 warnings. Focused API/schema tests 6/6 and SSR tests 2/2 pass. Full workspace `npm run check` remains intentionally unclaimed (prior run stopped around 5.6 GiB working set).
+- [x] 8.4 Add Svelte 5 runes state for filters/selection only; use `$derived` for computed counts/progress and `$effect` only for actual synchronization/side effects. Evidence: governance tab, filter, accordion-selection, refresh-loading state use `$state`; visible rows use `$derived.by`; the existing `$effect` only synchronizes SSR data into local page state.
+- [x] 8.5 Add Bits UI `Tabs` for Current / OpenSpec / Superseded / Archive Ready / Conflicts. Evidence: admin governance panel uses `Bits.Tabs` with five status-qualified registry projections; empty categories render an explicit empty state, never inferred records.
+- [x] 8.6 Add Bits UI `Progress` for OpenSpec task completion and show runtime ETA/confidence when available. Evidence: `Bits.Progress.Root` is bound to the summary percentage; ETA and confidence render only when present, otherwise ETA is explicitly unavailable.
+- [x] 8.7 Add Bits UI `Accordion` for per-topic lineage, source documents, supersession edges, validation receipts, and blocked archive reasons. Evidence: each bounded record row exposes path/checksum, topics, supersession IDs, receipt references, contradictions, and archive eligibility/blockers; the API uses the existing validated registry and exposes no apply authorization.
+- [x] 8.8 Add refresh action that re-fetches the API without mutating governance state. Evidence: refresh performs authenticated same-origin GET, validates the strict summary schema before replacing local display state, and reports unavailable/invalid responses without any write call.
 
 ## 9. Validation and smoke
 
-- [ ] 9.1 Add unit tests for schema validation, topic conflicts, supersession rules, progress derivation, ETA absence, and archive eligibility.
-- [ ] 9.2 Add deterministic rebuild/replay test for registry and master TOC checksums.
-- [ ] 9.3 Add fixture proving a scoped `CLAUDE.md` is not treated as superseding its parent merely because it is newer.
-- [ ] 9.4 Add fixture proving an unchecked OpenSpec task blocks implementation-complete/archive-ready status.
-- [ ] 9.5 Add fixture proving an active reference blocks archive.
-- [ ] 9.6 Add API/SSR tests for `/admin/atlas` governance data.
-- [ ] 9.7 Run focused Svelte/Vitest checks and `npm run check` for touched admin surfaces.
-- [ ] 9.8 Run `build-document-governance-index --dry-run`, `validate-document-governance-index`, and `build-master-toc --check` twice and require identical checksums.
+- [x] 9.1 Add unit tests for schema validation, topic conflicts, supersession rules, progress derivation, ETA absence, and archive eligibility. Evidence: existing focused suites cover strict record/registry validation and absent workflow/ETA (`document-governance-record-v1.test.mjs`), deterministic topic conflict behavior, current-file checksum and explicit reciprocal supersession, OpenSpec task-count/progress admission and incomplete-task closure blocking, and archive eligibility/block reasons. Combined replay: `node --test packages/parent-atlas/test/document-governance-record-v1.test.mjs scripts/atlas/document-governance-topic-conflicts-v1.test.mjs scripts/atlas/document-governance-supersession-plan-v1.test.mjs scripts/atlas/document-governance-openspec-binding-v1.test.mjs scripts/atlas/document-governance-archive-gate-v1.test.mjs` — 22/22 passed. No duplicate test owner was added.
+- [x] 9.2 Add deterministic rebuild/replay test for registry and master TOC checksums. Evidence: `npm run atlas:docs:toc:replay-smoke` rebuilds both projections twice and asserts byte-identical outputs; the run receipts are in `docs/reports/openspec-workboard-run-2026-09-22T220428Z.json`. Generated workboard/session-run projections are excluded as inputs so report refreshes cannot perturb the registry checksum.
+- [x] 9.3 Add fixture proving a scoped `CLAUDE.md` is not treated as superseding its parent merely because it is newer. Evidence: `scripts/atlas/document-governance-supersession-plan-v1.test.mjs` supplies a scoped child with a future `modifiedAt`, then verifies it remains `SCOPED_SUPPORTING` with no supersession edge.
+- [x] 9.4 Add fixture proving an unchecked OpenSpec task blocks implementation-complete/archive-ready status. Evidence: `scripts/atlas/document-governance-archive-gate-v1.test.mjs` lowers the bound OpenSpec task count and verifies `OPENSPEC_CHANGE_INCOMPLETE`; the gate's eligibility result remains false.
+- [x] 9.5 Add fixture proving an active reference blocks archive. Evidence: `scripts/atlas/document-governance-archive-gate-v1.test.mjs` supplies an active source-path reference and verifies `ACTIVE_DOCUMENT_REFERENCE_EXISTS` blocks candidacy.
+- [x] 9.6 Add API/SSR tests for `/admin/atlas` governance data. Evidence: API summary route suite verifies authenticated registry read, strict response contract, unauthorized stable response shape, unavailable receipts, and no archive-write authorization (6/6); SSR loader suite verifies server-side governance fetch/schema admission and unauthenticated redirect (2/2). Combined relevant API/SSR coverage: 8/8 focused tests. No runtime service or external store was contacted by the loader fixture.
+- [ ] 9.7 Run focused Svelte/Vitest checks and `npm run check` for touched admin surfaces. PARTIAL: after the document projections/UI changes, focused API/schema + SSR tests pass 9/9 and focused SvelteKit boundary check reports 0 errors/2 warnings. Full workspace `npm run check` remains unproven because the prior broad run was stopped for memory safety; do not infer it from the narrow pass.
+- [x] 9.8 Replay the canonical governance registry/TOC producer and validation twice with identical checksums. Evidence: the named `build-document-governance-index --dry-run` command does not exist; reconciled to the actual owner `scripts/atlas/build-master-toc.mjs`, whose `--check` mode is read-only. `npm run atlas:docs:governance:validate` ran and reported `BLOCKED`, 0 failures, one honest closure blocker `UNCHECKED_TASKS:3318`, 0 archive-eligible records, and zero document/archive/registry writes. Two consecutive read-only TOC checks returned the same registry checksum; the replay smoke also requires two byte-identical rebuilds. This proves deterministic bounded projections, not whole-change closure or archive readiness.
 
 ## 10. First bounded apply
 
-- [ ] 10.1 Generate the first complete registry and `docs/MASTER-TOC.md` without editing or moving original documents.
-- [ ] 10.2 Review every `CONFLICT` and `SUPERSEDED_CANDIDATE`; do not bulk-resolve through model judgment.
+- [x] 10.1 Generate the current registry and `docs/MASTER-TOC.md` without editing or moving
+      original documents (2026-09-24). Existing deterministic owner generated 4,846 registry
+      records and 75 incomplete OpenSpec task lists; it reported 0 archive-eligible records. The
+      read-only `npm run atlas:docs:toc:check` immediately afterward passed with registry checksum
+      `494732fe65b310265fdc969b4ece102bc749728378463af718d227134529cc8d`. Only the two generated
+      projections changed; no source documents, stores, or archive paths were touched.
+- [x] 10.2 Review every `CONFLICT` and `SUPERSEDED_CANDIDATE`; do not bulk-resolve through model judgment. Evidence: the current deterministic governance registry contains 4,846 records with 0 `CONFLICT`, 0 `SUPERSEDED_CANDIDATE`, and 0 archive-eligible records; the reviewed candidate set is empty, so no disposition was inferred or changed. Registry/TOC checksum `494732fe65b310265fdc969b4ece102bc749728378463af718d227134529cc8d`; no archive or store writes.
 - [ ] 10.3 Select at most five clearly superseded non-instruction docs for archive canary.
 - [ ] 10.4 Run archive canary with explicit authorization, exact pre/post path checks, rollback-on-failure semantics where applicable, and no OpenSpec/CLAUDE moves.
 - [ ] 10.5 Record the canary workflow receipt under this OpenSpec change.

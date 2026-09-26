@@ -59,7 +59,7 @@ const testMetadata = {
       'Date stamp: March 15, 2024',
     ],
     suggestedTags: ['contract', 'signed', 'notarized'],
-    model: 'gemma4-rotorquant:latest-q8_0 (turboquant)',
+    model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
     cached: false,
   },
   forensics: {

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, renameSync, unlinkSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -46,6 +46,14 @@ async function main() {
   });
   const counts = Object.fromEntries([...new Set(rows.map((row) => row.classification))].sort().map((key) => [key, rows.filter((row) => row.classification === key).length]));
   const report = { schema: 'atlas.feature-ontology-packet-lineage.v1', generatedAt: new Date().toISOString(), readOnly: true, postgresWrites: false, qdrantWrites: false, neo4jWrites: false, valkeyWrites: false, workspaceRevision: currentWorkspaceRevision || null, approvalReceipt: 'docs/reports/feature-ontology-explicit-alias-approval-v1.json', hashDomains: { packetContentHash: 'atlas_packets.content_hash; packet/chunk identity only', packetSha256: 'atlas_packets.sha256; identity-recovery hash, not source-revision authority', packetWorkspaceRevision: 'atlas_packets.workspace_revision; observed placeholder 0 for this cohort', chunkContentHash: 'codebase_chunk_index.content_hash; exact packet/chunk join only', graphifyContentHash: 'whole-source observation; not compared to packet/chunk hash' }, packetFieldObservation: { packetRowsWithContentHash: rows.filter((row) => row.packetContentHash).length, packetRowsWithSha256: rows.filter((row) => row.packetSha256).length, packetRowsWithZeroWorkspaceRevision: rows.filter((row) => row.packetWorkspaceRevision === 0 || text(row.packetWorkspaceRevision) === '0').length, exactChunkMatches: rows.filter((row) => row.exactChunkMatchCount === 1).length }, status: rows.some((row) => row.classification === 'PACKET_CONTENT_LINEAGE_MISSING') ? 'PACKET_CONTENT_LINEAGE_INCOMPLETE' : 'PACKET_CONTENT_LINEAGE_RECONCILED', counts: { tuplesExamined: rows.length, ...counts }, eligibleFreshUsesConceptTuples: 0, relationshipGraphRevision: null, nextGate: 'REGENERATE_ONTOLOGY_REQUIRED_UNLESS_PACKET_SOURCE_REVISION_CAN_BE_PROVEN', rows };
-  mkdirSync(dirname(REPORT), { recursive: true }); writeFileSync(REPORT, `${JSON.stringify(report, null, 2)}\n`); console.log(JSON.stringify({ schema: report.schema, status: report.status, counts: report.counts, report: REPORT }, null, 2));
+  mkdirSync(dirname(REPORT), { recursive: true });
+  const temporaryReport = `${REPORT}.${process.pid}.${Date.now()}.tmp`;
+  try {
+    writeFileSync(temporaryReport, `${JSON.stringify(report, null, 2)}\n`);
+    renameSync(temporaryReport, REPORT);
+  } finally {
+    try { unlinkSync(temporaryReport); } catch {}
+  }
+  console.log(JSON.stringify({ schema: report.schema, status: report.status, counts: report.counts, report: REPORT }, null, 2));
 }
 main().catch(async (error) => { await pool.end().catch(() => {}); console.error(`[feature-ontology-packet-lineage] ${error instanceof Error ? error.message : String(error)}`); process.exitCode = 1; });

@@ -37,7 +37,24 @@ def _stable_json(value: Any) -> str:
 
 
 def _normalize_ws(text: str) -> str:
-    return re.sub(r"[ \t]+", " ", re.sub(r"\r\n?", "\n", text)).strip()
+    """Collapse runs of spaces/tabs and normalize newlines, EXCEPT inside fenced code blocks.
+
+    A line starting with three backticks opens/closes a fence; fenced lines keep their indentation byte-for-byte, so the
+    function is idempotent on text produced by ``extract_structured_text``: the stored page text is the same text the chunk
+    byte spans and the page content hash address (EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY). An unterminated fence
+    protects the remainder of the text.
+    """
+    out: list[str] = []
+    in_fence = False
+    for line in re.sub(r"\r\n?", "\n", text).split("\n"):
+        if line.startswith("```"):
+            in_fence = not in_fence
+            out.append(line)
+        elif in_fence:
+            out.append(line)
+        else:
+            out.append(re.sub(r"[ \t]+", " ", line))
+    return "\n".join(out).strip()
 
 
 @dataclass(frozen=True)
@@ -101,6 +118,9 @@ class ChunkRecord:
     # (the real production constructor) always populates real values.
     start_byte: int = 0
     end_byte: int = 0
+    # EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_01: chunk-grain evidence identity (ExternalDocChunkEvidenceV1), distinct
+    # from the PARENT page coordinate carried in ``doc_coordinate``. None when no page coordinate was supplied.
+    chunk_evidence_revision: str | None = None
 
     def to_dict(self) -> Json:
         result = asdict(self)
@@ -236,6 +256,11 @@ def fetch_firecrawl_v2(url: str, *, api_key: str, timeout_seconds: int = 60) -> 
 
 
 _CODE_LANGUAGE_RE = re.compile(r"(?:language|lang|highlight)-([a-zA-Z0-9+#]+)")
+# GitHub wraps rendered code as ``<div class="highlight highlight-source-sql">``; the language is the part after
+# ``source-`` (the generic pattern above would report the literal word "source").
+_GITHUB_HIGHLIGHT_SOURCE_RE = re.compile(r"^highlight-source-([a-zA-Z0-9+#]+)")
+# Syntax highlighters that emit one element per source line, sometimes with no newline text node between lines.
+_CODE_LINE_CLASSES = frozenset({"line", "code-line", "token-line", "highlight-line", "cm-line"})
 
 
 def _detect_code_language(tag: Any) -> str | None:
@@ -247,11 +272,52 @@ def _detect_code_language(tag: Any) -> str | None:
         if node is None:
             break
         for cls in node.get("class") or []:
+            github = _GITHUB_HIGHLIGHT_SOURCE_RE.match(str(cls))
+            if github:
+                return github.group(1).lower()
             match = _CODE_LANGUAGE_RE.match(str(cls))
             if match:
                 return match.group(1).lower()
         node = getattr(node, "parent", None)
     return None
+
+
+def _code_block_text(node: Any) -> str:
+    """Source text of a ``<pre>``/``<code>`` subtree.
+
+    A newline exists in the result only where the source has one: a literal newline in a text node, a ``<br>``, or a
+    boundary between per-line highlighter elements (``class="line"`` and friends) that have no newline text between
+    them. Styling ``<span>`` elements inside one logical line are concatenated with NO separator. (The previous
+    ``get_text("\\n")`` put a newline between every text node, so ``<span>hnsw</span><span>.</span><span>iterative_scan</span>``
+    became three lines and exact API tokens like ``hnsw.iterative_scan`` were destroyed.)
+    """
+    from bs4.element import NavigableString, PreformattedString, Tag
+
+    parts: list[str] = []
+    tail = ""  # last emitted character
+
+    def emit(value: str) -> None:
+        nonlocal tail
+        if value:
+            parts.append(value)
+            tail = value[-1]
+
+    def walk(current: Any) -> None:
+        for child in current.children:
+            if isinstance(child, PreformattedString):  # comments, CDATA, doctype
+                continue
+            if isinstance(child, NavigableString):
+                emit(str(child))
+            elif isinstance(child, Tag):
+                if child.name == "br":
+                    emit("\n")
+                    continue
+                if _CODE_LINE_CLASSES.intersection(child.get("class") or []) and parts and tail != "\n":
+                    emit("\n")
+                walk(child)
+
+    walk(node)
+    return "".join(parts)
 
 
 def extract_structured_text(raw_html: bytes | str, *, base_url: str) -> tuple[str, str, tuple[str, ...]]:
@@ -287,7 +353,7 @@ def extract_structured_text(raw_html: bytes | str, *, base_url: str) -> tuple[st
     for pre in main.find_all("pre"):
         code_tag = pre.find("code")
         language = _detect_code_language(code_tag) or _detect_code_language(pre)
-        code_text = (code_tag or pre).get_text("\n").strip("\n")
+        code_text = _code_block_text(code_tag or pre).strip("\n")
         fence = f"```{language or ''}\n{code_text}\n```"
         placeholder = f"\x00CODEBLOCK{len(code_fences)}\x00"
         code_fences.append(fence)
@@ -511,11 +577,29 @@ def chunk_document(
     overlap_chars: int = 300,
     nlp: Callable[[str], tuple[tuple[Json, ...], tuple[Json, ...]]] | None = None,
     doc_coordinate: Any = None,
+    chunk_identity_version: str = "V1",
 ) -> tuple[ChunkRecord, ...]:
     if maximum_chars <= 0 or overlap_chars < 0 or overlap_chars >= maximum_chars:
         raise ValueError("INVALID_CHUNK_WINDOW")
+    if chunk_identity_version not in {"V1", "V2"}:
+        raise ValueError("UNSUPPORTED_DOC_CHUNK_IDENTITY_VERSION")
+    if chunk_identity_version == "V2" and (
+        doc_coordinate is None
+        or not getattr(doc_coordinate, "provider", None)
+        or not getattr(doc_coordinate, "product", None)
+        or not getattr(doc_coordinate, "product_version", None)
+    ):
+        raise ValueError("DOC_CHUNK_IDENTITY_V2_REQUIRES_VERSIONED_COORDINATE")
+    from atlas_doc_coordinate import (  # local: keeps this module importable without pydantic
+        chunk_evidence_revision,
+        external_doc_chunk_id_v2,
+    )
+
     normalized = _normalize_ws(text)
     document_checksum = _sha(normalized)
+    if doc_coordinate is not None and doc_coordinate.content_hash != document_checksum:
+        # The byte spans below address `normalized`; a page coordinate hashed over different text would mis-bind them.
+        raise ValueError("DOC_COORDINATE_CONTENT_HASH_MISMATCH")
     domain = classify_domain(title, normalized)
     chunks: list[ChunkRecord] = []
     ordinal = 0
@@ -554,13 +638,23 @@ def chunk_document(
                 # codepoint boundaries always land on byte boundaries).
                 start_byte = len(normalized[:absolute_start].encode("utf-8"))
                 end_byte = start_byte + len(chunk_text.encode("utf-8"))
-                chunk_id = f"doc:{source_id}:{document_checksum[:16]}:{ordinal}"
-                chunk_coordinate = None
+                # The PAGE coordinate is carried unchanged into every child chunk (heading/section stays chunk
+                # metadata in heading_path); the chunk's own identity is its span + bytes under that page revision.
+                chunk_evidence = None
                 if doc_coordinate is not None:
-                    section_anchor = "/".join(heading_path) or None
-                    chunk_coordinate = doc_coordinate.model_copy(
-                        update={"content_hash": document_checksum, "section_anchor": section_anchor}
+                    chunk_evidence = chunk_evidence_revision(
+                        page_evidence_revision=doc_coordinate.evidence_revision, ordinal=ordinal,
+                        start_byte=start_byte, end_byte=end_byte, chunk_checksum=_sha(chunk_text),
                     )
+                if chunk_identity_version == "V2":
+                    # V2 prevents identical text at two explicitly versioned page coordinates from
+                    # colliding with the global chunk_id unique constraint. V1 remains byte-for-byte stable.
+                    chunk_id = external_doc_chunk_id_v2(
+                        source_id=source_id,
+                        chunk_evidence_revision=chunk_evidence,
+                    )
+                else:
+                    chunk_id = f"doc:{source_id}:{document_checksum[:16]}:{ordinal}"
                 code_blocks, api_signatures = extract_code_blocks_and_signatures(chunk_text)
                 chunks.append(ChunkRecord(
                     chunk_id=chunk_id,
@@ -577,11 +671,12 @@ def chunk_document(
                     ontology_classes=classify_ontology(chunk_text),
                     lexical_tokens=lexical,
                     ontology_tuples=tuples,
-                    doc_coordinate=chunk_coordinate,
+                    doc_coordinate=doc_coordinate,
                     code_blocks=code_blocks,
                     api_signatures=api_signatures,
                     start_byte=start_byte,
                     end_byte=end_byte,
+                    chunk_evidence_revision=chunk_evidence,
                 ))
                 ordinal += 1
             if end >= len(body):

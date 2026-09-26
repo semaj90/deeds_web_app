@@ -1,0 +1,86 @@
+{
+  "schema": "atlas.symbol-classifier-owner-census.v1",
+  "generatedAt": "2026-09-20",
+  "mode": "READ_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "summary": {
+    "duplicateCanonicalOwnersProven": false,
+    "duplicateRiskPresent": true,
+    "riskMeaning": "overlapping historical, adapter, executor, and challenger helpers require lifecycle labels"
+  },
+  "owners": [
+    {
+      "surface": "symbol identity and resolution",
+      "canonicalOwner": "current source-bound structural pipeline plus atlas_symbol_registry/atlas_symbol_versions",
+      "evidence": [
+        "scripts/atlas/prove-current-structural-symbol-resolution-v1.mjs",
+        "scripts/atlas/prove-tree-bound-symbol-registry-resolution-v1.mjs",
+        "scripts/atlas/audit-ast-symbol-resolution-v1.mjs"
+      ],
+      "state": "COHORT_BLOCKED",
+      "duplicateRisk": "legacy symbol_resolver and ast-symbol backfill scripts must not be treated as current authority"
+    },
+    {
+      "surface": "domain classifier training",
+      "canonicalOwner": "python/train_domain_classifier.py",
+      "evidence": [
+        "python/train_domain_classifier.py",
+        "python/atlas_domain_classifier_eval_v1.py"
+      ],
+      "state": "BASELINE_PRESENT_REVIEW_SET_MISSING",
+      "duplicateRisk": "PyTorch logistic regression would be a challenger, not a second trainer owner"
+    },
+    {
+      "surface": "classification API adapter",
+      "canonicalOwner": "python/atlas_nlp_classification_helper_v1.py",
+      "evidence": [
+        "python/atlas_nlp_classification_helper_v1.py",
+        "python/atlas_external_docs.py"
+      ],
+      "state": "READ_ONLY_RULES",
+      "duplicateRisk": "helper delegates to shared rules; not a second learned-model owner"
+    },
+    {
+      "surface": "NLP/AST execution sidecar",
+      "canonicalOwner": "python/miniforge_nlp_sidecar_v2.py",
+      "evidence": [
+        "python/miniforge_nlp_sidecar_v2.py",
+        "scripts/atlas/run-nlp-classification-fastapi-smoke-v1.mjs"
+      ],
+      "state": "EXECUTOR_NOT_AUTHORITY",
+      "duplicateRisk": "miniforge_nlp_sidecar.py and miniforge_nlp_sidecar_oak.py require legacy/adapter lifecycle labels"
+    },
+    {
+      "surface": "structural evidence",
+      "canonicalOwner": "Tree-sitter plus ast-grep evidence helpers",
+      "evidence": [
+        "scripts/atlas/lib/ast-grep-symbol-extraction.mjs",
+        "sveltekit-frontend/src/lib/server/analysis/ast-grep-extractor.ts",
+        "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts"
+      ],
+      "state": "PROVIDER_SURFACES_PRESENT",
+      "duplicateRisk": "older phase/stage/backfill scripts are historical or experimental until caller reachability is proven"
+    }
+  ],
+  "classificationPolicy": {
+    "identity": "EXACT_FAIL_CLOSED",
+    "classification": "PROBABILISTIC_REVIEW_REQUIRED",
+    "ranking": "CHALLENGER_UNTIL_CALIBRATED",
+    "sidecar": "EVIDENCE_EXECUTOR",
+    "pytorch": "NOT_PRESENT_AS_LOGISTIC_TRAINER"
+  },
+  "validation": {
+    "classifierUnitTests": "9/9 PASS",
+    "astOwnershipAudit": "PROVEN_AUDIT",
+    "domainTrainingReadiness": "DOMAIN_CLASSIFIER_TRAINING_READY_FALSE",
+    "symbolOwnerLineage": "BLOCKED_ATLAS_WORKSPACE_REVISION_REQUIRED",
+    "openSpec": "PASS"
+  },
+  "blockers": [
+    "reviewed calibration labels are absent",
+    "current source frame is not admitted for the worktree",
+    "symbol resolution cohort is not aligned",
+    "sidecar source_revision remains unknown in the current smoke boundary"
+  ]
+}

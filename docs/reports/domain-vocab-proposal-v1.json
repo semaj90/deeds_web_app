@@ -1,0 +1,421 @@
+{
+  "schema": "atlas.domain-vocab-proposal.v2",
+  "generatedAt": "2026-09-20T18:57:51.518Z",
+  "supersedes": "v1 of this file, which compared only against the 9-domain code taxonomy and wrongly called gpu/compiler/test/frontend/api \"not domains\"",
+  "vocabularies": {
+    "packetLabels": {
+      "distinctCaseFolded": 39,
+      "rows": 61718,
+      "source": "atlas_packets.domain_class"
+    },
+    "codeTaxonomy": {
+      "revision": "parent-atlas-domain-taxonomy-v1",
+      "domains": [
+        "auth",
+        "ui",
+        "retrieval",
+        "network",
+        "database",
+        "cache",
+        "agent",
+        "graph",
+        "ml"
+      ],
+      "source": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+    },
+    "dbDomainOntology": {
+      "table": "atlas_domain_ontology",
+      "topLevel": [
+        "api",
+        "auth",
+        "cache",
+        "compiler",
+        "database",
+        "devops",
+        "error-handling",
+        "frontend",
+        "gpu",
+        "graph",
+        "machine-learning",
+        "retrieval",
+        "test"
+      ],
+      "children": [
+        "database.postgresql",
+        "devops.env-config",
+        "devops.process-mgmt",
+        "frontend.sveltekit"
+      ],
+      "hierarchyColumns": "parent_group_id, taxonomy_level"
+    },
+    "derivedTaxonomy": {
+      "taxonomy_nodes": 5527,
+      "taxonomy_edges": 62802
+    },
+    "emptyVersionedTable": "domain_taxonomy_v1 (0 rows; has parent_domain_id/deprecated_at/replaced_by)"
+  },
+  "ontologyGroupsNotInCodeTaxonomy": [
+    "api",
+    "compiler",
+    "devops",
+    "error-handling",
+    "frontend",
+    "gpu",
+    "machine-learning",
+    "test"
+  ],
+  "codeTaxonomyDomainsNotInOntology": [
+    "agent",
+    "network",
+    "ml (named machine-learning)",
+    "ui (named frontend)"
+  ],
+  "summary": {
+    "EXACT_IN_DOMAIN_ONTOLOGY": {
+      "labels": 9,
+      "rows": 31676
+    },
+    "ARTIFACT_KIND_NOT_A_DOMAIN": {
+      "labels": 5,
+      "rows": 16664
+    },
+    "FOLD_ALIAS": {
+      "labels": 4,
+      "rows": 6896
+    },
+    "SUBTYPE_OF": {
+      "labels": 4,
+      "rows": 2119
+    },
+    "AMBIGUOUS_OR_ABSENT_FROM_ONTOLOGY": {
+      "labels": 9,
+      "rows": 3682
+    },
+    "PRODUCT_FEATURE_AREA_NOT_IN_EITHER_VOCABULARY": {
+      "labels": 6,
+      "rows": 659
+    },
+    "QUARANTINE_NOT_A_LABEL": {
+      "labels": 2,
+      "rows": 22
+    }
+  },
+  "applied": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "requiresOperatorApproval": true,
+  "labels": [
+    {
+      "label": "graph",
+      "variants": "graph/Graph",
+      "rows": 10066,
+      "bucket": "EXACT_IN_DOMAIN_ONTOLOGY",
+      "proposedOntologyGroup": "graph",
+      "note": "case variants folded: graph/Graph"
+    },
+    {
+      "label": "documentation",
+      "variants": "documentation",
+      "rows": 6782,
+      "bucket": "ARTIFACT_KIND_NOT_A_DOMAIN",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "other",
+      "variants": "Other",
+      "rows": 5441,
+      "bucket": "ARTIFACT_KIND_NOT_A_DOMAIN",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "ui",
+      "variants": "UI",
+      "rows": 4365,
+      "bucket": "FOLD_ALIAS",
+      "proposedOntologyGroup": "frontend",
+      "note": ""
+    },
+    {
+      "label": "test",
+      "variants": "test",
+      "rows": 4228,
+      "bucket": "EXACT_IN_DOMAIN_ONTOLOGY",
+      "proposedOntologyGroup": "test",
+      "note": ""
+    },
+    {
+      "label": "gpu",
+      "variants": "gpu",
+      "rows": 3876,
+      "bucket": "EXACT_IN_DOMAIN_ONTOLOGY",
+      "proposedOntologyGroup": "gpu",
+      "note": ""
+    },
+    {
+      "label": "compiler",
+      "variants": "compiler",
+      "rows": 3766,
+      "bucket": "EXACT_IN_DOMAIN_ONTOLOGY",
+      "proposedOntologyGroup": "compiler",
+      "note": ""
+    },
+    {
+      "label": "tool",
+      "variants": "tool",
+      "rows": 3695,
+      "bucket": "ARTIFACT_KIND_NOT_A_DOMAIN",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "frontend",
+      "variants": "frontend",
+      "rows": 3190,
+      "bucket": "EXACT_IN_DOMAIN_ONTOLOGY",
+      "proposedOntologyGroup": "frontend",
+      "note": ""
+    },
+    {
+      "label": "database",
+      "variants": "database/Database",
+      "rows": 2695,
+      "bucket": "EXACT_IN_DOMAIN_ONTOLOGY",
+      "proposedOntologyGroup": "database",
+      "note": "case variants folded: database/Database"
+    },
+    {
+      "label": "machinelearning",
+      "variants": "MachineLearning",
+      "rows": 2341,
+      "bucket": "FOLD_ALIAS",
+      "proposedOntologyGroup": "machine-learning",
+      "note": ""
+    },
+    {
+      "label": "retrieval",
+      "variants": "retrieval",
+      "rows": 2306,
+      "bucket": "EXACT_IN_DOMAIN_ONTOLOGY",
+      "proposedOntologyGroup": "retrieval",
+      "note": ""
+    },
+    {
+      "label": "rag_retrieval",
+      "variants": "rag_retrieval",
+      "rows": 1847,
+      "bucket": "SUBTYPE_OF",
+      "proposedOntologyGroup": "retrieval",
+      "note": ""
+    },
+    {
+      "label": "agent",
+      "variants": "agent",
+      "rows": 1536,
+      "bucket": "AMBIGUOUS_OR_ABSENT_FROM_ONTOLOGY",
+      "proposedOntologyGroup": null,
+      "note": "NOT IN atlas_domain_ontology"
+    },
+    {
+      "label": "backend",
+      "variants": "backend",
+      "rows": 1495,
+      "bucket": "AMBIGUOUS_OR_ABSENT_FROM_ONTOLOGY",
+      "proposedOntologyGroup": null,
+      "note": "no parent (layer, not a domain)"
+    },
+    {
+      "label": "cache",
+      "variants": "cache",
+      "rows": 1385,
+      "bucket": "EXACT_IN_DOMAIN_ONTOLOGY",
+      "proposedOntologyGroup": "cache",
+      "note": ""
+    },
+    {
+      "label": "utility",
+      "variants": "Utility",
+      "rows": 525,
+      "bucket": "ARTIFACT_KIND_NOT_A_DOMAIN",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "agent_orchestration",
+      "variants": "agent_orchestration",
+      "rows": 407,
+      "bucket": "AMBIGUOUS_OR_ABSENT_FROM_ONTOLOGY",
+      "proposedOntologyGroup": null,
+      "note": "NOT IN atlas_domain_ontology"
+    },
+    {
+      "label": "evidence_upload_storage",
+      "variants": "evidence_upload_storage",
+      "rows": 236,
+      "bucket": "PRODUCT_FEATURE_AREA_NOT_IN_EITHER_VOCABULARY",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "library",
+      "variants": "Library",
+      "rows": 221,
+      "bucket": "ARTIFACT_KIND_NOT_A_DOMAIN",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "case_management",
+      "variants": "case_management",
+      "rows": 180,
+      "bucket": "PRODUCT_FEATURE_AREA_NOT_IN_EITHER_VOCABULARY",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "api",
+      "variants": "API",
+      "rows": 164,
+      "bucket": "EXACT_IN_DOMAIN_ONTOLOGY",
+      "proposedOntologyGroup": "api",
+      "note": ""
+    },
+    {
+      "label": "infrastructure",
+      "variants": "infrastructure",
+      "rows": 138,
+      "bucket": "FOLD_ALIAS",
+      "proposedOntologyGroup": "devops",
+      "note": ""
+    },
+    {
+      "label": "graph_topology",
+      "variants": "graph_topology",
+      "rows": 116,
+      "bucket": "SUBTYPE_OF",
+      "proposedOntologyGroup": "graph",
+      "note": ""
+    },
+    {
+      "label": "cache_layer",
+      "variants": "cache_layer",
+      "rows": 106,
+      "bucket": "SUBTYPE_OF",
+      "proposedOntologyGroup": "cache",
+      "note": ""
+    },
+    {
+      "label": "repair_workflow",
+      "variants": "repair_workflow",
+      "rows": 100,
+      "bucket": "PRODUCT_FEATURE_AREA_NOT_IN_EITHER_VOCABULARY",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "embedding_indexing",
+      "variants": "embedding_indexing",
+      "rows": 83,
+      "bucket": "AMBIGUOUS_OR_ABSENT_FROM_ONTOLOGY",
+      "proposedOntologyGroup": null,
+      "note": "machine-learning|retrieval"
+    },
+    {
+      "label": "mcp_agents",
+      "variants": "mcp_agents",
+      "rows": 61,
+      "bucket": "AMBIGUOUS_OR_ABSENT_FROM_ONTOLOGY",
+      "proposedOntologyGroup": null,
+      "note": "NOT IN atlas_domain_ontology"
+    },
+    {
+      "label": "document_processing",
+      "variants": "document_processing",
+      "rows": 57,
+      "bucket": "PRODUCT_FEATURE_AREA_NOT_IN_EITHER_VOCABULARY",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "citation_engine",
+      "variants": "citation_engine",
+      "rows": 52,
+      "bucket": "PRODUCT_FEATURE_AREA_NOT_IN_EITHER_VOCABULARY",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "authentication",
+      "variants": "Authentication",
+      "rows": 52,
+      "bucket": "FOLD_ALIAS",
+      "proposedOntologyGroup": "auth",
+      "note": ""
+    },
+    {
+      "label": "auth_login_register",
+      "variants": "auth_login_register",
+      "rows": 50,
+      "bucket": "SUBTYPE_OF",
+      "proposedOntologyGroup": "auth",
+      "note": ""
+    },
+    {
+      "label": "cluster_analysis",
+      "variants": "cluster_analysis",
+      "rows": 49,
+      "bucket": "AMBIGUOUS_OR_ABSENT_FROM_ONTOLOGY",
+      "proposedOntologyGroup": null,
+      "note": "graph|machine-learning"
+    },
+    {
+      "label": "legal_reports",
+      "variants": "legal_reports",
+      "rows": 34,
+      "bucket": "PRODUCT_FEATURE_AREA_NOT_IN_EITHER_VOCABULARY",
+      "proposedOntologyGroup": null,
+      "note": ""
+    },
+    {
+      "label": "memory_optimization",
+      "variants": "memory_optimization",
+      "rows": 28,
+      "bucket": "AMBIGUOUS_OR_ABSENT_FROM_ONTOLOGY",
+      "proposedOntologyGroup": null,
+      "note": "cache|machine-learning"
+    },
+    {
+      "label": "classification failed",
+      "variants": "Classification failed",
+      "rows": 21,
+      "bucket": "QUARANTINE_NOT_A_LABEL",
+      "proposedOntologyGroup": null,
+      "note": "error/system string stored in domain_class"
+    },
+    {
+      "label": "embedding",
+      "variants": "Embedding",
+      "rows": 16,
+      "bucket": "AMBIGUOUS_OR_ABSENT_FROM_ONTOLOGY",
+      "proposedOntologyGroup": null,
+      "note": "machine-learning|retrieval"
+    },
+    {
+      "label": "trace_mcp",
+      "variants": "trace_mcp",
+      "rows": 7,
+      "bucket": "AMBIGUOUS_OR_ABSENT_FROM_ONTOLOGY",
+      "proposedOntologyGroup": null,
+      "note": "NOT IN atlas_domain_ontology"
+    },
+    {
+      "label": "cluster.summary",
+      "variants": "cluster.summary",
+      "rows": 1,
+      "bucket": "QUARANTINE_NOT_A_LABEL",
+      "proposedOntologyGroup": null,
+      "note": "error/system string stored in domain_class"
+    }
+  ]
+}

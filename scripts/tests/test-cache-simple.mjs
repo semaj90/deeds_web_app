@@ -7,7 +7,7 @@
 // Do NOT route through Ollama or the SvelteKit dev server.
 
 const LLAMA_URL = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
-const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 // SSE streaming helper — assembles content deltas per CLAUDE.md Gemma4 rules.
 async function streamChat(messages, { maxTokens = 512, temperature = 0.3 } = {}) {

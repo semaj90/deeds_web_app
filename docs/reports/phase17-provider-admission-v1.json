@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.phase17-provider-admission.v1",
+  "status": "SCAFFOLD_COMPLETE",
+  "currentAuthority": false,
+  "liveProof": false,
+  "writesPerformed": false,
+  "providerStatuses": [
+    "AVAILABLE",
+    "DEGRADED",
+    "BLOCKED",
+    "UNAVAILABLE"
+  ],
+  "admissionRules": [
+    "required revisions are explicit",
+    "missing graph or representation revisions block the provider",
+    "unavailable providers do not emit promotional features",
+    "no persistence or datastore mutation is performed"
+  ],
+  "evidence": [
+    "sveltekit-frontend/src/lib/server/ml/phase17-schema.ts",
+    "sveltekit-frontend/src/lib/server/ml/phase17-provider-admission.spec.ts"
+  ],
+  "remainingBlockers": [
+    "current CandidateOrdinalMap/source-packet-chunk cohort",
+    "current graph and semantic revisions",
+    "live Phase 17 readback"
+  ]
+}

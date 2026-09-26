@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.8098-capability-receipt.v1",
+  "readOnly": true,
+  "baseUrl": "http://127.0.0.1:8098",
+  "status": "8098_CAPABILITY_RECEIPT_PROVEN",
+  "checks": {
+    "healthOk": true,
+    "executionOnly": true,
+    "cudaAvailable": true,
+    "graphAvailable": true,
+    "backendPresent": true,
+    "backendVersionPresent": true,
+    "algorithmRevisionPresent": true,
+    "writesFalse": true
+  },
+  "errors": [],
+  "health": {
+    "ok": true,
+    "service": "atlas-gpu-8098",
+    "executionOnly": true,
+    "cudaAvailable": true,
+    "device": "NVIDIA GeForce RTX 3060 Ti",
+    "torchAvailable": false,
+    "writes": {
+      "postgres": false,
+      "qdrant": false,
+      "valkey": false
+    }
+  },
+  "capabilities": {
+    "available": true,
+    "backend": "cugraph.pagerank",
+    "backendVersion": "26.08.00",
+    "algorithmRevision": "atlas.cugraph-pagerank.v1",
+    "maxSeeds": 64,
+    "maxResultNodes": 512,
+    "minGraphFreeGpuMb": 768,
+    "importError": null
+  }
+}

@@ -100,7 +100,7 @@ export const CLIENT_EMBEDDING_TOKENIZER_PATH = '/embeddinggemma_300m_onnx/tokeni
  */
 export const SERVER_CHAT_MODEL = 'ornith-1.5-9b';
 
-/** gemma4:e4b Q4_K_M — 8B params, 131K context, native tool calling + thinking via Ollama */
+	/** Legacy Gemma4 compatibility identifier; not the active chat owner. */
 export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';
 
 /** embeddinggemma:latest — 768-dim server embeddings via the embedding lane */
@@ -182,8 +182,8 @@ export const MODEL_CAPABILITIES: Record<string, ModelCapabilities> = {
 		supportsPLE: false,
 		supportsVision: true,
 		supportsAudio: false,
-		recommendedRuntime: 'ollama',
-		notes: 'Primary server reasoning/synthesis and VLM model. Served via Ollama (synthesis) or FastAPI VLM server (multimodal).',
+		recommendedRuntime: 'llama-server',
+		notes: 'Primary Ornith 1.5 reasoning/synthesis model via llama-server :8090; Ollama :11434 is embedding-only.',
 	},
 	[SERVER_GEMMA4_MODEL]: {
 		id: SERVER_GEMMA4_MODEL,
@@ -302,7 +302,7 @@ export const VLM_BASE_URL =
 /** TurboQuant llama-server endpoint (OpenAI-compatible, runs alongside Ollama) */
 export const TURBOQUANT_BASE_URL = 
   (typeof process !== 'undefined' && process.env?.TURBOQUANT_BASE_URL) || 
-  `http://${['127', '0', '0', '1'].join('.')}:8080`;
+  `http://${['127', '0', '0', '1'].join('.')}:8090`;
 /** ornith-1.5-9b — currently loaded on llama-server :8090; see SERVER_CHAT_MODEL's drift note above. */
 export const TURBOQUANT_MODEL = 'ornith-1.5-9b';
 
@@ -325,7 +325,7 @@ export const BIFROST_BASE_URL_CLIENT = '/api/cache/bifrost';
 /** TurboQuant — client-side endpoint (for future direct browser calls if needed) */
 export const TURBOQUANT_BASE_URL_CLIENT = 
   (typeof process !== 'undefined' && process.env?.TURBOQUANT_BASE_URL) || 
-  `http://${['127', '0', '0', '1'].join('.')}:8080`;
+  `http://${['127', '0', '0', '1'].join('.')}:8090`;
 
 // ── Qdrant collection names ──────────────────────────────────────────────
 // These MUST match VECTOR_CONFIG.COLLECTIONS in src/lib/server/config/vector-config.ts

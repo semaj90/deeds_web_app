@@ -2010,7 +2010,8 @@
     {
       "label": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
       "type": "shell",
-      "command": "node scripts/startup/run-graphify-daily-startup.mjs",
+      "command": "npm run graphify:daily:dry",
+      "detail": "CEI-20: was the frontend maintenance wrapper (sveltekit-frontend/scripts/startup/run-graphify-daily-startup.mjs). Now the canonical graphify:daily family in READ-ONLY dry-run mode; production apply is a deliberate manual npm run graphify:daily (root wrapper: admission then apply chain).",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend",
         "env": {
@@ -11797,15 +11798,15 @@
       "detail": "Phase 85 P5: Dry-run feature label extraction from 18,046 atlas_packets. Verifies 100% canonical feature_id + feature_label coverage. Zero writes, safe to run on startup."
     },
     {
-      "label": "🚀 Phase 85 P6: Summary Generation (Startup Dry-Run)",
+      "label": "🚀 Phase 85 P6: Summary Generation (Manual Dry-Run)",
       "type": "shell",
-      "command": "npm run atlas:p6:rebuild:summaries:dry -- --limit=25",
+      "command": "npm run atlas:p6:rebuild:summaries:768:dry -- --limit=25",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "isBackground": true,
       "runOptions": {
-        "runOn": "folderOpen"
+        "runOn": "default"
       },
       "problemMatcher": [],
       "presentation": {
@@ -11927,6 +11928,28 @@
         "clear": false
       },
       "detail": "Phase B: Asynchronous EmbeddingGemma worker. Consumes summaries from RabbitMQ atlas.enrichment.embedding queue, computes 768-dim embeddings via Ollama, logs analysis_pass_results, updates atlas_summary_layers. Runs continuously. Stop with Ctrl+C."
+    },
+    {
+      "label": "🧠 OpenCode: Atlas Residency Proof (read-only)",
+      "type": "shell",
+      "command": "opencode run --command atlas-residency-proof --agent ornith-atlas-kernel --format json",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": false,
+      "runOptions": {
+        "runOn": "userRequest"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Runs the existing OpenCode agent against the bounded unified-residency proof. The command is read-only and does not use --auto; no migration, datastore, projection, cleanup, or GPU-state mutation is authorized."
     }
   ]
 }

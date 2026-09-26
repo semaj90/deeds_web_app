@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T04:36:27Z",
+  "fromChange": "parent-atlas-rrf-fusion-consolidation",
+  "toChange": "parent-atlas-ontology-oaklib-fanout-bitmap",
+  "fromTask": "3.1",
+  "toTask": "3.5 / 4.6 / 6.1",
+  "pivotGate": "RRF_OPERATOR_DECISION_TO_OAK_FANOUT_AUTHORIZATION_GATES",
+  "reason": "RRF task 3.1 explicitly requires human sign-off and is not an autonomous implementation task. The ontology/fanout change is near-complete; its remaining work was checked before pivot and is blocked on a first live annotation batch, explicit authorization to apply the materialized-view/index migration, and that migration's dependent capability tests.",
+  "fromTaskState": {
+    "change": "parent-atlas-rrf-fusion-consolidation",
+    "task": "3.1",
+    "status": "OPERATOR_DECISION_REQUIRED",
+    "decision": "For each noncanonical RRF primitive, migrate callers, designate BACKEND/ADAPTER, or retire it."
+  },
+  "toTaskState": {
+    "change": "parent-atlas-ontology-oaklib-fanout-bitmap",
+    "openTasks": [
+      {
+        "task": "3.5",
+        "status": "WAITING_FOR_FIRST_LIVE_ANNOTATION_WRITES",
+        "writesPerformed": false
+      },
+      {
+        "task": "4.6",
+        "status": "EXPLICIT_HUMAN_AUTHORIZATION_REQUIRED",
+        "migrationApplied": false
+      },
+      {
+        "task": "6.1",
+        "status": "PARTIAL_DEPENDS_ON_4.6",
+        "resolutionBoundaryTests": "9/9 pass; fanout-storage capability scenarios remain unproven"
+      }
+    ]
+  },
+  "constraints": {
+    "containerRebuildsUntilEnd": true,
+    "canonicalWrites": false,
+    "datastoreWrites": false,
+    "preserveConcurrentWorkingTreeEdits": true,
+    "noCommitOrPush": true
+  }
+}

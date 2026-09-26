@@ -5,6 +5,7 @@ import {
 } from './algorithm-execution-manifest.js';
 import { detectModelTopology } from './model-topology-identity.js';
 import { auditRepresentationDimensions } from './representation-dimension-audit.js';
+import { jacobianJvpExecution, jacobianVjpExecution } from './known-execution-manifests.js';
 
 function baseManifest() {
   return {
@@ -76,6 +77,20 @@ function baseManifest() {
 }
 
 describe('AlgorithmExecutionManifestV1', () => {
+  it('keeps bounded JVP/VJP probes diagnostic-only and noncanonical', () => {
+    const context = {
+      manifestId: 'm-jacobian', executionId: 'e-jacobian', requestId: 'r-jacobian', workflowId: 'w-jacobian',
+      workflowRevision: 1, dagNodeId: 'jacobian', workspaceRevision: 'workspace:r1', graphRevision: null, producerRevision: 'producer:r1',
+    };
+    const jvp = jacobianJvpExecution({ ...context, representationRevision: 'projection:r1', dimensions: 154, implementationRevision: 'jvp:r1' });
+    const vjp = jacobianVjpExecution({ ...context, representationRevision: 'projection:r1', dimensions: 154, implementationRevision: 'vjp:r1' });
+    expect(jvp.algorithm.algorithmId).toBe('JACOBIAN_JVP');
+    expect(vjp.algorithm.algorithmId).toBe('JACOBIAN_VJP');
+    expect(jvp.geometry.role).toBe('DIAGNOSTIC');
+    expect(vjp.geometry.role).toBe('DIAGNOSTIC');
+    expect(jvp.canonicalWrites).toBe(false);
+    expect(vjp.canonicalWrites).toBe(false);
+  });
   it('records representation, algorithm, executor, transport, and geometry independently', () => {
     const parsed = AlgorithmExecutionManifestV1Schema.parse(baseManifest());
     expect(parsed.representations[0].representationId).toBe('semantic_768');

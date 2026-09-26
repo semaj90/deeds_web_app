@@ -8,7 +8,10 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const registryPath = join(process.cwd(), 'docs', 'reports', 'document-governance-registry-v1.json');
-const reportPath = join(process.cwd(), 'docs', 'reports', 'document-supersession-audit-v1.json');
+const outputFlag = process.argv.indexOf('--output');
+const reportPath = outputFlag >= 0 && process.argv[outputFlag + 1]
+  ? resolve(process.cwd(), process.argv[outputFlag + 1])
+  : join(process.cwd(), 'docs', 'reports', 'document-supersession-audit-v1.json');
 const registryText = existsSync(registryPath) ? readFileSync(registryPath, 'utf8') : '';
 const registry = registryText ? JSON.parse(registryText) : { records: [] };
 const records = registry.records ?? [];
@@ -44,7 +47,9 @@ for (const record of records) {
   const text = readFileSync(absolute, 'utf8');
   const lines = text.split(/\r?\n/);
   lines.forEach((line, lineNumber) => {
-    if (!/supersed/i.test(line)) return;
+    // A mention of a superseded candidate is not itself a declared edge.
+    // Require explicit relation language before extracting document paths.
+    if (!/\b(?:supersedes|superseded\s+by|supersededBy|replaces|replaced\s+by)\b/i.test(line)) return;
     const candidates = line.match(/(?:[\w.-]+\/)+[\w./-]+\.(?:md|json|ya?ml)/g) ?? [];
     for (const target of candidates) {
       const resolvedTarget = resolveTarget(target, record.path);

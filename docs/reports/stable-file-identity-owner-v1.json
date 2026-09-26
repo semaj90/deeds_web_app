@@ -1,0 +1,384 @@
+{
+  "schema": "atlas.stable-file-identity-owner.v1",
+  "gate": "S01-08",
+  "generatedAt": "2026-09-21T23:38:27.500Z",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admittedSourceCount": 25542,
+  "candidateCensusRef": {
+    "pointer": "docs/reports/stable-file-identity-candidate-census-v1.json",
+    "versioned": "docs/reports/stable-file-identity-candidate-census-v1.a86a141b7aa6.json",
+    "receiptChecksum": "sha256:a86a141b7aa66df3a5779801460de5e73c587a0f223a66514c0c583c9321d2a7"
+  },
+  "candidateCensus": [
+    {
+      "candidate": "graphify_files.file_id",
+      "verdict": "DISQUALIFIED_REVISION_IDENTITY",
+      "reasons": [
+        "ID_CHANGED_ACROSS_REVISIONS:357/357"
+      ]
+    },
+    {
+      "candidate": "graphify_symbols.file_id",
+      "verdict": "DISQUALIFIED_REVISION_IDENTITY",
+      "reasons": [
+        "ID_CHANGED_ACROSS_REVISIONS:357/357"
+      ]
+    },
+    {
+      "candidate": "atlas_packets.file_id",
+      "verdict": "DISQUALIFIED_PACKET_LOCAL",
+      "reasons": [
+        "ASSIGNED_PER_PACKET_ROW"
+      ]
+    },
+    {
+      "candidate": "atlas_source_refs.source_ref_key",
+      "verdict": "DISQUALIFIED_PATH_IDENTITY",
+      "reasons": [
+        "IDENTITY_IS_A_PATH_STRING"
+      ]
+    },
+    {
+      "candidate": "atlas_workspace_source_bindings.canonical_source_ref",
+      "verdict": "DISQUALIFIED_PATH_IDENTITY",
+      "reasons": [
+        "IDENTITY_IS_A_PATH_STRING"
+      ]
+    },
+    {
+      "candidate": "atlas_source_aliases (source identity columns)",
+      "verdict": "DISQUALIFIED_PATH_IDENTITY",
+      "reasons": [
+        "IDENTITY_IS_A_PATH_STRING"
+      ]
+    },
+    {
+      "candidate": "sourceIdentityKey (repository_id:repository_relative_path)",
+      "verdict": "DISQUALIFIED_PATH_IDENTITY",
+      "reasons": [
+        "IDENTITY_IS_A_PATH_STRING"
+      ]
+    }
+  ],
+  "writerCensus": {
+    "scope": "Informational: no candidate is QUALIFIED, so the canonical-creator requirements cannot be applied. Static scan only; liveness of each writer is UNKNOWN.",
+    "graphify_files": {
+      "assignedBy": "column default gen_random_uuid() on INSERT",
+      "writers": [
+        "scripts/atlas/graphify-symbol-extractor-v1.mts",
+        "scripts/atlas/smoke-graphify-symbol-lane-v1.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
+        "sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts"
+      ],
+      "classification": "UNKNOWN",
+      "note": "a new row (new id) per source revision, so the id is regenerated during revision ingest"
+    },
+    "atlas_packets_file_id": {
+      "assignedBy": "randomUUID() in sveltekit-frontend/scripts/atlas/backfill-unified-id-hierarchy.mjs",
+      "writers": [
+        "sveltekit-frontend/scripts/atlas/backfill-unified-id-hierarchy.mjs"
+      ],
+      "classification": "LEGACY_DUPLICATE",
+      "note": "a second, unrelated random file_id namespace (0 overlap with graphify_files.file_id); the script itself says random is a placeholder"
+    },
+    "atlas_source_refs": {
+      "writers": [
+        "scripts/atlas/apply-current-source-registry-reconciliation-v1.mjs",
+        "scripts/atlas/apply-feature-ontology-alias-target-registry-v1.mjs",
+        "scripts/atlas/apply-file-level-source-refs-content-reconciled-v1.mjs",
+        "scripts/atlas/plan-current-execution-source-refs-v1.mjs",
+        "sveltekit-frontend/scripts/atlas/populate-atlas-ast-nodes.mjs"
+      ],
+      "classification": "UNKNOWN",
+      "createsIdentity": "path key (not opaque)"
+    },
+    "atlas_workspace_source_bindings": {
+      "writers": [
+        "scripts/atlas/apply-admitted-workspace-source-bindings-content-reconciled-v1.mjs",
+        "scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs",
+        "scripts/atlas/apply-current-workspace-source-bindings-v1.mjs",
+        "scripts/atlas/smoke-graphify-symbol-lane-v1.mjs"
+      ],
+      "classification": "UNKNOWN",
+      "createsIdentity": "path key + revision rows"
+    },
+    "atlas_source_aliases": {
+      "writers": [],
+      "classification": "DEAD_WRITER",
+      "note": "no writer exists"
+    },
+    "atlas_identity_alias_decisions": {
+      "writers": [
+        "scripts/atlas/prove-feature-intelligence-database.mjs"
+      ],
+      "classification": "UNKNOWN",
+      "entityKindConstraint": "CHECK ((entity_kind = ANY (ARRAY['test'::text, 'schema_object'::text])))"
+    }
+  },
+  "coverage": {
+    "exactStableIdentity": 0,
+    "missingStableIdentity": 25542,
+    "ambiguousStableIdentity": 0,
+    "missingWorkspaceBinding": 1086,
+    "repositoryNamespaceUnproven": 25542,
+    "note": "No opaque logical-file identity exists for any admitted source. For repo:root the registry holds PATH-keyed file-level rows (24,456) but those are path identity. The 1,086 nested-repository sources have no registry identity at all (CASE 2), by writer scope."
+  },
+  "semantics": {
+    "revisionStable": "ONLY_AS_A_PATH_KEY",
+    "moveStable": "BLOCKED_NO_EVIDENCE",
+    "pathReuseSafe": false,
+    "repositoryScoped": "BLOCKED_NO_EVIDENCE",
+    "pathIndependent": false,
+    "contentIndependent": true,
+    "detail": {
+      "candidate": "atlas_source_refs.source_ref_key (+ atlas_workspace_source_bindings)",
+      "REVISION_STABILITY": {
+        "state": "PROVEN",
+        "detail": "198 logical sources have multiple known revisions in the bindings and their key is constant across them",
+        "caveat": "constant only because the key IS the path; this does not make it a stable file identity"
+      },
+      "PATH_ALIAS_STABILITY": {
+        "state": "BLOCKED_NO_EVIDENCE",
+        "detail": "atlas_source_aliases has 0 rows and no writer; atlas_identity_alias_decisions has 0 rows and its entity_kind constraint is ((entity_kind = ANY (ARRAY['test'::text, 'schema_object'::text])))",
+        "caveat": "absence of move evidence is not proof of move survival"
+      },
+      "PATH_REUSE_SAFETY": {
+        "state": "VIOLATED",
+        "detail": "identity is the path, so a deleted and recreated path inherits it; effective_from/effective_to populated on 0 of 46945 rows (no lifecycle identity)",
+        "caveat": "structural, not observed reuse"
+      },
+      "REPOSITORY_SCOPE": {
+        "state": "BLOCKED_NO_EVIDENCE",
+        "detail": "registry repo_id values in use: deeds-web-app (one); identical relative paths in a second repository cannot be shown to resolve to different identities",
+        "caveat": "Graphify keys include repository_id, the registry does not carry the nested repositories at all"
+      },
+      "ID_ASSIGNED_ONCE_OR_REGENERATED": {
+        "state": "PROVEN",
+        "detail": "no opaque id exists in these tables; the key is deterministic from the path"
+      },
+      "CONTENT_HASH_SEPARATE": {
+        "state": "PROVEN",
+        "detail": "content_hash (registry) and source_revision/content_digest (bindings) are separate columns"
+      },
+      "CURRENT_PATH_SEPARATE": {
+        "state": "VIOLATED",
+        "detail": "the key and the current path are the same string for file-level rows"
+      }
+    }
+  },
+  "repositories": {
+    "root": {
+      "graphifyRepositoryIdentity": "repo:root",
+      "registryRepositoryIdentity": "deeds-web-app",
+      "sourceCount": 24456,
+      "sourceRefsPresent": 24456,
+      "workspaceBindingsPresent": 24456,
+      "aliasesPresent": 0,
+      "coincidentalInnerPathMatchesNotIdentityEvidence": null,
+      "repositoryMappingEvidence": {
+        "exactRegistryKey": true,
+        "persistedMapping": false,
+        "sourceArtifact": {
+          "file": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+          "kind": "ROOT",
+          "relativePath": "",
+          "head": "cb122d7415a9a3ed570b759495888bf0a8c71413"
+        },
+        "configurationOwner": {
+          "kind": "HARDCODED_CONSTANT_IN_WRITERS",
+          "constant": "REPO_ID = 'deeds-web-app'",
+          "files": [
+            "scripts/atlas/apply-admitted-workspace-source-bindings-content-reconciled-v1.mjs",
+            "scripts/atlas/apply-file-level-source-refs-content-reconciled-v1.mjs"
+          ],
+          "scope": "writers filter repositoryId === 'repo:root' only"
+        },
+        "countOrPathInferenceOnly": true,
+        "rule": "equal counts, matching paths, common parent directory and repo:root ancestry are NOT accepted as repository identity proof"
+      },
+      "namespaceStatus": "NAMESPACE_AMBIGUOUS",
+      "namespaceStatusReason": "the repo:root -> deeds-web-app link is a constant inside writer scripts, not a persisted mapping; sources are bound but the namespace is not proven by a persisted key"
+    },
+    "nested": [
+      {
+        "graphifyRepositoryIdentity": "repo:claude-mem",
+        "registryRepositoryIdentity": null,
+        "sourceCount": 763,
+        "sourceRefsPresent": 0,
+        "workspaceBindingsPresent": 0,
+        "aliasesPresent": 0,
+        "coincidentalInnerPathMatchesNotIdentityEvidence": 6,
+        "repositoryMappingEvidence": {
+          "exactRegistryKey": false,
+          "persistedMapping": false,
+          "sourceArtifact": {
+            "file": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+            "kind": "SUBMODULE",
+            "relativePath": "claude-mem",
+            "head": "5f0a63fa508762632dcf72964a9fff4db6a016ae"
+          },
+          "configurationOwner": null,
+          "countOrPathInferenceOnly": true,
+          "rule": "equal counts, matching paths, common parent directory and repo:root ancestry are NOT accepted as repository identity proof"
+        },
+        "namespaceStatus": "REGISTRY_IDENTITY_MISSING",
+        "namespaceStatusReason": "no registry repo_id exists for this repository and the registry writers are scoped to repo:root only"
+      },
+      {
+        "graphifyRepositoryIdentity": "repo:mcp-server-mcp",
+        "registryRepositoryIdentity": null,
+        "sourceCount": 192,
+        "sourceRefsPresent": 0,
+        "workspaceBindingsPresent": 0,
+        "aliasesPresent": 0,
+        "coincidentalInnerPathMatchesNotIdentityEvidence": 5,
+        "repositoryMappingEvidence": {
+          "exactRegistryKey": false,
+          "persistedMapping": false,
+          "sourceArtifact": {
+            "file": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+            "kind": "SUBMODULE",
+            "relativePath": "mcp-server-mcp",
+            "head": "35b6a5a51ccfcfb228a317a8f8261dd91012d30b"
+          },
+          "configurationOwner": null,
+          "countOrPathInferenceOnly": true,
+          "rule": "equal counts, matching paths, common parent directory and repo:root ancestry are NOT accepted as repository identity proof"
+        },
+        "namespaceStatus": "REGISTRY_IDENTITY_MISSING",
+        "namespaceStatusReason": "no registry repo_id exists for this repository and the registry writers are scoped to repo:root only"
+      },
+      {
+        "graphifyRepositoryIdentity": "repo:turbovec",
+        "registryRepositoryIdentity": null,
+        "sourceCount": 86,
+        "sourceRefsPresent": 0,
+        "workspaceBindingsPresent": 0,
+        "aliasesPresent": 0,
+        "coincidentalInnerPathMatchesNotIdentityEvidence": 2,
+        "repositoryMappingEvidence": {
+          "exactRegistryKey": false,
+          "persistedMapping": false,
+          "sourceArtifact": {
+            "file": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+            "kind": "SUBMODULE",
+            "relativePath": "turbovec",
+            "head": "7351fc621368ea49797b710dff6448c9238605ca"
+          },
+          "configurationOwner": null,
+          "countOrPathInferenceOnly": true,
+          "rule": "equal counts, matching paths, common parent directory and repo:root ancestry are NOT accepted as repository identity proof"
+        },
+        "namespaceStatus": "REGISTRY_IDENTITY_MISSING",
+        "namespaceStatusReason": "no registry repo_id exists for this repository and the registry writers are scoped to repo:root only"
+      },
+      {
+        "graphifyRepositoryIdentity": "repo:sites/parent-atlas-gateboard",
+        "registryRepositoryIdentity": null,
+        "sourceCount": 22,
+        "sourceRefsPresent": 0,
+        "workspaceBindingsPresent": 0,
+        "aliasesPresent": 0,
+        "coincidentalInnerPathMatchesNotIdentityEvidence": 6,
+        "repositoryMappingEvidence": {
+          "exactRegistryKey": false,
+          "persistedMapping": false,
+          "sourceArtifact": {
+            "file": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+            "kind": "SUBMODULE",
+            "relativePath": "sites/parent-atlas-gateboard",
+            "head": "b77248ff61ac5238705b57ec4a83bb91a55a3257"
+          },
+          "configurationOwner": null,
+          "countOrPathInferenceOnly": true,
+          "rule": "equal counts, matching paths, common parent directory and repo:root ancestry are NOT accepted as repository identity proof"
+        },
+        "namespaceStatus": "REGISTRY_IDENTITY_MISSING",
+        "namespaceStatusReason": "no registry repo_id exists for this repository and the registry writers are scoped to repo:root only"
+      },
+      {
+        "graphifyRepositoryIdentity": "repo:models/embeddinggemma_300m",
+        "registryRepositoryIdentity": null,
+        "sourceCount": 13,
+        "sourceRefsPresent": 0,
+        "workspaceBindingsPresent": 0,
+        "aliasesPresent": 0,
+        "coincidentalInnerPathMatchesNotIdentityEvidence": 2,
+        "repositoryMappingEvidence": {
+          "exactRegistryKey": false,
+          "persistedMapping": false,
+          "sourceArtifact": {
+            "file": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+            "kind": "SUBMODULE",
+            "relativePath": "models/embeddinggemma_300m",
+            "head": "81e2a3b87eebf4bf78bbbedeb1c98dbe2522c3cd"
+          },
+          "configurationOwner": null,
+          "countOrPathInferenceOnly": true,
+          "rule": "equal counts, matching paths, common parent directory and repo:root ancestry are NOT accepted as repository identity proof"
+        },
+        "namespaceStatus": "REGISTRY_IDENTITY_MISSING",
+        "namespaceStatusReason": "no registry repo_id exists for this repository and the registry writers are scoped to repo:root only"
+      },
+      {
+        "graphifyRepositoryIdentity": "repo:granite-docling-258M",
+        "registryRepositoryIdentity": null,
+        "sourceCount": 10,
+        "sourceRefsPresent": 0,
+        "workspaceBindingsPresent": 0,
+        "aliasesPresent": 0,
+        "coincidentalInnerPathMatchesNotIdentityEvidence": 2,
+        "repositoryMappingEvidence": {
+          "exactRegistryKey": false,
+          "persistedMapping": false,
+          "sourceArtifact": {
+            "file": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+            "kind": "SUBMODULE",
+            "relativePath": "granite-docling-258M",
+            "head": "982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe"
+          },
+          "configurationOwner": null,
+          "countOrPathInferenceOnly": true,
+          "rule": "equal counts, matching paths, common parent directory and repo:root ancestry are NOT accepted as repository identity proof"
+        },
+        "namespaceStatus": "REGISTRY_IDENTITY_MISSING",
+        "namespaceStatusReason": "no registry repo_id exists for this repository and the registry writers are scoped to repo:root only"
+      }
+    ]
+  },
+  "proof": {
+    "ownerUnique": false,
+    "fullCohortCoverage": false,
+    "revisionSemantics": false,
+    "aliasSemantics": false,
+    "repositoryNamespace": false,
+    "writerOwnership": false
+  },
+  "result": "STABLE_FILE_ID_OWNER_MISSING",
+  "owner": null,
+  "blockers": [
+    "NO_CANDIDATE_SATISFIES_ALL_REQUIREMENTS",
+    "NO_PRODUCER_OR_CONSUMER_OF_stableFileId_IN_SCRIPTS_OR_SRC",
+    "NESTED_REPOSITORIES_HAVE_NO_REGISTRY_IDENTITY:6_repos_1086_sources",
+    "atlas_source_aliases_EMPTY_NO_WRITER",
+    "atlas_identity_alias_decisions_entity_kind_EXCLUDES_file",
+    "atlas_packets.file_id_IS_A_RANDOM_PLACEHOLDER_NAMESPACE"
+  ],
+  "decisionRequired": "A file identity owner would be a NEW registry (registry/aliases/versions following the atlas_symbol_registry pattern, enabling entity_kind=file in the alias-decision ledger, and covering the nested repositories). That is a schema change and a new identity owner. It is not done here; no generator, namespace, table, column or row was added. It needs its own explicitly designed and authorized gate.",
+  "safety": {
+    "databaseWrites": 0,
+    "registryWrites": 0,
+    "schemaChanges": 0,
+    "graphifyRun": false,
+    "readerCutover": false,
+    "inputIdentityBackfill": false,
+    "vectorWrites": 0,
+    "graphWrites": 0,
+    "cacheWrites": 0,
+    "newIdentityNamespaceCreated": false,
+    "idGeneratorAdded": false,
+    "transaction": "REPEATABLE READ READ ONLY, ROLLBACK"
+  },
+  "receiptChecksum": "sha256:783bcde940bb167666fa8668e039c96af2004dbc0e5bed7d7dda09475ed175c0",
+  "versionedReceipt": "docs/reports/stable-file-identity-owner-v1.783bcde940bb.json"
+}

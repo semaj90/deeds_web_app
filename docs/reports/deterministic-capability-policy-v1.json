@@ -1,0 +1,59 @@
+{
+  "schema": "ParentAtlasDeterministicCapabilityPolicyProofV1",
+  "generatedAt": "2026-09-19T01:32:51.579Z",
+  "status": "DETERMINISTIC_POLICY_PLUMBING_PROVEN",
+  "evidenceClass": "FIXTURE_ONLY",
+  "classifierExecuted": false,
+  "learnedModelPromoted": false,
+  "capabilityPolicyOwner": "retrieval-executor-policy-v2.ts",
+  "logicalNeedsOnly": true,
+  "implementationNamesPredictedByClassifier": false,
+  "input": {
+    "classificationSchema": "atlas.query-classification.v2",
+    "semanticRepresentation": "semantic_768",
+    "envelope": {
+      "gpuAvailable": true,
+      "allowGpuAnn": true,
+      "allowDiskAnn": false,
+      "allowSparseNeural": true,
+      "allowReranker": false,
+      "maxCandidates": 128,
+      "maxGraphHops": 1
+    }
+  },
+  "plan": {
+    "schema": "atlas.retrieval-executor-plan.v2",
+    "semanticRepresentation": "semantic_768",
+    "lexical": [
+      "postgres_fts"
+    ],
+    "sparse": [],
+    "semantic": [],
+    "ast": [
+      "ast_structural"
+    ],
+    "graph": [
+      "graph_bounded"
+    ],
+    "rerank": [],
+    "buildOnly": [],
+    "candidateBudget": 128,
+    "graphHops": 1,
+    "oneVotePerLogicalLane": true,
+    "evidenceAuthority": false,
+    "canonicalWritesAllowed": false,
+    "decisions": [
+      "semantic_requested_but_no_proven_executor",
+      "sparse_requested_but_no_proven_executor"
+    ]
+  },
+  "expectedFailClosedBehavior": {
+    "unprovenQdrantCuVSExecutorsExcluded": true,
+    "lexicalBaselineAllowed": true,
+    "astAndGraphAreSeparateLanes": true
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "canonicalWritesAllowed": false,
+  "nextRequirement": "REVISION_QUALIFIED_CLASSIFICATION_AND_LIVE_CAPABILITY_RECEIPTS"
+}

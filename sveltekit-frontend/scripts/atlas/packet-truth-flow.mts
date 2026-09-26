@@ -361,7 +361,7 @@ async function main() {
     },
     gemma4: {
       url: process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090',
-      model: 'gemma4-rotorquant:latest',
+      model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
       temperature: 0.3,
       maxTokens: 1024
     },

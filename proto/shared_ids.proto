@@ -40,6 +40,40 @@ message RunIds {
   int32 embedding_dim = 8;
 }
 
+// AtlasRequestContext carries caller-owned identity into an adapter boundary.
+// Empty values are invalid for Stage 13 receipt admission; proto3 optional
+// fields are reserved for values that are genuinely unavailable.
+message AtlasRequestContextV2 {
+  string tool_call_id = 1;
+  string run_id = 2;
+  string workspace_id = 3;
+  string workspace_revision = 4;
+  string packet_key = 5;
+  string packet_revision = 6;
+}
+
+// AtlasToolReceipt is an observation projection, not a canonical write owner.
+message AtlasToolReceiptV2 {
+  string schema = 1;
+  string tool_call_id = 2;
+  string tool_name = 3;
+  string run_id = 4;
+  string workspace_id = 5;
+  string workspace_revision = 6;
+  string packet_key = 7;
+  string packet_revision = 8;
+  bool succeeded = 9;
+  optional float retrieval_confidence = 10;
+  int32 evidence_count = 11;
+  string validation_status = 12;
+  optional string output_checksum = 13;
+  optional string error_code = 14;
+  bool canonical_authority = 15;
+  bool writes_performed = 16;
+  string receipt_id = 17;
+  string receipt_checksum = 18;
+}
+
 // ArtifactRef is a pointer to a file written under memory/runs/<run_id>/
 message ArtifactRef {
   string run_id = 1;

@@ -1,3 +1,4 @@
+import { SERVER_CHAT_MODEL } from '../../ai/model-ids.js';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
@@ -10,7 +11,7 @@ const SOURCE_REF_PREFIX = 'atlas:summary:source_ref:v1:';
 const FEATURE_INDEX_PREFIX = 'atlas:summary:feature:v1:';
 const DEFAULT_PROMPT_VERSION = 'phase101-summary-v1';
 const DEFAULT_INTENT = 'summary';
-const DEFAULT_MODEL = 'gemma4-rotorquant:latest';
+const DEFAULT_MODEL = SERVER_CHAT_MODEL;
 const DEFAULT_TTL_SECONDS = 6 * 60 * 60;
 const SEMANTIC_THRESHOLD = 0.95;
 const SEMANTIC_SCAN_LIMIT = 100;

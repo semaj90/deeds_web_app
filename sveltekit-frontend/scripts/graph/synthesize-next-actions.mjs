@@ -310,7 +310,7 @@ async function callLLM(prompt) {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
-        model:       'gemma4-rotorquant:latest',
+        model:       (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
         messages:    [{ role: 'user', content: prompt }],
         stream:      false,
         temperature: 0.3,
@@ -326,40 +326,9 @@ async function callLLM(prompt) {
     }
   } catch (err) { /* quiet fallback */ }
 
-  // 3. Ollama direct :11434
-  try {
-    const ctrl  = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 600_000);
-    const res   = await fetch('http://localhost:11434/api/chat', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        model:    'gemma4-rotorquant:latest',
-        messages: [{ role: 'user', content: prompt }],
-        stream:   false,
-        options:  { temperature: 0.1, num_predict: 512 },
-      }),
-      signal:  ctrl.signal,
-    });
-    clearTimeout(timer);
-    if (res.ok) {
-      const d = await res.json();
-      let answer = (d.message?.content || '').trim();
-      if (!answer && d.message?.thinking) {
-        // If content is empty but thinking has value, use thinking but strip the internal monologue if possible
-        answer = d.message.thinking.split('\n\n').slice(-1)[0].trim();
-        if (answer.length < 50) answer = d.message.thinking.trim(); // fallback
-      }
-      if (!answer) answer = (d.response || '').trim();
-      return { answer, toolsUsed: [], rounds: 1, backend: 'ollama-direct' };
-    } else {
-      console.error(`[llm] ollama-direct error: ${res.status} ${res.statusText}`);
-    }
-  } catch (err) {
-    console.error(`[llm] ollama-direct failed: ${err.message}`);
-  }
+  // (Ollama chat tier removed: Ollama is embeddings-only; chat goes through llama-server / the dev server.)
 
-  return { answer: '_(synthesis unavailable — start dev server or Ollama)_', toolsUsed: [], rounds: 0, backend: 'none' };
+  return { answer: '_(synthesis unavailable — start the dev server or llama-server)_', toolsUsed: [], rounds: 0, backend: 'none' };
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────

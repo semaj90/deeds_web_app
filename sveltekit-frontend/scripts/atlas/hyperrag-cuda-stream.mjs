@@ -144,7 +144,7 @@ async function rotorquantInfer(contextStr, query, centroidCount) {
   const userMsg = `Context (${centroidCount} semantic clusters):\n\n${contextStr}\n\nQuestion: ${query}`;
 
   const body = {
-    model: 'gemma4-rotorquant:latest',  // resolved by llama-server to whatever is loaded
+    model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),  // resolved by llama-server to whatever is loaded
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userMsg },

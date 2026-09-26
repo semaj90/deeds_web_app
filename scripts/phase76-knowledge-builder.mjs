@@ -2,6 +2,7 @@
 // Phase 76 Level 2: Knowledge Builder
 // Crawls documentation, generates embeddings, stores in Qdrant + MinIO + Postgres
 
+import { llamaChat } from './atlas/lib/llama-inference.mjs';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { storeDeepKnowledge } from './phase76-storage-layer.mjs';
 import dotenv from 'dotenv';
@@ -65,21 +66,7 @@ async function processUrl(url) {
 
     // 3. Generate summary using LLM
     console.log(`   🤖 Generating summary...`);
-    const summaryResponse = await fetch('http://localhost:11434/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma3-legal:latest',
-        prompt: `Summarize this documentation in 2-3 sentences:\n\n${markdown.slice(0, 4000)}`,
-        stream: false
-      })
-    });
-
-    if (!summaryResponse.ok) {
-      throw new Error(`LLM failed: ${summaryResponse.statusText}`);
-    }
-
-    const summaryData = await summaryResponse.json();
+    const summaryData = { response: await llamaChat(`Summarize this documentation in 2-3 sentences:\n\n${markdown.slice(0, 4000)}`, { maxTokens: 300 }) }; // llama-server (Ornith 1.5); Ollama is embeddings-only
     const summary = summaryData.response || markdown.slice(0, 500);
 
     // 4. Generate Embedding

@@ -107,43 +107,9 @@ export const phase18RerankerProcedure = publicProcedure
       };
     }
 
-    // Production: Load trained XGBoost model and run inference
-    // For now: placeholder scoring
-    const predictions = packets.map((packet, index) => {
-      const featureVec = features[index].values;
-      const avgFeature = featureVec.reduce((a, b) => a + b, 0) / featureVec.length;
-      const score = Math.min(1.0, avgFeature + 0.1 * Math.random());
-
-      return {
-        packetKey: packet.packetKey,
-        rerankScore: score,
-        confidence: 0.8 + 0.2 * Math.random(),
-        reason: returnReasons
-          ? `Average feature value ${avgFeature.toFixed(3)}`
-          : undefined,
-        modelVersion: '1.0-placeholder',
-        latencyMs: returnLatency ? Math.floor(5 + Math.random() * 15) : undefined
-      };
-    });
-
-    // Sort and take topK
-    const sortedResults = predictions
-      .sort((a, b) => b.rerankScore - a.rerankScore)
-      .slice(0, topK);
-
-    // Summary statistics
-    const successCount = sortedResults.filter(r => r.rerankScore >= 0.5).length;
-    const errorCount = sortedResults.filter(r => r.rerankScore < 0.1).length;
-    const avgScore = sortedResults.length > 0
-      ? sortedResults.reduce((sum, r) => sum + r.rerankScore, 0) / sortedResults.length
-      : 0;
-    const avgConfidence = sortedResults.length > 0
-      ? sortedResults.reduce((sum, r) => sum + r.confidence, 0) / sortedResults.length
-      : 0;
-    const totalLatencyMs = returnLatency
-      ? sortedResults.reduce((sum, r) => sum + (r.latencyMs || 0), 0)
-      : undefined;
-
+    // Do not return synthetic or non-deterministic scores. This legacy
+    // envelope has no admitted revision-qualified feature bundle or owned
+    // model identity. Scoring remains at the canonical executor boundary.
     const response: Phase18ResponseEnvelope = {
       metadata: {
         envelopeId: randomUUID(),
@@ -156,20 +122,25 @@ export const phase18RerankerProcedure = publicProcedure
         mode: input.metadata.mode || 'inference'
       },
       requestId: input.metadata.requestId,
-      success: true,
-      results: sortedResults,
-      summary: {
-        totalPackets: packets.length,
-        successCount,
-        errorCount,
-        avgScore,
-        avgConfidence,
-        totalLatencyMs
+      success: false,
+      results: [],
+      error: {
+        code: 'OWNED_RERANKER_NOT_ADMITTED',
+        message: 'Phase 18 scoring is unavailable until a revision-qualified owned model and feature bundle are admitted.',
+        details: {
+          canonicalOwner: 'canonical-rerank-executor',
+          legacyFeatureDimension: 13,
+          totalPackets: packets.length,
+          requestedTopK: topK,
+          returnReasons,
+          returnLatency,
+          writesPerformed: false,
+        },
       },
       cache: {
-        cacheKey: `phase18:${input.metadata.envelopeId}`,
+        cacheKey: undefined,
         ttlSeconds: 3600,
-        canCache: true
+        canCache: false
       }
     };
 
@@ -223,42 +194,11 @@ export const phase18RerankerMutationProcedure = publicProcedure
       };
     }
 
-    // Perform reranking (same as query procedure)
+    // Do not synthesize results in a mutation path. The legacy procedure has
+    // no admitted model/feature lineage and no authorized persistence owner.
     const validInput = validation.data as Phase18RequestEnvelope;
     const { packets, params = {} as any } = validInput;
     const { topK = 10, returnReasons = false } = params;
-
-    const predictions = packets.map((packet) => {
-      const featureVec = packet.features.values;
-      const avgFeature = featureVec.reduce((a, b) => a + b, 0) / featureVec.length;
-      const score = Math.min(1.0, avgFeature + 0.1 * Math.random());
-
-      return {
-        packetKey: packet.packetKey,
-        rerankScore: score,
-        confidence: 0.8 + 0.2 * Math.random(),
-        reason: returnReasons ? `Average feature value ${avgFeature.toFixed(3)}` : undefined,
-        modelVersion: '1.0-placeholder'
-      };
-    });
-
-    const sortedResults = predictions
-      .sort((a, b) => b.rerankScore - a.rerankScore)
-      .slice(0, topK);
-
-    // Side effects (production only)
-    let persistedAt: string | undefined;
-    let cachedAt: string | undefined;
-    let eventsEmitted = 0;
-
-    // TODO: Persist to Postgres task_semantic_packets
-    // persistedAt = await persistRerankerResults(sortedResults);
-
-    // TODO: Update Redis cache
-    // cachedAt = await cacheRerankerResults(sortedResults);
-
-    // TODO: Emit events
-    // eventsEmitted = await emitRerankerEvents(sortedResults);
 
     const response = {
       metadata: {
@@ -272,19 +212,24 @@ export const phase18RerankerMutationProcedure = publicProcedure
         mode: input.metadata.mode || 'inference'
       },
       requestId: input.metadata.requestId,
-      success: true,
-      results: sortedResults,
-      summary: {
-        totalPackets: packets.length,
-        successCount: sortedResults.filter(r => r.rerankScore >= 0.5).length,
-        errorCount: sortedResults.filter(r => r.rerankScore < 0.1).length,
-        avgScore: sortedResults.reduce((sum, r) => sum + r.rerankScore, 0) / sortedResults.length,
-        avgConfidence: sortedResults.reduce((sum, r) => sum + r.confidence, 0) / sortedResults.length
+      success: false,
+      results: [],
+      error: {
+        code: 'OWNED_RERANKER_NOT_ADMITTED',
+        message: 'Phase 18 mutation is unavailable until a revision-qualified owned model and feature bundle are admitted.',
+        details: {
+          canonicalOwner: 'canonical-rerank-executor',
+          legacyFeatureDimension: 13,
+          requestedTopK: topK,
+          returnReasons,
+          writesPerformed: false,
+          persistencePerformed: false,
+          cacheWritePerformed: false,
+          eventsEmitted: 0,
+        },
       },
       auditTrail: {
-        persistedAt,
-        cachedAt,
-        eventsEmitted
+        eventsEmitted: 0
       }
     };
 

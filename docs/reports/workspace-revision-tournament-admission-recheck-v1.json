@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.workspace-revision-tournament-admission.v1",
+  "generatedAt": "2026-09-15T00:58:26.527Z",
+  "mode": "EXPLICIT_BOUNDED_ADMISSION_RECEIPT",
+  "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
+  "proofLevel": "BOUNDED_LIVE_PROVEN",
+  "authority": true,
+  "workspaceRevision": "sha256:0cfd3f610cec5cded5228eb1fa676377cd88d2f2dbfccd8e264551f0a9fc0637",
+  "snapshotRevision": "sha256:1e33de94123d0f2475b98e75b218033eb310622c5a6cef616c361a7dabebbd52",
+  "sourceCount": 25542,
+  "sourceSelectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "snapshotMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\1e33de94123d0f2475b98e75b218033eb310622c5a6cef616c361a7dabebbd52.json",
+  "approval": {
+    "confirmation": "AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1",
+    "scope": "TOURNAMENT_SOURCE_AUTHORITY_ONLY"
+  },
+  "graphifyExecutionAuthorized": false,
+  "projectionWritesAuthorized": false,
+  "autoApply": false,
+  "training": false,
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "preflightPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-tournament-source-authority-recheck-v3.json",
+  "nextGate": "GRAPHIFY-BOUNDED-TOURNAMENT-CANARY-01"
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T21:09:23Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-gpu-runtime-abi-alignment",
+      "progress": "Strict OpenSpec passes at 17/22, but the change freezes candidate/feature artifacts, sample-query evaluation, and RAPIDS re-census ahead of the native bridge and downstream GPU parity work.",
+      "to": "parent-atlas-candidate-feature-execution-fabric",
+      "task": "inspect the frozen-priority dependency for a bounded canonical CandidateOrdinal/feature artifact gate",
+      "outcome": "Strict validation passes (185/276). Exact current lineage evidence says firstFailureBoundary=EXECUTION_SOURCE_AUTHORITY and candidateOrdinalEligibleRows=0 across the current semantic candidate snapshot (4,951 candidates; snapshotPath=null). The read-only lexical-stat receipt is stable with checksum 6f4ffc6f3f81791f57e45b45871a1ebe911612ec818c42254fbffb7f032ee7f7, but no fixed known-good query/top-k baseline receipt was found in the targeted evidence inventory, so QUERY-FEATURE-05 cannot be evaluated without inventing labels.",
+      "reason": "This is the explicit upstream prerequisite named by the GPU ABI change's priority order; target only the precise missing artifact rather than traversing all 94 open tasks."
+    }
+  ],
+  "scope": {
+    "readOnlyUntilTaskClassification": true,
+    "candidateFiles": [
+      "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "openspec/changes/parent-atlas-candidate-feature-execution-fabric/proposal.md",
+      "openspec/changes/parent-atlas-candidate-feature-execution-fabric/design.md",
+      "openspec/changes/parent-atlas-candidate-feature-execution-fabric/specs"
+    ],
+    "forbidden": [
+      "invented CandidateOrdinal identity or source revision",
+      "canonical promotion without authority evidence",
+      "datastore writes",
+      "container rebuilds until end of workboard tranche",
+      "Graphify"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "previousChange": "parent-atlas-gpu-runtime-abi-alignment",
+    "previousChangeProgress": "17/22",
+    "previousStrictOpenSpec": "PASS",
+    "candidateFeatureInspection": "COMPLETE; UPSTREAM AUTHORITY AND EVALUATION BASELINES MISSING",
+    "candidateFeatureProgress": "185/276",
+    "strictOpenSpec": "PASS",
+    "currentLineageFirstFailure": "EXECUTION_SOURCE_AUTHORITY",
+    "candidateOrdinalEligibleRows": 0,
+    "currentSemanticCandidateRows": 4951,
+    "currentSemanticSnapshotPath": null,
+    "lexicalStatsReceipt": "QUERY_LEXICAL_STATS_READ_ONLY_PROVEN; replayStable=true; checksum=6f4ffc6f3f81791f57e45b45871a1ebe911612ec818c42254fbffb7f032ee7f7",
+    "queryFeature05": "WAITING_FOR_FROZEN_KNOWN_GOOD_QUERY_TOPK_BASELINE",
+    "datastoreWrites": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "CANDIDATE_FEATURE_ARTIFACTS_WAITING_FOR_SOURCE_AUTHORITY; LEXICAL_KMEANS_WAITING_FOR_EVALUATION_BASELINE"
+}

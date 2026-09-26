@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.wfu-bitmap-aio-fixture.v1",
+  "generatedAt": "2026-09-23T18:48:58Z",
+  "status": "BITMAP_AND_PROVEN_AIO_EXECUTION_NOT_OBSERVED",
+  "purpose": "Bounded planner fixture for WFU-07; not a production corpus or performance claim.",
+  "database": {
+    "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "ioMethod": "worker",
+    "pgAiosInFlightAfterQuery": 0,
+    "aioExecution": "NOT_OBSERVED; zero in-flight handles do not establish whether AIO was exercised during the completed query"
+  },
+  "fixture": {
+    "relation": "temporary wfu_bitmap_fixture",
+    "rows": 32768,
+    "indexes": [
+      "B-tree(domain_id)",
+      "B-tree(language_id)",
+      "B-tree(is_active)",
+      "GIN(to_tsvector('english', body))"
+    ],
+    "predicates": [
+      "domain_id = 7",
+      "language_id = 3",
+      "is_active",
+      "to_tsvector('english', body) @@ plainto_tsquery('english', 'needle')"
+    ],
+    "defaultPlanner": {
+      "planNodes": [
+        "Limit",
+        "Bitmap Heap Scan",
+        "BitmapAnd",
+        "Bitmap Index Scan",
+        "Bitmap Index Scan"
+      ],
+      "bitmapAndPredicates": [
+        "domain_id = 7 via wfu_bitmap_domain_idx",
+        "language_id = 3 via wfu_bitmap_language_idx"
+      ],
+      "residualFilters": [
+        "is_active",
+        "full-text needle predicate"
+      ],
+      "actualRows": 16,
+      "executionMs": 0.25,
+      "sharedReadBlocks": 0,
+      "sharedHitBlocks": 0,
+      "walRecords": 0,
+      "settings": {}
+    },
+    "transaction": "temporary table and indexes created in transaction; ROLLBACK completed"
+  },
+  "liveCorpusPreflight": {
+    "domainTaxonomyRows": 0,
+    "activeDomainTaxonomyRows": 0,
+    "atlasPacketsCanonicalTrueRows": 0,
+    "consequence": "No production-shaped active topic/domain corpus is available for this query yet."
+  },
+  "result": {
+    "bitmapAndCapability": "PROVEN_WITH_SYNTHETIC_TEMP_FIXTURE",
+    "plannerSelectedByDefault": true,
+    "aioExecution": "NOT_OBSERVED",
+    "productionSearchProof": false,
+    "canonicalAuthority": false,
+    "persistentWrites": false
+  },
+  "writes": {
+    "persistentPostgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

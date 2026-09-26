@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "atlas:docs:ranker:adapt": "node scripts/atlas/adapt-openspec-controller-to-ranker-v2.mjs",
+    "atlas:docs:board:topics": "node scripts/atlas/audit-openspec-board-topics-v1.mjs",
+    "atlas:docs:directory-graph": "node scripts/atlas/audit-openspec-directory-graph-v1.mjs . docs/reports/openspec-directory-graph-v1.json",
+    "atlas:docs:file-kmeans": "python scripts/atlas/cluster-openspec-file-graph-v1.py docs/reports/openspec-directory-graph-v1.json docs/reports/openspec-file-kmeans-v1.json 12 1337",
+    "atlas:docs:runtime-readiness": "node scripts/atlas/audit-atlas-runtime-readiness-v1.mjs . docs/reports docs/reports/atlas-runtime-readiness-v1.json",
+    "atlas:docs:challenger-tournament": "node scripts/atlas/build-openspec-challenger-tournament-v1.mjs docs/reports docs/reports/openspec-challenger-tournament-v1.json",
+    "atlas:docs:progress:v2": "node scripts/atlas/audit-openspec-progress-v2.mjs docs/reports docs/reports/openspec-progress-audit-v2.json",
+    "atlas:feedback:dataset": "node scripts/atlas/build-human-agent-feedback-dataset-v1.mjs",
+    "atlas:feedback:tensors": "python scripts/atlas/prepare-human-feedback-tensors-v1.py",
+    "atlas:feedback:train-shadow": "python scripts/atlas/train-shadow-preference-head-v1.py",
+    "atlas:docs:awareness": "node scripts/atlas/run-openspec-awareness-audit-v1.mjs . docs/reports",
+    "atlas:docs:actionable-audit": "node scripts/atlas/audit-openspec-actionable-readiness-v2.mjs",
+    "atlas:ranker:adapt:v3": "node scripts/atlas/adapt-openspec-controller-to-ranker-v3.mjs",
+    "atlas:ace:packet-draft": "node scripts/atlas/build-ace-packet-draft-v1.mjs"
+  }
+}

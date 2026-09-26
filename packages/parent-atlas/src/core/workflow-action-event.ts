@@ -26,6 +26,8 @@ export const workflowActionEventSchema = z.object({
   schema: z.literal('atlas.workflow-action.v1').default('atlas.workflow-action.v1'),
   workflowId: id,
   workflowRevision: z.number().int().nonnegative(),
+  /** Runtime-owned durable execution identity; never inferred from workflowId. */
+  runId: id,
   sequence: z.number().int().nonnegative(),
   actionId: id,
   parentActionId: id.optional(),
@@ -39,6 +41,13 @@ export const workflowActionEventSchema = z.object({
   resourceRefs: z.array(workflowResourceRefSchema).default([]),
   evidenceRefs: z.array(id).default([]),
   artifactRefs: z.array(id).default([]),
+  revisions: z.object({
+    workspace: revision,
+    source: revision.optional(),
+    graph: revision.optional(),
+    feature: revision.optional(),
+    representation: revision.optional(),
+  }).strict().optional(),
   startedAt: z.string().datetime().optional(),
   completedAt: z.string().datetime().optional(),
   errorCode: z.string().min(1).optional(),

@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.semantic768-qdrant-cuvs-identity-proof.v2",
+  "status": "SEMANTIC768_IDENTITY_FIXTURE_PARITY_PROVEN",
+  "liveStatus": "BLOCKED_CANDIDATE_POPULATION_FREEZE",
+  "source": "deterministic two-row fixture; no Qdrant/cuVS service calls",
+  "rowCount": 2,
+  "representationId": "semantic_768",
+  "representationRevision": "semantic_768:fixture-v1",
+  "dimension": 768,
+  "identityManifestChecksum": "579d1d7cf4fc044d7ceff203eeaa3f20df8051f778b199615367b00afe558c1b",
+  "matrixChecksum": "e0e3d4a6986eee87f6a11bd5047319a453cdf4fcb96adea88a20ef6c270229f3",
+  "sameIdentityManifest": true,
+  "sameMatrix": true,
+  "parityReceipt": {
+    "schema": "atlas.semantic768-executor-parity.v1",
+    "executors": [
+      "qdrant",
+      "cuvs_exact_fixture"
+    ],
+    "representationId": "semantic_768",
+    "representationRevision": "semantic_768:fixture-v1",
+    "dimension": 768,
+    "rowCount": 2,
+    "identityManifestChecksum": "579d1d7cf4fc044d7ceff203eeaa3f20df8051f778b199615367b00afe558c1b",
+    "matrixChecksum": "e0e3d4a6986eee87f6a11bd5047319a453cdf4fcb96adea88a20ef6c270229f3",
+    "sameIdentityManifest": true,
+    "sameMatrix": true,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "qdrantEnvelope": {
+    "executor": "qdrant",
+    "representationId": "semantic_768",
+    "representationRevision": "semantic_768:fixture-v1",
+    "dimension": 768,
+    "rowCount": 2,
+    "identityManifestChecksum": "579d1d7cf4fc044d7ceff203eeaa3f20df8051f778b199615367b00afe558c1b",
+    "matrixChecksum": "e0e3d4a6986eee87f6a11bd5047319a453cdf4fcb96adea88a20ef6c270229f3",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "cuvsEnvelope": {
+    "executor": "cuvs_exact_fixture",
+    "representationId": "semantic_768",
+    "representationRevision": "semantic_768:fixture-v1",
+    "dimension": 768,
+    "rowCount": 2,
+    "identityManifestChecksum": "579d1d7cf4fc044d7ceff203eeaa3f20df8051f778b199615367b00afe558c1b",
+    "matrixChecksum": "e0e3d4a6986eee87f6a11bd5047319a453cdf4fcb96adea88a20ef6c270229f3",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "candidateFreeze": {
+    "status": "CANDIDATE_POPULATION_FREEZE_BLOCKED",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "downstreamAllowed": false
+  },
+  "canonicalAuthority": false,
+  "downstreamAllowed": false,
+  "writesPerformed": false,
+  "databaseWrites": false,
+  "qdrantWrites": false,
+  "cuvsWrites": false,
+  "nextGate": "CURRENT_LINEAGE_AND_LIVE_QDRANT_CUVS_READBACK"
+}

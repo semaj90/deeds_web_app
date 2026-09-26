@@ -259,7 +259,10 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   nullable for now — `NOT NULL` is deferred until DOC-06A's admission writer (below) is the thing
   actually enforcing every row populates them, not added as a premature constraint ahead of it.
   Combined regression across all Phase A/B test files after this change: 67/67 pass.
-- [x] **DOC-06A** `EXTERNAL_DOC_POSTGRES_ADMISSION_01` — done, live-proven. Operator-directed,
+- [x] **DOC-06A** `EXTERNAL_DOC_POSTGRES_ADMISSION_01` — done, live-proven (writer/adapter contract proven earlier; **pinned corpus admitted 2026-09-23, operator-confirmed:** 30 pages / 852 chunks committed via
+  `sveltekit-frontend/scripts/atlas/run-external-doc-admission-v1.mts --apply`, `EXTERNAL_DOC_CANONICAL_ADMISSION_PROVEN`, receipt `docs/reports/external-doc-canonical-admission-v1.json`:
+  852/852 rows match id, evidence revision, checksum, byte length and text; 30 unique page and 852 unique chunk revisions/ids in Postgres; generated FTS works (43 hits for `snippet`);
+  no embeddings/Qdrant/Valkey/Neo4j; text = post-fidelity representation. Studio canonical FTS since proven, see STUDIO_CANONICAL_EXTERNAL_DOC_FTS; still open downstream: live embedding population for the 852 admitted chunks (DOC-07/DOC-08 are separately checked as infrastructure/projection proofs), analyses). Operator-directed,
   depends on DOC-04/05/06. The missing join: DOC-06 proved the tables and their invariants via
   hand-written SQL; nothing yet takes the real Python `chunk_document()`/`fetch_beautifulsoup()`
   output and transactionally admits it. Scope: a TypeScript admission adapter — Pydantic-validated
@@ -357,14 +360,77 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   exactly one page; requesting the never-indexed `13.3` returns `VERSION_NOT_INDEXED` with
   `availableVersions: ["13.2"]` — confirms the fail-closed behavior end to end, not just at the
   database-constraint level.
-- [ ] **DOC-03** Firecrawl bounded crawler — `EXISTS` (`fetch_firecrawl_v2`), verify
-  bounded-crawl behavior (maxPages/maxDepth/sitemap-follow) matches the manifest's
-  `maximum_pages`/`maximum_depth` fields; **blocked** on Firecrawl actually being registered
-  (API key) — not required for Phase A/B, only for sources that need JS-rendering/recursive crawl
-  beyond what a static BeautifulSoup fetch covers.
-  - Read-only owner audit added at `scripts/atlas/audit-doc-03-firecrawl-bounded-owner-v1.mjs`.
-    It confirms manifest page/depth/sitemap bounds, domain scope, and disabled external links/subdomains.
-    Live Firecrawl registration/API-key proof remains blocked; no crawl or persistence was attempted.
+- [x] **DOC-CANARY-ADMISSION-01** (opened 2026-09-23; operator-authorized and run 2026-09-23: `DOC_CANARY_ADMISSION_ROLLBACK_PROVEN`) three-page
+  rollback canary: 3 of the 30 pinned pages (`docs/.okf/pinned`, envelopes from
+  `scripts/atlas/build-external-doc-admission-envelopes-v1.py`) -> existing `admitExternalDocPage` (needs a small runner; the
+  writer has no pipeline caller yet) -> exact page/chunk/checksum/version/byte-span readback + generated-FTS query -> ROLLBACK ->
+  `atlas_external_doc_pages/chunks` back to 0 rows. No embeddings, no `:8081`, no Qdrant. Only after this passes may the 30-page
+  canonical text load be authorized. Evidence baseline: `docs/reports/external-doc-chunk-evidence-identity-v1.json`
+  (`EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_PROVEN`, 30 pages / 847 chunks, 0 duplicate chunk revisions).
+  **Prerequisite: EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY** — 23/30 pages are chunked from a second-normalized text that collapses
+  code indentation; the canary must exercise the FINAL canonical text representation, not a known lossy intermediate. The runner must be
+  TypeScript (calls `admitExternalDocPage`; the Python crawler must not write Postgres).
+  **Frozen order (open versioned-doc tasks):** `EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY` -> replay chunk/page hashes + uniqueness ->
+  `DOC-CANARY-ADMISSION-01` (temporary transactional write, rolled back) -> real 30-page corpus admission -> `EXTERNAL_DOC_ANALYSIS_OWNER_01`
+  -> derived analysis (Ornith / LangExtract). Anything whose acceptance needs actual Postgres corpus rows waits for real admission.
+  `EXTERNAL_DOC_ANALYSIS_OWNER_01` (schema/owner design) is independent of admitted rows unless its own design requires them;
+  `EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT` is independent of this chain. Not started; no mutation authorized by this note.
+  DOC-06A above proves the writer/adapter contract only; canonical pinned-corpus admission has NOT run.
+  **Result (2026-09-23, `--apply`, receipt `docs/reports/external-doc-canary-admission-v1.json`):** baseline 0/0 -> inside the transaction 3 pages / 46 chunks
+  -> exact id/evidence-revision/checksum/byte-length/text readback 0 failures, generated-FTS query returned 13 hits (token `snippet`) -> ROLLBACK -> 0/0, independently
+  re-confirmed with psql. No embeddings, no :8081, no other stores. The real 30-page canonical admission then ran separately (see DOC-06A above).
+  **Runner (built earlier the same day):** `admitExternalDocPage` COMMITs its own transaction, so a
+  rollback canary cannot wrap it directly; `src/lib/server/atlas/docs/external-doc-canary-v1.ts` maps the writer's BEGIN/COMMIT/ROLLBACK onto
+  savepoints inside one always-rolled-back outer transaction (4 no-database vitest tests incl. the real writer against a fake client).
+  `sveltekit-frontend/scripts/atlas/run-doc-canary-admission-v1.mts`: default DRY RUN (validated handoff, 3 pages = first page of the first 3 sources
+  by id: bits-ui, drizzle-kit, drizzle-orm; 46 chunks; 0 DB connections); `--apply` additionally requires
+  `ATLAS_DOC_CANARY_AUTHORIZED=I_AUTHORIZE_ROLLBACK_CANARY`, aborts if the canonical tables are not empty, reads back id/checksum/byte-length/text
+  and a generated-FTS hit, rolls back, and requires counts back to 0. Receipt path `docs/reports/external-doc-canary-admission-v1.json`
+  (written only by `--apply`). Fidelity prerequisite is now met (see EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY, 852 chunks).
+- [x] **EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT** review `chunk_id` (`doc:<source_id>:<16-hex truncated document digest>:<ordinal>`) for
+  address/key collisions only; unchanged by the identity repair and does NOT redefine `chunkEvidenceRevision` (proven separately, not
+  reopened); must not be combined with it. **Audit done 2026-09-23 (read-only, 0 writes; `docs/reports/external-doc-chunk-id-collision-audit-v1.json`):**
+  current corpus 852 chunks / 852 unique chunk_ids, no shared (source, digest16), no duplicate page hashes. Latent finding F1: chunk_id excludes
+  page URL/version, so identical normalized text under one `source_id` across two versions/aliases would violate `UNIQUE(chunk_id)` on the second
+  admission (fails closed, never overwrites); 64-bit truncation risk is negligible. `chunk_id` NOT changed; if multi-version admission of identical
+  text is expected, open a separate contract change (add page evidenceRevision or version+url digest) with a replay proof.
+- [x] **EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY** `chunk_document` re-normalized page text and collapsed code indentation (23 of 30 stored
+  pages differed from the text the byte spans address). Scope: canonical text-buffer / UTF-8-span correctness before
+  admission; blocks DOC-CANARY-ADMISSION-01. **Done 2026-09-23 (offline, 0 datastore writes, `EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY_PROVEN`):**
+  `python/atlas_external_docs.py::_normalize_ws` is now fence-aware (lines inside ``` fences keep indentation; prose still collapses;
+  unterminated fence protects the remainder) and idempotent on `extract_structured_text` output. Replay
+  (`docs/reports/external-doc-chunk-text-fidelity-v1.json`): stored-text-vs-chunked-text mismatches 23 -> 0; 30 pages / 852 chunks
+  (was 847; windows now measure real indentation); page `contentHash` == sha256 of stored text; 0 byte-span slice mismatches;
+  852 unique chunk evidence revisions and 852 unique `chunkId`s. All content hashes for the 23 code pages changed, so the earlier
+  847-chunk receipt (`external-doc-chunk-evidence-identity-v1.json`) is superseded for counts only; its identity design is unchanged.
+  Tests: 5 new `ChunkTextIndentationFidelityTests` (idempotence, fenced indent preserved, unterminated fence, exact byte-span slicing,
+  page hash == chunk checksum); 76 focused Python tests + 38 vitest tests pass; DOC-06A handoff still `EXTERNAL_DOC_ADMISSION_HANDOFF_READY`.
+  Not covered: the 7 pages without fenced code were already stable; nothing re-crawled (fix applies to stored evidence).
+- [x] **EXTERNAL_DOC_ANALYSIS_OWNER_01** create `atlas_external_doc_analyses` for `ExternalDocAnalysisV1` (append-only by chunk evidence
+  revision + analysis type + producer/model/prompt revision) after a fresh owner audit; `analysis_pass_results` and `atlas_summary_layers`
+  are packet-keyed and not reusable. `20260923_external_doc_summaries_v1.sql` is `DRAFT_SUPERSEDED_PENDING_ANALYSIS_OWNER` and must not be applied.
+  Per-chunk BitFrost/Valkey analysis warming stays blocked until canonical chunks exist. Scope: derived-analysis persistence design,
+  not canonical chunk storage. **Applied and proven 2026-09-23 (operator-authorized; `EXTERNAL_DOC_ANALYSIS_OWNER_APPLY_PROVEN`, receipt `docs/reports/external-doc-analyses-owner-proof-v1.json`):** `sveltekit-frontend/drizzle/manual/20260923b_external_doc_analyses_v1.sql`
+  (append-only via trigger, FK to `atlas_external_doc_chunks(evidence_revision)`, `canonical_authority=false`, contract refinements as CHECKs);
+  4 static vitest tests (`external-doc-analyses-ddl.spec.ts`) pin it to `ExternalDocAnalysisV1` fields/types. DDL applied with `psql -1` (table + 3 indexes +
+  trigger, table empty). Proof in one always-rolled-back transaction with a synthetic page+chunk: insert, idempotent replay (`INSERT 0 0`), new model revision appends (2 rows);
+  rejected: bogus chunk FK, UPDATE, DELETE, SUMMARY without text, model without revisions, `canonical_authority=true`, bad checksum, deleting a referenced chunk; after rollback
+  0 analyses / 0 chunks / 0 pages. Only the empty analyses table persists; no analysis rows were written.
+- [x] **EXTERNAL_DOC_CANONICAL_ADMISSION_VERIFY** independent read-only re-verification of the admitted corpus (2026-09-23; `scripts/atlas/verify-external-doc-canonical-admission-v1.mts`, receipt `docs/reports/external-doc-canonical-admission-v1.json`, `EXTERNAL_DOC_CANONICAL_ADMISSION_PROVEN`). The earlier `--apply` outcome is confirmed SUCCEEDED from live Postgres, not from the receipt: 30 pages / 852 chunks / 0 analyses; 30 unique page and 852 unique chunk evidence revisions and ids, 0 duplicate groups, 0 unexpected rows; 852/852 checksum, byte-span, byte-length and exact-text parity with the envelopes; 8 distinct product/version identities. Canonical FTS (source `CANONICAL_POSTGRES`): `hnsw.iterative_scan` 2, `hnsw.scan_mem_multiplier` 1, `io_method` 3, `Bitmap Heap Scan` 17, `uuidv7` 3, `drizzle-kit` 26, `$derived` 29 (25 literal). Studio smoke now `DOC_INTELLIGENCE_STUDIO_READINESS_PROVEN` with the canonical corpus `PRESENT`, and live Studio search hits are all badged `CANONICAL_POSTGRES`. No embeddings, :8081, Qdrant, Valkey, Neo4j or Graphify; semantic/vector/Ornith/LangExtract/GPU tasks untouched.
+- [x] **STUDIO_CANONICAL_EXTERNAL_DOC_FTS** Parent Atlas Studio searches the admitted canonical Postgres corpus (2026-09-23, `STUDIO_CANONICAL_EXTERNAL_DOC_FTS_PROVEN`, receipt `docs/reports/doc-corpus-studio-canonical-fts-v1.json`). Postgres rows are the search authority: `searchDocCorpus` queries `atlas_external_doc_chunks` through the existing generated `search_vector` GIN index (no BM25, pg_search, extra column, Qdrant or local pinned files) with optional exact-match `product` / `productVersion` filters (bounded; admin GET `/api/admin/atlas/docs-corpus/search`; plain SSR GET form `?docq=&docprod=&docver=`, no JavaScript needed). Every canonical hit carries `sourceClass: CANONICAL`, `pageId`, `chunkId`, `chunkEvidenceRevision` (chunk grain, distinct from the page revision), provider/product/productVersion, URL, `headingPath` and a snippet; local captures are `REFERENCE_ONLY`/`GENERATED_CORPUS` with null canonical ids. Live results (852 chunks, read-only): `hnsw.iterative_scan` 2, `hnsw.scan_mem_multiplier` 1, `io_method` 3, `Bitmap Heap Scan` 17, `uuidv7` 3, `drizzle-kit` 26, `$derived` 29. Direct-SQL parity is exact for all 7 queries on ordered chunkId, chunkEvidenceRevision, pageId, page revision, provider/product/productVersion, URL and headingPath; snippet source: 64 hits are exact substrings of the row text and 12 are subset-only (see finding). The 8 stored product/version identities are exposed exactly as stored (`CURRENT_UPSTREAM@2026-09-23`, `UNVERSIONED@2026-09-23`, `18`; no invented semver). A canonical zero-hit query returns an empty CANONICAL result (no reference fallback); a database failure falls back to local results labelled `LOCAL_LEXICAL` / `REFERENCE_ONLY` with a `POSTGRES_UNAVAILABLE` note, never CANONICAL. Tests: read-model, panel SSR (canonical / zero-hit / fallback), route (4) and live SSR (`ATLAS_LIVE_DOC_DB=1`); Studio smoke 4 files / 50 tests, `DOC_INTELLIGENCE_STUDIO_READINESS_PROVEN`, canonical `PRESENT`. Finding (display only, follow-up): PostgreSQL `ts_headline` treats `<...>` as markup and splices around it in the displayed snippet (e.g. `<project root>` in a code block); stored `text` and checksums are unchanged. No embeddings, :8081, Qdrant, Valkey, Neo4j, Graphify, Ornith or LangExtract; DOC-19/20/21 untouched. 0 store writes.
+- [x] **EXTERNAL_DOC_ADMISSION_RUNNER_RESUMABLE_01** exact-resume reconciliation implemented through `external-doc-admission-plan-v1.ts`; existing `admitExternalDocPage()` remains the only writer. Focused classifier/replay tests prove exact pages are skipped, only missing pages reach the writer, crashes resume, and conflicts fail closed. Live read-only `--plan` receipt `docs/reports/external-doc-admission-resumability-v1.json`: 30 exact / 0 missing / 0 conflict, 30 pages / 852 chunks, 0 writer calls. Corpus supersession remains unsupported and separately gated as `EXTERNAL_DOC_CORPUS_SUPERSESSION_01`; no live apply/re-admission occurred.
+- [x] **DOC-03** Firecrawl bounded crawler — live bounded proof passed
+  `python/atlas_okf_docs_pipeline.py::firecrawl_crawl_v2`; keep the full indexing pipeline out of
+  this proof. The request is built by `build_firecrawl_crawl_v2_request()` and unit-tested against
+  manifest page/depth/sitemap settings, with external links, subdomains, and whole-domain crawl
+  disabled. Live canary runner: `scripts/atlas/prove-doc-03-firecrawl-live-bounded-v1.py`;
+  receipt: `docs/reports/parent-atlas/doc-03-firecrawl-live-bounded-v1.json`; owner audit:
+  `docs/reports/parent-atlas/doc-03-firecrawl-bounded-owner-v1.json` (`DOC_03_LIVE_BOUNDED_CRAWL_PROVEN`).
+  The 3-page/depth-1 canary returned exactly 3 same-domain Firecrawl v2 pages; requested limit,
+  depth, sitemap=`skip`, domain scope, and disabled external/subdomain/domain-wide crawling all
+  matched readback. The v1 `ignoreSitemap` field was replaced with the v2 `sitemap` enum after the
+  first request was rejected with HTTP 400. Credentials and page bodies are absent from receipts;
+  no corpus, database, Qdrant, Neo4j, or Valkey writes and no canonical promotion occurred.
 
 ## Phase C — Classification and multi-representation projection
 
@@ -631,11 +697,53 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   is reported as `NOT_OBSERVED` rather than fabricated. Keep the gate open for broader live
   ambiguity coverage and downstream index admission.
 
+  **DOC-13 status decomposition (ledger-only, 2026-09-23 audit; verdict `MULTIPLE_GATES_COLLAPSED_INTO_ONE_TASK`; acceptance
+  semantics unchanged, checkbox stays open; artifacts below re-verified present).** Only the DOC-13 bullet itself (up to the
+  "DOC-10/DOC-12 root cause found" paragraph) is DOC-13; the long DOC-10/DOC-12 notes that follow (before Phase E) are separate history, not DOC-13 work.
+
+  | Sub-gate | Purpose | Owner | Status | Mutation / runtime |
+  |---|---|---|---|---|
+  | 13.A | exact-match adapter + fixture outcomes (matched/stale/ambiguous/unmapped) | `prove-doc-symbol-mutual-index-v1.mjs`, receipt `doc-13-symbol-mutual-index-v1.json` | PROVEN (fixture) | no / no |
+  | 13.B | live read-only join to `atlas_symbol_registry` + `atlas_symbol_versions` | `prove-doc-symbol-mutual-index-live-v1.mjs`, receipt `...-live-v1.json` | PROVEN (read-only; 402 active rows) | no writes / Postgres read |
+  | 13.C | doc vs code revision-domain separation (`targetSourceRevision`) | shared exact-match helper (deterministic tests) | PROVEN | no / no |
+  | 13.D | live DOC-12 extraction -> symbol join | live proof | PARTIAL: extracted rule has no target code revision -> `UNRESOLVED`; resolves only in the labeled registry-backed control | no / needs sidecar |
+  | 13.E | ground a target code revision to current source authority | current-source-authority chain | BLOCKED (depends on `CURRENT_SOURCE_AUTHORITY_PROVEN`) | no / no |
+  | 13.F | broader live ambiguity coverage | live proof | PROVEN (all 20 ambiguous name/code-revision groups replayed through the existing resolver; all returned AMBIGUOUS) | no / Postgres read |
+  | 13.G | downstream index admission | none yet | OPEN, depends on 13.E, canonical corpus admission, DOC-14+ | yes (persistent write) / yes |
+  | 13.H | owner composition with `analysis_pass_results` + Ornith `:8090` | `prove-doc-symbol-nlp-dag-context-v1.mjs` | PROVEN (wiring only); pass selection, ContextManifest admission, SynthesisReceipt are separate open gates | no / no |
+
+  Recommendation: keep the checkbox open until 13.E and 13.G close; work 13.E first (no mutation needed), 13.D follows from it.
+
   Composition follow-up: `scripts/atlas/prove-doc-symbol-nlp-dag-context-v1.mjs` confirms the
   indexed symbol/version owner, existing append-only `analysis_pass_results` owner, bounded
   `ParameterArtifactV1` checksums, and Ornith `:8090` synthesis boundary compose without a
   duplicate table or datastore write. This proves owner wiring only; current-pass selection,
   ContextManifest admission, and a live SynthesisReceipt remain separate gates.
+
+  **DOC-13 revision-domain correction (2026-09-23, read-only):** review of the live proof found
+  that the prior helper incorrectly compared `ApiRuleV1.evidenceSpan.sourceRevision` (the
+  documentation artifact revision) directly with `atlas_symbol_versions.source_revision` (the
+  code artifact revision). Those revisions are not interchangeable. The shared exact-match
+  helper now requires an explicit, separately named `targetSourceRevision`, validates both as
+  SHA-256 revisions, and returns `UNRESOLVED/TARGET_CODE_SOURCE_REVISION_MISSING` when the
+  extracted rule has no code-revision binding. Five deterministic tests cover distinct document
+  and code revisions, absent target revision, stale target, exact-revision ambiguity, malformed
+  revision, and missing symbol. The read-only live replay now scans all 402 active registry rows
+  with SHA-256 source and workspace revisions (instead of a 200-row prefix that included legacy
+  `workspace:0` entries); the extracted rule has no target code revision and correctly remains
+  unresolved. Full-cohort duplicate-name/revision ambiguity is exercised (4 candidates), and a
+  separately labeled registry-backed resolver control matches only when its code revision is
+  explicit. Receipt: `docs/reports/parent-atlas/doc-13-symbol-mutual-index-live-v1.json`;
+  fixture receipt: `docs/reports/parent-atlas/doc-13-symbol-mutual-index-v1.json`.
+  A separate READ ONLY transaction replayed every ambiguous name/code-revision group through the
+  existing resolver: 20/20 returned `AMBIGUOUS` across the 402-row active revision-qualified
+  cohort. A synthetic documentation revision was used only for schema validation, never compared
+  to code revision. Receipt: `docs/reports/parent-atlas/doc-13-broad-ambiguity-live-v1.json`.
+  A broader read-only SQL census now finds 20 ambiguous groups each for qualified and bare names
+  (max 4 symbol versions/group), and none for canonical keys; it does not claim all groups were
+  individually replayed. Receipt: `docs/reports/parent-atlas/doc-13-live-ambiguity-census-v1.json`.
+  **DOC-13 remains open:** extraction has not yet grounded a target code revision to current
+  source authority, and no downstream index admission was performed. No persistent store writes.
 
 **DOC-10/DOC-12 root cause found (2026-09-04, later same day as the `doc-10-12-live-contract-v1.json`
 receipt above — answers that receipt's own `nextInvestigation` item 1 directly)**: the zero-extraction
@@ -792,52 +900,99 @@ extraction call site is added — do not reintroduce the flattened-prompt path.
   audit `scripts/atlas/audit-doc-15-retrieval-fanout-owner-v1.mjs` confirms the existing hybrid,
   Postgres FTS, Qdrant, retrieval-orchestrator, and identity-resolution surfaces are present;
   report: `docs/reports/parent-atlas/doc-15-retrieval-fanout-owner-v1.json`. Same-query live
-  fan-out replay and documentation-specific version/authority filtering remain open.
-- [ ] **DOC-16** `AceRepairPacketV1` — `NEW` contract, `EXTEND` of the existing general ACE packet
-  envelope pattern. A descriptor-only fixture proof now binds candidate snapshot, ordinal map,
-  packet/source/evidence references, diagnostic and documentation-rule references while rejecting
-  hidden thoughts, KV cache and tensor fields; see
-  `scripts/atlas/prove-doc-16-ace-repair-packet-fixture-v1.mjs` and
-  `docs/reports/parent-atlas/doc-16-ace-repair-packet-fixture-v1.json`. Live ACE composition,
-  ContextManifest admission, and repair validation remain open.
-- [ ] **DOC-22** `PatchTargetV1` — `NEW`. Fixture proof now binds `sourceRef`, exact UTF-8
-  byte range, `baseSourceRevision`, expected/replacement byte checksums, and evidence references;
-  stale base revision rejection and mutation=false are proven by
-  `scripts/atlas/prove-doc-22-patch-target-fixture-v1.mjs`.
-- [ ] **DOC-23** ast-grep repair planner — `EXTEND`. `ast-grep-observation-adapter.ts` exists for
+  fan-out replay and documentation-specific version/authority filtering remain open. The shared
+  research/document retrieval runtime is now bounded-smoke proven by
+  `scripts/atlas/prove-research-document-retrieval-v2.mjs` with report
+  `docs/reports/research-document-retrieval-v2.json`; its stale container image was corrected by
+  adding `COPY research_contracts.py` to `docker/langgraph-synthesis/Dockerfile` and rebuilding
+  only `legal-ai-langgraph`. This proves shared runtime wiring, not DOC-15's documentation-specific
+  fan-out or canonical admission. A bounded owner/fixture proof now records the existing
+  same-query PostgreSQL + Qdrant fan-out, `stable_key` fusion, one semantic-lane vote, and
+  version-before-fusion filtering in `scripts/atlas/prove-doc-15-same-query-fanout-v1.mjs`;
+  report: `docs/reports/parent-atlas/doc-15-same-query-fanout-v1.json`. The report deliberately
+  keeps live documentation fan-out/version-authority admission open and `canonicalAuthority=false`.
+  **Live executor readback (2026-09-24, read-only):** `external_programming_docs_768` exists but
+  reports `points_count=0`; `external_programming_docs_hybrid_768` returns HTTP 404. The hybrid
+  point contract currently projects chunk/source revisions and classification fields but omits
+  `product`, `product_version`, and `architecture`, so it cannot enforce the required version /
+  architecture filters before semantic ranking. Receipt:
+  `docs/reports/parent-atlas/doc-15-live-projection-readback-v1.json`. DOC-15 remains open pending
+  a metadata-complete projection and live filtered same-query replay; no Qdrant or other store was
+  written.
+  **RD3 shared-owner proof (2026-09-23):** `scripts/atlas/prove-research-document-retrieval-v3.mjs`,
+  receipt `docs/reports/research-document-retrieval-v3.json`, proves a valid bounded web-search
+  result, deterministic BeautifulSoup fetch/normalization and exact UTF-8 chunk-span replay, the
+  852-row revision-qualified/768-dimension docs corpus, live FTS hits, and exact-vs-HNSW parity on
+  a stored-corpus self-query. It is explicitly `RESEARCH_DOCUMENT_RETRIEVAL_V3_PARTIAL_PROVEN`:
+  no admission, MCP doc-search, TypeScript ParameterArtifact/DAG, ContextManifest, or code-fence
+  ast-grep join was exercised. This does not close DOC-15 or authorize corpus/projection writes.
+- [x] **DOC-16** `AceRepairPacketV1` — `NEW` contract, `EXTEND` of the existing general ACE packet
+  envelope pattern. The strict runtime schema now binds candidate snapshot, ordinal map,
+  packet/source/evidence references, diagnostic and documentation-rule references; it rejects
+  unknown fields (including hidden thoughts, KV cache, tensor and raw prompt data), unqualified
+  source revisions, duplicate ordinals and incomplete source/revision pairs. The existing fixture
+  proof now parses through this schema. Contract tests:
+  `packages/parent-atlas/test/ace-repair-packet-v1.test.mjs` (9/9); package TypeScript check
+  passes with `npx tsc -p packages/parent-atlas/tsconfig.json --noEmit`; the fixture receipt is
+  `DOC_16_ACE_PACKET_FIXTURE_PROVEN`. Live ACE composition, ContextManifest admission, and repair
+  validation remain open; a separate synthetic no-write fixture composes the validated descriptor
+  through the existing `buildAceContextManifestAdmissionV1` owner (5/5 focused ContextManifest
+  tests), but this is not live/current-snapshot admission. This implementation is not a promotion
+  or mutation authority.
+- [x] **DOC-22** `PatchTargetV1` — `NEW`. **Executable fixture contract proven (2026-09-23):**
+  exact source revision and UTF-8 byte slice/checksum validated, a stale base revision was rejected,
+  and applying the hunk in memory produced the expected output checksum. No source file was
+  modified; `canonicalAuthority=false`, `mutationAuthorized=false`. Producer/report:
+  `scripts/atlas/prove-doc-22-patch-target-fixture-v1.mjs`,
+  `docs/reports/parent-atlas/doc-22-patch-target-fixture-v1.json`.
+- [x] **DOC-23** ast-grep repair planner — `EXTEND`. `ast-grep-observation-adapter.ts` exists for
   structural *observation*; the rewrite/patch-proposal half (pattern -> rewrite -> diff preview) is
   new, built on ast-grep's existing metavariable/YAML-rule rewrite mechanism, not a custom text
-  editor. A fixture proof now binds an exact UTF-8 structural match to `baseSourceRevision` and
-  emits a non-authorized proposal without mutation; see
+  editor. **Executable fixture proof completed (2026-09-23):** repository ast-grep CLI 0.45.3
+  found exactly one structural match in an isolated temporary TypeScript fixture; its metavariable
+  byte range derived the inner UTF-8 patch hunk, the CLI emitted a before/after rewrite preview,
+  and the source bytes remained unchanged. Proposal base digest, hunk, and proposed digest match
+  DOC-24's receipt. `canonicalAuthority=false`, `mutationAuthorized=false`, temporary directory
+  cleaned. Evidence:
   `scripts/atlas/prove-doc-23-ast-grep-repair-planner-v1.mjs` and
-  `docs/reports/parent-atlas/doc-23-ast-grep-repair-planner-v1.json`. Live ast-grep execution,
-  diff validation, and explicit mutation authorization remain open.
-- [ ] **DOC-24** `PatchProposalV1` — `NEW`. Fixture proof now binds proposal ID, base source
+  `docs/reports/parent-atlas/doc-23-ast-grep-repair-planner-v1.json`. This closes the planner's
+  fixture contract only; reviewing/applying a real source patch remains separately gated by
+  DOC-24 and explicit target-specific mutation authorization.
+- [x] **DOC-24** `PatchProposalV1` — `NEW`. Fixture proof binds proposal ID, base source
   revision, patch digest, byte hunk, reasoning/analysis evidence, model/prompt revisions, and
   `mutationAuthorized=false`; see `scripts/atlas/prove-doc-24-patch-proposal-fixture-v1.mjs` and
-  `docs/reports/parent-atlas/doc-24-patch-proposal-fixture-v1.json`. Live patch application remains
-  out of scope until DOC-25 validation receipt passes.
-- [ ] **DOC-25** compiler/test replay receipt — `EXTEND` of this repo's existing
+  `docs/reports/parent-atlas/doc-24-patch-proposal-fixture-v1.json`. The isolated DOC-25 compiler
+  and behavior replay now passes for this proposal. This closes proposal-contract validation only;
+  no real source patch was applied, and any target-specific application still requires review and
+  explicit mutation authorization.
+- [x] **DOC-25** compiler/test replay receipt — `EXTEND` of this repo's existing
   `ExecutionReceiptV1`-style receipt pattern (see `parent-atlas-retrieval-lineage-dag-convergence`
   ). Fixture validation now records proposal reference, validation checks, validation checksum,
   `patchApplied=false`, and `mutationAuthorized=false`; see
   `scripts/atlas/prove-doc-25-compiler-test-replay-receipt-v1.mjs` and
-  `docs/reports/parent-atlas/doc-25-compiler-test-replay-receipt-v1.json`. Live isolated
-  patch/compiler/test replay remains open.
+  `docs/reports/parent-atlas/doc-25-compiler-test-replay-receipt-v1.json`. **Closed for the
+  bounded synthetic fixture gate (2026-09-23):** the proposal's base revision and byte hunk were
+  verified, the patch was applied only inside a temporary isolated directory, TypeScript strict
+  compilation passed, and a Node behavior test passed against the compiled output. The temporary
+  directory was removed. Receipt records repository HEAD/dirty state, input/output checksums,
+  commands and results; `mutationAuthorized=false`, `canonicalAuthority=false`, workspace source
+  unchanged. This does not prove live ast-grep execution or authorize/apply a real source patch;
+  those remain DOC-23/DOC-24 gates.
   for the established shape) applied to a patch-validate-test cycle.
 
 ## Phase G — Acceleration (optional, only after corpus is stable)
 
-- [ ] **DOC-19** cuVS exact baseline — `EXISTS` (`GPU-MINI-FABRIC-01`), reuse.
-- [ ] **DOC-20** CAGRA — `EXISTS` (`GPU-MINI-FABRIC-01`), reuse tuned `itopk_size` (default params
-  proven insufficient at N=65536 in that gate — do not reuse default params blindly here).
-- [ ] **DOC-21** IVF-PQ exact-refinement two-stage candidate generation (K0=80 -> exact refine ->
-  final K=20 style) — `AUDIT_FIRST`. `GPU-MINI-FABRIC-01` tested `ivf_pq` as a CAGRA *build_algo*,
-  not necessarily as a standalone two-stage generate-then-refine candidate pipeline — confirm which
-  is actually needed before assuming the existing proof covers this use case.
+Audit 2026-09-24 (read-only; DOC-19 exact oracle, DOC-20 CAGRA comparison, and DOC-21 IVF-PQ exact-refinement benchmark are proven on the admitted, embedded external-doc corpus):
+
+- [x] **DOC-19** cuVS exact baseline — live read-only proof on all 852 admitted external-doc chunks and their 768-dimensional canonical vectors: `scripts/atlas/prove-doc-19-cuvs-external-doc-parity-v1.mjs`, receipt `docs/reports/parent-atlas/doc-19-cuvs-external-doc-parity-v1.json`. cuVS 26.08.00 on the RTX 3060 Ti matched the independent CPU cosine oracle at exact Top-10 set and rank for 3 deterministic queries; maximum distance delta < 1.2e-7. The Arrow snapshot is execution-only (`canonicalAuthority=false`, `logicalLaneVote=NONE`); PostgreSQL was read in a read-only transaction and no canonical/projection/cache/graph writes or rebuilds occurred. The HTTP wrapper path is explicitly NOT proven: live health reports `torchAvailable=false`, so this baseline invoked the already-running container's CuPy/cuVS library directly. Wrapper repair/rebuild is a separate runtime-integration gate, not hidden in this executor-parity result.
+- [x] **DOC-20** CAGRA recall benchmark — `scripts/atlas/prove-doc-20-cagra-external-doc-recall-v1.mjs`, receipt `docs/reports/parent-atlas/doc-20-cagra-external-doc-recall-v1.json`. Reused the DOC-19 frozen 852-row/768-dimension canonical-vector artifact and existing in-container cuVS library. On 64 deterministic evenly spaced corpus-vector queries (self-hit excluded), both `itopk_size=64` and tuned `512` measured Recall@10=1.0 and Recall@20=1.0 (worst-query Recall@20=1.0) against cuVS brute-force exact. This is a bounded executor benchmark, not a natural-query recall claim or promotion: `canonicalAuthority=false`, `logicalLaneVote=NONE`, promotion false; no stores were written and no container was rebuilt. The HTTP wrapper remains separately unproven because its image reports `torchAvailable=false`.
+- [x] **DOC-21** standalone IVF-PQ candidate generation followed by exact refinement — `scripts/atlas/prove-doc-21-ivfpq-exact-refinement-v1.mjs`, receipt `docs/reports/parent-atlas/doc-21-ivfpq-exact-refinement-v1.json`. This is distinct from IVF-PQ as a CAGRA build algorithm. On the DOC-19 frozen 852-row/768-dimension canonical cohort, 64 deterministic leave-one-out queries, K0=80 and final K=20, two IVF-PQ configurations (n_lists=1, pq_dim=96/192, pq_bits=8) achieved candidate-pool Recall@20=1.0 and exact-refined Recall@20=1.0 against the cuVS exact oracle (also cross-checked with NumPy cosine). The IVF-PQ approximate first-20 ordering alone was lower (0.912/0.955), demonstrating the exact-refinement stage changes ranking using original vectors. This small corpus uses one IVF list, so it proves the requested two-stage mechanism and parity only—not scaling, production latency, or promotion. Execution-only, one semantic lane, no store writes or rebuild.
 - [ ] **DOC-17** `HotBucketDescriptorV1` BitFrost bucket warming — `NEW` contract, `EXTEND` of
   existing BitFrost. Descriptor-only (candidateOrdinals/docChunkIds/conceptIds/centroidIds), never
-  the canonical documents in Valkey.
+  the canonical documents in Valkey. The descriptor owner and bounded noncanonical fixture are
+  now proven by `scripts/atlas/prove-doc-17-hot-bucket-descriptor-v1.mjs` with report
+  `docs/reports/parent-atlas/doc-17-hot-bucket-descriptor-v1.json`; Valkey write/readback remains
+  explicitly open.
 - [ ] **DOC-18** centroid routing — `EXTEND` of existing SOM/centroid infrastructure
   (`karpathy-gpu-enrich.mjs` family), applied to doc-chunk embeddings.
 
@@ -847,17 +1002,116 @@ extraction call site is added — do not reintroduce the flattened-prompt path.
   `productVersion` changes and crawl only the delta, never overwrite the prior version's rows
   (depends on DOC-02/DOC-27).
   - Read-only fixture added: `scripts/atlas/prove-doc-26-incremental-recrawl-fixture-v1.mjs`.
-    It proves unchanged bytes with a later timestamp are skipped, changed bytes are reprocessed,
-    and a changed product version creates a new revision path while preserving prior rows.
-    This does not close DOC-26: live manifest/crawler integration and durable readback remain open.
+    It proves only a proposed decision rule: unchanged bytes/timestamp-only changes may be skipped,
+    changed bytes are reprocessed, and a changed product version requires a new revision. The
+    fixture is not wired to the crawler or admission owner and does not prove prior-row preservation.
+    The receipt's former `conditional-fetch.ts` owner label was incorrect. The actual boundaries
+    are `python/atlas_okf_docs_pipeline.py` (manifest/fetch/chunk orchestration) and
+    `external-doc-admission.ts` (canonical PostgreSQL writer); DOC-26 remains open until an
+    integrated delta plan uses those owners and a readback proves version rows are preserved.
+    **Identity blocker proven:** Python `chunk_id` is currently `doc:{source_id}:{contentHash[:16]}:{ordinal}`;
+    page/chunk evidence revisions change with `productVersion`, but identical bytes across versions
+    keep the same globally-unique `chunk_id` (table constraint in
+    `drizzle/manual/20260904_external_doc_intelligence_v1.sql`; live readback confirms
+    `UNIQUE (chunk_id)` and 0 cross-version duplicate groups in the admitted corpus today).
+    The focused test locks this potential collision in as a blocker; see
+    `docs/reports/parent-atlas/doc-26-chunk-id-compatibility-audit-v1.json`. Do not alter V1 IDs
+    here; resolve
+    `DOC_CHUNK_IDENTITY_V2_OR_COMPATIBILITY_CONTRACT_REVIEW` before attempting a second-version
+    admission. No crawler or durable write was run.
+    **Identity compatibility review (2026-09-24):** selected an additive `atlas.external-doc-chunk-identity.v2`
+    primitive in `python/atlas_doc_coordinate.py::external_doc_chunk_id_v2`, keyed by `sourceId` plus
+    the already version-qualified `chunkEvidenceRevision`. It preserves the current V1 default and
+    IDs; 31 focused coordinate/chunk tests pass, including V1 non-change, V2 cross-version
+    separation, malformed-revision rejection, and a Python ↔ frontend canonical-hash golden vector.
+    Receipt: `docs/reports/parent-atlas/doc-26-chunk-identity-v2-contract-review-v1.json`.
+    This clears only the identity-contract review subgate. V2 is not wired into admission; DOC-26
+    remains open pending delta-plan integration and prior-version preservation readback.
 
 ## Explicitly deferred / not part of this proposal
+
+### Temporal document/claim spine contract (supporting proof, 2026-09-21)
+
+The existing `packages/parent-atlas/src/core/temporal-indexing-fabric.ts` owner now
+exports revision-qualified `SourceArtifactV1`, `SourceCoordinateMapV1`,
+`DocumentObservationV1`, `KnowledgeClaimV1`, `RunManifestV1`, and
+`TemporalDocumentIndexV1` contracts. UTF-8 source bytes are the only authoritative
+coordinate basis; observations and claims require non-empty evidence references;
+claim freshness is classified against changed source revisions; aggregate checksums
+are deterministic; and every envelope is hard-coded noncanonical. The bounded proof
+`scripts/atlas/prove-temporal-document-claim-fabric-v1.mjs` produced
+`docs/reports/temporal-document-claim-fabric-v1.json` with 13/13 tests passing,
+`TEMPORAL_DOCUMENT_CLAIM_FABRIC_PROVEN`, `writes_performed=false`, and
+`promotion_authorized=false`. This is a contract foundation only: DOC-13/14/15/16/17/18/19/20/21/26
+remain open for their existing live index, graph, retrieval, cache, acceleration, and
+manifest readback gates.
+
+The downstream read-only composition was also re-run against current artifacts:
+`prove-doc-symbol-mutual-index-live-v1.mjs` returned
+`LIVE_DOC_EXTRACTION_SYMBOL_JOIN_PROVEN` (200 active registry rows),
+`prove-doc-symbol-nlp-dag-context-v1.mjs` returned
+`COMPOSITION_OWNER_WIRING_PROVEN`, `prove-parent-atlas-context-manifest-v1.mjs`
+returned `CONTEXT_MANIFEST_REPLAY_PROVEN` for the 15-row lineage-qualified canary,
+and `prove-ornith-agent-dag-readonly-gate-v1.mjs` returned
+`ORNITH_AGENT_DAG_READONLY_GATE_PROVEN` with seven candidate ordinals and zero
+mutation nodes. The current-pass selector remains blocked by separately tracked
+live view drift (`success` versus `succeeded`, and missing `id DESC` tiebreak); no
+DDL or source-of-truth change was applied.
 
 - Registering Firecrawl as a live MCP server with a budget cap — separate follow-up, needs an API
   key provisioned first.
 - A dedicated admin/search UI page for the doc corpus (mentioned in the original ask as
   "hypergraphrag admin page") — should extend the existing `/command-center/retrieval/` UI once
   Phase A-C prove the corpus is real and queryable, not be built speculatively first.
+  **STATUS 2026-09-23 (`STUDIO-DOCS-SSR-01` + `DOC-INTELLIGENCE-READINESS-01`, NOT closed):** a read-only
+  Documentation Intelligence panel extends `(app)/admin/atlas` (not `/command-center/retrieval/`; WFU-12
+  names the Studio as the shell) via `doc-intelligence-read-model.ts` + `GET /api/admin/atlas/docs-corpus[/search]`,
+  SSR-rendered (`DocCorpusPanel.ssr.spec.ts`). `npm run atlas:docs:studio:smoke` writes
+  `docs/reports/external-doc-studio-readiness-v1.json` (supersedes `doc-corpus-studio-smoke-v1.json`).
+  Result: `DOC_ADMISSION_HANDOFF_BLOCKED` (secondary `DOC_CANONICAL_CORPUS_EMPTY`). 30 pages / 847 chunks (after
+  the extractor fix below; 881 before) were acquired through the existing pipeline
+  (`docs/.okf/dev/pinned-docs.manifest.json` + coordinates sidecar) and never admitted: `admitExternalDocPage`
+  still has no runtime caller and no database write was made. Typed blockers: (1)
+  `PIPELINE_DOES_NOT_EMIT_DOC_COORDINATE` — `SourceConfigV1` forbids provider/product/version fields, so all 847
+  native chunks carry `doc_coordinate=null`; (2) `CHUNK_EVIDENCE_REVISION_NOT_UNIQUE` — DocCoordinateV1's chunk
+  revision hashes (url, section_anchor, document hash), so 280 of 847 chunks collide and
+  `atlas_external_doc_chunks_evidence_revision_uq` would reject them; a deterministic candidate (page revision +
+  chunkId + checksum + byte span) is unique for all 847 and needs an owner decision before any admission.
+  Also `AST_GREP_DOC_SYMBOL_MAPPING_INCOMPLETE` (dev symbol index: no chunk id / byte span / evidence revision,
+  line-based spans, 0 symbols), `LANGEXTRACT_DOC_EVIDENCE_JOIN_BLOCKED` (no coordinate / chunk id / byte
+  spans, URL-only join, absolute Windows paths) and `EXTERNAL_DOC_ANALYSIS_CONTRACT_READY`
+  (`ExternalDocAnalysisV1` in `external-doc-intelligence-contracts-v1.ts`, no migration; `analysis_pass_results`
+  reviewed and not reused). Closure of the admin/search item still needs admitted rows, Postgres provenance and
+  a live FTS hit; no ingestion, semantic/Qdrant or Ornith task is closed by this.
+  **EXTRACTION FIDELITY FIX (`DOC-04` owner `atlas_external_docs.py`, 2026-09-23, evidence-backed):** root cause
+  was `get_text("\n")` on the code node in `extract_structured_text` (now `_code_block_text`), which put a newline
+  between every text node, so highlighted `<span>` tokens became one line each (`hnsw` / `.` / `iterative_scan`). Fixed in
+  the existing owner (no second parser): source newlines now exist only where the source has them (literal
+  newline, `<br>`, or a boundary between per-line `class="line"` elements with no newline text), and
+  `highlight-source-<lang>` now yields the real language. 10 new regression tests (8 fail on the old extractor);
+  50 focused Python tests pass. Re-acquired all 30 pinned pages: 22 normalized hashes changed (20 with identical
+  raw HTML = extractor-only; 2 GitHub pages whose HTML also moved), and `hnsw.iterative_scan` /
+  `hnsw.scan_mem_multiplier` are now `LITERAL_HIT`. Raw pages under `docs/.okf/pinned/*/raw` are tracked evidence
+  (same convention as `docs/.okf/dev/raw`); `*.jsonl` intermediates stay ignored and the smoke rebuilds its handoff
+  envelopes offline. Fresh-checkout input audit and receipt: `docs/reports/external-doc-corpus-reproducibility-v1.json`.
+  Still open: DOC-06A admission, semantic embedding, LangExtract integration, and Studio admin/search closure.
+  **CHUNK EVIDENCE IDENTITY (`EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_01`, 2026-09-23, supersedes blockers (1) and (2)
+  above): `EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_PROVEN`.** Decisions: `DocCoordinateV1` is PAGE/VERSION identity, built
+  natively by `atlas_okf_docs_pipeline.build_page_coordinate` from new optional manifest fields and carried unchanged
+  into every chunk; its `content_hash` is over the same normalized text the byte spans address. A chunk's own identity
+  is `ExternalDocChunkEvidenceV1` = `sha256:canonicalSha256V1{schema, pageEvidenceRevision, ordinal, startByte,
+  endByte, chunkChecksum}` (headingPath/sectionAnchor/parser/chunker/model revisions are provenance, not identity);
+  Python and TypeScript agree on a golden value and a committed cross-language fixture. Before: chunks under one
+  heading shared a revision (78 groups / 358 rows; 280 rows the unique constraint would reject). After: 30 unique page
+  and 847 unique chunk revisions, 0 duplicate groups, all 847 native chunks carry the page coordinate; the DOC-06A
+  handoff validates `EXTERNAL_DOC_ADMISSION_HANDOFF_READY` with no writer call. `chunk_id` is unchanged (future gate
+  `EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT`). Finding: 23 of 30 stored pages differ from the text `chunk_document`
+  normalizes (code indentation is collapsed at chunking; future gate `EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY`).
+  Analysis owner: `analysis_pass_results` and `atlas_summary_layers` are packet-keyed and not reusable ->
+  `EXTERNAL_DOC_ANALYSIS_OWNER_REQUIRED` (`ExternalDocAnalysisV1` / conceptual `atlas_external_doc_analyses`, not
+  created); the summary-only SQL is `DRAFT_SUPERSEDED_PENDING_ANALYSIS_OWNER`, unapplied. Receipt:
+  `docs/reports/external-doc-chunk-evidence-identity-v1.json`. No canonical admission, embedding, Qdrant, LangExtract,
+  Ornith or Studio canonical-search task is closed; per-chunk cache warming stays blocked until admission.
 - Classifying `docs/.okf/dev/*`'s "okf.dev.manifest.v1" corpus as CANONICAL_OWNER / EXPERIMENT /
   DEAD relative to `atlas_okf_docs_pipeline.py`'s manifest lineage — flagged in proposal.md's Risks
   section, needs its own short audit before Phase A assumes they're the same generation.
@@ -875,3 +1129,76 @@ extraction call site is added — do not reintroduce the flattened-prompt path.
   canonical UTF-8 source bytes, matches `evidenceText` exactly.
 - Phase F: one real `AceRepairPacketV1` end-to-end, measured payload size in the "1-5 KB" range
   claimed in design.md, not unbounded.
+
+## Phase V — Summary claim validation spine
+
+- [x] **VAL-01** Align the established `SummaryClaimValidationV1` Zod owner in
+  `sveltekit-frontend/src/lib/server/atlas/docs/summary-claim-validation-v1.ts`; seal a content-only
+  claim checksum with `canonicalSha256V1`, add typed token/value/version/span/semantic/ontology
+  fields and `resolutionLayer`, and keep final ADMIT/REVIEW/REJECT handling structural only until
+  VAL-09. The TypeScript fixture is validated by the Zod suite (12/12). No Pydantic parity,
+  canonical-byte span readback, judge/OaK execution, decision algorithm, summary persistence, or
+  promotion is implied.
+- [x] **VAL-02 / VAL-02B** Add a strict Pydantic wire mirror in
+  `python/atlas_summary_claim_validation_v1.py`; consume the canonical Zod fixture and prove exact
+  JSON round-trip shape parity. The shape-only model validates transport; the sealed subclass
+  independently recomputes TypeScript-owned checksums as a parity verifier, not a second owner.
+  Proof: Python golden vectors and `validationId`/`claimChecksum`/`validationChecksum` parity pass
+  (10 unittest tests); strict shape/validator fixtures pass in the focused pytest suite. No writes.
+- [x] **VAL-03** Add `validate_summary_claim_technical_tokens_v1` in the existing deterministic
+  faithfulness owner. It reuses its established token assessment, emits the VAL-01 technical slot,
+  marks unsupported/corrupted identifiers `FAIL`, and keeps omitted source identifiers as
+  non-gating `missingTechnicalTokens` observations at claim granularity; summary-wide coverage is
+  separate. Numeric/version strings remain for VAL-04. Proof: exact dotted/underscored identifiers,
+  unsupported/corrupted identifiers, non-gating omission cases, and numeric/version separation pass
+  in the focused Python suite. No model/OaK call or persistence.
+- [x] **VAL-04** Add separate exact numeric-value and named-version validators in the existing
+  faithfulness owner. Version strings are preserved and compared as strings; numeric extraction
+  excludes named-version spans, so `18.4` in `PostgreSQL 18.4` is not also treated as a generic
+  numeric assertion. Both results match the VAL-01 slot schemas; focused tests cover unsupported
+  values, exact versions, `18.04` versus `18.4`, and unqualified decimals. No inference or writes.
+- [x] **VAL-05** Verify claimed byte spans independently against canonical UTF-8 chunk bytes.
+  `python/atlas_summary_claim_span_v1.py` requires exact `chunkId` and
+  `chunkEvidenceRevision`, rejects revision/identity mismatch, invalid UTF-8 boundaries, out-of-
+  bounds ranges, and checksum mismatch. Four focused cases pass, including a bounded read-only
+  replay of `doc:pgvector:ca39935f7857789b:1` at revision
+  `sha256:399d4ab96dcab93bad98595bfaca281283994645de96131ed8775341177508b4`; exact bytes verified
+  and a mismatched revision rejected. PostgreSQL/Qdrant/Valkey/Neo4j writes: 0.
+- [x] **VAL-06** Freeze bounded `SummaryJudgeInputV1` in
+  `sveltekit-frontend/src/lib/server/atlas/docs/summary-judge-input-v1.ts`. The builder requires a
+  sealed validation artifact plus a chunk readback whose `chunk_id` and `evidence_revision` exactly
+  match; it copies one claim and technical/numeric/version/source-span findings, includes only the
+  allowlisted prompt-visible metadata, and caps chunk text at 32 KiB UTF-8. Strict unknown-field
+  rejection excludes web/retrieval/neighbor/ACE/model context. Five focused tests and targeted
+  TypeScript validation pass. No retrieval, model call, OaK execution, or persistence.
+- [x] **VAL-07** Add `judge_claim_v1` in `python/atlas_summary_claim_judge_v1.py`; strict VAL-06
+  shape/seal, exact prompt revision, approved/listed Ornith model resolution, and fail-closed
+  semantic-slot output are proven. Sixteen focused adapter tests pass. The bounded live call
+  receipt `docs/reports/parent-atlas/summary-semantic-judge-live-proof-v1.json` proves one sealed
+  fixture claim used `ornith-1.5-9b` / `ornith-1.5-9b:hforf.gguf` and returned `SUPPORTED` with no
+  retrieval, OaK, source-span claim, or persistence. Model-path basename is the resolved runtime
+  revision; immutable weight digest was not read. A separate 19-chunk/51-claim replay receipt is
+  exploratory evidence only; VAL-10 remains open for post-VAL-09 admission-eligibility proof.
+- [x] **VAL-08** Add an OaK typed-assertion adapter; OaK does not judge ordinary prose. `python/atlas_oak_kernel.py`
+  now exposes `POST /oak/assertion/check` over an exact `(subject concept ID, allowlisted predicate,
+  object concept ID)` query with a hard `LIMIT 2`; results distinguish `MATCHED`, `NOT_FOUND`, and
+  `AMBIGUOUS`. Strict Pydantic input rejects unknown fields/predicates, the endpoint fails closed
+  for adapters without exact relation lookup, and it explicitly reports `sourceSpanVerification=NOT_PERFORMED`,
+  `canonicalAuthority=false`, and `writesPerformed=false`. It does not convert results into semantic
+  prose judgments or a VAL resolver decision. Focused OaK tests: 15/15. Live `atlas_ontology_relations`
+  read-only census: 0 rows; therefore live positive matching is unavailable and unclaimed. No OaK writes.
+- [x] **VAL-09** Add the pure TypeScript resolver `summary-claim-resolution-v1.ts`. Hard deterministic
+  contradictions, rejected byte spans, and unsupported/contradicted semantic assertions reject;
+  missing/unrun/partial evidence routes to review; only supported or supported-paraphrase with
+  passing deterministic checks admits. Semantic evidence cannot override deterministic failure.
+  Output is revalidated/resealed and remains `canonicalAuthority=false`. Ten focused resolver cases
+  plus 12 contract cases pass; no model, OaK, retrieval, or store writes. VAL-08 `NOT_RUN` means an
+  ordinary prose claim has no typed ontology assertion, not that prose was ontology-judged.
+- [x] **VAL-10** Replay the exact 19 chunk/revision pairs through current Ornith SUMMARY generation,
+  per-claim VAL-03/04/07 evidence, and the canonical VAL-09 Zod resolver. The read-only receipt
+  `docs/reports/parent-atlas/val-10-summary-eligibility-replay-v1.json` records 19/19 exact source
+  readbacks, 19 valid derived analysis envelopes, 49 claims (48 ADMIT, 1 REJECT, 0 judge errors),
+  and 18 whole-summary candidates eligible under the 20-item bound. The rejected claim excludes its
+  entire summary; no partial summary is eligible. This proves eligibility only: summary/analysis
+  rows were not persisted and the separate explicitly authorized `--apply --limit 20` gate remains
+  open. PostgreSQL/Qdrant/Valkey/Neo4j writes: 0.

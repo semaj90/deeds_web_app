@@ -5,8 +5,9 @@
  */
 
 import { Channel, ChannelCredentials, Metadata } from '@grpc/grpc-js';
-import { AtlasRuntimeContext } from './atlas-runtime-context';
+import { AtlasRuntimeContext, assertAtlasRuntimeRevisionQualified, RuntimeToolReceiptV1Schema, type RuntimeToolReceiptV1 } from './atlas-runtime-context';
 import { pool } from '$lib/server/db/client.js';
+import { ENV } from '$lib/server/env.server.js';
 
 // TODO: Generate from .proto with protoc
 // For now, mock the client interface
@@ -52,6 +53,7 @@ interface RetrieveResponse {
   retrievalId: string;
   workspaceRevision: string;
   evidence: EvidenceRef[];
+  receipt?: RuntimeToolReceiptV1;
 }
 
 interface BuildContextRequest {
@@ -65,6 +67,7 @@ interface ContextPacket {
   evidence: Record<string, unknown>[];
   metadata: Record<string, unknown>;
   tokenCount: number;
+  receipt?: RuntimeToolReceiptV1;
 }
 
 interface ValidatePacketRequest {
@@ -77,6 +80,7 @@ interface ValidationResult {
   valid: boolean;
   status: 'PASS' | 'WARN' | 'FAIL';
   errors: string[];
+  receipt?: RuntimeToolReceiptV1;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -120,6 +124,7 @@ export async function retrieveFromGo(
     lanes?: RetrievalLane[];
   }
 ): Promise<RetrieveResponse> {
+  assertAtlasRuntimeRevisionQualified(runtime);
   const client = await getRetrievalGrpcClient();
 
   const request: RetrieveRequest = {
@@ -150,6 +155,7 @@ export async function buildContextFromGo(
   packetKeys: string[],
   maxTokens?: number
 ): Promise<ContextPacket> {
+  assertAtlasRuntimeRevisionQualified(runtime);
   const client = await getRetrievalGrpcClient();
 
   const request: BuildContextRequest = {
@@ -171,6 +177,7 @@ export async function validatePacketFromGo(
   packetKey: string,
   proposedChange: Record<string, unknown>
 ): Promise<ValidationResult> {
+  assertAtlasRuntimeRevisionQualified(runtime);
   const client = await getRetrievalGrpcClient();
 
   const request: ValidatePacketRequest = {
@@ -210,6 +217,53 @@ interface GoCodebaseChunkHttp {
 interface GoCodebaseSearchResponseHttp {
   chunks?: GoCodebaseChunkHttp[];
   total_ms?: number;
+  receipt?: GoToolReceiptV2Http;
+}
+
+interface GoToolReceiptV2Http {
+  schema?: string;
+  tool_call_id?: string;
+  tool_name?: string;
+  run_id?: string;
+  workspace_id?: string;
+  workspace_revision?: string;
+  packet_key?: string;
+  packet_revision?: string;
+  succeeded?: boolean;
+  retrieval_confidence?: number;
+  evidence_count?: number;
+  validation_status?: string;
+  output_checksum?: string;
+  error_code?: string;
+  canonical_authority?: boolean;
+  writes_performed?: boolean;
+  receipt_id?: string;
+  receipt_checksum?: string;
+}
+
+function mapGoReceiptV2(receipt: GoToolReceiptV2Http | undefined): RuntimeToolReceiptV1 | undefined {
+  if (!receipt) return undefined;
+  const parsed = RuntimeToolReceiptV1Schema.safeParse({
+    schema: 'atlas.runtime-tool-receipt.v1',
+    receiptId: receipt.receipt_id,
+    receiptChecksum: receipt.receipt_checksum,
+    toolCallId: receipt.tool_call_id,
+    toolName: receipt.tool_name,
+    runId: receipt.run_id,
+    workspaceId: receipt.workspace_id,
+    packetKey: receipt.packet_key,
+    workspaceRevision: receipt.workspace_revision,
+    packetRevision: receipt.packet_revision,
+    succeeded: receipt.succeeded,
+    errorCode: receipt.error_code ?? null,
+    retrievalConfidence: receipt.retrieval_confidence ?? null,
+    evidenceCount: receipt.evidence_count,
+    validationStatus: receipt.validation_status,
+    outputChecksum: receipt.output_checksum ?? null,
+    writesPerformed: receipt.writes_performed,
+    canonicalAuthority: receipt.canonical_authority,
+  });
+  return parsed.success ? parsed.data : undefined;
 }
 
 async function retrieveFromGoHttp(
@@ -224,7 +278,8 @@ async function retrieveFromGoHttp(
   // /search/codebase is the closest real match for a dense codebase-retrieval request; this
   // fallback calls it directly rather than a fictional /retrieval/retrieve endpoint that has
   // never existed on this service, and maps its real response shape into RetrieveResponse.
-  const base = process.env.GO_RETRIEVAL_HTTP_URL || 'http://localhost:8100';
+  const base = ENV.GO_RETRIEVAL_HTTP_URL;
+  if (!base) throw new Error('GO_RETRIEVAL_HTTP_UNAVAILABLE');
   const url = new URL('/search/codebase', base);
 
   const response = await fetch(url.toString(), {
@@ -237,6 +292,16 @@ async function retrieveFromGoHttp(
     body: JSON.stringify({
       query,
       limit: options?.topK ?? 12,
+      atlas_context: {
+        tool_call_id: runtime.correlationId ?? '',
+        run_id: runtime.runId,
+        workspace_id: runtime.workspaceId,
+        workspace_revision: runtime.workspaceRevision,
+        packet_key: runtime.packetKey,
+        packet_revision: runtime.packetRevision,
+      },
+      workspace_revision: runtime.workspaceRevision,
+      packet_revision: runtime.packetRevision,
     }),
   });
 
@@ -249,15 +314,25 @@ async function retrieveFromGoHttp(
   const body: GoCodebaseSearchResponseHttp = await response.json();
   const chunks = body.chunks ?? [];
 
+  // A transport chunk ID is a projection identifier, never a packet identity.
+  // Drop hits without an explicit canonical packet_key rather than inventing
+  // one from a chunk ID, file path, or transport position.
+  const qualifiedChunks = chunks.filter((c) => (
+    typeof c.packet_key === 'string' && c.packet_key.trim().length > 0 &&
+    typeof c.source_ref === 'string' && c.source_ref.trim().length > 0 &&
+    typeof c.content_hash === 'string' && c.content_hash.trim().length > 0
+  ));
+
   return {
     retrievalId: `go-http:${runtime.runId}:${Date.now()}`,
     workspaceRevision: runtime.workspaceRevision,
-    evidence: chunks.map((c): EvidenceRef => ({
-      packetKey: c.packet_key ?? c.chunk_id,
-      sourceRef: c.source_ref ?? c.file_path,
-      contentHash: c.content_hash ?? '',
+    evidence: qualifiedChunks.map((c): EvidenceRef => ({
+      packetKey: c.packet_key!,
+      sourceRef: c.source_ref!,
+      contentHash: c.content_hash!,
       denseScore: c.score,
     })),
+    receipt: mapGoReceiptV2(body.receipt),
   };
 }
 

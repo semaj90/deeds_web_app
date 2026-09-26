@@ -2,7 +2,274 @@
   "schema": "atlas.packet-chunk-lineage-promotion-preflight.v1",
   "mode": "READ_ONLY_PROMOTION_PREFLIGHT",
   "limit": 10,
-  "candidates": [],
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "requestedRunId": null,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "executionBridge": {
+    "executionFound": true,
+    "legacyGraphifyRunId": "01a8d8fc-2507-4f39-868e-039039237b98",
+    "canonicalAuthority": true,
+    "status": "BRIDGE_AVAILABLE"
+  },
+  "joinFunnel": {
+    "execution_membership_rows": 25542,
+    "legacy_run_source_rows": 0,
+    "requested_run_file_rows": 0,
+    "candidate_run_registry_rows": 1,
+    "requested_run_workspace_revision": null,
+    "requested_run_manifest_digest": null,
+    "requested_run_manifest_source_count": null,
+    "requested_run_status": null,
+    "legacy_source_refs_any_run": 23743,
+    "legacy_rows_any_run": 24113,
+    "legacy_run_ids_any_run": 6,
+    "source_ref_matches": 0,
+    "source_revision_matches": 0,
+    "content_digest_matches": 0,
+    "packet_source_matches": 17398,
+    "packet_revision_matches": 0,
+    "packet_digest_matches": 0,
+    "chunk_source_matches": 20015,
+    "chunk_revision_matches": 0,
+    "chunk_file_content_matches": 0,
+    "requestedRunId": null,
+    "legacyEvidenceStatus": "RUN_FILE_EVIDENCE_UNDER_OTHER_RUN",
+    "firstFailingBoundary": "RUN_FILE_MISSING"
+  },
+  "candidates": [
+    {
+      "packetKey": null,
+      "sourceRef": "2-CONTEXT.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "724_agents.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ACE-BITFROST-WORKER-INTEGRATION.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [
+        {
+          "packet_key": "packet:3ad3b3b33566",
+          "source_ref": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+          "source_revision": null,
+          "content_hash": null,
+          "workspace_revision": null,
+          "lineage_binding_checksum": null
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_REVISION_MISMATCH",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ace-pipeline-audit.mjs",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [
+        {
+          "packet_key": "packet:11ee15a50565",
+          "source_ref": "ace-pipeline-audit.mjs",
+          "source_revision": null,
+          "content_hash": null,
+          "workspace_revision": null,
+          "lineage_binding_checksum": null
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_REVISION_MISMATCH",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ACE-QUICK-REFERENCE.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ACE-SUMMARY-LATENCY-IMPACT.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [
+        {
+          "packet_key": "packet:f7fa242997fb",
+          "source_ref": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+          "source_revision": null,
+          "content_hash": null,
+          "workspace_revision": null,
+          "lineage_binding_checksum": null
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_REVISION_MISMATCH",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
+    },
+    {
+      "packetKey": null,
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:ed3c32c3f498c66db78ef38dc6821a3e6576bfd0b648ed6d2b4db2cf085ad96d",
+      "memberships": [
+        {
+          "canonicalChunkId": null,
+          "chunkRowId": null
+        }
+      ],
+      "packetEvidence": [],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "PACKET_MISSING",
+        "CHUNK_MISSING"
+      ]
+    }
+  ],
+  "boundedCandidateBlockedReasonCounts": {
+    "PACKET_MISSING": 7,
+    "CHUNK_MISSING": 10,
+    "PACKET_REVISION_MISMATCH": 3
+  },
   "eligibleCandidateCount": 0,
   "plannedWrites": {
     "atlas_packets": 0,
@@ -12,11 +279,11 @@
     "cache": 0
   },
   "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
-  "generatedAt": "2026-09-11T14:22:35.863Z",
+  "generatedAt": "2026-09-20T23:54:05.423Z",
   "databaseError": null,
   "writesPerformed": false,
   "canonicalAuthority": false,
   "promotionAuthorized": false,
   "rollback": "Transaction rollback before commit; no transaction was opened by this preflight.",
-  "preflightChecksum": "sha256:113cd271010e7ded661c3201da1e3726e44596a083bd0d7e6d715bfc2b85cf79"
+  "preflightChecksum": "sha256:bda3d447cf79f770adf8182de990ed3681a3c9053f07a3f9434f41a0282039ab"
 }

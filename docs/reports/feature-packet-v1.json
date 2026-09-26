@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.feature-packet-contract-proof.v1",
+  "generatedAt": "2026-09-23T18:38:51Z",
+  "status": "FEATURE_PACKET_V1_FIXTURE_PROVEN_NONCANONICAL",
+  "owner": "@atlas/semantic-contracts",
+  "implementation": {
+    "contract": "packages/semantic-contracts/src/feature-packet-v1.ts",
+    "payloadOwnerReused": "DomainFeaturePacketSchema from packages/semantic-contracts/src/domain-feature-packet.ts",
+    "checksumOwner": "canonicalHashJSON from packages/semantic-contracts/src/canonical-hashing.ts",
+    "exportedFrom": [
+      "packages/semantic-contracts/src/index.ts",
+      "packages/semantic-contracts/package.json#exports./feature-packet-v1"
+    ],
+    "boundFields": ["packetKey", "sourceRef", "sourceRevision", "workspaceRevision", "producerRevision", "featureRevision"],
+    "groundedEvidence": ["topicEvidence", "domainEvidence", "languageEvidence"],
+    "safety": { "canonicalAuthority": false, "writesPerformed": false, "promotionAuthorized": false },
+    "identityBehavior": "packetKey is supplied by the existing owner; envelope validates it against the nested domain feature packet and never derives or rewrites it."
+  },
+  "checksumRegression": {
+    "oldFailure": "JSON.stringify replacer array was built from root keys, which silently removed nested keys absent at the root before hashing.",
+    "fix": "Recursively sort object keys while preserving every JSON-compatible nested value; array order remains significant.",
+    "test": "packages/semantic-contracts/src/canonical-hashing.test.ts"
+  },
+  "validation": {
+    "typescriptBuild": "PASS",
+    "focusedTests": { "passed": 7, "failed": 0 },
+    "coverage": [
+      "nested hash fields are retained",
+      "object insertion order does not affect digest",
+      "array order remains significant",
+      "topic evidence normalization is deterministic",
+      "source and producer revision changes alter the packet checksum",
+      "nested packet key mismatch and checksum tampering fail validation",
+      "nested feature-schema revision mismatch fails validation"
+    ]
+  },
+  "writes": { "postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0, "graphify": 0 }
+}

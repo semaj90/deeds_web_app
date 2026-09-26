@@ -15,7 +15,7 @@
 const args = process.argv.slice(2);
 const urlIdx = args.indexOf('--url');
 const BASE = urlIdx >= 0 ? args[urlIdx + 1] : 'http://127.0.0.1:8090';
-const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 let passed = 0;
 let failed = 0;

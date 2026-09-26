@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.candidate-manifest-contract.v1",
+  "change": "parent-atlas-retrieval-logic-convergence",
+  "task": "CANDIDATE-MANIFEST-01",
+  "status": "CANDIDATE_MANIFEST_CONTRACT_PROVEN",
+  "implementation": "sveltekit-frontend/src/lib/server/retrieval/candidate-manifest-v1.ts",
+  "tests": "sveltekit-frontend/src/lib/server/retrieval/candidate-manifest-v1.spec.ts",
+  "invariants": {
+    "requestId": true,
+    "workspaceRevision": true,
+    "rankingRevision": true,
+    "orderedCanonicalCandidateIds": true,
+    "duplicateIdsRejected": true,
+    "candidateSetChecksum": true,
+    "cursorBindsCandidateSetChecksum": true,
+    "paginationUsesCanonicalIdentity": true,
+    "incompleteCandidateSetFailsClosed": true
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "liveCandidateFreeze": false,
+  "nextGate": "CANDIDATE-MANIFEST-02_EPHEMERAL_RESIDENCY_AND_LIVE_ADMISSION"
+}

@@ -33,6 +33,12 @@ const REPORTS_DIR = path.join(REPO_ROOT, 'docs', 'reports');
 const OUT_JSON = path.join(REPORTS_DIR, 'postgres-contract-mirrors-report.json');
 const OUT_MD = path.join(REPORTS_DIR, 'postgres-contract-mirrors-report.md');
 
+async function writeReportAtomically(filePath, contents) {
+  const tempPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+  await fs.writeFile(tempPath, contents, 'utf8');
+  await fs.rename(tempPath, filePath);
+}
+
 const TABLES = [
   {
     tableName: 'kanban_tasks',
@@ -55,6 +61,36 @@ const TABLES = [
       path.join(FRONTEND_ROOT, 'drizzle', '0024_nebulous_mongoose.sql'),
     ],
     staticIdentityFields: ['id', 'feature_key'],
+  },
+  {
+    tableName: 'atlas_workspace_events',
+    schemaFiles: [
+      path.join(FRONTEND_ROOT, 'src', 'lib', 'server', 'db', 'schema', 'workspace-events.ts'),
+    ],
+    manualFiles: [
+      path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260916_workspace_event_head_v1.sql'),
+    ],
+    staticIdentityFields: ['event_id', 'event_checksum', 'workspace_id', 'sequence'],
+  },
+  {
+    tableName: 'atlas_workspace_event_participants',
+    schemaFiles: [
+      path.join(FRONTEND_ROOT, 'src', 'lib', 'server', 'db', 'schema', 'workspace-events.ts'),
+    ],
+    manualFiles: [
+      path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260916_workspace_event_head_v1.sql'),
+    ],
+    staticIdentityFields: ['event_id', 'participant_ordinal', 'canonical_id'],
+  },
+  {
+    tableName: 'atlas_workspace_heads',
+    schemaFiles: [
+      path.join(FRONTEND_ROOT, 'src', 'lib', 'server', 'db', 'schema', 'workspace-events.ts'),
+    ],
+    manualFiles: [
+      path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260916_workspace_event_head_v1.sql'),
+    ],
+    staticIdentityFields: ['workspace_id', 'workspace_head_revision', 'last_event_sequence'],
   },
   {
     tableName: 'task_semantic_packets',
@@ -244,13 +280,22 @@ function parseSqlText(text, tableName) {
         indexes.add(uniqueConstraintMatch[1].toLowerCase());
         continue;
       }
-      if (/^(primary key|foreign key|check|unique|exclude)\b/i.test(line)) continue;
+      // Table-level constraints and referential actions are not columns. The
+      // previous parser admitted `constraint` and `on delete/update` lines as
+      // identifiers, creating false static COLUMN_MISMATCH results for the
+      // workspace event/head sidecar.
+      if (/^(primary key|foreign key|check|unique|exclude|constraint)\b/i.test(line)) continue;
+      if (/^on\s+(delete|update)\b/i.test(line)) continue;
       if (/^(generated|case|when|then|else|end)\b/i.test(line)) continue;
-      const columnMatch = line.match(/^"?([A-Za-z0-9_]+)"?\s+[A-Za-z][A-Za-z0-9_\s\(\)\[\],"'`.-]*/);
+      // Drizzle-generated SQL commonly quotes identifiers (`"id" uuid`).
+      // Match the identifier and the required type separately so quoted SQL
+      // columns are not silently dropped from the manual contract.
+      const columnMatch = line.match(/^(?:"([A-Za-z0-9_]+)"|([A-Za-z0-9_]+))\s+[A-Za-z]/);
       if (columnMatch) {
-        columns.add(columnMatch[1].toLowerCase());
+        const columnName = columnMatch[1] ?? columnMatch[2];
+        columns.add(columnName.toLowerCase());
         if (/\bunique\b/i.test(line)) {
-          indexes.add(`${tableName}_${columnMatch[1].toLowerCase()}_key`);
+          indexes.add(`${tableName}_${columnName.toLowerCase()}_key`);
         }
       }
     }
@@ -658,8 +703,8 @@ async function main() {
   };
 
   await fs.mkdir(REPORTS_DIR, { recursive: true });
-  await fs.writeFile(OUT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-  await fs.writeFile(OUT_MD, buildMarkdown(report), 'utf8');
+  await writeReportAtomically(OUT_JSON, `${JSON.stringify(report, null, 2)}\n`);
+  await writeReportAtomically(OUT_MD, buildMarkdown(report));
 
   if (JSON_MODE) {
     console.log(JSON.stringify(report, null, 2));

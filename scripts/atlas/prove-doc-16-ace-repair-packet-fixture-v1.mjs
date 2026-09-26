@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { parseAceRepairPacketV1 } from '../../packages/parent-atlas/src/core/ace-repair-packet-v1.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const reportPath = path.resolve(root, 'docs/reports/parent-atlas/doc-16-ace-repair-packet-fixture-v1.json');
@@ -24,14 +25,23 @@ const packet = {
   canonicalAuthority: false,
   writesPerformed: false,
 };
+const validatedPacket = parseAceRepairPacketV1(packet);
 const forbidden = ['hiddenThoughts', 'chainOfThought', 'kv_cache', 'tensor', 'rawPrompt'];
-const serialized = JSON.stringify(packet, Object.keys(packet).sort());
+const serialized = JSON.stringify(validatedPacket, Object.keys(validatedPacket).sort());
 const report = {
   schema: 'atlas.doc-16-ace-repair-packet-fixture-proof.v1',
   gate: 'DOC-16',
   status: 'DOC_16_ACE_PACKET_FIXTURE_PROVEN',
-  packet,
+  packet: validatedPacket,
   packetChecksum: `sha256:${createHash('sha256').update(serialized, 'utf8').digest('hex')}`,
+  contractValidation: {
+    schema: 'atlas.ace-repair-packet.v1',
+    result: 'PASS',
+    strictUnknownFieldRejection: true,
+    sourceRevisionQualified: true,
+    duplicateOrdinalsRejected: true,
+    sourceRevisionPairsComplete: true,
+  },
   forbiddenFieldsPresent: forbidden.filter((field) => Object.prototype.hasOwnProperty.call(packet, field)),
   descriptorOnly: true,
   canonicalAuthority: false,

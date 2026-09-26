@@ -68,8 +68,12 @@ FRONTEND_DIR = WORKSPACE_ROOT / "sveltekit-frontend"
 
 # CLI args
 DRY_RUN = "--dry-run" in sys.argv
+# This legacy LangGraph script is retained for historical inspection only.
+# It is not the governed repair owner and must never mutate the workspace.
+LEGACY_REPLAY_ONLY = True
 MAX_CYCLES = 3
-MODEL = "gemma4-legal:latest"
+LLAMA_SERVER_URL = os.getenv("LLAMA_SERVER_URL", "http://127.0.0.1:8090")
+MODEL = os.getenv("LLAMA_SERVER_MODEL", "ornith-1.5-9b")
 for i, arg in enumerate(sys.argv):
     if arg == "--max-cycles" and i + 1 < len(sys.argv):
         MAX_CYCLES = int(sys.argv[i + 1])
@@ -82,7 +86,9 @@ OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "embeddinggemma:latest")
 SKIP_QDRANT = "--no-qdrant" in sys.argv
 
-SVELTE5_MODEL = os.getenv("SVELTE5_MODEL", "gemma4-legal-fast:latest")  # same weights, lower-latency tuning — faster for Svelte 5 pattern fixes
+# Phase 66 is historical/quarantined. Keep its model metadata aligned with the
+# active llama-server owner, but do not claim that this legacy path is live.
+SVELTE5_MODEL = os.getenv("SVELTE5_MODEL", MODEL)
 
 # Patterns that indicate Svelte 5 compliance violations (G21-G25)
 SVELTE5_ERROR_PATTERNS = [
@@ -107,13 +113,13 @@ KNOWN_FIXERS = {
     "fix-svelte5-all":          "scripts/fix-svelte5-all.ps1",            # Full Svelte 4→5 migration pass
 }
 
-llm = ChatOllama(model=MODEL, base_url="http://localhost:8090", temperature=0.1)
-svelte5_llm = ChatOllama(model=SVELTE5_MODEL, base_url="http://localhost:11434", temperature=0.05)
+llm = ChatOllama(model=MODEL, base_url=LLAMA_SERVER_URL, temperature=0.1)
+svelte5_llm = ChatOllama(model=SVELTE5_MODEL, base_url=LLAMA_SERVER_URL, temperature=0.05)
 
 print("🤖 Phase 66: Automated Error Fixer (LangGraph)")
 print("=" * 60)
 print(f"📁 Workspace: {WORKSPACE_ROOT}")
-print(f"🧠 LLM: {MODEL}  |  Svelte5 LLM: {SVELTE5_MODEL}")
+print(f"🧠 llama-server: {LLAMA_SERVER_URL}  |  model: {MODEL}  |  Svelte5 model: {SVELTE5_MODEL}")
 print(f"🔁 Max cycles: {MAX_CYCLES}")
 print(f"{'🔍 DRY RUN — no files will be modified' if DRY_RUN else '✏️  LIVE — fixes will be applied'}")
 print(f"🔎 Qdrant retrieval: {'SKIP (--no-qdrant)' if SKIP_QDRANT else QDRANT_URL + ' / ' + QDRANT_COLLECTION if QDRANT_AVAILABLE else 'UNAVAILABLE (install langchain-qdrant)'}")
@@ -424,7 +430,12 @@ If no clear automated fix exists, return an empty fix_actions list."""
 
 
 def fixer_node(state: AgentState) -> AgentState:
-    """Execute fix_plan actions (unless --dry-run)."""
+    """Keep legacy fixer actions non-executable.
+
+    The old implementation could invoke shell and regex mutators directly.
+    Current repair must use the evidence-first capture and governed replay
+    owners, so this node records the proposed actions without executing them.
+    """
     print("\n━━━ [fixer] ━━━")
     actions = state.get("fix_plan", [])
     applied = list(state.get("fixes_applied", []))
@@ -432,6 +443,10 @@ def fixer_node(state: AgentState) -> AgentState:
     if not actions:
         print("  No actions to apply.")
         return {**state, "fixes_applied": applied}
+
+    if LEGACY_REPLAY_ONLY:
+        print("  [BLOCKED] Legacy fixer actions are historical evidence only; no mutator is executable.")
+        return {**state, "fixes_applied": applied, "done": True}
 
     for action in actions:
         if action in applied:

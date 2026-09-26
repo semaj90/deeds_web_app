@@ -150,6 +150,11 @@
       behavior; per this repo's Agent Execution Integrity and canonical-mutation-authorization
       rules, this requires an explicit operator decision on which status convention(s) to cover
       before any `CREATE OR REPLACE VIEW` runs, not a same-pass fix bundled into a proof task.
+      Read-only reconciliation plan added at
+      `scripts/atlas/plan-analysis-pass-current-reconciliation-v1.mjs` with report
+      `docs/reports/parent-atlas/analysis-pass-current-reconciliation-plan-v1.json`.
+      The proposed compatibility policy is `status IN ('success', 'succeeded')` plus
+      `created_at DESC, id DESC`; no DDL is executed by the plan.
 
 ## 3. Deferred Engram ingestion lane — investigate before deciding to build
 

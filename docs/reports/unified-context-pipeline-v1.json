@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.unified-context-pipeline-report.v1",
+  "status": "CONTRACT_PROVEN_LIVE_DATA_GATES_OPEN",
+  "descriptor": "sveltekit-frontend/src/lib/server/atlas/pipeline/unified-context-pipeline-v1.ts",
+  "focusedTests": { "passed": 6, "failed": 0 },
+  "ownerIntegrationTests": { "passed": 14, "failed": 0 },
+  "openspecValidation": "PASS",
+  "diffCheck": "PASS",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "boundaries": {
+    "postgresql": "canonical identity and lineage",
+    "classifier": "derived evidence only",
+    "networkx": "CPU graph/DAG reference",
+    "simdjson": "bounded control/envelope parsing",
+    "turbovec": "executor/projection",
+    "pytorchSimt": "optional bounded executor",
+    "aceBitfrost": "revision-qualified cache admission"
+  },
+  "remainingLiveGates": [
+    "current packet cohort admission",
+    "classifier training/evaluation lineage",
+    "live FastAPI/Python producer readback",
+    "GPU or SIMT parity"
+  ]
+}

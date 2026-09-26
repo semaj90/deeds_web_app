@@ -1,0 +1,66 @@
+{
+  "schema": "atlas.graphify-incremental-head-report.v1",
+  "status": "PURE_DELTA_AND_REPLAY_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "proof": {
+    "testsPassed": 19,
+    "testsFailed": 0,
+    "sourceStates": ["ADDED", "CHANGED", "UNCHANGED", "DELETED"],
+    "staleSourceResultRejected": true,
+    "requeueRequired": true,
+    "deterministicEventReplay": true,
+    "casReadyConflictTombstoneNoopOutcomes": true,
+    "headScopedOwnerResolution": true,
+    "historicalWorkspaceOnlyOwnerRejected": true,
+    "equivalentReadOnlyOwnerDoesNotGrantMutation": true,
+    "casBatchPlan": {
+      "ready": 954,
+      "noop": 24714,
+      "tombstone": 0,
+      "conflict": 0,
+      "superseded": 0,
+      "writesPerformed": false
+    },
+    "selectiveInvalidationProjector": {
+      "explicitDependencyCone": true,
+      "unrelatedDependenciesPreserved": true,
+      "writesPerformed": false
+    },
+    "packetChunkRepairPlanner": {
+      "exactLineageRequired": true,
+      "syntheticTargetsAllowed": false,
+      "typedBlockers": true,
+      "writesPerformed": false
+    },
+    "fullSnapshotRequiredForOrdinaryDelta": false
+  },
+  "implementation": {
+    "eventContract": "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts",
+    "deltaContract": "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-delta-v1.ts",
+    "dailyGraphifyIntegration": "NOT_YET_WIRED",
+    "durablePostgresProjector": "NOT_YET_AUTHORIZED",
+    "casPlanner": "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-binding-cas-v1.ts",
+    "eventHeadSidecar": "sveltekit-frontend/drizzle/manual/20260916_workspace_event_head_v1.sql",
+    "eventHeadSidecarStatus": "PLANNED_UNAPPLIED",
+    "liveDeltaPlan": {
+      "status": "READ_ONLY_DELTA_PLAN",
+      "beforeSnapshotRevision": "sha256:ea92e7a9eb57d6bc5a03991eae21cd255e1e9b8b2e2b03f49085fbea4951d771",
+      "afterSnapshotRevision": "sha256:f22cc64278dbd5ccc197c62c2ee5b2ac3345dbdcf24d7eb4ac5c367b0b62ccf9",
+      "totalSources": 25668,
+      "added": 303,
+      "changed": 651,
+      "deleted": 0,
+      "unchanged": 24714,
+      "writesPerformed": false,
+      "promotionEligible": false
+    }
+  },
+  "remainingBlockers": [
+    "head-scoped Graphify execution admission",
+    "durable event/head storage owner",
+    "CAS source-binding projector",
+    "packet/chunk selective invalidation worker",
+    "periodic snapshot compaction policy"
+  ]
+}

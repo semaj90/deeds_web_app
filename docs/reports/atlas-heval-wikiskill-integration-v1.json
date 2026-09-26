@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.wikiskill-harness-evaluation.v1",
+  "generatedAt": "2026-09-11",
+  "status": "HEVAL_PLANNED_INTEGRATION_BLOCKED_ON_CURRENT_SOURCE_LINEAGE",
+  "paper": {
+    "title": "WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution",
+    "url": "https://arxiv.org/html/2608.27454",
+    "verifiedArchitecture": [
+      "immutable raw execution traces",
+      "persistent structured wiki knowledge",
+      "evolving procedural skills",
+      "validation-gated skill acceptance with rollback"
+    ]
+  },
+  "parentAtlasMapping": {
+    "rawLayer": "immutable execution and validation receipts",
+    "wikiLayer": "governed evidence and repair knowledge",
+    "skillsLayer": "versioned harness/procedure proposals",
+    "contextBoundary": "ACE ContextManifest",
+    "retrievalOwner": "SearchRuntime",
+    "identityOwner": "PostgreSQL canonical packet/chunk lineage"
+  },
+  "adapterBoundaries": {
+    "prime": "optional bounded RLM/harness adapter",
+    "hermes": "optional procedural-skill evolution and evaluation adapter",
+    "paperclip": "optional outer job/session orchestration adapter",
+    "canonicalAuthority": false,
+    "liveRuntimeWiringProven": false
+  },
+  "evaluationArms": [
+    "A0_BASELINE",
+    "A1_SKILL_ONLY",
+    "A2_RLM",
+    "A3_PRIME_RLM",
+    "A4_HERMES_SKILL",
+    "A5_HELPERS",
+    "A6_COMBINED"
+  ],
+  "censusKeywords": [
+    "Prime",
+    "Hermes",
+    "Paperclip",
+    "WikiSkill",
+    "ACE",
+    "BitFrost",
+    "RLM",
+    "CandidateFeatureMatrix",
+    "ContextManifest",
+    "Hamming",
+    "Hilbert",
+    "Tang",
+    "OakJudgeFeedback"
+  ],
+  "currentEvidence": {
+    "aceLedger": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "retrievalLineageLedger": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+    "traceMcpAudit": "docs/reports/trace-disabled-search-tools-v1.json",
+    "traceKnowledgeSearch": {
+      "tool": "kb.trace_search",
+      "query": "WikiSkill Prime Hermes Paperclip ACE BitFrost RLM",
+      "candidateSurface": "sveltekit-frontend/src/lib/server/ace/ace-wiki.ts",
+      "interpretation": "existing ACE/Ollama structured-output wiki candidate; not yet a governed skill layer",
+      "canonicalAuthority": false
+    },
+    "currentLineageBlocker": "GRAPHIFY_SOURCE_MEMBERSHIP",
+    "currentLineageStatus": "SCHEMA_BRIDGE_PROVEN_CURRENT_LINEAGE_UNPROVEN"
+  },
+  "writesPerformed": {
+    "postgresql": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "models": false,
+    "projections": false,
+    "runtimeIntegration": false
+  },
+  "nextGate": "HEVAL-05 bounded A0/A1/A2 three-candidate replay after current Graphify source membership is proven"
+}

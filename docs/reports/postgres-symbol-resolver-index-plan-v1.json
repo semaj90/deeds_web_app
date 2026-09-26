@@ -1,0 +1,112 @@
+{
+  "schema": "atlas.postgres-symbol-resolver-index-plan.v1",
+  "generatedAt": "2026-09-21T02:05:41.885Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "table": "public.atlas_symbol_versions",
+  "estimatedRows": 479,
+  "indexes": [
+    {
+      "name": "atlas_symbol_versions_pkey",
+      "definition": "CREATE UNIQUE INDEX atlas_symbol_versions_pkey ON public.atlas_symbol_versions USING btree (symbol_version_id)"
+    },
+    {
+      "name": "atlas_symbol_versions_stable_symbol_id_source_revision_decl_key",
+      "definition": "CREATE UNIQUE INDEX atlas_symbol_versions_stable_symbol_id_source_revision_decl_key ON public.atlas_symbol_versions USING btree (stable_symbol_id, source_revision, declaration_hash, upstream_node_id)"
+    },
+    {
+      "name": "idx_atlas_symbol_versions_packet_ordinal",
+      "definition": "CREATE INDEX idx_atlas_symbol_versions_packet_ordinal ON public.atlas_symbol_versions USING btree (packet_key, candidate_ordinal) WHERE (packet_key IS NOT NULL)"
+    },
+    {
+      "name": "idx_atlas_symbol_versions_source",
+      "definition": "CREATE INDEX idx_atlas_symbol_versions_source ON public.atlas_symbol_versions USING btree (source_ref, source_revision)"
+    },
+    {
+      "name": "idx_atlas_symbol_versions_symbol_revision",
+      "definition": "CREATE INDEX idx_atlas_symbol_versions_symbol_revision ON public.atlas_symbol_versions USING btree (stable_symbol_id, source_revision)"
+    },
+    {
+      "name": "idx_atlas_symbol_versions_upstream_node",
+      "definition": "CREATE INDEX idx_atlas_symbol_versions_upstream_node ON public.atlas_symbol_versions USING btree (upstream_node_id)"
+    },
+    {
+      "name": "idx_atlas_symbol_versions_upstream_symbol",
+      "definition": "CREATE INDEX idx_atlas_symbol_versions_upstream_symbol ON public.atlas_symbol_versions USING btree (upstream_symbol_id) WHERE (upstream_symbol_id IS NOT NULL)"
+    }
+  ],
+  "observedQueries": [
+    "source_ref = $1 AND source_revision = $2 (existing idx_atlas_symbol_versions_source covers this)",
+    "source_revision = $1 (no leading-column index observed)",
+    "qualified_name = $1 (no leading-column index observed)"
+  ],
+  "plans": [
+    {
+      "id": "source_revision_exact",
+      "predicate": "source_revision = $1",
+      "plan": {
+        "nodes": [
+          "Limit",
+          "Seq Scan"
+        ],
+        "usesSeqScan": true,
+        "usesIndex": false,
+        "usesBitmap": false
+      }
+    },
+    {
+      "id": "qualified_name_exact",
+      "predicate": "qualified_name = $1",
+      "plan": {
+        "nodes": [
+          "Limit",
+          "Seq Scan"
+        ],
+        "usesSeqScan": true,
+        "usesIndex": false,
+        "usesBitmap": false
+      }
+    },
+    {
+      "id": "source_revision_and_qualified_name",
+      "predicate": "source_revision = $1 AND qualified_name = $2",
+      "plan": {
+        "nodes": [
+          "Limit",
+          "Seq Scan"
+        ],
+        "usesSeqScan": true,
+        "usesIndex": false,
+        "usesBitmap": false
+      }
+    }
+  ],
+  "proposal": {
+    "status": "DRAFT_NOT_APPLIED",
+    "preferredShape": "Do not add an index solely because the table contract names a field; select a composite or standalone index only after resolver call-site census and EXPLAIN on production-shaped predicates.",
+    "candidates": [
+      {
+        "name": "atlas_symbol_versions_source_revision_idx",
+        "sql": "CREATE INDEX CONCURRENTLY atlas_symbol_versions_source_revision_idx ON public.atlas_symbol_versions (source_revision);",
+        "useWhen": "Independent revision-only filtering is a real hot query."
+      },
+      {
+        "name": "atlas_symbol_versions_qualified_name_idx",
+        "sql": "CREATE INDEX CONCURRENTLY atlas_symbol_versions_qualified_name_idx ON public.atlas_symbol_versions (qualified_name);",
+        "useWhen": "Independent exact qualified-name lookup is a real hot query."
+      },
+      {
+        "name": "atlas_symbol_versions_source_revision_qualified_name_idx",
+        "sql": "CREATE INDEX CONCURRENTLY atlas_symbol_versions_source_revision_qualified_name_idx ON public.atlas_symbol_versions (source_revision, qualified_name);",
+        "useWhen": "The dominant resolver predicate constrains both columns in this order."
+      }
+    ],
+    "excluded": [
+      "No pg_trgm index proposed: fuzzy qualified-name search is not yet proven as a resolver requirement.",
+      "No partial index excluding workspace:0: legacy values must be filtered by authority predicates, never hidden or coerced by index design.",
+      "No pgvector index: the existing semantic_768 HNSW owner is separate and already present."
+    ]
+  },
+  "nextGate": "POSTGRES_SYMBOL_RESOLVER_INDEX_PLAN_PROVEN"
+}

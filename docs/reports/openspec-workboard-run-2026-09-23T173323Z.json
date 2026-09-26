@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T17:33:23Z",
+  "pivot": {
+    "fromChange": "inference-wiring-deep-audit-aug22",
+    "toChange": "parent-atlas-versioned-doc-intelligence",
+    "reason": "The bounded inference-facade replay is already committed and verified; DOC-25 had a local, noncanonical compiler/test proof gap that could be closed without a container rebuild or persistent data mutation."
+  },
+  "previousGateReview": {
+    "inferenceFacadeReplay": "ALREADY_PROVEN_AND_COMMITTED",
+    "commit": "a5ae7a28ab181399810abf960f705be950e972eb",
+    "liveReplayRepeated": false
+  },
+  "selectedTask": "DOC-25",
+  "taskResult": "DOC_25_LIVE_ISOLATED_PATCH_COMPILER_TEST_REPLAY_PROVEN",
+  "completedTasksThisRun": [
+    "DOC-25 isolated patch/compiler/test receipt",
+    "DOC-23 executable ast-grep fixture and diff preview",
+    "DOC-22 exact byte-target/stale-revision fixture",
+    "DOC-24 revision-bound proposal contract fixture"
+  ],
+  "changeProgress": {
+    "change": "parent-atlas-versioned-doc-intelligence",
+    "complete": 17,
+    "total": 31,
+    "open": 14
+  },
+  "workboardSnapshot": {
+    "changes": 96,
+    "complete": 6163,
+    "total": 9395,
+    "open": 3232,
+    "source": "npx openspec list --json"
+  },
+  "postRunSnapshot": {
+    "changes": 96,
+    "complete": 6166,
+    "total": 9395,
+    "open": 3229,
+    "source": "npx openspec list --json"
+  },
+  "postRunChangeProgress": {
+    "change": "parent-atlas-versioned-doc-intelligence",
+    "complete": 20,
+    "total": 31,
+    "open": 11
+  },
+  "remainingKnownGates": [
+    "DOC-13 target code revision must be grounded to current source authority",
+    "DOC-23 live ast-grep execution and diff validation",
+    "DOC-24 real target-patch validation/application remains separately gated",
+    "DOC-17 Valkey readback remains explicitly open"
+  ],
+  "canonicalAuthority": false,
+  "canonicalWrites": false,
+  "containerRebuilds": 0,
+  "nextGate": "DOC_23_LIVE_AST_GREP_EXECUTION_AND_DIFF_VALIDATION",
+  "evidence": [
+    "scripts/atlas/prove-doc-24-patch-proposal-fixture-v1.mjs",
+    "scripts/atlas/prove-doc-25-compiler-test-replay-receipt-v1.mjs",
+    "docs/reports/parent-atlas/doc-24-patch-proposal-fixture-v1.json",
+    "docs/reports/parent-atlas/doc-25-compiler-test-replay-receipt-v1.json",
+    "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md"
+  ]
+}

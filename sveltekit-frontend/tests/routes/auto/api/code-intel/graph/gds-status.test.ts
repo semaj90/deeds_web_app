@@ -155,7 +155,7 @@ describe('src/routes/api/code-intel/graph/gds-status/+server.ts', () => {
 		const req = new Request('http://localhost/api/code-intel/graph/gds-status', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ action: 'full' }),
+			body: JSON.stringify({ action: 'full', apply: true }), // mutation-capable actions require apply=true (409 otherwise)
 		});
 		const resp = await handler({ request: req, locals: { user: { id: 'u1', email: 'user@example.com' } }, url: makeUrl(), params: {} });
 		expect(resp.status).toBe(200);

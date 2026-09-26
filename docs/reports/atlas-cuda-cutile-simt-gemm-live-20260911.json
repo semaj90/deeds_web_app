@@ -1,0 +1,45 @@
+{
+  "canonicalAuthority": false,
+  "cudaPeakMiB": 8.453,
+  "environment": {
+    "computeCapability": [
+      8,
+      6
+    ],
+    "cuTile": "1.5.0",
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "torch": "2.14.0+cu132",
+    "torchCuda": "13.2"
+  },
+  "fixture": {
+    "cutileFinite": true,
+    "dtype": "float16",
+    "maxAbsoluteDelta": 0.0,
+    "maxRelativeDelta": 0.0,
+    "shape": [
+      128,
+      128,
+      128
+    ],
+    "simtFinite": true
+  },
+  "schema": "atlas.cuda-cutile-simt-gemm-probe.v1",
+  "status": "CUTILE_SIMT_GEMM_FINITE_PARITY_PROVEN",
+  "timing": {
+    "cutileCompileAndFirstMs": 355.6719999996858,
+    "cutileWarmMeanMs": 0.13720533327917414,
+    "cutileWarmMs": [
+      0.23570899975311477,
+      0.06580300032510422,
+      0.1101039997593034
+    ],
+    "repeats": 3,
+    "simtWarmMeanMs": 0.09693666682627129,
+    "simtWarmMs": [
+      0.1471049999963725,
+      0.05020200023864163,
+      0.09350300024379976
+    ]
+  },
+  "writes": false
+}

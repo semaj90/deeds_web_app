@@ -1,4 +1,13 @@
-import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { integer, numeric, pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+
+// FIXED 2026-09-14 (PHASE78-LIVE-PROPOSAL-NO-PERSIST-01 investigation): errorClustersTable and
+// errorEventsTable below were stale relative to the live database -- confirmed via
+// information_schema.columns and pg_enum directly, not assumed. The live tables already have
+// real data (148 error_events rows) with these exact column names/types; this file was wrong,
+// not the database (Postgres is truth -- see root CLAUDE.md). No ALTER/migration was needed or
+// run for this fix; only this TypeScript declaration changed.
+export const errorKindEnum = pgEnum('error_kind', ['runtime', 'api', 'other']);
+export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'error', 'critical']);
 
 export const routeHealthTable = pgTable('route_health', {
 	id: uuid('id').defaultRandom().primaryKey(),
@@ -16,19 +25,30 @@ export const routeHealthTable = pgTable('route_health', {
 
 export const errorClustersTable = pgTable('error_clusters', {
 	id: uuid('id').defaultRandom().primaryKey(),
-	createdAt: timestamp('created_at').defaultNow(),
+	kind: errorKindEnum('kind').notNull(),
+	severity: errorSeverityEnum('severity').notNull(),
+	pattern: text('pattern').notNull(),
+	errorCount: integer('error_count').notNull().default(0),
+	routePaths: text('route_paths').array(),
+	radius: numeric('radius'),
+	lastUpdated: timestamp('last_updated').defaultNow().notNull(),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const errorEventsTable = pgTable('error_events', {
 	id: uuid('id').defaultRandom().primaryKey(),
-	routePath: text('route_path').notNull(),
-	filePath: text('file_path'),
+	routePath: varchar('route_path', { length: 255 }).notNull(),
+	file: varchar('file', { length: 255 }),
+	kind: errorKindEnum('kind').notNull(),
+	severity: errorSeverityEnum('severity').notNull(),
+	tsCode: varchar('ts_code', { length: 255 }), // TypeScript error code
 	message: text('message').notNull(),
-	stackTrace: text('stack_trace'),
-	tsCode: text('ts_code'), // TypeScript error code
-	severity: text('severity').notNull().default('error'),
+	stack: text('stack'),
+	lineNumber: integer('line_number'),
+	columnNumber: integer('column_number'),
 	clusterId: uuid('cluster_id').references(() => errorClustersTable.id, { onDelete: 'set null' }),
-	createdAt: timestamp('created_at').defaultNow(),
+	collectedAt: timestamp('collected_at').notNull(),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const errorSuggestionsTable = pgTable('error_suggestions', {

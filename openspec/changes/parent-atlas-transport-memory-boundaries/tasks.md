@@ -3,36 +3,100 @@
 ## Classification backlog
 
 - [ ] **PROTO-01** Freeze the transport ownership matrix for tRPC, gRPC, MCP, ACP, and A2A; record current callers and reject duplicate bus ownership.
-- [ ] **PROTO-02** Audit all active sidecar transports, including HTTP, gRPC, N-API, and spawned CLI paths; assign each to exactly one owner or mark it legacy/experimental.
-- [ ] **PROTO-03** Declare gRPC canonical for native polyglot compute only: Node, Python, Rust, C/CUDA, RAPIDS, TurboVec, and simdjson services.
-- [ ] **PROTO-04** Declare tRPC optional for TypeScript application-local control surfaces: SvelteKit UI, Kanban, recommendations, and receipts.
-- [ ] **ACP-01** Define the Parent Atlas coding-agent ACP boundary for editor sessions, permissions, tool actions, patches, terminal output, and progress.
-- [ ] **ACP-02** Map ACP session/task/action identifiers to existing `runId`, `taskId`, `ContextManifest` hash, and `ExecutionReceipt`; ACP must not own graph identity.
+- [x] **PROTO-02A** Classify TurboVec HTTP/gRPC operations, N-API adapter, and spawned-Python wrapper against one service owner; prove HTTP/gRPC health and fail closed on the missing N-API module/method. Evidence: `parent-atlas-transport-owner-matrix-v1.json`; no writes.
+- [ ] **PROTO-02B** Extend the owner/lifecycle matrix to all remaining active sidecars and verify each operation's runtime caller/protocol, without treating parallel interfaces as duplicate canonical owners.
+- [x] **PROTO-03** Declare gRPC the typed cross-language contract for native/polyglot compute, while permitting operation-specific HTTP health/compatibility/fallback routes under the same service owner. No app identity or fusion ownership transfers; contract added to the OpenSpec spec.
+- [x] **PROTO-04** Declare tRPC optional for demonstrated TypeScript application-local control surfaces. OpenSpec now states it is dormant capability without a client and cannot own identity, durable truth, cross-language compute, or workflow authority; the caller census found no in-repo tRPC client. Server mount remains unchanged.
+- [x] **ACP-01** Define the Parent Atlas coding-agent ACP boundary for editor sessions, permissions, tool actions, patches, terminal output, and progress. Contract-only: the new transport-memory-boundaries requirement and design section keep editor/session/action IDs protocol-local; delegate permission to `tool-authorization.ts`; bind actions to caller-resolved task/run/workflow-event/receipt owners; treat patches as proposals; bound/redact terminal output; and project progress from existing workflow events/receipts. ACP remains legacy inbound only with outbound disabled; no runtime adoption is claimed. `openspec validate parent-atlas-transport-memory-boundaries --strict` passes.
+- [x] **ACP-02A** Add a strict projection-only mapping contract for checksummed ACP ingress task/action/session/run references to the existing Kanban task attempt and `WorkflowActionEventV1` run/action/receipt references, carrying a supplied ContextManifest checksum; mismatched run, receipt, external refs, or ingress checksum fail closed. Fixture-proven only; no ACP runtime wiring, ContextManifest readback, or canonical authority is claimed.
+- [ ] **ACP-02B** Wire the ACP ingress caller to resolve the canonical task attempt, ContextManifest checksum, and ExecutionReceipt from their existing owners, then prove a bounded end-to-end mapping/readback. ACP must not own graph identity.
+      **Investigation done 2026-09-22, not wired — found the real "existing owners" for 2 of 3
+      inputs, and a real identity-format blocker that must be resolved before wiring can proceed
+      (recording this rather than forcing a wiring around it):**
+      - **Task attempt — real owner found, compatible.** `listKanbanTaskAttempts({ taskId, runId })`
+        (`sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts:380`) reads the real
+        `kanban_task_attempts` table (`id, task_id, run_id, worker, started_at, finished_at,
+        success, failure_kind, execution_receipt_id`) — column shape matches
+        `buildAcpIdentityProjectionV1`'s `taskAttempt` input exactly (`taskId`, `runId`,
+        `executionReceiptId`). Plain-text IDs both sides; no format conflict.
+      - **WorkflowActionEventV1 — canonical event IDs are UUIDs; ACP IDs remain external strings.**
+        `action-writer.ts` (`writeActionAtomically`,
+        lines ~222-245) already does the exact read this task needs — `SELECT payload FROM
+        workflow_events WHERE run_id = ? AND action_id = ? AND sequence_no = ?` — for its own
+        internal readback verification, then validates via
+        `canonical-action-write-adapter-v1.ts::validateCanonicalActionReadbackV1()`. But
+        `prepareCanonicalActionWriteV1()` in that same adapter file **hard-requires
+        `event.runId`/`event.actionId` to match a UUID regex**
+        (`CANONICAL_WORKFLOW_EVENT_RUN_ID_MUST_BE_UUID` / `..._ACTION_ID_MUST_BE_UUID`). The
+        ACP identity projection fixture now uses UUID-form `runId`/`actionId` for the Atlas-owned
+        event and task attempt while keeping ACP external identifiers as distinct protocol-local
+        strings. No UUID translation or canonical writer relaxation was added; the earlier
+        mismatch was fixture-level, not a production-owner decision.
+      - **ContextManifest checksum — no persisted lookup-by-run store found at all.**
+        `buildContextManifestV2()` (`sveltekit-frontend/src/lib/server/atlas/graph/
+        context-manifest-v2.ts`) is a pure function: given identity/revision inputs, it
+        deterministically computes a checksum — it is not a DB-backed store you resolve a
+        checksum FROM by run or task ID. Grepped `schema-postgres.ts` for any
+        `ContextManifestV2`/`context_manifest` table: zero matches. A separate, larger,
+        differently-scoped contract (`AtlasWorkflowSpecV1` in `agentic-file-compiler/contracts.ts`)
+        carries a `contextManifestId` field, but that's an ID reference inside a different DAG-spec
+        system, not confirmed to be the checksum store this task means — not chased further here.
+        **This remains the real gap**: there is currently nothing to "resolve the ContextManifest
+        checksum from its existing owner" by run/task ID; the checksum is only ever freshly
+        computed from inputs the caller must already have, which may mean ACP-02B's phrasing needs
+        revisiting rather than treating this as a missing implementation.
+      No code written, no tests run, no DB touched — read-only investigation only.
 - [ ] **A2A-01** Add a Parent Atlas AgentCard only after single-agent execution and receipts are proven.
-- [ ] **A2A-02** Map A2A task/message/artifact identifiers to existing task, run, receipt, and provenance records.
-- [ ] **A2A-03** Prohibit exposing canonical Postgres/Graphify operations as peer-agent writable state.
-- [ ] **MEM-01** Freeze the three-memory taxonomy: llama KV prompt cache, BitFrost/Valkey hot memory, and Postgres durable semantic/canonical memory.
-- [ ] **MEM-02** Keep `ContextManifest` as the reproducible model-context boundary; KV cache reuse is an optimization and never durable truth.
-- [ ] **MEM-03** Prove revision-qualified BitFrost keys and fail-open behavior across workspace, policy, graph, and representation revisions.
-- [ ] **STRUCT-01** Use Tree-sitter CST named-node projection for compact structural memory; do not create a canonical CAST subsystem.
-- [ ] **STRUCT-02** Define `StructuralMemoryCard` as derived evidence containing canonical IDs, source span, typed relationships, syntax status, and representation revision; upstream Tree-sitter node IDs remain provenance.
+- [x] **A2A-02A** Add a projection-only adapter contract that binds an A2A task to a caller-resolved Atlas task attempt, matching run and receipt IDs and carrying workflow/action/evidence/resource/artifact provenance; mismatches fail closed. Focused fixtures prove mapping only; no canonical authority or live resolver is claimed.
+- [ ] **A2A-02B** Wire the A2A adapter to the existing canonical task-attempt resolver and prove bounded end-to-end task/run/receipt/provenance readback. Keep A2A identifiers protocol-local and noncanonical.
+- [x] **A2A-03** `DISCOVERY_DESCRIPTOR_BOUNDARY_PROVEN` (status label corrected 2026-09-23 —
+  previously read as if it closed peer-write authorization; it does not). Prohibit *advertising*
+  canonical Postgres/Graphify operations as peer-agent writable state. The peer discovery
+  descriptor is now default-deny: only `identity:recover` and retrieval `Search`/`RRFFuse`/`Rerank`
+  are advertised; generic `ExecuteTool*`, mirror tools, unknown tools, and unknown methods are
+  omitted. The discovery route renders tools from the filtered descriptor IDs rather than the
+  complete ACP registry. Focused contract test passes 2/2. **This proves only that a peer cannot
+  discover a mutating capability through this descriptor — it does NOT prove a peer cannot invoke
+  an unadvertised mirror/write RPC method directly by name.** That is a distinct, still-open
+  question (see A2A-04 below), not covered by this task's evidence. Evidence:
+  `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts`,
+  `sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts`, and
+  `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.spec.ts`.
+- [x] **A2A-04 — `A2A_INVOCATION_AUTHORIZATION_PROVEN` (2026-09-23).** Preserved the before-fix
+  `A2A_PEER_WRITE_EXPOSURE_UNGUARDED` finding and added post-fix proof in
+  `docs/reports/a2a-direct-invocation-authorization-v1.json`. `POST /api/acp/execute` now resolves
+  the registered tool, obtains the grant through the existing `toolAuthorizationGuard()` owner,
+  checks its required permission, and dispatches only on ALLOW; absent permission-map entries
+  fail closed to `code:write`. Spy-backed suite passes 9/9: viewer `atlas.kanban.claim` and
+  `atlas.kanban.block` each return 403 with handler count 0; viewer read control reaches its handler
+  exactly once; admin `claim` dry-run reaches exactly once; unknown tools return 404 with all
+  registered handler spies at zero; mirror sync IDs remain unregistered/404. The permission-cache
+  adapter is mocked in this suite, and write handlers are denied or run in dry-run, so proof causes
+  no durable writes. A2A-05 Bearer/session authentication parity and workerId impersonation remain
+  separate open follow-ups. No packet identity, source authority, Graphify, container, or data-store
+  migration work is included in this gate.
+- [x] **MEM-01** Freeze the three-memory taxonomy: ephemeral llama KV prompt cache, disposable BitFrost/Valkey residency, and PostgreSQL durable canonical memory. Qdrant/Neo4j are rebuildable projections, not memory authorities; CLAUDE.md's historical linear hierarchy has been explicitly superseded. Documentation contract only; no runtime-state claim.
+- [x] **MEM-02** Keep `ContextManifest` as the reproducible model-context boundary; KV cache reuse is an optimization and never durable truth. `ContextManifestV2` preserves the existing V1 payload and deterministically checksums context/revision inputs (`context-manifest-v2.ts` and its focused spec); llama prompt reuse is marked `ephemeral` in `context-prompt-streamer.ts`. Contract-level proof only; live llama-server KV persistence behavior is not claimed.
+- [x] **MEM-03** Prove revision-qualified BitFrost keys and fail-open behavior across workspace, policy, graph, and representation revisions. `buildAceBitfrostCacheKeyV1` identity test now asserts a distinct key for each of those four revision changes; the existing cache-aside suite proves reconstruction after Valkey read failure and returning reconstructed canonical data when the cache write fails. Focused suites pass 27/27. Contract/fixture proof only; no live Valkey readback or cache write is claimed. Evidence: `sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.test.ts`, `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts`.
+- [x] **STRUCT-01** Use Tree-sitter CST named-node projection for compact structural memory; do not create a canonical CAST subsystem. The existing `CanonicalStructuralObservationV2` traverses named CST children, preserves AST paths and UTF-8 spans, and hard-codes `canonicalWritesAllowed=false`; its focused spec passes 5/5. This is a derived observation representation, not a new canonical CAST owner. `STRUCT-02` remains open for the richer `StructuralMemoryCard` contract (typed relationships and representation-revision coverage).
+- [x] **STRUCT-02** Define `StructuralMemoryCard` as derived evidence containing canonical IDs, source span, typed relationships, syntax status, and representation revision; upstream Tree-sitter node IDs remain provenance. Implemented/exported `StructuralMemoryCardV1` as a projection-only schema/builder: canonical references are supplied (never minted), source/workspace revisions and byte/line spans are bound into a deterministic evidence checksum, relation refs are typed and validated, and `canonicalAuthority=false`/`writesPerformed=false` are enforced. Package TypeScript build and focused contract tests pass 4/4; runtime/database promotion is not claimed. Evidence: `packages/parent-atlas/src/core/structural-memory-card-v1.ts`, `packages/parent-atlas/test/structural-memory-card-v1.test.mjs`.
 - [x] **STRUCT-03** Define one language-extension registry for TypeScript (`.ts/.tsx/.mts/.cts`), JavaScript (`.js/.jsx/.mjs/.cjs`), Python (`.py/.pyi`), Rust (`.rs`), Go (`.go`), and Java (`.java`); unsupported extensions stop at explicit classification. Live 8095 probe passed.
 - [x] **STRUCT-04** Normalize failures into typed diagnostics: `ChunkingError` for parse/extraction failure and `UnsupportedLanguageError` for unsupported extensions; preserve source revision and file path without fabricating evidence. Live unsupported-language probe passed; parse-failure parity remains tracked by STRUCT-05/GPH-15.
-- [ ] **STRUCT-05** Preserve Tree-sitter `ERROR`/`MISSING` syntax evidence in `syntaxStatus` (`CLEAN` or `RECOVERED_WITH_ERRORS`) separately from canonical identity validity. `ERROR` detection is live-proven; a dedicated `MISSING` fixture remains to be added.
-- [ ] **STRUCT-06** Evaluate `supermemoryai/code-chunk` only as a contextual chunking/reference implementation; its chunk IDs and memory graph cannot become Parent Atlas canonical identity or truth.
+- [x] **STRUCT-05** Preserve Tree-sitter `ERROR`/`MISSING` syntax evidence in `syntaxStatus` (`CLEAN` or `RECOVERED_WITH_ERRORS`) separately from canonical identity validity. The bounded live failure-isolation proof passes both malformed `ERROR` and missing-delimiter `MISSING` diagnostics with `RECOVERED_WITH_ERRORS`; the v2 owner now maps the same fatal diagnostics to `ChunkingError`, matching the legacy classifier (focused local test passed). The deployed sidecar image has not been rebuilt/re-probed, so STRUCT-04's live typed-envelope parity remains unproven.
+- [x] **STRUCT-06** Evaluate `supermemoryai/code-chunk` only as a contextual chunking/reference implementation; its chunk IDs and memory graph cannot become Parent Atlas canonical identity or truth. Upstream README review confirms AST-aware contextual chunk text, scope/import/sibling metadata, byte/line ranges, streaming, and per-file errors; it also demonstrates path-plus-ordinal IDs and vector-store upsert, which are explicitly NOT adopted as Parent Atlas identity or write authority. Classified `REFERENCE_ONLY / EXPERIMENTAL_CONTEXT_ENRICHER_CANDIDATE`; not installed or runtime-tested. `CC-01` remains open until local `StructuralChunkV1` is defined/reconciled; see `docs/reports/openspec-workboard-run-2026-09-23T005049Z.json` and https://github.com/supermemoryai/code-chunk.
 - [ ] **STRUCT-07** Prove the bounded path `CST named nodes → structural evidence → GIS identity → Postgres packet → semantic_768 projection`; no direct chunker writes to Qdrant or Neo4j.
-- [ ] **CC-01** Audit `supermemoryai/code-chunk` output against `StructuralChunkV1`: scope chain, entities, signatures, imports, siblings, byte/line ranges, contextualized text, and per-file errors.
+- [x] **CC-01** Audit `supermemoryai/code-chunk` output against `StructuralChunkV1`: scope chain, entities, signatures, imports, siblings, byte/line ranges, contextualized text, and per-file errors. Static field-level reconciliation completed against the existing `TreesitterChunkerChunkV1`, symbol/framework nominations, structural-reference facts, extraction receipt, and `StructuralMemoryCardV1`; no duplicate `StructuralChunkV1` owner was created. Scope, entities, imports, and byte/line ranges map to existing owners; signatures are partial (nomination only); sibling/contextualized-text fields are absent and must remain derived/nonidentity; per-file failure evidence exists across adapter/receipt boundaries but is not one batch-joined `StructuralChunkV1` field. No code-chunk package install or runtime output claim. Full mapping and gaps: `docs/reports/structural-chunk-reference-mapping-v1.json`.
 - [ ] **CC-02** Benchmark contextual structural metadata against the current treesitter-chunker evidence on a fixed corpus; record symbol localization and repair-localization Recall@10/MRR without changing identity.
-- [ ] **CC-03** Classify code-chunk as `EXPERIMENTAL_CONTEXT_ENRICHER` or `REPLACEMENT_CANDIDATE`; it must not become a second canonical Graphify/GIS/SearchRuntime owner.
+- [x] **CC-03** Classify code-chunk as `EXPERIMENTAL_CONTEXT_ENRICHER` or `REPLACEMENT_CANDIDATE`; it must not become a second canonical Graphify/GIS/SearchRuntime owner. Decision: `EXPERIMENTAL_CONTEXT_ENRICHER` only; no local dependency or runtime integration was found, and its output remains downstream of existing GIS identity. Replacement/promotion is not proposed; usefulness awaits the fixed-corpus CC-02 benchmark, while `CC-01` schema reconciliation remains open. Evidence: STRUCT-06 upstream reference review and scoped source search (no package/import/caller).
 - [ ] **CC-04** Feed code-chunk-style context into the existing SemanticCard compiler only after GIS identity assignment; contextualized text is representation input, never identity.
-- [ ] **CC-05** Prove batch failure isolation and bounded concurrency: one file may return `ChunkingError` while other files complete and the Graphify receipt counts each result.
+- [x] **CC-05 PROVEN (2026-09-23, local deterministic fixture).** Extended `graphify-structural-batch-v1.spec.ts` to run four entries through the existing batch owner: two `PROVEN` neighbors, one `RECOVERED_WITH_ERRORS` carrying `ChunkingError`, and one thrown `ChunkingError` mapped to `FAILED`. The fixture asserts peak concurrent materializations = 1, `totalInputs=4`, `processedFiles=4`, `provenFiles=2`, `recoveredFiles=1`, `failedFiles=1`, and `isolatedFailurePass=true`, with output checksums. Focused Vitest passes 3/3. The sidecar v2 typed-envelope regression separately passes 1/1 in the current source tree. No persistent writes or container rebuild; deployed-image `error_tag` parity remains a separate open runtime gate under STRUCT-04.
 - [ ] **HG-01** Map process/repair/execution n-ary events to the existing hypergraph owner using event provenance, not duplicate binary graph truth.
 - [ ] **HG-02** Keep hypergraph expansion after canonical retrieval as additional evidence; SearchRuntime remains the only candidate fusion owner.
-- [ ] **HG-03** Preserve hyperedge participants, task/run IDs, revisions, selected packets, tests, and receipts without promoting event IDs to packet identity.
+- [x] **HG-03 PROVEN (2026-09-23, fixture contract).** `acePacketToWorkflowArtifact()` now carries the schema-validated `relationship_evidence` records—including participant tuples and relationship revisions—inside workflow metadata, while workflow/run IDs remain event identity and `artifactRefs` continues to use the packet's own `packet_key`. The focused workflow-adapter test asserts participant/revision preservation and explicitly checks `runId` is not a packet artifact ID. Retrieval receipt adaptation separately retains `receiptId`, run/task identity, revisions, and selected candidate IDs as metadata/evidence rather than canonical packet resources. No durable writes or identity promotion.
 - [ ] **MEM-04** Define a CAST-like `TaskScene` episodic record around request/task/workspace revision, actors, evidence, actions, outcome, `ContextManifest`, `RLMTrace`, and `ExecutionReceipt`; reserve CAST-like for episodic memory.
 - [ ] **MEM-05** Model temporal semantic relationships as provenance-owned `UPDATES`, `EXTENDS`, and `DERIVES` observations while preserving superseded history.
 - [ ] **MEM-06** Keep semantic, episodic, and procedural memory separate: Atlas packets/graph, TaskScene/RLMTrace/receipts, and ACE playbooks/policy revisions; BitFrost/Valkey remains cache only.
-- [ ] **SIMD-05** Benchmark simdjson only on metadata JSON/JSONL paths such as receipts, snapshots, and traces; retain Zod/Pydantic/TypeScript schemas as semantic authorities.
+- [x] **SIMD-05 — metadata parser benchmark complete (2026-09-23, no promotion).** Extended the existing `scripts/bench/json-parse-bench.mjs` with a metadata-only mode restricted to `docs/reports` JSON/JSONL/NDJSON, checksum-bearing inputs, required native-vs-`JSON.parse` deep parity, and an explicit output path. Receipt `docs/reports/parent-atlas-simdjson-metadata-benchmark-v1.json`: the 331-row semantic-contract NDJSON has 331/331 direct native parity; all rows are below the existing 1 KiB fast-path threshold, so actual fast-path native calls are 0 and measured median ratio is 1.00×. The 27,496-byte A2A audit receipt also passes parity but the current native-wrapper path is slower in the 200-iteration bounded run (median 0.45× vs `JSON.parse`). No evidence supports expanding simdjson use; Zod/Pydantic/TypeScript semantic validators remain unchanged and authoritative. This is a benchmark result only, not parser promotion or production-path integration.
 - [ ] **TV-01** Restrict TurboVec to the canonical `semantic_768` representation and its own exact oracle.
 - [ ] **TV-02** Map TurboVec stable external IDs/ordinals back to canonical Atlas identity; never promote TurboVec local IDs to packet identity.
 - [ ] **TV-03** Prove TurboVec filtering parity with the canonical `SearchFilter` contract.
@@ -41,7 +105,7 @@
 - [ ] **TV-06A** Prove `TURBOVEC_EXECUTION_OWNER_PROVEN`: select one live transport and classify HTTP, gRPC, Rust N-API, and spawned CLI paths as primary, compatibility, deprecated, or rollback before building a TurboVec index.
 - [ ] **GRAPH-01** Prove bounded graph expansion: seed cap, explicit max depth, per-seed neighbor limit, visited canonical packet dedupe, final candidate cap, and fail-open behavior. Graph expansion supplies evidence only; it must not become a standalone ranking or fusion owner.
 - [ ] **GRAPH-02** Prove vector-seed expansion: semantic top-K canonical symbols → depth-limited typed edges → canonical-ID dedupe; PageRank remains a feature and hypergraph events remain additional evidence.
-- [ ] **GDS-01** Classify the Python `graphdatascience` client as a graph-algorithm executor only; Neo4j remains the structural graph projection and Postgres remains canonical truth.
+- [x] **GDS-01 PROVEN (2026-09-23, owner classification only).** No Python `graphdatascience` client is present in the checked production Python sources or pinned graph requirements. The active Neo4j GDS path is owned by the existing TypeScript `graph-analysis-runner`; optional cuGraph is a separate executor behind that owner. Neo4j remains a derived graph projection and PostgreSQL remains canonical identity/durable truth. Focused dispatch/adapter tests pass 4/4. This is static owner classification plus mocked unit proof only; no live runtime or cross-executor parity is claimed (GDS-04 remains open). Receipt: `docs/reports/gds-python-client-ownership-v1.json`.
 - [ ] **GDS-02** Run revision-qualified PageRank/community algorithms from the canonical Neo4j projection and emit derived feature records keyed by `symbol_version_id`/`workspace_revision`.
 - [ ] **GDS-03** Prove derived graph features enter `FeatureMatrixRow`/`RetrievalFeatureRow` without becoming a second ranker, embedding component, or RRF lane.
 - [ ] **GDS-04** Keep CPU Neo4j GDS and optional cuGraph comparisons on the same graph snapshot; record parity and runtime without promoting either implementation to identity ownership.
@@ -122,13 +186,72 @@ live Graphify owner integration remain upstream correctness gates.
 
 ## Current lane state
 
-- `PROTO-01`: `IN_PROGRESS` — ownership matrix not yet closed.
-- `PROTO-02`: `IN_PROGRESS` — duplicate transport audit not yet closed.
+- `PROTO-01`: `CALLER_AND_LIFECYCLE_RECONCILED_TWO_CONFLICTS_OPEN` (2026-09-23, `lifecycleReconciliationV1` section added to
+  `docs/reports/parent-atlas-transport-owner-matrix-v1.json`) — every transport surface (tRPC, the three Go
+  services' HTTP/gRPC pairs, MCP's 4 server groupings, ACP's two surfaces, A2A's two surfaces) now carries an
+  explicit classification into the 7-bucket taxonomy (`CANONICAL`/`OPTIONAL`/`COMPATIBILITY`/`EXPERIMENTAL`/
+  `LEGACY`/`DORMANT`/`UNKNOWN`), with `endpointExists`/`reachable`/`hasInRepoCaller`/`canonicalOwner` recorded
+  as separate, deliberately unmerged facts per surface. Real findings, not asserted from the comment text:
+  `retrieval-client.ts`'s actual probe-order conditionals (traced, not just read from its header comment) show
+  `RETRIEVAL_GRPC_ENABLED`/`RETRIEVAL_HTTP_ENABLED` both default `false` and are unset in `.env`/`.env.local`
+  (grepped, zero matches), so the app's configured retrieval path falls through to `go-search-service` (:8096)
+  — classified `CANONICAL` by configuration, but PROTO-02B's own live snapshot (below) reports it `DEGRADED`
+  (`qdrantConnected=false`), while `go-retrieval-service` (:8100, `READY_FULL` per that same snapshot) sits
+  disabled one env flag away, classified `OPTIONAL`. This tension — combining this pass's static config trace
+  with PROTO-02B's independent live probe — was not visible in either source alone and is flagged as an open
+  operator-decision conflict, not fixed. MCP: cross-checked BOTH live agent-surface configs directly
+  (repo-root `.mcp.json` for Claude Code, `.opencode/opencode.jsonc` for OpenCode) — `trace-mcp-server.ts` is
+  the only MCP server registered in both, classified `CANONICAL`; `src/mcp/server.ts` (stdio) and the three
+  domain-specific server factories are registered in neither and have no npm-script launcher, classified
+  `DORMANT`/`EXPERIMENTAL` respectively. The pre-existing MCP duplicate-tool finding
+  (`context.prefetch_feature_context`) is carried forward as the second open conflict, `UNKNOWN`, pending an
+  operator decision on which registration is authoritative. PROTO-01 is not marked fully `CLOSED` because its
+  own text requires "reject duplicate bus ownership," and that action (not just the classification) remains
+  outstanding for both conflicts — no tool registration or env default was touched. No runtime behavior
+  changed; no code retired, removed, switched, or rewired.
+  **`MCP_PREFETCH_OWNER_CONVERGENCE_01` (2026-09-23, `docs/reports/mcp-prefetch-feature-context-owner-v1.json`,
+  result `MCP_PREFETCH_SINGLE_OWNER_PROVEN`)** — confirmed `CONTRACT_DIVERGENT`, not a thin duplicate:
+  `new_tools.ts`'s registration takes optional `path`/`query` plus community/notecard/AGENTS.md options;
+  `trace-mcp-server.ts`'s inline registration requires `query` and takes an entirely different
+  `file_path`/`top_k`/`include_kb`/`include_karpathy` shape — zero field overlap beyond the name `query`
+  itself. Read the actual MCP SDK source (`node_modules/@modelcontextprotocol/sdk/dist/cjs/server/mcp.js`) and
+  confirmed `registerTool()` throws `Tool ${name} is already registered` on a duplicate name — not silent
+  last-write-wins — which by itself would predict a startup crash given `registerNewTools()` (line 565) runs
+  before the unguarded inline registration (line 7789). **Resolved with one read-only, non-mutating `tools/list`
+  call against the already-running `:8788` server** (no restart, within this gate's authorized scope): the
+  live server exposes exactly one `context.prefetch_feature_context` registration, matching `new_tools.ts`'s
+  schema and description verbatim. `new_tools.ts` is the live single owner; the inline duplicate is confirmed
+  unreachable via MCP discovery. The exact throw/catch mechanism explaining why the process doesn't crash
+  remains unidentified — a real, named, lower-priority open question, not chased further. No registration
+  touched, no restart performed, zero writes.
+- `PROTO-02A`: `VERIFIED` — TurboVec's operation-level service/transport owners are in `docs/reports/parent-atlas-transport-owner-matrix-v1.json`; both HTTP and gRPC health pass and report the same 327,820 indexed/64-dimension/4-bit sidecar. HTTP prefilter and rerank are operation-specific; candidate search prefers gRPC with HTTP fallback; the gRPC upsert is a read-only/no-op stub. The N-API adapter's path and API do not match the verified Rust crate and fail closed; the spawned Python wrapper has no scoped caller. No owner or path was removed.
+- `TURBOVEC_SEARCH_BACKEND_SINGLE_OWNER_AND_NATIVE_API_CONTRACT`: `TURBOVEC_SEARCH_SINGLE_OWNER_PROVEN`
+  (2026-09-23, `docs/reports/turbovec-search-backend-owner-v1.json`) — full caller trace, not just endpoint
+  health. Key finding: HTTP and gRPC are NOT two competing owners of one capability — they cover two
+  **different** TurboVec operations. gRPC's real caller (`turbovec-prefilter.ts::turbovecSearch()`) uses ANN
+  `/search`, gRPC-primary with HTTP fallback baked into the same function, wired as exactly one of 3 RRF
+  fusion lanes in `rrf-integration.ts` — traced the other lane (`qdrantPromise`) and confirmed it calls a
+  separate function (`queryQdrantVectorSignal`) with zero TurboVec involvement, so no duplicate-vote risk
+  exists for RRF today. HTTP's real caller (`turbovec-search.ts::searchTurboVecSidecar()`) uses `/rerank` on
+  Qdrant-sourced candidates, not `/search` — a genuinely different operation, reachable only via
+  `qdrant-search.ts`'s `TurboVecSearchBackend`, itself config-gated off by default (`CODEBASE_ANN_BACKEND`
+  defaults `'qdrant'`, unset in both env files). Two independent N-API adapter implementations found (not one)
+  — `rust-napi-search-backend.ts` expects `searchAnn`, `turbovec-search.ts`'s own `loadNativeTurboVec()`
+  expects `searchCodebaseAnn`/`search`/`query` — neither export exists in the verified crate (same 5 exports
+  as before); both fail closed, and this duplication is itself flagged, not consolidated. A dead-duplicate
+  `searchCodebaseAnn` function (defined independently in both `qdrant-search.ts` and `turbovec-search.ts`)
+  was found and flagged — the live one is confirmed by 10 real callers, the other has zero external callers.
+  CLI wrapper reconfirmed zero callers. Parity probe deliberately **not** run: gRPC's and HTTP's live
+  operations aren't the same capability, so comparing them would be misleading; the genuinely comparable pair
+  (gRPC `/search` vs HTTP `/search` fallback, both inside one function) is named as the correct future target
+  instead. No code changed, no config changed, no transport removed/switched. Committed locally only.
+- `PROTO-02B`: `OPEN` — remaining-sidecar fleet inventory and per-operation caller/lifecycle proof are still required. Supplemental live snapshot `docs/reports/openspec-workboard-run-2026-09-23T012648Z.json` (2026-09-23): 8095 NLP, 8091 LangGraph, and 8100 Go retrieval returned healthy/ok; 8097 embedding returned healthy with model loaded on CPU; 8096 Go search returned `degraded`/`qdrantConnected=false`; 8085 Docling returned `degraded` with `vlm_ocr=false`; 8121 neural decoder returned `degraded`; 8098 RAPIDS returned `ok`, CUDA available, PyTorch unavailable, execution-only and no-store-writes. Static source tracing found callers for the application-facing owners (NLP/structural, LangGraph, Go retrieval/search/embedding, Docling, decoder adapter, RAPIDS clients). New read-only probe `scripts/atlas/probe-go-grpc-health-v1.mjs` invoked each Go service's actual protobuf `Health` RPC: retrieval :50053 healthy, search :50055 degraded (`qdrantConnected=false`), embedding :50051 healthy on CPU. Therefore gRPC reachability and service health are now proven for these three methods; this does not prove that normal application traffic selects gRPC (retrieval/embedding are config-gated) or prove non-health RPC parity. Supplemental 2026-09-23 service/caller audit `docs/reports/openspec-workboard-run-2026-09-23T013727Z.json`: Bifrost :3040 is live/healthy and has a SvelteKit streaming caller; image-synthesis :8092 is live/healthy but reports CPU and all three model capabilities unloaded, while the evidence-upload caller's optional `/depth` result is handled as a settled failure. RabbitMQ AMQP/management and NATS client/monitoring ports are TCP-reachable, with SvelteKit publisher/caller code located; no messages were sent. The separate CrossEncoder `reranker-client.ts` has no in-repo caller and defaults to the image-synthesis port :8092 (wrong service); its documented sidecar port :8099 is also assigned by Compose to optional TensorRT, so do not repoint it without resolving ownership. Main retrieval instead calls the distinct `gpu-rerank.ts` owner. These are supplemental classifications only; no task checkbox earned. Other sidecar operations and full lifecycle classifications remain open.
+- `PROTO-03`: `VERIFIED` as an architecture contract only — OpenSpec now declares gRPC the typed native/polyglot compute boundary while allowing operation-specific HTTP health/compatibility/fallback paths under one service owner. It does not claim every running service is gRPC-primary or that runtime migration is complete.
 - TurboVec HTTP, gRPC, N-API, and spawned-CLI evidence: historical capability evidence; no live transport promotion.
 - ACP packet artifacts: capability evidence only; no proven editor-agent session.
-- A2A: not started; no independent-agent delegation requirement has been proven.
+- A2A: `A2A-02A` projection contract now requires a resolved Atlas task attempt, rejects run/receipt mismatches, and records Atlas task/run refs alongside workflow/action/evidence/resource/artifact provenance. Package build and focused tests pass 15/15. `A2A-02B` remains open: there is no demonstrated runtime adapter caller/resolver readback; no runtime caller or independent-agent delegation need is proven.
 - `STRUCT-03/04`: implementation is live in the rebuilt `miniforge-nlp-sidecar`; supported TypeScript returned `CLEAN` with chunks and unsupported `.txt` returned `UnsupportedLanguageError` with a diagnostic. Python syntax and client tests pass.
-- `STRUCT-05`: syntax recovery is represented in the response contract; live malformed-source `ERROR` detection is proven, while a dedicated `MISSING` node fixture remains open.
+- `STRUCT-05`: syntax recovery is represented in the response contract; the live failure-isolation receipt proves both malformed `ERROR` and missing-delimiter `MISSING` diagnostics with `RECOVERED_WITH_ERRORS`. The v2 source now uses the legacy fatal-diagnostic classifier for both `error_tag` and `syntax_status`; focused local tests cover recovered syntax errors and nonfatal CRLF span remapping. The live receipt still reflects the pre-fix service image (`error_tag=null` for recovered syntax), so runtime typed-envelope parity remains open until a normal image rebuild and bounded re-probe.
 - Runtime mutations from this OpenSpec: none.
 
 ## Existing evidence boundary
@@ -403,3 +526,4 @@ the artifacts are historical observations, not valid ordered frames.
   and predecessor evidence exist.
 
 Evidence: `docs/reports/temporal-bootstrap-plan-v1.json`.
+- [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).

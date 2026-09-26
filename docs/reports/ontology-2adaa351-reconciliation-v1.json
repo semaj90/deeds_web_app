@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.ontology-2adaa351-reconciliation.v1",
+  "generatedAt": "2026-09-13T00:00:00.000Z",
+  "mode": "READ_ONLY",
+  "question": "Is sha256:2adaa351... a legitimate competing 'current snapshot authority' that the ontology audit should reconcile against, per ONTOLOGY-CURRENT-COHORT-FRAME-RECHECK-2026-09-13-R1's unattributed claim?",
+  "finding": "NO -- sha256:2adaa351... has zero supporting evidence anywhere in the repo as an admitted or sealed snapshot. It appears in exactly two files, both downstream planning receipts (docs/reports/current-tree-bound-symbol-registry-input-v1.json, docs/reports/graphify-symbol-extractor-v1-*.json), always as the 'currentWorkspaceRevision' OUTPUT field of scripts/atlas/plan-current-tree-bound-symbol-registry-input-v1.mjs -- and that field is set from an unvalidated CLI flag (--workspace-revision=<value>) that overrides the script's own default canonical lookup (workspace-revision-tournament-admission-v1.json) with no cross-check against any authority file. A dead variable in that same script (authorityPath, pointing at docs/reports/current-graphify-snapshot-authority-v1.json) was declared but never read -- the intended validation was never wired in. sha256:2adaa351 does not appear as the primary workspaceRevision of any snapshot manifest or admission receipt anywhere under docs/reports/.",
+  "revisionLabelInventory": [
+    {
+      "revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "role": "THE canonical, sealed, admitted revision",
+      "source": "docs/reports/workspace-revision-tournament-admission-v1.json (authority: true, sealed 2026-09-11)"
+    },
+    {
+      "revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "role": "Owner-run revision, content-hash-reconciled (98.4%) against the admitted revision; used only as a source pool, bindings correctly written under 322ed1a6",
+      "source": "graphify_files.workspace_revision (26,014 rows)"
+    },
+    {
+      "revision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "role": "Stale, self-declared non-canonical candidate observation from 2026-09-03 (10 days before the real admission) -- explicitly canonicalAuthority: false in its own JSON",
+      "source": "docs/reports/workspace-source-binding-observation.json"
+    },
+    {
+      "revision": "sha256:2adaa35194e054f1381acbb82af2025e23a5596a881fa6e6d68528d4b8533b74",
+      "role": "Unvalidated ad hoc CLI-override value with zero supporting snapshot/admission evidence -- not a real authority, likely a manual/mistaken invocation argument",
+      "source": "output field only, never a primary record; see 'finding' above"
+    },
+    {
+      "revision": "sha256:3526fc383e074a87c7a4ed46c86f5b9321d8fcd7d0dfadbbedb3a374eb4a04bd",
+      "role": "Live/dynamic 'what would the workspace revision hash be if computed right now against the current, actively-changing working tree' -- expected to drift continuously during active development, not a fixed snapshot label",
+      "source": "docs/reports/current-graphify-snapshot-authority-v1.json (observedAt 2026-09-13T18:52:54Z, this session)"
+    }
+  ],
+  "correctiveAction": "Re-ran scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs explicitly against the real admitted revision (--workspace-revision=sha256:322ed1a6...) instead of trusting its default fallback (workspace-source-binding-observation.json's stale 927ed411) or the bogus 2adaa351.",
+  "correctiveActionResult": {
+    "status": "CURRENT_RELATIONSHIP_COHORT_EMPTY",
+    "examinedTuples": 603,
+    "exactSourceRefs": 7,
+    "currentWorkspaceTuples": 0,
+    "exactWrongWorkspace": 8,
+    "noExactGraphifySource": 595
+  },
+  "conclusion": "Grounding against the CORRECT admitted revision does not change the outcome -- the ontology cohort is still genuinely empty (0/603 tuples bind to the current admitted workspace's Graphify-recognized source set). This is real data staleness in feature_ontology_tuples, not a revision-label mixup. The prior entry's framing ('reconcile against the current snapshot authority') implied the blocker might be a labeling problem; it is not. CURRENT_RELATIONSHIP_COHORT_EMPTY is confirmed as the correct, precise status against the correct reference frame.",
+  "writesPerformed": false
+}

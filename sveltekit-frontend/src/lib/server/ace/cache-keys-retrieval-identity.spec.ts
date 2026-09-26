@@ -11,6 +11,7 @@ describe('revision-qualified ACE retrieval cache identity', () => {
     candidateSnapshotRevision: 'snapshot-1',
     ordinalMapChecksum: 'ordinals-1',
     representationRevision: 'semantic-768-1',
+    featureRevision: 'features-1',
     retrievalPolicyRevision: 'policy-1',
     contextPolicyRevision: 'context-1',
     graphRevision: null,

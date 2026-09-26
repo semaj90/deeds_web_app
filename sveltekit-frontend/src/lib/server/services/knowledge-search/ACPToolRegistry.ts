@@ -921,6 +921,121 @@ const handlers: Record<string, HandlerFn> = {
     }
   },
 
+  // Read-only OpenSpec workboard view (WORKBOARD-02 in parent-atlas-retrieval-staging-planes).
+  // Wraps the existing board snapshot reader; no second implementation, no writes, advisory only.
+  async openspecWorkboardRecommend(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    const limit = Math.min(50, Math.max(1, Number(args?.limit) || 10));
+    const changeId = typeof args?.change_id === 'string' && args.change_id.trim() ? args.change_id.trim() : null;
+    // Gates the caller has itself proven (e.g. 'CURRENT_SOURCE_AUTHORITY_PROVEN'); a BLOCKED receipt whose
+    // `unblocks` lists one of these becomes retryable. Caller-asserted, not verified by this tool.
+    const releasedEvents: string[] = Array.isArray(args?.released_events)
+      ? args.released_events.filter((e: unknown): e is string => typeof e === 'string' && e.length > 0 && e.length <= 200).slice(0, 20)
+      : [];
+
+    if (options?.dryRun) {
+      return planResult([
+        { action: 'analyze', target: 'openspec-board', detail: `readOpenSpecBoardSnapshot() — top ${limit} ACTIONABLE${changeId ? ` for ${changeId}` : ''}` },
+      ], startTime);
+    }
+
+    try {
+      const { readOpenSpecBoardSnapshot } = await import('$lib/server/atlas/openspec-board/report-reader');
+      const snapshot = await readOpenSpecBoardSnapshot();
+      // WORKBOARD-04: heuristic blocker class from task text (not authoritative; subagent audit
+      // 2026-09-20 found ~half of "ACTIONABLE" tasks are identity/source-revision gated).
+      const classify = (text: string, key: string | null): string => {
+        const s = `${text} ${key ?? ''}`.toLowerCase();
+        if (/source[- _]?revision|source authority|identity|packet[- _]?key|lineage|admission/.test(s)) return 'IDENTITY_SOURCE_REVISION_GATED';
+        if (/migration|backfill|\bwrite\b|upsert|promot|apply\b|drop /.test(s)) return 'NEEDS_DB_OR_CACHE_WRITE';
+        if (/docker|runtime|live |gpu|cuda|:80\d\d|neo4j|qdrant/.test(s)) return 'NEEDS_RUNTIME_SERVICE';
+        if (/operator|decision|owner|approve/.test(s)) return 'NEEDS_OPERATOR_DECISION';
+        return 'UNCLASSIFIED_POSSIBLY_READY';
+      };
+      // WORKBOARD-05: suppress tasks whose latest attempt receipt says do-not-retry. Receipts are an
+      // append-only JSONL in the reports dir; missing file or unparsable lines are ignored (fail open).
+      const { readLastTaskAttemptReceipts } = await import('$lib/server/atlas/openspec-board/receipt-store');
+      const lastReceipt = await readLastTaskAttemptReceipts();
+      const { shouldRetryTask } = await import('$lib/server/atlas/contracts/task-attempt-receipt-v1');
+      let suppressedByReceipts = 0;
+      const candidates = snapshot.tasks
+        .filter((t) => t.state === 'ACTIONABLE' && (!changeId || t.changeId === changeId))
+        .filter((t) => {
+          const last = lastReceipt.get(String((t.raw as Record<string, unknown>).stableKey ?? t.id)) ?? null;
+          if (last && !shouldRetryTask(last, releasedEvents)) { suppressedByReceipts += 1; return false; }
+          return true;
+        })
+        .map((t) => ({ t, blockerClass: classify(t.title, t.blockerKey) }));
+      const blockerCounts: Record<string, number> = {};
+      for (const c of candidates) blockerCounts[c.blockerClass] = (blockerCounts[c.blockerClass] ?? 0) + 1;
+      const ready = candidates
+        .filter((c) => c.blockerClass === 'UNCLASSIFIED_POSSIBLY_READY')
+        .slice(0, limit)
+        .map(({ t, blockerClass }) => ({
+          id: t.id,
+          // Use this as `logicalTaskKey` when writing a TaskAttemptReceiptV1 (board `id` is a derived hash).
+          stableKey: String((t.raw as Record<string, unknown>).stableKey ?? t.id),
+          changeId: t.changeId,
+          title: t.title,
+          topic: t.topic,
+          priority: t.priority,
+          blockerKey: t.blockerKey,
+          blockerClass,
+          fileRefs: t.fileRefs.slice(0, 5),
+        }));
+      return {
+        success: true,
+        kind: 'result',
+        data: {
+          schema: 'atlas.openspec-workboard-recommend.v1',
+          semanticChecksum: snapshot.semanticChecksum,
+          summary: snapshot.summary,
+          freshness: snapshot.freshness,
+          ready,
+          actionableByBlockerClass: blockerCounts,
+          receiptsRead: lastReceipt.size,
+          releasedEventsApplied: releasedEvents,
+          suppressedByReceipts,
+          blockerClassMethod: 'KEYWORD_HEURISTIC_NOT_AUTHORITATIVE',
+          advisoryOnly: true,
+          canonicalAuthority: false,
+          writesPerformed: false,
+        },
+        duration: Date.now() - startTime,
+      };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
+  },
+
+  // Records one TaskAttemptReceiptV1 (WORKBOARD-05). Writes ONLY to task-attempt-receipts-v1.jsonl in the
+  // reports dir; never edits tasks.md and never marks a task done. Invalid receipts are rejected.
+  async openspecRecordAttempt(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    try {
+      const { TaskAttemptReceiptV1Schema } = await import('$lib/server/atlas/contracts/task-attempt-receipt-v1');
+      const parsed = TaskAttemptReceiptV1Schema.safeParse(args);
+      if (!parsed.success) {
+        return fail(`invalid TaskAttemptReceiptV1: ${parsed.error.issues.map((i) => i.message).join('; ').slice(0, 400)}`, startTime);
+      }
+      if (options?.dryRun) {
+        return planResult([
+          { action: 'analyze', target: 'task-attempt-receipts-v1.jsonl', detail: `would append receipt for ${parsed.data.logicalTaskKey} (${parsed.data.result})` },
+        ], startTime);
+      }
+      const { appendTaskAttemptReceipt } = await import('$lib/server/atlas/openspec-board/receipt-store');
+      const stored = await appendTaskAttemptReceipt(parsed.data);
+      return {
+        success: true,
+        kind: 'result',
+        data: { stored: true, logicalTaskKey: stored.logicalTaskKey, result: stored.result, blockerClass: stored.blockerClass, canonicalAuthority: false },
+        duration: Date.now() - startTime,
+      };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
+  },
+
   async nlpAstChunk(args: any, options?: ACPToolOptions): Promise<ToolResult> {
     const startTime = Date.now();
     const { source, language, filePath, sourceRevision } = args ?? {};
@@ -1447,6 +1562,61 @@ export const TOOLS: Record<string, ACPTool> = {
       }
     ],
     handler: handlers.nlpClassifyDomain
+  },
+  'openspec:workboard_recommend': {
+    name: 'openspec:workboard_recommend',
+    description: 'Read-only OpenSpec workboard view: current board summary, report freshness and the top ACTIONABLE tasks from the existing board snapshot reader. Advisory only (canonicalAuthority false); never edits tasks.md. Note: ACTIONABLE is not yet blocker-aware (WORKBOARD-04), so many listed tasks may still be identity/source-revision gated.',
+    category: 'search',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        limit: { type: 'number', description: 'Max tasks to return (1-50, default 10)', minimum: 1, maximum: 50 },
+        change_id: { type: 'string', description: 'Optional OpenSpec change id to filter to', maxLength: 200 },
+        released_events: { type: 'array', items: { type: 'string', maxLength: 200 }, maxItems: 20, description: 'Gates the caller has proven (e.g. CURRENT_SOURCE_AUTHORITY_PROVEN). BLOCKED receipts whose unblocks include one of these are re-offered. Caller-asserted, not verified here.' }
+      },
+      additionalProperties: false
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { limit: 5 },
+        output: { schema: 'atlas.openspec-workboard-recommend.v1', ready: [], advisoryOnly: true, canonicalAuthority: false, writesPerformed: false },
+        description: 'Top 5 ready tasks with board freshness'
+      }
+    ],
+    handler: handlers.openspecWorkboardRecommend
+  },
+  'openspec:record_attempt': {
+    name: 'openspec:record_attempt',
+    description: 'Append one TaskAttemptReceiptV1 (an agent attempt at an OpenSpec task) to the append-only receipts JSONL so openspec:workboard_recommend stops re-offering blocked/finished tasks. Advisory only (canonicalAuthority false); never edits tasks.md and never marks a task done. COMPLETED requires a passing validation and no missing preconditions; BLOCKED must name a blockerClass. Use the stableKey from openspec:workboard_recommend as logicalTaskKey.',
+    category: 'search',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        logicalTaskKey: { type: 'string', description: 'The task stableKey from openspec:workboard_recommend', minLength: 1 },
+        taskRevision: { type: 'string', minLength: 1 },
+        result: { type: 'string', enum: ['COMPLETED', 'BLOCKED', 'SUPERSEDED', 'FAILED_VALIDATION'] },
+        blockerClass: { type: 'string', enum: ['IDENTITY_SOURCE_REVISION_GATED', 'NEEDS_DB_OR_CACHE_WRITE', 'NEEDS_RUNTIME_SERVICE', 'NEEDS_OPERATOR_DECISION', 'NONE'] },
+        preconditions: { type: 'array', items: { type: 'string' } },
+        missingPreconditions: { type: 'array', items: { type: 'string' } },
+        toolsUsed: { type: 'array', items: { type: 'string' } },
+        evidenceRefs: { type: 'array', items: { type: 'string' } },
+        validationsPassed: { type: 'array', items: { type: 'string' } },
+        patches: { type: 'array', items: { type: 'string' } },
+        unblocks: { type: 'array', items: { type: 'string' } }
+      },
+      required: ['logicalTaskKey', 'taskRevision', 'result', 'blockerClass'],
+      additionalProperties: false
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { logicalTaskKey: 'atlas-feature-intelligence#49497dc7828f92b4', taskRevision: 'sha256:abc', result: 'BLOCKED', blockerClass: 'IDENTITY_SOURCE_REVISION_GATED', missingPreconditions: ['CURRENT_SOURCE_AUTHORITY_PROVEN'], unblocks: ['CURRENT_SOURCE_AUTHORITY_PROVEN'] },
+        output: { stored: true, canonicalAuthority: false },
+        description: 'Record that an attempt was blocked on source-revision authority'
+      }
+    ],
+    handler: handlers.openspecRecordAttempt
   },
   'nlp:ast-chunk': {
     name: 'nlp:ast-chunk',

@@ -1,3 +1,4 @@
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { generateContextHash } from '$lib/server/cache-keys.js';
 import type { FeatureWikiPacket } from './token-aware-context-packer.js';
 import {
@@ -228,7 +229,7 @@ export function buildAceContextPlannerState(input: {
   const state = {
     query: input.query.trim(),
     queryHash: generateContextHash(input.query.trim()),
-    modelName: input.modelName ?? 'gemma4-rotorquant:latest',
+    modelName: input.modelName ?? SERVER_CHAT_MODEL,
     modelQuant: input.modelQuant ?? 'iq4_xs',
     kvQuant: input.kvQuant ?? 'q8_0/q8_0',
     draftModel: input.draftModel ?? false,

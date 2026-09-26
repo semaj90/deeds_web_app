@@ -35,6 +35,7 @@ const ALLOWED_DIMS = new Set([
   1536, // External OpenAI (text-embedding-3-small)
   384,  // Warden / GPU-Cache / Nomic-Embed-Text / Legacy Ingestion
   512,  // Clip / Vision / Medium models
+  256,  // Derived latent/MRL representation; never the canonical semantic lane
   128,  // Compressed / Autoencoder
   64,   // Latent space / Compressed
   32,   // Fingerprinting
