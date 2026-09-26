@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T07:54:05Z",
+  "status": "PIVOT_SNAPSHOT_ONLY",
+  "objective": "Advance exact-lineage candidate features from the newly sealed repository namespace bridge while preserving the separate canonical summary lane and historical HINT trust tier.",
+  "pivot": {
+    "fromChange": "parent-atlas-retrieval-lineage-dag-convergence",
+    "toChange": "parent-atlas-repair-candidate-feature-matrix",
+    "reason": "The root namespace bridge is proven read-only, the exact CandidateOrdinal cohort is materialized, and the legacy hint-to-ordinal join is now sealed. Work pivots to the aligned 425-row artifact-only query/feature replay; canonical summary/vector writes remain gated.",
+    "previousPivotRun": "docs/reports/openspec-workboard-run-2026-09-26T0750Z.json"
+  },
+  "evidence": {
+    "namespaceBridge": ".tmp/atlas/repository-namespace-bridge-v1/bridge-root-proof-20260926.json",
+    "candidateOrdinalReceipt": ".tmp/atlas/candidate-ordinal-bridged-v1/20260926T074719Z/receipt.json",
+    "hintOrdinalJoinManifest": ".tmp/atlas/legacy-summary-hint-ordinal-join-v1/20260926T075330Z/manifest.json"
+  },
+  "counts": {
+    "rootMembershipsWithExactCurrentBindings": 24456,
+    "exactBridgeSourceMembers": 577,
+    "exactCandidateOrdinalChunks": 6732,
+    "legacyHintsReadAndCensusMatched": 29219,
+    "lineageBoundHintsExactlyOrdinalAligned": 425,
+    "unqualifiedHintsExcluded": 28794,
+    "identityMismatches": 0,
+    "nestedRepositoriesExcluded": 1086
+  },
+  "next": [
+    "Materialize a checksummed legacy_summary_cosine feature replay over the exact aligned 425 HINT identities; preserve source/workspace revisions and HINT trust in every row, and do not emit a second retrieval-lane/RRF vote.",
+    "Use the existing exact cosine oracle and deterministic CandidateOrdinal tie-break; report measured throughput, duplicate behavior and token coverage. Recall/MRR/nDCG remain NOT_MEASURED until graded labels are supplied.",
+    "Then attach the feature artifact to the existing CandidateFeatureMatrix snapshot owner. Keep cluster/SOM/manifold/ACE and cache promotion downstream of their respective revision and admission gates."
+  ],
+  "validation": {
+    "canonicalCandidateOrdinalTests": "PASS_19_OF_19",
+    "strictOpenSpecRetrievalLineageDagConvergence": "PASS",
+    "strictOpenSpecRepairCandidateFeatureMatrix": "PASS",
+    "candidateOrdinalReceiptAndMapChecksums": "PASS",
+    "hintIndexVectorCensusChecksumsAndVectorLayout": "PASS",
+    "hintOrdinalConservation": "PASS_29219_TOTAL_425_ALIGNED_28794_EXCLUDED",
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "neo4jWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0,
+    "containerRebuild": false
+  },
+  "cautions": [
+    "The 425 exact matches remain LEGACY_HINT_LINEAGE_BOUND; summary admission and canonical representation authority are not implied.",
+    "577 is source-membership grain; 6,732 is chunk-candidate grain; 425 is aligned legacy-summary grain.",
+    "RepositoryIdentityV1 and stable-file identity tables remain empty and separately authorization-gated; six nested repository namespaces remain blocked."
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T08:09:06Z",
+  "status": "PIVOT_SNAPSHOT_ONLY",
+  "objective": "Move from the source-lineage/summary-quality correction back to bounded downstream CandidateFeatureMatrix alignment, without promoting legacy hints.",
+  "pivot": {
+    "fromChange": "parent-atlas-retrieval-lineage-dag-convergence",
+    "toChange": "parent-atlas-repair-candidate-feature-matrix",
+    "reason": "The source bridge, exact CandidateOrdinal refresh, fresh full-corpus quality re-census and 330-row exact HINT intersection now provide a safe artifact cohort. A deterministic exact-cosine + MMR mechanics canary is complete; remaining work is real-query feature integration and evidence-quality gates.",
+    "previousRun": "docs/reports/openspec-workboard-run-2026-09-26T0803Z.json"
+  },
+  "proofs": {
+    "sourceNamespaceBridge": ".tmp/atlas/repository-namespace-bridge-v1/bridge-root-proof-20260926.json",
+    "candidateOrdinalMap": ".tmp/atlas/candidate-ordinal-bridged-v1/20260926T074719Z/receipt.json",
+    "qualityRequalifiedHintJoin": ".tmp/atlas/legacy-summary-hint-ordinal-join-v1/20260926T080239Z/manifest.json",
+    "summaryCosineMmrCanary": ".tmp/atlas/legacy-summary-cosine-mmr-canary-v1/20260926T080813Z/manifest.json",
+    "nlpQualityReview": "docs/reports/summary-nlp-hint-quality-review-v2.json",
+    "fullLegacyCensus": "docs/reports/legacy-summary-census-v1-20260926T0800Z.json"
+  },
+  "currentCounts": {
+    "legacySummaryRows": 40306,
+    "legacyContaminated": 952,
+    "quarantined": 10416,
+    "cleanUnqualifiedHints": 28608,
+    "cleanLineageBoundHints": 330,
+    "exactCandidateOrdinalHintIntersection": 330,
+    "contaminatedOldVectorHintsExcluded": 281,
+    "cosineFeatureRows": 3200,
+    "pseudoQueries": 32,
+    "topK": 100,
+    "mmrFinalK": 20
+  },
+  "validation": {
+    "summaryQualityTests": "PASS_8_OF_8",
+    "fullCensusConservation": "PASS_40306_OF_40306",
+    "exactHintOrdinalConservation": "PASS_29219_ROWS",
+    "mmrReplayDeterminism": "PASS_TWO_IDENTICAL_FEATURE_AND_QUERY_CHECKSUMS",
+    "strictOpenSpecCandidateFeatureMatrix": "PASS",
+    "strictOpenSpecRetrievalLineageDagConvergence": "PASS",
+    "newScriptSyntax": "PASS",
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0,
+    "containerRebuild": false
+  },
+  "next": [
+    "Integrate the separate legacy_summary_cosine feature through the existing CandidateFeatureMatrix schema/materializer only after selecting a real frozen query contract; preserve HINT trust and prohibit a second semantic/RRF vote.",
+    "Keep actual user-query MMR quality evaluation blocked until graded labels and tokenizer-backed token coverage exist; current pseudo-query canary proves mechanics and diversity behavior only.",
+    "Keep :8095 expansion blocked pending source-grounded entity acceptance/rejection rules; four summaries from the first canary are now correctly detector-blocked and generic NER dominates its outputs."
+  ],
+  "cautions": [
+    "Earlier 425-row crosswalk is superseded; use 330 exact clean lineage-bound HINT rows after re-census.",
+    "Legacy hints, vectors, graph and pseudo-query results remain noncanonical; no summary/vector columns were changed.",
+    "CandidateFeatureMatrix schema integration remains open; mechanics artifact is not an admitted feature snapshot."
+  ]
+}

@@ -2,7 +2,7 @@
   "schema": "atlas.openspec-workboard-run.v1",
   "runId": "openspec-workboard-run-2026-09-24T221401Z",
   "startedAt": "2026-09-24T21:55:00Z",
-  "updatedAt": "2026-09-24T23:00:28Z",
+  "updatedAt": "2026-09-24T23:07:04Z",
   "mode": "EXPLICIT_MULTI_GATE_WORKBOARD_RUN",
   "containerRebuilds": 0,
   "datastoreWrites": 0,
@@ -64,6 +64,13 @@
       "reason": "User selected the source→packet→chunk critical path. ADVANCEABLE is not SELECTED; code-ingestion lifecycle review is not scheduler-authorized and is now NOT_SELECTED.",
       "result": "PACKET_QUALIFICATION_METRIC_CORRECTED_LIVE_READBACK_REQUIRED",
       "evidence": "Focused V2 membership/repair tests pass 12/12. Offline verification passed for the 16,151-entry immutable apply manifest (9 shards) and its 16,151-entry inverse manifest. Existing apply receipt records 33/33 committed batches, 16,151 intended/applied, alreadyApplied=0, and readback=PASS per batch; this is receipt evidence, not a new live read. Inspection found the zero packetQualifiedRows metric was derived from a stricter legacy content-hash equality (known to use a different recipe) rather than the exact packet source-revision/workspace-key/provenance join. The audit now counts only a source with one packet key and one source revision, exact source_revision and workspace_revision_key, and non-null lineage_binding_checksum and lineage_producer_revision; legacy content-hash comparison remains separate. New focused tests pass 5/5; both audit scripts pass node --check; OpenSpec strict passes. The current live receipt still has an unaligned 52-row source cohort, packetChunkQualifiedRows=577, candidateOrdinalEligibleRows=0, and a repair-plan revision different from the applied manifest. Corrected SQL metric has not been rerun against PostgreSQL; no database operation was performed by this session."
+    },
+    {
+      "from": "parent-atlas-retrieval-lineage-dag-convergence:SOURCE_AUTHORITY_READBACK_RECONCILIATION",
+      "to": "parent-atlas-code-ingestion-pipeline:GPH-05",
+      "reason": "The user explicitly selected a bounded read-only GPH-05 ownership audit; this was a user-directed selection, not an automatic ADVANCEABLE/completion-rank pivot.",
+      "result": "GPH_05_OWNER_PARTIAL",
+      "evidence": "node scripts/atlas/audit-ast-ownership.mjs completed without --write (PROVEN_AUDIT); cross-check found multiple AST/symbol producers and persistence paths without proof that they converge on one canonical extraction owner. GPH-05 ledger remains open; GPH-06 remains gated. Receipt docs/reports/ast-ownership-gph05-v1.md."
     }
   ],
   "schedulerPolicy": {
@@ -72,6 +79,29 @@
     "selectedGate": "SOURCE_AUTHORITY_READBACK_RECONCILIATION",
     "schedulerPermission": "SELECTED",
     "otherAdvanceableChanges": "NOT_SELECTED"
+  },
+  "sourceSnapshotRefresh": {
+    "gateState": "AUTHORIZATION_REQUIRED",
+    "schedulerPermission": "SELECTED",
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "priorAdmittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "snapshotPath": "docs/reports/workspace-source-snapshots/3b9b0e2ba445142987c3885f11fda705b78ab8587df34063a261e4545fdb700a.json",
+    "snapshotRevision": "sha256:3b9b0e2ba445142987c3885f11fda705b78ab8587df34063a261e4545fdb700a",
+    "sourceCount": 26528,
+    "repositoryCount": 7,
+    "captureStatus": "CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK",
+    "snapshotByteReadback": "SNAPSHOT_BYTES_READBACK_PROVEN",
+    "workspaceRevisionCandidate": "sha256:a00070763ee1245daf3152bb9e2f5509caced43c89c689524dd8e7bd91269d2d",
+    "candidateStatus": "CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION",
+    "canonicalAuthority": false,
+    "datastoreWrites": 0,
+    "graphifyExecution": "NOT_RUN",
+    "reports": [
+      "docs/reports/workspace-source-snapshot-audit-20260924T230558Z.json",
+      "docs/reports/workspace-revision-candidate-20260924T230558Z.json",
+      "docs/reports/workspace-revision-tournament-preflight-20260924T230558Z.json"
+    ],
+    "nextAction": "Explicit workspace-revision tournament admission; a Graphify execution that processes this snapshot is a separate later authorization."
   },
   "changes": {
     "parent-atlas-analysis-pass-ornith-adapter": {
@@ -251,8 +281,8 @@
   "nextGate": {
     "selectedCandidate": "parent-atlas-retrieval-lineage-dag-convergence:SOURCE_AUTHORITY_READBACK_RECONCILIATION",
     "schedulerPermission": "SELECTED",
-    "status": "CODE_PROVEN_LIVE_READBACK_REQUIRED",
-    "evidence": "16,151 packet updates are recorded as committed with per-batch PASS readbacks, and both frozen manifests verify offline. Packet qualification now has a strict code definition: unique packet key + exact source_revision + workspace_revision_key + non-null binding provenance; legacy content_hash parity is not canonical qualification. The existing current-lineage report is based on older upstream inputs and its bounded workspace-source cohort is misaligned. A fresh authorized/read-only DB evidence run is required to populate the corrected metric and establish current packet/chunk lineage. The selected gate remains open; do not proceed to Gate 2 or feature promotion.",
+    "status": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_AUTHORIZATION_REQUIRED",
+    "evidence": "16,151 packet updates are recorded as committed with per-batch PASS readbacks, and both frozen manifests verify offline. Packet qualification now has a strict code definition: unique packet key + exact source_revision + workspace_revision_key + non-null binding provenance; legacy content_hash parity is not canonical qualification. A fresh noncanonical workspace snapshot for the known workspace ID now has byte-readback PASS (26,528 sources, 7 repositories) and a read-only workspace revision candidate/preflight is ready. Candidate revision is sha256:a00070763ee1245daf3152bb9e2f5509caced43c89c689524dd8e7bd91269d2d; authority remains false. Tournament admission is an explicit durable authorization gate; the subsequent Graphify processing run is a separate authorization. No datastore or Graphify writes were performed. Do not proceed to Gate 2 or feature promotion.",
     "filesChanged": true,
     "rule": "Do not schedule by completion percentage. Continue only on the selected source-authority chain; no additional write, DDL, Graphify run, or unrelated change selection without its own authorization."
   }

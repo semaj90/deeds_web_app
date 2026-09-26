@@ -13,7 +13,9 @@ const root = process.cwd();
 const reportsDir = process.env.ATLAS_OPENSPEC_REPORTS_DIR
   ? path.resolve(root, process.env.ATLAS_OPENSPEC_REPORTS_DIR)
   : path.join(root, 'docs', 'reports');
-const workboardPath = path.join(reportsDir, 'openspec-workboard-v1.json');
+const workboardPath = process.env.ATLAS_OPENSPEC_WORKBOARD_PATH
+  ? path.resolve(root, process.env.ATLAS_OPENSPEC_WORKBOARD_PATH)
+  : path.join(root, 'docs', 'reports', 'openspec-workboard-v1.json');
 
 const readJson = (file, fallback = {}) => {
   try { return JSON.parse(fs.readFileSync(path.join(root, file), 'utf8')); } catch { return fallback; }
@@ -65,7 +67,10 @@ function describeWriteError(error) {
   return { name: null, code: null, message: String(error) };
 }
 
-const workboard = readJson('docs/reports/openspec-workboard-v1.json');
+const workboard = (() => {
+  try { return JSON.parse(fs.readFileSync(workboardPath, 'utf8')); }
+  catch { return {}; }
+})();
 const tasks = Array.isArray(workboard.taskInventory) ? workboard.taskInventory : [];
 const receipts = {
   lineage: readJson('docs/reports/current-lineage-closure-v1.json'),
@@ -248,7 +253,7 @@ for (const goal of goals) {
 const report = {
   schema: 'atlas.openspec-execution-controller.v1',
   generatedAt: new Date().toISOString(),
-  source: 'docs/reports/openspec-workboard-v1.json',
+  source: path.relative(root, workboardPath).split(path.sep).join('/'),
   policy: 'RECOMMENDATION_ONLY_NO_LEDGER_OR_RUNTIME_MUTATION',
   summary: {
     totalTasks: classifiedTasks.length,

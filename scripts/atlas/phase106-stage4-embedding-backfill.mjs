@@ -41,8 +41,11 @@ const __dirname = path.dirname(__filename);
 // ──────────────────────────────────────────────────────────────────────────
 
 const CONFIG = {
-  dryRun: process.argv.includes('--dry-run'),
-  limit: parseInt(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] || (process.argv.includes('--dry-run') ? '100' : '999999')),
+  // CEI-19b: this script wrote placeholder vectors (summary || content_text || '') for 54,774
+  // packets on 2026-07-20/21. Dry-run is now the default; writing needs BOTH --apply and
+  // PHASE106_ALLOW_APPLY=1, and should go through guard-pre-embedding-enrichment-v1.mjs first.
+  dryRun: !(process.argv.includes('--apply') && process.env.PHASE106_ALLOW_APPLY === '1'),
+  limit: parseInt(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] || (!(process.argv.includes('--apply') && process.env.PHASE106_ALLOW_APPLY === '1') ? '100' : '999999')),
   batchSize: parseInt(process.argv.find(a => a.startsWith('--batch-size='))?.split('=')[1] || '32'),
   concurrency: parseInt(process.argv.find(a => a.startsWith('--concurrency='))?.split('=')[1] || '4'),
 

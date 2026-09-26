@@ -1,0 +1,88 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T01:24:07Z",
+  "runType": "PROGRAM_GATE_LAYER_AND_READINESS_SEALING",
+  "pivot": {
+    "from": "controller-backed leaf readiness",
+    "to": "explicit milestone-to-gate-to-work-package-to-leaf structure",
+    "reason": "The prior plan attached exit-gate strings to waves/packages but did not emit gate nodes or package-to-gate references."
+  },
+  "repository": {
+    "head": "869756d1b71df6c0afa3b9863735d2e4084a959d",
+    "workingTreeWasDirty": true,
+    "canonicalSharedWorkboardOverwritten": false,
+    "taskLedgersEdited": false,
+    "selectedOpenSpec": "parent-atlas-workboard-feature-utility-fabric"
+  },
+  "inventory": {
+    "openTasks": 3224,
+    "classifiedWorkPackageLeaves": 2695,
+    "unclassifiedReviewLeaves": 529,
+    "leavesAccountedExactlyOnce": true,
+    "milestones": 6,
+    "waves": 11,
+    "explicitWaveExitGateNodes": 11,
+    "waveGateEdges": 10,
+    "workPackages": 500,
+    "selectedTasks": 0,
+    "declaredLeafDependencies": 4,
+    "undeclaredLeafDependencies": 3220,
+    "criticalPathRank": null,
+    "fanoutCount": null
+  },
+  "scopeLimitations": {
+    "programNodes20To30": "NOT_YET_MODELED",
+    "fineGrainedGateTarget80To120": "NOT_YET_PROVEN; only 11 declared wave-exit gates emitted",
+    "workPackageTarget250To400": "ABOVE_TARGET; 500; no cross-owner merging performed",
+    "reason": "The current task corpus lacks enough declared leaf dependencies and verified gate ownership to split these levels without inventing structure."
+  },
+  "readinessRules": {
+    "readyRequiresMatchingCurrentControllerBlockHash": true,
+    "nonReadyCannotBeSelected": true,
+    "canonicalOwnerUnknownIsNull": true,
+    "missingDependenciesRemainNull": true,
+    "proofLevelAndWriteRiskUnknownAreNull": true
+  },
+  "artifacts": {
+    "temporaryWorkboard": {
+      "path": ".tmp/codex-openspec-workboard-v1.json",
+      "sha256": "30A52230159AFC1795DE871BFA966E701A118ACB8639648141D602AC0DA5D0B1"
+    },
+    "durableProgramJson": {
+      "path": "docs/reports/openspec-implementation-program-run-2026-09-25T012407Z.json",
+      "sha256": "FF47D6E82D2DE0DF56BC59C818C3EB4197BCA89ED703EA4ABE36864E634BBDD1"
+    },
+    "durableProgramMarkdown": "docs/reports/openspec-implementation-program-run-2026-09-25T012407Z.md"
+  },
+  "validation": {
+    "programPlannerNodeTests": "9/9 PASS",
+    "workboardContractVitest": "11/11 PASS",
+    "targetedTypeScript": "PASS; workboard contract and spec",
+    "openSpecStrict": "PASS; parent-atlas-workboard-feature-utility-fabric",
+    "scopedDiffCheck": "PASS",
+    "datastoreWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "commits": 0,
+    "pushes": 0
+  },
+  "likely_cause": "The plan had a wave dependency graph but no separate gate entities, and its criticalPathRank field incorrectly reused the heuristic wave number despite missing leaf dependency/fanout evidence.",
+  "evidence": [
+    "Every wave now has a gate node and every classified work package references its gate.",
+    "Gate dependencies copy only the ten declared wave edges; gates have no proof receipt and remain unselected.",
+    "criticalPathRank, fanoutCount, canonicalOwner, proofLevel, and writeRisk remain null until owned evidence exists.",
+    "The snapshot preserves 11 wave-level gates only; it does not claim the requested 80-120 fine-grained gates or 20-30 program nodes are complete."
+  ],
+  "patch_targets": [
+    "scripts/atlas/lib/openspec-program-plan-v1.mjs",
+    "scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+    "scripts/atlas/build-openspec-workboard-v1.mjs",
+    "scripts/atlas/build-openspec-implementation-program-v1.mjs",
+    "sveltekit-frontend/src/lib/server/atlas/openspec-board/workboard-contract-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/openspec-board/workboard-contract-v1.spec.ts",
+    "openspec/changes/parent-atlas-workboard-feature-utility-fabric/specs/workboard-feature-vector/spec.md"
+  ],
+  "safe_next_command": "node scripts/atlas/build-openspec-workboard-v1.mjs .tmp/codex-openspec-workboard-v1.json .tmp/codex-openspec-workboard-v1.md",
+  "smoke_command": "cd sveltekit-frontend; $env:OPENSPEC_WORKBOARD_FIXTURE='..\\.tmp\\codex-openspec-workboard-v1.json'; npx vitest run src/lib/server/atlas/openspec-board/workboard-contract-v1.spec.ts",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T012407Z.json"
+}

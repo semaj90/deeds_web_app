@@ -1,0 +1,111 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runId": "openspec-workboard-run-2026-09-25T0045Z",
+  "generatedAt": "2026-09-25T00:45:45Z",
+  "head": "869756d1b7",
+  "pivot": {
+    "from": "parent-atlas-code-ingestion-pipeline:GPH-05 ownership proof",
+    "result": "GPH_05_OWNER_PARTIAL; no GPH-06 and no production cutover",
+    "to": "parent-atlas-workboard-feature-utility-fabric:WFU-14 program-plan and scheduler-permission logic",
+    "authorization": "User explicitly requested the all-open-task implementation plan and workboard logic update"
+  },
+  "implementationProgram": {
+    "receipt": "docs/reports/openspec-implementation-program-v1.json",
+    "markdown": "docs/reports/openspec-implementation-program-v1.md",
+    "totalLedgerTasks": 9512,
+    "completedTasks": 6288,
+    "openTasks": 3224,
+    "incumbentActionableEstimate": 2419,
+    "controllerActionableCurrentOpenTasks": 2176,
+    "controllerWaitingCurrentOpenTasks": 943,
+    "controllerDeferredCurrentOpenTasks": 101,
+    "controllerProofOnlyCurrentOpenTasks": 2,
+    "staleOrMissingControllerOpenRows": 2,
+    "taskRowsInExactlyOneWave": 3224,
+    "uniqueTaskKeys": 3224,
+    "waves": 11,
+    "milestones": 7,
+    "workPackages": 564,
+    "workPackagesUnderThreeTasks": 185,
+    "workPackageTarget": "APPROX_250_TO_400; current count remains above target; do not merge across owners automatically",
+    "tasksWithDeclaredDependencies": 4,
+    "tasksWithMissingDependencyDeclarations": 3220,
+    "taskTextMapped": 2194,
+    "changeFallbackReview": 487,
+    "unclassifiedReviewRequired": 543,
+    "canonicalRuntimeOwnerDeclared": 0,
+    "schedulerSelectedTasks": 0,
+    "selectionRule": "READY is not SELECTED; completion percentage and recommendation rank grant no execution permission; explicit unique stable-task-key manifest required",
+    "activeCriticalPath": "Source authority -> packet/chunk lineage -> Gate 2 remains the user-selected chain; no leaf task is selected for automatic execution by this report",
+    "dependencyGraphStatus": "PROVISIONAL_WAVE_ORDER; task-level dependency coverage is insufficient to claim a complete DAG"
+  },
+  "graphifyMetricAudit": {
+    "mode": "STATIC_CODE_REVIEW_ONLY; pipeline not executed",
+    "applyRun": false,
+    "writesByThisSession": 0,
+    "dryRunMutationFinding": "The BM25 SQL UPDATE is guarded by APPLY; APPLY requires --apply and is disabled by --dry-run. The 500 counter was candidate-loop count, not rows written.",
+    "bm25Owner": "atlas_packets.payload.bm25_text",
+    "bm25Denominator": "atlas_packets rows where packet_key IS NOT NULL; the has_bm25 count uses the same filter",
+    "bm25Interpretation": "0/61,718 present alongside 500 dry-run candidates is compatible: candidates are proposed updates and dry-run leaves the measured payload coverage unchanged. The prior label 'backfilled' was misleading, not proof of a different owner.",
+    "addressabilityPredicate": "packet_key IS NOT NULL only; this does not prove source revision or full packet/chunk lineage",
+    "addressabilityRejectionCounts": "Code now reports missing packet_key, source_ref, and source_revision counts separately; categories may overlap. No live Graphify query was run to establish this run's exact counts.",
+    "qdrant": {
+      "observedLogPoints": 328348,
+      "reportedPacketDenominator": 61718,
+      "reported532Percent": "Invalid as packet coverage because it divides collection point cardinality by packet rows without canonical identity deduplication.",
+      "newGateBehavior": "NOT_MEASURED_CANONICAL_IDENTITY_JOIN_REQUIRED; fail closed until unique packet coverage can be joined"
+    },
+    "communityConfidence": "95% threshold unchanged; code now emits exact missing count when measured. The cited 94.6% was not independently recomputed from a live same-run receipt.",
+    "pageRank": "Preserved as user-supplied dry-run evidence only: 1,477 features, 6,558 edges, d=0.85, 20 iterations, 1,477 scores, zero reported writes/errors; not rerun or promoted by this session."
+  },
+  "validation": {
+    "nodeSyntaxChecks": "PASS for touched JavaScript modules",
+    "focusedTests": "36/36 PASS across workboard program, Graphify dry-run metric helpers, WFU metadata, and step-burndown tests",
+    "openSpecStrict": "PASS: parent-atlas-workboard-feature-utility-fabric",
+    "scopedGitDiffCheck": "PASS",
+    "graphifyPipelineExecuted": false,
+    "datastoreWrites": 0,
+    "persistentCanonicalWrites": 0
+  },
+  "changedPaths": [
+    "package.json",
+    "scripts/atlas/build-openspec-workboard-v1.mjs",
+    "scripts/atlas/build-openspec-implementation-program-v1.mjs",
+    "scripts/atlas/lib/openspec-program-plan-v1.mjs",
+    "scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+    "scripts/atlas/graphify-langgraph-pipeline.mjs",
+    "scripts/atlas/lib/graphify-dry-run-metrics-v1.mjs",
+    "scripts/atlas/lib/graphify-dry-run-metrics-v1.test.mjs",
+    "openspec/changes/parent-atlas-workboard-feature-utility-fabric/specs/workboard-feature-vector/spec.md",
+    "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
+    "docs/reports/openspec-implementation-program-v1.json",
+    "docs/reports/openspec-implementation-program-v1.md",
+    "docs/reports/openspec-workboard-run-2026-09-25T0045Z.json"
+  ],
+  "writes": {
+    "taskLedgersChangedOnlyForWFU14Evidence": true,
+    "datastoreWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "neo4jWrites": 0,
+    "graphifyRuns": 0
+  },
+  "likely_cause": "The old workboard conflated recommendation rank and readiness with execution selection, while Graphify labels mixed proposed BM25 candidates with completed writes and compared projection-point counts to canonical packet counts.",
+  "evidence": [
+    "docs/reports/openspec-implementation-program-v1.json",
+    "scripts/atlas/build-openspec-workboard-v1.mjs",
+    "scripts/atlas/graphify-langgraph-pipeline.mjs",
+    "scripts/atlas/lib/graphify-dry-run-metrics-v1.test.mjs",
+    "OpenSpec controller checksum crosswalk: 3,222 current open rows; 2 stale/missing rows"
+  ],
+  "patch_targets": [
+    "scripts/atlas/build-openspec-workboard-v1.mjs",
+    "scripts/atlas/build-openspec-implementation-program-v1.mjs",
+    "scripts/atlas/graphify-langgraph-pipeline.mjs",
+    "openspec/changes/parent-atlas-workboard-feature-utility-fabric/specs/workboard-feature-vector/spec.md",
+    "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md"
+  ],
+  "safe_next_command": "node scripts/atlas/build-openspec-workboard-v1.mjs .tmp/codex-openspec-workboard-v1.json .tmp/codex-openspec-workboard-v1.md",
+  "smoke_command": "node --test scripts/atlas/lib/openspec-program-plan-v1.test.mjs scripts/atlas/lib/graphify-dry-run-metrics-v1.test.mjs scripts/atlas/lib/wfu-metadata.test.mjs scripts/atlas/audit-openspec-step-burndown-v1.test.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T0045Z.json"
+}

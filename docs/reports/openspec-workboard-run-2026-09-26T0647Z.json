@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T06:47:17.728Z",
+  "purpose": "Timestamped workboard refresh after pivoting from legacy-summary artifact fanout to the full OpenSpec dependency program; inventory only, no automatic selection.",
+  "pivot": {
+    "from": "parent-atlas-repair-candidate-feature-matrix / legacy summary census and HINT fanout",
+    "to": "repository-wide OpenSpec implementation program, prioritized by declared lineage, authorization, runtime, and dependency gates",
+    "reason": "The summary HINT artifact lane is now measured at full eligible-corpus scale. The original objective requires resolving the broader open-task DAG; downstream work must follow current identity and lineage blockers rather than extend an unqualified retrieval projection.",
+    "selectedTasks": 0,
+    "taskLedgerFilesEdited": [
+      "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md"
+    ]
+  },
+  "source": {
+    "changes": 88,
+    "taskLedgerFiles": 90,
+    "totalTasks": 9556,
+    "completedTasks": 6319,
+    "openTasks": 3237,
+    "actionableTasks": 2426,
+    "waitingTasks": 759,
+    "supersededTasks": 50,
+    "sourceHashesRechecked": true,
+    "workboardPath": ".tmp/codex-openspec-live-20260926T064500Z/workboard-v1.json"
+  },
+  "controller": {
+    "path": ".tmp/codex-openspec-live-20260926T064500Z/controller-output/openspec-execution-controller-v1.json",
+    "generatedAt": "2026-09-26T06:46:57.530Z",
+    "totalTasks": 9556,
+    "proven": 6321,
+    "actionable": 2180,
+    "waiting": 953,
+    "deferred": 102,
+    "writesPerformed": false,
+    "blockerGroups": {
+      "DECLARED_TASK_DEPENDENCY": 574,
+      "CANONICAL_AUTHORIZATION": 217,
+      "PACKET_MATERIALIZATION": 17,
+      "CURRENT_SOURCE_AUTHORITY": 111,
+      "CANDIDATE_POPULATION_FREEZE": 34
+    }
+  },
+  "program": {
+    "path": ".tmp/codex-openspec-live-20260926T064500Z/implementation-program-v1.json",
+    "markdownPath": ".tmp/codex-openspec-live-20260926T064500Z/implementation-program-v1.md",
+    "openTasks": 3237,
+    "workPackages": 811,
+    "accountedOpenTasks": 3237,
+    "duplicateAssignments": 0,
+    "missingAssignments": 0,
+    "schedulerSelectedTasks": 0,
+    "declaredDependencyTasks": 3,
+    "tasksWithoutDeclaredDependencies": 3234,
+    "mappingStatus": "PROVISIONAL",
+    "automaticDependencyEdgesInvented": 0
+  },
+  "nextWorkPolicy": {
+    "selectedWorkstream": "Q0 identity and current source authority before broad matrix or retrieval promotion",
+    "safeParallelWork": "Q1/Q2 code-only contracts and read-only audits only when they do not share mutable owners",
+    "notSelected": "Canonical DB/DDL/cache/projection writes, Graphify production runs, model-wide regeneration, and GPU package installation",
+    "containers": "Deferred until the final integration/verification stage"
+  },
+  "validation": {
+    "workboardBuilt": true,
+    "controllerReadOnly": true,
+    "allOpenTasksAccountedExactlyOnce": true,
+    "strictOpenSpec": "PASS",
+    "dataStoresMutated": false
+  }
+}

@@ -117,6 +117,7 @@
     "atlas:docs:go-retrieval-dense-lineage": "node scripts/atlas/audit-go-retrieval-dense-lineage-v1.mjs",
     "atlas:docs:analysis-pass-current-reconciliation": "node scripts/atlas/plan-analysis-pass-current-reconciliation-v1.mjs",
     "atlas:docs:workboard": "node scripts/atlas/build-openspec-workboard-v1.mjs",
+    "atlas:docs:program-plan": "node scripts/atlas/build-openspec-implementation-program-v1.mjs",
     "atlas:docs:execution-controller": "node scripts/atlas/run-openspec-execution-controller-atomic-v1.mjs",
     "atlas:docs:execution-controller:direct": "node scripts/atlas/audit-openspec-execution-controller-v1.mjs",
     "atlas:docs:blocker-audit": "node scripts/atlas/run-openspec-execution-controller-atomic-v1.mjs",

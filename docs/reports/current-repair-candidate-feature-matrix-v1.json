@@ -159,12 +159,32 @@
       "missingRows": 15
     }
   },
+  "contextManifestPresenceEvidence": {
+    "checksum": "sha256:725f777704c846fde7a801bebb31acb07a6127a4ec3190210274758f18b350b0",
+    "featurePresence": {
+      "latent256": "UNAVAILABLE",
+      "latent128": "UNAVAILABLE",
+      "latent64": "UNAVAILABLE",
+      "latent256QuerySimilarity": "UNAVAILABLE",
+      "latent128QuerySimilarity": "UNAVAILABLE",
+      "latent64QuerySimilarity": "UNAVAILABLE",
+      "semanticMrl512QuerySimilarity": "UNAVAILABLE",
+      "semanticMrl256QuerySimilarity": "UNAVAILABLE",
+      "semanticMrl128QuerySimilarity": "UNAVAILABLE"
+    },
+    "rowCount": 15,
+    "canonicalAuthority": false,
+    "mutationAuthority": false,
+    "deterministicReplay": true,
+    "allUnproducedFeaturesUnavailable": true
+  },
   "replay": {
     "manifest0": "sha256:e6039a998cba2945e6c79b5aae7e6926d7477786cb8b22da6f397425fad842a7",
     "manifest1": "sha256:e6039a998cba2945e6c79b5aae7e6926d7477786cb8b22da6f397425fad842a7",
     "identical": true,
     "matrixIdentical": true,
     "presenceIdentical": true,
+    "contextManifestPresenceIdentical": true,
     "identityIdentical": true
   },
   "authority": {

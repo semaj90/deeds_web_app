@@ -84,6 +84,7 @@
     "./core/ace-hypergraph-payload": "./dist/core/ace-hypergraph-payload.js",
     "./core/ace-packet-v2": "./dist/core/ace-packet-v2.js",
     "./core/ace-packet-v3": "./dist/core/ace-packet-v3.js",
+    "./core/ace-packet-v3-structural-composer": "./dist/core/ace-packet-v3-structural-composer.js",
     "./core/ace-packet-v3-admission": "./dist/core/ace-packet-v3-admission.js",
     "./core/ace-agentic-admission-v1": "./dist/core/ace-agentic-admission-v1.js",
     "./core/ace-runtime-adapter": "./dist/core/ace-runtime-adapter.js",

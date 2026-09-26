@@ -2,9 +2,25 @@ import { describe, expect, it } from 'vitest';
 
 import type { AstProvider } from './graphify-structural-materializer.js';
 import { GraphifyStructuralMaterializer } from './graphify-structural-materializer.js';
-import { createNodeTreeSitterAstProvider } from './node-tree-sitter-ast-provider.js';
+import {
+  createNodeTreeSitterAstProvider,
+  nodeTreeSitterProviderLanguageVocabularyV1,
+  NODE_TREE_SITTER_PROVIDER_LANGUAGES_V1,
+} from './node-tree-sitter-ast-provider.js';
 
 describe('Node Tree-sitter AstProvider challenger boundary', () => {
+  it('exports its runtime grammar vocabulary without creating aliases or canonical authority', () => {
+    const vocabulary = nodeTreeSitterProviderLanguageVocabularyV1();
+    expect(NODE_TREE_SITTER_PROVIDER_LANGUAGES_V1).toEqual(['typescript', 'tsx', 'javascript', 'jsx']);
+    expect(vocabulary).toMatchObject({
+      sourceOwner: 'sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts',
+      namespace: 'PARSER_GRAMMAR_ID',
+      labels: [...NODE_TREE_SITTER_PROVIDER_LANGUAGES_V1],
+    });
+    expect(vocabulary.sourceRevision).toMatch(/^sha256:[0-9a-f]{64}$/);
+    expect(Object.isFrozen(NODE_TREE_SITTER_PROVIDER_LANGUAGES_V1)).toBe(true);
+  });
+
   it('accepts a challenger through the shared AstProvider interface without granting canonical promotion', async () => {
     const challenger: AstProvider = {
       async materialize(input) {

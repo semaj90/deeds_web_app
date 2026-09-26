@@ -1,0 +1,126 @@
+{
+  "schema": "atlas.large-corpus-shards-postgres-reconciliation.v1",
+  "status": "READ_ONLY_JOIN_COMPLETE_REVISION_QUALIFICATION_BLOCKED",
+  "generatedAt": "2026-09-25T20:15:09.130Z",
+  "manifestPath": ".tmp/atlas/large-corpus-enrichment-shards-v1/20260925T201112Z/manifest.json",
+  "manifestRootSha256": "85712fd9ec1c065857361b2f926cb218b479555f89cd89d28094165e20e3f3ff",
+  "verifiedShards": [
+    {
+      "path": "primary_metadata_corpus-00001.ndjson",
+      "records": 5000,
+      "sha256": "3b0e89fcfd76aae9c58d53f22319bc45f36c1a31bb56be5089f880e24fdd4cd6"
+    },
+    {
+      "path": "representation_corpus-00001.ndjson",
+      "records": 5000,
+      "sha256": "72a11585f79fc7c0a2240e0a80e18eecb9b9ee5903b3f40ad22dbe950f69cf58"
+    },
+    {
+      "path": "representation_corpus-00002.ndjson",
+      "records": 5000,
+      "sha256": "416a2dd159c175362358b0827e12525c53815c6ee910f87af72231f9288bb9be"
+    },
+    {
+      "path": "representation_corpus-00003.ndjson",
+      "records": 5000,
+      "sha256": "8b78694ac97533072e53862c1bf224c6edbcc24faa3026bae54a1caaf8bfa46e"
+    },
+    {
+      "path": "representation_corpus-00004.ndjson",
+      "records": 5000,
+      "sha256": "ab8cfebc06b381f98b2d2e9e127890f438d5ddbdd8039a20f1795883d879258a"
+    },
+    {
+      "path": "representation_corpus-00005.ndjson",
+      "records": 5000,
+      "sha256": "f6d387efdb458acb79ee390e830a31a4595b2d3dcf6afe3bc19be5d73c070006"
+    },
+    {
+      "path": "representation_corpus-00006.ndjson",
+      "records": 5000,
+      "sha256": "7a8b68603c9f0dd296d969a5a372db61633418fd5340431d14eac9d59f4db423"
+    },
+    {
+      "path": "representation_corpus-00007.ndjson",
+      "records": 5000,
+      "sha256": "8de688703b04f22b335be6fb748494afbfd146807e3299b7db53622122d92dc5"
+    },
+    {
+      "path": "representation_corpus-00008.ndjson",
+      "records": 5000,
+      "sha256": "d51a2a142da271ca75ca091a33298a85a40b703ce05ebcbffca3962be38c1ac6"
+    },
+    {
+      "path": "representation_corpus-00009.ndjson",
+      "records": 5000,
+      "sha256": "577e80004026e37fe40d63e4bf0e8937f53f171559c852f5b181c71e826245c2"
+    },
+    {
+      "path": "representation_corpus-00010.ndjson",
+      "records": 5000,
+      "sha256": "d4131ba27db9192945bc41eb53f7574ced7fa25e5c7a1a65c66dc9394dc664f7"
+    },
+    {
+      "path": "representation_corpus-00011.ndjson",
+      "records": 5000,
+      "sha256": "30d0f7c187a1286a330ff21d392a25b7860e5de721f800ae0f10a16f2d9fc480"
+    },
+    {
+      "path": "representation_corpus-00012.ndjson",
+      "records": 5000,
+      "sha256": "3f1fb5a883b229ce241997bc6f01490627a66f6761110564bf4da4a34f36d38a"
+    },
+    {
+      "path": "representation_corpus-00013.ndjson",
+      "records": 5000,
+      "sha256": "fb7d9060f4e8b7baaa14144c3513b52297ffa9ee9b146babaa87bf5dd0418e20"
+    },
+    {
+      "path": "representation_corpus-00014.ndjson",
+      "records": 5000,
+      "sha256": "82751e2e92c4a7adec0aaded28a1670b5615554627710401d987534ae5070414"
+    },
+    {
+      "path": "representation_corpus-00015.ndjson",
+      "records": 5000,
+      "sha256": "7b8712d3d5a6be6f3b6548d31911eb1f53bc0064814174d940ab86c8888d9ed6"
+    },
+    {
+      "path": "representation_corpus-00016.ndjson",
+      "records": 1261,
+      "sha256": "8d9621d741677e141624156b93c6e750bd8f74188949f7dc17dbff760b2b962d"
+    }
+  ],
+  "input": {
+    "shardRecords": 81261,
+    "metadataIdentityUnresolved": 5000,
+    "representationOnly": 76261,
+    "uniqueExactSourceRefs": 61738,
+    "sourceRevisionPresent": 0,
+    "workspaceRevisionPresent": 0
+  },
+  "postgresExactSourceRefJoin": {
+    "identityBasis": "BYTE_EXACT_source_ref_ONLY_NOT_CANONICAL_IDENTITY",
+    "uniqueRefsMatchingCodebaseChunkIndex": 0,
+    "uniqueRefsMatchingAtlasPackets": 2,
+    "uniqueRefsMatchingNeither": 61736,
+    "matchedCodebaseChunkIndexRows": 0,
+    "matchedAtlasPacketRows": 2,
+    "refsWithMultipleChunkRows": 0,
+    "refsWithMultiplePacketRows": 0,
+    "refsWhoseMatchedChunkRowsHaveRevision": 0,
+    "refsWhoseMatchedPacketRowsHaveRevision": 0,
+    "promotionEligibleRows": 0,
+    "classification": "EXACT_SOURCE_REF_MATCH_REVISION_MISSING_OR_IDENTITY_UNRESOLVED"
+  },
+  "decision": {
+    "canonicalityClaimed": false,
+    "sourceRefNormalized": false,
+    "pathFallbackUsed": false,
+    "contentHashSubstitutionUsed": false,
+    "databaseWrites": 0,
+    "graphifyRuns": 0,
+    "llmCalls": 0,
+    "blocker": "INPUT_ARTIFACTS_LACK_SOURCE_REVISION_AND_WORKSPACE_REVISION"
+  }
+}

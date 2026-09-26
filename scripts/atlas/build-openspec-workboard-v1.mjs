@@ -10,7 +10,7 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from '
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { blockHash, parseWfu, resolveDeclarations, sectionSlug, sha256, stripWfuComment, summarizeDeclared, taskBlock } from './lib/wfu-metadata.mjs';
-import { buildProgramGates, buildProgramHierarchy, buildProgramWorkPackages, buildSelectedChainOverlay, classifyGateState, classifyProgramTask, computeCompletionTracking, isValidSchedulerSelection, mutationClass, PROGRAM_MILESTONES, PROGRAM_WAVES, schedulerPermission } from './lib/openspec-program-plan-v1.mjs';
+import { buildArchitectureOverlay, buildProgramGates, buildProgramHierarchy, buildProgramWorkPackages, buildSelectedChainOverlay, classifyArchitectureProgram, classifyGateState, classifyProgramTask, computeCompletionTracking, isValidSchedulerSelection, mutationClass, PROGRAM_MILESTONES, PROGRAM_WAVES, schedulerPermission } from './lib/openspec-program-plan-v1.mjs';
 
 // Repo root is owned by this script's location, not by process.cwd() (running from scripts/atlas wrote to a nonexistent scripts/atlas/docs path).
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -33,7 +33,10 @@ const previousWorkboard = (() => {
     return null;
   }
 })();
-const controllerPath = join(root, 'docs', 'reports', 'openspec-execution-controller-v1.json');
+const controllerArg = process.argv.find((arg) => arg.startsWith('--controller-file='));
+const controllerPath = controllerArg
+  ? resolve(root, controllerArg.slice('--controller-file='.length))
+  : join(root, 'docs', 'reports', 'openspec-execution-controller-v1.json');
 const controllerReport = existsSync(controllerPath) ? JSON.parse(readFileSync(controllerPath, 'utf8')) : null;
 const controllerByTaskKey = new Map((controllerReport?.allTasks ?? []).map((task) => [task.taskKey, task]));
 const selectionArg = process.argv.find((arg) => arg.startsWith('--selection-file='));
@@ -138,12 +141,14 @@ for (const file of taskFiles) {
     const program = classifyProgramTask(task);
     const wave = program.wave;
     const waveDefinition = wave == null ? null : PROGRAM_WAVES.find((item) => item.id === wave);
+    const architecture = classifyArchitectureProgram(change);
     task.program = {
       wave,
       waveTitle: waveDefinition?.title ?? null,
       classification: program.classification,
       matchedRule: program.matchedRule,
-      milestone: waveDefinition?.milestone ?? null,
+      architecture,
+      milestone: architecture.milestoneId,
       gate: waveDefinition?.exitGate ?? 'UNCLASSIFIED_REVIEW_REQUIRED',
       gateId: wave == null ? null : `GATE-WAVE-${String(wave).padStart(2, '0')}`,
       workPackageKey: null,
@@ -215,7 +220,7 @@ const waveWorkPackages = PROGRAM_WAVES.map((wave) => {
     state: members.length ? 'PLANNED_NOT_SELECTED' : 'NO_OPEN_TASKS',
   };
 });
-const reviewQueueTasks = tasks.filter((task) => task.state === 'OPEN' && task.program.wave == null);
+const reviewQueueTasks = tasks.filter((task) => task.state === 'OPEN' && !task.program.architecture.programId);
 const reviewQueue = {
   id: 'UNCLASSIFIED_REVIEW',
   title: 'Unclassified task mapping review',
@@ -527,6 +532,7 @@ const result = {
     staleOrMissingTaskCount: tasks.filter((task) => task.controllerState === 'STALE_CONTROLLER_RECEIPT').length,
   },
   ordering: 'PROGRAM_WAVE_THEN_MILESTONE_THEN_WORK_PACKAGE; READINESS_AND_SCHEDULER_PERMISSION_ARE_INDEPENDENT; WORKBOARD_RANKS_ARE_ADVISORY_ONLY; NO_SELECTION_BY_COMPLETION_PERCENTAGE',
+  architectureOverlay: buildArchitectureOverlay(),
   implementationProgram: {
     schema: 'atlas.openspec-implementation-program.v1',
     authority: 'ADVISORY_PLAN_ONLY',

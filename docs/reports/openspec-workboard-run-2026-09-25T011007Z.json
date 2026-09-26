@@ -1,0 +1,90 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T01:10:07Z",
+  "runType": "READ_ONLY_PROGRAM_INTEGRATION_VALIDATION",
+  "pivot": {
+    "from": "source-authority lineage investigation",
+    "to": "selected WFU-14 workboard program projection and consumer-contract integration",
+    "reason": "User explicitly requested implementation planning across actionable OpenSpec work and dependency-aware workboard generation."
+  },
+  "repository": {
+    "head": "869756d1b71df6c0afa3b9863735d2e4084a959d",
+    "workingTreeWasDirty": true,
+    "canonicalReportsOverwritten": false,
+    "taskLedgersEdited": false
+  },
+  "program": {
+    "openTaskCount": 3224,
+    "classifiedWorkPackageTaskCount": 2695,
+    "unclassifiedReviewTaskCount": 529,
+    "workPackageCount": 500,
+    "waveCount": 11,
+    "macroMilestoneCount": 6,
+    "waveZeroIsControlPlaneFoundation": true,
+    "declaredWaveDependencyEdges": 10,
+    "declaredLeafDependencyTaskCount": 4,
+    "missingLeafDependencyDeclarationCount": 3220,
+    "selectedTaskCount": 0,
+    "schedulerPermissionDefault": "NOT_SELECTED",
+    "unclassifiedTasksAppearOnlyInReviewQueue": true,
+    "allOpenTasksAccountedExactlyOnce": true,
+    "workPackageTargetStatus": "ABOVE_TARGET; DO_NOT_MERGE_ACROSS_OWNERS_AUTOMATICALLY"
+  },
+  "temporaryValidationArtifacts": [
+    {
+      "path": ".tmp/codex-openspec-workboard-v1.json",
+      "sha256": "96676CC9CB1D4D2C0A294DE62AA781528B63101B387BEDD5C1A9F8AC441AA585"
+    },
+    {
+      "path": ".tmp/codex-openspec-program-v1.json",
+      "sha256": "151DA4E19A9676C2AA4125D80FC4ECB99E203EFDD06A3FF828A39B63248B3DA3"
+    }
+  ],
+  "durablePlanArtifacts": [
+    {
+      "path": "docs/reports/openspec-implementation-program-run-2026-09-25T011218Z.json",
+      "sha256": "319B1944283A667996B4FD295BD4213FB0E39739253820B1C3AFCE684F679F7E"
+    },
+    {
+      "path": "docs/reports/openspec-implementation-program-run-2026-09-25T011218Z.md"
+    }
+  ],
+  "validation": {
+    "programPlannerNodeTests": "8/8 PASS",
+    "workboardContractVitest": "11/11 PASS",
+    "targetedTypeScript": "PASS; workboard contract and spec",
+    "frontendWideTypeScript": "INCOMPLETE_TIMED_OUT_AFTER_BOUNDED_WAIT",
+    "openSpecStrict": "PASS; parent-atlas-workboard-feature-utility-fabric",
+    "scopedDiffCheck": "PASS"
+  },
+  "mutations": {
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "neo4jWrites": 0,
+    "valkeyWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "taskSelections": 0,
+    "commits": 0,
+    "pushes": 0
+  },
+  "likely_cause": "The OpenSpec inventory was flat, and the standalone program generator duplicated grouping logic that blurred classified work packages with unclassified review tasks.",
+  "evidence": [
+    "Temporary generated workboard reconciled all 3,224 open task keys exactly once.",
+    "2,695 classified leaves map to 500 bounded work packages; 529 unclassified leaves appear only in the review queue.",
+    "Only 4 leaves declare dependencies; 3,220 remain undeclared rather than inferred.",
+    "Wave zero is a control-plane foundation; the six macro milestones are M1-M6.",
+    "The pre-existing task and report working tree was dirty; canonical reports were not overwritten."
+  ],
+  "patch_targets": [
+    "scripts/atlas/lib/openspec-program-plan-v1.mjs",
+    "scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+    "scripts/atlas/build-openspec-workboard-v1.mjs",
+    "scripts/atlas/build-openspec-implementation-program-v1.mjs",
+    "sveltekit-frontend/src/lib/server/atlas/openspec-board/workboard-contract-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/openspec-board/workboard-contract-v1.spec.ts"
+  ],
+  "safe_next_command": "node scripts/atlas/build-openspec-workboard-v1.mjs .tmp/codex-openspec-workboard-v1.json .tmp/codex-openspec-workboard-v1.md",
+  "smoke_command": "cd sveltekit-frontend && $env:OPENSPEC_WORKBOARD_FIXTURE='..\\.tmp\\codex-openspec-workboard-v1.json'; npx vitest run src/lib/server/atlas/openspec-board/workboard-contract-v1.spec.ts",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T011007Z.json"
+}

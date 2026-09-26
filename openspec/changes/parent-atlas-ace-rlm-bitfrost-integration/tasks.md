@@ -3542,7 +3542,17 @@ remains in this replay.
 - [ ] Add or reconcile a live `parse_node_id` field without relaxing the existing tree-node
   uniqueness constraint.
 - [ ] Prove `symbol_id` stability across two source revisions and `symbol_version_id` changes
-  only when the symbol's revision-bound definition changes.
+  only when the symbol's revision-bound definition changes. (2026-09-26 read-only audit: 402
+  SHA-256-revision rows, 208 exact current source bindings, but 0 stable-symbol/source-ref pairs
+  have two distinct SHA-256 revisions. The current `deriveSymbolVersionIdV1` formula matched
+  0/402 rows; 194 stored IDs have legacy 40-hex suffixes. Evidence:
+  `docs/reports/symbol-stability-two-revision-audit-v1.json`. Task remains OPEN: recover two
+  exact admitted source snapshots and reconcile historical producer/ID formula before claiming
+  stability or changing identity. Next procedure: (1) trace the historical symbol-version writer
+  and its hash/serialization contract from source and git history; (2) locate two immutable,
+  admitted revisions for the same stable symbol; (3) replay the historical derivation read-only
+  and compare definition changes versus ID changes; (4) only then propose a compatibility-safe
+  identity migration, as a separate reviewed gate. Do not synthesize revisions or rewrite IDs.)
 - [ ] Rebuild downstream packet/chunk/graph joins from the frozen lineage map before any
   structural reindex or topology promotion.
 

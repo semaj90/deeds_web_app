@@ -1,0 +1,105 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T21:27:27Z",
+  "runType": "FULL_OPEN_TASK_PROGRAM_RECONCILIATION",
+  "pivot": {
+    "from": "LARGE_CORPUS_ENRICHMENT_CENSUS_01 / ORNITH_LINEAGE_BOUND_SUMMARY_PROPOSAL_01",
+    "to": "current OpenSpec open-task hierarchy and achievable implementation program",
+    "reason": "User requested continuation across OpenSpec tasks to wire the needed implementation program, while deferring container rebuilds until the end."
+  },
+  "repository": {
+    "workingTreeWasDirty": true,
+    "concurrentTaskLedgerEditsObserved": false,
+    "controllerInputPathBugFound": true,
+    "controllerInputPathFix": "scripts/atlas/audit-openspec-execution-controller-v1.mjs now reads the workboard from its configured ATLAS_OPENSPEC_REPORTS_DIR instead of hardcoding docs/reports.",
+    "taskLedgersEditedByThisRun": false,
+    "selectedOpenSpec": null,
+    "schedulerSelectedTaskCount": 0
+  },
+  "currentSnapshot": {
+    "workboard": ".tmp/codex-openspec-live-20260925T2123/reports/openspec-workboard-v1.json",
+    "generatedAt": "2026-09-25T21:24:21.133Z",
+    "changeCount": 88,
+    "taskFilesHashed": 90,
+    "totalTasks": 9525,
+    "completedTasks": 6297,
+    "openTasks": 3228,
+    "openTaskAccounting": {
+      "workPackages": 3228,
+      "reviewRequired": 0,
+      "accountedExactlyOnce": true,
+      "duplicateTaskAssignments": 0,
+      "missingTaskAssignments": 0,
+      "workPackageCount": 799,
+      "allMappingsProvisional": true
+    },
+    "readiness": {
+      "currentlyReady": 2082,
+      "authorizationRequired": 201,
+      "blockedByLineage": 144,
+      "blockedByRuntime": 28,
+      "ownerDecisionRequired": 2,
+      "waitingForDependency": 438,
+      "deferred": 51,
+      "superseded": 38,
+      "reviewRequiredGateState": 244
+    },
+    "dependencyEvidence": {
+      "openTasksWithDeclaredDependencies": 3,
+      "openTasksWithoutDeclaredDependencies": 3225,
+      "dependenciesInvented": 0
+    },
+    "controllerFreshness": {
+      "embeddedControllerPath": "docs/reports/openspec-execution-controller-v1.json",
+      "embeddedControllerGeneratedAt": "2026-09-25T00:08:54.948Z",
+      "initialIsolatedControllerGeneratedAt": "2026-09-25T21:24:25.828Z",
+      "initialIsolatedControllerTaskRows": 9511,
+      "initialIsolatedControllerOpenRows": 3224,
+      "initialMismatchCause": "Controller ignored the isolated workboard path and read docs/reports/openspec-workboard-v1.json instead.",
+      "correctedIsolatedControllerGeneratedAt": "2026-09-25T21:30:24.580Z",
+      "correctedControllerTaskRows": 9525,
+      "correctedControllerOpenRowsIncludingInvariantTasks": 3228,
+      "correctedControllerStableKeyDifferences": {
+        "workboardOnly": 0,
+        "controllerOnly": 0
+      },
+      "correctedControllerSource": ".tmp/codex-openspec-live-20260925T2123/reports/openspec-workboard-v1.json",
+      "interpretation": "Controller/workboard population parity is proven after the path fix. The workboard builder still reads the shared controller path, so the existing plan's embedded readiness classification is stale and must be refreshed before using it as current."
+    }
+  },
+  "programPlan": {
+    "path": ".tmp/codex-openspec-live-20260925T2123/reports/openspec-achievable-implementation-program-v1.json",
+    "generatedAt": "2026-09-25T21:24:33.622Z",
+    "milestones": 7,
+    "programs": 25,
+    "workPackages": 799,
+    "reviewRequiredLeaves": 0,
+    "mappingStatus": "PROVISIONAL_FOR_ALL_OPEN_LEAVES",
+    "schedulerSelectedOpenTasks": 0,
+    "staleOrMissingControllerTaskCount": 992,
+    "note": "Exact accounting is proven for this captured workboard. The first isolated controller run exposed the hardcoded-input bug and has since been rerun with exact stable-key parity. The generated plan has not yet been rebuilt with a matching fresh controller classification; dependencies remain almost entirely undeclared and mappings provisional. No task was selected or completed by this planning run."
+  },
+  "corpusWork": {
+    "metadataEnrichment": "Previously sealed local shards; no canonical promotion population established.",
+    "ornithProposalCanary": "12 local proposals; no database row updates or projection writes.",
+    "containerRebuilds": 0,
+    "graphifyRuns": 0,
+    "datastoreWrites": 0
+  },
+  "likely_cause": "The execution controller hardcoded the shared workboard path, producing stale classifications for isolated snapshots; additionally, most leaves lack declared dependency edges, so hierarchy accounting alone is not an execution DAG.",
+  "evidence": [
+    ".tmp/codex-openspec-live-20260925T2123/reports/openspec-workboard-v1.json",
+    ".tmp/codex-openspec-live-20260925T2123/reports/openspec-execution-controller-v1.json",
+    ".tmp/codex-openspec-live-20260925T2123/reports/openspec-achievable-implementation-program-v1.json",
+    "stable-key comparison across the isolated workboard and corrected controller snapshots"
+  ],
+  "patch_targets": [
+    "scripts/atlas/build-openspec-workboard-v1.mjs",
+    "scripts/atlas/audit-openspec-execution-controller-v1.mjs",
+    "scripts/atlas/build-openspec-implementation-program-v1.mjs",
+    "scripts/atlas/lib/openspec-program-plan-v1.mjs"
+  ],
+  "safe_next_command": "Rebuild workboard and controller from one frozen task-ledger snapshot, then require stable-key and source-hash parity before publishing a program plan.",
+  "smoke_command": "node --test scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T2127Z.json"
+}

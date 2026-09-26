@@ -12,7 +12,7 @@ import { createHash } from 'node:crypto';
 import { hasGemma4ReasoningLeak } from './gemma4-summary-sanitizer.mjs';
 
 const TRANSPORT_TOKEN_RE = /<\|?\s*(?:start_of_turn|end_of_turn|bos|eos|message|end|start)\s*\|?>|<\s*(?:start|end)\s+of\s+turn\s*>/gi;
-const CONTROL_TOKEN_TEST_RE = /<\|?\s*(?:start_of_turn|end_of_turn|bos|eos|message|end|start|channel)\s*\|?>|<\|channel\>|<channel\|>|<\|endthinking\|?>|<\s*(?:start|end)\s+of\s+turn\s*>/i;
+const CONTROL_TOKEN_TEST_RE = /<\/?\s*(?:start_of_turn|end_of_turn)\s*>|<\|?\s*(?:start_of_turn|end_of_turn|bos|eos|message|end|start|channel)\s*\|?>|<\|channel\>|<channel\|>|<\|endthinking\|?>|<\s*(?:start|end)\s+of\s+turn\s*>/i;
 
 // Echoed few-shot / instruction scaffold (found in ~88% of the 2026-07-04 spool file)
 const SCAFFOLD_PATTERNS = [
@@ -25,6 +25,8 @@ const SCAFFOLD_PATTERNS = [
   /^\s*(the\s+)?(request|task)\s+is\s+to\s+summari[sz]e\b/i,
   /\bFeature:\s*\S[\s\S]{0,200}\bSource:\s*\S/i,
   /\bwrite\s+(one|a)\s+concise\s+(final\s+)?summary\s+sentence\b/i,
+  /\b(?:the\s+)?goal\s+is\s+to\s+summari[sz]e\s+this\s+in\s+\d+\s*[-–]\s*\d+\s+sentences?\b/i,
+  /\bself[- ]correction(?:\s*\/\s*refinement)?\b|\bno changes needed\b|\bi will ensure the final output\b/i,
 ];
 
 const PLACEHOLDER_RE = /\b(todo|fixme|placeholder|lorem ipsum|tbd)\b/i;
@@ -54,7 +56,9 @@ export function analyzeSummaryContaminationV1(value) {
   return { reasoningLeak, scaffoldLeak, controlTokenLeak, placeholderOrMeta, clean: reasons.length === 0, reasons };
 }
 
-const REQUIRED_LINEAGE = ['canonical_chunk_id', 'source_ref', 'source_revision', 'workspace_revision', 'input_digest', 'proposal_checksum', 'model_revision', 'prompt_template_revision'];
+// A stable model ID is required; immutable modelRevision is optional because
+// llama-server may expose only a friendly ID. Unknown revisions stay null.
+const REQUIRED_LINEAGE = ['canonical_chunk_id', 'source_ref', 'source_revision', 'workspace_revision', 'input_digest', 'proposal_checksum', 'model_id', 'prompt_template_revision'];
 const IDENTITY_COMPARED = ['source_revision', 'workspace_revision', 'input_digest'];
 
 /**

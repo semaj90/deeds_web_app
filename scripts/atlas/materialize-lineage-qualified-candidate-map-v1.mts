@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import * as dotenv from 'dotenv';
 import { materializeCandidateOrdinalMap } from '../../sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts';
+import { selectWorkspaceRevisionV1 } from './lib/select-workspace-revision-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 dotenv.config({ path: path.resolve(ROOT, 'sveltekit-frontend/.env') });
@@ -86,9 +87,7 @@ async function main(): Promise<void> {
     ORDER BY workspace_revision::text
   `);
   const workspaceRevisions = bindingRevisions.rows.map((row) => clean(row.workspace_revision)).filter((value): value is string => Boolean(value));
-  const workspaceRevision = requestedWorkspaceRevision ?? (workspaceRevisions.length === 1 ? workspaceRevisions[0] : null);
-  if (!workspaceRevision || !/^sha256:[0-9a-fA-F]{64}$/.test(workspaceRevision)) throw new Error('CANARY_CURRENT_WORKSPACE_REVISION_REQUIRED');
-  if (workspaceRevisions.some((value) => value !== workspaceRevision)) throw new Error('CANARY_MIXED_WORKSPACE_BINDING_REVISIONS');
+  const workspaceRevision = selectWorkspaceRevisionV1(requestedWorkspaceRevision, workspaceRevisions);
 
   const result = await pool.query<SourceRow>(`
     WITH chunk_by_source AS (

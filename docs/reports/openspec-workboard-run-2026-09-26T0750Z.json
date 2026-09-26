@@ -1,0 +1,60 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T07:50:28Z",
+  "status": "PIVOT_SNAPSHOT_ONLY",
+  "objective": "Continue the streamed corpus-to-canonical-metadata-enrichment path while keeping summary fanout, source identity, AST, and derived feature work as separate gates.",
+  "pivot": {
+    "fromChange": "parent-atlas-repair-candidate-feature-matrix",
+    "toChange": "parent-atlas-retrieval-lineage-dag-convergence",
+    "reason": "The prior workboard's repo:root/deeds-web-app equality join was structurally invalid. The existing stable-file classifier explicitly bridges the labels, allowing a read-only source-to-packet-to-chunk lineage rerun and CandidateOrdinal artifact refresh.",
+    "priorWorkboardRun": "docs/reports/openspec-workboard-run-2026-09-26T0726Z.json"
+  },
+  "implemented": [
+    {
+      "path": ".tmp/atlas/repository-namespace-bridge-v1/bridge-root-proof-20260926.json",
+      "result": "24,456 root membership rows map to exact current source bindings; 577 exact bridge source members resolve to 6,732 proven current chunk identities; 50 source members have lineage only at another revision; 1,086 nested rows remain blocked. No identity writes."
+    },
+    {
+      "path": ".tmp/atlas/candidate-ordinal-bridged-v1/20260926T074719Z/receipt.json",
+      "result": "Read-only CandidateOrdinal refresh for 6,732 exact revision-qualified chunks from the 577-member bridge cohort. identityAuthority=false; semantic representation bindings=0; canonical/projection/cache/queue writes=0. Receipt and map checksums verified."
+    },
+    {
+      "path": "scripts/atlas/materialize-bridged-candidate-ordinal-v1.mts",
+      "result": "Uses the existing canonical-candidate-v1.ts owner and fresh admitted bridge evidence under REPEATABLE READ READ ONLY; does not normalize namespaces or mint repository/stable-file identity."
+    }
+  ],
+  "workboard": {
+    "pivotedToTaskList": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+    "updatedParallelLedger": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
+    "candidateOrdinalRefresh": "ARTIFACT_PROVEN_FOR_6732_EXACT_CHUNKS",
+    "summaryHintFeatureJoin": "WAITING_ON_EXACT_HINT_TO_ORDINAL_JOIN",
+    "summaryMmr": "WAITING_ON_EXACT_HINT_TO_ORDINAL_JOIN_AND_GRADED_LABELS",
+    "canonicalRepositoryIdentity": "AUTHORIZATION_GATED_NOT_POPULATED",
+    "nestedRepositoryBindings": "BLOCKED_1086_ROWS"
+  },
+  "validation": {
+    "canonicalCandidateOrdinalTests": "PASS_19_OF_19",
+    "strictOpenSpecRetrievalLineageDagConvergence": "PASS",
+    "strictOpenSpecRepairCandidateFeatureMatrix": "PASS",
+    "receiptChecksum": "PASS",
+    "ordinalMapChecksum": "PASS",
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "neo4jWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0,
+    "containerRebuild": false
+  },
+  "next": [
+    "Reconcile the remaining 23,829 mapped root sources with no exact proven packet/chunk lineage and 50 revision-mismatched source members; do not path-fallback or infer identity.",
+    "Build the exact legacy-summary-hint to refreshed CandidateOrdinal intersection using chunk identity, sourceRef and exact source/workspace revisions; unmatched hints stay HINT-only and outside the matrix.",
+    "Only after that intersection is sealed, materialize the legacy_summary_cosine feature aligned to CandidateOrdinal; MMR stays downstream and relevance metrics await graded labels.",
+    "Continue the independent large-corpus shard reconciliation and feature-matrix owner tasks through their OpenSpec dependency gates; AST remains a feature lane, not a census blocker."
+  ],
+  "cautions": [
+    "577 counts exact bridge membership/source members; 6,732 counts proven chunk identities. They are different grains.",
+    "This read-only namespace bridge does not populate atlas_repository_identity or stable-file identity tables; those remain separately authorization-gated.",
+    "The prior 07:26Z report contains the superseded namespace-mismatch classification. This 07:50Z pivot snapshot records the corrected bridge result; historical report was retained unchanged."
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.repair-mrl-live-input-gate.v1",
+  "generatedAt": "2026-09-26T04:25:58.000Z",
+  "mode": "READ_ONLY_REPEATABLE_READ_CENSUS",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "candidateCount": 15,
+  "evidence": {
+    "exactChunkRowsFound": 15,
+    "sourceAndChunkHashMatches": 15,
+    "provenChunkLineageMatches": 15,
+    "valid768DimVectors": 15,
+    "exactWorkspaceAndSourceRevisionBindings": 0,
+    "rowSourceRevisionMirrorMatches": 0,
+    "rowWorkspaceRevisionMirrorMatches": 0,
+    "packetSourceRevisionMatches": 0,
+    "rowRepresentationRevisionEqualsCohortRevision": 0,
+    "sourceRefAndSourceRevisionBindingsAtOtherWorkspaceRevisions": 15
+  },
+  "observedAlternativeWorkspaceBindings": [
+    { "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf", "bindingRows": 15, "candidateSources": 15, "exactCandidateWorkspaceRows": 0 },
+    { "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc", "bindingRows": 15, "candidateSources": 15, "exactCandidateWorkspaceRows": 0 }
+  ],
+  "disposition": "REPAIR_FEATURE_INPUT_NOT_ADMITTED",
+  "reason": "The real vectors and exact chunk-lineage rows exist, but current readback does not bind those inputs to the frozen candidate workspace/source revision pair. Existing source-revision matches occur at different workspace revisions. No MRL feature was derived or marked available.",
+  "databaseWrites": 0,
+  "graphifyRuns": 0,
+  "projectionOrCacheWrites": 0,
+  "nextProof": "Re-establish the exact workspace/source binding for this frozen candidate snapshot, or select a different already-revisioned producer with exact snapshot coverage.",
+  "inputArtifacts": [
+    ".tmp/atlas/lineage-qualified-candidate-map-v1.json",
+    "docs/reports/lineage-semantic-768-cohort-v1.json",
+    ".tmp/atlas/semantic-768-cohort-v1-20260926T0420Z.ndjson"
+  ],
+  "freshVectorExportSha256": "93437955b7b5f480c2a053e5020c090dfc087c930f489294af886dc76a4236ef"
+}

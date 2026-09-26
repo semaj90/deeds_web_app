@@ -4433,6 +4433,33 @@ export type NewCourtroomKeyframe = typeof courtroomKeyframes.$inferInsert;
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** GPU-enriched codebase chunk index — mirrors codebase_chunk_index in Postgres */
+export interface CodebaseChunkSummaryProvenanceV1 {
+	schema: 'atlas.codebase-chunk-summary-provenance.v1';
+	sourceIdentityKey: string | null;
+	workspaceRevision: string | null;
+	sourceRef: string | null;
+	sourceRevision: string | null;
+	chunkId: string | null;
+	chunkCanonicalId: string | null;
+	chunkRowId: string | null;
+	chunkRevisionOrChecksum: string | null;
+	inputTextSha256: string | null;
+	inputByteLength: number | null;
+	modelId: string | null;
+	modelRevision: string | null;
+	modelParameterCount: number | null;
+	runtimeBuildRevision: string | null;
+	promptTemplateRevision: string | null;
+	summarySchemaRevision: string | null;
+	generationParameters: Record<string, unknown> | null;
+	summarySha256: string | null;
+	latencyMs: number | null;
+	usage: Record<string, unknown> | null;
+	evidenceRefs: string[];
+	lineageState: 'REVISION_QUALIFIED' | 'UNQUALIFIED' | 'PROPOSAL_ONLY';
+	canonicalAuthority: false;
+}
+
 export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 	qdrantId: varchar('qdrant_id', { length: 64 }),
@@ -4498,9 +4525,16 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	 * Schema matches CodeLlmOutputMeta from code_llm_index.
 	 */
 	outputMeta: jsonb('output_meta').notNull().default(sql`'{}'::jsonb`),
+	// Dedicated chunk summary text. The legacy `summary` column above is mapped
+	// as `signature` and must not be treated as an admitted summary.
+	summaryText: text('summary_text'),
 
 	embeddingModel: varchar('embedding_model', { length: 100 }),
 	summaryModel: varchar('summary_model', { length: 100 }),
+	// Nullable, revision-bound provenance for chunk summaries. Proposals and
+	// unknown model/prompt/generation details remain NULL until proven.
+	summaryHash: text('summary_hash'),
+	summaryProvenance: jsonb('summary_provenance').$type<CodebaseChunkSummaryProvenanceV1 | null>(),
 
 	// halfvec(768) embeddings — live column type verified 2026-07-22
 	// Use halfvec_cosine_ops HNSW index for ANN queries (see schema DDL)

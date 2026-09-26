@@ -1,0 +1,96 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T04:03:50.987Z",
+  "purpose": "Fresh task census after pivoting from implementation-program feasibility to the selected code-only summary-admission tasks; no scheduler selection.",
+  "pivot": {
+    "from": "parent-atlas-openspec-workstation-synthesis (all 31 tasks already complete)",
+    "to": "parent-atlas-repair-candidate-feature-matrix",
+    "reason": "SUM-02/SUM-03 summary admission is an upstream blocker for safe summary/embedding carryover; SUM-04 remains an explicitly authorized database-write gate.",
+    "selectedTasks": 0,
+    "taskLedgerFilesEdited": ["openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md"],
+    "openSpecProgress": { "total": 84, "complete": 59, "open": 25 }
+  },
+  "source": {
+    "taskFiles": 90,
+    "taskFileHashesRechecked": 90,
+    "sourceHashMismatches": 0,
+    "totalTasks": 9555,
+    "completedTasks": 6311,
+    "openTasks": 3244,
+    "controllerMatchedTasks": 9555,
+    "staleOrMissingControllerTasks": 0,
+    "workboardGeneratedAt": "2026-09-26T04:03:45.912Z",
+    "controllerGeneratedAt": "2026-09-26T04:03:38.113Z"
+  },
+  "program": {
+    "path": ".tmp/codex-openspec-live-20260926T0403Z/program.json",
+    "markdownPath": ".tmp/codex-openspec-live-20260926T0403Z/program.md",
+    "openTasks": 3244,
+    "workPackages": 812,
+    "assignedOpenTasks": 3244,
+    "duplicateAssignments": 0,
+    "missingAssignments": 0,
+    "schedulerSelectedTasks": 0,
+    "declaredDependencyTasks": 3,
+    "tasksWithoutDeclaredDependencies": 3241,
+    "dependenciesInvented": 0,
+    "programMappingsRemainProvisional": true,
+    "canonicalOwnerNullOpenTaskCount": 3244
+  },
+  "packageFeasibility": {
+    "targetRange": [250, 400],
+    "perPackageTaskRange": [3, 12],
+    "minimumPackagesPreservingChangeOwnerAndMutationClass": 491,
+    "targetAchievableWithoutChangingOwnershipOrMutationBoundaries": false,
+    "automaticMerges": 0
+  },
+  "implementationProgress": {
+    "summaryAdmissionKernel": "CODE_ONLY_IMPLEMENTED_WITH_INJECTED_TRANSACTION_FAKE",
+    "proposalChecksum": "DETERMINISTIC_AND_REPLAY_TESTED",
+    "unknownModelRevision": "NULL_ALLOWED_WHEN_STABLE_MODEL_ID_PRESENT",
+    "databaseAdapter": "NOT_IMPLEMENTED",
+    "databaseWrites": 0,
+    "summaryWriteCanary": "SUM-04 OPEN; EXPLICIT APPROVAL REQUIRED",
+    "graphifyRuns": 0,
+    "containerRebuilds": 0
+  },
+  "validation": {
+    "summaryAndAdmissionFocusedTests": "16/16 PASS",
+    "strictOpenSpec": "PASS",
+    "nodeSyntaxChecks": "PASS",
+    "scopedDiffCheck": "PASS (line-ending warnings only)"
+  },
+  "artifacts": {
+    "workboard": {
+      "path": ".tmp/codex-openspec-live-20260926T0403Z/workboard-v1.json",
+      "bytes": 41170410,
+      "sha256": "14d4ea2ccd2d64f079ab26e796c3709785ce1a4e5b7227ab96bca9f23ef1f5b2"
+    },
+    "controller": {
+      "path": ".tmp/codex-openspec-live-20260926T0403Z/controller-output/staging/openspec-execution-controller-v1.json",
+      "bytes": 47053815,
+      "sha256": "91accc71d0578058d13afa40d3cff9d480680f37584ca0b5fe28b8754a80b570"
+    },
+    "programJson": {
+      "path": ".tmp/codex-openspec-live-20260926T0403Z/program.json",
+      "bytes": 13897721,
+      "sha256": "6d89325032edd5d4739666416e182ba662eb9cc667dbaca874f84ef45540d95b"
+    },
+    "programMarkdown": {
+      "path": ".tmp/codex-openspec-live-20260926T0403Z/program.md",
+      "bytes": 1330394,
+      "sha256": "a24d553e23c4335d85968c8ac9feec9cd2b17c28cbf5631c944adf4b1308ab23"
+    }
+  },
+  "writeBoundaries": {
+    "taskLedgerFilesEdited": 1,
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "neo4jWrites": 0,
+    "valkeyWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "selectionChanges": 0
+  },
+  "reportPath": "docs/reports/openspec-workboard-run-2026-09-26T0403Z.json"
+}

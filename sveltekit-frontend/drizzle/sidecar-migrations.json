@@ -2,6 +2,24 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20260925_codebase_chunk_summary_text_v1.sql",
+      "status": "applied",
+      "reason": "Added nullable summary_text to codebase_chunk_index; the legacy summary column remains untouched because Drizzle maps it as signature. Applied transactionally on PostgreSQL 18.4 with zero rows populated.",
+      "appliedBy": "operator-requested-run",
+      "appliedAt": "2026-09-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL 18.4 readback: summary_text is nullable text, no default, 0 populated rows."
+    },
+    {
+      "file": "manual/20260925_codebase_chunk_summary_provenance_v1.sql",
+      "status": "applied",
+      "reason": "Operator-selected additive nullable summary-provenance JSONB envelope on codebase_chunk_index. Applied transactionally to PostgreSQL 18.4; no summary rows or metadata values were populated.",
+      "appliedBy": "operator-requested-run",
+      "appliedAt": "2026-09-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL 18.4 information_schema and row-null census; summary_provenance is nullable JSONB and populated=0."
+    },
+    {
       "file": "manual/20260916_workspace_event_head_v1.sql",
       "status": "planned_sidecar",
       "reason": "Additive append-only workspace event, participant, and head tables for incremental Graphify. Unapplied until migration-owner review, disposable readback canary, and explicit authorization.",

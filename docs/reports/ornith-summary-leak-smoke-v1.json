@@ -1,0 +1,508 @@
+{
+  "schema": "atlas.ornith-summary-leak-smoke.v1",
+  "model": "ornith-1.5-9b",
+  "runtimeBuild": "b8757-a29e4c0b7",
+  "indexedSources": 24456,
+  "cohortEligible": 6732,
+  "sampled": 48,
+  "clustersSampled": 48,
+  "clean": 47,
+  "contaminated": 1,
+  "callFailures": 0,
+  "reasoningContentNonEmpty": 0,
+  "reasons": {
+    "PLACEHOLDER_PATTERN": 1
+  },
+  "status": "LEAK_OR_FAILURE_FOUND",
+  "clusters": {
+    "domainClass": [
+      [
+        "null",
+        7913
+      ],
+      [
+        "documentation",
+        3963
+      ],
+      [
+        "frontend",
+        2218
+      ],
+      [
+        "UI",
+        1581
+      ],
+      [
+        "backend",
+        1417
+      ],
+      [
+        "test",
+        1098
+      ],
+      [
+        "database",
+        1013
+      ],
+      [
+        "graph",
+        982
+      ]
+    ],
+    "clusterId": [
+      [
+        "null",
+        7963
+      ],
+      [
+        3,
+        3179
+      ],
+      [
+        0,
+        2345
+      ],
+      [
+        12,
+        1746
+      ],
+      [
+        10,
+        1212
+      ],
+      [
+        5,
+        887
+      ],
+      [
+        41,
+        701
+      ],
+      [
+        8,
+        570
+      ]
+    ],
+    "somCellDistinct": 16396,
+    "somCellTop": [
+      [
+        "null",
+        8061
+      ],
+      [
+        [
+          4,
+          17
+        ],
+        1
+      ],
+      [
+        [
+          0,
+          10
+        ],
+        1
+      ],
+      [
+        [
+          2,
+          8
+        ],
+        1
+      ],
+      [
+        [
+          0,
+          10
+        ],
+        1
+      ]
+    ],
+    "extension": [
+      [
+        "md",
+        7912
+      ],
+      [
+        "ts",
+        7509
+      ],
+      [
+        "mjs",
+        3812
+      ],
+      [
+        "json",
+        1597
+      ],
+      [
+        "svelte",
+        932
+      ],
+      [
+        "sql",
+        655
+      ],
+      [
+        "py",
+        578
+      ],
+      [
+        "mts",
+        539
+      ],
+      [
+        "ps1",
+        301
+      ],
+      [
+        "js",
+        124
+      ]
+    ]
+  },
+  "results": [
+    {
+      "sourceRef": "docs/ACE-COMMAND-CHAIN-REFERENCE.md",
+      "cluster": "documentation|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 370
+    },
+    {
+      "sourceRef": "docs/ACE-MATERIALIZER-QUICK-START.md",
+      "cluster": "rag_retrieval|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 423
+    },
+    {
+      "sourceRef": "docs/AGENTIC-LOOP-FROZEN.md",
+      "cluster": "agent|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 333
+    },
+    {
+      "sourceRef": "docs/atlas/topology-function-map.json",
+      "cluster": "graph|json",
+      "clean": true,
+      "reasons": [],
+      "chars": 403
+    },
+    {
+      "sourceRef": "docs/architecture/deepseek-engram-architecture-search.md",
+      "cluster": "retrieval|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 412
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "cluster": "backend|ts",
+      "clean": true,
+      "reasons": [],
+      "chars": 357
+    },
+    {
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "cluster": "graph|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 583
+    },
+    {
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "cluster": "documentation|json",
+      "clean": true,
+      "reasons": [],
+      "chars": 208
+    },
+    {
+      "sourceRef": "docs/architecture/phase-17g-gpu-json-tensor-mapping.md",
+      "cluster": "gpu|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 530
+    },
+    {
+      "sourceRef": "docs/architecture/consolidation-and-schema-alignment.md",
+      "cluster": "database|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 545
+    },
+    {
+      "sourceRef": "docs/compiler-landscape.md",
+      "cluster": "compiler|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 451
+    },
+    {
+      "sourceRef": "docs/architecture/ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW.md",
+      "cluster": "graph_topology|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 442
+    },
+    {
+      "sourceRef": "docs/architecture/DAG-ACP-OPEN-MEMORY-WIRING.md",
+      "cluster": "memory_optimization|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 475
+    },
+    {
+      "sourceRef": "docs/graph/qdrant-cluster-tag-audit.json",
+      "cluster": "retrieval|json",
+      "clean": true,
+      "reasons": [],
+      "chars": 457
+    },
+    {
+      "sourceRef": "sveltekit-frontend/tests/evidence-view-modal.spec.ts",
+      "cluster": "test|ts",
+      "clean": true,
+      "reasons": [],
+      "chars": 235
+    },
+    {
+      "sourceRef": "scripts/packets/load-packets-neo4j.mjs",
+      "cluster": "graph|mjs",
+      "clean": true,
+      "reasons": [],
+      "chars": 347
+    },
+    {
+      "sourceRef": "docs/architecture/CORRECTED-embedding-dimension-policy.md",
+      "cluster": "embedding_indexing|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 460
+    },
+    {
+      "sourceRef": "docs/AGENTIC-TRACKING-LOOP-ARCHITECTURE.md",
+      "cluster": "agent_orchestration|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 432
+    },
+    {
+      "sourceRef": "scripts/atlas/audit-som-canonical-location.mjs",
+      "cluster": "tool|mjs",
+      "clean": true,
+      "reasons": [],
+      "chars": 435
+    },
+    {
+      "sourceRef": "scripts/tests/test-citations-scroll.mjs",
+      "cluster": "test|mjs",
+      "clean": true,
+      "reasons": [],
+      "chars": 411
+    },
+    {
+      "sourceRef": "sveltekit-frontend/colab-enrich-clusters.py",
+      "cluster": "cluster_analysis|py",
+      "clean": true,
+      "reasons": [],
+      "chars": 322
+    },
+    {
+      "sourceRef": "sveltekit-frontend/colab-export/colab-summarize.py",
+      "cluster": "rag_retrieval|py",
+      "clean": true,
+      "reasons": [],
+      "chars": 455
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/index.js",
+      "cluster": "compiler|js",
+      "clean": true,
+      "reasons": [],
+      "chars": 224
+    },
+    {
+      "sourceRef": "docs/architecture/AGENTIC-ERROR-FIXING-ARCHITECTURE.md",
+      "cluster": "repair_workflow|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 471
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "cluster": "compiler|rs",
+      "clean": true,
+      "reasons": [],
+      "chars": 247
+    },
+    {
+      "sourceRef": "docs/architecture/dual-lane-hot-brain-cold-queue.md",
+      "cluster": "cache|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 531
+    },
+    {
+      "sourceRef": "docs/metadata-contract-schema.json",
+      "cluster": "database|json",
+      "clean": true,
+      "reasons": [],
+      "chars": 462
+    },
+    {
+      "sourceRef": "sveltekit-frontend/scripts/atlas/codebase-ingester-unified.mjs",
+      "cluster": "UI|mjs",
+      "clean": true,
+      "reasons": [],
+      "chars": 329
+    },
+    {
+      "sourceRef": "docs/metadata-contract-schema.yaml",
+      "cluster": "database|yaml",
+      "clean": true,
+      "reasons": [],
+      "chars": 473
+    },
+    {
+      "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+      "cluster": "database|mjs",
+      "clean": true,
+      "reasons": [],
+      "chars": 288
+    },
+    {
+      "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
+      "cluster": "agent|mjs",
+      "clean": true,
+      "reasons": [],
+      "chars": 432
+    },
+    {
+      "sourceRef": "docs/ENGRAM-FILES-INDEX.md",
+      "cluster": "evidence_upload_storage|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 397
+    },
+    {
+      "sourceRef": "docs/atlas/package-boundary-registry.json",
+      "cluster": "rag_retrieval|json",
+      "clean": true,
+      "reasons": [],
+      "chars": 368
+    },
+    {
+      "sourceRef": "docs/OPENSPEC-READY-FOR-SESSION-95.md",
+      "cluster": "auth_login_register|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 333
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
+      "cluster": "frontend|ts",
+      "clean": true,
+      "reasons": [],
+      "chars": 342
+    },
+    {
+      "sourceRef": "scripts/atlas/test-p4-nats-wiring.mts",
+      "cluster": "cache|mts",
+      "clean": true,
+      "reasons": [],
+      "chars": 273
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "cluster": "compiler|ts",
+      "clean": true,
+      "reasons": [],
+      "chars": 326
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/contracts/schema-dependency-tool.okf.json",
+      "cluster": "agent_orchestration|json",
+      "clean": true,
+      "reasons": [],
+      "chars": 403
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/citations/LLMS.md",
+      "cluster": "frontend|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 386
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/features/feature_trace-mcp.md",
+      "cluster": "trace_mcp|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 299
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "cluster": "compiler|toml",
+      "clean": true,
+      "reasons": [],
+      "chars": 325
+    },
+    {
+      "sourceRef": "src/lib/server/valkey.ts",
+      "cluster": "cache|ts",
+      "clean": true,
+      "reasons": [],
+      "chars": 346
+    },
+    {
+      "sourceRef": "sveltekit-frontend/.codex_louvain_audit.mjs",
+      "cluster": "rag_retrieval|mjs",
+      "clean": true,
+      "reasons": [],
+      "chars": 504
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/couchdb/LLMS.md",
+      "cluster": "backend|md",
+      "clean": true,
+      "reasons": [],
+      "chars": 279
+    },
+    {
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/codebase/auto-research.test.ts",
+      "cluster": "retrieval|ts",
+      "clean": true,
+      "reasons": [],
+      "chars": 282
+    },
+    {
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/code-intel/graph/impact.test.ts",
+      "cluster": "graph|ts",
+      "clean": false,
+      "reasons": [
+        "PLACEHOLDER_PATTERN"
+      ],
+      "chars": 296
+    },
+    {
+      "sourceRef": "docs/PHASE-1-POSTGRES-INDEXES-EXECUTION.sql",
+      "cluster": "documentation|sql",
+      "clean": true,
+      "reasons": [],
+      "chars": 335
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/kmeans_run_r1_k128.json",
+      "cluster": "cluster_analysis|json",
+      "clean": true,
+      "reasons": [],
+      "chars": 435
+    }
+  ],
+  "scope": "sample only; not all indexed files",
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0
+}

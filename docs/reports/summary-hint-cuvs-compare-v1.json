@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.summary-hint-cuvs-compare.v1",
+  "status": "CHALLENGER_MEASURED",
+  "canonicalAuthority": false,
+  "retrievalVoteAdded": false,
+  "rows": 29219,
+  "dim": 768,
+  "queries": 200,
+  "k": 10,
+  "freeVramMiBBefore": 519,
+  "oracle": {
+    "implementation": "numpy float64 matmul",
+    "ms": 3447
+  },
+  "steps": {
+    "cuvs_brute_force": {
+      "recallAtK": 0.965,
+      "receiptSchema": "atlas.cuvs-exact-knn-receipt.v1",
+      "ms": 8037,
+      "status": "OK"
+    },
+    "cagra_nn_descent_itopk256": {
+      "recallAtK": 0.9635,
+      "buildAlgo": "nn_descent",
+      "itopkSize": 256,
+      "ms": 10446,
+      "status": "OK"
+    },
+    "cagra_ivf_pq_itopk256": {
+      "recallAtK": 0.9635,
+      "buildAlgo": "ivf_pq",
+      "itopkSize": 256,
+      "ms": 4631,
+      "status": "OK"
+    }
+  },
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0,
+  "freeVramMiBAfter": 984,
+  "generatedAt": "2026-09-26T06:55:04.846144+00:00"
+}

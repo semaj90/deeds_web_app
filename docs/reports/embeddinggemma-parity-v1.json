@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.embeddinggemma-parity-receipt.v1",
+  "status": "EMBEDDINGGEMMA_768_PARITY_PROVEN",
+  "endpoint": "http://127.0.0.1:8097/embed",
+  "referencePath": "models/embeddinggemma_300m",
+  "fixtureSha256": "sha256:96749b363f480f24a77d015cb01e6887037fdf8423e0ca878be3ad311b586b2d",
+  "fixtureCount": 12,
+  "dims": {
+    "reference": 768,
+    "endpoint": 768
+  },
+  "gates": {
+    "cosine_min": 0.999,
+    "cosine_mean": 0.9995,
+    "topk_overlap_min": 1.0,
+    "norm_tol": 0.001
+  },
+  "checks": {
+    "dimension_768": true,
+    "finite": true,
+    "l2_normalized": true,
+    "deterministic": true,
+    "cosine_min_ok": true,
+    "cosine_mean_ok": true,
+    "topk_overlap_ok": true
+  },
+  "cosine": {
+    "min": 0.9999827439409508,
+    "mean": 0.9999863979251694,
+    "perItem": [
+      0.9999860795494653,
+      0.9999893962262788,
+      0.9999843079270597,
+      0.9999869669006411,
+      0.9999869273933237,
+      0.999988130005667,
+      0.9999830049732088,
+      0.9999827439409508,
+      0.9999878041045306,
+      0.999990044049186,
+      0.9999863207063386,
+      0.9999850493253821
+    ]
+  },
+  "topkOverlap": {
+    "k": 5,
+    "min": 1.0,
+    "mean": 1.0
+  },
+  "normRange": [
+    0.9999996725148121,
+    1.0000001112448322
+  ],
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0
+}

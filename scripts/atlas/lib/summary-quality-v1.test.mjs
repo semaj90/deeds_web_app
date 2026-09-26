@@ -6,7 +6,7 @@ import {
 import { sanitizeGemma4Summary } from './gemma4-summary-sanitizer.mjs';
 
 const CLEAN = 'Registers the retrieval route, validates the query, and returns ranked packets with their score components.';
-const lineage = { canonical_chunk_id: 'fullrepo:src/a.ts:0', source_ref: 'src/a.ts', source_revision: 'sha256:aa', workspace_revision: 'sha256:bb', input_digest: 'sha256:cc', proposal_checksum: 'sha256:dd', model_revision: 'ornith-1.5-9b', prompt_template_revision: 'pt-1' };
+const lineage = { canonical_chunk_id: 'fullrepo:src/a.ts:0', source_ref: 'src/a.ts', source_revision: 'sha256:aa', workspace_revision: 'sha256:bb', input_digest: 'sha256:cc', proposal_checksum: 'sha256:dd', model_id: 'ornith-1.5-9b', model_revision: null, prompt_template_revision: 'pt-1' };
 const current = { source_revision: 'sha256:aa', workspace_revision: 'sha256:bb', input_digest: 'sha256:cc' };
 
 test('transport markers are removed but reasoning is never repaired', () => {
@@ -25,6 +25,25 @@ test('echoed few-shot scaffold (the July 4 failure mode) is detected', () => {
   assert.equal(analyzeSummaryContaminationV1(CLEAN).clean, true);
 });
 
+test('legacy summary census regression catches underscored turn markers and model self-review', () => {
+  for (const text of [
+    '</start_of_turn>This documentation describes an optional synchronization feature for local storage.',
+    '</start_of_turn>\nThis Go program implements a health aggregator and registers HTTP handlers.',
+  ]) {
+    const result = analyzeSummaryContaminationV1(text);
+    assert.equal(result.controlTokenLeak, true);
+    assert.equal(result.clean, false);
+  }
+  for (const text of [
+    'The goal is to summarize this in 1-2 sentences. This code defines a useful type.',
+    '**Self-Correction/Refinement:** The provided summary is excellent. I will ensure the final output is concise. No changes needed.',
+  ]) {
+    const result = analyzeSummaryContaminationV1(text);
+    assert.equal(result.scaffoldLeak, true);
+    assert.equal(result.clean, false);
+  }
+});
+
 test('admission: clean summary with matching lineage is ADMITTED with an exact digest', () => {
   const a = evaluateSummaryAdmissionV1({ summary: CLEAN, lineage, current });
   assert.equal(a.status, 'ADMITTED');
@@ -35,10 +54,15 @@ test('admission: clean summary with matching lineage is ADMITTED with an exact d
 test('admission blocks on changed identity, missing lineage, contamination and empty text', () => {
   assert.equal(evaluateSummaryAdmissionV1({ summary: CLEAN, lineage, current: { ...current, source_revision: 'sha256:zz' } }).status, 'BLOCKED_IDENTITY_CHANGED');
   assert.equal(evaluateSummaryAdmissionV1({ summary: CLEAN, lineage, current: { ...current, input_digest: 'sha256:zz' } }).reasons[0], 'CHANGED_INPUT_DIGEST');
-  assert.equal(evaluateSummaryAdmissionV1({ summary: CLEAN, lineage: { ...lineage, model_revision: '' }, current }).status, 'BLOCKED_LINEAGE_MISSING');
+  assert.equal(evaluateSummaryAdmissionV1({ summary: CLEAN, lineage: { ...lineage, model_id: '' }, current }).status, 'BLOCKED_LINEAGE_MISSING');
   assert.equal(evaluateSummaryAdmissionV1({ summary: CLEAN, lineage, current: null }).status, 'BLOCKED_LINEAGE_MISSING');
   assert.equal(evaluateSummaryAdmissionV1({ summary: `${CLEAN}\n---\nYour turn: Feature: a Source: b`, lineage, current }).status, 'BLOCKED_CONTAMINATION');
   assert.equal(evaluateSummaryAdmissionV1({ summary: '   ', lineage, current }).status, 'BLOCKED_EMPTY');
+});
+
+test('unknown model revision remains null and does not block when stable model ID is present', () => {
+  assert.equal(evaluateSummaryAdmissionV1({ summary: CLEAN, lineage: { ...lineage, model_revision: null }, current }).status, 'ADMITTED');
+  assert.equal(evaluateSummaryAdmissionV1({ summary: CLEAN, lineage: { ...lineage, model_id: null }, current }).status, 'BLOCKED_LINEAGE_MISSING');
 });
 
 test('admission never sanitizes: a summary with control tokens is blocked, not silently cleaned', () => {

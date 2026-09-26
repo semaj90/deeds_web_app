@@ -1,6 +1,6 @@
 {
   "schema": "atlas.openspec-deferred-discoveries.v1",
-  "generatedAt": "2026-09-21T01:05:54.919Z",
+  "generatedAt": "2026-09-25T21:54:24.428Z",
   "tasks": [
     {
       "taskKey": "atlas-feature-intelligence:133",
@@ -15,7 +15,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-15T20:00:05.385Z",
+      "lastUpdatedAt": "2026-09-23T02:51:11.032Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:15fa610c8fcf14fcb9f820422d9e6b695ff9cae24a8921f174a8295910897a36",
       "sectionSlug": "p2-current-repository-reconciliation",
@@ -52,7 +52,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-19T09:16:50.056Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.834Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:e7fc90fde0b9f6afa0b5f4e31dc37dfdadcea56f8bd6df821b9bd21b5a3e73c7",
       "sectionSlug": "graphify-currentness-recheck-02-unchanged-2026-09-08",
@@ -88,7 +88,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-19T09:16:50.056Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.834Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:eeb0b560797ef3c16672dc017bb2e6dec64d5891a51317060e9d15791ab11de6",
       "sectionSlug": "centroid-cache-revision-isolation-01-gap-recorded-2026-09-08",
@@ -124,7 +124,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-19T09:16:50.056Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.834Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:ffd52cdebd581ebe21c95a19e76edcb5e683e8ce48786176fc53c8c179b35e0e",
       "sectionSlug": "task-semantic-packet-writer-matrix-recheck-2026-09-12",
@@ -160,7 +160,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-19T09:16:50.056Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.834Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:1ddab489eb6dc2bc3f6568d4c76c2c14d6d6272c62e76a4ec853e3b370adbe31",
       "sectionSlug": "heval-06-receipt-metrics-and-negative-transfer",
@@ -196,7 +196,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-19T09:16:50.056Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.834Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:9a37fe1b8a32a8cd243bfaf4ecb1a60fa4db1381bc6ac3c577c3823ed9db968e",
       "sectionSlug": "trace-representation-capability-follow-up-source-fixes-verif",
@@ -221,47 +221,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-adaptive-dag-fabric:150",
-      "change": "parent-atlas-adaptive-dag-fabric",
-      "source": "openspec/changes/parent-atlas-adaptive-dag-fabric/tasks.md",
-      "line": 150,
-      "text": "DAG-CONTRACT-01 **Superseded in spirit by `research-kernel-contract-v1.ts`",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "SUPERSEDED_OR_HISTORICAL",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 60,
-      "lastUpdatedAt": "2026-09-04T00:43:46.417Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:4fe9417f48d79b25cdcb9150c6812034027f7c194006a0dd5977f114eba3fd07",
-      "sectionSlug": "dag-contract-typed-envelope",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-adaptive-dag-fabric#67f53b5c4aee17a5",
-      "ledgerId": "DAG-CONTRACT-01",
-      "logicalTaskKey": "parent-atlas-adaptive-dag-fabric:DAG-CONTRACT-01",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-adaptive-dag-fabric:DAG-CONTRACT-01",
-        "taskRevision": "sha256:4fe9417f48d79b25cdcb9150c6812034027f7c194006a0dd5977f114eba3fd07",
-        "sourceLine": 150,
-        "migrationKey": "parent-atlas-adaptive-dag-fabric#67f53b5c4aee17a5",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "SUPERSEDED",
-        "blockerKey": "HISTORICAL_TASK",
-        "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-agentic-repair-bundle-integration:277",
+      "taskKey": "parent-atlas-agentic-repair-bundle-integration:296",
       "change": "parent-atlas-agentic-repair-bundle-integration",
       "source": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md",
-      "line": 277,
+      "line": 296,
       "text": "Fit Baum-Welch **offline, batch, against historical `RouteTrace` data only** — never online,",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -270,7 +233,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-19T09:19:23.239Z",
+      "lastUpdatedAt": "2026-09-23T02:15:21.142Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:193306163bfea3cf56c553cd9729e9aecc86874a3e3b1e65c965ddfb3dada7db",
       "sectionSlug": "t15-real-viterbi-baum-welch-hmm-for-mcp-tool-selection-separ",
@@ -283,7 +246,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:193306163bfea3cf56c553cd9729e9aecc86874a3e3b1e65c965ddfb3dada7db",
-        "sourceLine": 277,
+        "sourceLine": 296,
         "migrationKey": "parent-atlas-agentic-repair-bundle-integration#7e6c2ff94f54d8aa",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -524,7 +487,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.720Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:d3e1b36566e53935abcfe971fd03d327b64ca49de8981c0c843a357c6db31bc0",
       "sectionSlug": "p0-queue-artifact-transport",
@@ -561,7 +524,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.720Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:31c8b6bf036e3eaccd0b02b5608b944ef8ed88ca067f17da58ee39ccc8675c71",
       "sectionSlug": "p1-candidate-feature-fabric",
@@ -598,7 +561,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.720Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:19a4414d084b3ead3b4e11c78eca703cacae0e0477efae63857b91141b04bf7f",
       "sectionSlug": "p2-crossencoder",
@@ -635,7 +598,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.720Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:01e7244acf1129ece1443527ce003bb79a5db626efb8ef94d5d4d68fd78503b6",
       "sectionSlug": "p3-neural-retrieval-adaptation",
@@ -672,7 +635,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.720Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:6f54bd7df7311523844a1dfc5ac0f075b0080002c7064a772ad4a8fa4064922f",
       "sectionSlug": "p3-neural-retrieval-adaptation",
@@ -709,7 +672,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-20T19:35:13.888Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.720Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:840268401142875101ac3f75dc71efa586c9e876920e217d1ebb103e1e9fdbad",
       "sectionSlug": "latest-proof-log-gate-state-2026-08-29",
@@ -746,7 +709,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 10,
-      "lastUpdatedAt": "2026-09-19T05:52:12.592Z",
+      "lastUpdatedAt": "2026-09-21T00:42:48.726Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:749943c72853881282a41abf16a97888cfbc5b795c5f18eaf41918863b7a73ef",
       "sectionSlug": "dir-index-05-semantic768-materialization",
@@ -783,7 +746,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 60,
-      "lastUpdatedAt": "2026-08-31T20:24:09.813Z",
+      "lastUpdatedAt": "2026-09-24T22:38:28.860Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:ba14340a503dbda36dc1f235957103b7b3a8dc2ac11d233d324bde01ca981a49",
       "sectionSlug": "graphify-hardening-lifecycle-ast-ownership-and-supersession",
@@ -820,7 +783,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 50,
-      "lastUpdatedAt": "2026-08-31T20:24:09.813Z",
+      "lastUpdatedAt": "2026-09-24T22:38:28.860Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:7377615514b4d1bf3a44512e7131b672dca1b4f86569f43475271a155a56dd47",
       "sectionSlug": "graphify-hardening-lifecycle-ast-ownership-and-supersession",
@@ -857,7 +820,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 60,
-      "lastUpdatedAt": "2026-08-31T20:24:09.813Z",
+      "lastUpdatedAt": "2026-09-24T22:38:28.860Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:63e5ce1a30bd9339e3ee77a815606e5de08abff70ba94915c1023d1fa23ba9c8",
       "sectionSlug": "graphify-hardening-lifecycle-ast-ownership-and-supersession",
@@ -894,7 +857,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 60,
-      "lastUpdatedAt": "2026-08-31T20:24:09.813Z",
+      "lastUpdatedAt": "2026-09-24T22:38:28.860Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:970caf71abfd740e3f6e4346329a435a0756a2cb12f819e079382281d5a7f158",
       "sectionSlug": "graphify-hardening-lifecycle-ast-ownership-and-supersession",
@@ -931,7 +894,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 60,
-      "lastUpdatedAt": "2026-08-31T20:24:09.813Z",
+      "lastUpdatedAt": "2026-09-24T22:38:28.860Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:619b80206261ff8f695cfecd1a8fe5daa7e0f8a55607ca56e98e7fe73136037c",
       "sectionSlug": "graphify-hardening-lifecycle-ast-ownership-and-supersession",
@@ -1028,306 +991,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-document-governance-master-index:14",
+      "taskKey": "parent-atlas-document-governance-master-index:120",
       "change": "parent-atlas-document-governance-master-index",
       "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 14,
-      "text": "2.2 Build `ClaudeInstructionSupersessionPlanV1` with current SHA-256, topic claims, explicit supersedes/supersededBy links, contradictions, and proposed disposition.",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "SUPERSEDED_OR_HISTORICAL",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 40,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:1f34e2e75f6c8d14ebbd5a4c25cec41adcbf60ea00bbcebea6139fedfd9ddaf6",
-      "sectionSlug": "2-claude-md-supersession-map",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-document-governance-master-index#ba492f9059070532",
-      "ledgerId": "2.2",
-      "logicalTaskKey": "parent-atlas-document-governance-master-index:2.2",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-document-governance-master-index:2.2",
-        "taskRevision": "sha256:1f34e2e75f6c8d14ebbd5a4c25cec41adcbf60ea00bbcebea6139fedfd9ddaf6",
-        "sourceLine": 14,
-        "migrationKey": "parent-atlas-document-governance-master-index#ba492f9059070532",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "SUPERSEDED",
-        "blockerKey": "HISTORICAL_TASK",
-        "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-document-governance-master-index:16",
-      "change": "parent-atlas-document-governance-master-index",
-      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 16,
-      "text": "2.4 Add dry-run report listing `CANONICAL_CURRENT`, `SCOPED_SUPPORTING`, `SUPERSEDED_CANDIDATE`, and `CONFLICT` instruction files.",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "SUPERSEDED_OR_HISTORICAL",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 20,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:7f390b74d260daea3543f1a4e7bad31a47b79cfe3392b5a630249bb312ada241",
-      "sectionSlug": "2-claude-md-supersession-map",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-document-governance-master-index#ae74b347745ea011",
-      "ledgerId": "2.4",
-      "logicalTaskKey": "parent-atlas-document-governance-master-index:2.4",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-document-governance-master-index:2.4",
-        "taskRevision": "sha256:7f390b74d260daea3543f1a4e7bad31a47b79cfe3392b5a630249bb312ada241",
-        "sourceLine": 16,
-        "migrationKey": "parent-atlas-document-governance-master-index#ae74b347745ea011",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "SUPERSEDED",
-        "blockerKey": "HISTORICAL_TASK",
-        "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-document-governance-master-index:17",
-      "change": "parent-atlas-document-governance-master-index",
-      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 17,
-      "text": "2.5 Add smoke test proving historical/original instruction files are not modified during discovery.",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "SUPERSEDED_OR_HISTORICAL",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 40,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:4e4a2d7aa4af0872289dd9be8e7c1db5feaf390aa578edc845090f9aaa13100b",
-      "sectionSlug": "2-claude-md-supersession-map",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-document-governance-master-index#e4adcded8fedbceb",
-      "ledgerId": "2.5",
-      "logicalTaskKey": "parent-atlas-document-governance-master-index:2.5",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-document-governance-master-index:2.5",
-        "taskRevision": "sha256:4e4a2d7aa4af0872289dd9be8e7c1db5feaf390aa578edc845090f9aaa13100b",
-        "sourceLine": 17,
-        "migrationKey": "parent-atlas-document-governance-master-index#e4adcded8fedbceb",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "SUPERSEDED",
-        "blockerKey": "HISTORICAL_TASK",
-        "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-document-governance-master-index:40",
-      "change": "parent-atlas-document-governance-master-index",
-      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 40,
-      "text": "5.3 Add replacement-coverage validation: superseded document must have at least one validated `supersededBy` target.",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "SUPERSEDED_OR_HISTORICAL",
-      "lane": "RETRIEVAL_ACE",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 40,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:f44e6893bf8d44d3e2835055f977ac89c1f6b5f89ce04f6fee86a14242dcf059",
-      "sectionSlug": "5-supersession-smoke-validation-and-archive-gates",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-document-governance-master-index#27ba0a672cd9bf31",
-      "ledgerId": "5.3",
-      "logicalTaskKey": "parent-atlas-document-governance-master-index:5.3",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-document-governance-master-index:5.3",
-        "taskRevision": "sha256:f44e6893bf8d44d3e2835055f977ac89c1f6b5f89ce04f6fee86a14242dcf059",
-        "sourceLine": 40,
-        "migrationKey": "parent-atlas-document-governance-master-index#27ba0a672cd9bf31",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "SUPERSEDED",
-        "blockerKey": "HISTORICAL_TASK",
-        "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-document-governance-master-index:50",
-      "change": "parent-atlas-document-governance-master-index",
-      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 50,
-      "text": "6.2 Generate `docs/MASTER-TOC.md` with canonical topics, active OpenSpec changes, progress, ETA when available, superseded docs, archive-ready docs, experiments, and conflicts.",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "SUPERSEDED_OR_HISTORICAL",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 20,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:e68cdd1f811e7d5316b7ca88eb03294e90ea3bb0ca038c7846e008e2dd443a85",
-      "sectionSlug": "6-master-toc-generation",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-document-governance-master-index#8e94010213881017",
-      "ledgerId": "6.2",
-      "logicalTaskKey": "parent-atlas-document-governance-master-index:6.2",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-document-governance-master-index:6.2",
-        "taskRevision": "sha256:e68cdd1f811e7d5316b7ca88eb03294e90ea3bb0ca038c7846e008e2dd443a85",
-        "sourceLine": 50,
-        "migrationKey": "parent-atlas-document-governance-master-index#8e94010213881017",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "SUPERSEDED",
-        "blockerKey": "HISTORICAL_TASK",
-        "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-document-governance-master-index:59",
-      "change": "parent-atlas-document-governance-master-index",
-      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 59,
-      "text": "7.3 Add validation preventing an experimental/challenger record from becoming `CANONICAL_CURRENT` merely through document consolidation.",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "ACTIONABLE",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 20,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:e83183c519873a2e5dec06b7be0f1f454ba2a175daef37947ec19babf86ca7e1",
-      "sectionSlug": "7-ewin-tang-experimental-recommendation-audit",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-document-governance-master-index#e8bf997609a941e7",
-      "ledgerId": "7.3",
-      "logicalTaskKey": "parent-atlas-document-governance-master-index:7.3",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-document-governance-master-index:7.3",
-        "taskRevision": "sha256:e83183c519873a2e5dec06b7be0f1f454ba2a175daef37947ec19babf86ca7e1",
-        "sourceLine": 59,
-        "migrationKey": "parent-atlas-document-governance-master-index#e8bf997609a941e7",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "DEFERRED",
-        "blockerKey": "OPTIONAL_CHALLENGER",
-        "retryWhen": "current completion envelope explicitly requires this lane"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-document-governance-master-index:68",
-      "change": "parent-atlas-document-governance-master-index",
-      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 68,
-      "text": "8.5 Add Bits UI `Tabs` for Current / OpenSpec / Superseded / Archive Ready / Conflicts.",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "SUPERSEDED_OR_HISTORICAL",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 40,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:402eef8f37bc1e315bf6c51998cd264bb0d3e2b119e5dff0c2cba976bed24450",
-      "sectionSlug": "8-parent-atlas-admin-ssr-api",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-document-governance-master-index#bdf03423ca9fbc8a",
-      "ledgerId": "8.5",
-      "logicalTaskKey": "parent-atlas-document-governance-master-index:8.5",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-document-governance-master-index:8.5",
-        "taskRevision": "sha256:402eef8f37bc1e315bf6c51998cd264bb0d3e2b119e5dff0c2cba976bed24450",
-        "sourceLine": 68,
-        "migrationKey": "parent-atlas-document-governance-master-index#bdf03423ca9fbc8a",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "SUPERSEDED",
-        "blockerKey": "HISTORICAL_TASK",
-        "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-document-governance-master-index:87",
-      "change": "parent-atlas-document-governance-master-index",
-      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 87,
-      "text": "10.2 Review every `CONFLICT` and `SUPERSEDED_CANDIDATE`; do not bulk-resolve through model judgment.",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "SUPERSEDED_OR_HISTORICAL",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 40,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:43543ff121ffc01427a9e475d94d31b072b8a2615256cfa60c9ac5bf6d6f2c84",
-      "sectionSlug": "10-first-bounded-apply",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-document-governance-master-index#98977304d68996fd",
-      "ledgerId": "10.2",
-      "logicalTaskKey": "parent-atlas-document-governance-master-index:10.2",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-document-governance-master-index:10.2",
-        "taskRevision": "sha256:43543ff121ffc01427a9e475d94d31b072b8a2615256cfa60c9ac5bf6d6f2c84",
-        "sourceLine": 87,
-        "migrationKey": "parent-atlas-document-governance-master-index#98977304d68996fd",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "SUPERSEDED",
-        "blockerKey": "HISTORICAL_TASK",
-        "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-document-governance-master-index:88",
-      "change": "parent-atlas-document-governance-master-index",
-      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 88,
+      "line": 120,
       "text": "10.3 Select at most five clearly superseded non-instruction docs for archive canary.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -1336,7 +1003,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "lastUpdatedAt": "2026-09-24T01:21:11.534Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:a846c6f64be10354a90d6a7ac7adddaba82aa0a763a672f8ae6462460d7a98f7",
       "sectionSlug": "10-first-bounded-apply",
@@ -1350,7 +1017,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-document-governance-master-index:10.3",
         "taskRevision": "sha256:a846c6f64be10354a90d6a7ac7adddaba82aa0a763a672f8ae6462460d7a98f7",
-        "sourceLine": 88,
+        "sourceLine": 120,
         "migrationKey": "parent-atlas-document-governance-master-index#1070a0c83e5eec78",
         "basis": "DECLARED_ID"
       },
@@ -1361,10 +1028,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-document-governance-master-index:96",
+      "taskKey": "parent-atlas-document-governance-master-index:128",
       "change": "parent-atlas-document-governance-master-index",
       "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 96,
+      "line": 128,
       "text": "**DOC-GOV-MASTER-TODO-03** Reconcile each still-open historical item to an existing OpenSpec change using exact source references and source revisions where available; do not copy or auto-close tasks.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -1373,7 +1040,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 10,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "lastUpdatedAt": "2026-09-24T01:21:11.534Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:aeabf866020e6ded5e52f61295644d75f29d24ca2812f6c66c5c4560857209cd",
       "sectionSlug": "master-feature-todo-reconciliation-2026-08-31",
@@ -1387,7 +1054,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-document-governance-master-index:DOC-GOV-MASTER-TODO-03",
         "taskRevision": "sha256:aeabf866020e6ded5e52f61295644d75f29d24ca2812f6c66c5c4560857209cd",
-        "sourceLine": 96,
+        "sourceLine": 128,
         "migrationKey": "parent-atlas-document-governance-master-index#e0b0a44a614833df",
         "basis": "DECLARED_ID"
       },
@@ -1398,10 +1065,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-document-governance-master-index:97",
+      "taskKey": "parent-atlas-document-governance-master-index:129",
       "change": "parent-atlas-document-governance-master-index",
       "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 97,
+      "line": 129,
       "text": "**DOC-GOV-MASTER-TODO-04** Classify historical completion claims as `PROVEN`, `FIXTURE_ONLY`, `REFERENCE_ONLY`, or `UNPROVEN` from current receipts before any task is marked complete.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -1410,7 +1077,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "lastUpdatedAt": "2026-09-24T01:21:11.534Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:bd39ba2ddb71baeb6f777e3d9a78cbf7b3b03de15af38a58430dce92ca52d573",
       "sectionSlug": "master-feature-todo-reconciliation-2026-08-31",
@@ -1424,7 +1091,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-document-governance-master-index:DOC-GOV-MASTER-TODO-04",
         "taskRevision": "sha256:bd39ba2ddb71baeb6f777e3d9a78cbf7b3b03de15af38a58430dce92ca52d573",
-        "sourceLine": 97,
+        "sourceLine": 129,
         "migrationKey": "parent-atlas-document-governance-master-index#c5ddd4eec18c78b9",
         "basis": "DECLARED_ID"
       },
@@ -1435,10 +1102,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-document-governance-master-index:98",
+      "taskKey": "parent-atlas-document-governance-master-index:130",
       "change": "parent-atlas-document-governance-master-index",
       "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
-      "line": 98,
+      "line": 130,
       "text": "**DOC-GOV-MASTER-TODO-05** Generate a bounded crosswalk from historical TODO sections to OpenSpec task keys and include unresolved/ambiguous rows in the governance report.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -1447,7 +1114,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-08-31T21:14:52.586Z",
+      "lastUpdatedAt": "2026-09-24T01:21:11.534Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:75bf60a8458172c1fb54be1862f3b07aa755e2b3eb8678ea70114dea1217a449",
       "sectionSlug": "master-feature-todo-reconciliation-2026-08-31",
@@ -1461,82 +1128,8 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-document-governance-master-index:DOC-GOV-MASTER-TODO-05",
         "taskRevision": "sha256:75bf60a8458172c1fb54be1862f3b07aa755e2b3eb8678ea70114dea1217a449",
-        "sourceLine": 98,
+        "sourceLine": 130,
         "migrationKey": "parent-atlas-document-governance-master-index#ce1d2977dd3d135e",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "SUPERSEDED",
-        "blockerKey": "HISTORICAL_TASK",
-        "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-gpu-prellm-recommendation-v1:218",
-      "change": "parent-atlas-gpu-prellm-recommendation-v1",
-      "source": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
-      "line": 218,
-      "text": "7.3 The Ewin Tang citation (arXiv:1807.04271) was not independently checked against arXiv.",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "ACTIONABLE",
-      "lane": "RESEARCH_CHALLENGER_EWIN_TANG",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 80,
-      "lastUpdatedAt": "2026-09-14T01:40:57.989Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:e95f89302de9f1fe062062e56a55e7b9308e561f764c0fbd1024d714e96b5cc0",
-      "sectionSlug": "7-explicitly-not-done-deferred-not-silently-skipped",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-gpu-prellm-recommendation-v1#a5bba78e6870348d",
-      "ledgerId": "7.3",
-      "logicalTaskKey": "parent-atlas-gpu-prellm-recommendation-v1:7.3",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-gpu-prellm-recommendation-v1:7.3",
-        "taskRevision": "sha256:e95f89302de9f1fe062062e56a55e7b9308e561f764c0fbd1024d714e96b5cc0",
-        "sourceLine": 218,
-        "migrationKey": "parent-atlas-gpu-prellm-recommendation-v1#a5bba78e6870348d",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "DEFERRED",
-        "blockerKey": "OPTIONAL_CHALLENGER",
-        "retryWhen": "current completion envelope explicitly requires this lane"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-gpu-prellm-recommendation-v1:219",
-      "change": "parent-atlas-gpu-prellm-recommendation-v1",
-      "source": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
-      "line": 219,
-      "text": "7.4 Whether the V1 classification lineage should eventually be retired in favor of V2 is an",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "SUPERSEDED_OR_HISTORICAL",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 20,
-      "lastUpdatedAt": "2026-09-14T01:40:57.989Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:5b0f86b05a8aa21416075d2b5557245c80bb415de608fc09ab35b332ef42eb02",
-      "sectionSlug": "7-explicitly-not-done-deferred-not-silently-skipped",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-gpu-prellm-recommendation-v1#d688e6360afbb8a0",
-      "ledgerId": "7.4",
-      "logicalTaskKey": "parent-atlas-gpu-prellm-recommendation-v1:7.4",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-gpu-prellm-recommendation-v1:7.4",
-        "taskRevision": "sha256:5b0f86b05a8aa21416075d2b5557245c80bb415de608fc09ab35b332ef42eb02",
-        "sourceLine": 219,
-        "migrationKey": "parent-atlas-gpu-prellm-recommendation-v1#d688e6360afbb8a0",
         "basis": "DECLARED_ID"
       },
       "controller": {
@@ -1558,7 +1151,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-19T05:55:18.961Z",
+      "lastUpdatedAt": "2026-09-21T06:00:14.786Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:b48a8a3953041af2c099c5a695091896b066f16462b70fae8f4fff3a1969df0f",
       "sectionSlug": "deferred-production-hardening-gates",
@@ -1595,7 +1188,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-19T05:55:18.961Z",
+      "lastUpdatedAt": "2026-09-21T06:00:14.786Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:997727f83cf352485dcb454363102b9a758a76667828c132b1f2f5e5825a85fa",
       "sectionSlug": "deferred-production-hardening-gates",
@@ -1632,7 +1225,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 60,
-      "lastUpdatedAt": "2026-09-19T05:55:18.961Z",
+      "lastUpdatedAt": "2026-09-21T06:00:14.786Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:741991c1fd7c25b1b8fcfe372be59ecb5b22c6c6822584bba9258774c7592603",
       "sectionSlug": "part-a-rapids-pagerank-verification",
@@ -1668,7 +1261,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-19T05:55:18.961Z",
+      "lastUpdatedAt": "2026-09-21T06:00:14.786Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:13d15fefa5270c6b7420ea3a013ed6f443d2340299e07e80bf223324162e7997",
       "sectionSlug": "part-b2-routing-and-hot-warm-cold-evaluation-backlog",
@@ -1705,7 +1298,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-19T05:55:18.961Z",
+      "lastUpdatedAt": "2026-09-21T06:00:14.786Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:384adacfda2e25c3850284d45528346704b60d18a7af535c397d43b933ff2d51",
       "sectionSlug": "part-d-adjacent-findings-not-this-proposal-s-scope-flagged-h",
@@ -1729,10 +1322,84 @@
       }
     },
     {
-      "taskKey": "parent-atlas-graph-retrieval-proof:699",
+      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament:301",
+      "change": "parent-atlas-gpu-sidecar-patch-tournament",
+      "source": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "line": 301,
+      "text": "SIMD-AUDIT-07 Tournament alignment: the Patch Tournament compares candidate receipts, so JSONL receipt parsing at the tournament boundary (the `SIMD-02` seam) must be chunk-invariant, checksum-stable and identical to the V8 oracle; add that as a determinism gate on tournament inputs (same bytes in, same records and checksums out, regardless of chunking or engine). Any speedup claim for the tournament path needs a measured, warm and cold benchmark on representative receipt sizes first.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 50,
+      "lastUpdatedAt": "2026-09-21T06:00:14.786Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:ca6f93a0a924ce3b782d0d19842885183dc7fe9eeee1ffe4b4da033ae78207b4",
+      "sectionSlug": "part-e-simdjson-chunking-streaming-audit-helpers-and-tournam",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-gpu-sidecar-patch-tournament#8da493017d41f5c5",
+      "ledgerId": "SIMD-AUDIT-07",
+      "logicalTaskKey": "parent-atlas-gpu-sidecar-patch-tournament:SIMD-AUDIT-07",
+      "taskIdentity": {
+        "logicalTaskKey": "parent-atlas-gpu-sidecar-patch-tournament:SIMD-AUDIT-07",
+        "taskRevision": "sha256:ca6f93a0a924ce3b782d0d19842885183dc7fe9eeee1ffe4b4da033ae78207b4",
+        "sourceLine": 301,
+        "migrationKey": "parent-atlas-gpu-sidecar-patch-tournament#8da493017d41f5c5",
+        "basis": "DECLARED_ID"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-gpu-sidecar-patch-tournament:303",
+      "change": "parent-atlas-gpu-sidecar-patch-tournament",
+      "source": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "line": 303,
+      "text": "SIMD-AUDIT-09 Docs sweep: update the six architecture docs and the `CLAUDE.md` simdjson sections with the audit result (which claims are proven, measured, unmeasured or stale) and add a short \"chunking and streaming contract\" note; historical text is labelled, not rewritten.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 70,
+      "lastUpdatedAt": "2026-09-21T06:00:14.786Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:a4ec5862ccb637694c90dcbc24fc9bfa63e5157ab7fff08f5edf173a98a8ae52",
+      "sectionSlug": "part-e-simdjson-chunking-streaming-audit-helpers-and-tournam",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-gpu-sidecar-patch-tournament#229a0a6e0d926268",
+      "ledgerId": "SIMD-AUDIT-09",
+      "logicalTaskKey": "parent-atlas-gpu-sidecar-patch-tournament:SIMD-AUDIT-09",
+      "taskIdentity": {
+        "logicalTaskKey": "parent-atlas-gpu-sidecar-patch-tournament:SIMD-AUDIT-09",
+        "taskRevision": "sha256:a4ec5862ccb637694c90dcbc24fc9bfa63e5157ab7fff08f5edf173a98a8ae52",
+        "sourceLine": 303,
+        "migrationKey": "parent-atlas-gpu-sidecar-patch-tournament#229a0a6e0d926268",
+        "basis": "DECLARED_ID"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:743",
       "change": "parent-atlas-graph-retrieval-proof",
       "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
-      "line": 699,
+      "line": 743,
       "text": "**Not done**: did not identify which of the 18 scripts (see item 4 below) originally wrote the old 59,692-row `pageRankScore` data, nor whether that old computation was itself correct. Out of scope for this reconciliation — the property name is now aligned with production reads; provenance of historical data before this pass was not audited.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -1741,7 +1408,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-09T01:02:53.461Z",
+      "lastUpdatedAt": "2026-09-24T20:54:51.746Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:f877ed0bbe3b10a3bc9669c17d15614891ba18f0c2ab8b3cce182003a973d688",
       "sectionSlug": "gs1-35-items-1-3-pagerank-property-reconciliation-promoterec",
@@ -1754,7 +1421,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:f877ed0bbe3b10a3bc9669c17d15614891ba18f0c2ab8b3cce182003a973d688",
-        "sourceLine": 699,
+        "sourceLine": 743,
         "migrationKey": "parent-atlas-graph-retrieval-proof#b64baea82e195e98",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -1765,10 +1432,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-graph-retrieval-proof:740",
+      "taskKey": "parent-atlas-graph-retrieval-proof:784",
       "change": "parent-atlas-graph-retrieval-proof",
       "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
-      "line": 740,
+      "line": 784,
       "text": "**Recommended next bounded step, not done this pass**: (a) resolve the `compute-pagerank-neo4j.mjs` self-declared-retired-but-still-wired discrepancy with an operator decision; (b) archive `compute-pagerank-nodejs.mjs` (self-declared dead by its own author — lowest-risk candidate); (c) read `promote-pagerank-authority-from-neo4j.mjs` in full to confirm or refute overlap with `promote-neo4j-pagerank-to-postgres.mts`; (d) decide whether `atlas_packets.page_rank_score` (Postgres) should be reconciled with `pageRankScore` (Neo4j) as part of the same identity chain, or intentionally kept as a separate downstream projection.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -1777,7 +1444,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 10,
-      "lastUpdatedAt": "2026-09-09T01:02:53.461Z",
+      "lastUpdatedAt": "2026-09-24T20:54:51.746Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:d063c99eb8eb8895f9b25021fb025eb685f2ffab8a06b5621e94e0072e3012ac",
       "sectionSlug": "gs1-36-item-4-pagerank-script-duplication-inventory-classifi",
@@ -1790,7 +1457,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:d063c99eb8eb8895f9b25021fb025eb685f2ffab8a06b5621e94e0072e3012ac",
-        "sourceLine": 740,
+        "sourceLine": 784,
         "migrationKey": "parent-atlas-graph-retrieval-proof#eba37a5a23a9fa30",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -1798,42 +1465,6 @@
         "state": "SUPERSEDED",
         "blockerKey": "HISTORICAL_TASK",
         "retryWhen": "never"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-graph-runtime-python-consolidation:158",
-      "change": "parent-atlas-graph-runtime-python-consolidation",
-      "source": "openspec/changes/parent-atlas-graph-runtime-python-consolidation/tasks.md",
-      "line": 158,
-      "text": "`scripts/atlas/run_louvain_challenger_v1.py` — \"challenger\" naming suggests an A/B algorithm",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "ACTIONABLE",
-      "lane": "GENERAL",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 30,
-      "lastUpdatedAt": "2026-08-31T21:53:33.048Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:7f8eb99d67b362c7079715bba54cf3c2e81bb0e2c96c4d02f6216d0e4b4209e6",
-      "sectionSlug": "t5-follow-up-audit-scope-tracked-not-resolved-here",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-graph-runtime-python-consolidation#3d4d1397d80d82d4",
-      "logicalTaskKey": null,
-      "taskIdentity": {
-        "logicalTaskKey": null,
-        "taskRevision": "sha256:7f8eb99d67b362c7079715bba54cf3c2e81bb0e2c96c4d02f6216d0e4b4209e6",
-        "sourceLine": 158,
-        "migrationKey": "parent-atlas-graph-runtime-python-consolidation#3d4d1397d80d82d4",
-        "basis": "MIGRATION_TITLE_HASH"
-      },
-      "controller": {
-        "state": "DEFERRED",
-        "blockerKey": "OPTIONAL_CHALLENGER",
-        "retryWhen": "current completion envelope explicitly requires this lane"
       }
     },
     {
@@ -1849,7 +1480,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-14T01:44:50.689Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.560Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:4edd6796829b374c55ea5b5f59b0b74a3227b9320f313a64ec78202886c97a8c",
       "sectionSlug": "p3-cuvs-rapids-remote-boundary",
@@ -1885,7 +1516,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T01:44:50.689Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.560Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:becdbee9340cceb8c50605550d8a510fe3076887755569e80b09f0f43c96cb78",
       "sectionSlug": "p5-session-188-operational-next-steps-2026-08-04-handoff",
@@ -2747,10 +2378,84 @@
       }
     },
     {
-      "taskKey": "parent-atlas-nlp-sidecar-feature-compiler:712",
+      "taskKey": "parent-atlas-nlp-sidecar-feature-compiler:406",
       "change": "parent-atlas-nlp-sidecar-feature-compiler",
       "source": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
-      "line": 712,
+      "line": 406,
+      "text": "7.1 SUPERSEDED_BY_EMBEDDINGGEMMA_768_ARCHITECTURE / DO_NOT_WIRE (operator direction 2026-09-20: MiniLM and MS MARCO are retired from the Parent Atlas runtime; no runtime reranker, embedding, vote or matrix producer; see `parent-atlas-retrieval-staging-planes` SPINE-04). Original text follows, kept for history: Wire MiniLM (`ms-marco-MiniLM-L6-v2`, `sentence-transformers`",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-23T18:01:28.092Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:011be5c9bb13b20eed55f46d731430656b4bc2d00bc247f24873eba42d12711c",
+      "sectionSlug": "7-minilm-mixedbread-reranker-tiers-nlp5-blocked-on-section-6",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-nlp-sidecar-feature-compiler#3b912898e086f722",
+      "ledgerId": "7.1",
+      "logicalTaskKey": "parent-atlas-nlp-sidecar-feature-compiler:7.1",
+      "taskIdentity": {
+        "logicalTaskKey": "parent-atlas-nlp-sidecar-feature-compiler:7.1",
+        "taskRevision": "sha256:011be5c9bb13b20eed55f46d731430656b4bc2d00bc247f24873eba42d12711c",
+        "sourceLine": 406,
+        "migrationKey": "parent-atlas-nlp-sidecar-feature-compiler#3b912898e086f722",
+        "basis": "DECLARED_ID"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-nlp-sidecar-feature-compiler:409",
+      "change": "parent-atlas-nlp-sidecar-feature-compiler",
+      "source": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+      "line": 409,
+      "text": "7.2 SUPERSEDED_BY_EMBEDDINGGEMMA_768_ARCHITECTURE / DO_NOT_WIRE (operator direction 2026-09-20, same decision as 7.1: no runtime reranker, embedding or vote from Mixedbread; existing default-off module stays COMPATIBILITY pending archive). Original text follows, kept for history: Wire Mixedbread (`mxbai-rerank-base-v2`) as `RERANK_DEEP`, disabled",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "GENERAL",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-23T18:01:28.092Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:883432a8ed6547161d6734b4589b723cf692825b3d0ea8121c87d371095ef43b",
+      "sectionSlug": "7-minilm-mixedbread-reranker-tiers-nlp5-blocked-on-section-6",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-nlp-sidecar-feature-compiler#e1b7aba4ed81151b",
+      "ledgerId": "7.2",
+      "logicalTaskKey": "parent-atlas-nlp-sidecar-feature-compiler:7.2",
+      "taskIdentity": {
+        "logicalTaskKey": "parent-atlas-nlp-sidecar-feature-compiler:7.2",
+        "taskRevision": "sha256:883432a8ed6547161d6734b4589b723cf692825b3d0ea8121c87d371095ef43b",
+        "sourceLine": 409,
+        "migrationKey": "parent-atlas-nlp-sidecar-feature-compiler#e1b7aba4ed81151b",
+        "basis": "DECLARED_ID"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-nlp-sidecar-feature-compiler:910",
+      "change": "parent-atlas-nlp-sidecar-feature-compiler",
+      "source": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+      "line": 910,
       "text": "PR-RECONCILE-01 (2026-09-20; `docs/reports/parent-atlas-pr-reconciliation-v1.json`): the 11 open PRs were treated as candidate implementations, not merged. Adopted only files absent from the tree: #89 owner-reconcile v2 (script ran read-only), #90 Valkey stream contract (+4 additive event-fabric patches, 9/9 tests), #91 Graphify projection/preflight/writer contracts (preflight rebased: strict schema -> strip because main's receipt gained 10 keys; 21/21 tests), #98 pure digest contracts (13/13; main's newer planner/producer kept), #97-tip lineage audits (bridge: 0 of 25,271 current members have an exact packet-chunk bridge, all CURRENT_SOURCE_BINDING_MISSING; deployment present, 7,421 proven rows; migration-owner blockers: sidecar manifest unregistered, Drizzle ledger empty, proof not bound to current SQL checksum). #93-#96 superseded by main or contained in #97; #92 parked; #37 historical. NLP-EXTRACT-03: extended the existing `langextract-grounding-adapter.ts` with `groundLangExtractUtf8SpansV1` (explicit offset basis PYTHON_CODEPOINT vs UTF16_CODE_UNIT, UTF8_PARSER_BUFFER_V1 byte spans, fail-closed; 11 new tests, 13/13). Found: the older `adaptGroundedLangExtract` slices by UTF-16 units although LangExtract counts code points, wrong on astral text. Not done: wiring the new function into the structural adapter. No DB/Valkey/Qdrant/Graphify writes, no DDL, nothing committed. canonicalAuthority=false; next gate CURRENT_SOURCE_AUTHORITY_PROVEN.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -2759,7 +2464,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T23:21:01.552Z",
+      "lastUpdatedAt": "2026-09-23T18:01:28.092Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:94a2551e187f1bc2aecc93df452a0086af685cb71598a80fa7dac1d9cc9ade4b",
       "sectionSlug": "14-6-deep-audit-results-2026-09-20-trace-mcp-stale-probe-rea",
@@ -2773,7 +2478,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-nlp-sidecar-feature-compiler:PR-RECONCILE-01",
         "taskRevision": "sha256:94a2551e187f1bc2aecc93df452a0086af685cb71598a80fa7dac1d9cc9ade4b",
-        "sourceLine": 712,
+        "sourceLine": 910,
         "migrationKey": "parent-atlas-nlp-sidecar-feature-compiler#9f6da9151369e406",
         "basis": "DECLARED_ID"
       },
@@ -3039,10 +2744,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7070",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7266",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 7070,
+      "line": 7266,
       "text": "Do NOT rewrite historical `graphify_runs` rows.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3051,7 +2756,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:e52ad5eca089b704ab240b7c5eef831c3b1e250fb65986fb7b1210e6667b61a7",
       "sectionSlug": "graphify-execution-ledger-schema-02-2026-09-03",
@@ -3064,7 +2769,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:e52ad5eca089b704ab240b7c5eef831c3b1e250fb65986fb7b1210e6667b61a7",
-        "sourceLine": 7070,
+        "sourceLine": 7266,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#851a8307a088eae1",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3075,10 +2780,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12092",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12288",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 12092,
+      "line": 12288,
       "text": "Do not start Graphify, relabel an historical execution, or advance",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3087,7 +2792,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:772db201c0096b2230832eccde99204918bad14a431cd406b04f8b9e22a18d75",
       "sectionSlug": "current-snapshot-readback-blocker-2026-09-14",
@@ -3100,7 +2805,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:772db201c0096b2230832eccde99204918bad14a431cd406b04f8b9e22a18d75",
-        "sourceLine": 12092,
+        "sourceLine": 12288,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#92dc80df6c50645d",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3111,10 +2816,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12350",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12546",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 12350,
+      "line": 12546,
       "text": "Do not treat historical index claims as proof of current source",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3123,7 +2828,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:5f76b2aa41fd35ac6ed738a41dc7e4abaca30cf8c26eaad5b94a8df70dff1132",
       "sectionSlug": "master-atlas-index-historical-reconciliation-01-2026-09-11",
@@ -3136,7 +2841,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:5f76b2aa41fd35ac6ed738a41dc7e4abaca30cf8c26eaad5b94a8df70dff1132",
-        "sourceLine": 12350,
+        "sourceLine": 12546,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#5434ed5edcda8b11",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3147,10 +2852,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13232",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13428",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 13232,
+      "line": 13428,
       "text": "Keep this cohort historical; do not promote or use it to seed current",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3159,7 +2864,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:a6acf6db7632423623cd66a887fecaf80a32d7c8d7826d3c48756a6f3660bde0",
       "sectionSlug": "current-source-cohort-lineage-recheck-01-2026-09-11",
@@ -3172,7 +2877,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:a6acf6db7632423623cd66a887fecaf80a32d7c8d7826d3c48756a6f3660bde0",
-        "sourceLine": 13232,
+        "sourceLine": 13428,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#e25c27ceaa8d9f86",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3183,10 +2888,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13247",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13443",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 13247,
+      "line": 13443,
       "text": "Do not combine this admitted historical revision with the newer",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3195,7 +2900,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:435143ebb1d67e9f2eabb1f98607109712b95ea4ec1a8fa897041c87003dd190",
       "sectionSlug": "graphify-snapshot-binding-recheck-01-2026-09-11",
@@ -3208,7 +2913,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:435143ebb1d67e9f2eabb1f98607109712b95ea4ec1a8fa897041c87003dd190",
-        "sourceLine": 13247,
+        "sourceLine": 13443,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#3893806a9ddbc74d",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3219,10 +2924,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:15835",
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16031",
       "change": "parent-atlas-retrieval-lineage-dag-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "line": 15835,
+      "line": 16031,
       "text": "TOURNAMENT-FEATURES-01 Define and populate real ranking features upstream (controller or adapter) from the signals above — a controller-contract change, so it needs its own decision; do not synthesize features inside the challenger.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3231,7 +2936,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-20T19:36:58.721Z",
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:ef293d6ed2378bc2f78359e56f8af2f0369c47e3fdb0a5cdb2a8c8ef8d3c15cf",
       "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
@@ -3245,7 +2950,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:ef293d6ed2378bc2f78359e56f8af2f0369c47e3fdb0a5cdb2a8c8ef8d3c15cf",
-        "sourceLine": 15835,
+        "sourceLine": 16031,
         "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#46b1f778b75a08d2",
         "basis": "AMBIGUOUS_DECLARED_ID"
       },
@@ -3253,6 +2958,228 @@
         "state": "DEFERRED",
         "blockerKey": "OPTIONAL_CHALLENGER",
         "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16043",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 16043,
+      "text": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-01 (2026-09-21, PROPOSAL only — no schema/data change; needs operator sign-off under the Drizzle Safety Rule). Frozen model to adopt: snapshot/artifact identity = SHA-256 (immutable); Graphify execution identity = UUIDv7 (one event/attempt, a re-run of an identical snapshot is a NEW execution, never collapsed); operational times = `started_at`/`completed_at` timestamptz (authority for time; do not parse time out of the UUID); canonical authority = explicit selection, not inferred from time or id; a mutation = a server-side action + a receipt. Live facts checked read-only: PostgreSQL 18.4 supports `uuidv7()` (returns version 7; `uuid_extract_timestamp` works); `graphify_executions.execution_id` currently defaults to `gen_random_uuid()` (all 36 rows are UUIDv4) and has `started_at`/`completed_at` but NO `created_at`; `canonical_authority` is a bare boolean with no selected-by/selected-at/receipt; exactly 1 row is `canonical_authority=true`; indexes are only pkey, (workspace_id, workspace_revision), (status, started_at), legacy-run, running-heartbeat — NOTHING enforces at most one canonical execution per (workspace_id, workspace_revision), so the patched binding audit's \"exactly one canonical\" rule is unenforced at the database. Proposed changes, each separate and gated: (1) new-run default `uuidv7()` (no rewrite of the 36 existing ids); (2) enforce single canonical — minimum a partial unique index on `(workspace_id, workspace_revision) WHERE canonical_authority`, better an explicit `graphify_execution_authority(workspace_revision PK, execution_id FK, selected_at, selected_by, selection_receipt)` table with `canonicalAuthority` derived; (3) optional deterministic `sha256:` input-identity column over (workspace_id, snapshot revision, parser/extraction/algorithm contract revisions) purely to RECOGNIZE identical re-runs (not to reuse the id; RFC 9562 puts SHA-256 name-based ids in v8, not v5). Correction to keep straight: the two identical duplicate executions (`74d50c86-...` canonical, `0dba1c0d-...` not) belong to the ADMITTED revision `sha256:e24bb971...` (2026-09-15), not to the new snapshot `sha256:1078418e...` (which has no execution yet); `sha256:dc05165a...` is the derived workspace-revision CANDIDATE, not a membership checksum. Admin surface direction (not built): extend `admin/graphify-readiness` (currently a read-only status page whose \"Run Now\" is an unwired alert; it does not read executions/snapshots/admission) with a server-rendered read-only Graphify/admission panel first; mutations later as small domain form actions (captureSnapshot, runGraphify, setCanonicalExecution, requestAdmission, authorizeAdmission, retireDuplicateExecution) each requiring a typed confirmation and writing a receipt. Status: `NOT_PROVEN` (design only).",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 10,
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:b6a44993bae6168853a2d7706c607a668de8197e71e7887385e9103c17a5242c",
+      "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-retrieval-lineage-dag-convergence#7927589157b27fdf",
+      "ledgerId": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-01",
+      "logicalTaskKey": "parent-atlas-retrieval-lineage-dag-convergence:GRAPHIFY-EXECUTION-IDENTITY-MODEL-01",
+      "taskIdentity": {
+        "logicalTaskKey": "parent-atlas-retrieval-lineage-dag-convergence:GRAPHIFY-EXECUTION-IDENTITY-MODEL-01",
+        "taskRevision": "sha256:b6a44993bae6168853a2d7706c607a668de8197e71e7887385e9103c17a5242c",
+        "sourceLine": 16043,
+        "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#7927589157b27fdf",
+        "basis": "DECLARED_ID"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16046",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 16046,
+      "text": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-02 (2026-09-21) — migration DRAFT written, NOT APPLIED: `sveltekit-frontend/drizzle/manual/20260921_graphify_execution_authority_DRAFT.sql` (manual sidecar, not journaled; needs explicit operator sign-off under the Drizzle Safety Rule). Contents, all additive/idempotent, no rewrite of the 36 existing rows: (1) `graphify_executions.execution_id` default `gen_random_uuid()` -> `uuidv7()` (future rows only); (2) new `graphify_execution_authority(workspace_id, workspace_revision, execution_id, selected_at, selected_by, selection_receipt)` with PK `(workspace_id, workspace_revision)` and a composite FK `(execution_id, workspace_id, workspace_revision)` -> `graphify_executions` (via unique index `graphify_executions_id_ws_rev_uidx_v1`) so an authority row cannot point at an execution of another revision; (3) backfill of the 1 current canonical execution with `selected_by='LEGACY_UNKNOWN'` and a migration receipt string (no invented person/receipt; `selected_at` = the execution's completion time); (4) nullable `input_identity text` + sha256 CHECK + partial index, NOT backfilled (historical contract revisions are unrecorded); (5) OPTIONAL partial unique index `graphify_executions_one_canonical_uidx_v1` on `(workspace_id, workspace_revision) WHERE canonical_authority` (reviewer may drop). Not included by design: UUID rewrite, `created_at` (`started_at` exists), change to the `canonical_authority` boolean (binding audit still reads it), a cross-table 'must be COMPLETED' check (must be enforced by the future setCanonicalExecution command in the same transaction). Observed while drafting: `graphify_executions` already has status `COMPLETED_REUSED` + `reused_graph_revision` (a reuse concept exists; input_identity would let a runner decide to reuse instead of re-run). Rehearsal: the file was executed inside `BEGIN; ... ROLLBACK;` against the live database (with `lock_timeout 3s`): all statements succeeded; in-transaction default = `uuidv7()`, authority rows = 1, composite join = 1. After ROLLBACK verified live: default still `gen_random_uuid()`, `graphify_execution_authority` absent, `input_identity` column absent, 0 new indexes, 36 executions unchanged. The file contains 0 `DROP TABLE|DROP COLUMN|DROP CONSTRAINT|TRUNCATE|DELETE FROM` tokens (a first version used `DROP CONSTRAINT IF EXISTS` for idempotence and was rewritten to an existence-guarded ADD). Open: operator review + explicit approval; then apply; then GRAPHIFY-STUDIO-ACTIONS-01 (server-side commands with receipts). Status: `DRY_RUN_PROVEN` (rolled-back rehearsal only), not `APPLY_PROVEN`.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 10,
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:0be46396b2aebaf2cf585e40a032b90ac0bd9032dbab49ccd01afff3d113d0e3",
+      "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-retrieval-lineage-dag-convergence#d22d8ac5abdeab1f",
+      "ledgerId": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-02",
+      "logicalTaskKey": null,
+      "taskIdentity": {
+        "logicalTaskKey": null,
+        "taskRevision": "sha256:0be46396b2aebaf2cf585e40a032b90ac0bd9032dbab49ccd01afff3d113d0e3",
+        "sourceLine": 16046,
+        "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#d22d8ac5abdeab1f",
+        "basis": "AMBIGUOUS_DECLARED_ID"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16047",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 16047,
+      "text": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-02 REVISION (2026-09-21, after operator review; supersedes the single-file draft described above; still DRAFT, NOT APPLIED). Operator decisions recorded: UUIDv7 default approved; authority table approved as the canonical selection owner; composite FK approved with a real non-partial unique key on the referenced side; legacy partial unique index kept TEMPORARILY as `TRANSITIONAL_COMPATIBILITY_GUARD` (the boolean is a legacy compatibility field, to be retired; do not dual-write forever); `input_identity` approved as nullable but the runner must NOT populate it until the canonical input serialization (workspaceId, workspaceRevision, snapshotChecksum, parserRevision, graphifyAlgorithmRevision, extractionContractRevision, featureContractRevision) is frozen; `LEGACY_UNKNOWN` backfill REJECTED in favour of an explicit `LEGACY_IMPORTED` state with NULL historical selector/time and a real import receipt; apply split into two gates; apply NOT approved yet. Files: 02A schema only `sveltekit-frontend/drizzle/manual/20260921_graphify_execution_authority_DRAFT.sql` (UUIDv7 default; unique index on `(workspace_id, workspace_revision, execution_id)` as the FK target; `graphify_execution_authority` with `authority_state IN ('SELECTED','LEGACY_IMPORTED')`, a CHECK that ties each state to its required/forbidden fields, composite FK; transitional partial unique index on the boolean; nullable `input_identity` + sha256 CHECK + partial index; no rows inserted); 02B legacy import `sveltekit-frontend/drizzle/manual/20260921b_graphify_execution_authority_legacy_import_DRAFT.sql` (refuses to run unless `atlas.import_receipt` is set to a real receipt id; refuses if more than one legacy canonical per revision or if a canonical execution is not COMPLETED/COMPLETED_REUSED; inserts `LEGACY_IMPORTED` with selected_* NULL). Two deliberate deviations from the review sketch, open to reversal: imported_at/import_receipt are nullable and required only for LEGACY_IMPORTED (a live selection is not an import); state name `SELECTED` instead of `LIVE_PROVEN` (avoids overloading the UI badge). Rehearsal, all inside `BEGIN; ... ROLLBACK;` against the live database (0 destructive tokens in either file): positive 02A+02B (with `atlas.import_receipt='REHEARSAL-ONLY-ROLLED-BACK'`) -> default `uuidv7()`, 1 row `LEGACY_IMPORTED` with selected_at/by/receipt NULL and import_receipt set, join to `canonical_authority=true`; negatives all rejected as intended: 02B without a receipt refused; LEGACY_IMPORTED row carrying a selector rejected by the state CHECK; SELECTED row missing selected_by rejected by the state CHECK; authority row pointing at an execution of another revision rejected by the composite FK; a second legacy canonical execution for one revision rejected by the partial unique index; a valid SELECTED row accepted. After rollback verified live: default still `gen_random_uuid()`, authority table absent, `input_identity` column absent, 0 new indexes, 36 executions, 1 canonical. Command-owner rule (documented, not SQL): one server function `selectCanonicalExecution()` shared by Studio action / CLI / MCP: execution exists, workspace+revision match, status in (COMPLETED, COMPLETED_REUSED), snapshot binding LIVE_PROVEN, preflight LIVE_PROVEN, expected current authority still matches, then one transaction (upsert authority row + receipt); `canonicalAuthority` derived as `authority.executionId === execution.executionId`. Status: `DRY_RUN_PROVEN` for 02A+02B (rolled-back rehearsal only). Open: operator apply approval (02A then 02B separately, with a real import receipt), freezing the `input_identity` recipe, `GRAPHIFY-STUDIO-ACTIONS-01`.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 10,
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:e0e261837aaec1cb1ebfc7d6063d3c13b1514a52ca28ec6e7c306a23103e590d",
+      "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-retrieval-lineage-dag-convergence#85a361716b40f509",
+      "ledgerId": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-02",
+      "logicalTaskKey": null,
+      "taskIdentity": {
+        "logicalTaskKey": null,
+        "taskRevision": "sha256:e0e261837aaec1cb1ebfc7d6063d3c13b1514a52ca28ec6e7c306a23103e590d",
+        "sourceLine": 16047,
+        "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#85a361716b40f509",
+        "basis": "AMBIGUOUS_DECLARED_ID"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16049",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 16049,
+      "text": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-02 STATUS BLOCK (2026-09-21, live-verified read-only immediately before recording): `status = DRAFT_REHEARSED_NOT_APPLIED`; `02A schemaApplied = false`; `02B legacyImportApplied = false`; `uuidv7DefaultApplied = false` (execution_id default is still `gen_random_uuid()`); `authorityTableExists = false`; `inputIdentityColumnExists = false`; `historicalExecutionsRewritten = 0` (36 executions, all UUIDv4, 1 canonical, unchanged); `admissionAuthorized = false`; `graphifyRunsStarted = 0`. Evidence kept with the draft: the six rehearsal cases (missing import receipt refused; legacy row carrying a selector rejected; selected row missing selected_by rejected; cross-revision authority rejected by the composite FK; duplicate legacy canonical rejected by the partial unique index; valid selected row accepted) are listed at the end of `sveltekit-frontend/drizzle/manual/20260921_graphify_execution_authority_DRAFT.sql`. Next gate: migration review and approval, not application.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 10,
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:73a322e900f89b76e5dc5c8e0abfa07e4d53becddfc61634d41c5f28b264b363",
+      "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-retrieval-lineage-dag-convergence#a273f4b016d3ecd9",
+      "ledgerId": "GRAPHIFY-EXECUTION-IDENTITY-MODEL-02",
+      "logicalTaskKey": null,
+      "taskIdentity": {
+        "logicalTaskKey": null,
+        "taskRevision": "sha256:73a322e900f89b76e5dc5c8e0abfa07e4d53becddfc61634d41c5f28b264b363",
+        "sourceLine": 16049,
+        "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#a273f4b016d3ecd9",
+        "basis": "AMBIGUOUS_DECLARED_ID"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16050",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 16050,
+      "text": "INPUT-IDENTITY-RECIPE-PROPOSAL-01 (2026-09-21, PROPOSAL for operator sign-off; read-only lookup, no code/schema/data change). Correction to earlier text: the contract revisions behind the 36 historical executions ARE recorded — `parser_contract_version` and `extraction_contract_version` are NOT NULL and `graph_algorithm_revision` is populated; all 36 rows carry `graphify.parser.v1` / `graphify.extraction.v1` / `graphify.graph.v1` (`scheduler_revision` and `environment_revision` also populated: 32 rows `atlas.graphify-daily-coordinator.v1` + `operator-authorized-canary`, 4 rows `atlas.graphify-daily-snapshot-native-open.v1` + `operator-authorized-terminal-run`). Not recorded: any feature-contract revision (no column) and a separate snapshot checksum (`workspace_revision` is the snapshot identity). Proposed recipe v1 (freeze before any producer writes it): `input_identity = 'sha256:' + hex(SHA-256(UTF-8(canonicalJson({schema:'atlas.graphify-input-identity.v1', workspaceId, workspaceRevision, parserContractVersion, extractionContractVersion, graphAlgorithmRevision}))))` where canonicalJson = keys sorted, no whitespace, UTF-8 (RFC 8785 JCS equivalent), all six fields required non-null. Deliberately EXCLUDED: `execution_id`, timestamps, `scheduler_revision` and `environment_revision` (run context, not processing contract), `canonical_authority`, `status`. Add a feature-contract revision only via a new schema string (`...v2`) once a column exists; never change v1 in place. Reuse rule (for `COMPLETED_REUSED` decisions): an existing COMPLETED execution with the same `input_identity` may be reused; a re-run still gets its own new UUIDv7. Backfill of the 36 historical rows under v1 is now possible (all inputs recorded) but is a separate operator decision and a separate migration. Draft comment in `20260921_graphify_execution_authority_DRAFT.sql` corrected (uncommitted). Status: `NOT_PROVEN` (proposal).",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 10,
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:02bdb902a033d1e1ef0d38b35ca0622832da1f9b82db98195e60ef8261eaa9c5",
+      "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-retrieval-lineage-dag-convergence#3f432e59d020813a",
+      "ledgerId": "INPUT-IDENTITY-RECIPE-PROPOSAL-01",
+      "logicalTaskKey": "parent-atlas-retrieval-lineage-dag-convergence:INPUT-IDENTITY-RECIPE-PROPOSAL-01",
+      "taskIdentity": {
+        "logicalTaskKey": "parent-atlas-retrieval-lineage-dag-convergence:INPUT-IDENTITY-RECIPE-PROPOSAL-01",
+        "taskRevision": "sha256:02bdb902a033d1e1ef0d38b35ca0622832da1f9b82db98195e60ef8261eaa9c5",
+        "sourceLine": 16050,
+        "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#3f432e59d020813a",
+        "basis": "DECLARED_ID"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16064",
+      "change": "parent-atlas-retrieval-lineage-dag-convergence",
+      "source": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "line": 16064,
+      "text": "CANONICAL-IDENTITY-V1 DECISIONS (2026-09-21; operator direction, spec/ledger only; codeChanges=0, schemaChanges=0, databaseWrites=0; `CANONICAL-IDENTITY-V1-SPEC-01` stays `SPEC_DRAFT`/`SPEC_ONLY`; `parent-atlas-native-acceleration-cabi` P0.1 stays NOT implemented because the live retrieval FeatureEnvelopeSchema is still globally nullable and lacks `identity_kind`/`stable_file_id`). (1) OWNER LOCATION: `packages/atlas-core` (package.json description: 'Canonical packet identity, validation, RPC contracts, and lifecycle enforcement for Parent Atlas'); target `packages/atlas-core/src/identity/canonical-identity-v1.ts` exported from `packages/atlas-core/src/index.ts`; the three feature-envelope implementations become consumers, not co-owners. CHECK BEFORE ANY CODE (duplication rule): `packages/atlas-core/src/identity/` already exists and currently contains: feature-identity.spec.ts, feature-identity.ts — the new contract must extend/reuse what is there, not add a parallel owner. (2) `stableFileId`: REGISTRY-ASSIGNED opaque identity of one logical source file, REQUIRED for canonical file identity; it survives content changes, workspace/source revisions and verified MOVED_PATH/HISTORICAL_PATH aliases; it is NOT derived from path alone, content hash, sourceRevision, treeNodeId, packetKey, `graphify_files.file_id` (a revision/run-row id today), `atlas_packets.file_id`, or any retrieval-generated random UUID. Producer = the source registry (`atlas_source_refs` + `atlas_source_aliases` + `atlas_workspace_source_bindings`, all three exist live). The exact live assignment/derivation rule is OPEN; do not invent values. Reconcile `SourceArtifactV1.file_id` (`packages/parent-atlas/src/core/temporal-indexing-fabric.ts` L20, described as stable file identity plus exact admitted bytes) with `stableFileId` rather than creating two concepts, only after its producer is proven stable. (3) `treeNodeId`: revision-qualified structural OCCURRENCE evidence only — canonical structural occurrence coordinate YES; canonical source-object identity NO; valid without `sourceRevision` NO; assumed to survive parser/re-materialization changes NO; may be an exact structural join key inside one sourceRevision but never substitutes for stableFileId, stableSymbolId, symbolVersionId or canonicalChunkId. (4) LEGACY CLASSIFICATION (verified): `sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.ts` `generateIDHierarchy()` builds repository/directory/file/... ids with `randomUUID()` (7 uses; `file_id` at L192) — classify as LEGACY / NON-AUTHORITATIVE for new identity construction; it must never become the `stableFileId` producer. (5) CANARY (next runtime gate, NOT started): `CANONICAL-IDENTITY-CANARY-01` — select exactly one current candidate with PROVEN workspaceRevision and sourceRevision and either (A) a symbol with PROVEN stableSymbolId + symbolVersionId or (B) a chunk with PROVEN canonicalChunkId sourced from the real `codebase_chunk_index` chunk identity; require the same identity and revisions to survive CurrentSourceAuthority -> AST structural readback -> semantic_768 exact readback -> Postgres lexical/FTS readback -> CandidateOrdinalMapV1, with no source-only latest fallback, no 'unknown', no Qdrant point id as identity, and no CandidateOrdinal feeding back into identity. The canary is NOT blocked on inventing `stableFileId` when the candidate carries a proven chunk or symbol identity; the file-identity absence must be stated explicitly in its receipt. Open: the exact `stableFileId` assignment rule.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 10,
+      "lastUpdatedAt": "2026-09-24T22:50:48.234Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:be52aa5afb08c396b9e2615a8220e728ff160ab3d8341bebb07618e686d66452",
+      "sectionSlug": "recommendation-tournament-01-workboard-challenger-tournament",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-retrieval-lineage-dag-convergence#95d6b18c7a2bcc48",
+      "ledgerId": "CANONICAL-IDENTITY-V1",
+      "logicalTaskKey": "parent-atlas-retrieval-lineage-dag-convergence:CANONICAL-IDENTITY-V1",
+      "taskIdentity": {
+        "logicalTaskKey": "parent-atlas-retrieval-lineage-dag-convergence:CANONICAL-IDENTITY-V1",
+        "taskRevision": "sha256:be52aa5afb08c396b9e2615a8220e728ff160ab3d8341bebb07618e686d66452",
+        "sourceLine": 16064,
+        "migrationKey": "parent-atlas-retrieval-lineage-dag-convergence#95d6b18c7a2bcc48",
+        "basis": "DECLARED_ID"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
       }
     },
     {
@@ -3268,7 +3195,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-06T00:59:49.386Z",
+      "lastUpdatedAt": "2026-09-24T16:59:45.680Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:8fb07d92835d116bccf5020f8354b246e2eb6454b1f080241adb4af3ba537828",
       "sectionSlug": "t7-rust-simd-turbovec-and-bounded-lod-residency-audit-before",
@@ -3305,7 +3232,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-06T00:59:49.386Z",
+      "lastUpdatedAt": "2026-09-24T16:59:45.680Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:523a3f4720def0ec327a26b62f61af63862f8f9d7d7724823ffbbb701fa46f0b",
       "sectionSlug": "turbovec-lod-refinement-2026-08-14",
@@ -3330,6 +3257,43 @@
       }
     },
     {
+      "taskKey": "parent-atlas-retrieval-lod-algorithm-taxonomy:764",
+      "change": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+      "line": 764,
+      "text": "**LOD-02B** Recover an immutable historical model artifact digest for the 2026-08-25 run, or leave `MODEL_REVISION_UNRESOLVED`.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "SUPERSEDED_OR_HISTORICAL",
+      "lane": "RETRIEVAL_ACE",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 30,
+      "lastUpdatedAt": "2026-09-24T16:59:45.680Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:4be624a0095d71ee57cd39c78d4e828adfaa0c8c3588963b0a25bb46a84f4042",
+      "sectionSlug": "open-all-unchecked-none-authorized-yet",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-retrieval-lod-algorithm-taxonomy#8be3d937e41015a1",
+      "ledgerId": "LOD-02B",
+      "logicalTaskKey": "parent-atlas-retrieval-lod-algorithm-taxonomy:LOD-02B",
+      "taskIdentity": {
+        "logicalTaskKey": "parent-atlas-retrieval-lod-algorithm-taxonomy:LOD-02B",
+        "taskRevision": "sha256:4be624a0095d71ee57cd39c78d4e828adfaa0c8c3588963b0a25bb46a84f4042",
+        "sourceLine": 764,
+        "migrationKey": "parent-atlas-retrieval-lod-algorithm-taxonomy#8be3d937e41015a1",
+        "basis": "DECLARED_ID"
+      },
+      "controller": {
+        "state": "SUPERSEDED",
+        "blockerKey": "HISTORICAL_TASK",
+        "retryWhen": "never"
+      }
+    },
+    {
       "taskKey": "parent-atlas-retrieval-logic-convergence:297",
       "change": "parent-atlas-retrieval-logic-convergence",
       "source": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
@@ -3342,7 +3306,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 30,
-      "lastUpdatedAt": "2026-09-20T04:54:46.624Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.864Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:1a93f224c0872effa61cbeb758c8f4195d00bfc5837037adcba331f4f8f4530b",
       "sectionSlug": "candidate-universe-feature-matrix-and-ranking",
@@ -3379,7 +3343,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-15T01:47:42.154Z",
+      "lastUpdatedAt": "2026-09-23T18:01:28.100Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:260948e0e9bc94e00b7bc38f4732e87e6c76134de940721c7add28d602fab719",
       "sectionSlug": "gpu-cache-tiling-offload-topology-expansion-2026-08-31",
@@ -3404,10 +3368,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-tensor-residency-integration:1032",
+      "taskKey": "parent-atlas-tensor-residency-integration:1049",
       "change": "parent-atlas-tensor-residency-integration",
       "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
-      "line": 1032,
+      "line": 1049,
       "text": "**GPU-EXP-19** Keep QLoRA/GEPA as offline challengers with immutable base,",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3416,7 +3380,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-15T01:47:42.154Z",
+      "lastUpdatedAt": "2026-09-23T18:01:28.100Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:bf0f4e763411db54ac945a86d6826e645621f7fbbdc7131459f1856e630cbb38",
       "sectionSlug": "gpu-cache-tiling-offload-topology-expansion-2026-08-31",
@@ -3430,7 +3394,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-tensor-residency-integration:GPU-EXP-19",
         "taskRevision": "sha256:bf0f4e763411db54ac945a86d6826e645621f7fbbdc7131459f1856e630cbb38",
-        "sourceLine": 1032,
+        "sourceLine": 1049,
         "migrationKey": "parent-atlas-tensor-residency-integration#72fadedc970311b2",
         "basis": "DECLARED_ID"
       },
@@ -3441,10 +3405,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-tensor-residency-integration:1346",
+      "taskKey": "parent-atlas-tensor-residency-integration:1363",
       "change": "parent-atlas-tensor-residency-integration",
       "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
-      "line": 1346,
+      "line": 1363,
       "text": "**`GPJSON-CHALLENGER-01` (design target, low priority)**: the review's positioning — GpJSON",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3453,7 +3417,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-15T01:47:42.154Z",
+      "lastUpdatedAt": "2026-09-23T18:01:28.100Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:ad7772db1e98452cf641061441e4aaf29df24f2c3acb12d89664d0de4905323a",
       "sectionSlug": "physical-arrow-mmap-tensor-architecture-review-2026-09-06-op",
@@ -3467,7 +3431,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-tensor-residency-integration:GPJSON-CHALLENGER-01",
         "taskRevision": "sha256:ad7772db1e98452cf641061441e4aaf29df24f2c3acb12d89664d0de4905323a",
-        "sourceLine": 1346,
+        "sourceLine": 1363,
         "migrationKey": "parent-atlas-tensor-residency-integration#40ded17ddebb78e7",
         "basis": "DECLARED_ID"
       },
@@ -3478,10 +3442,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-tensor-residency-integration:2036",
+      "taskKey": "parent-atlas-tensor-residency-integration:2053",
       "change": "parent-atlas-tensor-residency-integration",
       "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
-      "line": 2036,
+      "line": 2053,
       "text": "**TRACE-CUVS-CAGRA-01** evaluate CAGRA only as an approximate challenger against the",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3490,7 +3454,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-15T01:47:42.154Z",
+      "lastUpdatedAt": "2026-09-23T18:01:28.100Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:b12a51001c55ef2e23328523e841c295558c739c13c94b73ca0f6cf160cdbce8",
       "sectionSlug": "parent-atlas-workstation-agentic-repair-integration-map-2026",
@@ -3504,7 +3468,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-tensor-residency-integration:TRACE-CUVS-CAGRA-01@parent-atlas-workstation-agentic-repair-integration-map-2026",
         "taskRevision": "sha256:b12a51001c55ef2e23328523e841c295558c739c13c94b73ca0f6cf160cdbce8",
-        "sourceLine": 2036,
+        "sourceLine": 2053,
         "migrationKey": "parent-atlas-tensor-residency-integration#2774bbdbdb78138d",
         "basis": "DECLARED_ID_SECTION_QUALIFIED"
       },
@@ -3515,10 +3479,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-tensor-residency-integration:2100",
+      "taskKey": "parent-atlas-tensor-residency-integration:2117",
       "change": "parent-atlas-tensor-residency-integration",
       "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
-      "line": 2100,
+      "line": 2117,
       "text": "**TRACE-CUVS-CAGRA-01** measure CAGRA as an approximate challenger against the cuVS",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3527,7 +3491,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-15T01:47:42.154Z",
+      "lastUpdatedAt": "2026-09-23T18:01:28.100Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:8ebd4b364c3361b768fa209627abf3e5c90edb61234648b8ab88f211b1e4ba9b",
       "sectionSlug": "current-missing-gates-after-trace-capability-audit-2026-09-1",
@@ -3541,7 +3505,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-tensor-residency-integration:TRACE-CUVS-CAGRA-01@current-missing-gates-after-trace-capability-audit-2026-09-1",
         "taskRevision": "sha256:8ebd4b364c3361b768fa209627abf3e5c90edb61234648b8ab88f211b1e4ba9b",
-        "sourceLine": 2100,
+        "sourceLine": 2117,
         "migrationKey": "parent-atlas-tensor-residency-integration#65611bcc7aef854c",
         "basis": "DECLARED_ID_SECTION_QUALIFIED"
       },
@@ -3564,7 +3528,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 80,
-      "lastUpdatedAt": "2026-09-14T01:44:50.719Z",
+      "lastUpdatedAt": "2026-09-21T19:03:38.665Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:264e3426e1b2487e4dfc167e00f37c5a59e1894f21b9ec38dca844b951b118f2",
       "sectionSlug": "current-alignment-checkpoint-2026-08-28",
@@ -3589,10 +3553,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-transport-memory-boundaries:25",
+      "taskKey": "parent-atlas-transport-memory-boundaries:89",
       "change": "parent-atlas-transport-memory-boundaries",
       "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
-      "line": 25,
+      "line": 89,
       "text": "**CC-02** Benchmark contextual structural metadata against the current treesitter-chunker evidence on a fixed corpus; record symbol localization and repair-localization Recall@10/MRR without changing identity.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3601,7 +3565,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 10,
-      "lastUpdatedAt": "2026-09-14T01:44:50.721Z",
+      "lastUpdatedAt": "2026-09-24T22:23:17.761Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:2faa046f193ffb8970a6d5c04aa166aab3442676301e6536b248f134ed78461a",
       "sectionSlug": "classification-backlog",
@@ -3615,7 +3579,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-transport-memory-boundaries:CC-02",
         "taskRevision": "sha256:2faa046f193ffb8970a6d5c04aa166aab3442676301e6536b248f134ed78461a",
-        "sourceLine": 25,
+        "sourceLine": 89,
         "migrationKey": "parent-atlas-transport-memory-boundaries#c15a997defe9bd09",
         "basis": "DECLARED_ID"
       },
@@ -3626,10 +3590,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-transport-memory-boundaries:33",
+      "taskKey": "parent-atlas-transport-memory-boundaries:97",
       "change": "parent-atlas-transport-memory-boundaries",
       "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
-      "line": 33,
+      "line": 97,
       "text": "**MEM-05** Model temporal semantic relationships as provenance-owned `UPDATES`, `EXTENDS`, and `DERIVES` observations while preserving superseded history.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3638,7 +3602,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 20,
-      "lastUpdatedAt": "2026-09-14T01:44:50.721Z",
+      "lastUpdatedAt": "2026-09-24T22:23:17.761Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:d360a2eaa07a786a0b3add9c2f70cedaee8e592363382c624789d49a094cf488",
       "sectionSlug": "classification-backlog",
@@ -3652,7 +3616,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-transport-memory-boundaries:MEM-05",
         "taskRevision": "sha256:d360a2eaa07a786a0b3add9c2f70cedaee8e592363382c624789d49a094cf488",
-        "sourceLine": 33,
+        "sourceLine": 97,
         "migrationKey": "parent-atlas-transport-memory-boundaries#839ceee910a0c84a",
         "basis": "DECLARED_ID"
       },
@@ -3663,47 +3627,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-transport-memory-boundaries:35",
+      "taskKey": "parent-atlas-transport-memory-boundaries:485",
       "change": "parent-atlas-transport-memory-boundaries",
       "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
-      "line": 35,
-      "text": "**SIMD-05** Benchmark simdjson only on metadata JSON/JSONL paths such as receipts, snapshots, and traces; retain Zod/Pydantic/TypeScript schemas as semantic authorities.",
-      "state": "OPEN",
-      "kind": "WORK_ITEM",
-      "executionState": "ACTIONABLE",
-      "lane": "RETRIEVAL_ACE",
-      "declaredSourceRef": null,
-      "declaredSourceRevision": null,
-      "priority": 40,
-      "lastUpdatedAt": "2026-09-14T01:44:50.721Z",
-      "timestampMethod": "FILESYSTEM_MTIME",
-      "blockHash": "sha256:47b76efff63d178fd8412e5172d503fd884299f644df0d891dc05660cf3e7e12",
-      "sectionSlug": "classification-backlog",
-      "eta": {
-        "status": "UNKNOWN",
-        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
-      },
-      "stableKey": "parent-atlas-transport-memory-boundaries#87da7d1962119815",
-      "ledgerId": "SIMD-05",
-      "logicalTaskKey": "parent-atlas-transport-memory-boundaries:SIMD-05",
-      "taskIdentity": {
-        "logicalTaskKey": "parent-atlas-transport-memory-boundaries:SIMD-05",
-        "taskRevision": "sha256:47b76efff63d178fd8412e5172d503fd884299f644df0d891dc05660cf3e7e12",
-        "sourceLine": 35,
-        "migrationKey": "parent-atlas-transport-memory-boundaries#87da7d1962119815",
-        "basis": "DECLARED_ID"
-      },
-      "controller": {
-        "state": "DEFERRED",
-        "blockerKey": "OPTIONAL_CHALLENGER",
-        "retryWhen": "current completion envelope explicitly requires this lane"
-      }
-    },
-    {
-      "taskKey": "parent-atlas-transport-memory-boundaries:362",
-      "change": "parent-atlas-transport-memory-boundaries",
-      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
-      "line": 362,
+      "line": 485,
       "text": "Do not append candidates yet. Historical snapshot pairing, source CRUD",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3712,7 +3639,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 70,
-      "lastUpdatedAt": "2026-09-14T01:44:50.721Z",
+      "lastUpdatedAt": "2026-09-24T22:23:17.761Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:535dc394ebe423f57edcfcd47b892458f9ebc23d27c83528c105bd5d2aa2aaa7",
       "sectionSlug": "temporal-event-candidate-compiler-01-2026-09-09",
@@ -3725,7 +3652,7 @@
       "taskIdentity": {
         "logicalTaskKey": null,
         "taskRevision": "sha256:535dc394ebe423f57edcfcd47b892458f9ebc23d27c83528c105bd5d2aa2aaa7",
-        "sourceLine": 362,
+        "sourceLine": 485,
         "migrationKey": "parent-atlas-transport-memory-boundaries#c19088642506c21c",
         "basis": "MIGRATION_TITLE_HASH"
       },
@@ -3736,10 +3663,46 @@
       }
     },
     {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric:272",
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric:150",
       "change": "parent-atlas-workboard-feature-utility-fabric",
       "source": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
-      "line": 272,
+      "line": 150,
+      "text": "Retire the adapter's legacy defaulted scalar fields (`lowRankScore=0.5`, `estimatedMinutes=15`, `remainingRequiredGates=999`, ...) once a consumer census shows nothing reads them (unchanged for now). **Read-only consumer census (2026-09-23): NOT RETIRABLE.** `adapt-openspec-controller-to-ranker-v3.mjs` still emits defaults for `remainingRequiredGates`, `estimatedMinutes`, `lowRankScore`, and other compatibility scalars; its deterministic sorter consumes `remainingRequiredGates` and `estimatedMinutes`. `build-openspec-challenger-tournament-v1.mjs::scoreOf` still recognizes `lowRankScore` as a fallback score. `python/build_low_rank_task_recommendation_v2.py` explicitly excludes legacy scalar inputs and consumes only qualified `featureVector` columns, so it is a compatibility guard rather than a scalar consumer. The v2 adapter retains the same defaults. No fields were removed or altered; keep this task open until the actual remaining consumers migrate to qualified features and deterministic ordering is proven unchanged. Receipt: `docs/reports/wfu-legacy-scalar-consumer-census-v1.json`.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "executionState": "ACTIONABLE",
+      "lane": "RESEARCH_CHALLENGER_EWIN_TANG",
+      "declaredSourceRef": null,
+      "declaredSourceRevision": null,
+      "priority": 40,
+      "lastUpdatedAt": "2026-09-23T19:59:53.720Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "blockHash": "sha256:94f86c604bd4fd9d0be58b014330a1abff4d2a178b03900d81dfb1944bf19ca0",
+      "sectionSlug": "wfu-10-tournament-feature-population",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      },
+      "stableKey": "parent-atlas-workboard-feature-utility-fabric#abe3787b505b1d4a",
+      "logicalTaskKey": null,
+      "taskIdentity": {
+        "logicalTaskKey": null,
+        "taskRevision": "sha256:94f86c604bd4fd9d0be58b014330a1abff4d2a178b03900d81dfb1944bf19ca0",
+        "sourceLine": 150,
+        "migrationKey": "parent-atlas-workboard-feature-utility-fabric#abe3787b505b1d4a",
+        "basis": "MIGRATION_TITLE_HASH"
+      },
+      "controller": {
+        "state": "DEFERRED",
+        "blockerKey": "OPTIONAL_CHALLENGER",
+        "retryWhen": "current completion envelope explicitly requires this lane"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric:274",
+      "change": "parent-atlas-workboard-feature-utility-fabric",
+      "source": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
+      "line": 274,
       "text": "**REGISTRY-COVERAGE-01b** The 200 `workspace:0` registry rows carry a legacy revision. Repo rule: never coerce a SHA-256 revision into legacy `0`. Classify them historical / non-promotion-eligible or re-materialize under a real revision.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3748,7 +3711,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-20T06:12:53.009Z",
+      "lastUpdatedAt": "2026-09-23T19:59:53.720Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:a92f1c612a6880ed3b991f99b14d6179eeee062626fa52a9e26e840bd8b5420b",
       "sectionSlug": "registry-coverage-01-result-2026-09-20-read-only-no-writes",
@@ -3762,7 +3725,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-workboard-feature-utility-fabric:REGISTRY-COVERAGE-01b",
         "taskRevision": "sha256:a92f1c612a6880ed3b991f99b14d6179eeee062626fa52a9e26e840bd8b5420b",
-        "sourceLine": 272,
+        "sourceLine": 274,
         "migrationKey": "parent-atlas-workboard-feature-utility-fabric#64ae0a1cad5187d8",
         "basis": "DECLARED_ID"
       },
@@ -3773,10 +3736,10 @@
       }
     },
     {
-      "taskKey": "parent-atlas-workboard-feature-utility-fabric:344",
+      "taskKey": "parent-atlas-workboard-feature-utility-fabric:348",
       "change": "parent-atlas-workboard-feature-utility-fabric",
       "source": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
-      "line": 344,
+      "line": 348,
       "text": "**FOREST-02** If ML: keep XGBoost as the ranker; evaluate cuML FIL only when a trained model exists and batch inference latency is a measured problem; treat cuML Random Forest as a challenger needing its own gap proof.",
       "state": "OPEN",
       "kind": "WORK_ITEM",
@@ -3785,7 +3748,7 @@
       "declaredSourceRef": null,
       "declaredSourceRevision": null,
       "priority": 40,
-      "lastUpdatedAt": "2026-09-20T06:12:53.009Z",
+      "lastUpdatedAt": "2026-09-23T19:59:53.720Z",
       "timestampMethod": "FILESYSTEM_MTIME",
       "blockHash": "sha256:1857b473c53264ec2801d400ece8ebca0ec26bac2b4686a175cb2485decc2028",
       "sectionSlug": "forest-two-meanings-corrected-2026-09-20",
@@ -3799,7 +3762,7 @@
       "taskIdentity": {
         "logicalTaskKey": "parent-atlas-workboard-feature-utility-fabric:FOREST-02",
         "taskRevision": "sha256:1857b473c53264ec2801d400ece8ebca0ec26bac2b4686a175cb2485decc2028",
-        "sourceLine": 344,
+        "sourceLine": 348,
         "migrationKey": "parent-atlas-workboard-feature-utility-fabric#6ce45d5a447f7270",
         "basis": "DECLARED_ID"
       },

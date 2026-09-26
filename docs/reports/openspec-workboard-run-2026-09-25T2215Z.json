@@ -1,0 +1,89 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T22:15:11Z",
+  "runType": "FRESH_LEDGER_CENSUS_AND_PROGRAM_REVIEW",
+  "supersedes": "docs/reports/openspec-workboard-run-2026-09-25T2210Z.json",
+  "pivot": {
+    "from": "program mapping collision review",
+    "to": "refresh the isolated inventory after detecting task-ledger drift, then re-evaluate the same review surface",
+    "reason": "A source task file changed after the preceding snapshot was generated; the first refresh also raced that edit. A second isolated rebuild incorporated the updated source set and passed immediate source-hash parity."
+  },
+  "repository": {
+    "workingTreeWasDirty": true,
+    "taskLedgersEditedByThisRun": false,
+    "selectedTaskCount": 0,
+    "schedulerPermissionPolicy": "READY_NEVER_IMPLIES_SELECTED",
+    "datastoreWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0
+  },
+  "snapshot": {
+    "directory": ".tmp/codex-openspec-live-20260925T2213Z/reports",
+    "workboard": ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-workboard-v1.json",
+    "controller": ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-execution-controller-v1.json",
+    "programJson": ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-achievable-implementation-program-v1.json",
+    "programMarkdown": ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-achievable-implementation-program-v1.md",
+    "workboardGeneratedAt": "2026-09-25T22:14:47.803Z",
+    "controllerGeneratedAt": "2026-09-25T22:14:45.883Z",
+    "programGeneratedAt": "2026-09-25T22:14:49.308Z",
+    "changeCount": 88,
+    "taskFilesHashed": 90,
+    "totalTasks": 9555,
+    "completedTasks": 6309,
+    "openTasks": 3246,
+    "controllerRows": 9555,
+    "controllerStaleOrMissingRows": 0,
+    "sourceHashParityAtAudit": "PASS 90/90 immediately after generation",
+    "openTaskAssignments": {
+      "accountedExactlyOnce": true,
+      "missing": 0,
+      "duplicates": 0,
+      "selected": 0
+    }
+  },
+  "programPlan": {
+    "architectureMilestones": 7,
+    "architecturePrograms": 25,
+    "architecturePrerequisiteGates": 17,
+    "programMappingReviewChanges": 73,
+    "ambiguousRuleMatches": 7,
+    "multipleCandidateCorpusSets": 3,
+    "allMappingsRemainProvisional": true,
+    "workPackages": 814,
+    "openLeavesWithDeclaredDependencies": 3,
+    "openLeavesWithoutDeclaredDependencies": 3243,
+    "dependenciesInvented": 0,
+    "schedulerSelected": 0
+  },
+  "validation": {
+    "programPlanAndControllerTests": "PASS 22/22",
+    "implementationProgramSyntax": "PASS",
+    "openspecStrict": "PASS parent-atlas-workboard-feature-utility-fabric",
+    "sourceHashParity": "PASS 90/90 after the stable rebuild",
+    "taskAssignmentParity": "PASS 3,246/3,246; no duplicates or omissions",
+    "scopedDiffCheck": "PASS; line-ending normalization warnings only"
+  },
+  "concurrentLedgerDrift": {
+    "observed": true,
+    "ledger": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
+    "priorObservedInventory": { "totalTasks": 9549, "openTasks": 3241, "completedTasks": 6308 },
+    "refreshedInventory": { "totalTasks": 9555, "openTasks": 3246, "completedTasks": 6309 },
+    "interpretation": "Net inventory drift only; no claim is made about who edited the ledger or whether the individual task changes are correct."
+  },
+  "next": {
+    "schedulerSelection": "NONE",
+    "mappingReview": "The same seven multi-rule changes remain provisional; this refresh confirms the added task entries did not settle the mapping owner.",
+    "dependencyCaveat": "3,243 open leaves lack declared dependencies; no inferred dependency edges were added."
+  },
+  "likely_cause": "The prior workboard snapshot lagged a concurrent OpenSpec ledger edit, so its task counts and mapping evidence were stale until rebuilt from current source hashes.",
+  "evidence": [
+    ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-workboard-v1.json",
+    ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-execution-controller-v1.json",
+    ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-achievable-implementation-program-v1.json",
+    ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-achievable-implementation-program-v1.md"
+  ],
+  "patch_targets": [],
+  "safe_next_command": "Review the refreshed provisional mappings and dependencies; do not infer task selection from readiness or completion percentage.",
+  "smoke_command": "node --test scripts/atlas/lib/openspec-program-plan-v1.test.mjs scripts/atlas/audit-openspec-execution-controller-v1.test.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T2215Z.json"
+}

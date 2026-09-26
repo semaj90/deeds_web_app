@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T21:34:31.793Z",
+  "generatedAt": "2026-09-26T03:47:32.428Z",
   "inputs": {
     "boardPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\kanban-board.json",
     "featureLabelsPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\feature_labels.jsonl",
@@ -27,11 +27,12 @@
       "deterministicFallback": 0,
       "degraded": false
     },
-    "groupCount": 6528,
+    "groupCount": 6527,
     "consolidationCandidateGroups": 118,
     "highOverlapGroups": 6,
     "turbovecBackendCounts": {
-      "offline": 6725
+      "search-derived": 6,
+      "offline": 6719
     },
     "libtorchAvailable": true,
     "libtorchGroupsScored": 118,
@@ -41,7 +42,7 @@
       "nativeParses": 1,
       "fallbackParses": 6625,
       "totalBytesParsed": 3957402,
-      "nativeTimeMs": 1.6085000000000491,
+      "nativeTimeMs": 2.074299999999994,
       "cacheBytes": 7815662,
       "cacheSize": 6626
     },
@@ -365,6 +366,43 @@
         "source": "cpu",
         "cohesion": 0.861,
         "pairCount": 10
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "lib:cluster:none",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [],
+      "featureFamilies": [
+        "lib"
+      ],
+      "sourceRefs": [],
+      "topTitles": [
+        "lib › icons",
+        "lib › shims",
+        "lib › agent",
+        "lib › schemas"
+      ],
+      "topFeatureIds": [],
+      "topSourceRefs": [
+        "local:sveltekit-frontend/src/lib/icons/yorha/IconAiAssistant.svelte#L1",
+        "local:sveltekit-frontend/src/lib/icons/yorha/IconCitation.svelte#L1",
+        "local:sveltekit-frontend/src/lib/icons/yorha/IconEvidenceFile.svelte#L1",
+        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/shims/melt-ui-shim.ts#L1",
+        "local:sveltekit-frontend/src/lib/shims/commonjs-shim.js#L1"
+      ],
+      "statuses": {
+        "BACKLOG": 4
+      },
+      "backendCounts": {
+        "search-derived": 4
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.6566,
+        "pairCount": 6
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
@@ -1005,47 +1043,6 @@
         "source": "cpu",
         "cohesion": 0.9707,
         "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "lib:cluster:48",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [
-        48,
-        65,
-        79
-      ],
-      "featureFamilies": [
-        "lib"
-      ],
-      "sourceRefs": [],
-      "topTitles": [
-        "lib › icons",
-        "lib › upsert-validated › mjs",
-        "lib › utils"
-      ],
-      "topFeatureIds": [],
-      "topSourceRefs": [
-        "local:sveltekit-frontend/src/lib/icons/yorha/IconAiAssistant.svelte#L1",
-        "local:sveltekit-frontend/src/lib/icons/yorha/IconCitation.svelte#L1",
-        "local:sveltekit-frontend/src/lib/icons/yorha/IconEvidenceFile.svelte#L1",
-        "local:scripts/lib/upsert-validated.mjs#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/utils/buffer-utils.ts#L1"
-      ],
-      "statuses": {
-        "BACKLOG": 2,
-        "TODO": 1
-      },
-      "backendCounts": {
-        "offline": 3
-      },
-      "priorityMax": 2,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.5294,
-        "pairCount": 3
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },

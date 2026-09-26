@@ -1,0 +1,124 @@
+{
+  "schema": "atlas.summary-search-census-manifest.v1",
+  "status": "SEALED",
+  "mode": "POSTGRES_READ_ONLY_SNAPSHOT",
+  "canonicalAuthority": false,
+  "repositoryId": "deeds-web-app",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "selection": "all non-empty codebase_chunk_index.summary rows; B-tree UUID keyset; no FTS-based identity selection",
+  "inputState": {
+    "before": {
+      "chunk_rows": 274465,
+      "legacy_summaries": 40306,
+      "legacy_vectors": 1160,
+      "admitted_summary_text": 0
+    },
+    "after": {
+      "chunk_rows": 274465,
+      "legacy_summaries": 40306,
+      "legacy_vectors": 1160,
+      "admitted_summary_text": 0
+    },
+    "unchanged": true
+  },
+  "shardSize": 5000,
+  "batchSize": 1000,
+  "tally": {
+    "rowsRead": 40306,
+    "accepted": 40306,
+    "rejected": 0,
+    "bySummaryState": {
+      "QUARANTINED": 10416,
+      "LEGACY_HINT_UNQUALIFIED": 28794,
+      "LEGACY_HINT_LINEAGE_BOUND": 425,
+      "CONTAMINATED": 671
+    },
+    "byIdentityState": {
+      "LEGACY_IDENTITY_UNQUALIFIED": 39753,
+      "REVISION_QUALIFIED": 553
+    },
+    "legacyVectorPresent": 1160,
+    "hintRepresentationPresent": 64,
+    "routingPresence": {
+      "domain": 0,
+      "community": 0,
+      "cluster": 0,
+      "somCell": 526,
+      "pageRank": 653,
+      "domainClass": null,
+      "communityId": null,
+      "clusterId": null
+    },
+    "peakBatchRows": 1000,
+    "totalExpected": 40306
+  },
+  "checks": {
+    "conservation": true,
+    "schemaRejected": 0,
+    "zeroUnexpectedSchemaRejections": true,
+    "postgresReadOnly": true
+  },
+  "acceptedShards": [
+    {
+      "path": "accepted-00001.ndjson",
+      "rows": 5000,
+      "sha256": "sha256:47c6dba1697ee06ff5e9886664b173576d46f46767f7370b66fc20c74374b6db"
+    },
+    {
+      "path": "accepted-00002.ndjson",
+      "rows": 5000,
+      "sha256": "sha256:90f1825aedff1b895ad1df3063e33feac03d7524198ca148238e5bf1f0a7a3b3"
+    },
+    {
+      "path": "accepted-00003.ndjson",
+      "rows": 5000,
+      "sha256": "sha256:d3a3374bc4de27ba6d8be0df50b18dff3eaf08616dfc8445648412295ea7bb3f"
+    },
+    {
+      "path": "accepted-00004.ndjson",
+      "rows": 5000,
+      "sha256": "sha256:0c6ee66c7bd70e1ad05321b16a1a85e5e641dab0694bc326660b0ebf899c784b"
+    },
+    {
+      "path": "accepted-00005.ndjson",
+      "rows": 5000,
+      "sha256": "sha256:4a3b9fe19ecf9900d3918ecdaf53c0e4e31e8bf0065491b4a693f4fc86270c9a"
+    },
+    {
+      "path": "accepted-00006.ndjson",
+      "rows": 5000,
+      "sha256": "sha256:9b9186e469ec9f49ed1ffaf5993001e401c31940327f0e63b56e6990f64d3a49"
+    },
+    {
+      "path": "accepted-00007.ndjson",
+      "rows": 5000,
+      "sha256": "sha256:34eb952901d86ead550ac85a0716c1bc9f5120f0437b72bc799d6c65f52deb75"
+    },
+    {
+      "path": "accepted-00008.ndjson",
+      "rows": 5000,
+      "sha256": "sha256:d4fa8223bed2e7c61d92a08001a65c9ad43c321a1ead6d4dd6d5be97ae6d074c"
+    },
+    {
+      "path": "accepted-00009.ndjson",
+      "rows": 306,
+      "sha256": "sha256:f291f7c3a98d3f223b151053a91014e2d1ab169c568d1c103bae1ea5c424d478"
+    }
+  ],
+  "rejectedShards": [],
+  "acceptedBytes": 58730434,
+  "rejectedBytes": 0,
+  "acceptedRootChecksum": "sha256:a12d6d33250cdb681231f93edcfed5e2551359676ec3b869994f23a19bde59f9",
+  "rejectedRootChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceCohortChecksum": "sha256:6c3cde7ec9ea49c6fa0631921536b66c98cd5c2c1f262aa105b49bf94228393a",
+  "hintRepresentationArtifact": ".tmp/atlas/legacy-summary-hint-embedding-v1/20260926T062011Z/representations-00001.ndjson",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "generatedAt": "2026-09-26T06:29:26.288Z",
+  "outputDir": ".tmp/atlas/summary-search-census-v1/20260926T062750Z"
+}

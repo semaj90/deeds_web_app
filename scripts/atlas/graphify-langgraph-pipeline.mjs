@@ -30,6 +30,7 @@ import { execSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { bm25ExecutionCounts, coverageMetric } from './lib/graphify-dry-run-metrics-v1.mjs';
 
 const __dir  = dirname(fileURLToPath(import.meta.url));
 const ROOT   = join(__dir, '../..');
@@ -339,13 +340,16 @@ const INITIAL_STATE = {
   missingFeatureId:  0,
   missingBm25:       0,
   missingConcepts:   0,
-  missingVectors:    0,
+  missingVectors:    null,
+  vectorCoverageStatus: 'NOT_MEASURED_IDENTITY_JOIN_REQUIRED',
   noiseRefs:         0,
 
   // Work performed
   featureIdsAssigned:  0,
   vectorsUpserted:     0,
-  bm25Backfilled:      0,
+  bm25Candidates:      0,
+  bm25WouldBackfill:   0,
+  bm25RowsWritten:     0,
   noiseRemoved:        0,
 
   // Kanban output
@@ -369,6 +373,9 @@ async function auditCoverage(state) {
     SELECT
       COUNT(*)                                              AS total,
       COUNT(CASE WHEN packet_key IS NOT NULL THEN 1 END)  AS addressable,
+      COUNT(*) FILTER (WHERE packet_key IS NULL)          AS rejected_missing_packet_key,
+      COUNT(*) FILTER (WHERE source_ref IS NULL OR BTRIM(source_ref) = '') AS rejected_missing_source_ref,
+      COUNT(*) FILTER (WHERE source_revision IS NULL OR BTRIM(source_revision) = '') AS rejected_missing_source_revision,
       COUNT(CASE WHEN feature_id IS NULL
                    AND packet_key IS NOT NULL THEN 1 END) AS missing_feature_id,
       COUNT(CASE WHEN (payload->>'bm25_text') IS NULL
@@ -389,23 +396,28 @@ async function auditCoverage(state) {
     qdrantCount = d.result?.points_count ?? 0;
   } catch { /* offline */ }
 
-  const missingVectors = Math.max(0, parseInt(totals.addressable) - qdrantCount);
-
   log(`  total packets:       ${totals.total}`);
-  log(`  addressable:         ${totals.addressable}`);
+  log(`  packet_key present (legacy addressable predicate): ${totals.addressable}`);
+  log(`  rejected: packet_key missing=${totals.rejected_missing_packet_key}; source_ref missing=${totals.rejected_missing_source_ref}; source_revision missing=${totals.rejected_missing_source_revision} (overlapping counts)`);
   log(`  missing feature_id:  ${totals.missing_feature_id}`);
   log(`  missing bm25_text:   ${totals.missing_bm25}`);
   log(`  missing concepts:    ${totals.missing_concepts}`);
-  log(`  missing vectors:     ~${missingVectors} (qdrant=${qdrantCount})`);
+  log(`  qdrant points:       ${qdrantCount} (not packet coverage; canonical join not evaluated)`);
   log(`  noise refs:          ${totals.noise_refs}`);
 
   return {
     totalPackets:     parseInt(totals.total),
     addressable:      parseInt(totals.addressable),
+    addressabilityRejections: {
+      missingPacketKey: parseInt(totals.rejected_missing_packet_key),
+      missingSourceRef: parseInt(totals.rejected_missing_source_ref),
+      missingSourceRevision: parseInt(totals.rejected_missing_source_revision),
+      note: 'Counts overlap; addressable currently means packet_key IS NOT NULL and does not itself prove full lineage.',
+    },
     missingFeatureId: parseInt(totals.missing_feature_id),
     missingBm25:      parseInt(totals.missing_bm25),
     missingConcepts:  parseInt(totals.missing_concepts),
-    missingVectors,
+    qdrantPointCount: qdrantCount,
     noiseRefs:        parseInt(totals.noise_refs),
   };
 }
@@ -499,14 +511,14 @@ async function kanbanTask(state) {
     blockedBy: [],
   });
 
-  if (state.missingVectors > 50) tasks.push({
+  if (state.vectorCoverageStatus !== 'MEASURED') tasks.push({
     id:       'embed_missing',
     priority: 'P0',
-    label:    'Embed packets missing Qdrant vectors',
-    count:    state.missingVectors,
+    label:    'Qdrant packet coverage needs canonical identity reconciliation',
+    count:    null,
     script:   'node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage embed_missing',
-    gate:     'Qdrant vector coverage ≥ 80%',
-    blockedBy: [],
+    gate:     'No embedding until point-to-canonical-packet identity join is proven',
+    blockedBy: ['QDRANT_CANONICAL_IDENTITY_JOIN_REQUIRED'],
   });
 
   if (state.missingBm25 > 0) tasks.push({
@@ -617,8 +629,12 @@ async function kanbanTask(state) {
 async function embedMissing(state) {
   log('\n── Node: embed_missing ──────────────────────────────────────────');
 
+  if (state.vectorCoverageStatus !== 'MEASURED' || !Number.isInteger(state.missingVectors)) {
+    log('  blocked — canonical packet-to-point identity coverage is not measured');
+    return { vectorsUpserted: 0 };
+  }
   if (state.missingVectors <= 0) {
-    log('  nothing to do — Qdrant appears fully covered');
+    log('  nothing to do — identity-qualified packet coverage is complete');
     return { vectorsUpserted: 0 };
   }
 
@@ -708,11 +724,11 @@ async function indexBm25(state) {
 
   if (rows.length === 0) {
     log('  nothing to do — all packets have bm25_text');
-    return { bm25Backfilled: 0 };
+    return bm25ExecutionCounts(0, 0, APPLY);
   }
 
   log(`  backfilling ${rows.length} packets`);
-  let done = 0;
+  let rowsWritten = 0;
 
   for (const row of rows) {
     const parts = [
@@ -726,19 +742,22 @@ async function indexBm25(state) {
     const newPayload = { ...(row.payload ?? {}), bm25_text: bm25Text };
 
     if (APPLY) {
-      await pool.query(
+      const result = await pool.query(
         `UPDATE atlas_packets
          SET payload = $1::jsonb, updated_at = NOW()
          WHERE packet_id = $2
            AND (payload->>'bm25_text') IS NULL`,
         [JSON.stringify(newPayload), row.packet_id]
       );
+      rowsWritten += result.rowCount ?? 0;
     }
-    done++;
   }
 
-  log(`  bm25_text backfilled: ${done}${DRY_RUN ? ' (dry-run)' : ''}`);
-  return { bm25Backfilled: done };
+  const counts = bm25ExecutionCounts(rows.length, rowsWritten, APPLY);
+  log(`  bm25 candidates: ${counts.bm25Candidates}`);
+  log(`  bm25 would backfill: ${counts.bm25WouldBackfill}`);
+  log(`  bm25 rows written: ${counts.bm25RowsWritten}`);
+  return counts;
 }
 
 /**
@@ -755,7 +774,7 @@ async function rankSignals(state) {
       COUNT(*) FILTER (WHERE packet_key IS NOT NULL AND (payload->>'bm25_text') IS NOT NULL) AS has_bm25,
       COUNT(*) FILTER (WHERE packet_key IS NOT NULL AND concept_ids IS NOT NULL
                          AND array_length(concept_ids,1) > 0) AS has_concepts,
-      COUNT(*) FILTER (WHERE community_confidence >= 0.65) AS high_conf,
+      COUNT(*) FILTER (WHERE packet_key IS NOT NULL AND community_confidence >= 0.65) AS high_conf,
       COUNT(*) FILTER (WHERE packet_key IS NOT NULL AND community_confidence IS NOT NULL) AS any_conf
     FROM atlas_packets
   `);
@@ -768,16 +787,20 @@ async function rankSignals(state) {
   } catch { /* offline */ }
 
   const addr         = parseInt(cov.addressable);
-  const bm25Pct      = addr > 0 ? (parseInt(cov.has_bm25)    / addr * 100).toFixed(1) : '0';
-  const conceptPct   = addr > 0 ? (parseInt(cov.has_concepts) / addr * 100).toFixed(1) : '0';
-  const highConfPct  = addr > 0 ? (parseInt(cov.high_conf)   / addr * 100).toFixed(1) : '0';
-  const qdrantPct    = addr > 0 ? (qdrantCount               / addr * 100).toFixed(1) : '0';
+  const bm25Coverage = coverageMetric(parseInt(cov.has_bm25), addr);
+  const conceptCoverage = coverageMetric(parseInt(cov.has_concepts), addr);
+  const communityCoverage = coverageMetric(parseInt(cov.any_conf), addr);
+  const bm25Pct = bm25Coverage.percent;
+  const conceptPct = conceptCoverage.percent;
+  const highConfPct = addr > 0 ? (parseInt(cov.high_conf) / addr * 100).toFixed(1) : null;
+  // Collection point count is a projection-cardinality metric, not canonical
+  // packet coverage. Do not divide it by packets without a deduplicated join.
 
   const gates = [
-    { name: 'bm25_coverage_85pct',    pass: parseFloat(bm25Pct) >= 85,    detail: `${bm25Pct}% (${cov.has_bm25}/${addr})` },
-    { name: 'concept_coverage_60pct', pass: parseFloat(conceptPct) >= 60, detail: `${conceptPct}% (${cov.has_concepts}/${addr})` },
-    { name: 'community_conf_95pct',   pass: addr > 0 && (parseInt(cov.any_conf) / addr) >= 0.95, detail: `${(parseInt(cov.any_conf)/addr*100).toFixed(1)}% (${cov.any_conf}/${addr})` },
-    { name: 'qdrant_coverage_50pct',  pass: parseFloat(qdrantPct) >= 50,  detail: `${qdrantPct}% (~${qdrantCount}/${addr})` },
+    { name: 'bm25_coverage_85pct',    pass: bm25Coverage.status === 'MEASURED' && bm25Pct >= 85, detail: bm25Coverage.status === 'MEASURED' ? `${bm25Pct}% (${cov.has_bm25}/${addr})` : `${bm25Coverage.status} (${cov.has_bm25}/${addr})` },
+    { name: 'concept_coverage_60pct', pass: conceptCoverage.status === 'MEASURED' && conceptPct >= 60, detail: conceptCoverage.status === 'MEASURED' ? `${conceptPct}% (${cov.has_concepts}/${addr})` : `${conceptCoverage.status} (${cov.has_concepts}/${addr})` },
+    { name: 'community_conf_95pct',   pass: communityCoverage.status === 'MEASURED' && communityCoverage.percent >= 95, detail: communityCoverage.status === 'MEASURED' ? `${communityCoverage.percent}% (${cov.any_conf}/${addr}); missing=${addr - parseInt(cov.any_conf)}` : `${communityCoverage.status} (${cov.any_conf}/${addr})` },
+    { name: 'qdrant_unique_packet_coverage_50pct', pass: false, detail: `NOT_MEASURED_CANONICAL_IDENTITY_JOIN_REQUIRED (points=${qdrantCount}; packet_denominator=${addr})` },
   ];
 
   log('  Ranking signal coverage:');
@@ -790,11 +813,12 @@ async function rankSignals(state) {
 
   const report = {
     generated: new Date().toISOString(),
-    addressable: addr,
-    bm25:     { count: parseInt(cov.has_bm25),    pct: bm25Pct },
-    concepts: { count: parseInt(cov.has_concepts), pct: conceptPct },
-    highConf: { count: parseInt(cov.high_conf),   pct: highConfPct },
-    qdrant:   { count: qdrantCount,               pct: qdrantPct },
+    addressable: { count: addr, definition: 'atlas_packets rows with packet_key IS NOT NULL', rejectionCounts: state.addressabilityRejections ?? null },
+    bm25:     { count: parseInt(cov.has_bm25), coverage: bm25Coverage, owner: 'atlas_packets.payload.bm25_text' },
+    concepts: { count: parseInt(cov.has_concepts), coverage: conceptCoverage },
+    communityConfidence: { count: parseInt(cov.any_conf), coverage: communityCoverage, missing: addr > 0 ? addr - parseInt(cov.any_conf) : null },
+    highConf: { count: parseInt(cov.high_conf), pct: highConfPct },
+    qdrant:   { pointCount: qdrantCount, packetCoverage: { status: 'NOT_MEASURED', percent: null, requires: 'deduplicated canonical packet identity join' } },
     gates,
     xgboostUnblocked: allPass,
   };
@@ -893,10 +917,12 @@ async function main() {
 
   // ── Summary ───────────────────────────────────────────────────────────────
   console.log('\n══ Pipeline Summary ══════════════════════════════════════');
-  console.log(`  addressable packets:   ${result.addressable.toLocaleString()}`);
+  console.log(`  packet_key-present packets (legacy addressability): ${result.addressable.toLocaleString()}`);
   console.log(`  feature_ids assigned:  ${result.featureIdsAssigned}`);
   console.log(`  vectors upserted:      ${result.vectorsUpserted}`);
-  console.log(`  bm25 backfilled:       ${result.bm25Backfilled}`);
+  console.log(`  bm25 candidates:       ${result.bm25Candidates}`);
+  console.log(`  bm25 would backfill:   ${result.bm25WouldBackfill}`);
+  console.log(`  bm25 rows written:     ${result.bm25RowsWritten}`);
   console.log(`  noise pruned:          ${result.noiseRemoved}`);
 
   if (result.tasks?.length > 0) {

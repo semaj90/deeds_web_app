@@ -6,6 +6,7 @@ import {
   buildRepairCandidateFeatureMatrixV1,
   type RepairOverlayFeatureStatesV1,
 } from '../../sveltekit-frontend/src/lib/server/retrieval/repair-candidate-feature-matrix-v1.js';
+import { buildRepairFeaturePresenceEvidenceV1 } from '../../sveltekit-frontend/src/lib/server/retrieval/repair-feature-presence-evidence-v1.js';
 import { buildCandidateFeatureMatrixManifest } from './lib/candidate-feature-matrix-manifest-v1.mts';
 
 const root = resolve(import.meta.dirname, '../..');
@@ -111,6 +112,18 @@ const build = () => buildRepairCandidateFeatureMatrixV1({
 
 const run0 = build();
 const run1 = build();
+const presence0 = buildRepairFeaturePresenceEvidenceV1({
+  candidateSnapshotRevision: map.candidateSnapshotRevision,
+  ordinalMapChecksum: map.ordinalMapChecksum,
+  candidateRowCount: map.candidates.length,
+});
+const presence1 = buildRepairFeaturePresenceEvidenceV1({
+  candidateSnapshotRevision: map.candidateSnapshotRevision,
+  ordinalMapChecksum: map.ordinalMapChecksum,
+  candidateRowCount: map.candidates.length,
+});
+const presenceEvidenceIdentical = presence0.presenceChecksum === presence1.presenceChecksum;
+const unavailablePresenceOnly = Object.values(presence0.featurePresence).every((state) => state === 'UNAVAILABLE');
 
 const basePlanePreserved = (() => {
   for (let row = 0; row < baseMatrix.candidate_count; row++) {
@@ -149,12 +162,22 @@ const report = {
   overlayPresenceCount,
   overlayFeatureStates: run0.overlayFeatureStates,
   overlayCoverage: run0.overlayCoverage,
+  contextManifestPresenceEvidence: {
+    checksum: presence0.presenceChecksum,
+    featurePresence: presence0.featurePresence,
+    rowCount: presence0.candidateRowCount,
+    canonicalAuthority: presence0.canonicalAuthority,
+    mutationAuthority: presence0.mutationAuthority,
+    deterministicReplay: presenceEvidenceIdentical,
+    allUnproducedFeaturesUnavailable: unavailablePresenceOnly,
+  },
   replay: {
     manifest0: run0.manifestChecksum,
     manifest1: run1.manifestChecksum,
     identical: run0.manifestChecksum === run1.manifestChecksum,
     matrixIdentical: run0.matrixChecksum === run1.matrixChecksum,
     presenceIdentical: run0.presenceMaskChecksum === run1.presenceMaskChecksum,
+    contextManifestPresenceIdentical: presenceEvidenceIdentical,
     identityIdentical: run0.identityChecksum === run1.identityChecksum,
   },
   authority: {
@@ -170,6 +193,8 @@ const report = {
     run0.manifestChecksum === run1.manifestChecksum &&
     run0.matrixChecksum === run1.matrixChecksum &&
     run0.presenceMaskChecksum === run1.presenceMaskChecksum &&
+    presenceEvidenceIdentical &&
+    unavailablePresenceOnly &&
     run0.identityChecksum === run1.identityChecksum
       ? 'REPAIR_CANDIDATE_FEATURE_MATRIX_CONTRACT_PROVEN'
       : 'REPAIR_CANDIDATE_FEATURE_MATRIX_CONTRACT_BLOCKED',
@@ -186,6 +211,9 @@ console.log(JSON.stringify({
   totalFeatureCount: report.totalFeatureCount,
   basePlanePreserved: report.basePlanePreserved,
   overlayPresenceCount: report.overlayPresenceCount,
+  contextManifestPresenceChecksum: presence0.presenceChecksum,
+  contextManifestPresenceIdentical: presenceEvidenceIdentical,
+  allUnproducedFeaturesUnavailable: unavailablePresenceOnly,
   replayIdentical: report.replay.identical,
   reportPath: 'docs/reports/current-repair-candidate-feature-matrix-v1.json',
 }, null, 2));

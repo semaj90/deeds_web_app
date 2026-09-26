@@ -263,3 +263,94 @@ pub fn turbovec_smoke(dim: u32, bits: u32) -> Result<String> {
     index.add(&vectors);
     Ok(format!("ok dim={dim} bits={bits}"))
 }
+
+// ── 7. summary hint top-k (SUMMARY-NAPI-01) ─────────────────────────────────
+// Flat Float32Array in, flat arrays out: no JSON vectors. Never a canonical identity or RRF vote:
+// the exact function is the oracle, the turbovec function is a quantized CHALLENGER compared against it.
+
+/// Exact cosine top-k (oracle). `vectors` is n*dim, `queries` is nq*dim, row-major. Rows are L2-normalised
+/// here so callers may pass unnormalised data. Returns nq*k row indices then nq*k scores (as two arrays).
+#[napi(object)]
+pub struct TopKResult {
+    pub indices: Vec<u32>,
+    pub scores: Vec<f64>,
+}
+
+fn l2_normalize_rows(data: &[f32], dim: usize) -> Vec<f32> {
+    let mut out = data.to_vec();
+    out.par_chunks_mut(dim).for_each(|row| {
+        let n = row.iter().map(|x| (*x as f64) * (*x as f64)).sum::<f64>().sqrt();
+        if n > 0.0 {
+            for x in row.iter_mut() {
+                *x = (*x as f64 / n) as f32;
+            }
+        }
+    });
+    out
+}
+
+#[napi]
+pub fn hint_exact_cosine_topk(vectors: Float32Array, queries: Float32Array, dim: u32, k: u32) -> Result<TopKResult> {
+    let dim = dim as usize;
+    if dim == 0 || vectors.len() % dim != 0 || queries.len() % dim != 0 {
+        return Err(Error::from_reason("SHAPE_MISMATCH"));
+    }
+    let n = vectors.len() / dim;
+    let nq = queries.len() / dim;
+    let k = (k as usize).min(n);
+    let v = l2_normalize_rows(&vectors, dim);
+    let q = l2_normalize_rows(&queries, dim);
+    let per_query: Vec<Vec<(u32, f64)>> = (0..nq)
+        .into_par_iter()
+        .map(|qi| {
+            let qrow = &q[qi * dim..(qi + 1) * dim];
+            let mut scored: Vec<(u32, f64)> = (0..n)
+                .map(|i| {
+                    let row = &v[i * dim..(i + 1) * dim];
+                    let s: f64 = row.iter().zip(qrow).map(|(a, b)| (*a as f64) * (*b as f64)).sum();
+                    (i as u32, s)
+                })
+                .collect();
+            // deterministic: score desc, then row index asc
+            scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal).then(a.0.cmp(&b.0)));
+            scored.truncate(k);
+            scored
+        })
+        .collect();
+    let mut indices = Vec::with_capacity(nq * k);
+    let mut scores = Vec::with_capacity(nq * k);
+    for row in per_query {
+        for (i, s) in row {
+            indices.push(i);
+            scores.push(s);
+        }
+    }
+    Ok(TopKResult { indices, scores })
+}
+
+/// Quantized turbovec top-k (challenger). Same layout and return shape as the exact oracle.
+#[napi]
+pub fn hint_turbovec_topk(vectors: Float32Array, queries: Float32Array, dim: u32, bits: u32, k: u32) -> Result<TopKResult> {
+    let dimu = dim as usize;
+    if dimu == 0 || vectors.len() % dimu != 0 || queries.len() % dimu != 0 {
+        return Err(Error::from_reason("SHAPE_MISMATCH"));
+    }
+    let n = vectors.len() / dimu;
+    let v = l2_normalize_rows(&vectors, dimu);
+    let q = l2_normalize_rows(&queries, dimu);
+    let mut index = TurboQuantIndex::new(dimu, bits as usize);
+    index.add(&v);
+    index.prepare();
+    let k = (k as usize).min(n);
+    let res = index.search(&q, k);
+    let nq = q.len() / dimu;
+    let mut indices = Vec::with_capacity(nq * k);
+    let mut scores = Vec::with_capacity(nq * k);
+    for qi in 0..nq {
+        for (i, s) in res.indices_for_query(qi).iter().zip(res.scores_for_query(qi)) {
+            indices.push(*i as u32);
+            scores.push(*s as f64);
+        }
+    }
+    Ok(TopKResult { indices, scores })
+}

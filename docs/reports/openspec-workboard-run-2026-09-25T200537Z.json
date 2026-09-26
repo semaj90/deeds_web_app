@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T20:05:37Z",
+  "runType": "SELECTED_GATE_PIVOT",
+  "pivot": {
+    "from": "current-scope AST/index coverage discussion",
+    "to": "large-corpus enrichment census and summary-runtime alignment",
+    "reason": "User requested a fuller inventory of the large JSONL artifacts, current EmbeddingGemma coverage, Ornith summaries, and possible daily Graphify integration."
+  },
+  "repository": {
+    "workingTreeWasDirty": true,
+    "taskLedgersEdited": false,
+    "selectedOpenSpec": null,
+    "selectedGate": "LARGE_CORPUS_ENRICHMENT_CENSUS_01"
+  },
+  "census": {
+    "status": "LARGE_CORPUS_ENRICHMENT_CENSUS_PROVEN",
+    "metadataCorpus": {
+      "path": ".tmp/mapreduce-full-v5.ndjson",
+      "bytes": 805352974,
+      "records": 5000,
+      "sha256": "9ed6d8d3e28f6b0453d75f305b67586ef9dc70cfac05b97825f6763916a42664",
+      "canonicalPacketKeys": 0,
+      "sourceRefs": 0,
+      "sourceRevisions": 0,
+      "summaries": 0
+    },
+    "embeddingCorpus": {
+      "path": "sveltekit-frontend/tmp/codebase_chunks_768-embeddings.ndjson",
+      "bytes": 739230455,
+      "records": 76261,
+      "sha256": "6474990e4914d53dfb05ed261313bba44f97b56d9de261e75941fb34ba7b9db5",
+      "dimensions": 768,
+      "sourceRefs": 76241,
+      "sourceRevisions": 0,
+      "summaries": 0
+    },
+    "canonicalEnrichmentReady": false,
+    "blocker": "CURRENT_SOURCE_IDENTITY_AND_REVISION_JOIN_REQUIRED"
+  },
+  "summaryRuntime": {
+    "requestedModel": "ornith-1.5-9b",
+    "requestedEndpoint": "llama-server :8090",
+    "existingDailySummarizer": "legacy Gemma4 route via :5173; writes summary rows to PostgreSQL",
+    "dailyGraphifyIntegrationChanged": false,
+    "reasonNotIntegrated": "Censused artifacts contain no current source text/revision binding; existing daily chain is write-capable and must not consume these stale unbound exports as canonical summary input."
+  },
+  "execution": {
+    "llmCalls": 0,
+    "datastoreWrites": 0,
+    "graphifyRuns": 0,
+    "existingDirtyPipelineModifiedByThisRun": false
+  },
+  "likely_cause": "The large exports are stale metadata and vector artifacts without current revision-qualified source text, so they cannot safely ground new summaries or daily Graphify enrichment.",
+  "evidence": [
+    "docs/reports/large-corpus-enrichment-census-v1.json",
+    "scripts/atlas/audit-large-corpus-enrichment-census-v1.mjs",
+    "scripts/atlas/summarize-indexed-packets-dual-llm.mjs",
+    "scripts/startup/run-graphify-daily-startup.mjs",
+    "sveltekit-frontend/package.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/audit-large-corpus-enrichment-census-v1.mjs",
+    "docs/reports/large-corpus-enrichment-census-v1.json",
+    "docs/reports/openspec-workboard-run-2026-09-25T200537Z.json"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-large-corpus-enrichment-census-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/audit-large-corpus-enrichment-census-v1.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T200537Z.json"
+}

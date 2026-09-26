@@ -1,0 +1,92 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T01:19:09Z",
+  "runType": "PROGRAM_PLAN_AND_CONTROLLER_READINESS_HARDENING",
+  "pivot": {
+    "from": "dependency-ordered task inventory plan",
+    "to": "canonical workboard task metadata and current-controller-backed readiness",
+    "reason": "The prior plan exposed that canonical task rows omitted explicit owner/dependency/proof slots and could label any ACTIONABLE row READY without current matching controller evidence."
+  },
+  "repository": {
+    "head": "869756d1b71df6c0afa3b9863735d2e4084a959d",
+    "workingTreeWasDirty": true,
+    "canonicalSharedWorkboardOverwritten": false,
+    "taskLedgersEdited": false,
+    "selectedOpenSpec": "parent-atlas-workboard-feature-utility-fabric"
+  },
+  "inventory": {
+    "changeCount": 88,
+    "totalTaskCount": 9512,
+    "openTaskCount": 3224,
+    "incumbentActionableOpenTaskCount": 2419,
+    "currentControllerActionableOpenTaskCount": 2176,
+    "currentControllerWaitingCount": 943,
+    "classifiedWorkPackageTaskCount": 2695,
+    "unclassifiedReviewTaskCount": 529,
+    "workPackageCount": 500,
+    "workPackagesBelowThreeTasks": 181,
+    "workPackageTargetStatus": "ABOVE_TARGET; DO_NOT_MERGE_ACROSS_OWNERS_AUTOMATICALLY",
+    "leafDependenciesDeclared": 4,
+    "leafDependenciesMissing": 3220,
+    "waveCount": 11,
+    "macroMilestoneCount": 6,
+    "waveZeroIsControlPlaneFoundation": true,
+    "declaredWaveDependencyEdges": 10,
+    "selectedTaskCount": 0,
+    "openTaskAccountingExactlyOnce": true
+  },
+  "readiness": {
+    "rule": "READY_REQUIRES_CURRENT_CONTROLLER_ROW_AND_MATCHING_TASK_BLOCK_HASH",
+    "staleOrMissingOpenControllerRows": 2,
+    "readyTasksWithoutCurrentControllerMatch": 0,
+    "schedulerSelectionRequiresReady": true,
+    "ownerScope": "OPENSPEC_CHANGE_ONLY_NOT_CANONICAL_RUNTIME_OWNER",
+    "unknownOwnerDependenciesProofRiskAndFanoutRemainNull": true
+  },
+  "artifacts": {
+    "temporaryWorkboard": {
+      "path": ".tmp/codex-openspec-workboard-v1.json",
+      "sha256": "C3DD26002A757AD5852B4E40D2A472F1F0BA5F7BF88B4DE18F6CA97C57B620AF"
+    },
+    "durableProgramJson": {
+      "path": "docs/reports/openspec-implementation-program-run-2026-09-25T011833Z.json",
+      "sha256": "A5DF2E7355DEA6E201E3164DDC472B21D8ED600A8F47578B015D203593A8FDCF"
+    },
+    "durableProgramMarkdown": "docs/reports/openspec-implementation-program-run-2026-09-25T011833Z.md"
+  },
+  "validation": {
+    "programPlannerNodeTests": "8/8 PASS",
+    "workboardContractVitest": "11/11 PASS",
+    "targetedTypeScript": "PASS; workboard contract and spec",
+    "openSpecStrict": "PASS; parent-atlas-workboard-feature-utility-fabric",
+    "scopedDiffCheck": "PASS",
+    "fullFrontendTypeScript": "INCOMPLETE_TIMED_OUT_AFTER_BOUNDED_WAIT"
+  },
+  "mutations": {
+    "datastoreWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "taskSelections": 0,
+    "commits": 0,
+    "pushes": 0,
+    "localReportArtifactsWritten": true
+  },
+  "likely_cause": "The flat workboard treated incumbent actionability as gate readiness and omitted explicit nullable authority/planning metadata from its canonical leaf rows.",
+  "evidence": [
+    "Only controller rows with a matching current task block hash can now make a task READY.",
+    "Explicit selection is rejected for any leaf whose gateState is not READY.",
+    "2,176 current-controller actionable leaves are READY; 2 open controller rows are stale/missing; selected count is zero.",
+    "All 3,224 open leaves are represented exactly once across classified packages and the separate 529-leaf review queue."
+  ],
+  "patch_targets": [
+    "scripts/atlas/lib/openspec-program-plan-v1.mjs",
+    "scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+    "scripts/atlas/build-openspec-workboard-v1.mjs",
+    "scripts/atlas/build-openspec-implementation-program-v1.mjs",
+    "sveltekit-frontend/src/lib/server/atlas/openspec-board/workboard-contract-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/openspec-board/workboard-contract-v1.spec.ts"
+  ],
+  "safe_next_command": "node scripts/atlas/build-openspec-workboard-v1.mjs .tmp/codex-openspec-workboard-v1.json .tmp/codex-openspec-workboard-v1.md",
+  "smoke_command": "cd sveltekit-frontend; $env:OPENSPEC_WORKBOARD_FIXTURE='..\\.tmp\\codex-openspec-workboard-v1.json'; npx vitest run src/lib/server/atlas/openspec-board/workboard-contract-v1.spec.ts",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T011909Z.json"
+}

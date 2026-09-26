@@ -1,0 +1,86 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T03:52:21.030Z",
+  "purpose": "Fresh full-workboard implementation-program snapshot and package-size feasibility audit; no task selection or task-ledger mutation.",
+  "source": {
+    "taskFiles": 90,
+    "totalTasks": 9555,
+    "completedTasks": 6311,
+    "openTasks": 3244,
+    "sourceHashMismatches": 0,
+    "controllerMatchedTasks": 9555,
+    "staleOrMissingControllerTasks": 0,
+    "generatedAt": "2026-09-26T03:49:18.122Z"
+  },
+  "program": {
+    "path": ".tmp/codex-openspec-live-20260925T2213Z/fresh-2226/program.json",
+    "markdownPath": ".tmp/codex-openspec-live-20260925T2213Z/fresh-2226/program.md",
+    "generatedAt": "2026-09-26T03:52:21.030Z",
+    "openTasks": 3244,
+    "workPackages": 812,
+    "reviewRequiredTasks": 0,
+    "assignedOpenTasks": 3244,
+    "duplicateAssignments": 0,
+    "missingAssignments": 0,
+    "schedulerSelectedTasks": 0,
+    "declaredDependencyTasks": 3,
+    "tasksWithoutDeclaredDependencies": 3241,
+    "dependenciesInvented": 0,
+    "programMappingsRemainProvisional": true
+  },
+  "packageFeasibility": {
+    "targetRange": [250, 400],
+    "perPackageTaskRange": [3, 12],
+    "currentBoundary": ["change owner", "program", "mutation class", "gate state"],
+    "currentPackagesAtChunkSize10": 812,
+    "minimumAt12TaskCapWithCurrentBoundaries": 781,
+    "minimumPreservingChangeOwnerAndMutationClass": 491,
+    "ownerMutationGroupsBelowThreeTasks": 132,
+    "currentPackagesBelowThreeTasks": 433,
+    "targetAchievableWithoutChangingBoundaries": false,
+    "automaticMerges": 0
+  },
+  "validation": {
+    "focusedPlannerTests": "22/22 PASS",
+    "strictOpenSpec": "PASS",
+    "nodeSyntaxChecks": "PASS",
+    "scopedDiffCheck": "PASS (line-ending warnings only)"
+  },
+  "changes": {
+    "codeFiles": [
+      "scripts/atlas/lib/openspec-program-plan-v1.mjs",
+      "scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+      "scripts/atlas/build-openspec-implementation-program-v1.mjs"
+    ],
+    "taskLedgersEdited": 0,
+    "datastoreWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "selectionChanges": 0
+  },
+  "artifacts": {
+    "workboard": {
+      "path": ".tmp/codex-openspec-live-20260925T2213Z/fresh-2226/workboard.json",
+      "bytes": 41170395,
+      "sha256": "7243e9ac5cec44a86c9fefef86494c42ee53618dd580e4391a2062ff7766fbe5"
+    },
+    "controller": {
+      "path": ".tmp/codex-openspec-live-20260925T2213Z/fresh-2226/openspec-execution-controller-v1.json",
+      "bytes": 46789368,
+      "sha256": "0ac5270cb618dca674ca8450dace6e2ba43124d21178897c62b79adb486ede4c"
+    },
+    "programJson": {
+      "bytes": 13897714,
+      "sha256": "d34e8671e674ca1bf3c45c6857df3e832c77f4f4b0d3aa1aab89d5e50b1f3d70"
+    },
+    "programMarkdown": {
+      "bytes": 1330394,
+      "sha256": "a6b72c38b071048168298ce1270bceb496a8bc99eaecaed96473a7897e321ef0"
+    }
+  },
+  "limitations": [
+    "Program-to-change mappings remain provisional; no owner review was inferred.",
+    "Package target cannot be reached while preserving the current per-change owner and single-mutation-class boundaries at a 12-task maximum; review canonical owner consolidation or revise the target explicitly.",
+    "Most leaf tasks still have no declared dependency; none were fabricated."
+  ]
+}

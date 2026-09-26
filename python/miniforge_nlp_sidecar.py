@@ -602,6 +602,10 @@ def _capabilities() -> dict[str, bool]:
 
 def _capability_report() -> dict[str, Any]:
     capabilities = _capabilities()
+    language_pairs = sorted(_AST_LANGUAGE_EXTENSIONS.items())
+    language_revision = "sha256:" + hashlib.sha256(
+        json.dumps(language_pairs, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
     return {
         "service": "parent-atlas-compute-sidecar",
         "ast": {
@@ -609,6 +613,32 @@ def _capability_report() -> dict[str, Any]:
             "available": TREESITTER_CHUNKER_AVAILABLE,
             "xref": TREESITTER_CHUNKER_AVAILABLE,
             "repositoryProcessing": TREESITTER_CHUNKER_AVAILABLE,
+            "languageVocabularies": [
+                {
+                    "sourceOwner": "python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS",
+                    "sourceRevision": language_revision,
+                    "namespace": "FILE_EXTENSION",
+                    "labels": [extension for extension, _ in language_pairs],
+                },
+                {
+                    "sourceOwner": "python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS",
+                    "sourceRevision": language_revision,
+                    "namespace": "SIDECAR_LANGUAGE",
+                    "labels": sorted({language for _, language in language_pairs}),
+                },
+            ],
+            "languageBindings": [
+                {
+                    "fromNamespace": "FILE_EXTENSION",
+                    "fromLabel": extension,
+                    "toNamespace": "SIDECAR_LANGUAGE",
+                    "toLabel": language,
+                    "authorityOwner": "python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS",
+                    "authorityRevision": language_revision,
+                    "evidenceRefs": ["python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS"],
+                }
+                for extension, language in language_pairs
+            ],
         },
         "gpu": {"available": TORCH_AVAILABLE},
         "graph": {"networkx": NETWORKX_AVAILABLE, "cugraph": CUGRAPH_AVAILABLE, "nx_cugraph": NX_CUGRAPH_AVAILABLE},

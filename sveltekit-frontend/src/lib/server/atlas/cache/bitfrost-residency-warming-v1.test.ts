@@ -1,16 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import type Redis from 'ioredis';
+import { buildAcePacketV3, type AceCacheExpectationV3, type AcePacketV3 } from '@deeds/parent-atlas';
+import { AcePacketReader } from '../../ace/ace-packet-reader.js';
+import { AcePacketWriter } from '../../ace/ace-packet-writer.js';
 import {
   MAX_HOTNESS_SNAPSHOT_TOP_N,
   buildBucketWarmPlanV1,
   buildHotnessSnapshotV1,
   computeResidencyScoreV1,
   executeBucketWarmPlanV1,
+  readAcePacketV3FromBitfrostV1,
   getOrWarmCacheAsideV1,
   getTopHeatKeysV1,
   recordHeatSignalV1,
+  writeAcePacketV3ToBitfrostV1,
   type HotArtifactV1,
 } from './bitfrost-residency-warming-v1.js';
+import {
+  buildAceBitfrostCacheKeyV1,
+  type AceBitfrostCacheIdentityV1,
+} from './ace-bitfrost-cache-identity-v1.js';
 
 /** Minimal in-memory fake covering only the ioredis surface this module uses. */
 class FakeRedis {
@@ -80,6 +89,75 @@ function makeArtifact(key: string, score: number, kind: HotArtifactV1['kind'] = 
       latencySavedMs: 0,
       byteCost: 0,
     }),
+  };
+}
+
+function makeCurrentAcePacketV3(): AcePacketV3 {
+  const sha = (char: string) => `sha256:${char.repeat(64)}`;
+  const section = <T>(
+    data: T,
+    status: 'CURRENT' | 'HINT' | 'STALE' | 'PENDING' = 'CURRENT',
+    revision: string | null = 'r1',
+  ) => ({
+    status, revision, evidence_refs: [], data,
+  });
+  return buildAcePacketV3({
+    base: {
+      packet_revision: 'packet-rev-1',
+      producer_revision: 'producer-rev-1',
+      envelope: {
+        packet_key: 'packet:cache-proof', source_ref: 'src/cache-proof.ts',
+        canonical_source_ref: 'src/cache-proof.ts', feature_id: 'feature:cache-proof',
+        source_revision: 'source-rev-1',
+      },
+      hypergraph: null,
+    },
+    identity: {
+      packet_key: 'packet:cache-proof', source_ref: 'src/cache-proof.ts',
+      workspace_revision: 'workspace-rev-1', source_revision: 'source-rev-1',
+      packet_revision: 'packet-rev-1', producer_revision: 'producer-rev-1',
+      representation_id: 'semantic_768', representation_revision: 'representation-rev-1',
+      feature_revision: 'feature-rev-1', graph_revision: 'graph-rev-1',
+      symbol_version_id: null, tree_node_id: null,
+    },
+    source: section({ language: 'typescript', source_digest: sha('a'), start_byte: null, end_byte: null, ast_state: 'REVISION_QUALIFIED' }, 'CURRENT', 'source-rev-1'),
+    semantic: section({
+      summary: section({ text: null, input_digest: null, model_revision: null }, 'PENDING', null),
+      embedding: section({
+        model: 'EmbeddingGemma', dimension: 768, input_digest: sha('b'),
+        embedding_digest: sha('c'), vector_ref: { kind: 'CANDIDATE_ORDINAL', value: '0' },
+      }, 'CURRENT', 'representation-rev-1'),
+      keywords: [], entities: [], concept_ids: [], domain_class: null,
+    }),
+    topology: section({ community_id: null, pagerank: null, som: null, kmeans_cluster: null, centroid_refs: [] }, 'CURRENT', 'graph-rev-1'),
+    residency: section({ tier: 'COLD', lod: 'IDENTITY', utility: null, prefetch_reasons: [], cache_identity_checksum: null }, 'PENDING', null),
+    evidence: section({ refs: [], contradictions: [], stale_refs: [] }),
+  });
+}
+
+function cacheIdentityForPacket(packet: AcePacketV3): AceBitfrostCacheIdentityV1 {
+  return {
+    cacheKind: 'ACE_PACKET', artifactKind: 'ace_packet_v3',
+    workspaceRevision: packet.identity.workspace_revision,
+    sourceRevision: packet.identity.source_revision,
+    packetRevision: packet.identity.packet_revision,
+    representationId: packet.identity.representation_id,
+    representationRevision: packet.identity.representation_revision!,
+    candidateSnapshotRevision: 'candidate-snapshot-1', ordinalMapChecksum: 'sha256:ordinal-map',
+    graphRevision: packet.identity.graph_revision!, featureRevision: packet.identity.feature_revision!,
+    producerRevision: packet.identity.producer_revision, normalizationPolicyRevision: 'l2-renormalize-v1',
+    artifactChecksum: packet.integrity.packet_checksum,
+  };
+}
+
+function expectationForPacket(packet: AcePacketV3): AceCacheExpectationV3 {
+  return {
+    packet_key: packet.identity.packet_key, source_ref: packet.identity.source_ref,
+    source_revision: packet.identity.source_revision, workspace_revision: packet.identity.workspace_revision,
+    representation_id: packet.identity.representation_id,
+    representation_revision: packet.identity.representation_revision,
+    feature_revision: packet.identity.feature_revision, graph_revision: packet.identity.graph_revision,
+    producer_revision: packet.identity.producer_revision, packet_checksum: packet.integrity.packet_checksum,
   };
 }
 
@@ -362,5 +440,113 @@ describe('bounded heat ZSETs', () => {
     };
     const top = await getTopHeatKeysV1(redis as unknown as Redis, 'query', 10);
     expect(top).toEqual([]);
+  });
+});
+
+describe('ACE packet v3 BitFrost cache owner', () => {
+  it('exposes the guarded v3 cache owner through the existing ACE reader and writer', async () => {
+    const redis = new FakeRedis();
+    const packet = makeCurrentAcePacketV3();
+    const cacheIdentity = cacheIdentityForPacket(packet);
+    const embedAllowedPacketKeys = new Set([packet.identity.packet_key]);
+    const writer = new AcePacketWriter();
+    const reader = new AcePacketReader();
+
+    const write = await writer.writeRevisionQualifiedV3ToBitfrost(redis as unknown as Redis, {
+      packet, cacheIdentity, embedAllowedPacketKeys,
+    });
+    expect(write.status).toBe('WRITTEN');
+    const read = await reader.readRevisionQualifiedV3FromBitfrost(redis as unknown as Redis, {
+      cacheIdentity, expected: expectationForPacket(packet), embedAllowedPacketKeys,
+    });
+    expect(read.status).toBe('HIT');
+  });
+
+  it('writes and reads only embed-admitted, fully revisioned packets through the shared identity key', async () => {
+    const redis = new FakeRedis();
+    const packet = makeCurrentAcePacketV3();
+    const cacheIdentity = cacheIdentityForPacket(packet);
+    const embedAllowedPacketKeys = new Set([packet.identity.packet_key]);
+
+    const write = await writeAcePacketV3ToBitfrostV1(redis as unknown as Redis, {
+      packet, cacheIdentity, embedAllowedPacketKeys,
+    });
+    expect(write.status).toBe('WRITTEN');
+    if (write.status !== 'WRITTEN') return;
+    expect(write.cacheKey).toContain('atlas:bitfrost:v1:ace_packet:ace_packet_v3');
+
+    const read = await readAcePacketV3FromBitfrostV1(redis as unknown as Redis, {
+      cacheIdentity, expected: expectationForPacket(packet), embedAllowedPacketKeys,
+    });
+    expect(read.status).toBe('HIT');
+    if (read.status === 'HIT') expect(read.packet.integrity.packet_checksum).toBe(packet.integrity.packet_checksum);
+  });
+
+  it('blocks unadmitted keys and invalidates stale or malformed cache entries', async () => {
+    const redis = new FakeRedis();
+    const packet = makeCurrentAcePacketV3();
+    const cacheIdentity = cacheIdentityForPacket(packet);
+    const denied = await writeAcePacketV3ToBitfrostV1(redis as unknown as Redis, {
+      packet, cacheIdentity, embedAllowedPacketKeys: new Set(),
+    });
+    expect(denied).toEqual({ status: 'BLOCKED', cacheKey: null, reason: 'PACKET_NOT_EMBED_ALLOWED' });
+    expect(redis.strings.size).toBe(0);
+
+    const key = (await writeAcePacketV3ToBitfrostV1(redis as unknown as Redis, {
+      packet, cacheIdentity, embedAllowedPacketKeys: new Set([packet.identity.packet_key]),
+    }));
+    expect(key.status).toBe('WRITTEN');
+    if (key.status !== 'WRITTEN') return;
+    redis.strings.set(key.cacheKey, '{malformed');
+    const miss = await readAcePacketV3FromBitfrostV1(redis as unknown as Redis, {
+      cacheIdentity, expected: expectationForPacket(packet),
+      embedAllowedPacketKeys: new Set([packet.identity.packet_key]),
+    });
+    expect(miss).toEqual({ status: 'MISS', cacheKey: key.cacheKey, reason: 'UNPARSEABLE' });
+  });
+
+  it('fails closed when the composed packet is only a hint or the key checksum drifts', async () => {
+    const redis = new FakeRedis();
+    const currentPacket = makeCurrentAcePacketV3();
+    const { integrity: _integrity, ...packetBody } = currentPacket;
+    const packet = buildAcePacketV3({
+      ...packetBody,
+      semantic: {
+        ...packetBody.semantic,
+        data: {
+          ...packetBody.semantic.data,
+          embedding: { ...packetBody.semantic.data.embedding, status: 'HINT' },
+        },
+      },
+    });
+    const cacheIdentity = cacheIdentityForPacket(packet);
+    const hintWrite = await writeAcePacketV3ToBitfrostV1(redis as unknown as Redis, {
+      packet, cacheIdentity,
+      embedAllowedPacketKeys: new Set([packet.identity.packet_key]),
+    });
+    expect(hintWrite).toEqual({ status: 'BLOCKED', cacheKey: null, reason: 'EMBEDDING_NOT_CURRENT' });
+
+    const wrongChecksum = { ...cacheIdentity, artifactChecksum: 'sha256:' + 'f'.repeat(64) };
+    const driftWrite = await writeAcePacketV3ToBitfrostV1(redis as unknown as Redis, {
+      packet: makeCurrentAcePacketV3(), cacheIdentity: wrongChecksum,
+      embedAllowedPacketKeys: new Set(['packet:cache-proof']),
+    });
+    expect(driftWrite).toEqual({ status: 'BLOCKED', cacheKey: null, reason: 'IDENTITY_MISMATCH:artifactChecksum' });
+    expect(redis.strings.size).toBe(0);
+  });
+
+  it('treats a packet stored under a key with a different packet revision as a cache miss', async () => {
+    const redis = new FakeRedis();
+    const packet = makeCurrentAcePacketV3();
+    const identity = { ...cacheIdentityForPacket(packet), packetRevision: 'wrong-packet-revision' };
+    const cacheKey = buildAceBitfrostCacheKeyV1(identity);
+    redis.strings.set(cacheKey, JSON.stringify(packet));
+
+    const result = await readAcePacketV3FromBitfrostV1(redis as unknown as Redis, {
+      cacheIdentity: identity,
+      expected: expectationForPacket(packet),
+      embedAllowedPacketKeys: new Set([packet.identity.packet_key]),
+    });
+    expect(result).toEqual({ status: 'MISS', cacheKey, reason: 'IDENTITY_MISMATCH:packetRevision' });
   });
 });

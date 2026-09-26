@@ -53,6 +53,20 @@ export const PROGRAM_DOMAINS = [
   ['SEMANTIC_REPRESENTATION', 'Semantic representation contracts', 'M1', 'CODE_RETRIEVAL', 'CODEBASE_PACKET', /semantic-512|semantic-768|onnx-webgpu|pca-svd/],
 ];
 
+// Program tags describe architectural function, not runtime proof or promotion readiness.
+export const PROGRAM_AUTHORITY_ROLES = Object.freeze({
+  CONTROL_PLANE: 'EVIDENCE', SOURCE_AUTHORITY: 'OWNER', PACKET_INGESTION: 'OWNER',
+  COMPILER_SYMBOLS: 'EVIDENCE', CODE_RETRIEVAL: 'EXECUTOR', EXTERNAL_DOCS: 'EVIDENCE',
+  ONTOLOGY_OKF: 'EVIDENCE', GRAPH_RETRIEVAL: 'PROJECTION', PROJECTION_EXECUTORS: 'PROJECTION',
+  FEATURE_CONTEXT: 'EVIDENCE', RANKING_RECOMMENDATION: 'POLICY', ADAPTIVE_DAG: 'POLICY',
+  PREFILL_CONTEXT: 'EVIDENCE', ACE_MEMORY: 'CACHE', RESIDENCY_RUNTIME: 'EXECUTOR',
+  LDR_VALIDATION: 'EVIDENCE', AGENT_REPAIR: 'EXECUTOR', AGENT_EXECUTION: 'EXECUTOR',
+  ORNITH_ANALYSIS: 'EXECUTOR', NATIVE_ACCELERATION: 'EXECUTOR', GPU_EXECUTORS: 'EXECUTOR',
+  GOVERNED_COMPUTE: 'POLICY', EVALUATION_LEARNING: 'POLICY', TRANSPORT_EVENTS: 'TRANSPORT',
+  SEMANTIC_REPRESENTATION: 'REPRESENTATION',
+});
+export const OWNERSHIP_ROLE_VALUES = Object.freeze(['OWNER', 'REPRESENTATION', 'EXECUTOR', 'PROJECTION', 'TRANSPORT', 'CACHE', 'POLICY', 'EVIDENCE']);
+
 // Named prerequisite gates are the dependency authority. Milestone order is organizational only.
 export const ARCHITECTURE_GATES = [
   { id: 'SOURCE_AUTHORITY_PROVEN', milestone: 'M0', corpus: 'CODEBASE_PACKET', dependsOnGateIds: [] },
@@ -75,15 +89,15 @@ export const ARCHITECTURE_GATES = [
 ];
 
 export const OWNERSHIP_BOUNDARIES = [
-  { domain: 'SOURCE_IDENTITY', authorityKind: 'OWNER', canonicalOwner: 'source authority / registry', representation: null, executor: null, transport: null },
-  { domain: 'PACKET_IDENTITY', authorityKind: 'OWNER', canonicalOwner: 'PostgreSQL packet identity owner', representation: null, executor: null, transport: null },
-  { domain: 'SEMANTIC_CODE', authorityKind: 'REPRESENTATION', canonicalOwner: 'PostgreSQL canonical rows', representation: 'semantic_768', executor: null, transport: null },
-  { domain: 'QDRANT', authorityKind: 'PROJECTION', canonicalOwner: 'PostgreSQL canonical rows', representation: null, executor: 'Qdrant', transport: null },
-  { domain: 'CUVS_CAGRA', authorityKind: 'EXECUTOR', canonicalOwner: 'PostgreSQL canonical rows', representation: null, executor: 'cuVS / CAGRA', transport: null },
-  { domain: 'NEO4J_CUGRAPH', authorityKind: 'PROJECTION', canonicalOwner: 'PostgreSQL canonical rows', representation: null, executor: 'Neo4j / cuGraph', transport: null },
-  { domain: 'ACE_BITFROST_VALKEY', authorityKind: 'CACHE_RESIDENCY', canonicalOwner: 'PostgreSQL canonical rows', representation: null, executor: 'ACE / BitFrost / Valkey', transport: null },
-  { domain: 'NATS_RABBITMQ_GRPC', authorityKind: 'TRANSPORT', canonicalOwner: 'PostgreSQL control state', representation: null, executor: null, transport: 'NATS / RabbitMQ / gRPC' },
-  { domain: 'ORNITH', authorityKind: 'SYNTHESIS_EXECUTOR', canonicalOwner: 'evidence envelope / context manifest', representation: null, executor: 'Ornith', transport: null },
+  { domain: 'SOURCE_IDENTITY', authorityKind: 'OWNER', authorityRole: 'OWNER', canonicalOwner: 'source authority / registry', representation: null, executor: null, transport: null },
+  { domain: 'PACKET_IDENTITY', authorityKind: 'OWNER', authorityRole: 'OWNER', canonicalOwner: 'PostgreSQL packet identity owner', representation: null, executor: null, transport: null },
+  { domain: 'SEMANTIC_CODE', authorityKind: 'REPRESENTATION', authorityRole: 'REPRESENTATION', canonicalOwner: 'PostgreSQL canonical rows', representation: 'semantic_768', executor: null, transport: null },
+  { domain: 'QDRANT', authorityKind: 'PROJECTION', authorityRole: 'PROJECTION', canonicalOwner: 'PostgreSQL canonical rows', representation: null, executor: 'Qdrant', transport: null },
+  { domain: 'CUVS_CAGRA', authorityKind: 'EXECUTOR', authorityRole: 'EXECUTOR', canonicalOwner: 'PostgreSQL canonical rows', representation: null, executor: 'cuVS / CAGRA', transport: null },
+  { domain: 'NEO4J_CUGRAPH', authorityKind: 'PROJECTION', authorityRole: 'PROJECTION', canonicalOwner: 'PostgreSQL canonical rows', representation: null, executor: 'Neo4j / cuGraph', transport: null },
+  { domain: 'ACE_BITFROST_VALKEY', authorityKind: 'CACHE_RESIDENCY', authorityRole: 'CACHE', canonicalOwner: 'PostgreSQL canonical rows', representation: null, executor: 'ACE / BitFrost / Valkey', transport: null },
+  { domain: 'NATS_RABBITMQ_GRPC', authorityKind: 'TRANSPORT', authorityRole: 'TRANSPORT', canonicalOwner: 'PostgreSQL control state', representation: null, executor: null, transport: 'NATS / RabbitMQ / gRPC' },
+  { domain: 'ORNITH', authorityKind: 'SYNTHESIS_EXECUTOR', authorityRole: 'EXECUTOR', canonicalOwner: 'evidence envelope / context manifest', representation: null, executor: 'Ornith', transport: null },
 ];
 
 export const EVENT_OWNERSHIP_RULES = [
@@ -126,6 +140,42 @@ export function classifyArchitectureProgram(change) {
   return { programId, programName, milestoneId, lane, corpus, classification: 'CHANGE_DOMAIN_RULE', matchedRule: pattern.source };
 }
 
+/** Change-level review aid; exposes regex collisions without changing the provisional primary mapping. */
+export function buildProgramMappingReview(tasks) {
+  const byChange = new Map();
+  for (const task of tasks.filter((row) => row.state === 'OPEN')) {
+    const rows = byChange.get(task.change) ?? [];
+    rows.push(task);
+    byChange.set(task.change, rows);
+  }
+  return [...byChange].sort(([a], [b]) => a.localeCompare(b)).map(([change, rows]) => {
+    const candidates = PROGRAM_DOMAINS.filter(([, , , , , pattern]) => pattern.test(change ?? ''))
+      .map(([programId, name, milestoneId, lane, corpus, pattern]) => ({
+        programId, name, milestoneId, lane, corpus, matchedRule: pattern.source,
+      }));
+    const provisional = classifyArchitectureProgram(change);
+    const focusedTaskDomains = Object.fromEntries([...new Set(rows.map((row) => row.program?.architecture?.programId).filter(Boolean))]
+      .sort().map((programId) => [programId, rows.filter((row) => row.program?.architecture?.programId === programId).length]));
+    return {
+      change,
+      openTaskCount: rows.length,
+      mappingStatus: 'PROVISIONAL_REQUIRES_REVIEW',
+      provisionalPrimaryProgramId: provisional.programId,
+      provisionalRule: provisional.matchedRule,
+      candidatePrograms: candidates,
+      candidateCorpora: [...new Set(candidates.map((candidate) => candidate.corpus))].sort(),
+      multipleCandidateCorpora: new Set(candidates.map((candidate) => candidate.corpus)).size > 1,
+      focusedTaskDomainCounts: focusedTaskDomains,
+      mutationClassCounts: Object.fromEntries([...new Set(rows.map((row) => row.mutationClass ?? 'UNCLASSIFIED'))].sort()
+        .map((value) => [value, rows.filter((row) => (row.mutationClass ?? 'UNCLASSIFIED') === value).length])),
+      gateStateCounts: Object.fromEntries([...new Set(rows.map((row) => row.gateState ?? 'REVIEW_REQUIRED'))].sort()
+        .map((value) => [value, rows.filter((row) => (row.gateState ?? 'REVIEW_REQUIRED') === value).length])),
+      declaredDependencyTaskCount: rows.filter((row) => (row.declaredDependencies ?? []).length > 0).length,
+      schedulerPermission: 'NOT_SELECTED',
+    };
+  });
+}
+
 export function classifyArchitectureTask(task) {
   const text = `${task.sectionSlug ?? ''} ${task.text ?? ''}`;
   const focused = [
@@ -145,51 +195,60 @@ export function classifyArchitectureTask(task) {
   return classifyArchitectureProgram(task.change);
 }
 
-export function buildArchitectureOverlay(tasks) {
+export function buildArchitectureOverlay() {
   validateArchitectureOverlay();
-  const open = tasks.filter((task) => task.state === 'OPEN');
-  const classified = open.map((task) => ({ task, classification: classifyArchitectureTask(task) }));
-  const domainPrograms = PROGRAM_DOMAINS.map(([id, name, milestoneId, lane, corpus, pattern]) => {
-    const members = classified.filter(({ classification }) => classification.programId === id);
-    return members.length ? { id, name, milestoneId, primaryLane: lane, corpus, taskCount: members.length,
-      changes: [...new Set(members.map(({ task }) => task.change))].sort(), classificationRule: pattern.source,
-      ownerScope: 'PROVISIONAL_PROGRAM_GROUP_NOT_CANONICAL_RUNTIME_OWNER', canonicalOwner: null,
-      prerequisiteGateIds: PROGRAM_GATE_REQUIREMENTS[id] ?? [], schedulerPermission: 'NOT_SELECTED' } : null;
-  }).filter(Boolean);
-  const changeGates = [...new Set(classified.map(({ task }) => task.change))].sort().map((change) => {
-    const members = classified.filter(({ task }) => task.change === change);
-    return { id: `GATE-CHANGE-${change}`, kind: 'OPENSPEC_CHANGE', change, taskCount: members.length,
-      taskKeys: members.map(({ task }) => task.taskKey), dependsOnGateIds: [], proofReceipt: null,
-      schedulerPermission: 'NOT_SELECTED', ownerScope: 'OPENSPEC_CHANGE_ONLY_NOT_CANONICAL_RUNTIME_OWNER' };
-  });
+  const programs = PROGRAM_DOMAINS.map(([id, name, milestoneId, lane, corpus, pattern]) => ({
+    id, name, milestoneId, primaryLane: lane, corpus, classificationRule: pattern.source,
+    ownerScope: 'PROGRAM_TAXONOMY_NOT_CANONICAL_RUNTIME_OWNER', canonicalOwner: null,
+    authorityRole: PROGRAM_AUTHORITY_ROLES[id], evidenceStatus: 'CURRENT',
+    evidenceScope: 'ARCHITECTURAL_CONSTRAINT_NOT_RUNTIME_CLAIM', proofReceipt: null,
+    replayRequired: false, promotionState: 'NOT_ELIGIBLE',
+    prerequisiteGateIds: PROGRAM_GATE_REQUIREMENTS[id] ?? [], schedulerPermission: 'NOT_SELECTED',
+  }));
   const architectureGates = ARCHITECTURE_GATES.map((gate) => ({ ...gate, kind: 'ARCHITECTURE_PREREQUISITE',
     proofReceipt: null, proofLevel: null, schedulerPermission: 'NOT_SELECTED', state: 'UNPROVEN_NOT_SELECTED' }));
-  const unmappedTaskKeys = classified.filter(({ classification }) => classification.programId === null).map(({ task }) => task.taskKey);
   return {
     schema: 'atlas.openspec-program-overlay.v1', authority: 'ARCHITECTURAL_CONSTRAINTS_ONLY_NOT_TASK_OR_RUNTIME_AUTHORITY',
-    milestones: PROGRAM_MILESTONES, programs: domainPrograms,
+    milestones: PROGRAM_MILESTONES, programs,
     corpora: ['CODEBASE_PACKET', 'EXTERNAL_DOCUMENT', 'CROSS_CORPUS_CONTROL'],
     lanes: ['AUTHORITY', 'LINEAGE', 'CODE_RETRIEVAL', 'DOC_RETRIEVAL', 'FEATURE_CONTEXT', 'LDR_VALIDATION', 'PROJECTION', 'EXECUTOR', 'CACHE_RESIDENCY', 'AGENT_EXECUTION', 'LEARNING', 'ACCELERATOR', 'CONTROL_PLANE', 'EVENT_PLANE'],
-    gates: [...architectureGates, ...changeGates], ownershipBoundaries: OWNERSHIP_BOUNDARIES,
+    gates: architectureGates, ownershipBoundaries: OWNERSHIP_BOUNDARIES,
+    ownershipRoleValues: OWNERSHIP_ROLE_VALUES,
     eventOwnershipRules: EVENT_OWNERSHIP_RULES,
     eventPlaneOwnership: EVENT_PLANE_OWNERSHIP,
-    corpusSeparation: { codebasePacketProgram: 'PostgreSQL packet/source authority → rg/FTS/AST → semantic_768 → graph → fusion → ACE → Ornith', externalDocumentProgram: 'canonical external pages/chunks → PostgreSQL FTS → semantic_768 → exact/HNSW → bounded acquisition → EvidenceEnvelope → ContextManifest → LDR validators → Ornith', crossCorpusDependencyInference: false },
-    taskAssignments: classified.map(({ task, classification }) => ({ taskKey: task.taskKey, change: task.change,
-      programId: classification.programId, milestoneId: classification.milestoneId, primaryLane: classification.lane,
-      corpus: classification.corpus, classification: classification.classification, matchedRule: classification.matchedRule,
-      schedulerPermission: 'NOT_SELECTED' })),
-    unmappedTaskKeys, counts: { openTasks: open.length, mappedTasks: open.length - unmappedTaskKeys.length,
-      unmappedTasks: unmappedTaskKeys.length, programCount: domainPrograms.length, architectureGateCount: architectureGates.length,
-      changeGateCount: changeGates.length, totalGateCount: architectureGates.length + changeGates.length,
-      selectedTasks: 0 },
+    corpusSeparation: {
+      codebasePacketProgram: 'PostgreSQL packet/source authority → rg/FTS/AST → semantic_768 → graph → fusion → ACE → Ornith',
+      externalDocumentProgram: 'canonical external pages/chunks → PostgreSQL FTS → semantic_768 → exact/HNSW → bounded acquisition → EvidenceEnvelope → ContextManifest → LDR validators → Ornith',
+      crossCorpusDependencyInference: false,
+      corpusIdentityRule: 'CODEBASE_PACKET != EXTERNAL_DOCUMENT; populations never share denominators by representation alone',
+    },
+    invariants: [
+      'OWNER != REPRESENTATION != EXECUTOR != TRANSPORT != CACHE',
+      'Qdrant/Neo4j/GPU IDs are projection/executor addresses, not canonical identity',
+      'Milestone and wave membership never creates a dependency edge',
+      'READY != SELECTED; completion percentage never grants scheduler permission',
+      'A work command may request mutation but cannot prove it committed',
+      'A policy/recommendation signal cannot promote itself',
+    ],
+    assignmentPolicy: 'PROGRAM_CLASSIFICATION_IS_PROVISIONAL_UNTIL_REVIEWED; THIS_OVERLAY_CONTAINS_NO_LEAF_TASK_ASSIGNMENTS',
+    counts: { programCount: programs.length, architectureGateCount: architectureGates.length, selectedTasks: 0 },
   };
 }
 
 export function validateArchitectureOverlay() {
   const gateIds = new Set(ARCHITECTURE_GATES.map((gate) => gate.id));
+  const milestoneIds = new Set(PROGRAM_MILESTONES.map((milestone) => milestone.id));
+  const corpora = new Set(['CODEBASE_PACKET', 'EXTERNAL_DOCUMENT', 'CROSS_CORPUS_CONTROL']);
   if (new Set(PROGRAM_MILESTONES.map((milestone) => milestone.id)).size !== 7) throw new Error('OVERLAY_MILESTONE_SET_INVALID');
   if (new Set(PROGRAM_DOMAINS.map(([id]) => id)).size !== PROGRAM_DOMAINS.length || PROGRAM_DOMAINS.length < 20 || PROGRAM_DOMAINS.length > 30) throw new Error('OVERLAY_PROGRAM_SET_INVALID');
+  for (const [id, , milestone, , corpus] of PROGRAM_DOMAINS) {
+    if (!milestoneIds.has(milestone)) throw new Error(`OVERLAY_UNKNOWN_PROGRAM_MILESTONE:${id}:${milestone}`);
+    if (!corpora.has(corpus)) throw new Error(`OVERLAY_UNKNOWN_PROGRAM_CORPUS:${id}:${corpus}`);
+    if (!OWNERSHIP_ROLE_VALUES.includes(PROGRAM_AUTHORITY_ROLES[id])) throw new Error(`OVERLAY_PROGRAM_ROLE_MISSING:${id}`);
+  }
   for (const gate of ARCHITECTURE_GATES) {
+    if (!milestoneIds.has(gate.milestone)) throw new Error(`OVERLAY_UNKNOWN_GATE_MILESTONE:${gate.id}`);
+    if (!corpora.has(gate.corpus)) throw new Error(`OVERLAY_UNKNOWN_GATE_CORPUS:${gate.id}`);
     if (gate.dependsOnGateIds.some((dependency) => !gateIds.has(dependency))) throw new Error(`OVERLAY_UNKNOWN_GATE_DEPENDENCY:${gate.id}`);
   }
   const visiting = new Set(); const visited = new Set();
@@ -201,9 +260,24 @@ export function validateArchitectureOverlay() {
     visiting.delete(id); visited.add(id);
   };
   for (const id of gateIds) visit(id);
-  const nonOwners = new Set(['PROJECTION', 'EXECUTOR', 'CACHE_RESIDENCY', 'TRANSPORT', 'SYNTHESIS_EXECUTOR']);
-  for (const boundary of OWNERSHIP_BOUNDARIES) {
-    if (nonOwners.has(boundary.authorityKind) && boundary.canonicalOwner === boundary.executor) throw new Error(`OVERLAY_OWNER_CATEGORY_COLLISION:${boundary.domain}`);
+  validateOwnershipBoundaries();
+  const externalCorpusProgram = PROGRAM_DOMAINS.find(([id]) => id === 'EXTERNAL_DOCS');
+  if (!externalCorpusProgram || externalCorpusProgram[4] !== 'EXTERNAL_DOCUMENT') throw new Error('OVERLAY_EXTERNAL_CORPUS_BOUNDARY_INVALID');
+  return true;
+}
+
+export function validateOwnershipBoundaries(boundaries = OWNERSHIP_BOUNDARIES) {
+  if (new Set(boundaries.map((boundary) => boundary.domain)).size !== boundaries.length) throw new Error('OVERLAY_DUPLICATE_OWNERSHIP_DOMAIN');
+  for (const boundary of boundaries) {
+    if (!OWNERSHIP_ROLE_VALUES.includes(boundary.authorityRole)) throw new Error(`OVERLAY_UNKNOWN_AUTHORITY_ROLE:${boundary.domain}`);
+    if (!boundary.canonicalOwner?.trim()) throw new Error(`OVERLAY_CANONICAL_OWNER_MISSING:${boundary.domain}`);
+    const canonical = boundary.canonicalOwner.trim().toLowerCase();
+    if ([boundary.executor, boundary.transport].filter(Boolean).some((value) => value.trim().toLowerCase() === canonical)) {
+      throw new Error(`OVERLAY_OWNER_CATEGORY_COLLISION:${boundary.domain}`);
+    }
+    if (boundary.authorityRole === 'REPRESENTATION' && !boundary.representation) throw new Error(`OVERLAY_REPRESENTATION_MISSING:${boundary.domain}`);
+    if (['EXECUTOR', 'PROJECTION', 'CACHE'].includes(boundary.authorityRole) && !boundary.executor) throw new Error(`OVERLAY_EXECUTOR_MISSING:${boundary.domain}`);
+    if (boundary.authorityRole === 'TRANSPORT' && !boundary.transport) throw new Error(`OVERLAY_TRANSPORT_MISSING:${boundary.domain}`);
   }
   return true;
 }
@@ -211,7 +285,8 @@ export function validateArchitectureOverlay() {
 export function buildProgramGates(waves = PROGRAM_WAVES, workPackages = []) {
   return waves.map((wave) => {
     const id = `GATE-WAVE-${String(wave.id).padStart(2, '0')}`;
-    const members = workPackages.filter((workPackage) => workPackage.wave === wave.id);
+    const members = workPackages.filter((workPackage) => workPackage.wave === wave.id
+      || (Array.isArray(workPackage.waveIds) && workPackage.waveIds.includes(wave.id)));
     return {
       id,
       waveId: wave.id,
@@ -219,7 +294,7 @@ export function buildProgramGates(waves = PROGRAM_WAVES, workPackages = []) {
       exitGate: wave.exitGate,
       dependsOnGateIds: wave.dependsOnWaveIds.map((dependencyId) => `GATE-WAVE-${String(dependencyId).padStart(2, '0')}`),
       workPackageIds: members.map((workPackage) => workPackage.id),
-      taskCount: members.reduce((sum, workPackage) => sum + workPackage.taskCount, 0),
+      taskCount: new Set(members.flatMap((workPackage) => workPackage.taskKeys)).size,
       proofReceipt: null,
       proofLevel: null,
       canonicalOwner: null,
@@ -236,10 +311,10 @@ export function buildProgramWorkPackages(tasks, chunkSize = 10) {
   for (const task of [...tasks].sort((a, b) => (a.program?.wave ?? 99) - (b.program?.wave ?? 99)
     || String(a.change ?? '').localeCompare(String(b.change ?? ''))
     || (a.line ?? 0) - (b.line ?? 0))) {
-    const wave = task.program?.wave ?? null;
-    if (wave == null) continue; // Unclassified leaves belong only to the separately emitted review queue.
-    const waveKey = wave == null ? 'R' : String(wave);
-    const key = `${waveKey}:${task.change ?? 'UNOWNED_CHANGE'}:${task.program?.architecture?.programId ?? 'UNMAPPED'}`;
+    const architecture = task.program?.architecture;
+    if (!architecture?.programId) continue; // Unmapped leaves are review-required, never guessed into a package.
+    const key = [task.change ?? 'UNOWNED_CHANGE', architecture.programId,
+      task.mutationClass ?? 'MUTATION_UNCLASSIFIED', task.gateState ?? 'READINESS_UNCLASSIFIED'].join(':');
     const group = buckets.get(key) ?? [];
     group.push(task);
     buckets.set(key, group);
@@ -247,18 +322,21 @@ export function buildProgramWorkPackages(tasks, chunkSize = 10) {
 
   const packages = [];
   for (const [key, members] of buckets) {
-    const [waveKey, change, domainId] = key.split(':');
-    const waveId = waveKey === 'R' ? null : Number(waveKey);
+    const [change, domainId, mutation, gateState] = key.split(':');
+    const waveIds = [...new Set(members.map((task) => task.program?.wave).filter(Number.isInteger))].sort((a, b) => a - b);
+    const waveId = waveIds.length === 1 ? waveIds[0] : null;
     const wave = waveId == null ? null : PROGRAM_WAVES.find((item) => item.id === waveId);
     for (let offset = 0; offset < members.length; offset += chunkSize) {
       const part = members.slice(offset, offset + chunkSize);
       const partNumber = String(Math.floor(offset / chunkSize) + 1).padStart(2, '0');
-      const id = `${waveId == null ? 'REVIEW' : `W${String(waveId).padStart(2, '0')}`}:${change}:${domainId}:WP${partNumber}`;
+      const id = `${domainId}:${change}:${mutation}:${gateState}:WP${partNumber}`;
       const architecture = part[0].program?.architecture;
       const item = {
         id,
         wave: waveId,
-        milestone: wave?.milestone ?? null,
+        waveIds,
+        milestone: architecture?.milestoneId ?? null,
+        milestoneId: architecture?.milestoneId ?? null,
         gateId: wave == null ? null : `GATE-WAVE-${String(waveId).padStart(2, '0')}`,
       changeGateId: `GATE-CHANGE-${change}`,
       programId: architecture?.programId ?? null,
@@ -266,6 +344,8 @@ export function buildProgramWorkPackages(tasks, chunkSize = 10) {
         primaryLane: architecture?.lane ?? null,
         secondaryLanes: [],
         corpus: architecture?.corpus ?? null,
+        mutationClass: mutation,
+        gateState,
         gate: wave?.exitGate ?? 'UNCLASSIFIED_REVIEW_REQUIRED',
         owner: change,
         ownerScope: 'OPENSPEC_CHANGE_ONLY_NOT_CANONICAL_RUNTIME_OWNER',
@@ -276,13 +356,89 @@ export function buildProgramWorkPackages(tasks, chunkSize = 10) {
         dependsOnWaveIds: wave?.dependsOnWaveIds ?? [],
         dependsOn: [],
         schedulerPermission: 'NOT_SELECTED',
-        state: waveId == null ? 'REVIEW_REQUIRED' : 'PLANNED_NOT_SELECTED',
+        state: 'PLANNED_NOT_SELECTED',
       };
       for (const task of part) task.program.workPackageKey = id;
       packages.push(item);
     }
   }
   return packages;
+}
+
+/** Report whether target package sizing is possible without relaxing ownership/readiness boundaries. */
+export function analyzeWorkPackageFeasibility(tasks, {
+  currentChunkSize = 10,
+  minimumTasksPerPackage = 3,
+  maximumTasksPerPackage = 12,
+  targetMinimumPackages = 250,
+  targetMaximumPackages = 400,
+} = {}) {
+  for (const [name, value] of Object.entries({ currentChunkSize, minimumTasksPerPackage, maximumTasksPerPackage,
+    targetMinimumPackages, targetMaximumPackages })) {
+    if (!Number.isInteger(value) || value < 1) throw new Error(`WORK_PACKAGE_FEASIBILITY_OPTION_INVALID:${name}`);
+  }
+  if (minimumTasksPerPackage > maximumTasksPerPackage || targetMinimumPackages > targetMaximumPackages) {
+    throw new Error('WORK_PACKAGE_FEASIBILITY_RANGE_INVALID');
+  }
+
+  const groups = new Map();
+  const ownerMutationGroups = new Map();
+  let reviewRequiredTaskCount = 0;
+  for (const task of tasks) {
+    const architecture = task.program?.architecture;
+    if (!architecture?.programId) {
+      reviewRequiredTaskCount += 1;
+      continue;
+    }
+    const key = [task.change ?? 'UNOWNED_CHANGE', architecture.programId,
+      task.mutationClass ?? 'MUTATION_UNCLASSIFIED', task.gateState ?? 'READINESS_UNCLASSIFIED'].join(':');
+    groups.set(key, (groups.get(key) ?? 0) + 1);
+    const ownerMutationKey = [task.change ?? 'UNOWNED_CHANGE', task.mutationClass ?? 'MUTATION_UNCLASSIFIED'].join(':');
+    ownerMutationGroups.set(ownerMutationKey, (ownerMutationGroups.get(ownerMutationKey) ?? 0) + 1);
+  }
+
+  const sizes = [...groups.values()];
+  const ownerMutationSizes = [...ownerMutationGroups.values()];
+  const currentPackageCount = sizes.reduce((sum, size) => sum + Math.ceil(size / currentChunkSize), 0);
+  const currentUndersizedPackageCount = sizes.reduce((sum, size) => {
+    const remainder = size % currentChunkSize;
+    return sum + (remainder > 0 && remainder < minimumTasksPerPackage ? 1 : 0);
+  }, 0);
+  const minimumPackageCountAtMaximumSize = sizes.reduce((sum, size) => sum + Math.ceil(size / maximumTasksPerPackage), 0);
+  const minimumPackagesPreservingChangeOwnerAndMutation = ownerMutationSizes.reduce((sum, size) => sum + Math.ceil(size / maximumTasksPerPackage), 0);
+  const ownerMutationGroupsBelowMinimum = ownerMutationSizes.filter((size) => size < minimumTasksPerPackage).length;
+  const maximumPackageCountAtMinimumSize = sizes.reduce((sum, size) => sum + Math.floor(size / minimumTasksPerPackage), 0);
+  const boundaryGroupsBelowMinimum = sizes.filter((size) => size < minimumTasksPerPackage).length;
+  const boundaryTasksInGroupsBelowMinimum = sizes.filter((size) => size < minimumTasksPerPackage).reduce((sum, size) => sum + size, 0);
+  const packageCountCanReachTarget = minimumPackageCountAtMaximumSize <= targetMaximumPackages
+    && maximumPackageCountAtMinimumSize >= targetMinimumPackages;
+
+  return {
+    scope: 'CLASSIFIED_OPEN_TASKS_ONLY',
+    boundary: ['CHANGE_OWNER', 'PRIMARY_PROGRAM', 'MUTATION_CLASS', 'GATE_STATE'],
+    groupCount: groups.size,
+    classifiedTaskCount: sizes.reduce((sum, size) => sum + size, 0),
+    reviewRequiredTaskCount,
+    currentChunkSize,
+    minimumTasksPerPackage,
+    maximumTasksPerPackage,
+    targetPackageRange: { minimum: targetMinimumPackages, maximum: targetMaximumPackages },
+    currentPackageCount,
+    currentUndersizedPackageCount,
+    minimumPackageCountAtMaximumSize,
+    minimumPackagesPreservingChangeOwnerAndMutation,
+    ownerMutationGroupsBelowMinimum,
+    targetAchievablePreservingChangeOwnerAndMutation: minimumPackagesPreservingChangeOwnerAndMutation <= targetMaximumPackages
+      && ownerMutationGroupsBelowMinimum === 0,
+    maximumPackageCountAtMinimumSize,
+    boundaryGroupsBelowMinimum,
+    boundaryTasksInGroupsBelowMinimum,
+    targetAchievableWithoutBoundaryChanges: packageCountCanReachTarget && boundaryGroupsBelowMinimum === 0,
+    boundaryChangesRequired: packageCountCanReachTarget && boundaryGroupsBelowMinimum === 0
+      ? [] : ['REVIEW_GROUPING_BOUNDARIES_WITH_OWNER; DO_NOT_MERGE_AUTOMATICALLY'],
+    dependenciesInvented: 0,
+    tasksSelected: 0,
+  };
 }
 
 export const MAPPING_STATUSES = ['PROVEN', 'PROVISIONAL', 'REVIEW_REQUIRED'];

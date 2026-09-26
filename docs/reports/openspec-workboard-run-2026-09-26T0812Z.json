@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T08:12:10Z",
+  "status": "PIVOT_SNAPSHOT_ONLY",
+  "objective": "Turn the quality-requalified 330-row CandidateOrdinal cohort into a verified artifact-only feature/MMR mechanics proof, then retain actual user-query and matrix integration as open tasks.",
+  "pivot": {
+    "fromChange": "parent-atlas-retrieval-lineage-dag-convergence",
+    "toChange": "parent-atlas-repair-candidate-feature-matrix",
+    "reason": "The exact quality-requalified hint intersection is sealed. The candidate-feature lane now has deterministic exact-cosine and MMR mechanics evidence cross-checked against the existing TurboVec N-API exact oracle.",
+    "previousRun": "docs/reports/openspec-workboard-run-2026-09-26T0809Z.json"
+  },
+  "implementation": {
+    "script": "scripts/atlas/build-legacy-summary-cosine-mmr-canary-v1.mjs",
+    "artifact": ".tmp/atlas/legacy-summary-cosine-mmr-canary-v1/20260926T081130Z/manifest.json",
+    "candidateHints": 330,
+    "cleanUnqualifiedPseudoQueries": 32,
+    "topK": 100,
+    "mmrFinalK": 20,
+    "mmrRelevanceWeights": [0.7, 0.8, 0.9, 1.0],
+    "featureRows": 3200,
+    "candidateDigestDeduplication": { "inputRows": 330, "uniqueDigests": 330, "collapsed": 0 }
+  },
+  "oracleAndReplay": {
+    "oracle": "turbovec-napi hintExactCosineTopk",
+    "rankScorePairsChecked": 3200,
+    "maxAbsoluteScoreError": 0.0000005115434691393972,
+    "nearTieRankReorders": 2,
+    "nearTieTolerance": 0.000001,
+    "deterministicTieBreak": "CandidateOrdinal ASC",
+    "twoRunFeatureRevisionEqual": true,
+    "twoRunFeatureChecksumEqual": true,
+    "twoRunQueryChecksumEqual": true
+  },
+  "diversityDiagnostics": {
+    "meanUniqueSourceRefsAt20": { "alpha_0_70": 19.031, "alpha_0_80": 18.563, "alpha_0_90": 17.406, "alpha_1_00": 16.563 },
+    "meanPairwiseRedundancy": { "alpha_0_70": 0.4066, "alpha_0_80": 0.4282, "alpha_0_90": 0.4471, "alpha_1_00": 0.4611 },
+    "gradedLabels": 0,
+    "recallMrrNdcg": "NOT_MEASURED",
+    "tokenCoverage": "NOT_MEASURED",
+    "clusterConceptMetadata": "UNAVAILABLE"
+  },
+  "validation": {
+    "summaryQualityTests": "PASS_8_OF_8",
+    "legacyCensusConservation": "PASS_40306_OF_40306",
+    "exactHintOrdinalJoin": "PASS_330_ROWS; 281_CONTAMINATED_EXCLUDED",
+    "candidateAndQueryVectors": "FINITE_UNIT_NORM",
+    "strictOpenSpecCandidateFeatureMatrix": "PASS",
+    "strictOpenSpecRetrievalLineageDagConvergence": "PASS",
+    "canonicalWrites": 0,
+    "projectionWrites": 0,
+    "cacheWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0
+  },
+  "next": [
+    "Add a separately typed legacySummaryCosine query feature to the existing CandidateFeatureRow/Snapshot contract, with HINT trust explicit and no second semantic/RRF vote; require a real frozen query input for production-shaped scoring.",
+    "Keep MMR mechanics at the ContextManifest selection boundary; wait on real query/graded labels and tokenizer coverage for quality claims.",
+    "Do not expand :8095 NLP over the corpus until the quality review's generic/mislabeled entity rejection policy and source-ref requirements are closed."
+  ],
+  "cautions": [
+    "The query vectors are clean unqualified historical summary pseudo-probes, not user queries; this proves mechanics only.",
+    "The 330 candidate summaries remain LEGACY_HINT_LINEAGE_BOUND, not CURRENT or admitted.",
+    "The 32-row NLP review caught four old-detector false negatives; the updated detector classifies them as contaminated."
+  ]
+}

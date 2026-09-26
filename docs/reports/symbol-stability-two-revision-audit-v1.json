@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.symbol-stability-two-revision-audit.v1",
+  "generatedAt": "2026-09-26T06:59:10Z",
+  "status": "INSUFFICIENT_TWO_REVISION_EVIDENCE",
+  "mode": "POSTGRES_REPEATABLE_READ_READ_ONLY",
+  "scope": "public.atlas_symbol_versions with SHA-256-shaped source_revision, joined to exact current workspace source bindings",
+  "observed": {
+    "sha256RevisionRows": 402,
+    "exactCurrentBindingRows": 208,
+    "stableSymbolAndSourceRefPairs": 402,
+    "pairsWithMultipleSha256Revisions": 0,
+    "currentDerivationMatches": 0,
+    "versionIdsWithLegacy40HexShape": 194
+  },
+  "derivationOwner": {
+    "sourcePath": "packages/parent-atlas/src/core/identity-v1.ts",
+    "formula": "symbol_version_id = sha256(stableSymbolId + NUL + sourceRevision + declarationHash + upstreamNodeId)",
+    "existingFixture": "packages/parent-atlas/test/identity-v1.test.mjs",
+    "result": "current derivation matched 0 of 402 live rows with non-null declaration_hash and upstream_node_id"
+  },
+  "conclusion": "The live rows do not contain two SHA-256 source revisions for the same stable symbol and source_ref, so they cannot prove cross-revision stable symbol identity. Current derivation also does not reproduce the observed IDs. Do not infer a migration or replace existing IDs; first reconcile the historical producer/formula and recover two exact admitted source snapshots.",
+  "writes": {
+    "postgres": 0,
+    "ddl": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "graphify": 0
+  },
+  "canonicalAuthority": false
+}

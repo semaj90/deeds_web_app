@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.legacy-summary-carry-forward-plan.v1",
+  "gate": "LEGACY_SUMMARY_CARRY_FORWARD_PLAN_01",
+  "mode": "READ_ONLY",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "repositoryId": "deeds-web-app",
+  "tally": {
+    "candidates": 553,
+    "eligible": 425,
+    "excluded": {
+      "CONTAMINATED:REASONING_LEAK": 18,
+      "CONTAMINATED:PROMPT_SCAFFOLD_LEAK": 103,
+      "CONTAMINATED:PLACEHOLDER_PATTERN": 15,
+      "CONTAMINATED:TOO_SHORT": 2,
+      "CONTAMINATED:CONTROL_TOKEN_LEAK": 15
+    },
+    "updatedDates": {
+      "Sun Sep 13": 364,
+      "Tue Aug 25": 60,
+      "Fri Aug 28": 1
+    },
+    "models": {
+      "gemma4-legal-iq4xs": 275,
+      "gemma4-legal-iq4xs-direct.gguf": 150
+    }
+  },
+  "shardPath": ".tmp/atlas/legacy-summary-carry-forward-v1/carry-forward-20260926T055323Z.ndjson",
+  "shardSha256": "sha256:baafae3a00246f2ce90ef9f1d7f2bc63ac9edbfd191647a48092568a137adf05",
+  "readOnlyGuard": {
+    "populations": {
+      "st": {
+        "before": 0,
+        "after": 0,
+        "unchanged": true
+      },
+      "sp": {
+        "before": 0,
+        "after": 0,
+        "unchanged": true
+      },
+      "se": {
+        "before": 1160,
+        "after": 1160,
+        "unchanged": true
+      }
+    },
+    "pass": true,
+    "databaseWrites": 0,
+    "modelCalls": 0
+  },
+  "semantics": "LEGACY_CARRIED = lineage-bound persisted HINT; never CURRENT; no embedding job; apply requires separate operator authorization",
+  "generatedAt": "2026-09-26T05:53:23.878Z"
+}

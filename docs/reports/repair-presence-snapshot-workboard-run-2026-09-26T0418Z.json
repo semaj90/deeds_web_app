@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.repair-presence-snapshot-workboard-run.v1",
+  "generatedAt": "2026-09-26T04:18:52.000Z",
+  "change": "parent-atlas-repair-candidate-feature-matrix",
+  "pivot": "Within the active matrix change, completed the RF-05 presence-evidence replay against its actual frozen candidate snapshot; SUM-04 remains an authorization gate and was not approached.",
+  "evidence": {
+    "focusedTest": "sveltekit-frontend/src/lib/server/retrieval/repair-feature-presence-evidence-v1.spec.ts",
+    "focusedTestsPassed": 4,
+    "workstationReplay": "scripts/atlas/prove-current-repair-candidate-feature-matrix-v1.mts",
+    "candidateCount": 15,
+    "presenceChecksum": "sha256:725f777704c846fde7a801bebb31acb07a6127a4ec3190210274758f18b350b0",
+    "deterministicReplay": true,
+    "allUnproducedFeaturesUnavailable": true,
+    "overlayPresenceCount": 0
+  },
+  "validation": {
+    "databaseWrites": 0,
+    "graphifyRuns": 0,
+    "projectionOrCacheWrites": 0
+  },
+  "limitation": "This replay proves conservative ContextManifest presence evidence only; it does not prove a live feature producer or feature availability.",
+  "reportPath": "docs/reports/current-repair-candidate-feature-matrix-v1.json"
+}

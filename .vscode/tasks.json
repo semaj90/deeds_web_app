@@ -11798,15 +11798,15 @@
       "detail": "Phase 85 P5: Dry-run feature label extraction from 18,046 atlas_packets. Verifies 100% canonical feature_id + feature_label coverage. Zero writes, safe to run on startup."
     },
     {
-      "label": "🚀 Phase 85 P6: Summary Generation (Startup Dry-Run)",
+      "label": "🚀 Phase 85 P6: Summary Generation (Manual Dry-Run)",
       "type": "shell",
-      "command": "npm run atlas:p6:rebuild:summaries:dry -- --limit=25",
+      "command": "npm run atlas:p6:rebuild:summaries:768:dry -- --limit=25",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "isBackground": true,
       "runOptions": {
-        "runOn": "folderOpen"
+        "runOn": "default"
       },
       "problemMatcher": [],
       "presentation": {

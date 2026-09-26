@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.summary-admission-writer-workboard-run.v1",
+  "generatedAt": "2026-09-26T04:16:04.000Z",
+  "change": "parent-atlas-repair-candidate-feature-matrix",
+  "pivot": "Continue SUM-02/SUM-03 code-only admission writer work in the matrix OpenSpec change; no production owner transition or database canary was attempted.",
+  "completed": [
+    "Single proposal admission kernel with ordered transaction reads and fail-closed lineage classification",
+    "Inert injected PostgreSQL repository adapter with exact binding/lineage checks and conditional summary-slot update",
+    "Provenance envelope construction; legacy summary_hash and all representation/projection columns excluded from update"
+  ],
+  "validation": {
+    "focusedTests": { "passed": 20, "failed": 0 },
+    "openspecStrict": "PASS",
+    "scopedDiffCheck": "PASS",
+    "nodeSyntax": "PASS",
+    "liveDatabaseCalls": 0,
+    "databaseWrites": 0,
+    "graphifyRuns": 0,
+    "projectionOrCacheWrites": 0
+  },
+  "openGates": [
+    "SUM-04: explicit operator approval required before 12-row database canary",
+    "SUM-05/SUM-06: summary admission to embedding path and semantic canary remain downstream",
+    "Read-only reconcile discrepancy: provenance migration SQL header says DESIGN ONLY while sidecar ledger labels it applied"
+  ],
+  "reportPath": "docs/reports/summary-admission-writer-workboard-run-2026-09-26T0416Z.json"
+}

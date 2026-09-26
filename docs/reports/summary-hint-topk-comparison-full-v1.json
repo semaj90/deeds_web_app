@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.summary-hint-topk-comparison.v1",
+  "status": "CHALLENGER_MEASURED",
+  "canonicalAuthority": false,
+  "retrievalVoteAdded": false,
+  "artifactDir": ".tmp/atlas/legacy-summary-hint-embedding-full-v1/20260926T063456Z",
+  "rows": 29219,
+  "dim": 768,
+  "queries": 200,
+  "k": 10,
+  "oracle": {
+    "residentBytesFp32": 89760768,
+    "implementation": "turbovec-napi hintExactCosineTopk (rayon, f64 accumulate)",
+    "jsReferenceAgreement": "20/20",
+    "ms": 659
+  },
+  "challengers": [
+    {
+      "bits": 2,
+      "status": "OK",
+      "recallAtK": 0.834,
+      "top1Agreement": 0.65,
+      "buildPlusSearchMs": 1116,
+      "residentBytesApprox": 5610048
+    },
+    {
+      "bits": 3,
+      "status": "OK",
+      "recallAtK": 0.8835,
+      "top1Agreement": 0.7,
+      "buildPlusSearchMs": 1432,
+      "residentBytesApprox": 8415072
+    },
+    {
+      "bits": 4,
+      "status": "OK",
+      "recallAtK": 0.93,
+      "top1Agreement": 0.745,
+      "buildPlusSearchMs": 2128,
+      "residentBytesApprox": 11220096
+    }
+  ],
+  "caveat": "Unlabelled artifact set; measures quantization fidelity vs exact cosine, not relevance. Queries are rows of the same set (self dropped).",
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0,
+  "generatedAt": "2026-09-26T06:40:31.606Z"
+}

@@ -1,11 +1,14 @@
 import {
   adaptHyperRagFirstStageHits,
+  attachHypergraphEvidenceToAcePacketV3,
   runHypergraphFusionFacade,
   type AceHypergraphPayloadV1,
+  type AcePacketV3,
   type FeatureIntelligenceRepository,
   type HypergraphFusionFacadeResult,
   type HyperRagFirstStageHitV1,
   type QueryEvidenceExpectationV1,
+  verifyAcePacketV3,
 } from '@deeds/parent-atlas';
 
 export type HyperRagFusionRuntimePacketV1 = {
@@ -133,6 +136,72 @@ export async function runHyperRagFusionRuntimeV1(
       acePayloads: [],
       facade: null,
       reason: error instanceof Error ? error.message : 'HYPERRAG_FUSION_UNAVAILABLE',
+    };
+  }
+}
+
+/**
+ * Compose bounded HyperRAG evidence into one verified ACE v3 packet using the
+ * existing retrieval facade. This is a pure composition boundary: the caller
+ * supplies an already-canonical packet and repository adapter; this function
+ * neither discovers candidates nor persists the result.
+ */
+export async function enrichAcePacketV3WithHyperRagV1(input: {
+  packet: AcePacketV3;
+  queryId: string;
+  producerRevision: string;
+  repository: FeatureIntelligenceRepository;
+  expectation?: QueryEvidenceExpectationV1;
+  relationshipTypes?: readonly string[];
+  maximumHopCount?: 0 | 1 | 2;
+  fanoutLimit?: number;
+  score?: number;
+}): Promise<HyperRagFusionRuntimeResultV1 & { packet: AcePacketV3 }> {
+  const packet = verifyAcePacketV3(input.packet);
+  if (packet.base.hypergraph !== null) {
+    return {
+      status: 'UNAVAILABLE', acceptedCandidateCount: 0, rejectedCandidateCount: 1,
+      acePayloads: [], facade: null, packet, reason: 'ACE3_HYPERGRAPH_ALREADY_PRESENT',
+    };
+  }
+
+  const result = await runHyperRagFusionRuntimeV1({
+    queryId: input.queryId,
+    workspaceRevision: packet.identity.workspace_revision,
+    producerRevision: input.producerRevision,
+    repository: input.repository,
+    expectation: input.expectation,
+    relationshipTypes: input.relationshipTypes,
+    maximumHopCount: input.maximumHopCount,
+    fanoutLimit: input.fanoutLimit,
+    packets: [{
+      packet_key: packet.identity.packet_key,
+      source_ref: packet.identity.source_ref,
+      feature_id: packet.base.envelope.feature_id,
+      workspace_revision: packet.identity.workspace_revision,
+      identity_status: 'canonical',
+      score: input.score,
+    }],
+  });
+
+  if (result.status !== 'ENRICHED') return { ...result, packet };
+  const matching = result.acePayloads.filter((payload) =>
+    payload.packet_key === packet.identity.packet_key
+    && payload.source_ref === packet.identity.source_ref
+    && (payload.feature_id ?? null) === (packet.base.envelope.feature_id ?? null)
+    && payload.lineage.source_snapshot_revision === packet.identity.workspace_revision);
+  if (matching.length !== 1) {
+    return {
+      ...result, status: 'UNAVAILABLE', acePayloads: [], packet,
+      reason: 'ACE3_HYPERGRAPH_EXACT_PACKET_PAYLOAD_REQUIRED',
+    };
+  }
+  try {
+    return { ...result, packet: attachHypergraphEvidenceToAcePacketV3(packet, matching[0]) };
+  } catch (error) {
+    return {
+      ...result, status: 'UNAVAILABLE', acePayloads: [], packet,
+      reason: error instanceof Error ? error.message : 'ACE3_HYPERGRAPH_COMPOSITION_FAILED',
     };
   }
 }

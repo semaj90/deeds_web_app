@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T08:03:45Z",
+  "status": "PIVOT_SNAPSHOT_ONLY",
+  "objective": "Requalify legacy summary HINTs against the corrected shared contamination detector, then return to the CandidateFeatureMatrix downstream alignment gate.",
+  "pivot": {
+    "fromChange": "parent-atlas-repair-candidate-feature-matrix",
+    "detectorAndCensusGate": "parent-atlas-retrieval-lineage-dag-convergence",
+    "nextChange": "parent-atlas-repair-candidate-feature-matrix",
+    "reason": "The 32-row NLP quality review exposed four false negatives in the old shared detector. A regression fix required rerunning the full read-only PostgreSQL legacy-summary census before using the earlier 425-row hint alignment; the resulting current intersection is 330, not 425.",
+    "priorSnapshot": "docs/reports/openspec-workboard-run-2026-09-26T0754Z.json"
+  },
+  "implemented": [
+    {
+      "path": "scripts/atlas/lib/summary-quality-v1.mjs",
+      "result": "Shared fail-closed detector now catches underscored Gemma turn-control markers, self-correction/refinement text, and echoed summary instructions. No historical text was modified."
+    },
+    {
+      "path": "docs/reports/legacy-summary-census-v1-20260926T0800Z.json",
+      "result": "Read-only repeatable-read PostgreSQL census of 40,306 legacy summaries; 40,306 classified, state unchanged. 952 contaminated, 10,416 quarantined, 28,608 clean unqualified HINT, 330 clean lineage-bound HINT."
+    },
+    {
+      "path": ".tmp/atlas/legacy-summary-hint-ordinal-join-v1/20260926T080239Z/manifest.json",
+      "result": "29,219 vector-index rows reconcile; exact current HINT-to-CandidateOrdinal intersection is 330; 28,608 unqualified and 281 newly detected contaminated vectors are excluded; zero identity mismatch or bound row missing an ordinal."
+    },
+    {
+      "path": "docs/reports/summary-nlp-hint-quality-review-v2.json",
+      "result": "32 NLP proposals reconciled to exact census inputs; 38/38 spans exact, 0 duplicate spans, 4/32 detector false negatives identified and caught by the updated detector, 20 generic/mislabeled entities, 9 low-information entities, 31 sourceRef-missing rows, only 1 lineage-bound. Expansion is blocked pending entity quality rules."
+    }
+  ],
+  "validation": {
+    "summaryQualityFocusedTests": "PASS_8_OF_8",
+    "legacyCensusConservation": "PASS_40306_OF_40306",
+    "legacyCensusReadOnlyStateGuard": "PASS",
+    "hintVectorIndexAndF32Checksums": "PASS",
+    "candidateOrdinalAlignment": "PASS_330_EXACT_ROWS",
+    "databaseWrites": 0,
+    "modelCalls": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0,
+    "containerRebuild": false
+  },
+  "next": [
+    "Build the query-bound legacy_summary_cosine feature replay against only the frozen 330-row HINT intersection; keep it a feature artifact, not a second semantic vote.",
+    "Run an artifact-only MMR mechanics canary only after the query pool is frozen; retain graded relevance metrics as NOT_MEASURED until labels exist.",
+    "Keep the 32-row :8095 NLP lane blocked from expansion until span-grounded usefulness/rejection labels and source-ref requirements are specified."
+  ],
+  "cautions": [
+    "Do not consume the earlier 425-row hint crosswalk as clean under the new detector; it is retained as historical evidence only.",
+    "The 330 lineage-bound legacy summaries remain HINT, not CURRENT or admitted summaries.",
+    "No canonical PostgreSQL summary or vector fields, Qdrant, Valkey, RabbitMQ, or Graphify state was changed."
+  ]
+}

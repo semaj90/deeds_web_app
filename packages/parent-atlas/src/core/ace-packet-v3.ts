@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { aceCanonicalEnvelopeProjectionSchema } from './ace-packet-v2.js';
-import { aceHypergraphPayloadSchema } from './ace-hypergraph-payload.js';
+import { aceHypergraphPayloadSchema, type AceHypergraphPayloadV1 } from './ace-hypergraph-payload.js';
+import { lspResolvedStructuralReferenceSchema } from './lsp-semantic-observation.js';
+import { structuralReferenceFactSchema, structuralSymbolNominationSchema } from './structural-symbol.js';
 import { sha256HexV1 } from './knowledge/stable-json-v1.js';
 
 /**
@@ -109,6 +111,30 @@ const residencyData = z.object({
   cache_identity_checksum: sha256Prefixed.nullable(),
 }).strict();
 
+/**
+ * Structural facts from the existing owners (tree-sitter chunker structure + ast-grep observations). Deterministic
+ * evidence only: no identity is minted here (symbol/tree-node identity stays in identity.*). Optional so sealed
+ * packets composed before this section existed keep their checksum.
+ */
+const structuralData = z.object({
+  provider: z.string().min(1).nullable(),
+  provider_revision: revision.nullable(),
+  symbols: z.array(z.object({
+    name: z.string().min(1),
+    kind: z.string().min(1),
+    byte_start: z.number().int().nonnegative(),
+    byte_end: z.number().int().nonnegative(),
+  }).strict().refine((s) => s.byte_end > s.byte_start, { message: 'byte_end must be > byte_start' })),
+  imports: z.array(z.string().min(1)),
+  calls: z.array(z.string().min(1)),
+  exports: z.array(z.string().min(1)),
+  ast_grep_rule_ids: z.array(z.string().min(1)),
+  structural_fact_refs: z.array(z.string().min(1)),
+  symbol_nominations: z.array(structuralSymbolNominationSchema).optional(),
+  reference_facts: z.array(structuralReferenceFactSchema).optional(),
+  lsp_references: z.array(lspResolvedStructuralReferenceSchema).optional(),
+}).strict();
+
 const evidenceData = z.object({
   refs: z.array(z.string().min(1)),
   contradictions: z.array(z.string().min(1)),
@@ -144,6 +170,7 @@ const acePacketV3Body = z.object({
   topology: section(topologyData),
   residency: section(residencyData),
   evidence: section(evidenceData),
+  structural: section(structuralData).optional(),
 }).strict();
 
 function refine(value: z.infer<typeof acePacketV3Body>, ctx: z.RefinementCtx) {
@@ -162,6 +189,7 @@ function refine(value: z.infer<typeof acePacketV3Body>, ctx: z.RefinementCtx) {
   }
   const summary = value.semantic.data.summary;
   if (summary.status === 'CURRENT' && (!summary.data.text || !summary.data.input_digest)) add('a CURRENT summary needs text and input_digest', ['semantic', 'data', 'summary', 'data']);
+  if (value.structural?.status === 'CURRENT' && value.structural.data.provider_revision === null) add('a CURRENT structural section needs data.provider_revision', ['structural', 'data', 'provider_revision']);
   if (value.topology.status === 'CURRENT') {
     if (value.identity.graph_revision === null && value.identity.representation_revision === null) add('CURRENT topology needs identity.graph_revision or identity.representation_revision', ['identity']);
     for (const [i, ref] of value.topology.data.centroid_refs.entries()) {
@@ -186,6 +214,38 @@ export type AcePacketV3BodyInput = z.input<typeof acePacketV3BodySchema>;
 export function buildAcePacketV3(input: AcePacketV3BodyInput): AcePacketV3 {
   const body = acePacketV3BodySchema.parse({ ...input, schema: 'atlas.ace-packet.v3' });
   return acePacketV3Schema.parse({ ...body, integrity: { packet_checksum: `sha256:${sha256HexV1(body)}` } });
+}
+
+/**
+ * Compose query-scoped, bounded HyperGraphRAG evidence onto an existing v3
+ * packet. This does not run retrieval or persist the result. The snapshot and
+ * canonical packet identity must match exactly; the packet is then resealed.
+ */
+export function attachHypergraphEvidenceToAcePacketV3(
+  packetInput: unknown,
+  hypergraphInput: unknown,
+): AcePacketV3 {
+  const packet = verifyAcePacketV3(packetInput);
+  const hypergraph = aceHypergraphPayloadSchema.parse(hypergraphInput) as AceHypergraphPayloadV1;
+
+  if (packet.identity.packet_key !== hypergraph.packet_key) {
+    throw new Error('ACE3_HYPERGRAPH_PACKET_KEY_MISMATCH');
+  }
+  if (packet.identity.source_ref !== hypergraph.source_ref) {
+    throw new Error('ACE3_HYPERGRAPH_SOURCE_REF_MISMATCH');
+  }
+  if ((packet.base.envelope.feature_id ?? null) !== (hypergraph.feature_id ?? null)) {
+    throw new Error('ACE3_HYPERGRAPH_FEATURE_ID_MISMATCH');
+  }
+  if (packet.identity.workspace_revision !== hypergraph.lineage.source_snapshot_revision) {
+    throw new Error('ACE3_HYPERGRAPH_WORKSPACE_REVISION_MISMATCH');
+  }
+
+  const { integrity: _integrity, ...body } = packet;
+  return buildAcePacketV3({
+    ...body,
+    base: { ...body.base, hypergraph },
+  });
 }
 
 /** Re-parses a stored packet and recomputes its checksum. Any mismatch throws; callers treat that as a cache MISS. */

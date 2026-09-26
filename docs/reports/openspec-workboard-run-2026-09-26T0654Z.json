@@ -1,0 +1,76 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T06:54:30.362Z",
+  "purpose": "Refreshed repository-wide OpenSpec inventory after the full legacy HINT vector and exact CSR graph artifacts; records pivot from corpus fanout experiments to dependency-ordered open work.",
+  "pivot": {
+    "from": "parent-atlas-repair-candidate-feature-matrix summary census/vector/TurboVec fanout",
+    "to": "repository-wide OpenSpec work program, with source identity and lineage as the Q0 critical spine",
+    "selectedTasks": 0,
+    "reason": "29,219 legacy HINT vectors and a 467,504-edge exact CSR challenger graph are now locally sealed. They do not prove current identity or relevance and must not displace unresolved source-authority dependencies.",
+    "taskLedgerFilesEdited": ["openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md"]
+  },
+  "source": {
+    "changes": 88,
+    "taskLedgerFiles": 90,
+    "totalTasks": 9556,
+    "completedTasks": 6319,
+    "openTasks": 3237,
+    "actionableTasks": 2426,
+    "waitingTasks": 759,
+    "supersededTasks": 50,
+    "sourceHashesRecorded": true,
+    "controllerMatchedTaskCount": 9556,
+    "workboardPath": ".tmp/codex-openspec-live-20260926T065500Z/workboard-v1.json"
+  },
+  "controller": {
+    "path": ".tmp/codex-openspec-live-20260926T065500Z/controller-output/openspec-execution-controller-v1.json",
+    "generatedAt": "2026-09-26T06:54:26.154Z",
+    "totalTasks": 9556,
+    "proven": 6321,
+    "actionable": 2180,
+    "waiting": 953,
+    "deferred": 102,
+    "writesPerformed": false,
+    "blockerGroups": {
+      "DECLARED_TASK_DEPENDENCY": 574,
+      "CANONICAL_AUTHORIZATION": 217,
+      "PACKET_MATERIALIZATION": 17,
+      "CURRENT_SOURCE_AUTHORITY": 111,
+      "CANDIDATE_POPULATION_FREEZE": 34
+    }
+  },
+  "program": {
+    "path": ".tmp/codex-openspec-live-20260926T065500Z/implementation-program-v1.json",
+    "markdownPath": ".tmp/codex-openspec-live-20260926T065500Z/implementation-program-v1.md",
+    "openTasks": 3237,
+    "accountedOpenTasks": 3237,
+    "workPackages": 811,
+    "duplicateAssignments": 0,
+    "missingAssignments": 0,
+    "schedulerSelectedTasks": 0,
+    "declaredDependencyTasks": 3,
+    "openTasksWithoutDeclaredDependencies": 3234,
+    "programMappingsProvisional": 3237,
+    "automaticDependencyEdgesInvented": 0
+  },
+  "evidence": {
+    "summaryHintVectors": ".tmp/atlas/legacy-summary-hint-vectors-v1/legacy-full-20260926-a/manifest.json",
+    "independentF32Parity": "29,219/29,219 identity/class/text-digest/vector-digest matches against the concurrently discovered F32LE artifact; no third embedding run needed",
+    "summaryHintGraph": ".tmp/atlas/summary-hint-knn-csr-v1/legacy-hint-exact-knn-20260926-a/manifest.json",
+    "accelerator": "WSL sees RTX 3060 Ti; torch/cuVS/cuGraph/CuPy unavailable, no package installation"
+  },
+  "nextWorkPolicy": {
+    "Q0": "continue current source/repository identity and packet/chunk lineage gates",
+    "Q1_Q2": "parallelize independent code-only contracts and read-only validation only when mutable owners do not overlap",
+    "Q3": "keep hint graph/TurboVec/cuVS/CAGRA as challengers until labels, parity, and canonical identity exist",
+    "authorizationRequired": "do not execute DB/DDL/cache/projection writes or production Graphify based on READY classification",
+    "containers": "defer rebuilds until final integration stage"
+  },
+  "validation": {
+    "strictOpenSpec": "PASS",
+    "summaryCensusTests": "5/5 PASS",
+    "workboardAccounting": "9556/9556, exactly once",
+    "programAccounting": "3237/3237, zero duplicate or missing assignments",
+    "writesPerformed": false
+  }
+}

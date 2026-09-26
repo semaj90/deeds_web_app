@@ -29,13 +29,14 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { loadStableFileBackfillClassifierModuleV1 } from './lib/load-stable-file-backfill-classifier-v1.mjs';
 
 const require = createRequire(import.meta.url);
 const { Pool } = require('pg');
 
 const root = path.resolve(import.meta.dirname, '../..');
-const reportPath = path.join(root, 'docs/reports/current-packet-chunk-lineage-bridge-v1.json');
 const currentnessPath = path.join(root, 'docs/reports/promotion-gate-receipt-currentness-v1.json');
+const namespacePreviewPath = path.join(root, 'docs/reports/stable-file-population-preview-v1.json');
 
 const clean = (value) => String(value ?? '').trim();
 const normalizePath = (value) => clean(value).replaceAll('\\', '/').replace(/^\.\//, '').replace(/^\/+/, '');
@@ -45,6 +46,15 @@ const arg = (name) => {
   const index = process.argv.indexOf(name);
   return index >= 0 ? process.argv[index + 1] : undefined;
 };
+const reportOverride = arg('--report-path');
+const reportPath = reportOverride
+  ? path.resolve(root, reportOverride)
+  : path.join(root, 'docs/reports/current-packet-chunk-lineage-bridge-v1.json');
+if (reportOverride) {
+  const scratchRoot = path.resolve(root, '.tmp', 'atlas') + path.sep;
+  if (!reportPath.startsWith(scratchRoot)) throw new Error('REPORT_OVERRIDE_MUST_BE_UNDER_TMP_ATLAS');
+  if (fs.existsSync(reportPath)) throw new Error('IMMUTABLE_REPORT_ALREADY_EXISTS');
+}
 const membershipIdentity = (row) => `${clean(row.repository_id)}:${normalizePath(row.repository_relative_path)}`;
 const bindingKey = (repositoryId, sourceRef) => `${clean(repositoryId)}\0${normalizePath(sourceRef)}`;
 const lineageKey = (sourceRef, sourceRevision) => `${normalizePath(sourceRef)}\0${clean(sourceRevision)}`;
@@ -60,10 +70,28 @@ const setChecksum = (rows) => `sha256:${sha256(rows.map((row) => stableJson(row)
 const selected = fs.existsSync(currentnessPath)
   ? JSON.parse(fs.readFileSync(currentnessPath, 'utf8'))
   : {};
+const namespacePreview = JSON.parse(fs.readFileSync(namespacePreviewPath, 'utf8'));
+if (namespacePreview.status !== 'STABLE_FILE_POPULATION_PREVIEW_READY'
+  || namespacePreview.readOnly !== true
+  || namespacePreview.databaseWrites !== 0) {
+  throw new Error('STABLE_FILE_NAMESPACE_PREVIEW_NOT_ADMITTED');
+}
+const stableFileCounts = namespacePreview.liveDbContext?.stableFileTableCountsAtRunTime ?? {};
+if (Object.values(stableFileCounts).some((count) => Number(count) !== 0)) {
+  throw new Error('STABLE_FILE_CLASSIFIER_CONTEXT_REQUIRES_REFRESH');
+}
+const stableFileClassifier = await loadStableFileBackfillClassifierModuleV1();
+const repositoryBridge = namespacePreview.liveDbContext?.graphifyToSourceAuthorityRepoIdBridge;
+if (!repositoryBridge || typeof repositoryBridge !== 'object') {
+  throw new Error('STABLE_FILE_REPOSITORY_NAMESPACE_BRIDGE_MISSING');
+}
 const executionId = arg('--execution-id') ?? selected.admittedExecutionId ?? null;
 const workspaceRevision = arg('--workspace-revision') ?? selected.admittedWorkspaceRevision ?? null;
 if (!executionId || !workspaceRevision) {
   throw new Error('CURRENT_PACKET_CHUNK_LINEAGE_EXECUTION_OR_WORKSPACE_REVISION_MISSING');
+}
+if (namespacePreview.authority?.admittedWorkspaceRevision !== workspaceRevision) {
+  throw new Error('STABLE_FILE_NAMESPACE_PREVIEW_WORKSPACE_REVISION_MISMATCH');
 }
 
 const pool = new Pool({
@@ -254,13 +282,38 @@ const rows = members.map((member) => {
   const identity = membershipIdentity(member);
   const repositoryId = clean(member.repository_id);
   const sourceRef = normalizePath(member.source_ref);
+  const repositoryRelativePath = normalizePath(member.repository_relative_path);
   const sourceRevision = clean(member.code_source_revision);
   const sourceDigest = normalizeDigest(member.content_hash);
   const workspaceMatches = clean(member.workspace_revision) === clean(workspaceRevision);
+  const namespaceResult = stableFileClassifier.classifyStableFileBackfillCandidateV1({
+    sourceRef,
+    repositoryId,
+    repositoryRelativePath,
+    sourceRevision,
+    contentDigest: sourceDigest,
+    byteLength: Number(member.byte_length),
+  }, {
+    sourceAuthorityRepoIdForGraphifyRepo: (graphifyRepositoryId) => repositoryBridge[graphifyRepositoryId] ?? null,
+    admittedBindingFor: (sourceAuthorityRepoId, canonicalSourceRef) => {
+      const candidate = (bindingRowsByKey.get(bindingKey(sourceAuthorityRepoId, canonicalSourceRef)) ?? [])[0];
+      return candidate ? {
+        source_revision: clean(candidate.source_revision),
+        content_digest: normalizeDigest(candidate.content_digest),
+        workspace_revision: clean(candidate.workspace_revision),
+      } : null;
+    },
+    activeStableFileExistsFor: () => false,
+    provenMoveEvidenceFor: () => false,
+  });
+  const sourceAuthorityRepoId = namespaceResult.sourceAuthorityRepoId;
+  const namespaceAdmitted = namespaceResult.classification === 'SAFE_NEW_ID';
   const refOwners = selectedSourceRefOwners.get(sourceRef) ?? new Set();
   const sourceRefAmbiguousAcrossSelectedRepositories = refOwners.size > 1;
 
-  const exactBindingRows = bindingRowsByKey.get(bindingKey(repositoryId, sourceRef)) ?? [];
+  const exactBindingRows = sourceAuthorityRepoId
+    ? bindingRowsByKey.get(bindingKey(sourceAuthorityRepoId, sourceRef)) ?? []
+    : [];
   const sourceRefBindingRows = bindingRowsBySourceRef.get(sourceRef) ?? [];
   const bindingSignatures = distinctBindingSignatures(exactBindingRows);
   const binding = exactBindingRows[0] ?? null;
@@ -303,6 +356,8 @@ const rows = members.map((member) => {
 
   let classification = 'EXACT_CURRENT_PACKET_CHUNK_BRIDGE';
   if (!workspaceMatches) classification = 'WORKSPACE_REVISION_MISMATCH';
+  else if (!sourceAuthorityRepoId) classification = 'REPOSITORY_NAMESPACE_MISSING';
+  else if (!namespaceAdmitted) classification = `NAMESPACE_BRIDGE_${namespaceResult.classification}`;
   else if (sourceRefAmbiguousAcrossSelectedRepositories) classification = 'SOURCE_REF_AMBIGUOUS_ACROSS_SELECTED_REPOSITORIES';
   else if (bindingAmbiguous) classification = 'CURRENT_SOURCE_BINDING_AMBIGUOUS';
   else if (!binding && bindingRepositoryMismatch) classification = 'CURRENT_SOURCE_BINDING_REPOSITORY_MISMATCH';
@@ -321,7 +376,19 @@ const rows = members.map((member) => {
   return {
     identity,
     repositoryId,
-    repositoryRelativePath: normalizePath(member.repository_relative_path),
+    sourceAuthorityRepoId,
+    repositoryNamespaceBridge: sourceAuthorityRepoId ? {
+      graphifyRepositoryId: repositoryId,
+      sourceAuthorityRepoId,
+      workspaceRevision: clean(member.workspace_revision),
+      mappingSource: 'STABLE_FILE_BACKFILL_CLASSIFIER_V1',
+      mappingStatus: namespaceAdmitted ? 'ADMITTED' : namespaceResult.classification,
+      evidenceRefs: ['docs/reports/stable-file-population-preview-v1.json', 'docs/reports/current-source-authority-cohort-v1.json'],
+      canonicalRepositoryId: null,
+      canonicalAuthority: false,
+    } : null,
+    namespaceClassification: namespaceResult.classification,
+    repositoryRelativePath,
     sourceRef,
     workspaceRevision: clean(member.workspace_revision) || null,
     sourceRevision: sourceRevision || null,
@@ -351,6 +418,33 @@ const classificationCounts = Object.fromEntries(
     .sort()
     .map((classification) => [classification, rows.filter((row) => row.classification === classification).length]),
 );
+
+// Preserve the full-cohort explanation for partial joins without emitting tens of thousands
+// of row payloads. This distinguishes absent lineage from present chunks that have not yet
+// acquired exact revision-qualified packet/chunk lineage.
+const classificationDiagnostics = {};
+for (const row of rows) {
+  const key = `${row.repositoryId}\0${row.classification}`;
+  const diagnostic = classificationDiagnostics[key] ??= {
+    repositoryId: row.repositoryId,
+    classification: row.classification,
+    rows: 0,
+    exactBindingRows: 0,
+    sourceRefsWithPhysicalChunks: 0,
+    physicalChunkRowsByExactSourceRef: {},
+    provenLineageAtOtherRevisions: 0,
+    sourceRevisionMismatches: 0,
+    contentDigestMismatches: 0,
+  };
+  diagnostic.rows += 1;
+  diagnostic.exactBindingRows += row.exactBindingRowCount > 0 ? 1 : 0;
+  diagnostic.sourceRefsWithPhysicalChunks += row.observedPhysicalChunkRowsByExactSourceRef > 0 ? 1 : 0;
+  diagnostic.physicalChunkRowsByExactSourceRef[row.observedPhysicalChunkRowsByExactSourceRef] =
+    (diagnostic.physicalChunkRowsByExactSourceRef[row.observedPhysicalChunkRowsByExactSourceRef] ?? 0) + 1;
+  diagnostic.provenLineageAtOtherRevisions += row.provenLineageRowsAtOtherRevisions > 0 ? 1 : 0;
+  diagnostic.sourceRevisionMismatches += row.exactBindingRowCount > 0 && !row.bindingRevisionMatches ? 1 : 0;
+  diagnostic.contentDigestMismatches += row.exactBindingRowCount > 0 && !row.bindingDigestMatches ? 1 : 0;
+}
 
 const exactRows = rows.filter((row) => row.classification === 'EXACT_CURRENT_PACKET_CHUNK_BRIDGE');
 const workspaceRevisionMismatches = rows.filter((row) => row.classification === 'WORKSPACE_REVISION_MISMATCH').length;
@@ -424,12 +518,22 @@ const report = {
   selectedWorkspaceRevision: workspaceRevision,
   execution,
   identityContract: {
-    selectedSource: 'repository_id + repository_relative_path',
+    selectedSource: 'Graphify repository_id + repository_relative_path; source binding lookup first resolves repository_id through the admitted StableFileBackfillClassifierV1 bridge',
     currentSourceBinding: 'repo_id + canonical_source_ref + workspace_revision with exact source_revision/content_digest parity',
     packetChunkLineage: "source_ref + source_revision where revision_status='PROVEN'",
     physicalChunk: 'atlas_packet_chunk_lineage.chunk_row_id = codebase_chunk_index.id',
     canonicalChunk: 'atlas_packet_chunk_lineage.canonical_chunk_id must equal codebase_chunk_index.chunk_id',
     packet: 'atlas_packet_chunk_lineage.packet_key -> atlas_packets.packet_key; optional exact alias resolution only',
+  },
+  repositoryNamespaceBridge: {
+    schema: 'atlas.repository-namespace-bridge.v1',
+    graphifyRepositoryToSourceAuthority: repositoryBridge,
+    mappingSource: 'STABLE_FILE_BACKFILL_CLASSIFIER_V1',
+    mappingStatus: 'PER_ROW_CLASSIFIED_AGAINST_ADMITTED_SOURCE_BINDING',
+    evidenceRefs: ['docs/reports/stable-file-population-preview-v1.json', 'docs/reports/current-source-authority-cohort-v1.json'],
+    canonicalRepositoryIdentityAvailable: false,
+    canonicalAuthority: false,
+    unresolvedGraphifyRepositories: Object.keys(namespacePreview.bySourceRepository ?? {}).filter((repositoryId) => !repositoryBridge[repositoryId]).sort(),
   },
   hashGrain: {
     selectedSourceContentHash: 'WHOLE_SOURCE_BYTES',
@@ -444,16 +548,24 @@ const report = {
     basenameJoinAllowed: false,
     inferredRevisionAllowed: false,
     qdrantPointIdAllowedAsCanonicalBridge: false,
+    graphifyToSourceAuthorityRepositoryMappingIsPersistedCanonicalIdentity: false,
+    repositoryIdentityMinted: false,
   },
   counts,
   classificationCounts,
+  classificationDiagnostics: Object.values(classificationDiagnostics)
+    .sort((a, b) => a.repositoryId.localeCompare(b.repositoryId) || a.classification.localeCompare(b.classification)),
   checksums: {
     selectedMembershipChecksum: membershipChecksum,
     provenLineageCandidateChecksum: bridgedLineageChecksum,
   },
   rows: rows.slice(0, 2000),
   rowsTruncated: rows.length > 2000,
-  unresolvedSamples: rows.filter((row) => row.classification !== 'EXACT_CURRENT_PACKET_CHUNK_BRIDGE').slice(0, 250),
+  unresolvedSamples: rows.filter((row) => row.classification !== 'EXACT_CURRENT_PACKET_CHUNK_BRIDGE')
+    .sort((a, b) => Number(Boolean(b.sourceAuthorityRepoId)) - Number(Boolean(a.sourceAuthorityRepoId))
+      || a.classification.localeCompare(b.classification)
+      || a.sourceRef.localeCompare(b.sourceRef))
+    .slice(0, 250),
   nextGate: status === 'CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_PROVEN'
     ? 'PROMOTION-RECEIPT-COHORT-01'
     : 'CURRENT-PACKET-CHUNK-EXPECTED-SOURCE-SCOPE-01',
@@ -473,8 +585,6 @@ console.log(JSON.stringify({
   firstBlocker: report.firstBlocker,
   counts: report.counts,
   classificationCounts: report.classificationCounts,
-  reportPath: 'docs/reports/current-packet-chunk-lineage-bridge-v1.json',
+  reportPath: path.relative(root, reportPath).replaceAll(path.sep, '/'),
 }, null, 2));
 if (status !== 'CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_PROVEN') process.exitCode = 3;
-
-

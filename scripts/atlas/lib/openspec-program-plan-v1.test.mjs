@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildProgramHierarchy, buildSelectedChainOverlay, computeCompletionTracking, buildProgramGates, buildProgramWorkPackages, classifyGateState, classifyProgramTask, isValidSchedulerSelection, mutationClass, PROGRAM_WAVES, schedulerPermission } from './openspec-program-plan-v1.mjs';
+import { analyzeWorkPackageFeasibility, buildArchitectureOverlay, buildProgramHierarchy, buildProgramMappingReview, buildSelectedChainOverlay, computeCompletionTracking, buildProgramGates, buildProgramWorkPackages, classifyArchitectureProgram, classifyGateState, classifyProgramTask, isValidSchedulerSelection, mutationClass, PROGRAM_WAVES, schedulerPermission, validateArchitectureOverlay, validateOwnershipBoundaries } from './openspec-program-plan-v1.mjs';
 
 const task = (change, text, extra = {}) => ({ taskKey: `${change}:K-1`, change, text, state: 'OPEN', executionState: 'ACTIONABLE', ...extra });
 
@@ -10,16 +10,62 @@ test('source authority and Gate 2 sort into the lineage wave ahead of downstream
   assert.equal(classifyProgramTask(task('parent-atlas-candidate-feature-execution-fabric', 'freeze feature matrix')).wave, 5);
 });
 
+test('architectural milestone assignment is independent from legacy wave heuristics', () => {
+  const change = 'agent-branch-review-fanout-ace-centroid-aug22';
+  assert.equal(classifyProgramTask(task(change, 'ACE memory')).wave, 7);
+  assert.equal(classifyArchitectureProgram(change).programId, 'ACE_MEMORY');
+  assert.equal(classifyArchitectureProgram(change).milestoneId, 'M2');
+});
+
 test('program waves encode prerequisite gates without selecting leaf tasks', () => {
   // No synthetic sequential-wave edges: presentation order must not imply dependency.
   assert.ok(PROGRAM_WAVES.every((wave) => wave.dependsOnWaveIds.length === 0));
   assert.ok(PROGRAM_WAVES.every((wave) => Array.isArray(wave.dependsOnWaveIds)));
 });
 
+test('machine-readable overlay validates ownership roles and refuses owner/executor collisions', () => {
+  assert.equal(validateArchitectureOverlay(), true);
+  assert.throws(() => validateOwnershipBoundaries([
+    { domain: 'BAD', authorityRole: 'PROJECTION', canonicalOwner: 'Qdrant', representation: null, executor: 'Qdrant', transport: null },
+  ]), /OVERLAY_OWNER_CATEGORY_COLLISION/);
+});
+
+test('program overlay is architectural metadata, not a duplicated task list or runtime proof', () => {
+  const overlay = buildArchitectureOverlay();
+  assert.deepEqual(overlay.milestones.map((milestone) => milestone.id), ['M0', 'M1', 'M2', 'M3', 'M4', 'M5', 'M6']);
+  assert.equal(overlay.gates.length, 17);
+  assert.ok(overlay.gates.every((gate) => gate.kind === 'ARCHITECTURE_PREREQUISITE' && gate.schedulerPermission === 'NOT_SELECTED'));
+  assert.ok(overlay.gates.some((gate) => gate.dependsOnGateIds.length > 0));
+  assert.equal(overlay.programs.find((program) => program.id === 'EXTERNAL_DOCS').corpus, 'EXTERNAL_DOCUMENT');
+  assert.equal(overlay.programs.find((program) => program.id === 'CODE_RETRIEVAL').corpus, 'CODEBASE_PACKET');
+  assert.equal(overlay.programs.every((program) => program.evidenceScope === 'ARCHITECTURAL_CONSTRAINT_NOT_RUNTIME_CLAIM'), true);
+  assert.equal(overlay.programs.every((program) => program.promotionState === 'NOT_ELIGIBLE'), true);
+  assert.equal(overlay.corpusSeparation.crossCorpusDependencyInference, false);
+  assert.equal('taskAssignments' in overlay, false);
+  assert.equal('unmappedTaskKeys' in overlay, false);
+});
+
+test('program mapping review surfaces rule collisions without selecting or remapping tasks', () => {
+  const rows = buildProgramMappingReview([
+    task('parent-atlas-deep-research-ingestion', 'external pages'),
+    task('parent-atlas-deep-research-ingestion', 'LDR validation'),
+    { ...task('parent-atlas-deep-research-ingestion', 'already done'), state: 'DONE' },
+    task('parent-atlas-retrieval-lineage-dag-convergence', 'source authority'),
+  ]);
+  const deepResearch = rows.find((row) => row.change === 'parent-atlas-deep-research-ingestion');
+  assert.equal(rows.length, 2);
+  assert.equal(deepResearch.openTaskCount, 2);
+  assert.equal(deepResearch.mappingStatus, 'PROVISIONAL_REQUIRES_REVIEW');
+  assert.deepEqual(deepResearch.candidatePrograms.map((candidate) => candidate.programId), ['EXTERNAL_DOCS', 'LDR_VALIDATION']);
+  assert.equal(deepResearch.multipleCandidateCorpora, false);
+  assert.equal(deepResearch.schedulerPermission, 'NOT_SELECTED');
+  assert.equal(rows.find((row) => row.change === 'parent-atlas-retrieval-lineage-dag-convergence').candidatePrograms.length, 1);
+});
+
 test('gate nodes mirror only declared wave edges and aggregate their packages', () => {
   const workPackages = [
-    { id: 'w0-a', wave: 0, taskCount: 2 },
-    { id: 'w1-a', wave: 1, taskCount: 3 },
+    { id: 'w0-a', wave: 0, taskCount: 2, taskKeys: ['a:1', 'a:2'] },
+    { id: 'w1-a', wave: 1, taskCount: 3, taskKeys: ['b:1', 'b:2', 'b:3'] },
   ];
   const gates = buildProgramGates(PROGRAM_WAVES, workPackages);
   assert.equal(gates.length, 11);
@@ -31,9 +77,9 @@ test('gate nodes mirror only declared wave edges and aggregate their packages', 
 
 test('work packages contain classified leaves only; unmapped leaves remain in the separate review queue', () => {
   const leaves = [
-    { taskKey: 'a:1', change: 'a', line: 1, program: { wave: 0, milestone: null } },
-    { taskKey: 'b:2', change: 'b', line: 2, program: { wave: 9, milestone: 'M6' } },
-    { taskKey: 'c:3', change: 'c', line: 3, program: { wave: null, milestone: null } },
+    { taskKey: 'a:1', change: 'a', line: 1, program: { wave: 0, milestone: 'M0', architecture: { programId: 'CONTROL_PLANE', milestoneId: 'M0' } } },
+    { taskKey: 'b:2', change: 'b', line: 2, program: { wave: 9, milestone: 'M4', architecture: { programId: 'PROJECTION_EXECUTORS', milestoneId: 'M4' } } },
+    { taskKey: 'c:3', change: 'c', line: 3, program: { wave: null, milestone: null, architecture: { programId: null } } },
   ];
   const packages = buildProgramWorkPackages(leaves);
   const keys = packages.flatMap((item) => item.taskKeys);
@@ -41,9 +87,51 @@ test('work packages contain classified leaves only; unmapped leaves remain in th
   assert.equal(new Set(keys).size, keys.length);
   assert.deepEqual(packages.find((item) => item.taskKeys.includes('b:2')).dependsOnWaveIds, []);
   assert.equal(packages.some((item) => item.taskKeys.includes('c:3')), false);
-  const reviewTaskKeys = leaves.filter((item) => item.program.wave == null).map((item) => item.taskKey);
+  const reviewTaskKeys = leaves.filter((item) => !item.program.architecture.programId).map((item) => item.taskKey);
   assert.deepEqual(reviewTaskKeys, ['c:3']);
   assert.equal(new Set([...keys, ...reviewTaskKeys]).size, leaves.length);
+});
+
+test('work packages never mix mutation class or readiness gate and retain wave metadata without edges', () => {
+  const base = { program: { wave: 2, milestone: 'M0', architecture: { programId: 'SOURCE_AUTHORITY', milestoneId: 'M0', lane: 'LINEAGE', corpus: 'CODEBASE_PACKET' } } };
+  const rows = [
+    { taskKey: 'x:1', change: 'x', line: 1, mutationClass: 'CODE_ONLY', gateState: 'READY', ...base },
+    { taskKey: 'x:2', change: 'x', line: 2, mutationClass: 'DB_WRITE', gateState: 'AUTHORIZATION_REQUIRED', ...base },
+    { taskKey: 'x:3', change: 'x', line: 3, mutationClass: 'CODE_ONLY', gateState: 'READY', ...base, program: { ...base.program, wave: 3 } },
+  ];
+  const packages = buildProgramWorkPackages(rows);
+  assert.equal(packages.length, 2);
+  assert.ok(packages.every((item) => item.taskKeys.length > 0 && item.taskCount <= 10));
+  assert.ok(packages.every((item) => item.taskKeys.every((key) => rows.find((row) => row.taskKey === key).mutationClass === item.mutationClass)));
+  assert.ok(packages.every((item) => item.taskKeys.every((key) => rows.find((row) => row.taskKey === key).gateState === item.gateState)));
+  const codePackage = packages.find((item) => item.mutationClass === 'CODE_ONLY');
+  assert.deepEqual(codePackage.waveIds, [2, 3]);
+  assert.equal(codePackage.wave, null);
+  assert.equal(codePackage.dependsOn.length, 0);
+});
+
+test('package feasibility reports lower bound without relaxing boundaries or selecting tasks', () => {
+  const rows = [
+    ...Array.from({ length: 25 }, (_, i) => ({ taskKey: `a:${i}`, change: 'a', mutationClass: 'CODE_ONLY', gateState: 'READY', program: { architecture: { programId: 'P' } } })),
+    ...Array.from({ length: 2 }, (_, i) => ({ taskKey: `b:${i}`, change: 'b', mutationClass: 'CODE_ONLY', gateState: 'READY', program: { architecture: { programId: 'P' } } })),
+    { taskKey: 'review:1', change: 'review', program: { architecture: { programId: null } } },
+  ];
+  const result = analyzeWorkPackageFeasibility(rows, { currentChunkSize: 10, targetMinimumPackages: 2, targetMaximumPackages: 4 });
+  assert.equal(result.groupCount, 2);
+  assert.equal(result.classifiedTaskCount, 27);
+  assert.equal(result.reviewRequiredTaskCount, 1);
+  assert.equal(result.currentPackageCount, 4);
+  assert.equal(result.currentUndersizedPackageCount, 1);
+  assert.equal(result.minimumPackageCountAtMaximumSize, 4);
+  assert.equal(result.minimumPackagesPreservingChangeOwnerAndMutation, 4);
+  assert.equal(result.ownerMutationGroupsBelowMinimum, 1);
+  assert.equal(result.targetAchievablePreservingChangeOwnerAndMutation, false);
+  assert.equal(result.maximumPackageCountAtMinimumSize, 8);
+  assert.equal(result.boundaryGroupsBelowMinimum, 1);
+  assert.equal(result.targetAchievableWithoutBoundaryChanges, false);
+  assert.deepEqual(result.boundary, ['CHANGE_OWNER', 'PRIMARY_PROGRAM', 'MUTATION_CLASS', 'GATE_STATE']);
+  assert.equal(result.dependenciesInvented, 0);
+  assert.equal(result.tasksSelected, 0);
 });
 
 test('READY does not imply scheduler selection; only explicit selected task keys pass', () => {
@@ -87,7 +175,7 @@ test('unknown task grouping is visibly review-required and mutation defaults con
 });
 
 const done = (change, key, extra = {}) => ({ taskKey: `${change}:${key}`, change, text: `t${key}`, state: 'DONE', selectionKey: `${change}#${key}`, ...extra });
-const open = (change, key, extra = {}) => ({ ...done(change, key), state: 'OPEN', program: { wave: 2, workPackageKey: null }, ...extra });
+const open = (change, key, extra = {}) => ({ ...done(change, key), state: 'OPEN', program: { wave: 2, milestone: classifyArchitectureProgram(change).milestoneId, architecture: classifyArchitectureProgram(change), workPackageKey: null }, ...extra });
 
 test('hierarchy: one primary program per change, provisional by name rule, unmapped stays review', () => {
   const tasks = [open('parent-atlas-retrieval-lineage-dag-convergence', 1), done('parent-atlas-retrieval-lineage-dag-convergence', 2), open('totally-unknown-change', 3)];
