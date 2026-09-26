@@ -1,0 +1,79 @@
+{
+  "schema": "atlas.sum04-canary-receipt.v1",
+  "generatedAt": "2026-09-26T22:39:06.500Z",
+  "mode": "REHEARSAL",
+  "manifest": ".tmp\\atlas\\ornith-summary-proposals-v1\\20260926T200225Z\\manifest.json",
+  "manifestRoot": "sha256:fa52d907c3bafbe443efd01f2381b58e0c077047ce8489c09e0aa582421cbc06",
+  "requested": 12,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "results": [
+    {
+      "chunkRowId": "61ae9efd-997f-4e28-8a58-06aaa4cca39a",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "e19c0dea-4573-4bcb-acad-432c797f5e8d",
+      "status": "BLOCKED_CONTAMINATION",
+      "reasons": [
+        "PLACEHOLDER_PATTERN"
+      ]
+    },
+    {
+      "chunkRowId": "b39ebb64-3a51-4603-87a3-0d21c4d922fe",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "9be66ebd-8c00-46d4-9bc2-c5c8baf4a2de",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "99ca3736-4556-46d8-aa98-e8790b503142",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "35f96c43-d0bb-4b49-b84f-b9281a498b4f",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "3d2c2850-e3cb-4cee-af7f-b107d2e33296",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "ed72be55-79b0-4114-95b4-86f9ebcde039",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "4b2571c5-4020-4590-b706-9bfc48afdde3",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "8d35c289-3dbb-4608-9c8e-85664faf12b9",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "7c5d84d9-52e2-4dab-9401-40e2d19575b2",
+      "status": "ADMITTED",
+      "reasons": []
+    },
+    {
+      "chunkRowId": "c44c481f-370f-44c6-8cc8-b9f50e058fb1",
+      "status": "ADMITTED",
+      "reasons": []
+    }
+  ],
+  "checks": {
+    "unexpectedExisting": 0
+  },
+  "status": "FAILED",
+  "failure": "ROW_NOT_ADMITTED:e19c0dea-4573-4bcb-acad-432c797f5e8d:BLOCKED_CONTAMINATION",
+  "committed": false
+}

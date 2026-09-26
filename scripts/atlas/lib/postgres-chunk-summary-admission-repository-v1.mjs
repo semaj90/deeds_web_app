@@ -41,7 +41,7 @@ export function createPostgresChunkSummaryAdmissionRepositoryV1({
               SELECT workspace_revision AS "workspaceRevision", source_revision AS "sourceRevision",
                      binding_checksum AS "bindingChecksum"
                 FROM public.atlas_workspace_source_bindings
-               WHERE repo_id = $1::uuid
+               WHERE repo_id = $1::text
                  AND workspace_revision = $2
                  AND canonical_source_ref = $3
                  AND source_revision = $4

@@ -95,3 +95,11 @@ test('update failure rolls back and releases the injected client', async () => {
 test('adapter requires the existing logical identity owner to be injected', () => {
   assert.throws(() => createPostgresChunkSummaryAdmissionRepositoryV1({ pool: { connect() {} }, repositoryUuid: 'repo-uuid', identityRepositoryId: 'deeds-web-app' }), /CANONICAL_SOURCE_IDENTITY_OWNER_REQUIRED/);
 });
+
+test('binding lookup treats repo_id as TEXT (live column type), never uuid', async () => {
+  const { pool, calls } = fakePool();
+  await admitCanonicalChunkSummaryV1({ proposal: makeProposal(), repository: createRepository(pool), admittedAt: '2026-09-25T00:00:00.000Z' });
+  const q = calls.find((c) => c.sql && c.sql.includes('FROM public.atlas_workspace_source_bindings')).sql;
+  assert.match(q, /repo_id = \$1::text/);
+  assert.doesNotMatch(q, /repo_id = \$1::uuid/);
+});
