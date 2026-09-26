@@ -1,14 +1,17 @@
 # TurboVec Kanban Consolidation Report
 
-Generated: 2026-09-26T03:47:32.428Z
+Generated: 2026-09-26T22:09:48.935Z
 Board tasks: 123
 Mass inputs: 6889
 Unique records: 6747
 Embedded records: 6725
-TurboVec backend mix: search-derived=6, offline=6719
+TurboVec backend mix: search-derived=5, offline=6720
 simdjson parses: 3957402 bytes
 
 ## Consolidation groups
+- **lib:cluster:0**: 6 records, 6 open, clusters=0, 17, 31, families=lib
+  - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
+  - top: lib › icons | lib › shims | lib › agent | lib › shared | lib › integrations
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:39**: 6 records, 6 open, clusters=39, 56, 70, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Summarize docs with Gemma4 and persist the compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate. | Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred
@@ -27,9 +30,6 @@ simdjson parses: 3957402 bytes
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:64**: 5 records, 5 open, clusters=64, 81, 95, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Re-run the assistant-path comparison after each boundary change and record the result in `IMPLEMENTATION_STATUS.md`.
-- **lib:cluster:none**: 4 records, 4 open, clusters=none, families=lib
-  - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
-  - top: lib › icons | lib › shims | lib › agent | lib › schemas
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:28**: 4 records, 4 open, clusters=28, 45, 59, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats | Install Unsloth + PyTorch (`uv pip install unsloth --torch-backend=auto`) | Keep CPU fallback paths available for dev and rollback | todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md

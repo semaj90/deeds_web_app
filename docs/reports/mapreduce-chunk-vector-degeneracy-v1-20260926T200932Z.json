@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.mapreduce-chunk-vector-degeneracy-receipt.v1",
+  "generatedAt": "2026-09-26T20:09:32.129Z",
+  "status": "VECTOR_COHORT_WELL_FORMED",
+  "sourceReadinessReceipt": "docs/reports/mapreduce-chunk-readiness-v2-20260926T194719Z.json",
+  "sourceReadinessReceiptChecksum": "sha256:f7a147d8b078105320e58cb092b0ff62baa53984a7951c944606d8b311c93373",
+  "candidateSnapshotRevision": "sha256:09bfbf6125ddc67f194edd6170f6d9c87a14d001f877eef1ec269600b2424388",
+  "ordinalMapChecksum": "90c237c8d8afd41d176540e2a5a3430ae86b626b7de94e08b49255e7b7fd4bf9",
+  "inputRowsChecksum": "sha256:52b22399cb5ae6af479e32b31164d93d6f6229e0830892657ff4e73937caf52a",
+  "rowsExpected": 1520,
+  "rowsRead": 1520,
+  "distinctVectorDigests": 1520,
+  "duplicateVectorRows": 0,
+  "duplicateVectorGroups": 0,
+  "duplicateSizeHistogram": {},
+  "duplicateRowsSameContentDigest": 0,
+  "duplicateRowsAcrossDifferentContentDigests": 0,
+  "missingVectors": 0,
+  "wrongVectorDimensions": 0,
+  "nonFiniteVectors": 0,
+  "zeroNormVectors": 0,
+  "nonUnitVectorsOutsideTolerance": 0,
+  "unitNormTolerance": 0.02,
+  "representationRevisionCounts": {
+    "UNRECORDED": 1520
+  },
+  "vectorRowsChecksum": "sha256:ccfb0eb79f30d4006e1ed976cd85e0384d1938baa3f7d3cdd5a247f28cd7f99b",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "canonicalAuthority": false
+}

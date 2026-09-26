@@ -48,16 +48,16 @@
     "question": "Does today's working tree still match that sealed cohort?",
     "state": "DRIFT_PRESENT",
     "admitted": 25542,
-    "liveExactMatch": 23728,
-    "changedSinceSeal": 720,
+    "liveExactMatch": 23610,
+    "changedSinceSeal": 838,
     "excludedNestedRepository": 1086,
     "unavailable": 8,
     "notObserved": 0,
-    "driftCount": 1814,
+    "driftCount": 1932,
     "plannerRowsOutsideCohort": 0,
     "plannerLabelCounts": {
-      "EXACT_CURRENT_BINDING": 23728,
-      "CURRENT_BINDING_MISMATCH": 720,
+      "EXACT_CURRENT_BINDING": 23610,
+      "CURRENT_BINDING_MISMATCH": 838,
       "EXCLUDED_SUBMODULE": 1086,
       "SOURCE_UNAVAILABLE": 8
     },
@@ -66,6 +66,11 @@
     "drifted": [
       {
         "sourceRef": "codex.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": ".claude/skills/drizzle-schema-review/SKILL.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -3930,6 +3935,16 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "docs/GAN-DEEP-AUDIT-GUIDE.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "docs/MASTER-TOC.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "docs/OPENSPEC-WORKBOARD.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -3946,6 +3961,11 @@
       },
       {
         "sourceRef": "docs/architecture/runtime-ownership-registry.json",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "docs/archive-manifest.json",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -5045,12 +5065,42 @@
         "plannerStatus": "EXCLUDED_SUBMODULE"
       },
       {
+        "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/proposal.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "openspec/changes/atlas-feature-intelligence/tasks.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
         "sourceRef": "openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/deep-audit-code-gates-aug22/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/feature-label-semantic-derivation/proposal.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/feature-label-semantic-derivation/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/inference-wiring-deep-audit-aug22/tasks.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -5071,6 +5121,11 @@
       },
       {
         "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-adaptive-dag-fabric/tasks.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -5110,6 +5165,21 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "openspec/changes/parent-atlas-deep-research-ingestion/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-document-governance-master-index/design.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "openspec/changes/parent-atlas-error-embedding-768-migration/tasks.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -5125,7 +5195,42 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/design.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-graph-pagerank-okf-fanout-hardening/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-graph-runtime-enhancement/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-graph-runtime-python-consolidation/proposal.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-graph-runtime-python-consolidation/tasks.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -5200,12 +5305,27 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "openspec/changes/parent-atlas-qdrant-structural-payload-enrichment/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
         "sourceRef": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -5240,7 +5360,22 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "openspec/changes/parent-atlas-transport-memory-boundaries/proposal.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-transport-memory-boundaries/specs/transport-memory-boundaries/spec.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-versioned-doc-intelligence/specs/versioned-doc-intelligence/spec.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -5650,6 +5785,21 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "packages/parent-atlas-retrieval/src/bifrost/index.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas-retrieval/src/bifrost/residency-scheduler.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas-retrieval/tests/bifrost/residency-scheduler.spec.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "packages/parent-atlas/INTEGRATION-GUIDE.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -5770,6 +5920,11 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "packages/parent-atlas/src/core/a2a-wire-v1.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "packages/parent-atlas/src/core/agentic-workflow-control-plane.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -5845,7 +6000,27 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "packages/parent-atlas/src/core/external-doc-qdrant-hybrid.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/src/core/external-doc-retrieval-proof.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/src/core/external-doc-retrieval-runtime.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "packages/parent-atlas/src/core/feature-ontology-projection-v1.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/src/core/graph-node-key-v1.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6070,7 +6245,22 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "packages/parent-atlas/src/core/structural-extraction-fabric.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/src/core/structural-symbol.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "packages/parent-atlas/src/core/summary-context.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/src/core/symbol-registry-repository.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6225,12 +6415,37 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "packages/parent-atlas/test/a2a-wire-v1.test.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/test/agentic-workflow-control-plane.test.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "packages/parent-atlas/test/contextual-tree-snapshot.test.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
         "sourceRef": "packages/parent-atlas/test/external-doc-knowledge-fabric.test.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/test/external-doc-qdrant-hybrid.test.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/test/external-doc-retrieval-proof.test.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/test/external-doc-retrieval-runtime.test.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6245,7 +6460,17 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "packages/parent-atlas/test/graph-node-key-v1.test.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "packages/parent-atlas/test/graph-snapshot-v2.test.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/test/structural-extraction.test.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6275,6 +6500,21 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "packages/semantic-contracts/package.json",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/semantic-contracts/src/canonical-hashing.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "packages/semantic-contracts/src/index.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/docs/architecture/TOKEN_REMAP_LATENT_PROJECTION.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -6300,7 +6540,27 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "python/atlas_compute/typed_graph_runtime.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "python/atlas_cuda_cutile_simt_gemm_probe_v1.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/atlas_doc_coordinate.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/atlas_doc_manifest.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/atlas_external_docs.py",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6310,7 +6570,27 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "python/atlas_oak_kernel.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/atlas_okf_docs_pipeline.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/atlas_rapids_graph_runtime.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "python/miniforge_nlp_sidecar.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/miniforge_nlp_sidecar_v2.py",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6330,12 +6610,52 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "python/test_atlas_doc_coordinate.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/test_atlas_doc_qdrant_projection.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/test_atlas_doc_structure_extraction.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/test_atlas_oak_kernel.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/test_atlas_okf_docs_pipeline.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/test_miniforge_nlp_sidecar_v2_multiline_crlf.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "python/tests/test_atlas_rapids_graph_runtime.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "python/train_domain_classifier.py",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
         "sourceRef": "reports/archive/phase-2a-packet-materialization-checklist.md",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "reports/parent-atlas-open-lanes-todo.md",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6356,6 +6676,11 @@
       },
       {
         "sourceRef": "scripts/atlas/acp-nlp-sidecar-tools-live-proof-v1.mts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6416,6 +6741,16 @@
       },
       {
         "sourceRef": "scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/audit-doc-03-firecrawl-bounded-owner-v1.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/audit-document-supersession-v1.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6535,6 +6870,16 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "scripts/atlas/build-current-structural-graph-artifact-v1.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/build-master-toc.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "scripts/atlas/build-openspec-workboard-v1.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -6560,12 +6905,22 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "scripts/atlas/compute-pagerank-neo4j-v2.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "scripts/atlas/drizzle-schema-drift-audit.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
         "sourceRef": "scripts/atlas/export-graph-snapshot-v2.mts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/gan-validate-live-packets.mts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6610,6 +6965,11 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -6640,6 +7000,11 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "scripts/atlas/prove-ace-context-cache-replay-v1.mts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -6650,7 +7015,52 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "scripts/atlas/prove-ast-failure-isolation.mts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "scripts/atlas/prove-current-candidate-feature-matrix-manifest-v1.mts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/prove-doc-16-ace-repair-packet-fixture-v1.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/prove-doc-22-patch-target-fixture-v1.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/prove-doc-23-ast-grep-repair-planner-v1.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/prove-doc-24-patch-proposal-fixture-v1.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/prove-doc-25-compiler-test-replay-receipt-v1.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/prove-doc-26-incremental-recrawl-fixture-v1.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/prove-doc-symbol-mutual-index-live-v1.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/prove-doc-symbol-mutual-index-v1.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6690,6 +7100,11 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "scripts/atlas/run-ast-entity-prefill-yaml.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "scripts/atlas/run-patch-tournament-replay-v1.mts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -6700,12 +7115,22 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "scripts/atlas/symbol-reconciliation-writer-v1.mts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "scripts/atlas/sync-parent-atlas-packets-to-postgres.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
         "sourceRef": "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/atlas/validate-document-governance-index.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -6741,6 +7166,11 @@
       },
       {
         "sourceRef": "scripts/batch_repair_chat.py",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "scripts/bench/json-parse-bench.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -7220,12 +7650,22 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "sveltekit-frontend/scripts/atlas/kanban-turbovec-consolidation.mts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "sveltekit-frontend/scripts/atlas/langgraph-gemma4-synthesis.mjs",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
         "sourceRef": "sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/scripts/atlas/native-structural-materializer.mts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -7585,6 +8025,16 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "sveltekit-frontend/src/lib/gpu/gemma4-synthesis-generator.test.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/gpu/gemma4-synthesis-generator.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "turbovec/turbovec/src/pack.rs",
         "live": "LIVE_EXCLUDED_NESTED_REPOSITORY",
         "plannerStatus": "EXCLUDED_SUBMODULE"
@@ -7621,6 +8071,11 @@
       },
       {
         "sourceRef": "sveltekit-frontend/src/lib/server/ace/query-router.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -7681,6 +8136,11 @@
       },
       {
         "sourceRef": "sveltekit-frontend/src/lib/server/ai/onnx-server.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/ai/openai-facade.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -7815,6 +8275,11 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "sveltekit-frontend/src/lib/server/atlas/classification/query-classification-v2.spec.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -7846,6 +8311,16 @@
       },
       {
         "sourceRef": "sveltekit-frontend/src/lib/server/atlas/classification/xgboost-ranking-lineage-v1.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/context/ace-card-selection-v2.spec.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/context/ace-card-selection-v2.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -7891,6 +8366,16 @@
       },
       {
         "sourceRef": "sveltekit-frontend/src/lib/server/atlas/contracts/retrieval-router-feature-row-v1.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-admission.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-retrieval-port.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -7995,6 +8480,11 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/graph/relationship-kernel-neo4j-projector-v1.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "sveltekit-frontend/src/lib/server/atlas/graph/structural-feature-snapshot-v1.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -8030,12 +8520,27 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-batch-v1.spec.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.spec.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
         "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/source-coordinate-map-v1.spec.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/source-coordinate-map-v1.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -8101,6 +8606,16 @@
       },
       {
         "sourceRef": "sveltekit-frontend/src/lib/server/atlas/prefill/prefill-contracts-v1.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/research/local-research-circuit-v1.spec.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/research/local-research-circuit-v1.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -8205,6 +8720,11 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "sveltekit-frontend/src/lib/server/auth/tool-authorization.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "sveltekit-frontend/src/lib/server/cache-keys.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -8246,6 +8766,11 @@
       },
       {
         "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/atlas-ast-nodes.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/embedding/canonical-embed.spec.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -8325,6 +8850,11 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "sveltekit-frontend/src/lib/server/llm/runtime-contract.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "sveltekit-frontend/src/lib/server/ml/phase17-schema.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
@@ -8371,6 +8901,11 @@
       },
       {
         "sourceRef": "sveltekit-frontend/src/lib/server/queue/event-fabric.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/queue/queue-worker.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -8515,7 +9050,22 @@
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
       {
+        "sourceRef": "sveltekit-frontend/src/lib/services/tts.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
         "sourceRef": "sveltekit-frontend/src/lib/utils/ollama.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/utils/uuid.spec.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/utils/uuid.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -8526,6 +9076,16 @@
       },
       {
         "sourceRef": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.server.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.svelte",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -8556,6 +9116,21 @@
       },
       {
         "sourceRef": "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/api/acp/execute/+server.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/api/admin/atlas/document-governance/+server.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -8616,6 +9191,11 @@
       },
       {
         "sourceRef": "sveltekit-frontend/src/routes/api/codeintel/semantic-health/+server.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/api/embed/+server.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -8686,6 +9266,16 @@
       },
       {
         "sourceRef": "sveltekit-frontend/tests/cache-keys.spec.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/tests/openai-facade.spec.ts",
+        "live": "LIVE_CHANGED_SINCE_SEAL",
+        "plannerStatus": "CURRENT_BINDING_MISMATCH"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/tests/reports-embed-chat-routes.spec.ts",
         "live": "LIVE_CHANGED_SINCE_SEAL",
         "plannerStatus": "CURRENT_BINDING_MISMATCH"
       },
@@ -9137,14 +9727,14 @@
     ],
     "observation": {
       "file": "docs/reports/current-source-authority-repair-plan-v1.json",
-      "generatedAt": "2026-09-21T22:53:45.863Z",
+      "generatedAt": "2026-09-24T21:30:58.795Z",
       "status": "REPAIR_PLAN_PARTIAL_EXACT_BLOCKED",
       "ownerRunId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
       "ownerRunIsCohortExecution": true,
-      "currentWorkspaceRevision": "sha256:7cf81f82cc0ce8d1c1a63fea7259282a6cfd5d66353c8e10a616bc08aa6a1135",
+      "currentWorkspaceRevision": "sha256:98914c394f4112963080857b5cbef21058cbe4cc9ac60ed4afffb05b808704ce",
       "plannerCounts": {
-        "EXACT_CURRENT_BINDING": 23728,
-        "CURRENT_BINDING_MISMATCH": 720,
+        "EXACT_CURRENT_BINDING": 23610,
+        "CURRENT_BINDING_MISMATCH": 838,
         "EXCLUDED_SUBMODULE": 1086,
         "SOURCE_UNAVAILABLE": 8
       }
@@ -9152,12 +9742,12 @@
     "note": "Planner labels are preserved verbatim in plannerLabelCounts. The drift census reflects the working tree at the planner report generatedAt, not now; re-run the planner for a fresh reading."
   },
   "existingPlannerClassifications": {
-    "EXACT_CURRENT_BINDING": 23728,
-    "CURRENT_BINDING_MISMATCH": 720,
+    "EXACT_CURRENT_BINDING": 23610,
+    "CURRENT_BINDING_MISMATCH": 838,
     "EXCLUDED_SUBMODULE": 1086,
     "SOURCE_UNAVAILABLE": 8
   },
-  "generatedAt": "2026-09-21T23:26:12.864Z",
+  "generatedAt": "2026-09-26T17:03:01.235Z",
   "blockers": [],
   "owners": {
     "admissionReceipt": {
@@ -9283,6 +9873,6 @@
     "cagraPromotion": false,
     "transaction": "REPEATABLE READ READ ONLY, ROLLBACK"
   },
-  "receiptChecksum": "sha256:53d560a1314eac626cfe096935c09e4a48421d9da6a50ad300ecf125b2ec2b65",
-  "versionedReceipt": "docs/reports/current-source-authority-cohort-v1.53d560a1314e.json"
+  "receiptChecksum": "sha256:802a095902801053cb82c677720ab30bde82fe87ee3d5f70f58da51b6fd50be5",
+  "versionedReceipt": "docs/reports/current-source-authority-cohort-v1.802a09590280.json"
 }

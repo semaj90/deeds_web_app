@@ -52,6 +52,7 @@ export * from './core/adaptive-dag-plan-v1.js';
 export * from './core/parameter-artifact-v1.js';
 export * from './core/candidate-representation-slice-v1.js';
 export * from './core/oak-candidate-latent-owner-v1.js';
+export * from './core/oak-execution-lineage-v1.js';
 export * from './core/latent-derived-view-transform-v1.js';
 export * from './core/latent-source-manifest-v1.js';
 export * from './core/domain-classification-v1.js';

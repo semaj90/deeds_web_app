@@ -60,6 +60,8 @@ export const REPAIR_OVERLAY_FEATURE_NAMES = [
   'topology_ae64_neighbor_fit',
   'topology_manifold4_similarity',
   'tang_nomination_weight',
+  // Appended (never reordered) so existing overlay column indices are unchanged.
+  'legacy_summary_cosine_max',
 ] as const;
 
 export type RepairOverlayFeatureName = (typeof REPAIR_OVERLAY_FEATURE_NAMES)[number];

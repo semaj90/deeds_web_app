@@ -7,10 +7,11 @@ import { availableParallelism } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
+import { resolveLargeCorpusWorkerCountV1 } from './lib/large-corpus-worker-config-v1.mjs';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const censusPath = resolve(repoRoot, 'docs/reports/large-corpus-enrichment-census-v1.json');
-const workerCount = Math.max(1, Math.min(4, availableParallelism() - 1));
+const workerCount = resolveLargeCorpusWorkerCountV1(process.argv.slice(2), availableParallelism());
 const shardSize = 5000;
 
 const supportedExtensions = new Set([
@@ -233,8 +234,12 @@ if (!isMainThread) {
 
 	let results;
 	try {
-		results = [];
-		for (const artifact of census.artifacts) results.push(await buildArtifact(artifact));
+		// The artifact roles are independent. Share the bounded worker pool while
+		// streaming both inputs; each role writes to its own deterministic shard names.
+		const artifactRuns = await Promise.allSettled(census.artifacts.map((artifact) => buildArtifact(artifact)));
+		const failedRun = artifactRuns.find((result) => result.status === 'rejected');
+		if (failedRun) throw failedRun.reason;
+		results = artifactRuns.map((result) => result.value);
 	} finally {
 		await Promise.all(workers.map((worker) => worker.terminate()));
 	}
@@ -250,6 +255,8 @@ if (!isMainThread) {
 		outputDir: outputDir.replace(`${repoRoot}\\`, '').replaceAll('\\', '/'),
 		shardRecordsMax: shardSize,
 		workerCount,
+		parallelArtifactScans: census.artifacts.length > 1,
+		maxInFlightRows: workerCount * 8 * census.artifacts.length,
 		rootSha256: createHash('sha256').update(rootMaterial).digest('hex'),
 		artifacts: results,
 		invariants: {

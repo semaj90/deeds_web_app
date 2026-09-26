@@ -1,0 +1,146 @@
+{
+  "schema": "atlas.mapreduce-chunk-readiness-receipt.v2",
+  "generatedAt": "2026-09-26T19:09:08.151Z",
+  "status": "READINESS_REPLAY_PARTIAL",
+  "sourceManifest": ".tmp\\atlas\\mapreduce-packet-chunk-evidence-overlay-v1\\20260926T181939Z\\manifest.json",
+  "sourceManifestChecksum": "sha256:e2db192da7cc34631adf9d30049b1fccb6868466acc1e86f509067d7eba20d13",
+  "sourceOverlay": ".tmp\\atlas\\mapreduce-packet-chunk-evidence-overlay-v1\\20260926T181939Z\\packet-chunk-evidence.ndjson",
+  "sourceOverlayChecksum": "sha256:ff5ff53e58eb46dd4a2f79b61b8b6b9453b98696e7e80e1851367cfb35ad0a50",
+  "candidateSnapshotRevision": "sha256:09bfbf6125ddc67f194edd6170f6d9c87a14d001f877eef1ec269600b2424388",
+  "ordinalMapChecksum": "90c237c8d8afd41d176540e2a5a3430ae86b626b7de94e08b49255e7b7fd4bf9",
+  "candidateCount": 127,
+  "chunkCount": 1520,
+  "measured": {
+    "inputConserved": true,
+    "packetStates": {
+      "PACKET_REVISION_QUALIFIED": 1520
+    },
+    "chunkStates": {
+      "CANONICAL_CHUNK_MISMATCH": 1406,
+      "CHUNK_REVISION_QUALIFIED": 114
+    },
+    "eligibilityStates": {
+      "CHUNK_REVISION_QUALIFIED": 114,
+      "PACKET_REVISION_QUALIFIED": 1406
+    },
+    "semantic768States": {
+      "AVAILABLE": 114,
+      "UNQUALIFIED": 1406
+    },
+    "summaryStates": {
+      "MISSING": 1520
+    },
+    "summarySemanticStates": {
+      "MISSING": 1338,
+      "UNBOUND": 182
+    },
+    "chunkSourceRevisionMirror": {
+      "null": 1520
+    },
+    "chunkWorkspaceRevisionMirror": {
+      "null": 1520
+    },
+    "exactSourceFileDigestRows": 1520,
+    "semanticRepresentationRevisionRows": 0,
+    "contentEmbedding768DiagnosticRows": 0,
+    "canonicalChunkMismatchDiagnosis": {
+      "sameFileDifferentChunkOrdinal": 1406,
+      "otherCanonicalIdMismatch": 0,
+      "chunkOrdinalDeltaCounts": {
+        "1": 113,
+        "2": 95,
+        "3": 83,
+        "4": 61,
+        "5": 36,
+        "6": 27,
+        "7": 51,
+        "8": 37,
+        "9": 30,
+        "10": 34,
+        "11": 21,
+        "12": 16,
+        "13": 13,
+        "14": 9,
+        "15": 13,
+        "16": 10,
+        "17": 4,
+        "18": 8,
+        "19": 4,
+        "20": 6,
+        "21": 4,
+        "22": 4,
+        "23": 6,
+        "25": 1,
+        "26": 2,
+        "27": 2,
+        "28": 5,
+        "29": 4,
+        "30": 2,
+        "31": 1,
+        "32": 2,
+        "34": 3,
+        "35": 1,
+        "36": 1,
+        "38": 1,
+        "40": 1,
+        "41": 3,
+        "44": 1,
+        "46": 1,
+        "-46": 2,
+        "-45": 1,
+        "-43": 2,
+        "-40": 2,
+        "-37": 2,
+        "-35": 3,
+        "-34": 1,
+        "-33": 2,
+        "-32": 2,
+        "-31": 5,
+        "-30": 1,
+        "-29": 2,
+        "-28": 1,
+        "-27": 2,
+        "-26": 4,
+        "-25": 3,
+        "-24": 5,
+        "-23": 6,
+        "-22": 5,
+        "-21": 4,
+        "-20": 2,
+        "-19": 5,
+        "-18": 9,
+        "-17": 8,
+        "-16": 9,
+        "-15": 14,
+        "-14": 7,
+        "-13": 10,
+        "-12": 10,
+        "-11": 11,
+        "-10": 28,
+        "-9": 32,
+        "-8": 41,
+        "-7": 30,
+        "-6": 35,
+        "-5": 48,
+        "-4": 69,
+        "-3": 87,
+        "-2": 67,
+        "-1": 113
+      }
+    }
+  },
+  "artifacts": {
+    "rowDetails": ".tmp\\atlas\\mapreduce-chunk-readiness-v2\\20260926T190908Z\\readiness.ndjson",
+    "rowDetailsChecksum": "sha256:fba99aa90ea12bea83011095c0a94fdd08cccd1b7c7aea386436ab9c39f4bddd"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "canonicalAuthority": false,
+  "receiptChecksum": "sha256:7c3757453105536788f6ef96dcf886aee823fa1a3a210d63ee671d8e03fb11f5"
+}

@@ -6,6 +6,7 @@
  */
 
 // Packet identity (core spine)
+export * from './identity/atlas-coordinate-v1.js';
 export * from './packet/index.js';
 
 // Evidence pipeline

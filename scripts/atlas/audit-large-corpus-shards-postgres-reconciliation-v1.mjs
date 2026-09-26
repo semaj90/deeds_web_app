@@ -9,14 +9,16 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const manifestArg = process.argv.slice(2).find((arg) => arg.startsWith('--manifest='))?.slice('--manifest='.length);
+const outputArg = process.argv.slice(2).find((arg) => arg.startsWith('--output='))?.slice('--output='.length);
 if (!manifestArg) throw new Error('pass an explicit --manifest=<sealed local shard manifest path>');
+if (!outputArg) throw new Error('pass an explicit --output=<immutable report path>');
 const manifestPath = resolve(repoRoot, manifestArg);
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
 if (manifest.status !== 'LOCAL_SHARDS_SEALED_NONCANONICAL' || manifest.canonicalAuthority !== false) {
 	throw new Error('manifest is not a sealed noncanonical local shard manifest');
 }
 
-const outputPath = resolve(repoRoot, 'docs/reports/large-corpus-shards-postgres-reconciliation-v1.json');
+const outputPath = resolve(repoRoot, outputArg);
 const sourceRefs = new Set();
 const verifiedShards = [];
 let shardRecordCount = 0;

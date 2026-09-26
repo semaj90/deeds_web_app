@@ -12,6 +12,7 @@ import crypto from 'node:crypto';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 import { classifyFileCapabilityV1, extensionOf } from './lib/current-file-capability-classification-v1.mjs';
+import { classifyCurrentEnrichedLineageV1 } from './lib/current-enriched-lineage-v1.mjs';
 
 const arg = (name) => { const i = process.argv.indexOf(name); return i >= 0 ? process.argv[i + 1] : null; };
 const workspaceRevision = arg('--workspace-revision');
@@ -77,21 +78,12 @@ try {
   await pool.end();
 }
 
-function lineageState(r) {
-  if (r.packet_key) {
-    if (!r.packet_source_revision) return 'REVISION_MISSING';
-    if (r.packet_source_revision !== r.rev) return 'REVISION_CONFLICT';
-    // packet.sha256 is a whole-file hash; if present it must agree with the admitted hash.
-    if (r.packet_sha256 && r.packet_sha256 !== String(r.chash).replace(/^sha256:/, '')) return 'REVISION_HASH_CONFLICT';
-    return 'REVISION_QUALIFIED';
-  }
-  return r.chunk_rows > 0 ? 'LEGACY_ONLY' : 'IDENTITY_UNRESOLVED';
-}
-
 const records = rows.map((r) => {
   const cap = classifyFileCapabilityV1({ sourceRef: r.source_ref, lineageClass: 'AST_EVIDENCE_ABSENT' });
   const astEligibility = cap.outcome === 'NOT_AST_ELIGIBLE' ? 'NOT_ELIGIBLE' : 'ELIGIBLE';
-  const state = lineageState(r);
+  const state = classifyCurrentEnrichedLineageV1({ packetKey: r.packet_key, packetSourceRevision: r.packet_source_revision,
+    sourceRevision: r.rev, packetSha256: r.packet_sha256, chunkRows: r.chunk_rows });
+  const sourceRevisionQualified = state === 'REVISION_QUALIFIED' || state === 'REVISION_QUALIFIED_PACKET_SHA256_STALE';
   return {
     schema: 'atlas.enriched-index-record.v1',
     packetKey: r.packet_key ?? null,
@@ -101,7 +93,8 @@ const records = rows.map((r) => {
     sourceContentHash: r.chash,
     fileKind: extensionOf(r.source_ref) || 'none',
     language: cap.language,
-    summary: { present: r.packet_has_summary === true, length: r.packet_summary_length ?? null, hash: r.summary_hash ?? null, revisionQualified: r.packet_has_summary === true && state === 'REVISION_QUALIFIED' },
+    summary: { present: r.packet_has_summary === true, length: r.packet_summary_length ?? null, hash: r.summary_hash ?? null,
+      trustState: r.packet_has_summary === true ? 'LEGACY_HINT_UNQUALIFIED' : 'MISSING', revisionQualified: false },
     chunkSummaryMetadata: {
       exactLineageChunkRows: r.chunk_rows,
       canonicalSummaryTextRows: r.chunk_summary_text_rows,
@@ -121,7 +114,8 @@ const records = rows.map((r) => {
     somCell: r.som_cell_x != null && r.som_cell_y != null ? [r.som_cell_x, r.som_cell_y] : null,
     pagerank: r.pagerank ?? null,
     lineageState: state,
-    packetSha256MatchesAdmitted: r.packet_sha256 ? r.packet_sha256 === String(r.chash).replace(/^sha256:/, '') : null,
+    sourceRevisionQualified,
+    packetSha256MatchesAdmitted: r.packet_sha256 ? r.packet_sha256 === String(r.rev).replace(/^sha256:/, '') : null,
     evidenceRefs: ['graphify_execution_file_membership_v2', ...(r.packet_key ? ['atlas_packets:exact_source_ref'] : []), ...(r.chunk_rows > 0 ? ['codebase_chunk_index:exact_source_ref'] : [])],
   };
 });
@@ -148,10 +142,13 @@ const report = {
   records: records.length, lineageStates: tally((r) => r.lineageState),
   noPacketByExtension: Object.fromEntries(Object.entries(noPacketByExt).sort((a, b) => b[1] - a[1])),
   astEligibility: tally((r) => r.astEligibility),
-  revisionQualifiedWithSummary: records.filter((r) => r.summary.revisionQualified).length,
-  revisionQualifiedWithoutSummary: records.filter((r) => r.lineageState === 'REVISION_QUALIFIED' && !r.summary.present).length,
+  sourceRevisionQualified: records.filter((r) => r.sourceRevisionQualified).length,
+  sourceRevisionQualifiedWithLegacySummaryHint: records.filter((r) => r.sourceRevisionQualified && r.summary.present).length,
+  summaryRevisionQualified: records.filter((r) => r.summary.revisionQualified).length,
+  sourceRevisionQualifiedWithoutSummary: records.filter((r) => r.sourceRevisionQualified && !r.summary.present).length,
+  stalePacketSha256CompatibilityRows: records.filter((r) => r.lineageState === 'REVISION_QUALIFIED_PACKET_SHA256_STALE').length,
   packetSha256: { matchesAdmitted: records.filter((r) => r.packetSha256MatchesAdmitted === true).length, differs: records.filter((r) => r.packetSha256MatchesAdmitted === false).length, absent: records.filter((r) => r.packetSha256MatchesAdmitted === null).length },
-  notes: ['astState is NOT_JOINED_IN_THIS_PASS for eligible files; see current-workspace-ast-lineage-v1 receipts', 'summary text is not copied into shards; length and hash only', 'exact source_ref join; not canonical identity by itself', 'packet.content_hash is a different-scope hash (0/100 match) and is ignored; packet.sha256 is the whole-file hash and gates REVISION_QUALIFIED when present'],
+  notes: ['astState is NOT_JOINED_IN_THIS_PASS for eligible files; see current-workspace-ast-lineage-v1 receipts', 'summary text is not copied into shards; legacy packet summaries remain HINT and are not source-revision-qualified by packet lineage alone', 'exact source_ref join; not canonical identity by itself', 'packet.content_hash is a different-scope hash and is ignored; packet.sha256 is diagnostic compatibility metadata and cannot veto an exact packet.source_revision match'],
   generatedAt: new Date().toISOString(),
 };
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });

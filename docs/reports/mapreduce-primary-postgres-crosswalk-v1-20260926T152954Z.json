@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.mapreduce-primary-postgres-crosswalk.v1",
+  "status": "READ_ONLY_EXACT_PATH_CROSSWALK_COMPLETE",
+  "generatedAt": "2026-09-26T15:29:59.294Z",
+  "input": {
+    "path": ".tmp/mapreduce-full-v5.ndjson",
+    "rows": 5000,
+    "uniqueFilePaths": 5000,
+    "sha256": "9ed6d8d3e28f6b0453d75f305b67586ef9dc70cfac05b97825f6763916a42664",
+    "malformedRows": 0,
+    "pathsWithConflictingInputHashes": 0
+  },
+  "postgresExactPathCrosswalk": {
+    "sourceAuthorityRepoId": "deeds-web-app",
+    "matchingRule": "BYTE_EXACT_FILEPATH_TO_CANONICAL_SOURCE_REF_OR_INDEXED_PATH; NO NORMALIZATION",
+    "pathsWithAdmittedSourceBinding": 0,
+    "pathsWithAmbiguousBindings": 0,
+    "pathsMatchingPacketSourceRef": 0,
+    "pathsMatchingPacketFilePath": 0,
+    "pathsWithExactPacketSourceAndWorkspaceRevision": 0,
+    "pathsMatchingChunkSourceRef": 0,
+    "pathsMatchingChunkRelativePath": 0,
+    "pathsMatchingChunkPathAndInputContentHash": 0,
+    "pathsMatchingNoIndexedIdentityPath": 5000,
+    "identityPromoted": false,
+    "unresolvedFieldsRemainNull": true
+  },
+  "policy": {
+    "ftsOrFuzzySearchUsedAsIdentity": false,
+    "pathAliasesInferred": false,
+    "contentHashUsedAsIdentity": false,
+    "databaseTransaction": "READ ONLY; ROLLBACK",
+    "databaseWrites": 0,
+    "projectionWrites": 0
+  },
+  "nextGate": "USE_EXISTING_ADMITTED_NAMESPACE_AND_SOURCE_REF_OWNER_FOR_ANY_NON-EXACT_PATH_CANDIDATE; OTHERWISE KEEP_UNRESOLVED"
+}

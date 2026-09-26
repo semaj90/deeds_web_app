@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.contract-parity-receipt.v2",
+  "contract": "atlas.research-evidence.v1",
+  "schemaVersion": "1",
+  "status": "ZOD_PYDANTIC_PARITY_PROVEN",
+  "sealedBundle": {
+    "manifestChecksum": "sha256:7829168e17822ef2b43b179c9a14d78885e97f5875300b657392761e0f268739",
+    "schemaChecksum": "sha256:97b3a850bf4197862d632e2ab760cb0bc1a32e53000c9a8749f8aaade016b3c5",
+    "fixtureManifestChecksum": "sha256:c653c28a57c74e825b8dabf4ae7fdac7e5576aebc93fc3e76dbd06f5de951934",
+    "producerRevision": "sha256:6874ef740c36cc2bc0605e05cd2a326e0e719e225a58e46049fe61cf90e6fff4"
+  },
+  "expectedExplicitly": {
+    "schemaId": "atlas.research-evidence.v1",
+    "schemaVersion": "1",
+    "schemaChecksum": "sha256:97b3a850bf4197862d632e2ab760cb0bc1a32e53000c9a8749f8aaade016b3c5"
+  },
+  "proofs": {
+    "schemaIdAndVersionIdentical": true,
+    "propertySetsIdentical": true,
+    "enumSetsIdentical": true,
+    "requiredFieldsIdentical": true,
+    "extraPropertiesRejected": true,
+    "fixtureVerdictsIdentical": true
+  },
+  "failures": [],
+  "shapeDiff": [],
+  "verdictMismatches": [],
+  "fixtures": {
+    "total": 38,
+    "zodAccepts": 8,
+    "zodRejects": 30
+  },
+  "crossFieldParityMode": "FIXTURE_PROVEN",
+  "crossFieldFixtures": {
+    "declared": 5,
+    "matching": 5
+  },
+  "crossFieldNote": "superRefine / model_validator rules are not encodable in JSON Schema; parity for them is proven only by identical verdicts on the sealed fixtures from two independent implementations.",
+  "schemaChecksumCanonicalization": "sorted-key compact JSON; Python recomputed the identical checksum",
+  "gateSelfTests": {
+    "wrongVerdictDetected": true,
+    "droppedPropertyDetected": true,
+    "tamperedSchemaChecksumDetected": true
+  },
+  "realRows": {
+    "checked": 0,
+    "rejected": 0
+  },
+  "canonicalAuthority": false,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  }
+}

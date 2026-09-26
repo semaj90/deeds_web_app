@@ -3255,6 +3255,30 @@ Postgres builtin still works.
 
 ---
 
+## ParadeDB / pg_search + pgvector HNSW — live state (verified 2026-09-26)
+
+**Any older note in this repo saying "pg_search is not installed" is stale** (e.g. dated entries in
+`parent-atlas-neural-prefill-encoder/tasks.md`, `parent-atlas-workstation-todo.md`). Receipt:
+`PG-SEARCH-ENVIRONMENT-IDENTITY-01` in `openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md`.
+
+| Item | Live value |
+|---|---|
+| Server | container `legal-ai-postgres`, image `pgvector-pgsearch:pg18-local`, host port **5434**, PostgreSQL 18.4, `shared_preload_libraries=pg_search` |
+| Extensions | `pg_search` 0.25.1 (ParadeDB BM25), `vector` 0.8.3, `pg_trgm` 1.6 |
+| Size | `pg_search.so` 183 MB; BM25 index 91 MB |
+| BM25 index | `idx_codebase_chunk_pgsearch_bm25` on `codebase_chunk_index (id, content, relative_path)`, `USING bm25 ... WITH (key_field=id)` |
+| API | Both work on installed 0.25.1: `@@@` with `paradedb.score`, and the triple-pipe (any term) and triple-ampersand (all terms) operators with `pdb.score`. `USING paradedb` untested. Upstream has since published 0.25.9 and 0.25.10 packages for PostgreSQL 18; upgrade remains a separate, unmade decision. |
+| Native FTS | Built in (not an extension): GIN `idx_codebase_chunk_bm25_search` on `codebase_chunk_index.search_vector` (English tsvector, misleadingly named "bm25"). Declared owner path `search_code_lexical` reads `code_retrieval_chunks` (41,662 rows, `stable_key`), a different table and grain |
+| Canonical HNSW | `codebase_chunk_index_content_hnsw` on `content_embedding` halfvec(768), `halfvec_cosine_ops`, m=16, ef_construction=200. HNSW comes from pgvector, not ParadeDB. Measured recall@10 0.997 vs exact (100 in-corpus queries, ef_search 40/100/200), ~5-30 ms vs ~530-730 ms exact. Filtered/iterative-scan not yet proven |
+
+**Rules**
+- **Probe the right server first.** Host port 5432 is a separate Windows-native `postgres.exe` service; the app uses 5434. Before any extension/index probe record `inet_server_port()`, `data_directory`, `version()`; never let a probe without that fingerprint overwrite this table.
+- **Ownership:** native FTS = declared lexical owner; pg_search BM25 = installed, unpromoted challenger (no relevance labels, so no quality claim). `Bm25Lane` (`'bm25'` in `search-lanes.ts`) is actually pg_trgm `similarity`, not BM25; the string is a live routing key (`cognitive-router.ts`), so rename only with an alias.
+- No `CREATE`/`DROP`/`ALTER EXTENSION`, index rebuild, or pg_search upgrade without an explicit decision.
+- Postgres needs only SQL; TypeScript calls it via Drizzle `sql` templates. Keep extension DDL in SQL migrations.
+
+---
+
 ## UI bugs are HOT — never deferred (May 11, 2026)
 
 The "do not touch" lists below (Drizzle Safety Rule § 1-4, identity strategy, hypergraph write fire, CUDA Graphs, cuVS, new LangGraph workers) cover **infrastructure/data-layer changes** that need operator review. They do **NOT** cover broken UI affordances. **UI bugs jump the queue.**

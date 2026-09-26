@@ -48,7 +48,7 @@ export async function publishEventIdempotent(
   } = {},
 ): Promise<{ streamId: string; stream: string; producerId: string }> {
   const stream = opts.stream ?? ATLAS_EVENT_STREAM;
-  const producerId = opts.producerId ?? event.producerId;
+  const producerId = opts.producerId ?? ('producerId' in event ? event.producerId : undefined);
   if (!producerId) {
     throw new Error(`event ${event.eventId} is missing producerId required for idempotent stream publication`);
   }
@@ -121,10 +121,19 @@ export async function readEventBatch(opts: {
   );
 
   if (!raw) return [];
+  if (!Array.isArray(raw)) throw new Error('VALKEY_EVENT_READ_INVALID_RESPONSE');
 
   const deliveries: ValkeyEventDelivery[] = [];
-  for (const [, entries] of raw) {
-    for (const [streamId, fields] of entries) {
+  for (const streamResult of raw) {
+    if (!Array.isArray(streamResult) || !Array.isArray(streamResult[1])) {
+      throw new Error('VALKEY_EVENT_READ_INVALID_STREAM');
+    }
+    const entries: unknown[] = streamResult[1];
+    for (const entry of entries) {
+      if (!Array.isArray(entry) || typeof entry[0] !== 'string' || !Array.isArray(entry[1])) {
+        throw new Error('VALKEY_EVENT_READ_INVALID_ENTRY');
+      }
+      const [streamId, fields] = entry as [string, unknown[]];
       const map = new Map<string, string>();
       for (let i = 0; i < fields.length; i += 2) {
         map.set(String(fields[i]), String(fields[i + 1]));

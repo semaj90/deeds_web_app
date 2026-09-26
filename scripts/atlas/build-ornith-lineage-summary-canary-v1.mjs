@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { computeSourceIdentityKeyV1 } from '../../sveltekit-frontend/src/lib/server/atlas/identity/stable-file-identity-mint-v1.ts';
 import { buildSummaryProposalV1, selectStratifiedCandidates, sha256Hex, stableJsonV1, validateSummaryOutput } from './lib/summary-proposal-candidate-v1.mjs';
 import { analyzeSummaryContaminationV1 } from './lib/summary-quality-v1.mjs';
+import { discoverOrnithModel, streamChatCompletion } from './lib/workstation-ornith-adapter.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const args = new Map(process.argv.slice(2).map((arg) => {
@@ -29,6 +31,11 @@ if (!Number.isInteger(maxInputBytes) || maxInputBytes < 1) throw new Error('INVA
 if (!/^sha256:[0-9a-f]{64}$/.test(workspaceRevision)) throw new Error('INVALID_WORKSPACE_REVISION');
 
 const hashPrefixed = (value) => `sha256:${sha256Hex(value)}`;
+const hashFile = async (filePath) => {
+  const hash = createHash('sha256');
+  for await (const chunk of createReadStream(filePath)) hash.update(chunk);
+  return hash.digest('hex');
+};
 const inputBytes = await fs.readFile(inputPath);
 const cohortReport = JSON.parse(await fs.readFile(cohortReportPath, 'utf8'));
 const actualInputChecksum = hashPrefixed(inputBytes);
@@ -68,21 +75,25 @@ const prompt = [
   'Do not invent details, identities, revisions, or behavior. Return only the summary text.',
 ].join(' ');
 const promptRevision = hashPrefixed(prompt);
-const generationParameters = Object.freeze({ temperature: 0, top_p: 1, seed: 20260925, max_tokens: 192, stream: false, presence_penalty: 0, frequency_penalty: 0 });
+const generationParameters = Object.freeze({ temperature: 0, top_p: 1, seed: 20260925, max_tokens: 192, presence_penalty: 0, frequency_penalty: 0 });
 const schemaRevision = 'atlas.chunk-summary-proposal.v1';
 
 const propsResponse = await fetch(`${baseUrl}/props`, { signal: AbortSignal.timeout(10000) });
 if (!propsResponse.ok) throw new Error(`LLAMA_PROPS_HTTP_${propsResponse.status}`);
 const props = await propsResponse.json();
-const modelsResponse = await fetch(`${baseUrl}/v1/models`, { signal: AbortSignal.timeout(10000) });
-if (!modelsResponse.ok) throw new Error(`LLAMA_MODELS_HTTP_${modelsResponse.status}`);
-const modelsPayload = await modelsResponse.json();
-const modelId = String(props.model_alias ?? '');
-const modelListing = (modelsPayload.data ?? []).find((model) => model.id === modelId || model.model === modelId);
-if (!modelId || !modelListing) throw new Error('EXPECTED_ORNITH_MODEL_NOT_LOADED');
-const modelDigest = modelListing.digest || props.model_sha256 || null;
-const modelRevision = typeof modelDigest === 'string' && modelDigest.trim() ? modelDigest.trim() : null;
-const model = { id: modelId, revision: modelRevision, parameterCount: modelListing.meta?.n_params ?? null };
+const modelDiscovery = await discoverOrnithModel(baseUrl);
+const modelId = modelDiscovery.loadedModel;
+if (props.model_alias && props.model_alias !== modelId) throw new Error('LLAMA_PROPS_MODEL_ALIAS_MISMATCH');
+const reportedModelPath = String(props.model_path ?? '').trim();
+if (!reportedModelPath) throw new Error('MODEL_ARTIFACT_PATH_UNAVAILABLE');
+const modelArtifactPath = path.resolve(reportedModelPath);
+const modelsRoot = `${path.resolve(ROOT, 'models')}${path.sep}`;
+if (!modelArtifactPath.startsWith(modelsRoot)) throw new Error('MODEL_ARTIFACT_PATH_OUTSIDE_REPO_MODELS');
+const modelArtifactSha256 = await hashFile(modelArtifactPath);
+const modelRevision = `sha256:${modelArtifactSha256}`;
+const reportedDigest = String(props.model_sha256 ?? modelDiscovery.loadedModelDetails?.digest ?? '').trim().replace(/^sha256:/i, '').toLowerCase();
+if (/^[0-9a-f]{64}$/.test(reportedDigest) && reportedDigest !== modelArtifactSha256) throw new Error('MODEL_ARTIFACT_DIGEST_MISMATCH');
+const model = { id: modelId, revision: modelRevision, parameterCount: modelDiscovery.loadedModelDetails?.meta?.n_params ?? null };
 const runtimeBuildRevision = props.build_info || null;
 
 const proposals = [];
@@ -99,22 +110,19 @@ for (const row of selectedResult.selected) {
   const sourceIdentityKey = computeSourceIdentityKeyV1(repositoryId, row.sourceRef);
   const started = performance.now();
   try {
-    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      signal: AbortSignal.timeout(90000),
-      body: JSON.stringify({
-        model: modelId,
-        messages: [
-          { role: 'system', content: prompt },
-          { role: 'user', content: `source_ref: ${row.sourceRef}\nsource_revision: ${row.sourceRevision}\nchunk content follows:\n\n${row.content}` },
-        ],
-        ...generationParameters,
-      }),
+    const result = await streamChatCompletion(baseUrl, modelId, [
+      { role: 'system', content: prompt },
+      { role: 'user', content: `source_ref: ${row.sourceRef}\nsource_revision: ${row.sourceRevision}\nchunk content follows:\n\n${row.content}` },
+    ], {
+      maxTokens: generationParameters.max_tokens,
+      temperature: generationParameters.temperature,
+      topP: generationParameters.top_p,
+      seed: generationParameters.seed,
+      presencePenalty: generationParameters.presence_penalty,
+      frequencyPenalty: generationParameters.frequency_penalty,
+      timeoutMs: 90000,
     });
-    if (!response.ok) throw new Error(`LLAMA_COMPLETION_HTTP_${response.status}`);
-    const result = await response.json();
-    const summary = result.choices?.[0]?.message?.content;
+    const summary = result.assembled;
     const invalid = validateSummaryOutput(summary, row.content);
     if (invalid) { failedByReason[invalid] = (failedByReason[invalid] ?? 0) + 1; continue; }
     const proposal = buildSummaryProposalV1({
@@ -175,7 +183,11 @@ const manifestBody = {
   selectedExtensions: [...new Set(selectedResult.selected.map((row) => row.sourceRef.split('.').pop()?.toLowerCase() ?? 'none'))].sort(),
   excludedByReason: selectedResult.excludedByReason,
   failedByReason,
-  model: { modelId, modelRevision, modelParameterCount: model.parameterCount, runtimeBuildRevision },
+  model: {
+    modelId, modelRevision, modelArtifactSha256, modelArtifactPath: path.relative(ROOT, modelArtifactPath).replaceAll('\\', '/'),
+    modelParameterCount: model.parameterCount, runtimeBuildRevision,
+  },
+  generationTransport: 'SHARED_LLAMA_SERVER_SSE_ADAPTER',
   promptTemplateRevision: promptRevision,
   summarySchemaRevision: schemaRevision,
   generationParameters,

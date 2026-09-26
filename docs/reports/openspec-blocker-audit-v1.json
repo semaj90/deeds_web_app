@@ -1,10 +1,10 @@
 {
   "schema": "atlas.openspec-blocker-audit.v1",
-  "generatedAt": "2026-09-25T21:54:24.428Z",
-  "source": "docs/reports/openspec-workboard-v1.json",
+  "generatedAt": "2026-09-26T17:08:37.551Z",
+  "source": "docs/reports/openspec-workboard-pivot-20260926T1707Z.json",
   "policy": "READ_ONLY_BLOCKER_CLASSIFICATION_NO_TASK_OR_RUNTIME_MUTATION",
   "summary": {
-    "totalWaitingTasks": 943,
+    "totalWaitingTasks": 964,
     "blockerGroups": 5,
     "retryableWithoutEvidenceChange": 0,
     "writesPerformed": false
@@ -18,7 +18,7 @@
       "releaseEvent": "owning dependency receipt changes and satisfies the prerequisite",
       "retryPolicy": "do not retry until the dependency receipt checksum changes",
       "selection": "exclude from implementation queue; keep in dependency review queue",
-      "taskCount": 570,
+      "taskCount": 576,
       "taskKeys": [
         {
           "taskKey": "atlas-feature-intelligence:58",
@@ -426,396 +426,396 @@
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3945",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3955",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 3945,
+          "line": 3955,
           "text": "Extend the current planner into a sealed snapshot only after exact source, parse, symbol,",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:4419",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:4429",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 4419,
+          "line": 4429,
           "text": "Do not expand this canary or run the daily apply chain. A separate",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6735",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6745",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6735,
+          "line": 6745,
           "text": "Keep the lane blocked: `0/1,992` packets have `kag_node_key` or",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6738",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6748",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6738,
+          "line": 6748,
           "text": "Do not promote the sprite/evaluation artifacts from their local",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6752",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6762",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6752,
+          "line": 6762,
           "text": "Re-run only after current source membership, semantic owner, and graph",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6767",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6777",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6767,
+          "line": 6777,
           "text": "Keep ACE live-dry materialization blocked; no replacement artifacts were",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6790",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6800",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6790,
+          "line": 6800,
           "text": "Keep live-dry materialization blocked; do not synthesize replacement",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6823",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6833",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6823,
+          "line": 6833,
           "text": "Keep ACE/context materialization and bounded execution blocked until a",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6843",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6853",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6843,
+          "line": 6853,
           "text": "Keep write-through cache testing separately authorized, and keep ACE",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6861",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6871",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6861,
+          "line": 6871,
           "text": "Keep live ACE adoption blocked until one server-owned caller supplies",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6879",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6889",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6879,
+          "line": 6889,
           "text": "Keep registry consolidation and optional-tool reintegration deferred",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6918",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6928",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6918,
+          "line": 6928,
           "text": "Keep ACE caller migration and strict cache admission blocked until a",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6932",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6942",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6932,
+          "line": 6942,
           "text": "Keep the remaining legacy callers outside migration until they supply",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6947",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6957",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6947,
+          "line": 6957,
           "text": "Keep tool re-enablement and mutation admission blocked until the `66`",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6995",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7005",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6995,
+          "line": 7005,
           "text": "Keep HEVAL-05 and current-corpus evaluation blocked until the live KAG",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7106",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7116",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7106,
+          "line": 7116,
           "text": "Live KAG identity-envelope readback remains pending the separately",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7127",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7137",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7127,
+          "line": 7137,
           "text": "Reload the live `:8788` gateway only after the exact operator",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7165",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7175",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7165,
+          "line": 7175,
           "text": "Keep the live gate closed until the authorized reload and a subsequent",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7230",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7240",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7230,
+          "line": 7240,
           "text": "A6 `COMBINED`: permitted only after A1–A5 have independent receipts.",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7270",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7280",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7270,
+          "line": 7280,
           "text": "Keep accumulated repair/evidence knowledge append-only and separately",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7328",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7338",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7328,
+          "line": 7338,
           "text": "Keep ACE materialization and cache writes closed. Do not synthesize",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7363",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7373",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7363,
+          "line": 7373,
           "text": "Keep full-corpus ordinal expansion and graph-revision ownership open;",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7378",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7388",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7378,
+          "line": 7388,
           "text": "Keep ACE/context projection blocked: the first gate remains Graphify",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8624",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8634",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8624,
+          "line": 8634,
           "text": "Do not synthesize or seed replacement artifacts. ACE/context admission",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8712",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8722",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8712,
+          "line": 8722,
           "text": "Keep temporal action-history and artifact-supersession admission open",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8729",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8739",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8729,
+          "line": 8739,
           "text": "Keep artifact supersession and current-owner admission blocked until two",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8751",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8761",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8751,
+          "line": 8761,
           "text": "Artifact supersession remains unproven until at least two ordered,",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8788",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8798",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8788,
+          "line": 8798,
           "text": "Keep optional registries disabled until operator review, dependency",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8804",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8814",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8804,
+          "line": 8814,
           "text": "Keep repair-candidate execution and ACE admission blocked until",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8817",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8827",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8817,
+          "line": 8827,
           "text": "Keep re-enablement closed until dependency health, identity-envelope",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8829",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8839",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8829,
+          "line": 8839,
           "text": "Keep cache prefill handoff blocked until every caller emits the",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8842",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8852",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8842,
+          "line": 8852,
           "text": "Keep protocol/caller compatibility separate from live handshake,",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8917",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8927",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8917,
+          "line": 8927,
           "text": "Keep write-test execution outside routine portfolio audits and require",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8932",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8942",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8932,
+          "line": 8942,
           "text": "Keep write-test execution outside routine portfolio audits and require",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8947",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8957",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8947,
+          "line": 8957,
           "text": "Keep write-through replay opt-in and separately authorized; this proof",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8962",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8972",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8962,
+          "line": 8972,
           "text": "Keep live adoption open: the census does not identify a caller with a",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9000",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9010",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9000,
+          "line": 9010,
           "text": "Add the live TRACE request-envelope implementation only after the",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9015",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9025",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9015,
+          "line": 9025,
           "text": "Keep ACE/context materialization and bounded execution blocked until",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9090",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9100",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9090,
+          "line": 9100,
           "text": "Keep live accelerator admission separate from dry-run safety. Do not",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9109",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9119",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9109,
+          "line": 9119,
           "text": "Keep cuVS/CUDA execution and GPU ordinal parity blocked until the 8098",
           "priority": 30,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9169",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9179",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9169,
+          "line": 9179,
           "text": "Live read-only extractor execution remains open and must use an exact",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9208",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9218",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9208,
+          "line": 9218,
           "text": "Keep both collisions open for owner review. Do not resolve them by",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9233",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9243",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9233,
+          "line": 9243,
           "text": "Keep the remaining collision open until the two schemas, handlers,",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9291",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9301",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9291,
+          "line": 9301,
           "text": "Keep optional registries disabled until operator review, dependency",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
@@ -3693,10 +3693,73 @@
           "retryWhen": "owning dependency receipt changes"
         },
         {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:46",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 46,
+          "text": "Require exact live identity/revision coverage and feature-state receipt before changing that feature from `UNAVAILABLE` in a workstation proof. (Blocked pending a new candidate map whose packet/chunk rows and source/workspace pair are all proven by existing owners; no MRL value was derived.)",
+          "priority": 10,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "owning dependency receipt changes"
+        },
+        {
           "taskKey": "parent-atlas-repair-candidate-feature-matrix:48",
           "change": "parent-atlas-repair-candidate-feature-matrix",
           "line": 48,
           "text": "Only after measured lift decide whether broad materialization/backfill is justified.",
+          "priority": 40,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "owning dependency receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:91",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 91,
+          "text": "**CEI-09** `som_revision` — absent on all qualified packets; SOM-keyed buckets stay blocked until a versioned SOM run writes assignments and revision together (no invented revision).",
+          "priority": 40,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "owning dependency receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:99",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 99,
+          "text": "**CEI-16b** Wire the guard: daily-graphify / EmbeddingGemma fan-out passes its candidate `packet_key`s through `--keys-file ... --strict` (or reads `--out`) and embeds only EMBED_ALLOWED. Original note: Pre-embedding gate (specified, NOT wired): EmbeddingGemma fan-out and daily-graphify graph creation consume only packets meeting L1+L2(+L3); everything else is recorded as embedding_blocked with the first unmet level and never receives a default/shared vector. `graphify-langgraph-pipeline.mjs` has uncommitted edits from another session, so wire this only after that lands; reuse `audit-enrichment-readiness-v1.mjs` predicates as the gate, and add its check to `smoke-validate-enriched-index-v1.mjs`.",
+          "priority": 30,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "owning dependency receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:118",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 118,
+          "text": "**ACE3-05** (OPEN: residency section is PENDING/COLD on all 15,732 composed packets; feeding `AtlasAceResidencyV1` needs its inputs (utility, neighbor prefetch) and a replay; not attempted) Scope: Feed packets to `AtlasAceResidencyV1` (HOT/WARM/COLD, graph/SOM-neighbor prefetch) and replay metrics.",
+          "priority": 40,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "owning dependency receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:141",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 141,
+          "text": "**SUM-05** Admitted summary -> EmbeddingGemma (this is CEI-16b): read `summary_text` only where provenance.status = ADMITTED, current sourceRevision and summaryDigest verify, then `guard-pre-embedding-enrichment-v1`; no `summary || content_text || ''` fallback anywhere in the new path (no admitted summary = BLOCKED_NO_ADMITTED_SUMMARY); a source-content embedding is a separate named representation with its own input digest.",
+          "priority": 10,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "owning dependency receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:466",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 466,
+          "text": "SUMMARY-LABEL-EVAL-01: obtain/define a graded retrieval set, deduplicate candidates by summary digest, compare exact cosine to TurboVec/cuVS/CAGRA and lexical FTS; report Recall@K, MRR and nDCG. Until labels exist, make no quality/lift claims and do not promote retrieval.",
+          "priority": 30,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "owning dependency receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:519",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 519,
+          "text": "**Held-out gain labels/eval, then MMR:** open (steps 6-7 of the locked sequence). Blocked on a graded label set; do not claim lift before it exists.",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
@@ -3828,765 +3891,765 @@
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:5463",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:5471",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 5463,
+          "line": 5471,
           "text": "Run AE training/fanout only after KNN/KMeans/top-K alignment is proven; no latent or centroid writes in the current tranche.",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:5846",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:5854",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 5846,
+          "line": 5854,
           "text": "Separate workspace snapshot identity from execution identity before further lifecycle repair.",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7265",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7273",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 7265,
+          "line": 7273,
           "text": "Do NOT change the existing `graphify_runs` unique index yet.",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7267",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7275",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 7267,
+          "line": 7275,
           "text": "Do NOT run broad `graphify:daily` yet — see the \"ignore the stale codebase-graph.json hook\"",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7269",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:7277",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 7269,
+          "line": 7277,
           "text": "Do NOT retry `PKT-LINEAGE-08`'s authorized apply from this gate — that item's own",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:8571",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:8579",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 8571,
+          "line": 8579,
           "text": "Keep implementation in `scripts/atlas` until the directory-index, evidence, ACE, DAG,",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:8901",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:8909",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 8901,
+          "line": 8909,
           "text": "Runtime adapter remains open: the seed has 0/40,136 identity-ready rows and the",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:8914",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:8922",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 8914,
+          "line": 8922,
           "text": "AST-EXPLORE-02 remains `BLOCKED_UPSTREAM`: no seed rows are admitted until exact",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10846",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10854",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 10846,
+          "line": 10854,
           "text": "Current Graphify consumption remains unproven until a stable snapshot",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10873",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10881",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 10873,
+          "line": 10881,
           "text": "Tournament/source-authority admission remains open; no tournament,",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10880",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10888",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 10880,
+          "line": 10888,
           "text": "Full-workspace nested-repository coverage and Graphify consumption remain unproven. Ignored nested repositories are explicitly outside the capture policy. This manifest does not retain source blobs, so consumers must verify bytes immediately before use; it is not an atomic filesystem snapshot.",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10936",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10944",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 10936,
+          "line": 10944,
           "text": "Do not promote this observation. Resolve the nested-repository read",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10957",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10965",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 10957,
+          "line": 10965,
           "text": "Keep `QDRANT_V2_IDENTITY_PROVEN` closed. Collection reachability, 768-D",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10993",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11001",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 10993,
+          "line": 11001,
           "text": "Do not trigger source-selection ledger writes or Graphify execution. The",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11009",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11017",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11009,
+          "line": 11017,
           "text": "Keep source-authority admission closed. The separate namespace audit is",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11063",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11071",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11063,
+          "line": 11071,
           "text": "Snapshot binding remains blocked at `SNAPSHOT_READBACK_NOT_PROVEN`;",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11066",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11074",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11066,
+          "line": 11074,
           "text": "Do not launch foreground Graphify, source selection, or projection apply",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11081",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11089",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11081,
+          "line": 11089,
           "text": "Binding remains blocked: Graphify origin has `24,176` root sources while",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11100",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11108",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11100,
+          "line": 11108,
           "text": "Do not reuse the root-only Graphify origin for this snapshot. The origin",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11116",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11124",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11116,
+          "line": 11124,
           "text": "Do not apply a direct ALTER/backfill to `graphify_execution_files`. The",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11138",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11146",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11138,
+          "line": 11146,
           "text": "Cut one bounded Graphify writer over to the v2 relation only after the",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11180",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11188",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11180,
+          "line": 11188,
           "text": "Keep Graphify/source admission blocked until the origin producer consumes",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11200",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11208",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11200,
+          "line": 11208,
           "text": "Handoff remains `PHASE16_DAILY_HANDOFF_BLOCKED`: the existing scale",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11204",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11212",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11204,
+          "line": 11212,
           "text": "Do not launch `graphify:daily` yet. A successful dry/no-op proves the",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11233",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11241",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11233,
+          "line": 11241,
           "text": "Keep Phase-8 as `PHASE8_DRYRUN_PROVEN`, not production authority. Dry-run",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11250",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11258",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11250,
+          "line": 11258,
           "text": "Keep model execution separate from Phase-8 authority. A future draft",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11270",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11278",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11270,
+          "line": 11278,
           "text": "Do not promote this optional model-backed draft step to a Phase-8",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11306",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11314",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11306,
+          "line": 11314,
           "text": "Keep projection admission blocked: `10/11` predicates remain below",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11318",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11326",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11318,
+          "line": 11326,
           "text": "Keep the binding layer blocked: only `117` of `25,643` Graphify source",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11321",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11329",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11321,
+          "line": 11329,
           "text": "Do not populate or promote bindings from this audit; it proves the",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11334",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11342",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11334,
+          "line": 11342,
           "text": "Do not treat this empty-plan result as a Qdrant identity proof; a",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11354",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11362",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11354,
+          "line": 11362,
           "text": "Keep candidate admission blocked: `0` rows were admitted, `61,717`",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11365",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11373",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11365,
+          "line": 11373,
           "text": "Keep the contract at `PARTIAL_PROVEN`: packet-key identity semantics",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11376",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11384",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11376,
+          "line": 11384,
           "text": "Keep authority alignment blocked with decision `DO_NOT_APPLY`.",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11386",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11394",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11386,
+          "line": 11394,
           "text": "Keep reconciliation blocked: the current source plan supplied",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11431",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11439",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11431,
+          "line": 11439,
           "text": "Keep evidence admission blocked: authoritative namespaces,",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11475",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11483",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11475,
+          "line": 11483,
           "text": "Reconcile one canonical packet/chunk identity to one current Qdrant",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11561",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11569",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11561,
+          "line": 11569,
           "text": "Launch only after the operator-authorized canary contract is supplied;",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11645",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11653",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11645,
+          "line": 11653,
           "text": "Run the bounded snapshot-native opener only after fresh snapshot",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11662",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11670",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11662,
+          "line": 11670,
           "text": "Keep terminal execution proof open until one freshly admitted run",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11675",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11683",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11675,
+          "line": 11683,
           "text": "Keep live proof pending until the authorized opener is run and a fresh",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11690",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11698",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11690,
+          "line": 11698,
           "text": "Keep the gate blocked until one authorized terminal execution matches",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11732",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11740",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11732,
+          "line": 11740,
           "text": "Keep the terminal execution gate blocked. The materialized snapshot is",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11758",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11766",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11758,
+          "line": 11766,
           "text": "Keep structural lineage blocked; no packet, chunk, or source identity was",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11789",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11797",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11789,
+          "line": 11797,
           "text": "Keep structural lineage blocked; do not repair or backfill packet/chunk",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11868",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11876",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11868,
+          "line": 11876,
           "text": "Keep RRF, Qdrant, classifier, and projection authority closed; no repair,",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11884",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11892",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11884,
+          "line": 11892,
           "text": "Keep migration unauthorized until every fusion caller has an explicit",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11920",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11928",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11920,
+          "line": 11928,
           "text": "Keep structural and ontology lanes blocked until admitted source and",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11939",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11947",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11939,
+          "line": 11947,
           "text": "Keep all downstream lanes closed and switch only to code/spec work that",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11958",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11966",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11958,
+          "line": 11966,
           "text": "Do not repair payloads or promote Qdrant identity until the admitted",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11976",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11984",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11976,
+          "line": 11984,
           "text": "Do not interpret independent findings as authority or use them to bypass",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11996",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12004",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11996,
+          "line": 12004,
           "text": "Keep semantic ownership, RRF migration, and downstream projection",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12022",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12030",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12022,
+          "line": 12030,
           "text": "Do not claim terminal execution proof until the authorized run and fresh",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12207",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12215",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12207,
+          "line": 12215,
           "text": "Obtain a terminal Graphify execution explicitly bound to the admitted",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12240",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12248",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12240,
+          "line": 12248,
           "text": "Bind a terminal Graphify execution to the admitted snapshot, then reread",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12264",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12272",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12264,
+          "line": 12272,
           "text": "Obtain a snapshot-native terminal Graphify execution with V2 immutable",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12411",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12419",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12411,
+          "line": 12419,
           "text": "Obtain an explicitly authorized snapshot-native terminal Graphify",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12500",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12508",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12500,
+          "line": 12508,
           "text": "Keep the terminal execution gate blocked until the exact execution",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12567",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12575",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12567,
+          "line": 12575,
           "text": "Do not treat the fixture as live tool-routing proof; current semantic",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12592",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12600",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12592,
+          "line": 12600,
           "text": "Do not promote canonical authority or projections: downstream semantic,",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12645",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12653",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12645,
+          "line": 12653,
           "text": "Re-run evidence-span and classifier admission only after exact",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12724",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12732",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12724,
+          "line": 12732,
           "text": "Keep semantic ownership, ontology admission, graph sealing, Qdrant",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12792",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12800",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12792,
+          "line": 12800,
           "text": "Keep the terminal Graphify gate blocked until one execution consumes the",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12812",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12820",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12812,
+          "line": 12820,
           "text": "Keep terminal execution unproven: this is consumer readiness only and",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12883",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12891",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12883,
+          "line": 12891,
           "text": "Keep structural lineage blocked downstream of the snapshot-bound",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12922",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12930",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12922,
+          "line": 12930,
           "text": "Keep all dependent gates blocked; aggregate evidence must not promote a",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12942",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12950",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12942,
+          "line": 12950,
           "text": "Do not infer execution or canonical authority from this preflight; the",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13002",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13010",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13002,
+          "line": 13010,
           "text": "Do not backfill, recompute, or route around the 39,114 short-hash /",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13044",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13052",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13044,
+          "line": 13052,
           "text": "Do not backfill, recompute, or route around either mismatch. Whether",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13323",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13331",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13323,
+          "line": 13331,
           "text": "Do not promote semantic, graph, or projection lanes until a current",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13337",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13345",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13337,
+          "line": 13345,
           "text": "Do not invoke an apply script or migration until a producer emits exact",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13352",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13360",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13352,
+          "line": 13360,
           "text": "Keep structural lineage blocked until a current producer-bound cohort",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13369",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13377",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13369,
+          "line": 13377,
           "text": "Do not promote the local snippet layer or add a second router until its",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13384",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13392",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13384,
+          "line": 13392,
           "text": "Keep this bounded evidence separate from the admitted 25,291-source",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13398",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13406",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13398,
+          "line": 13406,
           "text": "Do not generalize this result to the current 25,291-source snapshot or",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13414",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13422",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13414,
+          "line": 13422,
           "text": "Do not run packet backfill or source repair from this census; a current",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13475",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13483",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13475,
+          "line": 13483,
           "text": "Keep the terminal execution receipt unproven until a separately",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13551",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13559",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13551,
+          "line": 13559,
           "text": "Replace the live route's revision-blind persistence call only after the",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13653",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13661",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13653,
+          "line": 13661,
           "text": "Keep legacy nullable revision observations distinct from the",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13687",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13695",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13687,
+          "line": 13695,
           "text": "Do not infer a current cohort from this empty/missing join. First bind a",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13712",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13720",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13712,
+          "line": 13720,
           "text": "Bind a future terminal Graphify execution to this exact admitted",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13746",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13754",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13746,
+          "line": 13754,
           "text": "Rebuild the selection only after an admitted terminal Graphify execution",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13764",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13772",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13764,
+          "line": 13772,
           "text": "Full current-source registry reconciliation and any insert remain separately gated by",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13780",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13788",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13780,
+          "line": 13788,
           "text": "Keep the `418` missing rows review-only until exact source-byte readback,",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13897",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13905",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13897,
+          "line": 13905,
           "text": "**Step 2 (run a fresh incremental pass with the NEW writer)** — genuinely blocked on step 1:",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
@@ -4962,15 +5025,6 @@
           "retryWhen": "owning dependency receipt changes"
         },
         {
-          "taskKey": "parent-atlas-workboard-feature-utility-fabric:114",
-          "change": "parent-atlas-workboard-feature-utility-fabric",
-          "line": 114,
-          "text": "Language detect + registry; reuse `atlas_ast_nodes.language` and treesitter-chunker language names before adding any enum. **Read-only owner census (2026-09-23):** live `atlas_ast_nodes.parser_language` values are `typescript=9,526`, `svelte=1,477`, `markdown=150`, `sql=37`, `json=20`, `javascript=63` (11,273 total). The Node Tree-sitter provider accepts grammar IDs `typescript/tsx/javascript/jsx`; the sidecar chunker map includes `typescript/tsx/javascript/python/rust/go/java` plus React aliases; document/data owners also emit labels such as `markdown`, `jsonl`, `text`, and `ndjson`. These are overlapping but non-equivalent vocabularies, and `parser_language` is the live column name (not `language`). **Partial contract proof (2026-09-23):** added `LanguageRegistryV1` as a read-only reconciler over source-owned, namespaced vocabularies and explicitly evidenced alias bindings. It keeps content/parser/grammar/extension namespaces separate; exact explicit bindings resolve, known-but-unmapped labels return `UNMAPPED`, absent labels return `UNSUPPORTED`, and conflicting targets return `AMBIGUOUS`. Package TypeScript build and 4 focused tests pass, including deterministic output under reordered owner snapshots. No source-owner adapters or production detection are wired yet, so this task remains open; next gate is ingesting the existing vocabularies without duplicating their alias maps.",
-          "priority": 40,
-          "executionState": "WAITING_ON_DEPENDENCY",
-          "retryWhen": "owning dependency receipt changes"
-        },
-        {
           "taskKey": "parent-atlas-workboard-feature-utility-fabric:141",
           "change": "parent-atlas-workboard-feature-utility-fabric",
           "line": 141,
@@ -5151,7 +5205,7 @@
           "retryWhen": "owning dependency receipt changes"
         }
       ],
-      "evidenceHash": "sha256:a59e389ce3672c2fb255a8f96b66bfc60fbac20132e503886f08cc290aa8c86d",
+      "evidenceHash": "sha256:27fe3c8a9f8245ac0a1755be8c567dc6198e4659816ce1cd7eeda0b58fe7c337",
       "writesPerformed": false
     },
     {
@@ -5162,7 +5216,7 @@
       "releaseEvent": "bounded authorization receipt and target-list checksum are present",
       "retryPolicy": "do not retry on unchanged authorization state",
       "selection": "exclude from implementation queue; allow only read-only preparation",
-      "taskCount": 213,
+      "taskCount": 221,
       "taskKeys": [
         {
           "taskKey": "atlas-feature-intelligence:59",
@@ -5237,144 +5291,144 @@
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3972",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3982",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 3972,
+          "line": 3982,
           "text": "Keep HyperRAG apply blocked until its writer is revision-qualified, transaction-safe, and",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3974",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3984",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 3974,
+          "line": 3984,
           "text": "Decide whether HyperRAG becomes the single canonical registry writer or remains",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6726",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6736",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6726,
+          "line": 6736,
           "text": "Keep KAG/ACE promotion blocked until the KAG/DAG audit trail has",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6779",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6789",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6779,
+          "line": 6789,
           "text": "Keep ACE/context promotion blocked until authoritative ordinal, feature snapshot, and revision envelopes align.",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6806",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6816",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6806,
+          "line": 6816,
           "text": "Keep ACE/context promotion blocked until those authoritative artifacts",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6900",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6910",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6900,
+          "line": 6910,
           "text": "Keep optional registries and identity-dependent promotion closed; the",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6962",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6972",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6962,
+          "line": 6972,
           "text": "Keep route promotion and live ACE selection blocked until route outputs",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6978",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6988",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6978,
+          "line": 6988,
           "text": "Keep ACE/context promotion blocked until snapshot-bound Graphify",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7311",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7321",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7311,
+          "line": 7321,
           "text": "Keep route promotion closed. Do not migrate the legacy cache surface or",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7344",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7354",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7344,
+          "line": 7354,
           "text": "Keep retrieval parity and ACE promotion gated until those qualifiers",
           "priority": 30,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7393",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7403",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7393,
+          "line": 7403,
           "text": "Keep RAPIDS promotion blocked until the `:8098` sidecar proves the",
           "priority": 30,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7482",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7492",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7482,
+          "line": 7492,
           "text": "Keep cuDF/cuVS/cuGraph promotion blocked until the sidecar exposes a",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7497",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:7507",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 7497,
+          "line": 7507,
           "text": "Keep ACE/context promotion blocked until current Graphify source",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8696",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8706",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8696,
+          "line": 8706,
           "text": "Keep ACE promotion blocked until authoritative ordinal, feature, and",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8857",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8867",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8857,
+          "line": 8867,
           "text": "Keep packet revision admission and ACE/context promotion blocked until",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8982",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8992",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8982,
+          "line": 8992,
           "text": "Keep optional registries and identity-dependent promotion closed; the",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
@@ -5747,6 +5801,15 @@
           "text": "Keep Qdrant promotion blocked. No payload repair or projection write was",
           "priority": 30,
           "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "authorization receipt or target-list receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-candidate-feature-execution-fabric:1468",
+          "change": "parent-atlas-candidate-feature-execution-fabric",
+          "line": 1468,
+          "text": "`LARGE_CORPUS_CANONICAL_JOIN_01`: read-only exact-key reconciliation of the sealed records to current PostgreSQL source/packet identity and revisions. No prefix/fuzzy joins; unresolved rows remain unresolved. Do not write until a separate authorized apply/readback gate.",
+          "priority": 10,
+          "executionState": "ACTIONABLE",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
@@ -6551,6 +6614,51 @@
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:100",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 100,
+          "text": "**CEI-17** New-file enrichment contract (write path, needs operator approval): on each daily-graphify update the canonical PostgreSQL 18 payload is completed in order (lineage -> summary -> keywords/entities via existing GIN FTS lexemes and pg_trgm -> domain/concepts -> then embedding -> then projections) before fan-out, in one transaction per packet batch with Postgres-first writes, Redis invalidation after, events last. keywords/entities are CPU-derivable from summary text (ts_stat over idx_atlas_packets_summary_fts) and need no model call; summaries come from the CEI-05 admission path. Legacy-form source_refs (sveltekit-frontend-relative) must resolve through the existing source_ref owner, not ad hoc prefixing.",
+          "priority": 20,
+          "executionState": "ACTIONABLE",
+          "retryWhen": "authorization receipt or target-list receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:105",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 105,
+          "text": "**CEI-16b (re-scoped)** PRE-EMBEDDING-ADMISSION-OWNER: prove every canonical EmbeddingGemma fan-out receives only `PRE_EMBEDDING_ENRICHMENT_GUARD_V1 = EMBED_ALLOWED` keys. Primary owner is the ROOT daily wrapper `scripts/startup/run-graphify-daily-startup.mjs` (admission -> materialize -> provenance -> projection admission -> graphify_runs -> `graphify:daily:chain` [dedup-validation, materialize, cold-processing, phase8 fanout, qdrant tag-mirror, feature-map-sync]); the guard belongs at the phase-8 fan-out / any EmbeddingGemma writer boundary. `graphify-langgraph-pipeline.mjs` `embed_missing` is a subordinate writer (downstream orchestrator invokes only `--stage kanban_task`) and must consume the same admitted-key manifest; it is not the daily owner. Supersedes the two wire points above.",
+          "priority": 20,
+          "executionState": "ACTIONABLE",
+          "retryWhen": "authorization receipt or target-list receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:140",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 140,
+          "text": "**SUM-04** 12-row canary apply, atomic 12/12 for this first proof (prevalidate all 12, one transaction, readback + recompute summaryDigest, ROLLBACK on any difference). Receipt must show requested 12, prevalidated 12, admitted 12, updated 12 and zeros for unexpected_existing, identity_changed, source_revision_changed, input_digest_changed, contamination_blocked, readback_digest_mismatch, summary_hash_mutated, qdrant_writes, embedding_writes, graph_writes, cache_writes. Needs explicit operator approval (DB write). Later batches use per-row dispositions.",
+          "priority": 10,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "authorization receipt or target-list receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:471",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 471,
+          "text": "ACE3-STRUCT-01: keep AST-grep/Tree-sitter observations HINT until exact current source binding, stable `symbol_id`, and revision-bound `symbol_version_id` are proven. The live symbol audit is insufficient; see `docs/reports/symbol-stability-two-revision-audit-v1.json`. No ID migration or structural promotion.",
+          "priority": 10,
+          "executionState": "ACTIONABLE",
+          "retryWhen": "authorization receipt or target-list receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:472",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 472,
+          "text": "Canonical summary path stays independent: SUM-ADM-01..04 atomic proposal validation/readback first; SUM-04C remains the first DB write and requires explicit authorization. Representation metadata/outbox/embedding and FTS each remain separate gates. HINT census/vector/graph work does not satisfy or authorize these writes.",
+          "priority": 20,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "authorization receipt or target-list receipt changes"
+        },
+        {
           "taskKey": "parent-atlas-retrieval-executor-compatibility-convergence:58",
           "change": "parent-atlas-retrieval-executor-compatibility-convergence",
           "line": 58,
@@ -6605,190 +6713,199 @@
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:1760",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:1768",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 1760,
+          "line": 1768,
           "text": "PROMOTION-02 — Permit writes only through an explicit target list,",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:1810",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:1818",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 1810,
+          "line": 1818,
           "text": "PKT-LINEAGE-08 (PROMOTION-01) — **`IMPLEMENTATION_PROVEN / SUCCESS_CANARY_PENDING`**.",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:4872",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:4880",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 4872,
+          "line": 4880,
           "text": "Keep live execution and promotion blocked until current registry and",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10881",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10889",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 10881,
+          "line": 10889,
           "text": "Snapshot-pair deletion hydration, rename identity, terminal Graphify receipt and canonical admission remain open. Tournament fixture development can proceed independently of full-workspace promotion.",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11285",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11293",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11285,
+          "line": 11293,
           "text": "Keep Qdrant identity promotion blocked: `109,776` points and `9,964`",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11296",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11304",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11296,
+          "line": 11304,
           "text": "Keep full Qdrant promotion blocked. The bounded parity result does not",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11343",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11351",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11343,
+          "line": 11351,
           "text": "Keep full lineage promotion blocked: `74` rows were source-only",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11442",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11450",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11442,
+          "line": 11450,
           "text": "Keep identity promotion blocked: all `15` candidates resolved to",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11593",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11601",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11593,
+          "line": 11601,
           "text": "Keep all downstream promotion lanes diagnostic-only until the admitted",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11745",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11753",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11745,
+          "line": 11753,
           "text": "Keep bulk apply blocked; `unboundedApplyAuthorized=false` and no latent",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11809",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11817",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11809,
+          "line": 11817,
           "text": "Keep Qdrant promotion blocked. No payload repair, reindex, or projection",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12042",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12050",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12042,
+          "line": 12050,
           "text": "Keep packet/chunk, semantic, graph, and projection promotion blocked",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12118",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12126",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12118,
+          "line": 12126,
           "text": "Reconcile canonical packet-writer inputs with admitted execution/source",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12607",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12615",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12607,
+          "line": 12615,
           "text": "Keep structural lineage and all downstream promotion gates blocked until",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12756",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12764",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12756,
+          "line": 12764,
           "text": "Keep Qdrant promotion blocked: only `15` groups are validly",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12773",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12781",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12773,
+          "line": 12781,
           "text": "Keep structural lineage and every dependent promotion gate blocked until",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13147",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13155",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13147,
+          "line": 13155,
           "text": "`docs/reports/promotion-board-reconcile-v2.md`'s generator",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13165",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13173",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13165,
+          "line": 13173,
           "text": "`audit-promotion-board-reconcile-v2.mjs` was NOT updated — it only aggregates other reports'",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13651",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13659",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13651,
+          "line": 13659,
           "text": "Bind the canonical packet writer to an admitted execution/source",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16033",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16041",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 16033,
+          "line": 16041,
           "text": "TOURNAMENT-PROMOTION-01 Any promotion beyond `SHADOW` still requires `RecommendationTournamentV1`/`RecommendationReceiptV1` per gate 8.",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16069",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16077",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 16069,
+          "line": 16077,
           "text": "CANONICAL-IDENTITY-CANARY-01 = BLOCKED_NOT_PROVEN (2026-09-21, read-only, fail-closed; no writes). sourceAuthorityProven/astIdentityProven/semantic768IdentityProven/lexicalIdentityProven/candidateOrdinalBound/crossLaneIdentityParityProven all false. Evidence: `atlas_symbol_versions` 479 rows, only 194 with a `sha256:` source_revision, all sharing ONE revision across 10 `deeds_labs/archive/scaffolds` files (not a per-file digest); 0 of those match an `atlas_ast_nodes` row by source_ref/relative_path; symbol `candidate_ordinal` NULL on all 479; 55,169 embedded chunks have no `sha256:` source_revision and empty workspace_revision in metadata; the 98 revision-qualified AST nodes match no symbol version or chunk. Any pass would need a latest-row fallback or a substituted revision. Unblock: a producer stamps per-file source digest + workspace revision in one pass (admitted snapshot + Graphify run, needs the typed admission token) OR a bounded approved write of one file's symbol/chunk/AST rows under the identity owner. Status: `NOT_PROVEN`.",
+          "priority": 10,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "authorization receipt or target-list receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16414",
+          "change": "parent-atlas-retrieval-lineage-dag-convergence",
+          "line": 16414,
+          "text": "Keep canonical identity promotion blocked. `SourceNamespaceV1` names `deeds-web-app`, while Graphify membership uses `repo:root`; current task evidence says the association is a script constant, not a persisted repository-identity bridge. The six nested repositories also have no admitted source bindings. Do not normalize/join these namespaces by name, path, equal counts, or legacy alias. Reconcile the identity owner and nested-repository admission scope first, then rerun this exact bridge.",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "authorization receipt or target-list receipt changes"
@@ -7037,6 +7154,15 @@
           "retryWhen": "authorization receipt or target-list receipt changes"
         },
         {
+          "taskKey": "parent-atlas-workboard-feature-utility-fabric:114",
+          "change": "parent-atlas-workboard-feature-utility-fabric",
+          "line": 114,
+          "text": "Language detect + registry; reuse `atlas_ast_nodes.language` and treesitter-chunker language names before adding any enum. **Read-only owner census (2026-09-23):** live `atlas_ast_nodes.parser_language` values are `typescript=9,526`, `svelte=1,477`, `markdown=150`, `sql=37`, `json=20`, `javascript=63` (11,273 total). The Node Tree-sitter provider accepts grammar IDs `typescript/tsx/javascript/jsx`; the sidecar chunker map includes `typescript/tsx/javascript/python/rust/go/java` plus React aliases; document/data owners also emit labels such as `markdown`, `jsonl`, `text`, and `ndjson`. These are overlapping but non-equivalent vocabularies, and `parser_language` is the live column name (not `language`). **Partial contract proof (2026-09-23):** added `LanguageRegistryV1` as a read-only reconciler over source-owned, namespaced vocabularies and explicitly evidenced alias bindings. It keeps content/parser/grammar/extension namespaces separate; exact explicit bindings resolve, known-but-unmapped labels return `UNMAPPED`, absent labels return `UNSUPPORTED`, and conflicting targets return `AMBIGUOUS`. Package TypeScript build and 4 focused tests pass, including deterministic output under reordered owner snapshots. No source-owner adapters or production detection are wired yet, so this task remains open; next gate is ingesting the existing vocabularies without duplicating their alias maps. **Partial owner-export proof (2026-09-25):** the Node Tree-sitter provider now exports its grammar vocabulary from the same tuple that defines its language type; the Python sidecar `/capabilities` response exposes `FILE_EXTENSION` and `SIDECAR_LANGUAGE` vocabularies plus explicit bindings derived from `_AST_LANGUAGE_EXTENSIONS`, each with a content-derived SHA-256 revision. Focused checks pass (Node 7/7; Python 1/1). These are owner snapshots only: no database vocabulary observation, registry assembly, alias promotion, parser behavior change, or persistence is claimed. Next: bind a read-only `atlas_ast_nodes.parser_language` observation with query/schema revision, then assemble the existing registry from these snapshots.",
+          "priority": 40,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "authorization receipt or target-list receipt changes"
+        },
+        {
           "taskKey": "parent-atlas-workboard-feature-utility-fabric:273",
           "change": "parent-atlas-workboard-feature-utility-fabric",
           "line": 273,
@@ -7082,7 +7208,7 @@
           "retryWhen": "authorization receipt or target-list receipt changes"
         }
       ],
-      "evidenceHash": "sha256:a6cc5bbaf13abb337e9e8b4f45b9983742b72a7079068220ec0441cfb4fe6d20",
+      "evidenceHash": "sha256:a25cfa1e920c0d82bd57d22613b811bd4d74c2db4aba20f07d75e2f0d40ebacd",
       "writesPerformed": false
     },
     {
@@ -7093,7 +7219,7 @@
       "releaseEvent": "packet materialization and independent digest readback become current for the admitted source cohort",
       "retryPolicy": "do not retry until the packet identity/digest receipt checksum changes",
       "selection": "exclude packet-dependent promotion; allow read-only writer and identity audits",
-      "taskCount": 16,
+      "taskCount": 18,
       "taskKeys": [
         {
           "taskKey": "atlas-feature-intelligence:98",
@@ -7114,9 +7240,9 @@
           "retryWhen": "current packet materialization or digest receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8768",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:8778",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 8768,
+          "line": 8778,
           "text": "Keep ACE packet/cache materialization blocked; do not synthesize these",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
@@ -7222,11 +7348,29 @@
           "retryWhen": "current packet materialization or digest receipt changes"
         },
         {
+          "taskKey": "parent-atlas-candidate-feature-execution-fabric:1469",
+          "change": "parent-atlas-candidate-feature-execution-fabric",
+          "line": 1469,
+          "text": "`LARGE_CORPUS_CURRENT_BINDING_01`: current authority is no longer the blocker: a fresh read-only `audit-current-source-authority-v1.mts` run proved the admitted 25,542-source cohort at workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`; root binding coverage is 24,456 exact / 1,086 absent, with 0 revision mismatches. The separate live-working-tree diagnostic reports drift and does not alter the admitted-cohort proof. However, the required 5,000-row MapReduce source-ref/path reconciliation against that exact revision still found 0 admitted paths, 0 packet paths, and 0 chunk paths (`docs/reports/mapreduce-primary-postgres-crosswalk-v1-20260926T170724Z.json`). The older 412 content-digest candidates are not identity joins and remain unpromoted pending an exact current binding/readback path. Do not use filePath/stableKey or embedding similarity as identity.",
+          "priority": 10,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "current packet materialization or digest receipt changes"
+        },
+        {
           "taskKey": "parent-atlas-graph-retrieval-proof:992",
           "change": "parent-atlas-graph-retrieval-proof",
           "line": 992,
           "text": "Next bounded step: before re-attempting `graphify:daily`, check for and kill any stray Node processes touching `atlas_packets`/`materialize-feature-envelopes` (`wmic process where \"name='node.exe'\" get ProcessId,CommandLine | grep -i materialize`), and/or read `scripts/atlas/materialize-feature-envelopes.mts`'s batch-write loop to confirm whether its own internal batching can self-deadlock (e.g. missing `ORDER BY` before row-level updates within one transaction, or multiple pooled connections issuing overlapping updates without a serializable/advisory-lock guard) before blindly retrying — a bare retry risks reproducing the same deadlock if the root cause is structural rather than a one-off collision with a stray process.",
           "priority": 30,
+          "executionState": "ACTIONABLE",
+          "retryWhen": "current packet materialization or digest receipt changes"
+        },
+        {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:45",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 45,
+          "text": "Choose one live already-revisioned repair feature producer and join it to the same frozen candidate snapshot. (2026-09-26 recheck: original frozen snapshot workspace `b19…` has no exact source-binding rows; the existing read-only materializer was fixed to allow an explicitly selected revision only when present in the binding census, but its exact packet/chunk/Graphify/content-digest query returns `CANARY_EXACT_LINEAGE_COHORT_EMPTY` for both admitted revisions `e24…` and `322…`. No replacement map was emitted; the original frozen artifact is unchanged. The strict legacy-hash join still needs an owner-level audit before changing its semantics.)",
+          "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "current packet materialization or digest receipt changes"
         },
@@ -7240,7 +7384,7 @@
           "retryWhen": "current packet materialization or digest receipt changes"
         }
       ],
-      "evidenceHash": "sha256:6af850318e62564a5422fa4e029b98f759aa62e69c0e5ec8006302f0f0f60f30",
+      "evidenceHash": "sha256:c35cb431b4e5539c3388b0a96f38768a1b602e55ad5e922d776187ce2e81c81d",
       "writesPerformed": false
     },
     {
@@ -7251,7 +7395,7 @@
       "releaseEvent": "current workspace/source/execution authority receipt changes to admitted and current",
       "retryPolicy": "do not retry until the relevant authority receipt or revision changes",
       "selection": "exclude live implementation; allow bounded audits that can produce the missing receipt",
-      "taskCount": 110,
+      "taskCount": 111,
       "taskKeys": [
         {
           "taskKey": "atlas-feature-intelligence:237",
@@ -7344,36 +7488,36 @@
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:4354",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:4364",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 4354,
+          "line": 4364,
           "text": "Resolve the existing Graphify source-owner lifecycle and produce one",
           "priority": 40,
           "executionState": "ACTIONABLE",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6714",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:6724",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 6714,
+          "line": 6724,
           "text": "Gate 1 remains blocked until exactly one terminal current-source execution is bound to a non-null workspace revision; gates 2–10 remain dependency-blocked and must not be represented as promoted.",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9190",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9200",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9190,
+          "line": 9200,
           "text": "Keep live symbol materialization and current-source authority blocked",
           "priority": 40,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9536",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9546",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9536,
+          "line": 9546,
           "text": "CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).",
           "priority": 10,
           "executionState": "ACTIONABLE",
@@ -7920,6 +8064,15 @@
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
+          "taskKey": "parent-atlas-repair-candidate-feature-matrix:116",
+          "change": "parent-atlas-repair-candidate-feature-matrix",
+          "line": 116,
+          "text": "**ACE3-03** (PARTIAL 2026-09-26: the existing `bitfrost-residency-warming-v1.ts` owner provides v3 read/write adapters using `AceBitfrostCacheIdentityV1`, exact checksum/revision comparisons, bounded TTL, and the pre-embedding `EMBED_ALLOWED` key set. Existing `AcePacketReader`/`AcePacketWriter` now expose explicit v3 BitFrost methods delegating to that owner with an injected Redis client; the methods do not implicitly connect or write. Fake-Valkey tests prove reader/writer delegation, admitted write/read HIT, unadmitted write rejection, malformed entry MISS, and packet-revision key drift MISS; focused cache suites pass 27/27. STILL OPEN: live Valkey write/readback/stale-miss proof and a production caller decision; no Valkey write performed.) Scope: BitFrost packet identity: use `AceBitfrostCacheIdentityV1` keys (`atlas:bitfrost:v1:ace_packet:*`); hit only on full identity + checksum equality; stale = miss.",
+          "priority": 10,
+          "executionState": "ACTIONABLE",
+          "retryWhen": "workspace/source/execution authority receipt changes"
+        },
+        {
           "taskKey": "parent-atlas-retrieval-executor-compatibility-convergence:86",
           "change": "parent-atlas-retrieval-executor-compatibility-convergence",
           "line": 86,
@@ -7938,171 +8091,171 @@
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10978",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:10986",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 10978,
+          "line": 10986,
           "text": "Keep `workspaceRevision=null` and `canonicalAuthority=false`. The",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11038",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11046",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11038,
+          "line": 11046,
           "text": "Keep `workspaceRevision=null` and do not feed this artifact to Graphify,",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11053",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11061",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11053,
+          "line": 11061,
           "text": "This hardening does not admit `workspaceRevision`, change source selection,",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11162",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11170",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11162,
+          "line": 11170,
           "text": "Keep `workspaceRevision=null`, `canonicalAuthority=false`, and source",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11397",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11405",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11397,
+          "line": 11405,
           "text": "Keep Git source authority unproven: no file-level comparison could be",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11407",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11415",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11407,
+          "line": 11415,
           "text": "Keep workspace lineage blocked: the cohort revision is",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11421",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11429",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11421,
+          "line": 11429,
           "text": "Keep the cohort blocked: `0/5` workspace revisions matched the live",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11578",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:11586",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 11578,
+          "line": 11586,
           "text": "Keep source authority blocked: the audit returned",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12164",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12172",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12164,
+          "line": 12172,
           "text": "Reconcile the zero admitted joins against the terminal execution/source",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12193",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12201",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12193,
+          "line": 12201,
           "text": "Obtain a separately authorized terminal execution and fresh V2 source",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12339",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12347",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12339,
+          "line": 12347,
           "text": "Reconcile the current admitted execution/source cohort with packet and",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12641",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12649",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12641,
+          "line": 12649,
           "text": "Establish the admitted terminal execution and immutable source membership",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12844",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12852",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12844,
+          "line": 12852,
           "text": "Keep terminal execution, canonical source authority, and all dependent",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12902",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:12910",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 12902,
+          "line": 12910,
           "text": "Keep structural/source authority blocked; namespace existence does not",
           "priority": 20,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13635",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13643",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13635,
+          "line": 13643,
           "text": "Require exact packet/chunk identity, source revision, workspace revision,",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13667",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13675",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13667,
+          "line": 13675,
           "text": "Reconcile the candidate's exact execution, graph, and source-membership",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13669",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13677",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13669,
+          "line": 13677,
           "text": "Accept it only if workspace revision, immutable membership, source",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:14229",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:14237",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 14229,
+          "line": 14237,
           "text": "**Not yet done**: recording an explicit `EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION` --",
           "priority": 20,
           "executionState": "ACTIONABLE",
           "retryWhen": "workspace/source/execution authority receipt changes"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16059",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16067",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 16059,
+          "line": 16067,
           "text": "CANONICAL-IDENTITY-V1-SPEC-01 REVISION (2026-09-21) — spec-only, folds operator-supplied refinements into the earlier draft entry; no code, schema or data change. Verified read-only against the cited owners: `sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts` states 'packet identity != chunk identity', says `canonicalChunkId` MUST be sourced from a real row, and marks `chunkRowId` (`codebase_chunk_index.id`, a uuid row PK) as a physical coordinate only; `.../features/canonical-candidate-v1.ts` states CandidateOrdinal values are execution coordinates scoped to `candidateSnapshotRevision`; `packages/parent-atlas/src/core/structural-symbol.ts` requires `source_ref` + `source_revision` on symbol nominations/versions and says GIS/registry alone assigns `stable_symbol_id`/`symbol_version_id` (a `workspace_revision` requirement there was NOT confirmed in this pass). CORRECTION to the earlier draft: chunk identity is NOT a namespaced `canonicalId`; `canonicalChunkId` must come from a real `codebase_chunk_index` chunk identity per `packet-chunk-membership-v1.ts` and must never be generated from randomUUID(), the row id, a sourceRef hash, treeNodeId, a Qdrant point id, nearest AST match or CandidateOrdinal.",
           "priority": 10,
           "executionState": "ACTIONABLE",
@@ -8244,7 +8397,7 @@
           "retryWhen": "workspace/source/execution authority receipt changes"
         }
       ],
-      "evidenceHash": "sha256:105bb3cab8c513fa4d1ccfb4a99d2652234c7a74b7cbf049600425ec108c0d6f",
+      "evidenceHash": "sha256:d5bad52337541a6a34666ab537aab1092ed29ef968969c1c390010f83429cd78",
       "writesPerformed": false
     },
     {
@@ -8255,12 +8408,12 @@
       "releaseEvent": "semantic snapshot and candidate-freeze receipts both become current and lineage-qualified",
       "retryPolicy": "do not retry until either required receipt checksum changes",
       "selection": "exclude ANN/KMeans/SOM production work; allow fixture and read-only parity proofs",
-      "taskCount": 34,
+      "taskCount": 38,
       "taskKeys": [
         {
-          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9523",
+          "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:9533",
           "change": "parent-atlas-ace-rlm-bitfrost-integration",
-          "line": 9523,
+          "line": 9533,
           "text": "**TRACE-SEMANTIC-EXECUTOR-SELECTION-01** prove Qdrant, pgvector, cuVS exact,",
           "priority": 30,
           "executionState": "ACTIONABLE",
@@ -8325,6 +8478,15 @@
           "change": "parent-atlas-candidate-feature-execution-fabric",
           "line": 1113,
           "text": "**LATENT-BRIDGE-01** — exact CandidateOrdinal to canonical chunk ID to",
+          "priority": 10,
+          "executionState": "ACTIONABLE",
+          "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
+        },
+        {
+          "taskKey": "parent-atlas-candidate-feature-execution-fabric:1470",
+          "change": "parent-atlas-candidate-feature-execution-fabric",
+          "line": 1470,
+          "text": "`LARGE_CORPUS_FEATURE_SNAPSHOT_01`: after exact join, feed only qualified rows through the existing CandidateOrdinal/CandidateFeatureSnapshot owners; preserve metadata-only and representation-only populations as separate lanes.",
           "priority": 10,
           "executionState": "ACTIONABLE",
           "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
@@ -8501,37 +8663,64 @@
           "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:5458",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:5466",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 5458,
+          "line": 5466,
           "text": "Freeze the shared candidate population and `CandidateOrdinalMapV1` before production KNN/KMeans/SOM execution.",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:5462",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:5470",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 5462,
+          "line": 5470,
           "text": "Run SOM 20x20 only from the frozen shared matrix; record coordinates as derived features, not identity or retrieval votes.",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:5607",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:5615",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 5607,
+          "line": 5615,
           "text": "14 Only after cohort admission, materialize one semantic `CandidateOrdinalMapV1` bound to the exact vector snapshot and freeze its checksum.",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
         },
         {
-          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13926",
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:13934",
           "change": "parent-atlas-retrieval-lineage-dag-convergence",
-          "line": 13926,
+          "line": 13934,
           "text": "**Step 7 (scale CandidateOrdinalMap/semantic_768/graph)** — correctly still not started, per",
+          "priority": 10,
+          "executionState": "WAITING_ON_DEPENDENCY",
+          "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
+        },
+        {
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16424",
+          "change": "parent-atlas-retrieval-lineage-dag-convergence",
+          "line": 16424,
+          "text": "Downstream feature consumers must join their evidence to this exact CandidateOrdinal/source/chunk/revision tuple; do not use all 24,456 mapped source bindings as candidates. MMR remains a downstream pre-ContextManifest selector after the hint-to-ordinal intersection is proven; it is not a retrieval lane/RRF vote and cannot unblock identity.",
+          "priority": 10,
+          "executionState": "ACTIONABLE",
+          "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
+        },
+        {
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16444",
+          "change": "parent-atlas-retrieval-lineage-dag-convergence",
+          "line": 16444,
+          "text": "SUMMARY-HINT-FEATURE-03 — no exact query vector was found in the frozen CandidateOrdinal/census/vector artifacts or the inspected query-population/parity receipts (the latter freeze query identities/ordinals, not vector bytes). Provide or freeze an explicit, revision-qualified `semantic_768` query vector with query identity and digest; only then compute bounded exact cosine scores for the aligned 330 hints. Preserve 6,402 `UNAVAILABLE` states across the full universe. Do not substitute legacy pseudo-queries or score missing values as zero.",
+          "priority": 10,
+          "executionState": "ACTIONABLE",
+          "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
+        },
+        {
+          "taskKey": "parent-atlas-retrieval-lineage-dag-convergence:16462",
+          "change": "parent-atlas-retrieval-lineage-dag-convergence",
+          "line": 16462,
+          "text": "CEI-24 CandidateOrdinal convergence remains packetKey-scoped and snapshot-bound; retain the existing packetKey map/crosswalk receipts as the applicable coordinate proof. Do not consume the competing packet_id-ordered map or its dependent hint-feature artifact. All 330 quality HINTs are conserved, but only 322 have an exact same-snapshot candidate and 8 remain `NO_CURRENT_CANDIDATE`; feature computation and RF admission remain blocked for the all-330 gate. See `docs/reports/cei24-canonical-candidate-id-reconciliation-v1-20260926T163301Z.json`.",
           "priority": 10,
           "executionState": "WAITING_ON_DEPENDENCY",
           "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
@@ -8564,7 +8753,7 @@
           "retryWhen": "current semantic snapshot and candidate-freeze receipts change"
         }
       ],
-      "evidenceHash": "sha256:bcc2a481bc5ca1c916251cd376aa2295b9dad1362e0e09980c6ccdecd5373cc1",
+      "evidenceHash": "sha256:e728392134e32248003b943cf54763c33bcaa91d449ae8d1443d33c4faee495b",
       "writesPerformed": false
     }
   ],

@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.mapreduce-verified-source-lineage-audit.v1",
+  "generatedAt": "2026-09-26T15:39:15.772Z",
+  "sourceReport": "docs/reports/mapreduce-primary-postgres-crosswalk-v1-20260926T153537Z.json",
+  "sourceWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "counts": {
+    "candidateBindings": 412,
+    "exactPacketRows": 0,
+    "distinctPacketKeys": 0,
+    "exactLineageRows": 0,
+    "distinctCanonicalChunks": 0,
+    "exactChunkRows": 0,
+    "distinctChunkRows": 0
+  },
+  "lineageStatuses": {},
+  "exactRows": [],
+  "canonicalAuthority": false,
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0,
+  "rabbitmqPublishes": 0
+}

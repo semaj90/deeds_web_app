@@ -1,0 +1,114 @@
+{
+  "schema": "atlas.source-ref-exception-classification.v1",
+  "generatedAt": "2026-09-26T21:31:26.000Z",
+  "status": "LIVE_READ_ONLY_CLASSIFICATION_COMPLETE",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "input": {
+    "liveProofReceipt": "docs/reports/gan-readonly-live-proof-v1-20260926T212915Z.json",
+    "liveProofReceiptSha256": "sha256:57b7e55585fe61ec157ae09a278a1963d6b337d731fa6d80c32d288b6982e171",
+    "databaseSnapshot": "REPEATABLE READ READ ONLY"
+  },
+  "conservation": {
+    "exceptionRows": 7,
+    "sourceRefOutcomes": {
+      "PATH_SHAPE_VALID_SOURCE_BINDING_UNPROVEN": 2,
+      "BLANK_SOURCE_REF": 1,
+      "NO_PATH_STRUCTURE": 4
+    },
+    "sum": 7
+  },
+  "liveCensus": {
+    "rowsRead": 61718,
+    "passed": 61713,
+    "hardFailures": 5,
+    "sqlJsParity": true,
+    "legacyOnlyFalseRejects": 56719,
+    "legacyAcceptedNewRejected": 0,
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "neo4jWrites": 0,
+    "graphifyRuns": 0
+  },
+  "rows": [
+    {
+      "packetKey": "packet:652bad7c1002",
+      "sourceRef": ".python-version",
+      "classification": "PATH_SHAPE_VALID_SOURCE_BINDING_UNPROVEN",
+      "currentFileExists": true,
+      "gitTracked": true,
+      "currentFileBytes": 7,
+      "currentFileSha256": "sha256:61141e9590171b900fdf709e7ea8f050d5c2a69198d4a4a1977d7c45186307e5",
+      "historicalMetadataHash": "304ede43879b1458",
+      "historicalSourceRevision": null,
+      "workspaceRevisionKey": null,
+      "workspaceRevision": 0,
+      "note": "The path is a legitimate root-level dotfile shape, but historical hash differs and no current revision binding exists."
+    },
+    {
+      "packetKey": "packet:ab2e2d90162e",
+      "sourceRef": "deeds-web-app.code-workspace",
+      "classification": "PATH_SHAPE_VALID_SOURCE_BINDING_UNPROVEN",
+      "currentFileExists": true,
+      "gitTracked": true,
+      "currentFileBytes": 2394,
+      "currentFileSha256": "sha256:e1c4357623fb9faee96c0d07b6f71c2f112e424b98fa32934b8d2f125fe7ba57",
+      "historicalMetadataHash": "988cc844dba1c099",
+      "historicalSourceRevision": null,
+      "workspaceRevisionKey": null,
+      "workspaceRevision": 0,
+      "note": "The path is a legitimate root-level workspace-file shape, but historical hash differs and no current revision binding exists."
+    },
+    {
+      "packetKey": "ace:packet:e3b0c44298fc",
+      "sourceRef": "",
+      "classification": "BLANK_SOURCE_REF",
+      "currentFileExists": false,
+      "historicalSourceRevision": null,
+      "workspaceRevisionKey": null,
+      "workspaceRevision": 0
+    },
+    {
+      "packetKey": "packet:99e624275901",
+      "sourceRef": "nul",
+      "classification": "NO_PATH_STRUCTURE",
+      "currentFileExists": false,
+      "note": "No regular file exists at this reference in the current Windows checkout; it is also a reserved DOS device name."
+    },
+    {
+      "packetKey": "packet:b1c8ef9a1a6b",
+      "sourceRef": "utputFormat",
+      "classification": "NO_PATH_STRUCTURE",
+      "currentFileExists": true,
+      "gitTracked": true,
+      "currentFileBytes": 47,
+      "currentFileContentPrefix": "HTTP/1.1 400 Bad Request\\nConnection: close",
+      "note": "Tracked artifact is an HTTP error response, not a source path."
+    },
+    {
+      "packetKey": "packet:6b86b273ff34",
+      "sourceRef": "1",
+      "classification": "NO_PATH_STRUCTURE",
+      "currentFileExists": true,
+      "gitTracked": true,
+      "currentFileBytes": 0,
+      "note": "A zero-byte tracked root entry has no source path structure."
+    },
+    {
+      "packetKey": "packet:9cb07eae5501",
+      "sourceRef": "--since 2h",
+      "classification": "NO_PATH_STRUCTURE",
+      "currentFileExists": true,
+      "gitTracked": true,
+      "currentFileBytes": 2838,
+      "note": "Tracked root entry begins with captured status/commit-note text; not treated as a source path."
+    }
+  ],
+  "policyChange": {
+    "acceptedSyntax": "relative path, or root-level filename with a dotted name/suffix; supports dotfiles and compound/hyphenated suffixes",
+    "examplesNowAccepted": [".python-version", "deeds-web-app.code-workspace"],
+    "authorityEffect": "none; syntax acceptance does not prove file identity, source revision, or workspace binding"
+  }
+}

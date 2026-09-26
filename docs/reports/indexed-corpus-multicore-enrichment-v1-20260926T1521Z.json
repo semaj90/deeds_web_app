@@ -1,0 +1,76 @@
+{
+  "schema": "atlas.indexed-corpus-multicore-enrichment.v1",
+  "status": "MULTICORE_ARTIFACT_STAGE_PROVEN_INDEXED_ENRICHMENT_BLOCKED",
+  "generatedAt": "2026-09-26T15:21:16Z",
+  "scope": {
+    "repository": "deeds-web-app",
+    "notWholeRepository": true,
+    "repositoryFileCountClaimed": false,
+    "inputs": [
+      {
+        "path": ".tmp/mapreduce-full-v5.ndjson",
+        "role": "PRIMARY_METADATA_CORPUS",
+        "records": 5000,
+        "bytes": 805352974,
+        "sha256": "9ed6d8d3e28f6b0453d75f305b67586ef9dc70cfac05b97825f6763916a42664",
+        "revisionFieldsPresent": false,
+        "sourceRefFieldsPresent": false,
+        "identityState": "UNRESOLVED_FILE_PATH_IS_METADATA_ONLY"
+      },
+      {
+        "path": "sveltekit-frontend/tmp/codebase_chunks_768-embeddings.ndjson",
+        "role": "REPRESENTATION_CORPUS",
+        "records": 76261,
+        "bytes": 739230455,
+        "sha256": "6474990e4914d53dfb05ed261313bba44f97b56d9de261e75941fb34ba7b9db5",
+        "revisionFieldsPresent": false,
+        "sourceRefDistinct": 61738,
+        "duplicateSourceRefRows": 14503,
+        "representationState": "UNQUALIFIED_HISTORICAL_VECTOR"
+      }
+    ]
+  },
+  "multicoreArtifactBuild": {
+    "script": "scripts/atlas/build-large-corpus-enrichment-shards-v1.mjs",
+    "workerConfigOwner": "scripts/atlas/lib/large-corpus-worker-config-v1.mjs",
+    "workers": 8,
+    "artifactScansConcurrent": true,
+    "shardRecordsMax": 5000,
+    "status": "LOCAL_SHARDS_SEALED_NONCANONICAL",
+    "outputManifest": ".tmp/atlas/large-corpus-enrichment-shards-v1/20260926T152018Z/manifest.json",
+    "rootSha256": "85712fd9ec1c065857361b2f926cb218b479555f89cd89d28094165e20e3f3ff",
+    "previousSerialRootSha256": "85712fd9ec1c065857361b2f926cb218b479555f89cd89d28094165e20e3f3ff",
+    "deterministicRootParity": true
+  },
+  "indexedEvidenceReconciliation": {
+    "priorReadOnlyReport": "docs/reports/large-corpus-shards-postgres-reconciliation-v1.json",
+    "distinctRepresentationSourceRefs": 61738,
+    "exactCodebaseChunkIndexSourceRefMatches": 0,
+    "exactAtlasPacketSourceRefMatches": 2,
+    "refsMatchingNeither": 61736,
+    "sourceRevisionPresentInInputs": 0,
+    "workspaceRevisionPresentInInputs": 0,
+    "sampleNumericIdIsCanonicalChunkRowId": false,
+    "sampleExactChunkRefMatched": false,
+    "canonicalIdentityOrRevisionPlaceholdersFilled": 0,
+    "decision": "DO_NOT_INFER_OR_NORMALIZE_IDENTITIES_FROM_LEGACY_EXPORT_KEYS"
+  },
+  "dailyGraphify": {
+    "canonicalOwner": "sveltekit-frontend/package.json graphify:daily:chain -> scripts/startup/run-graphify-daily-startup.mjs",
+    "productionChainChanged": false,
+    "historicalArtifactScanWiredIntoDaily": false,
+    "existingIndexer": "scripts/atlas/index-full-repo-for-search.mjs",
+    "existingIndexerBehavior": "async embedding batches and per-chunk Promise.all, but also direct PostgreSQL/Qdrant writes; not a safe worker-thread target before lineage admission",
+    "chainExecution": "ordered sequential stages; no stage fanout added",
+    "reason": "The source artifacts are historical, have no admitted revision bindings, and are not daily Graphify inputs."
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphifyApply": 0,
+    "modelCalls": 0
+  },
+  "nextGate": "EXACT_CURRENT_INDEX_LOOKUP_BY_ADMITTED_SOURCE_BINDING_AND_CHUNK_LINEAGE; KEEP_UNMATCHED_FIELDS_NULL"
+}

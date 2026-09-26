@@ -1,7 +1,7 @@
 {
   "schema": "atlas.large-corpus-enrichment-census.v1",
   "status": "LARGE_CORPUS_ENRICHMENT_CENSUS_PROVEN",
-  "generatedAt": "2026-09-25T20:03:34.707Z",
+  "generatedAt": "2026-09-26T16:53:27.359Z",
   "mode": "READ_ONLY_STREAMING_CENSUS",
   "artifacts": [
     {

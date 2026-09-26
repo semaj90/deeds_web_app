@@ -60,7 +60,7 @@ export function buildErrorAgentExecutionReceiptV1(
     dispatchStatus: dispatch.status,
     workerStatus,
     smokePassed: execution.ok,
-    reconciliationStatus: options.reconciliationStatus ?? 'NOT_RUN',
+    reconciliationStatus: (options.reconciliationStatus ?? 'NOT_RUN') as ReconciliationStatus | 'NOT_RUN',
     proofRefs: [...new Set([...(execution.proofRefs ?? []), ...(options.proofRefs ?? [])])],
     canonicalAuthority: false as const,
     canonicalWritesAllowed: false as const,
@@ -78,4 +78,3 @@ export function verifyErrorAgentExecutionReceiptV1(receipt: ErrorAgentExecutionR
   const { checksum: provided, ...unsigned } = receipt;
   return Boolean(provided) && provided === checksum(unsigned);
 }
-

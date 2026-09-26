@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.mapreduce-primary-placeholder-enrichment-report.v1",
+  "generatedAt": "2026-09-26T22:43:00Z",
+  "decision": "LOCAL_ARTIFACT_ENRICHED_WITH_NONCANONICAL_INDEX_EVIDENCE",
+  "sourceArtifacts": {
+    "inputManifest": ".tmp/atlas/large-corpus-enrichment-shards-v1/20260926T152018Z/manifest.json",
+    "sourceBindingAudit": "docs/reports/mapreduce-primary-postgres-crosswalk-v1-20260926T153537Z.json",
+    "packetChunkAudit": "docs/reports/mapreduce-verified-source-lineage-v1-20260926T154153.838Z.json",
+    "inputRows": 5000,
+    "inputSha256": "sha256:9ed6d8d3e28f6b0453d75f305b67586ef9dc70cfac05b97825f6763916a42664"
+  },
+  "postgresReadOnlyFindings": {
+    "uniqueCurrentSourceBindingsWithDiskByteVerification": 412,
+    "packetExactSourceRef": 397,
+    "packetExactSourceAndRevision": 364,
+    "packetWorkspaceRevisionExact": 0,
+    "provenPacketLineageRows": 1520,
+    "exactCurrentCodebaseChunkRows": 0,
+    "exactCurrentCodebaseChunkRowsWithWorkspaceRevision": 0
+  },
+  "enrichedArtifact": {
+    "path": ".tmp/atlas/mapreduce-primary-placeholder-enrichment-v1/20260926T154258.271Z/primary_metadata_corpus-enriched-00001.ndjson",
+    "manifest": ".tmp/atlas/mapreduce-primary-placeholder-enrichment-v1/20260926T154258.271Z/manifest.json",
+    "rows": 5000,
+    "sha256": "sha256:80f87826edafa6765abf55f3241c28dba07897c409e72039625efc7daa51786f",
+    "sourceBindingEvidenceRows": 417,
+    "packetKeyLinkedButWorkspaceMirrorUnqualifiedRows": 365,
+    "rowsWithPacketLineageHints": 127,
+    "unresolvedRowsLeftUnchanged": 4583,
+    "summaryTextsAdded": 0,
+    "canonicalChunkRowsResolved": 0
+  },
+  "interpretation": [
+    "The 412 source bindings are unique current-workspace digest matches whose actual local file bytes and byte lengths were verified; repeated content hashes in the 5,000-row export map these bindings onto 417 exported metadata rows.",
+    "Packet keys are attached only where packet source_ref and source_revision exactly match the verified binding. Packet workspace_revision mirrors are not current-qualified, so these remain explicitly noncanonical evidence.",
+    "The 1,520 proven lineage-table rows do not resolve to a current codebase_chunk_index row by exact lineage chunk ID, source_ref, and source_revision. No canonical chunk identity was minted or promoted.",
+    "Historical summary/vector exports remain outside production graphify:daily and were not loaded into PostgreSQL, Qdrant, Valkey, RabbitMQ, or Graphify."
+  ],
+  "writes": { "postgres": 0, "qdrant": 0, "valkey": 0, "rabbitmq": 0, "graphifyProduction": 0 },
+  "canonicalAuthority": false,
+  "nextGate": "Resolve packet workspace binding mirrors and exact current chunk-row lineage before canonical feature or ACE promotion; keep ordered daily Graphify writer path separately gated."
+}

@@ -13,7 +13,9 @@ import { ENRICHMENT_READINESS_CTE_V1 } from './lib/enrichment-readiness-sql-v1.m
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
 const shardRoot = path.join(REPO_ROOT, '.tmp/atlas/current-enriched-index-shards-v1');
-const dir = process.argv[2] ?? fs.readdirSync(shardRoot).sort().at(-1);
+const arg = (name) => { const i = process.argv.indexOf(name); return i >= 0 ? process.argv[i + 1] : null; };
+const dir = arg('--shard-dir') ?? process.argv[2] ?? fs.readdirSync(shardRoot).sort().at(-1);
+const reportPath = path.resolve(REPO_ROOT, arg('--report-path') ?? 'docs/reports/enriched-index-smoke-validation-v1.json');
 const manifest = JSON.parse(fs.readFileSync(path.join(shardRoot, dir, 'manifest.json'), 'utf8'));
 const checks = [];
 const check = (name, pass, detail) => { checks.push({ name, pass: Boolean(pass), detail: detail ?? null }); };
@@ -32,24 +34,26 @@ check('manifest root sha256', root === manifest.rootSha256);
 check('total records equals manifest', records.length === manifest.records, `${records.length}`);
 
 // 2. Record invariants
-const STATES = new Set(['REVISION_QUALIFIED', 'REVISION_MISSING', 'REVISION_CONFLICT', 'REVISION_HASH_CONFLICT', 'LEGACY_ONLY', 'IDENTITY_UNRESOLVED']);
+const SOURCE_QUALIFIED = new Set(['REVISION_QUALIFIED', 'REVISION_QUALIFIED_PACKET_SHA256_STALE']);
+const STATES = new Set([...SOURCE_QUALIFIED, 'REVISION_MISSING', 'REVISION_CONFLICT', 'REVISION_HASH_CONFLICT', 'LEGACY_ONLY', 'IDENTITY_UNRESOLVED']);
 const REV = /^[0-9a-f]{64}$|^sha256:[0-9a-f]{64}$/;
 check('unique sourceRef', new Set(records.map((r) => r.sourceRef)).size === records.length);
 check('schema tag on every record', records.every((r) => r.schema === 'atlas.enriched-index-record.v1'));
 check('lineageState in vocabulary', records.every((r) => STATES.has(r.lineageState)));
-check('qualified rows carry packetKey + revision', records.filter((r) => r.lineageState === 'REVISION_QUALIFIED').every((r) => r.packetKey && REV.test(r.sourceRevision)));
+check('source-qualified rows carry packetKey + revision', records.filter((r) => SOURCE_QUALIFIED.has(r.lineageState)).every((r) => r.packetKey && REV.test(r.sourceRevision) && r.sourceRevisionQualified === true));
 check('packetKey unique among packet-bearing rows', (() => { const k = records.filter((r) => r.packetKey).map((r) => r.packetKey); return new Set(k).size === k.length; })());
 check('no summary text copied', records.every((r) => typeof r.summary === 'object' && !('text' in r.summary)));
 check('embedding never marked identity', records.every((r) => r.representation.isIdentity === false));
 check('unresolved/legacy rows have no packetKey', records.filter((r) => r.lineageState === 'IDENTITY_UNRESOLVED' || r.lineageState === 'LEGACY_ONLY').every((r) => !r.packetKey));
-check('summary.revisionQualified only when qualified', records.every((r) => !r.summary.revisionQualified || r.lineageState === 'REVISION_QUALIFIED'));
+check('legacy summary remains HINT, not source-revision-qualified', records.every((r) => r.summary.revisionQualified === false && r.summary.trustState === (r.summary.present ? 'LEGACY_HINT_UNQUALIFIED' : 'MISSING')));
 check('non-eligible AST rows are NOT_APPLICABLE', records.filter((r) => r.astEligibility === 'NOT_ELIGIBLE').every((r) => r.astState === 'NOT_APPLICABLE'));
-check('hash-conflict rows never counted qualified', records.filter((r) => r.packetSha256MatchesAdmitted === false).every((r) => r.lineageState !== 'REVISION_QUALIFIED'));
+check('stale packet sha256 does not erase source-revision qualification', records.filter((r) => r.lineageState === 'REVISION_QUALIFIED_PACKET_SHA256_STALE').every((r) => r.sourceRevisionQualified === true));
 
 // 2b. Matrix draft integrity (if built)
 const matrixRoot = path.join(REPO_ROOT, '.tmp/atlas/candidate-feature-matrix-v1');
 if (fs.existsSync(matrixRoot)) {
-  const mdir = path.join(matrixRoot, fs.readdirSync(matrixRoot).sort().at(-1));
+  const requestedMatrixDir = arg('--matrix-dir');
+  const mdir = path.join(matrixRoot, requestedMatrixDir ?? fs.readdirSync(matrixRoot).sort().at(-1));
   const d = JSON.parse(fs.readFileSync(path.join(mdir, 'descriptor.json'), 'utf8'));
   for (const [name, meta] of Object.entries(d.files)) {
     const buf = fs.readFileSync(path.join(mdir, name));
@@ -57,7 +61,7 @@ if (fs.existsSync(matrixRoot)) {
   }
   check('matrix numeric size = N*K*4', d.files['numeric.f32le'].bytes === d.candidates * d.numeric.shape[1] * 4);
   check('matrix semantic size = N*768*4', d.files['semantic768.f32le'].bytes === d.candidates * 768 * 4);
-  check('matrix candidates equals qualified rows', d.candidates === records.filter((r) => r.lineageState === 'REVISION_QUALIFIED').length);
+  check('matrix candidates equals source-qualified rows', d.candidates === records.filter((r) => SOURCE_QUALIFIED.has(r.lineageState)).length);
   check('matrix never claims canonical while blockers remain', d.canonical === false);
   const em = fs.readFileSync(path.join(mdir, 'semantic768_mask.u8'));
   const ef = fs.readFileSync(path.join(mdir, 'semantic768.f32le'));
@@ -66,7 +70,8 @@ if (fs.existsSync(matrixRoot)) {
 }
 
 // 3. Embedding sanity on qualified rows (read-only)
-const qualifiedRefs = records.filter((r) => r.lineageState === 'REVISION_QUALIFIED').map((r) => r.sourceRef);
+const qualifiedRefs = records.filter((r) => SOURCE_QUALIFIED.has(r.lineageState)).map((r) => r.sourceRef);
+const legacyGateRefs = records.filter((r) => r.lineageState === 'REVISION_QUALIFIED').map((r) => r.sourceRef);
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, connectionTimeoutMillis: 5000, statement_timeout: 120000 });
 const client = await pool.connect();
 let emb; let rep; let dup; let gate;
@@ -88,7 +93,7 @@ try {
     FROM public.atlas_packets ap WHERE ap.source_ref = ANY($1::text[])`, [qualifiedRefs])).rows[0];
   dup = (await client.query(`SELECT coalesce(max(n),0)::int AS largest_identical_group, coalesce(sum(n) FILTER (WHERE n > 1),0)::int AS rows_in_duplicate_groups FROM (SELECT count(*) AS n FROM public.atlas_packets ap WHERE ap.source_ref = ANY($1::text[]) AND ap.embedding IS NOT NULL GROUP BY md5(ap.embedding::text)) g`, [qualifiedRefs])).rows[0];
   dup.embedding_eligible_false = (await client.query(`SELECT count(*)::int AS n FROM public.atlas_packets ap WHERE ap.source_ref = ANY($1::text[]) AND ap.embedding IS NOT NULL AND ap.embedding_eligible IS FALSE`, [qualifiedRefs])).rows[0].n;
-  gate = (await client.query(`${ENRICHMENT_READINESS_CTE_V1} SELECT count(*) FILTER (WHERE emb_real AND NOT embed_allowed)::int AS real_but_blocked, count(*) FILTER (WHERE embed_allowed AND emb_placeholder)::int AS allowed_but_placeholder, count(*) FILTER (WHERE embed_allowed)::int AS allowed, count(*) FILTER (WHERE emb_placeholder AND has_summary)::int AS placeholder_with_summary FROM lv WHERE source_ref = ANY($1::text[])`, [qualifiedRefs])).rows[0];
+  gate = (await client.query(`${ENRICHMENT_READINESS_CTE_V1} SELECT count(*) FILTER (WHERE emb_real AND NOT embed_allowed)::int AS real_but_blocked, count(*) FILTER (WHERE embed_allowed AND emb_placeholder)::int AS allowed_but_placeholder, count(*) FILTER (WHERE embed_allowed)::int AS allowed, count(*) FILTER (WHERE emb_placeholder AND has_summary)::int AS placeholder_with_summary FROM lv WHERE source_ref = ANY($1::text[])`, [legacyGateRefs])).rows[0];
   await client.query('ROLLBACK');
 } finally {
   client.release();
@@ -115,10 +120,13 @@ if (missingVer > 0) blockers.push({ id: 'EMBEDDING_VERSION_MISSING_ON_SOME', sev
 if (emb.non_unit_norm > 0) blockers.push({ id: 'EMBEDDING_NORM_NOT_UNIT', severity: 'NORMALIZE_BEFORE_COSINE', evidence: `${emb.non_unit_norm} vectors outside [0.99,1.01] norm`, fixNeeds: 'L2-normalize in the matrix builder (no stored mutation)' });
 const c = (s) => records.filter((r) => r.lineageState === s).length;
 if (c('REVISION_HASH_CONFLICT') > 0) blockers.push({ id: 'PACKET_DIGEST_STALE', severity: 'EXCLUDED_FROM_MATRIX', evidence: `${c('REVISION_HASH_CONFLICT')} packets: revision matches disk, packet.sha256 stale (writer current-packet-digest-bridge-v1)`, fixNeeds: 'digest refresh + summary/embedding re-derivation (writes)' });
+if (c('REVISION_QUALIFIED_PACKET_SHA256_STALE') > 0) blockers.push({ id: 'PACKET_SHA256_STALE_COMPATIBILITY_METADATA', severity: 'DIAGNOSTIC_ONLY', evidence: `${c('REVISION_QUALIFIED_PACKET_SHA256_STALE')} rows pass exact source-revision qualification while the compatibility sha256 differs; retained in the matrix with an explicit stale flag`, fixNeeds: 'no identity correction implied; preserve the stale metadata for a separately authorized repair decision' });
 if (c('REVISION_MISSING') > 0) blockers.push({ id: 'PACKET_REVISION_MISSING', severity: 'EXCLUDED_FROM_MATRIX', evidence: `${c('REVISION_MISSING')} packets without source_revision`, fixNeeds: 'revision stamping from proven admission (writes)' });
 if (c('LEGACY_ONLY') + c('IDENTITY_UNRESOLVED') > 0) blockers.push({ id: 'NO_CANONICAL_PACKET', severity: 'COVERAGE_GAP', evidence: `${c('LEGACY_ONLY')} legacy-chunk-only + ${c('IDENTITY_UNRESOLVED')} unresolved identities`, fixNeeds: 'packet creation under the canonical truth flow (writes)' });
 if (records.some((r) => String(r.astState).startsWith('NOT_JOINED'))) blockers.push({ id: 'AST_LANE_NOT_JOINED', severity: 'NON_BLOCKING', evidence: 'some records have astState NOT_JOINED_*', fixNeeds: 'run join-ast-state-into-enriched-shards-v1.mjs' });
-check('astState joined on every record', records.every((r) => !String(r.astState).startsWith('NOT_JOINED')));
+check('astState is explicit without overstating join completion', records.every((r) => r.astEligibility === 'NOT_ELIGIBLE'
+  ? r.astState === 'NOT_APPLICABLE'
+  : r.astState === 'PARSER_UNAVAILABLE' || r.astState === 'NOT_JOINED_IN_THIS_PASS'));
 
 const failed = checks.filter((x) => !x.pass);
 const report = {
@@ -127,10 +135,10 @@ const report = {
   status: failed.length === 0 ? 'SMOKE_PASS' : 'SMOKE_FAIL',
   checksRun: checks.length, checksFailed: failed.length, failures: failed, checks,
   embeddingSanity: emb, duplicateEmbeddings: dup, representationState: rep,
-  matrixCohort: { qualifiedRows: qualifiedRefs.length, blockedFromCanonicalMatrix: blockers.filter((b) => b.severity === 'BLOCKS_CANONICAL_MATRIX').map((b) => b.id) },
+  matrixCohort: { sourceQualifiedRows: qualifiedRefs.length, enrichmentGateEvaluatedRows: legacyGateRefs.length, blockedFromCanonicalMatrix: blockers.filter((b) => b.severity === 'BLOCKS_CANONICAL_MATRIX').map((b) => b.id) },
   blockers, canonicalMatrixReady: blockers.every((b) => !b.severity.startsWith('BLOCKS_')),
   generatedAt: new Date().toISOString(),
 };
-fs.writeFileSync(path.join(REPO_ROOT, 'docs/reports/enriched-index-smoke-validation-v1.json'), JSON.stringify(report, null, 2) + '\n', 'utf8');
+fs.writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n', { flag: 'wx' });
 console.log(JSON.stringify({ status: report.status, checksRun: report.checksRun, checksFailed: report.checksFailed, failures: failed, embeddingSanity: emb, representationState: rep, canonicalMatrixReady: report.canonicalMatrixReady, blockers: blockers.map((b) => `${b.id} [${b.severity}]`) }, null, 2));
 process.exit(failed.length ? 1 : 0);

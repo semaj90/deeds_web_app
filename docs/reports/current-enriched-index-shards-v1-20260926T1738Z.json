@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.current-enriched-index-shards.v1",
+  "mode": "READ_ONLY_DB_LOCAL_SHARDS",
+  "databaseWrites": 0,
+  "valkeyWrites": 0,
+  "llmCalls": 0,
+  "scope": {
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+  },
+  "manifestPath": ".tmp\\atlas\\current-enriched-index-shards-v1\\20260926T173847Z\\manifest.json",
+  "rootSha256": "50c305ad0affacbc04fc527b929d6cd20c551cfb9bd8139d02317a936f7e6a9e",
+  "records": 24456,
+  "lineageStates": {
+    "IDENTITY_UNRESOLVED": 7913,
+    "REVISION_QUALIFIED": 15732,
+    "REVISION_MISSING": 392,
+    "REVISION_HASH_CONFLICT": 419
+  },
+  "noPacketByExtension": {
+    "ts": 3005,
+    "md": 1646,
+    "mjs": 1553,
+    "mts": 491,
+    "py": 457,
+    "json": 349,
+    "sql": 212,
+    "yaml": 65,
+    "ps1": 43,
+    "sh": 20,
+    "svelte": 20,
+    "go": 12,
+    "js": 8,
+    "proto": 7,
+    "cpp": 6,
+    "yml": 5,
+    "toml": 5,
+    "cjs": 3,
+    "c": 2,
+    "cc": 2,
+    "h": 1,
+    "java": 1
+  },
+  "astEligibility": {
+    "NOT_ELIGIBLE": 9638,
+    "ELIGIBLE": 14818
+  },
+  "revisionQualifiedWithSummary": 3295,
+  "revisionQualifiedWithoutSummary": 12437,
+  "packetSha256": {
+    "matchesAdmitted": 3222,
+    "differs": 477,
+    "absent": 20757
+  },
+  "notes": [
+    "astState is NOT_JOINED_IN_THIS_PASS for eligible files; see current-workspace-ast-lineage-v1 receipts",
+    "summary text is not copied into shards; length and hash only",
+    "exact source_ref join; not canonical identity by itself",
+    "packet.content_hash is a different-scope hash (0/100 match) and is ignored; packet.sha256 is the whole-file hash and gates REVISION_QUALIFIED when present"
+  ],
+  "generatedAt": "2026-09-26T17:38:48.121Z"
+}

@@ -181,7 +181,7 @@ const PatchTournamentInputSchema = z.object({
     PatchTournamentCandidateSchema,
     PatchTournamentCandidateSchema,
   ]).superRefine((candidates, context) => {
-    if (new Set(candidates.map((candidate) => candidate.candidateId)).size !== 3) {
+    if (new Set([candidates[0].candidateId, candidates[1].candidateId, candidates[2].candidateId]).size !== 3) {
       context.addIssue({ code: z.ZodIssueCode.custom, message: 'candidateId values must be unique' });
     }
   }),

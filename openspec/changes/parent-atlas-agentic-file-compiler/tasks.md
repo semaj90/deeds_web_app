@@ -44,22 +44,39 @@ datastore/model state was changed.
 - [ ] AFC-11 Wire exact promotion to the live retrieval owner.
 - [ ] AFC-12 Extend existing context manifest persistence with revision/evidence refs through a migration only after compatibility proof.
 - [x] AFC-13 Persist WorkflowActionEventV1 through the existing action/outbox writer. The compiler now converts supported lifecycle events through `workflowEventToCanonicalActionWriterRequest` and delegates to `writeCanonicalWorkflowActionAtomically`; compiler-only kinds fail closed. Adapter proof passes 5/5 and existing action/outbox writer proof passes 11/11. No live database write/readback was run in this tranche.
-- [ ] AFC-14 Install/verify a real Mastra runtime before replacing the current passthrough shim. Read-only recheck: the isolated `@deeds/atlas-orchestrator` workspace resolves `@mastra/core@0.1.26`, but importing it fails with `MODULE_NOT_FOUND: @prisma-app/client`; Prisma is not an approved Parent Atlas persistence owner, so the frontend shim remains active and this task is not complete.
+- [x] AFC-14 Install/verify a real Mastra runtime before replacing the current passthrough shim. The existing `@deeds/atlas-orchestrator` owner now pins `@mastra/core@1.71.0`, its PostgreSQL and Redis adapters, and an isolated LangChain/Deep Agents dependency set satisfying the Deep Agents peer ranges. A checksum-verified portable Node `v22.23.3` import smoke loads `Mastra`, `createDurableAgent`, `PostgresStore`, `WorkflowsPG`, `RedisServerCache`, `createDeepAgent`, LangChain `tool`, and LangGraph `StateGraph`; TypeScript check passes. The repo `.npmrc` disables workspaces, so install required explicit `--workspaces=true --workspace=@deeds/atlas-orchestrator --install-strategy=nested`. No agent was instantiated, no database connection or write occurred, and the SvelteKit shim was not replaced. See `docs/reports/mastra-deepagents-install-20260926.md`. AFC-15 restart/suspend parity remains open.
+- [x] AFC-14B-01 Wire the authenticated SvelteKit Mastra route to accept only the existing `AceContextManifestAdmissionV1` + `PromptPlanV1` + checksum-bound segment content; revalidate manifest/plan checksums and packet-key/evidence membership, resolve the loaded model through the existing llama-server resolver, and execute with a request-scoped tool-free Mastra Agent. The route does not retrieve/build candidates, write stores, persist durable state, or accept an ad-hoc prompt. Fixture route and executor tests pass (6/6); package type-check passes. This is wiring/fixture proof only, not a live same-snapshot inference proof; immutable model artifact revision remains unavailable. See route `sveltekit-frontend/src/routes/api/atlas/mastra-agent/+server.ts` and executor `packages/atlas-orchestrator/src/models/prompt-plan-agent.ts`.
+- [x] AFC-14B-01A Rehome the route fixture spec outside the reserved SvelteKit `+` route directory to `sveltekit-frontend/src/lib/server/atlas/mastra-agent-route.spec.ts`. Under PATH Node `v22.23.3`, the focused route suite passes 3/3 and the orchestrator import/typecheck smoke passes. The initial 8-GiB-heap check reported 36 errors / 291 warnings; the 2026-09-26 remediation rerun now reports 0 errors / 291 warnings across 100 files. AFC-17 remains open pending the required Tree-sitter and test-barrier proof. No live inference or datastore operation was performed. Details: `docs/reports/svelte-check-error-remediation-20260926.md`.
+- [ ] AFC-14B-02 Prove one authenticated live request using an owner-produced packet-key CandidateOrdinal snapshot, admitted ContextManifestV2, and PromptPlanV1 through the Mastra route; preserve the exact loaded model ID and record immutable model-artifact provenance if the endpoint exposes it. No candidate selection or identity interpretation may move into Mastra. Until this receipt exists, application runtime execution is not live-proven.
 - [ ] AFC-15 Prove suspend/resume restart parity using Mastra snapshots.
 - [ ] AFC-16 Wire bounded filesystem mutation behind authorization and human-approval policy.
 - [ ] AFC-17 Prove Tree-sitter/typecheck/test validation barrier. The pure barrier contract now
   has pass/fail, warning-admission, required-validator ordering, and deterministic replay tests
-  (`validation-barrier.spec.ts`, 4/4); live repository Tree-sitter/typecheck/test execution is
-  still required before this task can close.
+  (`validation-barrier.spec.ts`, 5/5); live repository Tree-sitter/typecheck/test execution is
+  still required before this task can close. The app-wide typecheck subgate now passes with
+  0 errors / 291 warnings across 100 files; the remaining Tree-sitter and required test-barrier
+  gates are not yet proven.
 
 Live barrier recheck (read-only, 2026-09-19): the structured-value runtime probe is ready with
 `tree-sitter 0.25.1`, `tree-sitter-typescript 0.23.2`, `treesitter-chunker 4.0.0`, Python 3.13.5,
-and `pyarrow 21.0.0`; the four barrier tests pass. The SvelteKit `typecheck:native` check is present
-and currently exits with 62 TypeScript errors after one active workflow union-narrowing error was repaired, so the live barrier remains blocked. AFC-17 remains open;
-no compiler or runtime mutation was performed.
+and `pyarrow 21.0.0`; the four barrier tests pass. The SvelteKit `typecheck:native` check at that
+time exited with 62 TypeScript errors. This historical baseline is superseded by the fresh 2026-09-26
+8-GiB-heap check below; it is retained as history, not current status.
+
 The barrier contract was hardened to fail closed on duplicate validator observations; focused coverage
-now passes 5/5. The current native TypeScript run still reports unrelated repository-wide errors, so
-this task remains open pending a clean live Tree-sitter/typecheck/test receipt.
+passes 5/5. Fresh 2026-09-26 verification is recorded in
+`docs/reports/svelte-check-error-remediation-20260926.md`: the full frontend `npm run check` with
+`NODE_OPTIONS=--max-old-space-size=8192` now reports 0 errors and 291 warnings across 100 files.
+This closes the app-wide typecheck subgate only. AFC-17 remains OPEN pending Tree-sitter and full
+required test-barrier execution. No model inference, canonical datastore mutation, or Graphify run
+was performed.
+
+Warning/barrier diagnosis (2026-09-26): machine census confirms 0 errors / 291 Svelte warnings
+(233 accessibility, 58 unused CSS selectors). AFC-17's pure aggregator has no live runner callsite;
+no repository Tree-sitter receipt or selected test-suite receipt is bound into a
+`ValidationBarrierResultV1`. The current aggregator trusts caller-supplied validators/statuses and
+does not bind PASS to exit codes/output evidence or warning-code/count admission. Keep AFC-17 OPEN
+until these proof/contract gaps are closed; see `docs/reports/svelte-check-error-remediation-20260926.md`.
 - [ ] AFC-18 Wire incremental AST/semantic_768/graph refresh and cache invalidation.
 - [ ] AFC-19 Run CPU/GPU semantic executor parity and confirm one-vote-per-lane behavior.
 - [ ] AFC-20 Retire the fake Mastra `defineWorkflow` shim only after AFC-14/AFC-15 pass.

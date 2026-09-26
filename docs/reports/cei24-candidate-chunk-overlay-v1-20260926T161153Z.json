@@ -1,0 +1,83 @@
+{
+  "schema": "atlas.cei24-candidate-chunk-overlay-receipt.v1",
+  "generatedAt": "2026-09-26T16:11:53.888Z",
+  "canonicalAuthority": false,
+  "inputs": {
+    "matrixDir": ".tmp\\atlas\\candidate-feature-matrix-v1\\20260926T150456Z",
+    "matrixOrdinalFileSha256": "sha256:dcdbec415e4e131a4595f8118bb21da217bf0edc42e3509fdfb1191f9a2d59b2",
+    "matrixRows": 16151,
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+  },
+  "cei24a": {
+    "owner": "atlas_packets.packet_id (convention of scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts)",
+    "exactTupleJoin": "packet_key + exact source_ref (canonical_source_ref is a lowercased variant, not the key) + source_revision + workspace_revision_key (atlas_packets.workspace_revision is legacy integer 0)",
+    "unresolved": 0,
+    "ambiguous": 0,
+    "duplicatePacketIds": 0,
+    "packetIdEqualsPacketKeyRows": 16025,
+    "packetIdDiffersFromPacketKeyRows": 126,
+    "verdict": "CEI_PACKET_CANONICAL_ID_OWNER_PROVEN"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "status": "CANDIDATE_CHUNK_OVERLAY_SEALED",
+  "cei24b": {
+    "candidateSnapshotRevision": "sha256:603ec7df0c335cbd7feecc9f7041d9e09605e2008a37d7f7998d1c475aa4be81",
+    "ordinalMapChecksum": "6ae3cbcc4c4e6eff3ff6f516cdc1216db59b94a6b83c382e6cddc028f9418a0e",
+    "rowCount": 16151,
+    "producerRevision": "materialize-cei24-candidate-chunk-overlay-v1:sha256:9551420e3325517ee5bfa354c54df64f6db9c2200557f742ca31690aff2b137c",
+    "orderingNote": "CandidateOrdinalMapV1 ordinals are canonicalId(packet_id)-ordered; CEI-23 matrix rows are sourceRef-ordered — overlay carries matrixRowIndex as the crosswalk.",
+    "ordinalIsPermutationOfMatrixRow": true
+  },
+  "overlay": {
+    "checksum": "860e3050b8787b6c92a5d64f9ada516c827139ad8c37861c677d2793721c4eb2",
+    "candidateRowsWithNoProvenChunks": 15638,
+    "candidateRowsWithOneProvenChunk": 0,
+    "candidateRowsWithMultipleProvenChunks": 513,
+    "totalProvenChunks": 6651,
+    "maxChunksPerCandidate": 50,
+    "lineageRowsWithoutExistingChunkRow": 0
+  },
+  "hints": {
+    "input": ".tmp\\atlas\\legacy-summary-hint-ordinal-join-v1\\20260926T080239Z\\hint-candidate-ordinal.ndjson",
+    "rows": 330,
+    "statusCounts": {
+      "MATCHED_PROVEN_CHUNK": 322,
+      "NO_CURRENT_CANDIDATE": 8
+    },
+    "qualifiedHintsMatched": 322,
+    "qualifiedHintsUnmatched": 8,
+    "distinctCandidateOrdinalsWithHint": 178,
+    "unavailableCandidates": 15973
+  },
+  "producer": {
+    "feature": "legacy_summary_cosine",
+    "started": false,
+    "queryVectorCreated": false,
+    "cosineComputed": false,
+    "rf04Admitted": false,
+    "rf05Replayed": false
+  },
+  "artifacts": {
+    "ordinalMap": {
+      "path": ".tmp\\atlas\\cei24-candidate-chunk-overlay-v1\\20260926T161153Z\\candidate-ordinal-map-v1.json",
+      "sha256": "sha256:07c03c02464169de6de0269f055933045f02dc839f01ef8468a067918302d970",
+      "bytes": 11253571
+    },
+    "overlay": {
+      "path": ".tmp\\atlas\\cei24-candidate-chunk-overlay-v1\\20260926T161153Z\\candidate-chunk-evidence-overlay.ndjson",
+      "sha256": "sha256:f8c72d13f6f5eaf3e18f59d8800abb19e3141e846f7a0ecd827ac67faef39608",
+      "bytes": 12824829
+    },
+    "hintAssociation": {
+      "path": ".tmp\\atlas\\cei24-candidate-chunk-overlay-v1\\20260926T161153Z\\hint-association.ndjson",
+      "sha256": "sha256:ad65e431b8e82a5bea42634fe5921e3b7be48bfeb61c87377a8d1242916c9447",
+      "bytes": 102036
+    }
+  }
+}
