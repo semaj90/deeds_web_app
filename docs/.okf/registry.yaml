@@ -217,6 +217,16 @@ contracts:
       - Firecrawl
       - domain_class
       - focus_tags
+  - name: documentation-diff-learning-circuit-v1
+    owner: docs/.okf/dev/documentation-diff-learning-circuit.schema.yaml
+    role: artifact-only documentation-delta contract feeding Learning Circuit evidence and ACE/BitFrost preview planning
+    notes:
+      - BeautifulSoup acquisition remains owned by python/atlas_external_docs.py
+      - manifest delta planning remains owned by python/atlas_okf_docs_pipeline.py
+      - local JSONL index only; no canonical storage writes
+      - ACE preview requires ContextManifest/candidate coordinates before admission
+      - BitFrost preview never inserts model KV tensors
+      - node_lts_target_22_23_3
   - name: openwiki-dev-corpus-spec
     owner: docs/.okf/dev/openwiki-dev-corpus-spec.md
     role: executable OKF dev corpus build contract
