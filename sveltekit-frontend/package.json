@@ -746,7 +746,7 @@
     "index:codebase:fast": "node scripts/index-codebase-fast.mjs",
     "graphify:dedup-validation": "node ../scripts/atlas/graphify-dedup-validation.mjs",
     "graphify:dedup-validation:apply": "node ../scripts/atlas/graphify-dedup-validation.mjs --apply",
-    "graphify:daily:chain": "npm run graphify:dedup-validation:apply && npm run graphify:materialize:apply && node ../scripts/atlas/daily-graphify-cold-processing.mjs && npm run atlas:phase8:fanout:apply && npm run atlas:qdrant:tag-mirror:apply && npm run atlas:qdrant:feature-map-sync:apply",
+    "graphify:daily:chain": "npm run graphify:dedup-validation:apply && npm run graphify:materialize:apply && node ../scripts/atlas/daily-graphify-cold-processing.mjs && npm run atlas:phase8:fanout:apply && npm run atlas:qdrant:tag-mirror:apply && npm run atlas:qdrant:feature-map-sync:apply && node ../scripts/atlas/graphify-daily-ace-packet-step-v1.mjs",
     "atlas:nes:packets:dry": "node ../scripts/atlas/materialize-nes-packets.mjs --dry-run --only-missing --limit=128",
     "atlas:nes:packets:apply": "node ../scripts/atlas/materialize-nes-packets.mjs --only-missing --limit=128",
     "atlas:nes:packets:enrich": "node ../scripts/atlas/materialize-nes-packets.mjs --enrich --limit=128",

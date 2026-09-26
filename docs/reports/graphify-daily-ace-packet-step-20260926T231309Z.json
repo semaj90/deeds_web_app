@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.graphify-daily-ace-packet-step.v1",
+  "generatedAt": "2026-09-26T23:13:09.902Z",
+  "enabledByDefault": true,
+  "disabled": false,
+  "ttlSeconds": 86400,
+  "status": "BLOCKED",
+  "reasons": [
+    "PROJECTION_NOT_ADMITTED:NOT_SAFE_TO_PROJECT"
+  ],
+  "admission": "NOT_SAFE_TO_PROJECT",
+  "embedAllowedPackets": 3295,
+  "packetsComposed": 0,
+  "cacheWrites": 0,
+  "canonicalWrites": 0,
+  "totalPackets": 61718
+}
