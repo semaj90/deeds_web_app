@@ -1,0 +1,123 @@
+# Parent Atlas documentation-diff / Learning Circuit artifact contract.
+# Noncanonical development contract. The existing external-doc pipeline remains the acquisition owner.
+schema_id: atlas.documentation-diff-learning-circuit.v1
+schema_version: 1
+status: DEVELOPMENT
+canonical_authority: false
+
+owners:
+  acquisition: python/atlas_external_docs.py
+  manifest: python/atlas_doc_manifest.py
+  pipeline: python/atlas_okf_docs_pipeline.py
+  learning_circuit: derived_artifact_only
+  ace_context: sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts
+  bitfrost_identity: sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.ts
+
+runtime:
+  python: ">=3.11"
+  node_lts_target: "22.23.3"
+  note: "Node is not required to run the Python crawler; 22.23.3 is the shared OpenWiki/Mastra target."
+
+inputs:
+  previous_manifest:
+    format: json
+    contract: atlas_doc_manifest.PipelineManifestV1
+  current_manifest:
+    format: json
+    contract: atlas_doc_manifest.PipelineManifestV1
+  previous_diff_artifact:
+    format: json
+    required: false
+
+outputs:
+  documentation_diff:
+    format: json
+    schema: atlas.documentation-diff-learning-circuit.v1
+  local_index:
+    format: jsonl
+    schema: atlas.documentation-diff-index-row.v1
+  ace_preview:
+    format: json
+    schema: atlas.ace-doc-diff-context-preview.v1
+
+diff_entry:
+  required:
+    - evidenceId
+    - sourceId
+    - sourceRevision
+    - sourceRef
+    - normalizedChecksum
+    - diffKind
+    - domainClass
+    - ontologyClasses
+    - tokenFeatures
+    - evidenceRefs
+    - canonicalAuthority
+  diffKind:
+    enum:
+      - OBSERVED_NO_BASELINE
+      - CONTENT_CHANGED
+      - CONTENT_UNCHANGED
+      - FETCH_FAILED
+  tokenFeatures:
+    authoritative: false
+    fields:
+      - utf8Bytes
+      - charCount
+      - lineCount
+      - approximateTokens
+      - estimatorRevision
+  constraints:
+    canonicalAuthority: false
+    feature_values_are_derived: true
+
+learning_circuit:
+  evidence_kind: PINNED_DOCUMENTATION
+  resolver_kind: PINNED_DOC_CRAWL
+  writes_performed: false
+  model_generation_required: false
+  note: "The crawler emits deterministic evidence and prompt-planning features only."
+
+indexing:
+  local:
+    kind: jsonl
+    purpose: "Artifact navigation and replay; not canonical storage."
+  postgres:
+    action: NONE
+    future_owner: atlas_external_doc_pages/atlas_external_doc_chunks
+  qdrant:
+    action: NONE
+    future_owner: external_programming_docs_768
+  graph:
+    action: NONE
+
+ace_bitfrost:
+  cache_write: false
+  preview_only: true
+  requires_before_admission:
+    - ContextManifestV2
+    - candidateSnapshotRevision
+    - ordinalMapChecksum
+    - representationRevision
+    - featureRevision
+    - artifactChecksum
+  kv_cache_policy:
+    insert_model_kv_tensors: false
+    reason: "BitFrost caches revision/checksum-addressed context artifacts, not model-runtime KV tensors."
+  prompt_feature_mapping:
+    fields:
+      - diffKind
+      - domainClass
+      - ontologyClasses
+      - changedLineCount
+      - apiSignatureCount
+      - codeBlockCount
+      - approximateTokens
+      - promptPriority
+
+safety:
+  network_default: false
+  datastore_writes: false
+  cache_writes: false
+  graph_writes: false
+  model_calls: false
