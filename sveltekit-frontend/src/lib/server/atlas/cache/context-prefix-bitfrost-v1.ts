@@ -155,6 +155,8 @@ function buildDescriptor(input: {
 export function buildContextPrefixBitfrostAdmissionV1(input: {
   admission: AceContextManifestAdmissionV1;
   compiled: ManifestBoundPromptPlanV1;
+  /** Supplied by the live caller; never inferred from snapshot/request identity. */
+  workspaceRevision: string;
 }): ContextPrefixBitfrostAdmissionV1 {
   let admission: AceContextManifestAdmissionV1;
   let promptPlan: PromptPlanV1;
@@ -169,6 +171,8 @@ export function buildContextPrefixBitfrostAdmissionV1(input: {
 
   const manifest = admission.manifest;
   const revisions = manifest.identityInput.evidenceRevisions;
+  const workspaceRevision = input.workspaceRevision.trim();
+  if (!workspaceRevision) return blocked('WORKSPACE_REVISION_REQUIRED');
   if (promptPlan.contextManifestChecksum !== manifest.identityChecksum) return blocked('CONTEXT_MANIFEST_CHECKSUM_MISMATCH');
   if (promptPlan.promptTemplateRevision !== contextPrefixIdentity.templateRevision) return blocked('PROMPT_TEMPLATE_PREFIX_MISMATCH');
   if (!revisions.sourceRevision) return blocked('SOURCE_REVISION_SET_REQUIRED');
@@ -185,6 +189,7 @@ export function buildContextPrefixBitfrostAdmissionV1(input: {
     artifactKind: CONTEXT_PREFIX_BITFROST_ARTIFACT_KIND_V1,
     requestHash: manifest.identityChecksum,
     modelRevision: contextPrefixIdentity.modelRevision,
+    workspaceRevision,
     sourceRevision: revisions.sourceRevision,
     representationId: CONTEXT_PREFIX_BITFROST_REPRESENTATION_ID_V1,
     representationRevision: revisions.representationRevision,
@@ -241,6 +246,7 @@ export async function readContextPrefixDescriptorFromBitfrostV1(
   input: {
     admission: AceContextManifestAdmissionV1;
     compiled: ManifestBoundPromptPlanV1;
+    workspaceRevision: string;
   },
 ): Promise<ContextPrefixBitfrostReadV1> {
   const cacheAdmission = buildContextPrefixBitfrostAdmissionV1(input);
@@ -298,6 +304,7 @@ export async function writeContextPrefixDescriptorToBitfrostV1(
   input: {
     admission: AceContextManifestAdmissionV1;
     compiled: ManifestBoundPromptPlanV1;
+    workspaceRevision: string;
     ttlSeconds?: number;
   },
 ): Promise<ContextPrefixBitfrostWriteV1> {
