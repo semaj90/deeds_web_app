@@ -110,6 +110,7 @@ function getAddon(): PytorchAddon | null {
 	loadAttempted = true;
 
 	const paths = [
+		resolve(process.cwd(), '../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),
