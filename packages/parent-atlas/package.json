@@ -88,6 +88,7 @@
     "./core/ace-packet-v3-structural-composer": "./dist/core/ace-packet-v3-structural-composer.js",
     "./core/ace-packet-v3-admission": "./dist/core/ace-packet-v3-admission.js",
     "./core/ace-agentic-admission-v1": "./dist/core/ace-agentic-admission-v1.js",
+    "./core/ace-runtime-memory-contracts-v1": "./dist/core/ace-runtime-memory-contracts-v1.js",
     "./core/ace-runtime-adapter": "./dist/core/ace-runtime-adapter.js",
     "./core/hyperrag-live-integration": "./dist/core/hyperrag-live-integration.js",
     "./core/proof-gates": "./dist/core/proof-gates.js",
