@@ -1202,3 +1202,181 @@ DDL or source-of-truth change was applied.
   entire summary; no partial summary is eligible. This proves eligibility only: summary/analysis
   rows were not persisted and the separate explicitly authorized `--apply --limit 20` gate remains
   open. PostgreSQL/Qdrant/Valkey/Neo4j writes: 0.
+
+## LangChain external-doc corpus discovery — 2026-09-26 (read-only)
+
+- [x] `LANGCHAIN-DOC-CORPUS-CENSUS-01`: identified the existing canonical
+  external-doc corpus owner rather than creating a second store. Live read-only
+  PostgreSQL census: `atlas_external_doc_pages` has 30 pages and
+  `atlas_external_doc_chunks` has 852 chunks; none of the 30 pages match
+  LangChain provider/product/URL coordinates. All 852 existing chunks have a
+  `content_embedding`; the chunk table's `qdrant_point_id` is null on all 852,
+  so this field does not prove current Qdrant projection coverage.
+- Current upstream discovery: `https://docs.langchain.com/llms.txt` advertises
+  43 LangGraph + 40 Deep Agents + 4 Concepts Python pages (87 total). Direct
+  bounded HTTP fetches returned status 200 for all three child indexes. Two
+  independent fetches produced identical sorted-URL-set SHA-256 values:
+  LangGraph `1146575d666587edc280f0c2b6616e237e30d13caa35bc0380637fcb6cda4cd4`
+  (43 URLs), Deep Agents
+  `9c00a3c08b66ec3ae7e29e2d27959f4a656fb4207608562229c21f72c69855dc` (40),
+  Concepts `567a2827131c98ba64935cd736431990b072a0af23f36f2d35592b33beccef89`
+  (4). Every discovered URL was within its declared section prefix; the 87-page
+  set contains 87 unique URLs.
+- [x] `LANGCHAIN-DOC-CORPUS-FETCH-01`: added a source-bound corpus config,
+  bounded downloader, and artifact verifier at `docs/.okf/topics/langchain/corpus.json`,
+  `scripts/atlas/fetch-langchain-doc-corpus-v1.mjs`, and
+  `scripts/atlas/verify-langchain-doc-corpus-v1.mjs`. Two runs fetched 86/87
+  pages each with identical URL-set checksum
+  `sha256:b161c8ff9997954df572db6f7c0c7fe7f1122cf5d245ca0c0f16a4f3a7bbac23`
+  and identical sorted page-manifest checksum
+  `sha256:b835512fe039ba42cf37935a567ba4a45c3a2e9da4ebac18b8fef334659137f7`.
+  The one source `https://docs.langchain.com/oss/python/deepagents/code-link.md`
+  returns 404; its extensionless HTML route also returns 404. It remains a
+  conserved failure (`fallbackStatus=NOT_CONFIGURED`), not a guessed URL. Both
+  artifact verifications checked all 86 content hashes and the 86+1=87
+  conservation equation; they intentionally exit 2 for the partial cohort.
+  Four focused tests pass. Artifacts live under ignored `.tmp/atlas/`.
+- Fetch remains artifact-only: no page admission, embeddings, or
+  Postgres/Qdrant/Valkey/RabbitMQ/Neo4j/Graphify writes. Crawl4AI, Firecrawl,
+  and BeautifulSoup fallbacks are declared in the corpus policy but disabled
+  in this bounded downloader. Reuse `python/atlas_doc_manifest.py` and
+  `python/atlas_okf_docs_pipeline.py` as canonical manifest/admission owners.
+  Do not add this source to the active pinned ingest manifest until the
+  embedding endpoint, immutable `semantic_768` revision, and write mode are
+  reconciled; the current sample points at `:8081`.
+- [x] `LANGCHAIN-DOC-CHUNK-ARTIFACT-01` (2026-09-27, local artifact-only): added
+  `scripts/atlas/chunk-langchain-doc-corpus-v1.py` as a thin adapter over the
+  existing `atlas_okf_docs_pipeline.compile_chunks` and `DocCoordinateV1` /
+  chunk-ID V2 owners. It verifies the fetched manifest and every page digest,
+  enforces canonical and resolved URLs remain inside the declared section,
+  streams deterministic chunk JSONL into a staged local artifact directory,
+  and emits a partial receipt; it does not embed or admit rows. On the pinned
+  fetch snapshot: 87 discovered = 79 scope-admitted + 7 out-of-prefix redirects
+  + 1 HTTP 404; 1,548 chunks, 1,548 unique IDs/evidence revisions. Two runs
+  reproduce `sha256:b1feae501c9e28a3147d1ec4f73d09d3d59bcccd986133411ebb0afc7201f121`.
+  During the byte-span gate this exercised and fixed a shared chunker defect:
+  trimming leading blank lines after a heading previously left UTF-8 spans
+  one byte/character early on affected sections. Regression coverage now
+  includes blank-line headings and multibyte text. Focused tests: 15/15.
+  Outputs are under ignored `.tmp/atlas/langchain-doc-corpus-v1/20260926T232349097Z/`
+  (`chunks-v1-streaming/` and `chunks-v1-streaming-replay/`). This is local
+  derivation proof only: `canonicalAuthority=false`; PostgreSQL/Qdrant/Valkey/
+  Neo4j/Graphify writes 0; embedding and admission remain blocked on
+  `EMB-PROV-01` and explicit writer authorization.
+
+## Fabric split decision — documentation corpus vs live structural search (2026-09-27)
+
+An external architecture review proposed splitting future work into two
+independent fabrics. Audited against this file's own real evidence before
+accepting it — the review's specific numeric claim ("87 URLs discovered, 86
+fetched, one known 404") was checked and **matches exactly**:
+`LANGCHAIN-DOC-CORPUS-CENSUS-01`/`-FETCH-01` above already recorded 87
+discovered / 86 fetched / 1 conserved-404. The review was grounded in this
+file, not invented.
+
+**FABRIC A — document knowledge (build now, real owners already exist)**:
+Firecrawl/BeautifulSoup/llms.txt → raw immutable doc → `.okf` corpus manifest
+→ stream chunker → Postgres canonical metadata → `semantic_768` (Qdrant/cuVS/
+CAGRA/TurboVec as 4 co-equal executors of the same candidate identity, not 4
+competing retrieval votes) → Top-K → exact-source promotion → ACE/
+ContextManifest. This matches what's already partially built here
+(`LANGCHAIN-DOC-CORPUS-CENSUS-01/FETCH-01`, `docs/.okf/topics/langchain/corpus.json`,
+`python/atlas_doc_manifest.py`, `python/atlas_okf_docs_pipeline.py` as the
+canonical manifest/admission owners) plus ARCH-TOC V2's `TemporalDocumentIndexV1`
+(project memory, session 2026-09-26). **Real, incremental next step, not new
+construction.**
+
+**FABRIC B — live structural code search (new construction, confirmed absent)**:
+request → domain/language classification → a structural execution owner
+(Tree-sitter / ast-grep N-API / ts-morph / LSP) → canonical identity
+normalization → same candidate fabric as docs/semantic/graph. This repo's own
+OPS-06 census (`parent-atlas-kv-cache-adaptation-research/tasks.md`) already
+proved every ast-grep/Tree-sitter/ts-morph caller is offline-script-only, zero
+live SvelteKit route reachable — this fabric genuinely does not exist yet.
+ASTG-01..04 (ast-grep version convergence, closed 2026-09-27, same file)
+was a prerequisite hygiene fix for Fabric B, not Fabric B itself.
+
+**Decision**: sequence Fabric A first (real owners, partial progress, bounded
+remaining gates below) before starting Fabric B's STRUCT-LIVE-00..09
+(declared-absent → chosen owner → StructuralCandidateV1 → bounded
+worker_threads executor → per-tool adapters → identity normalization →
+read-only canary), which is unstarted greenfield design. Not started here —
+recording the sequencing decision only.
+
+**Fabric A's actual next gate (not a fresh tranche list — most of DOC-CORPUS-01..05
+already exist under different names in this file)**: the FETCH-01 entry above
+already names the real blocker — admission is intentionally withheld until
+the embedding endpoint (currently sampled at `:8081`, not reconciled against
+the canonical embeddings path), an immutable `semantic_768` revision, and the
+write mode are settled. That reconciliation is `EMB-PROV-01` in the
+`parent-atlas-kv-cache-adaptation-research` build order — the same gate this
+repo already identified as step 2 after ASTG-01. Fabric A's chunk/Postgres/
+lexical/vector/ontology/grounding/retrieval/promotion/ContextManifest steps
+are real remaining work, but they are sequenced *behind* EMB-PROV-01, not
+independent of it — do not build DOC-SEM-01/DOC-VECTOR-01 on an
+unreconciled embedding endpoint.
+
+**Tiered storage note (accepted, not yet built)**: hot (Postgres: metadata,
+chunks, FTS, small/medium text) / warm (filesystem: normalized markdown,
+JSONL, Arrow) / cold (SeaweedFS S3: raw HTML, large PDFs, old crawl
+generations) — consistent with this repo's existing SeaweedFS-canonical
+object-store rule (root CLAUDE.md) and the Wire Format Layering Rule (bulk
+numeric arrays never through JSON). Canonical Postgres rows hold
+`artifact_address/checksum/byte_length/content_type/source_revision`
+pointers, not raw cold bytes. Not yet implemented for this corpus — the
+LangChain fetch artifacts currently sit under gitignored `.tmp/atlas/` only.
+
+## DOC-06/DOC-06b sidecar-migration registration — CLOSED (2026-09-27)
+
+**Verified an external audit's claims via `rg`/direct file reads before acting** —
+all 6 concrete file-path claims checked exactly true: `DocCorpusPanel.svelte`
+exists and is mounted at `admin/atlas/+page.svelte:960` (imported line 15);
+the LangChain snapshot (`.tmp/atlas/langchain-doc-corpus-v1/20260926T232349097Z/
+chunks-v1-streaming/chunks.jsonl`) is exactly 1,548 chunks; `drizzle/manual/
+20260904_external_doc_intelligence_v1.sql` exists; it had **zero** entry in
+`drizzle/sidecar-migrations.json` (confirmed via grep, matching the audit's claim
+exactly); `doc-intelligence-read-model.ts`/`.spec.ts` exist and the read model
+genuinely uses an injected raw `pg.Pool`, not Drizzle, matching the audit's
+"queries the tables directly" claim.
+
+**Fix applied (purely additive, zero schema/data risk)**: registered
+`manual/20260904_external_doc_intelligence_v1.sql` in `drizzle/sidecar-migrations.json`
+(same shape as the file's other 67 entries — `file`/`status`/`reason`/`appliedBy`/
+`appliedAt`/`requiresJournalEntry`/`validationCommand`). This is a documentation
+registry only, consumed by `scripts/atlas/audit-contract-map.mjs` to classify
+manual SQL files as `documented_sidecar` (WARN) instead of
+`unknown_unjournaled_sql` (FAIL) — it does not touch Drizzle's TypeScript schema,
+run any migration, or alter live data.
+
+**Verified**: `audit-contract-map.mjs` re-run — 0 `unknown_unjournaled` flags,
+clean exit 0 (previously this file was undocumented and would have flagged).
+`validationCommand` re-confirmed live: `atlas_external_doc_pages`=30 rows,
+`atlas_external_doc_chunks`=852 rows (matches `LANGCHAIN-DOC-CORPUS-CENSUS-01`
+exactly). `doc-intelligence-read-model.spec.ts` — 19/19 pass, unaffected (no
+code changed).
+
+**Still open, correctly NOT touched here** (per the audit's own "safe next
+command" framing — inspection before schema registration, not a mandate to add
+Drizzle table definitions): `atlas_external_doc_pages`/`atlas_external_doc_chunks`
+still have no matching Drizzle TypeScript schema entries. Adding them is a
+separate, deliberate decision (new Drizzle table declarations for tables that
+already exist live, with hand-written GIN/HNSW indexes Drizzle can't generate —
+same pattern as `code_retrieval_chunks`) — not done in this pass. A "Local
+snapshots — unadmitted" viewer panel for the 1,548-chunk LangChain snapshot
+(distinct from the canonical Postgres-backed `DocCorpusPanel.svelte`) is now
+implemented as a separately badged read-only panel. Its exact snapshot is pinned
+in `docs/.okf/topics/langchain/viewer-snapshot.json`; the reader verifies the
+manifest checksum, receipt, and chunk SHA-256 before rendering; rejects changed
+manifests between pages and paths outside the approved `.tmp` artifact root;
+uses deterministic bounded pagination and never merges into Postgres search.
+Coverage includes manifest mismatch, artifact digest mismatch, path escape,
+search, pagination, and SSR. Focused snapshot/read-model/panel SSR tests passed
+33/33; full Svelte check passed with 0 errors and 291 existing warnings; strict
+OpenSpec validation passed. A live local read returned 1,548 chunks with corpus
+revision `sha256:b1feae501c9e28a3147d1ec4f73d09d3d59bcccd986133411ebb0afc7201f121`
+and manifest checksum `sha256:0f0b79c8dfe303ae76cb3bd0d5e849eb3d44ff9e3a348ecaec583bcbf48cead9`.
+This closes viewability only; the artifact remains noncanonical and unadmitted.
+
+- [x] `LANGCHAIN-LOCAL-CHUNK-SNAPSHOT-VIEWER-01`: added a pinned, checksum-verified
+  read-only local snapshot reader and Admin Docs Corpus panel. It is distinct from
+  canonical Postgres FTS; no database, Qdrant, Valkey, Neo4j, or Graphify writes.

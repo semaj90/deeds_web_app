@@ -134,7 +134,7 @@ import { featureMaps, grpoMemorySticks } from '$lib/server/db/schema/features.js
 import { eq, desc, sql as drizzleSql } from 'drizzle-orm';
 import { getLlmOutputHitsBulk, recordLlmOutputHit } from '$lib/server/cache/code-llm-index.js';
 import { getRedis } from '$lib/server/redis.js';
-import { aceTopkKey, type RetrievalCacheIdentityV1 } from '../../../ace/cache-keys.js';
+import { aceTopkKey, type BifrostRetrievalCacheIdentityV3, type RetrievalCacheIdentityV1 } from '../../../ace/cache-keys.js';
 import { persistRevisionedAceTopRetrievalCache } from '$lib/server/cache/ace-top-retrieval-cache.js';
 import {
   normalizeTelemetrySourceRefs,
@@ -1536,14 +1536,8 @@ export async function assembleACEContext(opts: {
   corpusHash?: string;
   ragBundleHash?: string;
   graphSnapshotHash?: string;
-  /** Optional caller-owned retrieval identity forwarded to QueryRouter. */
-  workspaceRevision?: string;
-  candidateSnapshotRevision?: string;
-  ordinalMapChecksum?: string;
-  representationRevision?: string;
-  retrievalPolicyRevision?: string;
-  contextPolicyRevision?: string;
-  graphRevision?: string | null;
+  /** Only a server-validated handoff may enable strict retrieval cache v3. */
+  retrievalCacheIdentityV3?: BifrostRetrievalCacheIdentityV3;
   /** Optional complete identity from the admitted SearchRuntime manifest. */
   retrievalCacheIdentity?: RetrievalCacheIdentityV1;
   /**
@@ -1595,13 +1589,8 @@ export async function assembleACEContext(opts: {
       if (!routeResult) {
         routeResult = await routeQuery({
           query: opts.query,
-          workspaceRevision: opts.workspaceRevision,
-          candidateSnapshotRevision: opts.candidateSnapshotRevision,
-          ordinalMapChecksum: opts.ordinalMapChecksum,
-          representationRevision: opts.representationRevision,
-          retrievalPolicyRevision: opts.retrievalPolicyRevision,
-          contextPolicyRevision: opts.contextPolicyRevision,
-          graphRevision: opts.graphRevision,
+          retrievalCacheIdentityV3: opts.retrievalCacheIdentityV3,
+          disableRetrievalCache: !opts.retrievalCacheIdentityV3,
         });
       }
       const packet = routeResult.packet;
@@ -5545,7 +5534,8 @@ async function getQueryEmbedding(query: string): Promise<number[] | null> {
         modelArtifactRevision,
         tokenizerRevision,
         inputPolicyRevision,
-        baseUrl: ENV.EMBEDDING_BASE_URL,
+        // EMB-PROV-01: dedicated strict-lane URL, not the shared EMBEDDING_BASE_URL.
+        baseUrl: ENV.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081',
         timeoutMs: 5_000,
       });
       return result.embedding;

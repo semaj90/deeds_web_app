@@ -175,6 +175,7 @@
     "atlas:okf:library-modules:crawl:dry": "tsx ../scripts/atlas/library-module-crawl.mts --dry-run",
     "atlas:docs:studio:smoke": "python ../scripts/atlas/build-external-doc-admission-envelopes-v1.py && tsx ../scripts/atlas/validate-external-doc-corpus-readiness-v1.mts && vitest run src/lib/server/atlas/docs/doc-intelligence-read-model.spec.ts src/lib/server/atlas/docs/external-doc-intelligence.spec.ts \"src/routes/(app)/admin/atlas/DocCorpusPanel.ssr.spec.ts\" src/routes/api/admin/atlas/docs-corpus/search/search.spec.ts && ATLAS_LIVE_DOC_DB=1 vitest run \"src/routes/(app)/admin/atlas/DocCorpusPanel.live.spec.ts\" && tsx scripts/atlas/prove-studio-canonical-fts-v1.mts",
     "atlas:backfill:hybrid:dry": "node ../scripts/atlas/backfill-hybrid-collection.mjs --dry-run",
+    "atlas:astg:capability-receipt": "node ../scripts/atlas/astg-01-capability-receipt.mjs",
     "atlas:ast-nodes:dry": "node ../scripts/atlas/populate-atlas-ast-nodes.mjs --dry-run",
     "atlas:ast-nodes:apply": "node ../scripts/atlas/populate-atlas-ast-nodes.mjs --apply",
     "atlas:ast-nodes:verify": "node ../scripts/atlas/populate-atlas-ast-nodes.mjs --verify",
@@ -1674,7 +1675,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "2.0.47",
-    "@ast-grep/napi": "0.44.0",
+    "@ast-grep/napi": "0.45.3",
     "@aws-sdk/client-s3": "3.1121.0",
     "@babel/code-frame": "7.29.7",
     "@babel/parser": "7.29.8",

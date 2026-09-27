@@ -600,6 +600,15 @@
       "appliedAt": "2026-09-09",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT tgname FROM pg_trigger WHERE tgrelid='public.graphify_execution_file_membership_v2'::regclass AND NOT tgisinternal ORDER BY tgname;\""
+    },
+    {
+      "file": "manual/20260904_external_doc_intelligence_v1.sql",
+      "status": "applied",
+      "reason": "Canonical Postgres owner for external documentation pages/chunks (parent-atlas-versioned-doc-intelligence DOC-06/DOC-06b). Version-qualified identity (DocCoordinateV1), GIN tsvector + pgvector HNSW indexes expressed here because drizzle-kit cannot generate USING gin(...)/USING hnsw. No matching Drizzle TypeScript table definitions exist yet -- the app's read model (doc-intelligence-read-model.ts) queries these tables via an injected raw pg.Pool, not through Drizzle. Registered here (2026-09-27, EMB-PROV-01/docs-corpus follow-up) purely to close the audit gap this file exists to prevent -- no schema, data, or migration change made.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-04",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT count(*) FROM atlas_external_doc_pages; SELECT count(*) FROM atlas_external_doc_chunks;\""
     }
   ]
 }

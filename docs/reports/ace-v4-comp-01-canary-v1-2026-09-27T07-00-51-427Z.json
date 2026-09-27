@@ -1,0 +1,137 @@
+{
+  "schema": "atlas.ace-v4-comp-01-canary-receipt.v1",
+  "generatedAt": "2026-09-27T07:00:51.426Z",
+  "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+  "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+  "v3ShardSource": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\ace-packets-v3\\20260925T220337Z\\ace-packets-v3-00001.ndjson",
+  "embeddingExecutor": {
+    "url": "http://127.0.0.1:8081",
+    "model": "embeddinggemma",
+    "modelRevision": "sha256:BC843658E96D2E9CC7C3402332B158F0CC4F73E61B23CEF9A41ACEE1C0D372B7"
+  },
+  "sampleSize": 8,
+  "provenCount": 8,
+  "results": [
+    {
+      "candidateOrdinal": 0,
+      "packetKey": "ace:packet:0051e908c9be",
+      "sourceRef": "docs/architecture/phase8-query-optimization-taxonomy.md",
+      "status": "V4_PACKET_BUILT_AND_VERIFIED",
+      "v3PacketChecksum": "sha256:25e36fbd7c0167f7183320531508c14a7fd2d197c932c63d66237997af43933a",
+      "v4EnvelopeChecksum": "sha256:6c5d403c2ad33499fe68de842bd564e3b886ffc8911b99f0e91d5414ff185700",
+      "embeddingDigest": "sha256:d2cb1118035b4791e7700fbdcd0b14027bb62f03e748b8d896126fa98713a77b",
+      "vectorRef": {
+        "kind": "CANDIDATE_ORDINAL",
+        "value": "0"
+      },
+      "roundTripOk": true
+    },
+    {
+      "candidateOrdinal": 1,
+      "packetKey": "ace:packet:014b1c91aa72",
+      "sourceRef": "scripts/agent/schema-agent-tracking.sql",
+      "status": "V4_PACKET_BUILT_AND_VERIFIED",
+      "v3PacketChecksum": "sha256:32cb9b83366b791d90d69f0beab627897d44a82b89820201187a9892ea4dbe8d",
+      "v4EnvelopeChecksum": "sha256:583200a31a965cdf24ac0a115b830e5aaed2205d23bfa27fd222e7c616cdb9fd",
+      "embeddingDigest": "sha256:0cfb49e4ca999b4edf308401f96e018b47c6faa04ccd12db1928d99e98a0b5c7",
+      "vectorRef": {
+        "kind": "CANDIDATE_ORDINAL",
+        "value": "1"
+      },
+      "roundTripOk": true
+    },
+    {
+      "candidateOrdinal": 2,
+      "packetKey": "ace:packet:02dae66923a3",
+      "sourceRef": "docs/LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md",
+      "status": "V4_PACKET_BUILT_AND_VERIFIED",
+      "v3PacketChecksum": "sha256:f1dd9e59c228cff74d6d64e934283c65f0151e5125cfd59c0ea8d51716cc9322",
+      "v4EnvelopeChecksum": "sha256:fbb320accda75800ed17e13982967c3129786a4e78ba6065f2296faba5a63f73",
+      "embeddingDigest": "sha256:8326f40429af7f7cebe79ca0dc3b5e8c687092bce7ecf47a9ec3b6ac7a85cc97",
+      "vectorRef": {
+        "kind": "CANDIDATE_ORDINAL",
+        "value": "2"
+      },
+      "roundTripOk": true
+    },
+    {
+      "candidateOrdinal": 3,
+      "packetKey": "ace:packet:04518e5714ed",
+      "sourceRef": "docs/GEMMA4-POLICY-ORCHESTRATOR-ARCHITECTURE.md",
+      "status": "V4_PACKET_BUILT_AND_VERIFIED",
+      "v3PacketChecksum": "sha256:151711215466fa5a8a1653eb9fc281df49c4d18c70fc1f517eaf71badf4256f5",
+      "v4EnvelopeChecksum": "sha256:c007d3a423d27fb1d162cc374f93df377611105bd18cfa1864fe5232ed2d2fdc",
+      "embeddingDigest": "sha256:f90ba644d1e3ff7ebb3fcf558a5d76f7040b1a2437e0cf6bb5985bdff2cbfa28",
+      "vectorRef": {
+        "kind": "CANDIDATE_ORDINAL",
+        "value": "3"
+      },
+      "roundTripOk": true
+    },
+    {
+      "candidateOrdinal": 4,
+      "packetKey": "ace:packet:04abe0bfe254",
+      "sourceRef": "scripts/agent/dag-reducer.mjs",
+      "status": "V4_PACKET_BUILT_AND_VERIFIED",
+      "v3PacketChecksum": "sha256:0d2537c76f3fe87b44a85a6b7fcf6f9776b3a6e260279ff09608f1c2d2fdb654",
+      "v4EnvelopeChecksum": "sha256:9d3ef4bac6e1ade2ed6cca38de6acf03dc0ad2cb25f3076d7626b962aa57507b",
+      "embeddingDigest": "sha256:e9f60382953a2d1abf3eda60ca9a2f2e77a533d72a3c0cef4fbae4b4a88bc995",
+      "vectorRef": {
+        "kind": "CANDIDATE_ORDINAL",
+        "value": "4"
+      },
+      "roundTripOk": true
+    },
+    {
+      "candidateOrdinal": 5,
+      "packetKey": "ace:packet:06568f01c146",
+      "sourceRef": "docs/PHASE-85-P9-LANGEXTRACT-AGENTIC-INTEGRATION.md",
+      "status": "V4_PACKET_BUILT_AND_VERIFIED",
+      "v3PacketChecksum": "sha256:5839589abe438671d72bc81b18056c797e867d7ac7ea6065ef628de0ab4006d8",
+      "v4EnvelopeChecksum": "sha256:367b29f4eff945e7d269d6c66cee40a59fa0448fc053784860d5e0a5713dc8e7",
+      "embeddingDigest": "sha256:e417359a10ebd1f52b45527ff5d791c5a6482ea07d453bfc70584916d2df92a6",
+      "vectorRef": {
+        "kind": "CANDIDATE_ORDINAL",
+        "value": "5"
+      },
+      "roundTripOk": true
+    },
+    {
+      "candidateOrdinal": 6,
+      "packetKey": "ace:packet:07b76f513d2a",
+      "sourceRef": "docs/PHASE-B-P3-DEPENDENCY-CLARIFICATION.md",
+      "status": "V4_PACKET_BUILT_AND_VERIFIED",
+      "v3PacketChecksum": "sha256:dd4b62d3241384cbf5c39c66b19daca5e6f6ef2d241a098ff321fd7a84cfb193",
+      "v4EnvelopeChecksum": "sha256:643d383c2fe6ab7edc8c6ae1af574216ebd05e5f90517f7db802802aa2e729a8",
+      "embeddingDigest": "sha256:da3f5b988f6c24ac2bc99bb6e0c06617d58899d56cc0d27664bd2e501b466ad4",
+      "vectorRef": {
+        "kind": "CANDIDATE_ORDINAL",
+        "value": "6"
+      },
+      "roundTripOk": true
+    },
+    {
+      "candidateOrdinal": 7,
+      "packetKey": "ace:packet:09e9df686b49",
+      "sourceRef": "docs/architecture/CUVS-DOCKER-IMPLEMENTATION-CHECKLIST.md",
+      "status": "V4_PACKET_BUILT_AND_VERIFIED",
+      "v3PacketChecksum": "sha256:9e81ba8dfa9f3ca70135e91447865a6b03af1597940061f849568043371b3d9b",
+      "v4EnvelopeChecksum": "sha256:67f47e07bf475ef0672752e9b8c50dc3bafd5f26c4dd3a064df0172650c25e1a",
+      "embeddingDigest": "sha256:5cfa06f486a80debd4c816766d29fac943b328dbb25e712539c239a5bf314d18",
+      "vectorRef": {
+        "kind": "CANDIDATE_ORDINAL",
+        "value": "7"
+      },
+      "roundTripOk": true
+    }
+  ],
+  "authority": {
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0
+  },
+  "status": "ACE_V4_COMP_01_CANARY_PROVEN",
+  "scope": "Proves the composer pattern (V3-embedding-fill + V4-wrap) is sound on real stored packets. Does NOT scale to the full 16,151-row corpus, does not decide a production content-selection/chunking policy, and produces no admitted/persisted artifact -- new V3/V4 bytes exist only in this receipt and process memory, matching the read-only convention of every prior gate in this thread."
+}

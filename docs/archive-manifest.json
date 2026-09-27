@@ -560,3 +560,4 @@
     "reason": "stale scratch receipt from the first 21-page inline fetch (6 sources); superseded by docs/reports/external-doc-admission-envelopes-v1.json from the manifest-driven builder. Not consumed by any validator."
   }
 ]
+{"path":"sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/helper-eligibility-v1.spec.ts","archived":"2026-09-27","reason":"orphaned by a concurrent write that replaced helper-registry-v1.ts/keyword-recognition-v1.ts/helper-eligibility-v1.ts with a different implementation; original design preserved as the -v2 files for review, per explicit instruction"}

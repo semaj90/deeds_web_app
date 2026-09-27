@@ -80,3 +80,210 @@ until these proof/contract gaps are closed; see `docs/reports/svelte-check-error
 - [ ] AFC-18 Wire incremental AST/semantic_768/graph refresh and cache invalidation.
 - [ ] AFC-19 Run CPU/GPU semantic executor parity and confirm one-vote-per-lane behavior.
 - [ ] AFC-20 Retire the fake Mastra `defineWorkflow` shim only after AFC-14/AFC-15 pass.
+
+## Helper-routing tranche — reviewed and frozen, not yet built (2026-09-27)
+
+An external review proposed a query-classification → helper-eligibility →
+retrieval-plan routing layer (HelperRegistryV1, keyword/radix vocabulary,
+tri-state eligibility, phased cost-bounded scheduling). Audited against real
+code before recording anything, since the proposal implicitly reads as if
+extending a mostly-empty spine — it is not:
+
+**Already real (verified by direct read, not assumed)**:
+- `src/lib/server/atlas/agentic-file-compiler/query-expansion-v1.ts` —
+  `QueryExpansionBundleV1`/`QueryExpansionTermV1` already exist, already carry
+  a `source: TaxonomySourceV1` provenance field (the proposal's
+  `ExpandedTermV1.source` idea), already checksum via a deterministic
+  sorted-key `stable()` preimage (matching `reduction-router-v1.ts`'s existing
+  convention), already dedupe by `(normalized, source)` and cap via
+  `scope.maxExpansionTerms`.
+- `src/lib/server/atlas/agentic-file-compiler/retrieval-plan.ts` —
+  `RetrievalPlanV1` already exists and already implements the proposal's
+  "checksum-linked chain" idea: it carries `taxonomyScopeRef`+
+  `taxonomyScopeChecksum`, `queryExpansionRef`+`queryExpansionChecksum`,
+  `queryFingerprintRef`+`queryFingerprintChecksum`, each checksum computed
+  over the *whole* upstream artifact (not just its own body), and the plan's
+  own `checksum` covers all of it via `sha256Stable`. This is the same
+  pattern the proposal describes as new (`QueryClassificationV1 → checksum A
+  → TaxonomyScopeV1 → checksum B → ...`) — already live, just with a flatter
+  `lanes: RetrievalLane[]` (4 lanes: lexical/ast/semantic/graph) instead of
+  the proposal's phased/cost-bounded scheduling.
+- `QueryClassificationV1`, `TaxonomyScopeV1`, `QueryFingerprintV1` all exist
+  (imported as real types by `retrieval-plan.ts`) and are wired live —
+  `AFC-10`/`AFC-10-01`/`AFC-10-02` (this file, checked off) already route
+  `/api/search/hyperrag` through a compiled `RetrievalPlanV1` for
+  revision-qualified requests.
+
+**Genuinely new, does not exist yet** (verified via targeted grep, zero
+matches): `HelperRegistryV1`, `HelperCapabilitySnapshotV1`,
+`HelperEligibilityV1` (tri-state ELIGIBLE/INELIGIBLE/BLOCKED),
+`KeywordRecognitionV1`, any vocabulary/radix/normalization module,
+`ParameterBindingV1`'s `resolution: EXACT|DERIVED|DEFAULTED` mode,
+`HelperCandidateV1` (the executor≠lane normalization layer), and the
+phased/cost-bounded `RetrievalPlanPhaseV1` scheduling model. `retrieval-plan.ts`'s
+4-lane list is the closest existing analog to "lane" but has no helper-level
+eligibility, no capability registry, no phases.
+
+**Frozen tranche** (task IDs below are new; they do not collide with
+AFC-00..20 above). The bounded initial helper-routing slice is implemented
+and fixture-proven; remaining items below stay open unless specifically marked:
+
+- [x] AFC-HELPER-01 `HelperRegistryV1` — static capability registry (languages,
+  intents, requires, produces, executor kind/owner, costClass, mutationClass).
+  Describes executable reality only; does not encode runtime up/down state.
+- [x] AFC-HELPER-02 `HelperCapabilitySnapshotV1` — runtime availability
+  snapshot, separate from the static registry (per-helper `available`,
+  `executorRevision`/`serviceRevision`, `observedAt`, checksum). Avoids
+  mutating the registry every time a service cycles.
+- [x] AFC-KW-01 `KeywordRecognitionV1` contract (bounded exact-token matching;
+  vocabulary remains fixture-supplied; no radix/prefix expansion).
+- [ ] AFC-KW-02 Versioned vocabulary + normalization contract (case folding,
+  Unicode normalization, camelCase/snake_case/kebab-case splitting, dot/path
+  segmentation, package-name preservation) — separate revision domain from
+  the classifier/taxonomy revisions already in use.
+- [ ] AFC-KW-03 Exact map + radix compiler over normalized tokens, with
+  `prefixPolicy: CONTROLLED` + explicit `allowedExpansions` per prefix entry
+  (radix answers "which registered vocabulary entries share this prefix",
+  never decides semantic relatedness).
+- [ ] AFC-KW-04 Aho-Corasick bulk recognizer — DEFERRED (explicitly, per the
+  review itself).
+- [x] AFC-HELPER-03 Tri-state `HelperEligibilityV1`
+  (ELIGIBLE/INELIGIBLE/BLOCKED, with `positiveReasons`/`blockingReasons`,
+  `matchedEvidenceRefs`, `estimatedCostClass`) — combines the static registry
+  + query evidence + runtime capability snapshot. Separate revision fields
+  per domain: `classifierRevision`, `taxonomyRevision`, `vocabularyRevision`,
+  `normalizationRevision`, `helperRegistryRevision`, `expansionPolicyRevision`,
+  `retrievalPolicyRevision` — explicitly never collapsed into one "routing
+  revision" (a vocabulary alias change must not imply an executor-capability
+  change).
+- [ ] AFC-PARAM-01 `ParameterBindingV1` resolution modes
+  (`EXACT`/`DERIVED`/`DEFAULTED`), forbidding `DEFAULTED` for any identity/
+  revision parameter (`canonicalId`, `packetKey`, `sourceRevision`,
+  `workspaceRevision`, `symbolVersionId`, `candidateSnapshotRevision`,
+  `ordinalMapChecksum`, `representationRevision`) — a planner may default
+  `topK`/`timeoutMs`, never an identity or revision field.
+- [ ] AFC-PLAN-01 Extend the existing (real, checked-off) `RetrievalPlanV1`
+  with phased/cost-bounded scheduling (`RetrievalPlanPhaseV1`: cheap lexical
+  → structural → expensive semantic/graph → extraction escalation, each
+  phase with `continueWhen`/`minCandidates`/`minConfidence` stop conditions).
+  This is additive to the existing lane list, not a replacement.
+- [ ] AFC-CAND-01 `HelperCandidateV1` — common output normalization
+  (`lane`, `canonicalId?`, `packetKey?`, `sourceRef`, `identityResolution:
+  CANONICAL_ID|PACKET_KEY|SOURCE_REF|UNRESOLVED`) so multiple executors of
+  one logical lane (Qdrant/cuVS/CAGRA under `semantic`) produce one vote per
+  lane, not N — preserving this repo's existing "executor != retrieval lane"
+  invariant (already documented in root CLAUDE.md's Duplication Prevention
+  section).
+- [ ] AFC-CACHE-01 Stage-specific, revision-qualified caches (classification /
+  keywordRecognition / queryExpansion / helperEligibility / retrievalPlan),
+  each keyed on its own upstream checksum + its own revision fields — so a
+  service-availability change invalidates eligibility/plan without forcing
+  keyword recognition to recompute.
+- [x] AFC-PROOF-01 Positive + negative + blocked routing fixture (e.g. "explain
+  CAGRA indexing parameters" → docs/postgres-fts/semantic-768 ELIGIBLE,
+  lsp-references/ast-grep/langextract INELIGIBLE; and a deliberately-unavailable-LSP
+  case proving `BLOCKED` with `reason=CAPABILITY_UNAVAILABLE` rather than
+  silently omitting the helper).
+
+**Bounded helper-routing proof (2026-09-27):** Added the static 12-helper
+registry with explicit owner references and execution-surface labels; the
+labels do not claim those owners are live request-time capabilities. Runtime
+capability snapshots are separate checksum-sealed inputs. Exact-only keyword
+recognition binds classifier, taxonomy, vocabulary, and registry checksums;
+tri-state eligibility is deterministic and fail-closed on missing, stale,
+duplicate, or checksum-tampered capability evidence. Six fixed queries cover
+code references, CAGRA, cache/Graphify, ROS2, semanticRevision, and Postgres
+HNSW; an LSP available/unavailable pair changes eligibility while leaving
+keyword recognition unchanged. Focused fixture suite: 10/10 passed. No live
+helper execution, datastore/cache writes, or `RetrievalPlanV1` changes were
+performed. `AFC-KW-02/03`, planning, cache, parameters, candidate normalization,
+and live capability probes remain open.
+
+**Proposed physical layout** (extends the existing, real
+`src/lib/server/atlas/agentic-file-compiler/` directory — matches what's
+already there, not a new directory):
+`helper-registry-v1.ts`, `helper-capability-snapshot-v1.ts`,
+`keyword-recognition-v1.ts`, `vocabulary-v1.ts`, `radix-index-v1.ts`,
+`helper-eligibility-v1.ts`, `parameter-binding-v1.ts`; `retrieval-plan.ts` and
+`query-expansion-v1.ts` are extended in place, not replaced. Vocabulary data
+placement (`docs/.okf/routing/*.yaml` vs. checked-in JSON next to the AFC
+contracts) is explicitly left as an open question pending the existing `.okf`
+namespace-ownership decision — not resolved here.
+
+**Not started in this entry**: zero new files created, zero schema changes,
+zero code written. This is a design-freeze + accuracy-correction entry only,
+matching this session's established pattern for large external proposals.
+
+## Concurrent-write collision on AFC-HELPER-01/02/03 + AFC-KW-01 — both preserved, reviewed (2026-09-27)
+
+**What happened**: while this session's `helper-registry-v1.ts`/`keyword-recognition-v1.ts`/
+`helper-eligibility-v1.ts` were mid-test, a second, independently-built
+implementation of the same 4 contracts landed on those exact file paths
+(source unconfirmed — no other session was reachable via `ListAgents` at
+the time; possibly a separate window/process on the same machine working
+the same OpenSpec board). Neither version was silently kept or discarded —
+per explicit instruction, this session's original design was preserved
+under a `-v2` suffix (`helper-registry-v2.ts`, `helper-capability-snapshot-v2.ts`,
+`keyword-recognition-v2.ts`, `helper-eligibility-v2.ts`,
+`helper-eligibility-v2.spec.ts`) rather than overwriting the file that
+appeared. The orphaned original spec was archived (not deleted) to
+`deeds_labs/archive/2026-09-27/`, manifest recorded.
+
+**Both are real and both pass their own tests** (verified, not assumed):
+this session's v2 set: 8/8 (`helper-eligibility-v2.spec.ts`, includes the
+LSP-toggle invariant and a registry/snapshot revision-mismatch rejection
+test). The other, `v1`-named set: 9/10 (`helper-routing-v1.spec.ts`; the one
+failure is a minor error-code string mismatch — test expects
+`CAPABILITY_REVISION_MISMATCH`, code throws `CAPABILITY_CHECKSUM_MISMATCH`
+— cosmetic, not a design defect).
+
+**Comparison**:
+
+| Aspect | This session (`-v2`) | The other (`-v1`, currently at the canonical path) |
+|---|---|---|
+| Structure | `helpers` array, flat fields | `entries` array, similar shape |
+| Cost/mutation classes | `CHEAP/MEDIUM/EXPENSIVE`, 3-way mutation class | `LOW/MEDIUM/HIGH`, mutation hardcoded `READ_ONLY` (literal, not enum) |
+| Capability snapshot | Separate file, per-registry-revision batch snapshot (`observations[]`) | Merged into the registry file, **per-helper** snapshot with its own `registryChecksum` binding |
+| Eligibility schema | 3 states, reasons, cost class | Same 3 states, **plus explicit `executionAuthorized/executionPerformed/writesPerformed/canonicalAuthority: literal(false)` fields baked into the schema itself** |
+| Determinism | `sha256Stable` canonical JSON, same convention as existing `retrieval-plan.ts` | Same `sha256Stable` convention |
+| Helper seed | 12 helpers, `ownerRef` as a single string per helper | Same 12 helpers, richer `ownerRef` (some helpers list multiple owning files, e.g. `graph-ppr`) |
+| LSP handling | Registry entry + snapshot reports `available:false` honestly (grep-verified) | Not yet inspected for this specific case at this review depth |
+
+**Honest assessment**: the other implementation's decision to bake
+`executionAuthorized/executionPerformed/writesPerformed/canonicalAuthority: false`
+directly into the `HelperEligibilityV1` schema (not just this session's
+looser "authority" convention used elsewhere as a receipt-level field) is a
+**stricter, more idiomatic match to this repo's own established governance
+pattern** (see e.g. `MutationApprovalReceiptSchema` in the same
+`contracts.ts` file) — arguably the better design choice on that one point.
+This session's version is not worse overall, but that specific difference
+is worth carrying forward regardless of which base implementation is kept.
+
+**Not resolved here**: which implementation becomes canonical. Both are
+real, tested, and mutually incompatible at the type level (different field
+names/shapes). Reconciling them (or deliberately keeping one as a challenger)
+was left for an operator decision in the collision review.
+
+**Resolution after explicit bounded-slice direction (2026-09-27):** The user
+selected the per-helper, exact-only, tri-state contract described above for
+the initial slice. The canonical implementation is the `*-v1.ts` set; the
+independent `*-v2.ts` set remains untouched as a comparison, not a second
+runtime owner. Capability snapshot construction seals caller-observed facts
+only and performs no service probes. This resolves the choice for this
+bounded slice; it does not authorize live helper execution or complete the
+rest of the frozen tranche.
+nothing further built or deleted in this entry.
+
+## SESSION NEXT STEPS (2026-09-27, end of session)
+
+**Immediate, operator-decision-blocked:**
+1. **Resolve the `-v1` vs `-v2` helper-eligibility collision** (this file, section above) — pick a canonical implementation (or explicitly keep both as challenger/incumbent) before either is wired to a live caller. Carry forward the `-v1` design's `executionAuthorized/executionPerformed/writesPerformed/canonicalAuthority: false` schema-level fields regardless of which base is kept.
+2. **`PERSISTENCE-DECISION-01`** (`parent-atlas-repair-candidate-feature-matrix/tasks.md`) — decide where V4 packets live (new table? `atlas_packets`? files-only?) before running `SEM-MATERIALIZE-01`'s full 16,151-row job (~32 min, sized and safe, just currently pointless without a destination).
+
+**Ready to resume, not blocked:**
+3. `AFC-KW-02` (versioned vocabulary + normalization: camelCase/snake_case/kebab-case splitting) and `AFC-KW-03` (radix compiler) — deferred per the reviewed design's own sequencing ("prove exact-only first"), now provable since AFC-KW-01 (either version) is done.
+4. `AFC-PLAN-01` (phased/cost-bounded `RetrievalPlanV1` extension), `AFC-CAND-01` (`HelperCandidateV1` executor-vs-lane normalization), `AFC-CACHE-01` (stage-specific caches), `AFC-PARAM-01` (`ParameterBindingV1` EXACT/DERIVED/DEFAULTED) — remaining items from the frozen 13-item tranche, explicitly deferred behind the eligibility-collision resolution.
+5. `SEM-INPUT-01`'s structural-selection coverage is ~79% by extension count (TS/JS/MTS/Markdown) — extending to `.py`/`.svelte`/`.sql`/config formats is real, bounded follow-on work, not blocked on anything.
+6. `ORDINAL-VECTOR-01`/`ACE-V4-COMP-01` canaries (8/8 each) are ready to scale once `PERSISTENCE-DECISION-01` lands — same throughput numbers apply (~32 min at concurrency=4).
+
+**This session's full real-gate closures** (for a future session's orientation, read before re-deriving any of this): ASTG-01 (ast-grep version convergence), EMB-PROV-01 (embedding provenance + a real `.env` bug fixed), external-doc sidecar migration registration, `CandidateOrdinalMapV1` integrity re-verification (16,151/16,151, pre-existing), `ORDINAL-VECTOR-01` canary (8/8), `ACE-V4-COMP-01` canary (8/8, first real V4 packets ever produced), full-corpus throughput sizing (~32min/concurrency=4, 0 failures), `CONTENT-POLICY-01` design freeze, `SEM-INPUT-01`/`SEM-INPUT-02` (real compiler, real bug found+fixed, 8/8 mixed canary), the AFC helper-routing tranche design audit + first bounded slice (built twice, concurrently, both preserved for review).

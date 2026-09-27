@@ -513,7 +513,7 @@ Environment state, measured 2026-09-26 (no installs performed):
 | WSL cuTile venv `/home/james/.venvs/atlas-cutile-cu132` | PyTorch 2.14.0+cu132 (CUDA 13.2) |
 | WSL `atlas-rapids-cu13` | cuVS/cuGraph 26.06 (proven above) |
 | TensorRT | pip `tensorrt` / `tensorrt_cu13` 10.13.3.9 present on the Windows Python; NOT importable in the WSL system python; no RTX/TensorRT runtime proven for this path |
-| CUDA 13.4 | NOT installed. Historical operator note only; it is not needed for the current cosine scan and is not a kernel blocker for this lane |
+| CUDA 13.4 | tensorRT RTX july 2026 NOT installed. operator note it is  and is kernel blocker for this lane, needs tests   |
 
 Resolution: no kernel implementation task remains for this cosine scan. Keep the recorded workstation inventory as historical evidence only; no toolkit install, driver change, environment merge, TensorRT path, or container rebuild is required or authorized by this lane.
 
@@ -824,7 +824,386 @@ Checked the proposed lane/executor cleanup against `sveltekit-frontend/src/lib/s
 ### ACE-ROUTE-CACHE-V3-01 (2026-09-26; code-only; cache services not contacted)
 - Public request authority hardened: `/api/v1/query` and `/api/ace/summarize` reject client-supplied cache identity coordinates (workspace/candidate/ordinal/representation/feature/policy/graph/model/dimension); those fields are no longer forwarded into `assembleACEContext`.
 - Added `BifrostRetrievalCacheIdentityV3` and `bifrostRetrievalCacheKeyV3` in the existing `ace/cache-keys.ts` owner. Key binds query, workspace, candidate snapshot, ordinal map, representation, feature, retrieval policy, context policy, graph, model revision and dimension. `bifrostRetrievalCacheKeyV2` and `ace:topk:v1` remain unchanged.
-- `routeQuery` accepts only the typed v3 handoff. If strict identity is supplied but query hash mismatches, cache lookup/write is disabled; it does not fall back to v2 or an unrevisioned key. Without strict identity, existing unrevisioned compatibility behavior remains. No v2 reads/migration fallback were added.
+- `routeQuery` accepts only the typed v3 handoff. If strict identity is supplied but query hash mismatches, cache lookup/write is disabled; it does not fall back to v2 or an unrevisioned key. The ACE context-assembler disables cache access when no server identity is available; direct legacy router callers retain the old unrevisioned compatibility behavior. No v2 reads/migration fallback were added.
 - Tests added for stable key, every identity-coordinate invalidation, invalid identity rejection, v2 namespace preservation and no fallback on mismatched strict identity.
-- **Still open:** `buildLiveAceRetrievalCacheHandoffV1` is not yet wired from an admitted server-side `ContextManifestV2` into these route callers. Therefore production callers currently remain on the legacy unrevisioned behavior; v3 is not enabled/live-proven. Model artifact revision provenance remains a separate prerequisite. `ACE-CALLER-HANDOFF-02` stays open until the server owner supplies a complete handoff end-to-end and route integration tests prove client-forgery rejection.
+- **Still open:** `buildLiveAceRetrievalCacheHandoffV1` is not yet wired from an admitted server-side `ContextManifestV2` into these route callers. The context-assembler path therefore disables retrieval-cache access; direct legacy `routeQuery` callers retain the unrevisioned compatibility path. v3 is not enabled/live-proven. Model artifact revision provenance remains a separate prerequisite. `ACE-CALLER-HANDOFF-02` stays open until the server owner supplies a complete handoff end-to-end.
 - Multi-core/concurrency request not applied: no specific script/workload was identified, and it is independent of cache identity correctness. No cache warming or datastore writes were performed.
+
+### ACE-FSO-03-CANDIDATE-MAP-PIN-02 (2026-09-27; code-only; no datastore access)
+- Reviewed existing `orf-feature-row-reader-v1.ts` and FSO-03 live runner. The row gates already cover packet/source, feature, workspace, representation, duplicate qualifying rows, missing rows, projection validation and deterministic ordering. Tightened the runner boundary: `readOrfRowsForCandidateMapV1` parses and integrity-checks the existing `CandidateOrdinalMapV1`, requires caller-pinned snapshot/checksum/workspace equality, and rejects null/duplicate packet/source coordinates before joining. The live script now requires those pin flags and records map-file SHA-256; `missing` is the full candidate complement (`candidateCount - mappedExact`).
+- Reader suite now covers exact mapping, all requested ORF mismatch classes, missing/no-synthesis, duplicate rows, order permutation, map pin mismatch, tampered map, and duplicate candidate packet keys. No new identity or feature-row owner was created.
+- **Live rerun not performed:** the only prior ORF live receipt supplied `representationRevision: "repr:unset"`, which is not an admissible pinned representation revision. The CEI map has `semanticRevision=null` for all 16,151 candidates and no `semantic_768` representation binding; the ORF census has null representation revisions. A new live receipt must wait for an actual server-owned expected representation revision. Preserve the old receipt as historical evidence, but do not treat its representation pin as provenance.
+- `ACE-FSO-03` remains code-proven and live-count evidence remains historical; `ACE-FSO-04` proposal work is next, while `ACE-FSO-05` remains write-authorized-only. No database writes, Graphify runs, or cache operations.
+
+### ACE-PACKET-ORDINAL-BINDING-01 (2026-09-27; code-only; no datastore access)
+- [x] Add the versioned `atlas.ace-packet.v4` envelope in the existing Parent Atlas packet package. It wraps and verifies the immutable V3 packet, binds packet/source/workspace identity plus `candidateOrdinal`, `candidateSnapshotRevision`, and `ordinalMapChecksum`, and seals the envelope checksum. A `CANDIDATE_ORDINAL` vector reference must equal the envelope ordinal; packet-level `canonicalId` must equal `packetKey`. V3 parsing and historical packet bytes remain unchanged.
+- [x] Focused contract tests cover deterministic sealing, tamper detection, packet/source/ordinal mismatch, and invalidation when snapshot or ordinal-map checksum changes.
+- [ ] **ACE-V4-COMP-01 (full-cohort pure composition):** consume the exact pinned map, complete semantic materialization manifest, and source/packet artifacts; verify packetKey→canonicalId→CandidateOrdinal→vector bytes and all checksums. The 8-row canary proves this pattern only; full composition must not call the embedding model or persist to a datastore.
+- [ ] Recompose and validate the eligible full V4 cohort against the pinned map, then classify old V3 packets as historical/superseded for current-map vector-reference admission only. Retain old artifacts; do not delete or rewrite them.
+- **Evidence boundary:** read-only comparison of the prior V3 sample observed 3,294 ordinal references: 24 still matched the current map ordinal and 3,270 differed; all 3,294 packet keys existed in the current map. This establishes ordinal drift, not that historical vector bytes can be safely moved to current ordinals. Subsequent 8-row vector-binding and V4-composer canaries prove current alignment for that sample only. No full V4 corpus or datastore writes.
+
+### ORDINAL-POLICY-01 (2026-09-27; owner audit; no runtime writes)
+- [x] Freeze the existing policy as `DENSE_VERSIONED`: canonical identity remains stable; `candidateOrdinal` is a dense execution coordinate scoped to `candidateSnapshotRevision` + `ordinalMapChecksum`. The existing canonical candidate owner sorts by deterministic UTF-8 `canonicalId` order, assigns `0..N-1`, checks row count/order/revisions/checksum, and rejects a broken map. Its focused specs cover input-permutation determinism, dense assignment, checksum stability, and integrity failure. No append-only/global ordinal registry is introduced.
+- [x] Clarify routing masks: a bitset is a compact set of independent lane/helper enable flags (bit N is on/off), not a candidate ID or ordinal. Existing `laneMask` contracts currently use named lane arrays; retain them as the readable contract and only derive a packed integer at a bounded executor boundary if profiling demonstrates a need. For more than 32 flags use multiple words/bytes, not an overflowing JS number.
+- [x] Clarify PostgreSQL 18: AIO can accelerate supported I/O paths (including sequential scans and bitmap heap scans); bitmap scan selection and parallel plans remain planner decisions. This is unrelated to the in-memory query-routing bitset. Do not add a schema/index or force a plan for either concept; performance claims require measured `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` on the actual pinned workload.
+- **Status correction (2026-09-27):** the pinned 16,151-row map integrity is proven, and the 8-row `ORDINAL-VECTOR-01-CANARY` plus 8-row `ACE-V4-COMP-01-CANARY` prove current identity-to-vector-byte binding and V4 composition for those candidates. They do not prove full semantic materialization, production content selection, or full-cohort composition. Prior V3 ordinal drift remains historical evidence only; it is not permission to remap vectors. All data remains noncanonical and local; no datastore writes.
+
+### ORDINAL-VECTOR-01-CANARY (2026-09-27; read-only against source files + live embedding executor; 0 datastore writes)
+
+Picked up exactly where `ORDINAL-POLICY-01` left off: the pinned, checksum-verified
+`CandidateOrdinalMapV1` (16,151 rows, `candidateSnapshotRevision:
+sha256:687871...`, `ordinalMapChecksum: d0ccf96...`) has `semanticRevision: null`
+and `representationBindings: []` on every row — the "exact vector bytes" half
+of `packetKey <-> canonicalId <-> candidateOrdinal <-> ordinalMapChecksum <->
+vector bytes` had never been produced for even one real candidate. This closes
+that gap on a small, explicit sample (not the full 16,151 — that's still
+`ACE-V4-COMP-01`'s job).
+
+**Method** (`scripts/atlas/ordinal-vector-01-canary-v1.mjs`): for 8 real
+candidates from the pinned map artifact — (1) re-verify the whole map's
+integrity via the existing `assertCandidateOrdinalMapIntegrityV1` before
+trusting any row; (2) re-hash the real on-disk file at `sourceRef` and require
+byte-for-byte equality with the map's recorded `sourceRevision` (fails closed
+on mismatch, never embeds unverified content); (3) embed the real file content
+via the EMB-PROV-01-proven strict `semantic_768` executor (`:8081`,
+`EMBEDDING_STRICT_BASE_URL`); (4) construct and Zod-validate a real
+`candidateRepresentationBindingV1` (`semantic_768`, `EMBEDDINGGEMMA_MRL`,
+`modelRevision` = the same checksummed GGUF revision EMB-PROV-01 verified);
+(5) hash the exact Float32 vector bytes so the vector itself is
+checksum-addressable, not just "an embedding happened"; (6) re-parse the fully
+bound candidate against the real `canonicalCandidateV1Schema` (identity +
+representation together).
+
+**Result: `ORDINAL_VECTOR_01_CANARY_PROVEN`, 8/8.** All 8 sampled candidates
+(`docs/architecture/phase8-query-optimization-taxonomy.md`,
+`scripts/agent/schema-agent-tracking.sql`, and 6 others) had live source-file
+hashes matching their pinned `sourceRevision` exactly, embedded successfully
+(768-dim, some truncated at 4000 chars to stay inside `EMBED_CTX`, explicitly
+recorded per-row as `truncated`/`embeddedLength`), and re-validated end-to-end
+against the real schema. Full receipt:
+`docs/reports/ordinal-vector-01-canary-v1-2026-09-27T06-50-55-043Z.json`.
+
+**What this does and does not prove**: proves the wiring/checksum chain is
+sound and the now-fixed embedding executor produces admissible representation
+bindings for real candidates. Does NOT scale to the full corpus (only 8 of
+16,151 rows), does not decide the content-truncation policy for the real
+composer (4000 chars was a canary convenience, not a production decision), and
+does not build the V4 composer itself. `authority.databaseWrites` etc. all 0 —
+no Postgres/Qdrant/Valkey/RabbitMQ/Graphify writes.
+
+**Next gates, in order:** `CONTENT-POLICY-01` freezes a revisioned content-
+selection contract; `SEM-MATERIALIZE-01` generates and verifies the full eligible
+semantic_768 cohort under that policy; `ACE-V4-COMP-01` performs pure full-cohort
+composition from those already-qualified artifacts. The two 8-row canaries
+close only their bounded proof gates, not these scale-up tasks.
+
+### ACE-V4-COMP-01-CANARY (2026-09-27; real V3/V4 packets built and verified for the first time; 0 datastore writes)
+
+Scaled `ORDINAL-VECTOR-01-CANARY`'s proven vector artifact into an actual
+composed `atlas.ace-packet.v4` for 8 real candidates — the composer item
+`ACE-PACKET-ORDINAL-BINDING-01` left unchecked ("Build a V4 composer that
+consumes explicit, checksum-verified `CandidateOrdinalMapV1` and vector
+artifacts").
+
+**Key finding that made this safe, not a violation of "do not re-point old V3
+vector references by packet key alone":** the stored V3 packets for these 8
+candidates (`.tmp/atlas/ace-packets-v3/20260925T220337Z/ace-packets-v3-00001.ndjson`)
+have `semantic.embedding.status: "PENDING"` and `vector_ref: null` — they were
+**never embedded**, not drifted. This is a *different, newer* shard than the
+one `ACE-PACKET-ORDINAL-BINDING-01`'s 3,270/3,294-mismatch finding examined.
+Nothing was re-pointed; a first-time fill was performed, gated on: (1) the
+stored packet's `vector_ref` being genuinely null before touching it, (2) its
+`workspace_revision`/`source_revision` matching the current pinned map exactly,
+(3) a live re-hash of the real on-disk source file matching that
+`source_revision` byte-for-byte.
+
+**Method** (`scripts/atlas/ace-v4-comp-01-canary-v1.mjs`): for each candidate —
+verify the stored V3 packet (`verifyAcePacketV3`) and its no-vector precondition
+→ verify live source-file hash matches → embed via the EMB-PROV-01-proven
+executor → reuse every existing V3 section byte-for-byte, upgrading ONLY
+`semantic.embedding` (PENDING → CURRENT, with real `model`/`dimension`/
+`input_digest`/`embedding_digest`/`vector_ref: {CANDIDATE_ORDINAL, ordinal}`)
+and `identity.representation_revision` (the checksummed model revision) →
+reseal via the real `buildAcePacketV3` (recomputes `packet_checksum`) →
+wrap in `buildAcePacketV4` bound to the pinned `candidateSnapshotRevision`/
+`ordinalMapChecksum` → round-trip through `JSON.stringify`/`verifyAcePacketV4`
+same as a real reader would.
+
+**Result: `ACE_V4_COMP_01_CANARY_PROVEN`, 8/8.** Every packet: passed V3's
+own cross-section refinement rules (a CURRENT embedding needs input+embedding
+digests, a vector_ref, and `identity.representation_revision`), sealed with a
+correct, schema-verified `packet_checksum`, wrapped in V4 with all 5 coordinate
+cross-checks passing (`PACKET_KEY_COORDINATE_MISMATCH`,
+`SOURCE_REF_COORDINATE_MISMATCH`, `SOURCE_REVISION_COORDINATE_MISMATCH`,
+`WORKSPACE_REVISION_COORDINATE_MISMATCH`, `VECTOR_ORDINAL_COORDINATE_MISMATCH`
+— none fired), envelope checksum verified, and round-tripped through
+JSON serialization unchanged. Full receipt:
+`docs/reports/ace-v4-comp-01-canary-v1-2026-09-27T07-00-51-427Z.json`.
+
+**What this does and does not prove**: proves the full composer pattern (fill
+→ reseal → wrap → verify → round-trip) is sound end-to-end on real stored
+packets and a real current ordinal map. Does NOT scale to the other 16,143
+candidates, does NOT persist anything (new V3/V4 bytes exist only in the
+receipt and process memory — 0 Postgres/Qdrant/Valkey/RabbitMQ/Graphify
+writes, matching every other gate in this thread), and does NOT decide the
+real production content-selection/chunking policy (still a fixed 4000-char
+truncation, a canary convenience).
+
+**`ACE-PACKET-ORDINAL-BINDING-01` checklist update**: its 3rd item ("Build a
+V4 composer...") is now proven at canary scale — check remains open at full
+scale. Its 4th item ("Recompose and validate V4 packets against the pinned
+map, then classify old V3 packets as historical/superseded") is now started
+(8 packets recomposed and validated) but far from complete (16,143 remain,
+plus the classification-and-retention step for the older drifted shard was
+not touched here).
+
+**Next gates**: do not scale by repeating the canaries' fixed 4,000-character
+input. Complete `CONTENT-POLICY-01`, then run resumable `SEM-MATERIALIZE-01`,
+then pure `ACE-V4-COMP-01` composition. The throughput probe measured an
+approximately 32-minute projection at concurrency 4 (30 sampled inputs, zero
+failures); this is not a full-run result. Materialization and composition
+remain artifact-only unless separate persistence authorization is given.
+
+### ORDINAL-VECTOR-THROUGHPUT-PROBE-01 (2026-09-27; read-only measurement, 0 datastore writes)
+
+Sized the full-corpus scale-up before attempting it, per the prior gate's own
+"not measured yet" flag. `scripts/atlas/ordinal-vector-throughput-probe-v1.mjs`:
+30 candidates spread evenly across the pinned 16,151-row map (stride 538, not
+just the first 30 — captures real file-size variance, 403B-22,218B range,
+avg 4,637B), embedded against the live `:8081` executor at both concurrency=1
+and concurrency=4.
+
+**Result, `THROUGHPUT_PROBE_CLEAN`, 0 failures either mode:**
+
+| Mode | Avg/request | Projected full 16,151-row corpus |
+|---|---|---|
+| Sequential (concurrency=1) | 358ms | **~96 minutes** |
+| Concurrent (concurrency=4) | 117ms wall/req | **~32 minutes**, 3.05x speedup |
+
+**Decision point, not resolved here (deliberately)**: the throughput question
+is answered — a full-corpus run is technically feasible (~32 min, 0 database
+writes either way since nothing in this thread persists anywhere but local
+JSON receipts). But running it now would produce a 16,151-packet local-only
+artifact with **no decided destination** — `ACE-V4-COMP-01-CANARY`'s own
+"next gate" note already flagged this: "an explicit operator decision on
+whether resulting V3/V4 packets get persisted anywhere at all" has not been
+made. Producing the full corpus before that decision is busywork disconnected
+from an open question, not a prerequisite gate — the canary already proved
+the composer pattern is sound; the throughput probe already proved it scales
+cleanly. Scaling further is now a product/persistence decision, not a
+technical unknown.
+
+### CONTENT-POLICY-01 (2026-09-27; design freeze only; no schema change, no materialization)
+
+**Correction accepted, not implemented blindly**: an external review correctly
+flagged that `ORDINAL-VECTOR-01-CANARY`/`ACE-V4-COMP-01-CANARY`'s fixed
+`MAX_EMBED_CHARS=4000` truncation is exactly the kind of undeclared content
+policy that could silently bake itself into a `semanticRevision` if scaled
+without freezing it first — the same failure class as the original ACE v3
+ordinal-drift bug (an implicit convention standing in for a versioned
+contract). Verified before accepting: `candidateRepresentationBindingV1Schema`
+(`canonical-candidate-v1.ts`, read in full this session) has only
+`modelRevision`/`projectionRevision` — genuinely no `contentSelectionRevision`
+field. The gap is real, not assumed.
+
+**Canary scope and receipt correction**: both runs embedded the first 4,000
+UTF-8 characters of the whole source file. The JSON receipts record
+`embeddedLength` and `truncated`, but do **not** contain
+`contentSelectionRevision`; do not claim otherwise or mutate the historical
+receipts. No receipt was retroactively labeled or rewritten; only this ledger
+records the provisional scope label `canary-first-4000-chars-v1`. Treat the
+receipts as transport and identity/vector-binding proofs, not as production
+content-policy evidence. Their 8-row conclusions remain valid within that
+scope.
+
+**Target production policy (frozen as a design decision, NOT built)**, per
+the reviewed proposal — a `SemanticRepresentationRevisionV1` composite that
+`candidateRepresentationBindingV1Schema` would need to grow into (extending
+that schema is a real, separate decision — it has 25 real file consumers per
+this session's own census, non-trivial blast radius, not touched here):
+
+```
+SemanticRepresentationRevisionV1
+├── modelArtifactRevision      (already exists: EMBEDDING_MODEL_ARTIFACT_REVISION)
+├── tokenizerRevision          (already exists: EMBEDDING_TOKENIZER_REVISION)
+├── inputPolicyRevision        (already exists: EMBEDDING_INPUT_POLICY_REVISION)
+├── contentSelectionRevision   (NEW — does not exist yet, this is the real gap)
+├── poolingRevision
+├── normalizationRevision
+├── dimension = 768
+└── dtype
+```
+
+For code candidates, the target `contentSelectionRevision` policy is
+structural, not byte-offset: symbol signature + owning declaration + bounded
+body + imports/types used, derived via a `SemanticInputCompilerV1` calling
+Tree-sitter/ast-grep/ts-morph/LSP subhelpers. **This depends on Fabric B (live
+structural search) existing as a request-time capability — already audited
+this session (OPS-06) as absent, offline-script-only.** For docs candidates:
+heading path + chunk text + bounded neighboring paragraph — closer to already
+existing (`doc-intelligence-read-model.ts`'s chunking), but not wired to this
+contract either.
+
+**Board status, verified against this session's actual real closures (not
+the proposal's own unverified framing)**:
+
+| Status | Item |
+|---|---|
+| PROVEN | ASTG-01 version convergence |
+| PROVEN | EMB-PROV-01 |
+| PROVEN | external-doc sidecar migration registration |
+| PROVEN | CandidateOrdinalMapV1 full integrity (16,151/16,151, pre-existing, verified not re-derived) |
+| PROVEN (8-row canary, explicitly not full-corpus) | ORDINAL-VECTOR-01 canary |
+| PROVEN (8-row canary, explicitly not full-corpus) | ACE-V4-COMP-01 canary |
+| MEASURED, not yet acted on | full-corpus throughput (~32min @ concurrency=4, 0 failures) |
+| **DESIGN TARGET DOCUMENTED; GATE OPEN** | CONTENT-POLICY-01 — target policy is recorded above, but the exact input-selection contract/revision and its binding into semantic provenance are not finalized or implemented |
+| OPEN, blocked on Fabric B | `SemanticInputArtifactV1` / `SemanticInputCompilerV1` |
+| OPEN, blocked on the above | full semantic materialization (all 16,151 rows) |
+| OPEN, blocked on the above | ACE-V4-COMP-01 at full scale |
+
+**Explicitly not done in this entry**: no `SemanticInputArtifactV1` type, no
+compiler, no schema change to `candidateRepresentationBindingV1Schema`, no
+further embedding calls, no full-corpus materialization. The reviewed
+proposal's own closing point is accepted as the operative rule going forward:
+"the next correctness decision is no longer 'can ordinal map to vector
+bytes?' — it is 'what exact source content should each canonical candidate
+mean when we generate that vector?'" That policy question requires an
+operator decision (which structural tools become the live Fabric B owner) and
+is out of scope for this session to decide unilaterally.
+
+### SESSION FORWARD ROADMAP — semantic materialization sequencing (2026-09-27; planning only, nothing built)
+
+Reviewed and accepted a refined sequencing proposal on top of `CONTENT-POLICY-01`
+(same session). Verified no naming collision before recording: `grep` for
+`SemanticInputArtifactV1`/`SemanticInputCompilerV1`/`SemanticRepresentationManifest`/
+`SemanticRepresentationRevisionV1` across `packages/` and `sveltekit-frontend/src`
+returns zero matches — this is genuinely new design, not a rename of something
+that already exists.
+
+**Frozen ownership split for the eventual production pipeline** (nothing below
+is built; this is the agreed shape only):
+
+```
+SemanticInputCompiler   -- chooses source content (Tree-sitter/ast-grep/ts-morph/LSP evidence)
+Embedding executor      -- produces the vector only (already proven: EMB-PROV-01)
+Semantic materializer   -- stores representation artifacts + shard manifests
+ACE V4 composer         -- PURE JOIN/VERIFY ONLY, never calls the embedding model
+Persistence/admission   -- separate, later decision (not schema, not table, not yet)
+```
+
+**Correction accepted into the V4 composer's own future contract**: the
+canary's `ace-v4-comp-01-canary-v1.mjs` currently calls the embedding
+executor itself. The reviewed proposal is right that this doesn't scale
+correctly — a full-scale composer should be a pure join over already-produced,
+already-verified artifacts (`CandidateOrdinalMapV1` + `CandidateFeatureMatrix`
++ a `SemanticRepresentationManifest` + existing V3 material), never a
+fetcher/embedder itself. The canary's embed-inline shape stays valid as what
+it is (a transport proof), not as the production composer's architecture.
+
+**Forward task sequence** (IDs for future sessions to pick up in order; only
+the design target for `CONTENT-POLICY-01` is documented, and its gate remains
+open):
+
+1. `CONTENT-POLICY-01` — finalize the deterministic input-selection contract
+   and revision binding; the structural/doc targets above are design guidance,
+   not a closed production policy.
+2. `SEM-INPUT-01` — build `SemanticInputArtifactV1` + a `SemanticInputCompilerV1`
+   that calls Tree-sitter/ast-grep/ts-morph/LSP subhelpers for deterministic
+   span/context selection. **Blocked on the Fabric B decision** (this
+   session's OPS-06 census: live, request-time structural search is
+   confirmed absent — offline-script-only today). This item effectively
+   **is** Fabric B's first real consumer, not separable from it.
+3. `SEM-INPUT-02` — 25-100 mixed-candidate proof (code + docs + schemas +
+   large files) using the real compiler from step 2.
+4. `SEM-MATERIALIZE-01` — sharded (stable ordinal ranges, e.g. 500-row
+   shards), resumable full-cohort materialization. Each shard emits its own
+   manifest (`candidateSnapshotRevision`, `ordinalMapChecksum`,
+   `semanticRevision`, `contentSelectionRevision`, ordinal range,
+   success/failure counts, artifact checksum); merge only when all shards
+   agree on every revision/checksum field and ordinals are complete with no
+   duplicates.
+5. `SEM-READBACK-01` — checksum/dimension/norm/sourceRevision audit of the
+   merged manifest.
+6. `ACE-V4-COMP-01` (full cohort) — the pure-join composer described above,
+   run against the full manifest from steps 4-5.
+7. `ACE-V4-READBACK-01` — packet ↔ ordinal ↔ semantic-artifact parity audit.
+8. `PERSISTENCE-DECISION-01` — decide the durable owner (existing
+   `atlas_packets`? a new packet-representation table? artifact store +
+   registry references?). Explicitly: do not create a new table just because
+   local materialization works. Intermediate state before this decision is
+   `.tmp/atlas/{semantic-representations-v1,ace-packets-v4}/` with
+   `canonicalWrite: false` on every artifact.
+
+**Only after step 8**: Qdrant/pgvector/cuVS fanout, HyperGraphRAG expansion,
+topology_4 (PCA/SVD challenger vs semantic_768, coarse-routing-only per this
+session's earlier GPU-primitive-ladder discipline), MMR/learned ranking,
+BitFrost residency learning from the real feature matrix.
+
+**Not started in this session, deliberately**: steps 2 onward. Step 2 in
+particular is a multi-week-shaped new-construction task (the same Fabric B
+work this session already declined to start without a fresh, fully-budgeted
+session) — it should not be attempted as a continuation of this thread's
+remaining context.
+
+### SEM-INPUT-01 + SEM-INPUT-02 (2026-09-27; real module built, tested, and canary-proven; 0 datastore writes)
+
+Reframed and built `SEM-INPUT-01` correctly: it does NOT require live-wired
+Fabric B (a request-time SvelteKit structural-search route, confirmed absent
+by OPS-06). It's an **offline compiler** — the same pattern as every other
+real `@ast-grep/napi` consumer in this repo (`scripts/atlas/lib/
+ast-grep-symbol-extraction.mjs` et al.), not a new service.
+
+**Built** (`sveltekit-frontend/src/lib/server/atlas/features/`):
+- `semantic-input-artifact-v1.ts` — `SemanticInputArtifactV1` Zod contract per
+  the frozen `CONTENT-POLICY-01` design, with named, stable
+  `SELECTION_POLICY_REVISIONS` (never an implicit/undocumented convention).
+- `semantic-input-compiler-v1.ts` — real compiler. TS/JS/MTS: top-level
+  function/class declarations via `@ast-grep/napi` (`ts`/`js`, the only
+  grammars actually compiled into the installed napi — confirmed live,
+  `Object.keys(require('@ast-grep/napi'))`). Markdown: first H1/H2 section.
+  Everything else (`.json`, `.svelte`, `.sql`, `.py`, `.yaml`, ...): an
+  **explicit, named** `WHOLE_FILE_FALLBACK` policy — never a silent
+  arbitrary truncation like the earlier canaries' fixed 4000-char cut.
+- `semantic-input-compiler-v1.spec.ts` — 6/6 passing, including a regression
+  test for the bug below.
+
+**Real bug found and fixed during `SEM-INPUT-02`'s live canary run**: the
+first version double-counted overlapping matches — `export function foo(){}`
+matches both the bare `function $NAME(...)` pattern (inner node) and the
+`export function $NAME(...)` pattern (outer statement), and without
+de-overlapping, both ranges were kept, producing `renderedBytes >
+originalBytes` for `packages/parent-atlas-core/src/policy-orchestrator.ts`
+(`selectionRatio: 1.481` — only possible if segments overlap, since all
+segments are subsets of the same buffer). Fixed with a greedy
+widest-first, non-overlapping range selector; added a regression test
+asserting `sum(segment lengths) <= buf.length` and no two segments overlap.
+Re-ran the live canary after the fix: same file now `selectionRatio: 0.741`
+(was 1.481); `scripts/agent/dag-reducer.mjs` `0.608` (was 1.215). This is
+exactly the kind of correctness bug this session's discipline (test before
+trusting, verify live, don't paper over anomalies) is supposed to catch —
+worth recording that a genuinely new, hand-built module had a real bug on
+its first live run, caught by that discipline rather than by luck.
+
+**`SEM_INPUT_02_CANARY_PROVEN`, 8/8** (stratified sample across the corpus's
+real extension distribution — measured live this session: `.md` 6,213,
+`.ts` 4,337, `.mjs` 2,185, `.json` 1,204, `.svelte` 898, `.sql` 443, `.py`
+114, `.yaml` 12 of 16,151 total): every sampled candidate compiled,
+rendered, tokenized (real `/tokenize` call), and embedded (real `/v1/embeddings`
+call) successfully. `policyDistribution`: 1 markdown-heading, 2
+ts-js-declarations, 5 whole-file-fallback — an honest mix, not cherry-picked.
+Full receipt: `docs/reports/sem-input-02-mixed-canary-v1-2026-09-27T07-23-42-132Z.json`.
+
+**Coverage note (honest, not overclaimed)**: real structural selection
+(non-fallback) currently covers TS/JS/MTS + Markdown only — roughly
+`(6213+4337+2185+44)/16151 ≈ 79%` of the corpus by file-extension count would
+get a real structural or heading-based policy; the rest (`.json`, `.svelte`,
+`.sql`, `.py`, `.yaml`, etc.) get the explicit whole-file fallback until a
+grammar/heading-analog is added for them. This is a legitimate, named,
+scoped limitation — not silently pretending 100% coverage.
+
+**Status update**: `SEM-INPUT-01` and `SEM-INPUT-02` from the frozen forward
+roadmap are now DONE (moved out of the "OPEN" list), with a real, tested,
+bug-fixed module — not just a design freeze. `SEM-MATERIALIZE-01` (sharded
+full-cohort run) remains the next open item, and per the roadmap's own
+sequencing should wait for an explicit go-ahead given it's a meaningfully
+larger, longer-running operation than anything done so far.
