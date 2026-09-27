@@ -101,6 +101,17 @@
   Test: `sveltekit-frontend/tests/cache-keys.spec.ts` (15/15).
 - [ ] CACHE-PREFILL-03 after caller ownership is verified, run a separately scoped
   live read proof; cache SET/DEL fixtures need explicit cache-write effect accounting.
+  - 2026-09-26 code-only progress: added
+    `sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.ts`
+    and focused in-memory tests. The component accepts only an admitted
+    ContextManifestV2 + ManifestBoundPromptPlanV1 + caller-supplied
+    workspaceRevision; it derives an AceBitfrostCacheIdentityV1 descriptor,
+    bounds TTL to <= 86400 seconds, stores no raw stable-prefix text and no
+    portable llama.cpp KV/tensor state, and reports cache writes separately
+    from canonical writes. The stale-workspace fixture changes the cache key
+    and therefore misses. This is NOT the live CACHE-PREFILL-03 proof: no
+    Valkey SET/DEL, no production caller promotion, and no Ornith call were
+    performed in this change.
 
 ### Strict streaming handoff update — 2026-09-15
 
