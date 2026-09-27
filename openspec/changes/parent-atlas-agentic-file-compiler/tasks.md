@@ -343,10 +343,16 @@ remain open and require their own review/proof.
 - [x] AFC-OWNER-01 Verify all 12 helper declarations against source owners/call paths; record declared-owner mismatches without changing registry code.
 - [x] AFC-OWNER-02 Classify every entry as LIVE, UNIT_PROVEN_NOT_LIVE, CONTRACT_ONLY, BLOCKED, or UNRESOLVED in the owner receipt.
 - [x] AFC-OWNER-03 Record router-signal ownership separately from executor ownership; leave per-helper signal mappings unresolved where no owner evidence exists.
-- [ ] AFC-OWNER-04 Verify each helper's logical-fusion-lane mapping and one-vote behavior; currently only the two lexical helpers are fully mapped, and dense fixture coverage is partial.
+- [ ] AFC-OWNER-04 Verify each helper's logical-fusion-lane mapping and one-vote behavior; rg -> rg and trigram -> lexical are verified, FTS is not shown in SearchRuntime, and dense four-executor fixture coverage is incomplete.
 - [x] AFC-OWNER-05 Emit `docs/reports/afc-helper-owner-verification-v1.json` with evidence refs and no-promotion/no-write declarations.
 - [ ] AFC-ROUTING-PROMOTE-01 Owner-verify helper entries, then promote the reviewed contract to stable paths; keep this separate from the implemented query-radix component.
 - [ ] AFC-OWNER-MAP-01 Resolve remaining per-helper router-signal and logical-fusion-lane mappings, including whether helpers outside SearchRuntime are orchestration-only; do not invent `docs` or `graph` fusion lanes. Read-only owner audit is recorded, but mapping/promotion remains open.
+- [x] AFC-OWNER-VERIFY-01 Complete the read-only 12-helper caller/owner census using statuses PROVEN / PROVEN_WITH_ADAPTER / BLOCKED / UNRESOLVED / NOT_A_FUSION_LANE; keep unknown signal and fusion mappings explicit.
+- [x] AFC-LANE-VERIFY-01 Extract the actual SearchRuntime `Candidate.scoreSource` and `LogicalRetrievalLane` vocabulary from its owner; do not substitute the router matrix's legacy target labels.
+- [ ] AFC-LANE-PARITY-01 Fixture one revision-qualified canonical candidate from Qdrant, TurboVec, cuVS, and CAGRA; retain four executor IDs and prove exactly one dense contribution.
+- [ ] AFC-GRAPH-LANE-01 Determine graph-PPR fusion role only after a live dispatcher/caller exists; do not invent a `graph` fusion lane.
+- [ ] AFC-DOC-LANE-01 Keep docs search non-fusion/admin-only unless an actual SearchRuntime adapter and candidate contract are demonstrated.
+- [ ] AFC-LEXICAL-LANE-01 Reconcile router `lexical_exact` targets with SearchRuntime's separate `rg` and `lexical` lanes; establish whether FTS has a SearchRuntime adapter.
 - [ ] AFC-RADIX-ACCEPT-01 Review QUERY-RADIX-01 acceptance semantics against required lookup behavior. Current implementation remains an opt-in, tested prototype: it only expands explicitly configured prefixes via `allowedExpansions`; it does not implement Patricia `prefix_match` longest-stored-key-prefix fallback. No live caller or approved vocabulary owner exists yet.
 - [ ] AFC-RADIX-LIVE-01 Resolve the revisioned vocabulary source/owner, then compile QUERY-RADIX-01 at the AFC query-compilation seam in shadow mode only; do not alter SearchRuntime inputs or invoke radix from RLM directly.
 - [ ] AFC-RADIX-PROOF-01 Emit a checksum-bound baseline-vs-radix plan-diff receipt (added/removed terms and helpers, latency, no writes); require deterministic results for the same input revisions.
@@ -383,21 +389,26 @@ mappings or a separately reviewed change to the fusion-lane owner.
 
 ## AFC HELPER OWNER VERIFICATION (2026-09-27)
 
-See `docs/reports/afc-helper-owner-verification-v1.json` for the 12-entry
-read-only source/call-path matrix. PostgreSQL FTS and trigram are verified
-request-time executors and both normalize to one `lexical` fusion lane. Docs
-search is live only through the admin docs route, not a SearchRuntime lane.
-Other declarations are unit-proven but not request-time wired, contract-only,
-blocked by an absent dispatcher/role mismatch, or unresolved as detailed in
-the receipt. No per-helper router `SignalType` mapping is owner-verified; the
-router-matrix signal owner, executor owner, and SearchRuntime fusion owner
-remain distinct. No registry promotion or live routing call was made.
+The initial receipt `docs/reports/afc-helper-owner-verification-v1.json` is
+superseded by `docs/reports/afc-helper-owner-verification-v2.json`. The wider
+call-path census corrected two earlier misses: `retrieve-candidates.ts`
+actually creates `rg_keyword` candidates consumed by SearchRuntime (logical
+lane `rg`), and the Tree-sitter sidecar has SvelteKit callers. It also found
+the LangExtract tool on the agentic proposal path. V2 distinguishes those
+real execution paths from fusion membership: trigram maps to `lexical`,
+semantic Qdrant to `dense`, while FTS, docs, chunking, and LangExtract are not
+proven as independent SearchRuntime votes. The router matrix's signal targets
+do not equal SearchRuntime's logical lane vocabulary, so individual
+helper-to-signal bindings remain unresolved. No registry promotion, service
+call, datastore write, or QUERY-RADIX change occurred.
 
 `QUERY-RADIX-01` remains a tested prototype, not accepted/live-wired. Its
 current explicit-prefix plus `allowedExpansions` behavior is intentionally
 not equivalent to Patricia `prefix_match`'s longest stored-key-prefix lookup.
-The vocabulary owner, desired prefix semantics, and shadow integration proof
-remain open; the radix source was not modified in this audit.
+Patricia's stock operation is longest stored key that prefixes the query, not
+autocomplete enumeration of longer vocabulary keys. The vocabulary owner,
+desired prefix semantics, and shadow integration proof remain open; the radix
+source was not modified in this audit.
 
 ## AFC-OWNER-MANUAL-MAPPING-01 (partial: 2/12 entries, 2026-09-27)
 
@@ -425,3 +436,33 @@ registry promoted, no code wired, no runtime calls made. Remaining 10 entries
 and the operator decisions this receipt surfaces (does langextract-grounding
 need a new fusion lane, or is it a producer-only helper outside the fusion
 model?) are still open.
+
+## AFC-OWNER-MANUAL-MAPPING-01, slice 2: ast/exact lanes are live, but not via the registered helpers (2026-09-27)
+
+Traced the real, non-test producers of the `'ast'`/`'exact'` fusion lanes:
+`retrieve-candidates.ts` runs real, live Postgres queries reading
+pre-backfilled `tree_node_id`/`metadata`/`output_meta` columns
+(`scoreSource: 'exact_symbol'` / `'ast_tree'`) — these genuinely feed live
+`getFusionLogicalLane()` branches. But this is **not** the registered
+`ast-grep-structural`/`ts-morph-symbol` helpers executing at request time —
+it's a Postgres read of columns some earlier offline backfill process
+populated. Same pattern already found for `rg-exact`: the registry's
+`ownerRef` names a real, tested capability module, not necessarily the
+actual live lane executor.
+
+`ast-grep-structural` and `ts-morph-symbol` stay `UNIT_PROVEN_NOT_LIVE`
+(unchanged) — this slice adds precision, not a status change: the lanes
+they're *associated with* are live, just not through them. `code_symbol_context`
+is the plausible (not owner-confirmed) shared `routerSignal` candidate for
+both. Receipt: `docs/reports/afc-owner-manual-mapping-01-partial-v2.json`.
+
+**New operator question this surfaces**: should the registry's `ownerRef`
+distinguish "capability owner" (the reusable module) from "live lane
+executor" (whatever query/service actually runs at request time) as two
+separate fields? Right now one field conflates both, which is exactly how
+`rg-exact` and these two entries ended up looking more/less live than they
+actually are.
+
+Not touched in this slice: `lsp-definition`, `lsp-references`,
+`tree-sitter-chunk`, `semantic-768`, `graph-ppr`. No registry promoted, no
+code wired, no runtime calls made.
