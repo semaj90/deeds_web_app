@@ -349,7 +349,7 @@ remain open and require their own review/proof.
 - [ ] AFC-OWNER-MAP-01 Resolve remaining per-helper router-signal and logical-fusion-lane mappings, including whether helpers outside SearchRuntime are orchestration-only; do not invent `docs` or `graph` fusion lanes. Read-only owner audit is recorded, but mapping/promotion remains open.
 - [x] AFC-OWNER-VERIFY-01 Complete the read-only 12-helper caller/owner census using statuses PROVEN / PROVEN_WITH_ADAPTER / BLOCKED / UNRESOLVED / NOT_A_FUSION_LANE; keep unknown signal and fusion mappings explicit.
 - [x] AFC-LANE-VERIFY-01 Extract the actual SearchRuntime `Candidate.scoreSource` and `LogicalRetrievalLane` vocabulary from its owner; do not substitute the router matrix's legacy target labels.
-- [ ] AFC-LANE-PARITY-01 Fixture one revision-qualified canonical candidate from Qdrant, TurboVec, cuVS, and CAGRA; retain four executor IDs and prove exactly one dense contribution.
+- [x] AFC-LANE-PARITY-01 Fixture one revision-qualified canonical candidate from Qdrant, TurboVec, cuVS, and CAGRA; retain four executor IDs and prove exactly one dense contribution. Fixture proof only: no live cuVS/CAGRA executor or GPU call was made.
 - [ ] AFC-GRAPH-LANE-01 Determine graph-PPR fusion role only after a live dispatcher/caller exists; do not invent a `graph` fusion lane.
 - [ ] AFC-DOC-LANE-01 Keep docs search non-fusion/admin-only unless an actual SearchRuntime adapter and candidate contract are demonstrated.
 - [ ] AFC-LEXICAL-LANE-01 Reconcile router `lexical_exact` targets with SearchRuntime's separate `rg` and `lexical` lanes; establish whether FTS has a SearchRuntime adapter.
@@ -466,3 +466,29 @@ actually are.
 Not touched in this slice: `lsp-definition`, `lsp-references`,
 `tree-sitter-chunk`, `semantic-768`, `graph-ppr`. No registry promoted, no
 code wired, no runtime calls made.
+
+## AFC-OWNER-MANUAL-MAPPING-01, slice 3: all 12 entries now have direct-code evidence (2026-09-27)
+
+Completes a full pass over the remaining entries. Key new finding:
+`tree-sitter-chunk` reclassified `UNIT_PROVEN_NOT_LIVE` → `LIVE_VIA_OFFLINE_PIPELINE`
+— it's real, wired into the Graphify offline structural-indexing pipeline
+(`graphify-structural-batch-v1.ts`/`graphify-structural-materializer.ts`,
+imported by `canonical-lifecycle-reconciler-v1.ts`), and its output plausibly
+feeds the same `tree_node_id`/`metadata` Postgres columns `retrieve-candidates.ts`
+reads live for the `'ast'`/`'exact'` lanes (connects directly to slice 2's
+finding). **Caveat, not proven**: the specific column-write wasn't traced to
+its exact INSERT/UPDATE statement — flagged as plausible-by-pipeline-shape,
+not confirmed end-to-end.
+
+`lsp-definition`/`lsp-references` stay `CONTRACT_ONLY` (stronger evidence: a
+real code comment elsewhere explicitly says the LSP contract was deliberately
+NOT reused). `semantic-768`/`graph-ppr` stay `BLOCKED` (confirmed via targeted
+negative greps in `search-runtime.ts`/`src/lib/server`, not just absence of
+earlier mention). Receipt: `docs/reports/afc-owner-manual-mapping-01-partial-v3.json`.
+
+**All 12 helper entries now have at least one round of direct-code
+verification** beyond the original audit. Remaining open work is the
+end-to-end column-write trace for tree-sitter-chunk, and the operator
+decisions already surfaced (registry `ownerRef` field split, langextract's
+missing fusion lane, rg-exact's unconfirmed signal). No registry promoted,
+no code wired, no runtime calls made across all three slices.
