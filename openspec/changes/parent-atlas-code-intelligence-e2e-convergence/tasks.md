@@ -52,7 +52,7 @@
 - [x] Route PageRank/attention/KMeans/SOM through the existing pytorch-graph owner
   instead of duplicating native N-API signatures.
 - [x] Add CPU PageRank oracle and connected-components diagnostics.
-- [ ] Run focused Vitest for `semantic-knn-graph-v1.spec.ts` on the workstation.
+- [x] Run focused Vitest for `semantic-knn-graph-v1.spec.ts` on the workstation. Independently verified in the review worktree: **6/6 tests passed**. This closes only the focused helper suite; it does not prove the Qdrant dry replay, GPU execution source, or PageRank runtime parity.
 - [ ] Run bounded dry replay against current Qdrant semantic_768
   (`--limit=128 --graph-limit=128 --graph-k=8`).
 - [ ] Record GPU/CPU PageRank max-abs error, graph density/components, KMeans/SOM
@@ -60,6 +60,10 @@
 - [ ] Do not run `--apply` until the dry report is reviewed.
 
 ## Compaction handoff — 2026-09-27
+
+### SPEC VALIDATION REPAIR — 2026-09-27
+- [x] Added `specs/code-intelligence-e2e-convergence/spec.md` because strict validation previously failed with `Change must have at least one delta`.
+- [ ] Re-run `npx openspec validate parent-atlas-code-intelligence-e2e-convergence --strict` in the workstation checkout after fetching this branch. Do not mark strict validation passed until that command succeeds locally.
 
 ### PROVEN / implemented in source
 - The earlier LibTorch five-zero-caller census was wrong; all five have real callers.
