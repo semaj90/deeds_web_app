@@ -111,9 +111,43 @@ authority=false; writesPerformed=false.
       collection storage, and `24.97 GiB` retained snapshots.
 - [x] Confirmed zero role violations and no collection retirement or payload
       mutation.
-- [ ] The report still finds `0` repository consumers, so consumer discovery
+- [x] The report still finds `0` repository consumers, so consumer discovery
       coverage must be reconciled before any cleanup or projection change.
 
-Evidence: `docs/reports/qdrant-collection-roles-v1.json`.
-Status: `QDRANT_COLLECTION_ROLES_PROVEN_CONSUMER_CENSUS_OPEN`;
-authority=false; writesPerformed=false.
+**Reconciled (2026-09-27):** the `0` was a script bug, not a real finding.
+`scanConsumers()` invokes `rg` via `execFileSync` against 5 hardcoded root
+directories (`scripts`, `services`, `docker`, `sveltekit-frontend`, `packages`);
+run from any cwd other than the repo root, `rg` errors on the missing path
+args (`services`/`packages` don't exist under `sveltekit-frontend/`), the
+script's own `command()` helper swallows that as `available: false`, and
+`scanConsumers()` silently returns `[]` — a real failure was being recorded
+as a real zero. Re-ran the audit from its canonical cwd (repo root, matching
+its own registered `atlas:qdrant:collection-roles:audit` npm script):
+**1,344 real consumer files found**, not 0. Live re-run also confirmed 48
+collections / 140 snapshot files (unchanged) and active collection storage
+grew from 2.77 GiB to 5.51 GiB (snapshots unchanged at 24.97 GiB) — no
+cleanup or payload mutation performed, read-only throughout.
+
+The correct consumer count surfaced 2 real violations invisible while
+consumers read 0: `ACTIVE_LEGACY_384_CONSUMER_REFERENCES`
+(`schema-postgres.ts` still declares two live 384-dim vector columns —
+`embedding` and `summary_embedding_384` — distinct from the already-dropped
+`content_embedding_384`; not touched here, schema changes need operator
+review per this repo's Drizzle Safety Rule) and
+`ACTIVE_COMPETING_768_CONSUMER_REFERENCES` (`packet-dense-rerank.ts`,
+`trace-mcp-server.ts` reference `codebase_chunks_768_v2`, the known
+not-yet-resolved challenger collection — consistent with, not new beyond,
+this repo's existing documented `codebase_chunks_768` vs `_768_v2` split).
+
+Evidence: `docs/reports/qdrant-collection-roles-v1.json` (regenerated, real
+consumer census). Status: `QDRANT_COLLECTION_ROLES_REVIEW_REQUIRED`;
+authority=false; writesPerformed=false. Next gate (per the report):
+`SEMANTIC_OWNER_CONSISTENCY_REVIEW_V1` — not started here, out of scope for
+this reconciliation.
+
+**Script bug not yet fixed** (flagged, not fixed — scope was reconciling the
+count, not hardening the script): `scanConsumers()` should record an explicit
+failure/error state when `rg` errors, instead of defaulting to an empty
+array indistinguishable from a genuine zero-consumer result — the same
+"record null, continue, never promote" principle this repo's own CLAUDE.md
+already states for multi-step proof runs.
