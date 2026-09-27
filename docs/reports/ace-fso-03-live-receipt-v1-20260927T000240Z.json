@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.ace-fso-03-live-receipt.v1",
+  "generatedAt": "2026-09-27T00:02:40.040Z",
+  "level": "LIVE_READ_ONLY",
+  "map": {
+    "path": ".tmp/atlas/cei24-candidate-ordinal-map-v1/20260926T170421.895Z/candidate-ordinal-map-v1.json",
+    "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+    "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+  },
+  "expected": {
+    "featureRevision": "atlas-ast-entity-prefill-v2",
+    "representationRevision": "repr:unset"
+  },
+  "candidateCount": 16151,
+  "persistedRowsRead": 1808,
+  "mappedExact": 0,
+  "missing": 16142,
+  "rejectedWithRow": 9,
+  "rejectionCounts": {
+    "NO_ORF_ROW": 16142,
+    "ORF_WORKSPACE_REVISION_NULL": 9
+  },
+  "synthesizedRows": 0,
+  "outputChecksum": "sha256:b7bb07e8a5b7d8eaa848916c1f0cdb6d7f00e2e10568cd39e05a526a626d72ec",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

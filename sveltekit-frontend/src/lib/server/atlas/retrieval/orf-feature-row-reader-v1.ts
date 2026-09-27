@@ -51,6 +51,7 @@ export type OrfRejectionReasonV1 =
   | 'ORF_WORKSPACE_REVISION_NULL'
   | 'ORF_WORKSPACE_REVISION_MISMATCH'
   | 'ORF_REPRESENTATION_REVISION_NULL'
+  | 'ORF_REPRESENTATION_REVISION_MISMATCH'
   | 'PROJECTION_INVALID';
 
 export interface OrfAcceptedV1 { candidateOrdinal: number; candidate: OrfCandidateV1; projection: ObservationFeatureProjectionV1 }
@@ -70,6 +71,7 @@ export function readOrfRowsForCandidatesV1(input: {
   candidates: readonly OrfCandidateV1[];
   rows: readonly OrfDbRowV1[];
   expectedFeatureRevision: string;
+  expectedRepresentationRevision: string;
 }): OrfReadResultV1 {
   const byKey = new Map<string, OrfDbRowV1[]>();
   for (const row of input.rows) (byKey.get(row.packet_key) ?? byKey.set(row.packet_key, []).get(row.packet_key)!).push(row);
@@ -92,6 +94,7 @@ export function readOrfRowsForCandidatesV1(input: {
     if (r.workspace_revision == null) { reject(c, 'ORF_WORKSPACE_REVISION_NULL'); continue; }
     if (r.workspace_revision !== c.workspaceRevision) { reject(c, 'ORF_WORKSPACE_REVISION_MISMATCH'); continue; }
     if (r.representation_revision == null) { reject(c, 'ORF_REPRESENTATION_REVISION_NULL'); continue; }
+    if (r.representation_revision !== input.expectedRepresentationRevision) { reject(c, 'ORF_REPRESENTATION_REVISION_MISMATCH'); continue; }
     const parsed = ObservationFeatureProjectionV1Schema.safeParse({
       schema: 'atlas.observation-feature-projection.v1',
       packetKey: r.packet_key, sourceRef: r.source_ref, treeNodeId: r.tree_node_id,
@@ -109,6 +112,9 @@ export function readOrfRowsForCandidatesV1(input: {
     if (!parsed.success) { reject(c, 'PROJECTION_INVALID'); continue; }
     accepted.push({ candidateOrdinal: c.candidateOrdinal, candidate: c, projection: parsed.data });
   }
+  // deterministic output regardless of input ordering
+  accepted.sort((a, b) => a.candidateOrdinal - b.candidateOrdinal);
+  rejected.sort((a, b) => a.candidateOrdinal - b.candidateOrdinal);
   return { accepted, rejected, rejectionCounts: counts, synthesizedRows: 0, writesPerformed: false };
 }
 
