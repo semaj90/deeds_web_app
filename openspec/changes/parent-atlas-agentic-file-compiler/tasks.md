@@ -398,3 +398,30 @@ current explicit-prefix plus `allowedExpansions` behavior is intentionally
 not equivalent to Patricia `prefix_match`'s longest stored-key-prefix lookup.
 The vocabulary owner, desired prefix semantics, and shadow integration proof
 remain open; the radix source was not modified in this audit.
+
+## AFC-OWNER-MANUAL-MAPPING-01 (partial: 2/12 entries, 2026-09-27)
+
+Bounded slice only — resolved the 2 `UNRESOLVED` entries from
+`afc-helper-owner-verification-v1.json` by reading the real `SignalType`
+union (`router-matrix.ts`) and `LogicalRetrievalLane`/`getFusionLogicalLane()`
+(`search-runtime.ts`) directly. The other 10 entries are untouched.
+
+- **`rg-exact`**: UNRESOLVED → **BLOCKED**. `LogicalRetrievalLane` genuinely
+  includes a distinct `'rg'` value (`case 'rg_keyword': return 'rg'`),
+  confirming rg is separate from lexical in the real fusion type — the
+  lane/signal shape exists, only a live caller producing `rg_keyword`
+  candidates is unproven. `lexical_exact` is a plausible (not owner-confirmed)
+  signal candidate.
+- **`langextract-grounding`**: UNRESOLVED → **BLOCKED_STRUCTURALLY_ABSENT** (a
+  stronger finding than the original status implied). The full real
+  `LogicalRetrievalLane` set is `{dense, lexical, exact, ast, schema, rg,
+  bm42}` — there is no doc/grounding lane anywhere in the type, not merely an
+  unproven one. Confirms the receipt's own cross-cutting finding. No
+  `SignalType` match either; `evidence_source_ref_context` is flagged as the
+  closest conceptual candidate only, explicitly not asserted as the answer.
+
+Receipt: `docs/reports/afc-owner-manual-mapping-01-partial-v1.json`. No
+registry promoted, no code wired, no runtime calls made. Remaining 10 entries
+and the operator decisions this receipt surfaces (does langextract-grounding
+need a new fusion lane, or is it a producer-only helper outside the fusion
+model?) are still open.
