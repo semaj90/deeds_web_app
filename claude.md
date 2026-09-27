@@ -257,6 +257,29 @@ below were stale, verified live against Postgres and Qdrant directly, not assume
 - **Postgres mirror**: `codebase_chunk_index.content_embedding` (vector(768), 52,380 rows populated as of 2026-08-23)
 - **Retrieval path**: Qdrant ANN → Postgres join by source_ref → optional Neo4j topology expansion
 
+**Live re-verification (2026-09-27, `GET /collections/<name>` against the live Qdrant instance,
+via `docs/reports/qdrant-collection-roles-v1.json`'s regenerated census — this superseded a stale
+0-consumer bug in that same script, see `parent-atlas-qdrant-structural-payload-enrichment/tasks.md`
+`QDRANT-COLLECTION-ROLE-RECHECK-2026-09-12-R2`)**:
+
+| Collection | Live points | Named vectors | Note |
+|---|---|---|---|
+| `codebase_chunks_768` | **328,348** (was 105,762/109,776/40,568 at various earlier dates — real growth, not a typo; update again before citing an old figure) | `content`/`error`/`signature`, all 768-dim Cosine | `ACTIVE_SEMANTIC_PROJECTION` |
+| `codebase_chunks_768_v2` | 52,816 (was 52,380) | `content`/`error`/`signature`, all 768-dim Cosine | `COMPARISON_CHALLENGER`, still `NOT_PROMOTED` — the split below is still unresolved |
+| `codebase_chunks_512` | 53,380 (matches prior 53,379) | single unnamed vector | `SEMANTIC_EXPERIMENT` |
+| `codebase_chunks_256` | **does not exist** | — | confirms the note below is still accurate |
+| `codebase_chunks_128` | **does not exist** | — | confirms the note below is still accurate |
+| `codebase_chunks_latent256` | 55,169 (matches Postgres `latent_256` population exactly) | single unnamed vector | `LEARNED_LATENT_PROJECTION` |
+| `codebase_chunks_latent128` | **does not exist** | — | Postgres `latent_128` (55,169 rows) has no Qdrant mirror yet, per this file's own earlier note — still true |
+| `codebase_chunks_latent64` | **does not exist** | — | Postgres `latent_64` (1,703 rows) has no Qdrant mirror yet, per this file's own earlier note — still true |
+| `codebase_chunks_384` | 1 point | 384-dim | `LEGACY_SEMANTIC`, near-empty as documented |
+| `codebase_chunks_384_hybrid` | 10 points | 384-dim | `LEGACY_SEMANTIC`, near-empty as documented |
+
+Bottom line: the 768/512/latent-256 lanes are real and match (or exceed) what this file already
+claimed; the 256/128 MRL lanes and the latent-128/latent-64 Qdrant mirrors are still genuinely
+absent, not a doc gap — don't build them speculatively without a stated need, per
+`DEPENDENCY-CAPABILITY-GUARD-01`.
+
 **SECONDARY ROUTING LANE(S)**: 512d, 256d, 128d — all MRL-truncated prefixes of the same 768d
 embeddinggemma vector (optional, cost-optimized re-ranking). 384d is retired (see above) — do not
 add it back as a lane.
@@ -2340,7 +2363,7 @@ Embedding Dimensions Policy above; they were never deleted, just abandoned.)
 | `evidence_items` | Evidence chunks + metadata | Active |
 | `legal_documents` | Legal document embeddings | Active |
 | `legal_cases` | Case description embeddings | Active |
-| `codebase_chunks_768` | Dual-vector code search | Active (109,776 points) |
+| `codebase_chunks_768` | Dual-vector code search | Active (328,348 points as of 2026-09-27 — see the live re-verification table in the Embedding Dimensions Policy section above before citing an older figure) |
 | `chat_messages` | Chat context search | Active |
 | `embedding_cache` | Embedding lookup cache | Active |
 
