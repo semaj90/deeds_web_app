@@ -148,6 +148,7 @@ export * from './core/ace-packet-v3-structural-composer.js';
 export * from './core/ace-packet-v3-admission.js';
 export * from './core/ace-structural-section-v1.js';
 export * from './core/ace-agentic-admission-v1.js';
+export * from './core/ace-runtime-memory-contracts-v1.js';
 export * from './core/ace-runtime-adapter.js';
 export * from './core/hyperrag-live-integration.js';
 export * from './core/proof-gates.js';
