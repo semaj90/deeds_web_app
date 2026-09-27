@@ -148,6 +148,39 @@ describe('qdrant collection contract lineage', () => {
     ).toThrow(PayloadValidationError);
   });
 
+
+  it('does not infer representation identity from vector dimension', () => {
+    expect(COLLECTION_CONTRACTS.codebase_chunks_768.representationId).toBe('semantic_768');
+    expect(COLLECTION_CONTRACTS.codebase_chunks_384_hybrid.representationId).toBe('legacy_384');
+    expect(COLLECTION_CONTRACTS.codebase_topology_64.representationId).toBe('latent_64');
+
+    expect(() =>
+      validateQdrantPayloadForCollection('codebase_chunks_768', {
+        packet_key: 'packet:codebert',
+        source_ref: 'src/lib/server/analysis/representation-analysis-service.ts',
+        workspace_id: 'sveltekit-frontend',
+        ontology_version: 'v1.0',
+        postgres_id: '00000000-0000-0000-0000-000000000099',
+        content_hash: 'sha256:codebert',
+        contract_version: 'atlas-qdrant-768-source-v1',
+        metadata_schema: 'atlas-semantic-metadata-v1',
+        metadata_version: 1,
+        file_path: 'src/lib/server/analysis/representation-analysis-service.ts',
+        language: 'typescript',
+        embedding_model: 'codebert:experimental',
+        embedding_dimension: 768,
+        representation_id: 'codebert_768',
+        embedding_lane: 'dense_768',
+        embedding_role: 'derived',
+        embedding_status: 'REFERENCE_ONLY',
+        embedding_native_dimension: 768,
+        projection_method: 'none',
+        normalization: 'L2',
+        indexed_at: new Date('2026-09-27T00:00:00Z').toISOString(),
+      })
+    ).toThrowError(/Expected semantic_768 for collection=codebase_chunks_768, got codebert_768/);
+  });
+
   it('keeps the hybrid dense lane and sparse lane separate from the 768 native lane', () => {
     expect(COLLECTION_CONTRACTS.codebase_chunks_384_hybrid.vectors.content.size).toBe(384);
     expect(COLLECTION_CONTRACTS.codebase_chunks_384_hybrid.sparseVectors).toEqual(
