@@ -128,26 +128,30 @@ eligibility, no capability registry, no phases.
 AFC-00..20 above). The bounded initial helper-routing slice is implemented
 and fixture-proven; remaining items below stay open unless specifically marked:
 
-- [x] AFC-HELPER-01 `HelperRegistryV1` — static capability registry (languages,
+- [ ] AFC-HELPER-01 `HelperRegistryV1` — static capability registry (languages,
   intents, requires, produces, executor kind/owner, costClass, mutationClass).
   Describes executable reality only; does not encode runtime up/down state.
-- [x] AFC-HELPER-02 `HelperCapabilitySnapshotV1` — runtime availability
+- [ ] AFC-HELPER-02 `HelperCapabilitySnapshotV1` — runtime availability
   snapshot, separate from the static registry (per-helper `available`,
   `executorRevision`/`serviceRevision`, `observedAt`, checksum). Avoids
   mutating the registry every time a service cycles.
-- [x] AFC-KW-01 `KeywordRecognitionV1` contract (bounded exact-token matching;
+- [ ] AFC-KW-01 `KeywordRecognitionV1` contract (bounded exact-token matching;
   vocabulary remains fixture-supplied; no radix/prefix expansion).
 - [ ] AFC-KW-02 Versioned vocabulary + normalization contract (case folding,
   Unicode normalization, camelCase/snake_case/kebab-case splitting, dot/path
   segmentation, package-name preservation) — separate revision domain from
   the classifier/taxonomy revisions already in use.
-- [ ] AFC-KW-03 Exact map + radix compiler over normalized tokens, with
+- [x] AFC-KW-03 Exact map + radix compiler over normalized tokens, with
   `prefixPolicy: CONTROLLED` + explicit `allowedExpansions` per prefix entry
   (radix answers "which registered vocabulary entries share this prefix",
   never decides semantic relatedness).
+- [x] QUERY-RADIX-01 Add a distinct CPU/in-process query-prefix index over a
+  revisioned, caller-supplied vocabulary. Keep it separate from GPU
+  `ACE-RADIX-01`; do not create a new agent/runtime or change SearchRuntime
+  ownership.
 - [ ] AFC-KW-04 Aho-Corasick bulk recognizer — DEFERRED (explicitly, per the
   review itself).
-- [x] AFC-HELPER-03 Tri-state `HelperEligibilityV1`
+- [ ] AFC-HELPER-03 Tri-state `HelperEligibilityV1`
   (ELIGIBLE/INELIGIBLE/BLOCKED, with `positiveReasons`/`blockingReasons`,
   `matchedEvidenceRefs`, `estimatedCostClass`) — combines the static registry
   + query evidence + runtime capability snapshot. Separate revision fields
@@ -179,7 +183,7 @@ and fixture-proven; remaining items below stay open unless specifically marked:
   each keyed on its own upstream checksum + its own revision fields — so a
   service-availability change invalidates eligibility/plan without forcing
   keyword recognition to recompute.
-- [x] AFC-PROOF-01 Positive + negative + blocked routing fixture (e.g. "explain
+- [ ] AFC-PROOF-01 Positive + negative + blocked routing fixture (e.g. "explain
   CAGRA indexing parameters" → docs/postgres-fts/semantic-768 ELIGIBLE,
   lsp-references/ast-grep/langextract INELIGIBLE; and a deliberately-unavailable-LSP
   case proving `BLOCKED` with `reason=CAPABILITY_UNAVAILABLE` rather than
@@ -196,8 +200,30 @@ code references, CAGRA, cache/Graphify, ROS2, semanticRevision, and Postgres
 HNSW; an LSP available/unavailable pair changes eligibility while leaving
 keyword recognition unchanged. Focused fixture suite: 10/10 passed. No live
 helper execution, datastore/cache writes, or `RetrievalPlanV1` changes were
-performed. `AFC-KW-02/03`, planning, cache, parameters, candidate normalization,
-and live capability probes remain open.
+performed. At that checkpoint, `AFC-KW-02/03`, planning, cache, parameters,
+candidate normalization, and live capability probes remained open; see the
+subsequent QUERY-RADIX-01 progress below for the radix increment.
+
+**QUERY-RADIX-01 proof (2026-09-27):** Added a versioned vocabulary input
+contract and deterministic compressed radix index. Prefix rules require
+explicit `allowedExpansions`; each target must be a registered term beginning
+with that prefix, and each rule is capped at eight expansions. There is no
+implicit descendant search, semantic expansion, fuzzy matching, or default
+vocabulary corpus; vocabulary placement/ownership remains unresolved. The
+lookup can be converted to the existing `QueryExpansionTermV1` with
+`source=KEYWORD_RADIX`, vocabulary revision, and lookup-checksum evidence.
+`KEYWORD_RADIX` is not allowed by default in `TaxonomyScopeV1`; the caller must
+opt in. Focused helper/radix/taxonomy/retrieval-plan suites pass 21/21.
+No RLM runtime/SearchRuntime call site was wired, and no cache or datastore
+writes occurred. `ACE-RADIX-01` remains the separate GPU residency sorter.
+
+**QUERY-RADIX-01 current-worktree verification (2026-09-27):** Re-ran the
+focused radix, exact keyword, taxonomy expansion, and retrieval-plan suites:
+21/21 passed. This closes the implementation/fixture gate, not live request
+integration. The radix lookup remains opt-in and caller-supplied; no
+production vocabulary source/owner is approved yet. Next is an AFC-owned,
+shadow-only compile/plan comparison after vocabulary ownership is resolved;
+the live SearchRuntime input and RLM behavior must remain unchanged.
 
 **Proposed physical layout** (extends the existing, real
 `src/lib/server/atlas/agentic-file-compiler/` directory — matches what's
@@ -274,16 +300,101 @@ bounded slice; it does not authorize live helper execution or complete the
 rest of the frozen tranche.
 nothing further built or deleted in this entry.
 
+**Superseding ownership review (2026-09-27):** The above selection is historical
+and is no longer an acceptance decision. New review evidence says the v1-named
+helper files were concurrently written and must not be treated as the final
+contract. Both source sets are preserved. In the current checkout, the v1
+focused suite passes 10/10 and the v2 focused suite passes 8/8; this corrects
+the older 9/10 note above but does not select either set as canonical.
+
+| Contract area | v1 candidate | v2 candidate | Review decision |
+|---|---|---|---|
+| Static registry | `entries`, owner/surface metadata; no logical fusion lane | `helpers`, explicit lane and executor | Keep v2's separate `executor` and `logicalLane` fields, but type the lane from the existing `LogicalRetrievalLane` owner (`search-runtime.ts`). |
+| Capability | Per-helper snapshot binds registry checksum; caller-observed only | Batch snapshot binds registry revision; observer also contains live probing/default-availability behavior | Keep batch observation shape, bind both registry revision and checksum plus per-helper revision, and keep the contract builder pure with no probes/default availability. |
+| Keyword recognition | Binds classifier/taxonomy/vocabulary/registry; free-form domain strings | Binds query/vocabulary; domain/helper strings are not all owner-validated | Keep separate revision/checksum coordinates; domain outputs must come from `domain-taxonomy.ts`, and vocabulary domain refs must be canonical taxonomy labels. |
+| Eligibility | Tri-state with free-form reasons and strict false side-effect fields | Tri-state with typed reasons, without the same strict false fields | Keep typed reasons and explicit `executionAuthorized=false`, `executionPerformed=false`, `writesPerformed=false`, `canonicalAuthority=false`. |
+| Existing routing ownership | Does not encode the router signal separately | Lane/executor separation but no binding to the exact signal owner | `lexical_exact` remains a `router-matrix.ts` signal; no new lexical owner. SearchRuntime remains fusion owner. |
+
+Review-only merged candidate created at
+`src/lib/server/atlas/agentic-file-compiler/routing-review-v2/`. It is not
+exported or wired into runtime. It deliberately has no default helper seed:
+owner refs and actual request-time availability need separate evidence. The
+candidate compiles and fixture tests cover static-vs-runtime separation,
+executor-vs-lane identity, canonical domain filtering, tri-state behavior,
+revision separation, and no-authority/no-write invariants. The query-radix
+implementation is recorded above as implemented and fixture-proven, but still
+has no production caller. Vocabulary placement/ownership remains unresolved,
+and the competing helper-routing candidates are not promoted; this does not
+authorize a live route, SearchRuntime, or RLM behavior change.
+
+**AFC-ROUTING-REVIEW-01..05:** completed as an isolated contract comparison
+and review-candidate selection only. The merged design candidate is the
+`routing-review-v2` set; the existing v1/v2 files remain untouched. Promotion
+of that candidate into stable contract paths, a verified default helper seed,
+`HelperCandidateV1`, phased scheduling, and RLM/SearchRuntime integration
+remain open and require their own review/proof.
+
+- [x] AFC-ROUTING-REVIEW-01 Preserve both helper-routing candidates and create an isolated review namespace.
+- [x] AFC-ROUTING-REVIEW-02 Compile and fixture-test the review candidate independently.
+- [x] AFC-ROUTING-REVIEW-03 Compare the two candidate field/ownership choices above.
+- [x] AFC-ROUTING-REVIEW-04 Test static/runtime separation, tri-state eligibility, executor/lane separation, revision domains, and no-write/no-authority invariants.
+- [x] AFC-ROUTING-REVIEW-05 Select the isolated merged design candidate without promoting it into production paths.
+- [x] AFC-ROUTING-REVIEW-06 Compare router signal, SearchRuntime fusion lane, and executor as three distinct axes; record the owner-backed review receipt.
+- [x] AFC-OWNER-01 Verify all 12 helper declarations against source owners/call paths; record declared-owner mismatches without changing registry code.
+- [x] AFC-OWNER-02 Classify every entry as LIVE, UNIT_PROVEN_NOT_LIVE, CONTRACT_ONLY, BLOCKED, or UNRESOLVED in the owner receipt.
+- [x] AFC-OWNER-03 Record router-signal ownership separately from executor ownership; leave per-helper signal mappings unresolved where no owner evidence exists.
+- [ ] AFC-OWNER-04 Verify each helper's logical-fusion-lane mapping and one-vote behavior; currently only the two lexical helpers are fully mapped, and dense fixture coverage is partial.
+- [x] AFC-OWNER-05 Emit `docs/reports/afc-helper-owner-verification-v1.json` with evidence refs and no-promotion/no-write declarations.
+- [ ] AFC-ROUTING-PROMOTE-01 Owner-verify helper entries, then promote the reviewed contract to stable paths; keep this separate from the implemented query-radix component.
+- [ ] AFC-OWNER-MAP-01 Resolve remaining per-helper router-signal and logical-fusion-lane mappings, including whether helpers outside SearchRuntime are orchestration-only; do not invent `docs` or `graph` fusion lanes. Read-only owner audit is recorded, but mapping/promotion remains open.
+- [ ] AFC-RADIX-ACCEPT-01 Review QUERY-RADIX-01 acceptance semantics against required lookup behavior. Current implementation remains an opt-in, tested prototype: it only expands explicitly configured prefixes via `allowedExpansions`; it does not implement Patricia `prefix_match` longest-stored-key-prefix fallback. No live caller or approved vocabulary owner exists yet.
+- [ ] AFC-RADIX-LIVE-01 Resolve the revisioned vocabulary source/owner, then compile QUERY-RADIX-01 at the AFC query-compilation seam in shadow mode only; do not alter SearchRuntime inputs or invoke radix from RLM directly.
+- [ ] AFC-RADIX-PROOF-01 Emit a checksum-bound baseline-vs-radix plan-diff receipt (added/removed terms and helpers, latency, no writes); require deterministic results for the same input revisions.
+- [ ] AFC-RLM-BRIDGE-01 After AFC shadow proof and helper-contract promotion, let RLM consume one immutable AFC routing artifact; do not reconstruct routing or call the radix index directly from RLM.
+
+**AFC-ROUTING-REVIEW-06 receipt (2026-09-27):**
+`docs/reports/afc-routing-contract-review-v1.json` compares both collided
+registry/capability/eligibility candidates and the isolated merged review
+candidate. The isolated review candidate is the only shape that explicitly
+keeps `routerSignal` (`router-matrix.ts`), `logicalLane` (typed from
+`SearchRuntime`), and executor identity separate. Decision is `MANUAL` for
+promotion: the current SearchRuntime lane set is `dense`, `lexical`, `exact`,
+`ast`, `schema`, `rg`, and `bm42`; it does not currently define conceptual `graph` or `docs`
+fusion lanes, and `rg_keyword` maps to its own `rg` lane rather than `lexical`.
+The existing one-vote-per-lane fixture proof directly covers Qdrant+TurboVec
+as one `dense` contribution, not every proposed cuVS/CAGRA route. No helper
+registry, SearchRuntime, or routing behavior was changed. QUERY-RADIX-01 was
+not touched. Promotion requires owner-verified helper-to-signal/lane/executor
+mappings or a separately reviewed change to the fusion-lane owner.
+
 ## SESSION NEXT STEPS (2026-09-27, end of session)
 
-**Immediate, operator-decision-blocked:**
-1. **Resolve the `-v1` vs `-v2` helper-eligibility collision** (this file, section above) — pick a canonical implementation (or explicitly keep both as challenger/incumbent) before either is wired to a live caller. Carry forward the `-v1` design's `executionAuthorized/executionPerformed/writesPerformed/canonicalAuthority: false` schema-level fields regardless of which base is kept.
+**Immediate, owner-proof-blocked:**
+1. **Live routing integration remains open.** QUERY-RADIX-01 is implemented and fixture-proven, but the vocabulary source/owner is unresolved and no production caller exists. Keep the next AFC integration shadow-only. Helper v1/v2 candidates remain unpromoted; verify owner references, logical-lane mappings, and capability evidence before using helper eligibility in the request path.
 2. **`PERSISTENCE-DECISION-01`** (`parent-atlas-repair-candidate-feature-matrix/tasks.md`) — decide where V4 packets live (new table? `atlas_packets`? files-only?) before running `SEM-MATERIALIZE-01`'s full 16,151-row job (~32 min, sized and safe, just currently pointless without a destination).
 
 **Ready to resume, not blocked:**
-3. `AFC-KW-02` (versioned vocabulary + normalization: camelCase/snake_case/kebab-case splitting) and `AFC-KW-03` (radix compiler) — deferred per the reviewed design's own sequencing ("prove exact-only first"), now provable since AFC-KW-01 (either version) is done.
-4. `AFC-PLAN-01` (phased/cost-bounded `RetrievalPlanV1` extension), `AFC-CAND-01` (`HelperCandidateV1` executor-vs-lane normalization), `AFC-CACHE-01` (stage-specific caches), `AFC-PARAM-01` (`ParameterBindingV1` EXACT/DERIVED/DEFAULTED) — remaining items from the frozen 13-item tranche, explicitly deferred behind the eligibility-collision resolution.
+3. `AFC-KW-02` (full normalization: camelCase/snake_case/kebab-case splitting, dot/path segmentation, package-name preservation) remains open. QUERY-RADIX-01's implemented normalization is narrower and does not close this broader contract. `AFC-RADIX-LIVE-01` remains gated on approved vocabulary ownership and must stay shadow-only.
+4. `AFC-PLAN-01` (phased/cost-bounded `RetrievalPlanV1` extension), `AFC-CAND-01` (`HelperCandidateV1` executor-vs-lane normalization), `AFC-CACHE-01` (stage-specific caches), `AFC-PARAM-01` (`ParameterBindingV1` EXACT/DERIVED/DEFAULTED) remain open; helper eligibility is still a review candidate, not a production caller input.
 5. `SEM-INPUT-01`'s structural-selection coverage is ~79% by extension count (TS/JS/MTS/Markdown) — extending to `.py`/`.svelte`/`.sql`/config formats is real, bounded follow-on work, not blocked on anything.
 6. `ORDINAL-VECTOR-01`/`ACE-V4-COMP-01` canaries (8/8 each) are ready to scale once `PERSISTENCE-DECISION-01` lands — same throughput numbers apply (~32 min at concurrency=4).
 
 **This session's full real-gate closures** (for a future session's orientation, read before re-deriving any of this): ASTG-01 (ast-grep version convergence), EMB-PROV-01 (embedding provenance + a real `.env` bug fixed), external-doc sidecar migration registration, `CandidateOrdinalMapV1` integrity re-verification (16,151/16,151, pre-existing), `ORDINAL-VECTOR-01` canary (8/8), `ACE-V4-COMP-01` canary (8/8, first real V4 packets ever produced), full-corpus throughput sizing (~32min/concurrency=4, 0 failures), `CONTENT-POLICY-01` design freeze, `SEM-INPUT-01`/`SEM-INPUT-02` (real compiler, real bug found+fixed, 8/8 mixed canary), the AFC helper-routing tranche design audit + first bounded slice (built twice, concurrently, both preserved for review).
+
+## AFC HELPER OWNER VERIFICATION (2026-09-27)
+
+See `docs/reports/afc-helper-owner-verification-v1.json` for the 12-entry
+read-only source/call-path matrix. PostgreSQL FTS and trigram are verified
+request-time executors and both normalize to one `lexical` fusion lane. Docs
+search is live only through the admin docs route, not a SearchRuntime lane.
+Other declarations are unit-proven but not request-time wired, contract-only,
+blocked by an absent dispatcher/role mismatch, or unresolved as detailed in
+the receipt. No per-helper router `SignalType` mapping is owner-verified; the
+router-matrix signal owner, executor owner, and SearchRuntime fusion owner
+remain distinct. No registry promotion or live routing call was made.
+
+`QUERY-RADIX-01` remains a tested prototype, not accepted/live-wired. Its
+current explicit-prefix plus `allowedExpansions` behavior is intentionally
+not equivalent to Patricia `prefix_match`'s longest stored-key-prefix lookup.
+The vocabulary owner, desired prefix semantics, and shadow integration proof
+remain open; the radix source was not modified in this audit.
