@@ -351,7 +351,7 @@ remain open and require their own review/proof.
 - [x] AFC-LANE-VERIFY-01 Extract the actual SearchRuntime `Candidate.scoreSource` and `LogicalRetrievalLane` vocabulary from its owner; do not substitute the router matrix's legacy target labels.
 - [x] AFC-LANE-PARITY-01 Fixture one revision-qualified canonical candidate from Qdrant, TurboVec, cuVS, and CAGRA; retain four executor IDs and prove exactly one dense contribution. Fixture proof only: no live cuVS/CAGRA executor or GPU call was made.
 - [x] AFC-GRAPH-LANE-01 Determine graph-PPR fusion role only after a live dispatcher/caller exists; do not invent a `graph` fusion lane. Read-only caller census found query-time PPR in the Admin Atlas synthesis route as a graph-revision/seed-bound candidate ranking feature, not a SearchRuntime fusion lane. The ordinary SearchRuntime graph expansion is a separate post-fusion `graphExpanded` result. No live GPU call was made.
-- [ ] AFC-DOC-LANE-01 Keep docs search non-fusion/admin-only unless an actual SearchRuntime adapter and candidate contract are demonstrated.
+- [x] AFC-DOC-LANE-01 Keep docs search non-fusion/admin-only unless an actual SearchRuntime adapter and candidate contract are demonstrated. Owner trace: the admin-only `/api/admin/atlas/docs-corpus/search` route calls `searchDocCorpus`, which returns canonical Postgres FTS hits when admitted rows exist and otherwise a local lexical fallback; neither result path is adapted into SearchRuntime candidates or an RRF lane.
 - [ ] AFC-LEXICAL-LANE-01 Reconcile router `lexical_exact` targets with SearchRuntime's separate `rg` and `lexical` lanes; establish whether FTS has a SearchRuntime adapter.
 - [ ] AFC-RADIX-ACCEPT-01 Review QUERY-RADIX-01 acceptance semantics against required lookup behavior. Current implementation remains an opt-in, tested prototype: it only expands explicitly configured prefixes via `allowedExpansions`; it does not implement Patricia `prefix_match` longest-stored-key-prefix fallback. No live caller or approved vocabulary owner exists yet.
 - [ ] AFC-RADIX-LIVE-01 Resolve the revisioned vocabulary source/owner, then compile QUERY-RADIX-01 at the AFC query-compilation seam in shadow mode only; do not alter SearchRuntime inputs or invoke radix from RLM directly.
@@ -581,3 +581,47 @@ All work this session was read-only against Postgres/Qdrant/Valkey/Neo4j/
 RabbitMQ (0 writes throughout, verified per-receipt). Everything is
 committed and pushed to `origin/handoff/summary-enrichment-lineage-20260925`
 through commit `deae3a1bb5`.
+
+## RECONCILIATION: afc-helper-owner-verification-v2 supersedes this session's v1 findings (2026-09-27)
+
+A parallel Codex session (same operator, run concurrently, confirmed) produced
+`docs/reports/afc-helper-owner-verification-v2.json`, which **supersedes**
+this file's earlier `afc-helper-owner-verification-v1.json` +
+`afc-owner-manual-mapping-01-partial-v{1,2,3}.json` receipts. Verified one
+correction directly before accepting it: `src/routes/api/admin/atlas/synthesize/+server.ts`
+genuinely references query-time PPR — my earlier `graph-ppr: BLOCKED`
+conclusion (slice 3) was **incomplete**, not fabricated; a real caller exists
+outside SearchRuntime's fusion path that I didn't find.
+
+**Corrected final status (v2, richer vocabulary: PROVEN / PROVEN_WITH_ADAPTER
+/ BLOCKED / UNRESOLVED / NOT_A_FUSION_LANE)**:
+
+| Helper | v1 (this session) | v2 (corrected) |
+|---|---|---|
+| rg-exact | BLOCKED | PROVEN_WITH_ADAPTER → `rg` lane |
+| postgres-fts | LIVE | **NOT_A_FUSION_LANE** |
+| postgres-trigram | LIVE | PROVEN → `lexical` lane |
+| tree-sitter-chunk | LIVE_VIA_OFFLINE_PIPELINE | NOT_A_FUSION_LANE (chunking isn't an RRF vote) |
+| ast-grep-structural | UNIT_PROVEN_NOT_LIVE | UNRESOLVED |
+| ts-morph-symbol | UNIT_PROVEN_NOT_LIVE | UNRESOLVED |
+| lsp-definition/references | CONTRACT_ONLY | BLOCKED |
+| docs-corpus-search | LIVE (admin-only) | NOT_A_FUSION_LANE (confirmed admin-only, no RRF conversion found) |
+| semantic-768 | BLOCKED | PROVEN_WITH_ADAPTER → `dense` |
+| graph-ppr | BLOCKED | **PROVEN_WITH_ADAPTER** (real caller in admin synthesis route; not a SearchRuntime fusion lane) |
+| langextract-grounding | BLOCKED_STRUCTURALLY_ABSENT | NOT_A_FUSION_LANE |
+
+**Key correction to this session's framing**: "not a SearchRuntime fusion
+lane" (v2) is a distinct, legitimate category from "blocked"/"not live" (v1)
+— several helpers (docs-corpus-search, tree-sitter-chunk, langextract-grounding,
+now also postgres-fts) are real and used, just not as independent RRF votes.
+v2's `AFC-LANE-PARITY-01` also closed with a real fixture: qdrant/turbovec/cuvs/cagra
+hits on one candidate collapse to exactly one `dense` fusion contribution
+(22/22 tests passing), proving the executor≠lane invariant this session
+could only assert, not fixture-prove for all 4 executors.
+
+**Authoritative going forward**: `docs/reports/afc-helper-owner-verification-v2.json`
+and its own AFC ledger updates (progress tracked there as "43/73" — a
+tracker this session's own work did not use/see the source of). This
+session's v1 receipts remain as historical evidence of the audit
+methodology, not as the current status. Do not re-derive owner status from
+the v1 files going forward — read v2 first.
