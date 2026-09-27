@@ -82,6 +82,7 @@ export const REVISION_FILTER_PAYLOAD_FIELDS = {
 export const COLLECTION_CONTRACTS = {
   codebase_chunks_384_hybrid: {
     contractVersion: 'atlas-qdrant-384-hybrid-v1' as const,
+    representationId: 'legacy_384' as const,
     vectors: {
       // Named dense vector in live collection is "content" (not "content_384") — verified 2026-07-22
       content: {
@@ -116,6 +117,7 @@ export const COLLECTION_CONTRACTS = {
   },
   codebase_chunks_768: {
     contractVersion: 'atlas-qdrant-768-source-v1' as const,
+    representationId: 'semantic_768' as const,
     vectors: {
       // Named dense vectors in live collection are "content", "error", "signature" — verified 2026-07-22
       content: {
@@ -157,6 +159,7 @@ export const COLLECTION_CONTRACTS = {
   // physical vector name `content`; sparse lanes require their own proof.
   codebase_chunks_768_v2: {
     contractVersion: 'atlas-qdrant-768-semantic-v2' as const,
+    representationId: 'semantic_768' as const,
     vectors: {
       content: {
         size: 768,
@@ -185,6 +188,7 @@ export const COLLECTION_CONTRACTS = {
   },
   codebase_topology_64: {
     contractVersion: 'atlas-qdrant-64-routing-v1' as const,
+    representationId: 'latent_64' as const,
     vectors: {
       latent_64: {
         size: 64,
@@ -218,6 +222,7 @@ export const COLLECTION_CONTRACTS = {
   // scripts/atlas/export-taxonomy-nodes-ndjson-v1.mjs.
   taxonomy_nodes_768: {
     contractVersion: 'atlas-qdrant-taxonomy-768-v1' as const,
+    representationId: 'semantic_768' as const,
     vectors: {
       content: {
         size: 768,
@@ -304,7 +309,15 @@ export interface QdrantChunkPayload {
 
   // Embedding provenance — not indexed
   embedding_model:     string;
-  representation_id?: 'semantic_768' | 'legacy_384' | 'semantic_512' | 'semantic_256' | 'semantic_128' | 'latent_64';
+  representation_id?:
+    | 'semantic_768'
+    | 'legacy_384'
+    | 'semantic_512'
+    | 'semantic_256'
+    | 'semantic_128'
+    | 'latent_64'
+    | 'codebert_768'
+    | 'graphcodebert_768';
   representation_revision?: number;
   embedding_digest?: string;
   embedding_dimension: 64 | 384 | 768;
@@ -420,11 +433,11 @@ export function validateQdrantPayloadForCollection(
   }
 
   if (payload.representation_id !== undefined) {
-    const expectedRepresentation = payload.embedding_dimension === 768 ? 'semantic_768' : 'legacy_384';
+    const expectedRepresentation = contract.representationId;
     if (payload.representation_id !== expectedRepresentation) {
       throw new PayloadValidationError(
         'representation_id',
-        `Expected ${expectedRepresentation} for embedding_dimension=${payload.embedding_dimension}, got ${payload.representation_id}`
+        `Expected ${expectedRepresentation} for collection=${collection}, got ${payload.representation_id}`
       );
     }
   }
