@@ -136,7 +136,9 @@ live optimizer:
 The executable audit is `scripts/atlas/audit-dspy-gepa-subprompts-v1.mjs` and its
 read-only report is `docs/reports/dspy-gepa-subprompt-audit-v1.json`. It defines the
 ordered follow-up gates `SUBPROMPT-REPLAY-01`, `DSPY-SIDECAR-01`, `GEPA-VERSION-01`,
-`GEPA-HELDOUT-01`, `GEPA-SHADOW-01`, `OAK-JUDGE-01`, and `PROMOTION-01`.
+`GEPA-768-INPUT-01` (added 2026-09-27 — proves the `semantic_768` retrieval trace → DSPy/GEPA
+training-row conversion, gating the two entries below), `GEPA-HELDOUT-01`, `GEPA-SHADOW-01`,
+`OAK-JUDGE-01`, and `PROMOTION-01`.
 
 Do not mark the DSPy or GEPA tasks complete from the existence of signatures, a
 constructor, or sub-agent routing. A live promotion requires serialized promoted
@@ -151,6 +153,24 @@ must not write to PostgreSQL, Qdrant, Valkey, Neo4j, Graphify, or canonical iden
 - [x] SUBPROMPT-REPLAY-01 — add read-only prompt replay mode comparing stable prompt-selection projections and checksums; live ACE-backed replay remains required for runtime proof.
 - [ ] DSPY-SIDECAR-01 — connect the TypeScript evidence owner to an isolated DSPy worker; no store access from the worker.
 - [ ] GEPA-VERSION-01 — prove pinned DSPy/GEPA imports in an isolated WSL2/container environment.
+- [ ] GEPA-768-INPUT-01 — prove a revision-qualified `semantic_768` retrieval trace converts into
+      this change's existing DSPy/GEPA training/eval schema without: (a) raw vector duplication —
+      identity is frozen as `source_ref + source_revision + content_hash + representation_revision`,
+      never a bare row count, so the same evidence item populated in both `content_embedding` and
+      `content_embedding_768` (see `parent-atlas-semantic-768-canonical-contract`'s
+      `SEMANTIC-768-OWNER-RECHECK-2026-09-27`) is never counted as two independent training
+      examples; (b) missing `packetKey` — every row must round-trip candidate → `packetKey`/
+      `canonicalId` → evidence, not synthesize one; (c) inferred revisions — no `unknown`/`latest`
+      substitution for `sourceRevision`/`workspaceRevision`; (d) changing `semantic_768` ownership —
+      this gate consumes the existing representation as a fixed feature source, it does not touch
+      or resolve `AMBIGUOUS_SEMANTIC_768_OWNER`. A conforming row is shaped roughly as
+      `{queryChecksum, sourceRevision, packetKey, semanticRepresentation: {kind: "semantic_768",
+      representationRevision, modelRevision, vectorChecksum}, routing: {logicalLane, executor},
+      outcome: {recallAt10, mrr, validationPassed, latencyMs}}` — never the raw 768-dim vector
+      itself, only its checksum (GEPA optimizes routing/program behavior around the representation,
+      it does not optimize the representation). This gate is data/schema work and can be attempted
+      read-only, without a live DSPy/GEPA runtime — it does not depend on `DSPY-SIDECAR-01`/
+      `GEPA-VERSION-01` passing first, but `GEPA-HELDOUT-01`/`GEPA-SHADOW-01` below depend on it.
 - [ ] GEPA-HELDOUT-01 — freeze train/validation/test IDs and enforce held-out isolation.
 - [ ] GEPA-SHADOW-01 — run a bounded validation-only GEPA experiment with fixed seed, resumable log, and candidate checksum.
 - [ ] OAK-JUDGE-01 — map real bounded execution receipts to judge feedback and repair suggestions without auto-promotion.
