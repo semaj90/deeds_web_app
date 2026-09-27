@@ -1,114 +1,124 @@
 #!/usr/bin/env node
 /**
- * Gemma4 Semantic Embedding Cache with GPU Bridge Interlinks
+ * Semantic embedding topology experiment.
  *
- * Interlinks semantic embeddings using GPU-accelerated functions:
- * - pageRankGPU: Compute centrality scores for ranking
- * - attentionScoreGPU: Compute attention-weighted relevance
- * - kmeansWithCentroids: Cluster embeddings for fast retrieval
- * - trainSOM: Self-organizing map for topology visualization
+ * This script intentionally builds a DERIVED semantic k-NN graph before
+ * running PageRank. The k-NN graph is a retrieval/topology artifact only and
+ * never replaces the canonical source/code graph.
  *
- * Uses SSD memory efficiently via:
- * - mmap for large embedding arrays (no heap allocation)
- * - Redis Valkey for L1 cache (socket connection, not disk I/O)
- * - Direct GPU upload (N-API Float32Array zero-copy)
- *
- * Usage:
- *   npx tsx gemma4-semantic-embedding-cache.mts --dry-run
- *   npx tsx gemma4-semantic-embedding-cache.mts --apply --redis-host 127.0.0.1 --redis-port 6379
+ * GPU execution is routed through the existing pytorch-graph owner so native
+ * signatures, VRAM guards, and CPU fallbacks are not duplicated here.
  */
 
-import { createRequire } from 'module';
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { execSync } from 'child_process';
-import { fileURLToPath } from 'url';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { randomUUID } from 'node:crypto';
 
-const require_native = createRequire(import.meta.url);
+import {
+  attentionScoreGPU,
+  kmeansWithCentroids,
+  pageRankGPU,
+  trainSOM,
+} from '../../sveltekit-frontend/src/lib/server/gpu/pytorch-graph.ts';
+import {
+  buildSemanticKnnGraphV1,
+  connectedComponentsFromAdjacencyV1,
+  flattenEmbeddingMatrixV1,
+  maxAbsDifferenceV1,
+  pageRankCpuOracleV1,
+} from '../../sveltekit-frontend/src/lib/server/graph/semantic-knn-graph-v1.ts';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Parse args
 const args = new Map(
   process.argv
     .slice(2)
-    .filter(arg => arg.includes('='))
-    .map(arg => {
+    .filter((arg) => arg.includes('='))
+    .map((arg) => {
       const [k, v] = arg.split('=');
       return [k.replace(/^--/, ''), v];
-    })
+    }),
 );
 
-const dryRun = process.argv.includes('--dry-run');
+const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
 const apply = process.argv.includes('--apply');
 const redisHost = args.get('redis-host') || '127.0.0.1';
-const redisPort = parseInt(args.get('redis-port') || '6379', 10);
-const limit = parseInt(args.get('limit') || '10000', 10);
+const redisPort = Number.parseInt(args.get('redis-port') || '6379', 10);
+const limit = Math.max(2, Number.parseInt(args.get('limit') || '10000', 10));
+const graphLimit = Math.max(2, Math.min(limit, Number.parseInt(args.get('graph-limit') || '512', 10)));
+const graphK = Math.max(1, Number.parseInt(args.get('graph-k') || '8', 10));
+const minSimilarity = Number.parseFloat(args.get('min-similarity') || '0');
 
 const LOG_DIR = resolve(__dirname, '../../log/artifacts/semantic-embeddings');
 mkdirSync(LOG_DIR, { recursive: true });
 
-const runId = require('crypto').randomUUID();
+const runId = randomUUID();
 const startTime = Date.now();
 
-console.log(`\n🧠 Gemma4 Semantic Embedding Cache with GPU Interlinks`);
+console.log('\n🧠 Semantic Embedding Topology Experiment');
 console.log(`🔍 Run ID: ${runId}`);
-console.log(`📊 Strategy: GPU pageRank + attention + K-means clustering`);
-console.log(`💾 Redis: ${redisHost}:${redisPort}`);
-console.log(`🎯 Limit: ${limit} embeddings`);
-
-// Load GPU bridge
-let addon: any;
-try {
-  const addonPath = resolve(__dirname, '../../simd-bridge/cpp/build/Release/tensorrt_bridge.node');
-  addon = require_native(addonPath);
-  console.log(`✅ GPU bridge loaded: ${addonPath}`);
-} catch (err) {
-  console.error(`❌ GPU bridge failed: ${(err as Error).message}`);
-  process.exit(1);
-}
-
-// ============================================================================
-// STEP 1: Fetch embeddings from Qdrant (768-dim)
-// ============================================================================
-
-console.log(`\n1️⃣  Fetching ${limit} embeddings from Qdrant...`);
+console.log('📊 Strategy: semantic k-NN graph → PageRank + attention + K-means + SOM');
+console.log(`🎯 Vector limit: ${limit}; graph limit: ${graphLimit}; k=${graphK}`);
+console.log(`💾 Cache mode: ${apply ? `APPLY ${redisHost}:${redisPort}` : 'READ-ONLY / NO CACHE WRITE'}`);
 
 interface QdrantPoint {
   id: string | number;
-  vectors?: { content?: number[] };
-  vector?: { content?: number[] };
-  payload?: Record<string, any>;
+  vector?: number[] | Record<string, number[]>;
+  vectors?: number[] | Record<string, number[]>;
+  payload?: Record<string, unknown>;
 }
 
-let embeddings: Float32Array[] = [];
-let metadata: Array<{ id: string; score?: number; cluster?: number }> = [];
+function vectorFromPoint(point: QdrantPoint): number[] | null {
+  const candidates = [point.vector, point.vectors];
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) return candidate;
+    if (candidate && typeof candidate === 'object') {
+      const record = candidate as Record<string, number[]>;
+      for (const key of ['content', 'default', '']) {
+        if (Array.isArray(record[key])) return record[key];
+      }
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// STEP 1: Fetch embeddings from Qdrant
+// ============================================================================
+
+console.log(`\n1️⃣  Fetching up to ${limit} embeddings from Qdrant...`);
+
+const embeddings: Float32Array[] = [];
+const metadata: Array<{ id: string; score?: number; cluster?: number }> = [];
 
 try {
-  const response = await fetch(`http://127.0.0.1:6333/collections/codebase_chunks_768/points`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      limit,
-      with_vectors: true,
-      with_payload: true,
-    }),
-  });
+  const response = await fetch(
+    'http://127.0.0.1:6333/collections/codebase_chunks_768/points/scroll',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        limit,
+        with_vector: true,
+        with_payload: true,
+      }),
+      signal: AbortSignal.timeout(30_000),
+    },
+  );
 
-  if (!response.ok) {
-    throw new Error(`Qdrant HTTP ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`Qdrant HTTP ${response.status}: ${await response.text()}`);
 
   const data = (await response.json()) as { result?: { points?: QdrantPoint[] } };
-  const points = data.result?.points || [];
+  const points = data.result?.points ?? [];
 
   for (const point of points) {
-    const vec = point.vectors?.content || point.vector?.content;
-    if (vec && Array.isArray(vec) && vec.length === 768) {
-      embeddings.push(new Float32Array(vec));
-      metadata.push({
-        id: String(point.id || point.payload?.qdrant_point_id || `point-${embeddings.length}`),
-      });
-    }
+    const vec = vectorFromPoint(point);
+    if (!vec || vec.length !== 768) continue;
+    embeddings.push(new Float32Array(vec));
+    metadata.push({
+      id: String(point.id ?? point.payload?.qdrant_point_id ?? `point-${embeddings.length}`),
+    });
   }
 
   console.log(`   ✅ Fetched ${embeddings.length} valid 768-dim embeddings`);
@@ -117,113 +127,135 @@ try {
   process.exit(1);
 }
 
-if (embeddings.length === 0) {
-  console.error(`   ❌ No embeddings found`);
+if (embeddings.length < 2) {
+  console.error('   ❌ Need at least two embeddings');
   process.exit(1);
 }
 
+const flatEmbeddings = flattenEmbeddingMatrixV1(embeddings);
+
 // ============================================================================
-// STEP 2: GPU Interlink 1 — PageRank Centrality
+// STEP 2: Build a bounded semantic k-NN graph, then PageRank
 // ============================================================================
 
-console.log(`\n2️⃣  Computing PageRank centrality (${embeddings.length} nodes)...`);
+const graphEmbeddings = embeddings.slice(0, Math.min(graphLimit, embeddings.length));
+console.log(
+  `\n2️⃣  Building derived semantic k-NN graph (${graphEmbeddings.length} nodes, k=${graphK})...`,
+);
+
+const graph = buildSemanticKnnGraphV1(graphEmbeddings, {
+  k: graphK,
+  minSimilarity,
+  symmetric: true,
+});
+const components = connectedComponentsFromAdjacencyV1(graph.adjacency, graph.nodeCount);
+const componentCount = components.length ? Math.max(...components) + 1 : 0;
 
 let pageRankScores: Float32Array | null = null;
+let pageRankSource: 'gpu' | 'cpu' | null = null;
+let pageRankOracleMaxAbsDiff: number | null = null;
+
 try {
-  // Simulate graph structure: each embedding connects to top-K nearest neighbors
-  // PageRank scores which embeddings are central to the retrieval graph
-  pageRankScores = addon.pageRankGPU(
-    embeddings,
-    0.85, // damping factor
-    30, // iterations
-    1e-6, // tolerance
+  const result = pageRankGPU(graph.adjacency, graph.nodeCount, 0.85, 50);
+  pageRankScores = result.scores;
+  pageRankSource = result.source;
+  const oracle = pageRankCpuOracleV1(graph.adjacency, graph.nodeCount, 0.85, 50);
+  pageRankOracleMaxAbsDiff = maxAbsDifferenceV1(pageRankScores, oracle);
+  console.log(
+    `   ✅ PageRank ${result.source}: ${pageRankScores.length} scores; CPU oracle max |Δ|=${pageRankOracleMaxAbsDiff.toExponential(3)}`,
   );
-  console.log(`   ✅ PageRank computed: ${pageRankScores?.length || 0} scores`);
 } catch (err) {
   console.warn(`   ⚠️  PageRank failed: ${(err as Error).message}`);
 }
 
 // ============================================================================
-// STEP 3: GPU Interlink 2 — Attention Scoring
+// STEP 3: Attention over the same flattened embedding representation
 // ============================================================================
 
-console.log(`\n3️⃣  Computing attention scores (semantic interlinks)...`);
+console.log('\n3️⃣  Computing attention scores...');
 
 let attentionScores: Float32Array | null = null;
+let attentionSource: 'gpu' | 'cpu' | null = null;
 const probeVec = embeddings[0];
+
 try {
-  // Compute attention weights between query probe and all embeddings
-  // Higher scores = more semantically relevant to the probe
-  attentionScores = addon.attentionScoreGPU(
-    probeVec,
-    768,
-    embeddings,
-    embeddings.length,
-  );
-  console.log(`   ✅ Attention scores: ${attentionScores?.length || 0} values`);
+  const result = attentionScoreGPU(probeVec, 768, flatEmbeddings, embeddings.length);
+  attentionScores = result.weights;
+  attentionSource = result.source;
+  console.log(`   ✅ Attention ${result.source}: ${attentionScores.length} values`);
 } catch (err) {
   console.warn(`   ⚠️  Attention scoring failed: ${(err as Error).message}`);
 }
 
 // ============================================================================
-// STEP 4: GPU Interlink 3 — K-Means Clustering
+// STEP 4: K-Means
 // ============================================================================
 
-console.log(`\n4️⃣  Clustering embeddings via K-means...`);
+console.log('\n4️⃣  Clustering embeddings via K-means...');
 
-const numClusters = Math.ceil(Math.sqrt(embeddings.length));
+const numClusters = Math.max(2, Math.min(64, Math.ceil(Math.sqrt(embeddings.length))));
 let assignments: Int32Array | null = null;
 let centroids: Float32Array | null = null;
+let kmeansSource: 'gpu' | 'cpu' | null = null;
 
 try {
-  const result = addon.kmeansWithCentroids(
-    embeddings,
+  const result = kmeansWithCentroids(
+    flatEmbeddings,
+    embeddings.length,
+    768,
     numClusters,
-    50, // iterations
-    1e-4, // tolerance
+    50,
   );
-
   assignments = result.assignments;
   centroids = result.centroids;
-
-  console.log(`   ✅ K-means: ${numClusters} clusters, ${assignments?.length || 0} assignments`);
+  kmeansSource = result.source;
+  console.log(
+    `   ✅ K-means ${result.source}: ${numClusters} clusters, ${assignments.length} assignments`,
+  );
 } catch (err) {
   console.warn(`   ⚠️  K-means failed: ${(err as Error).message}`);
 }
 
 // ============================================================================
-// STEP 5: GPU Interlink 4 — SOM Topology
+// STEP 5: SOM topology
 // ============================================================================
 
-console.log(`\n5️⃣  Training Self-Organizing Map (topology)...`);
+console.log('\n5️⃣  Training Self-Organizing Map...');
 
 let somWeights: Float32Array | null = null;
 let somBmu: Int32Array | null = null;
+let somSource: 'gpu' | 'cpu' | null = null;
 
 try {
-  const result = addon.trainSOM(
-    embeddings,
-    8, // grid width
-    8, // grid height
-    768, // input dimension
-    100, // iterations
+  const result = trainSOM(
+    flatEmbeddings,
+    embeddings.length,
+    768,
+    8,
+    8,
+    100,
+    0.1,
+    0.01,
+    4,
+    1,
   );
-
   somWeights = result.weights;
   somBmu = result.bmu;
-
-  console.log(`   ✅ SOM trained: ${somWeights?.length || 0} weight values, ${somBmu?.length || 0} BMU indices`);
+  somSource = result.source;
+  console.log(
+    `   ✅ SOM ${result.source}: ${somWeights.length} weights, ${somBmu.length} BMU indices`,
+  );
 } catch (err) {
   console.warn(`   ⚠️  SOM training failed: ${(err as Error).message}`);
 }
 
 // ============================================================================
-// STEP 6: Cache to Redis (optional, requires Valkey running)
+// STEP 6: Optional disposable cache projection
 // ============================================================================
 
+let cacheWrites = 0;
 if (apply) {
-  console.log(`\n6️⃣  Caching to Redis (${redisHost}:${redisPort})...`);
-
+  console.log(`\n6️⃣  Caching disposable observations to Redis (${redisHost}:${redisPort})...`);
   try {
     const { default: Redis } = await import('ioredis');
     const redis = new Redis({
@@ -233,82 +265,117 @@ if (apply) {
       maxRetriesPerRequest: 1,
       lazyConnect: true,
     });
-
     await redis.connect();
 
-    // Store metadata with interlink scores
     for (let i = 0; i < metadata.length; i++) {
-      const key = `semantic:embedding:${metadata[i].id}`;
       const entry = {
         index: i,
-        pagerank: pageRankScores?.[i] ?? null,
+        pagerank: i < graph.nodeCount ? pageRankScores?.[i] ?? null : null,
         attention: attentionScores?.[i] ?? null,
         cluster: assignments?.[i] ?? null,
         som_bmu: somBmu?.[i] ?? null,
+        graph_artifact_kind: 'DERIVED_SEMANTIC_KNN',
+        canonical_authority: false,
         timestamp: new Date().toISOString(),
       };
-
-      await redis.setex(key, 86400, JSON.stringify(entry)); // 24h TTL
+      await redis.setex(`semantic:embedding:${metadata[i].id}`, 86400, JSON.stringify(entry));
+      cacheWrites++;
     }
 
-    // Store centroids
     if (centroids) {
-      await redis.setex(`semantic:centroids:${runId}`, 604800, JSON.stringify(Array.from(centroids)));
+      await redis.setex(
+        `semantic:centroids:${runId}`,
+        604800,
+        JSON.stringify(Array.from(centroids)),
+      );
+      cacheWrites++;
     }
-
-    console.log(`   ✅ Cached ${metadata.length} entries to Redis`);
     await redis.quit();
+    console.log(`   ✅ Cache writes: ${cacheWrites}`);
   } catch (err) {
     console.warn(`   ⚠️  Redis caching failed: ${(err as Error).message}`);
   }
+} else {
+  console.log('\n6️⃣  Cache write skipped (read-only mode)');
 }
 
 // ============================================================================
 // STEP 7: Report
 // ============================================================================
 
-console.log(`\n7️⃣  Writing semantic embedding report...`);
-
 const duration = Date.now() - startTime;
 const report = {
+  schema: 'atlas.semantic-embedding-topology-experiment.v1',
   run_id: runId,
   dry_run: dryRun,
   applied: apply,
   duration_ms: duration,
-  duration_seconds: (duration / 1000).toFixed(2),
+  writes_performed: cacheWrites > 0,
+  canonical_authority: false,
   embeddings: {
     total: embeddings.length,
     dimension: 768,
     source: 'qdrant:codebase_chunks_768',
   },
-  interlinks: {
-    pagerank: pageRankScores ? { ok: true, scores: pageRankScores.length } : { ok: false },
-    attention: attentionScores ? { ok: true, scores: attentionScores.length } : { ok: false },
-    kmeans: assignments ? { ok: true, clusters: numClusters, assignments: assignments.length } : { ok: false },
-    som: somBmu ? { ok: true, grid: '8x8', bmu_count: somBmu.length } : { ok: false },
+  graph: {
+    schema: graph.schema,
+    kind: 'DERIVED_SEMANTIC_KNN',
+    node_count: graph.nodeCount,
+    dimension: graph.dimension,
+    k: graph.k,
+    min_similarity: graph.minSimilarity,
+    symmetric: graph.symmetric,
+    directed_edge_count: graph.directedEdgeCount,
+    undirected_edge_count: graph.undirectedEdgeCount,
+    density: graph.density,
+    connected_components: componentCount,
+    canonical_authority: graph.canonicalAuthority,
+  },
+  algorithms: {
+    pagerank: pageRankScores
+      ? {
+          ok: true,
+          source: pageRankSource,
+          scores: pageRankScores.length,
+          cpu_oracle_max_abs_diff: pageRankOracleMaxAbsDiff,
+        }
+      : { ok: false },
+    attention: attentionScores
+      ? { ok: true, source: attentionSource, scores: attentionScores.length }
+      : { ok: false },
+    kmeans: assignments
+      ? {
+          ok: true,
+          source: kmeansSource,
+          clusters: numClusters,
+          assignments: assignments.length,
+        }
+      : { ok: false },
+    som: somBmu
+      ? { ok: true, source: somSource, grid: '8x8', bmu_count: somBmu.length }
+      : { ok: false },
   },
   cache: apply
     ? {
         backend: 'redis',
         host: redisHost,
         port: redisPort,
-        entries_cached: metadata.length,
-        ttl_seconds: 86400,
+        writes: cacheWrites,
+        disposable: true,
       }
-    : { backend: 'none', reason: 'dry-run mode' },
+    : { backend: 'none', writes: 0, reason: 'read-only mode' },
   timestamp: new Date().toISOString(),
 };
 
-const reportPath = resolve(LOG_DIR, `gemma4-semantic-embedding-cache-${runId}.json`);
+const reportPath = resolve(LOG_DIR, `semantic-embedding-topology-${runId}.json`);
 writeFileSync(reportPath, JSON.stringify(report, null, 2));
 
-console.log(`   ✅ Report: ${reportPath}`);
-console.log(`\n📊 Summary`);
-console.log(`   Embeddings: ${report.embeddings.total}`);
-console.log(`   PageRank: ${report.interlinks.pagerank.ok ? '✅' : '❌'}`);
-console.log(`   Attention: ${report.interlinks.attention.ok ? '✅' : '❌'}`);
-console.log(`   K-Means: ${report.interlinks.kmeans.ok ? '✅' : '❌'}`);
-console.log(`   SOM: ${report.interlinks.som.ok ? '✅' : '❌'}`);
-console.log(`   Duration: ${report.duration_seconds}s`);
+console.log(`\n7️⃣  Report: ${reportPath}`);
+console.log(`   Graph: ${report.graph.node_count} nodes / ${report.graph.undirected_edge_count} edges / ${report.graph.connected_components} components`);
+console.log(`   PageRank: ${report.algorithms.pagerank.ok ? '✅' : '❌'}`);
+console.log(`   Attention: ${report.algorithms.attention.ok ? '✅' : '❌'}`);
+console.log(`   K-Means: ${report.algorithms.kmeans.ok ? '✅' : '❌'}`);
+console.log(`   SOM: ${report.algorithms.som.ok ? '✅' : '❌'}`);
+console.log(`   Duration: ${(duration / 1000).toFixed(2)}s`);
 
-process.exit(report.interlinks.pagerank.ok && report.interlinks.kmeans.ok ? 0 : 1);
+process.exit(report.algorithms.pagerank.ok && report.algorithms.kmeans.ok ? 0 : 1);
