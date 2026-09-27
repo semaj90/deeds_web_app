@@ -350,7 +350,7 @@ remain open and require their own review/proof.
 - [x] AFC-OWNER-VERIFY-01 Complete the read-only 12-helper caller/owner census using statuses PROVEN / PROVEN_WITH_ADAPTER / BLOCKED / UNRESOLVED / NOT_A_FUSION_LANE; keep unknown signal and fusion mappings explicit.
 - [x] AFC-LANE-VERIFY-01 Extract the actual SearchRuntime `Candidate.scoreSource` and `LogicalRetrievalLane` vocabulary from its owner; do not substitute the router matrix's legacy target labels.
 - [x] AFC-LANE-PARITY-01 Fixture one revision-qualified canonical candidate from Qdrant, TurboVec, cuVS, and CAGRA; retain four executor IDs and prove exactly one dense contribution. Fixture proof only: no live cuVS/CAGRA executor or GPU call was made.
-- [ ] AFC-GRAPH-LANE-01 Determine graph-PPR fusion role only after a live dispatcher/caller exists; do not invent a `graph` fusion lane.
+- [x] AFC-GRAPH-LANE-01 Determine graph-PPR fusion role only after a live dispatcher/caller exists; do not invent a `graph` fusion lane. Read-only caller census found query-time PPR in the Admin Atlas synthesis route as a graph-revision/seed-bound candidate ranking feature, not a SearchRuntime fusion lane. The ordinary SearchRuntime graph expansion is a separate post-fusion `graphExpanded` result. No live GPU call was made.
 - [ ] AFC-DOC-LANE-01 Keep docs search non-fusion/admin-only unless an actual SearchRuntime adapter and candidate contract are demonstrated.
 - [ ] AFC-LEXICAL-LANE-01 Reconcile router `lexical_exact` targets with SearchRuntime's separate `rg` and `lexical` lanes; establish whether FTS has a SearchRuntime adapter.
 - [ ] AFC-RADIX-ACCEPT-01 Review QUERY-RADIX-01 acceptance semantics against required lookup behavior. Current implementation remains an opt-in, tested prototype: it only expands explicitly configured prefixes via `allowedExpansions`; it does not implement Patricia `prefix_match` longest-stored-key-prefix fallback. No live caller or approved vocabulary owner exists yet.
@@ -482,9 +482,23 @@ not confirmed end-to-end.
 
 `lsp-definition`/`lsp-references` stay `CONTRACT_ONLY` (stronger evidence: a
 real code comment elsewhere explicitly says the LSP contract was deliberately
-NOT reused). `semantic-768`/`graph-ppr` stay `BLOCKED` (confirmed via targeted
-negative greps in `search-runtime.ts`/`src/lib/server`, not just absence of
-earlier mention). Receipt: `docs/reports/afc-owner-manual-mapping-01-partial-v3.json`.
+NOT reused). At the time of this census, `semantic-768`/`graph-ppr` were
+classified `BLOCKED` from their absence in SearchRuntime; the graph-PPR
+classification is superseded by the route-level caller evidence below.
+Receipt: `docs/reports/afc-owner-manual-mapping-01-partial-v3.json`.
+
+**AFC-GRAPH-LANE-01 caller-role correction (2026-09-27):** A later focused
+trace found `routes/api/admin/atlas/synthesize/+server.ts` conditionally calls
+`atlas-rapids-pagerank-client.ts` with the requested graph revision, seed
+weights, candidate nodes, alpha/tolerance/iteration bounds, and a deadline.
+Its scores populate `personalizedPageRank` on that route's candidate feature
+rows and participate in that route's ranking. This proves a code-wired,
+route-scoped PPR feature path, not that a live GPU request was executed.
+Separately, `atlas/retrieval/search-runtime-adapter.ts` returns bounded graph
+expansion in `graphExpanded` after `SearchRuntime.search()`; it is not an RRF
+lane. Therefore `graph-ppr` has no independent SearchRuntime logical lane or
+fusion vote. Updated owner evidence is in
+`docs/reports/afc-helper-owner-verification-v2.json`.
 
 **All 12 helper entries now have at least one round of direct-code
 verification** beyond the original audit. Remaining open work is the
@@ -492,3 +506,78 @@ end-to-end column-write trace for tree-sitter-chunk, and the operator
 decisions already surfaced (registry `ownerRef` field split, langextract's
 missing fusion lane, rg-exact's unconfirmed signal). No registry promoted,
 no code wired, no runtime calls made across all three slices.
+
+## SESSION HANDOFF (2026-09-27, end of session)
+
+**Full owner-verification pass is complete.** All 12 registered helper
+entries now have direct-code-verified status (3 slices,
+`docs/reports/afc-owner-manual-mapping-01-partial-v{1,2,3}.json`, plus the
+original `afc-helper-owner-verification-v1.json`). Final status:
+
+| Status | Helpers |
+|---|---|
+| LIVE | postgres-fts, postgres-trigram, docs-corpus-search |
+| LIVE_VIA_OFFLINE_PIPELINE | tree-sitter-chunk |
+| UNIT_PROVEN_NOT_LIVE | ast-grep-structural, ts-morph-symbol |
+| CONTRACT_ONLY | lsp-definition, lsp-references |
+| BLOCKED | rg-exact, semantic-768, graph-ppr |
+| BLOCKED_STRUCTURALLY_ABSENT | langextract-grounding |
+
+**Best cross-cutting finding**: `tree-sitter-chunk` (Graphify offline
+pipeline) plausibly feeds the same Postgres `tree_node_id`/metadata columns
+that `retrieve-candidates.ts` reads live for the `'ast'`/`'exact'` fusion
+lanes — three previously separate-looking entries (`tree-sitter-chunk`,
+`ast-grep-structural`, `ts-morph-symbol`) turned out to describe one real
+pipeline, not three independent gaps. **Not fully proven**: the exact
+INSERT/UPDATE statement writing `tree_node_id` was not traced — that's the
+single concrete next step if someone wants this end-to-end, not a new
+open-ended task.
+
+**New, cheap forward option found** (not built, just recorded): ast-grep
+ships its own official MCP server for AI-agent structural queries. This
+repo has zero ast-grep MCP integration today (verified: no
+`.opencode`/`.claude`/`.mcp.json` config, no registration in
+`src/mcp/server.ts`). Adopting the official MCP server could be a smaller,
+more standard path to make `ast-grep-structural` request-time-available
+than hand-building a live wiring layer — worth evaluating against
+`DEPENDENCY-CAPABILITY-GUARD-01` (root `CLAUDE.md`) before choosing it over
+this session's own `semantic-input-compiler-v1.ts` in-process consumer.
+
+**Operator decisions still open** (nothing here should be resolved
+unilaterally by a future session without your input):
+1. `v1` vs `v2` helper-eligibility/registry implementations — which becomes
+   canonical (routing-review-v2 fork keeps the cleanest separation of
+   `routerSignal`/`logicalLane`/`executor`; the `v1` schema's baked-in
+   `executionAuthorized/executionPerformed/writesPerformed/canonicalAuthority: false`
+   fields are worth carrying forward regardless of which base wins).
+2. Should the registry's `ownerRef` split into "capability owner" (the
+   reusable module) vs. "live lane executor" (the actual request-time
+   caller)? Currently one field conflates both, which is what made
+   `rg-exact`/`ast-grep-structural`/`ts-morph-symbol` look more or less live
+   than they actually are.
+3. Does `langextract-grounding` need a new `SearchRuntime` fusion lane +
+   `SignalType` added, or is it a producer-only/evidence-attachment helper
+   that should sit outside the fusion model entirely?
+4. `PERSISTENCE-DECISION-01` (`parent-atlas-repair-candidate-feature-matrix/tasks.md`)
+   — still blocks `SEM-MATERIALIZE-01`'s full 16,151-row run (sized, safe,
+   ~32min, just has nowhere to write yet).
+
+**Do not promote, wire, or accept anything from this tranche** (the merged
+helper contract, `QUERY-RADIX-01`, any registry) until decisions 1-3 above
+are made — every receipt this session produced is explicitly
+`canonicalAuthority: false` / `writesPerformed: false` for exactly this
+reason.
+
+**Where everything lives** (4 OpenSpec changes touched this session, read in
+this order for full context): `parent-atlas-kv-cache-adaptation-research/tasks.md`
+(ASTG-01, EMB-PROV-01, ordinal-vector/V4 canaries, throughput sizing) →
+`parent-atlas-versioned-doc-intelligence/tasks.md` (sidecar migration
+registration) → `parent-atlas-repair-candidate-feature-matrix/tasks.md`
+(CONTENT-POLICY-01, SEM-INPUT-01/02, PERSISTENCE-DECISION-01) →
+`parent-atlas-agentic-file-compiler/tasks.md` (this file — the
+helper-routing/owner-verification tranche, most recently active).
+
+All work this session was read-only against Postgres/Qdrant/Valkey/Neo4j/
+RabbitMQ (0 writes throughout, verified per-receipt). Everything is
+committed and pushed to `origin/handoff/summary-enrichment-lineage-20260925`
+through commit `deae3a1bb5`.
