@@ -1181,3 +1181,44 @@ first-384-dims slice of 768 (`populate-packet-vector-bundles.mjs`), renormalizat
 No column, index, embedding, or Qdrant write was performed. Do not overwrite `atlas_packets.embedding`
 from any retargeted 384 writer.
 - [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+### SEMANTIC-768-OWNER-RECHECK-2026-09-27 (read-only, bounded)
+
+Re-ran the same read-only writer census (`atlas:semantic-768:writer-ownership`)
+this file's own `SEMANTIC-768-OWNER-01`/`CORE-LANE-RECHECK-2026-09-10` entries
+recorded, since the last run is dated 2026-09-14 (13 days stale) and this
+session already found unrelated Qdrant collections grew substantially in
+that window (`codebase_chunks_768`: 105,762 → 328,348 points, see
+`parent-atlas-qdrant-structural-payload-enrichment/tasks.md`).
+
+- [x] Re-ran `scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs` against
+      the live PostgreSQL instance. Confirmed real drift since 2026-09-14, not
+      a stale-report artifact:
+
+| Surface | 2026-09-14 | 2026-09-27 (live) |
+|---|---|---|
+| `atlas_packets.embedding` populated | 61,659/61,718 | 61,659/61,718 (unchanged) |
+| `codebase_chunk_index.content_embedding` populated | 55,169/55,853 | 55,169/274,465 (row count grew, populated count identical) |
+| `codebase_chunk_index.content_embedding_768` populated | 1,386/55,853 | **219,998/274,465** — real backfill happened |
+
+- [x] Confirmed the verdict logic itself did not silently change: still
+      `OWNER_NOT_PROVEN`, still `19` writer surfaces, still
+      `UNRESOLVED_WRITER_SPLIT` between `activeCandidate:
+      codebase_chunk_index.content_embedding` (the still-current pick),
+      `historicalDominantProducer: reembed-corpus-document-prefix-v1.mjs`,
+      and `operatorReachableCandidate: backfill-graphify-file-embeddings-768.mjs`
+      — same three-way split as before, not resolved by the backfill.
+- [ ] **New concrete risk this recheck surfaces**: `content_embedding_768` going
+      from near-empty (1,386 rows, easy to ignore) to 80% populated (219,998
+      rows) materially raises the cost of leaving `OWNER_NOT_PROVEN` open —
+      it is no longer a thin, low-consequence duplicate surface. Whoever picks
+      up the owner-reconciliation gate next should treat this column as a
+      live, substantial candidate, not a historical leftover.
+
+No write performed (script is read-only by its own contract, verified before
+running: `readOnly: true`, `writesPerformed: false`). This recheck does not
+resolve `AMBIGUOUS_SEMANTIC_768_OWNER` — that remains an explicit operator
+decision per this file's own existing guard tasks above, not something to
+resolve unilaterally here.
+
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json` (regenerated).

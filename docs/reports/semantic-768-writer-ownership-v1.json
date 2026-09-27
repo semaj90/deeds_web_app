@@ -1,6 +1,6 @@
 {
   "schema": "atlas.semantic-768-writer-ownership.v1",
-  "generatedAt": "2026-09-14T16:24:53.495Z",
+  "generatedAt": "2026-09-27T10:04:55.939Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "activeCandidate": "codebase_chunk_index.content_embedding",
@@ -19,16 +19,6 @@
       "kind": "MUTATION_WRITER",
       "revisionQualified": true,
       "guarded": true,
-      "dryRun": false,
-      "productionReachableCandidate": false
-    },
-    {
-      "path": "sveltekit-frontend/src\\lib\\server\\unknown\\promotion-executor.ts",
-      "surface": "atlas_packets.embedding",
-      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
-      "kind": "READER_OR_DIAGNOSTIC",
-      "revisionQualified": false,
-      "guarded": false,
       "dryRun": false,
       "productionReachableCandidate": false
     },
@@ -103,6 +93,26 @@
       "productionReachableCandidate": false
     },
     {
+      "path": "scripts\\atlas\\phase-17-hyperrag-indexing-e2e.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase106-stage4-embedding-backfill.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
       "path": "scripts\\atlas\\phase1-canonical-embedding-rabbitmq.mjs",
       "surface": "atlas_packets.embedding",
       "role": "SECONDARY_768_SURFACE_UNRESOLVED",
@@ -133,16 +143,6 @@
       "productionReachableCandidate": false
     },
     {
-      "path": "scripts\\atlas\\phase106-stage4-embedding-backfill.mjs",
-      "surface": "atlas_packets.embedding",
-      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
-      "kind": "MUTATION_WRITER",
-      "revisionQualified": false,
-      "guarded": false,
-      "dryRun": true,
-      "productionReachableCandidate": false
-    },
-    {
       "path": "scripts\\atlas\\reembed-corpus-document-prefix-v1.mjs",
       "surface": "codebase_chunk_index.content_embedding",
       "role": "ACTIVE_CANONICAL_CANDIDATE",
@@ -150,6 +150,16 @@
       "revisionQualified": false,
       "guarded": false,
       "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "sveltekit-frontend/src\\lib\\server\\unknown\\promotion-executor.ts",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "READER_OR_DIAGNOSTIC",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": false,
       "productionReachableCandidate": false
     },
     {
@@ -275,6 +285,26 @@
       "productionReachableCandidate": false
     },
     {
+      "path": "scripts\\atlas\\phase-17-hyperrag-indexing-e2e.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase106-stage4-embedding-backfill.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
       "path": "scripts\\atlas\\phase1-canonical-embedding-rabbitmq.mjs",
       "surface": "atlas_packets.embedding",
       "role": "SECONDARY_768_SURFACE_UNRESOLVED",
@@ -296,16 +326,6 @@
     },
     {
       "path": "scripts\\atlas\\phase1-canonical-embedding-backfill.mjs",
-      "surface": "atlas_packets.embedding",
-      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
-      "kind": "MUTATION_WRITER",
-      "revisionQualified": false,
-      "guarded": false,
-      "dryRun": true,
-      "productionReachableCandidate": false
-    },
-    {
-      "path": "scripts\\atlas\\phase106-stage4-embedding-backfill.mjs",
       "surface": "atlas_packets.embedding",
       "role": "SECONDARY_768_SURFACE_UNRESOLVED",
       "kind": "MUTATION_WRITER",
@@ -397,13 +417,13 @@
       },
       "codebase_chunk_index.content_embedding": {
         "type": "halfvec",
-        "total": 55853,
+        "total": 274465,
         "populated": 55169
       },
       "codebase_chunk_index.content_embedding_768": {
         "type": "vector",
-        "total": 55853,
-        "populated": 1386
+        "total": 274465,
+        "populated": 219998
       }
     }
   },
