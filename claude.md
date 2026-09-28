@@ -1,5 +1,123 @@
 # Legal AI Platform — Claude Project Instructions
 
+## Current runtime and ACE/BitFrost status (2026-09-28; supersedes stale July status below)
+
+- **Current semantic storage contract (2026-09-27 correction):** the active PostgreSQL
+  `semantic_768` physical owner is `codebase_chunk_index.content_embedding_768` (`vector(768)`), per
+  the current repository instructions. `semantic-representation-v1.ts` and its receipts retain
+  their historical `content_embedding` (`halfvec(768)`) coordinate; new bindings use the additive
+  V2 contract. Physical presence in either column does not prove source, tokenizer, model, or
+  representation lineage. Do not rewrite historical receipts or treat the old readiness audit as
+  proof for the V2 owner.
+- **Native Windows CUDA/LibTorch startup build (2026-09-27):** the reviewed forced rebuild of
+  `tensorrt_bridge.node` completed configure, compile/link, addon-existence, and GPU-load probing
+  successfully on the existing RTX 3060 Ti / sm_86 lane using CUDA 13.0.48 and LibTorch
+  `2.9.0+cu130`. `scripts/startup/build-cuda-libtorch-on-startup.mjs` now reports the distinct
+  `CONFIGURE_OK`, `BUILD_OK`, `ADDON_EXISTS`, and `PROBE_EXIT_OK` stages, and its inline probe exits
+  explicitly after checking CUDA availability. This resolves the reported stale-invocation failure
+  for that existing lane; it is not a CUDA 13.4/TensorRT-RTX build, a 13.2.2 migration, or proof of
+  production inference. Keep those challenger/migration decisions separate and preserve the
+  working CUDA 13.0 + cu130 path.
+
+- **Synthesis/tool-use model:** Ornith 1.5 9B on llama-server `:8090`; resolve its active model
+  through the runtime model resolver. Ornith is not the semantic embedding writer. TRACE MCP has a
+  separate startup task (`:8788`); it is not part of `graphify:daily:chain`. The checked-in MCP
+  configs do not register a Docker MCP server. Do not expose generic `shell.run` or Docker control
+  to the model; keep operations typed and governed.
+- **Bifrost != BitFrost:** Bifrost is the inference/MCP gateway. BitFrost is the disposable
+  Valkey-backed residency/cache policy. A `gpu:karpathy:*` cache write or a healthy Bifrost service
+  is not proof that revision-qualified ACE packets were admitted to BitFrost.
+- **Daily Graphify and TRACE MCP are separate startup paths:**
+  `sveltekit-frontend/package.json` defines `graphify:daily:chain` as an apply sequence ending in
+  `scripts/atlas/graphify-daily-ace-packet-step-v1.mjs`. The root startup wrapper runs the
+  projection-admission gate before that apply chain; while admission is `NOT_SAFE_TO_PROJECT`, it
+  fails closed before the chain mutates projections. The final ACE step itself only repeats the
+  gate, performs a read-only eligible-packet count, and writes a local receipt; it does no
+  Postgres/Qdrant/Valkey packet writes and reports `PACKET_COMPOSITION_NOT_WIRED`. TRACE MCP starts
+  independently on its own task. A successful Graphify or TRACE startup is not an ACE packet/cache
+  promotion receipt.
+- **Hit-demand is implemented, but is not semantic/token-cache warming:** the
+  `ace:hit-demand` and `ace:hit-demand:dry` npm aliases point to the existing
+  `sveltekit-frontend/scripts/seed-hit-demand.mjs`; `context-for-file.ts::loadHitDemand()` consumes
+  its `{hits, hot_score, last_hit_at, avg_rerank}` values. The apply script aggregates recent
+  `chunk_hit_log` rows by normalized relative path and atomically replaces Redis
+  `ace:rank:demand` (one-hour TTL; a separate 24-hour high-water mark). The folder-open task can
+  therefore make a real Redis write. This is a coarse demand-ranking hint, not a tokenizer/model
+  token cache, revision-qualified ACE packet, BitFrost residency admission, or embedding trigger.
+  Its current path-keyed payload lacks the source/workspace/representation identity needed to claim
+  canonical warming. The old “missing command/implementation” notes below are historical; the
+  2026-09-28 follow-up records the alias fix and bounded live test.
+- **Existing packet, RPC, and prompt owners:** `packages/parent-atlas` provides
+  `buildAcePacketV3`; SvelteKit provides `AcePacketWriter.writeRevisionQualifiedV3ToBitfrost` and
+  revision-aware write helpers. The HyperRAG Packet RPC is also real: retrieval logic lives in
+  `src/lib/server/retrieval/hyperrag-packet-rpc.ts` and is exposed by
+  `src/routes/api/hyperrag/packet-rpc/+server.ts` (with additional routes). Separately, the live
+  OpenAI facade calls `assembleACEContext()` and `buildACEPromptCached()` before synthesis. Do not
+  conflate retrieval RPC packets, request-time prompt context, and persistent `AcePacketV3` cache
+  objects: the missing link is a proven admitted producer/caller that binds current
+  `ContextManifest` and packet/source/representation identity, derives the exact
+  `embedAllowedPacketKeys`, calls the BitFrost writer, and verifies readback. Do not create a second
+  packet schema, generic RPC registry, or cache owner to fill that gap.
+- **LangGraph/TRACE boundary:** TRACE MCP owns registered typed tool transport/execution; the
+  LangGraph bridge should only admit an already-executed result into bounded dispatcher state. The
+  current `src/mcp/langgraph-bridge.ts` is legacy Headroom code: it budgets serialized characters
+  rather than UTF-8 bytes, truncates arbitrary result/state JSON, can discard low-confidence state,
+  and has a last-resort summary fallback. `ensureSchema()` also creates a table at runtime. This is
+  not the settled V2 policy: keep identity, active DAG dependencies, required evidence refs, and
+  ContextManifest checksums pinned; prune only optional/disposable references; use artifact/receipt
+  refs for large outputs; fail closed if required state exceeds budget. Do not expose generic
+  `shell.run` or Docker control to Ornith; retain typed, operator-gated `ops.*` operations.
+- **Packet wire format and identity:** ACE packet JSON is a bounded descriptor/envelope, not a
+  container for 768-float vectors or bulk feature arrays. Preserve canonical `packet_key` and
+  source/revision identity; UUIDs are used only in their declared lifecycle roles and are not
+  interchangeable with packet keys, ordinals, Qdrant IDs, or checksums. Large numeric payloads use
+  qualified references and Arrow IPC or contiguous mmap/tensor artifacts. This is the existing wire
+  format rule, not a choice between “UUID JSON” and “all-mmap packets.”
+- **Admission remains closed:** the latest recorded
+  `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-28.json` verdict is
+  `NOT_SAFE_TO_PROJECT`; only the ontology-cohort predicate is fully `PASS`. Revision qualification,
+  latent/graph/ordinal manifests, projection checksum alignment, BitFrost key derivability, and ACE
+  evidence grounding remain incomplete or partial. No ACE packet/cache promotion follows from the
+  receipt's existence. The fresh `gan-readonly-live-proof-v1-20260928T022800Z.json` confirms
+  61,718 packet rows read-only, 5 structural `source_ref` failures, and 1,520/1,520 qualified
+  chunks for the named cohort; semantic projection remains `NOT_EXERCISED`, so the overall
+  validation audit remains blocked on that separate lane.
+- **Separate cache path:** the 2026-09-27 startup follow-up proves the admitted Karpathy path wrote
+  `gpu:karpathy:scores` (190 Redis hash fields on its first run). This is a distinct cache family,
+  not `BITFROST-LIVE-WARM-01` proof. The latter remains blocked pending admitted packet identity
+  and a bounded write/readback/expiry canary. The last direct BitFrost cache census in the ledger is
+  dated 2026-09-27; do not present it as a live 2026-09-28 measurement.
+- **MCP configuration:** checked-in MCP configuration does not register a Docker MCP server.
+  Existing TRACE MCP tools and the HyperRAG HTTP Packet RPC are separate surfaces; configuration or
+  process presence alone does not prove a live handshake or authorize Docker/shell control.
+
+### Remaining implementation order
+
+1. Close `ACE-GATE-RECONCILE-01` from the latest admission receipt. Keep Graphify apply, Karpathy
+   score-cache enrichment, TRACE MCP startup, and ACE/BitFrost warming as separate outcomes.
+2. Close `ACE-STARTUP-BOUNDARY-01`: retain the existing hit-demand feature, but decide whether its
+   folder-open Redis write is acceptable as a noncanonical path-demand hint. If it is, document and
+   test its bounded key/payload/TTL/consumer contract; if revision-qualified corpus warming is
+   intended, design that as a separate gated feature. Do not label it a token cache.
+3. Close `ACE-PRODUCER-TRACE-01`: trace the request-time ContextManifest through
+   `buildAcePacketV3`, prove packet/source/representation identity and derive the exact admitted
+   packet-key set. Treat HyperRAG Packet RPC as an existing retrieval interface, not as proof of
+   persistent ACE packet admission.
+4. Close `ACE-BITFROST-CALLER-01` using the existing writer only after the producer and admission
+   proofs pass; add focused identity/revision/checksum rejection, no-inline-vector, and
+   one-vote-per-lane fixtures. Keep fixtures datastore-free.
+5. Only after an explicit operator authorization and passing admission receipt, run one disposable
+   BitFrost write/readback/TTL-expiry canary. Broader bucket warming and centroid warming come later,
+   after revision-qualified artifact/key derivation and atomic publication/readback are proven.
+6. In a separate bounded change, evolve LangGraph Headroom to reference/revision-aware state
+   admission (UTF-8 byte budgets, pinned required evidence, receipt/artifact refs, no arbitrary JSON
+   truncation or emergency summary, migration-owned schema). Keep execution in typed TRACE/OaK
+   operators, not the bridge.
+
+The detailed execution checklist is in
+`openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`. Historical status banners and
+pipeline snapshots later in this file must not override this current-state note.
+
 > MCP/Atlas status note (2026-08-23, superseded 2026-09-08 by a name-level reconciliation, not just
 > a count refresh): TRACE MCP tool counts are runtime-derived and static-derived measurements of
 > two genuinely different populations — do not cite either as "the" tool count on its own, and do
@@ -631,8 +749,10 @@ function validateWorkingDirectory(): void {
 ---
 
 ## Last Updated: July 28, 2026 (Cross-Directory Script Safety + Qdrant workspace_id Convention)
-## Status: All services UP ✅ | llama-server hforf.gguf :8090 ✅ | Qdrant :6333 ✅ | TurboVec :8791 ✅ | Postgres ✅ | Valkey ✅ | BitFrost 155K keys ✅ | OpenCode agents bash FIXED ✅
-## Pipeline Status: Phase 7 producing clean summaries (93% quality) → BitFrost cache warming (155,162 keys) → Summary indexing next → ACE packets deferred
+## Historical status snapshot (July 2026 — superseded; do not use as current health evidence)
+The following service/pipeline claims were captured in July 2026 and are retained only as history.
+In particular, the “BitFrost 155K keys” and “155,162 keys” counts are not current measurements;
+see “Current runtime and ACE/BitFrost status” above and the dated BitFrost audit receipts.
 
 ---
 
@@ -1787,6 +1907,189 @@ cuTile half (this dev host's CUDA 13.0 toolkit only ships a compiler-intrinsic s
 **See**: `docs/reports/runtime-capability-registry-v1.json` (the registry — `wsl::atlas-rapids-cu13`
 and `docker::atlas-gpu-8098` entries, per-capability owner map, the atlas-gpu-8098 over-install
 finding and its minimal-rebuild target, prohibited-duplicate-owner list).
+
+### CUDA 13.x multi-lane strategy: TensorRT-RTX 1.6 / CUDA 13.4 — DIRECTION ONLY, not started (2026-09-27)
+
+**Stated plan, nothing installed yet — verified live on this host**: only CUDA `v12.8`/`v13.0` exist
+under `NVIDIA GPU Computing Toolkit/CUDA/`, `CUDA_PATH` still points at `v13.0`, and no
+TensorRT-RTX installation was found anywhere on disk. The proven native lane (RTX 3060 Ti/sm_86,
+CUDA 13.0, LibTorch `2.9.0+cu130`, `tensorrt_bridge.node`) is untouched.
+
+**Rule**: TensorRT-RTX 1.6 (NVIDIA's separate CUDA-13.4-packaged SDK) must land as a **side-by-side
+challenger lane**, never an in-place replacement of the proven CUDA 13.0 lane — do not uninstall
+13.0, do not repoint the existing CMake preset's `CUDA_PATH`/`LIBTORCH_ROOT` at 13.4. LibTorch
+`cu130` and TensorRT-RTX's `cuda-13.4` package are separate binary/toolchain boundaries; TensorRT-RTX
+engines/runtime caches are version-sensitive (tied to GPU SKU, TensorRT-RTX version, CiG state,
+driver) and not forward-compatible across TensorRT-RTX runtime versions — a fresh runtime cache
+must be built per lane, never reused as proof the other configuration works. The 3060 Ti (Turing+)
+is architecturally fine for TensorRT-RTX; the GPU is not the blocker.
+
+**Planned layering** (mirrors this file's existing GPU LEVEL-ladder discipline — challenger proven
+independently before promotion, never silently replacing the working lane):
+
+```
+Native LibTorch lane (KEEP, unchanged)      TensorRT-RTX 1.6 lane (PROVE independently)
+  CUDA 13.0                                   CUDA 13.4
+  LibTorch cu130                              TensorRT-RTX 1.6 cuda-13.4 package
+  existing N-API addon / CMake preset         separate CMake preset + env selection
+                                               new engine/runtime cache
+```
+
+**Required gate before any promotion — `TRT-RTX-1.6-CUDA134-01`** (all must PASS, plus the existing
+CUDA 13.0 + LibTorch cu130 lane must still build and pass independently, unchanged):
+nvcc reports 13.4; RTX 3060 Ti sm_86 compile succeeds; TensorRT-RTX 1.6 DLL loads; a trivial engine
+build succeeds; inference succeeds; a *fresh* runtime cache succeeds (no reused cache as evidence);
+Node native bridge loads with no napi/CUDA DLL resolution conflicts; output parity vs. the current
+reference path; latency and VRAM measured.
+
+**Cross-stack correction (2026-09-27, same day) — CUDA 13.4 is NOT a universal target.** A follow-up
+operator brief proposed a fuller per-stack picture; the two most consequential claims were verified
+live via WebSearch before being recorded here (one of them needed a correction):
+
+| Stack | Verified current state | Target for this repo |
+|---|---|---|
+| **PyTorch/LibTorch** | Confirmed live: PyTorch is removing CUDA 13.0 from its nightly build matrix starting the week of 2026-09-28; **13.2 is becoming stable/default**, **13.4 stays prototype/nightly** (PyTorch 2.14 RFC promotes 13.2 to default PyPI). Confirmed live (2026-09-27) the actual C++ archive exists, not just the Python wheel — `download.pytorch.org/libtorch/cu132/` lists real `libtorch-win-shared-with-deps-{2.12.0,2.12.1,2.13.0,2.14.0}+cu132.zip` (plus a `2.12.0` debug variant). Also confirmed: `developer.nvidia.com/cuda-13-2-2-download-archive` (CUDA Toolkit 13.2 **Update 2**) is a real, Windows-supported download page — the specific patch that fixes the 12.8-13.2.1 compiler bug (see correction below). | Migrate the native LibTorch lane **13.0 → cu132 LibTorch zip + CUDA Toolkit 13.2.2 (Update 2)** — not 13.4, and not bare "13.2" (13.2.0/13.2.1 still carry the bug). **Two separate installs needed for this repo specifically**: the LibTorch zip alone bundles its own CUDA runtime libs (cudart/cublas/etc.) and would be sufficient for a pure-LibTorch consumer, but `simd-bridge/cpp/CMakeLists.txt` also calls `find_package(CUDAToolkit)` and compiles `.cu` files directly via `nvcc` for the `cuda_kernels` static lib — that needs an actual CUDA Toolkit 13.2.2 install on the host, `LIBTORCH_ROOT` and `CUDA_PATH` repointed together, same side-by-side discipline as the TensorRT-RTX lane. |
+| **RAPIDS/cuVS/cuGraph** | Confirmed live: RAPIDS 26.08 officially supports `cuda-version>=13.0,<=13.3` — **13.4 is out of range**, not yet supported. | Keep `atlas-rapids-cu13` (WSL2, per GPU-MINI-FABRIC-01 above) on 13.0-13.3; do **not** move it to 13.4. |
+| **cuTile** | **Checked against two primary sources (2026-09-27) and NOT confirmed — do not cite these claims.** CUDA Toolkit 13.4's own release notes list the "CUDA Tile" and "CUDA Tile IR" sections as **"None"** (no new features for 13.4). The official cuTile Python release-notes page (`docs.nvidia.com/cuda/cutile-python/release_notes.html`) lists only **version 1.0.0** (2025-12-02, "Initial release") — no 1.6 entry exists there. None of the specific features the brief cited (programmatic dependent launch, `ct.insert()`, unchecked memory access option, portable TileIR bytecode export, JAX interop, etc.) appear in either source. Treat "cuTile 1.6 adds CUDA-13.4 features" as unconfirmed/likely inaccurate until a real source is found — GPU-MINI-FABRIC-01 above's "stable on Ampere/sm_86 from CUDA 13.2" remains the only verified cuTile fact in this file. | No independent 13.4 justification currently stands for cuTile — the only confirmed reason for a 13.4 lane in this repo remains TensorRT-RTX. |
+| **TensorRT-RTX** | As established above — 1.6 adds CUDA 13.4 support, sm_86 in range. | The one lane that actually *needs* 13.4 right now. |
+
+**Correction to the brief's own claim**: it cited a PyTorch-disclosed compiler bug (nested thread
+divergence / incorrect reconvergence) as affecting "CUDA versions 12.8 through 13.0, fixed in
+13.2.2" — verified live via WebSearch against NVIDIA's own 13.2 Update 2 release notes: the bug's
+actual affected range is **12.8 through 13.2.1** (not just through 13.0), fixed in **13.2.2**. This
+matters because it means CUDA 13.2 alone (without the .2 update) still carries the bug — the
+correct migration target is specifically **13.2.2 or later**, not merely "13.2."
+
+**Revised lane layout** (supersedes the two-lane framing above — now three purposes, still all
+side-by-side, still nothing installed):
+
+```
+Windows native                          WSL2
+---------------                         ----
+CUDA 13.0 (current, KEEP for now —      atlas-rapids-cu13 (existing, per
+  known compiler bug 12.8-13.2.1;         GPU-MINI-FABRIC-01): CUDA 13.0-13.3,
+  LibTorch cu130 unaffected by that        RAPIDS 26.08, cuVS/cuGraph/cuML —
+  specific bug class per the brief,        do NOT move to 13.4
+  but still the eventual migration
+  source, not destination)
+                                         atlas-cutile-cu132 (existing, per
+CUDA 13.2.2+ (FUTURE migration            GPU-MINI-FABRIC-01): unchanged
+  target for LibTorch — confirmed
+  real artifacts exist: CUDA Toolkit    A future atlas-cutile-cu134 or
+  13.2.2 Update 2 installer (developer.  atlas-torch-cu132 WSL env is a
+  nvidia.com) + libtorch-win-shared-     DIRECTION only if Windows-native
+  with-deps-2.14.0+cu132.zip (download.  13.2.2/13.4 lanes prove insufficient
+  pytorch.org/libtorch/cu132/). BOTH     for a given experiment — not
+  installs needed for this repo (LibTorch
+  zip alone bundles its own CUDA
+  runtime, but tensorrt_bridge.node's
+  own nvcc/CUDAToolkit calls need the
+  Toolkit installed separately). Not yet
+  started; requires its own proof pass
+  before promotion, same discipline as
+  every other lane in this file.
+CUDA 13.4 (challenger — TensorRT-RTX      started here.
+  1.6 only; the cuTile-1.6-on-13.4
+  justification checked out negative,
+  see the table above — no cuTile
+  work belongs on this lane yet)
+```
+
+**Hard rule reaffirmed**: no stack in this repo moves to 13.4 as its canonical/production version
+right now. TensorRT-RTX is the only confirmed 13.4 consumer. LibTorch's real migration target is
+13.2.2+, not 13.4. RAPIDS stays on its already-current 13.0-13.3 range. Each of these is a
+separate, independently-gated proof lane per `DEPENDENCY-CAPABILITY-GUARD-01` above — do not
+collapse them into one "upgrade to 13.4" action.
+
+**Not done in this pass**: no CMake preset, env scaffolding, or install was created — operator
+explicitly deferred to a documentation-only step. CUDA 13.4 and TensorRT-RTX 1.6 installers are
+NVIDIA-site/license-gated downloads; a future session should not attempt to fetch/run them without
+the operator supplying the installer path first.
+
+**Reference docs fetched 2026-09-27**: `docs/.okf/tensorRTX7_26/` — overview, 1.6 release notes,
+Windows prerequisites, and SDK-zip Windows install steps, all mirrored from the live NVIDIA docs
+via `WebFetch` (see that folder's `README.md` for a fidelity caveat — one fetch produced a clearly
+wrong release date, flagged there, not treated as fact). Confirms: CUDA 13.4 support in 1.6,
+Ampere/sm_86 in the supported architecture range, WDDM-only on Windows, and the tightened
+runtime-cache compatibility rule already captured above.
+
+### LIBTORCH-DEPENDENCY-CENSUS-01 — real caller census (2026-09-27, read-only, source/caller only)
+
+**Purpose**: an operator brief proposed that LibTorch may be an `ARCHITECTURALLY_REPLACEABLE`
+convenience backend (a handful of tensor ops), not an irreplaceable architectural owner, and
+proposed a census gate (`rg 'torch::|#include <torch' simd-bridge/cpp` + per-function caller/
+replacement/blocker) before considering any removal. Ran that exact command and traced every
+result to its real TS-side production caller (not just the first bridge file), which the brief's
+own proposed command wouldn't distinguish on its own. **Parity tests, latency, and VRAM
+measurement were NOT run in this pass — this is source/caller mapping only**, per this file's
+Status Language discipline (`NOT_PROVEN` until measured).
+
+`rg 'torch::' simd-bridge/cpp` hits exactly 3 files: `pytorch_graph.cc` (10 exported ops),
+`pytorch_graph_fp16.cc` (3 fp16 variants), `libtorch_graph_impl.cpp` (6 ops + 2 diagnostics).
+`pytorch-graph.ts` and `libtorch-bridge.ts` are themselves thin N-API bridges (confirmed via their
+own docstrings), not production callers — excluded from the "real caller" column below; only
+callers of those bridges count.
+
+**CORRECTED same-day (2026-09-27) — the first pass's "5 zero-caller" claim was wrong, not a real
+finding.** That grep only matched `.fnName(` method-call style (`grep "\.${fn}("`), which misses
+(a) plain identifier calls after a destructured import (`clusterEmbeddings(args)`, no leading dot)
+and (b) direct `addon.fnName(...)` calls in repo-root `scripts/atlas/*.mjs`/`.mts` pipeline
+scripts, which live outside `sveltekit-frontend/src` and were never in scope for that grep's search
+root. A broader `Grep` (bare identifier, whole repo, `*.{ts,js,mjs,mts}`) found real, direct call
+sites for **all 5** — no dynamic/string-keyed dispatch needed to explain any of them, they were
+simply missed by too-narrow a search. Table below corrected accordingly.
+
+| Exported API | Op (LibTorch call) | Real production caller(s) | Possible replacement | Removal blocker |
+|---|---|---|---|---|
+| `pageRankGPU` | `torch::mm` power iteration | `/api/codebase-index/gpu-pipeline`, `master-feature-map.ts`, `route-feature-map.ts` | cuBLASLt SGEMM directly | Low — this GPU PageRank path is arguably already superseded by the canonical NetworkX/cuGraph pipeline (see "NetworkX vs. Neo4j" section above); may be a removal candidate outright, not just a replacement candidate |
+| `attentionScoreGPU` | `torch::mm` + softmax | `libtorch-reranker.ts` → `attention-head-ranker.ts`, `hyperrag-fusion-service.ts`; `karpathy-blend.ts` → 5 files incl. `/api/metrics/retrieval` | cuBLASLt GEMM + custom softmax kernel | Medium — `hyperrag-fusion-service.ts` looks live; Karpathy blend is separately marked LEGACY/REFERENCE ONLY elsewhere in this file (lower priority) |
+| `rewardScoreGPU` | cosine similarity (GRPO reward) | `gpu-pipeline.ts` (2 real routes) | cuBLASLt dot-product/GEMM | Low — GRPO/RL work is `Deferred` per multiple sections of this file |
+| `softmaxGPU` | numerically-stable softmax | `gpu-pipeline.ts` | trivial custom kernel or CPU (small n) | None found |
+| `topKIndicesGPU` | `torch::topk` | `gpu-pipeline.ts` | **CUB `DeviceRadixSort`/top-k** — already `DRY_RUN_PROVEN` in this repo (`ACE-RADIX-01`, see GPU-MINI-FABRIC-01 above) | None — this is the most concrete near-term replacement; the CUB oracle already exists and is proven |
+| `kmeansWithCentroids` | `torch::cdist` k-means | `som-clustering.ts` → 5 admin routes; `kmeans-cluster.ts` → `rg-atlas/run.ts` | RAPIDS cuML KMeans (`atlas-rapids-cu13` WSL2 env already exists) | Medium — cross-process boundary (WSL2 vs. native Windows Node), needs an RPC hop, not a drop-in swap |
+| `trainSOM` | `torch::cdist` SOM training | **Real**: `scripts/atlas/dir-pipeline.mjs:274`, `scripts/atlas/gemma4-semantic-embedding-cache.mts:204` (call itself buggy — see LibTorch-adjacent script-alignment note below), `scripts/atlas/gpu-full-pipeline.mjs:263` — direct `addon.trainSOM(...)` calls, repo-root pipeline scripts outside `sveltekit-frontend/src` | N/A yet — live, not a removal candidate | None currently — genuinely used by 3 pipeline scripts |
+| `autoencoderEncodeGPU`/`autoencoderDecodeGPU` | `tanh(mm)` | `autoencoder-bridge.ts` → `autoencoder-cuvs-bridge.ts`; `topology-projection.ts` → 2 API routes + `encode-768-to-64.ts` | cuBLASLt GEMM (it's one linear layer + tanh — trivially cheap to replace) | Low-technical, but this file's own "Why autoencoder is bypassed" note already flags the underlying weights as untrained/Xavier-random — any replacement needs numeric parity against that (already weak) baseline, not against a good result |
+| `pcaProjectGPU` | `torch::mm` | `autoencoder-bridge.ts`, `topology-projection.ts` | cuBLASLt GEMM (PCA projection is one matmul) | None found |
+| `graphSimilarity`/`graphSimilarityHalf`/`batchCosineSimilarity`(`_fp16`) | cosine similarity | `batch-rerank-orchestrator.ts` → `cuda-graph-caching-bridge.ts`; `prefilter.shadow.ts` → `discover-clusters.ts`, `encoded-cluster-prefilter.ts` | cuVS exact-KNN (already `PASS` in `SEMANTIC-EXACT-PARITY-01`, GPU-MINI-FABRIC-01 above) | Medium — same WSL2/native-process boundary as `kmeansWithCentroids` |
+| `clusterEmbeddings` | k-means (older API) | **Real**: `/api/codebase-index/cluster-assign/+server.ts` (live API route), `/api/codebase-index/cluster-detect/+server.ts`, `/api/codebase/analyze/+server.ts`, `scripts/atlas/phase-1b-gpu-kmeans-som.mjs` (this one's own `addon` is hardcoded `null` — deliberate CPU-only demo mode, not a real GPU call), `gpu-graph-analysis.ts`, `codebase-cluster-detection.ts` | N/A — live, backing production API routes | None — not a removal candidate |
+| `computeCaseEmbedding` | weighted embedding sum | **Real**: `/api/gpu/compute/+server.ts` (live API route), `sveltekit-frontend/scripts/atlas/prototype_feature_extract.mjs:23` | N/A — live, backing a production API route | None — not a removal candidate |
+| `attentionScoreGPU_fp16`/`rewardScoreGPU_fp16` | fp16 variants | **Real**: `scripts/atlas/karpathy-gpu-enrich.mjs:59` + its duplicate `scripts/karpathy-gpu-enrich.mjs:65` (the canonical Karpathy GPU Authority Blend pipeline, already documented elsewhere in this file), `sveltekit-frontend/scripts/run-hypergraph.ts:150`, `scripts/smoke/smoke-attention-score-gpu-boundary.mjs` | N/A — live, backing the canonical Karpathy blend | None — not a removal candidate |
+| `checkCudaAvailable`/`getCudaMemory` | device query | `batch-rerank-orchestrator.ts` | `cudaGetDeviceCount`/`cudaMemGetInfo` direct — LibTorch is overkill for a device query | None — trivially replaceable regardless of any other decision |
+
+**Bottom line (corrected)**: of 19 exported native APIs, **all 19 have real production callers** —
+zero are dead. All 5 that this file previously mislabeled "zero-caller" are real and no dynamic-
+dispatch mechanism was needed to explain any of them; the original claim was a search-tooling
+error (grep pattern too narrow), not evidence of dead code. Do not archive `trainSOM`,
+`clusterEmbeddings`, `computeCaseEmbedding`, or the fp16 variants on the basis of this census.
+Of the 19, most still map to a plausible non-LibTorch replacement this repo already has proven
+groundwork for (`ACE-RADIX-01`'s CUB oracle for top-k, `SEMANTIC-EXACT-PARITY-01`'s cuVS for
+cosine/KNN, `atlas-rapids-cu13` for k-means) rather than needing new research — but no parity/
+latency/VRAM proof was run, so **do not treat any single row above as cleared for migration**
+until that measurement exists, per this file's Status Language rule.
+
+**Separately found while verifying these callers (2026-09-27) — GPU addon path alignment, not
+census scope**: several of the calling scripts (`dir-pipeline.mjs`, `gpu-full-pipeline.mjs`,
+`gemma4-semantic-embedding-cache.mts`, `prototype_feature_extract.mjs`,
+`phase2b-lexical-extraction-kmeans.mjs`, `smoke-gpu-hardening.mjs`) hardcoded only the stale
+`simd-bridge/cpp/build/Release/tensorrt_bridge.node` path and would silently run against an old
+(pre-CUDA-rebuild) addon rather than the current `build-x64-cuda/Release` one. Fixed all 6 to check
+`build-x64-cuda/Release` first, matching the pattern `karpathy-gpu-enrich.mjs`/`run-hypergraph.ts`/
+`smoke-attention-score-gpu-boundary.mjs` already used correctly. Re-ran both smoke tests after the
+fix: `smoke-gpu-hardening.mjs` 3/3 pass (now against the correct Sept-27 CUDA build, not the stale
+June-2 one it was silently using before), `smoke-attention-score-gpu-boundary.mjs` 6 pass/1
+non-critical warning. Separately, `gemma4-semantic-embedding-cache.mts` was found to have two
+real pre-existing bugs beyond the addon path (a `require('crypto')`-vs-top-level-`await` module-
+type conflict, and a wrong Qdrant endpoint — `/points` instead of `/points/scroll`), both fixed;
+its 4 GPU call sites (`pageRankGPU`/`attentionScoreGPU`/`kmeansWithCentroids`/`trainSOM`) still
+pass arguments in the wrong shape (e.g. raw unflattened embeddings where a flat adjacency matrix
+or `Float32Array(n×dim)` is required) and have never produced valid output — this duplicates the
+already-correct, already-canonical `karpathy-gpu-enrich.mjs` pipeline. Recommend archiving
+`gemma4-semantic-embedding-cache.mts` (per this file's archive-not-delete convention) rather than
+repairing its call signatures, pending operator confirmation — not done in this pass.
+
+**Not done in this pass**: no code removed, no replacement implemented, no benchmark run. This is
+the corrected census plus the addon-path alignment fix — the brief's own proposed gate correctly
+separates "know the shape of the dependency" from "act on it."
 
 ---
 
@@ -4811,6 +5114,13 @@ See `sveltekit-frontend/scripts/docs/compiler-stack-explainer.md` for complete r
 
 **5-pillar smoke**: `npm run smoke:graphify` (read-only, <1s) — checks graph JSON + map.md + Redis fast cache + KAG notes + Qdrant `codebase_chunks_768` + ACE `FAST_AST_SCORE_CAP ≤ 0.07`. Flags: `--strict`, `--no-redis`, `--no-qdrant`.
 
+**Correction (2026-09-28)**: `smoke:graphify` and `graphify:full` (used in the table above) are
+confirmed **absent** from both `package.json` files — found by `npm run atlas:audit:startup-tasks`
+(new, see the Karpathy section's correction below) and spot-verified by direct `grep`, not just tool
+output. Only `smoke:graphify:symbols` exists under a similar name. Not investigated further in this
+pass (root-cause/rename target unknown) — treat every command in this Graphify table as unverified
+until re-checked against live `package.json`, not just this doc.
+
 **ACE priority order** (verified in `context-assembler.ts`): Qdrant semantic → ACP cross-feed → Redis KAG (cap 0.08) → Redis fast-AST (`FAST_AST_SCORE_CAP = 0.07` named constant) → SOM/hypergraph/PageRank.
 
 **Topo-byte Redis cache (May 5, 2026)**: Stage A0 in `fetchACPKnowledgeResults()` checks `ace:topo:{topoClass}:{queryHash}` (TTL 300s) before ANN. On cache hit, Qdrant is skipped entirely. `TopoPrefilterStats` flows to `ACEContext.retrievalTrace.topoPrefilter`. Implementation: `src/lib/server/cache/topo-candidate-cache.ts`.
@@ -4879,6 +5189,58 @@ Wired into the heavy lane of `scripts/startup/ace-incremental-startup.mjs` via `
 - 24h cooldown via `ace:startup:heavy_last_run`
 - Sequence: `graphify:authority → graphify:gds → graphify:cluster-summaries → graphify:bow-tiles → topology:validate → karpathy:gpu → audit:full-pipeline`
 - Allowlist also permits `karpathy:gpu:dirty` and `karpathy:gpu:dry` on every folder open (incremental lane)
+
+### Correction (2026-09-28): the Surface aliases were documentation, not reality — `karpathy:gpu` was completely broken; this Auto-fire policy subsection describes two files that do not exist
+
+**`karpathy:gpu` (bare) was non-functional since the moment its admission gate was added — verified
+live, not assumed.** Running it threw `Error: KARPATHY_APPLY_ADMITTED_WORKSPACE_REVISION_REQUIRED`
+at `scripts/atlas/karpathy-gpu-enrich.mjs:623` every single time, because its apply mode hard-requires
+`ATLAS_WORKSPACE_REVISION` (`sha256:`-prefixed) and `ATLAS_SOURCE_COHORT_CHECKSUM` env vars, and a
+full repo-wide search found **zero code anywhere that ever set either one**. The "Surface" line
+above (`karpathy:gpu:dirty`, `karpathy:gpu:top200`, `karpathy:gpu:dry`) was aspirational when
+written — none of those three npm aliases existed in `sveltekit-frontend/package.json` until this
+correction; only bare `karpathy:gpu` existed, and it was broken.
+
+**Fixed 2026-09-28, live-verified, no fabrication**: `scripts/atlas/run-karpathy-gpu-admitted-v1.mjs`
+(new) resolves `ATLAS_WORKSPACE_REVISION` from the most recent COMPLETED `graphify_runs` row's real
+`workspace_revision` (fails closed with `NO_ADMITTED_WORKSPACE_REVISION` if none exists — never a
+timestamp or synthesized value), and `ATLAS_SOURCE_COHORT_CHECKSUM` from a sha256 of the exact real
+candidate set `karpathy-gpu-enrich.mjs` itself fetches for the run (via a new
+`--dry-run --dry-run-candidates` mode that emits a `KARPATHY_COHORT_JSON:` line for exactly this
+purpose), then re-invokes the real script with both supplied. **Live result**: `gpu:karpathy:scores`
+went **0 → 190 → 390** real Redis hash entries across two runs (verified via `HLEN`, not the
+script's own self-report), exit 0 both times. New, now-real npm aliases: `karpathy:gpu:dry` (the raw
+script's read-only mode), `karpathy:gpu:admitted` (the fix — this is what should be called from now
+on), `karpathy:gpu:dirty` and `karpathy:gpu:top200` (both routed through the admitted wrapper). All 3
+places in `.vscode/tasks.json` that called bare `karpathy:gpu` (including the `runOn: folderOpen`
+gated daily-startup task) now call `karpathy:gpu:admitted`. Full evidence trail:
+`openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`,
+`STARTUP-BITFROST-WARM-DIAGNOSIS-01` and its follow-up entry.
+
+**The "Auto-fire policy" paragraph above this correction is STALE — `scripts/startup/
+ace-incremental-startup.mjs` and `config/startup-ace-policy.json` do not exist anywhere in this
+repo** (confirmed via direct `find`/`ls`, not a stale grep). The `.vscode/tasks.json` task whose
+`detail` field repeats this same description (`"🚀 Startup: ACE Incremental Refresh (detached,
+safe)"`) has a `command` of `npm run startup:ace:detached` — **also not a real npm script** in
+either `package.json` — so this task has silently done nothing on every folder-open since it was
+added. A sibling task, `"🔥 Startup: Seed Hit-Demand (chunk_hit_log → Redis, detached)"`, has the
+identical failure shape: its command `npm run ace:hit-demand` is also not a real script (the
+underlying `chunk_hit_log` Postgres table is real and has real consumers — `context-assembler.ts`,
+`mcp/server.ts` — but nothing seeds a Redis demand signal from it). **Do not treat either capability
+as live.** Both are recorded as open, unbuilt gates (not fixed in this correction — each needs its
+own build-vs-remove decision) in
+`openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`. A new read-only check,
+`npm run atlas:audit:startup-tasks` (`scripts/atlas/audit-startup-task-npm-scripts-v1.mjs`), now
+exists specifically to catch this failure mode — any `.vscode/tasks.json` task whose `npm run X`
+doesn't resolve to a real script in either `package.json` (or the task's own declared cwd). Running
+it found the real scope is **4** silently-broken `runOn: folderOpen` tasks, not just these 2 — also
+`"🩺 Startup: Atlas Smoke Gate"` (`smoke:atlas`) and `"🧪 Startup: OpenCode Sidecars Smoke"`
+(`smoke:mcp:opencode-sidecars`), both likely non-functional since whichever of the 4 broke first,
+since they're chained via `dependsOn`. It also found 157 additional stale references on manual-only
+tasks (lower urgency — those fail loudly the moment someone runs them). None of the 161 were fixed
+in this pass; full detail in
+`openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`'s
+`STARTUP-BITFROST-WARM-DIAGNOSIS-01` follow-up entries.
 
 ### Verification
 

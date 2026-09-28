@@ -16,6 +16,9 @@
 - [x] AFC-04B-06 Verify the compiled `PromptPlanV1.checksumSha256` against the existing Atlas canonical encoding before model discovery/generation; preserve `tokenizerRevision` and reject field tampering before any POST. Focused adapter, worker, and bounded-graph tests pass (8/8).
 - [x] AFC-04B-07 Repair the existing Kanban LangGraph builder's typed node-edge construction so the installed LangGraph runtime can typecheck through the exported index; behavior and datastore ownership are unchanged.
 - [x] AFC-04B-08 Separate the unused legacy block-reference planner from the canonical revisioned `atlas.prompt-plan.v1` wire contract; retain a deprecated builder alias, but emit `atlas.agentic-file-compiler.block-plan.v1` so unresolved block references cannot masquerade as executable PromptPlan evidence.
+- [x] AFC-TOOL-BOUNDARY-01A Retire the generic `shell.run` TRACE MCP registration and remove it from the tool-audit execution categories. A source-level regression test passes 2/2 and the runtime discovery gate now rejects `shell.run` if it reappears. Typed, operator-gated `ops.*` executors remain; this does not expose arbitrary commands.
+- [ ] AFC-TOOL-BOUNDARY-01B Reload the active TRACE MCP process under the controlled runtime workflow and verify `tools/list` omits `shell.run`; source edits and static tests alone do not prove the live advertised tool surface changed. Read-only check on 2026-09-27 found `:8788` still advertises 177 tools including `shell.run`; the listener is a local Node process using `scripts/node-ts-loader.mjs`, with an established client connection. No restart was attempted; runtime cutover remains open.
+- [x] AFC-LANGGRAPH-RESULT-ADMISSION-01 Rename the bridge's simulated `invokeTool` API to `applyToolResult`; middleware executes the original handler exactly once, then admits its result with call identity into bounded dispatcher state. The adapter does not claim tool execution. Focused optionalization suite passes 9/9; broader Headroom byte/reference-pruning and durable-state ownership remain separate gates.
 
 LangGraph runtime recheck (read-only, 2026-09-19): the installed StateGraph replay matched the
 local adapter, and the failure/retry/cancellation/replay fixture passed with deterministic output.
@@ -137,10 +140,21 @@ and fixture-proven; remaining items below stay open unless specifically marked:
   mutating the registry every time a service cycles.
 - [ ] AFC-KW-01 `KeywordRecognitionV1` contract (bounded exact-token matching;
   vocabulary remains fixture-supplied; no radix/prefix expansion).
-- [ ] AFC-KW-02 Versioned vocabulary + normalization contract (case folding,
+- [x] AFC-KW-02 Versioned vocabulary + normalization contract (case folding,
   Unicode normalization, camelCase/snake_case/kebab-case splitting, dot/path
   segmentation, package-name preservation) — separate revision domain from
-  the classifier/taxonomy revisions already in use.
+  the classifier/taxonomy revisions already in use. `agentic-file-compiler/
+  token-normalization-v1.ts` (+ `.spec.ts`, 8 tests passing) implements
+  `normalizeAndSplitTokenV1()` (NFC + lowercase + camelCase/PascalCase
+  splitting + dot/slash/hyphen/underscore segmentation + scoped
+  `@scope/pkg-name` preservation) under a distinct
+  `TOKEN_NORMALIZATION_REVISION_V1` — a test asserts this revision id is
+  never equal to `KEYWORD_NORMALIZATION_REVISION_V1` (the existing exact-
+  token NFC+lowercase-only normalization AFC-KW-03/QUERY-RADIX-01 already
+  depend on), so this broader splitting policy cannot silently invalidate
+  that narrower, already-shipped revision. Not wired into
+  `keyword-recognition-v1.ts`'s vocabulary matching — that wiring decision
+  is separate, deliberately deferred work (see the note below).
 - [x] AFC-KW-03 Exact map + radix compiler over normalized tokens, with
   `prefixPolicy: CONTROLLED` + explicit `allowedExpansions` per prefix entry
   (radix answers "which registered vocabulary entries share this prefix",
@@ -160,29 +174,51 @@ and fixture-proven; remaining items below stay open unless specifically marked:
   `retrievalPolicyRevision` — explicitly never collapsed into one "routing
   revision" (a vocabulary alias change must not imply an executor-capability
   change).
-- [ ] AFC-PARAM-01 `ParameterBindingV1` resolution modes
+- [x] AFC-PARAM-01 `ParameterBindingV1` resolution modes
   (`EXACT`/`DERIVED`/`DEFAULTED`), forbidding `DEFAULTED` for any identity/
   revision parameter (`canonicalId`, `packetKey`, `sourceRevision`,
   `workspaceRevision`, `symbolVersionId`, `candidateSnapshotRevision`,
   `ordinalMapChecksum`, `representationRevision`) — a planner may default
-  `topK`/`timeoutMs`, never an identity or revision field.
-- [ ] AFC-PLAN-01 Extend the existing (real, checked-off) `RetrievalPlanV1`
+  `topK`/`timeoutMs`, never an identity or revision field. Contract-only, no
+  wiring: `agentic-file-compiler/parameter-binding-v1.ts` (+ `.spec.ts`, 7
+  tests passing) rejects `DEFAULTED` on every listed identity/revision name,
+  requires `derivedFromRefs` for `DERIVED` and forbids it for `EXACT`, and
+  seals bindings with a checksum. `ParameterBindingSetV1` dedupes/sorts by
+  parameter name.
+- [x] AFC-PLAN-01 Extend the existing (real, checked-off) `RetrievalPlanV1`
   with phased/cost-bounded scheduling (`RetrievalPlanPhaseV1`: cheap lexical
   → structural → expensive semantic/graph → extraction escalation, each
   phase with `continueWhen`/`minCandidates`/`minConfidence` stop conditions).
-  This is additive to the existing lane list, not a replacement.
-- [ ] AFC-CAND-01 `HelperCandidateV1` — common output normalization
+  This is additive to the existing lane list, not a replacement. Landed in
+  `retrieval-plan.ts`: `buildRetrievalPlanPhasesV1()` groups the plan's
+  existing `lanes` into 4 ordered tiers (never a second lane source of
+  truth — `phases` is a scheduling view over the same `lanes` array,
+  verified by a test asserting the two sets match); `buildRetrievalPlan()`
+  now attaches `phases` whenever lanes are non-empty. 3 new tests + the 2
+  pre-existing `retrieval-plan.spec.ts` tests all pass (5/5).
+- [x] AFC-CAND-01 `HelperCandidateV1` — common output normalization
   (`lane`, `canonicalId?`, `packetKey?`, `sourceRef`, `identityResolution:
   CANONICAL_ID|PACKET_KEY|SOURCE_REF|UNRESOLVED`) so multiple executors of
   one logical lane (Qdrant/cuVS/CAGRA under `semantic`) produce one vote per
   lane, not N — preserving this repo's existing "executor != retrieval lane"
   invariant (already documented in root CLAUDE.md's Duplication Prevention
-  section).
-- [ ] AFC-CACHE-01 Stage-specific, revision-qualified caches (classification /
+  section). `agentic-file-compiler/helper-candidate-v1.ts` (+ `.spec.ts`, 6
+  tests passing) derives `identityResolution` from which field is actually
+  populated (never caller-asserted) and `dedupeHelperCandidatesByLane()`
+  collapses same-lane/same-identity candidates to one vote while keeping
+  distinct identities and distinct lanes separate. Not yet wired into
+  SearchRuntime — a normalization contract only, per this task's own scope.
+- [x] AFC-CACHE-01 Stage-specific, revision-qualified caches (classification /
   keywordRecognition / queryExpansion / helperEligibility / retrievalPlan),
   each keyed on its own upstream checksum + its own revision fields — so a
   service-availability change invalidates eligibility/plan without forcing
-  keyword recognition to recompute.
+  keyword recognition to recompute. Contract-only, no cache backend: `agentic-
+  file-compiler/stage-cache-key-v1.ts` (+ `.spec.ts`, 5 tests passing) builds
+  a deterministic `atlas:afc:cache:{stage}:{upstreamChecksum}:{revisionFingerprint}`
+  key; tests prove determinism (order-independent revisionFields), revision-
+  sensitivity, and stage independence (same revision fields under a
+  different stage produce a different key). No Redis/Valkey read or write
+  performed — wiring an actual backend behind this shape is separate work.
 - [ ] AFC-PROOF-01 Positive + negative + blocked routing fixture (e.g. "explain
   CAGRA indexing parameters" → docs/postgres-fts/semantic-768 ELIGIBLE,
   lsp-references/ast-grep/langextract INELIGIBLE; and a deliberately-unavailable-LSP
@@ -343,8 +379,8 @@ remain open and require their own review/proof.
 - [x] AFC-OWNER-01 Verify all 12 helper declarations against source owners/call paths; record declared-owner mismatches without changing registry code.
 - [x] AFC-OWNER-02 Classify every entry as LIVE, UNIT_PROVEN_NOT_LIVE, CONTRACT_ONLY, BLOCKED, or UNRESOLVED in the owner receipt.
 - [x] AFC-OWNER-03 Record router-signal ownership separately from executor ownership; leave per-helper signal mappings unresolved where no owner evidence exists.
-- [ ] AFC-OWNER-04 Verify each helper's logical-fusion-lane mapping and one-vote behavior; rg -> rg and trigram -> lexical are verified, FTS is not shown in SearchRuntime, and dense four-executor fixture coverage is incomplete.
-- [x] AFC-OWNER-05 Emit `docs/reports/afc-helper-owner-verification-v1.json` with evidence refs and no-promotion/no-write declarations.
+- [x] AFC-OWNER-04 Verify logical-fusion role/lane for the currently evidenced helpers and one-vote behavior. Proven contributors: `rg-exact` -> `rg`, `postgres-trigram` -> `lexical`, `semantic-768` -> `dense`; `AFC-LANE-PARITY-01` proves Qdrant/TurboVec/cuVS/CAGRA fixture identities collapse to one dense contribution. `postgres-fts`, docs search, graph-PPR, Tree-sitter chunking, and LangExtract are explicitly non-fusion/enrichment in their evidenced caller scopes. ast-grep/ts-morph are not proven request-time fusion executors; LSP remains blocked. This closes mapping for the evidenced surface only, not live GPU parity or unresolved capabilities. `AFC-OWNER-MAP-01` remains open for router-signal binding; `AFC-ROUTING-PROMOTE-01` remains open.
+- [x] AFC-OWNER-05 Emit the initial `docs/reports/afc-helper-owner-verification-v1.json`; it is historical and superseded as the current control baseline by `docs/reports/afc-helper-owner-verification-v2.json`.
 - [ ] AFC-ROUTING-PROMOTE-01 Owner-verify helper entries, then promote the reviewed contract to stable paths; keep this separate from the implemented query-radix component.
 - [ ] AFC-OWNER-MAP-01 Resolve remaining per-helper router-signal and logical-fusion-lane mappings, including whether helpers outside SearchRuntime are orchestration-only; do not invent `docs` or `graph` fusion lanes. Read-only owner audit is recorded, but mapping/promotion remains open.
 - [x] AFC-OWNER-VERIFY-01 Complete the read-only 12-helper caller/owner census using statuses PROVEN / PROVEN_WITH_ADAPTER / BLOCKED / UNRESOLVED / NOT_A_FUSION_LANE; keep unknown signal and fusion mappings explicit.
@@ -352,9 +388,10 @@ remain open and require their own review/proof.
 - [x] AFC-LANE-PARITY-01 Fixture one revision-qualified canonical candidate from Qdrant, TurboVec, cuVS, and CAGRA; retain four executor IDs and prove exactly one dense contribution. Fixture proof only: no live cuVS/CAGRA executor or GPU call was made.
 - [x] AFC-GRAPH-LANE-01 Determine graph-PPR fusion role only after a live dispatcher/caller exists; do not invent a `graph` fusion lane. Read-only caller census found query-time PPR in the Admin Atlas synthesis route as a graph-revision/seed-bound candidate ranking feature, not a SearchRuntime fusion lane. The ordinary SearchRuntime graph expansion is a separate post-fusion `graphExpanded` result. No live GPU call was made.
 - [x] AFC-DOC-LANE-01 Keep docs search non-fusion/admin-only unless an actual SearchRuntime adapter and candidate contract are demonstrated. Owner trace: the admin-only `/api/admin/atlas/docs-corpus/search` route calls `searchDocCorpus`, which returns canonical Postgres FTS hits when admitted rows exist and otherwise a local lexical fallback; neither result path is adapted into SearchRuntime candidates or an RRF lane.
-- [x] AFC-STRUCT-WRITE-TRACE-01 (CLOSED_NEGATIVE) Proved the opposite of the hypothesized chain: `graphify-structural-batch-v1.ts` only invokes its materialize port and emits a receipt; `GraphifyStructuralMaterializer` explicitly reports `persistence: NOT_ATTEMPTED`. A separate, unrelated full-repo indexer writes `tree_node_id` into `codebase_chunk_index.metadata`, but no call/dataflow edge binds that writer to this Graphify batch's output. Do not claim Graphify → Postgres → SearchRuntime provenance. A disproven hypothesis is a closed gate, not an open one — see the reconciliation section below for the corrected per-field status.
-- [ ] AFC-LEXICAL-LANE-01 Reconcile router `lexical_exact` targets with SearchRuntime's separate `rg` and `lexical` lanes; establish whether FTS has a SearchRuntime adapter.
-- [ ] AFC-RADIX-ACCEPT-01 Review QUERY-RADIX-01 acceptance semantics against required lookup behavior. Current implementation remains an opt-in, tested prototype: it only expands explicitly configured prefixes via `allowedExpansions`; it does not implement Patricia `prefix_match` longest-stored-key-prefix fallback. No live caller or approved vocabulary owner exists yet.
+- [x] AFC-STRUCT-WRITE-TRACE-01A Prove the negative producer/materializer fact: `graphify-structural-batch-v1.ts` only invokes its materialize port and emits a receipt; `GraphifyStructuralMaterializer` reports `persistence: NOT_ATTEMPTED`. The retrieval reader and SearchRuntime lane mapping are separately located; the separate indexer's input is not yet linked to this batch.
+- [x] AFC-STRUCT-WRITE-TRACE-01 Classify the current Graphify-to-SearchRuntime structural path as DISCONNECTED. `graphify-structural-batch-v1.ts` only delegates to its materializer; `GraphifyStructuralMaterializer` returns `persistence: NOT_ATTEMPTED`. Its callers persist Graphify receipts/evidence and symbol-registry facts, not `codebase_chunk_index.metadata/output_meta`. The apparent legacy writer `ast-treesitter-facts.mjs` computes `primaryNodeId` but its UPDATE persists only AST symbols/imports/exports and timestamps. Separately, `retrieveASTMatches()` reads existing `metadata/output_meta.tree_node_id`, emits `scoreSource: ast_tree`, and SearchRuntime maps that to lane `ast`. This closes the reachability question negatively for the current Graphify path; it does not prove who populated historical JSONB values or claim live-row provenance. No live DB query or write was performed.
+- [x] AFC-LEXICAL-LANE-01 Reconcile lexical routing and SearchRuntime fusion, and establish whether FTS has a SearchRuntime adapter. Read-only trace: SearchRuntime's `LogicalRetrievalLane` (`dense|lexical|exact|ast|schema|rg|bm42`) is a post-retrieval fusion vocabulary; `postgres_trigram` maps to `lexical`, `rg_keyword` to `rg`. No FTS adapter exists in SearchRuntime (`retrieve-candidates.ts` owns the `search_vector` FTS query separately). **Correction from AFC-LIVE-ROUTER-OWNER-RECHECK-01 (2026-09-27):** the earlier note incorrectly attributed the live ACE router to `retrieval/router-matrix.ts` and `retrieval/query-router-4x4.ts`. Actual production caller `features/ai/ace/context-assembler.ts` imports `routing/query-router-4x4.ts`, whose live signal shape is numeric `{semantic, lexical, graph, trustPressure}` and dispatch set is `{qdrant, postgres, neo4j, mcp}`. `retrieval/router-matrix.ts` is not found in production imports (only the isolated routing-review candidate uses it); `retrieval/query-router-4x4.ts` is a simulation stub and has no production import. Thus router-matrix `SignalType` is not proven to be the live router signal owner; helper-to-live-signal mapping stays open in `AFC-OWNER-MAP-01`, and promotion stays blocked on operator decisions 1-3. Receipt: `docs/reports/afc-live-router-owner-recheck-v1-20260927T202448Z.json`. No code, DB/cache writes, or inference.
+- [x] AFC-RADIX-ACCEPT-01 Review QUERY-RADIX-01 acceptance semantics against required lookup behavior. Review complete (2026-09-27): retain the current V1 contract as an **explicit-prefix mapping**, not Patricia `prefix_match` longest-stored-key-prefix semantics and not implicit autocomplete/subtree enumeration. `allowedExpansions` is the authorization boundary; absent rules produce no expansion. Focused radix suite passed 7/7 and strict OpenSpec validation passed. Scope limits remain explicit: the fixture covers `qdr`, `cagr`, `postgr`, `hns`, and NFC/case normalization, but not the proposed `postg`, `tree-s`, or `langex` examples; current vocabulary validation and lookup accept only letters/digits/underscore, so hyphenated prefixes such as `tree-s` are unsupported. Do not silently broaden V1 normalization or claim those cases accepted; define and test a versioned compound-token/alias policy first. This closes the semantics review only: QUERY-RADIX remains a prototype, opt-in, without an approved vocabulary owner or live caller; no promotion or Patricia backend change is implied.
 - [ ] AFC-RADIX-LIVE-01 Resolve the revisioned vocabulary source/owner, then compile QUERY-RADIX-01 at the AFC query-compilation seam in shadow mode only; do not alter SearchRuntime inputs or invoke radix from RLM directly.
 - [ ] AFC-RADIX-PROOF-01 Emit a checksum-bound baseline-vs-radix plan-diff receipt (added/removed terms and helpers, latency, no writes); require deterministic results for the same input revisions.
 - [ ] AFC-RLM-BRIDGE-01 After AFC shadow proof and helper-contract promotion, let RLM consume one immutable AFC routing artifact; do not reconstruct routing or call the radix index directly from RLM.
@@ -378,13 +415,13 @@ mappings or a separately reviewed change to the fusion-lane owner.
 
 **Immediate, owner-proof-blocked:**
 1. **Live routing integration remains open.** QUERY-RADIX-01 is implemented and fixture-proven, but the vocabulary source/owner is unresolved and no production caller exists. Keep the next AFC integration shadow-only. Helper v1/v2 candidates remain unpromoted; verify owner references, logical-lane mappings, and capability evidence before using helper eligibility in the request path.
-2. **`PERSISTENCE-DECISION-01`** (`parent-atlas-repair-candidate-feature-matrix/tasks.md`) — decide where V4 packets live (new table? `atlas_packets`? files-only?) before running `SEM-MATERIALIZE-01`'s full 16,151-row job (~32 min, sized and safe, just currently pointless without a destination).
+2. **`PERSISTENCE-DECISION-01`** (`parent-atlas-repair-candidate-feature-matrix/tasks.md`) is now recorded as `FILES_ONLY_SEALED_ARTIFACT`. This authorizes local artifacts only; the full run remains gated on binding the exact embedded bytes and implementing/testing a resumable compiler-backed driver. The old ~32-minute estimate is not transferable.
 
 **Ready to resume, not blocked:**
-3. `AFC-KW-02` (full normalization: camelCase/snake_case/kebab-case splitting, dot/path segmentation, package-name preservation) remains open. QUERY-RADIX-01's implemented normalization is narrower and does not close this broader contract. `AFC-RADIX-LIVE-01` remains gated on approved vocabulary ownership and must stay shadow-only.
-4. `AFC-PLAN-01` (phased/cost-bounded `RetrievalPlanV1` extension), `AFC-CAND-01` (`HelperCandidateV1` executor-vs-lane normalization), `AFC-CACHE-01` (stage-specific caches), `AFC-PARAM-01` (`ParameterBindingV1` EXACT/DERIVED/DEFAULTED) remain open; helper eligibility is still a review candidate, not a production caller input.
+3. **Superseded 2026-09-27**: `AFC-KW-02` (full normalization: camelCase/snake_case/kebab-case splitting, dot/path segmentation, package-name preservation) is now closed — see the checked-off item above (`token-normalization-v1.ts`, 8 tests). Deliberately NOT wired into `keyword-recognition-v1.ts`'s exact-token matching: `AFC-RADIX-LIVE-01` still remains gated on approved vocabulary ownership and must stay shadow-only; wiring this broader normalization into the live matcher is a separate promotion decision, not implied by the contract existing.
+4. **Superseded 2026-09-27**: `AFC-PLAN-01` (phased/cost-bounded `RetrievalPlanV1` extension), `AFC-CAND-01` (`HelperCandidateV1` executor-vs-lane normalization), `AFC-CACHE-01` (stage-specific caches), `AFC-PARAM-01` (`ParameterBindingV1` EXACT/DERIVED/DEFAULTED) are now closed as contract-only work — see the checked-off items above, all with passing focused tests. None are wired into a live request path; helper eligibility is still a review candidate, not a production caller input.
 5. `SEM-INPUT-01`'s structural-selection coverage is ~79% by extension count (TS/JS/MTS/Markdown) — extending to `.py`/`.svelte`/`.sql`/config formats is real, bounded follow-on work, not blocked on anything.
-6. `ORDINAL-VECTOR-01`/`ACE-V4-COMP-01` canaries (8/8 each) are ready to scale once `PERSISTENCE-DECISION-01` lands — same throughput numbers apply (~32 min at concurrency=4).
+6. `ORDINAL-VECTOR-01`/`ACE-V4-COMP-01` canaries (8/8 each) prove identity/vector and V4 composition patterns only. The 4,000-character canary cut and absent resumable driver must be resolved before scale-up; the earlier ~32-minute estimate is not a current full-run ETA.
 
 **This session's full real-gate closures** (for a future session's orientation, read before re-deriving any of this): ASTG-01 (ast-grep version convergence), EMB-PROV-01 (embedding provenance + a real `.env` bug fixed), external-doc sidecar migration registration, `CandidateOrdinalMapV1` integrity re-verification (16,151/16,151, pre-existing), `ORDINAL-VECTOR-01` canary (8/8), `ACE-V4-COMP-01` canary (8/8, first real V4 packets ever produced), full-corpus throughput sizing (~32min/concurrency=4, 0 failures), `CONTENT-POLICY-01` design freeze, `SEM-INPUT-01`/`SEM-INPUT-02` (real compiler, real bug found+fixed, 8/8 mixed canary), the AFC helper-routing tranche design audit + first bounded slice (built twice, concurrently, both preserved for review).
 
@@ -533,11 +570,14 @@ pipeline, not three independent gaps. The follow-up write trace below found
 the exact gap: `graphify-structural-batch-v1.ts` only invokes its materialize
 port and emits a receipt; `GraphifyStructuralMaterializer` explicitly
 returns `persistence: NOT_ATTEMPTED`, and the lifecycle reconciler requires a
-separate persistence owner. A different full-repo indexer writes
-`tree_node_id` into `codebase_chunk_index.metadata`, but no call/dataflow
-binds that writer to this Graphify batch. The producer-to-column edge remains
-open as `AFC-STRUCT-WRITE-TRACE-01`; do not infer lineage from matching field
-names.
+separate persistence owner. Earlier wording that a different full-repo indexer
+writes `tree_node_id` into `codebase_chunk_index.metadata` was based on the
+legacy `ast-treesitter-facts.mjs` header and computed `primaryNodeId`. Its SQL
+does not persist that value. Current source review classifies the Graphify
+output as disconnected from the JSONB field read by SearchRuntime; the producer
+of any historical values in that JSONB field remains unidentified. See the
+closed-negative result at `AFC-STRUCT-WRITE-TRACE-01` below; do not infer
+lineage from matching field names.
 
 **New, cheap forward option found** (not built, just recorded): ast-grep
 ships its own official MCP server for AI-agent structural queries. This
@@ -564,9 +604,12 @@ unilaterally by a future session without your input):
 3. Does `langextract-grounding` need a new `SearchRuntime` fusion lane +
    `SignalType` added, or is it a producer-only/evidence-attachment helper
    that should sit outside the fusion model entirely?
-4. `PERSISTENCE-DECISION-01` (`parent-atlas-repair-candidate-feature-matrix/tasks.md`)
-   — still blocks `SEM-MATERIALIZE-01`'s full 16,151-row run (sized, safe,
-   ~32min, just has nowhere to write yet).
+4. The former persistence-choice blocker is superseded by the user's
+   `FILES_ONLY_SEALED_ARTIFACT` decision recorded in
+   `parent-atlas-repair-candidate-feature-matrix/tasks.md`. The full run still
+   requires a resumable, checksum-sealed materializer; the old ~32-minute
+   estimate came from a different input path and is not a current runtime
+   guarantee for the SemanticInputCompilerV1 pipeline.
 
 **Do not promote, wire, or accept anything from this tranche** (the merged
 helper contract, `QUERY-RADIX-01`, any registry) until decisions 1-3 above
@@ -626,11 +669,14 @@ hits on one candidate collapse to exactly one `dense` fusion contribution
 could only assert, not fixture-prove for all 4 executors.
 
 **Authoritative going forward**: `docs/reports/afc-helper-owner-verification-v2.json`
-and its own AFC ledger updates (progress tracked there as "43/73" — a
-tracker this session's own work did not use/see the source of). This
-session's v1 receipts remain as historical evidence of the audit
-methodology, not as the current status. Do not re-derive owner status from
-the v1 files going forward — read v2 first.
+is the corrected owner-census baseline; its `nextGates` array is a point-in-time
+snapshot, not a live task controller. The current checkbox states below govern:
+later ledger evidence closes `AFC-STRUCT-WRITE-TRACE-01` and
+`AFC-LEXICAL-LANE-01`, while `AFC-OWNER-MAP-01` and promotion remain open. The
+receipt's progress value ("43/73") is historical and is not used as the live
+OpenSpec task count. This session's v1 receipts remain as historical evidence
+of the audit methodology, not as the current status. Do not re-derive owner
+status from the v1 files going forward — read v2 first.
 
 ## RECONCILIATION 2: flat status fields were hiding real distinctions (2026-09-27, external review)
 
@@ -666,14 +712,14 @@ persistence at all:
 tree-sitter-chunk
   capabilityStatus:              PROVEN            (real, wired Graphify pipeline)
   producerPath:                  LOCATED           (graphify-structural-batch-v1.ts)
-  persistenceBridge:              NOT_PROVEN        (materializer reports
+  persistenceBridge:              DISCONNECTED      (materializer reports
                                                      persistence: NOT_ATTEMPTED;
-                                                     no edge to the indexer that
-                                                     actually writes tree_node_id)
+                                                     located callers persist other
+                                                     artifacts, not the reader's JSONB)
   liveLaneExecutor:               retrieve-candidates.ts (Postgres-backed,
                                                      reads a column a DIFFERENT,
                                                      unrelated writer populates)
-  provenanceLinkToTreeSitterBatch: NOT_PROVEN
+  provenanceLinkToTreeSitterBatch: DISCONNECTED_IN_CURRENT_PATH
   fusionRole (per v2):             NOT_A_FUSION_LANE
 ```
 
@@ -709,12 +755,65 @@ checkboxes):
 | `AFC-LANE-PARITY-01` (external review's "dense-4x-parity") | CLOSED |
 | `AFC-GRAPH-LANE-01` | CLOSED |
 | `AFC-DOC-LANE-01` | CLOSED |
-| `AFC-STRUCT-WRITE-TRACE-01` | CLOSED_NEGATIVE (this pass) |
-| `AFC-LEXICAL-LANE-01` | OPEN |
+| `AFC-STRUCT-WRITE-TRACE-01A` | CLOSED_NEGATIVE (Graphify batch does not persist; field-name coincidence is not lineage) |
+| `AFC-STRUCT-WRITE-TRACE-01` | CLOSED_DISCONNECTED (current Graphify structural output is not persisted to the JSONB field read by SearchRuntime) |
+| `AFC-LEXICAL-LANE-01` | CLOSED — the checkbox and read-only trace at line 390 already reconcile router signals with SearchRuntime lanes; no adapter or fusion behavior was added. |
 | `AFC-OWNER-MAP-01` (external review's "signal-binding") | OPEN |
 | `AFC-ROUTING-PROMOTE-01` (external review's "registry-owner-split" + "registry-promote") | OPEN — needs operator decisions 1-3 above first |
-| `AFC-RADIX-ACCEPT-01` (external review's "query-radix-accept") | OPEN |
+| `AFC-RADIX-ACCEPT-01` (external review's "query-radix-accept") | CLOSED — semantics review only; V1 remains explicit-prefix prototype, not live-accepted |
 
 No registry code, SearchRuntime, or routing behavior changed in this pass —
 documentation-only, reconciling two rounds of external review on top of the
 in-progress local edit already in this file.
+
+### AFC-OWNER-04 lane/fusion reconciliation (2026-09-27; source + fixture scope)
+
+Closed only the per-helper role/lane mapping that current code and fixtures
+support. SearchRuntime's logical lane vocabulary is
+`dense|lexical|exact|ast|schema|rg|bm42`; the router's `SignalType` is a
+separate pre-fusion vocabulary, and no helper-to-router-signal mapping is
+inferred here.
+
+| Helper/capability | Current fusion result | Evidence boundary |
+|---|---|---|
+| `rg-exact` | `rg` contributor | `retrieve-candidates.ts` emits `rg_keyword`; SearchRuntime maps it to `rg`. |
+| `postgres-trigram` | `lexical` contributor | `postgres_trigram` normalizes to `lexical`. |
+| `semantic-768` | `dense` contributor | Semantic search adapter; four-executor parity remains fixture-only. |
+| Qdrant / TurboVec / cuVS / CAGRA | one `dense` vote | `AFC-LANE-PARITY-01` fixture retains executor identities while deduplicating the logical contribution. |
+| `postgres-fts` | non-fusion helper | Current FTS owner path is not adapted to SearchRuntime candidates. |
+| `tree-sitter-chunk` | evidence producer, not a fusion vote | Offline chunking capability; current Graphify persistence path is disconnected. |
+| `ast-grep-structural`, `ts-morph-symbol` | no helper-owned live fusion mapping proven | Unit/capability evidence does not prove request-time execution; the `ast`/`exact` SearchRuntime candidates have separate owners. |
+| `lsp-definition`, `lsp-references` | blocked; no lane assigned | Required live LSP executor/caller is not proven. |
+| `docs-corpus-search` | non-fusion helper | Admin docs search results are not converted to SearchRuntime candidates. |
+| `graph-ppr` | synthesis-ranking/enrichment, not SearchRuntime fusion | Admin synthesis caller is outside SearchRuntime fusion. |
+| `langextract-grounding` | evidence enrichment, not a fusion vote | Proposal/grounding path does not emit an independent SearchRuntime lane. |
+
+Validation: five focused Vitest files passed (47 tests), including helper
+routing/eligibility/candidate contracts, the isolated v2 review fixture, and
+SearchRuntime. This does not prove live service/GPU availability, actual
+production FTS/AST row lineage, or router-signal binding. `AFC-OWNER-MAP-01`
+and `AFC-ROUTING-PROMOTE-01` remain open; no registry or runtime behavior was
+changed.
+
+### AFC-STRUCT-WRITE-TRACE-01 source-only recheck (2026-09-27; closed as disconnected)
+
+- `graphify-structural-batch-v1.ts` delegates to an injected `materialize` port
+  and records the returned structural receipt; it contains no Postgres write.
+- `GraphifyStructuralMaterializer.materialize()` calls the 8095 AST provider,
+  normalizes its evidence, and returns `persistence: 'NOT_ATTEMPTED'`. Its
+  contract does not write `codebase_chunk_index.metadata` or `output_meta`.
+- The legacy `sveltekit-frontend/scripts/atlas/ast-treesitter-facts.mjs` is a
+  plausible writer by its header and local `primaryNodeId` computation, but its
+  actual `UPDATE codebase_chunk_index` persists only `ast_symbols`,
+  `ast_imports`, `ast_exports`, and timestamps; it does not persist that ID or
+  either JSONB field read below. It is not the missing producer edge.
+- The request-time reader is real but proves only the read edge:
+  `retrieveASTMatches()` selects existing rows from `codebase_chunk_index`,
+  filters on `COALESCE(metadata->>'tree_node_id', output_meta->>'tree_node_id')`,
+  and emits `scoreSource: 'ast_tree'`.
+- Other located Graphify callers either emit a coordination receipt or, under
+  explicit apply mode, persist evidence-ledger/symbol-registry records. Neither
+  writes the `codebase_chunk_index` JSONB fields read by `retrieveASTMatches()`.
+  The source-level outcome is therefore **DISCONNECTED_IN_CURRENT_PATH**, not
+  producer-to-row lineage proven. Historical JSONB population/readback remains
+  a separate owner question. No live database query or write was run.

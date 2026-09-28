@@ -7,37 +7,28 @@
 #include <cmath>
 #include <limits>
 #include <vector>
+#include <string>
 #include <torch/torch.h>
+#include "native_execution_counters.h"
+#include "native_runtime_info.h"
 
 extern "C" int checkCudaAvailable() {
   return torch::cuda::is_available() ? 1 : 0;
 }
 
 extern "C" int getCudaMemory(int64_t* free_bytes, int64_t* total_bytes) {
-  if (!torch::cuda::is_available()) {
-    if (free_bytes) *free_bytes = 0;
-    if (total_bytes) *total_bytes = 0;
-    return -1;
-  }
-  // Best-effort: try CUDA runtime query
-  size_t free_mem = 0, total_mem = 0;
-#ifdef __CUDACC__
-  // If CUDA runtime available in this build, use cudaMemGetInfo
-  cudaError_t err = cudaMemGetInfo(&free_mem, &total_mem);
-  if (err != cudaSuccess) {
-    if (free_bytes) *free_bytes = 0;
-    if (total_bytes) *total_bytes = 0;
-    return -2;
-  }
-  if (free_bytes) *free_bytes = (int64_t)free_mem;
-  if (total_bytes) *total_bytes = (int64_t)total_mem;
-  return 0;
-#else
-  // CUDA runtime not visible; return unknown but indicate CUDA available
   if (free_bytes) *free_bytes = 0;
   if (total_bytes) *total_bytes = 0;
+
+  AtlasCudaRuntimeInfo runtime{};
+  const int query_rc = atlasGetCudaRuntimeInfo(&runtime);
+  if (query_rc <= 0 || runtime.query_status != 0 || !runtime.cuda_runtime_available) {
+    return query_rc < 0 ? query_rc : (runtime.query_status != 0 ? runtime.query_status : -1);
+  }
+  if (!free_bytes || !total_bytes) return -1;
+  *free_bytes = static_cast<int64_t>(runtime.free_bytes);
+  *total_bytes = static_cast<int64_t>(runtime.total_bytes);
   return 0;
-#endif
 }
 
 // Placeholder implementations: real optimized GPU kernels should be
@@ -61,6 +52,7 @@ extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* o
       output[i * n + j] = dot / (sqrtf(na) * sqrtf(nb) + 1e-12f);
     }
   }
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
 
@@ -94,6 +86,7 @@ extern "C" int batchCosineSimilarity(const float* query, int dim, const float* c
         c_cpu, torch::nn::functional::NormalizeFuncOptions().p(2).dim(1));
       auto result = torch::mm(q_norm, c_norm.t()).squeeze(0).contiguous();
       std::memcpy(scores, result.data_ptr<float>(), static_cast<size_t>(n) * sizeof(float));
+      atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
       return 0;
     } catch (const c10::Error&) {
       // Continue to the scalar correctness fallback below.
@@ -106,6 +99,7 @@ extern "C" int batchCosineSimilarity(const float* query, int dim, const float* c
       for (int d = 0; d < dim; ++d) { dot += query[d] * c[d]; na += query[d]*query[d]; nb += c[d]*c[d]; }
       scores[i] = dot / (sqrtf(na) * sqrtf(nb) + 1e-12f);
     }
+    atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
     return 0;
   }
 
@@ -134,15 +128,20 @@ extern "C" int batchCosineSimilarity(const float* query, int dim, const float* c
     // Async D2H back into the caller's buffer (pinned scores buffer for max throughput).
     auto scores_tensor = torch::from_blob(scores, {n}, torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCPU));
     scores_tensor.copy_(result.to(torch::kCPU));
+    atlasNativeCounterRecord(AtlasExecutionCounter::cuda_execution);
     return 0;
   } catch (const c10::Error& e) {
     // CUDA OOM or device error — fall back to CPU
+    atlasNativeCounterRecord(AtlasExecutionCounter::cuda_error_fallback);
+    if (std::string(e.what()).find("out of memory") != std::string::npos)
+      atlasNativeCounterRecord(AtlasExecutionCounter::oom_fallback);
     for (int i = 0; i < n; ++i) {
       const float* c = corpus + (size_t)i * dim;
       float dot = 0.0f, na = 0.0f, nb = 0.0f;
       for (int d = 0; d < dim; ++d) { dot += query[d] * c[d]; na += query[d]*query[d]; nb += c[d]*c[d]; }
       scores[i] = dot / (sqrtf(na) * sqrtf(nb) + 1e-12f);
     }
+    atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
     return 0;
   }
 }
@@ -171,6 +170,7 @@ extern "C" int computeCaseEmbedding(const float* weights, int n, const float* em
   if (norm > 1e-12) {
     for (int d = 0; d < dim; ++d) output[d] = (float)(output[d] / norm);
   }
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
 
@@ -219,5 +219,6 @@ extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k,
   }
   std::copy(next_assignments.begin(), next_assignments.end(), assignments);
   if (out_reseeded_count) *out_reseeded_count = 0;
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }

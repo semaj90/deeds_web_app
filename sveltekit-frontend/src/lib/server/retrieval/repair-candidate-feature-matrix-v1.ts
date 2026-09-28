@@ -208,6 +208,44 @@ function assertFinite(value: number, code: string): void {
   if (!Number.isFinite(value)) throw new Error(code);
 }
 
+/**
+ * CFM-PRESENCE-NULLABILITY-01: required identity/revision string fields must reject
+ * undefined, null, '', and whitespace-only forms alike. A bare `!value` falsy check
+ * (the pre-existing pattern this replaces) rejects '' but NOT '   ' — letting a
+ * blank-but-truthy string masquerade as qualified provenance.
+ */
+function assertNonBlankString(value: unknown, code: string): asserts value is string {
+  if (typeof value !== 'string' || value.trim().length === 0) throw new Error(code);
+}
+
+/**
+ * Optional revision fields (sourceRevision, workspaceRevision, representationRevision, etc.)
+ * legitimately may be absent (null/undefined = "not supplied"). But if a caller supplies a
+ * value at all, it must not be blank/whitespace-only — that is never a real revision token.
+ */
+function assertOptionalNonBlankString(
+  value: string | null | undefined,
+  code: string,
+): void {
+  if (value === null || value === undefined) return;
+  assertNonBlankString(value, code);
+}
+
+const OPTIONAL_REVISION_FIELDS = [
+  'sourceRevision',
+  'workspaceRevision',
+  'treeNodeId',
+  'stableSymbolId',
+  'symbolVersionId',
+  'observationFeatureRevision',
+  'astGraphRevision',
+  'compilerSemanticGraphRevision',
+  'relationshipGraphRevision',
+  'semanticRevision',
+  'representationRevision',
+  'analysisPassSetChecksum',
+] as const satisfies readonly (keyof RepairCandidateIdentityInputV1)[];
+
 function validateOverlayFeatureState(
   feature: RepairOverlayFeatureName,
   state: RepairFeaturePresenceState,
@@ -278,10 +316,17 @@ export function buildRepairCandidateFeatureMatrixV1(
     if (identity.candidateOrdinal !== row) {
       throw new Error(`REPAIR_CANDIDATE_ORDINAL_ROW_MISMATCH:${row}`);
     }
-    if (!identity.packetKey || seenPacketKeys.has(identity.packetKey)) {
+    assertNonBlankString(identity.packetKey, `REPAIR_PACKET_KEY_INVALID_OR_DUPLICATE:${row}`);
+    if (seenPacketKeys.has(identity.packetKey)) {
       throw new Error(`REPAIR_PACKET_KEY_INVALID_OR_DUPLICATE:${row}`);
     }
-    if (!identity.sourceRef) throw new Error(`REPAIR_SOURCE_REF_REQUIRED:${row}`);
+    assertNonBlankString(identity.sourceRef, `REPAIR_SOURCE_REF_REQUIRED:${row}`);
+    for (const field of OPTIONAL_REVISION_FIELDS) {
+      assertOptionalNonBlankString(
+        identity[field],
+        `REPAIR_${field.replace(/[A-Z]/g, (c) => `_${c}`).toUpperCase()}_BLANK:${row}`,
+      );
+    }
     if (baseMatrix.candidate_packet_keys[row] !== identity.packetKey) {
       throw new Error(`REPAIR_BASE_PACKET_KEY_MISMATCH:${row}`);
     }

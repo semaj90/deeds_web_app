@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.hyperedge-evidence-parity-summary.v1",
+  "status": "ZOD_PYDANTIC_PARITY_PROVEN",
+  "contract": {
+    "schemaId": "atlas.hyperedge-evidence.v1",
+    "schemaVersion": "1",
+    "schemaChecksum": "sha256:0ccf51a595dd4ba494b36dd2c3036a29055099a591d9d16d853bc7dbe0cefbaf",
+    "producerRevision": "sha256:83f4a660efab9be43f068714b2f626a8235abce6b5096d3c4a02b184a7fd1ec6"
+  },
+  "sealedInput": {
+    "manifest": ".tmp/atlas/contract-parity-v1/atlas.hyperedge-evidence.v1/20260927T213617Z/manifest.json",
+    "manifestChecksum": "sha256:32652be312aa4f18c639df53c47e297ab2746129c6c5faf759de2abecc35ca90",
+    "fixtureManifestChecksum": "sha256:35fcb9d89c28cb1df4f7b37164e097daf8db2edca64c4641c85662d21a08f701",
+    "runnerReceipt": ".tmp/atlas/contract-parity-v1/hyperedge-evidence-receipt-20260927T213617Z.json"
+  },
+  "fixtures": {
+    "total": 16,
+    "zodAccepts": 2,
+    "zodRejects": 14,
+    "crossFieldDeclared": 6,
+    "crossFieldMatching": 6
+  },
+  "proofs": {
+    "schemaIdAndVersionIdentical": true,
+    "propertySetsIdentical": true,
+    "enumSetsIdentical": true,
+    "requiredFieldsIdentical": true,
+    "extraPropertiesRejected": true,
+    "fixtureVerdictsIdentical": true,
+    "wrongVerdictDetected": true,
+    "droppedPropertyDetected": true,
+    "tamperedSchemaChecksumDetected": true
+  },
+  "contractBoundary": {
+    "wrapsExistingHyperedgeV1": true,
+    "evidenceRefsExplicitlyBound": true,
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "isPersistenceOrGraphPromotionProof": false
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "limitations": [
+    "Cross-field parity is fixture-proven; JSON Schema does not encode the Zod superRefine or Pydantic model-validator rules.",
+    "The proof validates a bounded synthetic fixture bundle only; it does not establish live hyperedge persistence, source admission, graph projection, or production callers."
+  ]
+}

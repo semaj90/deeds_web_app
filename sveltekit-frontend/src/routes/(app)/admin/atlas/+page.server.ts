@@ -27,7 +27,14 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	const docsQuery = (url.searchParams.get('docq') ?? '').trim().slice(0, 300);
 	const docsProduct = (url.searchParams.get('docprod') ?? '').trim().slice(0, 100);
 	const docsVersion = (url.searchParams.get('docver') ?? '').trim().slice(0, 100);
+	const localDocsQuery = (url.searchParams.get('localDocq') ?? '').trim().slice(0, 120);
+	const localDocsOffsetRaw = Number(url.searchParams.get('localDocOffset') ?? 0);
+	const localDocsOffset = Number.isSafeInteger(localDocsOffsetRaw) && localDocsOffsetRaw >= 0 ? Math.min(localDocsOffsetRaw, 100_000) : 0;
+	const localDocsManifestChecksum = url.searchParams.get('manifestChecksum') ?? '';
 	const docsCorpusPromise = fetch('/api/admin/atlas/docs-corpus')
+		.then(async (r) => (r.ok ? await r.json() : null))
+		.catch(() => null);
+	const localDocsSnapshotPromise = fetch(`/api/admin/atlas/docs-corpus/local-snapshot?q=${encodeURIComponent(localDocsQuery)}&offset=${localDocsOffset}${localDocsManifestChecksum ? `&manifestChecksum=${encodeURIComponent(localDocsManifestChecksum)}` : ''}`)
 		.then(async (r) => (r.ok ? await r.json() : null))
 		.catch(() => null);
 	const docsSearchPromise = docsQuery.length >= 2
@@ -42,13 +49,14 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 			.catch(() => null)
 		: Promise.resolve(null);
 
-	const [health, runtimeRegistry, documentGovernance, cacheStats, docsCorpus, docsSearch] = await Promise.all([
+	const [health, runtimeRegistry, documentGovernance, cacheStats, docsCorpus, docsSearch, localDocsSnapshot] = await Promise.all([
 		healthPromise,
 		runtimeRegistryPromise,
 		documentGovernancePromise,
 		cacheStatsPromise,
 		docsCorpusPromise,
-		docsSearchPromise
+		docsSearchPromise,
+		localDocsSnapshotPromise
 	]);
 
 	const workflowTaskId = url.searchParams.get('taskId');
@@ -75,7 +83,10 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		cacheStats,
 		docsCorpus,
 		docsSearch,
+		localDocsSnapshot,
 		docsQuery,
+		localDocsQuery,
+		localDocsOffset,
 		docsProduct,
 		docsVersion,
 		workflowStatus: workflowStatus?.status ?? null,

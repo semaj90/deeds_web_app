@@ -1,7 +1,7 @@
 {
   "schema": "atlas.symbol-revision-producer-census.v1",
   "gate": "S01-10A",
-  "generatedAt": "2026-09-21T23:56:06.268Z",
+  "generatedAt": "2026-09-27T22:16:14.181Z",
   "findings": {
     "placeholderRegistryRows": 10220,
     "placeholderOriginExactExpression": "NOT a fallback expression in any symbol writer: no writer contains a `workspace:` literal or a revision fallback. The writers PASS THROUGH the revision value of their input row. The literal value `workspace:0` was already present in the 2026-08-24 nominations input (a `workspace:${workspace_id}` namespace label with workspace_id 0 used where a revision belongs; prove-ast-backfill-idempotency.mjs calls these \"legacy-coerced\"). The exact generating call site of that Aug-24 input is not recoverable: the input artifact has since been regenerated fully qualified.",
@@ -18,6 +18,7 @@
         "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf"
       ],
       "versionProducer": [
+        "atlas-ast-symbol-version-materializer-v1",
         "symbol-reconciliation-writer-v1"
       ]
     },
@@ -68,11 +69,11 @@
   "versionsByProducerAndShape": [
     {
       "producer": "atlas-ast-symbol-version-materializer-v1",
-      "source_shape": "PLACEHOLDER_workspace_N",
-      "workspace_shape": "PLACEHOLDER_workspace_N",
-      "rows": 200,
-      "sample_source": "workspace:0",
-      "sample_workspace": "workspace:0"
+      "source_shape": "QUALIFIED_SHA256",
+      "workspace_shape": "QUALIFIED_SHA256",
+      "rows": 208,
+      "sample_source": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+      "sample_workspace": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
     },
     {
       "producer": "symbol-reconciliation-writer-v1",
@@ -84,11 +85,11 @@
     },
     {
       "producer": "atlas-ast-symbol-version-materializer-v1",
-      "source_shape": "LEGACY_40HEX",
-      "workspace_shape": "QUALIFIED_SHA256",
-      "rows": 85,
-      "sample_source": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
-      "sample_workspace": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9"
+      "source_shape": "PLACEHOLDER_workspace_N",
+      "workspace_shape": "PLACEHOLDER_workspace_N",
+      "rows": 77,
+      "sample_source": "workspace:0",
+      "sample_workspace": "workspace:0"
     }
   ],
   "registrySymbolsByRevisionShapeAndVersionEvidence": [
@@ -139,11 +140,19 @@
         "revisionFallbackExpressions": [],
         "revisionRelatedLines": [
           {
-            "line": 135,
-            "text": "created_from_source_revision, registry_revision, status"
+            "line": 130,
+            "text": "const provenanceMap = await q.loadBindingProvenanceV1(pool, batch.map(([, r]) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));"
+          },
+          {
+            "line": 134,
+            "text": "const verdict = q.admitLogicalSymbolRegistryV1({ sourceRef: row.source_ref, createdFromSourceRevision: row.source_revision, registryRevision: REGISTRY_REVISION,"
           },
           {
             "line": 148,
+            "text": "created_from_source_revision, registry_revision, status"
+          },
+          {
+            "line": 161,
             "text": "row.source_revision,"
           }
         ],
@@ -183,25 +192,33 @@
         "randomUuid": false,
         "revisionFallbackExpressions": [
           {
-            "line": 125,
+            "line": 137,
             "text": "if (!actual || actual.stable_symbol_id !== row.stable_symbol_id || actual.canonical_key !== row.symbol_key || actual.language !== row.language || actual.symbol_"
           }
         ],
         "revisionRelatedLines": [
           {
-            "line": 100,
+            "line": 98,
+            "text": "const provenanceMap = await q.loadBindingProvenanceV1(pool, rows.map((r) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));"
+          },
+          {
+            "line": 101,
+            "text": "const verdict = q.admitLogicalSymbolRegistryV1({ sourceRef: row.source_ref, createdFromSourceRevision: row.source_revision, registryRevision: 'atlas-current-tre"
+          },
+          {
+            "line": 112,
             "text": "created_from_source_ref, created_from_source_revision, registry_revision, status)"
           },
           {
-            "line": 105,
+            "line": 117,
             "text": "row.qualified_name, row.nomination_id, row.source_ref, row.source_revision,"
           },
           {
-            "line": 115,
+            "line": 127,
             "text": "created_from_source_ref, created_from_source_revision, registry_revision, status"
           },
           {
-            "line": 125,
+            "line": 137,
             "text": "if (!actual || actual.stable_symbol_id !== row.stable_symbol_id || actual.canonical_key !== row.symbol_key || actual.language !== row.language || actual.symbol_"
           }
         ],
@@ -235,42 +252,42 @@
         "randomUuid": false,
         "revisionFallbackExpressions": [
           {
-            "line": 72,
+            "line": 73,
             "text": "graphifySourceRevision: node.graphifySourceRevision ?? node.sourceRevision,"
           }
         ],
         "revisionRelatedLines": [
           {
-            "line": 85,
+            "line": 86,
             "text": "const revisionQualifiedRows = rows.filter((row) => row.source_revision && row.workspace_revision);"
           },
           {
-            "line": 93,
+            "line": 94,
             "text": "missingSourceRevision: rows.filter((row) => !row.source_revision).length,"
           },
           {
-            "line": 94,
+            "line": 95,
             "text": "missingWorkspaceRevision: rows.filter((row) => !row.workspace_revision).length,"
           },
           {
-            "line": 109,
+            "line": 112,
             "text": "&& comparableRevision(node.graphifySourceRevision) === comparableRevision(row.source_revision)"
           },
           {
-            "line": 139,
+            "line": 136,
+            "text": "const provenanceMap = await q.loadBindingProvenanceV1(pool, batch.map((r) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));"
+          },
+          {
+            "line": 142,
+            "text": "const verdict = q.qualifySymbolVersionRevisionsV1({ sourceRef: row.source_ref, sourceRevision: row.source_revision, workspaceRevision: row.workspace_revision, p"
+          },
+          {
+            "line": 151,
             "text": "sourceRevision: row.source_revision,"
           },
           {
-            "line": 145,
+            "line": 157,
             "text": "symbol_version_id, stable_symbol_id, source_ref, source_revision, workspace_revision,"
-          },
-          {
-            "line": 153,
-            "text": "symbolVersionId, resolution.stable_symbol_id, row.source_ref, row.source_revision,"
-          },
-          {
-            "line": 154,
-            "text": "row.workspace_revision, row.upstream_node_id, null,"
           }
         ],
         "upstreamFileIdWritten": "column named"
@@ -278,15 +295,15 @@
       "rowsAttributed": [
         {
           "table": "atlas_symbol_versions",
-          "sourceShape": "PLACEHOLDER_workspace_N",
-          "workspaceShape": "PLACEHOLDER_workspace_N",
-          "rows": 200
+          "sourceShape": "QUALIFIED_SHA256",
+          "workspaceShape": "QUALIFIED_SHA256",
+          "rows": 208
         },
         {
           "table": "atlas_symbol_versions",
-          "sourceShape": "LEGACY_40HEX",
-          "workspaceShape": "QUALIFIED_SHA256",
-          "rows": 85
+          "sourceShape": "PLACEHOLDER_workspace_N",
+          "workspaceShape": "PLACEHOLDER_workspace_N",
+          "rows": 77
         }
       ]
     },
@@ -310,36 +327,36 @@
         "revisionFallbackExpressions": [],
         "revisionRelatedLines": [
           {
-            "line": 65,
+            "line": 66,
             "text": "`SELECT canonical_source_ref FROM atlas_workspace_source_bindings WHERE workspace_revision = $1`,"
-          },
-          {
-            "line": 103,
-            "text": "? `workspace_revision ${targetWorkspaceRevision} has zero rows in atlas_workspace_source_bindings -- this is exactly the ungrounded-revision failure mode flagge"
           },
           {
             "line": 104,
+            "text": "? `workspace_revision ${targetWorkspaceRevision} has zero rows in atlas_workspace_source_bindings -- this is exactly the ungrounded-revision failure mode flagge"
+          },
+          {
+            "line": 105,
             "text": ": `workspace_revision ${targetWorkspaceRevision} has ${('boundSourceRefCount' in gate ? gate.boundSourceRefCount : 0)} bound source_refs, but graphify_symbols h"
           },
           {
-            "line": 116,
+            "line": 117,
             "text": "`SELECT canonical_source_ref FROM atlas_workspace_source_bindings WHERE workspace_revision = $1`,"
           },
           {
-            "line": 151,
-            "text": "source_revision: targetWorkspaceRevision,"
-          },
-          {
             "line": 152,
-            "text": "workspace_revision: targetWorkspaceRevision,"
-          },
-          {
-            "line": 173,
             "text": "source_revision: targetWorkspaceRevision,"
           },
           {
-            "line": 174,
+            "line": 153,
             "text": "workspace_revision: targetWorkspaceRevision,"
+          },
+          {
+            "line": 175,
+            "text": "const provenanceMap = await loadBindingProvenanceV1(pool, nominations.map((n) => ({ sourceRef: n.source_ref, sourceRevision: n.source_revision })));"
+          },
+          {
+            "line": 177,
+            "text": "const v = qualifyPromotionNominationV1(n, targetWorkspaceRevision, provenanceForV1(provenanceMap, n.source_ref, n.source_revision));"
           }
         ],
         "upstreamFileIdWritten": "no"
@@ -380,6 +397,6 @@
     "newIdentityNamespaceCreated": false,
     "transaction": "REPEATABLE READ READ ONLY, ROLLBACK"
   },
-  "receiptChecksum": "sha256:d524f0d57440318f61fd8bf62c846d785e0d9968156e49d83220f3b6b48165ab",
-  "versionedReceipt": "docs/reports/symbol-revision-producer-census-v1.d524f0d57440.json"
+  "receiptChecksum": "sha256:aa83abdef950d2f8af2d7819bbcee38d5272e9a85c8b941e434f33f6293249e0",
+  "versionedReceipt": "docs/reports/symbol-revision-producer-census-v1.aa83abdef950.json"
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { compileSemanticInputArtifactV1, renderSemanticInputText } from './semantic-input-compiler-v1.js';
-import { SELECTION_POLICY_REVISIONS, semanticInputArtifactV1Schema } from './semantic-input-artifact-v1.js';
+import { compileSemanticEmbeddingInputV1, compileSemanticInputArtifactV1, renderSemanticInputText } from './semantic-input-compiler-v1.js';
+import { SEMANTIC_EMBEDDING_INPUT_MAX_TOKENS, SEMANTIC_EMBEDDING_INPUT_POLICY_REVISION, SELECTION_POLICY_REVISIONS, semanticEmbeddingInputV1Schema, semanticInputArtifactV1Schema, sha256HexPrefixed } from './semantic-input-artifact-v1.js';
 
 const SOURCE_REVISION = 'sha256:' + '0'.repeat(64);
 
@@ -97,5 +97,53 @@ describe('compileSemanticInputArtifactV1', () => {
     const a2 = await compileSemanticInputArtifactV1({ canonicalId: 'c', packetKey: null, sourceRef: 'a.ts', sourceRevision: SOURCE_REVISION, fileBuffer: Buffer.from(src) });
     expect(a1.renderedTextChecksum).toBe(a2.renderedTextChecksum);
     expect(a1.renderedTextChecksum).not.toBe('sha256:' + require('node:crypto').createHash('sha256').update(src).digest('hex'));
+  });
+
+  it('binds the exact selected text counted by the tokenizer to the admitted embedding input', async () => {
+    const buf = Buffer.from('function exactInput() { return "same bytes"; }\n');
+    const artifact = await compileSemanticInputArtifactV1({ canonicalId: 'test:exact', packetKey: null, sourceRef: 'src/exact.ts', sourceRevision: SOURCE_REVISION, fileBuffer: buf });
+    let tokenizedText = '';
+    const input = await compileSemanticEmbeddingInputV1({
+      artifact,
+      fileBuffer: buf,
+      tokenizerRevision: 'test-tokenizer:v1',
+      tokenize: async (text) => { tokenizedText = text; return text.trim().split(/\s+/).length; },
+    });
+
+    semanticEmbeddingInputV1Schema.parse(input);
+    expect(input.status).toBe('ADMITTED');
+    expect(input.inputPolicyRevision).toBe(SEMANTIC_EMBEDDING_INPUT_POLICY_REVISION);
+    expect(input.contentSelectionRevision).toBe(artifact.selectionPolicyRevision);
+    expect(input.inputText).toBe(tokenizedText);
+    expect(input.embeddedInputChecksum).toBe(sha256HexPrefixed(Buffer.from(tokenizedText, 'utf8')));
+    expect(input.renderedTextChecksum).toBe(artifact.renderedTextChecksum);
+  });
+
+  it('rejects over-budget text without truncating or returning sendable input', async () => {
+    const buf = Buffer.from('function overBudget() { return 1; }\n');
+    const artifact = await compileSemanticInputArtifactV1({ canonicalId: 'test:budget', packetKey: null, sourceRef: 'src/budget.ts', sourceRevision: SOURCE_REVISION, fileBuffer: buf });
+    let tokenizedText = '';
+    const input = await compileSemanticEmbeddingInputV1({
+      artifact,
+      fileBuffer: buf,
+      tokenizerRevision: 'test-tokenizer:v1',
+      tokenize: async (text) => { tokenizedText = text; return SEMANTIC_EMBEDDING_INPUT_MAX_TOKENS + 1; },
+    });
+
+    expect(input.status).toBe('REJECTED_OVER_BUDGET');
+    expect(input.inputText).toBeNull();
+    expect(input.embeddedTokenCount).toBe(SEMANTIC_EMBEDDING_INPUT_MAX_TOKENS + 1);
+    expect(input.embeddedInputChecksum).toBe(sha256HexPrefixed(Buffer.from(tokenizedText, 'utf8')));
+  });
+
+  it('fails closed if the source bytes changed after compilation', async () => {
+    const original = Buffer.from('function stable() { return 1; }\n');
+    const artifact = await compileSemanticInputArtifactV1({ canonicalId: 'test:drift', packetKey: null, sourceRef: 'src/stable.ts', sourceRevision: SOURCE_REVISION, fileBuffer: original });
+    await expect(compileSemanticEmbeddingInputV1({
+      artifact,
+      fileBuffer: Buffer.from('function stable() { return 2; }\n'),
+      tokenizerRevision: 'test-tokenizer:v1',
+      tokenize: async () => 1,
+    })).rejects.toThrow('SEMANTIC_INPUT_SOURCE_SEGMENT_CHECKSUM_MISMATCH');
   });
 });

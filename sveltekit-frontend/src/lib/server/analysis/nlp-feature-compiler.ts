@@ -89,8 +89,13 @@ export const AstUnitSchema = z
 	.object({
 		sourceRef: z.string().min(1),
 		sourceRevision: z.string().min(1),
+		packetKey: z.string().min(1).nullable().default(null),
 		treeNodeId: z.string().min(1),
 		symbolVersionId: z.string().min(1).nullable().default(null),
+		// Matches the Python twin's `canonical_authority: Literal[False]` — tree_node_id/
+		// symbol_version_id here are sidecar-local digests, proposal coordinates only. Never
+		// silently promotable to atlas_symbol_versions/CandidateOrdinal/GraphNodeKey identity.
+		canonicalAuthority: z.literal(false).default(false),
 		language: z.string().min(1),
 		nodeKind: z.string().min(1),
 		qualifiedSymbol: z.string().min(1).nullable().default(null),

@@ -59,4 +59,20 @@ describe('SemanticCandidateSnapshotV1', () => {
       rows: rows().map((row) => row.candidateOrdinal === 0 ? { ...row, vector: [Number.NaN] } : row),
     })).toThrow('SEMANTIC_CANDIDATE_SNAPSHOT_DIMENSION');
   });
+
+  it('requires a nonblank cohort representation revision', () => {
+    expect(() => buildSemanticCandidateSnapshotV1({
+      ordinalMap: map(),
+      representationRevision: '  ',
+      rows: rows(),
+    })).toThrow('SEMANTIC_CANDIDATE_SNAPSHOT_REPRESENTATION_REVISION_REQUIRED');
+  });
+
+  it('requires complete ordinal coverage rather than treating absent rows as zero-valued features', () => {
+    expect(() => buildSemanticCandidateSnapshotV1({
+      ordinalMap: map(),
+      representationRevision,
+      rows: rows().slice(1),
+    })).toThrow('SEMANTIC_CANDIDATE_SNAPSHOT_ROW_COUNT_MISMATCH');
+  });
 });

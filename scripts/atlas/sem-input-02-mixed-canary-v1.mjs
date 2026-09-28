@@ -10,8 +10,8 @@
  *      kind (structural declarations for TS/JS, heading section for MD,
  *      an explicitly-named WHOLE_FILE_FALLBACK for anything without a
  *      supported grammar -- never a silent truncation).
- *   2. That selected content tokenizes and embeds successfully through the
- *      EMB-PROV-01-proven executor.
+ *   2. The exact selected content is token-counted and, if within budget,
+ *      embedded unchanged through the EMB-PROV-01-proven executor.
  *   3. The resulting content-selection policy is honestly, distinctly
  *      labeled per row (`selectionPolicyRevision`), not one blanket string.
  *
@@ -50,12 +50,15 @@ for (const envFile of ['.env', '.env.local']) {
 // has zero SvelteKit ($lib) dependencies, using Node's native TS stripping.
 const compilerUrl = pathToFileURL(path.join(FRONTEND_ROOT, 'src/lib/server/atlas/features/semantic-input-compiler-v1.ts')).href;
 const artifactUrl = pathToFileURL(path.join(FRONTEND_ROOT, 'src/lib/server/atlas/features/semantic-input-artifact-v1.ts')).href;
-const { compileSemanticInputArtifactV1, renderSemanticInputText } = await import(compilerUrl);
+const { compileSemanticEmbeddingInputV1, compileSemanticInputArtifactV1 } = await import(compilerUrl);
 const { semanticInputArtifactV1Schema } = await import(artifactUrl);
+const requestV2Url = pathToFileURL(path.join(FRONTEND_ROOT, 'src/lib/server/atlas/features/semantic-embedding-request-v2.ts')).href;
+const { prepareStrictEmbeddingRequestV2 } = await import(requestV2Url);
 
 const MAP_ARTIFACT = path.join(REPO_ROOT, '.tmp/atlas/cei24-candidate-ordinal-map-v1/20260926T161327.479Z/candidate-ordinal-map-v1.json');
 const EMBEDDING_URL = process.env.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081';
 const EMBEDDING_MODEL = process.env.EMBEDDING_SERVER_MODEL ?? 'embeddinggemma';
+const EMBEDDING_TOKENIZER_REVISION = process.env.EMBEDDING_TOKENIZER_REVISION;
 
 const sampleArg = process.argv.find((a) => a.startsWith('--sample='));
 const SAMPLE_SIZE = sampleArg ? Number(sampleArg.split('=')[1]) : 30;
@@ -68,7 +71,8 @@ async function tokenize(text) {
   });
   if (!res.ok) throw new Error(`TOKENIZE_HTTP_${res.status}`);
   const body = await res.json();
-  return Array.isArray(body.tokens) ? body.tokens.length : null;
+  if (!Array.isArray(body.tokens)) throw new Error('TOKENIZE_RESPONSE_MISSING_TOKENS');
+  return body.tokens.length;
 }
 
 async function embed(text) {
@@ -85,6 +89,7 @@ async function embed(text) {
 }
 
 async function main() {
+  if (!EMBEDDING_TOKENIZER_REVISION) throw new Error('EMBEDDING_TOKENIZER_REVISION_REQUIRED');
   const map = JSON.parse(readFileSync(MAP_ARTIFACT, 'utf8'));
 
   // Stratified sample: group real candidates by extension, take a
@@ -127,11 +132,31 @@ async function main() {
       });
       semanticInputArtifactV1Schema.parse(artifact); // fail loudly on any contract violation
 
-      const renderedText = renderSemanticInputText(artifact, buf);
-      if (!renderedText.trim()) { results.push({ ...row, status: 'EMPTY_RENDERED_TEXT' }); continue; }
+      const embeddingInput = await compileSemanticEmbeddingInputV1({
+        artifact,
+        fileBuffer: buf,
+        tokenizerRevision: EMBEDDING_TOKENIZER_REVISION,
+        tokenize,
+      });
+      if (embeddingInput.status !== 'ADMITTED' || embeddingInput.inputText === null) {
+        results.push({
+          ...row,
+          status: embeddingInput.status,
+          contentSelectionRevision: embeddingInput.contentSelectionRevision,
+          inputPolicyRevision: embeddingInput.inputPolicyRevision,
+          tokenizerRevision: embeddingInput.tokenizerRevision,
+          embeddedTokenCount: embeddingInput.embeddedTokenCount,
+          embeddedInputChecksum: embeddingInput.embeddedInputChecksum,
+          renderedTextChecksum: embeddingInput.renderedTextChecksum,
+        });
+        continue;
+      }
 
-      const tokenCount = await tokenize(renderedText);
-      const vector = await embed(renderedText.length > 4000 ? renderedText.slice(0, 4000) : renderedText);
+      // Independently verify canonical artifact bytes and exact selected text
+      // before the executor call. The live legacy executor remains separate
+      // from /embed/v2; this receipt proves caller preparation only.
+      const preparedRequest = prepareStrictEmbeddingRequestV2({ artifact, fileBuffer: buf, embeddingInput });
+      const vector = await embed(preparedRequest.request.text);
 
       policyCounts[artifact.selectionPolicyRevision] = (policyCounts[artifact.selectionPolicyRevision] ?? 0) + 1;
 
@@ -142,10 +167,15 @@ async function main() {
         segmentCount: artifact.segments.length,
         segmentKinds: [...new Set(artifact.segments.map((s) => s.kind))],
         originalBytes: buf.length,
-        renderedBytes: Buffer.byteLength(renderedText, 'utf8'),
-        selectionRatio: Math.round((Buffer.byteLength(renderedText, 'utf8') / buf.length) * 1000) / 1000,
-        tokenCount,
-        renderedTextChecksum: artifact.renderedTextChecksum,
+        renderedBytes: Buffer.byteLength(embeddingInput.inputText, 'utf8'),
+        selectionRatio: Math.round((Buffer.byteLength(embeddingInput.inputText, 'utf8') / buf.length) * 1000) / 1000,
+        tokenCount: embeddingInput.embeddedTokenCount,
+        embeddedInputChecksum: embeddingInput.embeddedInputChecksum,
+        inputArtifactChecksum: preparedRequest.request.inputArtifactChecksum,
+        contentSelectionRevision: embeddingInput.contentSelectionRevision,
+        inputPolicyRevision: embeddingInput.inputPolicyRevision,
+        tokenizerRevision: embeddingInput.tokenizerRevision,
+        renderedTextChecksum: embeddingInput.renderedTextChecksum,
         vectorDim: vector.length,
       });
     } catch (err) {
@@ -155,10 +185,10 @@ async function main() {
 
   const proven = results.filter((r) => r.status === 'SEM_INPUT_COMPILED_AND_EMBEDDED').length;
   const receipt = {
-    schema: 'atlas.sem-input-02-mixed-canary-receipt.v1',
+    schema: 'atlas.sem-input-02-mixed-canary-receipt.v2',
     generatedAt: new Date().toISOString(),
     candidateSnapshotRevision: map.candidateSnapshotRevision,
-    embeddingExecutor: { url: EMBEDDING_URL, model: EMBEDDING_MODEL },
+    embeddingExecutor: { url: EMBEDDING_URL, model: EMBEDDING_MODEL, tokenizerRevision: EMBEDDING_TOKENIZER_REVISION },
     sampleSize: sample.length,
     provenCount: proven,
     policyDistribution: policyCounts,
@@ -167,7 +197,7 @@ async function main() {
     status: proven === sample.length && sample.length > 0 ? 'SEM_INPUT_02_CANARY_PROVEN' : 'SEM_INPUT_02_CANARY_PARTIAL',
   };
 
-  const outPath = path.join(REPO_ROOT, 'docs', 'reports', `sem-input-02-mixed-canary-v1-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+  const outPath = path.join(REPO_ROOT, 'docs', 'reports', `sem-input-02-mixed-canary-v2-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
   writeFileSync(outPath, JSON.stringify(receipt, null, 2) + '\n');
   console.log(JSON.stringify({ ...receipt, results: results }, null, 2));
   console.log('\nFull receipt:', outPath);

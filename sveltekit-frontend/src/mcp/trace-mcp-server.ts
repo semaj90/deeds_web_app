@@ -46,8 +46,9 @@
  *   legal.similar_cases          — find cases similar to a reference case
  *   legal.batch_ingest           — publish document URLs to document.embed queue
  *
- * Architecture note — tools are READ-ONLY except the four ops.* tools which require an
- * operator_token to execute. Batch writes flow through graphify:* npm scripts outside the ACE hot path.
+ * Architecture note — tools are READ-ONLY except the operator-gated ops.* tools which require an
+ * operator_token. There is no generic shell/process tool exposed to models. Internal subprocesses
+ * are restricted to typed operations. Batch writes flow through governed paths outside the ACE hot path.
  *
  * TODO (optional future sidecar):
  *   LangGraph can orchestrate long-running graphify → verify → human-approval → patch workflows
@@ -10686,54 +10687,6 @@ server.registerTool(
       metadata: result.metadata,
       processing_time: result.processing_time,
     };
-  }
-);
-
-// ── Shell Tool Wrapper (Safe bash execution for Gemma4) ────────────────────────
-server.registerTool(
-  'shell.run',
-  {
-    description:
-      'Run a bash command and return output. Used by Gemma4 to safely invoke shell operations. ' +
-      'Output is truncated to 10KB to stay within context limits.',
-    inputSchema: z.object({
-      command: z.string().describe('Bash command to run'),
-      timeout_ms: z.number().int().positive().default(10000).describe('Timeout in milliseconds (max 30000)'),
-      cwd: z.string().optional().describe('Working directory for command'),
-    }),
-  },
-  async (input: Record<string, unknown>) => {
-    const { exec } = await import('child_process');
-    const { promisify } = await import('util');
-    const execAsync = promisify(exec);
-
-    const command = String(input.command ?? '').slice(0, 500);
-    const timeoutMs = Math.min(Number(input.timeout_ms ?? 10000), 30000);
-    const cwd = String(input.cwd ?? process.cwd()).slice(0, 255);
-
-    try {
-      const { stdout, stderr } = await execAsync(command, {
-        timeout: timeoutMs,
-        cwd,
-        maxBuffer: 1024 * 1024, // 1MB buffer
-      });
-
-      return {
-        status: 'success',
-        command,
-        stdout: String(stdout).slice(0, 10240),
-        stderr: String(stderr).slice(0, 5120),
-        truncated: stdout.length > 10240 || stderr.length > 5120,
-      };
-    } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : String(err);
-      return {
-        status: 'error',
-        command,
-        error: errorMsg.slice(0, 5120),
-        hint: errorMsg.includes('timeout') ? 'Command exceeded timeout limit' : undefined,
-      };
-    }
   }
 );
 

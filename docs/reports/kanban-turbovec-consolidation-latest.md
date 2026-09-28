@@ -1,20 +1,20 @@
 # TurboVec Kanban Consolidation Report
 
-Generated: 2026-09-26T22:09:48.935Z
+Generated: 2026-09-27T16:48:15.612Z
 Board tasks: 123
 Mass inputs: 6889
 Unique records: 6747
 Embedded records: 6725
-TurboVec backend mix: search-derived=5, offline=6720
+TurboVec backend mix: search-derived=7, offline=6718
 simdjson parses: 3957402 bytes
 
 ## Consolidation groups
-- **lib:cluster:0**: 6 records, 6 open, clusters=0, 17, 31, families=lib
-  - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
-  - top: lib › icons | lib › shims | lib › agent | lib › shared | lib › integrations
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:39**: 6 records, 6 open, clusters=39, 56, 70, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Summarize docs with Gemma4 and persist the compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate. | Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred
+- **lib:cluster:none**: 5 records, 5 open, clusters=none, families=lib
+  - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
+  - top: lib › icons | lib › shims | lib › agent | lib › shared | lib › data
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:82**: 5 records, 5 open, clusters=82, 99, 113, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Add Playwright test fixtures for auth + DB seeding | Add the export/import bridge that turns local SQLite research state into canonical backend rows before ACE packet generation. | Archive duplicate JSON-RPC 2.0 shim logic after the canonical handler is confirmed

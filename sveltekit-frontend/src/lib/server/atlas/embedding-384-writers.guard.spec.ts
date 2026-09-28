@@ -62,4 +62,19 @@ describe('384-dim embedding writers are frozen', () => {
 	it('has no writer outside the known legacy list', () => {
 		expect(findWriters()).toEqual([...KNOWN_LEGACY_WRITERS].sort());
 	});
+
+	it('keeps the legacy summary exporter opt-in and non-canonical', () => {
+		const source = readFileSync(resolve(REPO_ROOT, 'scripts/atlas/rebuild-gemma4-summaries-384.mjs'), 'utf8');
+		expect(source).toContain('--allow-legacy-384-write');
+		expect(source).toContain('LEGACY_384_WRITE_BLOCKED');
+		expect(source).toContain('384-D is not canonical');
+	});
+
+	it('keeps the SOM writer on strict 768-D input and gates unqualified writes', () => {
+		const source = readFileSync(resolve(REPO_ROOT, 'scripts/atlas/run-som-on-chunks.mjs'), 'utf8');
+		expect(source).toContain('const DIM        = 768');
+		expect(source).toContain('vector.length !== DIM');
+		expect(source).toContain('provenance unverified');
+		expect(source).toContain('--allow-unqualified-experimental-write');
+	});
 });

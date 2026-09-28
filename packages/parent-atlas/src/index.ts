@@ -144,6 +144,7 @@ export * from './core/qlora-dataset-export.js';
 export * from './core/ace-hypergraph-payload.js';
 export * from './core/ace-packet-v2.js';
 export * from './core/ace-packet-v3.js';
+export * from './core/ace-packet-v4.js';
 export * from './core/ace-packet-v3-structural-composer.js';
 export * from './core/ace-packet-v3-admission.js';
 export * from './core/ace-structural-section-v1.js';

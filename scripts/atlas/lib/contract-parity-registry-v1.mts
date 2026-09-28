@@ -12,6 +12,14 @@ import {
 import {
   RESEARCH_EVIDENCE_BUNDLE_SCHEMA_V1, buildResearchEvidenceBundleV1, researchEvidenceBundleChecksumV1, researchEvidenceBundleV1JsonSchema, researchEvidenceBundleV1Schema, researchEvidenceSetChecksumV1,
 } from '../../../sveltekit-frontend/src/lib/server/atlas/contracts/research-evidence-bundle-v1.js';
+import { createHyperedgeV1 } from '../../../sveltekit-frontend/src/lib/server/graph/hyperedge-contract.js';
+import {
+  buildHyperEdgeEvidenceV1, HYPEREDGE_EVIDENCE_SCHEMA_V1, hyperEdgeEvidenceV1Schema, hyperEdgeEvidenceV1JsonSchema,
+} from '../../../sveltekit-frontend/src/lib/server/atlas/contracts/hyperedge-evidence-v1.js';
+import {
+  recommendationOutcomeReceiptSchema,
+} from '../../../packages/parent-atlas/src/core/temporal-action-ledger.js';
+import { z } from 'zod';
 
 export interface ParityFixture { id: string; value: unknown; crossField?: boolean }
 export interface ParityRegistryEntry {
@@ -163,6 +171,93 @@ function bundleFixtures(): ParityFixture[] {
   ];
 }
 
+function hyperEdgeEvidenceFixtures(): ParityFixture[] {
+  const D = 'sha256:' + 'a'.repeat(64);
+  const refA = 'source:code:src/a.ts#L1-L3';
+  const refB = 'source:doc:https://example.org/spec#section-2';
+  // Normalize optional undefined participant fields exactly as JSON transport does.
+  const edge = JSON.parse(JSON.stringify(createHyperedgeV1({
+    predicate: 'SUPPORTED_BY',
+    participants: [{ canonicalId: 'claim:alpha', role: 'claim' }, { canonicalId: 'source:src-a', role: 'source' }],
+    evidenceRefs: [refA, refB], workspaceRevision: 'workspace:rev-1', graphRevision: 'graph:rev-1',
+    sourceRevision: 'source:rev-1', producerRevision: 'graphify:rev-1',
+  })));
+  const evidence = [
+    { schema: 'atlas.research-evidence.v1', evidenceId: 'evidence:a', sourceKind: 'CODE', sourceRef: 'src/a.ts', sourceRevision: 'source:rev-1', contentDigest: D, proposition: 'Code evidence supports the relation.', confidence: 0.8, evidenceRefs: [refA], webProvenance: null, producerRevision: 'research:rev-1', canonicalAuthority: false },
+    { schema: 'atlas.research-evidence.v1', evidenceId: 'evidence:b', sourceKind: 'WEB', sourceRef: 'https://example.org/spec', sourceRevision: null, contentDigest: D, proposition: 'Pinned web evidence supports the relation.', confidence: 0.7, evidenceRefs: [refB], webProvenance: { url: 'https://example.org/spec', fetchedAt: '2026-09-27T00:00:00Z', responseDigest: D }, producerRevision: 'research:rev-1', canonicalAuthority: false },
+  ];
+  const good = buildHyperEdgeEvidenceV1({
+    hyperedge: edge, evidence: evidence as any,
+    bindings: [{ evidenceId: 'evidence:a', evidenceRef: refA }, { evidenceId: 'evidence:b', evidenceRef: refB }],
+    producerRevision: 'hyperedge-evidence-fixture:v1',
+  });
+  const reorderedBindings = buildHyperEdgeEvidenceV1({
+    hyperedge: edge, evidence: evidence as any,
+    bindings: [{ evidenceId: 'evidence:b', evidenceRef: refB }, { evidenceId: 'evidence:a', evidenceRef: refA }],
+    producerRevision: 'hyperedge-evidence-fixture:v1',
+  });
+  const mutate = (over: Record<string, unknown>) => ({ ...good, ...over });
+  return [
+    fx('valid bound code and web evidence', good),
+    fx('valid reordered bindings with resealed checksum', reorderedBindings),
+    fx('extra envelope field', mutate({ extra: true })),
+    fx('canonical authority escalation', mutate({ canonicalAuthority: true })),
+    fx('writes performed escalation', mutate({ writesPerformed: true })),
+    fx('wrong schema literal', mutate({ schema: 'atlas.hyperedge-evidence.v2' })),
+    fx('empty evidence', mutate({ evidence: [] })),
+    fx('empty bindings', mutate({ bindings: [] })),
+    fx('unknown evidence id', mutate({ bindings: [{ evidenceId: 'evidence:missing', evidenceRef: refA }, { evidenceId: 'evidence:b', evidenceRef: refB }] }), true),
+    fx('item does not cite bound reference', mutate({ bindings: [{ evidenceId: 'evidence:a', evidenceRef: refB }, { evidenceId: 'evidence:b', evidenceRef: refA }] }), true),
+    fx('edge ref missing binding', mutate({ bindings: [{ evidenceId: 'evidence:a', evidenceRef: refA }] }), true),
+    fx('duplicate edge reference', mutate({ hyperedge: { ...edge, evidenceRefs: [refA, refA] } }), true),
+    fx('duplicate evidence id', mutate({ evidence: [evidence[0], { ...evidence[1], evidenceId: 'evidence:a' }] }), true),
+    fx('tampered checksum', mutate({ checksum: 'sha256:' + 'f'.repeat(64) }), true),
+    fx('nested hyperedge extra field', mutate({ hyperedge: { ...edge, packetKey: 'not-authority' } })),
+    fx('nested evidence extra field', mutate({ evidence: [{ ...evidence[0], score: 1 }, evidence[1]] })),
+  ];
+}
+
+function learningOutcomeFixtures(): ParityFixture[] {
+  const D = 'a'.repeat(64);
+  const good = {
+    schema: 'atlas.recommendation-outcome-receipt.v1',
+    recommendation_id: 'recommendation:repair-17',
+    selected_action_id: 'action:run-tests',
+    followed_recommendation: true,
+    resulting_execution_key: D,
+    outcome: 'SUCCESS_EXACT',
+    downstream_success: true,
+    evidence_refs: ['validation:test-receipt', 'source:src/example.ts'],
+    observed_at: '2026-09-27T20:30:00Z',
+    producer_revision: 'repair-runtime:v1',
+  };
+  const defaultsOmitted = {
+    recommendation_id: 'recommendation:repair-18',
+    followed_recommendation: false,
+    observed_at: '2026-09-27T20:31:00Z',
+    producer_revision: 'repair-runtime:v1',
+  };
+  const mutate = (over: Record<string, unknown>) => ({ ...good, ...over });
+  const no = (key: string) => { const value: any = { ...good }; delete value[key]; return value; };
+  return [
+    fx('valid fully qualified outcome', good),
+    fx('valid defaulted nullable fields omitted', defaultsOmitted),
+    fx('valid explicit null outcome with downstream status', mutate({ outcome: null, downstream_success: false })),
+    fx('extra outcome field', mutate({ reward: 1 })),
+    fx('wrong schema literal', mutate({ schema: 'atlas.learning-outcome.v1' })),
+    fx('missing recommendation id', no('recommendation_id')),
+    fx('empty recommendation id', mutate({ recommendation_id: '' })),
+    fx('missing followed flag', no('followed_recommendation')),
+    fx('wrong execution checksum', mutate({ resulting_execution_key: 'not-a-sha256' })),
+    fx('unknown action outcome', mutate({ outcome: 'SUCCESS' })),
+    fx('offset timestamp is not canonical UTC Z', mutate({ observed_at: '2026-09-27T20:30:00+00:00' })),
+    fx('invalid calendar date', mutate({ observed_at: '2026-02-30T20:30:00Z' })),
+    fx('empty producer revision', mutate({ producer_revision: '' })),
+    fx('wrong type for downstream success', mutate({ downstream_success: 'true' })),
+    fx('nested enum includes no implicit success inference', mutate({ outcome: null, downstream_success: true })),
+  ];
+}
+
 export const CONTRACT_PARITY_REGISTRY: Readonly<Record<string, ParityRegistryEntry>> = {
   [UNKNOWN_RESOLUTION_SCHEMA_V1]: {
     schemaId: UNKNOWN_RESOLUTION_SCHEMA_V1, schemaVersion: '1', contractFile: 'sveltekit-frontend/src/lib/server/atlas/contracts/unknown-resolution-v1.ts',
@@ -175,5 +270,15 @@ export const CONTRACT_PARITY_REGISTRY: Readonly<Record<string, ParityRegistryEnt
   [RESEARCH_EVIDENCE_BUNDLE_SCHEMA_V1]: {
     schemaId: RESEARCH_EVIDENCE_BUNDLE_SCHEMA_V1, schemaVersion: '1', contractFile: 'sveltekit-frontend/src/lib/server/atlas/contracts/research-evidence-bundle-v1.ts',
     safeParse: (v) => researchEvidenceBundleV1Schema.safeParse(v), jsonSchema: researchEvidenceBundleV1JsonSchema, fixtures: bundleFixtures,
+  },
+  [HYPEREDGE_EVIDENCE_SCHEMA_V1]: {
+    schemaId: HYPEREDGE_EVIDENCE_SCHEMA_V1, schemaVersion: '1', contractFile: 'sveltekit-frontend/src/lib/server/atlas/contracts/hyperedge-evidence-v1.ts',
+    safeParse: (v) => hyperEdgeEvidenceV1Schema.safeParse(v), jsonSchema: hyperEdgeEvidenceV1JsonSchema, fixtures: hyperEdgeEvidenceFixtures,
+  },
+  'atlas.recommendation-outcome-receipt.v1': {
+    schemaId: 'atlas.recommendation-outcome-receipt.v1', schemaVersion: '1', contractFile: 'packages/parent-atlas/src/core/temporal-action-ledger.ts',
+    safeParse: (v) => recommendationOutcomeReceiptSchema.safeParse(v),
+    jsonSchema: () => z.toJSONSchema(recommendationOutcomeReceiptSchema) as Record<string, unknown>,
+    fixtures: learningOutcomeFixtures,
   },
 };

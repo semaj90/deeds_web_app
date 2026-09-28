@@ -1,0 +1,76 @@
+{
+  "schema": "atlas.feature-promotion-readiness.v2",
+  "featureId": "semantic_768",
+  "candidateSnapshotRevision": "sha256:09bfbf6125ddc67f194edd6170f6d9c87a14d001f877eef1ec269600b2424388",
+  "ordinalMapChecksum": "90c237c8d8afd41d176540e2a5a3430ae86b626b7de94e08b49255e7b7fd4bf9",
+  "representationId": "semantic_768",
+  "storage": {
+    "table": "codebase_chunk_index",
+    "column": "content_embedding_768",
+    "storageType": "vector(768)"
+  },
+  "gates": {
+    "FEATURE_ARTIFACT_PRESENT": {
+      "state": "OPEN",
+      "evidenceRefs": [
+        "docs/reports/mapreduce-chunk-readiness-v3-20260928T012835Z.json#sha256:2451c6dd1671e649cabfe0076aeb087d333817465d8dacf1c56199d8308e847c"
+      ],
+      "note": "The readiness receipt proves measurements, not an admitted semantic feature artifact."
+    },
+    "SAME_SNAPSHOT_COORDINATES": {
+      "state": "PROVEN",
+      "evidenceRefs": [
+        "docs/reports/mapreduce-chunk-readiness-v3-20260928T012835Z.json#sha256:2451c6dd1671e649cabfe0076aeb087d333817465d8dacf1c56199d8308e847c"
+      ],
+      "note": "Candidate snapshot and ordinal map are pinned by the source receipt."
+    },
+    "GRAIN_QUALIFICATION": {
+      "state": "PROVEN",
+      "evidenceRefs": [
+        "docs/reports/mapreduce-chunk-readiness-v3-20260928T012835Z.json#sha256:2451c6dd1671e649cabfe0076aeb087d333817465d8dacf1c56199d8308e847c"
+      ],
+      "note": "packet=1520/1520; chunk=1520/1520; eligibility=1520/1520; sourceBytes=1520/1520; filesRehashed=127/127."
+    },
+    "INPUT_PROVENANCE": {
+      "state": "BLOCKED",
+      "evidenceRefs": [
+        "docs/reports/mapreduce-chunk-readiness-v3-20260928T012835Z.json#sha256:2451c6dd1671e649cabfe0076aeb087d333817465d8dacf1c56199d8308e847c"
+      ],
+      "note": "semanticPhysicalMissing=1520/1520; qualityMissing=1520/1520; representationUnqualified=1520/1520."
+    },
+    "MISSING_VALUE_POLICY": {
+      "state": "OPEN",
+      "evidenceRefs": [],
+      "note": "No cohort-bound admitted matrix artifact was evaluated by this diagnostic."
+    },
+    "PLACEHOLDER_MASKING": {
+      "state": "OPEN",
+      "evidenceRefs": [],
+      "note": "No cohort-bound placeholder-mask receipt was evaluated by this diagnostic."
+    },
+    "CONTEXT_MANIFEST_READBACK": {
+      "state": "OPEN",
+      "evidenceRefs": [],
+      "note": "ContextManifest readback was not part of the source readiness replay."
+    },
+    "PRODUCTION_SCORER_CALLER": {
+      "state": "OPEN",
+      "evidenceRefs": [],
+      "note": "Production scorer exposure was not tested by the source readiness replay."
+    },
+    "HELD_OUT_EVALUATION": {
+      "state": "DEFERRED",
+      "evidenceRefs": [],
+      "note": "No eligible frozen human relevance labels are available in this gate."
+    },
+    "PERSISTENCE_AUTHORIZATION": {
+      "state": "DEFERRED",
+      "evidenceRefs": [],
+      "note": "No persistent feature admission or DDL authorization is included."
+    }
+  },
+  "highestReadyStage": "NOT_READY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "checksum": "sha256:76e3f65b9032ed2aeb34c2853b056d73acf6633d9094e0bd70e786bf9d90eb87"
+}

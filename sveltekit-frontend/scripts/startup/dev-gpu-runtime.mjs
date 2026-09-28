@@ -24,6 +24,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
+import { isMiniforgeNlpRunning } from './miniforge-nlp-health.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_ROOT = path.resolve(__dirname, '../..');
@@ -452,19 +453,6 @@ async function isLlamaServerRunning(port = 8090) {
       signal: AbortSignal.timeout(2000),
     });
     return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-async function isMiniforgeNlpRunning(port = 8095) {
-  try {
-    const res = await fetch(`http://127.0.0.1:${port}/health`, {
-      signal: AbortSignal.timeout(2000),
-    });
-    if (!res.ok) return false;
-    const data = await res.json().catch(() => null);
-    return data?.status === 'ok' && data?.model === 'miniforge-nlp-sidecar';
   } catch {
     return false;
   }

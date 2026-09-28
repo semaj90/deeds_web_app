@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.large-corpus-qdrant-id-bridge-audit.v1",
+  "generatedAt": "2026-09-27T19:19:48.109Z",
+  "mode": "LOCAL_NDJSON_STREAM_PLUS_POSTGRES_REPEATABLE_READ_READ_ONLY",
+  "input": {
+    "path": "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+    "sha256": "6474990e4914d53dfb05ed261313bba44f97b56d9de261e75941fb34ba7b9db5",
+    "records": 76261,
+    "distinctProjectionIds": 76261,
+    "distinctIdSourceRefPairs": 76241,
+    "malformedRecords": 0,
+    "missingProjectionIds": 0,
+    "missingSourceRefs": 20
+  },
+  "postgresProjectionBridges": {
+    "codebase_chunk_index": {
+      "available": true,
+      "canonicalLocatorTable": true,
+      "projectionIdColumn": "qdrant_id",
+      "acceptedPrefixForm": "raw-point-id",
+      "matchRows": 484,
+      "matchedExportIds": 484,
+      "exactSourceRefRows": 0,
+      "duplicateMatchedIds": 0,
+      "identityWarning": "Projection ID equality is locator evidence only; it does not prove canonical identity, current source revision, content hash, or vector-byte parity."
+    },
+    "atlas_packets": {
+      "available": true,
+      "canonicalLocatorTable": true,
+      "projectionIdColumn": "qdrant_point_id",
+      "acceptedPrefixForm": "raw-point-id",
+      "matchRows": 0,
+      "matchedExportIds": 0,
+      "exactSourceRefRows": 0,
+      "duplicateMatchedIds": 0,
+      "identityWarning": "Projection ID equality is locator evidence only; it does not prove canonical identity, current source revision, content hash, or vector-byte parity."
+    },
+    "code_retrieval_chunks": {
+      "available": true,
+      "canonicalLocatorTable": false,
+      "projectionIdColumn": "qdrant_id",
+      "acceptedPrefixForm": "qdrant:<point-id>",
+      "matchRows": 1486,
+      "matchedExportIds": 1486,
+      "exactSourceRefRows": 0,
+      "duplicateMatchedIds": 0,
+      "identityWarning": "Projection ID equality is locator evidence only; it does not prove canonical identity, current source revision, content hash, or vector-byte parity."
+    }
+  },
+  "decision": "LOCATOR_CENSUS_ONLY_NO_CANONICAL_ADMISSION",
+  "safeguards": {
+    "qdrantPointIdIsCanonicalIdentity": false,
+    "sourceRefEqualityAloneProvesRevision": false,
+    "vectorsFetched": false,
+    "inferenceCalls": 0,
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "graphWrites": 0
+  }
+}

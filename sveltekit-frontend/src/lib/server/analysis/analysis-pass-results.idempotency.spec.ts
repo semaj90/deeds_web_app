@@ -58,6 +58,7 @@ const deterministicInput = {
 	passName: 'ast_symbols',
 	passRevision: 'ast-symbols-v1',
 	passType: 'ast_symbols',
+	inputHash: 'stable-ast-input-hash',
 	producerId: 'parent-atlas-analysis-worker',
 	producerRevision: 'analysis-worker-v1',
 	backend: 'native-ts' as const,

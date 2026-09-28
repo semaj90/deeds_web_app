@@ -25,6 +25,7 @@ import { createRequire } from 'module';
 import { Worker } from 'worker_threads';
 import { createHash } from 'crypto';
 import { getRedis } from '$lib/server/redis.js';
+import { bridgeCandidatePaths } from './native-addon-paths.mjs';
 
 const esmRequire = createRequire(import.meta.url);
 
@@ -88,6 +89,19 @@ export interface NativeAddonPoolStats {
   totalCapacityBytes: number;
 }
 
+interface NativeBackendInfo {
+  per_export_backend?: Record<string, { backend?: string; reason?: string }>;
+}
+
+function nativeExportHasCudaBackend(native: NativeAddon, exportName: string): boolean {
+  try {
+    const backend = native.getBackendInfo?.().per_export_backend?.[exportName]?.backend;
+    return backend === 'libtorch_cuda' || backend === 'cuda_kernel';
+  } catch {
+    return false;
+  }
+}
+
 export interface NativeAddon {
   bridgeSIMD: (json: string) => number;
   checkCudaAvailable: () => number;
@@ -127,6 +141,7 @@ export interface NativeAddon {
     outputLen: number
   ) => number;
   poolStats?: () => NativeAddonPoolStats;
+  getBackendInfo?: () => NativeBackendInfo;
   // Extended N-API exports (wired after Phase 110)
   trainSOM?: (
     data: Float32Array, n: number, dim: number,
@@ -287,39 +302,6 @@ export function getAddonInternal(): NativeAddon | null {
 
 	console.warn('[libtorch-bridge] Native addon not found, using CPU fallback');
 	return null;
-}
-
-function uniquePaths(paths: Array<string | undefined>): string[] {
-	const seen = new Set<string>();
-	const out: string[] = [];
-	for (const raw of paths) {
-		const p = raw?.trim();
-		if (!p || seen.has(p)) continue;
-		seen.add(p);
-		out.push(p);
-	}
-	return out;
-}
-
-function bridgeCandidatePaths(): string[] {
-	const envOverride = process.env.TENSORRT_BRIDGE_NODE_PATH?.trim();
-	const thisDir = dirname(fileURLToPath(import.meta.url));
-	const cwd = process.cwd();
-	return uniquePaths([
-		envOverride,
-		resolve(thisDir, '../../../../../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
-		resolve(thisDir, '../../../../../../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
-		resolve(cwd, '../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
-		resolve(cwd, 'simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
-		'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node',
-		resolve(thisDir, '../../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-		resolve(thisDir, '../../../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-		resolve(cwd, '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-		resolve(cwd, '../simd-bridge/cpp/build/tensorrt_bridge.node'),
-		resolve(cwd, '../simd-bridge/build/Release/tensorrt_bridge.node'),
-		resolve(cwd, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-		'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build/Release/tensorrt_bridge.node',
-	]);
 }
 
 /**
@@ -574,8 +556,9 @@ function cpuWeightedEmbedding(weights: number[], embeddings: number[][]): number
 
 /**
  * Cosine similarity matrix.
- * GPU: libtorch CUDA matmul. CPU: L2-cache-blocked, 8× unrolled dot product.
- * CUDA OOM guard: skips GPU if <256 MB VRAM free.
+ * Current `graphSimilarity` native export is explicitly CPU-owned; this bridge
+ * only enters a native path when per-export metadata positively identifies a
+ * CUDA backend. Otherwise it uses the local CPU oracle.
  */
 // P1: hard N-cap — n×n result matrix grows as O(n²). At n=2048 that is
 // 2048²×4 bytes = 16 MB (manageable); at n=4096 it is 64 MB on VRAM + 64 MB
@@ -599,7 +582,10 @@ export async function graphSimilarity(embeddings: number[][]): Promise<Similarit
   }
 
   const native = getAddonInternal();
-  if (native?.graphSimilarity) {
+  // Do not label a CPU-owned native export as GPU merely because it is present
+  // in a CUDA-enabled addon. Older addons without per-export metadata also fail
+  // closed to the existing CPU implementation.
+  if (native?.graphSimilarity && nativeExportHasCudaBackend(native, 'graphSimilarity')) {
     const mb = vramNeededMB(n, dim);
     if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
       const flat = acquireFloat32(n * dim);
@@ -748,7 +734,7 @@ export async function batchCosineSimilarity(
   if (n === 0 || dim === 0) return { scores: [], n: 0, source: 'cpu' };
 
   const native = getAddonInternal();
-  if (native?.batchCosineSimilarity) {
+  if (native?.batchCosineSimilarity && nativeExportHasCudaBackend(native, 'batchCosineSimilarity')) {
     const mb = vramNeededMB(n, dim);
     if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
       const qArr = new Float32Array(query);
@@ -838,8 +824,9 @@ export async function batchCosineSimilarityChunked(
 }
 
 /**
- * FP16 similarity matrix — 50% VRAM savings vs FP32.
- * GPU: kFloat16 cast → matmul → cast back. CPU: FP32 blocked fallback.
+ * Half-precision similarity API. The current native graphSimilarityHalf export
+ * is classified CPU fallback, so it uses the local CPU oracle unless a future
+ * addon build reports and proves an explicit CUDA backend for this export.
  */
 export async function graphSimilarityHalf(embeddings: number[][]): Promise<HalfPrecisionSimilarityResult> {
 	const n   = embeddings.length;
@@ -847,7 +834,7 @@ export async function graphSimilarityHalf(embeddings: number[][]): Promise<HalfP
 	if (n === 0 || dim === 0) return { matrix: [], n: 0, source: 'cpu' };
 
 	const native = getAddonInternal();
-  if (native?.graphSimilarityHalf) {
+  if (native?.graphSimilarityHalf && nativeExportHasCudaBackend(native, 'graphSimilarityHalf')) {
     const mb = vramNeededMB(n, dim) / 2; // FP16 is half the bytes
     if (gpuHasRoom(mb + CUDA_OOM_MIN_MB)) {
       const flat = acquireFloat32(n * dim);

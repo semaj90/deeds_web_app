@@ -34,6 +34,29 @@ repo's existing Postgres-is-truth convention.
 - **WHEN** a caller attempts to treat that chunk as canonical evidence
 - **THEN** the system rejects the promotion (no canonical Postgres row to promote from)
 
+### Requirement: Admin can inspect a pinned local chunk artifact without implying admission
+
+The Admin Docs Corpus panel MAY display one explicitly pinned local chunk snapshot for review.
+The reader SHALL verify its pinned manifest checksum, receipt, and chunk-manifest checksum, enforce
+bounded deterministic pagination, and label every result `LOCAL_UNADMITTED`; requests for later
+pages SHALL include the first page's manifest checksum and fail closed if it changed. It SHALL NOT
+write to a store or merge these results into canonical Postgres search.
+
+#### Scenario: Local artifact is viewable but remains noncanonical
+
+- **GIVEN** an explicit local snapshot pointer, matching manifest checksum, chunk receipt, and matching artifact digest
+- **WHEN** an administrator searches or pages through the local snapshot
+- **THEN** the panel shows bounded chunk excerpts with source coordinates, total-count pagination, the pinned manifest checksum, and an unadmitted badge
+- **AND** canonical Postgres search remains a separate result set
+- **AND** no durable store is written
+
+#### Scenario: Artifact or pointer mismatch fails closed
+
+- **GIVEN** a missing artifact, invalid pointer, out-of-root path, or checksum mismatch
+- **WHEN** the local snapshot viewer loads
+- **THEN** it returns an unavailable/invalid status with no chunk rows
+- **AND** it does not fall back to a different or latest snapshot
+
 ### Requirement: Deterministic structure is extracted before any LLM involvement
 
 For every crawled page, structural fields (URL, title, version, heading path, code fences,

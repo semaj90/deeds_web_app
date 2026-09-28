@@ -3,15 +3,22 @@
 train-packet-jepa.py
 
 Minimal Packet-JEPA experiment lane:
-  A. EmbeddingGemma 384 cosine baseline
+  A. EmbeddingGemma semantic_768 cosine baseline (strict dimension gate)
   B. PCA latent baseline
   C. Packet-JEPA 128
 
+The canonical input is always the full 768-D semantic_768 vector. MRL 512/256/128
+and learned latent_256/latent_128/latent_64 are separate derived comparison
+representations; this trainer does not relabel them as canonical inputs.
+
+The legacy 64-D export is intentionally rejected. This script checks dimensionality,
+not encoder provenance; callers still need a qualified semantic_768 input receipt.
+
 Outputs:
-  models/packet-jepa/packet-jepa.pt
-  models/packet-jepa/pca_components.npy
-  .tmp/packet-jepa-latents.ndjson
-  docs/reports/packet-jepa-train-report.{json,md}
+  models/packet-jepa-semantic-768-v2/packet-jepa.pt
+  models/packet-jepa-semantic-768-v2/pca_components.npy
+  .tmp/packet-jepa-semantic-768-v2-latents.ndjson
+  docs/reports/packet-jepa-semantic-768-v2-train-report.{json,md}
 """
 
 from __future__ import annotations
@@ -26,13 +33,14 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 TMP_DIR = ROOT / ".tmp"
-MODEL_DIR = ROOT / "models" / "packet-jepa"
+MODEL_DIR = ROOT / "models" / "packet-jepa-semantic-768-v2"
 REPORT_DIR = ROOT / "docs" / "reports"
-INPUT_PAIRS = TMP_DIR / "packet-jepa-training-pairs.ndjson"
-INPUT_EVAL = TMP_DIR / "packet-jepa-eval-candidates.ndjson"
-OUTPUT_LATENTS = TMP_DIR / "packet-jepa-latents.ndjson"
-REPORT_JSON = REPORT_DIR / "packet-jepa-train-report.json"
-REPORT_MD = REPORT_DIR / "packet-jepa-train-report.md"
+INPUT_PAIRS = TMP_DIR / "packet-jepa-semantic-768-v2-training-pairs.ndjson"
+INPUT_EVAL = TMP_DIR / "packet-jepa-semantic-768-v2-eval-candidates.ndjson"
+OUTPUT_LATENTS = TMP_DIR / "packet-jepa-semantic-768-v2-latents.ndjson"
+REPORT_JSON = REPORT_DIR / "packet-jepa-semantic-768-v2-train-report.json"
+REPORT_MD = REPORT_DIR / "packet-jepa-semantic-768-v2-train-report.md"
+EXPECTED_INPUT_DIM = 768
 
 
 def read_ndjson(path: Path) -> List[dict]:
@@ -64,23 +72,38 @@ def cosine_score(a: np.ndarray, b: np.ndarray) -> float:
 def dedupe_packet_vectors(pair_rows: List[dict], eval_rows: List[dict]) -> Tuple[List[str], Dict[str, np.ndarray], Dict[str, str]]:
     vectors: Dict[str, np.ndarray] = {}
     domains: Dict[str, str] = {}
+
+    def add_vector(packet_key: str, raw_vector, field: str) -> None:
+        vector = np.asarray(raw_vector, dtype=np.float32)
+        if vector.ndim != 1 or vector.shape[0] != EXPECTED_INPUT_DIM:
+            raise ValueError(
+                f"{field} for {packet_key!r} must be a flat {EXPECTED_INPUT_DIM}-D semantic_768 vector; "
+                f"got shape {vector.shape}"
+            )
+        if not np.isfinite(vector).all():
+            raise ValueError(f"{field} for {packet_key!r} contains non-finite values")
+        existing = vectors.get(packet_key)
+        if existing is not None:
+            if not np.array_equal(existing, vector):
+                raise ValueError(
+                    f"Conflicting semantic_768 vectors for duplicate packet key {packet_key!r}; "
+                    "refusing last-row-wins deduplication"
+                )
+            return
+        vectors[packet_key] = vector
+
     for row in pair_rows:
-        vectors[row["anchor_packet_key"]] = np.asarray(row["anchor_vector"], dtype=np.float32)
-        vectors[row["target_packet_key"]] = np.asarray(row["target_vector"], dtype=np.float32)
+        add_vector(row["anchor_packet_key"], row["anchor_vector"], "anchor_vector")
+        add_vector(row["target_packet_key"], row["target_vector"], "target_vector")
         domains[row["anchor_packet_key"]] = row.get("anchor_domain_class") or ""
         domains[row["target_packet_key"]] = row.get("target_domain_class") or ""
     for row in eval_rows:
-        vectors[row["query_packet_key"]] = np.asarray(row["query_vector"], dtype=np.float32)
+        add_vector(row["query_packet_key"], row["query_vector"], "query_vector")
         domains[row["query_packet_key"]] = row.get("query_domain_class") or domains.get(row["query_packet_key"], "")
         for key, vec in zip(row.get("positive_packet_keys", []), row.get("positive_vectors", [])):
-            vectors[key] = np.asarray(vec, dtype=np.float32)
+            add_vector(key, vec, "positive_vector")
         for key, vec in zip(row.get("negative_packet_keys", []), row.get("negative_vectors", [])):
-            vectors[key] = np.asarray(vec, dtype=np.float32)
-    dim_counts: Dict[int, int] = {}
-    for vec in vectors.values():
-        dim_counts[int(vec.shape[0])] = dim_counts.get(int(vec.shape[0]), 0) + 1
-    dominant_dim = sorted(dim_counts.items(), key=lambda item: item[1], reverse=True)[0][0]
-    vectors = {key: vec for key, vec in vectors.items() if int(vec.shape[0]) == dominant_dim}
+            add_vector(key, vec, "negative_vector")
     domains = {key: value for key, value in domains.items() if key in vectors}
     keys = sorted(vectors.keys())
     return keys, vectors, domains
@@ -352,6 +375,11 @@ def main():
     input_dim = len(vectors_by_key[keys[0]]) if keys else 0
     if input_dim <= 0:
         raise SystemExit("No usable vectors in pair export")
+    if input_dim != EXPECTED_INPUT_DIM:
+        raise SystemExit(
+            f"Expected {EXPECTED_INPUT_DIM}-D semantic_768 input; got {input_dim}-D. "
+            "Legacy 64-D/retired 384-D exports are not valid inputs for this run."
+        )
     raw_matrix = np.stack([vectors_by_key[key] for key in keys]).astype(np.float32)
     raw_matrix = l2_normalize(raw_matrix)
 
@@ -361,6 +389,9 @@ def main():
             "pair_rows": len(pair_rows),
             "eval_rows": len(eval_rows),
             "unique_packets": len(keys),
+            "input_representation_id": "semantic_768",
+            "input_dim": input_dim,
+            "encoder_provenance": "NOT_VERIFIED_BY_DIMENSION_CHECK",
             "torch_required_for_apply": True,
         }, indent=2))
         return
@@ -381,11 +412,11 @@ def main():
     jepa_latents, train_meta = train_packet_jepa(pair_rows, vectors_by_key, input_dim, args)
 
     evaluation = {
-        "embedding384_cosine": evaluate_representation(cosine_latents, eval_rows),
+        "semantic_768_cosine": evaluate_representation(cosine_latents, eval_rows),
         "pca128_cosine": evaluate_representation(pca_latents, eval_rows),
         "packet_jepa_128": evaluate_representation(jepa_latents, eval_rows),
     }
-    evaluation["embedding384_cosine"]["domain_f1"] = nearest_centroid_f1(cosine_latents, domains, train_keys, eval_keys)
+    evaluation["semantic_768_cosine"]["domain_f1"] = nearest_centroid_f1(cosine_latents, domains, train_keys, eval_keys)
     evaluation["pca128_cosine"]["domain_f1"] = nearest_centroid_f1(pca_latents, domains, train_keys, eval_keys)
     evaluation["packet_jepa_128"]["domain_f1"] = nearest_centroid_f1(jepa_latents, domains, train_keys, eval_keys)
 
@@ -416,6 +447,8 @@ def main():
             "train_packets": len(train_keys),
             "eval_packets": len(eval_keys),
             "input_dim": input_dim,
+            "input_representation_id": "semantic_768",
+            "encoder_provenance": "NOT_VERIFIED_BY_DIMENSION_CHECK",
         },
         "training": train_meta,
         "evaluation": evaluation,

@@ -6,6 +6,7 @@ import { aceHypergraphPayloadSchema } from '../dist/core/ace-hypergraph-payload.
 import { buildAcePacketV2 } from '../dist/core/ace-packet-v2.js';
 import { runHypergraphFusionFacade } from '../dist/core/hypergraph-fusion-facade.js';
 import { attachHypergraphEvidenceToAcePacketV3, buildAcePacketV3, verifyAcePacketV3 } from '../dist/core/ace-packet-v3.js';
+import { buildAcePacketV4, verifyAcePacketV4 } from '../dist/core/ace-packet-v4.js';
 
 const sha = (c) => `sha256:${c.repeat(64)}`;
 const SRC = 'src/routes/api/case/[id]/+server.ts';
@@ -76,6 +77,52 @@ test('builds a sealed v3 packet with a deterministic checksum that verifies', as
   assert.match(a.integrity.packet_checksum, /^sha256:[0-9a-f]{64}$/);
   assert.equal(a.integrity.packet_checksum, b.integrity.packet_checksum);
   assert.equal(verifyAcePacketV3(JSON.parse(JSON.stringify(a))).integrity.packet_checksum, a.integrity.packet_checksum);
+});
+
+test('V4 binds the V3 packet ordinal to explicit candidate snapshot coordinates', async () => {
+  const packet = buildAcePacketV3(body(await baseV2()));
+  const coordinates = {
+    candidateOrdinal: 17, canonicalId: packet.identity.packet_key, packetKey: packet.identity.packet_key,
+    sourceRef: packet.identity.source_ref, sourceRevision: packet.identity.source_revision,
+    workspaceRevision: packet.identity.workspace_revision, candidateSnapshotRevision: 'sha256:snapshot',
+    ordinalMapChecksum: sha('f'),
+  };
+  const a = buildAcePacketV4({ packet, coordinates });
+  const b = buildAcePacketV4({ packet, coordinates });
+  assert.equal(a.schema, 'atlas.ace-packet.v4');
+  assert.equal(a.integrity.envelopeChecksum, b.integrity.envelopeChecksum);
+  assert.equal(verifyAcePacketV4(JSON.parse(JSON.stringify(a))).coordinates.candidateSnapshotRevision, 'sha256:snapshot');
+});
+
+test('V4 rejects ordinal, identity, coordinate, and checksum drift without changing V3', async () => {
+  const packet = buildAcePacketV3(body(await baseV2()));
+  const coordinates = {
+    candidateOrdinal: 17, canonicalId: packet.identity.packet_key, packetKey: packet.identity.packet_key,
+    sourceRef: packet.identity.source_ref, sourceRevision: packet.identity.source_revision,
+    workspaceRevision: packet.identity.workspace_revision, candidateSnapshotRevision: 'sha256:snapshot',
+    ordinalMapChecksum: sha('f'),
+  };
+  assert.throws(() => buildAcePacketV4({ packet, coordinates: { ...coordinates, candidateOrdinal: 18 } }), /VECTOR_ORDINAL_COORDINATE_MISMATCH/);
+  assert.throws(() => buildAcePacketV4({ packet, coordinates: { ...coordinates, packetKey: 'packet:other' } }), /PACKET_KEY_COORDINATE_MISMATCH/);
+  assert.throws(() => buildAcePacketV4({ packet, coordinates: { ...coordinates, sourceRevision: 'source:other' } }), /SOURCE_REVISION_COORDINATE_MISMATCH/);
+  const valid = buildAcePacketV4({ packet, coordinates });
+  assert.throws(() => verifyAcePacketV4({ ...valid, coordinates: { ...coordinates, candidateSnapshotRevision: 'sha256:other' } }), /ACE_PACKET_V4_CHECKSUM_MISMATCH/);
+  assert.equal(verifyAcePacketV3(packet).integrity.packet_checksum, packet.integrity.packet_checksum);
+});
+
+test('V4 checksum changes with the pinned snapshot or ordinal map', async () => {
+  const packet = buildAcePacketV3(body(await baseV2()));
+  const coordinates = {
+    candidateOrdinal: 17, canonicalId: packet.identity.packet_key, packetKey: packet.identity.packet_key,
+    sourceRef: packet.identity.source_ref, sourceRevision: packet.identity.source_revision,
+    workspaceRevision: packet.identity.workspace_revision, candidateSnapshotRevision: 'sha256:snapshot-a',
+    ordinalMapChecksum: sha('f'),
+  };
+  const original = buildAcePacketV4({ packet, coordinates });
+  const changedSnapshot = buildAcePacketV4({ packet, coordinates: { ...coordinates, candidateSnapshotRevision: 'sha256:snapshot-b' } });
+  const changedMap = buildAcePacketV4({ packet, coordinates: { ...coordinates, ordinalMapChecksum: sha('e') } });
+  assert.notEqual(original.integrity.envelopeChecksum, changedSnapshot.integrity.envelopeChecksum);
+  assert.notEqual(original.integrity.envelopeChecksum, changedMap.integrity.envelopeChecksum);
 });
 
 test('attaches only exact-snapshot hypergraph evidence and reseals the v3 packet', async () => {

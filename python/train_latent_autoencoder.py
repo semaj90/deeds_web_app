@@ -1,7 +1,9 @@
 """Trains NestedSemanticAutoencoder (python/atlas_compute/latent_autoencoder.py) on live
 semantic_768 rows.
 
-Reads codebase_chunk_index.content_embedding (Postgres, read-only) as the canonical semantic_768
+Reads codebase_chunk_index.content_embedding (Postgres, read-only) as the current active-candidate
+768-D source for semantic_768 comparisons. The physical writer/column split remains unresolved;
+dimension and column selection do not prove encoder provenance or canonical admission.
 source per root CLAUDE.md's embedding dimension policy. Writes a checkpoint (.pt) and a
 schema-versioned, checksummed training receipt (JSON) alongside it — never writes back to
 Postgres, never touches any canonical table.
@@ -48,7 +50,7 @@ DEFAULT_DATABASE_URL = "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_
 
 
 def fetch_semantic_768(database_url: str, limit: int) -> tuple[list[str], list[str], np.ndarray]:
-    """Read-only. Returns (chunk_ids, source_refs, embeddings[N,768]), ordered by id."""
+    """Read-only candidate source. Returns (chunk_ids, source_refs, vectors[N,768]), ordered by id."""
     conn = psycopg2.connect(database_url)
     try:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:

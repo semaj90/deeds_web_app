@@ -40,23 +40,24 @@ decision. This change freezes the corrected validation order before any further 
       `batchEmbedOnnx()` uses the shared `EmbeddingContextPlanV1`/`semantic_768` validator;
       it reports the actual executor/provider used; it does not silently treat a WebGPU failure
       that fell back to WASM as a WebGPU success.
-      **Inspected 2026-09-24 (read-only, `src/lib/server/embedding/onnx-embed.ts`, 233 lines) — criteria NOT met, left open:**
-      (a) `isOnnxEmbedAvailable()` does load the session + tokenizer and checks `input_ids`/`attention_mask` inputs, so it is
-      more than a file-existence check — PASS. (b) `batchEmbedOnnx()` just loops `tryEmbedOnnx()`; it does not use
-      `EmbeddingContextPlanV1`; only the output goes through `validateSemantic768OutputV1` — FAIL. (c) Executor is hard-coded
-      CPU (`executionProviders: ['cpu']`); the trace reports `onnx-local-cpu`, so there is no WebGPU path here to mislabel —
-      the WebGPU challenger lives only in `services/embedding-onnx-webgpu/`. (d) **Correctness defect:** the local
-      `models/embeddinggemma_300m_onnx/model.onnx` outputs only `last_hidden_state`; this code mean-pools + L2-normalizes it
-      but never applies EmbeddingGemma's `2_Dense` (768→3072) / `3_Dense` (3072→768) projections. Measured this session:
-      that recipe gives cosine ≈ 0 against Ollama `embeddinggemma:latest`; even with the Dense layers applied the QInt8
-      export only reaches ≈ 0.537 against the fp32 checkpoint (tokenizer parity proven), while fp32 SentenceTransformers ↔
-      Ollama = 1.0000 on raw/no-prefix text. So any vector from this lane is off the `semantic_768` corpus space.
-      Reachability: `canonical-embed.ts::tryEmbedCanonical` falls back to this lane when `/api/embed` fails; it was
-      sending `model: 'embeddinggemma:latest'`, which the route rejects (400), so that fallback fired on every call —
-      fixed 2026-09-24 (sends `model: 'embeddinggemma'`; regression test in `canonical-embed.spec.ts` proven to fail before
-      the fix). A second ONNX-first `tryEmbedCanonical` in `src/lib/server/embeddings/ollama.ts` has no live importer.
-      The fallback itself still returns off-space vectors when `/api/embed` is down — disabling it is an embedding-lane
-      decision, not taken here.
+      **Re-audited 2026-09-27; criteria still NOT met, canonical misuse removed:**
+      (a) `isOnnxEmbedAvailable()` loads the CPU session and local tokenizer and checks the required `input_ids` and
+      `attention_mask` inputs; that proves this CPU executor can initialize, not WebGPU readiness. (b) `batchEmbedOnnx()`
+      still accepts raw strings rather than `EmbeddingContextPlanV1`; its output validator proves dimension/finiteness/L2
+      normalization only, not the required EmbeddingGemma projection or semantic-space parity. (c) The implementation is
+      explicitly `onnxruntime-node` CPU (`executionProviders: ['cpu']`) and traces `onnx-local-cpu`; WebGPU is a separate
+      challenger in `services/embedding-onnx-webgpu/`, not a fallback hidden in this function. (d) The local ONNX graph
+      exposes `last_hidden_state`; this code mean-pools and normalizes without the EmbeddingGemma `2_Dense`/`3_Dense`
+      projections. Existing parity evidence says this recipe is off-space; no inference was run in this re-audit.
+      **Safety correction, 2026-09-27:** source search found two additional canonical call paths not captured by the
+      2026-09-24 note: `src/lib/server/embeddings/ollama.ts::tryEmbedCanonical` and
+      `src/lib/server/grpc/embedding-client.ts::generateEmbeddings`. Both previously returned the off-space ONNX result
+      under the shared EmbeddingGemma label; the latter could write it into the shared embedding cache. Those canonical
+      call paths now exclude ONNX, and structured cache entries labeled `onnx-local` are ignored without deletion.
+      ONNX remains callable through `canonical-embed.ts::tryEmbedOnnxChallenger`, which explicitly marks
+      `canonicalAuthority: false` and `promotionEligible: false`. Focused regression suites pass 8/8. Task 3 stays open
+      until the challenger/input-plan and representation-parity contract is resolved; no model inference or cache/DB
+      writes were performed by this correction.
 - [x] **4. Harden the standalone proof to fail closed.** Added
       `services/embedding-onnx-webgpu/prove-embeddinggemma-onnx-webgpu-only-v1.mjs` with
       `requestedProvider: 'webgpu'`, `fallbackAllowed: false`, artifact/input/vector checksums,
@@ -211,23 +212,57 @@ occurred.
 
 ## Future browser cache integration: IndexedDB + WebGPU Transformers.js
 
-- [ ] **12. Define `ClientInferenceCacheEntryV1`** for browser-only chat and
+- [x] **12. Define `ClientInferenceCacheEntryV1`** for browser-only chat and
       bounded preview inference results. Include model, representation,
       tokenizer, input checksum, schema version, expiry, and
-      `canonicalAuthority: false`.
-- [ ] **13. Add a typed IndexedDB adapter** for client chat transcripts, model
+      `canonicalAuthority: false`. **Verified 2026-09-27:** the strict schema
+      binds model/representation/tokenizer revisions and input/output checksums,
+      caps preview text at 8,000 characters and TTL at 24 hours, rejects
+      canonical authority, and rejects hidden-thought, KV, tensor, and embedding
+      fields. Focused schema tests pass 3/3; no browser storage or inference ran.
+- [x] **13. Add a typed IndexedDB adapter** for client chat transcripts, model
       load metadata, tokenizer metadata, and bounded inference hints. Use the
       existing `idb` dependency or Dexie; do not move canonical chats, source
       identity, embeddings, receipts, or hidden reasoning into browser storage.
-- [ ] **14. Keep in-memory acceleration optional**. LokiJS/`Map` may serve as an
+      **Verified 2026-09-27:** `client-inference-store-v1.ts` uses a dedicated
+      versioned database, revision-pair keys for model/tokenizer metadata,
+      strict schemas, visible user/assistant transcript limits, and null/false
+      fallback on SSR, invalid records, and storage errors. Six focused tests
+      and a scoped TypeScript check pass. Tests use the injected backend; browser
+      IndexedDB reload/quota behavior remains for task 16.
+- [x] **14. Keep in-memory acceleration optional**. LokiJS/`Map` may serve as an
       L0 session cache; IndexedDB is the persistent browser cache. Cache misses,
       expiry, quota errors, and schema upgrades must fall back safely.
-- [ ] **15. Cache model artifacts only through the Transformers.js/runtime
+      **Verified 2026-09-27:** an optional injected `Map` is disabled by default
+      and serves only the current session when IndexedDB cannot open or write;
+      expiry evicts from both tiers, and failures otherwise return cache misses.
+      Seven focused tests and the scoped TypeScript check pass. Real browser
+      storage reload/quota behavior remains open for task 16.
+- [x] **15. Cache model artifacts only through the Transformers.js/runtime
       cache contract**. Store local metadata and checksums; browser cache state
-      is not model-promotion evidence.
-- [ ] **16. Add client replay tests** for cache hit/miss, revision mismatch,
+      is not model-promotion evidence. **Verified 2026-09-27:** this adapter
+      stores only model load metadata and an optional SHA-256 artifact checksum;
+      its strict schema rejects model artifact bytes. Model loading remains
+      through the existing `@huggingface/transformers` `from_pretrained` owner.
+      Tests verify metadata acceptance and artifact-byte rejection; this is not
+      cache integrity or model-promotion evidence.
+- [x] **16. Add client replay tests** for cache hit/miss, revision mismatch,
       expiry, reload persistence, deterministic input checksums, WebGPU
       unavailable fallback labeling, and explicit `fallbackUsed` reporting.
-- [ ] **17. Promotion boundary**: browser WebGPU remains a challenger/preview
+      **Verified 2026-09-27:** a focused Playwright Chromium test exercised the
+      production adapter against real IndexedDB in an isolated browser context.
+      It proved hit/miss, input/model-representation-tokenizer revision-bound
+      cache keys, expiry eviction, persistence across page reload, deterministic
+      SHA-256 input checksums, and separate WebGPU-unavailable / WASM-fallback
+      metadata with explicit `fallbackUsed`. No model/provider call occurred;
+      this is local browser storage proof, not model execution or promotion.
+- [x] **17. Promotion boundary**: browser WebGPU remains a challenger/preview
       lane. It cannot write canonical vectors, alter CandidateOrdinal, promote
       ontology tuples, or replace server retrieval/chat truth.
+      **Verified 2026-09-27:** browser inference persistence is strict local
+      preview/transcript/model/tokenizer metadata with `canonicalAuthority:false`;
+      unknown vector, canonical identity, CandidateOrdinal, ontology, and
+      promotion fields are rejected. The server ONNX challenger remains marked
+      non-canonical and not promotion-eligible, and regression tests confirm the
+      canonical paths do not route through it. This closes the boundary contract;
+      it does not promote WebGPU or claim provider parity.

@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.large-corpus-source-ref-candidate-bridge.v1",
+  "status": "CANDIDATE_CROSSWALK_COMPLETE_NO_CHUNK_BINDING",
+  "generatedAt": "2026-09-27T20:00:51.109Z",
+  "mode": "LOCAL_IMMUTABLE_ARTIFACT_SCAN_ONLY",
+  "inputs": {
+    "censusPath": "docs\\reports\\large-corpus-enrichment-census-v2-20260927T1718Z.json",
+    "metadataPath": ".tmp\\mapreduce-full-v5.ndjson",
+    "metadataSha256": "9ed6d8d3e28f6b0453d75f305b67586ef9dc70cfac05b97825f6763916a42664",
+    "representationPath": "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+    "representationSha256": "6474990e4914d53dfb05ed261313bba44f97b56d9de261e75941fb34ba7b9db5",
+    "currentEnrichedManifestPath": ".tmp\\atlas\\current-enriched-index-shards-v1\\20260926T174815Z\\manifest.json",
+    "currentEnrichedManifestRootSha256": "c5a5e241ee64607b6dfb428c48c72c031b0a39be5ee1f42e8821befe420e85b9",
+    "currentEnrichedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "currentEnrichedShardCount": 5,
+    "currentEnrichedRows": 24456,
+    "currentEnrichedShardChecksumsVerified": true
+  },
+  "metadataCrosswalk": {
+    "records": 5000,
+    "exactPathMatches": 0,
+    "normalizedPathMatches": 501,
+    "contentHashMatches": 430,
+    "exactPathAndHashMatches": 0,
+    "normalizedPathAndHashMatches": 415,
+    "normalizedPathAndHashQualifiedPacketCandidates": 367,
+    "normalizedPairAmbiguous": 0,
+    "blankLines": 0,
+    "malformedLines": 0
+  },
+  "representationCrosswalk": {
+    "records": 76261,
+    "missingSourceRefs": 20,
+    "uniqueRawSourceRefs": 61738,
+    "uniqueNormalizedSourceRefs": 8158,
+    "exactSourceRefMatches": 3,
+    "uniqueExactSourceRefMatches": 1,
+    "normalizedFileCandidateRows": 51207,
+    "uniqueNormalizedFileCandidates": 4788,
+    "normalizedFileCandidatesWithQualifiedPacketSourceRows": 41941,
+    "normalizedKeysWithMultipleRawSourceRefs": 6663,
+    "blankLines": 0,
+    "malformedLines": 0
+  },
+  "interpretation": {
+    "normalizationOwner": "scripts/atlas/lib/normalize-source-ref.mjs",
+    "normalizationUse": "candidate source-file grouping only; normalizer strips query/fragment suffixes and can collapse distinct raw refs",
+    "metadataPathAndHashJoin": "candidate correlation only; content-hash equality and normalized path are not by themselves canonical identity or a packet/chunk join",
+    "representationJoin": "source-file candidate only; export has numeric id and source_ref but no stable_key, chunk_row_id, packet_key, source_revision, or workspace_revision",
+    "vectorAdmission": false,
+    "canonicalAuthority": false,
+    "promotionReady": false
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "rabbitmq": 0,
+    "graphify": 0,
+    "modelCalls": 0
+  }
+}

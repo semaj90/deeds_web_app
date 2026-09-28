@@ -5,7 +5,7 @@ import type { QueryClassificationV1 } from './query-classifier.js';
 export const TAXONOMY_SCOPE_V1_SCHEMA = 'parent-atlas.taxonomy-scope.v1' as const;
 
 export const TAXONOMY_SOURCE_V1 = [
-  'FEATURE_ALIAS', 'TAXONOMY', 'SYMBOL', 'API_DOC', 'ONTOLOGY', 'PRF', 'LLM',
+  'FEATURE_ALIAS', 'TAXONOMY', 'SYMBOL', 'API_DOC', 'ONTOLOGY', 'PRF', 'LLM', 'KEYWORD_RADIX',
 ] as const;
 export type TaxonomySourceV1 = typeof TAXONOMY_SOURCE_V1[number];
 
@@ -56,6 +56,7 @@ export function compileTaxonomyScopeV1(input: {
   ontologyRevision: string;
   knownFeatures?: readonly TaxonomyFeatureDescriptorV1[];
   knownApis?: readonly TaxonomyApiDescriptorV1[];
+  allowedSources?: readonly TaxonomySourceV1[];
 }): TaxonomyScopeV1 {
   const queryTerms = normalizedTerms(input.classification.rawQuery);
   const domains = [...new Set(input.classification.domains)].sort();
@@ -85,7 +86,7 @@ export function compileTaxonomyScopeV1(input: {
     experimentRefs: [],
     confidence: 1,
     evidenceRefs,
-    allowedSources: ['FEATURE_ALIAS', 'TAXONOMY', 'SYMBOL', 'API_DOC', 'ONTOLOGY'],
+    allowedSources: [...new Set(input.allowedSources ?? ['FEATURE_ALIAS', 'TAXONOMY', 'SYMBOL', 'API_DOC', 'ONTOLOGY'])].sort(),
     maxExpansionTerms: 32,
   };
   return TaxonomyScopeV1Schema.parse({ ...body, checksum: sha256Stable(body) });

@@ -5,7 +5,8 @@
  * Checks:
  *   - collection exists
  *   - points > 0
- *   - vector dim = 384 (or 768, warns if wrong)
+ *   - vector dim matches an explicit/configured collection dimension
+ *   - default canonical code collection dimension = 768
  *   - payload.source_ref exists on sampled points
  *   - payload.packet_key exists on sampled points (advisory)
  *
@@ -22,9 +23,17 @@ config({ path: resolve('.', 'sveltekit-frontend/.env.local'), override: false })
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const COLLECTION = process.env.QDRANT_COLLECTION || 'codebase_chunks_768';
 const SAMPLE_SIZE = 20;
-// codebase_chunks_768 is intentionally 768-dim (see CLAUDE.md §Qdrant Collections)
-// atlas_packets embed dim is 384 but that collection does not yet have a separate Qdrant mirror
-const EXPECTED_DIM = COLLECTION.includes('768') ? 768 : 384;
+// Never silently treat an unknown collection as the legacy 384-D lane.
+const configuredDimension = Number(process.env.QDRANT_EXPECTED_DIM);
+const collectionDimension = /(?:^|[_-])768(?:[_-]|$)/i.test(COLLECTION) ? 768
+  : /(?:^|[_-])384(?:[_-]|$)/i.test(COLLECTION) ? 384
+    : null;
+const EXPECTED_DIM = Number.isInteger(configuredDimension) && configuredDimension > 0
+  ? configuredDimension
+  : collectionDimension;
+if (EXPECTED_DIM === null) {
+  throw new Error(`QDRANT_EXPECTED_DIM_REQUIRED: collection '${COLLECTION}' has no dimension suffix; configure QDRANT_EXPECTED_DIM explicitly.`);
+}
 
 let exitCode = 0;
 

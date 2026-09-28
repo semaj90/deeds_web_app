@@ -437,3 +437,67 @@ Policy (unchanged): tasks with no declared id stay **non-authoritative**; nothin
 
 ### WFU-14 — Dependency-ordered implementation program and explicit selection
 - [x] **WFU-14 PROVEN (2026-09-25, code/report only):** added the 11-wave, 6-milestone OpenSpec program projection across the full open-task inventory, with provisional bounded work-package grouping, explicit wave prerequisite/exit-gate edges, and an unclassified review queue that does not mislabel unknown tasks as Wave 0. The workboard separates `gateState` from `schedulerPermission`; all tasks default to `NOT_SELECTED`, and only a schema-validated explicit manifest keyed by stable task identity may select exact rows. Readiness, completion percentage, and recommendations do not select work. Existing controller classifications are reused only when task-block checksums match. Task-level dependencies remain missing where the ledger does not declare them; wave edges do not invent leaf dependencies. Focused tests and strict OpenSpec validation pass. Program receipt: `docs/reports/openspec-implementation-program-v1.json`; latest timestamped run receipt: `docs/reports/openspec-workboard-run-2026-09-25T0053Z.json`. No task-ledger completion was inferred; runtime/datastore writes = 0.
+
+## ERR-FIX-KANBAN-BRIDGE-01 — done (2026-09-27): agentic error-fixing candidates surfaced on the existing daily-graphify board, no new board built
+
+**Context**: operator asked for a "kanban board for agentic error fixing" plus "OpenCode agents
+solving using llama-server in parallel." Per this repo's Duplication Prevention rule, checked first
+— a real, wired kanban board already exists and renders live at `/admin/ai-dashboard`
+(`loadDailyGraphifyBoard()` in `sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board.ts`,
+grouped into P0-P3 columns, read from `docs/reports/atlas/atlas-kanban-tasks.json` /
+`docs/reports/atlas-kanban-tasks.json` / `docs/graph/kanban-board.json`, whichever is newest and
+populated). Building a second board would have been exactly the failure mode that section warns
+against. Confirmed via `AskUserQuestion` with the operator: extend the existing board, and treat
+"parallel llama-server" as multiple agent loops queuing against one sequential inference backend —
+not literal parallel GPU inference (this repo's own hard rule: `batch=1 (sequential) — Gemma4
+cannot serve parallel completions`, still true for the current Ornith-1.5 llama-server on `:8090`).
+
+**What shipped (done, real, verified — not just planned)**:
+- `scripts/atlas/build-error-fixing-kanban-tasks-v1.mjs` — reads the existing, already-real
+  `docs/reports/agentic-error-fixing-v1.json` (produced by the existing
+  `scripts/atlas/run-agentic-error-fixing-v1.mjs`, itself pre-existing and untouched — a read-only
+  diagnostics classifier, `mutationAllowed: false`, `canonicalAuthority: false`), maps each
+  candidate into the board's real `DailyGraphifyTask` shape (priority derived from `kind`, e.g.
+  `AUTHORIZATION`/`LINEAGE_ADMISSION` → P0, `TYPECHECK_OR_SCHEMA`/`TIMEOUT` → P2), and merges it
+  into `docs/reports/atlas/atlas-kanban-tasks.json`'s flat `tasks` array, replacing only rows this
+  script previously wrote (tagged `origin: "agentic_error_fixing_v1"`) so re-runs are idempotent
+  and don't accumulate duplicates or clobber other origins' tasks.
+- Added `npm run atlas:error:kanban` (`sveltekit-frontend/package.json`) as the invocation entry
+  point, alongside the existing `atlas:error:audit/plan/apply/verify/trace` scripts.
+- **Verified end-to-end against the real code, not just this script's own output**: ran
+  `run-agentic-error-fixing-v1.mjs` against a synthetic 4-line diagnostics sample (auth/typecheck/
+  DB/Qdrant mix) → 3 candidates → ran the bridge script → fed the resulting JSON through the real,
+  unmodified `summarizeDailyGraphifyBoard()` (the exact function `loadDailyGraphifyBoard()` calls)
+  via a scratch `tsx` script → confirmed real Zod validation passes and tasks land in the correct
+  P0/P2 columns with `origin`, `evidence_refs` (populated from `proposedAction`, since the
+  persisted report deliberately strips the raw diagnostic text for a stable checksum — a real gap
+  found and worked around, not assumed), and `reason_codes` (`kind` + `errorCode`) intact.
+- **Zero DB/Qdrant/Redis writes, zero agent dispatch, zero llama-server calls.** Pure JSON-to-JSON
+  bridge; `writesPerformed: true` refers only to the one JSON file already in the board's own read
+  path.
+
+**Explicitly NOT built this pass, recorded rather than guessed at — `AGENTIC-FIX-DISPATCH-01`
+(NOT_PROVEN, no code exists)**: an orchestrator that lets multiple OpenCode/agent loops pull
+`PROPOSED` rows from this board, claim them (`status: IN_PROGRESS`), and actually generate fixes by
+calling llama-server. This is genuinely new infrastructure — no existing queue/claim/dispatch layer
+for this was found in this repo (checked `scripts/atlas/run-agentic-error-fixing-v1.mjs` and the
+`atlas:error:*` family: they classify and validate, none of them claim/dispatch/write fixes). Open
+design questions before building it, so it isn't guessed into existence:
+1. **Claim mechanism** — needs a compare-and-swap-style claim (e.g. a `status` transition guarded
+   by an optimistic check) so two agent loops can't both grab the same `PROPOSED` row; a flat JSON
+   file (the board's current storage) is not safe for concurrent claims without a lock or a move to
+   a real store (Postgres row, matching this repo's "Postgres is truth" rule) for anything beyond a
+   single-writer dry run.
+2. **llama-server serialization** — the existing `batch=1` hard rule means "parallel" here can only
+   mean N agent loops with M ≤ 1 concurrent in-flight request to `:8090` — a shared mutex/queue in
+   front of the one llama-server instance, not N parallel completions. A naive "just fire concurrent
+   requests" implementation would violate this repo's own documented constraint and likely produce
+   queued/timed-out requests, not parallelism.
+3. **Fix-application boundary** — `run-agentic-error-fixing-v1.mjs`'s docstring is explicit that it
+   "never edits source files" by design; an actual fix-writer would be new, higher-risk code (it
+   would touch source files) and needs its own dry-run/apply-token discipline matching this repo's
+   existing repair-script pattern (preview → apply-token → transactional/scoped write → verify),
+   not an ad hoc agent-writes-whatever-it-wants loop.
+
+None of these three were resolved or implemented — flagged per this repo's "record what you found,
+even when you don't fix it" rule, not silently deferred.

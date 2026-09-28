@@ -128,8 +128,19 @@ function extractLexicalFeatures(astSymbols, featureLabel, metadataKeywords, tags
 async function clusterWithGpu(vectors, k) {
   return new Promise((resolve, reject) => {
     try {
-      // Load the N-API addon
-      const addon = require(path.join(repoRoot, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'));
+      // Load the N-API addon — build-x64-cuda (CUDA/LibTorch build) checked first
+      let addon = null;
+      for (const candidate of [
+        path.join(repoRoot, 'simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+        path.join(repoRoot, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+      ]) {
+        try { addon = require(candidate); break; } catch { /* try next */ }
+      }
+      if (!addon) {
+        console.warn('⚠️  tensorrt_bridge addon not found in any known build directory, falling back to CPU clustering');
+        resolve(null);
+        return;
+      }
 
       if (!addon.clusterEmbeddings) {
         console.warn('⚠️  tensorrt_bridge addon not available, falling back to CPU clustering');

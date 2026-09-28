@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 /**
- * Export deterministic packet training pairs for Packet-JEPA experiments.
+ * Historical-only exporter for the pre-semantic_768 Packet-JEPA corpus.
+ *
+ * This path reads legacy packet vectors and is not a canonical or valid
+ * source for the semantic_768-v2 trainer. It is disabled unless the caller
+ * explicitly opts into generating separately named, unqualified artifacts.
  *
  * Produces:
  *   .tmp/packet-jepa-training-pairs.ndjson
@@ -20,13 +24,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const TMP_DIR = path.join(REPO_ROOT, '.tmp');
 const REPORTS_DIR = path.join(REPO_ROOT, 'docs', 'reports');
-const OUTPUT_PAIRS = path.join(TMP_DIR, 'packet-jepa-training-pairs.ndjson');
-const OUTPUT_EVAL = path.join(TMP_DIR, 'packet-jepa-eval-candidates.ndjson');
-const REPORT_JSON = path.join(REPORTS_DIR, 'packet-jepa-training-pairs.json');
-const REPORT_MD = path.join(REPORTS_DIR, 'packet-jepa-training-pairs.md');
+const OUTPUT_PAIRS = path.join(TMP_DIR, 'packet-jepa-training-pairs-legacy-unqualified-v1.ndjson');
+const OUTPUT_EVAL = path.join(TMP_DIR, 'packet-jepa-eval-candidates-legacy-unqualified-v1.ndjson');
+const REPORT_JSON = path.join(REPORTS_DIR, 'packet-jepa-training-pairs-legacy-unqualified-v1.json');
+const REPORT_MD = path.join(REPORTS_DIR, 'packet-jepa-training-pairs-legacy-unqualified-v1.md');
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run') || argv.includes('--dry');
+const ALLOW_HISTORICAL_UNQUALIFIED = argv.includes('--allow-historical-unqualified');
 const LIMIT = parseIntFlag(argv, '--limit', 1000);
 const OFFSET = parseIntFlag(argv, '--offset', 0);
 const NEGATIVES = parseIntFlag(argv, '--negatives', 9);
@@ -361,6 +366,14 @@ function renderMarkdown(report) {
 }
 
 async function main() {
+  if (!ALLOW_HISTORICAL_UNQUALIFIED) {
+    throw new Error(
+      'LEGACY_JEPA_EXPORT_DISABLED: this exporter reads retired/unqualified packet vectors; ' +
+      '384-D is not canonical. Use only a future sealed, revision-qualified semantic_768 artifact. ' +
+      'For historical reconstruction only, pass --allow-historical-unqualified; outputs use a separate legacy namespace.'
+    );
+  }
+
   const packets = await loadPackets(LIMIT, OFFSET);
   const { pairRows, evalRows } = buildPairs(packets);
 
@@ -385,8 +398,10 @@ async function main() {
       trainingPairs: pairRows.length,
       evalRows: evalRows.length,
       negativesPerEvalRow: NEGATIVES,
+      inputRepresentation: 'LEGACY_UNQUALIFIED',
+      canonicalAuthority: false,
     },
-    nextSafeAction: 'node scripts/atlas/run-venv-python.mjs scripts/atlas/train-packet-jepa.py --dry-run',
+    nextSafeAction: 'Do not train from this historical export; wait for a sealed, revision-qualified semantic_768 materialization.',
   };
 
   await fs.writeFile(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');

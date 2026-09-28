@@ -7,6 +7,11 @@ import {
   type BuildRetrievalRouterFeatureRowInputV1,
   type RetrievalRouterFeatureRowV1,
 } from '../contracts/retrieval-router-feature-row-v1.js';
+import {
+  assertCandidateOrdinalMapIntegrityV1,
+  candidateOrdinalMapV1Schema,
+  type CandidateOrdinalMapV1,
+} from '../features/canonical-candidate-v1.js';
 
 /**
  * ACE-FSO-03: exact-gate reader from persisted `atlas_observation_feature_rows` (ORF) rows to the existing
@@ -64,6 +69,15 @@ export interface OrfReadResultV1 {
   writesPerformed: false;
 }
 
+export interface OrfCandidateMapReadResultV1 extends OrfReadResultV1 {
+  mapIdentity: {
+    candidateSnapshotRevision: string;
+    ordinalMapChecksum: string;
+    workspaceRevision: string;
+    rowCount: number;
+  };
+}
+
 const flag = (flags: Record<string, unknown> | null, key: string): boolean => flags?.[key] === true;
 
 /** `expectedFeatureRevision` is required: rows of any other producer revision are never accepted implicitly. */
@@ -73,6 +87,9 @@ export function readOrfRowsForCandidatesV1(input: {
   expectedFeatureRevision: string;
   expectedRepresentationRevision: string;
 }): OrfReadResultV1 {
+  if (!input.expectedFeatureRevision.trim() || !input.expectedRepresentationRevision.trim()) {
+    throw new Error('ORF_EXPECTED_REVISION_REQUIRED');
+  }
   const byKey = new Map<string, OrfDbRowV1[]>();
   for (const row of input.rows) (byKey.get(row.packet_key) ?? byKey.set(row.packet_key, []).get(row.packet_key)!).push(row);
 
@@ -116,6 +133,58 @@ export function readOrfRowsForCandidatesV1(input: {
   accepted.sort((a, b) => a.candidateOrdinal - b.candidateOrdinal);
   rejected.sort((a, b) => a.candidateOrdinal - b.candidateOrdinal);
   return { accepted, rejected, rejectionCounts: counts, synthesizedRows: 0, writesPerformed: false };
+}
+
+/** Validate and pin the existing canonical coordinate owner before any ORF join. */
+export function readOrfRowsForCandidateMapV1(input: {
+  ordinalMap: unknown;
+  expectedCandidateSnapshotRevision: string;
+  expectedOrdinalMapChecksum: string;
+  expectedWorkspaceRevision: string;
+  rows: readonly OrfDbRowV1[];
+  expectedFeatureRevision: string;
+  expectedRepresentationRevision: string;
+}): OrfCandidateMapReadResultV1 {
+  const map: CandidateOrdinalMapV1 = candidateOrdinalMapV1Schema.parse(input.ordinalMap);
+  assertCandidateOrdinalMapIntegrityV1(map);
+  if (map.candidateSnapshotRevision !== input.expectedCandidateSnapshotRevision) {
+    throw new Error('ORF_CANDIDATE_SNAPSHOT_PIN_MISMATCH');
+  }
+  if (map.ordinalMapChecksum !== input.expectedOrdinalMapChecksum) {
+    throw new Error('ORF_ORDINAL_MAP_CHECKSUM_PIN_MISMATCH');
+  }
+  if (map.workspaceRevision !== input.expectedWorkspaceRevision) {
+    throw new Error('ORF_WORKSPACE_REVISION_PIN_MISMATCH');
+  }
+  const seenPacketKeys = new Set<string>();
+  const candidates = map.candidates.map((candidate) => {
+    if (candidate.packetKey === null) throw new Error(`ORF_CANDIDATE_PACKET_KEY_REQUIRED:${candidate.candidateOrdinal}`);
+    if (candidate.sourceRef === null) throw new Error(`ORF_CANDIDATE_SOURCE_REF_REQUIRED:${candidate.candidateOrdinal}`);
+    if (seenPacketKeys.has(candidate.packetKey)) throw new Error(`ORF_CANDIDATE_PACKET_KEY_DUPLICATE:${candidate.packetKey}`);
+    seenPacketKeys.add(candidate.packetKey);
+    return {
+      candidateOrdinal: candidate.candidateOrdinal,
+      canonicalId: candidate.canonicalId,
+      packetKey: candidate.packetKey,
+      sourceRef: candidate.sourceRef,
+      workspaceRevision: candidate.workspaceRevision,
+    };
+  });
+  const result = readOrfRowsForCandidatesV1({
+    candidates,
+    rows: input.rows,
+    expectedFeatureRevision: input.expectedFeatureRevision,
+    expectedRepresentationRevision: input.expectedRepresentationRevision,
+  });
+  return {
+    ...result,
+    mapIdentity: {
+      candidateSnapshotRevision: map.candidateSnapshotRevision,
+      ordinalMapChecksum: map.ordinalMapChecksum,
+      workspaceRevision: map.workspaceRevision,
+      rowCount: map.rowCount,
+    },
+  };
 }
 
 export type OrfQueryTimeInputV1 = Pick<BuildRetrievalRouterFeatureRowInputV1, 'semantic' | 'lexical' | 'graph' | 'cluster' | 'temporal' | 'evidence' | 'graphRevision' | 'latent'>;

@@ -18,6 +18,10 @@ import { z } from 'zod';
  */
 
 export const SEMANTIC_INPUT_ARTIFACT_SCHEMA = 'atlas.semantic-input-artifact.v1' as const;
+export const SEMANTIC_EMBEDDING_INPUT_SCHEMA = 'atlas.semantic-embedding-input.v1' as const;
+export const SEMANTIC_EMBEDDING_INPUT_POLICY_REVISION =
+  'semantic-embedding-input-v1:exact-selection-no-truncation:max-1800-tokens' as const;
+export const SEMANTIC_EMBEDDING_INPUT_MAX_TOKENS = 1800 as const;
 
 const sha256Prefixed = z.string().regex(/^sha256:[0-9a-f]{64}$/);
 
@@ -66,6 +70,36 @@ export const semanticInputArtifactV1Schema = z.object({
   tokenCount: z.number().int().nonnegative().nullable(),
 }).strict();
 export type SemanticInputArtifactV1 = z.infer<typeof semanticInputArtifactV1Schema>;
+
+/** Exact bytes eligible for one embedding request; rejected inputs carry no sendable text. */
+export const semanticEmbeddingInputV1Schema = z.object({
+  schema: z.literal(SEMANTIC_EMBEDDING_INPUT_SCHEMA),
+  canonicalId: z.string().min(1),
+  packetKey: z.string().min(1).nullable(),
+  sourceRef: z.string().min(1),
+  sourceRevision: sha256Prefixed,
+  contentSelectionRevision: z.string().min(1),
+  inputPolicyRevision: z.literal(SEMANTIC_EMBEDDING_INPUT_POLICY_REVISION),
+  tokenizerRevision: z.string().min(1),
+  maxInputTokens: z.literal(SEMANTIC_EMBEDDING_INPUT_MAX_TOKENS),
+  renderedTextChecksum: sha256Prefixed,
+  embeddedInputChecksum: sha256Prefixed,
+  embeddedTokenCount: z.number().int().nonnegative(),
+  status: z.enum(['ADMITTED', 'REJECTED_EMPTY', 'REJECTED_OVER_BUDGET']),
+  inputText: z.string().nullable(),
+}).strict().superRefine((value, ctx) => {
+  const admitted = value.status === 'ADMITTED';
+  if (admitted !== (value.inputText !== null)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'inputText must exist if and only if status is ADMITTED' });
+  }
+  if (admitted && value.embeddedTokenCount > value.maxInputTokens) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'admitted input exceeds maxInputTokens' });
+  }
+  if (value.status === 'REJECTED_OVER_BUDGET' && value.embeddedTokenCount <= value.maxInputTokens) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'over-budget input must exceed maxInputTokens' });
+  }
+});
+export type SemanticEmbeddingInputV1 = z.infer<typeof semanticEmbeddingInputV1Schema>;
 
 export function sha256HexPrefixed(buf: Buffer | string): string {
   return 'sha256:' + createHash('sha256').update(buf).digest('hex');

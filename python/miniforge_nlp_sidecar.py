@@ -361,6 +361,7 @@ class AnalysisPassResult(BaseModel):
 class AstUnit(BaseModel):
     source_ref: str
     source_revision: str
+    packet_key: Optional[str] = None
     tree_node_id: str
     symbol_version_id: Optional[str] = None
     # tree_node_id/symbol_version_id are sidecar-local digests (digest(source_ref, symbol,
@@ -966,7 +967,13 @@ def _spacy_pos_tags(text: str) -> PosTagResponse:
     if dependency_parser_available:
         for token in doc:
             head = token.head
-            if head is token or not token.dep_:
+            if (
+                head is token
+                or not token.dep_
+                or token.text.isspace()
+                or token.pos_ in {"PUNCT", "SPACE"}
+                or not any(character.isalnum() for character in token.text)
+            ):
                 continue
             dependent_start = int(token.idx)
             head_start = int(head.idx)
@@ -1033,20 +1040,25 @@ def _linguistic_input(text: str, *, code_mode: bool) -> str:
     if not code_mode:
         return text
 
+    source_chars = list(text)
     chars = list(text)
     state = "code"
     quote = ""
     index = 0
     while index < len(chars):
-        current = chars[index]
-        next_char = chars[index + 1] if index + 1 < len(chars) else ""
+        current = source_chars[index]
+        next_char = source_chars[index + 1] if index + 1 < len(source_chars) else ""
 
         if state == "code":
             if current == "/" and next_char == "/":
+                chars[index] = " " * len(current.encode("utf-8"))
+                chars[index + 1] = " " * len(next_char.encode("utf-8"))
                 state = "line_comment"
                 index += 2
                 continue
             if current == "/" and next_char == "*":
+                chars[index] = " " * len(current.encode("utf-8"))
+                chars[index + 1] = " " * len(next_char.encode("utf-8"))
                 state = "block_comment"
                 index += 2
                 continue
@@ -1056,7 +1068,9 @@ def _linguistic_input(text: str, *, code_mode: bool) -> str:
                 index += 1
                 continue
             if current not in {"\n", "\r", "\t"}:
-                chars[index] = " "
+                # Keep the UTF-8 byte length invariant so spaCy offsets over
+                # the masked input still address the original source.
+                chars[index] = " " * len(current.encode("utf-8"))
             index += 1
             continue
 
@@ -1068,6 +1082,8 @@ def _linguistic_input(text: str, *, code_mode: bool) -> str:
 
         if state == "block_comment":
             if current == "*" and next_char == "/":
+                chars[index] = " " * len(current.encode("utf-8"))
+                chars[index + 1] = " " * len(next_char.encode("utf-8"))
                 index += 2
                 state = "code"
             else:
@@ -1740,6 +1756,7 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
             AstUnit(
                 source_ref=source_ref,
                 source_revision=source_revision,
+                packet_key=req.packet_key,
                 tree_node_id=_digest_parts(source_ref, symbol, start, end, idx)[:24],
                 symbol_version_id=_digest_parts(source_ref, symbol, structural_revision)[:24],
                 language=language or "unknown",
@@ -1772,6 +1789,7 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
             AstUnit(
                 source_ref=source_ref,
                 source_revision=source_revision,
+                packet_key=req.packet_key,
                 tree_node_id=_digest_parts(source_ref, "fallback", language)[:24],
                 symbol_version_id=None,
                 language=language or "unknown",
@@ -2456,6 +2474,7 @@ def _build_pass_results(
     if "linguistic" in requested:
         linguistic_text = _linguistic_input(text, code_mode=_is_code(req.source_type, text))
         linguistic_entities = _spacy_entities(linguistic_text)
+        linguistic_pos = _spacy_pos_tags(linguistic_text)
         add_pass(
             "linguistic",
             "spacy_entities",
@@ -2465,8 +2484,16 @@ def _build_pass_results(
             {"entity_count": len(linguistic_entities)},
             {
                 "entities": [entity.model_dump() for entity in linguistic_entities],
+                "pos": linguistic_pos.model_dump(),
                 "input_scope": "comments_docstrings_strings_query_text" if _is_code(req.source_type, text) else "full_text",
                 "input_hash": hashlib.sha256(linguistic_text.encode("utf-8")).hexdigest(),
+                "coordinate_source": {
+                    "source_ref": source_ref,
+                    "source_revision": source_revision,
+                    "offset_basis": linguistic_pos.coordinate_basis,
+                    "source_byte_length": len(text.encode("utf-8")),
+                    "masked_input_byte_length": len(linguistic_text.encode("utf-8")),
+                },
             },
         )
 

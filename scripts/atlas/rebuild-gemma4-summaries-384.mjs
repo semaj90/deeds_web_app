@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * PHASE 85 P6: REBUILD GEMMA4 SUMMARIES + 384-DIM EMBEDDINGS
+ * LEGACY ONLY: REBUILD SUMMARIES + HISTORICAL 384-DIM PROJECTIONS
  *
- * Populates missing summaries and 384-dim embeddings for canonical storage.
+ * 384-D is not the canonical semantic lane. Use the sibling 768-D path for
+ * new semantic work; this script is retained only for explicitly authorized
+ * legacy migration/replay against its separate *_384 columns and collection.
  *
  * Flow:
  * 1. Select chunks missing summary_text or summary_embedding_384
  * 2. Group by som_cluster / feature_id / relative_path for context
  * 3. Call Gemma4 llama-server for summarization
  * 4. Store summary_text to codebase_chunk_index
- * 5. Call embeddinggemma for summary_embedding_384
+ * 5. Call the configured embedder for the legacy summary_embedding_384 projection
  * 6. Store to Postgres + upsert to Qdrant (via restore script)
  * 7. Warm Redis/Bifrost summary cache
  *
@@ -21,8 +23,8 @@
  *
  * Usage:
  *   node scripts/atlas/rebuild-gemma4-summaries-384.mjs                    [dry-run, default]
- *   node scripts/atlas/rebuild-gemma4-summaries-384.mjs --apply             [write to DB]
- *   node scripts/atlas/rebuild-gemma4-summaries-384.mjs --apply --sample=10 [test 10 items]
+ *   node scripts/atlas/rebuild-gemma4-summaries-384.mjs --apply --allow-legacy-384-write
+ *   node scripts/atlas/rebuild-gemma4-summaries-384.mjs --apply --sample=10 --allow-legacy-384-write
  */
 
 import pg from 'pg';
@@ -37,6 +39,11 @@ const __root = path.resolve(__dirname, '../..');
 
 const args = process.argv.slice(2);
 const dryRun = !args.includes('--apply');
+const allowLegacy384Write = args.includes('--allow-legacy-384-write');
+if (!dryRun && !allowLegacy384Write) {
+  console.error('LEGACY_384_WRITE_BLOCKED: 384-D is not canonical. Pass --allow-legacy-384-write only for an explicitly approved legacy migration/replay.');
+  process.exit(2);
+}
 const sampleSize = parseInt(args.find(a => a.startsWith('--sample='))?.split('=')[1] || '0');
 const limitArg = parseInt(args.find(a => a.startsWith('--limit='))?.split('=')[1] || '0');
 const offsetArg = parseInt(args.find(a => a.startsWith('--offset='))?.split('=')[1] || '0');
@@ -85,7 +92,8 @@ async function probeJson(url, timeoutMs = 4000) {
   }
 }
 
-console.log('\n🔨 PHASE 85 P6: REBUILD GEMMA4 SUMMARIES + 384-DIM EMBEDDINGS\n');
+console.log('\n🔨 LEGACY-ONLY: REBUILD SUMMARIES + 384-DIM PROJECTIONS\n');
+if (!dryRun) console.warn('WARNING: explicit legacy 384-D write opt-in; this is not semantic_768 authority.');
 console.log(`Mode: ${dryRun ? 'DRY-RUN' : 'APPLY'}`);
 console.log(`Concurrency: Gemma4=${concurrencyArg}, Embed=${embedConcurrencyArg}`);
 if (sampleSize > 0) console.log(`Sample size: ${sampleSize}`);

@@ -9,13 +9,22 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
-import { readOrfRowsForCandidatesV1 } from '../../sveltekit-frontend/src/lib/server/atlas/retrieval/orf-feature-row-reader-v1.ts';
+import { readOrfRowsForCandidateMapV1 } from '../../sveltekit-frontend/src/lib/server/atlas/retrieval/orf-feature-row-reader-v1.ts';
 
 const arg = (n: string) => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : null; };
 const mapPath = arg('--map'); const featureRevision = arg('--feature-revision'); const representationRevision = arg('--representation-revision');
-if (!mapPath || !featureRevision || !representationRevision) { console.error('--map, --feature-revision and --representation-revision are all required (pinned; never "latest")'); process.exit(64); }
+const expectedSnapshot = arg('--snapshot'); const expectedOrdinalChecksum = arg('--ordinal-map-checksum'); const expectedWorkspace = arg('--workspace-revision');
+if (!mapPath || !featureRevision || !representationRevision || !expectedSnapshot || !expectedOrdinalChecksum || !expectedWorkspace) {
+  console.error('--map, --snapshot, --ordinal-map-checksum, --workspace-revision, --feature-revision and --representation-revision are required and must be explicitly pinned');
+  process.exit(64);
+}
+const isUnresolvedRevision = (value: string) =>
+  /(?:^|[:/_-])(?:latest|unset|unknown|now|pending|unresolved|none|null)(?:$|[:/_-])/i.test(value.trim());
+if (isUnresolvedRevision(representationRevision) || isUnresolvedRevision(featureRevision) || isUnresolvedRevision(expectedWorkspace)) {
+  console.error('pinned feature, representation and workspace revisions must not contain unresolved sentinels'); process.exit(64);
+}
 const map = JSON.parse(fs.readFileSync(path.resolve(REPO_ROOT, mapPath), 'utf8'));
-const candidates = map.candidates.map((c: any) => ({ candidateOrdinal: c.candidateOrdinal, canonicalId: c.canonicalId, packetKey: c.packetKey, sourceRef: c.sourceRef, workspaceRevision: c.workspaceRevision }));
+const mapBytes = fs.readFileSync(path.resolve(REPO_ROOT, mapPath));
 
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1 });
 const c = await pool.connect(); let rows: any[] = [];
@@ -25,13 +34,25 @@ try {
   await c.query('ROLLBACK');
 } finally { c.release(); await pool.end(); }
 
-const result = readOrfRowsForCandidatesV1({ candidates, rows, expectedFeatureRevision: featureRevision, expectedRepresentationRevision: representationRevision });
+const result = readOrfRowsForCandidateMapV1({
+  ordinalMap: map,
+  expectedCandidateSnapshotRevision: expectedSnapshot,
+  expectedOrdinalMapChecksum: expectedOrdinalChecksum,
+  expectedWorkspaceRevision: expectedWorkspace,
+  rows,
+  expectedFeatureRevision: featureRevision,
+  expectedRepresentationRevision: representationRevision,
+});
+if (result.accepted.length + result.rejected.length !== result.mapIdentity.rowCount) {
+  throw new Error('ORF_READ_RESULT_CANDIDATE_CONSERVATION_FAILED');
+}
 const receipt = {
   schema: 'atlas.ace-fso-03-live-receipt.v1', generatedAt: new Date().toISOString(), level: 'LIVE_READ_ONLY',
-  map: { path: mapPath, candidateSnapshotRevision: map.candidateSnapshotRevision, ordinalMapChecksum: map.ordinalMapChecksum, workspaceRevision: map.workspaceRevision },
+  map: { path: mapPath, fileSha256: createHash('sha256').update(mapBytes).digest('hex'), ...result.mapIdentity },
   expected: { featureRevision, representationRevision },
-  candidateCount: candidates.length, persistedRowsRead: rows.length,
-  mappedExact: result.accepted.length, missing: result.rejected.filter((r) => r.reason === 'NO_ORF_ROW').length,
+  candidateCount: result.mapIdentity.rowCount, persistedRowsRead: rows.length,
+  mappedExact: result.accepted.length, missing: result.rejected.length,
+  noOrfRow: result.rejected.filter((r) => r.reason === 'NO_ORF_ROW').length,
   rejectedWithRow: result.rejected.filter((r) => r.reason !== 'NO_ORF_ROW').length,
   rejectionCounts: result.rejectionCounts, synthesizedRows: result.synthesizedRows,
   outputChecksum: 'sha256:' + createHash('sha256').update(JSON.stringify(result)).digest('hex'),

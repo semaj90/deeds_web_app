@@ -23,6 +23,8 @@ const { parseTangInspiredShortlistReceiptV1 } = await import('./document-governa
 const repoRoot = process.cwd();
 const registryPath = join(repoRoot, 'docs', 'reports', 'document-governance-registry-v1.json');
 const tocPath = join(repoRoot, 'docs', 'MASTER-TOC.md');
+const architectureTocPath = join(repoRoot, 'docs', 'architecture', 'ARCH-TOC.md');
+const workstationHelperPath = join(repoRoot, '.claude', 'skills', 'parent-atlas-workstation', 'SKILL.md');
 const checkOnly = process.argv.includes('--check');
 
 const sha256 = (value) => createHash('sha256').update(value).digest('hex');
@@ -108,7 +110,7 @@ const candidates = [
   // Generated projections must not become inputs to their own checksum.
   .filter((value) => {
     const path = repoPath(value);
-    if (path === repoPath(registryPath) || path === repoPath(tocPath)) return false;
+    if (path === repoPath(registryPath) || path === repoPath(tocPath) || path === repoPath(architectureTocPath)) return false;
     // Governance outputs are projections and must not feed their own input
     // registry or make replay checksums depend on audit execution time.
     if (/^docs\/reports\/(?:document-(governance|supersession)-|claude-instruction-supersession-plan-)/.test(path)) return false;
@@ -218,6 +220,72 @@ const qdrantIdentity = readJson('docs/reports/lineage-qdrant-semantic-canary-v1.
 const qdrantTargets = readJson('docs/reports/lineage-qdrant-projection-targets-v1.json');
 const latentParity = readJson('docs/reports/latent256-ann-exact-parity-bounded-v2.json');
 const neuralDecoderSeparation = readJson('docs/reports/neural-decoder-runtime-separation-v1.json');
+const architectureDocs = records
+  .filter((record) => record.documentKind === 'ARCHITECTURE')
+  .sort((a, b) => a.path.localeCompare(b.path));
+const workstationHelperText = existsSync(workstationHelperPath)
+  ? readFileSync(workstationHelperPath, 'utf8')
+  : '';
+const ownerTable = workstationHelperText.match(/## Owners\b([\s\S]*?)(?=\n## |$)/)?.[1] ?? '';
+const workstationOwnerRows = ownerTable
+  .split(/\r?\n/)
+  .filter((line) => /^\|/.test(line) && !/^\|\s*:?-{3,}/.test(line))
+  .map((line) => line.trim());
+const temporalArchitectureSnapshots = records
+  .filter((record) => /^docs\/reports\/architecture-temporal-snapshots\/architecture-temporal-index-v1-[a-f0-9]{64}\.json$/.test(record.path))
+  .map((record) => ({ record, report: readJson(record.path) }))
+  .filter(({ report }) => report?.schema === 'atlas.architecture-temporal-snapshot.v1')
+  .sort((a, b) => (a.report.captured_at ?? '').localeCompare(b.report.captured_at ?? '')
+    || a.record.path.localeCompare(b.record.path));
+const architectureDocLink = (record) => {
+  const target = relative(join(repoRoot, 'docs', 'architecture'), join(repoRoot, record.path)).split(sep).join('/');
+  const label = basename(record.path).replace(/\.(md|json)$/i, '');
+  return `- [${label}](./${target})`;
+};
+const architectureMarkdownDocs = architectureDocs.filter((record) => /\.md$/i.test(record.path));
+const architectureJsonDocs = architectureDocs.filter((record) => /\.json$/i.test(record.path));
+const architectureToc = [
+  '# Parent Atlas Architecture TOC (V2)',
+  '',
+  '> V2 adds explicit temporal snapshot receipts to the V1 navigation projection.',
+  '> Generated from the document-governance registry and Parent Atlas workstation helper; this index is not canonical architecture or ownership authority.',
+  '',
+  '## Authority and routing sources',
+  '',
+  '- [Parent Atlas workstation helper](../../.claude/skills/parent-atlas-workstation/SKILL.md) — task routing and owner pointers.',
+  '- [Runtime ownership registry](./runtime-ownership-registry.json) — re-check this registry before implementation; helper summaries can become stale.',
+  '- [Master TOC](../MASTER-TOC.md) — repository-wide document navigation.',
+  '',
+  '## Workstation helper owner map',
+  '',
+  '> Snapshot extracted from the helper for navigation. The registry and implementation contracts remain authoritative.',
+  ...(workstationOwnerRows.length ? workstationOwnerRows : ['| Need | Owner | Status |', '| --- | --- | --- |', '| Workstation helper unavailable | — | UNAVAILABLE |']),
+  '',
+  '## Temporal snapshot history',
+  '',
+  '- Contract owner: [TemporalDocumentIndexV1](../../packages/parent-atlas/src/core/temporal-indexing-fabric.ts); each receipt is content-addressed and noncanonical.',
+  '- The first receipt is a baseline only. A delta is reported only when a previous snapshot path is supplied explicitly; no fuzzy path or “latest” selection is used.',
+  ...(temporalArchitectureSnapshots.length
+    ? temporalArchitectureSnapshots.map(({ record, report }) => {
+      const temporalIndex = report.temporal_document_index;
+      const artifacts = report.source_artifacts?.length ?? 0;
+      const deltas = report.source_revision_deltas?.length ?? 0;
+      const previous = report.previous_source_snapshot_revision ?? 'INITIAL_BASELINE_NO_PRIOR';
+      return `- [${record.path.split('/').at(-1)}](../reports/${record.path.slice('docs/reports/'.length)}) — ${temporalIndex?.status ?? 'INVALID'}; ${artifacts} source artifacts; ${deltas} explicit deltas; previous=${previous}; index checksum \`${temporalIndex?.index_checksum ?? 'missing'}\`.`;
+    })
+    : ['- No architecture temporal snapshot receipts have been captured.']),
+  '',
+  '## Architecture documents',
+  '',
+  '### Markdown',
+  '',
+  ...(architectureMarkdownDocs.length ? architectureMarkdownDocs.map(architectureDocLink) : ['- None discovered.']),
+  '',
+  '### JSON registries and baselines',
+  '',
+  ...(architectureJsonDocs.length ? architectureJsonDocs.map(architectureDocLink) : ['- None discovered.']),
+  '',
+].join('\n');
 const toc = [
   '# Parent Atlas Master TOC',
   '',
@@ -237,6 +305,10 @@ const toc = [
   ...(canonicalTopicOwners.size
     ? [...canonicalTopicOwners.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([topicId, owners]) => `- \`${topicId}\` — ${owners.map((r) => `[${r.path}](${r.path})`).join(', ')}`)
     : ['- No document currently declares an explicit canonical topic owner.']),
+  '',
+  '## Architecture index',
+  '',
+  '- [Parent Atlas Architecture TOC V2](architecture/ARCH-TOC.md) — complete navigation, workstation owner map, and explicit temporal snapshot receipts.',
   '',
   '## Active OpenSpec task progress',
   '',
@@ -299,7 +371,8 @@ const toc = [
 if (checkOnly) {
   const currentRegistry = existsSync(registryPath) ? readFileSync(registryPath, 'utf8') : null;
   const currentToc = existsSync(tocPath) ? readFileSync(tocPath, 'utf8') : null;
-  if (currentRegistry !== registryJson || currentToc !== toc) {
+  const currentArchitectureToc = existsSync(architectureTocPath) ? readFileSync(architectureTocPath, 'utf8') : null;
+  if (currentRegistry !== registryJson || currentToc !== toc || currentArchitectureToc !== architectureToc) {
     console.error('MASTER_TOC_CHECK_FAILED');
     process.exitCode = 1;
   } else {
@@ -308,6 +381,7 @@ if (checkOnly) {
 } else {
   writeFileSync(registryPath, registryJson, 'utf8');
   writeFileSync(tocPath, toc, 'utf8');
+  writeFileSync(architectureTocPath, architectureToc, 'utf8');
   console.log(`MASTER_TOC_BUILT ${sha256(registryJson)}`);
   console.log(`records=${records.length} openspecTasks=${openSpecs.length} archiveEligible=${records.filter((record) => record.archive.eligible).length}`);
 }

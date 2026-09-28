@@ -3,7 +3,8 @@
  * prove-one-packet-vector-lineage.mts
  *
  * Comprehensive proof of vector lineage contract for one canonical packet.
- * Tests: identity resolution, 768d canonical retrieval, 384d routing, cache behavior,
+ * Tests: identity resolution and 768d canonical retrieval. Legacy 384d Redis entries,
+ * if present, are historical observations only and are not routing or retrieval evidence.
  * Qdrant neighbor search, fallback behavior, and determinism.
  *
  * Output artifacts:
@@ -62,7 +63,7 @@ interface OnePacketVectorLineageProof {
     present: boolean;
   };
   compactRouting: {
-    lane: 'DENSE_384_COMPACT';
+    lane: 'LEGACY_384_CACHE_OBSERVATION';
     backend: 'REDIS' | 'QDRANT' | null;
     vectorId: string | null;
     dimensions: 384;
@@ -116,11 +117,11 @@ const proof: OnePacketVectorLineageProof = {
     present: false,
   },
   compactRouting: {
-    lane: 'DENSE_384_COMPACT',
+    lane: 'LEGACY_384_CACHE_OBSERVATION',
     backend: null,
     vectorId: null,
     dimensions: 384,
-    model: 'warden-nomic',
+    model: 'unqualified-legacy-cache-entry',
     modelVersion: '',
     present: false,
     cacheKey: null,
@@ -325,7 +326,7 @@ async function main() {
     }
 
     // ════════════════════════════════════════════════════════════════════════════
-    // GATE L4: 384d routing projection is independently identified in Redis
+    // GATE L4: observe a legacy 384d Redis artifact for diagnosis only; never admit it as a live route
     // ════════════════════════════════════════════════════════════════════════════
     try {
       const redis = await createReadOnlyRedisClient();
@@ -350,12 +351,13 @@ async function main() {
 
       recordGate({
         gateId: 'L4',
-        description: '384d routing projection is independently identified',
-        status: exists ? 'PASS' : 'SKIP',
+        description: 'legacy 384d Redis artifact observed (noncanonical; not routing evidence)',
+        status: 'SKIP',
         details: {
           cacheKey,
           vectorFound: exists,
           dimensions: proof.compactRouting.present ? 384 : null,
+          admission: 'LEGACY_UNQUALIFIED_NOT_ROUTING_EVIDENCE',
         },
         latencyMs: latency,
       });
@@ -364,7 +366,7 @@ async function main() {
     } catch (err) {
       recordGate({
         gateId: 'L4',
-        description: '384d routing projection is independently identified',
+        description: 'legacy 384d Redis artifact observed (noncanonical; not routing evidence)',
         status: 'SKIP',
         details: { error: err instanceof Error ? err.message : String(err) },
       });
@@ -467,15 +469,15 @@ async function main() {
     });
 
     // ════════════════════════════════════════════════════════════════════════════
-    // GATE L8: 384d route leads to 768d query
+    // GATE L8: historical 384d-to-768 routing claim is not an accepted current contract
     // ════════════════════════════════════════════════════════════════════════════
     recordGate({
       gateId: 'L8',
-      description: '384d route leads to 768d query',
+        description: 'legacy 384d route claim is not proven or admitted',
       status: 'SKIP',
       details: {
         note: 'Requires live retrieval orchestration; verified in L9',
-        expectedBehavior: 'If 384d cache hit, use it to partition candidates; still query 768d for recall',
+        expectedBehavior: 'Ignore legacy 384d cache entries; semantic_768 remains the qualified dense reference',
       },
     });
 
@@ -568,7 +570,7 @@ async function main() {
 - **Model Version**: ${proof.canonicalSemantic.modelVersion}
 - **Present**: ${proof.canonicalSemantic.present}
 
-## Compact Routing (384-dim)
+## Legacy 384-D cache observation (noncanonical; ignored by retrieval)
 - **Lane**: ${proof.compactRouting.lane}
 - **Backend**: ${proof.compactRouting.backend || '(none)'}
 - **Model**: ${proof.compactRouting.model}

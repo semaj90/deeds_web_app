@@ -106,10 +106,14 @@ export const ff1Tools = {
       const { createClient } = await import('redis');
       const raw = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000 } });
       await raw.connect();
-      // D16: `await using` auto-calls .quit() on scope exit (even on throw)
-      await using r = attachDispose(raw);
-      const note = await r.get(`wiki:note:dir:${params.dir}`) as string | null;
-      return note ?? `No KAG note for: ${params.dir}`;
+      // `await using` is a SyntaxError on Node 22 (route/module 500s at load); try/finally is equivalent.
+      const r = attachDispose(raw);
+      try {
+        const note = await r.get(`wiki:note:dir:${params.dir}`) as string | null;
+        return note ?? `No KAG note for: ${params.dir}`;
+      } finally {
+        await r[Symbol.asyncDispose]();
+      }
     } catch (err) {
       return `KAG lookup failed: ${(err as Error).message}`;
     }
@@ -159,20 +163,24 @@ export const ff1Tools = {
       const { createClient } = await import('redis');
       const raw = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000 } });
       await raw.connect();
-      // D16: `await using` auto-calls .quit() on scope exit (even on throw)
-      await using r = attachDispose(raw);
-      const keys = await r.keys('ff1:repair:plan:*') as string[];
-      const plans: unknown[] = [];
-      for (const k of keys.slice(0, params.limit ?? 5)) {
-        const v = await r.get(k) as string | null;
-        if (v) {
-          const p = JSON.parse(v) as { files?: Array<{ path: string }> };
-          if (p.files?.some(f => f.path.includes(params.filePath))) {
-            plans.push(p);
+      // `await using` is a SyntaxError on Node 22 (route/module 500s at load); try/finally is equivalent.
+      const r = attachDispose(raw);
+      try {
+        const keys = await r.keys('ff1:repair:plan:*') as string[];
+        const plans: unknown[] = [];
+        for (const k of keys.slice(0, params.limit ?? 5)) {
+          const v = await r.get(k) as string | null;
+          if (v) {
+            const p = JSON.parse(v) as { files?: Array<{ path: string }> };
+            if (p.files?.some(f => f.path.includes(params.filePath))) {
+              plans.push(p);
+            }
           }
         }
+        return plans.length ? JSON.stringify(plans, null, 2) : 'No repair history found.';
+      } finally {
+        await r[Symbol.asyncDispose]();
       }
-      return plans.length ? JSON.stringify(plans, null, 2) : 'No repair history found.';
     } catch (err) {
       return `History lookup failed: ${(err as Error).message}`;
     }

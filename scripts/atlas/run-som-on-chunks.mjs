@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * SOM training on codebase_chunk_index.content_embedding (384-dim)
+ * Experimental SOM training on 768-D codebase_chunk_index.content_embedding.
+ * Vector dimension is checked; per-vector semantic representation provenance is not.
  *
- * Reads content_embedding vectors from codebase_chunk_index,
+ * Reads 768-D content_embedding vectors from codebase_chunk_index,
  * trains a 20×20 SOM, then backfills atlas_packets with
  * som_row, som_col, som_index joined by source_ref.
  * Also writes gpu:som:cell:{row}:{col} keys to Redis.
@@ -12,8 +13,8 @@
  *
  * Usage:
  *   node scripts/atlas/run-som-on-chunks.mjs --dry-run
- *   node scripts/atlas/run-som-on-chunks.mjs --apply
- *   node scripts/atlas/run-som-on-chunks.mjs --apply --sample 5000
+ *   node scripts/atlas/run-som-on-chunks.mjs --apply --allow-unqualified-experimental-write
+ *   node scripts/atlas/run-som-on-chunks.mjs --apply --sample 5000 --allow-unqualified-experimental-write
  */
 
 import pg from 'pg';
@@ -35,7 +36,7 @@ const GRID_H     = 20;
 const ITERATIONS = ITER_ARG >= 0 ? parseInt(process.argv[ITER_ARG + 1]) : parseInt(process.env.ATLAS_SOM_ITERATIONS || '30');
 const INIT_LR    = 0.5;
 const INIT_RADIUS = Math.max(GRID_W, GRID_H) / 2;
-const DIM        = 384;
+const DIM        = 768;
 const REDIS_TTL  = 7 * 24 * 3600; // 7 days
 
 const pgPool = new pg.Pool({
@@ -54,7 +55,7 @@ const redis = new Redis({
 redis.on('error', () => {});
 
 console.log('\n╔══════════════════════════════════════════════════════════════════╗');
-console.log('║  SOM 20×20 Training on content_embedding_384                     ║');
+console.log('║  SOM 20×20 Training on 768-D vectors (provenance unverified)        ║');
 console.log(`║  Mode: ${(APPLY ? 'APPLY' : 'DRY-RUN').padEnd(57)}║`);
 console.log(`║  Grid: ${GRID_W}×${GRID_H}=${GRID_W*GRID_H} cells, ${ITERATIONS} iterations, max ${MAX_SAMPLE} samples  ║`);
 console.log('╚══════════════════════════════════════════════════════════════════╝\n');
@@ -103,10 +104,16 @@ function trainEpoch(codebook, vectors, rows, cols, lr, radius) {
 }
 
 async function main() {
+  if (APPLY && !process.argv.includes('--allow-unqualified-experimental-write')) {
+    console.error('BLOCKED: SOM --apply requires --allow-unqualified-experimental-write; this script does not verify per-vector representation provenance.');
+    process.exitCode = 2;
+    return;
+  }
+
   await redis.connect().catch(() => {});
 
   // Step 1: Load embeddings from codebase_chunk_index
-  console.log('  Step 1: Load 384-dim embeddings from codebase_chunk_index...\n');
+  console.log('  Step 1: Load 768-D vectors (provenance unverified) from codebase_chunk_index...\n');
 
   const rows = await pgPool.query(`
     SELECT ci.source_ref, ci.content_embedding::text AS emb_text
@@ -127,6 +134,12 @@ async function main() {
     const vals = r.emb_text.slice(1, -1).split(',').map(Number);
     return new Float32Array(vals);
   });
+  const invalidVectorIndex = vectors.findIndex(vector =>
+    vector.length !== DIM || vector.some(value => !Number.isFinite(value))
+  );
+  if (invalidVectorIndex >= 0) {
+    throw new Error(`SOM_VECTOR_SHAPE_INVALID: row=${invalidVectorIndex} expected=${DIM} actual=${vectors[invalidVectorIndex].length}`);
+  }
   const sourceRefs = rows.rows.map(r => r.source_ref);
 
   if (DRY_RUN) {

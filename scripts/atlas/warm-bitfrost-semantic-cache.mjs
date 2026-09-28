@@ -1,4 +1,21 @@
 #!/usr/bin/env node
+/**
+ * warm-bitfrost-semantic-cache.mjs (atlas/) — reads from Postgres `atlas_higher_hop_index`
+ * directly and plans `bifrost:sem:packet:{packet_key}` / `bifrost:sem:feature:{feature_id}`
+ * writes keyed on canonical packetKey identity.
+ *
+ * There is a SECOND, unrelated script with a near-identical name:
+ * `scripts/cache/warm-bifrost-semantic-cache.mjs` — that one reads a DuckDB-exported
+ * JSONL file and writes `bifrost:sem:query:{query_hash}` entries keyed on query-hash
+ * identity, a different identity axis entirely. Do not conflate the two, and do not
+ * assume one supersedes the other without reading both first (see root CLAUDE.md's
+ * BitFrost warm-buckets section for the fuller history).
+ *
+ * THIS script's `--apply` is permanently hard-blocked
+ * (`REVISION_BOUND_ACE_PACKET_IDENTITY_REQUIRED`) until a revision-bound ACE packet
+ * identity/ordinal-map source exists — see `BITFROST-LIVE-WARM-01` in
+ * `openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`. Dry-run only.
+ */
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -6,7 +23,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { packetFieldValue, safeJsonObject } from './lib/adaptive-schema.mjs';
 import { normalizeSourceRef } from './lib/lineage-field-aliases.mjs';
-import { resolveAtlasRedisContext, runRedisCli } from './lib/redis-valkey.mjs';
+import { resolveAtlasRedisContext } from './lib/redis-valkey.mjs';
 import { buildTopologyEnvelope, deriveCentroidKeys } from './lib/topology-ontology.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -18,6 +35,9 @@ const POSTGRES_PASSWORD = process.env.PARENT_ATLAS_POSTGRES_PASSWORD || '123456'
 const APPLY_REQUESTED = process.argv.includes('--apply');
 const LIMIT_ARG = process.argv.find((arg) => arg.startsWith('--limit='));
 const LIMIT = LIMIT_ARG ? Math.max(1, Number(LIMIT_ARG.split('=')[1] ?? 25) || 25) : 25;
+const WORKSPACE_REVISION_ARG = process.argv.find((arg) => arg.startsWith('--workspace-revision='));
+const WORKSPACE_REVISION = WORKSPACE_REVISION_ARG?.slice('--workspace-revision='.length) ?? null;
+const SOURCE_AUTHORITY_REPO_ID = 'deeds-web-app'; // explicit root namespace bridge target
 const OUT_JSON = path.join(REPO_ROOT, 'docs', 'reports', 'bitfrost-semantic-cache-warm.json');
 const OUT_MD = path.join(REPO_ROOT, 'docs', 'reports', 'bitfrost-semantic-cache-warm.md');
 
@@ -87,16 +107,6 @@ function parseTsvRows(text, columns) {
   });
 }
 
-function writeKey(container, key, value, ttlSeconds, password = '') {
-  if (!container) {
-    return { ok: false, status: 1, stderr: 'No Redis/Valkey container found' };
-  }
-  const setResult = runRedisCli(container, ['-x', 'SET', key], password, value);
-  if (!setResult.ok) return setResult;
-  const expireResult = runRedisCli(container, ['EXPIRE', key, String(ttlSeconds)], password);
-  return expireResult.ok ? expireResult : expireResult;
-}
-
 function renderMarkdown(report) {
   return [
     '# Bitfrost Semantic Cache Warm Plan',
@@ -109,6 +119,7 @@ function renderMarkdown(report) {
     '',
     `- candidate rows: ${report.summary.candidateRows}`,
     `- source table: ${report.source.table}`,
+    `- source admission funnel: ${JSON.stringify(report.source.admissionFunnel ?? {})}`,
     `- packets planned: ${report.summary.packetKeysPlanned}`,
     `- feature keys planned: ${report.summary.featureKeysPlanned}`,
     `- ace keys planned: ${report.summary.aceKeysPlanned}`,
@@ -122,10 +133,14 @@ function renderMarkdown(report) {
     '## Next Safe Action',
     '',
     report.nextSafeAction,
+    ...(report.applyBlockedReason ? ['', `Apply blocked: ${report.applyBlockedReason}`] : []),
   ].join('\n');
 }
 
 async function main() {
+  if (WORKSPACE_REVISION !== null && !/^sha256:[a-f0-9]{64}$/i.test(WORKSPACE_REVISION)) {
+    throw new Error('BITFROST_WARM_WORKSPACE_REVISION_MUST_BE_EXPLICIT_SHA256');
+  }
   const { container, password: redisPassword } = await resolveAtlasRedisContext(REPO_ROOT, process.env);
   const sourceTable = await pickLedgerTable();
   if (!sourceTable) {
@@ -142,35 +157,68 @@ async function main() {
     ['column_name'],
   );
   const columnSet = new Set(columnRows.map((row) => row.column_name));
-  const col = (name, alias = name) => (columnSet.has(name) ? `${name}::text as ${alias}` : `null::text as ${alias}`);
+  const col = (name, alias = name) => (columnSet.has(name) ? `p.${name}::text as ${alias}` : `null::text as ${alias}`);
   const whereCandidates = [
-    columnSet.has('source_ref_key') ? 'source_ref_key' : null,
-    columnSet.has('source_ref') ? 'source_ref' : null,
-    columnSet.has('file_path') ? 'file_path' : null,
-    columnSet.has('packet_key') ? 'packet_key' : null,
+    columnSet.has('source_ref_key') ? 'p.source_ref_key' : null,
+    columnSet.has('source_ref') ? 'p.source_ref' : null,
+    columnSet.has('file_path') ? 'p.file_path' : null,
+    columnSet.has('packet_key') ? 'p.packet_key' : null,
   ].filter(Boolean);
   const sourceClause = whereCandidates.length > 0
     ? `nullif(btrim(coalesce(${whereCandidates.join(', ')})::text), '') is not null`
     : 'true';
-  const featureClause = columnSet.has('feature_id') ? "nullif(btrim(feature_id::text), '') is not null" : 'false';
-  const lineageColumns = ['source_revision', 'workspace_revision', 'canonical_source_ref'];
+  const featureClause = columnSet.has('feature_id') ? "nullif(btrim(p.feature_id::text), '') is not null" : 'false';
+  const lineageColumns = ['source_revision', 'canonical_source_ref'];
   const missingLineageColumns = lineageColumns.filter((name) => !columnSet.has(name));
   if (missingLineageColumns.length > 0) {
     throw new Error(`BITFROST_WARM_SOURCE_LINEAGE_COLUMNS_MISSING:${missingLineageColumns.join(',')}`);
   }
-  const lineageClause = `
-      nullif(btrim(source_revision::text), '') is not null
-      and lower(btrim(source_revision::text)) not in ('0', 'workspace:0')
-      and nullif(btrim(workspace_revision::text), '') is not null
-      and lower(btrim(workspace_revision::text)) not in ('0', 'workspace:0')
-      and nullif(btrim(canonical_source_ref::text), '') is not null
+  const sourceRevisionClause = `
+      nullif(btrim(p.source_revision::text), '') is not null
+      and lower(btrim(p.source_revision::text)) not in ('0', 'workspace:0')
     `;
+  const workspaceRevisionClause = WORKSPACE_REVISION
+    ? `b.workspace_revision = '${WORKSPACE_REVISION}'`
+    : 'false';
+  const canonicalSourceRefClause = "nullif(btrim(p.canonical_source_ref::text), '') is not null";
+  const admissionFunnelRows = parseTsvRows(runPsql(`
+    select
+      count(*)::text as total_rows,
+      count(*) filter (where ${sourceClause})::text as source_ref_rows,
+      count(*) filter (where ${sourceClause} and ${featureClause})::text as feature_rows,
+      count(*) filter (where ${sourceClause} and ${featureClause} and ${sourceRevisionClause})::text as source_revision_rows,
+      (select count(*) from public.${sourceTable} p join public.atlas_workspace_source_bindings b
+        on b.repo_id = '${SOURCE_AUTHORITY_REPO_ID}'
+        and b.canonical_source_ref = p.canonical_source_ref
+        and b.source_revision = p.source_revision
+        and ${workspaceRevisionClause}
+        where ${sourceClause} and ${featureClause} and ${sourceRevisionClause} and ${canonicalSourceRefClause})::text as workspace_revision_rows,
+      (select count(distinct p.packet_key) from public.${sourceTable} p join public.atlas_workspace_source_bindings b
+        on b.repo_id = '${SOURCE_AUTHORITY_REPO_ID}'
+        and b.canonical_source_ref = p.canonical_source_ref
+        and b.source_revision = p.source_revision
+        and ${workspaceRevisionClause}
+        where ${sourceClause} and ${featureClause} and ${sourceRevisionClause} and ${canonicalSourceRefClause})::text as fully_qualified_rows
+    from public.${sourceTable} p
+  `), [
+    'total_rows',
+    'source_ref_rows',
+    'feature_rows',
+    'source_revision_rows',
+    'workspace_revision_rows',
+    'fully_qualified_rows',
+  ])[0] ?? {};
+  const admissionFunnel = Object.fromEntries(
+    Object.entries(admissionFunnelRows).map(([key, value]) => [key, Number(value) || 0]),
+  );
   const sql = `
+    with joined as (
     select
       ${col('packet_key')},
       ${col('source_ref_key')},
       ${col('source_ref')},
       ${col('canonical_source_ref')},
+      ${col('source_revision')},
       ${col('file_path')},
       ${col('feature_id')},
       ${col('feature_label')},
@@ -196,15 +244,27 @@ async function main() {
       ${col('repair_status')},
       ${col('lineage_version')},
       ${col('ledger_type')},
-      ${col('metadata')}
-    from public.${sourceTable}
-    where ${sourceClause} and ${featureClause} and ${lineageClause}
+      ${col('metadata')},
+      b.workspace_revision::text as workspace_revision,
+      b.binding_checksum::text as binding_checksum,
+      b.repo_id::text as source_authority_repo_id,
+      count(*) over (partition by p.packet_key) as binding_match_count
+    from public.${sourceTable} p
+    join public.atlas_workspace_source_bindings b
+      on b.repo_id = '${SOURCE_AUTHORITY_REPO_ID}'
+      and b.canonical_source_ref = p.canonical_source_ref
+      and b.source_revision = p.source_revision
+      and ${workspaceRevisionClause}
+    where ${sourceClause} and ${featureClause} and ${sourceRevisionClause} and ${canonicalSourceRefClause}
+    )
+    select * from joined
+    where binding_match_count = 1
     order by
-      ${columnSet.has('community_id') ? 'community_id asc nulls last,' : ''}
-      ${columnSet.has('som_cell_x') ? 'som_cell_x asc nulls last,' : ''}
-      ${columnSet.has('som_cell_y') ? 'som_cell_y asc nulls last,' : ''}
-      ${columnSet.has('identity_confidence') ? 'identity_confidence desc nulls last,' : ''}
-      ${columnSet.has('packet_key') ? 'packet_key asc' : '1'}
+      community_id asc nulls last,
+      som_cell_x asc nulls last,
+      som_cell_y asc nulls last,
+      identity_confidence desc nulls last,
+      packet_key asc
       ${LIMIT > 0 ? `limit ${LIMIT}` : ''}
   `;
 
@@ -213,6 +273,7 @@ async function main() {
     'source_ref_key',
     'source_ref',
     'canonical_source_ref',
+    'source_revision',
     'file_path',
     'feature_id',
     'feature_label',
@@ -239,11 +300,20 @@ async function main() {
     'lineage_version',
     'ledger_type',
     'metadata',
+    'workspace_revision',
+    'binding_checksum',
+    'source_authority_repo_id',
+    'binding_match_count',
   ]).map((row) => ({
     packet_key: normalizeText(row.packet_key),
     source_ref_key: normalizeSourceRef(row.source_ref_key),
     source_ref: normalizeSourceRef(row.source_ref || row.canonical_source_ref || row.file_path || row.source_ref_key),
     canonical_source_ref: normalizeSourceRef(row.canonical_source_ref || row.source_ref || row.source_ref_key),
+    source_revision: normalizeText(row.source_revision),
+    workspace_revision: normalizeText(row.workspace_revision),
+    binding_checksum: normalizeText(row.binding_checksum),
+    source_authority_repo_id: normalizeText(row.source_authority_repo_id),
+    binding_match_count: toOptionalNumber(row.binding_match_count),
     file_path: normalizeText(row.file_path),
     feature_id: normalizeText(row.feature_id),
     feature_label: normalizeText(row.feature_label),
@@ -334,6 +404,10 @@ async function main() {
       source_ref: sourceRef,
       source_ref_key: sourceRefKey || null,
       canonical_source_ref: canonicalSourceRef || null,
+      source_revision: row.source_revision,
+      workspace_revision: row.workspace_revision,
+      binding_checksum: row.binding_checksum,
+      source_authority_repo_id: row.source_authority_repo_id,
       qdrant_point_id: qdrantPointId || null,
       qdrant_collection: qdrantCollection || null,
       qdrant_payload_key: qdrantPayloadKey || null,
@@ -518,10 +592,19 @@ async function main() {
   const report = {
     generatedAt: new Date().toISOString(),
     mode: APPLY_REQUESTED ? 'apply' : 'dry-run',
+    cacheRuntime: {
+      targetContainer: container ?? null,
+      passwordConfigured: Boolean(redisPassword),
+      writesPerformed: false,
+    },
     limit: LIMIT,
     source: {
       table: sourceTable,
       rowsRead: rows.length,
+      sourceAuthorityRepoId: SOURCE_AUTHORITY_REPO_ID,
+      workspaceRevision: WORKSPACE_REVISION,
+      exactSourceBindingJoin: true,
+      admissionFunnel,
     },
     summary: {
       candidateRows: rows.length,
@@ -541,30 +624,15 @@ async function main() {
       som_cell: plan.value.som_cell ?? null,
     })),
     nextSafeAction: APPLY_REQUESTED
-      ? 'Warm writes have been requested; rerun the audit to confirm hot cache families exist.'
+      ? 'Apply was requested, but this legacy warm path emits packet-key cache entries without candidate snapshot/ordinal-map identity; no writes are performed. Use the validated ACE packet residency owner after a current ContextManifest admission exists.'
       : plans.length === 0
-        ? 'No lineage-qualified packets were admitted; do not apply. Resolve source/workspace authority, then rerun the guarded dry-run.'
-        : 'Review the dry-run plan; apply remains separately gated and is not authorized by this report.',
+        ? `No rows passed the exact source-binding join (source=${admissionFunnel.source_ref_rows ?? 0}, feature=${admissionFunnel.feature_rows ?? 0}, sourceRevision=${admissionFunnel.source_revision_rows ?? 0}, exactWorkspaceBinding=${admissionFunnel.workspace_revision_rows ?? 0}, fullyQualified=${admissionFunnel.fully_qualified_rows ?? 0}). Supply an explicit --workspace-revision=sha256:...; do not apply this legacy cache format.`
+        : 'Review the dry-run plan only; these legacy packet-key entries are not eligible for apply without snapshot/ordinal-map identity.',
   };
 
   if (APPLY_REQUESTED) {
-    let appliedWrites = 0;
-    const failures = [];
-    for (const plan of plans) {
-      const payload = JSON.stringify(plan.value);
-      const setResult = writeKey(container, plan.key, payload, plan.ttl, redisPassword);
-      if (!setResult.ok) {
-        failures.push({ key: plan.key, status: setResult.status, error: setResult.stderr.trim() });
-        continue;
-      }
-      appliedWrites += 1;
-    }
-    report.summary.appliedWrites = appliedWrites;
-    report.summary.failures = failures.length;
-    report.failures = failures;
-    report.nextSafeAction = failures.length === 0
-      ? 'Hot cache families were warmed; rerun the Bitfrost audit to verify key counts and TTL samples.'
-      : 'Some warm writes failed; inspect the failures and rerun the apply pass.';
+    report.mode = 'apply-blocked-legacy-identity';
+    report.applyBlockedReason = 'REVISION_BOUND_ACE_PACKET_IDENTITY_REQUIRED';
   }
 
   await fs.mkdir(path.dirname(OUT_JSON), { recursive: true });
@@ -580,6 +648,7 @@ async function main() {
     failures: report.summary.failures,
     passwordConfigured: Boolean(redisPassword),
   }, null, 2));
+  if (report.applyBlockedReason) process.exitCode = 2;
 }
 
 main().catch((error) => {

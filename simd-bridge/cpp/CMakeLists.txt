@@ -1,6 +1,31 @@
 cmake_minimum_required(VERSION 3.18)
 project(tensorrt_bridge LANGUAGES C CXX)
 
+execute_process(
+  COMMAND git rev-parse --short=12 HEAD
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../.."
+  OUTPUT_VARIABLE TENSORRT_BRIDGE_BUILD_COMMIT
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_QUIET
+  RESULT_VARIABLE _git_commit_result
+)
+if(NOT _git_commit_result EQUAL 0 OR NOT TENSORRT_BRIDGE_BUILD_COMMIT)
+  set(TENSORRT_BRIDGE_BUILD_COMMIT "unknown")
+endif()
+execute_process(
+  COMMAND git status --porcelain
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../.."
+  OUTPUT_VARIABLE _git_dirty_status
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_QUIET
+  RESULT_VARIABLE _git_status_result
+)
+if(_git_status_result EQUAL 0 AND NOT _git_dirty_status)
+  set(TENSORRT_BRIDGE_BUILD_DIRTY 0)
+else()
+  set(TENSORRT_BRIDGE_BUILD_DIRTY 1)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -47,6 +72,7 @@ set(SIMD_HAVE_LIBTORCH OFF)
 set(SIMD_HAVE_CUBLAS   OFF)
 set(SIMD_HAVE_CUBLASLT OFF)
 set(SIMD_HAVE_CUDNN    OFF)
+set(SIMD_HAVE_TENSORRT OFF)
 set(SIMD_HAVE_CUVS     OFF)
 set(SIMD_HAVE_CUTLASS  OFF)
 
@@ -67,6 +93,17 @@ else()
     list(APPEND CMAKE_PREFIX_PATH "${_lt_best}")
     message(STATUS "LibTorch root (auto): ${_lt_best}")
   endif()
+endif()
+
+# ── TensorRT runtime presence (capability metadata only) ──────────────
+find_path(TENSORRT_INCLUDE_DIR NvInfer.h
+  HINTS "${TENSORRT_ROOT}/include" "$ENV{TENSORRT_ROOT}/include" "$ENV{TENSORRT_ROOT}/include/x86_64-linux-gnu")
+find_library(TENSORRT_NVINFER_LIBRARY nvinfer
+  HINTS "${TENSORRT_ROOT}/lib" "${TENSORRT_ROOT}/lib64" "${TENSORRT_ROOT}/lib/x64"
+        "$ENV{TENSORRT_ROOT}/lib" "$ENV{TENSORRT_ROOT}/lib64" "$ENV{TENSORRT_ROOT}/lib/x64")
+if(TENSORRT_INCLUDE_DIR AND TENSORRT_NVINFER_LIBRARY)
+  set(SIMD_HAVE_TENSORRT ON)
+  message(STATUS "TensorRT runtime found (capability metadata only)")
 endif()
 
 # cuVS: env CUVS_ROOT > RAPIDS conda env > skip
@@ -147,14 +184,17 @@ if(SIMD_ENABLE_CUDA)
   include(CheckLanguage)
   check_language(CUDA)
   if(CMAKE_CUDA_COMPILER)
+    # Set the workstation fallback before enable_language(CUDA) lets CMake
+    # cache the compiler's generic default (which may target the wrong SM).
+    # Explicit toolchain/cache values remain authoritative.
+    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+      set(CMAKE_CUDA_ARCHITECTURES "86" CACHE STRING "CUDA architectures for Parent Atlas native kernels")
+    endif()
     enable_language(CUDA)
     set(SIMD_HAVE_CUDA ON)
     message(STATUS "CUDA compiler: ${CMAKE_CUDA_COMPILER}")
     if(CUDAToolkit_VERSION)
       message(STATUS "CUDA Toolkit: ${CUDAToolkit_VERSION}")
-    endif()
-    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-      set(CMAKE_CUDA_ARCHITECTURES "86")
     endif()
     if(NOT DEFINED TORCH_CUDA_ARCH_LIST)
       set(TORCH_CUDA_ARCH_LIST "8.6")
@@ -269,10 +309,18 @@ if(SIMD_ENABLE_LIBTORCH)
 
   if(Torch_FOUND)
     set(SIMD_HAVE_LIBTORCH ON)
+    if(TORCH_VERSION)
+      set(TENSORRT_BRIDGE_LIBTORCH_VERSION "${TORCH_VERSION}")
+    else()
+      set(TENSORRT_BRIDGE_LIBTORCH_VERSION "linked-version-unknown")
+    endif()
     message(STATUS "LibTorch: found — cuBLASLt FP16/BF16 dispatched via torch::mm()")
   else()
+    set(TENSORRT_BRIDGE_LIBTORCH_VERSION "not-linked")
     message(WARNING "LibTorch: not found — building CPU fallback stubs")
   endif()
+else()
+  set(TENSORRT_BRIDGE_LIBTORCH_VERSION "not-linked")
 endif()
 
 # ── Capability summary ────────────────────────────────────────────────
@@ -291,12 +339,12 @@ message(STATUS "")
 
 # ── CUDA source files ─────────────────────────────────────────────────
 if(SIMD_HAVE_CUDA)
-  add_library(cuda_kernels STATIC som_cache.cu lstm_gpu.cu cuda_graph_bridge.cu)
+  add_library(cuda_kernels STATIC som_cache.cu lstm_gpu.cu cuda_graph_bridge.cu native_runtime_info.cu)
   target_compile_definitions(cuda_kernels PRIVATE SOM_HAVE_CUDA=1)
   set_target_properties(cuda_kernels PROPERTIES CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
 else()
-  add_library(cuda_kernels STATIC som_cache.cu lstm_gpu.cu cuda_graph_bridge.cu)
-  set_source_files_properties(som_cache.cu lstm_gpu.cu cuda_graph_bridge.cu PROPERTIES LANGUAGE CXX)
+  add_library(cuda_kernels STATIC som_cache.cu lstm_gpu.cu cuda_graph_bridge.cu native_runtime_info.cu)
+  set_source_files_properties(som_cache.cu lstm_gpu.cu cuda_graph_bridge.cu native_runtime_info.cu PROPERTIES LANGUAGE CXX)
   target_compile_definitions(cuda_kernels PRIVATE NO_CUDA=1 SOM_HAVE_CUDA=0)
 endif()
 
@@ -311,6 +359,7 @@ endif()
 # ── Main addon sources ────────────────────────────────────────────────
 set(ADDON_SOURCES
   binding.cc
+  native_execution_counters.cpp
   tensor_bridge.cc
   simdjson_bridge.cc
   lstm_bridge.cc
@@ -344,8 +393,12 @@ target_compile_definitions(tensorrt_bridge PRIVATE
   SIMD_HAVE_CUBLAS=$<BOOL:${SIMD_HAVE_CUBLAS}>
   SIMD_HAVE_CUBLASLT=$<BOOL:${SIMD_HAVE_CUBLASLT}>
   SIMD_HAVE_CUDNN=$<BOOL:${SIMD_HAVE_CUDNN}>
+  SIMD_HAVE_TENSORRT=$<BOOL:${SIMD_HAVE_TENSORRT}>
   SIMD_HAVE_CUVS=$<BOOL:${SIMD_HAVE_CUVS}>
   SIMD_HAVE_CUTLASS=$<BOOL:${SIMD_HAVE_CUTLASS}>
+  TENSORRT_BRIDGE_BUILD_COMMIT="${TENSORRT_BRIDGE_BUILD_COMMIT}"
+  TENSORRT_BRIDGE_BUILD_DIRTY=${TENSORRT_BRIDGE_BUILD_DIRTY}
+  TENSORRT_BRIDGE_LIBTORCH_VERSION="${TENSORRT_BRIDGE_LIBTORCH_VERSION}"
 )
 
 if(SIMD_HAVE_CUTLASS)
@@ -385,6 +438,11 @@ if(SIMD_HAVE_CUDNN)
   elseif(TARGET CUDA::cudnn)
     target_link_libraries(tensorrt_bridge PRIVATE CUDA::cudnn)
   endif()
+endif()
+
+if(SIMD_HAVE_TENSORRT)
+  target_include_directories(tensorrt_bridge PRIVATE "${TENSORRT_INCLUDE_DIR}")
+  target_link_libraries(tensorrt_bridge PRIVATE "${TENSORRT_NVINFER_LIBRARY}")
 endif()
 
 # cuVS

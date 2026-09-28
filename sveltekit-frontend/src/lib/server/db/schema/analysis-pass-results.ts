@@ -187,13 +187,16 @@ export function buildAnalysisPassOutputHash(payload: AnalysisPassPayload | undef
  * full reasoning — this was found by reading buildAnalysisPassInputHash's
  * exact field list, not assumed.
  */
-export function buildAnalysisPassIdentityHash(input: AnalysisPassLedgerInput): string {
+export function buildAnalysisPassIdentityHash(input: AnalysisPassLedgerInput): string | null {
+	const inputHash = input.inputHash?.trim();
+	if (!inputHash) return null;
+
 	const canonical = {
 		packetKey: input.packetKey ?? null,
 		sourceRevision: input.sourceRevision ?? null,
 		passName: input.passName,
 		passRevision: input.passRevision,
-		inputHash: input.inputHash ?? buildAnalysisPassInputHash(input),
+		inputHash,
 	};
 
 	return sha256Hex(stableStringify(canonical));
@@ -243,7 +246,9 @@ export function buildAnalysisPassIdempotencyKey(input: AnalysisPassLedgerInput):
 export function normalizeAnalysisPassLedgerInput(input: AnalysisPassLedgerInput): NewAnalysisPassResultRow {
 	const passKey = (input.passKey ?? buildAnalysisPassIdempotencyKey(input)).trim();
 	const inputHash = input.inputHash?.trim() || buildAnalysisPassInputHash(input);
-	const passIdentityHash = buildAnalysisPassIdentityHash({ ...input, inputHash });
+	// The stored inputHash fallback is execution-scoped. Never promote it to a
+	// logical identity, because it includes analysisJobId/evidenceId.
+	const passIdentityHash = buildAnalysisPassIdentityHash(input);
 	const promptHash = input.promptHash?.trim() || null;
 	const passType = (input.passType ?? input.passName ?? input.family).trim();
 	const payload = input.payload ?? {};

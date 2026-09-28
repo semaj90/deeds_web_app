@@ -9,36 +9,83 @@
 import Redis from 'ioredis';
 
 /**
- * Vector lane registry: defines semantic meaning of each dimension
- * Used by retrieval, caching, and embedding stages to coordinate operations
+ * Representation registry: semantic_768 is the canonical dense reference.
+ * MRL and learned latent lanes are separately named, noncanonical projections;
+ * dimensions alone never establish identity or representation provenance.
  */
 export const VECTOR_LANE_REGISTRY = {
   DENSE_768: {
     role: 'CANONICAL_SEMANTIC',
     dimensions: 768,
     authoritative: true,
-    model: 'embeddinggemma',
-    modelVersion: 'latest',
+    representationId: 'semantic_768',
+    model: 'EmbeddingGemma',
+    modelVersion: 'REQUIRED_FROM_QUALIFIED_RUNTIME_RECEIPT',
     onlineSearch: true,
-    description: 'Primary semantic representation from embeddinggemma:latest'
+    description: 'Canonical 768-D semantic reference; runtime artifact/tokenizer provenance must be receipt-bound.'
   },
-  DENSE_384_COMPACT: {
-    role: 'ROUTING_PREFILTER',
-    dimensions: 384,
+  MRL_512: {
+    role: 'DERIVED_MRL_PROJECTION',
+    representationId: 'semantic_mrl_512',
+    dimensions: 512,
     authoritative: false,
-    model: 'nomic-embed-text-warden',
-    modelVersion: 'optional',
+    derivedFrom: 'DENSE_768',
+    projectionMethod: 'PREFIX_TRUNCATE_L2_RENORMALIZE',
     onlineSearch: false,
-    description: 'Secondary routing cache for fast re-ranking (cost optimization)'
+    description: 'Noncanonical 512-D MRL view derived from a qualified semantic_768 vector.'
+  },
+  MRL_256: {
+    role: 'DERIVED_MRL_PROJECTION',
+    representationId: 'semantic_mrl_256',
+    dimensions: 256,
+    authoritative: false,
+    derivedFrom: 'DENSE_768',
+    projectionMethod: 'PREFIX_TRUNCATE_L2_RENORMALIZE',
+    onlineSearch: false,
+    description: 'Noncanonical 256-D MRL view derived from a qualified semantic_768 vector.'
+  },
+  MRL_128: {
+    role: 'DERIVED_MRL_PROJECTION',
+    representationId: 'semantic_mrl_128',
+    dimensions: 128,
+    authoritative: false,
+    derivedFrom: 'DENSE_768',
+    projectionMethod: 'PREFIX_TRUNCATE_L2_RENORMALIZE',
+    onlineSearch: false,
+    description: 'Noncanonical 128-D MRL view derived from a qualified semantic_768 vector.'
+  },
+  LATENT_256: {
+    role: 'LEARNED_DERIVED_PROJECTION',
+    representationId: 'latent_256',
+    dimensions: 256,
+    authoritative: false,
+    derivedFrom: 'DENSE_768',
+    model: 'autoencoder',
+    modelVersion: 'CHECKPOINT_REVISION_REQUIRED',
+    onlineSearch: false,
+    description: 'Learned noncanonical projection; checkpoint and input representation revisions are required.'
+  },
+  LATENT_128: {
+    role: 'LEARNED_DERIVED_PROJECTION',
+    representationId: 'latent_128',
+    dimensions: 128,
+    authoritative: false,
+    derivedFrom: 'DENSE_768',
+    model: 'autoencoder',
+    modelVersion: 'CHECKPOINT_REVISION_REQUIRED',
+    onlineSearch: false,
+    description: 'Learned noncanonical projection; checkpoint and input representation revisions are required.'
   },
   LATENT_64: {
-    role: 'EXPERIMENTAL_COMPRESSION',
+    role: 'LEARNED_DERIVED_PROJECTION',
+    representationId: 'latent_64',
     dimensions: 64,
     authoritative: false,
+    derivedFrom: 'DENSE_768',
     model: 'autoencoder',
-    modelVersion: 'pending-training',
+    modelVersion: 'CHECKPOINT_REVISION_REQUIRED',
     onlineSearch: false,
-    description: 'Experimental 768→64 latent compression (future MLA-style consumer)'
+    description: 'Learned noncanonical topology/routing feature; not canonical dense retrieval.'
   }
 };
 

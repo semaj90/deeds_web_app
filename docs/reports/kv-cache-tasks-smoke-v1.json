@@ -1,0 +1,89 @@
+{
+  "schema": "kv-cache-tasks-smoke-v1",
+  "at": "2026-09-27T05:01:13.597Z",
+  "tasksFile": "openspec\\changes\\parent-atlas-kv-cache-adaptation-research\\tasks.md",
+  "smoke": {
+    "counts": {
+      "PASS": 10,
+      "INFO": 2
+    },
+    "passOfVerifiable": "10/10",
+    "results": [
+      {
+        "id": "SM-CFG-01",
+        "status": "PASS",
+        "detail": "config.json valid; clients=trace,atlas_tools; disable_auto_tool_inject=true"
+      },
+      {
+        "id": "SM-BF-01",
+        "status": "PASS",
+        "detail": "health=200; live disable_auto_tool_inject=true; restart_required={\"required\":false}"
+      },
+      {
+        "id": "SM-BF-02",
+        "status": "PASS",
+        "detail": "trace:connected:177tools:codemode=true | atlas_tools:connected:10tools:codemode=false"
+      },
+      {
+        "id": "SM-OPS-PORT",
+        "status": "INFO",
+        "detail": "config.json atlas_tools=http://host.docker.internal:8794/mcp; live (masked)=http************************/mcp"
+      },
+      {
+        "id": "SM-BF-03",
+        "status": "PASS",
+        "detail": "direct=17 bifrost_default=17 (must be equal: no auto-injection)"
+      },
+      {
+        "id": "SM-BF-04",
+        "status": "PASS",
+        "detail": "opt-in atlas_tools=1088 (expect >17, <5000); opt-in trace code-mode=1783 (expect <6000; conventional TRACE was ~35,000)"
+      },
+      {
+        "id": "SM-KV-01",
+        "status": "PASS",
+        "detail": "cold {\"n\":1853,\"cache\":0,\"ms\":1058} | identical {\"n\":1853,\"cache\":1849,\"ms\":38} (reuse 99.8%) | new suffix {\"n\":1854,\"cache\":1721,\"ms\":132} (reuse 92.8%)"
+      },
+      {
+        "id": "SM-BF-05",
+        "status": "PASS",
+        "detail": "initialize=200; tools/list=12; record_outcome_exposed=false"
+      },
+      {
+        "id": "SM-BF-06",
+        "status": "PASS",
+        "detail": "tools/call classify_intent -> \"{\\n  \\\"intent\\\": \\\"planning\\\",\\n  \\\"domain\\\": \\\"general\\\",\\n  \\\"subdomain\\\": \\\"cache\\\",\\n  \\\"confidence\\\": 0.85,\\n  \\\"s"
+      },
+      {
+        "id": "SM-ACE-01",
+        "status": "INFO",
+        "detail": "ace_context_packets,ace_chunks rows = 0,0 (claim in tasks.md: 0,0)"
+      },
+      {
+        "id": "SM-REG-01",
+        "status": "PASS",
+        "detail": "symbol_identity=UNKNOWN semantic_768=UNKNOWN (tasks.md ID-01 says both UNKNOWN)"
+      },
+      {
+        "id": "SM-SKILL-01",
+        "status": "PASS",
+        "detail": "parent-atlas-workstation skill file present (loadability not tested)"
+      }
+    ]
+  },
+  "checkboxCensus": {
+    "file": {
+      "done": 9,
+      "open": 54,
+      "total": 63,
+      "pctChecked": 14.3
+    },
+    "thisSession": {
+      "section": "from \"## BIFROST-CODEMODE-01\" to EOF",
+      "done": 5,
+      "open": 31,
+      "pctChecked": 13.9
+    },
+    "caveat": "Checkbox ratio counts ticked boxes only; it is not verified progress. The smoke block above is the verified evidence."
+  }
+}

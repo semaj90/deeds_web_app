@@ -1,13 +1,13 @@
 {
   "schema": "atlas.symbol-producer-ownership.v1",
   "gate": "S01-10",
-  "generatedAt": "2026-09-22T00:01:03.921Z",
+  "generatedAt": "2026-09-27T22:15:59.064Z",
   "inputs": {
     "census": "docs/reports/symbol-revision-producer-census-v1.json",
     "censusReceiptChecksum": "sha256:d524f0d57440318f61fd8bf62c846d785e0d9968156e49d83220f3b6b48165ab",
     "staticScan": {
-      "filesScanned": 9382,
-      "codeFilesScanned": 8958
+      "filesScanned": 9657,
+      "codeFilesScanned": 9227
     }
   },
   "writersByTarget": {
@@ -17,6 +17,9 @@
       "scripts/atlas/prove-feature-intelligence-database.mjs"
     ],
     "symbol_versions": [
+      "scripts/atlas/apply-symbol-revision-repair-v1.mjs",
+      "scripts/atlas/freeze-symbol-revision-placeholder-repair-manifest-v1.mjs",
+      "scripts/atlas/freeze-symbol-revision-repair-manifest-v1.mjs",
       "scripts/atlas/materialize-ast-symbol-versions.mjs"
     ],
     "symbol_aliases": [],
@@ -39,7 +42,7 @@
       "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-writer-v1.ts"
     ]
   },
-  "writerCount": 12,
+  "writerCount": 15,
   "writers": [
     {
       "file": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
@@ -48,8 +51,10 @@
       ],
       "runtimeEntrypoints": [],
       "cliEntrypoint": true,
-      "referencedByOtherFiles": [],
-      "referencedByOtherFilesCount": 0,
+      "referencedByOtherFiles": [
+        "scripts/atlas/audit-symbol-revision-forward-qualification-v1.mjs"
+      ],
+      "referencedByOtherFilesCount": 1,
       "transaction": {
         "begin": true,
         "commit": true,
@@ -59,15 +64,23 @@
       "dryRunDefault": true,
       "revisionSourceLines": [
         {
-          "line": 100,
+          "line": 98,
+          "text": "const provenanceMap = await q.loadBindingProvenanceV1(pool, rows.map((r) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));"
+        },
+        {
+          "line": 101,
+          "text": "const verdict = q.admitLogicalSymbolRegistryV1({ sourceRef: row.source_ref, createdFromSourceRevision: row.source_revision, registryRevision: 'atlas-current-tree-bound-sy"
+        },
+        {
+          "line": 112,
           "text": "created_from_source_ref, created_from_source_revision, registry_revision, status)"
         },
         {
-          "line": 105,
+          "line": 117,
           "text": "row.qualified_name, row.nomination_id, row.source_ref, row.source_revision,"
         },
         {
-          "line": 115,
+          "line": 127,
           "text": "created_from_source_ref, created_from_source_revision, registry_revision, status"
         }
       ],
@@ -86,8 +99,10 @@
       ],
       "runtimeEntrypoints": [],
       "cliEntrypoint": true,
-      "referencedByOtherFiles": [],
-      "referencedByOtherFilesCount": 0,
+      "referencedByOtherFiles": [
+        "scripts/atlas/audit-symbol-revision-forward-qualification-v1.mjs"
+      ],
+      "referencedByOtherFilesCount": 1,
       "transaction": {
         "begin": false,
         "commit": false,
@@ -97,21 +112,29 @@
       "dryRunDefault": true,
       "revisionSourceLines": [
         {
-          "line": 55,
+          "line": 56,
           "text": "// `symbol-key:${sha256({sourceRef, sourceRevision, kind, name, startByte,"
         },
         {
-          "line": 135,
-          "text": "created_from_source_revision, registry_revision, status"
+          "line": 130,
+          "text": "const provenanceMap = await q.loadBindingProvenanceV1(pool, batch.map(([, r]) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));"
+        },
+        {
+          "line": 134,
+          "text": "const verdict = q.admitLogicalSymbolRegistryV1({ sourceRef: row.source_ref, createdFromSourceRevision: row.source_revision, registryRevision: REGISTRY_REVISION, provenanc"
         },
         {
           "line": 148,
+          "text": "created_from_source_revision, registry_revision, status"
+        },
+        {
+          "line": 161,
           "text": "row.source_revision,"
         }
       ],
       "placeholderOrFallbackExpressions": [
         {
-          "line": 56,
+          "line": 57,
           "text": "// endByte}).slice(0,40)}` — already unique per exact declaration"
         }
       ],
@@ -129,8 +152,10 @@
       ],
       "runtimeEntrypoints": [],
       "cliEntrypoint": true,
-      "referencedByOtherFiles": [],
-      "referencedByOtherFilesCount": 0,
+      "referencedByOtherFiles": [
+        "scripts/atlas/audit-symbol-revision-forward-qualification-v1.mjs"
+      ],
+      "referencedByOtherFilesCount": 1,
       "transaction": {
         "begin": true,
         "commit": false,
@@ -161,6 +186,188 @@
       "writesUpstreamFileId": []
     },
     {
+      "file": "scripts/atlas/apply-symbol-revision-repair-v1.mjs",
+      "writesTargets": [
+        "symbol_versions"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [],
+      "referencedByOtherFilesCount": 0,
+      "transaction": {
+        "begin": true,
+        "commit": true,
+        "rollback": true
+      },
+      "readbackVerification": true,
+      "dryRunDefault": false,
+      "revisionSourceLines": [
+        {
+          "line": 8,
+          "text": "* OLD precondition, apply each UPDATE under WHERE symbol_version_id = ? AND source_revision = OLD AND"
+        },
+        {
+          "line": 9,
+          "text": "* workspace_revision = OLD (exactly the manifest's template), require exactly one row affected per statement,"
+        },
+        {
+          "line": 67,
+          "text": "const locked = new Map((await client.query(`SELECT symbol_version_id, source_revision, workspace_revision, upstream_file_id FROM atlas_symbol_versions WHERE symbol_versio"
+        },
+        {
+          "line": 74,
+          "text": "if (!live || live.source_revision !== row.precondition.oldSourceRevision || live.workspace_revision !== row.precondition.oldWorkspaceRevision) {"
+        },
+        {
+          "line": 83,
+          "text": "`UPDATE atlas_symbol_versions SET source_revision = $1, workspace_revision = $2 WHERE symbol_version_id = $3 AND source_revision = $4 AND workspace_revision = $5`,"
+        },
+        {
+          "line": 84,
+          "text": "[row.proposed.sourceRevision, row.proposed.workspaceRevision, row.symbolVersionId, row.precondition.oldSourceRevision, row.precondition.oldWorkspaceRevision],"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 74,
+          "text": "if (!live || live.source_revision !== row.precondition.oldSourceRevision || live.workspace_revision !== row.precondition.oldWorkspaceRevision) {"
+        }
+      ],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": [
+        {
+          "line": 67,
+          "text": "const locked = new Map((await client.query(`SELECT symbol_version_id, source_revision, workspace_revision, upstream_file_id FROM atlas_symbol_versions WHERE symbol_versio"
+        },
+        {
+          "line": 77,
+          "text": "if (live.upstream_file_id !== null) throw new Error(`REPAIR_PREVIEW_STALE: ${row.symbolVersionId} upstream_file_id unexpectedly non-null`);"
+        },
+        {
+          "line": 99,
+          "text": "const upstreamFileIdStillAllNull = (await client.query(`SELECT count(*)::int AS n FROM atlas_symbol_versions WHERE upstream_file_id IS NOT NULL`)).rows[0].n === 0;"
+        }
+      ]
+    },
+    {
+      "file": "scripts/atlas/freeze-symbol-revision-placeholder-repair-manifest-v1.mjs",
+      "writesTargets": [
+        "symbol_versions"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [],
+      "referencedByOtherFilesCount": 0,
+      "transaction": {
+        "begin": false,
+        "commit": false,
+        "rollback": false
+      },
+      "readbackVerification": false,
+      "dryRunDefault": false,
+      "revisionSourceLines": [
+        {
+          "line": 33,
+          "text": "const bad = (await pool.query(`SELECT symbol_version_id, stable_symbol_id, source_ref, source_revision, workspace_revision FROM atlas_symbol_versions WHERE source_revisio"
+        },
+        {
+          "line": 35,
+          "text": "const bindingRows = refs.length ? (await pool.query(`SELECT canonical_source_ref, source_revision, content_digest FROM atlas_workspace_source_bindings WHERE repo_id = $1 "
+        },
+        {
+          "line": 44,
+          "text": "if (!/^[0-9a-f]{64}$/.test(b.content_digest) || b.source_revision !== proposedSourceRevision) { sourceUnavailable += 1; continue; }"
+        },
+        {
+          "line": 47,
+          "text": "precondition: { symbolVersionId: row.symbol_version_id, oldSourceRevision: row.source_revision, oldWorkspaceRevision: row.workspace_revision },"
+        },
+        {
+          "line": 48,
+          "text": "proposed: { sourceRevision: proposedSourceRevision, workspaceRevision: ADMITTED_WORKSPACE_REVISION },"
+        },
+        {
+          "line": 49,
+          "text": "updateTemplate: 'UPDATE atlas_symbol_versions SET source_revision = $newSourceRevision, workspace_revision = $newWorkspaceRevision WHERE symbol_version_id = $symbolVersio"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 53,
+          "text": "&& sourceUnavailable === (preview.versionClassificationCounts.SOURCE_NOT_IN_COHORT ?? -1)"
+        }
+      ],
+      "revisionShapeValidation": true,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
+      "file": "scripts/atlas/freeze-symbol-revision-repair-manifest-v1.mjs",
+      "writesTargets": [
+        "symbol_versions"
+      ],
+      "runtimeEntrypoints": [],
+      "cliEntrypoint": true,
+      "referencedByOtherFiles": [],
+      "referencedByOtherFilesCount": 0,
+      "transaction": {
+        "begin": false,
+        "commit": false,
+        "rollback": false
+      },
+      "readbackVerification": true,
+      "dryRunDefault": false,
+      "revisionSourceLines": [
+        {
+          "line": 8,
+          "text": "* of this manifest pending S01-10-schema). The manifest freezes: symbolVersionId, prior (source_revision, workspace_revision),"
+        },
+        {
+          "line": 9,
+          "text": "* proposed (source_revision, workspace_revision), and a per-row precondition (`WHERE symbol_version_id = ? AND source_revision ="
+        },
+        {
+          "line": 10,
+          "text": "* OLD AND workspace_revision = OLD`) that S01-10E must use unmodified — this script does not execute any UPDATE."
+        },
+        {
+          "line": 41,
+          "text": "const ADMITTED_WORKSPACE_REVISION = preview.admittedWorkspace.workspaceRevision;"
+        },
+        {
+          "line": 42,
+          "text": "const bad = await pool.query(`SELECT symbol_version_id, stable_symbol_id, source_ref, source_revision, workspace_revision FROM atlas_symbol_versions WHERE source_revision"
+        },
+        {
+          "line": 45,
+          "text": "? await pool.query(`SELECT canonical_source_ref, source_revision, content_digest FROM atlas_workspace_source_bindings WHERE repo_id = 'deeds-web-app' AND canonical_source"
+        }
+      ],
+      "placeholderOrFallbackExpressions": [
+        {
+          "line": 55,
+          "text": "if (binding.source_revision !== proposedSourceRevision || !/^[0-9a-f]{64}$/.test(binding.content_digest)) { sourceUnavailable += 1; continue; }"
+        },
+        {
+          "line": 67,
+          "text": "&& sourceUnavailable === (preview.versionPreview.tally.SOURCE_UNAVAILABLE ?? -1)"
+        }
+      ],
+      "revisionShapeValidation": false,
+      "randomGenerators": {
+        "randomUUID": false,
+        "genRandomUuid": false
+      },
+      "writesUpstreamFileId": []
+    },
+    {
       "file": "scripts/atlas/materialize-ast-symbol-versions.mjs",
       "writesTargets": [
         "symbol_versions"
@@ -175,8 +382,11 @@
         }
       ],
       "cliEntrypoint": true,
-      "referencedByOtherFiles": [],
-      "referencedByOtherFilesCount": 0,
+      "referencedByOtherFiles": [
+        "scripts/atlas/audit-symbol-revision-forward-qualification-v1.mjs",
+        "scripts/atlas/plan-symbol-revision-placeholder-repair-preview-v1.mjs"
+      ],
+      "referencedByOtherFilesCount": 2,
       "transaction": {
         "begin": true,
         "commit": true,
@@ -186,33 +396,33 @@
       "dryRunDefault": true,
       "revisionSourceLines": [
         {
-          "line": 71,
+          "line": 72,
           "text": "// candidate.sourceRevision is the content-hash evidence revision."
         },
         {
-          "line": 72,
+          "line": 73,
           "text": "graphifySourceRevision: node.graphifySourceRevision ?? node.sourceRevision,"
         },
         {
-          "line": 85,
+          "line": 86,
           "text": "const revisionQualifiedRows = rows.filter((row) => row.source_revision && row.workspace_revision);"
         },
         {
-          "line": 93,
+          "line": 94,
           "text": "missingSourceRevision: rows.filter((row) => !row.source_revision).length,"
         },
         {
-          "line": 94,
+          "line": 95,
           "text": "missingWorkspaceRevision: rows.filter((row) => !row.workspace_revision).length,"
         },
         {
-          "line": 109,
+          "line": 112,
           "text": "&& comparableRevision(node.graphifySourceRevision) === comparableRevision(row.source_revision)"
         }
       ],
       "placeholderOrFallbackExpressions": [
         {
-          "line": 72,
+          "line": 73,
           "text": "graphifySourceRevision: node.graphifySourceRevision ?? node.sourceRevision,"
         }
       ],
@@ -223,7 +433,7 @@
       },
       "writesUpstreamFileId": [
         {
-          "line": 146,
+          "line": 158,
           "text": "upstream_node_id, upstream_file_id, upstream_symbol_id, upstream_chunk_id,"
         }
       ]
@@ -311,7 +521,7 @@
         "commit": true,
         "rollback": true
       },
-      "readbackVerification": false,
+      "readbackVerification": true,
       "dryRunDefault": true,
       "revisionSourceLines": [
         {
@@ -319,53 +529,53 @@
           "text": "* via `ORDER BY workspace_revision DESC, code_source_revision DESC` -- sorting"
         },
         {
-          "line": 112,
+          "line": 114,
           "text": "// `status`/`executionId`/`workspaceRevision`, NOT nested under a `sourceSnapshot`"
         },
         {
-          "line": 141,
+          "line": 143,
           "text": "workspaceRevision: parsed.workspaceRevision ?? null,"
         },
         {
-          "line": 142,
+          "line": 144,
           "text": "workspaceRevisionRecordChecksum: parsed.workspaceRevisionRecordChecksum ?? null,"
         },
         {
-          "line": 445,
-          "text": "source_revision: binding.sourceRevision,"
+          "line": 192,
+          "text": "if (APPLY && GRAPHIFY_SNAPSHOT_RECEIPT && !/^sha256:[a-f0-9]{64}$/i.test(GRAPHIFY_SNAPSHOT_RECEIPT.workspaceRevision ?? '')) {"
         },
         {
-          "line": 462,
-          "text": "NULLIF(BTRIM(gef.code_source_revision::text), '') AS source_revision"
+          "line": 502,
+          "text": "source_revision: binding.sourceRevision,"
         }
       ],
       "placeholderOrFallbackExpressions": [
         {
-          "line": 141,
+          "line": 143,
           "text": "workspaceRevision: parsed.workspaceRevision ?? null,"
         },
         {
-          "line": 142,
+          "line": 144,
           "text": "workspaceRevisionRecordChecksum: parsed.workspaceRevisionRecordChecksum ?? null,"
         },
         {
-          "line": 143,
+          "line": 145,
           "text": "workspaceOriginRuntimeRevision: parsed.workspaceOriginRuntimeRevision ?? null,"
         },
         {
-          "line": 161,
+          "line": 163,
           "text": "if (!Array.isArray(parsed.targetSourceRefs) || parsed.targetSourceRefs.length === 0 || !Array.isArray(parsed.bindings)) {"
         },
         {
-          "line": 220,
-          "text": "const base = sourceRef.split('/').pop()?.replace(/\\.\\w+$/, '') || 'unknown';"
+          "line": 192,
+          "text": "if (APPLY && GRAPHIFY_SNAPSHOT_RECEIPT && !/^sha256:[a-f0-9]{64}$/i.test(GRAPHIFY_SNAPSHOT_RECEIPT.workspaceRevision ?? '')) {"
         },
         {
-          "line": 247,
-          "text": "const lower = (sourceRef || '').toLowerCase();"
+          "line": 230,
+          "text": "const base = sourceRef.split('/').pop()?.replace(/\\.\\w+$/, '') || 'unknown';"
         }
       ],
-      "revisionShapeValidation": false,
+      "revisionShapeValidation": true,
       "randomGenerators": {
         "randomUUID": false,
         "genRandomUuid": false
@@ -713,8 +923,11 @@
       ],
       "runtimeEntrypoints": [],
       "cliEntrypoint": false,
-      "referencedByOtherFiles": [],
-      "referencedByOtherFilesCount": 0,
+      "referencedByOtherFiles": [
+        "sveltekit-frontend/scripts/atlas/symbol-canonical-writer-owner-census-v1.mjs",
+        "sveltekit-frontend/scripts/atlas/symbol-registry-population-preview-v1.mjs"
+      ],
+      "referencedByOtherFilesCount": 2,
       "transaction": {
         "begin": true,
         "commit": true,
@@ -783,6 +996,8 @@
       "column": "atlas_symbol_versions.producer_revision",
       "filesContainingLabel": [
         "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "scripts/atlas/audit-symbol-revision-forward-qualification-v1.mjs",
+        "scripts/atlas/plan-symbol-revision-placeholder-repair-preview-v1.mjs",
         "scripts/atlas/smoke-graphify-symbol-lane-v1.mjs",
         "scripts/atlas/symbol-reconciliation-writer-v1.mts"
       ],
@@ -838,7 +1053,7 @@
       "producerLabel": "symbol-reconciliation-writer-v1",
       "status": "UNKNOWN",
       "producer": null,
-      "basis": "label \"symbol-reconciliation-writer-v1\" found in 3 files: scripts/atlas/audit-canonical-projection-fabric.mjs, scripts/atlas/smoke-graphify-symbol-lane-v1.mjs, scripts/atlas/symbol-reconciliation-writer-v1.mts"
+      "basis": "label \"symbol-reconciliation-writer-v1\" found in 5 files: scripts/atlas/audit-canonical-projection-fabric.mjs, scripts/atlas/audit-symbol-revision-forward-qualification-v1.mjs, scripts/atlas/plan-symbol-revision-placeholder-repair-preview-v1.mjs, scripts/atlas/smoke-graphify-symbol-lane-v1.mjs, scripts/atlas/symbol-reconciliation-writer-v1.mts"
     }
   },
   "writerClassification": [
@@ -854,6 +1069,21 @@
     },
     {
       "file": "scripts/atlas/prove-feature-intelligence-database.mjs",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "scripts/atlas/apply-symbol-revision-repair-v1.mjs",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "scripts/atlas/freeze-symbol-revision-placeholder-repair-manifest-v1.mjs",
+      "classification": "UNKNOWN",
+      "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
+    },
+    {
+      "file": "scripts/atlas/freeze-symbol-revision-repair-manifest-v1.mjs",
       "classification": "UNKNOWN",
       "basis": "attributed by the producer labels the rows carry; every writer not tied to a bad or qualified population is UNKNOWN (static scan cannot prove liveness)"
     },
@@ -911,10 +1141,27 @@
   ],
   "upstreamFileIdWriters": [
     {
+      "file": "scripts/atlas/apply-symbol-revision-repair-v1.mjs",
+      "lines": [
+        {
+          "line": 67,
+          "text": "const locked = new Map((await client.query(`SELECT symbol_version_id, source_revision, workspace_revision, upstream_file_id FROM atlas_symbol_versions WHERE symbol_versio"
+        },
+        {
+          "line": 77,
+          "text": "if (live.upstream_file_id !== null) throw new Error(`REPAIR_PREVIEW_STALE: ${row.symbolVersionId} upstream_file_id unexpectedly non-null`);"
+        },
+        {
+          "line": 99,
+          "text": "const upstreamFileIdStillAllNull = (await client.query(`SELECT count(*)::int AS n FROM atlas_symbol_versions WHERE upstream_file_id IS NOT NULL`)).rows[0].n === 0;"
+        }
+      ]
+    },
+    {
       "file": "scripts/atlas/materialize-ast-symbol-versions.mjs",
       "lines": [
         {
-          "line": 146,
+          "line": 158,
           "text": "upstream_node_id, upstream_file_id, upstream_symbol_id, upstream_chunk_id,"
         }
       ]
@@ -935,6 +1182,6 @@
     "static scan: liveness of a writer is not proven, only whether it is referenced by a package script or another file",
     "the exact origin of the `workspace:0` value in the 2026-08-24 input artifact is not recoverable"
   ],
-  "receiptChecksum": "sha256:47ac4261104de10c88013184b9489a556ca7b189a0524d6264ec1523aa078a04",
-  "versionedReceipt": "docs/reports/symbol-producer-ownership-v1.47ac4261104d.json"
+  "receiptChecksum": "sha256:06784890bcab3571ead0c1abe270b5da0c809e1889e143d0d678855ced52024a",
+  "versionedReceipt": "docs/reports/symbol-producer-ownership-v1.06784890bcab.json"
 }

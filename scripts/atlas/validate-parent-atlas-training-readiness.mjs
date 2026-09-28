@@ -14,7 +14,7 @@ const FRONTEND_ROOT = path.join(REPO_ROOT, 'sveltekit-frontend');
 const REPORT_JSON = path.join(REPO_ROOT, 'docs', 'reports', 'parent-atlas-training-readiness.json');
 const REPORT_MD = path.join(REPO_ROOT, 'docs', 'reports', 'parent-atlas-training-readiness.md');
 const ARROW_REPORT = path.join(REPO_ROOT, 'docs', 'reports', 'arrow-batch-validation.json');
-const JEPA_REPORT = path.join(REPO_ROOT, 'docs', 'reports', 'packet-jepa-train-report.json');
+const JEPA_REPORT = path.join(REPO_ROOT, 'docs', 'reports', 'packet-jepa-semantic-768-v2-train-report.json');
 const QDRANT_TOPOLOGY_REPORT = path.join(FRONTEND_ROOT, 'docs', 'reports', 'p2-qdrant-payload-sync-topology.json');
 const NEO4J_GRAPHIFY_REPORT = path.join(REPO_ROOT, 'docs', 'reports', 'graphify-packet-contract.json');
 const pool = new Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)) });
@@ -151,7 +151,9 @@ async function main() {
   const arrowReady = arrow?.status === 'PASS';
   const nativeGpuReady = gpu.payload?.nativeAddon?.ok === true;
   const pythonGpuReady = gpu.payload?.pythonCuda?.ok === true;
-  const baseline = jepa?.evaluation?.embedding384_cosine;
+  // Historical `embedding384_cosine` exports were mislabeled and contained 64-D rows.
+  // Only a fresh, explicitly named 768-D baseline can support this comparison.
+  const baseline = jepa?.evaluation?.semantic_768_cosine;
   const packetJepa = jepa?.evaluation?.packet_jepa_128;
   const jepaBeatsBaseline = Boolean(
     baseline && packetJepa

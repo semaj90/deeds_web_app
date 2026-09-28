@@ -8,6 +8,7 @@
 #   Tier 1 (parallel):     llama-server.exe :8090  (TurboQuant + Gemma4 GGUF)
 #                          topology-search  :8101  (4D manifold search engine)
 #   Tier 2 (after Tier 1): TRACE MCP cluster :8788  (TypeScript agentic tools)
+#                          atlas-tools HTTP bridge    :8794 (Bifrost MCP client)
 #   Tier 3:                SvelteKit dev :5173
 #   Background (non-block):graphify:som — SOM centroid clustering refresh
 #                          Redis 8 eval lane (opt-in, eval-only)
@@ -372,6 +373,95 @@ if (-not $mcpUp) {
 }
 $health["trace_mcp"] = @{ url = "http://127.0.0.1:$McpPort/health"; healthy = $mcpUp; tier = 2; workers = $McpWorkers }
 if ($mcpPid) { $pids["trace_mcp"] = $mcpPid }
+
+# ── TIER 2.5: atlas-tools stdio-to-HTTP bridge :8794 ────────────────────────
+# Bifrost runs in Docker and cannot launch the local stdio MCP process itself.
+# Keep the bridge restart-safe; do not take over a port owned by another process.
+$bridgePort = 8794
+$bridgeUrl = "http://127.0.0.1:$bridgePort/health"
+$bridgeScript = Join-Path $Frontend "scripts\mcp\atlas-tools-http-bridge.mjs"
+$bridgeUp = $false
+$bridgePid = $null
+try {
+  $bridgeHealth = Invoke-RestMethod $bridgeUrl -TimeoutSec 1 -ErrorAction Stop
+  if ($bridgeHealth.ok -and $bridgeHealth.name -eq "atlas-tools-bridge") {
+    Write-Host "  v atlas-tools HTTP bridge already healthy on :$bridgePort" -ForegroundColor Yellow
+    $bridgeUp = $true
+  }
+} catch {}
+
+if (-not $bridgeUp) {
+  $portOwner = Get-NetTCPConnection -LocalPort $bridgePort -State Listen -ErrorAction SilentlyContinue |
+    Select-Object -First 1
+  if ($portOwner) {
+    Write-Host "  x :$bridgePort is occupied by PID $($portOwner.OwningProcess); not replacing it" -ForegroundColor Red
+  } elseif (-not (Test-Path $bridgeScript)) {
+    Write-Host "  x atlas-tools bridge script not found: $bridgeScript" -ForegroundColor Yellow
+  } else {
+    $sidecarLogDir = Join-Path $Root "logs\sidecars"
+    New-Item -ItemType Directory -Path $sidecarLogDir -Force | Out-Null
+    $bridgePid = (Start-Process -FilePath "node.exe" `
+      -ArgumentList @($bridgeScript) `
+      -WorkingDirectory $Frontend -WindowStyle Hidden -PassThru `
+      -RedirectStandardOutput (Join-Path $sidecarLogDir "atlas-tools-bridge-8792.out.log") `
+      -RedirectStandardError (Join-Path $sidecarLogDir "atlas-tools-bridge-8792.err.log"))?.Id
+    $bridgeUp = Wait-Service -Url $bridgeUrl -Label "atlas-tools bridge :$bridgePort" -RetryCount 10 -DelayMs 300
+  }
+}
+$health["atlas_tools_bridge"] = @{ url = $bridgeUrl; healthy = $bridgeUp; tier = 2; pid = $bridgePid }
+if ($bridgePid) { $pids["atlas_tools_bridge"] = $bridgePid }
+
+# ── TIER 2.75: restore Atlas Tools admission on Bifrost /mcp ────────────────
+# This Bifrost build does not restore allow_by_default from config.json.
+# Reapply only to the bounded atlas_tools client; do not broaden TRACE tools.
+$bifrostMcpGatewayReady = $false
+if ($bifrostHealthy -and $bridgeUp) {
+  $bifrostApiBase = $BifrostUrl -replace "/health/?$", ""
+  $atlasMcpClient = $null
+  for ($attempt = 0; $attempt -lt 20; $attempt++) {
+    try {
+      $clientRoster = Invoke-RestMethod "$bifrostApiBase/api/mcp/clients" -TimeoutSec 3 -ErrorAction Stop
+      $atlasMcpClient = @($clientRoster.clients | Where-Object { $_.config.name -eq "atlas_tools" -and $_.state -eq "connected" } | Select-Object -First 1)[0]
+      if ($atlasMcpClient -and $atlasMcpClient.config.client_id) { break }
+      $atlasMcpClient = $null
+    } catch { $atlasMcpClient = $null }
+    Start-Sleep -Milliseconds 500
+  }
+
+  if (-not $atlasMcpClient) {
+    Write-Host "  ! Bifrost atlas_tools client is not connected; /mcp admission was not changed" -ForegroundColor Yellow
+  } else {
+    $allowedAtlasTools = @($atlasMcpClient.config.tools_to_execute | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+    if ($allowedAtlasTools.Count -eq 0 -or $allowedAtlasTools -contains "*") {
+      Write-Host "  x atlas_tools allowlist is empty or wildcard; refusing to broaden /mcp admission" -ForegroundColor Red
+    } else {
+      try {
+        $admissionBody = @{ allow_by_default = $true } | ConvertTo-Json -Compress
+        Invoke-RestMethod "$bifrostApiBase/api/mcp/client/$($atlasMcpClient.config.client_id)" `
+          -Method Put -ContentType "application/json" -Body $admissionBody -TimeoutSec 5 -ErrorAction Stop | Out-Null
+
+        $toolsListBody = '{"jsonrpc":"2.0","id":"startup-atlas-tools-list","method":"tools/list","params":{}}'
+        $gatewayTools = Invoke-RestMethod "$bifrostApiBase/mcp" -Method Post `
+          -ContentType "application/json" -Body $toolsListBody -TimeoutSec 8 -ErrorAction Stop
+        $exposedAtlasTools = @($gatewayTools.result.tools | Where-Object { $_.name -like "atlas_tools-*" } |
+          ForEach-Object { $_.name.Substring("atlas_tools-".Length) } | Sort-Object -Unique)
+        $unexpectedAtlasTools = @($exposedAtlasTools | Where-Object { $_ -notin $allowedAtlasTools })
+        $missingAtlasTools = @($allowedAtlasTools | Where-Object { $_ -notin $exposedAtlasTools })
+        if ($missingAtlasTools.Count -eq 0 -and $unexpectedAtlasTools.Count -eq 0) {
+          $bifrostMcpGatewayReady = $true
+          Write-Host "  v Bifrost /mcp exposes the configured atlas_tools allowlist ($($exposedAtlasTools.Count) tools)" -ForegroundColor Green
+        } else {
+          Write-Host "  ! Bifrost /mcp allowlist mismatch; missing=$($missingAtlasTools -join ',') unexpected=$($unexpectedAtlasTools -join ',')" -ForegroundColor Yellow
+        }
+      } catch {
+        Write-Host "  ! Bifrost /mcp runtime admission or readback failed: $($_.Exception.Message)" -ForegroundColor Yellow
+      }
+    }
+  }
+} elseif (-not $bifrostHealthy) {
+  Write-Host "  ! Bifrost is unavailable; skipping runtime /mcp admission" -ForegroundColor Yellow
+}
+$health["bifrost_mcp_gateway"] = @{ ready = $bifrostMcpGatewayReady; tier = 2; client = "atlas_tools" }
 Write-Host ""
 
 # ── TIER 3: SvelteKit dev :5173 ─────────────────────────────────────────────

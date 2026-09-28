@@ -74,6 +74,9 @@ test('gate 02: identity change, ambiguous lineage, and stale file digest block b
   for (const [c, status] of [
     [{ ...cur, sourceRevision: H('9') }, 'BLOCKED_IDENTITY_CHANGED'],
     [{ ...cur, lineageMatchCount: 2 }, 'BLOCKED_LINEAGE_MISSING'],
+    // A source/enriched-index row may legitimately have packetKey=null, but at this boundary a null packetKey means
+    // no packet->chunk lineage row matches (0). That must block; it must never be read as "packet identity optional".
+    [{ ...cur, lineageMatchCount: 0 }, 'BLOCKED_LINEAGE_MISSING'],
     [{ ...cur, bindingStatus: 'MISSING' }, 'BLOCKED_LINEAGE_MISSING'],
     [{ ...cur, sourceFileSha256: H('9') }, 'BLOCKED_STALE_DIGEST'],
   ]) {

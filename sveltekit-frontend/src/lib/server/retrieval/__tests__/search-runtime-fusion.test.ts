@@ -463,6 +463,38 @@ describe('RF6-SEMANTIC-VOTE-01 — one vote per revision-qualified dense candida
     ]);
   });
 
+  it('deduplicates Qdrant, TurboVec, cuVS, and CAGRA into one dense vote for the same revision-qualified candidate', () => {
+    const fused = fuseSearchRuntimeCandidates([
+      candidate({
+        id: 'qdrant-point-1', packetKey: 'pkt:shared', sourceRef: 'src/a.ts', score: 0.94,
+        scoreSource: 'qdrant_768', embeddingLane: 'dense_768', retrievalExecutor: 'qdrant', ...revision,
+      }),
+      candidate({
+        id: 'turbovec-point-1', packetKey: 'pkt:shared', sourceRef: 'src/a.ts', score: 0.93,
+        scoreSource: 'qdrant_768', embeddingLane: 'dense_768', retrievalExecutor: 'turbovec', ...revision,
+      }),
+      candidate({
+        id: 'cuvs-point-1', packetKey: 'pkt:shared', sourceRef: 'src/a.ts', score: 0.92,
+        scoreSource: 'qdrant_768', embeddingLane: 'dense_768', retrievalExecutor: 'cuvs', ...revision,
+      }),
+      candidate({
+        id: 'cagra-point-1', packetKey: 'pkt:shared', sourceRef: 'src/a.ts', score: 0.91,
+        scoreSource: 'qdrant_768', embeddingLane: 'dense_768', retrievalExecutor: 'cagra', ...revision,
+      }),
+    ]);
+
+    expect(fused).toHaveLength(1);
+    expect(fused[0]!.fusionScore).toBeCloseTo(1 / 61, 10);
+    expect(fused[0]!.laneEvidence).toEqual([
+      expect.objectContaining({
+        lane: 'dense',
+        contributionCount: 1,
+        supportingHitCount: 4,
+        executorIds: ['cagra', 'cuvs', 'qdrant', 'turbovec'],
+      }),
+    ]);
+  });
+
   it('keeps distinct canonical chunks separate even when packet and revisions match', () => {
     const fused = fuseSearchRuntimeCandidates([
       candidate({

@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.embedding-runtime-tokenizer-identity-census.v1",
+  "observedAt": "2026-09-28T00:13:13Z",
+  "status": "LIVE_STRICT_CANARY_BLOCKED",
+  "runtime": {
+    "port8081": {
+      "listening": false,
+      "healthReachable": false
+    },
+    "port8097": {
+      "listening": true,
+      "health": "healthy",
+      "statsModelAlias": "embeddinggemma:latest",
+      "buildRevisionExposed": false,
+      "tokenizerRevisionExposed": false,
+      "perCallModelDigest": false
+    },
+    "container": {
+      "name": "/legal-ai-go-embedding",
+      "image": "deeds-web-app-go-embedding-service",
+      "imageId": "sha256:431ddc0acb6fb8252b003fb514727f2fee9dad6b81735a1cf485dc3d98617fd2",
+      "createdAt": "2026-07-29T16:00:28.069994873Z",
+      "strictV2Configuration": {
+        "serviceBuildRevisionPresent": false,
+        "tokenizerRevisionPresent": false,
+        "inputPolicyRevisionPresent": false,
+        "contentSelectionAllowlistPresent": false
+      }
+    }
+  },
+  "localArtifactObservation": {
+    "path": "models/embeddinggemma_300m/tokenizer.model",
+    "sha256": "1299c11d7cf632ef3b4e11937501358ada021bbdf7c47638d13c0ee982f2e79c",
+    "binding": "LOCAL_HUGGINGFACE_ARTIFACT_ONLY_NOT_BOUND_TO_SERVING_EXECUTOR"
+  },
+  "evidenceLimits": [
+    "A local tokenizer artifact digest does not prove that the Ollama-backed serving process uses those bytes.",
+    "The :8097 health/stats response reports no immutable service or tokenizer revision and uses a mutable model alias.",
+    "The active container lacks every required strict-v2 revision/allowlist setting; local Go code/fixtures are not deployed proof.",
+    "No embedding request, inference, service rebuild, database write, or cache write was performed."
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

@@ -1,13 +1,16 @@
 <script lang="ts">
 	import type { DocIntelligenceStudioSnapshotV1, DocSearchResult } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
+	import type { LocalChunkSnapshotPageV1 } from '$lib/server/atlas/docs/local-chunk-snapshot-v1.js';
 
 	let {
 		snapshot = null,
 		search = null,
 		query = '',
 		product = '',
-		version = ''
-	}: { snapshot?: DocIntelligenceStudioSnapshotV1 | null; search?: DocSearchResult | null; query?: string; product?: string; version?: string } = $props();
+		version = '',
+		localSnapshot = null,
+		localQuery = ''
+	}: { snapshot?: DocIntelligenceStudioSnapshotV1 | null; search?: DocSearchResult | null; query?: string; product?: string; version?: string; localSnapshot?: LocalChunkSnapshotPageV1 | null; localQuery?: string } = $props();
 
 	const issueCount = $derived(snapshot?.issues.length ?? 0);
 	const yes = (value: boolean | null | undefined) => (value ? 'yes' : 'no');
@@ -129,4 +132,36 @@
 			{/each}
 		</ul>
 	{/if}
+
+	<details class="text-[0.62rem]" data-testid="docs-local-snapshot">
+		<summary class="cursor-pointer text-[#a39f90] font-bold uppercase">Pinned local chunk snapshot · never canonical</summary>
+		{#if localSnapshot}
+			<p class="mt-2 text-[#d8b26a]" data-testid="docs-local-snapshot-status">{localSnapshot.status} · {localSnapshot.note ?? 'No note'}</p>
+			{#if localSnapshot.status === 'LOCAL_UNADMITTED'}
+				<p class="mt-1 text-[#a39f90]">{localSnapshot.corpusId} · run {localSnapshot.runId} · {localSnapshot.pagination.total} matching chunks / {localSnapshot.chunkCount} total · {localSnapshot.pageCount} scope-admitted pages · {localSnapshot.failedPageCount} failed page</p>
+				<p class="mt-1 font-mono text-[#a39f90]">manifest {localSnapshot.manifestChecksum} · corpus revision {localSnapshot.corpusRevision}</p>
+				<form method="GET" action="/admin/atlas#docs-local-snapshot" class="mt-2 flex gap-2" role="search">
+					<input type="search" name="localDocq" value={localQuery} maxlength="120" placeholder="Search pinned chunks" aria-label="Search pinned local document chunks" class="flex-1 px-2 py-1 bg-[#23221c] border border-[#5c594c] text-[0.7rem] text-[#efede4]" />
+					<button type="submit" class="px-3 py-1 border border-[#5c594c] text-[0.6rem] font-bold uppercase text-[#d1cdb8]">Search snapshot</button>
+				</form>
+				<ul class="mt-2 space-y-2">
+					{#each localSnapshot.chunks as item (item.chunkId)}
+						<li class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+							<p class="font-bold text-[#efede4]">{item.product} · {item.headingPath.join(' › ') || 'Unheaded section'} · chunk #{item.ordinal}</p>
+							<p class="mt-1 font-mono text-[#a39f90] break-all">{item.chunkId} · {item.evidenceRevision}</p>
+							<p class="mt-1 whitespace-pre-wrap text-[#d1cdb8]">{item.excerpt}</p>
+							<a class="mt-1 block text-[#a39f90] underline break-all" href={item.canonicalUrl} rel="noreferrer noopener">{item.canonicalUrl}</a>
+						</li>
+					{:else}
+						<li class="text-[#a39f90]">No local chunks match this query.</li>
+					{/each}
+				</ul>
+				{#if localSnapshot.nextOffset !== null}
+					<a class="mt-2 inline-block text-[#a39f90] underline" href={`/admin/atlas?localDocq=${encodeURIComponent(localQuery)}&localDocOffset=${localSnapshot.nextOffset}&manifestChecksum=${encodeURIComponent(localSnapshot.manifestChecksum ?? '')}#docs-local-snapshot`}>Next page</a>
+				{/if}
+			{/if}
+		{:else}
+			<p class="mt-2 text-[#a39f90]">Pinned snapshot unavailable. Canonical corpus search remains separate.</p>
+		{/if}
+	</details>
 </section>

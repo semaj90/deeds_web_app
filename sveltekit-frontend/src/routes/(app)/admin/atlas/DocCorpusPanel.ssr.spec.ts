@@ -3,6 +3,7 @@ import { render } from 'svelte/server';
 import { describe, expect, it } from 'vitest';
 import DocCorpusPanel from './DocCorpusPanel.svelte';
 import type { DocIntelligenceStudioSnapshotV1, DocSearchResult } from '$lib/server/atlas/docs/doc-intelligence-read-model.js';
+import type { LocalChunkSnapshotPageV1 } from '$lib/server/atlas/docs/local-chunk-snapshot-v1.js';
 
 const snapshot: DocIntelligenceStudioSnapshotV1 = {
 	schema: 'atlas.doc-intelligence-studio-snapshot.v1',
@@ -33,6 +34,28 @@ const search: DocSearchResult = {
 };
 
 describe('DocCorpusPanel SSR (no client hydration)', () => {
+	const localSnapshot: LocalChunkSnapshotPageV1 = {
+		schema: 'atlas.local-doc-snapshot-page.v1', status: 'LOCAL_UNADMITTED',
+		corpusId: 'langchain-docs-python-core', runId: 'fixture-run', chunkCount: 1548, pageCount: 79,
+		corpusRevision: 'sha256:chunkmanifest', manifestChecksum: 'sha256:pinnedmanifest',
+		failedPageCount: 1, chunkManifestSha256: 'sha256:chunkmanifest', query: '', pagination: { offset: 0, limit: 10, total: 1 },
+		chunks: [{ chunkId: 'doc:test:1', evidenceRevision: 'sha256:evidence', product: 'langgraph', canonicalUrl: 'https://docs.example/page', headingPath: ['Persistence'], ordinal: 4, excerpt: 'Checkpoint state' }],
+		nextOffset: 1, canonicalAuthority: false, writesPerformed: false,
+		note: 'Local checksum-verified artifact only; not admitted to PostgreSQL and not canonical evidence.'
+	};
+
+	it('renders the pinned local snapshot separately with its noncanonical badge and source coordinates', () => {
+		const { body } = render(DocCorpusPanel, { props: { snapshot, localSnapshot, localQuery: '' } });
+		expect(body).toContain('Pinned local chunk snapshot · never canonical');
+		expect(body).toContain('LOCAL_UNADMITTED');
+		expect(body).toContain('not admitted to PostgreSQL');
+		expect(body).toContain('name="localDocq"');
+		expect(body).toContain('doc:test:1');
+		expect(body).toContain('Checkpoint state');
+		expect(body).toContain('Next page');
+		expect(body).toContain('manifestChecksum=sha256%3Apinnedmanifest');
+	});
+
 	it('renders every server-loaded section as HTML', () => {
 		const { body } = render(DocCorpusPanel, { props: { snapshot, search: null, query: '' } });
 		for (const marker of ['data-testid="docs-corpus-panel"', 'Documentation Intelligence', 'docs-overview', 'docs-versions', 'docs-database', 'docs-analysis']) expect(body).toContain(marker);

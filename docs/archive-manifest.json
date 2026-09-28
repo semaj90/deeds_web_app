@@ -558,6 +558,19 @@
     "sha256": "04e30b7dc63f09275368cc9a1cac2d79db1ab9369582689287d0346562b52e12",
     "archived": "2026-09-23T17:19:46Z",
     "reason": "stale scratch receipt from the first 21-page inline fetch (6 sources); superseded by docs/reports/external-doc-admission-envelopes-v1.json from the manifest-driven builder. Not consumed by any validator."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/helper-eligibility-v1.spec.ts",
+    "archive_path": "deeds_labs/archive/2026-09-27/helper-eligibility-v1.spec.ts.orphaned-by-collision.bak",
+    "sha256": "6dd9970b88e1c941ca19344ed5ccc341d7223879cb25ce483c2f6156d1eb4976",
+    "archived": "2026-09-27",
+    "reason": "orphaned by a concurrent write that replaced helper-registry-v1.ts/keyword-recognition-v1.ts/helper-eligibility-v1.ts with a different implementation; original design preserved as the -v2 files for review, per explicit instruction. NOTE: this entry was found appended as a malformed stray object after the manifest array had already closed (invalid JSON as a whole file) and was repaired into the array here on 2026-09-27, same reason/archive_path preserved."
+  },
+  {
+    "path": "scripts/atlas/gemma4-semantic-embedding-cache.mts",
+    "archive_path": "deeds_labs/archive/2026-09-27/gemma4-semantic-embedding-cache.mts.bak",
+    "sha256": "309b6bf2cfa30eb8168a2f1f85f18b10af33100778bee4f201b155b5743f91bd",
+    "archived": "2026-09-27",
+    "reason": "never worked since inception: two module/endpoint bugs fixed during testing (require(crypto) vs top-level await module-type conflict; wrong Qdrant endpoint /points instead of /points/scroll), but all 4 GPU call sites (pageRankGPU/attentionScoreGPU/kmeansWithCentroids/trainSOM) pass arguments in the wrong shape and have never produced valid output. Duplicates the already-correct, already-canonical karpathy-gpu-enrich.mjs Karpathy GPU Authority Blend pipeline. See CLAUDE.md LIBTORCH-DEPENDENCY-CENSUS-01 for the full investigation trail."
   }
 ]
-{"path":"sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/helper-eligibility-v1.spec.ts","archived":"2026-09-27","reason":"orphaned by a concurrent write that replaced helper-registry-v1.ts/keyword-recognition-v1.ts/helper-eligibility-v1.ts with a different implementation; original design preserved as the -v2 files for review, per explicit instruction"}

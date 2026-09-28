@@ -206,6 +206,9 @@ zero-caller claim with a fresh grep (repo state moves).
 
 ## GPU expansion dependency crosswalk (2026-08-31)
 
+- [x] **GRAPH-RECEIPT-V2-CONTRACT-TEST (2026-09-26):** added an additive `GraphExecutionReceiptV2` beside the unchanged V1 contract. V1 field names/values are carried through; V2 requires an explicit executor revision and lowercase SHA-256 input/output checksums, and remains non-authoritative/no-write. The wrapper is not wired into execution. Focused compatibility/negative tests verify preservation and fail-closed provenance handling; this is contract-fixture proof only, not live graph execution or parity.
+- [x] **PAGERANK-BACKEND-ALIGNMENT-01 (2026-09-26):** added a pure NetworkX↔cuGraph comparison helper that requires proven V2 receipts, matching graph revision/input checksum/node and edge counts, explicit graph-ordinal-map checksum, exact ordinal-set equality, and output-checksum readback. It compares score deltas and deterministic top-k ordering with GraphOrdinal tie-break; fixture tests prove input-order independence and fail-closed identity mismatch. No GPU execution or live graph proof is claimed. Lane decision: cuGraph owns RAPIDS GPU PageRank; cuVS/CAGRA is a vector ANN challenger, not PageRank; DuckDB is offline receipt analytics; SIMT remains deferred pending a measured gap and parity proof.
+
 The tensor-residency expansion workboard tracks shared dependencies without
 moving graph ownership here. This graph runtime owns only the graph side:
 
@@ -232,13 +235,73 @@ moving graph ownership here. This graph runtime owns only the graph side:
   **Still open:** live traversal against one admitted frozen graph; `/v1/graph/resident` currently
   reports `resident:null`, and the available old artifact has the checksum ambiguity recorded
   under GPU-EXP-14. No synthetic graph was loaded into the live GPU service.
+  **Read-only recheck (2026-09-26):** `GET http://127.0.0.1:8098/v1/graph/resident` reports
+  `capability.available=true` (`cugraph.pagerank`, backend 26.08.00) but `resident=null`; therefore
+  this still cannot produce a live traversal receipt. Existing `graph-ordinal-cpu-gpu-parity-v1`
+  is a six-node fixture, and `current-structural-graph-cpu-gpu-parity-v1` is a 23-node structural
+  proof; neither is the admitted frozen graph artifact required here.
 - [ ] **GPU-EXP-16** NetworkX oracle → cuGraph executor parity, including any
   internal renumbering translation and deterministic replay. **Partial fixture proof (2026-09-23):**
   the BFS adapter is tested against NetworkX shortest paths with deliberately permuted executor
   ordinals; translated node-key paths match and replayed path checksums are identical. This uses a
   fake cuGraph result frame and proves adapter mapping/determinism only, not cuGraph computation or
   live parity. Full task remains open pending replay on the same admitted frozen graph artifact.
+  **Read-only recheck (2026-09-26):** no resident graph is loaded on `:8098`, so live NetworkX ↔
+  cuGraph replay against one shared admitted artifact remains blocked. Do not substitute the fixture
+  receipts listed under GPU-EXP-15 or infer parity from backend capability availability.
+  The new `pagerank_parity.py` helper closes the comparator/receipt mechanics only; GPU-EXP-16
+  remains open until both executors run the same admitted frozen graph artifact.
 
 GPU cache, HNSW, QLoRA, and 4D coordinate tasks remain owned by their existing
 OpenSpecs. A graph result is derived evidence and cannot become CandidateOrdinal,
 canonical identity, or an additional retrieval vote.
+
+## First execution tranche checkpoint (2026-09-27)
+
+- [x] **GRAPH-CAPABILITY-CENSUS:** read-only environment census recorded in
+  `docs/reports/graph-ace-gpu-first-tranche-20260927.md`. NetworkX 3.6.1 is
+  callable and tested locally; WSL exposes cuGraph 26.6.0/cuVS 26.6.0, while
+  8098 reports cuGraph 26.08.00. The service reports capability available but
+  no resident graph. Neo4j HTTP reachability is not counted as a GDS algorithm
+  invocation. This is capability evidence, not live graph parity.
+- [x] **NETWORKX-ORACLE-SURFACE:** added thin PageRank/weighted-SSSP exports
+  that delegate to `atlas_compute.typed_graph_runtime`; focused tests passed
+  16/16. No new graph math or identity owner.
+- [ ] **GPU-FABRIC-AUDIT:** still open until a single frozen CandidateOrdinal
+  artifact is checked across cuVS, hypergraph, feature-pack, and residency
+  owners with matching snapshot/map checksums.
+- [ ] **GPU-DAG-CANARY:** blocked while 8098 has `resident:null` and the shared
+  artifact identity/H2D counters are not available. No graph was loaded.
+
+Report: `docs/reports/graph-ace-gpu-first-tranche-20260927.md`.
+
+## Query-conditioned PPR parity (2026-09-27)
+
+- [x] **PPR-ORDINAL-IDENTITY-01:** added a typed execution identity binding
+  graph revision, CandidateOrdinal snapshot/map, graph-ordinal map, graph
+  edges, normalized seed CandidateOrdinals/weights, alpha, epsilon, iteration
+  limit, and `dangling=PERSONALIZATION`. Added NetworkX and cuGraph thin calls
+  plus a receipt comparator for Pearson/Spearman, top-10/50/100 overlap, score
+  L1/L-infinity, rank displacement, mass conservation, and dangling score mass.
+  Unit/contract proof is complete; this does not imply live graph parity.
+- [x] **PPR-CUGRAPH-FIXTURE-01:** the RAPIDS 26.06.00 environment passed the
+  same five-ordinal directed fixture, including dangling and isolated vertices.
+  NetworkX↔cuGraph: Pearson 0.9999999999999996, Spearman 1.0, score L1
+  2.98e-8, L-infinity 9.28e-9, zero rank displacement, full top-10/50/100
+  overlap (all 5 available nodes), score sums 1.0/1.00000003, and dangling
+  mass delta 9.0e-9. Immutable receipt:
+  `docs/reports/ppr-fixture-canary-v1-20260927.json`. Synthetic fixture only;
+  it is not admitted-graph parity or a cache HIT proof.
+- [ ] **PPR-LIVE-GRAPH-01:** remains separate from the synthetic canary. It
+  requires one admitted frozen graph resident on 8098 plus the same graph/map
+  checksums at both executors.
+- [ ] **SIMT-PPR-01:** deferred unless measured cuGraph latency/memory shows a
+  material gap. cuVS/CAGRA remains vector-neighbor search, never PPR/PageRank.
+  DuckDB remains offline receipt analytics; Hilbert/real-valued score geometry
+  and Hamming/binary-projection geometry remain distinct artifacts. A Jacobian
+  is a local derivative map, not a generic second graph-ranking space.
+
+Global PageRank metric comparison also now exposes Pearson/Spearman, score
+L1/L-infinity and sums, top-10/50/100 overlap, rank displacement, and explicit
+dangling policy/mass. DuckDB remains an offline receipt analyzer, not an
+execution backend. No SIMT kernel is justified by the five-node canary.

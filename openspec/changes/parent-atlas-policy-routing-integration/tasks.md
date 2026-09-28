@@ -40,11 +40,15 @@
   + `hmm-policy-bridge.spec.ts` passed.
 
 ## PRT3 — Finite policy
-- [ ] 12 allowed actions.
-- [ ] 3 model targets: NO_LLM / ORNITH / GEMMA4.
-- [ ] 3 budget tiers.
-- [ ] State-specific action masks.
-- [ ] Deterministic baseline before learned weights.
+- [x] 12 allowed actions — `POLICY_ACTIONS` is fixed at 12 entries.
+- [x] 3 model targets: NO_LLM / ORNITH / GEMMA4 — fixed `MODEL_TARGETS`.
+- [x] 3 budget tiers — fixed `BUDGET_TIERS` (SMALL / MEDIUM / DEEP).
+- [x] State-specific action masks — focused test checks all six HMM states
+  against their permitted actions before ranking.
+- [x] Deterministic baseline before learned weights — focused test proves
+  baseline-preferred actions for all six states with no learned weights.
+  Proof: `sveltekit-frontend/src/lib/server/atlas/policy/policy-router.ts`,
+  `policy-types.ts`, and `policy-router.spec.ts` (5/5 passed).
 
 ## PRT4 — Bounded concurrency
 - [x] Atlas owns max parallel tool calls (default 3).
@@ -82,8 +86,17 @@
 - [x] Compare deterministic vs learned held-out accuracy and repair success.
 - [x] Load replay rows from JSONL with malformed-line skipping.
 - [x] Persist a versioned policy-head artifact from replay rows.
-- [ ] DSPy remains program-optimization experiment.
+- [x] DSPy remains a program-optimization experiment. `DspyPolicyAuthorityV1`
+  confines it to shadow/challenger use and forbids changing legal HMM
+  transitions, bypassing exact promotion, authorizing mutation, or creating
+  canonical facts. `aligned-policy-lanes.spec.ts` passed 7/7. No GEPA
+  optimization, model call, or policy promotion was run.
 - [ ] QLoRA only from non-quantized checkpoint with action mask preserved.
+  Contract-only progress: `policy/qlora-admission-v1.ts` now rejects
+  quantized source checkpoints and requires the exact current state-specific
+  action-mask snapshot/checksum. Focused tests passed 4/4. This is not yet
+  consumed by a QLoRA trainer; no training, model call, or promotion occurred,
+  so this task remains open until an execution owner consumes the admission.
 - [ ] PPO remains blocked until stable replayable reward environment exists.
   Proof: `sveltekit-frontend/src/lib/server/atlas/policy/policy-training.ts`
   + `policy-training.spec.ts` passed.
@@ -97,15 +110,15 @@
   + `policy-head-artifact.spec.ts` passed.
 
 ## PRT8 — Geometry/SOM experiment
-- [ ] Prefer JVP/VJP sampled directional diagnostics over full Jacobian.
+- [x] Prefer JVP/VJP sampled directional diagnostics over full Jacobian. **Verified 2026-09-27:** `directional-diagnostics.ts` accepts caller-owned JVP/VJP operators and explicit bounded samples (1–64), validates dimensions/finiteness, and emits derived norms without materializing a Jacobian or granting canonical authority. Focused policy tests passed 4/4. This proves the diagnostic contract/fixture only; no live autodiff backend or SOM training is claimed.
 - [ ] Train SOM from KMeans centroids first.
-- [ ] SOM 20x20 coordinates remain derived/not canonical.
-- [ ] No geometry-derived production feature before GA8-style ablation.
+- [x] SOM 20x20 coordinates remain derived/not canonical. **Verified 2026-09-27:** `SomTopologySnapshotV1` fixes the 20×20 grid and declares `canonicalAuthority: false`; the policy feature tensor has no SOM/topology/geometry fields. `policy-state.spec.ts` now guards against adding such names or passing `som_x`/`som_y` through the strict tensor schema. This proves the policy boundary only; it does not claim SOM training or canonical promotion.
+- [x] No geometry-derived production feature before GA8-style ablation. **Verified 2026-09-27:** the fixed `POLICY_FEATURES` registry contains no SOM/topology/geometry feature and the strict state schema rejects coordinate fields. No geometry-derived input is admitted to policy decisions; GA8 ablation remains unperformed and is still required before any future geometry feature is proposed.
 
 ## PRT9 — E2E
 - [ ] error/query -> OKF -> HMM -> PolicyStateTensor -> finite decision -> bounded tools
 - [ ] canonical reducer -> rerank/ACE -> model if needed -> compile/test -> RouteTrace
-- [ ] same inputs/revisions produce same decision receipt under shuffled async completion.
+- [x] same inputs/revisions produce same decision receipt under shuffled async completion. **Verified 2026-09-27:** `policy-decision-receipt-v1.ts` seals the state tensor, explicit policy/weights revision, decision, and sorted upstream input revision/checksum bindings; its schema recomputes both decision and receipt checksums. Duplicate input IDs, non-finite/mismatched state shape, and state-hint mismatch fail closed. Three focused tests prove completion-order invariance, revision sensitivity, and tamper rejection. This is a deterministic contract/fixture proof; it does not claim the full query-to-tool E2E path is live.
 
 ## STOP CONDITIONS
 Stop on unresolved graph revision, duplicate runtime owner, ambiguous representation revision,

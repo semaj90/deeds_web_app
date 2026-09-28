@@ -4384,6 +4384,27 @@ bridge and exact source-to-packet-to-chunk closure.
 
 Evidence: `docs/reports/current-graphify-execution-owner-resolution-v1.json`.
 
+### Feature layout owner census correction (2026-09-27)
+
+- [x] Read-only census corrected the shorthand that there are only three
+      feature layouts. The repository has at least five distinct ABIs: static
+      packet FeatureVector5, ephemeral RetrievalCandidateFeatureMatrixV1 `[C,25]`,
+      CandidateFeatureSnapshotV1's 12 scalar columns, retrieval-router's 29
+      typed descriptors flattened to 173 numeric slots, and the XGBoost
+      sidecar's 16 columns. Their names and orders are not interchangeable.
+- [x] Confirmed the existing retrieval-router → CandidateFeatureSnapshot adapter
+      is layout-specific and revision/identity checked; it is not a universal
+      feature-order owner.
+- [ ] Define shared per-feature semantic metadata (producer/revision,
+      normalization, dtype, missing policy) separately from each consumer's
+      ordered `LayoutRevision`. Preserve all current layouts; no universal
+      `tensorOrdinal` and no positional projection.
+- [ ] Keep the existing XGBoost snapshot→sidecar projection task open until an
+      explicit, checksummed mapping covers every target feature and missing value.
+
+Evidence: `docs/reports/feature-layout-owner-census-v1-20260927.md` and the
+source owners listed there. Audit was read-only; no model or datastore writes.
+
 ### ACE route revision-qualified cache admission (2026-09-15)
 
 - [x] Added `admitAceRouteCacheIdentityV1()` as the route boundary for

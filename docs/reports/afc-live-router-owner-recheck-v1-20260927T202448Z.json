@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.afc-live-router-owner-recheck.v1",
+  "generatedAt": "2026-09-27T20:24:48Z",
+  "mode": "SOURCE_ONLY_READ_ONLY_OWNER_RECHECK",
+  "owners": {
+    "liveAceRouter": {
+      "path": "sveltekit-frontend/src/lib/server/routing/query-router-4x4.ts",
+      "productionCaller": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "signals": ["semantic", "lexical", "graph", "trustPressure"],
+      "dispatches": ["qdrant", "postgres", "neo4j", "mcp"],
+      "evidence": "context-assembler imports QueryRouter4x4/extractSignal and calls extractSignal(query), router.route(signal); Postgres FTS/Qdrant dispatch is performed in the ACE assembler path."
+    },
+    "legacyRouterMatrix": {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+      "signalUnion": ["lexical_exact", "semantic_concept", "graph_dependency", "legal_case_context", "code_symbol_context", "error_trace_context", "task_or_feature_context", "evidence_source_ref_context"],
+      "productionCallerFound": false,
+      "currentObservedImport": "agentic-file-compiler/routing-review-v2/helper-registry-v2-review.ts (review candidate only)"
+    },
+    "retrievalQueryRouterStub": {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/query-router-4x4.ts",
+      "productionImportFound": false,
+      "status": "SIMULATION_STUB_NOT_LIVE_ROUTER"
+    },
+    "searchRuntimeFusion": {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+      "logicalLanes": ["dense", "lexical", "exact", "ast", "schema", "rg", "bm42"],
+      "owner": "post-retrieval candidate normalization and fusion"
+    }
+  },
+  "decision": {
+    "legacySignalTypeIsLiveRouterVocabulary": false,
+    "helperToLiveSignalMappingsPromoted": false,
+    "routerSignalOwner": "LIVE_ACE_ROUTER_HAS_SEPARATE_NUMERIC_SIGNAL_CONTRACT",
+    "AFC_OWNER_MAP_01": "REMAINS_OPEN_PENDING_REVIEW_OF_SIGNAL_BINDING_TO_LIVE_ACE_ROUTER",
+    "AFC_ROUTING_PROMOTE_01": "REMAINS_OPEN_OPERATOR_DECISIONS_1_TO_3_REQUIRED"
+  },
+  "safeguards": {"codeChanged": false, "datastoreWrites": 0, "cacheWrites": 0, "inferenceCalls": 0}
+}

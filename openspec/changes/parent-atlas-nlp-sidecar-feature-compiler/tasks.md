@@ -176,35 +176,66 @@ unchanged: PageRank/Louvain/Leiden/CheiRank/k-core remain exactly
       in a running container this session). If false, diagnose why
       (import name mismatch, install failure) before proceeding — do not
       build pass-registry work on an assumption.
-- [ ] 0.2 Read `sveltekit-frontend/src/lib/server/nlp/miniforge-nlp-sidecar.ts`
-      and its 22 dependent files in full. Confirm the existing
-      `NlpAnalyzeRequest`/`NlpAnalyzeResponse` contract's exact shape and
-      every distinct `extractionMode` value currently in use, so the
-      additive pass-registry extension (task 1.1) doesn't collide with or
-      break any of them.
-- [ ] 0.3 Read `openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/`
-      in full — it owns the 5-domain classification and
-      `ExperimentFeatureMatrix` this change's `control5` slots into. Don't
-      redefine the taxonomy here.
-- [ ] 0.4 Read `openspec/changes/parent-atlas-semantic-768-canonical-contract/`
-      in full — confirms which service actually owns `semantic_768`
-      generation before this change's semantic-card work assumes it can call
-      it directly.
+- [x] 0.2 Reconcile the live sidecar request/response contract against current
+      consumers. Replaced the stale historical “22 dependent files” count with
+      a current `rg --no-ignore` inventory: 13 source files directly reference
+      the request/response/client symbols. The request modes are exactly
+      `entities`, `relationships`, `concepts`, and `full`; the pass list has
+      eight entries including `classify`. The API route had omitted that
+      existing pass, so its Zod contract now matches the sidecar and ACP
+      contract. Mocked sidecar-client and route tests pass 10/10, including all
+      four extraction modes and `classify`. No live sidecar/model call was
+      made. The response shape remains the existing typed contract; this task
+      adds no second NLP or taxonomy owner.
+- [x] 0.3 Reconcile retrieval LOD ownership without redefining taxonomy.
+      The referenced change describes 12 retrieval-algorithm domains and
+      production retrieval feature-matrix/scoring responsibilities; it is not
+      the five-value `Control5` classifier and does not own the NLP
+      `ExperimentFeatureMatrix` contract. This change keeps `Control5` as a
+      narrow, separately typed observation summary inside
+      `nlp-feature-compiler.ts`; no taxonomy or retrieval owner was added.
+      Evidence: the retrieval-LOD proposal/spec and
+      `nlp-feature-compiler.ts` (`Control5Schema`,
+      `ExperimentFeatureMatrixSchema`).
+- [ ] 0.4 Reconcile the current `semantic_768` generation owner before
+      semantic-card work calls an embedding service. The referenced contract
+      defines the canonical 768-dimensional representation and forbids
+      competing owners, but its latest writer/corpus receipts still report
+      `OWNER_NOT_PROVEN` across 19 writer/reference surfaces; the bounded
+      15-row proof does not select a full-cohort canonical owner. Therefore
+      this task is an explicit owner-reconciliation gate, not a read-only
+      checkbox: do not assume that the representation contract itself proves
+      which live service the semantic-card assembler may call. **Static
+      reconciliation update 2026-09-27:** the current strict runtime adapter is
+      `src/lib/server/embedding/canonical-embed.ts::embedSemantic768Canonical`
+      (768D, `semantic_768`, llama-server `/v1/embeddings`, revision inputs for
+      model artifact/tokenizer/input policy); production search/ACE callers
+      route through that adapter. However, the `SemanticCodeCard` consumer
+      census still finds no card-to-adapter caller, and the canonical
+      persisted-row/full-cohort writer ownership receipt still says
+      `OWNER_NOT_PROVEN`. This identifies the strict executor boundary but does
+      not authorize semantic-card dispatch, qualify historical vectors, or
+      close the full owner gate. No model call or datastore write was made.
 - [x] 0.5 Add a read-only bind mount to
       `docker/miniforge-nlp-sidecar/docker-compose.yml`
       (`../..:/workspace:ro` or equivalent — confirmed live 2026-08-09 that
       none currently exists). Required before any structural pass that reads
       files from disk (as opposed to inline request content) can work at all.
-- [ ] 0.6 Read `sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts`
-      and `query-router-4x4.ts` in full — confirm `lexical_exact`'s current
-      live behavior before deciding whether `lexical.rg_evidence` (design.md
-      D7) is needed at all, and if so, exactly what it should and should not
-      overlap with.
-- [ ] 0.7 Read `src/lib/server/services/knowledge-search/ACPToolRegistry.ts`
-      in full — confirm the registration API shape
-      (`name, description, category, inputSchema, outputSchema, examples`,
-      `supportsDryRun`) before designing the coarse-grained sidecar tool
-      wrappers (design.md D8).
+- [x] 0.6 Router ownership audit (2026-09-27): `retrieval/router-matrix.ts`
+      declares `lexical_exact`, but its adjacent `retrieval/query-router-4x4.ts`
+      is simulation-only and neither has a production caller. The live ACE
+      router is `routing/query-router-4x4.ts`, which emits a numeric lexical
+      signal and does not establish an `rg` executor. Current-source search
+      found no `/lexical/rg` endpoint or sidecar consumer. Decision: keep
+      `lexical.rg_evidence` deferred and do not add a retrieval/fusion lane;
+      revisit only with a concrete sidecar pass consumer.
+- [x] 0.7 ACP registration contract audit (2026-09-27): `ACPTool` entries
+      contain `name`, `description`, `category`, `inputSchema`, `outputSchema`,
+      `examples`, and `handler`. Existing `nlp:capabilities` and `nlp:analyze`
+      entries already exist. `supportsDryRun` is derived by the tools-list route
+      via `toolSupportsDryRun(name)`; it is not an `ACPTool` registration field
+      and does not prove handler side-effect behavior. Extend existing tools
+      only for a verified capability gap; do not duplicate these wrappers.
 
 **Sequencing boundary (2026-08-11)**: packet-level NLP can start once the
 preflight contract audit is complete. Document-root / tree-dependent
@@ -277,7 +308,7 @@ tree-lineage work is closed.
       The request omitted source/workspace revisions, so generated `unknown`
       identifiers remain diagnostic only. This closes input scoping/wiring,
       not linguistic quality or identity promotion.
-- [ ] 3.2 Live-verify with one real docstring/comment example, confirm noun
+- [x] 3.2 Live-verify with one real docstring/comment example, confirm noun
       chunks / dependency edges come back sensible (not garbage on code
       tokens that slipped through the exclusion). **Partial runtime result
       2026-09-20:** source identifiers are absent and the bounded linguistic
@@ -321,6 +352,33 @@ tree-lineage work is closed.
       for reviewed linguistic quality and dependency-edge evidence; model
       availability alone is not completion. This supersedes the earlier
       observation that the model was absent; no canonical writes occurred.
+      **Additive pass wiring (2026-09-27, partial):** the existing linguistic
+      `/analyze` pass now returns the spaCy POS/noun-phrase/dependency response
+      beside NER, with exact `source_ref`/`source_revision`, `UTF8_BYTES`, and
+      source/masked-input byte lengths. The code mask preserves byte offsets
+      across non-ASCII code and masks comment delimiters; dependency output
+      omits punctuation and masked whitespace. The focused sidecar suite passes
+      7/7. A container-side call to the same `_analyze` implementation with a
+      revisioned comment fixture sourced from `python/atlas_compute/som.py`
+      produced non-empty noun phrases and dependency edges without leaking the
+      function symbol. This is not yet an HTTP response from the running worker:
+      the active `miniforge_nlp_sidecar_oak.py` entrypoint imports the V2 facade,
+      which delegates to the legacy implementation, and the worker does not hot
+      reload. Keep 3.2 open until a bounded reload/API readback confirms the
+      serialized `/analyze` result and reviewed linguistic quality.
+      **Live HTTP acceptance passed (2026-09-27):** after the bounded local
+      `miniforge-nlp-sidecar` restart, `/health` reported the pinned spaCy model
+      installed and POS capability ready after the request. `POST /analyze`
+      returned the revision-bound linguistic pass with
+      `input_scope=comments_docstrings_strings_query_text`, `pos.source=spacy`,
+      non-empty noun phrases (`Empty cells`, `a count lattice`, `no observations`)
+      and non-empty dependency edges. The fixture's source/masked byte lengths
+      both equal 187, offsets use `UTF8_BYTES`, and `inspectLattice` did not
+      leak from the masked code. Fixture source revision:
+      `sha256:75574ab504b3f25a3899cf13c793defa357efa4841113bfe8f2628c89cb49a22`.
+      This closes the requested single-example live check only; it is not a
+      held-out accuracy claim or authorization to persist/promote linguistic
+      evidence. No database/cache/vector writes occurred.
 - [ ] 3.3 **PA-NLP-001 PyTorch POS/token-classification challenger** — preserve the earlier Parent Atlas requirement as a separate executor of the linguistic-POS assertion lane. The current implementation remains spaCy/reference-only; no PyTorch POS model or live GPU POS endpoint is present in the current sidecar. When implemented, it must report model ID/revision, CUDA/device status, exact source-text offsets, versioned assertions, and an explicit CPU fallback; compare against the spaCy reference on one frozen, reviewed fixture. It must not replace Tree-sitter, invent source identity, or promote ontology/cache state. This task is intentionally open and does not block the spaCy reference contract from being proven independently.
 
 ## 4. AST-conditioned semantic card wiring (NLP3)
@@ -401,25 +459,26 @@ tree-lineage work is closed.
       tiers until this is done, matching this session's established
       "audit before code" discipline.
 
-## 7. MiniLM + Mixedbread reranker tiers (NLP5) — blocked on section 6
+## 7. MiniLM + Mixedbread reranker tiers (NLP5) — superseded; do not wire
 
-- [ ] 7.1 SUPERSEDED_BY_EMBEDDINGGEMMA_768_ARCHITECTURE / DO_NOT_WIRE (operator direction 2026-09-20: MiniLM and MS MARCO are retired from the Parent Atlas runtime; no runtime reranker, embedding, vote or matrix producer; see `parent-atlas-retrieval-staging-planes` SPINE-04). Original text follows, kept for history: Wire MiniLM (`ms-marco-MiniLM-L6-v2`, `sentence-transformers`
+- [x] 7.1 SUPERSEDED_BY_EMBEDDINGGEMMA_768_ARCHITECTURE / DO_NOT_WIRE (operator direction 2026-09-20: MiniLM and MS MARCO are retired from the Parent Atlas runtime; no runtime reranker, embedding, vote or matrix producer; see `parent-atlas-retrieval-staging-planes` SPINE-04). Original text follows, kept for history: Wire MiniLM (`ms-marco-MiniLM-L6-v2`, `sentence-transformers`
       `CrossEncoder`) as `RERANK_FAST` behind `canonical-rerank-executor.ts`
       — for the ~30-50 candidate tier, not a new standalone file.
-- [ ] 7.2 SUPERSEDED_BY_EMBEDDINGGEMMA_768_ARCHITECTURE / DO_NOT_WIRE (operator direction 2026-09-20, same decision as 7.1: no runtime reranker, embedding or vote from Mixedbread; existing default-off module stays COMPATIBILITY pending archive). Original text follows, kept for history: Wire Mixedbread (`mxbai-rerank-base-v2`) as `RERANK_DEEP`, disabled
+- [x] 7.2 SUPERSEDED_BY_EMBEDDINGGEMMA_768_ARCHITECTURE / DO_NOT_WIRE (operator direction 2026-09-20, same decision as 7.1: no runtime reranker, embedding or vote from Mixedbread; existing default-off module stays COMPATIBILITY pending archive). Original text follows, kept for history: Wire Mixedbread (`mxbai-rerank-base-v2`) as `RERANK_DEEP`, disabled
       unless explicitly requested — for the ~8-20 candidate tier.
-- [ ] 7.3 Live-verify both against a real candidate set, confirm scores are
-      sane and the existing canonical rerank cache/fallback behavior
-      (24h CrossEncoder cache, XGBoost fallback per
-      `canonical-rerank-executor.ts`'s existing docstring) still works
-      correctly with the new backends plugged in.
+- [x] 7.3 SUPERSEDED with 7.1/7.2: no candidate-set live verification is
+      authorized or required for retired reranker backends. This is not a
+      runtime score/cache proof; the existing canonical rerank owner remains
+      unchanged and the new backends are not plugged in.
 
 ## 8. NetworkX/cuGraph parity fixture (NLP6)
 
-- [ ] 8.1 Cross-reference `openspec/changes/parent-atlas-gpu-graph-vector-substrate/`
-      — this task may already be covered there (its Gate 5 covers cuGraph
-      k-core/betweenness parity). Do not duplicate; extend if a BFS/SSSP
-      parity fixture doesn't already exist there.
+- [x] 8.1 Cross-reference complete (2026-09-27):
+      `parent-atlas-gpu-graph-vector-substrate` already owns Gate 5 for the
+      cuGraph k-core/betweenness alternatives and Gate 4.4 for overlapping
+      APOC/cuGraph BFS/SSSP response consistency. Do not create a second
+      parity harness here; implementation and live verification remain owned
+      by that graph-substrate change.
 
 ## 9. FeatureCompiler: pass results → ExperimentFeatureMatrix + control5 wiring (NLP7)
 
@@ -918,7 +977,7 @@ chain exists. Evidence below is from live `GET :8095/capabilities`, the launcher
 
 - [x] CLASSIFICATION-GATE-01a EVAL HARNESS (2026-09-20, `python/atlas_domain_classifier_eval_v1.py` + `python/test_atlas_domain_classifier_eval_v1.py`, 9/9 unit tests; report `docs/reports/domain-classifier-eval-baseline-v1.json`): read-only baseline evaluation harness, no training, canonicalAuthority=false, writesPerformed=false. Per-class precision/recall/F1, macro-F1, top-k recall, ECE, confidence-floor sweep. Accuracy is computed ONLY against human-reviewed `reviewedGroup`; weak-label agreement is reported separately and labelled NOT accuracy; samples under 200 total or 30 per class are flagged `INSUFFICIENT_SAMPLE`. Pluggable predictor so a PyTorch/neural challenger can be scored on the identical rows. Real run on the 142-row draft (predictor = existing rules `classify_domain`): status `NO_GOLD_LABELS` (0 reviewed rows, accuracy NOT computable); weak-label agreement diagnostic 15.5% (22/142), consistent with the earlier 0/6 parity finding — the deterministic rules and the weak labels are different vocabularies, not a measure of correctness. Unblocks: nothing downstream. The gate stays closed until a human fills `reviewedGroup` on enough revision-qualified rows (only 49 of 142 qualify; the trust floor is 200 rows / 30 per class), so more labelled rows, not more model code, is the binding constraint.
 
-- [ ] CLASSIFICATION-GATE-01b REVIEW SHEET + LABELING RULES (2026-09-20, `scripts/atlas/build-domain-review-sheet-v1.mjs` -> `docs/reports/domain-review-sheet-v1.html`; harness now 9/9): a self-contained OFFLINE searchable page over the 142-row draft (search path/label/evidence; filter revision-qualified / unresolved / to-do / proposed group; blind mode hides weak + proposed labels until the reviewer chooses, to avoid anchoring; autosaves to browser localStorage; exports `domain-calibration-reviewed-v1.jsonl` in the schema the harness reads: `python python/atlas_domain_classifier_eval_v1.py --input <exported file> [--revision-qualified-only]`). Generator options `--input/--output`; rows are rendered with text nodes (never innerHTML) and the embedded JSON escapes `<` and U+2028/2029 (proved on an adversarial `</script><img onerror>` fixture: not closed early, exact round-trip). No network, no DB writes; the exported JSONL is gitignored by `*.jsonl` (force-add or convert to a tracked format if it must be promoted).
+- [x] CLASSIFICATION-GATE-01b REVIEW SHEET + LABELING RULES (2026-09-20, `scripts/atlas/build-domain-review-sheet-v1.mjs` -> `docs/reports/domain-review-sheet-v1.html`; harness now 9/9): a self-contained OFFLINE searchable page over the 142-row draft (search path/label/evidence; filter revision-qualified / unresolved / to-do / proposed group; blind mode hides weak + proposed labels until the reviewer chooses, to avoid anchoring; autosaves to browser localStorage; exports `domain-calibration-reviewed-v1.jsonl` in the schema the harness reads: `python python/atlas_domain_classifier_eval_v1.py --input <exported file> [--revision-qualified-only]`). Generator options `--input/--output`; rows are rendered with text nodes (never innerHTML) and the embedded JSON escapes `<` and U+2028/2029 (proved on an adversarial `</script><img onerror>` fixture: not closed early, exact round-trip). No network, no DB writes; the exported JSONL is gitignored by `*.jsonl` (force-add or convert to a tracked format if it must be promoted). **Reverified 2026-09-27:** builder syntax passes; generated artifact exists and the focused classifier evaluator suite passes 9/9 with a scoped `unittest` invocation. This closes only the review-sheet implementation; human labeling and the 200-row/30-per-class gold-label floor remain open.
   - **Labeling rules (also embedded in the sheet):** (1) judge the file's primary responsibility from `sourceRef`, open the file if unsure; the evidence text is an LLM summary, often generic or contaminated with prompt residue, never truth; (2) decide independently (blind mode), agreement with the weak/proposed label is measured afterward; (3) exactly one group from the 13 top-level `atlas_domain_ontology` groups (api, auth, cache, compiler, database, devops, error-handling, frontend, gpu, graph, machine-learning, retrieval, test), a child (database.postgresql, devops.env-config, devops.process-mgmt, frontend.sveltekit) only when certain; (4) no dominant responsibility -> `AMBIGUOUS`; (5) run output / log / generated report / fixture / memory dump -> `NOT_A_DOMAIN`; (6) file gone/unreadable -> `SKIP`; AMBIGUOUS/NOT_A_DOMAIN/SKIP are counted but never gold; (7) review revision-qualified rows first; (8) a second reviewer on >=10% of rows (agreement check) before labels are trusted.
   - **What we need, measured:** trust floor = 200 reviewed rows total AND 30 per class. The 49 revision-qualified rows (proposed group): frontend 11, cache 8, api 7, database 6, auth 4, gpu 3, retrieval 3, graph 3, test 2, devops 2, **machine-learning 0, compiler 0, error-handling 0**; the largest class is 11, so NO class reaches 30 and total is 49 of 200. The draft itself is ~12 rows per class (142 total), so even labelling every row cannot reach the floor. Closing it needs more revision-qualified candidates, which depends on CURRENT_SOURCE_AUTHORITY_PROVEN (the classifier lineage blocker: only 148 rows are revision-qualified overall) — labelling effort alone cannot close it. Two-tier reporting is therefore the honest interim: Tier A revision-qualified (`--revision-qualified-only`, joinable to the feature matrix) and Tier B unresolved-revision (valid text labels for classifier evaluation only; never joined to a matrix or promoted to canonical authority).
   - **Next:** a reviewer works the sheet (revision-qualified first); rerun the harness on the export; extend the candidate pool only after source authority admits a frame.
@@ -1852,3 +1911,216 @@ content). `npx openspec validate parent-atlas-nlp-sidecar-feature-compiler --str
   rebuild was attempted.
 - Focused proof: `python -m pytest -q python/test_miniforge_nlp_sidecar_linguistic_scope.py`
   — 5 passed. No DB, cache, vector, graph, or canonical writes.
+
+## SESSION-207 — external reconciliation checklist received, recorded not verified (2026-09-27, expanded same day)
+
+An operator-pasted reconciliation checklist argued a proposed external component list is
+"already done, but not all under those exact names" and that the right move is reconciliation,
+not wholesale creation. **Recorded verbatim below for a future session to independently verify**
+(per this repo's Duplication Prevention rule — a claim that something exists is not itself
+evidence; grep it, check callers, don't just re-cite it) — **operator explicitly said "just
+record it, no action" this session, so none of the rows below were checked against the live repo
+in this pass.** This entry supersedes an earlier shorter (A-H only) version of the same table
+recorded minutes before — same discipline, more rows and concrete proposed gate names.
+
+| Row | Claimed status | Claimed evidence |
+|---|---|---|
+| A. AstUnit | IMPLEMENTED | `AstUnitSchema` in `nlp-feature-compiler.ts` with tests — consistent with this file's own tasks 2.1/4.1 above, likely accurate but not re-verified here |
+| B. Chonkie | NOT_PROVEN / effectively absent | No Chonkie implementation found in repo search |
+| C. CodeBERT | IMPLEMENTED as experimental representation contract | `codebert_768`/`graphcodebert_768` exist as explicit experimental candidates against `semantic_768`; dimension equality explicitly NOT treated as representation compatibility |
+| D. ExperimentFeatureMatrix | IMPLEMENTED contract, live producer blocked | `ExperimentFeatureMatrixSchema` + compiler exist; consistent with this file's own task 9 finding ("CONTRACT EXISTS, PRODUCER NOT WIRED") |
+| — FeatureRegistry | EXISTS, owner convergence still messy | Several registry surfaces (DB schema / JSON registry / snapshots) — needs owner normalization before treating as the sole tensor-column authority |
+| E. RAPIDS sidecar | PARTIAL | `atlas-gpu-8098` + graph runtime consolidation exist; cuGraph/cuVS executors separated conceptually, but a unified `/graph/*` `/vector/*` `/cluster/*` `/manifold/*` surface is not fully proven live |
+| F. GEMM abstraction | MOSTLY ALIGNED | Direct LibTorch `torch::mm`/cuBLASLt + GPU bridge exist; executors already sit beneath semantic ops rather than as business APIs |
+| G. cuVS exact oracle | PARTIAL / PROVEN in bounded comparison | WSL `atlas-rapids-cu13` cuVS/CAGRA availability + exact comparison proven bounded (matches `GPU-MINI-FABRIC-01`'s `SEMANTIC-EXACT-PARITY-01` in root CLAUDE.md); promotion/relevance evaluation remains gated |
+| H. KMeans/SOM/manifold | PARTIAL | KMeans/SOM infra + latent representation contracts exist; 4D manifold/UMAP as a fully revision-qualified promoted pipeline is not proven |
+| I. Qdrant named representations | PARTIAL, one claimed anti-pattern | `semantic_768` canonical + distinct experimental reps present, but claims some Qdrant code still infers representation identity from vector dimension alone (768-D `codebert_768` is NOT the same space as `semantic_768`) |
+| J. TraversalPolicy | IMPLEMENTED | `sveltekit-frontend/src/lib/server/graph/traversal-policy.ts` claimed to already define bounded traversal modes/relationship constraints; richer product-layer presets (ERROR_REPAIR/TEST_IMPACT/DEPENDENCY_REPAIR) claimed missing as extensions over it |
+| ContextSubgraphManifest | MISSING exact contract | No exact repo contract found (claimed) |
+| GPU job/scheduling | IMPLEMENTED primitives, missing exact policy contract | `gpu-job-queue.ts`, resource/residency schedulers, single-GPU worker semantics claimed to exist; no exact `GPUAdmissionPolicy` contract claimed found |
+| Representation invalidation | PARTIAL | `representationInvalidationKeyV1()` claimed to exist; no full `RepresentationInvalidationGraph` contract claimed found |
+| LaneFreshness | MISSING exact contract | No exact contract found (claimed) |
+| RetrievalReplayCase | PARTIAL | Replay claimed proven in workstation readiness; no exact reusable `RetrievalReplayCase` contract claimed found |
+| RetrievalAblationRun | MISSING exact contract | No exact contract found (claimed) |
+| ExecutionDerivedJudgment | MISSING exact contract | No exact contract found (claimed) |
+| GraphProjectionManifest | IMPLEMENTED, arguably duplicated | Multiple `GraphProjectionManifest` variants claimed to exist — needs convergence per this file's own Duplication Prevention rule, not another implementation |
+| GraphFanoutManifest | MISSING exact contract | No exact contract found (claimed) |
+| ChunkLineageManifest | MISSING exact name; lineage exists elsewhere | Packet/chunk lineage machinery claimed to exist, but not under this exact normalized manifest name |
+| RepresentationManifest | PARTIAL | `LatentRepresentationManifest` claimed to exist; a full canonical `RepresentationManifestV1` claimed still an open gate in semantic-768 work |
+
+**Proposed follow-up gate names** (also unverified/unselected — recorded as candidate task IDs
+only, none started):
+- `AST-UNIT-NORMALIZE-01` — audit current `AstUnitSchema` fields against a proposed canonical
+  field list (`packet_key`, `symbol_version_id`, `source_ref`, `language`, `symbol_kind`,
+  `byte_start`/`byte_end`, `line_start`/`line_end`, `parent_symbol`, `imports`, `calls`,
+  `references`, `exported`, `async`, `test`, `route`, `schema`, `worker`, `source_revision`,
+  `parser_revision`, `chunker_revision`) and normalize/adapt names rather than add a parallel
+  schema. AST observations stay HINT-only until exact `source_revision` + stable
+  `symbol_version_id` are proven (already this file's own standing rule).
+- `FEATURE-REGISTRY-OWNER-CONVERGENCE-01` — determine which existing registry surface owns
+  `feature_id`/`semantic_name`/`dtype`/`normalization`/`normalization_revision`/`producer`/
+  `producer_revision`/`missing_policy`/`promoted`/`tensor ordinal`; the claimed critical missing
+  invariant is that **tensor column order MUST come from a frozen registry revision** — check
+  whether that's already explicit before assuming it needs adding.
+- **Read-only owner census (2026-09-27):** column order is already frozen in two narrower,
+  non-interchangeable contracts. `sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-columnar-v1.ts`
+  owns the 12-scalar CandidateFeatureMatrix order and rejects
+  any `featureNames` mismatch; its artifact also binds `featureRevision`, `featureCount`, and
+  columnar checksum. Separately, `python/atlas_compute/retrieval_router_feature_order_v1.json`
+  owns the ordered fields and nullable value/presence encoding for the Python retrieval-router
+  tensor; `router_feature_flatten.py` consumes that file, and the Observation Routing Fabric
+  task records TS-shape and Python adapter tests. The older `tensors/feature-matrix-contract.ts`
+  is a distinct five-feature manifest, not the owner of either layout. No inspected surface
+  supplies one universal per-feature registry with the proposed producer/normalization/missing
+  policy metadata or maps both layouts to one tensor ordinal space. Finding: the claimed missing
+  order invariant is **already explicit per matrix**, but the layouts are not interchangeable.
+  The bounded compatibility decision is recorded below; no universal registry or adapter is
+  justified without a consumer that actually translates between these layouts. No code, schema,
+  database, cache, or tensor artifact was changed by the census.
+- [x] **FEATURE-REGISTRY-OWNER-CONVERGENCE-01 decision (2026-09-27):** retain separate, revisioned
+  owners for (a) the 12-column CandidateFeatureMatrix and its GPU packers, (b) the Python
+  RetrievalRouterFeatureRow tensor order/nullable encoding, and (c) the older five-feature tensor
+  manifest. Their column sets, shapes, and purposes differ; sharing a tensor ordinal or forcing a
+  single feature registry would create false equivalence. A future cross-layout adapter is allowed
+  only for a named consumer and must bind both source and target layout revisions plus an explicit
+  mapping/checksum. No such consumer was identified in this census, so no adapter was added. This
+  closes the ownership decision only; it does not claim producer completeness, feature parity,
+  training readiness, or runtime promotion.
+- `QDRANT-REPRESENTATION-ID-NON-DIMENSIONAL-01` — remove the claimed anti-pattern of inferring
+  `representation_id` from vector dimension alone (768 != semantic_768, since `codebert_768` is
+  also 768-D but a different coordinate space).
+- Per-area status shorthand proposed (also unverified): `CODEBERT-CONTRACT: IMPLEMENTED` /
+  `CODEBERT-LIVE-EVAL: NOT_PROVEN` / `CODEBERT-PROMOTION: NOT_PROVEN`;
+  `RAPIDS-SIDECAR-OWNER: IMPLEMENTED` / `RAPIDS-SIDECAR-CAPABILITY-CONVERGENCE: PARTIAL` /
+  `RAPIDS-UNIFIED-NAMESPACE: NOT_PROVEN`; cuVS split into
+  `RUNTIME_SMOKE_PROVEN` (exact executor) vs. geometry/parity `PARTIAL` vs.
+  `Recall@k/MRR/nDCG: NOT_PROVEN` (no labeled retrieval eval exists yet — claimed distinct from
+  the already-proven geometry/checksum parity).
+- Explicit "do not redesign" guidance carried in the same pasted brief: ExperimentFeatureMatrix
+  itself is claimed NOT the blocker — the claimed blocker is upstream packet -> source_revision ->
+  current-cohort lineage; fix lineage, not the matrix contract. Chonkie stays deferred
+  (benchmark/oracle + oversized-AST-refinement + prose-chunking only, never canonical code
+  chunker) until structural lineage is cleaner — adding it now would add another unbindable
+  chunk-ID source.
+
+**Not done in this pass**: no row above was independently checked, no code changed, no OpenSpec
+task closed or opened on the strength of this table alone, no proposed gate name above was
+started. Treat every "IMPLEMENTED"/"PROVEN" claim above as a lead to verify, not a fact, until a
+future session greps it directly — same discipline as this file's own
+`LIBTORCH-DEPENDENCY-CENSUS-01`-style corrections in root CLAUDE.md.
+
+## AST-UNIT-NORMALIZE-01 — first bounded slice done, code + tests (2026-09-27)
+
+Picked as an independent, unrelated-file item (per operator direction, avoiding collision with a
+concurrent session's live edits to `parent-atlas-candidate-feature-execution-fabric`). Audited the
+real `AstUnitSchema` (`nlp-feature-compiler.ts:88`) against the SESSION-207 brief's proposed
+canonical field list — **verified via direct read, not the brief's own claim**:
+
+| Proposed field | Found | Action |
+|---|---|---|
+| `source_ref`/`source_revision`/`symbol_version_id`/`language`/`byte_start`/`byte_end`/`line_start`/`line_end`/`parent_symbol`/`imports`/`calls`/`references`/`parser_revision`/`chunker_revision` | Already present (camelCase) | None — brief's own guidance says normalize/adapt names, not rename; renaming would break the one real caller and add zero value |
+| `symbol_kind` | Present as `nodeKind` | None — same-meaning naming variance, not a gap |
+| `packet_key` | **Genuinely missing** — present on the sibling `EvidenceSpanSchema` in the same file, but not on `AstUnitSchema` | **Fixed** — added `packetKey: z.string().min(1).nullable().default(null)` |
+| — (not in the brief's list, found while cross-checking the Python twin) `canonical_authority` | **Genuinely missing from the TS side** — the Python `AstUnit` model (`miniforge_nlp_sidecar.py:361`) already carries `canonical_authority: Literal[False] = False` with an explicit comment that `tree_node_id`/`symbol_version_id` are sidecar-local digests, never canonical identity; the TS twin had no equivalent field at all | **Fixed** — added `canonicalAuthority: z.literal(false).default(false)` to `AstUnitSchema`, matching this repo's dominant `canonicalAuthority: false` governance convention used pervasively elsewhere (`RepairCandidateFeatureMatrixV1`, `SemanticKnnGraphV1`, etc.) |
+| `exported`/`async`/`test`/`route`/`schema`/`worker` (boolean classification flags) | **Not implemented, deliberately deferred** | Checked whether the existing chunker (`_build_ast_units` in `miniforge_nlp_sidecar.py`) already has enough signal to derive these for free — it does not: `chunk.kind` is coarse (`"module"`, `"paragraph"`, etc.), not fine-grained AST node typing. This repo already has a real `isExported`/`isAsync` derivation pattern elsewhere (`ast-grep-structural-topk.ts`, `compiled-ast-query-executor.ts`) but it operates on ast-grep `SgNode`, a different input than this chunker's `Chunk` objects — not a drop-in reuse. Adding these 6 fields now with no real derivation would mean they always default to a value that's probably wrong for many real units, which is worse than not having the field (per `DEPENDENCY-CAPABILITY-GUARD-01`'s no-speculative-capability rule). Also confirmed independently via a live pytest warning this session ("Field name `schema` in `AstEvidenceResponse` shadows an attribute in parent `BaseModel`") that naming one of these fields literally `schema` on the Python side would collide with Pydantic's `BaseModel.schema` — a real reason the brief's raw names can't be copied verbatim if this is ever built. |
+
+**Implementation** (both sides changed together, one shared contract):
+- `sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.ts` — added `packetKey` and
+  `canonicalAuthority` to `AstUnitSchema`, both with `.default()` so the schema's `.strict()` mode
+  doesn't break the existing caller.
+- `python/miniforge_nlp_sidecar.py` — added `packet_key: Optional[str] = None` to the `AstUnit`
+  Pydantic model; wired `packet_key=req.packet_key` into both `_build_ast_units()` construction
+  sites (main chunk loop and the empty-chunks fallback) — real population from the request context
+  that was already available, not a stub. `canonical_authority` already existed on the Python side.
+- `sveltekit-frontend/src/lib/server/analysis/analysis-contracts.spec.ts` — added a new focused
+  test (`AST-UNIT-NORMALIZE-01: AstUnitSchema defaults packetKey to null and pins
+  canonicalAuthority to false`) covering: default `packetKey: null` when omitted, explicit
+  `packetKey` round-trips correctly, and `canonicalAuthority: true` is rejected (the literal type
+  fails closed — it can never be flipped to `true` by a caller).
+
+**Verified, not assumed**:
+- `npx vitest run src/lib/server/analysis/analysis-contracts.spec.ts` (sveltekit-frontend) —
+  **7/7 pass** (was 6/6 before this change; the pre-existing `AstUnitSchema.parse(...)` call that
+  omits both new fields still passes unchanged, confirming the additive fields don't break the one
+  real existing caller).
+- `python -m pytest -q python/test_miniforge_nlp_sidecar_semantic_card_bytes.py
+  python/test_miniforge_nlp_sidecar_linguistic_scope.py` (via `/c/Python313/python`, since the
+  default `python` on PATH lacked `pytest`) — **12/12 pass**, unchanged before/after (both existing
+  Python-side `AstUnit(...)` test constructions omit `packet_key`, which defaults to `None`, so
+  they're unaffected).
+
+**Not done in this pass**: the 6 boolean classification flags remain unimplemented and are not
+scheduled — they need real per-language AST/node-kind classification logic (a genuinely new
+capability, not a rename) before they'd carry trustworthy data. `FEATURE-REGISTRY-OWNER-
+CONVERGENCE-01` and `QDRANT-REPRESENTATION-ID-NON-DIMENSIONAL-01` (the other two proposed gates
+from the same SESSION-207 brief) were not started.
+
+## SESSION-209 (2026-09-27): re-pasted A-J architecture checklist — corrected against live code, then AST-UNIT-LINEAGE-CONVERGENCE-01 run for real
+
+An operator paste this session repeated the same A-J reconciliation checklist already recorded in
+this file's SESSION-207 note (AstUnit/Chonkie/CodeBERT/ExperimentFeatureMatrix/FeatureRegistry/
+RAPIDS/GEMM/cuVS/KMeans-SOM/Qdrant plus J-series manifests), scored ~60-65% implemented / ~50% proven
+as one live chain, and proposed `AST-UNIT-LINEAGE-CONVERGENCE-01` as the next gate. Two corrections
+before acting on it, made by reading the live file directly rather than trusting the paste's own
+"IMPLEMENTED" labels:
+
+1. **The paste doesn't know `AST-UNIT-NORMALIZE-01` already closed** (see this file's own earlier
+   SESSION-207 entry, same session family): `AstUnitSchema` in `sveltekit-frontend/src/lib/server/
+   analysis/nlp-feature-compiler.ts` already has `packetKey` and `canonicalAuthority: z.literal(false)`
+   — verified live at lines 88-121, not re-added here.
+2. **Most of the paste's proposed field list already exists, just under different names** (verified
+   by reading the schema directly, 2026-09-27): `source_ref`→`sourceRef`, `symbol_version_id`→
+   `symbolVersionId`, `symbol_kind`→`nodeKind`, `parent_symbol`→`parentSymbol`, `source_revision`→
+   `sourceRevision`, `parser_revision`→`parserRevision`, `chunker_revision`→`chunkerRevision`,
+   `imports`/`calls`/`references` present as-named. The 6 boolean flags the paste re-lists
+   (`exported`/`async`/`test`/`route`/`schema`/`worker`) were already evaluated and deliberately
+   NOT added in the prior AST-UNIT-NORMALIZE-01 pass, for reasons still valid (chunker's `chunk.kind`
+   too coarse to derive them accurately; this repo's real `isExported`/`isAsync` derivation operates
+   on a different input type; naming a field `schema` on the Python twin would collide with
+   Pydantic's `BaseModel.schema`, confirmed by an actual pytest warning at the time). Not revisited.
+
+**`AST-UNIT-LINEAGE-CONVERGENCE-01` — done, run for real (2026-09-27), read-only, 0 writes.**
+
+New script: `scripts/atlas/prove-ast-unit-lineage-convergence-v1.mjs`. Picks one real
+`atlas_symbol_versions` row and checks, against LIVE data (not the persisted row's own claims):
+identity-chain completeness (`symbolVersionId`/`stableSymbolId`/`sourceRef`/`sourceRevision`/
+`packetKey` all non-blank), `source_revision` is a real `sha256:` digest shape, the file resolves on
+disk, the file's **current** on-disk bytes hash to exactly `source_revision` (not a stale revision
+left over from before a later edit), the stored `byte_start`/`byte_end` span is in-range and
+non-degenerate against the **current** file bytes, and `packet_key` has a plausible live shape.
+Never persists, promotes, or calls the NLP sidecar — one receipt only
+(`docs/reports/ast-unit-lineage-convergence-v1.json`).
+
+Real bug caught and fixed before trusting the first result: `pg` returns `bigint` columns
+(`byte_start`/`byte_end`) as JS strings, and `Number.isFinite('10550')` is always `false` — the
+first run spuriously failed `BYTE_SPAN_IN_RANGE` on every row until fixed to `Number(row.byte_start)`.
+
+**Two real rows tried, two different honest outcomes — not cherry-picked to force a pass**:
+- Default row (`ORDER BY symbol_version_id LIMIT 1` among packet-keyed, revision-qualified rows) —
+  `scripts/agent/agent-scheduler-orchestrator.mjs` — **`LINEAGE_NOT_CONVERGED`**:
+  `SOURCE_REVISION_MATCHES_CURRENT_BYTES` genuinely fails (stored
+  `sha256:fbdd1e00...`, current on-disk `sha256:c93233...`) — this file was edited after this symbol
+  version was recorded; the byte-span itself is still in-range and non-empty (a real function body
+  excerpt), but the revision itself is stale. A true, useful finding: this row needs re-indexing, not
+  a schema fix.
+- `src/app.d.ts` (a row this same session's `SYMBOL-VERSION-QUARANTINE-01` repair re-hashed from
+  current bytes minutes earlier) — **`LINEAGE_CONVERGED`**, all 6 checks PASS: identity chain
+  complete, revision sha256-shaped, file resolves, current-bytes hash matches stored revision
+  exactly, byte span 252-339 of 1763 bytes is in-range and slices to real, non-empty source text,
+  packet_key (`ace:packet:b07092d78bfa`) has a plausible live shape. Receipt:
+  `docs/reports/ast-unit-lineage-convergence-v1.json` (this run's output, symbol version
+  `7698b7f3168a82e78fde72aefec9aa4f3ae1986a35035bb2f23e73cdbff8eba4`).
+
+**What this proves and doesn't**: it proves the exit condition ("source_ref -> source_revision ->
+symbol_version_id -> packet_key, all exact, all same revision, no fallback") is achievable for at
+least one real row right now, and gives a reusable, re-runnable check for any other row. It does
+**not** prove this holds for all 479 rows — the default-row run above shows at least one row (the
+`agent-scheduler-orchestrator.mjs` one) has already drifted since being recorded, meaning
+`atlas_symbol_versions` needs periodic re-verification against live file bytes, not a one-time
+repair, to stay converged. That periodic-reverification need is a real follow-up, not addressed here.
+
+**Sequencing note**: the paste's proposed chain after this gate
+(`REPRESENTATION-MANIFEST-V1` → `FEATURE-REGISTRY-OWNER-CONVERGENCE-01` → `EXPERIMENT-MATRIX-LIVE-01`
+→ `RETRIEVAL-ABLATION-RUN-01` → `CONTEXT-SUBGRAPH-MANIFEST-01` → `GPU-ADMISSION-POLICY-V1`) is
+recorded here as the proposed next sequence but **not started** — each is a substantial, separate
+gate and none was requested explicitly this session.

@@ -23,6 +23,7 @@ import { mkdirSync, writeFileSync, readFileSync, existsSync, openSync } from 'no
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Redis from 'ioredis';
+import { isMiniforgeNlpRunning } from './miniforge-nlp-health.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '../..');
@@ -111,19 +112,6 @@ async function probeGpuWarm() {
   const ol = await probe(gate.ollamaUrl);
   log.heavyLane.gpuProbe = { turboquant: tq, ollama: ol };
   return gate.requireBoth ? (tq && ol) : (tq || ol);
-}
-
-async function isMiniforgeNlpRunning(port = 8095) {
-  try {
-    const res = await fetch(`http://127.0.0.1:${port}/health`, {
-      signal: AbortSignal.timeout(2000),
-    });
-    if (!res.ok) return false;
-    const body = await res.json().catch(() => null);
-    return body?.status === 'ok' && body?.model === 'miniforge-nlp-sidecar';
-  } catch {
-    return false;
-  }
 }
 
 async function probeServices() {

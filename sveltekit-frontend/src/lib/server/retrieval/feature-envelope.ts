@@ -11,6 +11,33 @@
 
 import { z } from 'zod';
 
+/**
+ * Canonical identity contract for the staged envelope migration. The older
+ * FeatureEnvelopeSchema below remains a compatibility shape until hydration
+ * supplies the canonical join required by P0.2.
+ */
+export const FeatureEnvelopeIdentityV1Schema = z.discriminatedUnion('identity_kind', [
+  z.object({
+    identity_kind: z.literal('symbol'),
+    stable_symbol_id: z.string().trim().min(1),
+    symbol_version_id: z.string().trim().min(1),
+    stable_file_id: z.string().trim().min(1).nullable(),
+  }).strict(),
+  z.object({
+    identity_kind: z.literal('file'),
+    stable_symbol_id: z.null(),
+    symbol_version_id: z.null(),
+    stable_file_id: z.string().trim().min(1),
+  }).strict(),
+  z.object({
+    identity_kind: z.literal('chunk'),
+    stable_symbol_id: z.null(),
+    symbol_version_id: z.null(),
+    stable_file_id: z.string().trim().min(1),
+  }).strict(),
+]);
+export type FeatureEnvelopeIdentityV1 = z.infer<typeof FeatureEnvelopeIdentityV1Schema>;
+
 // ============================================================================
 // SIGNAL DEFINITIONS (Independent Scores)
 // ============================================================================

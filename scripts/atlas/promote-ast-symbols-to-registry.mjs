@@ -73,6 +73,17 @@ async function main() {
     console.error('Refusing --apply without an explicit --limit=N — canonical identity writes are always bounded here.');
     process.exit(1);
   }
+  if (APPLY && !process.env.ALLOW_LEGACY_SYMBOL_REGISTRY_BYPASS_WRITE) {
+    console.error(
+      '[PROMOTE-AST-SYMBOLS] retired as a direct-SQL bypass writer '
+      + '(LEGACY-SYMBOL-WRITER-RETIREMENT-01, openspec/changes/parent-atlas-code-intel-e2e/tasks.md, '
+      + 'SOURCE-SYMBOL-AUTHORITY-01 finding). This script wrote 10,220 atlas_symbol_registry rows '
+      + 'still carrying the workspace:0 placeholder revision, passed through unvalidated from its '
+      + 'input. Route new writes through packages/parent-atlas/src/core/symbol-registry-repository.ts. '
+      + 'Set ALLOW_LEGACY_SYMBOL_REGISTRY_BYPASS_WRITE=1 to override for a deliberate, reviewed one-off.'
+    );
+    process.exit(1);
+  }
 
   const raw = await fs.readFile(INPUT, 'utf8');
   const rows = raw.split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));

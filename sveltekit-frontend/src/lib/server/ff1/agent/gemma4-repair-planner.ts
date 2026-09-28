@@ -102,10 +102,14 @@ async function kagNote(filePath: string): Promise<string> {
     const { createClient } = await import('redis');
     const raw = createClient({ url: REDIS_URL, socket: { connectTimeout: 2000 } });
     await raw.connect();
-    // D16: `await using` auto-calls .quit() on scope exit (even on throw)
-    await using r = attachDispose(raw);
-    const note = await r.get(`wiki:note:dir:${dir}`) as string | null;
-    return (note ?? '').slice(0, 300);
+    // `await using` is a SyntaxError on Node 22 (route/module 500s at load); try/finally is equivalent.
+    const r = attachDispose(raw);
+    try {
+      const note = await r.get(`wiki:note:dir:${dir}`) as string | null;
+      return (note ?? '').slice(0, 300);
+    } finally {
+      await r[Symbol.asyncDispose]();
+    }
   } catch {
     return '';
   }

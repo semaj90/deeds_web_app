@@ -72,7 +72,7 @@ async function main() {
     // Phase 3: Attention scores
     log('\n=== Phase 3: GPU Attention Scores 🔴 BLOCKED ===');
     log('  Blocker: Phase 2 PageRank completion');
-    log('  Scope: embedding_gemma_384 + LibTorch cosine similarity');
+    log('  Scope: revision-qualified semantic_768 + LibTorch cosine similarity (provenance gate required)');
     log('  Scoring: top-K neighbors per packet');
     log('  Output: p4-attention-scores.json report');
 

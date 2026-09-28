@@ -12,6 +12,18 @@ def test_linguistic_input_masks_code_and_preserves_comments_and_strings():
     assert 'export' not in masked
 
 
+def test_linguistic_mask_preserves_source_utf8_byte_offsets():
+    source = 'const café = 1;\n/** The parser preserves source spans. */\nfunction verify() { return café; }'
+    masked = _linguistic_input(source, code_mode=True)
+
+    assert len(masked.encode('utf-8')) == len(source.encode('utf-8'))
+    assert 'The parser preserves source spans.' in masked
+    assert 'verify' not in masked
+    assert '/**' not in masked
+    assert '*/' not in masked
+    assert masked.encode('utf-8').index(b'The parser') == source.encode('utf-8').index(b'The parser')
+
+
 def test_linguistic_pass_records_bounded_input_scope_and_no_code_symbol():
     source = '/** Retrieve the canonical packet source. */ export function atlasFixture(value: string) { return value.trim(); }'
     req = AnalyzeRequest(
@@ -26,6 +38,42 @@ def test_linguistic_pass_records_bounded_input_scope_and_no_code_symbol():
     linguistic = results[0]
     assert linguistic.artifacts['input_scope'] == 'comments_docstrings_strings_query_text'
     assert all(entity['label'] != 'CODE_SYMBOL' for entity in linguistic.artifacts['entities'])
+
+
+def test_linguistic_pass_includes_pos_and_dependency_evidence_with_source_binding(monkeypatch):
+    source = '/** The parser validates source revisions. */ export function atlasFixture() { return 1; }'
+    req = AnalyzeRequest(
+        text=source,
+        source_type='codebase',
+        source_ref='fixtures/linguistic.ts',
+        source_revision='sha256:fixture-linguistic-v1',
+        language='typescript',
+        passes=['linguistic'],
+    )
+    monkeypatch.setattr(sidecar, '_spacy_entities', lambda _text: [])
+    monkeypatch.setattr(sidecar, '_spacy_pos_tags', lambda _text: sidecar.PosTagResponse(
+        nouns=['parser', 'revisions'], proper_nouns=[], verbs=['validates'],
+        adjectives=[], adverbs=[], lemmas=['parser', 'revision', 'validate'],
+        noun_phrases=['source revisions'], source='spacy',
+        dependency_parser_available=True, coordinate_basis='UTF8_BYTES',
+        dependency_edges=[sidecar.LinguisticDependencyEdge(
+            dependent_text='revisions', dependent_start_byte=31, dependent_end_byte=40,
+            head_text='validates', head_start_byte=21, head_end_byte=30, relation='dobj',
+        )],
+    ))
+
+    results, *_ = _build_pass_results(req, source, [], [], [], [], [])
+    linguistic = results[0]
+    assert linguistic.artifacts['pos']['source'] == 'spacy'
+    assert linguistic.artifacts['pos']['noun_phrases'] == ['source revisions']
+    assert linguistic.artifacts['pos']['dependency_edges'][0]['relation'] == 'dobj'
+    assert linguistic.artifacts['coordinate_source'] == {
+        'source_ref': 'fixtures/linguistic.ts',
+        'source_revision': 'sha256:fixture-linguistic-v1',
+        'offset_basis': 'UTF8_BYTES',
+        'source_byte_length': len(source.encode('utf-8')),
+        'masked_input_byte_length': len(source.encode('utf-8')),
+    }
 
 
 def test_pos_fails_closed_when_spacy_has_no_pos_annotations(monkeypatch):

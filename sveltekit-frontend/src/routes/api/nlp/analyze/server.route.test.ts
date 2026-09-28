@@ -132,4 +132,35 @@ describe('/api/nlp/analyze', () => {
     expect(body.classification_proposal.sourceRevision).toBe('sha256:' + '1'.repeat(64));
     expect(body.classification_proposal.canonicalAuthority).toBe(false);
   });
+
+  it.each(['entities', 'relationships', 'concepts', 'full'] as const)(
+    'preserves the supported extraction mode %s',
+    async (extractionMode) => {
+      const { POST } = await import('./+server.js');
+      const request = new Request('http://localhost/api/nlp/analyze', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text: 'fixture text', extractionMode }),
+      });
+
+      const response = await POST({ request, locals: { user: { id: 'u1' } } } as any);
+
+      expect(response.status).toBe(200);
+      expect(mocks.analyze).toHaveBeenCalledWith(expect.objectContaining({ extractionMode }));
+    },
+  );
+
+  it('accepts the existing classify pass exposed by the sidecar contract', async () => {
+    const { POST } = await import('./+server.js');
+    const request = new Request('http://localhost/api/nlp/analyze', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ text: 'fixture text', passes: ['classify'] }),
+    });
+
+    const response = await POST({ request, locals: { user: { id: 'u1' } } } as any);
+
+    expect(response.status).toBe(200);
+    expect(mocks.analyze).toHaveBeenCalledWith(expect.objectContaining({ passes: ['classify'] }));
+  });
 });

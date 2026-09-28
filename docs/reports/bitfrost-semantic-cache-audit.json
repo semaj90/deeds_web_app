@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-26T22:40:47.647Z",
+  "generatedAt": "2026-09-26T22:55:48.014Z",
   "status": "PASS_WITH_DRIFT",
   "redis": {
     "container": "legal-ai-valkey",
@@ -106,27 +106,27 @@
       "ttlSamples": [
         {
           "key": "embed:v2:embeddinggemma:latest:652192e08087cb09829cd6490f557ce51d7707c048fc9d63118f3f3ee875669b",
-          "ttl": 426749,
+          "ttl": 425848,
           "ok": true
         },
         {
           "key": "embed:v2:embeddinggemma:latest:7c5956df8db3078f1be169af1deb65774bab391e0aa091415cb2886b3bc5c338",
-          "ttl": 426749,
+          "ttl": 425848,
           "ok": true
         },
         {
           "key": "embed:v2:embeddinggemma:latest:5d64f3c7f55c13bc4cb4405d3f480bfc17cdd969f0223e2f1ad81034f034edb6",
-          "ttl": 426749,
+          "ttl": 425848,
           "ok": true
         },
         {
           "key": "embed:v2:embeddinggemma:latest:686f4228b98904b281f4ebfb562d1f0045ec8451956bb148afe1dd95656160fd",
-          "ttl": 426749,
+          "ttl": 425848,
           "ok": true
         },
         {
           "key": "embed:v2:embeddinggemma:latest:0cccf4769c1f4da3ba1fbad5337129a083ba24bd0473b7aed5b3ae033a3793d8",
-          "ttl": 426749,
+          "ttl": 425847,
           "ok": true
         }
       ],
@@ -150,27 +150,27 @@
       "ttlSamples": [
         {
           "key": "embed:embeddinggemma:latest:4223fde248b8715cc172b4756ba5954b",
-          "ttl": 28708,
+          "ttl": 27807,
           "ok": true
         },
         {
           "key": "embed:embeddinggemma:latest:a945db00112fb09e4e1873821cc6c2c8",
-          "ttl": 28658,
+          "ttl": 27757,
           "ok": true
         },
         {
           "key": "embed:embeddinggemma:latest:d4fb0f7b5656e96b674edac31f44ff72",
-          "ttl": 28578,
+          "ttl": 27676,
           "ok": true
         },
         {
           "key": "embed:embeddinggemma:latest:89859603cdbbcd3f074927ebb7b969c5",
-          "ttl": 28713,
+          "ttl": 27812,
           "ok": true
         },
         {
           "key": "embed:embeddinggemma:latest:915373f28c5da4c4aab1ea6924eeb2f8",
-          "ttl": 28711,
+          "ttl": 27809,
           "ok": true
         }
       ],
@@ -199,22 +199,22 @@
         },
         {
           "key": "ace:source_ref:f8955f0f",
-          "ttl": 88080,
+          "ttl": 87178,
           "ok": true
         },
         {
           "key": "ace:source_ref:23627406",
-          "ttl": 88206,
+          "ttl": 87305,
           "ok": true
         },
         {
           "key": "ace:source_ref:2a7ba9c5",
-          "ttl": 88206,
+          "ttl": 87305,
           "ok": true
         },
         {
           "key": "ace:source_ref:0dbba660",
-          "ttl": 88079,
+          "ttl": 87178,
           "ok": true
         }
       ],
@@ -356,17 +356,17 @@
       "ttlSamples": [
         {
           "key": "ace:feature:src.lib.server.cache-keys",
-          "ttl": 88077,
+          "ttl": 87174,
           "ok": true
         },
         {
           "key": "ace:feature:src.lib.server.cache.atlas-reward-cache",
-          "ttl": 88085,
+          "ttl": 87182,
           "ok": true
         },
         {
           "key": "ace:feature:src.lib.server.cache.redis-exact-match",
-          "ttl": 88203,
+          "ttl": 87301,
           "ok": true
         }
       ],

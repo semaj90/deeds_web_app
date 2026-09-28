@@ -81,3 +81,11 @@ export {
 // Canonical hashing
 export { canonicalHashJSON, verifyCanonicalHash } from './canonical-hashing.js';
 export { FeaturePacketV1Schema, buildFeaturePacketV1, type FeaturePacketV1 } from './feature-packet-v1.js';
+export {
+  EvidenceTupleV1Schema,
+  createEvidenceTupleV1,
+  createEvidenceTupleFromRawSpanV1,
+  type EvidenceTupleV1,
+  type EvidenceTupleV1Input,
+  type EvidenceTupleRawSpanInputV1,
+} from './evidence-tuple-v1.js';

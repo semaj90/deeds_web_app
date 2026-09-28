@@ -70,7 +70,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -80,7 +80,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -90,7 +90,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -100,7 +100,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>

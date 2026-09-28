@@ -1,0 +1,10 @@
+{
+  "schema": "atlas.local-doc-chunk-snapshot-pointer.v1",
+  "corpusId": "langchain-docs-python-core",
+  "runId": "20260926T232349097Z",
+  "chunksPath": ".tmp/atlas/langchain-doc-corpus-v1/20260926T232349097Z/chunks-v1-streaming/chunks.jsonl",
+  "receiptPath": ".tmp/atlas/langchain-doc-corpus-v1/20260926T232349097Z/chunks-v1-streaming/receipt.json",
+  "chunkManifestSha256": "sha256:b1feae501c9e28a3147d1ec4f73d09d3d59bcccd986133411ebb0afc7201f121",
+  "canonicalAuthority": false,
+  "artifactOnly": true
+}

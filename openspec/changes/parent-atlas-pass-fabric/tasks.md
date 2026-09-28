@@ -5,6 +5,14 @@
 Skip to PF4. Do not re-implement claimBatch/gate-fill/LISTEN-NOTIFY — they
 already work as specified and correctly.
 
+**Verification addendum (2026-09-27)**: `claimBatch` previously coerced a
+zero/invalid limit to `LIMIT 1`, despite the worker currently skipping zero
+free slots. It now returns an empty batch before querying for non-positive or
+non-finite capacity. The isolated mocked boundary suite passes 6/6, including
+four-row/one-query and invalid-capacity cases. This is application/fixture
+proof only; PostgreSQL locking, concurrent workers, and notification latency
+remain unproven and no live database was contacted.
+
 ## P0 UPDATE (2026-08-11, later same day): identity collision is worse than "disconnected" — it's a 3-WAY FORMAT SPLIT
 
 Earlier framing was "a resolver exists (`packet-key-builder.ts`) and a
@@ -150,11 +158,13 @@ not one:
    (stochastic_history/observed_event) when one already exists for that
    identity.
 
-**PF4C status**: `PASS_KEY_SEMANTICS_PROVEN = true` (now precisely
-characterized — it's execution-scoped, not logical-identity-scoped, and
-that's the root cause requiring the two-hash split above, not a bug to
-patch in place). `PASS_IDENTITY_PROVEN` remains `false` until the
-`passIdentityHash` field is added and threaded through eligibility queries.
+**PF4C status**: `PASS_KEY_SEMANTICS_PROVEN = true`: `pass_key` is the
+job/execution retry key; `pass_identity_hash` is a separate logical identity.
+The logical identity is now emitted only when the caller supplies a stable
+`inputHash`; an absent/blank input hash remains `NULL` instead of silently
+falling back to the job-scoped execution hash. `PASS_IDENTITY_PROVEN` applies
+only to explicitly qualified inputs; population and consumer coverage remain
+separate open gates.
 
 ## STEPS 2-3 APPLIED (2026-08-11, same day): executionSemantics wired
 
@@ -298,9 +308,9 @@ for (const jobType of JOB_TYPES) {
 ```
 
 **Acceptance**:
-- [ ] Single Postgres query claims all free slots
-- [ ] Test: 4 free → 4 jobs claimed (not 1)
-- [ ] Test: 0 free → 0 jobs claimed (no error)
+- [x] Single Postgres query claims all free slots (source + mocked boundary proof; no live PostgreSQL claim)
+- [x] Test: 4 free → 4 jobs claimed (not 1)
+- [x] Test: 0 free → 0 jobs claimed (no error; invalid capacity short-circuits before DB call)
 
 ---
 
@@ -311,9 +321,14 @@ for (const jobType of JOB_TYPES) {
 **Change**: Update gate tracking in executeJob callback.
 
 **Acceptance**:
-- [ ] embed_gate: 0/3 → 3 jobs dispatched in one pollOnce call
-- [ ] entity_gate: 0/2 → 2 jobs dispatched
-- [ ] forensics_gate: 0/4 → 4 jobs dispatched
+- [ ] embed_gate: 0/3 → 3 jobs dispatched in one pollOnce call. Still open:
+      the current `stageConfig` has no embedding job type, and this lane cannot
+      be added until semantic writer/provenance ownership is authorized.
+- [x] entity_gate: 0/2 → 2 jobs dispatched. `analysis-worker-wakeup.spec.ts`
+      runs the actual poll loop with mocked queue/gate boundaries and confirms
+      two entity jobs are admitted in one poll; job handlers are not invoked.
+- [x] forensics_gate: 0/4 → 4 jobs dispatched. The same fixture confirms four
+      forensics jobs are admitted in one poll; job handlers are not invoked.
 
 ---
 
@@ -346,7 +361,12 @@ setInterval(pollOnce, 30_000);
 
 **Acceptance**:
 - [ ] Job enqueued → worker wakes in <100ms
-- [ ] Fallback poll fires every 30s
+- [x] Fallback poll fires every 30s. `sveltekit-frontend/tests/lane-contracts/analysis-worker-wakeup.spec.ts`
+      starts the real worker with fake timers and verifies no second poll at
+      29,999 ms and a poll at 30,000 ms. Job claims and PostgreSQL listener
+      boundaries are mocked; this proves the timer contract, not live enqueue
+      latency or PostgreSQL delivery. PF3's live wake-latency criterion remains
+      open above.
 
 ---
 
@@ -484,15 +504,24 @@ type PassExecution = {
       shape for `summarization`; `embedding`/`cache_push` duplicate cause
       still unknown (47 groups, ~97 rows — low volume, check before assuming
       same pattern applies)
-- [ ] PF4C — prove `pass_key` semantics. Existing column already combines
-      `packet_key + pass_type + input_hash + prompt_hash + model_name +
-      temperature + max_tokens`. If `pass_key` was designed to *be* the full
-      producer-config identity, the durable logical key may be `packet_key +
-      source_revision + pass_key + input_hash` rather than introducing a
-      redundant `pass_type + pass_revision` pair. Check code history /
-      original design intent before freezing either shape.
-- [ ] PF4D — recover `source_revision`/`pass_revision` where evidence exists
-      (packet source ledger, producer provenance) for the 11,076 legacy rows
+- [x] PF4C — prove `pass_key` semantics from code/history: it is job-scoped
+      execution retry identity, not logical pass identity. Keep it unchanged;
+      use the separate logical identity only when a stable `inputHash` is
+      explicitly supplied, otherwise leave `passIdentityHash` NULL. Focused
+      cross-job tests prove execution keys differ while qualified logical
+      identities match; no DB writes or uniqueness changes are part of this
+      proof. `sveltekit-frontend/src/lib/server/db/schema/analysis-pass-results.identity.spec.ts`
+      now also pins deterministic-idempotent, stochastic-history, and
+      observed-event semantics; isolated contract tests pass 2/2. This does
+      not resolve PF4B's 47 embedding/cache_push duplicate groups or authorize
+      a migration/writer.
+- [x] PF4D — read-only recovery census completed 2026-09-27. No values were
+      backfilled: all 11,076 legacy rows have both revisions NULL; none has an
+      exact historical source-revision binding at or before its execution time,
+      and legacy producer provenance has no explicit source/pass revision.
+      Current packet revisions are not safe substitutes for historical values.
+      The recovery outcome is zero evidence-backed candidates; PF4E remains the
+      separate gate for explicitly representing unresolved legacy rows.
 - [ ] PF4E — mark unrecoverable rows explicitly `legacy-unresolved` (do not
       silently leave ambiguous NULLs — a typed status is queryable, a NULL
       that means "we don't know" vs NULL that means "not applicable" is not)
@@ -582,14 +611,15 @@ prose:
   `currentBoundaryKind: "view_only"`, `rawRows: 11095` (11,076 → 11,095, +19 rows since this file
   was last dated — expected drift), `currentRows: 6903` (still matches this section's claim
   exactly), `uniqueConstraintPresent: false`.
-- **PF4C (identity/execution hash split) — core mechanism confirmed live**, contradicting this
-  line's own "undone" claim for at least the split itself: `analysis-pass-results.ts` still has
-  `passIdentityHash`, `resolveExecutionSemantics()`, and `KNOWN_PASS_EXECUTION_SEMANTICS`; the
-  `deterministic_idempotent` short-circuit-on-reuse path is still wired into
-  `recordAnalysisPassResult()`. Genuinely still open per this line: full `pass_key`
-  git-history/original-intent investigation, and the eligibility-query migration off `pass_key`
-  onto `passIdentityHash` for anything beyond the reuse check itself.
-- **PF4D (backfill legacy revisions) — confirmed still not done, and found to be a much smaller
+- **PF4C (identity/execution hash split) — source and fixture proof refreshed**:
+  `pass_key` remains the execution retry identity, while logical reuse queries
+  `passIdentityHash`. A stable caller-provided `inputHash` is required to emit
+  that logical hash; missing/blank input hashes now produce `NULL`, not a
+  job-scoped fallback. The idempotency fixture supplies the stable hash it
+  claims to exercise. Focused analysis-pass and lexical-adapter suites pass
+  15/15. This does not establish population coverage or authorize DB
+  uniqueness/materialization; those remain separate gates.
+- **PF4D historical checkpoint (2026-09-05; recovery/backfill was then unproven), and found to be a much smaller
   problem in practice than "wire the writer" suggests.** New diagnostic script
   `scripts/atlas/audit-pass-fabric-revision-population-v1.mts` (`npx tsx
   scripts/atlas/audit-pass-fabric-revision-population-v1.mts` from `sveltekit-frontend/`) queries
@@ -605,6 +635,13 @@ prose:
   be read as "the writer *can* populate both fields when the caller provides them, not that it does
   so in practice yet" — a narrower, more precise finding than either "zero code paths write" (the
   pre-2026-08-11 framing) or "wired" (which could be misread as "populated across the board").
+- **PF4D refresh (2026-09-27; read-only):** current population is 11,103 rows: 27 have both
+  revisions, zero have only one, and 11,076 legacy rows have neither. No legacy provenance row
+  carries an explicit source/pass revision. Although 1,304 legacy rows join to a packet with an
+  exact source-ref match, every such packet was updated after the pass execution; the current
+  revision is therefore not historical evidence. No exact workspace-source binding was observed
+  at or before pass execution. PF4D closes as **zero evidence-backed recovery candidates**; no
+  backfill or schema change was performed. PF4E remains open for explicit unresolved-state handling.
 - **PF4E (mark unrecoverable rows `legacy-unresolved`) — confirmed still not done.** `rg
   "legacy-unresolved|legacy_unresolved"` across `src/` returns zero matches.
 - **PF4G (duplicate-delivery idempotency on new writes) — not independently re-proven this pass**
@@ -1079,8 +1116,12 @@ async function executeToolBatch(
 **Note**: Real tricubic interpolation deferred (requires 3D lattice + 64-sample neighborhood).
 
 **Acceptance**:
-- [ ] Renamed in all callers
-- [ ] Governance: experimental implementation flagged, not canon
+- [x] Renamed in all callers to `cubicKernelNeighborhoodExperimental()`;
+      the scalar weight helper is `cubicKernelWeightExperimental()`.
+- [x] Governance: the CLI help, runtime label, and source comments identify
+      this as an experimental, noncanonical neighborhood only. The existing
+      `--tricube` flag and output behavior are preserved; real 3D lattice
+      interpolation remains deferred.
 
 ---
 

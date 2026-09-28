@@ -417,3 +417,10 @@ any library, database feature, model, or accelerator into a canonical owner.
 - Direct OpenWiki ingestion of secrets, raw vectors, or unbounded repository logs.
 - Treating PostgreSQL AIO, bitmap indexes, pgvector, or PyTorch as new canonical
   schema owners.
+
+## 2026-09-27 — Portable OKF / registry owner audit
+
+- [x] Read-only inventory against the live PostgreSQL 18.4 `legal_ai_db` confirmed several distinct existing owners: `atlas_schema_registry` (schema metadata), `atlas_domain_ontology` (17 domain-ontology group rows), `atlas_packet_registry` (packet-oriented registry), `atlas_ontology_concepts` (empty concept identity schema), `domain_taxonomy_v1` (empty version/alias adapter), and `taxonomy_nodes` / `taxonomy_edges` (populated topology read model). Application domain classification is separately owned by `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts` (`CANONICAL_DOMAINS`). This does **not** establish one universal registry or authorize merging/populating these tables.
+- [x] Keep OKF as portable Markdown + YAML authoring/interchange, validated against existing local schemas and checksums. It may nominate documented use-cases, keywords, language/domain labels, and routing metadata; it cannot mint canonical packet/symbol IDs, ordinals, revisions, or promote classifier output.
+- [ ] Before adding a PostgreSQL registry table or admin editor, close the existing domain-class owner decision and map each OKF field to exactly one admitted owner. Prefer a read-only registry projection/API over a new table if the existing owner is sufficient. No DDL, row writes, OpenWiki integration install, or wiki initialization occurred in this audit.
+- [ ] If later approved, expose the reviewed registry through the existing Admin Unified Indexing Studio as a read-only inspector first. A Pokédex-like display is an ordinal/hex UI metaphor only; do not copy Pokémon source/assets or use display numbers as identity.

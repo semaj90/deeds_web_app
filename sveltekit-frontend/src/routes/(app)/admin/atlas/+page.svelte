@@ -95,6 +95,9 @@
 		documentGovernance?: DocumentGovernanceSummaryV1 | null;
 		docsCorpus?: DocIntelligenceStudioSnapshotV1 | null;
 		docsSearch?: DocSearchResult | null;
+		localDocsSnapshot?: import('$lib/server/atlas/docs/local-chunk-snapshot-v1.js').LocalChunkSnapshotPageV1 | null;
+		localDocsQuery?: string;
+		localDocsOffset?: number;
 		docsQuery?: string;
 		docsProduct?: string;
 		docsVersion?: string;
@@ -957,7 +960,7 @@
 				</p>
 			</div>
 
-			<DocCorpusPanel snapshot={data.docsCorpus ?? null} search={data.docsSearch ?? null} query={data.docsQuery ?? ''} product={data.docsProduct ?? ''} version={data.docsVersion ?? ''} />
+			<DocCorpusPanel snapshot={data.docsCorpus ?? null} search={data.docsSearch ?? null} query={data.docsQuery ?? ''} product={data.docsProduct ?? ''} version={data.docsVersion ?? ''} localSnapshot={data.localDocsSnapshot ?? null} localQuery={data.localDocsQuery ?? ''} />
 
 			<!-- Document Governance -->
 			<div class="p-4 border-b border-[#3f3e37] bg-[#1c1b18]/40 space-y-3">

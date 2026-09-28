@@ -19,7 +19,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
 import { bifrostKey } from '$lib/server/cache-keys.js';
-import { bifrostRetrievalCacheKeyV2 } from './cache-keys.js';
+import { bifrostRetrievalCacheLookupKey, type BifrostRetrievalCacheIdentityV3 } from './cache-keys.js';
 import {
   writeAcePacket,
   readAcePacketBySourceRef,
@@ -164,14 +164,10 @@ export interface QueryRouterOpts {
   featureHint?: string;    // feature_id if caller knows the feature
   limit?: number;
   collection?: string;
-	/** Optional complete identity tuple for revision-qualified cache access. */
-	workspaceRevision?: string;
-	candidateSnapshotRevision?: string;
-	ordinalMapChecksum?: string;
-	representationRevision?: string;
-	retrievalPolicyRevision?: string;
-	contextPolicyRevision?: string;
-	graphRevision?: string | null;
+	/** Validated server-side handoff only. Never populate from request parameters. */
+	retrievalCacheIdentityV3?: BifrostRetrievalCacheIdentityV3;
+	/** Routes without admitted server identity can disable cache access entirely. */
+	disableRetrievalCache?: boolean;
 }
 
 export interface RouteTrace {
@@ -209,27 +205,8 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
   // ── Lane 1: Redis hot packet (exact query hash) ────────────────────────
   {
     const t0 = Date.now();
-    const hasRevisionedIdentity = Boolean(
-			opts.workspaceRevision &&
-			opts.candidateSnapshotRevision &&
-			opts.ordinalMapChecksum &&
-			opts.representationRevision &&
-			opts.retrievalPolicyRevision &&
-			opts.contextPolicyRevision
-		);
-		const hotKey = hasRevisionedIdentity
-			? bifrostRetrievalCacheKeyV2({
-				queryHash,
-				workspaceRevision: opts.workspaceRevision!,
-				candidateSnapshotRevision: opts.candidateSnapshotRevision!,
-				ordinalMapChecksum: opts.ordinalMapChecksum!,
-				representationRevision: opts.representationRevision!,
-				retrievalPolicyRevision: opts.retrievalPolicyRevision!,
-				contextPolicyRevision: opts.contextPolicyRevision!,
-				graphRevision: opts.graphRevision,
-			})
-			: `bitfrost:retrieval:${queryHash}`;
-    const cached = await redis.get(hotKey).catch(() => null);
+		const hotKey = bifrostRetrievalCacheLookupKey(queryHash, opts.retrievalCacheIdentityV3, opts.disableRetrievalCache);
+		const cached = hotKey ? await redis.get(hotKey).catch(() => null) : null;
     if (cached) {
       try {
         const prior = JSON.parse(cached) as { source_refs?: string[]; atlas_cluster_ids?: string[] };
@@ -604,26 +581,10 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
   const packet = await writeAcePacket(packetInput, { asLatest: true });
 
   // Log to Bifrost telemetry key for future hot-path reuse
-  const retrievalCacheKey = opts.workspaceRevision &&
-    opts.candidateSnapshotRevision &&
-    opts.ordinalMapChecksum &&
-    opts.representationRevision &&
-    opts.retrievalPolicyRevision &&
-    opts.contextPolicyRevision
-    ? bifrostRetrievalCacheKeyV2({
-        queryHash,
-        workspaceRevision: opts.workspaceRevision,
-        candidateSnapshotRevision: opts.candidateSnapshotRevision,
-        ordinalMapChecksum: opts.ordinalMapChecksum,
-        representationRevision: opts.representationRevision,
-        retrievalPolicyRevision: opts.retrievalPolicyRevision,
-        contextPolicyRevision: opts.contextPolicyRevision,
-        graphRevision: opts.graphRevision,
-      })
-    : `bitfrost:retrieval:${queryHash}`;
+	const retrievalCacheKey = bifrostRetrievalCacheLookupKey(queryHash, opts.retrievalCacheIdentityV3, opts.disableRetrievalCache);
 
-  await redis.set(
-    retrievalCacheKey,
+	if (retrievalCacheKey) await redis.set(
+		retrievalCacheKey,
     JSON.stringify({
       query_hash: queryHash,
       source_refs: packet.source_refs,
@@ -637,7 +598,7 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
       logged_at: new Date().toISOString(),
     }),
     'EX', 7_200
-  ).catch(() => {});
+	).catch(() => {});
 
   return { packet, trace };
 }

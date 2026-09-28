@@ -2,9 +2,14 @@ import path from 'node:path';
 import {
   SEMANTIC_INPUT_ARTIFACT_SCHEMA,
   SELECTION_POLICY_REVISIONS,
+  SEMANTIC_EMBEDDING_INPUT_MAX_TOKENS,
+  SEMANTIC_EMBEDDING_INPUT_POLICY_REVISION,
+  SEMANTIC_EMBEDDING_INPUT_SCHEMA,
+  semanticEmbeddingInputV1Schema,
   semanticInputArtifactV1Schema,
   sha256HexPrefixed,
   type SemanticInputArtifactV1,
+  type SemanticEmbeddingInputV1,
   type SemanticInputSegmentV1,
 } from './semantic-input-artifact-v1.js';
 
@@ -157,4 +162,54 @@ export async function compileSemanticInputArtifactV1(input: CompileSemanticInput
 
 export function renderSemanticInputText(artifact: SemanticInputArtifactV1, fileBuffer: Buffer): string {
   return Buffer.concat(artifact.segments.map((s) => fileBuffer.subarray(s.startByte, s.endByte))).toString('utf8');
+}
+
+/**
+ * Bind the exact compiler-selected text to the tokenizer result used before
+ * embedding. This policy never truncates: oversized content is rejected and
+ * carries no sendable inputText. The caller must embed the returned inputText
+ * verbatim when status is ADMITTED.
+ */
+export async function compileSemanticEmbeddingInputV1(input: {
+  artifact: SemanticInputArtifactV1;
+  fileBuffer: Buffer;
+  tokenizerRevision: string;
+  tokenize: (text: string) => Promise<number>;
+}): Promise<SemanticEmbeddingInputV1> {
+  const artifact = semanticInputArtifactV1Schema.parse(input.artifact);
+  const segments = artifact.segments.map((item) => {
+    const bytes = input.fileBuffer.subarray(item.startByte, item.endByte);
+    if (sha256HexPrefixed(bytes) !== item.checksum) throw new Error('SEMANTIC_INPUT_SOURCE_SEGMENT_CHECKSUM_MISMATCH');
+    return bytes;
+  });
+  const renderedBuffer = Buffer.concat(segments);
+  const renderedTextChecksum = sha256HexPrefixed(renderedBuffer);
+  if (renderedTextChecksum !== artifact.renderedTextChecksum) throw new Error('SEMANTIC_INPUT_RENDERED_CHECKSUM_MISMATCH');
+
+  const inputText = renderedBuffer.toString('utf8');
+  if (!Buffer.from(inputText, 'utf8').equals(renderedBuffer)) throw new Error('SEMANTIC_INPUT_INVALID_UTF8_ROUNDTRIP');
+  const embeddedTokenCount = await input.tokenize(inputText);
+  if (!Number.isSafeInteger(embeddedTokenCount) || embeddedTokenCount < 0) throw new Error('SEMANTIC_TOKENIZER_RETURNED_INVALID_COUNT');
+  const status = !inputText.trim()
+    ? 'REJECTED_EMPTY'
+    : embeddedTokenCount > SEMANTIC_EMBEDDING_INPUT_MAX_TOKENS
+      ? 'REJECTED_OVER_BUDGET'
+      : 'ADMITTED';
+
+  return semanticEmbeddingInputV1Schema.parse({
+    schema: SEMANTIC_EMBEDDING_INPUT_SCHEMA,
+    canonicalId: artifact.canonicalId,
+    packetKey: artifact.packetKey,
+    sourceRef: artifact.sourceRef,
+    sourceRevision: artifact.sourceRevision,
+    contentSelectionRevision: artifact.selectionPolicyRevision,
+    inputPolicyRevision: SEMANTIC_EMBEDDING_INPUT_POLICY_REVISION,
+    tokenizerRevision: input.tokenizerRevision,
+    maxInputTokens: SEMANTIC_EMBEDDING_INPUT_MAX_TOKENS,
+    renderedTextChecksum,
+    embeddedInputChecksum: sha256HexPrefixed(renderedBuffer),
+    embeddedTokenCount,
+    status,
+    inputText: status === 'ADMITTED' ? inputText : null,
+  });
 }

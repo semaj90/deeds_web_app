@@ -4841,3 +4841,132 @@ authority=false; writesPerformed=false (temp-table + read-only joins only).
 Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; expected workspace revision is
 the admitted tournament revision; authority=false; writesPerformed=false.
 Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`.
+
+### DOMAIN-OWNER census and registry boundary (2026-09-27)
+
+- [x] **DOMAIN-OWNER-02 — MIXTURE_PROVEN.** The read-only census covers
+      61,718 `atlas_packets.domain_class` rows / 39 case-folded labels and
+      distinguishes exact ontology values, aliases, subtypes, artifact kinds,
+      product areas, ambiguous values, and quarantined noise. This field is
+      historical mixed classifier evidence, not a clean ontology foreign key.
+- [x] **DOMAIN-OWNER-03 — comparison complete.** `domain-taxonomy.ts` owns
+      classifier vocabulary semantics; `atlas_domain_ontology.group_id` owns
+      persisted ontology-node identity; `domain_taxonomy_v1` is an empty,
+      unauthorized version/alias adapter; `taxonomy_nodes`/`taxonomy_edges`
+      are traversal topology; `atlas_ontology_concepts` is the broader concept
+      registry; and `feature_domain_facts` is derived evidence/history.
+- [x] **DOMAIN-OWNER-04 — contract frozen.** Added
+      `docs/architecture/domain-registry-contract-v1.md`. The contract preserves
+      these distinct owners and prohibits rewriting legacy `domain_class` or
+      populating the adapter under this task.
+- [ ] **DOMAIN-OWNER-05 — read-side normalization.** Implement a pure,
+      revision-aware normalizer/report that preserves each raw label, classifies
+      exact/alias/subtype/non-domain/ambiguous/quarantined values, and leaves
+      unresolved values unmapped. No database writes or ontology promotion.
+- [ ] **DOMAIN-OWNER-06 — fixture/disposable proof.** Prove mappings and
+      fail-closed behavior against fixtures or a disposable database before any
+      adapter population is proposed. Production DDL/data changes require a
+      separate approved migration and authorization.
+
+Evidence: `docs/reports/domain-vocab-proposal-v1.json` (generated
+2026-09-20T18:57:51Z; `applied=false`, `writesPerformed=false`,
+`canonicalAuthority=false`). Existing ontology mapping coverage receipt:
+`docs/reports/domain-ontology-taxonomy-audit-v1.json`.
+
+## SESSION-208 — OaK/DSPy/GEPA/ACE-v3/BitFrost enhancement roadmap received, recorded NOT VERIFIED (2026-09-27)
+
+An operator-pasted design proposes a full self-improvement stack layered on top of the existing
+OaK ontology kernel: `OaK (legal function catalog) -> DSPy program -> GEPA (instruction
+optimization from execution feedback) -> ACE-style strategy-card playbook (distinct from this
+repo's own Parent Atlas ACE packet system -- explicitly NOT to be conflated) -> BitFrost/Valkey as
+a hot playbook+centroid+PrefixIdentity cache -> QLoRA/GRPO only after enough sealed
+LearningOutcomeV1 trajectories exist`. **Given this session is at critically low remaining
+context, none of this was independently verified, no code was written, and no existing gate was
+closed or opened on its strength — recorded verbatim/summarized for a future session to check
+against the live repo, same discipline as this file's own domain-vocab-proposal-v1.json entries
+above (`applied=false`, `writesPerformed=false`, `canonicalAuthority=false`).**
+
+Key claims, unverified:
+- GEPA's metric should be hierarchical: hard fail-closed gates (invented OaK function, invented
+  evidence ref, stale source revision, failed typecheck/tests) all force `score=0.0` with textual
+  feedback, multiplied by a soft weighted-utility score (evidence coverage / localization /
+  minimality / retrieval quality / latency / cache reuse) only when every hard gate passes.
+- The research "ACE" (Agentic Context Engineering, evolving strategy playbook) and this repo's own
+  Parent Atlas ACE packet/context-envelope system share a name but are proposed as two distinct
+  concepts — an ACE v3 packet would carry `strategyRefs: ["strategy:typescript:type-mismatch:v7"]`
+  pointing at revisioned playbook cards, never inline evolving prompt text.
+- BitFrost/Valkey proposed as a **hot** exact-cache + small-ANN layer (Valkey Search's native
+  vector/hybrid query support cited) for strategy cards and centroid artifacts only — explicitly
+  NOT a replacement for Qdrant/cuVS full semantic retrieval.
+- Centroid artifacts proposed as revision-qualified objects (`representationRevision`,
+  `algorithmRevision`, `parameterRevision`, `cohortChecksum`, `centroidDigest`,
+  `canonicalAuthority: false`) used only as a coarse routing accelerator ahead of exact/ANN search,
+  never as a fifth semantic retrieval vote (repeats this file's own multi-executor/one-semantic-lane
+  invariant).
+- KV-cache policy proposed unchanged from this repo's existing stance: cache a
+  `ContextPrefixIdentityV1` (checksums of ContextManifest + evidence + model/tokenizer/adapter/
+  template revisions), never persist portable K/V tensors into BitFrost/ACE as canonical artifacts
+  — llama-server owns actual runtime KV/recurrent state.
+- Proposed build order: (1) wire `LearningOutcomeV1` -> OaK/GEPA feedback, (2) TS ContextManifest ->
+  Python DSPy output guard -> TS response boundary, (3) `OakReasoningRegistryV1` (task->kernel->
+  function->executor lookup), (4) ACE strategy refs, (5) BitFrost strategy-card/centroid caching,
+  (6) layered stable-prefix prompt compilation, (7) GEPA in shadow mode on a frozen repair corpus,
+  (8) centroid-routed agentic dense search, (9) cuTile only as a profiled challenger after a
+  built-in-kernel cost is measured insufficient, (10) QLoRA training data only after enough
+  validated `LearningOutcomeV1` rows exist.
+- Explicit warning carried over from this same session's own live finding: **do not train QLoRA on
+  unqualified source rows or stale semantic vectors** — cites this session's own
+  `SOURCE-SYMBOL-AUTHORITY-01` audit (now substantially repaired: `atlas_symbol_registry` is
+  100% revision-qualified as of this session's `SYMBOL-REGISTRY-REPAIR-APPLY-01`, but
+  `atlas_symbol_versions` still has 77 unqualified rows and `SOURCE-REF-KEY-CONVERGENCE-01` is
+  still open) as exactly the kind of unqualified-data risk to avoid feeding into training data.
+
+**Not done in this pass**: no `OakReasoningRegistryV1`, DSPy program, GEPA metric, ACE v3 schema,
+or BitFrost centroid-artifact contract was created. No claim above was checked against live code
+(e.g. whether `LearningOutcomeV1` already exists, whether a DSPy/GEPA dependency is already
+present, whether Valkey Search's cited vector-query features are actually available in this repo's
+deployed Valkey version). Treat every claim here as a lead for a future session with full context
+budget to verify via the same discipline this repo already applies elsewhere (grep for existing
+owners, check live capability before citing it, per `DEPENDENCY-CAPABILITY-GUARD-01` in root
+CLAUDE.md) — not as fact.
+
+## SESSION-210 (2026-09-28): partial live verification of the SESSION-208/209 OaK/DSPy/GEPA design briefs — bounded, context-limited pass
+
+A third pasted design brief this session extended the same OaK→DSPy→GEPA reasoning-optimization
+line (hard-validity-gated metric, `GepaExecutionEvidenceV1` boundary contract) plus a much broader
+architecture-layering proposal (canonical-identity-vs-representation-vs-execution separation,
+HyperLogLog breadth signals, `CentroidCardV1`, simdjson-only-at-JSON-boundary, `diagnostics_channel`-
+based `ResearchEventV1` autoresearch logging, polynomial-cosine-as-separate-features, an
+`ExpansionStateV1` bounded hypergraph-expansion state machine, and a concurrency-ownership table).
+Given this session's remaining context budget, verification was intentionally narrow — a handful of
+concrete, checkable claims, not the whole brief — following the same "grep for existing owners
+before trusting a proposal" discipline this file's own SESSION-208 note asked for.
+
+**Checked, real findings**:
+- **HyperLogLog is not yet used anywhere** (`PFADD`/`PFCOUNT`/`PFMERGE`/"HyperLogLog" — zero real
+  usage found in `sveltekit-frontend/src`). It IS already a *named, anticipated* lane, though, not
+  a from-scratch idea: `src/lib/server/atlas/contracts/fabric-lanes.ts` lists
+  `'hyperloglog_telemetry'` as one of its lane names. Separately,
+  `src/lib/server/atlas/acquisition/acquisition-stream.ts` has an explicit existing exclusion note:
+  *"Do NOT use Pub/Sub or HyperLogLog here; Valkey carries [duplicate/dedup responsibility
+  elsewhere]"* — meaning at least one prior session already considered and deliberately rejected
+  HLL for that specific acquisition-dedup use case. The brief's proposed use (query/source/domain
+  *breadth* telemetry, not acquisition dedup) is a different use case from what that exclusion note
+  covers, so the two aren't necessarily in conflict — but this needs to be read and reconciled
+  before building anything, not assumed compatible.
+- **`CentroidCardV1`, `ResearchEventV1`, `ExpansionStateV1` do not exist anywhere** in
+  `sveltekit-frontend/src` — confirmed via direct grep, zero matches for all three. All three are
+  genuinely new proposals, not yet started.
+- **Not checked this pass** (time-boxed, not because they're unimportant): whether Valkey's
+  deployed version actually supports `PFADD`/`PFCOUNT`/`PFMERGE` (near-certain yes — Valkey is a
+  Redis-protocol-compatible fork and HLL commands are core Redis, but not directly verified against
+  this repo's specific Valkey image/version this pass); the `GepaExecutionEvidenceV1` boundary
+  contract from the immediately-preceding paste in this same session; the concurrency-ownership
+  table's claims about existing worker-thread/Python-pool/GPU-worker boundaries; the polynomial-
+  cosine-as-ranker-feature proposal's relationship to any existing ranker feature vector.
+
+**Not done in this pass**: no code written, no contract created, no OpenSpec change proposed for
+any of the above. This is a verification-only addendum to the existing SESSION-208 "not verified"
+note — narrowing which claims are now known-true (HLL unused-but-named-and-partially-precedented),
+known-false-as-"already exists" (the three V1 types), and still-unverified (everything else in the
+brief), so a future full-budget session doesn't have to re-derive even this much.

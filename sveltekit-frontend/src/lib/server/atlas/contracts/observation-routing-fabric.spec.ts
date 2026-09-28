@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { buildObservationFeatureProjectionV1 } from './observation-feature-projection-v1.js';
 import { buildRetrievalRouterFeatureRowV1 } from './retrieval-router-feature-row-v1.js';
 
@@ -88,6 +90,28 @@ describe('Observation Routing Fabric contracts', () => {
     expect(row.structure.hasDatabaseAccess).toBe(true);
     expect(row.ontology.mask).toHaveLength(32);
     expect(row.rowDigest).toHaveLength(64);
+
+    const orderContract = JSON.parse(readFileSync(
+      resolve(process.cwd(), '..', 'python', 'atlas_compute', 'retrieval_router_feature_order_v1.json'),
+      'utf8',
+    )) as { fields: Array<{ path: string; kind: string; length?: number; nullable?: boolean }> };
+    for (const field of orderContract.fields) {
+      const value = field.path.split('.').reduce<unknown>((current, key) => {
+        if (current === null || typeof current !== 'object' || !(key in current)) return undefined;
+        return (current as Record<string, unknown>)[key];
+      }, row);
+      expect(value, `shared feature-order path ${field.path}`).not.toBeUndefined();
+      if (value === null) {
+        expect(field.nullable, `${field.path} nullable declaration`).toBe(true);
+      } else if (field.kind === 'number_array' || field.kind === 'bit_array') {
+        expect(Array.isArray(value), `${field.path} array kind`).toBe(true);
+        expect((value as unknown[]).length, `${field.path} declared length`).toBe(field.length);
+      } else if (field.kind === 'boolean') {
+        expect(typeof value, `${field.path} boolean kind`).toBe('boolean');
+      } else {
+        expect(typeof value, `${field.path} number kind`).toBe('number');
+      }
+    }
   });
 
   it('rejects observation/router identity drift', () => {

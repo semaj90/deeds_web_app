@@ -285,3 +285,57 @@ already completed plus the follow-up scoping work, not feature implementation �
 - [ ] 5.8 Not decided: where this addendum's items slot into the frozen P0–P4 queue (section 2's
   fourth addendum). This section is additive to that queue; sequencing is an explicit operator
   decision, not made here.
+
+## 6. Addendum 9 follow-up — PACKET-CLASS-LUT-01 (2026-09-27): the one concrete, safe slice of the "Pokémon ROM-bank" frame, built
+
+Addendum 9 (proposal.md, 2026-09-06) reviewed the operator's ROM-bank/cartridge framing on its
+merits but deliberately built nothing (see 5.8 above — sequencing was left an explicit operator
+decision). The operator re-raised the frame this session ("pokemon registry lut kv cache bitfrost
+redis-valkey centroid ace json packets... token cache"); per
+`memory/reference_pokemon_rombank_lod_frame.md` (written specifically because this idea keeps
+getting re-proposed as if new), the concrete thing that frame actually calls for — and the only
+piece built here — is a **byte/nibble class LUT as a presentation layer over an already-decided
+label set**, never a new identity scheme and never a hardcoded "dex 0-151" numbering.
+
+- [x] **PACKET-CLASS-LUT-01, done**: `sveltekit-frontend/src/lib/server/atlas/residency/
+  packet-class-lut-v1.ts` — `PacketClassLutV1Schema` (`.strict()`, `canonicalAuthority: z.literal(false)`
+  always), `buildPacketClassLutV1(labels)` (deterministic: de-dupes, sorts, assigns byte codes 0..N-1,
+  same set in any order -> same `encodingRevision`/`sourceLabelSetChecksum`; throws on empty/duplicate/
+  >256-entry input rather than silently coercing), `lutEncode`/`lutDecode` (null on miss, never throw),
+  `isLutRevisionCurrent(lut, labels)` (detects drift — added/removed/renamed label — so a consumer
+  holding a byte code can refuse to decode against a stale table instead of silently mis-decoding).
+  12/12 tests pass (`packet-class-lut-v1.spec.ts`): schema validity, order-independence, lexicographic
+  code assignment, full round-trip, miss handling, empty/duplicate/overflow rejection, exactly-256
+  boundary, and revision-drift detection (added/removed/renamed, plus invalid-input non-throwing).
+- **Deliberately generic, not tied to any one vocabulary**: this module takes an arbitrary caller-
+  supplied label set — it does NOT hardcode any of this repo's three still-undecided domain
+  vocabularies (packet labels 39 / code `CANONICAL_DOMAINS` 9 / DB `atlas_domain_ontology` 13+4, per
+  CLAUDE.md's Schema Tournament section) as "the" 256-entry table. Baking in one of those before the
+  operator picks a winner would have pre-empted that decision through the back door of a cache-encoding
+  detail — exactly the kind of "silently re-decide this policy" failure CLAUDE.md's Embedding
+  Dimensions Policy section warns cost 5 rounds of churn previously. Whichever vocabulary the operator
+  eventually picks can call `buildPacketClassLutV1()` directly with its own label list.
+- **Not wired into any live cache/packet path this pass** — this is the LUT contract only, matching
+  the same bounded-slice discipline as `AFC-PARAM-01`/`AFC-CAND-01`/etc. in
+  `parent-atlas-agentic-file-compiler/tasks.md` (contract-only, tested, not yet a production input).
+  The concrete wiring targets the operator's own phrasing named (compressed packets, BitFrost/
+  Redis-Valkey cache keys, centroid keys, ACE JSON packet fields, a token-budget cache) are each a
+  separate, real integration decision — not done here, listed below as explicit next steps rather
+  than silently assumed:
+  1. `scripts/atlas/build-compressed-packets.mjs`'s `k` field (packet "kind") is the most natural
+     first consumer — replacing a repeated kind string with a `{code, encodingRevision}` pair. Not
+     done: needs to read the *actual* live kind values from that script first (not guessed), and the
+     script's existing consumers need to tolerate the new shape.
+  2. BitFrost/centroid cache-key suffixes (`cache-keys.ts`'s `bifrostKey.*`/`centroidKey`, per this
+     repo's CLAUDE.md "BitFrost warm buckets" section) could use a LUT byte instead of a full label
+     segment — not done: this repo's own BitFrost writer-census work (CLAUDE.md, 2026-09-20) already
+     found real spelling/identity fragmentation in this exact key layer; adding a LUT on top of an
+     unreconciled key layer would compound the problem, not fix it. Must wait for that reconciliation.
+  3. A "token cache" in the sense of a bounded LRU/TTL cache keyed by `(model, promptChecksum)` is a
+     different, unrelated concept from this LUT (it's about caching inference *results*, not
+     compressing a *label*) — no such cache was found to exist in this repo under that name; if the
+     operator meant something specific by "token cache", that needs its own clarification and design,
+     not a reuse of this LUT contract.
+  4. ACE JSON packet fields: same caution as BitFrost above — ACE's packet envelope shape is used
+     across many call sites; swapping any field to a LUT-coded byte needs a call-site audit first
+     (per this repo's Duplication Prevention rule), not a blind schema change.

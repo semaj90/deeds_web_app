@@ -53,6 +53,17 @@ const writeReport = async (report) => {
 
 async function main() {
   if (APPLY && !LIMIT) throw new Error('--apply requires an explicit --limit=N');
+  if (APPLY && !process.env.ALLOW_LEGACY_SYMBOL_VERSION_BYPASS_WRITE) {
+    throw new Error(
+      '[AST-VERSION-MATERIALIZER] retired as a direct-SQL bypass writer '
+      + '(LEGACY-SYMBOL-WRITER-RETIREMENT-01, openspec/changes/parent-atlas-code-intel-e2e/tasks.md, '
+      + 'SOURCE-SYMBOL-AUTHORITY-01 finding). This script previously wrote 77 atlas_symbol_versions '
+      + 'rows still carrying the workspace:0 placeholder revision, uncorrected by a 2026-09-22 '
+      + 'repair. Route new writes through packages/parent-atlas/src/core/symbol-registry-repository.ts '
+      + '(see scripts/atlas/symbol-reconciliation-writer-v1.mts for the intended call pattern). '
+      + 'Set ALLOW_LEGACY_SYMBOL_VERSION_BYPASS_WRITE=1 to override for a deliberate, reviewed one-off.'
+    );
+  }
   const [nominations, resolutions, rawAstSnapshot] = await Promise.all([
     readJsonl(inputPath),
     readJsonl(resolutionPath),

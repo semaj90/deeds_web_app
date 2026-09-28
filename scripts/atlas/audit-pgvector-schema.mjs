@@ -250,7 +250,7 @@ async function main() {
     console.log(`\n${C.bold}── pgvector Schema Audit ──${C.reset}\n`);
     console.log(`${C.bold}## Vector Dimension Policy${C.reset}`);
     console.log(` - 768: canonical codebase and programming-doc semantic embeddings.`);
-    console.log(` - 384: compact warden/GPU-cache embeddings.`);
+    console.log(` - 384: legacy/experimental only; not the canonical Parent Atlas semantic lane.`);
     console.log(` - Other dimensions require review.\n`);
   }
 

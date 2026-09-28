@@ -9,33 +9,35 @@
 
 import { CANDIDATE_FEATURE_NAMES } from '../atlas/contracts/feature-extraction-v1.js';
 
+type OptionalFeatureValue = number | null;
+
 export interface CandidateProjectionInput {
   packet_key: string;
-  semantic_similarity_768?: number;
-  lexical_score?: number;
-  exact_symbol_match?: number;
-  ast_signal?: number;
-  authority_norm?: number;
-  community_fit?: number;
-  domain_fit_query?: number;
-  concept_fit?: number;
-  nary_relation_fit?: number;
-  kmeans_centroid_similarity?: number;
-  kmeans_cluster_rank?: number;
-  som_distance?: number;
-  som_neighbor_radius?: number;
-  hilbert_locality?: number;
-  summary_quality?: number;
-  summary_provenance?: number;
-  recency?: number;
-  retrieval_frequency?: number;
-  execution_utility?: number; // Column 18
-  graph_distance?: number;
-  process_fit?: number;
-  dependency_fanout?: number;
-  feature_label_confidence?: number;
-  source_revision_match?: number;
-  representation_revision_match?: number;
+  semantic_similarity_768?: OptionalFeatureValue;
+  lexical_score?: OptionalFeatureValue;
+  exact_symbol_match?: OptionalFeatureValue;
+  ast_signal?: OptionalFeatureValue;
+  authority_norm?: OptionalFeatureValue;
+  community_fit?: OptionalFeatureValue;
+  domain_fit_query?: OptionalFeatureValue;
+  concept_fit?: OptionalFeatureValue;
+  nary_relation_fit?: OptionalFeatureValue;
+  kmeans_centroid_similarity?: OptionalFeatureValue;
+  kmeans_cluster_rank?: OptionalFeatureValue;
+  som_distance?: OptionalFeatureValue;
+  som_neighbor_radius?: OptionalFeatureValue;
+  hilbert_locality?: OptionalFeatureValue;
+  summary_quality?: OptionalFeatureValue;
+  summary_provenance?: OptionalFeatureValue;
+  recency?: OptionalFeatureValue;
+  retrieval_frequency?: OptionalFeatureValue;
+  execution_utility?: OptionalFeatureValue; // Column 18
+  graph_distance?: OptionalFeatureValue;
+  process_fit?: OptionalFeatureValue;
+  dependency_fanout?: OptionalFeatureValue;
+  feature_label_confidence?: OptionalFeatureValue;
+  source_revision_match?: OptionalFeatureValue;
+  representation_revision_match?: OptionalFeatureValue;
 }
 
 export interface RetrievalCandidateFeatureMatrixV1 {
@@ -61,7 +63,7 @@ export function buildCandidateFeatureMatrix(
     candidate_packet_keys.push(c.packet_key);
     const rowOffset = i * F;
 
-    const featureValues: Array<number | undefined> = [
+    const featureValues: Array<number | null | undefined> = [
       c.semantic_similarity_768,
       c.lexical_score,
       c.exact_symbol_match,
@@ -91,13 +93,17 @@ export function buildCandidateFeatureMatrix(
 
     for (let f = 0; f < F; f++) {
       const val = featureValues[f];
-      if (val !== undefined && val !== null && !Number.isNaN(val)) {
-        candidate_features[rowOffset + f] = val;
-        presence_mask[rowOffset + f] = 1;
-      } else {
+      if (val === undefined || val === null) {
         candidate_features[rowOffset + f] = 0.0;
-        presence_mask[rowOffset + f] = 0; // Explicit presence mask 0 for missing features (e.g. execution_utility)
+        presence_mask[rowOffset + f] = 0;
+        continue;
       }
+      const float32Value = Math.fround(val);
+      if (!Number.isFinite(val) || !Number.isFinite(float32Value)) {
+        throw new Error(`CANDIDATE_FEATURE_NON_FINITE:${i}:${f}`);
+      }
+      candidate_features[rowOffset + f] = float32Value;
+      presence_mask[rowOffset + f] = 1;
     }
   }
 

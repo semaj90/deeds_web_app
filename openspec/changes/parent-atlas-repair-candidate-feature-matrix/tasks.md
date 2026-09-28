@@ -11,6 +11,110 @@
 - [x] Fail closed on duplicate/out-of-range ordinals, packet-key drift, non-finite values, invalid presence masks, and illegal state/coverage combinations.
 - [x] Keep `canonicalAuthority=false`, `retrievalVote=false`, `rankingPromotion=false`, `mutationAuthority=false`.
 - [ ] **ACE-FSO-02-NULLABILITY-AND-PRESENCE-01**: preserve the distinction between an unavailable value and numeric zero. `null` means unavailable only for fields whose schema permits it; `0` remains a real measured value. `PENDING` is lifecycle/status, not a substitute feature value. Nullable `sourceVersionReceiptId` or individual feature signals do not relax required packet/source identity, exact workspace-revision match, complete ordinal coverage, nonempty lane masks, or the resolver's required cohort representation revision. A nullable semantic cosine does not make a missing representation identity acceptable. Add focused contract coverage when the production source owner is implemented.
+- [x] `ACE-FSO-02-MATRIX-PRESENCE-01` (2026-09-27; focused production-owner slice): `CandidateProjectionInput` now explicitly allows `null` for optional feature signals; only `null`/absent values become zero-filled with presence mask `0`, while measured `0` keeps mask `1`. NaN, ±Infinity, and finite values that overflow Float32 now fail closed. Focused `retrieval-candidate-feature-matrix-v1.spec.ts` passes 6/6. This closes only numeric presence semantics; the parent nullability gate remains open for the independent packet/source identity, workspace revision, ordinal coverage, lane mask, and cohort representation revision conditions.
+- [x] `ACE-FSO-02-PRESENCE-GUARDS-01` (2026-09-27; code/fixture only): added focused regressions proving a nullable `sourceVersionReceiptId` does not relax nonempty packet/source identity, semantic snapshots reject blank cohort representation revisions and incomplete row coverage, and the pinned ORF reader rejects a map entry missing packet/source identity. The existing ORF reader suite also pins exact workspace and representation revisions. Three focused suites pass 20/20. This closes only those local contract guards; the parent remains open because the production feature-source owner and per-ordinal nonempty lane-mask proof are still absent, and no end-to-end caller currently binds those requirements together.
+- [x] `CFM-PRESENCE-NULLABILITY-01` (2026-09-27; code/fixture only, IDENTITY_REQUIRED +
+  REVISION_REQUIRED string-blankness half only): found and fixed a real gap in
+  `repair-candidate-feature-matrix-v1.ts` — `identity.packetKey`/`identity.sourceRef` were
+  guarded with a bare `!value` falsy check, which rejects `undefined`/`null`/`''` but NOT a
+  whitespace-only string (`'   '`), letting a blank-but-truthy value pass as qualified
+  provenance. Added `assertNonBlankString()` (rejects all four forms) for the two required
+  identity fields, and `assertOptionalNonBlankString()` for the 12 optional revision/lineage
+  fields (`sourceRevision`, `workspaceRevision`, `treeNodeId`, `stableSymbolId`,
+  `symbolVersionId`, `observationFeatureRevision`, `astGraphRevision`,
+  `compilerSemanticGraphRevision`, `relationshipGraphRevision`, `semanticRevision`,
+  `representationRevision`, `analysisPassSetChecksum`) — `null`/`undefined` remain legitimately
+  "not supplied", but a supplied `''`/`'   '` now fails closed with a per-field
+  `REPAIR_<FIELD>_BLANK` code. Added 14 new regression tests (undefined/null/''/'   ' for the
+  2 required fields, blank-rejection for 2 representative optional revision fields, and an
+  explicit not-supplied-is-accepted case) — `repair-candidate-feature-matrix-v1.spec.ts` now
+  passes 20/20 (was 6/6), `retrieval-candidate-feature-matrix-v1.spec.ts` unchanged at 6/6.
+  Checked the one real caller (`repair-candidate-feature-bundle-v1.ts`) — it never supplies any
+  optional revision field, so the stricter validation does not break it.
+  **This closes only the IDENTITY_REQUIRED/REVISION_REQUIRED string-blankness half of
+  `ACE-FSO-02-NULLABILITY-AND-PRESENCE-01`, per that task's own note that nullability and numeric
+  presence semantics are the production-owner's responsibility, not this contract's alone.**
+  Per an operator-supplied evidence chain: FEATURE_PRESENCE numeric semantics (0/null/undefined/
+  NaN/±Infinity/>Float32) were already proven by `ACE-FSO-02-MATRIX-PRESENCE-01`'s 6/6 suite — do
+  not re-attempt that half here. The parent gate stays open: schema-level nullability (this task)
+  + runtime feature presence (already proven) + a revision-qualified representation owner (not
+  yet proven — see `SEMANTIC-REPRESENTATION-BINDING-01`, not started, tracked separately) +
+  candidate population/coverage accounting (not yet proven) together close the parent, not any
+  one of these alone.
+
+## SEMANTIC-REPRESENTATION-BINDING-01 — next gate, DESIGN ONLY, not started (2026-09-27)
+
+An operator-supplied design (recorded verbatim below, not independently verified or implemented
+in this pass) proposes the next load-bearing gate after `CFM-PRESENCE-NULLABILITY-01`: prove that
+one current canonical chunk owns exactly one `semantic_768` representation, rather than treating
+Qdrant point existence as proof of anything. Direct quote of the core inversion this fixes:
+
+> "A vector does not prove what it represents. The binding proves what it represents; Qdrant
+> merely stores the vector." — ownership flows from the canonical chunk downward to the vector,
+> never from the Qdrant point upward. This is the same inversion the 76,261-ID census (recorded
+> elsewhere in this file/tasks) already found empirically: 0 exact matches when going
+> point-ID-upward against `codebase_chunk_index`, the legacy retrieval table, or `atlas_packets`.
+
+**Proposed contract** (not yet a real file — `SemanticRepresentationBindingV1`):
+```typescript
+interface SemanticRepresentationBindingV1 {
+  canonicalId: string;
+  packetKey: string;
+  sourceRef: string;
+  sourceRevision: string;
+  representationId: string;         // e.g. "semantic_768"
+  representationRevision: string;   // sha256(kind + canonicalId + sourceRevision + inputDigest
+                                     //   + embeddingModelRevision + tokenizerRevision + dimension
+                                     //   + normalization/config revision)
+  kind: "semantic_768";
+  dimension: 768;
+  inputDigest: string;              // sha256 of the exact normalized embedding input text
+  embeddingModelRevision: string;
+  tokenizerRevision: string;
+  projection: { backend: "qdrant"; collection: "codebase_chunks_768"; pointId: string };
+}
+```
+Qdrant's `pointId` is explicitly locator-only ("file offset / mmap address / DB row locator /
+object-storage key" — never identity). Readback classifies each candidate against current
+authority into: `BOUND_EXACT`, `MISSING_REPRESENTATION`, `MISSING_MODEL_REVISION`,
+`MISSING_TOKENIZER_REVISION`, `STALE_SOURCE_REVISION`, `POINT_LOCATOR_ONLY`. Only `BOUND_EXACT`
+may populate `CandidateProjectionInput.semantic_similarity_768` as representation-qualified;
+everything else stays `null` (UNAVAILABLE), never a fabricated `0` — this is the same
+null-vs-measured-zero discipline `CFM-PRESENCE-NULLABILITY-01`/`ACE-FSO-02-MATRIX-PRESENCE-01`
+already enforce, extended one layer up to representation qualification itself.
+
+**Proposed 4-proof split, phase 1 explicitly read-only** (no re-embedding, no writes):
+1. Binding schema (above).
+2. Current-row producer proof — identify the actual writer that can emit this binding using the
+   same current source revision as the canonical row; no latest/fallback/path-guessing/point-ID
+   inference.
+3. Bounded cohort audit — run the 6-way classification above over the already-sealed 127/1,520
+   cohort (see `GAN-VALIDATION-V4` above), output only a count receipt, no materialization.
+4. Admission gate — wire `BOUND_EXACT` into `CandidateProjectionInput`, everything else stays
+   `null`.
+
+**Cross-reference, found while recording this (not in the pasted design) — a closely related
+binding already exists for a different lane, do not treat this as greenfield:**
+`sveltekit-frontend/src/lib/server/atlas/summary/summary-embedding-receipt-v1.ts`
+(`SummaryEmbeddingReceiptV1`) and `SUM-ROUTE-04`'s `summary_embedding_meta` check (line ~357
+above: `representationId=semantic_768 + summaryInputDigest == textDigest + representationRevision
++ vectorDigest`) already implement this exact binding shape and BOUND/UNBOUND-style
+classification — but for the **summary-text** embedding lane, not the **content-chunk**
+semantic_768 lane this design targets. Before building `SemanticRepresentationBindingV1` as a new
+file, check whether generalizing that existing contract (shared `representationRevision` formula,
+shared inputDigest/modelRevision/tokenizerRevision fields) is the correct move instead of a
+parallel one, per this repo's Duplication Prevention rule.
+
+**Separate, independent prerequisite, must NOT be conflated** (per the pasted design's own
+explicit warning): `EMBED_RUNTIME_AVAILABLE` (is `:8081`/the embedding runtime up) and
+`TOKENIZER_REVISION_QUALIFIED` (is there a real sha256 tokenizer revision, not a composite
+label) are two separate booleans. A working runtime must not be used to paper over an
+unqualified tokenizer revision, and vice versa.
+
+**Not done in this pass**: no code written, no schema created, no audit run, no verification of
+any claim in this section beyond what's already independently established elsewhere in this file
+(the 76,261-ID census, the `summary_embedding_meta` cross-reference). This is a recorded design
+handoff only.
 
 ## RF-02 Repair feature namespace
 
@@ -97,9 +201,9 @@ Scripts: `scripts/atlas/{audit-current-packet-summary-enrichment-census-v1,build
 - [x] **CEI-13** CURRENT_SUMMARY_REGEN cohort frozen (read-only, 2026-09-25) — `docs/reports/current-summary-regen-cohort-v1.json`; sealed `.tmp/atlas/current-summary-regen-cohort-v1/cohort-20260925T212309Z.ndjson` (15,732 rows, sha256 `92d6ec34…`). Of 24,456 identities: REGEN_SUMMARY_AND_EMBEDDING 12,437 (12,436 exact admitted bytes verified on disk; 1 mismatch = `scripts/atlas/graphify-langgraph-pipeline.mjs`, uncommitted edit, must be excluded/re-admitted), SUMMARY_PRESENT_PENDING_ADMISSION 3,295, BLOCKED_PACKET_CREATION_FIRST 7,913, BLOCKED_REVISION_STAMP_FIRST 392, BLOCKED_DIGEST_REFRESH_FIRST 419. Regen inputs: 12,148 single-prompt (about 20.1M est tokens) + 289 CHUNKED_DAG_REQUIRED (282 are json, incl. generated `docs/graph/*.json`; largest about 980k tokens; total est 86.8M tokens); no legacy chunk-summary hint overlaps this cohort. Open decisions: policy for generated/oversize JSON (summarize, structural-only, or skip); board priority scoring; CEI-05 admission adapter.
 - [x] **CEI-15** Enrichment readiness census over ALL 61,718 packets (read-only, 2026-09-25) — `scripts/atlas/audit-enrichment-readiness-v1.mjs` -> `docs/reports/enrichment-readiness-census-v1.json`. Contract levels: L1 lineage (packet_key+source_ref+source_revision; sha256 must agree when present), L2 text (summary + keywords, FTS-indexed), L3 classify (domain_class+concept_ids), L4 embed-ok (real non-shared vector + embedding_version + non-legacy representation_revision), L5 projections. Result: L1 15,732 (matches the qualified cohort); L1+L2 2,669; L4 0; all-levels 0. 54,774 packets carry the shared placeholder vector with no summary (88.75% of all embeddings), keywords only 11.4%, entities 0%, representation_revision non-legacy 0%, 3,256 summarized packets have no revision, 12,178 packets use the legacy sveltekit-frontend-relative source_ref form.
 - [x] **CEI-16a** (read-only guard landed, 2026-09-25) `scripts/atlas/guard-pre-embedding-enrichment-v1.mjs` (+ shared predicates in `scripts/atlas/lib/enrichment-readiness-sql-v1.mjs`, also used by the census) decides EMBED_ALLOWED vs BLOCKED_L1/L2/L3 per packet (`--all` or `--keys-file`, `--strict` exits 3 on any blocked, `--out` ndjson). Over all 61,718 packets: EMBED_ALLOWED 3,295 (== the summary-bearing qualified cohort), BLOCKED_L2_NO_SUMMARY 12,437, BLOCKED_L1_SOURCE_REVISION_MISSING 45,566, BLOCKED_L1_REVISION_HASH_CONFLICT 419, BLOCKED_L1_IDENTITY_MISSING 1; 3,589 blocked packets hold a real legacy vector (kept, just not revision-qualified); 626 allowed packets lack keywords (CPU-derivable, not gating). Smoke test now checks the gate against ground truth (no real embedding blocked; allowed packets do not hold the placeholder). NOT yet called from daily graphify.
-- [ ] **CEI-16b** Wire the guard: daily-graphify / EmbeddingGemma fan-out passes its candidate `packet_key`s through `--keys-file ... --strict` (or reads `--out`) and embeds only EMBED_ALLOWED. Original note: Pre-embedding gate (specified, NOT wired): EmbeddingGemma fan-out and daily-graphify graph creation consume only packets meeting L1+L2(+L3); everything else is recorded as embedding_blocked with the first unmet level and never receives a default/shared vector. `graphify-langgraph-pipeline.mjs` has uncommitted edits from another session, so wire this only after that lands; reuse `audit-enrichment-readiness-v1.mjs` predicates as the gate, and add its check to `smoke-validate-enriched-index-v1.mjs`.
+- [x] **CEI-16b-LEGACY-WIRING-PROPOSAL-SUPERSEDED** (scope reconciliation, 2026-09-27; NOT runtime completion): the original packet-level proposal to pass `packet_key`s into daily Graphify/EmbeddingGemma and gate its Qdrant `embed_missing` path is superseded by **CEI-16b (re-scoped) PRE-EMBEDDING-ADMISSION-OWNER** below. The packet guard's `EMBED_ALLOWED` result is not chunk-level admission and does not authorize the legacy Qdrant writer. No runtime wiring, embedding, or projection write is claimed; gates 02–06 remain authoritative and open as listed.
 - [ ] **CEI-17** New-file enrichment contract (write path, needs operator approval): on each daily-graphify update the canonical PostgreSQL 18 payload is completed in order (lineage -> summary -> keywords/entities via existing GIN FTS lexemes and pg_trgm -> domain/concepts -> then embedding -> then projections) before fan-out, in one transaction per packet batch with Postgres-first writes, Redis invalidation after, events last. keywords/entities are CPU-derivable from summary text (ts_stat over idx_atlas_packets_summary_fts) and need no model call; summaries come from the CEI-05 admission path. Legacy-form source_refs (sveltekit-frontend-relative) must resolve through the existing source_ref owner, not ad hoc prefixing.
-      CEI-16b wire points (found 2026-09-25): (1) `scripts/atlas/graphify-langgraph-pipeline.mjs` `embedMissing` node (stage `embed_missing`, after `kanban_task`; already requires `summary IS NOT NULL` but not lineage/revision, embeds summary+bm25_text+source_ref into Qdrant) — add the guard's EMBED_ALLOWED predicate to its SELECT; (2) `scripts/startup/run-graphify-daily-startup.mjs` daily-embedding step (`GRAPHIFY_DAILY_EMBEDDING=1`, limit 10, backend ollama). `graphify:daily:chain` itself (dedup-validation, materialize, cold-processing, phase8 fanout, qdrant tag-mirror, feature-map-sync) does not call the LangGraph pipeline.
+      Historical proposal only (found 2026-09-25; superseded, not an implementation instruction): the old candidate hook named `graphify-langgraph-pipeline.mjs` `embedMissing` and the startup wrapper's optional `GRAPHIFY_DAILY_EMBEDDING=1` dry-run. The packet-level guard must not be treated as sufficient authority for either path; any future canonical embedding integration must satisfy re-scoped gates 02–05 and the separate operator gate 06. The observed daily chain still does not call an embedding executor.
 - [x] **CEI-18** July 4 summary source located and quality-checked (read-only, 2026-09-25) — `.tmp/gemma4-summaries-5k.ndjson` (4,998 rows, llama-server `/v1/completions`, 2026-07-04) is text-identical to all 3,060 July-4 layer rows (CEI-14's 'missing artifact' is this file); 1,938 more rows never reached the layer. **88% of the file (90% of the July-4 layer, 16% of live packet summaries) contains echoed few-shot scaffold** ("Example of a good summary", "Your turn: Feature: ...", `---`), so the July-20/21 embeddings built on these are contaminated; current detectors (detectThoughtLeakage, phase8-5 sanitizer) do not match this pattern. Colab INPUT shards found at `Desktop\colab_630\summary-shards` (43,425 rows with source_text + source_text_hash, about 220 MB, no summaries). A user-provided 2026-07-01 shard report now reconciles the complete source-text export as 44,425 rows = 1,000 local backlog rows + 43,425 rows across eight Colab shards (seven × 5,429; final shard 5,422); it also records 5,260 existing summaries excluded, 53,019 missing-summary rows queried, and 8,594 skipped for no source_text. This is historical report evidence; the shard files were not re-read or re-hashed in this turn, and their source_text is not an admitted summary or revision-qualified lineage. Notebook output pattern `parent-atlas-gemma4-summaries-shard*.ndjson` (Drive `outputs/`) not found locally. Consequences for CEI-05: add a scaffold-leak detector to admission, treat July summaries as seed/evidence only, prefer regeneration through the chat-template path with lineage binding.
 - [x] **CEI-19** July 20-21 placeholder writer confirmed (read-only, 2026-09-25) — `scripts/atlas/phase106-stage4-embedding-backfill.mjs` (commit 4020e62910, 2026-07-20T17:07-0700) embeds `p.summary || p.content_text || ''` and UPDATEs `atlas_packets.embedding` with `embedding_timestamp = NOW()`; idempotency key is packet_key+model+dim (not an input digest, so it cannot rescue lineage). DB fingerprint: all 61,659 embedded packets carry `embedding_timestamp` inside ONE 32-minute window (2026-07-20T23:43:13Z to 2026-07-21T00:15:21Z; the earlier "07-20/07-21" split was a timezone artifact). By current input class: EMPTY_FALLBACK 54,774 packets -> 1 distinct vector; SUMMARY 6,885 -> 6,864 distinct. Qdrant publication is a separate, unproven owner.
 - [x] **CEI-19b** (done 2026-09-25) `scripts/atlas/phase106-stage4-embedding-backfill.mjs` now exits 78 unless `PHASE106_HISTORICAL_BACKFILL_ALLOW=1` (verified: `--dry-run` also refuses); the dangling npm targets `atlas:backfill:embedding:dry` and `:apply` in `sveltekit-frontend/package.json` now print a retirement message and exit 78 instead of pointing at the nonexistent `backfill-embedding-lane.mjs`. The script is retained (archive-not-delete). Follow-up still open: make any future embedding writer consume `guard-pre-embedding-enrichment-v1.mjs` (CEI-16b / SUM-05). Original scope: Neutralize the writer: the script has the exec bit, defaults to APPLY (limit 999999) unless `--dry-run`, and is not mapped by any current npm script (`atlas:backfill:embedding:apply` now points at `../scripts/atlas/backfill-embedding-lane.mjs`, which does NOT exist: dangling script). Either make it consume `guard-pre-embedding-enrichment-v1.mjs` EMBED_ALLOWED keys or mark it historical/noncanonical with a hard refusal; fix or remove the dangling npm target. Not edited yet.
@@ -582,7 +686,7 @@ TRT-RTX-00 (supersedes the "CUDA 13.4 needed" line in SUMMARY-KERNEL-01): STATUS
 - **Process fix (2026-09-26):** `admit-legacy-summary-cosine-max-rf04-v2.mts` and `draft-unknown-resolution-v2.mts` previously defaulted to the *latest* receipt on disk, so three RF-04 receipts (`…T164451Z`, `…T164718Z`, `…T164823Z`) bound another writer's snapshot without being told to. Both now require an explicit `--snapshot` pin (default = canonical `687871b7…e28d`) and refuse a receipt bound to any other snapshot. Multiple writers are editing these files concurrently; coordinate before further edits.
 - [x] **UNKNOWN-CONTRACT-01 / UNKNOWN-ADAPTER-01 / UNKNOWN-ADAPTER-02 (operator correction, 2026-09-26) — SUPERSEDES the "UNKNOWN-RESOLUTION v2 — converged" and FEATURE-UNKNOWNS entries above; BOTH proposed migrations are WITHDRAWN (never applied; headers marked; files kept):** generalizing `unknown_packets` into a universal unknown store was wrong — it is a packet-identity promotion lifecycle (OBSERVATION → CANDIDATE → VALIDATED → PROMOTED/REJECTED; required `observation_id`/`potential_source_ref`/`source_kind`; four pipeline files assume a row may become an `atlas_packets` row); a known CEI candidate missing a feature is not eligible for it, and "no conflicting ON CONFLICT" was not an ownership proof. Replaced by a shared LOGICAL contract with per-owner adapters: `sveltekit-frontend/src/lib/server/atlas/contracts/unknown-resolution-v1.ts` (`UnknownResolutionV1` strict Zod — no value field, `canonicalAuthority:false`, subject kinds PACKET_IDENTITY / FEATURE_EVIDENCE_GAP / PINNED_DOC_GAP / OPENWIKI_CLAIM_STALE / ONTOLOGY_RESOLUTION_GAP / HUMAN_REVIEW_REQUIRED; deterministic UUIDv5 surrogate ids; `UnknownResolutionSetV1` with order-independent checksum + tamper rejection; spec 10/10). ADAPTER-01 maps the existing `unknown_packets` lifecycle to PACKET_IDENTITY (pure, read-only; the four `src/lib/server/unknown/*.ts` files and the table are untouched). ADAPTER-02 `scripts/atlas/build-unknown-resolution-set-v1.mts` builds the FEATURE_EVIDENCE_GAP set from sealed artifacts pinned to `--snapshot` (default canonical `687871b7…e28d`; refuses others): receipt `docs/reports/unknown-resolution-set-v1-20260926T170413Z.json`, **15,973 rows = 15,638 `NO_PROVEN_CHUNK_LINEAGE` (SOURCE_LINEAGE_REPAIR) + 335 `CHUNK_WITHOUT_QUALIFIED_SUMMARY` (SUMMARY_GENERATION)**, setChecksum `7976a3ba…8ff06`, byte-identical replay, no `pg`/datastore access. Storage stays an artifact until durable claiming/leases/retries/cross-run state is demonstrably needed; only then promote a generic work-item owner. **UNKNOWN-ROUTER-01 (design table, no execution):** `UNKNOWN_REASON_RESOLVER_TABLE_V1` in the contract maps reason → resolver (NO_PROVEN_CHUNK_LINEAGE→SOURCE_LINEAGE_REPAIR; CHUNK_WITHOUT_QUALIFIED_SUMMARY→SUMMARY_GENERATION; PINNED_DOCUMENTATION_MISSING→DOCUMENT_CRAWL; OPENWIKI_CLAIM_STALE→OPENWIKI_REFRESH; ONTOLOGY_CONCEPT_UNRESOLVED→ONTOLOGY_RESOLUTION; UNPROMOTED_PACKET_IDENTITY→PACKET_PROMOTION_PIPELINE). `draft-unknown-resolution-v2.mts` and its receipt `unknown-resolution-draft-v2-20260926T165542Z.json` are superseded history.
 - **RF chain FROZEN on canonical snapshot `687871b7…e28d`** (packet_key): 322 exact chunk cosines → 178 DERIVED / 15,973 UNAVAILABLE, raw-cosine RF scalar, dedicated derivation `LEGACY_SUMMARY_HINT_MAX_COSINE`, RF-04 `PARTIAL`, RF-05 `legacySummaryCosineMax = PARTIAL` (`docs/reports/legacy-summary-cosine-max-rf04-rf05-v2-20260926T165559Z.json`; 57/57 tests). The `packet_id` chain is mechanics evidence only.
-- **LOCKED ORDER for the agentic-fabric gates (each its own OpenSpec gate; not started):** (3) Zod↔Pydantic parity via JSON Schema for ResearchEvidenceV1 / ResearchEvidenceBundleV1 / UnknownResolutionV1 / HyperEdgeEvidenceV1 / LearningOutcomeV1 (`schemaId/schemaVersion/schemaChecksum/producerRevision`); (4) OpenWiki → Parent Atlas claim-evidence adapter (OpenWikiClaimEvidenceV1; consumes Grounded Claims + OKF v0.2 provenance; no canonical writes; reuse root `.okf/` + `docs/.okf/pinned/`, no fourth vocabulary); (5) Mastra as the durable outer owner (request / research / long-running tiers; Temporal only for long-running), converging with the Learning Circuit rather than two durable machines; (6) bounded HyperGraphRAG projection over ontology-linked tuples (adaptive hop budget, never identity, never an extra RRF vote); (7) EvidenceBundle → ContextManifest → ACE packet → BitFrost with token-utility receipts (cache key = identity-affecting revisions only); (8) unresolved evidence → Learning Circuit → OpenWiki/LDR/web/human resolvers; (9) revisioned learning datasets from validated outcomes only; (10) qualified datasets → existing QLoRA shadow gate.
+- **LOCKED ORDER for the agentic-fabric gates (initial status; current closure is recorded in dated sections below):** (3) Zod↔Pydantic parity via JSON Schema for ResearchEvidenceV1 / ResearchEvidenceBundleV1 / UnknownResolutionV1 / HyperEdgeEvidenceV1 / LearningOutcomeV1 (`schemaId/schemaVersion/schemaChecksum/producerRevision`); (4) OpenWiki → Parent Atlas claim-evidence adapter (OpenWikiClaimEvidenceV1; consumes Grounded Claims + OKF v0.2 provenance; no canonical writes; reuse root `.okf/` + `docs/.okf/pinned/`, no fourth vocabulary); (5) Mastra as the durable outer owner (request / research / long-running tiers; Temporal only for long-running), converging with the Learning Circuit rather than two durable machines; (6) bounded HyperGraphRAG projection over ontology-linked tuples (adaptive hop budget, never identity, never an extra RRF vote); (7) EvidenceBundle → ContextManifest → ACE packet → BitFrost with token-utility receipts (cache key = identity-affecting revisions only); (8) unresolved evidence → Learning Circuit → OpenWiki/LDR/web/human resolvers; (9) revisioned learning datasets from validated outcomes only; (10) qualified datasets → existing QLoRA shadow gate.
 - **ARCHITECTURE RULE (verbatim):** Frameworks orchestrate. OpenWiki compiles knowledge. Pydantic/Zod validate contracts. PostgreSQL owns canonical identity and admitted evidence. Retrieval discovers candidates. Hypergraphs project higher-order relationships. ACE compiles context. BitFrost caches context. Models propose. Deterministic gates admit. The Learning Circuit measures outcomes. QLoRA learns only from sealed, validated datasets.
 - [x] **ZOD↔PYDANTIC PARITY, slice 1 — `UnknownResolutionV1` (locked-order step 3; artifact-only)** (`scripts/atlas/export-unknown-resolution-parity-v1.mts` exports Zod's native `z.toJSONSchema` via `unknownResolutionV1JsonSchema()` + 21 fixtures whose accept/reject verdicts are recorded FROM Zod; `python/atlas_contract_parity/unknown_resolution_v1.py` is the strict Pydantic mirror; `run_parity.py` is the gate; receipt `docs/reports/contract-parity-unknown-resolution-v1-20260926T170743Z.json`): **`ZOD_PYDANTIC_PARITY_PROVEN`** — 21/21 fixture verdicts identical (3 accept / 18 reject), JSON-Schema property and enum sets identical (subjectKind, status, resolverKind), `additionalProperties:false` in both (no `value`/`rawCosine` can ride along), and all 15,973 real set rows validate in Pydantic (0 rejected). Schema meta recorded: `schemaId atlas.unknown-resolution.v1`, `schemaVersion 1`, `schemaChecksum sha256:4aba5523…e39d`, `producerRevision`. Gate is non-vacuous: a deliberately wrong recorded verdict fails it (exit 2). **Known limit, stated not hidden:** the three cross-field `superRefine` rules are not expressible in JSON Schema, so parity for them rests on the fixtures (both sides implement them independently). Zod (4.4.3) remains the runtime source of truth; Pydantic (2.11.7) is a boundary validator with no authority. Remaining contracts for this step, each its own slice: ResearchEvidenceV1, ResearchEvidenceBundleV1, HyperEdgeEvidenceV1, LearningOutcomeV1.
 
@@ -605,8 +709,8 @@ TRT-RTX-00 (supersedes the "CUDA 13.4 needed" line in SUMMARY-KERNEL-01): STATUS
 - `npx tsx scripts/atlas/export-unknown-resolution-parity-v1.mts` then `python python/atlas_contract_parity/run_parity.py --dir <printed dir> --set <unknown-resolution-set.json> --out <receipt>`
 - Tests: `cd sveltekit-frontend && npx vitest run src/lib/server/atlas/contracts/unknown-resolution-v1.spec.ts src/lib/server/atlas/features/legacy-summary-hint-feature-v2.spec.ts src/lib/server/atlas/features/historical-evidence-current-candidate-overlay-v2.spec.ts src/lib/server/retrieval/repair`
 
-**Next steps, in locked order (each its own OpenSpec gate; none started):**
-1. **Parity slices 2-5:** `ResearchEvidenceV1`, `ResearchEvidenceBundleV1`, `HyperEdgeEvidenceV1`, `LearningOutcomeV1` — copy the slice-1 pattern (Zod contract + spec → `z.toJSONSchema` export → Zod-recorded fixtures → strict Pydantic mirror → `run_parity.py`-style gate; include a negative-verdict check).
+**Historical next steps (superseded by the dated proof records below):**
+1. **Artifact-only parity slices:** `ResearchEvidenceV1`, `ResearchEvidenceBundleV1`, `UnknownResolutionV1`, `HyperEdgeEvidenceV1`, and `LearningOutcomeV1` now have dated parity receipts. These close only cross-language schema/fixture parity; they do not close the downstream integration gates listed next.
 2. OpenWiki → Parent Atlas claim-evidence adapter (`OpenWikiClaimEvidenceV1`; no canonical writes; reuse root `.okf/` + `docs/.okf/pinned/`, no fourth vocabulary).
 3. Mastra durable outer owner (request / research / long-running tiers; Temporal only for long-running); converge with Learning Circuit.
 4. Bounded HyperGraphRAG projection (adaptive hop budget, never identity, never an extra RRF vote).
@@ -651,7 +755,7 @@ Slice-1 plumbing extracted into a registry-driven harness instead of copied. Sco
 - Gate can fail (proven): in-receipt self-tests (wrong verdict, dropped property, tampered schema) all detected; real-runner negatives in `.tmp/atlas/contract-parity-v1/negative-check-harness/` — tampered fixture verdict (bundle otherwise self-consistent) exit 2 with a verdict mismatch; wrong `--schema-checksum` exit 2; re-writing an existing receipt raises `FileExistsError`.
 - Also fixed: the handoff gotchas line above contained a literal NUL byte (why `grep` reported "Binary file matches"); replaced with plain text.
 - Not changed: UnknownResolutionV1 semantics. The reviewer's proposed hardenings (typed `reasonCode` enum, feature-gap coordinates required together, asserting expected counts against the frozen receipt) are pending an operator decision; they change the schema checksum and would need a parity re-run.
-- Next in locked order (each its own gate): RESEARCH-EVIDENCE-BUNDLE-PARITY-01 → HYPEREDGE-EVIDENCE-PARITY-01 → LEARNING-OUTCOME-PARITY-01 → OPENWIKI-EVIDENCE-01 → MASTRA-LC-01. Adding one = one registry entry + one Pydantic model + one line in `registry.py`.
+- Historical next-in-order note; current status is in the dated gate records below. Each parity slice is separate; no OpenWiki/Mastra/Temporal work is implied by a parity result.
 
 
 ### UNKNOWN-CONTRACT-01 hardening (2026-09-26) — supersedes the "pending operator decision" bullet above
@@ -678,7 +782,7 @@ Third slice through the harness (one registry entry + one Pydantic model + one `
 - Smoke: `npx vitest run src/lib/server/atlas/contracts` = 46 files / 256 tests passed; IDE diagnostics clean earlier on touched files.
 - GAN audit (`scripts/atlas/test-gan-audit-integration.mts`, dry-run only, ran from repo root and from `sveltekit-frontend/`): reports 7/7 but is `WIRED`, NOT proven. Every step logs `GanAuditOrchestrator requires a db client in standalone builds` and falls back to an empty batch (Processed 0), so no packet was validated. There is no "gan validation skill" in `.claude/skills`, `.opencode/skills` or `~/.claude/skills`, and the `atlas:gan-audit*` npm aliases named in CLAUDE.md do not exist in either `package.json`. Real proof needs an injected read-only db client and would be its own gate; the contract parity negatives (tampered/forged fixtures) are the adversarial probes actually exercised here.
 - Incident: while wiring the registry, a failed Python edit truncated the untracked `contract-parity-registry-v1.mts` to 0 bytes (open-for-write before an encode error). Recreated in full from the earlier write; the regenerated unknown-resolution and research-evidence bundles re-proved identical checksums, so no content changed. Lesson: build the new text before opening the file for write; untracked files have no git fallback.
-- Next in locked order: HYPEREDGE-EVIDENCE-PARITY-01 -> LEARNING-OUTCOME-PARITY-01 -> OPENWIKI-EVIDENCE-01 -> MASTRA-LC-01 (Node 22.23.3 upgrade is a separate gate; `nvm`/`choco` not usable as tried).
+- Historical next-in-order note; HYPEREDGE-EVIDENCE-PARITY-01 and LEARNING-OUTCOME-PARITY-01 are closed by their dated artifact-only proof records below. Later integration gates remain separate.
 
 
 ### RESEARCH-EVIDENCE-BUNDLE-PARITY-01 addendum: `evidenceSetChecksum` + schema-version discipline (2026-09-26)
@@ -712,7 +816,7 @@ Operator direction: main repo first (`sveltekit-frontend/src`, `scripts/atlas` o
 
 **Verification.** App specs (identity, contracts, cache, context): 90 files / 596 tests pass. `atlas-core` identity via the direct binary: my specs pass; 1 pre-existing failure (above). IDE diagnostics clean on the new scripts. Incident: a real NUL byte again slipped into a spec via a Python heredoc escape (`grep` "Binary file matches" caught it); fixed, and all touched files re-scanned to 0 NULs. Lesson: use the Edit/Write tools for backslash-heavy text.
 
-**Open (operator).** (1) Replace the historical `source_ref` validation rule (about 92% false hard-failures) and decide whether to add the four missing `atlas_packets` columns or remove those steps from the orchestrator (a schema change needs approval; migrations stay unapplied). (2) Reconcile `package-boundary-registry.json` ("atlas-core canonical") with main-repo-first practice, and resolve the zod 3 vs 4 split before packages take on more contracts. (3) Decide whether to build FEATURE-GRAIN-01 next or go straight to HYPEREDGE-EVIDENCE-PARITY-01 (namespace precomputed above).
+**Open (operator; historical decision list).** (1) Replace the historical `source_ref` validation rule (about 92% false hard-failures) and decide whether to add the four missing `atlas_packets` columns or remove those steps from the orchestrator (a schema change needs approval; migrations stay unapplied). (2) Reconcile `package-boundary-registry.json` ("atlas-core canonical") with main-repo-first practice, and resolve the zod 3 vs 4 split before packages take on more contracts. (3) The earlier choice between FEATURE-GRAIN-01 and HYPEREDGE-EVIDENCE-PARITY-01 is superseded: the latter is now proven by the dated artifact-only record below; the precomputed namespace remains unused.
 
 
 ### SOURCE-REF-CONTRACT-01 (2026-09-26) — legacy rule replaced; live census replayed
@@ -725,8 +829,8 @@ Scope kept to this gate: no row changes, no `ganValidated`/`ganWarnings`/`ganVal
 - **One validator**: `packet-adversarial-validator-v2.ts` (`validatePacketForAtlasV2`, SQL allowlist, blocked terms, operation order; historical `ERR_*` codes) is called by `GanAuditOrchestrator.validatePacketStructure`, the legacy `GanAdversarialValidator` ADV002 branch, the adversarial probes and the live runner. Specs: validator 10 + orchestrator 8 = 18/18 (direct vitest binary). Benign fixtures include `.svelte`, `.mts`, `.py`, uppercase, `[id]` and `[[slug]]` routes, `$lib/` alias, spaces, non-ASCII, `a..b.ts`; malicious: `../` traversal, NUL/control, absolute/drive escape, unknown namespace, `NOT_A_FILE_PATH`.
 - **Adversarial replay**: `docs/reports/gan-adversarial-proof-v1-20260926T180740Z.json` — ADV001-006 now call their real owners and compare exact `ERR_*` codes; ADV007-016 unchanged; 16/16, 5/5 broken-harness self-tests detected, known-gap re-measure = [] (all four legacy defects closed).
 - **Live replay** (`scripts/atlas/prove-gan-audit-readonly-v1.mts`, receipt schema `atlas.gan-readonly-live-proof.v2`, newest `gan-readonly-live-proof-v1-*.json`; named `--adversarial-receipt` and `--inventory-receipt`, no "latest" discovery): 61,718 rows read = validated. Old vs new source_ref classification: legacy rejected 56,724; new rejects 7; both rejected 7; legacy-rejected-new-accepted 56,717; legacy-accepted-new-rejected 0; both accepted 4,994. Remaining 7 hard failures are the 6 no-path-structure + 1 blank refs (real corpus findings). Soft warnings: missing_summary 54,826, missing_embedding 59. Consistency all true (SQL-computed predicate equals validator count = parity only). Status semantics: `execution` PROVEN and `validator` POLICY_DERIVED_FROM_INVENTORY_AND_FIXTURES; master `atlas.validation-audit.v2` stays BLOCKED (structural lineage lane).
-- **Skill**: `SKILL.md` gained the rule "agreement between two implementations is parity, not correctness" with the five LIVE_READ_ONLY requirements and the execution/validator split. Skill restructure into the four lane reference files (PARENT-ATLAS-VALIDATION-SKILL-01) is NOT done.
-- **Not done / next** (locked): PARENT-ATLAS-VALIDATION-SKILL-01 reference restructure; LINEAGE-QUALIFIER-01 expansion (source binding via `atlas_workspace_source_bindings`, lineage `chunk_row_id`/`canonical_chunk_id` match, `content_embedding` as the semantic_768 gate, `content_embedding_768` diagnostic only); MAPREDUCE-CHUNK-READINESS-01 (127 candidates / 1,520 chunks); IDENTITY-COORDINATE-01B (single owner instead of app + atlas-core mirror); HYPEREDGE-EVIDENCE-PARITY-01. Tooling issue recorded, not fixed: TEST_RUNNER_WORKSPACE_FLAG_CONFLICT (root `.npmrc` `workspaces=false`). Pre-existing, untouched: 5 failing tests in `packages/atlas-core/src/validation/gan-deep-audit.test.ts`; 1 in `identity/feature-identity.spec.ts`.
+- **Skill**: `SKILL.md` gained the rule "agreement between two implementations is parity, not correctness" with the five LIVE_READ_ONLY requirements and the execution/validator split. The four-lane reference restructure is complete, as confirmed in the later PARENT-ATLAS-VALIDATION-SKILL-01 entry; the earlier incomplete status is historical.
+- **Not done / next** (historical snapshot; superseded where later dated evidence exists): encoder/runtime revision at :8097; RF-EVAL-01 held-out labels; CEI-19b and summary generation (SUM-*); scorer/promotion, DDL, persistence, and MMR remain gated. LINEAGE-QUALIFIER-01 / MAPREDUCE-CHUNK-READINESS-01 and IDENTITY-COORDINATE-01B have later resolution records and must not be reopened from this stale list. Tooling issue recorded, not fixed: TEST_RUNNER_WORKSPACE_FLAG_CONFLICT (root `.npmrc` `workspaces=false`). Pre-existing test failures noted here are historical and were not remeasured by this entry.
 
 ### IDENTITY-COORDINATE-OWNER-02 / LINEAGE-QUALIFIER-02 / MAPREDUCE-CHUNK-READINESS-01 (2026-09-26; follow-on handoff)
 - [x] Coordinate owner collapsed: `packages/atlas-core/src/identity/atlas-coordinate-v1.ts` is canonical per `docs/atlas/package-boundary-registry.json`; the SvelteKit module is now a compatibility re-export. The previous app-owner/mirror note above is superseded for this contract. Existing app import paths remain intact.
@@ -745,7 +849,7 @@ Scope kept to this gate: no row changes, no `ganValidated`/`ganWarnings`/`ganVal
 - Next gates: `INDEXED-CHUNK-CANONICAL-ID-RECONCILIATION-01`; obtain immutable encoder/runtime provenance at the existing :8097 receipt boundary; identify an authorized persistence owner before any DDL; only then re-run same-snapshot feature admission and determine whether production scorer exposure is warranted.
 - Four-lane read-only GAN receipt refreshed with this named readiness input: `docs/reports/gan-readonly-live-proof-v1-20260926T185300Z.json`; master status LIVE_READ_ONLY_PROVEN, structuralLineage PARTIAL (114/1,520), semantic projection NOT_EXERCISED. Packet census remains 61,718 rows; 7 structural source_ref findings remain. Tests: coordinate/lineage suites 27/27; atlas-core TypeScript no-emit check passed; no DB data writes or projection/cache writes.
 - [x] INDEXED-CHUNK-CANONICAL-ID-RECONCILIATION-01: CLOSED as an audit defect, not an identity mismatch (see the 2026-09-26 v3 correction below and `MAPREDUCE-CHUNK-READINESS-02`). The 114/1,406 split above is SUPERSEDED.
-- [ ] Continue PARENT-ATLAS-VALIDATION-SKILL-01 four-lane reference restructure and HYPEREDGE-EVIDENCE-PARITY-01 only after the chunk mismatch has an authoritative resolution. Held-out gain labels, scorer/promotion, DDL, persistence, and MMR remain open/gated.
+- [x] PARENT-ATLAS-VALIDATION-SKILL-01 four-lane reference restructure completed (see the dated completion record below). The chunk-mismatch defer is superseded by its authoritative resolution; HYPEREDGE-EVIDENCE-PARITY-01 is closed by the dated artifact-only proof below. Held-out gain labels, scorer/promotion, DDL, persistence, and MMR remain open/gated.
 
 ### GAN-VALIDATION-V3 / SHARED-VECTOR-DIAGNOSIS-01 / PROMOTION-DEFINITION-01 (2026-09-26; read-only + docs, zero data writes)
 - **Correction of the two blocks above (v2 -> v3).** The 114/1,520 "PARTIAL" result came from a measurement defect: readback rows were sorted by `(candidateOrdinal, chunkRowId)` but paired by array index with inputs sorted by `(candidateOrdinal, canonicalChunkId, chunkRowId)`, cross-associating sibling chunks. After joining by unique `chunkRowId` (`measure-mapreduce-chunk-readiness-v2.mts`), two replays give 1,520/1,520 `CHUNK_REVISION_QUALIFIED`, `SEMANTIC_768` AVAILABLE 1,520, row-detail checksum identical (`sha256:52b22399...f52a`). Receipt `docs/reports/mapreduce-chunk-readiness-v2-20260926T194719Z.json`. `docs/reports/gan-readonly-live-proof-v1-20260926T185300Z.json` (structuralLineage PARTIAL 114/1,520) is history, not current. Lesson recorded in the skill: never pair rows from two different sorts by index.
@@ -753,9 +857,9 @@ Scope kept to this gate: no row changes, no `ganValidated`/`ganWarnings`/`ganVal
 - **PROMOTION-DEFINITION-01 (definition, not an action).** A feature (e.g. `legacySummaryCosineMax`) moves ARTIFACT_ONLY -> MATRIX_ADMITTED -> SCORER_EXPOSED -> PROMOTED only when, in order: (1) same-snapshot coordinates (`candidateSnapshotRevision` + `ordinalMapChecksum`) on every input; (2) grain-matched qualification (`CHUNK_REVISION_QUALIFIED` for chunk-grain); (3) immutable encoder provenance via the existing `SemanticRepresentationV1Schema` (representation/model/tokenizer revision, input digest, vector checksum) - currently 0/1,520 and the :8097 receipt reports `NOT_REPORTED_BY_SERVICE`; (4) UNAVAILABLE-not-zero missing-value policy present in the matrix; (5) placeholder/shared vectors masked; (6) live dry-run readback through `CandidateFeatureMatrix` -> `ContextManifest`; (7) frozen human-graded labels and a baseline-vs-feature A/B (Recall@K, MRR, nDCG@K); (8) persistence owner and approved DDL. MMR is evaluated only after (7). Current standing: 1,2,4,5 met for the 178-value artifact; 3,6,7,8 not met -> ARTIFACT_ONLY.
 - **Persistence schema (no new owner).** Reuse `SemanticRepresentationV1Schema` (Zod) as the field contract; the unapplied `drizzle/manual/20260926_codebase_chunk_summary_embedding_768_v1.sql` adds `summary_embedding_meta` jsonb. Index guidance for a future apply: btree on `(packet_key)` and `(source_revision)`; do not add pg_fts/BM25 indexes for vector metadata; no beam/ANN index on metadata columns. YAML is an export format only (derived from the Zod schema), never a second source of truth.
 - **Skill restructured (PARENT-ATLAS-VALIDATION-SKILL-01 done).** `reference/` now has one file per lane: `identity-and-lineage.md` (owner line corrected to the atlas-core canonical coordinate owner), `structural-lineage.md`, `semantic-projection.md`, `runtime-side-effects.md`, plus proof-levels and adversarial-probes; `SKILL.md` lane table links each.
-- Still open and gated: HYPEREDGE-EVIDENCE-PARITY-01; encoder revision at :8097; RF-EVAL-01 labels; CEI-19b; summary generation (SUM-*).
+- Still open and gated: encoder revision at :8097; RF-EVAL-01 labels; CEI-19b; summary generation (SUM-*). HYPEREDGE-EVIDENCE-PARITY-01 is closed by the dated proof below.
 - **GAN v3 replay (2026-09-26 21:18Z, all read-only, zero data writes).** Adversarial `docs/reports/gan-adversarial-proof-v1-20260926T211807Z.json`: failed=[], knownGaps=[]. Four-lane live receipt `docs/reports/gan-readonly-live-proof-v1-20260926T211829Z.json` (named inputs: that adversarial receipt, `source-ref-inventory-v1-20260926T180602Z.json`, `mapreduce-chunk-readiness-v2-20260926T194719Z.json`): master LIVE_READ_ONLY_PROVEN; authority LIVE_READ_ONLY (7 hard source_ref findings, 0 duplicate packet_keys, 45,567 packets without workspace/source revision); structuralLineage PROVEN for the sealed cohort only (1,520/1,520, 127 candidates; not a corpus-wide claim); semanticProjection NOT_EXERCISED; runtimeSideEffects LIVE_READ_ONLY (0 writes). Supersedes `...T185300Z` (PARTIAL 114/1,520).
-- Deferred with reason: the 7 malformed source_refs (6 no-path-structure, 1 blank) are not yet listed row-by-row; needs a read-only listing before any namespace decision. HYPEREDGE-EVIDENCE-PARITY-01 not started. Large-corpus enrichment census/build/verify (`LARGE_CORPUS_ENRICHMENT_*`) was already completed earlier today in `parent-atlas-candidate-feature-execution-fabric`; not re-run.
+- **Source-ref exception classification supersedes the defer above.** `docs/reports/source-ref-exception-classification-v1-20260926T213100Z.json` is a named, read-only, seven-row receipt (`LIVE_READ_ONLY_CLASSIFICATION_COMPLETE`; zero writes). It identifies two legitimate root-level path shapes (`.python-version`, `deeds-web-app.code-workspace`) whose source bindings remain unproven, four remaining `NO_PATH_STRUCTURE` rows (`nul`, `utputFormat`, `1`, `--since 2h`), and one blank `source_ref`. Thus five current hard failures remain; do not call all seven malformed, infer source identity, or mutate these rows. The earlier inventory's six no-path-shape findings include the two now-accepted root-level shapes. HYPEREDGE-EVIDENCE-PARITY-01 had not started when this receipt was written; it is closed by the later dated proof below. Large-corpus enrichment census/build/verify (`LARGE_CORPUS_ENRICHMENT_*`) was already completed in `parent-atlas-candidate-feature-execution-fabric`; not re-run.
 
 ### AGENT-RUNTIME-REPRO-01 (2026-09-26; read-only + tests, no install, no server, no datastore)
 - Runtime: Node v22.23.3, npm 11.6.2 (shell already on the portable runtime). No npm process running during capture.
@@ -1024,8 +1128,11 @@ this session's own census, non-trivial blast radius, not touched here):
 
 ```
 SemanticRepresentationRevisionV1
-├── modelArtifactRevision      (already exists: EMBEDDING_MODEL_ARTIFACT_REVISION)
-├── tokenizerRevision          (already exists: EMBEDDING_TOKENIZER_REVISION)
+├── ollamaModelDigest          (catalog/resident observation; not a GGUF file hash)
+├── ggufArtifactDigest         (must be independently verified; currently unavailable)
+├── serviceBuildRevision
+├── backendRuntimeRevision
+├── tokenizerRevision          (configured SHA; runtime/artifact binding unproven)
 ├── inputPolicyRevision        (already exists: EMBEDDING_INPUT_POLICY_REVISION)
 ├── contentSelectionRevision   (NEW — does not exist yet, this is the real gap)
 ├── poolingRevision
@@ -1207,3 +1314,216 @@ bug-fixed module — not just a design freeze. `SEM-MATERIALIZE-01` (sharded
 full-cohort run) remains the next open item, and per the roadmap's own
 sequencing should wait for an explicit go-ahead given it's a meaningfully
 larger, longer-running operation than anything done so far.
+
+### Multi-hop execution correction (2026-09-27)
+
+The user has now explicitly selected `FILES_ONLY_SEALED_ARTIFACT` for this
+materialization tranche. This is an output-mode decision for local,
+revision-qualified artifacts; it is **not** a decision to make files
+canonical, add a database table, or write to PostgreSQL, Qdrant, Valkey,
+Neo4j, or another durable service.
+
+- [x] **PERSISTENCE-DECISION-01 — FILES_ONLY_SEALED_ARTIFACT.** Store any
+  materialization output under `.tmp/atlas/semantic-representations-v1/`
+  with a sealed manifest and `canonicalWrite: false`. This records the user's
+  decision and permits the local-artifact tranche only; datastore/projection
+  writes still require separate authorization.
+- [x] **CONTENT-POLICY-01A — bind the actual embedded bytes (contract/code).**
+  Added `SemanticEmbeddingInputV1` with content-selection, input-policy, and
+  tokenizer revisions; an explicit 1,800-token limit; rendered/embedded input
+  checksums; and `ADMITTED` / `REJECTED_EMPTY` / `REJECTED_OVER_BUDGET` states.
+  The policy is exact-selection/no-truncation: over-budget inputs carry no
+  sendable text, and admitted text is returned unchanged for tokenization and
+  embedding. The mixed canary now consumes that result verbatim, requires an
+  externally supplied tokenizer revision, and emits a v2 receipt without
+  rewriting the historical v1 receipts. Focused fixture tests prove checksum,
+  tokenizer-input, embedding-input, over-budget, and source-drift behavior.
+  The prior 8/8 canary remains transport evidence only; its old
+  4,000-character request behavior is not accepted by this policy.
+- [x] **EMBED-V2-COMPILER-ARTIFACT-BYTE-VERIFY-01 — caller-side artifact verification (code/fixture only).** Added `prepareStrictEmbeddingRequestV2()` to revalidate compiler artifact segment bytes against current source, rendered checksum, admitted input text/checksum, and canonical identity/revision fields before constructing the `/embed/v2` request. The request's `inputArtifactChecksum` is computed from deterministically key-sorted canonical UTF-8 JSON bytes; the mixed canary runs this verifier before its existing executor call. The semantic-input compiler and request-preparation suites pass 14/14. This does **not** mean the existing mixed canary called `/embed/v2`; no live embedding/runtime call or datastore write was made, so CONTENT-POLICY-01B and EMB-SERVICE-V2-DEPLOY-01 remain open.
+- [ ] **CONTENT-POLICY-01B — live exact-byte canary.** Run the updated bounded
+  mixed canary with a verified `EMBEDDING_TOKENIZER_REVISION`; require matching
+  embedded-input checksum/token-count/embedding input and reject over-budget
+  inputs without embedding. No datastore writes. This remains open because no
+  live tokenizer/embedding call was run in this tranche.
+- [ ] **SEM-MATERIALIZE-01A — resumable driver.** After CONTENT-POLICY-01A/B,
+  implement/verify a stable ordinal-sharded runner that consumes the existing
+  `SemanticInputArtifactV1` compiler, binds each exact embedded input and its
+  policy revision to the embedding receipt, records immutable model/capability
+  and `semantic_768` vector checksums, and resumes only from matching sealed
+  shards. No persistent-store calls.
+- [ ] **SEM-MATERIALIZE-01B — bounded scale smoke.** Run a small multi-shard
+  sample through the actual runner; prove deterministic input/output checksums,
+  concurrency bounds, interruption/resume behavior, and zero datastore calls
+  before launching the full cohort.
+- [ ] **SEM-MATERIALIZE-01C — full local cohort.** Only after CONTENT-POLICY-01A/B
+  and SEM-MATERIALIZE-01A/01B pass,
+  materialize the pinned 16,151-row cohort to local sealed files, preserving
+  exact `candidateSnapshotRevision`, `ordinalMapChecksum`, source revisions,
+  per-row selection policy, vector dimension/norm/checksum, and complete
+  ordinal coverage. No Postgres/Qdrant/Valkey/Neo4j writes.
+- [ ] **SEM-READBACK-01 — merged artifact audit.** Independently verify shard
+  checksums, revision agreement, unique/full ordinal coverage, dimensions,
+  norms, and vector/input checksums before full-cohort ACE V4 composition.
+
+The earlier ~32-minute projection was measured by a separate throughput probe
+and is **not** a runtime guarantee for this new compiler+sharded materializer.
+No full-cohort materializer is currently present in `scripts/atlas`. The 8/8
+historical mixed canary proves compiler/transport samples, not batch resume or
+16,151-row execution; it tokenized full text but embedded a 4,000-character
+prefix, so its receipts do not bind the exact endpoint input. The canary script
+now implements the additive no-truncation v2 path, but it has not been run
+against a verified live tokenizer revision. The full run is authorized as
+files-only in principle but is not yet runnable safely; complete
+CONTENT-POLICY-01B and SEM-MATERIALIZE-01A/01B first. This ordering
+supersedes the earlier forward-roadmap placement of the persistence decision
+after materialization.
+
+- [x] **EMB-SERVICE-V2-CODE-01 — additive strict provenance endpoint (code-only).**
+  Added `/embed/v2` to the existing Go embedding service without changing the
+  legacy `/embed` contract or `embed:<model>:<input>` cache namespace. V2
+  requires explicit SHA-256 service-build and tokenizer revisions plus
+  server-owned input-policy and content-selection allowlists, resolves
+  the live Ollama model digest/runtime, binds content-selection and input-policy
+  revisions into the representation revision, verifies exact text checksum
+  and 768D finite unit-normalized vector bytes, and uses a separate
+  `embed:v2:<representation>:<input-artifact>:<input>` cache key. It rechecks
+  model identity after inference and fails closed if the mutable model alias
+  changed during the call. Local HTTP-fixture tests cover admission, checksum
+  rejection, missing tokenizer revision, cache-coordinate separation, exact
+  executor input, and model-alias drift during inference.
+  Re-verified in this continuation with `go test -count=1 ./...`
+  (`services/go-embedding-service`: passed; proto package has no test files).
+  This is code/fixture proof only: no service deployment, live embedding,
+  Valkey write, or database/projection write occurred. The input-artifact
+  checksum is caller-provided and echoed; this endpoint verifies the exact text
+  checksum but does not fetch or independently hash the compiler artifact, so
+  the caller must verify that artifact before submission.
+  Follow-up code-only hardening: after inference, `/embed/v2` also checks
+  Ollama `/api/ps` and requires exactly one loaded entry for the requested
+  model name with the same SHA-256 digest as the capability snapshot. A new
+  fixture holds `/api/tags` stable while returning a different loaded-model
+  digest and proves the response is blocked with HTTP 409. This is stronger
+  fixture evidence, not atomic per-call model binding; an alias/runtime change
+  that occurs and reverts before the post-call observation remains unproven.
+  Verified with `go test -count=1 ./...` in `services/go-embedding-service`;
+  no service deployment or live Ollama call occurred.
+- [x] **EMB-SERVICE-IDENTITY-SEPARATION-01 — observed-vs-artifact identity (code/fixture only, 2026-09-27).** Corrected the unshipped V2 contract so Ollama `/api/tags` digest is named `ollamaModelDigest`, not a generic GGUF/model-artifact revision. `ggufArtifactDigest` remains null with `UNAVAILABLE_NOT_PROVEN`; the configured tokenizer SHA is labeled `CONFIGURED_REVISION_NOT_RUNTIME_ATTESTED`. A fresh `/embed/v2` call now requires a matching resident-model observation before and after inference and checks the model name returned by `/api/embed`. Receipts report both resident digests, response model, `OBSERVED_PRE_POST_RESIDENT_DIGEST_STABLE`, and `atomicPerCallModelBinding=false`; cache hits explicitly state no model execution occurred. Fixtures cover stable observations, pre-call and post-call digest drift, response-model mismatch, and the separate digest/status fields. Validation: `go test -count=1 ./...` and `go vet ./...` passed in `services/go-embedding-service`. This is still fixture/code proof only: no live runtime/deployment, immutable GGUF-to-Ollama digest equivalence, tokenizer runtime attestation, or atomic per-call binding is proven; deployment gate remains open.
+- [ ] **EMB-SERVICE-V2-DEPLOY-01 — deployment and live canary.** Defer until the
+  operator-approved service rebuild/deployment window. Supply verified
+  `EMBEDDING_SERVICE_BUILD_REVISION`, `EMBEDDING_TOKENIZER_REVISION`, the exact
+  `EMBEDDING_INPUT_POLICY_REVISION`, and a server-owned allowlist in
+  `EMBEDDING_CONTENT_SELECTION_REVISIONS`; exercise `/embed/v2` with the
+  already-admitted `SemanticEmbeddingInputV1`, and verify the response receipt
+  against caller-side artifact bytes. This is separate from
+  CONTENT-POLICY-01B's existing strict `:8081` canary; neither gate is closed
+  by local Go fixtures.
+- [x] **EMB-RUNTIME-TOKENIZER-OBSERVATION-01** (2026-09-28; read-only, no
+  embedding request): current listener census confirms `:8081` is unavailable;
+  `:8097` is healthy but reports `embeddinggemma:latest` without immutable
+  build/tokenizer or per-call model identity. Its active container has no
+  strict-v2 build/tokenizer/input-policy/content-selection settings. A local
+  Hugging Face `tokenizer.model` exists with SHA-256
+  `1299c11d7cf632ef3b4e11937501358ada021bbdf7c47638d13c0ee982f2e79c`, but it
+  is not bound to the Ollama serving executor and cannot close CONTENT-POLICY-01B.
+  Receipt: `docs/reports/embedding-runtime-tokenizer-identity-census-v1-20260928T0013Z.json`.
+  Live canary and deployment tasks remain open; no service was rebuilt/restarted.
+
+### GAN-VALIDATION-V4 (2026-09-27; receipt reconciliation, read-only)
+
+- The earlier `gan-readonly-live-proof-v1-20260926T175412Z.json` record of
+  `structuralLineage=BLOCKED / CHUNK_REVISION_QUALIFICATION_MISSING` is
+  historical and was not re-measured in that receipt. Do not use that reason
+  as the current structural-lineage status.
+- The newer named receipt
+  `docs/reports/gan-readonly-live-proof-v1-20260926T225232Z.json`
+  (`sha256:88ABBEA4A292297C5F543A0C44CFC87B576AF351358D171211E0D294CADDD232`)
+  references `mapreduce-chunk-readiness-v2-20260926T194719Z.json` and proves
+  structural lineage for its sealed 127-candidate / 1,520-chunk cohort:
+  1,520/1,520 chunks are revision-qualified and source-binding-qualified.
+  This is bounded-cohort evidence, not a whole-corpus claim.
+- The master result remains `PARTIAL_PROVEN`: semantic projection was
+  `NOT_EXERCISED`, and the live authority census still has unresolved packet
+  and source/workspace revision findings. The adversarial companion
+  `docs/reports/gan-adversarial-proof-v1-20260926T224957Z.json` passed 16/16;
+  it does not close the live semantic-projection gate.
+- No new live query, inference, or datastore/cache write was performed for
+  this receipt reconciliation. Supersedes only the stale current-status wording
+  above; all historical receipts and prior findings remain unchanged.
+
+### HYPEREDGE-EVIDENCE-PARITY-01 (2026-09-27) — `ZOD_PYDANTIC_PARITY_PROVEN`; artifact-only
+
+- Added `HyperEdgeEvidenceV1` as a read-only envelope around the existing
+  `HyperedgeV1` and `ResearchEvidenceV1` contracts. Every hyperedge evidence
+  reference must bind to exactly one evidence item that cites that reference;
+  all evidence items must be bound. The envelope checksum covers the complete
+  payload. It cannot claim canonical authority or perform writes.
+- Zod contract/spec: `sveltekit-frontend/src/lib/server/atlas/contracts/hyperedge-evidence-v1.ts`
+  and `.spec.ts` (4/4 passed). Independent strict Pydantic mirror and shared
+  registry entry: `python/atlas_contract_parity/hyperedge_evidence_v1.py` and
+  `python/atlas_contract_parity/registry.py`; fixture/export registration is in
+  `scripts/atlas/lib/contract-parity-registry-v1.mts`.
+- Sealed 16 fixtures (2 accept / 14 reject; 6 cross-field), schema checksum
+  `sha256:0ccf51a595dd4ba494b36dd2c3036a29055099a591d9d16d853bc7dbe0cefbaf`.
+  The parity receipt reports identical schema shape and fixture verdicts,
+  `crossFieldParityMode=FIXTURE_PROVEN`, and all gate self-tests true, including
+  detection of a deliberately flipped verdict. Receipt summary:
+  `docs/reports/contract-parity-hyperedge-evidence-v1-20260927T213617Z.json`;
+  sealed inputs and full runner receipt remain in the named `.tmp` paths there.
+- This closes only the cross-language contract-parity gate. It does not prove
+  live producer/caller lineage, persistence, graph projection, admission, or
+  HyperGraphRAG retrieval. Database, Qdrant, Valkey, RabbitMQ, and Graphify
+  writes were zero; no model inference or service call occurred.
+- Validation: focused Vitest 4/4; exporter + WSL Python parity runner exit 0;
+  strict OpenSpec and scoped diff checks recorded after this entry.
+
+### LEARNING-OUTCOME-PARITY-01 (2026-09-27) — `ZOD_PYDANTIC_PARITY_PROVEN`; artifact-only
+
+- Reused the existing canonical Zod `recommendationOutcomeReceiptSchema` and
+  the registered Pydantic boundary mirror; no competing schema or learning
+  owner was introduced.
+- The sealed bundle binds schema `atlas.recommendation-outcome-receipt.v1`
+  version `1`, schema checksum
+  `sha256:42dc933ba5d9bef58dff47d43b14185461a33dc28d00b407ec03b013cce81561`,
+  and manifest checksum
+  `sha256:1dad607c953ed9afb5f53c533ac2f9688db75cf55f2d04fa57429cecc050a9e9`.
+  The runner matched schema shape and all 15 fixture verdicts (4 accept / 11
+  reject); wrong-verdict, dropped-property, and tampered-schema-checksum
+  self-tests were detected. No cross-field fixtures were declared.
+- Summary report:
+  `docs/reports/contract-parity-learning-outcome-v1-20260927T214901Z.json`.
+  The full runner receipt and sealed inputs remain at their named `.tmp`
+  locations. The receipt checked 0 real rows and asserts no canonical
+  authority; Postgres, Qdrant, Valkey, RabbitMQ, and Graphify writes were 0.
+- This closes only fixture-based Zod/Pydantic contract parity. It does not
+  prove producer lineage, persisted outcomes, learning behavior, retrieval
+  improvement, or Titans-style online learning; no inference or service call
+  occurred.
+- Validation for this ledger/report correction: strict OpenSpec validation,
+  JSON parse, and scoped whitespace checks passed.
+
+### IDENTITY-COORDINATE-OWNER-02 / LINEAGE-QUALIFIER-02 / MAPREDUCE-CHUNK-READINESS-01 — current replay (2026-09-27)
+
+- Revalidated the canonical coordinate-owner boundary: `packages/atlas-core/src/identity/atlas-coordinate-v1.ts` owns the contract; the SvelteKit path is a compatibility re-export. `lineage-qualification-v2.ts` consumes exact source binding, packet, proven membership, and exact indexed chunk-row identity; nullable revision mirrors remain diagnostics only.
+- Focused identity/lineage contract tests passed 17/17 using a single Vitest fork. The default worker-pool attempt was stopped after it expanded to many workers without producing test output; it is not counted as a test result.
+- Replayed the existing sealed overlay against current PostgreSQL in a `REPEATABLE READ READ ONLY` transaction. Receipt: `docs/reports/mapreduce-chunk-readiness-v2-20260927T232652Z.json`; row detail: `.tmp/atlas/mapreduce-chunk-readiness-v2/20260927T232652Z/readiness.ndjson`.
+- Result: 127 candidates / 1,520 chunks conserved; 1,520/1,520 packet and chunk lineage qualifications and `semantic_768` availability; 1,520 exact source-file digests; 0 immutable representation revisions; summaries missing 1,520/1,520; summary embeddings 1,338 missing / 182 unbound. Nullable chunk source/workspace revision mirrors remain null for all rows and are non-blocking diagnostics. Database and projection writes: 0.
+- This is a current-cohort read-only readiness replay, not corpus-wide readiness, encoder provenance, feature-matrix admission, scorer exposure, or retrieval-quality proof. Next work remains on the objective's large-corpus stream/enrichment path; do not promote these rows based on availability alone.
+
+### FEATURE-PROMOTION-READINESS-V2 / MAPREDUCE-CHUNK-READINESS-V3 (2026-09-27 PT; read-only contract, zero datastore writes)
+
+- **Supersession correction:** the 2026-09-27 V2 replay above is historical and is superseded for current semantic availability by `docs/reports/mapreduce-chunk-readiness-v3-20260928T012835Z.json`. Do not carry its `semantic_768 availability 1,520/1,520` statement forward as current-owner proof. V3 pins `codebase_chunk_index.content_embedding_768` (`vector(768)`) and reports 1,520/1,520 current-cohort rows missing that vector, quality `MISSING`, and representation binding `UNQUALIFIED_OR_INCOMPLETE`. Packet/chunk lineage remains qualified 1,520/1,520; all 127 files were rehashed and current source bytes match. V3 receipt checksum: `sha256:2451c6dd1671e649cabfe0076aeb087d333817465d8dacf1c56199d8308e847c`.
+- Added the pure Zod contract `sveltekit-frontend/src/lib/server/retrieval/feature-promotion-readiness-v2.ts`. It reports the highest contiguous evidence-backed stage across `ARTIFACT_ONLY` → `MATRIX_ADMITTED` → `SCORER_EXPOSED` → `PROMOTED`; a proven gate must cite evidence; the receipt checksum is verified; canonical authority and writes are fixed false. It references the current 768-D storage coordinate but does not own embeddings, persist state, perform admission, or invoke a scorer.
+- V3 is a readiness report, not a feature artifact, so the semantic materialization cohort is `NOT_READY` (no admitted feature artifact). This does not change the separate RF-04 legacy-summary artifact's historical `ARTIFACT_ONLY` status. Matrix admission remains blocked on current semantic input/provenance plus evidenced missing-value and placeholder policy; ContextManifest readback and production scorer caller are unproven; held-out relevance evaluation is deferred because eligible labels are absent; persistence authorization is deferred. MMR stays downstream of the retrieval evaluation gate. No inference, training, service call, database/cache/projection write, or promotion occurred.
+- This closes only the readiness-contract implementation/tests, not any live feature gate. Focused Vitest: 7/7; focused TypeScript no-emit check: PASS; strict OpenSpec validation: PASS; scoped `git diff --check`: PASS (Git reports only its normal LF→CRLF working-copy notice).
+- Added `scripts/atlas/diagnose-feature-promotion-readiness-v2.mts` and generated `docs/reports/feature-promotion-readiness-v2-20260928T020119Z.json` from the V3 receipt. The runner verifies the source-receipt checksum, row-detail checksum, expected `content_embedding_768` owner, zero-write evidence, and cohort counts before classifying gates. Independent replay produced the same readiness checksum `sha256:76e3f65b9032ed2aeb34c2853b056d73acf6633d9094e0bd70e786bf9d90eb87`: snapshot coordinates and chunk grain `PROVEN`; current semantic input provenance `BLOCKED`; feature artifact `OPEN`; matrix missingness/masking, ContextManifest readback, scorer caller `OPEN`; held-out evaluation and persistence `DEFERRED`; highest stage `NOT_READY`. This is a derived local diagnostic, not a materialized feature or admission receipt.
+- **WORKBOARD-PIVOT-20260928T020343Z:** refreshed the project-wide OpenSpec census with `scripts/atlas/build-openspec-workboard-v1.mjs`, writing timestamped JSON/Markdown snapshots only. The report sees 90 changes / 9,937 checklist entries (6,617 complete, 3,320 open; 2,480 actionable by its heuristics). Its scheduler selected zero tasks and the target change still has 39 open entries under the workboard parser versus 28 tasks in `openspec instructions apply`; these counts use different parsing scopes and are not interchangeable. The generated recommendation/controller fields are not authoritative selection because the receipt is unselected/stale; this run records the pivot to the feature-matrix change and the V3 readiness diagnosis, not scheduler approval or task completion. No task ledger was rewritten by the generator.
+- Refreshed runtime prerequisite with GET-only `/health` requests (no embedding text): strict `:8081` refused the connection; `:8097` returned `healthy`, `model_loaded=true`, `device=cpu`, with no model/tokenizer revision in that response. This does not alter the V3 diagnosis and is not an embedding or deployment proof. The live canary/materialization gates remain blocked; no service build, inference, datastore/cache/projection write occurred.
+
+### GAN-READINESS-V3-ADAPTER-01 / CURRENT READ-ONLY REPLAY (2026-09-28)
+
+- The GAN live-readonly runner previously accepted only `atlas.mapreduce-chunk-readiness-receipt.v2`; passing the current V3 receipt would silently produce `NOT_REMEASURED`. Added a small v2/v3 normalization boundary with fail-closed V3 checks for the exact current semantic owner, internal receipt checksum, full packet/chunk/source-byte counts, source-file rehash evidence, `canonicalAuthority=false`, and all write counters zero. Focused adapter tests: 6/6; `npx tsx --check scripts/atlas/prove-gan-audit-readonly-v1.mts` passed.
+- Fresh current-owner readiness replay rehashed 127 files and revalidated 1,520/1,520 packet, chunk, and source-byte bindings. `content_embedding_768` is missing/quality-missing on 1,520/1,520; representation binding is `UNQUALIFIED_OR_INCOMPLETE` on 1,520/1,520; summaries are missing 1,520/1,520 (summary vectors: 1,338 missing, 182 unbound). Receipt checksum `sha256:4644d89b121ed76e22a6c7ab5de5dab38217ef031a5120876612c2fc570d5712`: `docs/reports/mapreduce-chunk-readiness-v3-20260928T022535Z.json`.
+- The same-session feature readiness diagnostic remains `NOT_READY`; coordinates/grain are `PROVEN`, semantic input provenance `BLOCKED`, matrix/ContextManifest/scorer gates `OPEN`, and evaluation/persistence `DEFERRED`. Receipt: `docs/reports/feature-promotion-readiness-v2-20260928T022535Z.json`.
+- Fresh GAN audit against the explicitly named inventory, 16/16 adversarial fixture receipt, and V3 readiness receipt: `LIVE_READ_ONLY_PROVEN`; 61,718 rows read; 5 hard `ERR_INVALID_SOURCE_REF` findings; 56,719 rows were rejected only by the obsolete extension-only rule; all five consistency checks true. Structural lineage is `PROVEN` for this 127-candidate/1,520-chunk cohort. Semantic vectors remain missing and semantic projection is `NOT_EXERCISED`; the aggregate validation audit therefore remains `BLOCKED_SEMANTIC_PROJECTION_NOT_EXERCISED`. Final receipt after checksum-guard tests: `docs/reports/gan-readonly-live-proof-v1-20260928T022800Z.json`.
+- This is a bounded read-only proof, not corpus-wide semantic readiness or feature admission. PostgreSQL was read in a read-only transaction and rolled back; Postgres, Redis, NATS, Qdrant, Valkey, RabbitMQ, Neo4j, and Graphify writes are zero. No embedding/inference, DDL, backfill, cache/projection write, or promotion was attempted.

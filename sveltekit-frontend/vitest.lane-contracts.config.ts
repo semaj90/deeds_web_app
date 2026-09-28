@@ -38,6 +38,8 @@ export default defineConfig({
       'src/lib/server/cache/ace-top-retrieval-cache.spec.ts',
 		'src/lib/server/queue/**/*.spec.ts',
       'src/lib/server/analysis/ast-grep-extractor.lineage.spec.ts',
+      'src/lib/server/analysis/analysis-pass-results.idempotency.spec.ts',
+	  'src/lib/server/db/schema/analysis-pass-results.identity.spec.ts',
 		'src/lib/server/nlp/nlp-observation-lineage-v1.spec.ts',
 		'src/lib/server/embedding/semantic-embedding-cache-key-v2.spec.ts',
       'src/lib/server/graph/**/*.spec.ts',

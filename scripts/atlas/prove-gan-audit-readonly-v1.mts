@@ -20,6 +20,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { adaptGanLineageReadinessV1 } from './lib/gan-lineage-readiness-adapter-v1.mjs';
 import { validatePacketForAtlasV2 } from '../../packages/atlas-core/src/validation/packet-adversarial-validator-v2.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -54,23 +55,24 @@ function namedReceipt(flag: string): { path: string; sha256: string; body: Recor
 const adversarial = namedReceipt('--adversarial-receipt');
 const inventory = namedReceipt('--inventory-receipt');
 const lineageReadiness = namedReceipt('--lineage-readiness');
-const lineageMeasured = lineageReadiness?.body?.schema === 'atlas.mapreduce-chunk-readiness-receipt.v2'
-  && lineageReadiness.body.measured?.inputConserved === true
-  && lineageReadiness.body.writes?.postgres === 0
-  && lineageReadiness.body.canonicalAuthority === false;
+const normalizedLineage = lineageReadiness ? adaptGanLineageReadinessV1(lineageReadiness.body) : null;
+const lineageMeasured = normalizedLineage !== null;
 const chunkQualified = lineageMeasured
-  ? Number(lineageReadiness!.body.measured.chunkStates?.CHUNK_REVISION_QUALIFIED ?? 0) : 0;
+  ? Number(normalizedLineage!.chunkStates.CHUNK_REVISION_QUALIFIED ?? 0) : 0;
 const chunkNotQualified = lineageMeasured
-  ? Object.entries(lineageReadiness!.body.measured.chunkStates ?? {}).filter(([state]) => state !== 'CHUNK_REVISION_QUALIFIED').reduce((n, [, count]) => n + Number(count), 0) : 0;
+  ? Object.entries(normalizedLineage!.chunkStates).filter(([state]) => state !== 'CHUNK_REVISION_QUALIFIED').reduce((n, [, count]) => n + Number(count), 0) : 0;
 const structuralStatus = !lineageMeasured ? 'NOT_REMEASURED' : chunkNotQualified === 0 ? 'PROVEN' : chunkQualified > 0 ? 'PARTIAL' : 'BLOCKED';
 const structuralLane = lineageMeasured ? {
   status: structuralStatus, measuredHere: false, evidenceReceipt: { path: lineageReadiness!.path, sha256: lineageReadiness!.sha256 },
-  candidateCount: lineageReadiness!.body.candidateCount, chunkCount: lineageReadiness!.body.chunkCount,
-  counts: lineageReadiness!.body.measured.chunkStates,
-  sourceBindingQualifiedRows: lineageReadiness!.body.measured.packetStates?.PACKET_REVISION_QUALIFIED ?? 0,
-  semantic768: lineageReadiness!.body.measured.semantic768States,
-  summary: lineageReadiness!.body.measured.summaryStates,
-  summarySemantic: lineageReadiness!.body.measured.summarySemanticStates,
+  receiptVersion: normalizedLineage!.receiptVersion,
+  candidateCount: normalizedLineage!.candidateCount, chunkCount: normalizedLineage!.chunkCount,
+  counts: normalizedLineage!.chunkStates,
+  sourceBindingQualifiedRows: normalizedLineage!.packetStates.PACKET_REVISION_QUALIFIED ?? 0,
+  semantic768: normalizedLineage!.semantic768,
+  semantic768Quality: normalizedLineage!.semantic768Quality,
+  semanticRepresentationBinding: normalizedLineage!.semanticRepresentationBinding,
+  summary: normalizedLineage!.summary,
+  summarySemantic: normalizedLineage!.summarySemantic,
   reason: structuralStatus === 'PARTIAL' ? 'CANONICAL_CHUNK_ID_MISMATCH_REQUIRES_LINEAGE_RECONCILIATION' : null,
 } : { status: 'NOT_REMEASURED', measuredHere: false, reason: 'EXPLICIT_MAPREDUCE_CHUNK_READINESS_RECEIPT_NOT_SUPPLIED' };
 

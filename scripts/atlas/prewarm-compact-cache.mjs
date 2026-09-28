@@ -2,13 +2,13 @@
 /**
  * scripts/atlas/prewarm-compact-cache.mjs
  *
- * Pre-warms the Redis Hot Cache for the compact 384d Warden/Nomic routing lane
- * without using the GPU (bypassing embedding generation models when VRAM pressure is high).
+ * RETIRED: historical synthetic 384-D Warden/Nomic cache prewarm.
+ * This script generated mock vectors, not qualified semantic representations, and must not run.
  *
  * CANONICAL EMBEDDING: embeddinggemma:latest = 768-dim (Qdrant codebase_chunks_768)
- * ROUTING OPTIMIZATION: 384d Warden/Nomic lane is secondary for cost-optimized re-ranking
- * RETRIEVAL ORDER: 768d ANN (Qdrant) → 384d routing (Redis cache if available)
- * FINAL AUTHORITY: Qdrant 768d codebase_chunks_768 is always canonical for recall
+ * Canonical representation: semantic_768 / EmbeddingGemma.
+ * Derived comparisons: semantic_mrl_512/256/128 and learned latent_256/128/64.
+ * No synthetic or legacy 384-D cache vector is admissible as routing/retrieval evidence.
  */
 
 import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
@@ -21,6 +21,9 @@ const REPO_ROOT = resolve(__dirname, '../..');
 
 Object.assign(process.env, loadRepoEnv(process.env));
 const DRY_RUN = process.argv.includes('--dry-run');
+
+console.error('RETIRED_UNQUALIFIED_384_PREWARM: this script produced synthetic vectors and cannot populate the active semantic cache.');
+process.exit(78);
 
 // High-priority manifold anchor files to pre-warm
 const ANCHOR_FILES = [
@@ -37,14 +40,14 @@ async function runPrewarm() {
     port: parseInt(process.env.REDIS_PORT || process.env.VALKEY_PORT || '6379', 10),
     passwordSet: Boolean(process.env.REDIS_PASSWORD || process.env.VALKEY_PASSWORD),
   };
-  console.log('⚡ Starting Phase 12D: Compact 384d Warden/Nomic Cache Prewarm...');
+  console.log('RETIRED: historical synthetic 384-D cache prewarm is disabled.');
   console.log(`ℹ️ Redis Endpoint: ${config.host}:${config.port} (password: ${config.passwordSet ? 'set' : 'missing'})`);
 
   const report = {
     timestamp: new Date().toISOString(),
     canonicalEmbedding: 'embeddinggemma:latest (768-dim)',
     primaryVectorStore: 'Qdrant codebase_chunks_768',
-    routingOptimization: '384d Warden/Nomic (secondary, cost-optimized)',
+    routingOptimization: 'RETIRED_UNQUALIFIED_SYNTHETIC_384D',
     gpuUsageBypassed: true,
     totalKeysPrewarmed: 0,
     prewarmedKeys: [],
@@ -59,11 +62,11 @@ async function runPrewarm() {
     await redis.ping();
     console.log('✔️ Redis / BitFrost cache is active.');
 
-    // 2. Generate and write compact 384d mock/pre-calculated routing embeddings
+    // Unreachable legacy implementation retained for historical reference only.
     for (const filePath of ANCHOR_FILES) {
       const redisKey = `gpu:warden:cache:384d:${filePath}`;
       
-      // Generate a mock normalized 384d compact vector on CPU (reproducible seed based on string hash)
+      // Historical mock data only; this code is disabled by the module-level exit above.
       const vector = [];
       let hash = 0;
       for (let i = 0; i < filePath.length; i++) {
@@ -95,7 +98,7 @@ async function runPrewarm() {
       report.totalKeysPrewarmed++;
     }
 
-    console.log(`✔️ Successfully pre-warmed ${report.totalKeysPrewarmed} compact 384d routing keys in Redis.`);
+    console.log(`Historical mock cache entries observed: ${report.totalKeysPrewarmed}`);
     report.status = 'PASS';
   } catch (err) {
     console.error(`🔴 Cache prewarm failed: ${err.message}`);
@@ -118,7 +121,7 @@ async function runPrewarm() {
   }
 
   // Format MD Report
-  const mdContent = `# Compact 384d Warden Routing Cache Prewarm Report
+  const mdContent = `# Retired Synthetic 384-D Cache Prewarm (Noncanonical)
 
 ## Execution Summary
 - **Timestamp**: ${report.timestamp}

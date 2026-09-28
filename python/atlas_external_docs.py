@@ -548,9 +548,11 @@ def _heading_sections(text: str) -> list[tuple[tuple[str, ...], int, int, str]]:
         match = None if in_fence else re.match(r"^(#{1,6})\s+(.+?)\s*$", stripped)
         if match:
             if buffer:
-                body = "".join(buffer).strip()
+                raw_body = "".join(buffer)
+                leading_trim = len(raw_body) - len(raw_body.lstrip())
+                body = raw_body.strip()
                 if body:
-                    sections.append((section_heading, section_start, offset, body))
+                    sections.append((section_heading, section_start + leading_trim, offset, body))
             level = len(match.group(1))
             heading_stack = heading_stack[: level - 1] + [match.group(2).strip()]
             section_heading = tuple(heading_stack)
@@ -560,9 +562,11 @@ def _heading_sections(text: str) -> list[tuple[tuple[str, ...], int, int, str]]:
             buffer.append(line)
         offset += len(line)
     if buffer:
-        body = "".join(buffer).strip()
+        raw_body = "".join(buffer)
+        leading_trim = len(raw_body) - len(raw_body.lstrip())
+        body = raw_body.strip()
         if body:
-            sections.append((section_heading, section_start, len(text), body))
+            sections.append((section_heading, section_start + leading_trim, len(text), body))
     return sections or [(tuple(), 0, len(text), text)]
 
 

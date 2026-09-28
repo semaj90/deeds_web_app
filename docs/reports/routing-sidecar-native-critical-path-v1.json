@@ -1,0 +1,443 @@
+{
+  "schema": "atlas.routing-sidecar-native-critical-path.v1",
+  "generatedAt": "2026-09-27",
+  "scope": [
+    "parent-atlas-nlp-sidecar-feature-compiler",
+    "parent-atlas-observation-routing-fabric",
+    "parent-atlas-policy-routing-integration",
+    "parent-atlas-pass-fabric",
+    "parent-atlas-native-acceleration-cabi",
+    "parent-atlas-onnx-webgpu-embedding-promotion"
+  ],
+  "taskCensus": {
+    "source": "current openspec instructions apply task arrays; not attachment counts",
+    "total": 345,
+    "complete": 223,
+    "open": 122,
+    "reconciliation": {
+      "rawMarkdownCheckboxes": { "total": 351, "complete": 223, "open": 128 },
+      "activeInstructionTasks": { "total": 345, "complete": 223, "open": 122 },
+      "difference": "Six unchecked markdown boxes in the NLP ledger are not present in the current OpenSpec apply task array; use the active instruction task array for the workboard count and retain the raw checkbox count as a ledger-format discrepancy, not six additional active tasks."
+    },
+    "byChange": {
+      "parent-atlas-nlp-sidecar-feature-compiler": { "complete": 99, "total": 143 },
+      "parent-atlas-observation-routing-fabric": { "complete": 18, "total": 26 },
+      "parent-atlas-policy-routing-integration": { "complete": 35, "total": 40 },
+      "parent-atlas-pass-fabric": { "complete": 25, "total": 56 },
+      "parent-atlas-native-acceleration-cabi": { "complete": 36, "total": 63 },
+      "parent-atlas-onnx-webgpu-embedding-promotion": { "complete": 10, "total": 17 }
+    }
+  },
+  "ownershipBoundaries": {
+    "semanticRepresentation": {
+      "logicalRepresentation": "semantic_768",
+      "strictRuntimeAdapter": "sveltekit-frontend/src/lib/server/embedding/canonical-embed.ts::embedSemantic768Canonical",
+      "persistedCanonicalWriter": "UNPROVEN_FOR_FULL_COHORT",
+      "semanticCodeCardCaller": "NOT_FOUND",
+      "adapterProvenanceLimit": "modelArtifactRevision, tokenizerRevision, and inputPolicyRevision are supplied by the caller and returned in the result; the adapter does not independently attest those values against the encoder runtime artifact",
+      "authority": "runtime adapter identifies an executor boundary; it does not prove historical vector provenance, full-corpus writer ownership, or an attested encoder capability"
+    },
+    "passIdentity": {
+      "logicalIdentity": ["family", "passName", "passRevision"],
+      "executionIdentity": ["producerId", "producerRevision", "backend", "backendVersion", "device", "executionReceipt"],
+      "rule": "do not infer one from the other"
+    },
+    "sidecarHealth": {
+      "health": "process/readiness signal only",
+      "analyze": "separate request/response and pass-execution proof",
+      "rule": "health success does not prove /analyze behavior"
+    },
+    "acceleration": {
+      "nativeAndWebGPU": "execution challengers/providers",
+      "semanticAuthority": "unchanged logical semantic_768 representation and canonical identity/provenance owners",
+      "rule": "provider parity can support executor substitution but cannot promote representation identity or historical vectors"
+    }
+  },
+  "changeFindings": [
+    {
+      "change": "parent-atlas-nlp-sidecar-feature-compiler",
+      "status": "PARTIAL_BLOCKED",
+      "nextTask": "0.4 semantic_768 owner reconciliation",
+      "finding": "The strict :8081 embedding executor is identified, but no SemanticCodeCard-to-adapter caller exists. The 2026-09-27 writer census still selects no full-cohort writer across 19 writer/reference surfaces; it identifies competing PostgreSQL columns and mutation-capable paths. The adapter echoes caller-supplied model/tokenizer/input-policy revisions rather than independently attesting them. NLP task 3.2 now passes its bounded live HTTP acceptance: the existing `/analyze` linguistic pass returns scoped POS, noun-phrase, and dependency evidence with exact source revision/UTF8 byte-length binding, and code-symbol leakage is absent on the reviewed fixture. This is one-sample executor evidence, not corpus-wide accuracy or promotion. Semantic dispatch and owner promotion remain unauthorized.",
+      "evidence": [
+        "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md:200-218",
+        "sveltekit-frontend/src/lib/server/embedding/canonical-embed.ts:46-104",
+        "sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.ts:125-148",
+        "docs/reports/semantic-768-writer-ownership-v1.json:2026-09-27T10:04:55.939Z (READ_ONLY; 19 surfaces; OWNER_NOT_PROVEN)",
+        "scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs:57-79, 93-127 (its live census is SELECT-only, but the script writes a separate report and was not rerun)",
+        "python/miniforge_nlp_sidecar.py::_build_pass_results and `_linguistic_input` now attach `pos` plus source revision/UTF8 byte-coordinate metadata; `python/test_miniforge_nlp_sidecar_linguistic_scope.py` passed 7/7 inside the read-only sidecar container; direct container `_analyze` call on a revisioned comment fixture returned noun phrases and dependency edges with no function-symbol leakage",
+        "docker inspect: active 8095 process starts `miniforge_nlp_sidecar_oak.py`; that wrapper imports V2, whose `/analyze` delegates to the legacy implementation. This initially required a bounded reload; the following post-restart HTTP receipt supersedes the prior unverified status.",
+        "Live HTTP POST /analyze after bounded local sidecar restart: pos.source=spacy, scoped input hash present, noun phrases and dependency edges nonempty; source/masked UTF8 byte lengths both 187; no inspectLattice function-name leakage; exact fixture source revision sha256:75574ab504b3f25a3899cf13c793defa357efa4841113bfe8f2628c89cb49a22",
+        "scripts/atlas/audit-atlas-indexing-surfaces.mjs:175-200",
+        "docs/reports/atlas-canonical-projection-fabric-audit-2026-09-26.json: predicates.SEMANTIC_OWNER_PROVEN"
+      ]
+    },
+    {
+      "change": "parent-atlas-observation-routing-fabric",
+      "status": "FAIL_CLOSED_GUARD_PROVEN_OWNER_UNRESOLVED",
+      "nextTask": "ORF-2R observation repository reconciliation",
+      "finding": "The repository now requires explicit PACKET_KEY_ORF_V1 opt-in, preserves opaque text workspace revisions, rejects blank explicit filters, and refreshes source/version metadata on duplicate upsert consistent with the canonical Svelte materializer. The candidate_id-to-packet_key binding and staging-vs-canonical ownership remain unresolved. Drizzle and the runtime reader use text revisions, while an older unapplied manual SQL file declares integer; this is a migration discrepancy, not authority to alter the schema. Mocked-pool tests prove adapter behavior, not live database compatibility or identity parity. Independent ORF-3A read-only comparison completed across 852 external-doc chunks: all source vectors were nonzero 768-D with exact identity/checksum parity; normalized truncation to 512-D achieved sampled neighbor overlap 0.93125/0.91875/0.925 at K=5/10/20. This is projection parity only, not native 512 encoder provenance, relevance, or promotion evidence.",
+      "evidence": ["packages/parent-atlas/src/core/observation-feature-repository.ts and packages/parent-atlas/test/observation-feature-repository.test.mjs (explicit schema gate, text revision preservation, and strict filter; 5 repository tests passed)", "sveltekit-frontend/src/lib/server/db/schema/atlas-observation-feature-rows.ts:22-26 and sveltekit-frontend/src/lib/server/atlas/retrieval/orf-feature-row-reader-v1.ts:110-114 (text revision owner/consumer)", "sveltekit-frontend/drizzle/manual/20260819_atlas_observation_feature_rows.sql:12 (unapplied integer declaration)", "openspec/changes/parent-atlas-observation-routing-fabric/tasks.md:114-119, 181-183", "docs/reports/external-doc-768-to-512-dry-run-v1.json (live read-only receipt; 852 chunks, 32 queries, zero writes)"]
+    },
+    {
+      "change": "parent-atlas-policy-routing-integration",
+      "status": "PRT8_GEOMETRY_INPUT_BOUNDARY_PROVEN_EXPERIMENTS_HELD",
+      "nextTasks": ["QLoRA trainer consumes the checkpoint/action-mask admission", "PPO replayable reward environment", "KMeans-seeded SOM artifact"],
+      "finding": "A deterministic policy-decision receipt is fixture-proven under shuffled async input completion and binds state/feature revisions, explicit policy/weights revision, and sorted upstream input checksums. PRT8 proves SOM/topology coordinates remain derived and excluded from the policy-state tensor; bounded backend-neutral JVP/VJP diagnostics now validate explicit samples without materializing a Jacobian. The DSPy/GEPA policy boundary is fixture-proven as shadow-only and cannot bypass legal transitions, exact promotion, or mutation gates. A new pure QLoRA admission contract rejects already-quantized source checkpoints and changed/stale per-state action masks; it is not yet consumed by a trainer, and no training or promotion was run. PPO remains blocked pending a stable replayable reward environment; full query-to-tool E2E is still open.",
+      "evidence": ["openspec/changes/parent-atlas-policy-routing-integration/tasks.md:83-115", "sveltekit-frontend/src/lib/server/atlas/policy/qlora-admission-v1.ts and .spec.ts (5 focused tests; trainer consumer remains absent)", "sveltekit-frontend/src/lib/server/atlas/policy/aligned-policy-lanes.ts::DspyPolicyAuthorityV1Schema/dspyShadowAuthority plus aligned-policy-lanes.spec.ts (7/7 focused tests)", "sveltekit-frontend/src/lib/server/atlas/policy/policy-decision-receipt-v1.ts and .spec.ts (three focused tests; no datastore writes or model calls)", "sveltekit-frontend/src/lib/server/atlas/policy/directional-diagnostics.ts and .spec.ts (3 directional diagnostic tests; bounded JVP/VJP samples, no Jacobian materialization)", "sveltekit-frontend/src/lib/server/atlas/policy/policy-state.ts and policy-state.spec.ts (SOM/topology fields excluded; 3/3 tests)", "packages/parent-atlas/src/core/atlas-topology-v1.ts::SomTopologySnapshotV1 is derived and non-canonical"]
+    },
+    {
+      "change": "parent-atlas-pass-fabric",
+      "status": "TASK_ACCEPTANCE_STALE_OR_MISMATCHED",
+      "nextTask": "PF2 gate-fill acceptance reconciliation",
+      "finding": "The acceptance names embed_gate 0/3, entity_gate 0/2 and forensics_gate 0/4. Current worker stageConfig has no embedding job type; its configured stages use entityGate, forensicsGate and summarizeGate, with free capacity accounting activeCount plus pendingCount. A bounded fixture now proves 2 entity and 4 forensics jobs are admitted in one poll; the 30-second fallback timer is fake-clock proven, while live PostgreSQL enqueue-to-worker latency remains open. The requested embed dispatch proof cannot be claimed from this worker configuration. The read-only PF4B census now separates all 47 duplicate groups/97 rows: cache_push (10 groups/20 rows) and test-orchestrator embedding (10/20) are identical-output test executions without queue IDs; the remaining 27 embedding groups/57 rows come from queue_consumer_embedding_batch and carry 2-3 distinct queue_message_ids per logical group, with 18 identical-output groups and 9 output-varying groups. This establishes execution-history shape and rules out a single repeated queue-message ID as the explanation, but does not identify why equivalent inputs were enqueued or explain output variation. PF4B remains open for that cause. PF4D's read-only historical revision census found 11,076/11,076 legacy rows with both revision columns NULL, no explicit source/pass revision in legacy provenance, and no exact source-binding observation at or before the pass execution; 1,304 current packet/source joins are all updated after the pass and are not safe historical substitutes. PF4D is closed as zero evidence-backed recovery candidates; no database mutation occurred.",
+      "evidence": [
+        "openspec/changes/parent-atlas-pass-fabric/tasks.md:317-326",
+        "sveltekit-frontend/src/lib/server/analysis/worker.ts:286-395",
+        "sveltekit-frontend/src/lib/server/analysis/concurrency-gate.ts:13-44",
+        "sveltekit-frontend/tests/lane-contracts/analysis-worker-wakeup.spec.ts (3/3 tests: timer boundary, notification callback dispatch, and 2/4 one-poll stage capacity; claims/listener mocked; no job handler execution)",
+        "Read-only PostgreSQL aggregate, 2026-09-27: cache_push 10 groups/20 rows are test_orchestrator executions with input_kind=cache_push, no queue ID, and identical outputs; embedding includes 10 test_orchestrator groups/20 rows with input_kind=embedding and identical outputs plus 27 queue_consumer_embedding_batch groups/57 rows with 2-3 distinct queue IDs per group (18 groups/36 rows identical outputs; 9 groups/21 rows varying outputs). No source/pass revision, model, or prompt variation was observed. PF4D query: 11,103 total rows, 27 both-qualified, zero source-only/pass-only, and 11,076 both-null; among the legacy rows, 1,304 packet/source exact matches have current packet revisions but every matched packet updated after pass creation; zero exact atlas_workspace_source_bindings match had an observation timestamp at or before pass creation; zero legacy provenance rows carried source_revision/sourceRevision/pass_revision/passRevision. Query ran in explicit BEGIN READ ONLY with default_transaction_read_only=on and returned aggregates only. PF4B's exact enqueue/output-variation cause remains unresolved; PF4D closes as no historically recoverable values, not as a backfill."
+      ]
+    },
+    {
+      "change": "parent-atlas-native-acceleration-cabi",
+      "status": "P0.1_PROVEN; P0.2_BLOCKED_ZERO_IDENTITY_OWNER_ROWS; P2.6_MSGPACK_CODEC_PROVEN",
+      "nextTasks": ["P0.2 canonical identity owner/crosswalk resolution (blocked on zero exact matches and empty stable-file owner tables)", "P2.2 sparse similarity graph semantics/API scoping (contract details still missing)", "P4b.3 KAG indexing owner and exact evidence-pointer resolution"],
+      "finding": "P0.1 has an additive, fixture-proven discriminated identity schema. A live READ ONLY census of 274465 codebase_chunk_index rows found zero exact atlas_symbol_versions matches and zero exact atlas_packets source matches under complete identity/revision predicates; atlas_repository_identity, atlas_stable_file_identity, and atlas_stable_file_revision_binding each contain zero rows, while atlas_workspace_source_bindings has 47936 path/revision bindings that do not mint stable_file_id. P0.2/P0.4 therefore remain blocked and the legacy envelope stays in place. On the independent compute-only track, P2.6 now has deterministic `atlas.execution-receipt.v1` MessagePack encode/decode, strict schema validation, module-owned output buffers, C ABI fixtures passing in Debug/Release, and interoperability readback with the installed JavaScript MessagePack decoder in BigInt mode. No receipts were persisted. P1.1-P1.7 include bounded local CUDA execution/parity evidence: 14 deterministic operation fixtures passed against independent scalar oracles, CUDA branch counters were observed for 11 LibTorch GPU operations, batch cosine classified CUDA_LIVE with parity MATCH, and graph similarity classified CPU_FALLBACK. The independent compute-only P2 contract has opaque handles, stable enums, versioned options/receipts/buffers, module-owned allocation/release, and a C-compiled lifecycle smoke test. P2b.2 adds versioned representation-bound build/compute request envelopes and a precompute validator; this is contract proof, not compute implementation. P2b.4 preserves distinct NOT_IMPLEMENTED/LIBTORCH_CPU/NOT_PROVEN claims. P4b.1/P4b.2 tuple schema and exact byte-span binder are fixture-proven; P4b.4 documentation is complete. P4.3 has a separate Native Dawn target contract, DESIGN_ONLY_NOT_IMPLEMENTED; no Dawn build or viewer implementation is claimed. P4b.3 remains open. No datastore writes; no graph/GPU operation is implemented by atlas_core and no runtime authority is promoted.",
+      "evidence": [
+        "openspec/changes/parent-atlas-native-acceleration-cabi/tasks.md:3, 11, 41-56, 82-85",
+        "sveltekit-frontend/src/lib/server/retrieval/feature-envelope.ts::FeatureEnvelopeIdentityV1Schema and tests/lane-contracts/feature-envelope-identity-v1.spec.ts (4/4 contract fixtures; legacy schema unchanged)",
+        "native/atlas_core/include/atlas_core.h and src/atlas_core.cpp::atlas_receipt_encode_msgpack_v1/decode; C ABI tests pass Debug/Release and external @msgpack/msgpack decode with BigInt uint64 mode",
+        "packages/semantic-contracts/src/evidence-tuple-v1.ts and .test.ts; packages/semantic-contracts/schemas/evidence-tuple-v1.schema.json; package TypeScript compilation and 4 focused tests passed",
+        "sveltekit-frontend/scripts/startup/miniforge-nlp-health.mjs and .test.mjs (six focused assertions; both startup callers import the shared probe; syntax checks passed)",
+        "openspec/changes/parent-atlas-native-acceleration-cabi/tasks.md:174",
+        "openspec/changes/parent-atlas-native-acceleration-cabi/design.md:112-116",
+        "scripts/gpu/prove-native-gpu-numerical-parity.mjs (14 operation fixtures; CUDA branch counters observed for 11)",
+        "scripts/startup-gpu-bridge-probe.mjs (.tmp receipt: batchCosineSimilarity CUDA_LIVE/MATCH/cuda_execution=1; graphSimilarity CPU_FALLBACK/MATCH)",
+        "docs/reports/native-addon-contract-audit.json and docs/reports/native-gpu-numerical-parity.json (P1.7 receipts)",
+        "simd-bridge/cpp/binding.cc:1445-1451 (SIMD_HAVE_CUBLAS metadata check)",
+        "simd-bridge/cpp/CMakeLists.txt:210-219, 428-432 (cuBLAS discovery/link)",
+        "simd-bridge/cpp/libtorch_graph_impl.cpp::getCudaMemory now delegates to atlasGetCudaRuntimeInfo; bounded probe read 5,820/8,191 MiB",
+        "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts (native CPU-owned exports fail closed to CPU oracle)",
+        "simd-bridge/cpp/graph_fallback_stubs.cpp:145-160",
+        "native/atlas_core/include/atlas_core.h; native/atlas_core/src/atlas_core.cpp; native/atlas_core/tests/atlas_core_c_abi_test.c; native/atlas_core/CMakeLists.txt (standalone C ABI contract, representation mismatch receipts, lifecycle test, and dependency boundary)",
+        "docs/architecture/parent-atlas-unreal-client-contract-v1.md (design-only client boundary; no runtime implementation)",
+        "docs/architecture/parent-atlas-native-dawn-viewer-contract-v1.md (separate target/read-only projection boundary; design only)",
+        "scripts/atlas/native-addon-probe-classification.mjs and scripts/atlas/native-addon-probe-classification.test.mjs (tri-state separated probe claims; 6 tests passed)"
+      ]
+    },
+    {
+      "change": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "status": "CANONICAL_ONNX_PATHS_QUARANTINED_BROWSER_PREVIEW_BOUNDARY_PROVEN_PARITY_AND_INPUT_PLAN_OPEN",
+      "nextTasks": ["task 1 permission reload (operator/session state)", "task 3 challenger input/provider contract", "tasks 7-8 parity execution evidence"],
+      "finding": "Current source inspection found and closed two canonical call paths that had returned the known off-space local ONNX vector as EmbeddingGemma: embeddings/ollama.ts::tryEmbedCanonical and grpc/embedding-client.ts::generateEmbeddings. The second path could also write the vector to the shared embed cache; new ONNX canonical use is removed and structured onnx-local cache entries are ignored, not deleted. ONNX remains available only through tryEmbedOnnxChallenger with canonicalAuthority=false and promotionEligible=false. Task 3 remains open because batchEmbedOnnx still accepts raw text, the CPU executor does not provide a revision-bound runtime receipt, and existing ONNX output is not proven equivalent to semantic_768. Tasks 12-15 define a strict preview entry, dedicated typed client IndexedDB adapter, opt-in session Map fallback, and metadata-only artifact handling through the existing Transformers runtime boundary. Tasks 16-17 now have real isolated-browser IndexedDB reload/replay proof and an enforced local-preview/non-promotion boundary. Twenty focused Vitest tests, one Chromium replay test, and a focused TypeScript check of the client store/checksum/test/config files pass. A broader standalone tsc attempt including server modules could not resolve SvelteKit $lib aliases and is not a SvelteKit project typecheck. No model/provider call, permission reload, production browser-profile storage, server cache operation, or promotion occurred.",
+      "evidence": ["openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md:38-61, 215-267", "sveltekit-frontend/src/lib/server/embedding/onnx-embed.ts:26-27, 75-85, 127-210, 228-233", "sveltekit-frontend/src/lib/server/embedding/canonical-embed.ts:45-60, 152-165", "sveltekit-frontend/src/lib/server/embedding/canonical-embed.spec.ts (non-canonical challenger assertion)", "sveltekit-frontend/src/lib/server/embeddings/ollama.ts::tryEmbedCanonical", "sveltekit-frontend/src/lib/server/grpc/embedding-client.ts::generateEmbeddings and getCachedEmbeddingEntry", "sveltekit-frontend/src/lib/server/embeddings/ollama.spec.ts (2 mocked no-inference regressions)", "sveltekit-frontend/src/lib/ai/client-inference-cache-entry-v1.ts and .spec.ts (4 schema/boundary tests plus deterministic checksum/key helpers)", "sveltekit-frontend/src/lib/ai/client-inference-store-v1.ts and .spec.ts (4 adapter/fallback tests)", "sveltekit-frontend/tests/e2e/client-inference-store-v1.spec.ts and playwright.client-inference.config.ts (real IndexedDB replay/reload test in isolated Chromium context)", "sveltekit-frontend/package.json (@huggingface/transformers 4.2.0) and src/lib/ai/gemma4-e2b-client.ts::from_pretrained"]
+    }
+  ],
+  "completedBoundedGates": [
+    {
+      "gate": "NATIVE-P0.2-STABLE-FILE-CROSSWALK-READONLY-01",
+      "result": "OWNER_TABLES_EMPTY; exact symbol and packet join counts are zero; 47936 workspace path/revision bindings do not provide stable-file identity.",
+      "writesPerformed": false
+    }
+  ],
+  "readyBoundedGates": [],
+  "decisionGates": [
+    {
+      "gate": "NLP-SEMANTIC-WRITER-OWNER-DECISION",
+      "status": "REQUIRES_OWNER_DECISION",
+      "scope": "select or formally define the single revision-qualified full-cohort writer and encoder-attested provenance contract before SemanticCodeCard dispatch",
+      "whyNotAutonomous": "The current read-only writer receipt identifies multiple mutation-capable paths, distinct populated vector columns, and no selected owner; source edits cannot resolve organizational/canonical authority safely."
+    }
+  ],
+  "prohibitedOrDeferred": [
+    "database migrations or production writes",
+    "Qdrant, Valkey, or Redis mutation/cache warming",
+    "model inference, semantic materialization, or model promotion",
+    "enabling the legacy observation repository",
+    "claiming Pass Fabric embed_gate acceptance when no embed stage is configured",
+    "claiming broad/application CUDA or WebGPU liveness from compile/export/shape evidence; only bounded named counter-plus-parity canaries support local export claims",
+    "changing QUERY-RADIX or merging routing, taxonomy, helper, executor, and fusion-lane owners"
+  ],
+  "likely_cause": "The six workboards mix proven contracts with unresolved runtime owners and stale or mismatched acceptance gates; canonical semantic writing and Native identity hydration both lack live identity/provenance bindings.",
+  "evidence": [
+    "Fresh OpenSpec apply arrays for all six changes: 223/345 complete, 122 open after Native P2.6; raw Markdown checkboxes are 223/351 complete, 128 open because six unchecked NLP boxes are not in the active task array.",
+    "Native execution-receipt codec passed C ABI tests in Debug and Release and decoded with the installed JavaScript MessagePack implementation using BigInt mode for uint64; all writes were local build/test artifacts only. Native P0.2 live identity census was SELECT-only and rolled back.",
+    "Semantic writer receipt generated 2026-09-27T10:04:55.939Z: 19 writer/reference surfaces, selectedWriter=null, OWNER_NOT_PROVEN, writesPerformed=false; not rerun because its script writes a separate report.",
+    "canonical-embed.ts calls /tokenize and /v1/embeddings and validates vector dimension/normalization, but returns caller-supplied artifact/tokenizer/input-policy revisions without encoder-side attestation.",
+    "Out-of-tree CPU-fallback and CUDA-enabled builds succeeded. The bounded CUDA add-on fixture proved 11 CUDA execution branches with numerical parity; the startup probe classified batch cosine CUDA_LIVE only with parity and counters, and graph similarity CPU_FALLBACK. cuBLAS metadata now reads true under the actual CMake macro.",
+    "Pass worker configuration has no embedding job stage although PF2 acceptance expects embed_gate dispatch. The PF4B SELECT-only census found test-orchestrator copies and queue-consumer executions with distinct queue-message IDs, confirming append-only execution-history shape; it did not identify why equivalent inputs were enqueued or explain nine output-varying embedding groups, so PF4B remains open.",
+    "Native P0.1 adds FeatureEnvelopeIdentityV1Schema with symbol/file/chunk discrimination and 4/4 fixtures; the old hydration schema remains compatible until the canonical join/cutover gates. Native P2.1/P2b.1/P2b.2/P2b.3 passed the standalone C ABI contract/smoke and source/build dependency audit; P2b.4 probe-claim separation passed 6 focused Node tests; P4.2 is documented as design-only. The QLoRA admission contract passed 5 focused contract tests and checks exact action-mask contents/checksum plus a non-quantized base checkpoint, but no trainer consumes it. PRT9 task 40 has a revision-bound deterministic decision-receipt fixture. A full SvelteKit TypeScript check was started but stopped after extended no-output execution; treat it as unverified."
+  ],
+  "patch_targets": [
+    "scripts/atlas/orf3a-external-doc-768-512-dry-run-v1.mjs",
+    "scripts/atlas/orf3a-external-doc-768-512-dry-run-v1.test.mjs",
+    "docs/reports/external-doc-768-to-512-dry-run-v1.json",
+    "sveltekit-frontend/scripts/startup/miniforge-nlp-health.mjs",
+    "sveltekit-frontend/scripts/startup/miniforge-nlp-health.test.mjs",
+    "sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs",
+    "sveltekit-frontend/scripts/startup/dev-gpu-runtime.mjs",
+    "packages/semantic-contracts/src/evidence-tuple-v1.ts",
+    "packages/semantic-contracts/src/evidence-tuple-v1.test.ts",
+    "packages/semantic-contracts/src/index.ts",
+    "packages/semantic-contracts/schemas/evidence-tuple-v1.schema.json",
+    "packages/semantic-contracts/package.json",
+    "docs/reports/routing-sidecar-native-critical-path-v1.json",
+    "docs/reports/native-addon-contract-audit.json",
+    "docs/reports/native-addon-contract-audit.md",
+    "docs/reports/native-gpu-numerical-parity.json",
+    "docs/reports/native-gpu-numerical-parity.md",
+    "native/atlas_core/CMakeLists.txt",
+    "native/atlas_core/include/atlas_core.h",
+    "native/atlas_core/src/atlas_core.cpp",
+    "native/atlas_core/tests/atlas_core_c_abi_test.c",
+    "scripts/atlas/native-addon-probe-classification.mjs",
+    "scripts/atlas/native-addon-probe-classification.test.mjs",
+    "scripts/startup-gpu-bridge-probe.mjs",
+    "docs/architecture/parent-atlas-unreal-client-contract-v1.md",
+    "sveltekit-frontend/src/lib/server/embedding/onnx-embed.ts",
+    "sveltekit-frontend/src/lib/server/embedding/canonical-embed.ts",
+    "sveltekit-frontend/src/lib/server/embeddings/ollama.ts",
+    "sveltekit-frontend/src/lib/server/embeddings/ollama.spec.ts",
+    "sveltekit-frontend/src/lib/ai/client-inference-cache-entry-v1.ts",
+    "sveltekit-frontend/src/lib/ai/client-inference-cache-entry-v1.spec.ts",
+    "sveltekit-frontend/src/lib/ai/client-inference-store-v1.ts",
+    "sveltekit-frontend/src/lib/ai/client-inference-store-v1.spec.ts",
+    "sveltekit-frontend/tests/e2e/client-inference-store-v1.spec.ts",
+    "sveltekit-frontend/playwright.client-inference.config.ts",
+    "sveltekit-frontend/src/lib/server/grpc/embedding-client.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/policy-decision-receipt-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/policy-decision-receipt-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/policy-router.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/qlora-admission-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/qlora-admission-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/feature-envelope.ts",
+    "sveltekit-frontend/tests/lane-contracts/feature-envelope-identity-v1.spec.ts",
+    "openspec/changes/parent-atlas-policy-routing-integration/tasks.md",
+    "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
+    "openspec/changes/parent-atlas-native-acceleration-cabi/tasks.md",
+    "openspec/changes/parent-atlas-native-acceleration-cabi/specs/native-acceleration-core/spec.md",
+    "simd-bridge/cpp/CMakeLists.txt",
+    "simd-bridge/cpp/binding.cc",
+    "simd-bridge/cpp/native_runtime_info.h",
+    "simd-bridge/cpp/native_runtime_info.cu",
+    "simd-bridge/cpp/libtorch_graph_impl.cpp",
+    "simd-bridge/cpp/graph_fallback_stubs.cpp",
+    "sveltekit-frontend/src/lib/server/analysis/worker.ts",
+    "sveltekit-frontend/src/lib/server/analysis/concurrency-gate.ts"
+  ],
+  "safe_next_command": "Use the refreshed OpenSpec task arrays to select the next independent bounded gate; keep Native P0.2 hydration blocked until canonical stable-file/symbol identities and exact source/revision joins exist.",
+  "smoke_command": "cmake -S native/atlas_core -B $env:TEMP/atlas-core-receipt-check -DBUILD_TESTING=ON; cmake --build $env:TEMP/atlas-core-receipt-check --config Debug; ctest --test-dir $env:TEMP/atlas-core-receipt-check -C Debug --output-on-failure; openspec validate parent-atlas-native-acceleration-cabi --strict",
+  "report_path": "docs/reports/routing-sidecar-native-critical-path-v1.json",
+  "workspaceFilesModified": true,
+  "runtimeWritesPerformed": false,
+  "modelCalls": 0,
+  "databaseWrites": 0,
+  "projectionWrites": 0,
+  "nativeP02JoinReview": {
+    "status": "NO_EXACT_LIVE_SYMBOL_OR_PACKET_JOIN; STABLE_FILE_CROSSWALK_UNRESOLVED",
+    "reviewedAt": "2026-09-27",
+    "finding": "Do not add the hydration JOIN yet. hydrate-candidates.ts currently reads only codebase_chunk_index and its row normalizer can substitute packet_key/row.id for symbol_version_id. A bounded live REPEATABLE READ READ ONLY transaction confirmed all seven relevant relations exist and examined 274465 codebase_chunk_index rows: exact symbol-version join on chunk/source/source-revision/workspace-revision matched 0 rows; exact packet/source join matched 0 rows. A follow-up schema/owner census confirmed atlas_repository_identity, atlas_stable_file_identity, and atlas_stable_file_revision_binding each contain 0 rows; atlas_workspace_source_bindings contains 47936 path/revision bindings. Those bindings do not mint stable_file_id, so they cannot satisfy the discriminated file/chunk identity contract. This is a current owner-population gap, not evidence that legacy packet/chunk fields may be treated as stable identity. Existing older audit evidence warns that tree-node-only symbol joins can be ambiguous and is not treated as a current cardinality receipt.",
+    "evidence": [
+      "sveltekit-frontend/src/lib/server/retrieval/hydrate-candidates.ts:264-307 reads codebase_chunk_index only; lines 91-108 allow packet_key/row.id fallbacks for symbolVersionId",
+      "sveltekit-frontend/src/lib/server/db/schema/atlas-structural-intelligence.ts:48-78 defines symbol-version identity and source/chunk fields",
+      "docs/reports/stable-file-schema-ddl-v1.sql:21-47 binds stable file identity through repository, canonical source, source/workspace revisions",
+      "Live aggregate-only census: codebase_chunk_index=274465; exact atlas_symbol_versions join=0 matched / 274465 unmatched / 0 ambiguous; exact atlas_packets source join=0 matched / 274465 unmatched / 0 ambiguous; atlas_repository_identity=0, atlas_stable_file_identity=0, atlas_stable_file_revision_binding=0, atlas_workspace_source_bindings=47936",
+      "Transaction was REPEATABLE READ READ ONLY and rolled back; no writes were performed"
+    ],
+    "writesPerformed": false,
+    "safeNextAction": "Keep Native P0.2 blocked until an authorized producer establishes canonical repository and stable-file identities or a current symbol-version source crosswalk. Do not infer stable identity from path/revision bindings, add joins, or apply migrations."
+  },
+  "nativeComputeExportsInvoked": 16,
+  "gpuExecution": true,
+  "gpuExecutionScope": "16 bounded parity/probe operation cases on one explicit out-of-tree RTX 3060 Ti addon; not production or workload-scale liveness",
+  "currentTurnProgress": {
+    "taskCensus": {
+      "activeOpenSpecTasks": 345,
+      "complete": 223,
+      "open": 122,
+      "source": "openspec instructions apply task arrays for the six scoped changes"
+    },
+    "domainReviewSheet": {
+      "status": "IMPLEMENTATION_PROVEN_LABELING_STILL_OPEN",
+      "focusedEvaluatorTests": "9/9",
+      "artifact": "docs/reports/domain-review-sheet-v1.html",
+      "humanGoldLabelsCreated": false,
+      "writesPerformed": false,
+      "evidence": [
+        "scripts/atlas/build-domain-review-sheet-v1.mjs syntax check passed",
+        "generated HTML verified for offline label, blind mode, localStorage, textContent rendering and JSONL export",
+        "python -m unittest test_atlas_domain_classifier_eval_v1 -v passed from python/"
+      ]
+    },
+    "nlpSidecarLinguisticCanary": {
+      "status": "LIVE_WIRING_PROVEN_QUALITY_GATE_OPEN",
+      "endpointOwner": "miniforge-nlp-sidecar:8095",
+      "sourceRef": "python/atlas_contextual_feature_reference.py#L72-L95",
+      "sourceRevision": "sha256:5bd110acedb4309473ecad7f9db0509862382c98221051feb19d39ff6ac04d24",
+      "analyzeReceipt": {
+        "sourceType": "codebase",
+        "isCode": true,
+        "passCount": 1,
+        "family": "linguistic",
+        "backend": "spacy",
+        "inputScope": "comments_docstrings_strings_query_text",
+        "inputHash": "e0c667733716baee8b5299a04cd62bbe9d313279781f9cc268cb2ef84af8af86",
+        "sourceRevisionEchoMatched": true
+      },
+      "posReceipt": {
+        "source": "spacy",
+        "nonEmptyNounPhrases": true,
+        "dependencyParserAvailable": true,
+        "coordinateBasis": "UTF8_BYTES",
+        "qualityIssues": [
+          "Normalize was classified as PROPN",
+          "R4 and S3 were treated as proper nouns",
+          "technical vocabulary received inconsistent POS labels"
+        ]
+      },
+      "safety": {
+        "llmGenerationCalls": 0,
+        "databaseWrites": 0,
+        "cacheOrProjectionWrites": 0,
+        "groundedExtractionRequested": false,
+        "canonicalAuthority": false
+      },
+      "action": "NLP task 3.2 is closed at its explicit single-fixture live acceptance: scoped POS, noun phrases, dependency edges, UTF8 byte binding, and no code-symbol leakage. Held-out linguistic accuracy remains unproven and is not claimed."
+    },
+    "passWorkerFallbackTimer": {
+      "status": "UNIT_PROVEN_LIVE_LATENCY_OPEN",
+      "test": "sveltekit-frontend/tests/lane-contracts/analysis-worker-wakeup.spec.ts",
+      "proof": "Real startWorker() with fake clock: no additional poll at 29,999 ms; next poll at 30,000 ms. Notification callback also triggers a poll in the fixture.",
+      "jobClaimsMocked": true,
+      "postgresListenerMocked": true,
+      "liveEnqueueLatencyProven": false,
+      "datastoreWrites": 0
+    },
+    "passWorkerBatchDispatch": {
+      "status": "ENTITY_AND_FORENSICS_FIXTURE_PROVEN_EMBED_STAGE_ABSENT",
+      "test": "sveltekit-frontend/tests/lane-contracts/analysis-worker-wakeup.spec.ts",
+      "onePollClaims": { "entity_extraction": 2, "forensics": 4 },
+      "jobHandlersInvoked": false,
+      "databaseWrites": 0,
+      "embeddingStageConfigured": false
+    },
+    "nativeExecutionReceiptMsgpack": {
+      "status": "PROVEN",
+      "cAbiDebug": "PASS",
+      "cAbiRelease": "PASS",
+      "externalMessagePackDecode": "PASS_WITH_BIGINT_UINT64",
+      "datastoreWrites": 0,
+      "canonicalEnvelopeMutation": false
+    },
+    "semanticWriter": {
+      "status": "OWNER_NOT_PROVEN",
+      "selectedWriter": null,
+      "evidence": [
+        "docs/reports/semantic-768-writer-ownership-v1.json: selectedWriter=null, status=OWNER_NOT_PROVEN",
+        "SemanticCodeCard is declared in nlp-feature-compiler.ts but has no caller in the reviewed runtime paths",
+        "canonical-embed.ts callers are query/retrieval/context/research paths, not a SemanticCodeCard full-cohort writer"
+      ],
+      "action": "leave NLP task 0.4 open; do not dispatch or retroactively qualify vectors"
+    },
+    "gpuExecutorOwnership": {
+      "status": "SOLE_LIVE_ENDPOINT_OWNER_CAPABILITY_LIMITED",
+      "endpoint": "127.0.0.1:8098",
+      "liveContainer": "atlas-gpu-8098:26.08-cuda12-py3.13",
+      "livePortOwners": 1,
+      "wslUbuntuState": "STOPPED",
+      "health": {
+        "ok": true,
+        "cudaAvailable": true,
+        "device": "NVIDIA GeForce RTX 3060 Ti",
+        "torchAvailable": false,
+        "writes": { "postgres": false, "qdrant": false, "valkey": false }
+      },
+      "graphCapabilities": {
+        "available": true,
+        "backend": "cugraph.pagerank",
+        "backendVersion": "26.08.00",
+        "algorithmRevision": "atlas.cugraph-pagerank.v1"
+      },
+      "classification": "Primary live owner of the existing 8098 graph-executor surface only; not proven as the general PyTorch/cuVS executor because torch is unavailable. WSL and Python sidecar references are not additional live 8098 owners in this census.",
+      "writesPerformed": false,
+      "modelCallsPerformed": false,
+      "evidence": [
+        "docker ps: exactly one container publishes host port 8098, atlas-gpu-8098",
+        "GET http://127.0.0.1:8098/health returned ok=true, cudaAvailable=true, torchAvailable=false and all datastore writes=false",
+        "GET /v1/graph/capabilities returned available=true, backend=cugraph.pagerank, backendVersion=26.08.00",
+        "wsl --list --verbose: Ubuntu Stopped; docker-desktop Running",
+        "Get-NetTCPConnection plus process inspection identified Docker backend/WSL relay listeners, not a second Python sidecar process"
+      ],
+      "action": "Do not route PyTorch/cuVS work or replace/promote an image from this result. Keep the broad GPU ABI gate open; this closes only live 8098 endpoint ownership classification."
+    },
+    "nativeAcceleration": {
+      "p0_1": "BLOCKED_EXTERNAL_UNSIGNED_CANONICAL_IDENTITY_SPEC",
+      "p2_2": "CONTRACT_SCOPE_REQUIRED_BEFORE_IMPLEMENTATION",
+      "p2_2MissingContractDetails": [
+        "directed versus symmetric edge semantics",
+        "self-edge policy",
+        "deterministic tie ordering at the per-row neighbor cap",
+        "input/output buffer layout and bounded size limits"
+      ],
+      "evidence": [
+        "native/atlas_core/include/atlas_core.h has no similarity-graph request, CSR result, or build function",
+        "native-acceleration-core spec names threshold and max_neighbors_per_row but does not settle the listed behavior",
+        "tasks.md handoff explicitly requires scoping the sparse-graph C ABI contract before P2.2"
+      ],
+      "action": "do not implement P2.2 or redefine canonical identity in this pass"
+    },
+    "onnxWebgpu": {
+      "task3": "INSPECTION_CONFIRMS_CPU_ONLY_EXECUTOR",
+      "availabilityCheck": "isOnnxEmbedAvailable loads the local ONNX session and tokenizer, configured with executionProviders=['cpu']; its boolean is not a WebGPU execution receipt",
+      "action": "keep challenger/provider parity tasks open; no model/provider calls were made"
+    },
+    "policyGeometryBoundary": {
+      "status": "PROVEN_AT_POLICY_INPUT_BOUNDARY",
+      "evidence": [
+        "policy-state.ts uses a fixed POLICY_FEATURES list with no SOM/topology/geometry coordinate feature",
+        "PolicyStateTensorSchema is strict and rejects extra som_x/som_y fields",
+        "SomTopologySnapshotV1 fixes 20x20 and declares canonicalAuthority=false",
+        "focused policy-state suite passed 3/3"
+      ],
+      "limits": "This does not prove SOM training, GA8 ablation, or authorize any future geometry-derived production feature."
+    },
+    "centroidCompression": {
+      "invokerCallerAudit": "NO_PRODUCTION_GEMMA4INVOKER_CALLER; smoke script probes the export",
+      "valkeyWiring": "SOURCE_WIRED_FROM_GEMMA4_CODEINTEL_TO_BIFROSTCHAT_TO_READ_ONLY_COMPRESSION_PIPELINE",
+      "tokenSavingsProven": false,
+      "datastoreReadOrWriteThisTurn": false,
+      "modelCallsThisTurn": false
+    },
+    "observationRouting": {
+      "status": "FAIL_CLOSED_GUARD_PROVEN_OWNER_UNRESOLVED",
+      "schemaOptInRequired": true,
+      "opaqueWorkspaceRevisionPreserved": true,
+      "blankWorkspaceRevisionRejectedBeforeSql": true,
+      "candidateToPacketIdentityProven": false,
+      "orf2rSourceAudit": {
+        "status": "BLOCKED_CALLER_IDENTITY_BINDING_NOT_PROVEN",
+        "repositorySource": "packages/parent-atlas/src/core/observation-feature-repository.ts",
+        "finding": "upsertFeatureRow accepts row.candidate_id and input.packetKey independently, writes input.packetKey as packet_key, and performs no canonical mapping/readback join; findCandidates returns packet_key but does not hydrate or validate candidate_id.",
+        "fixtureEvidence": "packages/parent-atlas/test/observation-feature-repository.test.mjs uses candidate_id=candidate-1 with packetKey=packet-1, confirming the repository contract permits distinct values without a binding artifact.",
+        "semanticSearch": "explicitly rejected; canonical vector lane owns semantic search",
+        "noCallerFound": true,
+        "writesPerformed": false,
+        "action": "Do not enable callers or equate candidate_id with packet_key. Resolve the canonical binding owner/artifact first; no schema or query change is justified by this source-only audit."
+      },
+      "liveDatabaseWrite": false,
+      "focusedTests": "5 repository tests passed; 10 observation tests total passed"
+    },
+    "readyBoundedGates": [],
+    "writesThisRecheck": {
+      "database": 0,
+      "cacheOrProjection": 0,
+      "modelCalls": 0,
+      "localNlpInferenceRequests": 10,
+      "taskLedgerEdits": 3,
+      "codeFilesChanged": 4,
+      "reportFilesChanged": 1,
+      "localServiceRestarts": 1
+    }
+  }
+}

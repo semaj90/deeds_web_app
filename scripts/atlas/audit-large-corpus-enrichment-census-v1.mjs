@@ -9,11 +9,16 @@ import { createReadStream, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { createInterface } from 'node:readline';
 import { once } from 'node:events';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const outPath = resolve(repoRoot, 'docs/reports/large-corpus-enrichment-census-v1.json');
+const outputArg = process.argv.find((arg) => arg.startsWith('--output='));
+const reportRoot = resolve(repoRoot, 'docs/reports');
+const outPath = resolve(repoRoot, outputArg?.slice('--output='.length) ?? 'docs/reports/large-corpus-enrichment-census-v1.json');
+if (outPath !== reportRoot && !outPath.startsWith(`${reportRoot}${sep}`)) {
+	throw new Error('OUTPUT_PATH_MUST_REMAIN_UNDER_DOCS_REPORTS');
+}
 const inputs = [
 	{ path: '.tmp/mapreduce-full-v5.ndjson', role: 'PRIMARY_METADATA_CORPUS' },
 	{ path: 'sveltekit-frontend/tmp/codebase_chunks_768-embeddings.ndjson', role: 'REPRESENTATION_CORPUS' }

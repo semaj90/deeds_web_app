@@ -4,6 +4,12 @@
 #include <cstdint>
 #include <cmath>
 #include <cstring>
+#include "native_execution_counters.h"
+
+static int recordStubInvocation() {
+  atlasNativeCounterRecord(AtlasExecutionCounter::stub_invocation);
+  return -99;
+}
 
 extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* output, int output_len) {
   if (!embeddings || !output) return -1;
@@ -27,6 +33,7 @@ extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* o
     }
   }
   free(norms);
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
 
@@ -51,6 +58,7 @@ extern "C" int batchCosineSimilarity(const float* query, int dim, const float* c
     }
     scores[i] = dot / (qnorm * (sqrtf(cnorm) + 1e-12f));
   }
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
 
@@ -68,6 +76,7 @@ extern "C" int computeCaseEmbedding(const float* weights, int n, const float* em
   }
   if (total_w == 0.0) total_w = 1.0;
   for (int d = 0; d < dim; ++d) output[d] = (float)(output[d] / total_w);
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
 
@@ -128,6 +137,7 @@ extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k,
   free(centroids);
   free(counts);
   free(sums);
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
 
@@ -142,15 +152,19 @@ extern "C" int getCudaMemory(int64_t* free_bytes, int64_t* total_bytes) {
 }
 
 // Additional CPU-side fallbacks for functions referenced elsewhere
-extern "C" int autoencoderEncodeGPU(const float*, int, float*, int) { return -99; }
-extern "C" int autoencoderDecodeGPU(const float*, int, float*, int) { return -99; }
-extern "C" int pcaProjectGPU(const float*, int, int, float*, int) { return -99; }
+extern "C" int autoencoderEncodeGPU(const float*, int, float*, int) { return recordStubInvocation(); }
+extern "C" int autoencoderDecodeGPU(const float*, int, float*, int) { return recordStubInvocation(); }
+extern "C" int pcaProjectGPU(const float*, int, int, float*, int) { return recordStubInvocation(); }
 
-// Stubs for GPU-named functions expected by bindings; these are no-ops in CPU fallback.
-extern "C" void pageRankGPU() {}
-extern "C" void attentionScoreGPU() {}
-extern "C" void rewardScoreGPU() {}
-extern "C" void softmaxGPU() {}
-extern "C" void topKIndicesGPU() {}
-extern "C" void kmeansWithCentroids() {}
-extern "C" void trainSOM() {}
+// ABI-compatible no-LibTorch stubs. Preserve the signatures declared by the
+// N-API boundary and fail explicitly instead of returning success through a
+// mismatched no-op symbol.
+extern "C" int pageRankGPU(const float*, int, float, int, float*, int) { return recordStubInvocation(); }
+extern "C" int attentionScoreGPU(const float*, int, const float*, int, float*, int) { return recordStubInvocation(); }
+extern "C" int rewardScoreGPU(const float*, const float*, int, int, float*, int) { return recordStubInvocation(); }
+extern "C" int softmaxGPU(const float*, int, float*, int) { return recordStubInvocation(); }
+extern "C" int topKIndicesGPU(const float*, int, int, int*, int) { return recordStubInvocation(); }
+extern "C" int kmeansWithCentroids(const float*, int, int, int, int,
+                                    int*, int, float*, int, int*) { return recordStubInvocation(); }
+extern "C" int trainSOM(const float*, int, int, int, int, int,
+                         float, float, float, float, float*, int, int*, int) { return recordStubInvocation(); }

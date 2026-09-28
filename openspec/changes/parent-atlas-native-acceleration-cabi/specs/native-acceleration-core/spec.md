@@ -24,7 +24,12 @@ Every native index build and compute request SHALL be bound to a named represent
 #### Scenario: latent_64 query against semantic_768 index rejected
 - **WHEN** a query bound to `latent_64` is submitted against an index built for `semantic_768`
 - **THEN** the call fails with a representation-mismatch error before any computation
-- **AND** the execution receipt records the rejection reason
+- **AND** the versioned representation-validation receipt records the precise rejection reason
+
+#### Scenario: Invalid or mismatched representation contract rejected before compute
+- **WHEN** a build or compute request has an invalid or mismatched representation ID, revision, dimension, dtype, normalization, metric, or model ID/hash
+- **THEN** request validation fails before any compute operation is entered
+- **AND** the validation receipt identifies the invalid field or mismatch class
 
 #### Scenario: Every compute call returns a receipt
 - **WHEN** any `atlas_*` compute function completes (success or fallback)

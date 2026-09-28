@@ -99,18 +99,12 @@ export interface AnalysisPassLedgerProofSnapshot {
 }
 
 export function classifyAnalysisPassDuplicateGroup(input: {
+	passType: string | null;
 	outputVersions: number;
 	provenanceVersions: number;
 	sourceRevisionVersions: number;
 	passRevisionVersions: number;
 }): Pick<AnalysisPassDuplicateGroup, 'classification' | 'classificationReason'> {
-	if (input.outputVersions > 1) {
-		return {
-			classification: 'stochastic_history',
-			classificationReason: 'multiple output versions observed for the same logical duplicate group',
-		};
-	}
-
 	if (input.sourceRevisionVersions > 1 || input.passRevisionVersions > 1) {
 		return {
 			classification: 'revision_mixed',
@@ -118,16 +112,35 @@ export function classifyAnalysisPassDuplicateGroup(input: {
 		};
 	}
 
-	if (input.provenanceVersions <= 1) {
+	const semantics = resolveExecutionSemantics(input.passType ?? '');
+	if (input.outputVersions > 1 && semantics === 'stochastic_history') {
+		return {
+			classification: 'stochastic_history',
+			classificationReason: 'multiple outputs are consistent with the registered stochastic pass semantics',
+		};
+	}
+
+	if (input.outputVersions > 1) {
+		return {
+			classification: 'ambiguous',
+			classificationReason: semantics === 'deterministic_idempotent'
+				? 'outputs diverge despite deterministic pass semantics'
+				: 'outputs diverge, but this pass type is not registered as stochastic',
+		};
+	}
+
+	if (semantics === 'deterministic_idempotent' && input.provenanceVersions <= 1) {
 		return {
 			classification: 'identical_retry',
-			classificationReason: 'same provenance observed with no output divergence',
+			classificationReason: 'deterministic pass has identical output and provenance across duplicate rows',
 		};
 	}
 
 	return {
 		classification: 'ambiguous',
-		classificationReason: 'duplicate group has multiple provenance values but no output divergence',
+		classificationReason: semantics === 'stochastic_history'
+			? 'same output does not distinguish a stochastic re-execution from duplicate delivery'
+			: 'unregistered or observed-event pass semantics do not establish retry causality',
 	};
 }
 
@@ -394,6 +407,7 @@ export async function findAnalysisPassDuplicateGroups(limit = 100) {
 			sourceRevisionVersions: Number(row.source_revision_versions ?? 0),
 			passRevisionVersions: Number(row.pass_revision_versions ?? 0),
 			...classifyAnalysisPassDuplicateGroup({
+				passType: typeof row.pass_type === 'string' ? row.pass_type : null,
 				outputVersions: Number(row.output_versions ?? 0),
 				provenanceVersions: Number(row.provenance_versions ?? 0),
 				sourceRevisionVersions: Number(row.source_revision_versions ?? 0),
