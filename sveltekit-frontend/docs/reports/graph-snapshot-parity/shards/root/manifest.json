@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.graph-snapshot-shard-manifest.v1",
+  "repositoryId": "repo:root",
+  "repositoryKind": "FIRST_PARTY",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "sourceInventorySnapshotId": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "memberCount": 24456,
+  "snapshotId": "16b90ddf-8b55-433e-aaba-6b5697d753a0",
+  "nodeCount": 48339,
+  "edgeCount": 32226,
+  "topologyHash": "f6407b3ac00733131fb25a5f9dc6359223ad238e31be960cb9e4c69bec2ac178",
+  "materializerStatus": "MATERIALIZED",
+  "replayMatches": true,
+  "boundToAdmittedWorkspaceRevision": true,
+  "sealed": true,
+  "sealedAt": "2026-09-28T21:52:07.503Z"
+}

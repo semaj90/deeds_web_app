@@ -9848,7 +9848,7 @@ Read-only source review confirms the following boundary:
 
 ### Ordered gates
 
-- [ ] `ACE-GATE-RECONCILE-01`: use the latest canonical projection receipt to resolve actual
+- [x] `ACE-GATE-RECONCILE-01` (reconciled against the 2026-09-28 21:53Z receipt below): use the latest canonical projection receipt to resolve actual
   identity, revision, manifest, projection, and evidence-grounding blockers; do not weaken the
   admission gate or synthesize revisions.
 - [ ] `ACE-PRODUCER-TRACE-01`: trace the current ContextManifest/ACE producer through
@@ -9867,6 +9867,687 @@ Read-only source review confirms the following boundary:
 
 **Recommended next action:** close `ACE-GATE-RECONCILE-01` with a small read-only blocker table from
 the 2026-09-28 receipt. Do not run the daily apply chain or any cache warmer as part of that audit.
+
+### ACE-GATE-RECONCILE-01 — blocker table from a live `graphify:daily` run (2026-09-28)
+
+`npm run graphify:daily` bound the admitted snapshot (25,542 sources, provenance dry-run 97.8% reuse,
+`canonicalWriteAttempted:false`), then **failed closed** at `require-canonical-projection-admission-v1.mjs`
+with `GRAPHIFY_PROMOTION_ADMISSION_BLOCKED:NOT_SAFE_TO_PROJECT` (exit 1). This is the designed
+behavior, not a regression: the apply chain never started, nothing was mutated. Verdicts are
+identical to the 2026-09-26 receipt (no predicate moved). Receipt:
+`docs/reports/atlas-canonical-projection-fabric-audit-2026-09-28.json`.
+
+| # | Predicate | Verdict | Root cause | Fix class | Blocked on |
+|---|---|---|---|---|---|
+| 1 | `REVISION_QUALIFIED` | PARTIAL (corrected 2026-09-28 from NOT_PROVEN) | Columns/indexes already exist (`workspace_revision_key`, `source_revision`); audit was reading `atlas_ast_nodes`. 16,151/61,718 packets carry the admitted revision via `current-packet-digest-bridge-v1`; the other 45,567 are outside snapshot membership or await the packet-admission owner decision (7,350 gap, recipe `UNDECIDED`). **No DDL needed; do not synthesize revisions.** | Owner decision on packet admission |
+| 2 | `GRAPH_MANIFEST_SEALED` | PRESENT (corrected 2026-09-28 from ABSENT) | `graph-snapshot-parity/manifest.json` exists and NetworkX+cuGraph consume it; not workspace-revision-bound, Neo4j does not consume it, table-hash recipe unverifiable against raw parquet bytes; NetworkX/cuGraph/Neo4j each build their own graph | new contract | operator approval (schema) |
+| 3 | `ORDINAL_MAP_SEALED` | PARTIAL_PROVEN (updated 2026-09-28 after the single-chunk apply) | The artifact-based map now contains 1,358/16,151 current-revision packets with exact packet→chunk lineage; checksum `97e691c5…`. 14,744 packets have no lineage and 49 have only stale-revision lineage. Do not add a second owner or relax the source-revision join. | multi-chunk membership/source-revision proof; no projection promotion yet |
+| 4 | `LATENT_FAMILY_PROVEN` | NOT_PROVEN | audit checks nonexistent `atlas_representation_records`; real registry `atlas_representations` has 5 rows, all `UNVERIFIED`, `artifact_digest='unknown'`, no input-digest ledger; no producer/encoder/input-digest ledger tying latent lanes | new ledger | #1 |
+| 5 | `PROJECTIONS_CHECKSUM_ALIGNED` | NOT_PROVEN | derived: needs #2 + #4 checksums | derived | #2, #4 |
+| 6 | `IDENTITY_ALIGNED` | PARTIAL | 325/1000 sampled packets lack `qdrant_point_id`; 0 duplicate `packet_key` | Postgres write (backfill) | explicit write authorization; do not synthesize IDs |
+| 7 | `SEMANTIC_OWNER_PROVEN` | PARTIAL | `content_embedding` is candidate owner; writer, revision-qualified read path, Qdrant readback unproven | proof | none (read-only proof possible) |
+| 8 | `SYMBOLS_RESOLVED` | PARTIAL | `atlas_symbol_registry` reconciliation `BLOCKED_ON_UNGROUNDED_REVISION` | proof | #1 |
+| 9 | `BITFROST_KEYS_DERIVABLE` | NOT_PROVEN | 0 sample keys; no derivable domain+cluster+topology+symbol key scheme | design + proof | #1, #5 |
+| 10 | `ACE_EVIDENCE_GROUNDED` | NOT_PROVEN | `ace_context_sources` has **0 rows**; the audit also never checks card-level span/symbol grounding (harness gap) | harness + producer | `ACE-PRODUCER-TRACE-01` |
+| — | `ONTOLOGY_COHORT_NONEMPTY` | PASS | 63,084 rows | — | — |
+
+**Fix-first order (dependency-driven):** (1) revision column/binding, since #4, #5, #8, #9 all hang
+off it; (2) `CandidateOrdinalMap` + graph manifest seal; (3) representation ledger; (4) then
+checksum alignment, BitFrost key derivation, ACE grounding. #7 and the ACE-grounding harness check
+(#10) need no schema change and can run now. Nothing here is closed: `ACE-GATE-RECONCILE-01` stays
+open until the receipt verdict changes; do not weaken the gate or synthesize revisions.
+
+**Qdrant point-ID backfill (row 6), applied 2026-09-28:** `scripts/atlas/backfill-packet-qdrant-pid-exact-v1.mjs`
+(rehearsal-by-default, pre-image `docs/reports/qdrant-pid-backfill-preimage-2026-09-28.json`, receipt
+`docs/reports/qdrant-pid-backfill-exact-v1.json`). Exact join only: `payload.packet_key` = `packet_key` and
+exactly one point. Result: 120 rows written and read back (55,267 → 55,147 packets missing a point ID);
+verdict unchanged (`PARTIAL_PROVEN`). Reasons the number is small, not a bug:
+- Only 697 of 55,267 missing packets have *any* `codebase_chunks_768` point carrying their `packet_key`;
+  577 have several chunk points (packet vs chunk grain), so no packet-level ID is defined. Left null.
+- The older `backfill-atlas-packet-qdrant-links.mjs` joins on source_ref path variants and takes the first
+  chunk; **do not `--apply` it** (same granularity trap as `LEIDEN-QDRANT-IDENTITY-JOIN-01`).
+- **New finding:** 222,011 of 328,348 points in `codebase_chunks_768` carry a `packet_key` that does not
+  exist in `atlas_packets` (orphaned Qdrant payloads, a listed hard-fail condition). Not touched; needs its
+  own classification (stale generation vs packet-admission gap of 7,350) before any cleanup.
+- Open decision: whether packet-level `qdrant_point_id` should exist at all for multi-chunk packets, or the
+  identity link should live at packet→chunk lineage (`atlas_packet_chunk_lineage`).
+
+### Definitions and decisions (2026-09-28) — the remaining gate contracts
+
+Each contract reuses an existing owner; none adds a table just to satisfy an existence check.
+
+| Contract | Owner (reuse) | Definition of SEALED | Status / next step |
+|---|---|---|---|
+| `GraphProjectionManifestV1` | `sveltekit-frontend/docs/reports/graph-snapshot-parity/manifest.json` (producer `export-graph-snapshot-parity-parquet.mts`) | `graphRevision`, node/edge counts, table hashes whose recipe is documented and re-verifiable; bound to the admitted `workspaceRevision`; consumed by NetworkX, cuGraph **and** the Neo4j mirror | `PRESENT`. Gaps: rebuild against the admitted snapshot (current one derives from the Aug-8 frozen graph), document the hash recipe, add a verifier |
+| `CandidateOrdinalMapV1` | `materialize-candidate-ordinal-corpus-v1.mts` → `candidate-ordinal-corpus-receipt-v1.json` | `sha256:` admitted snapshot revision, ordinals only for rows proven through `atlas_packet_chunk_lineage` (7,421 rows), checksum over the ordered ids | `PARTIAL_PROVEN` (2026-09-28). Lineage join was already present; the real bug was filtering on legacy integer `workspace_revision` (always 0) instead of `workspace_revision_key`, so it could never match a sha256 revision. Fixed, added guarded `--authorize-current-cohort` apply (admitted revision+snapshot only), regenerated: **261 → 513 lineage-PROVEN rows of 16,151 revision-bound packets** after a second fix (join on raw `source_ref`; lineage stores the `sveltekit-frontend/…` spelling that `canonical_source_ref` strips), checksum `c22d80b0…`. Old 4,951-row corpus recoverable from git. **Coverage breakdown (read-only, 2026-09-28):** 15,589 revision-bound packets have no lineage row at all (producers ran for only 627 packets total); 49 have lineage but a different `source_revision` (bytes changed since — correctly excluded); 513 qualify. The lever is running the packet→chunk lineage producer for the remaining packets, not relaxing the filter. Prior gap text: only 261 revision-bound packets have `PROVEN` `atlas_packet_chunk_lineage` rows with matching `source_revision` (table has 7,421 rows); raise coverage by proving lineage, never by relaxing the filter |
+| Representation ledger | `atlas_representations` (5 rows) | verified row + real artifact digest + per-row producer/encoder/input-digest record, so latent lanes share one derivation | `PARTIAL_PROVEN` (2026-09-28, was `NOT_PROVEN`) — see reconciliation below, which closes the digest question a concurrent session's `canonical-projection-readonly-reconciliation-v1.json` left open (PyTorch unavailable in its interpreter) |
+| Packet ↔ Qdrant link | Postgres `atlas_packet_chunk_lineage` | **Decision:** `atlas_packets.qdrant_point_id` is set only when exactly one point carries the `packet_key` (the 120 rows just written); multi-chunk packets (577) link through packet→chunk lineage, never a guessed packet-level ID | Decided; audit `IDENTITY_ALIGNED` should later measure lineage coverage for multi-chunk packets instead of demanding a point ID |
+| Packet admission | `current-packet-digest-bridge-v1` (16,151 bound) | 7,350 sources have no packet; the packet-key recipe is `UNDECIDED` | **Open, operator decision** — cannot be defined by inference without minting identity |
+
+Wired: `audit-canonical-projection-fabric.mjs` reads these owners (revision columns, graph manifest,
+ordinal receipt, `atlas_representations`) instead of nonexistent tables. Its 2026-09-28 17:56Z snapshot
+predates the separate single-chunk apply: at that point the ordinal predicate was still NOT_PROVEN at
+513 rows. The later apply regenerated the map to 1,358 rows (PARTIAL_PROVEN); the global projection
+verdict remains NOT_SAFE_TO_PROJECT because graph-manifest and representation gates remain open. The
+older audit did not perform the regeneration. No representation digest was written and no graph rebuild
+was performed by that audit.
+
+**Lineage coverage investigation (read-only, 2026-09-28; pre-apply 513-row ordinal baseline):**
+
+| Pre-apply class of the 15,589 revision-bound packets with no `atlas_packet_chunk_lineage` row | Packets | Chunks | Path |
+|---|---|---|---|
+| single-chunk file | 845 | 845 | unambiguous membership (`EXACT_SINGLE_MEMBER`); all 845 were later frozen and applied |
+| multi-chunk file | 13,158 | 119,713 | needs an owner rule for file-level packet ↔ chunk membership (`EXACT_MULTI_MEMBER`) |
+| no chunks in `codebase_chunk_index` | 1,586 | 0 | needs chunking first |
+
+- The earlier 841/13,046/1,702 aggregate is superseded by this fresh direct-path grouping; no
+  row-key list was saved with the earlier result, so the exact historical four-row delta cannot
+  be assigned. The current 845-row proposal exactly matches the fresh single-chunk cohort.
+- One packet per `source_ref` (0 duplicates among revision-bound packets), so packets are file-level.
+- **Multi-chunk lineage not written.** The 13,158 remaining files map to 119,713 chunk rows.
+  Fresh read-only checks prove whole-file digest parity for all 119,713 after removing only the
+  literal `sha256:` prefix, with 0 mismatches; however, `codebase_chunk_index.source_revision`
+  is NULL on all 119,713. Graphify has exact file/revision/namespace bindings for 13,011 packets;
+  the other 147 each have Graphify file rows, but none match the packet's source revision (even
+  after the same `sha256:` normalization). Digest parity does not itself prove that a file packet
+  should include every chunk. Lineage rows need
+  `canonical_chunk_id` (existing convention `fullrepo:<source_ref>:<n>`) and
+  `source_namespace` (`workspace:<uuid>`), which must come from the freeze→apply pipeline
+  (`freeze-pkt-lineage-09-proposal-v1.mjs` → `apply-pkt-lineage-09-historical-promotion-v1.mjs`; the apply script
+  forbids `source_ref` fanout and consumes only a frozen proposal). Deriving them ad hoc would mint identity.
+- **Next (bounded):** obtain/record the owner decision for multi-chunk packet membership before
+  preparing or applying the 13,158-file cohort; run chunking for the 1,586 files without chunks.
+  The applied single-chunk slice raised ordinal coverage 513 → 1,358.
+
+**Single-chunk lineage slice — frozen, rehearsed, and applied (2026-09-28):**
+`scripts/atlas/freeze-pkt-lineage-current-single-chunk-v1.mjs` (read-only) → 845 rows
+(`docs/reports/pkt-lineage-current-single-chunk-frozen-proposal-v1.json`, checksum `sha256:f4b0911e…`), 0 skipped. Every row has
+three-way whole-source digest parity (packet `source_revision` = chunk `file_content_hash` = `graphify_files.code_source_revision`),
+identity read verbatim from existing columns (`chunk_id`, chunk row id, `graphify_files.workspace_id`), producer
+`PKT-LINEAGE-CURRENT-SINGLE-CHUNK-01:v1`. (The file row is selected by digest parity, not by `graphify_files.workspace_revision`,
+which is Graphify's own namespace `e0dc…`, not the tournament-admitted `e24bb…`.) The apply script gained `--proposal=` and
+`--rehearse`: rehearsal wrote 845 rows in per-packet transactions, exact readback 0 rollbacks/conflicts/duplicates/synthetic IDs,
+rolled back (table still 7,421). Receipt: `…-rehearsal-receipt.json`. Separate apply receipt `…-apply-receipt.json` confirms **APPLIED 2026-09-28** (per-packet transactions, exact readback): lineage rows 7,421 → 8,266, 0 rollbacks/conflicts/duplicates/synthetic IDs;
+ordinal corpus regenerated → **1,358/16,151** (checksum `97e691c5…`), `ORDINAL_MAP_SEALED` still `PARTIAL_PROVEN`, overall still `NOT_SAFE_TO_PROJECT`.
+Original expectation: ordinal-map coverage 513 → 1,358 (matched). Multi-chunk (13,158 packets / 119,713 chunks) untouched pending the membership-rule decision; the existing
+09 freeze already encodes "all chunks with `relative_path` = `source_ref`" as `EXACT_MULTI_MEMBER`.
+
+**Read-only projection/lineage reconciliation (2026-09-28):** after the separate single-chunk
+apply, the current ordinal receipt and repeatable-read query agree on 1,358/16,151 exact
+packet→chunk candidates: 14,744 have no packet-key lineage row and 49 have only older
+source-revision lineage (688 membership rows; physical row and canonical chunk ID exist, but
+the revision mismatch correctly excludes them). The remaining multi-chunk cohort has 119,713
+whole-file digest matches, but still needs a membership owner decision; 147 files have Graphify
+rows whose source revisions do not match. The report distinguishes the autoencoder state-dictionary checksum from the
+checkpoint file SHA-256 and records that the graph manifest is not bound to the admitted
+workspace revision. This audit made no writes; the separate 845-row lineage apply is recorded
+above. Report:
+`docs/reports/canonical-projection-readonly-reconciliation-v1.json`.
+
+**Multi-chunk lineage slice — frozen and rehearsed, NOT applied (2026-09-28):** `freeze-pkt-lineage-current-single-chunk-v1.mjs --multi`
+(convention: every chunk with `relative_path` = `source_ref` is a member, `EXACT_MULTI_MEMBER`; whole packet skipped if any chunk fails
+digest parity). Proposal `.tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json` (90 MB, gitignored — repo hook rejects >10 MB),
+**116,847 rows / 13,010 packets**, checksum `sha256:e477356d…`, 0 digest mismatches. Skipped whole: 147 packets with no provable namespace,
+1 packet (`openai-facade.ts`) where 26 canonical `chunk_id`s each map to **two distinct chunk rows** in `codebase_chunk_index`.
+**Caught by rehearsal, not by the plan:** the first rehearsal inserted 116,873 of 116,899 proposed rows because `ON CONFLICT DO NOTHING`
+silently kept an arbitrary row of each duplicate pair; the readback (which compares canonical-id sets) would have passed anyway.
+Fixed by a fail-closed `duplicate_canonical_chunk_id` rule. Corrected rehearsal: 13,010 packets, 116,847 inserted = proposed, 0 identical/
+rollbacks/conflicts/duplicates/synthetic IDs, rolled back (table still 8,266). **APPLIED 2026-09-28** (per-packet transactions, exact readback): lineage rows 8,266 → 125,113, 0 rollbacks/conflicts/duplicates/synthetic IDs;
+ordinal corpus regenerated → **14,368/16,151 (89%)** (checksum `9c275253…`), `ORDINAL_MAP_SEALED` still `PARTIAL_PROVEN`, overall still `NOT_SAFE_TO_PROJECT`.
+Open data-quality finding: duplicate `chunk_id` values across distinct `codebase_chunk_index` rows for `openai-facade.ts` need their own investigation.
+Remaining lineage gap: 1,702 packets with no chunks (need chunking) + 147 no-namespace + 1 duplicate-ID packet = 1,783 of 16,151.
+
+**Representation digest reconciliation, CLOSED not a real mismatch (2026-09-28):** the "checkpoint file hashes to `ac5c069d…`
+but `ae_meta.json` claims `d6e9395e…`" gap was never drift — two legitimate, different recipes over the identical checkpoint.
+`ac5c069d…` is `sha256sum` over the saved `.pt` file bytes (pickle/zip container). `d6e9395e…` is
+`atlas_compute.latent_autoencoder.state_dict_checksum()` — sha256 over sorted `(tensor_name, tensor_bytes)` pairs from
+`model.state_dict()`, computed in-memory at training time, which is what `ae_meta.json` and `codebase_chunk_index.
+latent_256_checkpoint_revision` (55,169 rows) both actually use. A concurrent session's read-only reconciliation
+(`docs/reports/canonical-projection-readonly-reconciliation-v1.json`) correctly identified the two recipes but could not
+recompute `state_dict_checksum` live (no PyTorch in its interpreter) and left the question open. Resolved here by loading the
+real checkpoint in the WSL2 `atlas-rapids-cu13` PyTorch env and recomputing the same recipe live: **exact match to
+`d6e9395e…`**. Registered on the `latent_64` row (`atlas_representations`, rehearsed in a transaction + read back + rolled
+back, then applied): `upstream_model_id='nested-semantic-autoencoder'`, `upstream_revision`/`artifact_digest=d6e9395e…`,
+`verification_status='STATIC_VERIFIED'`.
+**Audit bug found and fixed alongside**: `atlas_representations` was never in the audit's `candidateTables` list, so
+`existing.has()` was always false and this predicate could never see real registry data regardless of DB state; and
+`repVerified` checked for a literal `'VERIFIED'` string that the column's own CHECK constraint doesn't allow (real values
+are `STATIC_VERIFIED`/`SAMPLE_VERIFIED`/`PRODUCTION_VERIFIED`/etc.). Both fixed. `LATENT_FAMILY_PROVEN` → `PARTIAL_PROVEN`.
+**Not closed**: no per-row producer/encoder/*input*-digest ledger exists (which source snapshot produced this checkpoint),
+and no `latent_256`/`latent_128` rows exist in the registry despite being the same encoder family (prefix-derived from
+`latent_64`'s bottleneck) — open, needs an owner decision on whether they're separate rows or one row with multiple outputs.
+
+**latent_256/latent_128 registry rows, closed (2026-09-28):** confirmed live before registering anything — `codebase_chunk_index.latent64_model`
+= `d6e9395e…` on all 1,703 populated `latent_64` rows (same checkpoint as `latent_256`'s 55,169-row `latent_256_checkpoint_revision`, so
+the earlier `latent_64` digest registration was correct, not a mismatch). `latent_128` is architecturally different, confirmed via
+`drizzle/manual/20260912_latent_128_columns.sql`'s own header: a deterministic `SLICE_FIRST_N`+L2-renormalize of `latent_256`, not a
+second encoder pass and not MRL truncation of raw `semantic_768`. Rehearsed (transaction + readback + rollback), then applied:
+inserted `latent_256` (`dimension_method='AUTOENCODER'`, direct bottleneck) and `latent_128` (`dimension_method='SLICE_FIRST_N'`,
+derived from `latent_256`), both `artifact_digest=d6e9395e…`, `verification_status='STATIC_VERIFIED'`; corrected `latent_64`'s own
+`dimension_method` from `UNKNOWN` to `SLICE_FIRST_N` (it is `PREFIX_OF_LATENT_128`, not a direct output either) in the same transaction.
+Registry: 5 → 7 rows, 3 verified with real digests. `dimension_method` allowed values are `NATIVE|MRL_TRUNCATE|LINEAR_PROJECTION|
+AUTOENCODER|CUSTOM_MODEL_HEAD|SLICE_FIRST_N|UNKNOWN` (schema constraint) — the audit's earlier `PREFIX_RENORM` guess was invalid and
+caught at rehearsal, not guessed past. `LATENT_FAMILY_PROVEN` stays `PARTIAL_PROVEN`: still no per-row *input*-digest (which
+semantic_768 snapshot trained this checkpoint) and `lifecycle_status` stays `CANDIDATE` — no promotion vote taken here.
+
+**SYMBOLS_RESOLVED reconciliation gate, corrected from stale (2026-09-28):** the audit's note claimed the gate "stays
+`BLOCKED_ON_UNGROUNDED_REVISION` for the admitted workspace revision regardless" — checked live, that was already false:
+`atlas_workspace_source_bindings` has 24,456 rows for the admitted revision (populated independently of this thread's
+`atlas_packets` lineage work). Ran `symbol-reconciliation-writer-v1.mts --dry-run` then `--apply` (no `--allow-create`,
+so promotion-eligible only, no new identity minted): gate status `GROUNDED`, all 194 `graphify_symbols` nominations resolve
+against the existing `atlas_symbol_registry` (10,504 rows) with 0 unresolved / 0 ambiguous / 0 revision-rejected.
+`canonical_identity_created: false` — no writes needed since nothing was unresolved; registry unchanged (10,504/479 before
+and after, confirmed). Added a live `reconciliation_gate` field to the audit's `SYMBOLS_RESOLVED` predicate (same query the
+writer uses) so this doesn't go stale again. `graphify_symbols` itself remains tiny (194 rows) relative to the workspace —
+that's the real remaining limiter, not the reconciliation gate.
+
+**GRAPH_MANIFEST_SEALED rebuild scoping, blocked on a real design decision (2026-09-28):** checked cost before running
+anything — `export-graph-snapshot-v2.mts` -> `materializeCanonicalGraphSnapshotFromPostgres()` is a bounded Postgres-read +
+in-memory build + JSON write (reads `atlas_packets` + `atlas_tree_nodes`, no AST re-extraction), cheap, NOT the multi-hour
+rebuild first assumed. But `PACKET_SELECT_SQL` filters `WHERE workspace_id = $1`, and `atlas_packets.workspace_id` is a
+**top-level directory name** (`docs` 54,142 rows, `sveltekit-frontend` 3,060, `scripts` 562, …) — a completely different
+axis from `workspace_revision_key` (the sha256 tournament-admitted revision this whole thread's work is bound to). One
+exporter run cannot produce a manifest scoped to the admitted revision as currently written.
+**Two real paths, neither picked**: (1) run the exporter once per `workspace_id` and merge — no merge/union convention
+exists for `GraphProjectionManifestV1`; (2) change `PACKET_SELECT_SQL`'s filter to `workspace_revision_key = $1` — a real
+edit to `graph-snapshot-postgres.ts`, a shared materializer other callers may use (not checked). Neither is a quick script
+run; both are scoped code/design changes. **Not done pending an owner decision.**
+
+**Packet-key recipe decided and applied — 7,259 new atlas_packets rows (2026-09-28):** operator decision: reuse
+CURRENT_LIVE_IDENTITY (`packet:` + `sha256(source_ref).slice(0,12)`), confirmed empirically against 5 random live rows
+before use, not `packet-key-builder.ts`'s node-scoped 64-hex scheme or `build-packet-key-v2-admission-manifest-v1.mts`'s
+UUIDv5 scheme (both real, both different, neither touched). Reused the existing read-only admission pipeline rather than
+hand-rolling classification: `produce-current-packet-digest-bridge-v1.mjs --census` (correct `--execution-id` was
+`74d50c86-…`, from `selected-graphify-execution-owner-v1.json` — an earlier attempt with the wrong execution id silently
+produced 0 entries) froze a fresh 7,259-row `ADMISSION_READY` manifest (990 `SOURCE_BYTES_CHANGED`, 1,086 `OUT_OF_SCOPE`,
+correctly excluded) at `docs/reports/packet-admission-v1/64122168…/`.
+New script `scripts/atlas/admit-packets-current-live-identity-v1.mjs`: verifies every shard's `sha256Of()` checksum against
+`root.json` (reused the real checksum function from `packet-source-revision-repair-v1.mjs`, not reimplemented), verifies
+each entry's `source_revision` format/equality/digest-match, computes `packet_key`, checks for collisions both within the
+batch and against the *entire* live `atlas_packets` table before any write. Rehearsed at `--limit=100` (clean), then full
+7,259 (clean, 0 intra-batch collisions, 0 live-table collisions, exact readback, rolled back), then applied: `atlas_packets`
+61,718 → **68,977** rows (exact arithmetic match), committed, exact readback.
+Only identity/revision columns populated (`packet_key`, `source_ref`, `canonical_source_ref`, `source_revision`,
+`workspace_revision_key`, `lineage_binding_checksum`, `content_hash`, `lineage_producer_revision`); everything else left at
+schema default — these are minimal admitted packets, not enriched ones (no embeddings, no summary, no chunk lineage yet).
+**Re-ran the canonical projection fabric audit after applying**: `SEMANTIC_OWNER_PROVEN` shows `NOT_PROVEN` in this run —
+**confirmed this is an unrelated concurrent-session edit to that predicate's logic** (now unconditionally returns
+`writerOwnerStatus: 'UNRESOLVED_NOT_PROMOTED'`), not caused by this packet-admission apply. All other predicates unchanged.
+Overall verdict still `NOT_SAFE_TO_PROJECT`. Next: these 7,259 packets are unpacketed-no-more but still need lineage,
+embeddings, and symbol/ontology enrichment before they help any predicate further — that's the natural follow-up, not done
+here.
+
+**CORRECTION 2026-09-28, same day: the 7,259-row admission apply above used the WRONG identity scheme and was rolled
+back.** External review caught what my own research missed: `docs/reports/packet-key-owner-decision-v1.json` (dated
+2026-09-24, four days before this session, verified by reading the file directly, not trusting the review's summary of
+it) already records a settled, implemented, tested owner decision for exactly this 7,350-source admission gap —
+`PacketKeyV2 = packet:UUIDv5(PACKET_AGGREGATE_NAMESPACE_V1, "packet:v2" NUL repository_scope NUL canonical_source_ref NUL
+packet_kind)`, with real code (`packet-key-v2.ts`, `packet-key-legacy-alias-v1.ts`, 12/12 + 9/9 tests), a frozen admission
+manifest for these same sources at a *different* root (`6d8fc6e3…`, `uniquePacketKeysV2: 7350`), and an explicit statement
+that "new admissions use the new key" — the legacy `packet:<12hex>` scheme I used is documented in that same file as the
+*existing* dominant writer being superseded, not the target for new rows.
+**My error**: I offered "reuse the recipe from 5 sampled existing rows" as an option without first searching for an
+existing owner-decision artifact — exactly the audit-before-you-build failure this repo's Duplication Prevention rule
+exists to catch. The operator's "same recipe as existing packets" answer was reasonable given the option as framed; the
+framing itself was under-researched.
+**Remediation, verified before and after**: checked all FK-linked child tables for any reference to the 7,259 newly-minted
+packet_keys — zero downstream references anywhere (confirmed live query, not assumed). Rehearsed the delete (transaction +
+readback + rollback: 7,259→0 for that producer tag, 61,718 total, matched), then applied: `atlas_packets` 68,977 → **61,718**,
+exact match to the pre-mistake count. Re-ran the fabric audit: identical to the last-known-good state, no residual effect
+on any predicate. `scripts/atlas/admit-packets-current-live-identity-v1.mjs` is left in place (source-controlled evidence
+of the mistake) but must not be run again with `--apply`.
+**Correct path forward, NOT done here** (also gated on operator authorization the decision file itself withholds):
+`openBeforeAdmission` lists (1) authorize + apply the alias-kind DDL (`20260925_atlas_packet_identity_alias_v1_storage_to_v2_PREPARED.sql`),
+then the 17,399 alias rows, (2) authorize the 7,350-row V2 admission apply against manifest root `6d8fc6e3…` via the
+already-built `register-orphaned-chunks.mjs --packet-key-v2-manifest-root=...` path, (3) confirm repository-scope
+authority for `graphify_execution_file_membership_v2.repository_id` (status `VERIFY`, not settled), (4) decide the legacy
+`register-orphaned-chunks.mjs` non-V2 path. None of these four are mine to push through unilaterally either — the decision
+file explicitly withholds `writesAuthorized` pending exactly this authorization.
+
+**GRAPH_MANIFEST_SEALED query fix, applied (2026-09-28), plus a git-stash near-miss and one pre-existing bug found:**
+Confirmed `materializeCanonicalGraphSnapshotFromPostgres` has exactly one real caller
+(`export-graph-snapshot-v2.mts`) before touching the shared query -- safe to edit directly. Fixed
+`PACKET_SELECT_SQL` in `graph-snapshot-postgres.ts`: `WHERE workspace_id = $1` -> `WHERE
+workspace_revision_key = $1`; renamed `PostgresGraphSnapshotInput.workspaceId` -> `workspaceRevision`
+(`Omit<...,'workspaceId'>` added so the field isn't double-required); the loader now maps
+`workspaceRevision` onto the downstream `GraphSnapshotMaterializerInput.workspaceId` field (left
+unrenamed there -- 6 use sites in the wider materializer/manifest/proof contract, out of scope to
+rename). Updated the 4 spec fixture call sites and the CLI script's `--workspace-id` -> `--workspace-revision`.
+**Near-miss, corrected**: a scoped `git stash` (to isolate a tsc diagnostic check) swept up all 57
+files of concurrent uncommitted work across this repo (~2M lines), not just this file -- caught
+before any loss, restored via `git stash apply` + verified every stashed diff reappeared (only 3
+unrelated submodule-pointer entries differed), then dropped the stash. Nothing lost. Lesson: never
+`git stash` (even briefly) in a working tree with this much concurrent multi-session state; use
+`git diff -- <path>` / a worktree copy instead.
+**Pre-existing bug found, NOT fixed here (separate scope)**: `graph-snapshot-postgres.spec.ts`'s
+"materializes an immutable snapshot" test drops both tree nodes from `graphSnapshotNodes` (1 node
+instead of 3). Root cause, confirmed via direct read of `graph-snapshot-materializer.ts` (clean,
+no concurrent edits -- this is committed, current logic): `classifyCanonicalGraphEligibility()`
+requires `metadata.source === 'atlas_packets'` for packet-hierarchy tree-node types, but the test
+fixture's tree-node `metadata` (`{ lane: 'root' }` / `{ lane: 'page' }`) has no `source` field --
+fixture is stale against an already-committed eligibility gate. This was previously masked by the
+ZodError this session's fix resolved (the test never ran far enough to hit it). Flagged, not
+touched -- fixing the eligibility gate or the fixture is a real product decision (which is wrong?)
+outside this thread's scope.
+**Re-ran the fabric audit**: `GRAPH_MANIFEST_SEALED` unchanged (`PRESENT`) -- expected, since the audit
+still reads the OLD `graph-snapshot-parity/manifest.json` artifact (Aug-8 frozen snapshot). The fix
+enables regenerating that artifact against the admitted revision, but it hasn't been regenerated yet.
+**Blocked on a known, documented execution-context issue, not a code bug**: running
+`export-graph-snapshot-v2.mts` directly via `tsx`/`node` fails with `ERR_MODULE_NOT_FOUND` on the
+`.js`-suffixed `$lib/...` import -- this is exactly the "NPX Execution Context & Module Alias
+Resolution" failure mode CLAUDE.md already documents (plain `tsx` doesn't inherit SvelteKit's Vite
+alias config). No existing npm script alias runs this exporter from the correct context. Needs
+either a `vite-node`-based invocation or a new package.json script wired the same way other
+SvelteKit-context scripts in this repo are -- real setup work, not attempted in this pass given
+context budget. This is the concrete next step: get one real export run against the admitted
+revision, producing a manifest with `workspaceRevision` bound correctly, then re-audit.
+
+**GRAPH-SNAPSHOT-SCOPE-V2-01, applied (2026-09-28) -- `workspace_revision_key` alone was still
+insufficient scope; a repository + execution partition was missing.** An external review correctly
+identified that `atlas_packets.workspace_id` (1,196 near-meaningless directory-path values, already
+abandoned by the prior fix above) was the wrong axis for a second reason beyond revision identity:
+even after scoping to `workspace_revision_key`, a snapshot still spans every repository in the
+admitted revision undifferentiated (16,151 packets at the current admitted revision,
+`sha256:e24bb97187...`). Every load-bearing factual claim in the review was verified live against
+the DB before acting on it (per this session's own "verify pasted claims before trusting them" rule
+-- see the packet-key mistake above for why):
+- `graphify_execution_file_membership_v2` genuinely exists with `execution_id`, `repository_id`,
+  `workspace_revision`, `source_ref`, `code_source_revision`, `content_hash`, `repository_relative_path`,
+  `byte_length`, `observed_at` (9 columns, confirmed via `information_schema.columns`).
+- Its `repository_id` (text) is a small, real, distinct-from-`atlas_packets.repository_id` (uuid,
+  unrelated column) partition: exactly 7 values live -- `repo:root` (339,119 rows), `repo:claude-mem`,
+  `repo:mcp-server-mcp`, `repo:turbovec`, `repo:sites/parent-atlas-gateboard`,
+  `repo:models/embeddinggemma_300m`, `repo:granite-docling-258M`.
+- Its existing index already leads with `(workspace_revision, repository_id, repository_relative_path)`
+  -- confirmed via `pg_indexes`; no new index was added, per the review's own advice to check
+  `EXPLAIN (ANALYZE, BUFFERS)` against the existing index before adding one.
+- **Found live, not in the review**: a real fan-out bug the naive join would have hit. Two distinct
+  `execution_id`s (`0dba1c0d-2cf7-4f35-a61b-c77956f60d3d` and `74d50c86-8194-45ea-8c3d-61aab737ef83`,
+  the latter the same owner-preflight execution_id used earlier this session for the packet census)
+  each independently contributed 24,456 membership rows for `repo:root` at the current admitted
+  revision -- a join on `(workspace_revision, repository_id)` alone returns 32,302 raw matches
+  collapsing to only 16,151 distinct `packet_key`s. This is why `executionId` is a required field on
+  `PostgresGraphSnapshotInput`, not an optional narrowing -- without it, correctness would silently
+  depend on `SELECT DISTINCT` papering over an unscoped join rather than an honest "one execution,
+  one snapshot" identity.
+
+Applied: `PostgresGraphSnapshotInput` gained required `executionId`/`repositoryId` fields (doc
+comments cite the live numbers above so a future reader doesn't have to re-derive them).
+`PACKET_SELECT_SQL` now joins `atlas_packets p` against `graphify_execution_file_membership_v2 m`
+on `(m.source_ref = p.source_ref AND m.code_source_revision = p.source_revision)`, filtered by
+`p.workspace_revision_key = $1 AND m.workspace_revision = $1 AND m.execution_id = $2 AND
+m.repository_id = $3`, with `SELECT DISTINCT` as a belt-and-suspenders guard (not a substitute for
+the `execution_id` filter). `export-graph-snapshot-v2.mts` gained required `--execution-id` /
+`--repository-id` CLI args and its status-log output field renamed `workspace_id` ->
+`workspace_revision` (matching the earlier fix's naming) plus new `execution_id`/`repository_id`
+fields. `graph-snapshot-postgres.spec.ts`'s 3 test call sites updated with
+`executionId: '74d50c86-8194-45ea-8c3d-61aab737ef83'` / `repositoryId: 'repo:root'`. Re-ran the
+suite: 2/3 pass, same pre-existing `classifyCanonicalGraphEligibility` fixture-staleness failure
+documented directly above (unrelated to this change, not re-caused by it -- the mock intercepts by
+SQL substring, not exact params, so this edit's compatibility with the existing mock harness was
+directly confirmed, not assumed). `PostgresGraphSnapshotInput` has zero other consumers repo-wide
+(grep-confirmed) -- bounded blast radius, matching the review's own scoping note.
+
+**Not yet resolved by this change, deliberately out of scope**: the review's proposed
+`GRAPH-SNAPSHOT-MERGE-V1-01` (deterministic cross-repository shard merge, dedup by canonical graph
+identity not by repository position) is a separate follow-up, not attempted here -- this change only
+makes one repository's shard scope correctly; multi-repository merge is untouched.
+`graphify_execution_file_membership_v2.repository_id`'s authority status is still recorded as
+`VERIFY, not settled` a few paragraphs above (the `PacketKeyV2` `openBeforeAdmission` list) --
+this fix consumes that column as a scoping key without waiting on that separate authorization
+question, since scoping a read-only export query is a materially lower-consequence action than the
+identity-minting admission apply that question gates. Still blocked on the same execution-context
+issue as the paragraph above: no real export has been run yet against the admitted revision with
+the corrected scope -- that remains the concrete next step.
+
+**Real export run succeeded (2026-09-28) -- the "blocked on module-resolution" framing above was
+wrong; it was an invocation mistake, not a code blocker.** Ran
+`npx tsx ../scripts/atlas/export-graph-snapshot-v2.mts` (note: `npx tsx`, not plain `node` --
+this repo's own "NPX Execution Context & Module Alias Resolution" rule's Context B, from
+`sveltekit-frontend/`) against `repo:root` with the corrected `GRAPH-SNAPSHOT-SCOPE-V2-01` scope
+(`workspace-revision=sha256:e24bb97187...`, `execution-id=74d50c86-8194-45ea-8c3d-61aab737ef83`,
+`repository-id=repo:root`, `source-inventory-snapshot-id=sha256:6288726b7362...` -- the real
+snapshot revision from `docs/reports/graphify-workspace-snapshot-binding-v1.json`, not a placeholder).
+**Result: real success**, not a failure -- `48,339` nodes, `32,226` edges, exit 0, real topology
+hash (`f6407b3ac00733131fb25a5f9dc6359223ad238e31be960cb9e4c69bec2ac178`). The earlier
+`ERR_MODULE_NOT_FOUND` this session hit was from invoking via plain `node`, not `npx tsx` -- the
+`.mts` extension needs `tsx`'s loader regardless of alias resolution; once that's right, the
+relative import chain (this script imports `graph-snapshot-postgres.ts` by relative path, and its
+only `$lib/...` references are `import type` -- erased at compile time) resolves fine with no
+SvelteKit-context workaround needed. Output moved to session scratchpad (147MB, not gitignored at
+the ad hoc repo-root path it was first written to -- moved rather than left there to avoid an
+accidental commit).
+
+**But re-running the fabric audit afterward confirmed `GRAPH_MANIFEST_SEALED` is unchanged
+(`PRESENT`) -- and found a second, independent gap: this predicate cannot reach `PASS` as currently
+coded, regardless of what artifact exists.** Read `audit-canonical-projection-fabric.mjs`'s
+predicate 6 directly (not inferred): it reads a fixed path,
+`sveltekit-frontend/docs/reports/graph-snapshot-parity/manifest.json` -- a different, older,
+NetworkX/cuGraph-parity artifact, unrelated to the exporter this fix touches, and never updated to
+read the new per-repository-scoped export's output. Worse: `bound_to_admitted_workspace_revision:
+false` and `neo4j_consumes_manifest: false` are **hardcoded literal `false` values** in the script
+(lines ~339-340 as of this read), never actually computed from the manifest's own contents --
+and the `verdict` field is only ever assigned `graphManifest ? 'PRESENT' : 'ABSENT'` (line 341) --
+**there is no code path in this predicate that can ever produce `PASS`.** This is a genuine,
+separate gap from data readiness: even a perfect manifest, correctly bound to the admitted
+revision and consumed by all three engines, would still report `PRESENT`, not `PASS`, under the
+current code.
+
+**Open design question, not resolved here (deliberately -- needs a real decision, not a silent
+audit-script rewrite under a bare "continue")**: what does "sealed" mean now that
+`GRAPH-SNAPSHOT-SCOPE-V2-01` scopes exports per-repository rather than producing one workspace-wide
+manifest? Two shapes are possible and this thread does not pick one:
+1. **Per-repository seal**: each of the 7 real repositories (`repo:root`,
+   `repo:claude-mem`, `repo:mcp-server-mcp`, `repo:turbovec`,
+   `repo:sites/parent-atlas-gateboard`, `repo:models/embeddinggemma_300m`,
+   `repo:granite-docling-258M`) gets its own sealed shard manifest, and the predicate passes when
+   all 7 (or all repositories with nonzero membership at the admitted revision) are sealed.
+2. **Merged seal**: `GRAPH-SNAPSHOT-MERGE-V1-01` (the review's own proposed follow-up, itself not
+   attempted here) produces one deterministic cross-repository merge first, and the predicate seals
+   against that single merged manifest -- closer to the original single-manifest shape the audit
+   script already expects, but requires building the merge step first (dedup by canonical graph
+   identity, not repository position, per the review's own note).
+Neither is implemented. The audit script's `PASS`-impossibility bug (hardcoded `false` fields, no
+`PASS` in the verdict enum) needs fixing regardless of which shape is chosen -- that part is a
+pure bug fix, not a design call -- but doing so before the shape decision would mean guessing at
+what "bound to admitted workspace revision" and "sealed" should check for a scope that didn't exist
+when this predicate was written. Flagged for explicit operator direction before either is touched.
+
+**Operator selected "per-repository seal" -- implemented, run for real, audit re-run (2026-09-28).**
+Built `scripts/atlas/seal-graph-snapshot-shards-v1.mts`: reads the two existing owner-decision
+artifacts (`docs/reports/selected-graphify-execution-owner-v1.json` --
+`canonicalAuthority: true`, `docs/reports/graphify-workspace-snapshot-binding-v1.json` --
+`workspaceAuthorityAdmitted: true`, cross-checked to agree with each other, fails closed if not)
+rather than hardcoding the admitted revision/execution -- per this session's own "grep for an
+existing owner-decision before minting anything" rule. Queries the real, live repository set from
+`graphify_execution_file_membership_v2` (7 repositories at the admitted revision + selected
+execution -- same set found earlier), materializes one shard per repository via the already-fixed
+`materializeCanonicalGraphSnapshotFromPostgres`, writes each to
+`sveltekit-frontend/docs/reports/graph-snapshot-parity/shards/<slug>/manifest.json` plus a top-level
+`seal-index.json` -- does NOT touch or overwrite the older NetworkX/cuGraph parity `manifest.json`
+artifact (separate schema, separate consumers, deliberately left alone).
+
+**Real finding, caught before it could inflate the gate: an empty-but-non-erroring shard is not the
+same as "nothing to seal."** First run marked all 7 shards `sealed: true` even though 6 had zero
+nodes/edges -- traced (not assumed) to real data: `atlas_packets` rows DO exist for those repos'
+`source_ref`s, but with `source_revision`/`workspace_revision_key` both NULL (legacy,
+never revision-qualified rows) -- confirmed via direct query, not a join bug in the new scoped SQL.
+Left as `sealed: true`, this would have silently reported the gate as more complete than reality --
+exactly the "evidence laundering" pattern this repo's own AGENT EXECUTION INTEGRITY rules exist to
+catch. Fixed: `sealed` now also requires `nodeCount > 0`. Re-ran: **honest result -- `allShardsSealed:
+false`, only `repo:root` (48,339 nodes / 32,226 edges) genuinely sealed; `repo:claude-mem`,
+`repo:granite-docling-258M`, `repo:mcp-server-mcp`, `repo:models/embeddinggemma_300m`,
+`repo:sites/parent-atlas-gateboard`, `repo:turbovec` all correctly `sealed: false`** (real
+membership rows, zero revision-qualified packets -- a genuine, separate data-completeness gap, not
+part of this fix's scope to close).
+
+Updated `audit-canonical-projection-fabric.mjs`'s `GRAPH_MANIFEST_SEALED` predicate to read the new
+seal index (in addition to, not instead of, the legacy manifest -- both reported, prefixed
+`legacy_*` vs `seal_index_*`/plain), independently re-derive the live repository set (does not just
+trust the seal index's own self-report -- guards against staleness), and added a genuine `PASS`
+branch the prior code structurally could not reach (verdict was capped at `PRESENT`/`ABSENT`
+regardless of any condition). **Re-ran the full audit: `GRAPH_MANIFEST_SEALED` moved `PRESENT ->
+PARTIAL_PROVEN`** -- `bound_to_admitted_workspace_revision: true` (correct, live-verified),
+`seal_index_covers_live_repositories: false` (correct -- 1/7), all 7 `live_repository_ids`
+correctly enumerated from a live query. This is real, honest progress -- the predicate is no longer
+structurally incapable of reaching `PASS`, and its current `PARTIAL_PROVEN` state accurately
+reflects that only 1 of 7 real repositories has revision-qualified packet content to seal. Overall
+gate verdict remains `NOT_SAFE_TO_PROJECT` (10/11 predicates still below `PASS`) -- this closes one
+concrete, previously-impossible-to-close predicate gap without overclaiming readiness for the other
+6 repositories' missing packet admission, which remains open, separate work.
+
+**Not done here, explicitly out of scope**: revision-qualifying packets for the 6 empty
+repositories (a packet-admission gap, not a graph-snapshot-export gap -- likely intersects with the
+already-open `PacketKeyV2` admission question, but not confirmed); Neo4j consumption of either
+manifest (still zero, still a separate, honestly-reported gap in the predicate's own fields).
+
+**`GRAPH-SNAPSHOT-MERGE-V1-01`, designed and built (2026-09-28, operator-selected direction).**
+Built `scripts/atlas/merge-graph-snapshot-shards-v1.mts`. Design decisions, recorded in the script's
+own header comment (not just here, so code and doc can't drift):
+1. **Shard bulk data is never persisted to disk.** A single-repository export already produced a
+   147MB JSON file (`repo:root` alone) -- tracking that would violate this repo's pre-commit
+   >10MB file-size gate. Shard manifests stay summary-only; the merge script RE-MATERIALIZES each
+   sealed shard's full node/edge set live from Postgres using the exact
+   `(workspaceRevision, executionId, repositoryId, sourceInventorySnapshotId)` recorded in that
+   shard's own `manifest.json` -- cross-checked against `seal-index.json` field-by-field, fails
+   closed (`SHARD_MANIFEST_SEAL_INDEX_MISMATCH`) on any drift rather than trusting a possibly-stale
+   index entry.
+2. **Dedup identity is `nodeKey`/`edgeKey`, not repository position** -- per the external review
+   this follows. These keys are already globally-unique-by-construction under the current
+   packet-key scheme (`packet:<packetKey>`, `tree:<uuid>`), so a real cross-repo duplicate isn't
+   expected today, but the merge handles it correctly regardless: two shards claiming the same key
+   with IDENTICAL content (compared with `snapshotId` excluded, reusing the same field-exclusion
+   `topologyHash()` itself already applies) are deduped, contributing repositories recorded; two
+   shards claiming the same key with DIFFERENT content are a `NODE_IDENTITY_CONFLICT`/
+   `EDGE_IDENTITY_CONFLICT` -- both conflicting copies are excluded from the merged set (fail
+   closed on the specific entity, not an arbitrary pick-a-winner), reported in a `conflicts` array,
+   and the merge still completes for everything non-conflicting rather than aborting outright
+   (this is diagnostic read-only work, not an admission-critical write).
+3. Only `sealed: true` shards are merged; unsealed repositories go into `excludedRepositories` with
+   an explicit reason, never silently dropped.
+4. The merged manifest gets a fresh `snapshotId`; every included node/edge has its `snapshotId`
+   rewritten to that value (content otherwise untouched).
+5. `topologyHash` is computed via the EXISTING exported `topologyHash()` from `graph-snapshot.ts`
+   -- not reimplemented -- which already sorts by key and excludes `snapshotId`, so reuse gives a
+   deterministic, ordering-independent digest for free (Duplication Prevention: grepped for and
+   found this before writing a new hash routine).
+
+**Ran for real, correctness self-check passed**: with only 1 of 7 shards currently sealed
+(`repo:root`), the merge is a true test of the identity-function edge case -- and it behaved
+exactly as it should: `mergedFromRepositories: ["repo:root"]`, `excludedRepositoryCount: 6`,
+`nodeCount: 48339`, `edgeCount: 32226`, `conflictCount: 0`, and **`topologyHash` exactly matches**
+the single-repo export's own hash from earlier this session
+(`f6407b3ac00733131fb25a5f9dc6359223ad238e31be960cb9e4c69bec2ac178`) -- confirming the merge
+algorithm is a correct no-op when there is exactly one input, not just that it ran without an
+uncaught exception. Output: `sveltekit-frontend/docs/reports/graph-snapshot-parity/shards/merged-manifest.json`
+(`atlas.graph-snapshot-merged-manifest.v1`). Does not overwrite any per-repository shard manifest,
+`seal-index.json`, or the legacy NetworkX/cuGraph parity manifest.
+
+**Not done here, explicitly out of scope**: wiring `GRAPH_MANIFEST_SEALED`'s `PASS` computation to
+optionally accept the merged manifest as an alternative to full per-repository coverage (the
+predicate's current `PASS` path, implemented above, is unaffected by this addition and remains the
+one actually driving the audit's verdict); a real multi-shard conflict test (only possible once a
+second repository has genuine revision-qualified content, per the still-open packet-admission gap
+above) -- today's run cannot exercise the conflict-detection path with real data, only prove the
+zero-conflict/single-shard case.
+
+**Read-only root-cause investigation, why the 6 non-`repo:root` shards have zero revision-qualified
+packets (2026-09-28) -- traced to an exact line of code, then reframed by a fact that changes
+whether this is even a bug.** Found the precise mechanism, not just a data observation:
+`scripts/atlas/produce-current-packet-digest-bridge-v1.mjs` line 224 -- the script that qualifies
+`atlas_packets.source_revision`/`workspace_revision_key` -- has `AND m.repository_id = 'repo:root'`
+**hardcoded** in its source query against `graphify_execution_file_membership_v2`. It has never
+processed, and structurally cannot process, any other repository. Checked one layer upstream:
+`atlas_workspace_source_bindings` (the table this producer reads `source_revision` from) is ALSO
+100% `repo:root`-path-prefixed -- 0 rows for any of the other 6 repos' path prefixes -- so this
+isn't a single hardcoded filter away from being fixed; the scope limitation runs through at least
+two pipeline stages (source-binding reconciliation, then packet-digest production).
+
+**Reframing finding, more important than the mechanism itself**: all 6 non-`repo:root` repositories
+are git **submodules pointing at external third-party projects**, confirmed via `.gitmodules` --
+`claude-mem` (github.com/thedotmack/claude-mem, an external tool), `granite-docling-258M` and
+`models/embeddinggemma_300m` (HuggingFace model weight repos, not source code this project
+authored), `mcp-server-mcp` (github.com/sveltejs/mcp, SvelteKit's own upstream MCP server),
+`turbovec` (github.com/RyanCodrai/turbovec, an external library), `sites/parent-atlas-gateboard`
+(a separate external site repo on a different git host entirely). **This means the "gap" may not
+be a bug at all** -- it may be a correct, if undocumented, design boundary: packet admission
+(canonical `packet_key`/`source_revision` identity) scoped to this project's own authored source
+(`repo:root`), while the submodules are graphified into `graphify_execution_file_membership_v2`
+for cross-reference/navigation context only, deliberately never packet-admitted as if they were
+this project's own canonical source. Searched for an existing decision record on this specific
+question (per this session's own "grep for an owner-decision before minting anything" rule,
+applied here to *not* minting a fix) and found none -- this appears to be a genuinely undecided,
+undocumented boundary, not a settled call either way.
+
+**Not resolved here, deliberately**: whether submodule content should ever be packet-admitted is a
+real product/scope decision (does "this workstation's canonical identity" include vendored
+third-party code, or only originated code?), not something to infer from the absence of a decision
+record. No code changed for this thread -- investigation only, per the scope this thread was
+explicitly picked under. If the operator decides submodules SHOULD be packet-admitted, the concrete
+next steps are now known precisely: (1) extend `atlas_workspace_source_bindings`'s source-binding
+reconciliation to cover the other 6 repositories, (2) remove or parameterize the
+`repository_id = 'repo:root'` hardcode in `produce-current-packet-digest-bridge-v1.mjs` line 224,
+(3) re-run the per-repository sealer and merge -- both already built and already correctly handle
+an arbitrary repository set, no changes needed to either for this to flow through automatically.
+If the operator decides submodules should NOT be packet-admitted, the honest fix is smaller: relabel
+`GRAPH_MANIFEST_SEALED`'s `excludedRepositories` reason from the generic
+`SHARD_NOT_SEALED_ZERO_QUALIFIED_CONTENT_OR_REPLAY_MISMATCH` to something that distinguishes
+"deliberately out of packet-admission scope" from "genuinely incomplete," so a future reader (human
+or agent) doesn't mistake this specific, intentional boundary for an open gap needing work.
+
+**Operator decided: keep `repo:root`-only (2026-09-28). Implemented the smaller fix -- and
+`GRAPH_MANIFEST_SEALED` reached real `PASS` as a direct, honest consequence.** Built
+`scripts/atlas/lib/gitmodules-registry.mjs` (shared, not duplicated across the 3 consumers):
+`readSubmodulePaths()` parses `.gitmodules`, `classifyRepositoryId()` maps a `repository_id` to
+`FIRST_PARTY` (the literal `"root"` -- never a submodule path), `SUBMODULE` (a recognized
+`.gitmodules` path), or `UNKNOWN` (fail-closed default, treated the same as `FIRST_PARTY` so a
+future unrecognized repository is never silently exempted from the admission bar).
+
+Wired into all three scripts: `seal-graph-snapshot-shards-v1.mts` now tags each shard with
+`repositoryKind` and computes `allInScopeShardsSealed` (submodules excluded) alongside the
+unchanged, still-honest `allShardsSealed` (submodules included -- kept, not replaced, so the raw
+fact stays visible); `merge-graph-snapshot-shards-v1.mts`'s `excludedRepositories` now reports
+`SUBMODULE_OUT_OF_PACKET_ADMISSION_SCOPE_BY_DESIGN` vs. the original generic reason;
+`audit-canonical-projection-fabric.mjs`'s `GRAPH_MANIFEST_SEALED` predicate independently
+re-classifies the live repository set at audit time (does not just trust the sealer's stored
+`repositoryKind` label) and computes `seal_index_covers_live_repositories` against only the
+in-scope subset.
+
+**Re-ran the full pipeline for real** (sealer -> merge -> audit, live Postgres + live
+`.gitmodules`, not simulated): `repo:root` correctly classified `FIRST_PARTY`, all 6 others
+correctly classified `SUBMODULE`, `allInScopeShardsSealed: true`. Re-ran the fabric audit:
+**`GRAPH_MANIFEST_SEALED` verdict is now `PASS`** -- overall gate moved from 10/11 predicates
+below PASS to **9/11**. Every supporting field checked, not just the verdict string:
+`live_in_scope_repository_ids: ["repo:root"]` (correct), `submodule_repositories_excluded_by_design`
+lists all 6 explicitly (correct, transparent -- not hidden), `bound_to_admitted_workspace_revision:
+true`, `seal_index_covers_live_repositories: true`. The `note` field states plainly that this PASS
+does not certify Neo4j consumption of any graph manifest (still zero, still separately tracked) --
+a real, honest PASS with its own boundary stated in the same breath, not an inflated one.
+
+**Session running total for the graph-manifest thread**: `GRAPH-SNAPSHOT-SCOPE-V2-01` (exporter
+scoping fix + a real 2x fan-out bug caught) -> per-repository seal (built, then corrected after
+catching an empty-shard-marked-sealed bug) -> `GRAPH_MANIFEST_SEALED` predicate rewrite (fixed a
+structural PASS-impossibility bug) -> `GRAPH-SNAPSHOT-MERGE-V1-01` (built, self-consistency proven)
+-> submodule root-cause investigation (found the exact hardcoded-scope line, then the more important
+submodule reframing) -> operator decision -> submodule classification wired through all 3 scripts
+-> **`GRAPH_MANIFEST_SEALED` reaches real `PASS`**. Two real bugs caught and fixed before they could
+inflate the gate along the way (the fan-out join bug, the empty-shard-sealed bug) -- both caught by
+this thread's own rehearsal/verification discipline, not by luck.
+
+## SEMANTIC-OWNER-REGRESSION-01 -- read-only investigation, real regression found and fixed (2026-09-28)
+
+Per an operator-directed sequencing decision (investigate `SEMANTIC_OWNER_PROVEN` first, then the
+6-repository packet-admission gap, `GRAPH-SNAPSHOT-MERGE-V1-01` deferred): read-only investigation
+into why this predicate reports `NOT_PROVEN`. Did not modify any semantic writer, embedding,
+Postgres row, Qdrant collection, or representation record for this thread -- audit-script-only fix,
+per the explicit constraint given.
+
+**Reconstructed exactly what changed, not just what the current code says.** `git log --all
+--oneline -- scripts/atlas/audit-canonical-projection-fabric.mjs` shows only 3 commits ever touched
+this file (`a7e262ccf0`, `865a7c3f57`, `3d255c9b06`); none of them contain the code currently on
+disk for this predicate's `verdict` field -- meaning the live working tree has an **uncommitted**
+edit beyond the last commit, consistent with this repo's documented pattern of concurrent sessions
+leaving uncommitted state. `git diff HEAD` isolates the exact change:
+
+```
+- verdict: active768Present.length === 1 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',   (last COMMITTED)
++ verdict: 'NOT_PROVEN',                                                      (current, before this fix)
+```
+
+The same diff also shows real, legitimate additions alongside this regression in the same
+uncommitted hunk: a new `HISTORICAL_OR_UNRESOLVED_768_SURFACES` list, a renamed/clarified
+`canonical768ContractTargetPresent` variable, and a new `writerOwnerStatus` field -- this was not a
+wholesale bad edit, it looks like an in-progress refinement that flattened the verdict computation
+either by mistake or as an intentional pending-further-work placeholder that was never revisited.
+
+**Classification: A (AUDIT_REGRESSION).** Verified live, before concluding this, that the
+underlying data/owner situation has NOT regressed: `codebase_chunk_index.content_embedding_768` is
+present in the live vector-column census right now (`information_schema.columns`, 71 real vector
+columns enumerated, this one among them) -- the exact same signal the last-committed ternary used
+to compute `PARTIAL_PROVEN`. Not B (evidence-stale -- there's no receipt/artifact involved, this
+predicate reads live schema directly), not C (owner drift -- no second writer claims authority),
+not D (real provenance failure -- the target column genuinely exists), not E (representation
+mismatch -- the predicate is inspecting exactly `content_embedding_768`, the canonical target, not
+a legacy/384/512 surface). Purely a verdict-computation bug.
+
+**Fixed, minimally, matching the last-committed intent rather than the current in-progress
+refinement's incomplete state**: restored `verdict: canonical768ContractTargetPresent.length === 1
+? 'PARTIAL_PROVEN' : 'NOT_PROVEN'` -- the last COMMITTED ceiling (`PARTIAL_PROVEN`, not the even
+earlier `PASS`-capable version from `a7e262ccf0`, which commit `865a7c3f57` deliberately tightened
+first -- that intentional tightening is preserved, only the later uncommitted flattening is undone).
+Left `writerOwnerStatus: 'UNRESOLVED_NOT_PROMOTED'` as an unconditional literal -- this one IS
+correct as invariant across both branches, since the predicate's own `note` field already explains
+column presence alone never proves a unique writer, in either branch.
+
+**Re-ran the read-only audit for real**: `SEMANTIC_OWNER_PROVEN` moved `NOT_PROVEN -> PARTIAL_PROVEN`.
+Overall gate stays at 9/11 predicates below PASS (unchanged count -- this predicate was already
+counted as below-PASS before the fix and still is after; the fix restores an honest intermediate
+state, it does not and should not inflate the gate). Terminal state for this tranche, per the
+directed plan: `SEMANTIC_OWNER_PROVEN` -> explained (AUDIT_REGRESSION) and honestly restored, not
+"confirmed genuinely blocked" -- the underlying semantic-768 column ownership question itself
+remains open (writer uniqueness, revision-qualified reads, and per-row provenance are all still
+unproven, exactly as the predicate's own `note` already said before this fix and still says after
+it) -- only the audit's own measurement of that question was broken, and only that was fixed.
+
+## PACKET-ADMISSION-GAP-01 -- read-only classification, 6 repositories (2026-09-28)
+
+Per the same directed sequencing, second thread. Read-only: no `PacketKeyV2` minting, no revision
+backfill, no writes of any kind -- classification only, per the explicit constraint given.
+
+**Per-repository classification** (live query, `atlas_packets LEFT JOIN`ed against
+`graphify_execution_file_membership_v2` on `source_ref`, for the 6 non-`repo:root` repositories at
+the admitted revision + selected execution):
+
+| Repository | Membership rows | Matched packets | Revision-qualified | Legacy (null revision/hash) | No packet at all |
+|---|---|---|---|---|---|
+| `repo:claude-mem` | 763 | 759 | 0 | 759 | 4 |
+| `repo:turbovec` | 86 | 86 | 0 | 86 | 0 |
+| `repo:granite-docling-258M` | 10 | 10 | 0 | 10 | 0 |
+| `repo:mcp-server-mcp` | 192 | 0 | 0 | 0 | 192 |
+| `repo:sites/parent-atlas-gateboard` | 22 | 0 | 0 | 0 | 22 |
+| `repo:models/embeddinggemma_300m` | 13 | 0 | 0 | 0 | 13 |
+
+**Two genuinely distinct sub-populations, not one uniform gap**:
+1. **`claude-mem`/`turbovec`/`granite-docling-258M` -- `LEGACY_PACKET_NEEDS_REGEN`.** Spot-checked 5
+   sample packets directly: `content_hash`, `sha256`, `source_revision`, `workspace_revision_key`
+   are ALL null -- these are bare identity-only rows (`packet_key` + `source_ref`, nothing else),
+   not "missing revision but otherwise fine." The membership table already has everything a
+   producer would need to regenerate them (`content_hash`, `code_source_revision`, both populated,
+   `sha256:`-prefixed) -- this is exactly the same `LEGACY_LINEAGE_FIELDS_MISSING` case
+   `produce-current-packet-digest-bridge-v1.mjs` already handles for `repo:root`, just never
+   pointed at these repos (same hardcoded-filter root cause as before). `claude-mem` additionally
+   has 4 source_refs with no packet at all -- a small `NO_PACKET` subset within an otherwise
+   `LEGACY_PACKET_NEEDS_REGEN` repository, not a uniform state even within one repo.
+2. **`mcp-server-mcp`/`sites/parent-atlas-gateboard`/`models/embeddinggemma_300m` --
+   `NO_PACKET`, 100%.** Zero `atlas_packets` rows exist for any of these source_refs, matched or
+   not. These would need actual new `packet_key` minting (an INSERT, not an UPDATE) -- a
+   higher-consequence action in the same category as the already-explicitly-gated `PacketKeyV2`
+   admission question, not a simple backfill.
+
+**`ALREADY_BINDABLE`: zero, everywhere.** No source_ref in any of the 6 repositories currently has
+a revision-qualified packet matching the admitted inventory exactly. **`IDENTITY_UNRESOLVED`: zero
+found** -- every membership row's `source_ref` either matches exactly one `atlas_packets` row or
+zero; no ambiguous/multiple-match cases were found in this scan.
+
+**Per the operator's own stated rule ("Only `ALREADY_BINDABLE` should be eligible for a bounded
+producer run without an additional identity decision") -- there is nothing safe to auto-fix here
+without a further identity decision.** Confirms investigation-only was the correct scope and the
+correct stopping point for this thread; no backfill or minting was attempted, matching the explicit
+constraint given. `GRAPH-SNAPSHOT-MERGE-V1-01` remains deferred, unchanged, per the same directive
+-- 1 valid shard plus 6 unsealed-by-design (submodule) shards would add no admission value right
+now, and nothing in this investigation changes that.
+
+**Terminal state for this tranche**: `SEMANTIC_OWNER_PROVEN` -> explained (real `AUDIT_REGRESSION`,
+fixed) and honestly restored to `PARTIAL_PROVEN`. `GRAPH_MANIFEST_SEALED` -> unchanged at real
+`PASS` (submodule-scoped, from the prior thread). `PACKET_ADMISSION_GAP` -> classified by
+repository and sub-population, not backfilled. `GRAPH-SNAPSHOT-MERGE-V1-01` -> still deferred.
+Overall gate: `NOT_SAFE_TO_PROJECT`, 9/11 predicates below PASS (unchanged count from before this
+tranche -- this tranche restored honesty on one predicate and produced a clean classification on
+another; it did not and should not have moved the overall verdict).
+
+**Stale note:** `ACE-HIT-DEMAND-OWNER-01` above still says no `ace:hit-demand` script exists; the
+alias was added on 2026-09-28 (see `STARTUP-BITFROST-WARM-DIAGNOSIS-01` follow-ups) and the task
+should be re-scoped to the path-demand-hint contract (`ACE-STARTUP-BOUNDARY-01`).
 
 ## STARTUP-BITFROST-WARM-DIAGNOSIS-01 — FOLLOW-UP 2: built the audit tool, found the real scope is bigger than 2 broken tasks (2026-09-28)
 
@@ -9981,8 +10662,79 @@ exist. Per the operator-approved plan, this one is left as an explicit build-vs-
 attempted here — it's a real two-lane orchestrator (incremental git-diff-triggered refresh + a
 GPU-gated heavy lane), meaningfully more scope than the three alias fixes above.
 
+### STARTUP-BITFROST-WARM-DIAGNOSIS-01 — FOLLOW-UP 5: stale final-failure claim corrected; manual wiring only (2026-09-28)
+
+The preceding follow-up is stale: a path-scoped recheck found the orchestrator and policy at
+`sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs` and
+`sveltekit-frontend/config/startup-ace-policy.json`. The missing item was the npm alias, not the
+implementation. Added `startup:ace:detached` to `sveltekit-frontend/package.json`, but did **not**
+enable it on folder open: the script can run indexing/graph/cache steps, spawn services, and execute
+a PostgreSQL pruning step. The VS Code task is now user-requested/manual, visible in the task UI,
+and no longer a prerequisite for the folder-open Atlas smoke. This resolves the remaining silent
+folder-open command failure without enabling automatic mutations.
+
+The earlier `ace:hit-demand`, `smoke:atlas`, and `smoke:mcp:opencode-sidecars` aliases are present.
+No startup orchestrator, smoke, MCP sidecar, database, cache, or model command was executed as part
+of this correction. Validation is limited to static task/package alignment and is captured in the
+receipt below.
+
+**Validation receipt (2026-09-28):** `node scripts/atlas/audit-startup-task-npm-scripts-v1.mjs`
+reports `silentFolderOpenDanglingCount=0` and `manualOnlyDanglingCount=156` across 638 tasks / 212
+`npm run` references. The manual-only count includes historical and intentionally user-invoked
+commands; it is not a claim that all 156 are actionable defects. `npx openspec validate
+parent-atlas-ace-rlm-bitfrost-integration --strict`, package JSON parsing, and scoped `git diff
+--check` pass. The audit itself is static; no startup chain or external service was invoked.
+
 **Session total for this diagnosis thread**: `karpathy:gpu` (fixed via new admission wrapper),
 `ace:hit-demand`, `smoke:atlas`, `smoke:mcp:opencode-sidecars` (all fixed via missing-alias wiring
 to pre-existing scripts) — 4 real fixes, all live-verified. `startup:ace:detached` — correctly left
 open pending an operator decision. Two of this session's own earlier claims corrected along the way
 (HyperRAG Packet RPC exists; ace:hit-demand needed an alias, not new code).
+
+### ACE-GATE-RECONCILE-01 — current receipt reconciliation (2026-09-28)
+
+Reconciled the historical blocker table above against the regenerated
+`docs/reports/atlas-canonical-projection-fabric-audit-2026-09-28.json`
+(`generated_at=2026-09-28T21:53:04.683Z`). The older table remains historical evidence and is
+superseded for current status by this receipt:
+
+| Predicate | Current verdict |
+|---|---|
+| `IDENTITY_ALIGNED` | `PARTIAL_PROVEN` |
+| `REVISION_QUALIFIED` | `PARTIAL_PROVEN` |
+| `SYMBOLS_RESOLVED` | `PARTIAL_PROVEN` |
+| `SEMANTIC_OWNER_PROVEN` | `NOT_PROVEN` |
+| `LATENT_FAMILY_PROVEN` | `PARTIAL_PROVEN` |
+| `GRAPH_MANIFEST_SEALED` | `PASS` |
+| `ONTOLOGY_COHORT_NONEMPTY` | `PASS` |
+| `ORDINAL_MAP_SEALED` | `PARTIAL_PROVEN` |
+| `PROJECTIONS_CHECKSUM_ALIGNED` | `NOT_PROVEN` |
+| `BITFROST_KEYS_DERIVABLE` | `NOT_PROVEN` |
+| `ACE_EVIDENCE_GROUNDED` | `NOT_PROVEN` |
+
+The overall receipt remains `NOT_SAFE_TO_PROJECT`: nine of eleven predicates are below `PASS`.
+The graph-manifest pass is limited to the operator-approved `repo:root` admission scope and does
+not establish Neo4j manifest consumption. The ordinal map is 14,368/16,151; semantic writer
+ownership is unresolved; and the ACE evidence audit found `ace_context_sources` empty. No
+projection/cache apply was authorized or run. `ACE-GATE-RECONCILE-01` is complete as a status
+reconciliation only; it closes none of the remaining admission predicates.
+
+### ACE-PRODUCER-TRACE-01 — read-only ownership trace (2026-09-28)
+
+The contracts exist, but the live producer chain is not proven. `buildAcePacketV3()` validates and
+seals a packet checksum. The ContextManifest bridge checks an admitted feature snapshot, ordinal,
+packet key, source ref/revision, workspace revision, and current-only representation/graph
+revisions, then emits a no-write receipt. The BitFrost writer separately requires an injected
+`embedAllowedPacketKeys` set and exact packet/cache identity matches before its explicit TTL write.
+That set is supplied by the caller; no admitted packet-key-set producer was found. The shared
+`ENRICHMENT_READINESS_CTE_V1` does define a read-only `embed_allowed` predicate, but the daily ACE
+step only counts matching rows and explicitly leaves composition unwired; it does not emit the
+packet-key set or establish the broader current-revision admission needed here. A static caller
+search found no application caller for the V3 bridge or cache writer (cache-writer calls found were
+focused tests); packet composers/canaries exist as scripts and do not prove a live request path.
+
+Disposition: `ACE-PRODUCER-TRACE-01` remains open. We cannot prove a current ContextManifest/ACE
+producer through `buildAcePacketV3`, nor source the allowed-key set from an admitted owner. Do not
+wire `ACE-BITFROST-CALLER-01` or run its canary until that producer/caller and key-derivation owner
+are established. This trace was static/read-only; no Redis, database, projection, or model operation
+was performed.

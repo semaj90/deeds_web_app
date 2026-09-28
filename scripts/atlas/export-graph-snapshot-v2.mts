@@ -18,7 +18,22 @@ function requiredArg(name: string, fallback?: string): string {
 
 const root = resolve(import.meta.dirname, '..', '..');
 const outputJson = parseArg('--output-json', resolve(root, 'graphify/frozen-graph-snapshot-v2.json'));
-const workspaceId = requiredArg('--workspace-id', process.env.PAGERANK_WORKSPACE_ID);
+// Renamed from --workspace-id 2026-09-28: that name/value scoped the query to
+// atlas_packets.workspace_id (a directory-path label, 1,196 meaningless distinct
+// values), never the admitted revision. --workspace-revision now scopes to
+// atlas_packets.workspace_revision_key (sha256:<64-hex>), matching every other
+// admitted-revision-bound producer in this repo.
+const workspaceRevision = requiredArg('--workspace-revision', process.env.PAGERANK_WORKSPACE_REVISION ?? process.env.PAGERANK_WORKSPACE_ID);
+// GRAPH-SNAPSHOT-SCOPE-V2-01 (2026-09-28): workspace_revision alone still spans
+// every repository undifferentiated (16,151 packets at the current admitted
+// revision). --execution-id + --repository-id scope to a real
+// graphify_execution_file_membership_v2 partition (7 real repository_id values
+// live, e.g. "repo:root") and avoid a 2x join fan-out from multiple executions
+// recording membership for the same (workspace_revision, repository_id) pair --
+// see graph-snapshot-postgres.ts's PostgresGraphSnapshotInput doc comments for
+// the live verification numbers.
+const executionId = requiredArg('--execution-id', process.env.PAGERANK_EXECUTION_ID);
+const repositoryId = requiredArg('--repository-id', process.env.PAGERANK_REPOSITORY_ID);
 const snapshotId = requiredArg('--snapshot-id', process.env.PAGERANK_SNAPSHOT_ID);
 const sourceInventorySnapshotId = requiredArg('--source-inventory-snapshot-id', process.env.PAGERANK_SOURCE_INVENTORY_SNAPSHOT_ID);
 const identityContractVersion = requiredArg('--identity-contract-version', 'identity-contract-v1');
@@ -36,7 +51,9 @@ const queryLike: QueryLike = {
 try {
   const materialization = await materializeCanonicalGraphSnapshotFromPostgres(queryLike, {
     snapshotId,
-    workspaceId,
+    workspaceRevision,
+    executionId,
+    repositoryId,
     sourceInventorySnapshotId,
     identityContractVersion,
     parserContractVersion
@@ -56,7 +73,9 @@ try {
     status: 'GRAPH_SNAPSHOT_EXPORTED',
     output_json: outputJson,
     snapshot_id: snapshotId,
-    workspace_id: workspaceId,
+    workspace_revision: workspaceRevision,
+    execution_id: executionId,
+    repository_id: repositoryId,
     node_count: materialization.graphSnapshotManifest.nodeCount,
     edge_count: materialization.graphSnapshotManifest.edgeCount,
     topology_hash: materialization.graphSnapshotManifest.topologyHash

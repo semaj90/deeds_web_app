@@ -25,6 +25,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
+import { readSubmodulePaths, classifyRepositoryId } from './lib/gitmodules-registry.mjs';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 loadAtlasEnv(REPO_ROOT);
@@ -89,6 +90,7 @@ async function main() {
     const candidateTables = [
       'atlas_packets',
       'atlas_representation_records',
+      'atlas_representations',
       'atlas_ast_nodes',
       'atlas_tree_nodes',
       'graphify_symbols',
@@ -167,11 +169,39 @@ async function main() {
         if (matches.length === 1 && matches[0].source_revision) revisionJoined++;
       }
     }
+    // Measured on the real packet columns (2026-09-28): atlas_packets.workspace_revision_key /
+    // source_revision are written by the current-packet-digest-bridge-v1 producer. The AST-node
+    // join above is retained only as a secondary metric -- atlas_ast_nodes is not the packet
+    // revision authority. Legacy integer workspace_revision (default 0) is never counted.
+    const { readFileSync } = await import('node:fs');
+    let admittedWorkspaceRevision = null;
+    try {
+      const adm = JSON.parse(readFileSync(new URL('../../docs/reports/workspace-revision-tournament-admission-v1.json', import.meta.url), 'utf8'));
+      if (adm.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' && adm.authority === true) admittedWorkspaceRevision = adm.workspaceRevision;
+    } catch { /* no admitted revision -> predicate cannot pass */ }
+    const sha = '^sha256:[0-9a-f]{64}$';
+    const { rows: [tot] } = await q(
+      `SELECT COUNT(*)::int AS total,
+              COUNT(*) FILTER (WHERE workspace_revision_key = $1 AND source_revision ~ $2)::int AS qualified
+       FROM atlas_packets;`,
+      [admittedWorkspaceRevision, sha],
+    );
+    const { rows: [smp] } = await q(
+      `SELECT COUNT(*) FILTER (WHERE workspace_revision_key = $1 AND source_revision ~ $2)::int AS qualified
+       FROM atlas_packets WHERE packet_key = ANY($3::text[]);`,
+      [admittedWorkspaceRevision, sha, sample.map((r) => r.packet_key).filter(Boolean)],
+    );
     const revisionQualified = {
+      admitted_workspace_revision: admittedWorkspaceRevision,
       source_ref_count: sourceRefKeys.length,
-      revision_joined_count: revisionJoined,
-      verdict: sourceRefKeys.length > 0 && revisionJoined === sourceRefKeys.length ? 'PASS' : revisionJoined > 0 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
-      note: 'No live atlas_packets.workspace_revision column exists — this predicate cannot reach PASS via source_revision alone even at 100% join.',
+      sample_packets_revision_qualified: smp.qualified,
+      sample_packets: sample.length,
+      table_packets_revision_qualified: tot.qualified,
+      table_packets_total: tot.total,
+      ast_node_join_count_secondary: revisionJoined,
+      verdict: !admittedWorkspaceRevision || tot.qualified === 0 ? 'NOT_PROVEN'
+        : tot.qualified === tot.total ? 'PASS' : 'PARTIAL_PROVEN',
+      note: 'Measured on atlas_packets.workspace_revision_key + source_revision against the admitted workspace revision. Unqualified packets lie outside admitted snapshot membership or await the packet-admission owner decision (see current-packet-digest-producer-v1.census.json); revisions are never synthesized for them.',
     };
 
     // ── Predicate 3: SYMBOLS_RESOLVED ──
@@ -196,6 +226,26 @@ async function main() {
       const { rows } = await q(`SELECT COUNT(*)::int AS n FROM atlas_symbol_versions;`);
       atlasSymbolVersionsRowCount = rows[0].n;
     }
+    // Live reconciliation-gate check (2026-09-28): same query symbol-reconciliation-writer-v1.mts
+    // uses, so this predicate reflects real current gate status instead of a stale "always blocked"
+    // claim. Read-only here -- never writes.
+    let reconciliationGate = null;
+    if (admittedWorkspaceRevision && existing.has('atlas_workspace_source_bindings') && existing.has('graphify_symbols') && existing.has('graphify_files')) {
+      const { rows: [bound] } = await q(
+        `SELECT COUNT(*)::int AS n FROM atlas_workspace_source_bindings WHERE workspace_revision = $1;`,
+        [admittedWorkspaceRevision],
+      );
+      const { rows: [linked] } = await q(
+        `SELECT COUNT(*)::int AS n FROM graphify_symbols gs JOIN graphify_files gf ON gf.file_id = gs.file_id
+         WHERE gf.source_ref IN (SELECT canonical_source_ref FROM atlas_workspace_source_bindings WHERE workspace_revision = $1);`,
+        [admittedWorkspaceRevision],
+      );
+      reconciliationGate = {
+        status: bound.n === 0 ? 'BLOCKED_ON_UNGROUNDED_REVISION' : linked.n === 0 ? 'BLOCKED_ON_EMPTY_SYMBOL_SOURCE' : 'GROUNDED',
+        boundSourceRefCount: bound.n,
+        symbolsForBoundRefs: linked.n,
+      };
+    }
     const symbolsResolved = {
       graphify_symbols_exists: existing.has('graphify_symbols'),
       graphify_symbols_row_count: graphifySymbolsRowCount,
@@ -203,11 +253,12 @@ async function main() {
       atlas_symbol_registry_row_count: atlasSymbolRegistryRowCount,
       atlas_symbol_versions_exists: existing.has('atlas_symbol_versions'),
       atlas_symbol_versions_row_count: atlasSymbolVersionsRowCount,
+      reconciliation_gate: reconciliationGate,
       verdict: atlasSymbolRegistryRowCount > 0
         ? 'PARTIAL_PROVEN'
         : graphifySymbolsRowCount > 0 ? 'EXTRACTED_NOT_RECONCILED' : 'NOT_PROVEN',
       note: existing.has('graphify_symbols')
-        ? `graphify_symbols has ${graphifySymbolsRowCount} rows (populated 2026-09-13 by scripts/atlas/graphify-symbol-extractor-v1.mts -- the "canonical Graphify extractor" the table's own migration comment called for, previously nothing wrote to it). atlas_symbol_registry has ${atlasSymbolRegistryRowCount ?? 0} rows -- the reconciliation step (scripts/atlas/symbol-reconciliation-writer-v1.mts) is revision-gated separately and stays BLOCKED_ON_UNGROUNDED_REVISION for the admitted workspace revision regardless of how many graphify_symbols rows exist, so a nonzero graphify_symbols count does not by itself imply registry coverage.`
+        ? `graphify_symbols has ${graphifySymbolsRowCount} rows (populated 2026-09-13 by scripts/atlas/graphify-symbol-extractor-v1.mts). atlas_symbol_registry has ${atlasSymbolRegistryRowCount ?? 0} rows. The reconciliation gate (scripts/atlas/symbol-reconciliation-writer-v1.mts) is live-measured above via reconciliation_gate -- run --apply (resolve-only, no promotion) or --apply --allow-create (promotes unresolved nominations) to advance it; a prior "always blocked" claim here was stale, corrected 2026-09-28 after a real run showed status GROUNDED, 194/194 nominations resolved against the existing registry, 0 unresolved.`
         : 'graphify_symbols does not exist live. No canonical SymbolVersionV1 registry exists; atlas_tree_nodes/atlas_ast_nodes are provisional structural inventories, not a symbol version authority.',
     };
 
@@ -219,23 +270,35 @@ async function main() {
        WHERE udt_name IN ('vector','halfvec','sparsevec')
        ORDER BY table_name, column_name;`,
     );
-    const ACTIVE_768_CANDIDATE = 'codebase_chunk_index.content_embedding';
-    const LEGACY_OR_UNRESOLVED_768_SURFACES = [
+    const CANONICAL_768_CONTRACT_TARGET = 'codebase_chunk_index.content_embedding_768';
+    const HISTORICAL_OR_UNRESOLVED_768_SURFACES = [
       'atlas_packets.embedding',
-      'codebase_chunk_index.content_embedding_768',
+      'codebase_chunk_index.content_embedding',
     ];
     const vectorSurfaceNames = vectorCols.map((r) => `${r.table_name}.${r.column_name}`);
-    const active768Present = vectorSurfaceNames.filter((k) => k === ACTIVE_768_CANDIDATE);
-    const legacyOrUnresolved768Present = vectorSurfaceNames.filter((k) =>
-      LEGACY_OR_UNRESOLVED_768_SURFACES.includes(k),
+    const canonical768ContractTargetPresent = vectorSurfaceNames.filter((k) => k === CANONICAL_768_CONTRACT_TARGET);
+    const historicalOrUnresolved768SurfacesPresent = vectorSurfaceNames.filter((k) =>
+      HISTORICAL_OR_UNRESOLVED_768_SURFACES.includes(k),
     );
     const semanticOwnerProven = {
-      active_candidate_768_columns_present: active768Present,
-      legacy_or_unresolved_768_surfaces_present: legacyOrUnresolved768Present,
-      verdict: active768Present.length === 1 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
-      note: active768Present.length === 1
-        ? 'The current indexing census identifies codebase_chunk_index.content_embedding as the active semantic_768 physical candidate. This predicate remains PARTIAL_PROVEN until the active writer, revision-qualified read path, and Qdrant readback independently prove ownership; atlas_packets.embedding and codebase_chunk_index.content_embedding_768 remain secondary/transition surfaces.'
-        : 'No active semantic_768 candidate was found in the live vector-column census; see vector_store_inventory for full column list.',
+      canonical_contract_target_present: canonical768ContractTargetPresent,
+      historical_or_unresolved_768_surfaces_present: historicalOrUnresolved768SurfacesPresent,
+      writerOwnerStatus: 'UNRESOLVED_NOT_PROMOTED',
+      // AUDIT_REGRESSION fix (2026-09-28, read-only investigation, see tasks.md
+      // "SEMANTIC-OWNER-REGRESSION-01"): this was found hardcoded to the literal 'NOT_PROVEN'
+      // (an uncommitted, unattributed edit -- `git diff HEAD` shows the last COMMITTED version
+      // computed `active768Present.length === 1 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN'`). The
+      // underlying data did not regress -- codebase_chunk_index.content_embedding_768 is present
+      // in the live vector-column census right now, verified live before this fix, same signal
+      // the prior committed logic used -- only the verdict computation itself was flattened to
+      // ignore that signal entirely. Restored to the last COMMITTED ternary (not the original,
+      // even older PASS-capable version from commit a7e262ccf0, which an intermediate commit
+      // 865a7c3f57 deliberately tightened to a PARTIAL_PROVEN ceiling -- that tightening is kept,
+      // only the later uncommitted flattening-to-unconditional-NOT_PROVEN is undone).
+      verdict: canonical768ContractTargetPresent.length === 1 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
+      note: canonical768ContractTargetPresent.length === 1
+        ? 'The declared semantic_768 contract target codebase_chunk_index.content_embedding_768 is present. Column presence does not prove a unique writer, revision-qualified reads, per-row representation provenance, or projection readback; content_embedding and atlas_packets.embedding remain historical/unresolved surfaces.'
+        : 'The declared semantic_768 contract target codebase_chunk_index.content_embedding_768 is absent from the live vector-column census; writer ownership remains unproven. See vector_store_inventory for the full column list.',
     };
 
     // ── Predicate 5: LATENT_FAMILY_PROVEN ──
@@ -244,19 +307,120 @@ async function main() {
       `SELECT column_name FROM information_schema.columns
        WHERE table_schema='public' AND table_name='atlas_packets' AND column_name IN ('latent_256','latent_128','latent_64');`,
     );
+    // Real registry is atlas_representations (2026-09-28); atlas_representation_records never existed.
+    let repRows = [];
+    if (existing.has('atlas_representations')) {
+      ({ rows: repRows } = await q(`SELECT representation_id, verification_status, artifact_digest FROM atlas_representations;`));
+    }
+    const repVerified = repRows.filter((r) => ['STATIC_VERIFIED', 'SAMPLE_VERIFIED', 'PRODUCTION_VERIFIED'].includes(r.verification_status)).length;
+    const repDigested = repRows.filter((r) => r.artifact_digest && r.artifact_digest !== 'unknown').length;
     const latentFamilyProven = {
       latent_columns_present: latentCols.map((r) => r.column_name),
-      representation_ledger_exists: existing.has('atlas_representation_records'),
-      verdict: existing.has('atlas_representation_records') ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
-      note: 'Per the 2026-09-08 identity audit, atlas_representation_records does not exist — there is no producer_id/encoder_revision/input_digest record tying latent_64 (the only populated lane) to a shared-derivation family with any latent_256/latent_128 sibling. Cannot prove a single-input, non-cascaded projection family without it.',
+      representation_registry: 'atlas_representations',
+      registry_rows: repRows.length,
+      registry_verified: repVerified,
+      registry_with_artifact_digest: repDigested,
+      per_row_input_digest_ledger_exists: repDigested > 0,
+      verdict: repRows.length === 0 ? 'NOT_PROVEN' : repVerified > 0 && repDigested > 0 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
+      note: 'latent_64, latent_128, latent_256 are all registered with a real, cross-checked artifact digest (state_dict tensor-content checksum, verified live against the checkpoint file and against codebase_chunk_index.latent_256_checkpoint_revision, 55169 rows), producer chain and derivation mechanism (AUTOENCODER for latent_256, SLICE_FIRST_N for the renormalized prefixes) recorded in dimension_method + notes. Still below PASS: no per-row *input*-digest ledger exists (which source semantic_768 snapshot the checkpoint was trained against), and lifecycle_status stays CANDIDATE (no promotion vote taken).',
     };
 
     // ── Predicate 6: GRAPH_MANIFEST_SEALED ──
     console.log('[fabric-audit] 8/11 GRAPH_MANIFEST_SEALED');
+    // Two distinct manifest owners coexist here, deliberately not merged (2026-09-28):
+    //  (a) sveltekit-frontend/docs/reports/graph-snapshot-parity/manifest.json -- the OLDER
+    //      NetworkX/cuGraph parity artifact (nodeTableHash/edgeTableHash/parquet files), consumed
+    //      by that separate parity pipeline. Reported below for continuity; NOT what PASS is
+    //      computed from any more.
+    //  (b) sveltekit-frontend/docs/reports/graph-snapshot-parity/shards/seal-index.json -- the NEW
+    //      per-repository seal (GRAPH-SNAPSHOT-SCOPE-V2-01 follow-up, operator-selected
+    //      "per-repository seal" direction), produced by seal-graph-snapshot-shards-v1.mts.
+    //      PASS is computed from this artifact: sealed means every real repository partition
+    //      (graphify_execution_file_membership_v2.repository_id) of the CURRENTLY admitted
+    //      workspace revision has a materialized, replay-matched graph snapshot shard.
+    // Explicitly NOT certified by a PASS here: Neo4j consumption of any graph manifest (old or
+    // new -- still zero, a separate, still-open gap) and the old artifact's parquet-hash
+    // verifiability. Report both honestly rather than letting either block or inflate this
+    // predicate's specific, narrower claim.
+    const { readFileSync: rf, existsSync: ex, createReadStream } = await import('node:fs');
+    const { createHash } = await import('node:crypto');
+    const gDir = new URL('../../sveltekit-frontend/docs/reports/graph-snapshot-parity/', import.meta.url);
+    let graphManifest = null;
+    try { graphManifest = JSON.parse(rf(new URL('manifest.json', gDir), 'utf8')); } catch { /* absent */ }
+    const fileSha = (u) => new Promise((res, rej) => { const h = createHash('sha256'); createReadStream(u).on('data', (d) => h.update(d)).on('end', () => res(h.digest('hex'))).on('error', rej); });
+    let parquetBytesMatchTableHash = null;
+    if (graphManifest && ex(new URL('nodes.parquet', gDir))) {
+      parquetBytesMatchTableHash = (await fileSha(new URL('nodes.parquet', gDir))) === graphManifest.nodeTableHash
+        && (await fileSha(new URL('edges.parquet', gDir))) === graphManifest.edgeTableHash;
+    }
+
+    let sealIndex = null;
+    try { sealIndex = JSON.parse(rf(new URL('shards/seal-index.json', gDir), 'utf8')); } catch { /* absent */ }
+    const sealIndexBoundToAdmitted = Boolean(
+      sealIndex && admittedWorkspaceRevision && sealIndex.workspaceRevision === admittedWorkspaceRevision
+    );
+    // Re-derive the live repository set independently of the seal index's own self-report, so a
+    // repository added to graphify_execution_file_membership_v2 after sealing can't be silently
+    // missed -- this is a live query, not a re-read of what the sealer already claimed.
+    // 2026-09-28 operator decision (tasks.md "Submodule scope" thread): canonical packet
+    // admission -- and therefore this predicate's PASS bar -- is scoped to this project's own
+    // authored source (repo:root and any future non-submodule repository). SUBMODULE
+    // repositories (external third-party code, vendored -- classified independently here via
+    // .gitmodules, not by trusting the seal index's own repositoryKind label) are excluded from
+    // "must be sealed" by design, not because coverage was incomplete.
+    const submodulePaths = readSubmodulePaths(REPO_ROOT);
+    let liveRepositoryIds = [];
+    let liveInScopeRepositoryIds = [];
+    let sealIndexCoversLiveRepositories = false;
+    if (sealIndex && sealIndexBoundToAdmitted) {
+      const liveRepoRows = await q(
+        `SELECT DISTINCT repository_id FROM graphify_execution_file_membership_v2
+         WHERE workspace_revision = $1 AND execution_id = $2 ORDER BY repository_id;`,
+        [admittedWorkspaceRevision, sealIndex.executionId]
+      );
+      liveRepositoryIds = liveRepoRows.rows.map((r) => r.repository_id);
+      liveInScopeRepositoryIds = liveRepositoryIds.filter(
+        (id) => classifyRepositoryId(id, submodulePaths) !== 'SUBMODULE'
+      );
+      const sealedRepositoryIds = new Set(
+        (sealIndex.shards ?? []).filter((s) => s.sealed === true).map((s) => s.repositoryId)
+      );
+      sealIndexCoversLiveRepositories = liveInScopeRepositoryIds.length > 0
+        && liveInScopeRepositoryIds.every((id) => sealedRepositoryIds.has(id));
+    }
+    const graphManifestFullySealed = Boolean(
+      sealIndex
+      && sealIndexBoundToAdmitted
+      && sealIndexCoversLiveRepositories
+    );
+
     const graphManifestSealed = {
-      manifest_table_exists: existing.has('atlas_graph_projection_manifest'),
-      verdict: existing.has('atlas_graph_projection_manifest') ? 'PARTIAL_PROVEN' : 'ABSENT',
-      note: 'No GraphProjectionManifestV1-shaped table found. NetworkX/cuGraph/Neo4j currently each run their own graph construction (per CLAUDE.md\'s NetworkX↔cuGraph parity pipeline) rather than consuming one sealed node/edge manifest.',
+      legacy_manifest_artifact: 'sveltekit-frontend/docs/reports/graph-snapshot-parity/manifest.json',
+      legacy_manifest_present: Boolean(graphManifest),
+      legacy_graph_revision: graphManifest?.graphRevision ?? null,
+      legacy_node_count: graphManifest?.nodeCount ?? null,
+      legacy_edge_count: graphManifest?.edgeCount ?? null,
+      legacy_consumers_proven: ['networkx', 'cugraph'],
+      legacy_parquet_bytes_match_table_hash: parquetBytesMatchTableHash,
+      seal_index_artifact: 'sveltekit-frontend/docs/reports/graph-snapshot-parity/shards/seal-index.json',
+      seal_index_present: Boolean(sealIndex),
+      seal_index_workspace_revision: sealIndex?.workspaceRevision ?? null,
+      seal_index_execution_id: sealIndex?.executionId ?? null,
+      seal_index_repository_count: sealIndex?.repositoryCount ?? null,
+      bound_to_admitted_workspace_revision: sealIndexBoundToAdmitted,
+      live_repository_ids: liveRepositoryIds,
+      live_in_scope_repository_ids: liveInScopeRepositoryIds,
+      submodule_repositories_excluded_by_design: liveRepositoryIds.filter((id) => !liveInScopeRepositoryIds.includes(id)),
+      seal_index_covers_live_repositories: sealIndexCoversLiveRepositories,
+      neo4j_consumes_manifest: false,
+      verdict: graphManifestFullySealed ? 'PASS'
+        : sealIndex ? 'PARTIAL_PROVEN'
+        : (graphManifest ? 'PRESENT' : 'ABSENT'),
+      note: graphManifestFullySealed
+        ? 'Every in-scope (non-submodule) repository partition of the admitted workspace revision has a materialized, replay-matched graph snapshot shard, bound to the admitted revision by construction. Submodule repositories (vendored third-party code) are excluded from this bar by a 2026-09-28 operator decision, not because coverage was incomplete. Neo4j does not consume any graph manifest (old or new) -- a separate, still-open gap, not certified by this PASS.'
+        : sealIndex
+          ? 'A seal index exists but is stale, revision-mismatched, or does not cover every live in-scope (non-submodule) repository partition -- see bound_to_admitted_workspace_revision / seal_index_covers_live_repositories.'
+          : 'A legacy NetworkX/cuGraph parity manifest may exist, but it is not bound to the admitted workspace revision and covers no repository partition. No per-repository seal index exists yet -- run seal-graph-snapshot-shards-v1.mts.',
     };
 
     // ── Predicate 7: ONTOLOGY_COHORT_NONEMPTY ──
@@ -278,10 +442,23 @@ async function main() {
 
     // ── Predicate 8: ORDINAL_MAP_SEALED ──
     console.log('[fabric-audit] 10/11 ORDINAL_MAP_SEALED');
+    let ordReceipt = null;
+    try { ordReceipt = JSON.parse(rf(new URL('../../docs/reports/candidate-ordinal-corpus-receipt-v1.json', import.meta.url), 'utf8')); } catch { /* absent */ }
+    const ordRevisionQualified = /^sha256:[0-9a-f]{64}$/.test(String(ordReceipt?.candidateSnapshotRevision ?? ''));
     const ordinalMapSealed = {
-      ordinal_table_exists: existing.has('atlas_candidate_ordinals'),
-      verdict: existing.has('atlas_candidate_ordinals') ? 'PARTIAL_PROVEN' : 'ABSENT',
-      note: 'No dedicated CandidateOrdinal sealed-map table found. CLAUDE.md documents CandidateOrdinal normalization as a design intent (parent-atlas identity/retrieval alignment section), not yet a table-backed sealed artifact.',
+      artifact: 'docs/reports/candidate-ordinal-corpus-receipt-v1.json',
+      artifact_present: Boolean(ordReceipt),
+      row_count: ordReceipt?.rowCount ?? null,
+      ordinal_map_checksum: ordReceipt?.ordinalMapChecksum ?? null,
+      candidate_snapshot_revision: ordReceipt?.candidateSnapshotRevision ?? null,
+      snapshot_revision_is_sha256_admitted: ordRevisionQualified,
+      workspace_revision_matches_admitted: Boolean(ordReceipt && admittedWorkspaceRevision && ordReceipt.workspaceRevision === admittedWorkspaceRevision),
+      lineage_qualified: Boolean(ordReceipt && ordReceipt.lineageQualifiedRowCount === ordReceipt.rowCount && ordReceipt.rowCount > 0),
+      coverage_of_revision_bound_packets: ordReceipt?.packetRowsForRevision ? `${ordReceipt.rowCount}/${ordReceipt.packetRowsForRevision}` : null,
+      verdict: !ordReceipt ? 'ABSENT'
+        : (ordRevisionQualified && ordReceipt.workspaceRevision === admittedWorkspaceRevision && ordReceipt.lineageQualifiedRowCount === ordReceipt.rowCount && ordReceipt.rowCount > 0)
+          ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
+      note: 'Ordinal owner is materialize-candidate-ordinal-corpus-v1.mts (artifact-based, no table). PARTIAL_PROVEN means the corpus is regenerated against the admitted revision with only lineage-PROVEN rows, but covers a small subset of revision-bound packets; full PASS needs the remaining packets lineage-proven, not relaxed filtering.',
     };
 
     // ── Predicate 9: PROJECTIONS_CHECKSUM_ALIGNED ──
