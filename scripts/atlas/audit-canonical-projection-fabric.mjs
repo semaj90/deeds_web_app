@@ -22,7 +22,7 @@ import Redis from 'ioredis';
 import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 import { readSubmodulePaths, classifyRepositoryId } from './lib/gitmodules-registry.mjs';
@@ -36,6 +36,11 @@ const REDIS_PORT = Number(process.env.REDIS_PORT || 6379);
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 const SAMPLE_LIMIT = 1000;
 const REPORT_DATE = new Date().toISOString().slice(0, 10);
+const REPORT_DIR = resolve(REPO_ROOT, process.env.ATLAS_AUDIT_REPORT_DIR || 'docs/reports');
+const REPORT_DIR_RELATIVE = relative(REPO_ROOT, REPORT_DIR);
+if (!REPORT_DIR_RELATIVE || REPORT_DIR_RELATIVE.startsWith('..') || REPORT_DIR_RELATIVE.includes(`..${process.platform === 'win32' ? '\\' : '/'}`)) {
+  throw new Error('ATLAS_AUDIT_REPORT_DIR_MUST_BE_WITHIN_REPOSITORY');
+}
 
 const MUTATING_KEYWORDS = /\b(UPDATE|INSERT|DELETE|CREATE|ALTER|DROP|TRUNCATE|REFRESH|MERGE|CALL)\b/i;
 
@@ -442,23 +447,222 @@ async function main() {
 
     // ── Predicate 8: ORDINAL_MAP_SEALED ──
     console.log('[fabric-audit] 10/11 ORDINAL_MAP_SEALED');
-    let ordReceipt = null;
-    try { ordReceipt = JSON.parse(rf(new URL('../../docs/reports/candidate-ordinal-corpus-receipt-v1.json', import.meta.url), 'utf8')); } catch { /* absent */ }
-    const ordRevisionQualified = /^sha256:[0-9a-f]{64}$/.test(String(ordReceipt?.candidateSnapshotRevision ?? ''));
+    // ORDINAL-AUDIT-VERIFY-01: this predicate must use the sealed repo:root snapshot as its
+    // denominator, and an old row is not a canonical match merely because packetKey happens to
+    // resolve. canonicalId must equal packetKey and bind to the current packet/source revisions.
+    let ordinalCorpus = null;
+    try { ordinalCorpus = JSON.parse(rf(new URL('../../docs/reports/candidate-ordinal-corpus-v1.json', import.meta.url), 'utf8')); } catch { /* absent */ }
+    const ordinalCandidates = ordinalCorpus?.candidates ?? [];
+    const sha256Json = (value) => `sha256:${crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
+    const canonicalJson = (value) => {
+      if (value === null || typeof value !== 'object') return JSON.stringify(value);
+      if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+      const entries = Object.entries(value).filter(([, v]) => v !== undefined)
+        .sort(([a], [b]) => Buffer.compare(Buffer.from(a, 'utf8'), Buffer.from(b, 'utf8')));
+      return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v)}`).join(',')}}`;
+    };
+
+    let ordinalAdmission = null;
+    let rootSnapshotVerified = false;
+    let rootSnapshotError = null;
+    let rootSourceRevisionByRef = new Map();
+    try {
+      ordinalAdmission = JSON.parse(readFileSync(new URL('../../docs/reports/workspace-revision-tournament-admission-v1.json', import.meta.url), 'utf8'));
+      if (ordinalAdmission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED'
+        || ordinalAdmission.authority !== true
+        || ordinalAdmission.workspaceRevision !== admittedWorkspaceRevision
+        || typeof ordinalAdmission.manifestPath !== 'string') throw new Error('ADMISSION_BINDING_INVALID');
+      const snapshotRoot = resolve(REPO_ROOT, 'docs/reports/workspace-source-snapshots');
+      const manifestPath = resolve(REPO_ROOT, ordinalAdmission.manifestPath);
+      const relativeManifestPath = relative(snapshotRoot, manifestPath);
+      if (!relativeManifestPath || relativeManifestPath.startsWith('..') || relativeManifestPath.includes(`..${process.platform === 'win32' ? '\\' : '/'}`)) {
+        throw new Error('MANIFEST_OUTSIDE_SNAPSHOT_ROOT');
+      }
+      const snapshot = JSON.parse(readFileSync(manifestPath, 'utf8'));
+      const { schema, snapshotRevision, workspaceRevision: snapshotWorkspaceRevision, status, canonicalAuthority, datastoreWritesPerformed, ...body } = snapshot;
+      if (schema !== 'atlas.workspace-source-snapshot-capture.v1'
+        || snapshotRevision !== ordinalAdmission.snapshotRevision
+        || sha256Json(body) !== snapshotRevision
+        || snapshot.sourceMembershipChecksum !== ordinalAdmission.snapshotMembershipChecksum
+        || snapshot.workspaceRevision !== null
+        || status !== 'CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK'
+        || canonicalAuthority !== false
+        || datastoreWritesPerformed !== false
+        || !Array.isArray(snapshot.sources)
+        || (snapshot.violations?.length ?? 0) !== 0) throw new Error('ADMITTED_SNAPSHOT_INVALID');
+      const sourceIdentityKeys = snapshot.sources.map((s) => s.sourceIdentityKey ?? `${s.repositoryId}:${s.repositoryRelativePath}`);
+      if (sha256Json([...sourceIdentityKeys].sort()) !== snapshot.sourceMembershipChecksum
+        || new Set(sourceIdentityKeys).size !== sourceIdentityKeys.length) throw new Error('SOURCE_MEMBERSHIP_CHECKSUM_INVALID');
+      const sourceContentRows = snapshot.sources.map((s) => [
+        s.sourceIdentityKey ?? `${s.repositoryId}:${s.repositoryRelativePath}`, s.sourceRevision, s.byteLength,
+      ]);
+      if (sha256Json(sourceContentRows) !== snapshot.sourceContentChecksum) throw new Error('SOURCE_CONTENT_CHECKSUM_INVALID');
+      for (const source of snapshot.sources.filter((s) => s.repositoryId === 'repo:root')) {
+        if (typeof source.sourceRef !== 'string' || !source.sourceRef
+          || source.sourceRef !== source.repositoryRelativePath
+          || source.sourceIdentityKey !== `repo:root:${source.sourceRef}`
+          || !/^sha256:[0-9a-f]{64}$/i.test(source.sourceRevision ?? '')
+          || rootSourceRevisionByRef.has(source.sourceRef)) throw new Error('ROOT_SOURCE_ENTRY_INVALID');
+        rootSourceRevisionByRef.set(source.sourceRef, source.sourceRevision);
+      }
+      if (rootSourceRevisionByRef.size === 0) throw new Error('ROOT_SOURCE_COHORT_EMPTY');
+      rootSnapshotVerified = true;
+    } catch (error) {
+      rootSnapshotError = String(error?.message ?? error);
+      rootSourceRevisionByRef = new Map();
+    }
+
+    const ordinalSnapshotMatchesAdmitted = Boolean(
+      ordinalCorpus && ordinalAdmission && rootSnapshotVerified
+      && ordinalCorpus.candidateSnapshotRevision === ordinalAdmission.snapshotRevision
+    );
+    const ordinalWorkspaceMatchesAdmitted = Boolean(
+      ordinalCorpus && admittedWorkspaceRevision && ordinalCorpus.workspaceRevision === admittedWorkspaceRevision
+    );
+    const ordRevisionQualified = ordinalSnapshotMatchesAdmitted;
+
+    let workspaceRevisionRows = [];
+    let rootCandidateRows = [];
+    if (rootSnapshotVerified && admittedWorkspaceRevision) {
+      const { rows } = await q(
+        `SELECT packet_key, source_ref, canonical_source_ref, source_revision, workspace_revision_key
+         FROM atlas_packets
+         WHERE workspace_revision_key = $1 AND source_revision IS NOT NULL;`,
+        [admittedWorkspaceRevision],
+      );
+      workspaceRevisionRows = rows;
+      rootCandidateRows = rows.filter((r) => rootSourceRevisionByRef.get(r.source_ref) === r.source_revision);
+    }
+    const admittedRootCandidateCount = rootCandidateRows.length;
+    const rootByPacketKey = new Map(rootCandidateRows.map((r) => [r.packet_key, r]));
+    const allWorkspaceByPacketKey = new Map(workspaceRevisionRows.map((r) => [r.packet_key, r]));
+    let exactIdentityMatches = 0;
+    let revisionExactMatches = 0;
+    let workspaceRevisionMismatch = 0;
+    let snapshotRevisionMismatch = 0;
+    let missingSourceRevision = 0;
+    let sourceRefMismatch = 0;
+    let missingPacket = 0;
+    let missingOrdinal = 0;
+    let canonicalIdPacketKeyMismatch = 0;
+    let duplicateCanonicalId = 0;
+    let duplicatePacketKey = 0;
+    let duplicateOrdinal = 0;
+    let orphanOrdinalRows = 0;
+    let foreignRepositoryRows = 0;
+    let invalidOrdinal = 0;
+    const canonicalIdCounts = new Map();
+    const packetKeyCounts = new Map();
+    const ordinalCounts = new Map();
+    const validCanonicalKeys = new Set();
+    for (const c of ordinalCandidates) {
+      canonicalIdCounts.set(c.canonicalId, (canonicalIdCounts.get(c.canonicalId) ?? 0) + 1);
+      packetKeyCounts.set(c.packetKey, (packetKeyCounts.get(c.packetKey) ?? 0) + 1);
+      ordinalCounts.set(c.candidateOrdinal, (ordinalCounts.get(c.candidateOrdinal) ?? 0) + 1);
+      if (c.canonicalId !== c.packetKey) canonicalIdPacketKeyMismatch++;
+      if (!Number.isInteger(c.candidateOrdinal) || c.candidateOrdinal < 0 || c.candidateOrdinal >= ordinalCandidates.length) invalidOrdinal++;
+      if (c.workspaceRevision !== admittedWorkspaceRevision) workspaceRevisionMismatch++;
+      if (c.candidateSnapshotRevision !== ordinalAdmission?.snapshotRevision) snapshotRevisionMismatch++;
+      if (typeof c.sourceRevision !== 'string' || !/^sha256:[0-9a-f]{64}$/i.test(c.sourceRevision)) missingSourceRevision++;
+      if (!rootByPacketKey.has(c.canonicalId)) orphanOrdinalRows++;
+      if (!allWorkspaceByPacketKey.has(c.packetKey)) missingPacket++;
+      else if (!rootByPacketKey.has(c.packetKey)) foreignRepositoryRows++;
+      const live = c.canonicalId === c.packetKey ? rootByPacketKey.get(c.canonicalId) : undefined;
+      if (live) {
+        exactIdentityMatches++;
+        if (live.source_revision === c.sourceRevision) revisionExactMatches++;
+        const sourceRefExact = typeof c.sourceRef === 'string' && c.sourceRef.length > 0
+          && (c.sourceRef === live.canonical_source_ref || c.sourceRef === live.source_ref);
+        if (!sourceRefExact) sourceRefMismatch++;
+        if (live.source_revision === c.sourceRevision
+          && c.workspaceRevision === admittedWorkspaceRevision
+          && c.candidateSnapshotRevision === ordinalAdmission?.snapshotRevision
+          && sourceRefExact) validCanonicalKeys.add(live.packet_key);
+      }
+    }
+    duplicateCanonicalId = [...canonicalIdCounts.values()].filter((n) => n > 1).length;
+    duplicatePacketKey = [...packetKeyCounts.values()].filter((n) => n > 1).length;
+    duplicateOrdinal = [...ordinalCounts.values()].filter((n) => n > 1).length;
+    missingOrdinal = rootCandidateRows.filter((r) => !validCanonicalKeys.has(r.packet_key)).length;
+    const ordinalSlotGaps = ordinalCandidates.length
+      ? Array.from({ length: ordinalCandidates.length }, (_, ordinal) => ordinal).filter((ordinal) => !ordinalCounts.has(ordinal)).length
+      : 0;
+    const ordinalSequenceValid = ordinalCandidates.every((c, index) => c.candidateOrdinal === index);
+    const checksumRecomputed = Boolean(ordinalCorpus && ordinalCorpus.ordinalMapChecksum === crypto.createHash('sha256')
+      .update(canonicalJson({
+        candidateSnapshotRevision: ordinalCorpus.candidateSnapshotRevision,
+        workspaceRevision: ordinalCorpus.workspaceRevision,
+        candidates: ordinalCandidates,
+      })).digest('hex'));
+    const ordinalRowCountMatchesDenominator = ordinalCandidates.length === admittedRootCandidateCount;
+    const ordinalMapFullySealed = Boolean(
+      ordinalCorpus
+      && rootSnapshotVerified
+      && ordinalWorkspaceMatchesAdmitted
+      && ordRevisionQualified
+      && admittedRootCandidateCount > 0
+      && exactIdentityMatches === admittedRootCandidateCount
+      && revisionExactMatches === exactIdentityMatches
+      && validCanonicalKeys.size === admittedRootCandidateCount
+      && ordinalRowCountMatchesDenominator
+      && canonicalIdPacketKeyMismatch === 0
+      && duplicateCanonicalId === 0
+      && duplicatePacketKey === 0
+      && duplicateOrdinal === 0
+      && orphanOrdinalRows === 0
+      && foreignRepositoryRows === 0
+      && workspaceRevisionMismatch === 0
+      && snapshotRevisionMismatch === 0
+      && missingSourceRevision === 0
+      && sourceRefMismatch === 0
+      && missingPacket === 0
+      && missingOrdinal === 0
+      && invalidOrdinal === 0
+      && ordinalSlotGaps === 0
+      && ordinalSequenceValid
+      && checksumRecomputed,
+    );
     const ordinalMapSealed = {
-      artifact: 'docs/reports/candidate-ordinal-corpus-receipt-v1.json',
-      artifact_present: Boolean(ordReceipt),
-      row_count: ordReceipt?.rowCount ?? null,
-      ordinal_map_checksum: ordReceipt?.ordinalMapChecksum ?? null,
-      candidate_snapshot_revision: ordReceipt?.candidateSnapshotRevision ?? null,
+      artifact: 'docs/reports/candidate-ordinal-corpus-v1.json',
+      artifact_present: Boolean(ordinalCorpus),
+      row_count: ordinalCandidates.length,
+      row_count_matches_admitted_root_denominator: ordinalRowCountMatchesDenominator,
+      ordinal_map_checksum: ordinalCorpus?.ordinalMapChecksum ?? null,
+      ordinal_map_checksum_recomputed: checksumRecomputed,
+      candidate_snapshot_revision: ordinalCorpus?.candidateSnapshotRevision ?? null,
       snapshot_revision_is_sha256_admitted: ordRevisionQualified,
-      workspace_revision_matches_admitted: Boolean(ordReceipt && admittedWorkspaceRevision && ordReceipt.workspaceRevision === admittedWorkspaceRevision),
-      lineage_qualified: Boolean(ordReceipt && ordReceipt.lineageQualifiedRowCount === ordReceipt.rowCount && ordReceipt.rowCount > 0),
-      coverage_of_revision_bound_packets: ordReceipt?.packetRowsForRevision ? `${ordReceipt.rowCount}/${ordReceipt.packetRowsForRevision}` : null,
-      verdict: !ordReceipt ? 'ABSENT'
-        : (ordRevisionQualified && ordReceipt.workspaceRevision === admittedWorkspaceRevision && ordReceipt.lineageQualifiedRowCount === ordReceipt.rowCount && ordReceipt.rowCount > 0)
-          ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
-      note: 'Ordinal owner is materialize-candidate-ordinal-corpus-v1.mts (artifact-based, no table). PARTIAL_PROVEN means the corpus is regenerated against the admitted revision with only lineage-PROVEN rows, but covers a small subset of revision-bound packets; full PASS needs the remaining packets lineage-proven, not relaxed filtering.',
+      admitted_root_snapshot_verified: rootSnapshotVerified,
+      admitted_root_snapshot_error: rootSnapshotError,
+      workspace_revision_matches_admitted: ordinalWorkspaceMatchesAdmitted,
+      workspace_revision_packet_rows: workspaceRevisionRows.length,
+      workspace_revision_rows_outside_admitted_repo_root: workspaceRevisionRows.length - admittedRootCandidateCount,
+      admitted_root_candidate_count: admittedRootCandidateCount,
+      exact_identity_matches: exactIdentityMatches,
+      revision_exact_matches: revisionExactMatches,
+      missing_ordinal: missingOrdinal,
+      canonical_id_packet_key_mismatch: canonicalIdPacketKeyMismatch,
+      excluded_legacy_identity: canonicalIdPacketKeyMismatch,
+      duplicate_canonical_id: duplicateCanonicalId,
+      duplicate_packet_key: duplicatePacketKey,
+      duplicate_ordinal: duplicateOrdinal,
+      orphan_ordinal_rows: orphanOrdinalRows,
+      foreign_repository_rows: foreignRepositoryRows,
+      missing_packet: missingPacket,
+      missing_source_revision: missingSourceRevision,
+      source_ref_mismatch: sourceRefMismatch,
+      workspace_revision_mismatch: workspaceRevisionMismatch,
+      candidate_snapshot_revision_mismatch: snapshotRevisionMismatch,
+      invalid_ordinal: invalidOrdinal,
+      ordinal_slot_gaps: ordinalSlotGaps,
+      ordinal_sequence_valid: ordinalSequenceValid,
+      verdict: ordinalMapFullySealed ? 'PASS'
+        : (ordinalCorpus && rootSnapshotVerified && ordinalWorkspaceMatchesAdmitted && exactIdentityMatches > 0) ? 'PARTIAL_PROVEN'
+        : ordinalCorpus ? 'NOT_PROVEN' : 'ABSENT',
+      note: ordinalMapFullySealed
+        ? 'Every admitted repo:root candidate has an exact source/revision-bound canonical row; workspace/snapshot revisions, unique contiguous ordinals, map checksum, and zero orphan/legacy/foreign rows all verify.'
+        : ordinalCorpus && rootSnapshotVerified && ordinalWorkspaceMatchesAdmitted
+          ? `Valid canonical subset exists (${validCanonicalKeys.size}/${admittedRootCandidateCount}); missing_ordinal=${missingOrdinal}, orphan_ordinal_rows=${orphanOrdinalRows}, legacy_identity_rows=${canonicalIdPacketKeyMismatch}. See the separate rejection counters; partial rows do not satisfy sealing.`
+          : `Corpus or admitted repo:root snapshot binding is absent/invalid${rootSnapshotError ? ` (${rootSnapshotError})` : ''}.`,
     };
 
     // ── Predicate 9: PROJECTIONS_CHECKSUM_ALIGNED ──
@@ -536,7 +740,7 @@ async function main() {
       : `${verdicts.filter((v) => v !== 'PASS').length}/11 predicates below PASS: ${Object.entries(report.predicates).filter(([, p]) => p.verdict !== 'PASS').map(([k, p]) => `${k}=${p.verdict}`).join(', ')}`;
 
     // ── Write reports ──
-    const reportsDir = resolve(REPO_ROOT, 'docs', 'reports');
+    const reportsDir = REPORT_DIR;
     mkdirSync(reportsDir, { recursive: true });
     const jsonPath = resolve(reportsDir, `atlas-canonical-projection-fabric-audit-${REPORT_DATE}.json`);
     const mdPath = resolve(reportsDir, `atlas-canonical-projection-fabric-audit-${REPORT_DATE}.md`);
