@@ -1,6 +1,7 @@
 #include "atlas_core.h"
 
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -161,5 +162,164 @@ int main(int argc, char **argv) {
   build_request.row_count = 0u;
   assert(atlas_index_build_request_validate_v1(&build_request, &validation_receipt) == ATLAS_STATUS_INVALID_ARGUMENT);
   assert(validation_receipt.reason == ATLAS_REPRESENTATION_REASON_INVALID_CONTRACT);
+
+  {
+    const float vectors[] = {1.0f, 0.0f, 0.8f, 0.6f, 0.0f, 1.0f, 0.8f, -0.6f};
+    atlas_similarity_graph_request_v1_t graph_request;
+    atlas_csr_graph_v1_t graph;
+    atlas_execution_receipt_t graph_receipt;
+    assert(atlas_similarity_graph_request_init_v1(&graph_request) == ATLAS_STATUS_OK);
+    graph_request.row_count = 4u;
+    graph_request.dimension = 2u;
+    graph_request.max_neighbors_per_row = 1u;
+    graph_request.threshold = 0.5f;
+    graph_request.row_major_values = vectors;
+    graph_request.input_byte_length = sizeof(vectors);
+    set_representation(&graph_request.representation);
+    graph_request.representation.dimensions = 2u;
+    assert(atlas_representation_validation_receipt_init_v1(&validation_receipt) == ATLAS_STATUS_OK);
+    assert(atlas_similarity_graph_request_validate_v1(&graph_request, &validation_receipt) == ATLAS_STATUS_OK);
+
+    graph_request.threshold = 1.1f;
+    assert(atlas_similarity_graph_request_validate_v1(&graph_request, &validation_receipt) == ATLAS_STATUS_INVALID_ARGUMENT);
+    graph_request.threshold = 0.5f;
+    graph_request.input_byte_length -= sizeof(float);
+    assert(atlas_similarity_graph_request_validate_v1(&graph_request, &validation_receipt) == ATLAS_STATUS_INVALID_ARGUMENT);
+    graph_request.input_byte_length = sizeof(vectors);
+    graph_request.representation.dimensions = 768u;
+    assert(atlas_similarity_graph_request_validate_v1(&graph_request, &validation_receipt) == ATLAS_STATUS_DIMENSION_MISMATCH);
+    graph_request.representation.dimensions = 2u;
+
+    assert(atlas_csr_graph_init_v1(&graph) == ATLAS_STATUS_OK);
+    memset(&graph_receipt, 0, sizeof(graph_receipt));
+    graph_receipt.struct_size = (uint32_t)sizeof(graph_receipt);
+    graph_receipt.abi_version = ATLAS_ABI_VERSION_1;
+    assert(atlas_execution_receipt_init(&graph_receipt) == ATLAS_STATUS_OK);
+    assert(atlas_context_options_init(&options) == ATLAS_STATUS_OK);
+    assert(atlas_context_create(&options, &context) == ATLAS_STATUS_OK);
+#if ATLAS_GRAPH_BACKEND_AVAILABLE
+    assert(atlas_similarity_graph_build(context, &graph_request, &graph, &graph_receipt) == ATLAS_STATUS_OK);
+    assert(graph_receipt.status == ATLAS_STATUS_OK);
+    assert(graph.row_count == 4u && graph.edge_count == 4u);
+    assert(((const uint64_t *)graph.row_offsets.data)[0] == 0u);
+    assert(((const uint64_t *)graph.row_offsets.data)[1] == 1u);
+    assert(((const uint64_t *)graph.row_offsets.data)[2] == 2u);
+    assert(((const uint64_t *)graph.row_offsets.data)[3] == 3u);
+    assert(((const uint64_t *)graph.row_offsets.data)[4] == 4u);
+    /* Equal 0.8 scores from row 0 resolve to the smaller ordinal. */
+    assert(((const uint32_t *)graph.column_indices.data)[0] == 1u);
+    assert(((const uint32_t *)graph.column_indices.data)[1] == 0u);
+    assert(((const uint32_t *)graph.column_indices.data)[2] == 1u);
+    assert(((const uint32_t *)graph.column_indices.data)[3] == 0u);
+    assert(((const float *)graph.edge_weights.data)[0] > 0.79f);
+    assert(atlas_csr_graph_release_v1(&graph) == ATLAS_STATUS_OK);
+
+    assert(atlas_csr_graph_init_v1(&graph) == ATLAS_STATUS_OK);
+    graph_request.max_neighbors_per_row = 0u;
+    assert(atlas_similarity_graph_build(context, &graph_request, &graph, &graph_receipt) == ATLAS_STATUS_OK);
+    assert(graph.row_count == 4u && graph.edge_count == 0u);
+    assert(((const uint64_t *)graph.row_offsets.data)[4] == 0u);
+    assert(atlas_csr_graph_release_v1(&graph) == ATLAS_STATUS_OK);
+
+    {
+      float invalidVectors[8] = {0.0f};
+      graph_request.max_neighbors_per_row = 1u;
+      graph_request.row_major_values = invalidVectors;
+      assert(atlas_csr_graph_init_v1(&graph) == ATLAS_STATUS_OK);
+      assert(atlas_similarity_graph_build(context, &graph_request, &graph, &graph_receipt) == ATLAS_STATUS_INVALID_ARGUMENT);
+      assert(graph.row_count == 0u && graph.row_offsets.data == 0);
+      invalidVectors[0] = 1.0f;
+      invalidVectors[1] = 0.0f;
+      invalidVectors[2] = 1.0f;
+      invalidVectors[3] = 0.0f;
+      invalidVectors[4] = 1.0f;
+      invalidVectors[5] = 0.0f;
+      invalidVectors[6] = 1.0f;
+      invalidVectors[7] = 0.0f;
+      invalidVectors[3] = (float)NAN;
+      assert(atlas_similarity_graph_build(context, &graph_request, &graph, &graph_receipt) == ATLAS_STATUS_INVALID_ARGUMENT);
+      assert(graph.row_count == 0u && graph.row_offsets.data == 0);
+      assert(atlas_csr_graph_release_v1(&graph) == ATLAS_STATUS_OK);
+    }
+#else
+    assert(atlas_similarity_graph_build(context, &graph_request, &graph, &graph_receipt) == ATLAS_STATUS_NOT_IMPLEMENTED);
+    assert(graph_receipt.status == ATLAS_STATUS_NOT_IMPLEMENTED);
+    assert(graph.row_count == 0u && graph.edge_count == 0u);
+    assert(graph.row_offsets.data == 0 && graph.column_indices.data == 0 && graph.edge_weights.data == 0);
+#endif
+    assert(atlas_context_destroy(&context) == ATLAS_STATUS_OK);
+    assert(atlas_csr_graph_release_v1(&graph) == ATLAS_STATUS_OK);
+  }
+
+  {
+    uint64_t offsets[] = {0u, 1u, 2u, 2u};
+    uint32_t columns[] = {1u, 0u};
+    float weights[] = {1.0f, 1.0f};
+    atlas_csr_graph_v1_t graph;
+    atlas_pagerank_options_v1_t pagerank_options;
+    atlas_pagerank_result_v1_t pagerank_result;
+    atlas_execution_receipt_t pagerank_receipt;
+    assert(atlas_csr_graph_init_v1(&graph) == ATLAS_STATUS_OK);
+    graph.row_count = 3u;
+    graph.edge_count = 2u;
+    graph.row_offsets.data = (void *)offsets;
+    graph.row_offsets.byte_length = sizeof(offsets);
+    graph.row_offsets.capacity = sizeof(offsets);
+    graph.column_indices.data = (void *)columns;
+    graph.column_indices.byte_length = sizeof(columns);
+    graph.column_indices.capacity = sizeof(columns);
+    graph.edge_weights.data = (void *)weights;
+    graph.edge_weights.byte_length = sizeof(weights);
+    graph.edge_weights.capacity = sizeof(weights);
+    assert(atlas_pagerank_options_init_v1(&pagerank_options) == ATLAS_STATUS_OK);
+    assert(atlas_pagerank_result_init_v1(&pagerank_result) == ATLAS_STATUS_OK);
+    memset(&pagerank_receipt, 0, sizeof(pagerank_receipt));
+    pagerank_receipt.struct_size = (uint32_t)sizeof(pagerank_receipt);
+    pagerank_receipt.abi_version = ATLAS_ABI_VERSION_1;
+    assert(atlas_execution_receipt_init(&pagerank_receipt) == ATLAS_STATUS_OK);
+    assert(atlas_context_options_init(&options) == ATLAS_STATUS_OK);
+    assert(atlas_context_create(&options, &context) == ATLAS_STATUS_OK);
+    assert(atlas_pagerank(context, &graph, &pagerank_options, &pagerank_result, &pagerank_receipt) == ATLAS_STATUS_OK);
+    assert(pagerank_result.converged == 1u && pagerank_result.iterations > 0u);
+    assert(pagerank_result.node_count == 3u && pagerank_result.scores.byte_length == 3u * sizeof(double));
+    {
+      const double *scores = (const double *)pagerank_result.scores.data;
+      assert(fabs(scores[0] - 0.46511627906976744) < 1e-10);
+      assert(fabs(scores[1] - 0.46511627906976744) < 1e-10);
+      assert(fabs(scores[2] - 0.06976744186046512) < 1e-10);
+      assert(fabs(scores[0] + scores[1] + scores[2] - 1.0) < 1e-12);
+      if (argc == 2 && strcmp(argv[1], "--emit-pagerank-json") == 0) {
+        printf("{\"scores\":[%.17g,%.17g,%.17g],\"iterations\":%u,\"converged\":%s}\n",
+            scores[0], scores[1], scores[2], pagerank_result.iterations,
+            pagerank_result.converged ? "true" : "false");
+      }
+    }
+    assert(atlas_pagerank_result_release_v1(&pagerank_result) == ATLAS_STATUS_OK);
+
+    assert(atlas_pagerank_result_init_v1(&pagerank_result) == ATLAS_STATUS_OK);
+    pagerank_options.max_iterations = 1u;
+    assert(atlas_pagerank(context, &graph, &pagerank_options, &pagerank_result, &pagerank_receipt) == ATLAS_STATUS_OK);
+    assert(pagerank_result.iterations == 1u && pagerank_result.converged == 0u);
+    assert(atlas_pagerank_result_release_v1(&pagerank_result) == ATLAS_STATUS_OK);
+
+    assert(atlas_pagerank_result_init_v1(&pagerank_result) == ATLAS_STATUS_OK);
+    columns[0] = 3u;
+    assert(atlas_pagerank(context, &graph, &pagerank_options, &pagerank_result, &pagerank_receipt) == ATLAS_STATUS_INVALID_ARGUMENT);
+    assert(pagerank_result.scores.data == 0u && pagerank_result.node_count == 0u);
+    columns[0] = 1u;
+    weights[0] = (float)NAN;
+    assert(atlas_pagerank(context, &graph, &pagerank_options, &pagerank_result, &pagerank_receipt) == ATLAS_STATUS_INVALID_ARGUMENT);
+    assert(pagerank_result.scores.data == 0u && pagerank_result.node_count == 0u);
+    weights[0] = 1.0f;
+    offsets[1] = 2u;
+    assert(atlas_pagerank(context, &graph, &pagerank_options, &pagerank_result, &pagerank_receipt) == ATLAS_STATUS_INVALID_ARGUMENT);
+    assert(pagerank_result.scores.data == 0u && pagerank_result.node_count == 0u);
+    offsets[1] = 1u;
+    assert(atlas_pagerank_result_release_v1(&pagerank_result) == ATLAS_STATUS_OK);
+
+    assert(atlas_context_destroy(&context) == ATLAS_STATUS_OK);
+    /* This fixture borrows stack-backed CSR arrays; reinitialize, do not free them. */
+    assert(atlas_csr_graph_init_v1(&graph) == ATLAS_STATUS_OK);
+  }
   return 0;
 }

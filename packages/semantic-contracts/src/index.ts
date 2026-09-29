@@ -89,3 +89,10 @@ export {
   type EvidenceTupleV1Input,
   type EvidenceTupleRawSpanInputV1,
 } from './evidence-tuple-v1.js';
+export {
+  createEvidenceTupleKagIndexV1,
+  type EvidenceTupleKagQueryV1,
+  type EvidenceTupleKagHitV1,
+  type EvidenceTupleKagSearchResultV1,
+  type EvidenceTupleSourceReaderV1,
+} from './evidence-tuple-kag-index-v1.js';

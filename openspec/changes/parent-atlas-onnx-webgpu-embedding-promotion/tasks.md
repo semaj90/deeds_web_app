@@ -35,12 +35,12 @@ decision. This change freezes the corrected validation order before any further 
       `ORT_NODE_PACKAGE_DIR` override was found in the targeted env/source audit.
       the ONNX model path var, `ORT_NODE_PACKAGE_DIR` (or equivalent) — confirm what
       `npm run dev:gpu` will actually select, don't assume.
-- [ ] **3. Inspect `onnx-embed.ts` before starting the app.** Verify: `isOnnxEmbedAvailable()`
+- [x] **3. Inspect `onnx-embed.ts` before starting the app.** Verify: `isOnnxEmbedAvailable()`
       checks real runtime/provider readiness (not just file existence);
       `batchEmbedOnnx()` uses the shared `EmbeddingContextPlanV1`/`semantic_768` validator;
       it reports the actual executor/provider used; it does not silently treat a WebGPU failure
       that fell back to WASM as a WebGPU success.
-      **Re-audited 2026-09-27; criteria still NOT met, canonical misuse removed:**
+      **Re-audited 2026-09-27; criteria then NOT met, canonical misuse removed:**
       (a) `isOnnxEmbedAvailable()` loads the CPU session and local tokenizer and checks the required `input_ids` and
       `attention_mask` inputs; that proves this CPU executor can initialize, not WebGPU readiness. (b) `batchEmbedOnnx()`
       still accepts raw strings rather than `EmbeddingContextPlanV1`; its output validator proves dimension/finiteness/L2
@@ -55,9 +55,15 @@ decision. This change freezes the corrected validation order before any further 
       under the shared EmbeddingGemma label; the latter could write it into the shared embedding cache. Those canonical
       call paths now exclude ONNX, and structured cache entries labeled `onnx-local` are ignored without deletion.
       ONNX remains callable through `canonical-embed.ts::tryEmbedOnnxChallenger`, which explicitly marks
-      `canonicalAuthority: false` and `promotionEligible: false`. Focused regression suites pass 8/8. Task 3 stays open
-      until the challenger/input-plan and representation-parity contract is resolved; no model inference or cache/DB
-      writes were performed by this correction.
+      `canonicalAuthority: false` and `promotionEligible: false`. The 2026-09-27 correction passed 8/8 focused
+      regression tests; it made no model inference or cache/DB writes.
+      **Closed 2026-09-28 for the inspection contract only:** the current `batchEmbedOnnx()` delegates to
+      `createOnnxChallengerBatchV1`, which validates `EmbeddingContextPlanV1` and its rendered-input checksum before
+      execution, then reports `ONNX_CPU_CHALLENGER` / `CPUExecutionProvider`. The lower executor remains explicitly
+      `onnxruntime-node` CPU and validates 768-dimensional finite L2 output. The result contract keeps semantic-space
+      parity `UNPROVEN`, `canonicalAuthority:false`, and `promotionEligible:false`; this does not prove EmbeddingGemma
+      projection parity or WebGPU readiness. Focused suites passed 10/10 with `--maxWorkers=1`; no model inference,
+      service call, cache write, or database write was performed.
 - [x] **4. Harden the standalone proof to fail closed.** Added
       `services/embedding-onnx-webgpu/prove-embeddinggemma-onnx-webgpu-only-v1.mjs` with
       `requestedProvider: 'webgpu'`, `fallbackAllowed: false`, artifact/input/vector checksums,

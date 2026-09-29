@@ -119,6 +119,18 @@ import { registerPhase109aTools } from '$lib/server/mcp/phase109a-mcp-tools.js';
 import { registerRgAtlasTools } from './rg_atlas_tools.js';
 import { registerEngramTools } from './engram_tools.js';
 import { registerAtlasEmbeddingTools } from './atlas_embedding_tools.js';
+import { registerNativeAccelerationTools } from './native-acceleration-tools.js';
+import { withCanonicalReadOnlyQueryBudget } from '../lib/server/db/client.js';
+import {
+  atlasPacketSearchInputSchema,
+  featureEvidenceTuplesInputSchema,
+  FEATURE_EVIDENCE_STATEMENT_TIMEOUT_MS,
+  GRAPH_EXPAND_NEO4J_TIMEOUT_MS,
+  graphExpandNeighborhoodInputSchema,
+  PACKET_SEARCH_CLIENT_TIMEOUT_MS,
+  PACKET_SEARCH_STATEMENT_TIMEOUT_MS,
+  serializeBoundedReadResult,
+} from './read-tool-bounds.js';
 import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 import { explainWikiPage, getWikiStatus, refreshDirectory, searchWiki } from '../lib/server/kb/wiki-logic.js';
 import { buildSubgraphV1SeedNeighborhood } from '../lib/server/retrieval/subgraph-seed-neighborhood.js';
@@ -601,6 +613,29 @@ registerLdrResearchTools(server, pool);
 // the existing SQL-function-backed handlers, no duplicated lifecycle logic.
 registerPhase109aTools(server);
 
+// Native diagnostics are lazy-loaded and fixture-bounded. The tools expose no
+// store or gRPC handles and do not reset process-wide execution counters.
+registerNativeAccelerationTools(server, async () => {
+  const { getAddonInternal } = await import('../lib/server/gpu/libtorch-bridge.js');
+  const addon = getAddonInternal() as null | {
+    getBackendInfo?: () => unknown;
+    getExecutionCounters?: () => unknown;
+    batchCosineTopK?: (query: Float32Array, corpus: Float32Array, rows: number, dimensions: number, topK: number) => {
+      indices: ArrayLike<number>;
+      scores: ArrayLike<number>;
+      backend: string;
+    };
+  };
+  if (!addon?.getBackendInfo || !addon.getExecutionCounters || !addon.batchCosineTopK) {
+    throw new Error('NATIVE_ACCELERATION_DIAGNOSTICS_UNAVAILABLE');
+  }
+  return {
+    backendInfo: () => addon.getBackendInfo!(),
+    executionCounters: () => addon.getExecutionCounters!(),
+    exactTopK: (query, corpus, rows, dimensions, topK) => addon.batchCosineTopK!(query, corpus, rows, dimensions, topK),
+  };
+});
+
 // ── Shared embedding cache (Redis L1, 1h TTL) ────────────────────────────────
 // search.hybrid + topology.search_near + search.dev_context all embed the same
 // query independently — single embeddinggemma call costs 3-7s, cache hit is <5ms.
@@ -967,10 +1002,16 @@ function normalizeTopologyHits(
 // Returns the same `{ row: unknown[] }[]` shape the old HTTP transaction API
 // produced, so none of the call sites below need to change.
 
-async function neo4jQuery(cypher: string, params: Record<string, unknown> = {}) {
+async function neo4jQuery(
+  cypher: string,
+  params: Record<string, unknown> = {},
+  options: { readOnly?: boolean; timeoutMs?: number } = {},
+) {
   const neo4j = (await import('neo4j-driver')).default;
   const { getNeo4jDriver } = await import('../lib/server/neo4j-driver.js');
-  const session = getNeo4jDriver().session();
+  const session = getNeo4jDriver().session(
+    options.readOnly ? { defaultAccessMode: neo4j.session.READ } : undefined,
+  );
   try {
     // Cypher clauses like LIMIT/SKIP require a Neo4j Integer, not a JS float —
     // the driver otherwise serializes `3` as `3.0` and Neo4j rejects it.
@@ -980,7 +1021,11 @@ async function neo4jQuery(cypher: string, params: Record<string, unknown> = {}) 
         typeof value === 'number' && Number.isInteger(value) ? neo4j.int(value) : value,
       ]),
     );
-    const result = await session.run(cypher, intSafeParams);
+    const result = await session.run(
+      cypher,
+      intSafeParams,
+      options.timeoutMs ? { timeout: options.timeoutMs } : undefined,
+    );
     return result.records.map((record) => ({
       row: record.keys.map((key) => record.get(key)),
     }));
@@ -1314,47 +1359,7 @@ server.registerTool(
   {
     description:
       'Expands graph neighborhood from sourceRefs (read-only). Supports legacy stableKey/depth args for backward compatibility.',
-    inputSchema: z.object({
-      sourceRefs: z
-        .array(z.string())
-        .optional()
-        .describe(
-          'Primary source references (file paths or stable keys). Preferred over legacy stableKey.'
-        ),
-      stableKey: z.string().optional().describe('Legacy single center stable key.'),
-      depth: z
-        .number()
-        .int()
-        .min(1)
-        .max(3)
-        .default(2)
-        .optional()
-        .describe('Legacy hop depth (1–3).'),
-      maxHops: z
-        .number()
-        .int()
-        .min(1)
-        .max(2)
-        .optional()
-        .describe('Hop depth for sourceRefs flow (1–2).'),
-      limit: z.number().int().min(1).max(100).default(40).describe('Max neighbors returned'),
-      query: z
-        .string()
-        .optional()
-        .describe('Optional free-text query used only for deterministic seed-envelope labeling'),
-      route: z
-        .string()
-        .optional()
-        .describe('Optional route used only for deterministic seed-envelope labeling'),
-      symbol: z
-        .string()
-        .optional()
-        .describe('Optional symbol used only for deterministic seed-envelope labeling'),
-      filePath: z
-        .string()
-        .optional()
-        .describe('Optional explicit file path when the stable key is not a file:* key'),
-    }),
+    inputSchema: graphExpandNeighborhoodInputSchema,
   },
   async ({ sourceRefs, stableKey, depth, maxHops, limit, query, route, symbol, filePath }) => {
     const normalizeStableKey = (value: string): string => {
@@ -1463,7 +1468,7 @@ server.registerTool(
         content: [
           {
             type: 'text' as const,
-            text: JSON.stringify(
+            text: serializeBoundedReadResult(
               {
                 ok: true,
                 nodes: Array.from(nodesById.values()),
@@ -1484,9 +1489,7 @@ server.registerTool(
                   stable_key: n.stableKey,
                   pagerank: n.pagerank ?? n.pageRank ?? null,
                 })),
-              },
-              null,
-              2
+              }
             ),
           },
         ],
@@ -1502,7 +1505,8 @@ server.registerTool(
                 type(last(r)) AS lastRelation,
                 coalesce(c.stableKey, c.stable_key) AS fromStableKey
          LIMIT $limit`,
-        { keys: seedKeys, limit }
+        { keys: seedKeys, limit },
+        { readOnly: true, timeoutMs: GRAPH_EXPAND_NEO4J_TIMEOUT_MS },
       );
       const neighbors = rows.map((d: { row?: unknown[] }) => {
         const stable = String(d.row?.[0] ?? '');
@@ -1540,7 +1544,7 @@ server.registerTool(
         content: [
           {
             type: 'text' as const,
-            text: JSON.stringify(
+            text: serializeBoundedReadResult(
               {
                 ok: true,
                 nodes,
@@ -1554,9 +1558,7 @@ server.registerTool(
                 center,
                 seedEnvelope,
                 neighbors: neighbors.map((n) => ({ stable_key: n.stableKey, pagerank: null })),
-              },
-              null,
-              2
+              }
             ),
           },
         ],
@@ -9346,16 +9348,7 @@ server.registerTool(
       'feature_id, concept_id membership, or free-text summary match. ' +
       'Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. ' +
       'Use this to find which packets are associated with a file or feature before querying Qdrant.',
-    inputSchema: z.object({
-      source_ref: z.string().optional().describe(
-        'File path (any form: absolute, repo-relative, with/without sveltekit-frontend/ prefix). ' +
-        'Variants are tried automatically via canonicalization.'
-      ),
-      feature_id: z.string().optional().describe('Exact feature_id to filter on.'),
-      concept_id: z.string().optional().describe('Filter to packets whose concept_ids array contains this value.'),
-      summary_query: z.string().optional().describe('Full-text search against packet summaries.'),
-      limit: z.number().int().min(1).max(50).default(20).optional(),
-    }),
+    inputSchema: atlasPacketSearchInputSchema,
   },
   async ({ source_ref, feature_id, concept_id, summary_query, limit = 20 }) => {
     try {
@@ -9421,15 +9414,36 @@ server.registerTool(
       `;
       params.push(limit ?? 20);
 
-      const result = await pool.query(sql, params);
+      const client = await pool.connect();
+      let readOnlyTransactionOpen = false;
+      let result;
+      try {
+        await client.query('BEGIN READ ONLY');
+        readOnlyTransactionOpen = true;
+        await client.query("SELECT set_config('statement_timeout', $1, true)", [
+          `${PACKET_SEARCH_STATEMENT_TIMEOUT_MS}ms`,
+        ]);
+        result = await client.query({
+          text: sql,
+          values: params,
+          query_timeout: PACKET_SEARCH_CLIENT_TIMEOUT_MS,
+        });
+        await client.query('ROLLBACK');
+        readOnlyTransactionOpen = false;
+      } finally {
+        if (readOnlyTransactionOpen) {
+          await client.query('ROLLBACK').catch(() => undefined);
+        }
+        client.release();
+      }
       return {
         content: [{
           type: 'text' as const,
-          text: JSON.stringify({
+          text: serializeBoundedReadResult({
             count: result.rowCount,
             packets: result.rows,
             filters: { source_ref, feature_id, concept_id, summary_query },
-          }, null, 2),
+          }),
         }],
       };
     } catch (err) {
@@ -9867,28 +9881,31 @@ server.registerTool(
     description:
       'Read-only tuple materializer for Parent Atlas feature-document evidence. ' +
       'Links feature docs to canonical packet_key, source_ref, tree_node_id, and fact-table provenance without writing any new rows.',
-    inputSchema: z.object({
-      featureId: z.string().min(1).describe('Canonical feature_id to materialize tuple previews for'),
-      maxTuples: z.number().int().min(1).max(64).default(16).describe('Maximum tuple previews to return'),
-    }),
+    inputSchema: featureEvidenceTuplesInputSchema.describe('Bounded read-only tuple preview from existing packet evidence.'),
   },
   async (input: Record<string, unknown>) => {
     try {
-      const result = await materializeFeatureEvidenceTuples(String(input.featureId ?? ''), {
-        maxTuples: typeof input.maxTuples === 'number' ? input.maxTuples : undefined,
-      });
-      return {
+      const boundedInput = featureEvidenceTuplesInputSchema.parse(input);
+      const result = await withCanonicalReadOnlyQueryBudget(
+        FEATURE_EVIDENCE_STATEMENT_TIMEOUT_MS,
+        () => materializeFeatureEvidenceTuples(boundedInput.featureId, {
+          maxTuples: boundedInput.maxTuples,
+        }),
+      );
+      return JSON.parse(serializeBoundedReadResult({
         status: 'success',
+        canonicalAuthority: false,
+        writesPerformed: false,
         featureId: result.plan.featureId,
         schema_version: result.plan.schemaVersion,
         evidence_state: result.plan.evidenceState,
         tuple_count: result.tuples.length,
         tuples: result.tuples,
         warnings: result.plan.warnings,
-      };
+      }));
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      return { status: 'error', error: errorMsg.slice(0, 500) };
+      return JSON.parse(serializeBoundedReadResult({ status: 'error', error: errorMsg.slice(0, 500) }));
     }
   }
 );

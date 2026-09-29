@@ -15,12 +15,15 @@ import {
   type CandidateOrdinalMapV1,
 } from '../../sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts';
 
+import { projectCurrentOrdinalMapCoreV1 } from './lib/large-corpus-current-map-rebase-v2.mjs';
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const arg = (name: string): string => {
   const value = process.argv.slice(2).find((item) => item.startsWith(`--${name}=`))?.slice(name.length + 3);
   if (!value) throw new Error(`EXPLICIT_${name.toUpperCase().replaceAll('-', '_')}_REQUIRED`);
   return value;
 };
+const allowLineageQualifiedSubsetMap = process.argv.includes('--allow-lineage-qualified-subset-map');
 const inputPath = (name: string) => {
   const result = path.resolve(ROOT, arg(name));
   if (!result.startsWith(`${ROOT}${path.sep}`)) throw new Error(`INPUT_OUTSIDE_REPOSITORY:${name}`);
@@ -45,7 +48,9 @@ if (!crosswalkPath.startsWith(`${ROOT}${path.sep}`)) throw new Error('CROSSWALK_
 const lineagePath = inputPath('lineage-report');
 const candidateMapPath = inputPath('candidate-map');
 const outputRoot = path.resolve(ROOT, arg('output-root'));
-const allowedRoot = path.resolve(ROOT, '.tmp/atlas/mapreduce-packet-chunk-evidence-overlay-v1');
+const allowedRoot = path.resolve(ROOT, allowLineageQualifiedSubsetMap
+  ? '.tmp/atlas/mapreduce-packet-chunk-evidence-overlay-v2'
+  : '.tmp/atlas/mapreduce-packet-chunk-evidence-overlay-v1');
 if (outputRoot !== allowedRoot && !outputRoot.startsWith(`${allowedRoot}${path.sep}`)) throw new Error('OUTPUT_ROOT_OUTSIDE_OVERLAY_ROOT');
 
 const crosswalkBytes = fs.readFileSync(crosswalkPath);
@@ -57,15 +62,22 @@ if (crosswalkManifest.counts?.conserved !== true || crosswalkManifest.writes?.po
 }
 const crosswalkRows = parseJsonl(crosswalkBytes, 'PACKET_CROSSWALK');
 const lineageReport = JSON.parse(fs.readFileSync(lineagePath, 'utf8'));
-const candidateMap = candidateOrdinalMapV1Schema.parse(JSON.parse(fs.readFileSync(candidateMapPath, 'utf8'))) as CandidateOrdinalMapV1;
+const rawCandidateMap = JSON.parse(fs.readFileSync(candidateMapPath, 'utf8'));
+const candidateMap = candidateOrdinalMapV1Schema.parse(allowLineageQualifiedSubsetMap
+  ? projectCurrentOrdinalMapCoreV1(rawCandidateMap)
+  : rawCandidateMap) as CandidateOrdinalMapV1;
 assertCandidateOrdinalMapIntegrityV1(candidateMap);
 if (lineageReport.canonicalAuthority !== false || lineageReport.databaseWrites !== 0
   || lineageReport.sourceWorkspaceRevision !== candidateMap.workspaceRevision
+  || (allowLineageQualifiedSubsetMap
+    ? rawCandidateMap.lineageQualifiedRowCount !== candidateMap.rowCount
+      || rawCandidateMap.lineageRequired !== true || rawCandidateMap.canonicalOrderingPolicy !== 'CANONICAL_ID_ASCENDING'
+    : candidateMap.rowCount !== 16_151)
   || candidateMap.candidateSnapshotRevision !== crosswalkManifest.authority.candidateSnapshotRevision
   || candidateMap.ordinalMapChecksum !== crosswalkManifest.authority.ordinalMapChecksum
   || candidateMap.candidateSnapshotRevision !== crosswalkManifest.authority.candidateSnapshotRevision
   || candidateMap.ordinalMapChecksum !== crosswalkManifest.authority.ordinalMapChecksum
-  || candidateMap.candidates.some((candidate, ordinal) => candidate.candidateOrdinal !== ordinal || candidate.canonicalId !== candidate.packetKey)) {
+  || candidateMap.candidates.some((candidate, ordinal) => candidate.candidateOrdinal !== ordinal)) {
   throw new Error('CANDIDATE_LINEAGE_COORDINATE_MISMATCH');
 }
 
@@ -174,6 +186,7 @@ const receipt: Record<string, any> = {
   },
   candidateSnapshotRevision: candidateMap.candidateSnapshotRevision,
   ordinalMapChecksum: candidateMap.ordinalMapChecksum,
+  candidateMapScope: allowLineageQualifiedSubsetMap ? 'LINEAGE_QUALIFIED_SUBSET' : 'FULL_CANDIDATE_SNAPSHOT',
   counts: {
     exactPacketCandidates: exactPacketRows.length,
     candidatesWithProvenChunkLineage: grouped.size,

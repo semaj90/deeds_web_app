@@ -220,3 +220,4 @@ export * from './schema/atlas-acquisition.js';
 // drizzle.config.ts.
 export * from './schema/atlas-structural-intelligence.js';
 export * from './schema/atlas-test-intelligence.js';
+export * from './schema/external-doc-intelligence.js';

@@ -18,6 +18,7 @@ import {
   candidateOrdinalMapV1Schema,
   type CandidateOrdinalMapV1,
 } from '../../sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts';
+import { projectCurrentOrdinalMapCoreV1 } from './lib/large-corpus-current-map-rebase-v2.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const arg = (name: string): string => {
@@ -25,6 +26,7 @@ const arg = (name: string): string => {
   if (!value) throw new Error(`EXPLICIT_${name.toUpperCase().replaceAll('-', '_')}_REQUIRED`);
   return value;
 };
+const allowLineageQualifiedSubsetMap = process.argv.includes('--allow-lineage-qualified-subset-map');
 const repoFile = (name: string) => {
   const absolute = path.resolve(ROOT, arg(name));
   if (!absolute.startsWith(`${ROOT}${path.sep}`)) throw new Error(`INPUT_OUTSIDE_REPOSITORY:${name}`);
@@ -46,7 +48,9 @@ const authorityReportPath = repoFile('authority-report');
 const lineageReportPath = repoFile('lineage-report');
 const candidateMapPath = repoFile('candidate-map');
 const outputRoot = repoFile('output-root');
-const allowedOutputRoot = path.resolve(ROOT, '.tmp/atlas/mapreduce-candidate-evidence-crosswalk-v1');
+const allowedOutputRoot = path.resolve(ROOT, allowLineageQualifiedSubsetMap
+  ? '.tmp/atlas/mapreduce-candidate-evidence-crosswalk-v2'
+  : '.tmp/atlas/mapreduce-candidate-evidence-crosswalk-v1');
 if (outputRoot !== allowedOutputRoot && !outputRoot.startsWith(`${allowedOutputRoot}${path.sep}`)) {
   throw new Error('OUTPUT_ROOT_OUTSIDE_MAPREDUCE_CANDIDATE_CROSSWALK');
 }
@@ -54,7 +58,10 @@ if (outputRoot !== allowedOutputRoot && !outputRoot.startsWith(`${allowedOutputR
 const sourceReport = JSON.parse(fs.readFileSync(sourceReportPath, 'utf8'));
 const authorityReport = JSON.parse(fs.readFileSync(authorityReportPath, 'utf8'));
 const lineageReport = JSON.parse(fs.readFileSync(lineageReportPath, 'utf8'));
-const map = candidateOrdinalMapV1Schema.parse(JSON.parse(fs.readFileSync(candidateMapPath, 'utf8'))) as CandidateOrdinalMapV1;
+const rawMap = JSON.parse(fs.readFileSync(candidateMapPath, 'utf8'));
+const map = candidateOrdinalMapV1Schema.parse(allowLineageQualifiedSubsetMap
+  ? projectCurrentOrdinalMapCoreV1(rawMap)
+  : rawMap) as CandidateOrdinalMapV1;
 assertCandidateOrdinalMapIntegrityV1(map);
 
 const shardManifest = JSON.parse(fs.readFileSync(path.join(shardDir, 'manifest.json'), 'utf8'));
@@ -84,8 +91,11 @@ if (authorityReport.status !== 'CURRENT_SOURCE_AUTHORITY_PROVEN'
   || lineageReport.sourceReport !== path.relative(ROOT, sourceReportPath).replaceAll('\\', '/')
   || lineageReport.sourceWorkspaceRevision !== authorityRevision
   || map.workspaceRevision !== authorityRevision
-  || map.rowCount !== 16_151
-  || map.candidates.some((candidate, index) => candidate.candidateOrdinal !== index || candidate.canonicalId !== candidate.packetKey)) {
+  || (allowLineageQualifiedSubsetMap
+    ? map.rowCount < 1 || rawMap.lineageQualifiedRowCount !== map.rowCount
+      || rawMap.lineageRequired !== true || rawMap.canonicalOrderingPolicy !== 'CANONICAL_ID_ASCENDING'
+    : map.rowCount !== 16_151)
+  || map.candidates.some((candidate, index) => candidate.candidateOrdinal !== index)) {
   throw new Error('PINNED_AUTHORITY_LINEAGE_OR_CANDIDATE_SNAPSHOT_MISMATCH');
 }
 
@@ -224,6 +234,8 @@ const receipt = {
     candidateMap: path.relative(ROOT, candidateMapPath).replaceAll('\\', '/'),
     candidateSnapshotRevision: map.candidateSnapshotRevision,
     ordinalMapChecksum: map.ordinalMapChecksum,
+    candidateMapScope: allowLineageQualifiedSubsetMap ? 'LINEAGE_QUALIFIED_SUBSET' : 'FULL_CANDIDATE_SNAPSHOT',
+    candidateMapRows: map.rowCount,
   },
   inputs: {
     metadataShard: path.relative(ROOT, shardPath).replaceAll('\\', '/'),

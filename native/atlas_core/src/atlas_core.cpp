@@ -1,5 +1,6 @@
 #include "atlas_core.h"
 
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
@@ -335,6 +336,20 @@ atlas_status_t atlas_context_destroy(atlas_context_t **context) {
   return ATLAS_STATUS_OK;
 }
 
+atlas_status_t atlas_context_get_options_v1(
+    const atlas_context_t *context,
+    atlas_context_options_t *out_options) {
+  if (context == nullptr || out_options == nullptr ||
+      !hasV1Size(out_options->struct_size, sizeof(*out_options)) ||
+      out_options->abi_version != ATLAS_ABI_VERSION_1) {
+    return ATLAS_STATUS_INVALID_ARGUMENT;
+  }
+  const uint32_t callerSize = out_options->struct_size;
+  *out_options = context->options;
+  out_options->struct_size = callerSize;
+  return ATLAS_STATUS_OK;
+}
+
 atlas_status_t atlas_buffer_init(atlas_buffer_t *buffer) {
   if (buffer == nullptr) return ATLAS_STATUS_INVALID_ARGUMENT;
   std::memset(buffer, 0, sizeof(*buffer));
@@ -550,6 +565,96 @@ atlas_status_t atlas_compute_request_validate_v1(
   }
   return compareRepresentations(&request->query_representation,
       &request->index_representation, receipt);
+}
+
+atlas_status_t atlas_similarity_graph_request_init_v1(
+    atlas_similarity_graph_request_v1_t *request) {
+  if (request == nullptr) return ATLAS_STATUS_INVALID_ARGUMENT;
+  std::memset(request, 0, sizeof(*request));
+  request->struct_size = static_cast<uint32_t>(sizeof(*request));
+  request->abi_version = ATLAS_ABI_VERSION_1;
+  return atlas_representation_contract_init_v1(&request->representation);
+}
+
+atlas_status_t atlas_similarity_graph_request_validate_v1(
+    const atlas_similarity_graph_request_v1_t *request,
+    atlas_representation_validation_receipt_v1_t *receipt) {
+  if (receipt == nullptr ||
+      !hasV1Size(receipt->struct_size, sizeof(*receipt)) ||
+      receipt->abi_version != ATLAS_ABI_VERSION_1) return ATLAS_STATUS_INVALID_ARGUMENT;
+  if (request == nullptr ||
+      !hasV1Size(request->struct_size, sizeof(*request)) ||
+      request->abi_version != ATLAS_ABI_VERSION_1 ||
+      request->row_count == 0u || request->row_count > UINT32_MAX ||
+      request->dimension == 0u || request->row_major_values == nullptr ||
+      !std::isfinite(request->threshold) || request->threshold < 0.0f ||
+      request->threshold > 1.0f || request->max_neighbors_per_row > request->row_count - 1u ||
+      request->reserved0 != 0u) {
+    return setRepresentationResult(receipt, ATLAS_STATUS_INVALID_ARGUMENT,
+        ATLAS_REPRESENTATION_REASON_INVALID_CONTRACT);
+  }
+  for (uint32_t value : request->reserved) {
+    if (value != 0u) return setRepresentationResult(receipt, ATLAS_STATUS_INVALID_ARGUMENT,
+        ATLAS_REPRESENTATION_REASON_INVALID_CONTRACT);
+  }
+  if (request->row_count > UINT64_MAX / request->dimension ||
+      request->row_count * request->dimension > UINT64_MAX / sizeof(float)) {
+    return setRepresentationResult(receipt, ATLAS_STATUS_INVALID_ARGUMENT,
+        ATLAS_REPRESENTATION_REASON_INVALID_CONTRACT);
+  }
+  const uint64_t elementCount = request->row_count * request->dimension;
+  if (elementCount > static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) ||
+      elementCount > static_cast<uint64_t>(std::numeric_limits<size_t>::max() / sizeof(float))) {
+    return setRepresentationResult(receipt, ATLAS_STATUS_INVALID_ARGUMENT,
+        ATLAS_REPRESENTATION_REASON_INVALID_CONTRACT);
+  }
+  const uint64_t expectedBytes = elementCount * sizeof(float);
+  if (request->input_byte_length != expectedBytes) {
+    return setRepresentationResult(receipt, ATLAS_STATUS_INVALID_ARGUMENT,
+        ATLAS_REPRESENTATION_REASON_INVALID_CONTRACT);
+  }
+
+  atlas_status_t status = validateRepresentation(&request->representation, receipt);
+  if (status != ATLAS_STATUS_OK) return status;
+  if (request->representation.dimensions != request->dimension) {
+    return setRepresentationResult(receipt, ATLAS_STATUS_DIMENSION_MISMATCH,
+        ATLAS_REPRESENTATION_REASON_DIMENSION_MISMATCH);
+  }
+  if (request->representation.dtype != ATLAS_DTYPE_F32) {
+    return setRepresentationResult(receipt, ATLAS_STATUS_INVALID_ARGUMENT,
+        ATLAS_REPRESENTATION_REASON_DTYPE_MISMATCH);
+  }
+  if (request->representation.metric != ATLAS_METRIC_COSINE) {
+    return setRepresentationResult(receipt, ATLAS_STATUS_INVALID_ARGUMENT,
+        ATLAS_REPRESENTATION_REASON_METRIC_MISMATCH);
+  }
+  return setRepresentationResult(receipt, ATLAS_STATUS_OK, ATLAS_REPRESENTATION_REASON_NONE);
+}
+
+atlas_status_t atlas_csr_graph_init_v1(atlas_csr_graph_v1_t *graph) {
+  if (graph == nullptr) return ATLAS_STATUS_INVALID_ARGUMENT;
+  std::memset(graph, 0, sizeof(*graph));
+  graph->struct_size = static_cast<uint32_t>(sizeof(*graph));
+  graph->abi_version = ATLAS_ABI_VERSION_1;
+  atlas_buffer_init(&graph->row_offsets);
+  atlas_buffer_init(&graph->column_indices);
+  atlas_buffer_init(&graph->edge_weights);
+  return ATLAS_STATUS_OK;
+}
+
+atlas_status_t atlas_csr_graph_release_v1(atlas_csr_graph_v1_t *graph) {
+  if (graph == nullptr ||
+      !hasV1Size(graph->struct_size, sizeof(*graph)) ||
+      graph->abi_version != ATLAS_ABI_VERSION_1) return ATLAS_STATUS_INVALID_ARGUMENT;
+  atlas_status_t status = atlas_buffer_release(&graph->row_offsets);
+  if (status != ATLAS_STATUS_OK) return status;
+  status = atlas_buffer_release(&graph->column_indices);
+  if (status != ATLAS_STATUS_OK) return status;
+  status = atlas_buffer_release(&graph->edge_weights);
+  if (status != ATLAS_STATUS_OK) return status;
+  graph->row_count = 0u;
+  graph->edge_count = 0u;
+  return ATLAS_STATUS_OK;
 }
 
 }  // extern "C"

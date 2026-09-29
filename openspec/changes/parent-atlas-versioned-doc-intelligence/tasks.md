@@ -1002,9 +1002,10 @@ Audit 2026-09-24 (read-only; DOC-19 exact oracle, DOC-20 CAGRA comparison, and D
   `productVersion` changes and crawl only the delta, never overwrite the prior version's rows
   (depends on DOC-02/DOC-27).
   - Read-only fixture added: `scripts/atlas/prove-doc-26-incremental-recrawl-fixture-v1.mjs`.
-    It proves only a proposed decision rule: unchanged bytes/timestamp-only changes may be skipped,
-    changed bytes are reprocessed, and a changed product version requires a new revision. The
-    fixture is not wired to the crawler or admission owner and does not prove prior-row preservation.
+    It initially proved only a proposed decision rule: unchanged bytes/timestamp-only changes may
+    be skipped, changed bytes are reprocessed, and a changed product version requires a new revision.
+    The integrated code-only path below now supersedes the old statement that recrawl is not wired
+    to the crawler/admission owner; live PostgreSQL preservation is still unproven.
     The receipt's former `conditional-fetch.ts` owner label was incorrect. The actual boundaries
     are `python/atlas_okf_docs_pipeline.py` (manifest/fetch/chunk orchestration) and
     `external-doc-admission.ts` (canonical PostgreSQL writer); DOC-26 remains open until an
@@ -1025,8 +1026,23 @@ Audit 2026-09-24 (read-only; DOC-19 exact oracle, DOC-20 CAGRA comparison, and D
     IDs; 31 focused coordinate/chunk tests pass, including V1 non-change, V2 cross-version
     separation, malformed-revision rejection, and a Python ↔ frontend canonical-hash golden vector.
     Receipt: `docs/reports/parent-atlas/doc-26-chunk-identity-v2-contract-review-v1.json`.
-    This clears only the identity-contract review subgate. V2 is not wired into admission; DOC-26
-    remains open pending delta-plan integration and prior-version preservation readback.
+    This cleared only the identity-contract review subgate at that time; see the dated
+    code-composition follow-up below. DOC-26 remains open pending live prior-version preservation
+    proof.
+
+    **DOC-26 code-composition follow-up (2026-09-28, no live calls/writes):** the Python delta
+    planner is now consumed by `_sources_selected_by_recrawl_plan()` in `run_pipeline()`, which
+    processes only selected additions/version transitions and namespaces version-transition
+    artifacts separately. The TypeScript composition in
+    `external-doc-versioned-recrawl-admission-v2.ts` validates the Python plan checksum, requires
+    exact prior/current envelopes and V2 chunk IDs, then uses the existing resumable admission
+    planner/writer. `run-external-doc-versioned-recrawl-v2.mts` defaults to repeatable-read
+    `PLAN_ONLY`; `--apply` is behind the explicit `ATLAS_DOC_VERSIONED_RECRAWL_AUTHORIZED` gate.
+    Focused validation: Python manifest-planner tests 4/4 and TypeScript composition tests 9/9;
+    the fake-pool proof confirms SELECT-only statements and zero writer calls. No live database
+    runner, crawler, or apply path was invoked. DOC-26 remains open for a real read-only plan
+    against exact prior/current artifacts and independent prior-version preservation readback after
+    any separately authorized admission.
 
 ## Explicitly deferred / not part of this proposal
 
@@ -1380,3 +1396,45 @@ This closes viewability only; the artifact remains noncanonical and unadmitted.
 - [x] `LANGCHAIN-LOCAL-CHUNK-SNAPSHOT-VIEWER-01`: added a pinned, checksum-verified
   read-only local snapshot reader and Admin Docs Corpus panel. It is distinct from
   canonical Postgres FTS; no database, Qdrant, Valkey, Neo4j, or Graphify writes.
+
+## DSPy official documentation reference snapshot — 2026-09-28
+
+- [x] `DSPY-DOC-LOCAL-SNAPSHOT-01`: Firecrawl Map v2 discovered the official
+  `https://dspy.ai/current/` sitemap scope (166 URLs); the existing
+  `atlas_external_docs.extract_structured_text` BeautifulSoup normalizer captured
+  raw HTML and normalized text for all 166 pages under
+  `.okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/`. URL-set checksum:
+  `sha256:1d0dffe4ef6323154f0dc8355e954094601025b6715b4c8e8c472dd9e3b91052`.
+  This is a local reference snapshot of the mutable `current` channel, not an
+  immutable upstream release identity: `LOCAL_UNADMITTED`,
+  `canonicalAuthority=false`. No Postgres, Valkey, Qdrant, Neo4j, Graphify, or
+  embedding writes/calls occurred. Readback/checksum verification is provided by
+  `py -3.13 scripts/atlas/capture-dspy-doc-corpus-v1.py --verify-dir
+  .okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63`.
+- Existing PostgreSQL 18 canonical page/chunk tables and FTS/index definitions
+  are in `sveltekit-frontend/drizzle/manual/20260904_external_doc_intelligence_v1.sql`.
+  DSPy canonical admission remains separate: add Drizzle schema alignment
+  before any row admission; the exact 3.4.0 release documentation is captured below.
+- [x] `DSPY-DOC-RELEASE-SNAPSHOT-01`: confirmed DSPy 3.4.0 as the latest stable
+  release in the official repository release list and verified the versioned
+  `https://dspy.ai/3.4.0/llms.txt` and sitemap. Captured all 165 sitemap-listed
+  pages into `.okf/docs/dspy/snapshots/20260928T205007Z-9bd30a9471d9/`, separate
+  from the mutable `current` snapshot above. URL-set checksum:
+  `sha256:9bd30a9471d9b064a5ab4b3ed80ebbaaf71cd97742a02ff4ce261fbfc6c37c2f`.
+  Snapshot remains `LOCAL_UNADMITTED`; no database, vector, cache, graph, or
+  embedding writes/calls. The 3.4.0 release source is pinned, but its official
+  docs content checksum is the local snapshot's evidence revision, not a claim
+  that the documentation site is cryptographically signed by the package tag.
+
+- [x] `DSPY-DOC-DRIZZLE-ALIGN-01` (declaration-only): added runtime Drizzle
+  declarations for the already-existing `atlas_external_doc_pages` and
+  `atlas_external_doc_chunks` tables, exported from the configured schema entrypoint.
+  The declarations mirror the registered manual SQL's identities, constraints,
+  generated FTS column, nullable `vector(768)`, and index names. Both tables are
+  explicitly excluded from drizzle-kit generation; the manual sidecar remains
+  the DDL owner. Focused TypeScript compilation passed with `--types node`.
+  The full `npm run check` did not complete within the bounded run and was
+  stopped while consuming substantial workspace memory. The schema-export audit
+  found no duplicate for either new table but exits nonzero on 23 duplicate
+  declarations elsewhere in the schema. No migration was generated/applied and
+  no database or other datastore was contacted or written.

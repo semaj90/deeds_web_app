@@ -163,6 +163,80 @@ def test_semantic_pass_wires_ast_unit_and_linguistic_facts_into_bounded_card():
     assert control5 is None
 
 
+def test_grounded_opt_in_adds_only_grounded_evidence_without_changing_structural_cards(monkeypatch):
+    text = '"Runs a value."\nfunction run() { return 1; }'
+    revision = "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
+    request = sidecar.AnalyzeRequest(
+        text=text,
+        source_type="codebase",
+        source_ref="fixture/grounded-identity.ts",
+        source_revision=revision,
+        workspace_revision="workspace-fixture-v1",
+        packet_key="packet:grounded-identity",
+        language="typescript",
+        passes=["structural", "semantic", "sequence", "rerank"],
+    )
+    extraction_calls = []
+
+    monkeypatch.setattr(sidecar, "_spacy_entities", lambda _text: [])
+    monkeypatch.setattr(sidecar, "_regex_entities", lambda _text: [])
+    monkeypatch.setattr(
+        sidecar,
+        "_code_chunks_tree_sitter",
+        lambda source, _language: [sidecar.Chunk(
+            kind="function_declaration",
+            text=source,
+            start=0,
+            end=len(source.encode("utf-8")),
+            symbol="run",
+        )],
+    )
+    monkeypatch.setattr(sidecar, "_code_features_ast_grep", lambda _text, _language: [])
+    monkeypatch.setattr(sidecar, "_code_relationships", lambda _text: [])
+    monkeypatch.setattr(sidecar, "_torch_summary", lambda _text: {})
+    monkeypatch.setattr(sidecar, "CLASSIFICATION_HELPER_AVAILABLE", False)
+    monkeypatch.setattr(sidecar, "LANGEXTRACT_AVAILABLE", True)
+    monkeypatch.setattr(
+        sidecar,
+        "_grounded_extractions",
+        lambda source, _model: extraction_calls.append(source) or [{
+            "extraction_class": "function_behavior",
+            "extraction_text": "Runs a value.",
+            "char_interval": {"start_pos": 1, "end_pos": 15},
+            "attributes": {"source": "fixture"},
+        }],
+    )
+
+    default_result = sidecar._analyze(request)
+    assert extraction_calls == []
+    assert "grounded_extraction_required" not in default_result.metadata
+
+    grounded_result = sidecar._analyze(
+        request.model_copy(update={"grounded_extraction_required": True})
+    )
+    assert extraction_calls == [text]
+
+    def pass_artifact(result, family, artifact):
+        pass_result = next(item for item in result.pass_results if item.family == family)
+        return pass_result.artifacts[artifact]
+
+    default_ast = pass_artifact(default_result, "structural", "ast_units")
+    grounded_ast = pass_artifact(grounded_result, "structural", "ast_units")
+    default_cards = pass_artifact(default_result, "semantic", "semantic_cards")
+    grounded_cards = pass_artifact(grounded_result, "semantic", "semantic_cards")
+
+    assert grounded_ast == default_ast
+    assert grounded_cards == default_cards
+    assert grounded_result.metadata["grounded_extractions"][0]["extraction_text"] == "Runs a value."
+    assert all(unit["canonical_authority"] is False for unit in grounded_ast)
+    assert all(card["canonical_authority"] is False for card in grounded_cards)
+    assert pass_artifact(grounded_result, "semantic", "embedding_status") == "NOT_RUN"
+    assert pass_artifact(grounded_result, "sequence", "inference_status") == "NOT_RUN"
+    assert next(item for item in grounded_result.pass_results if item.family == "rerank").status == "skipped"
+    assert grounded_result.experiment_feature_matrix is None
+    assert grounded_result.control5 is None
+
+
 def test_pass_results_do_not_invent_source_identity_or_revision():
     request = sidecar.AnalyzeRequest(
         text="const value = 1;",

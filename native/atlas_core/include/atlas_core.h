@@ -109,6 +109,36 @@ typedef struct atlas_compute_request_v1 {
   atlas_representation_contract_v1_t index_representation;
 } atlas_compute_request_v1_t;
 
+typedef struct atlas_similarity_graph_request_v1 {
+  uint32_t struct_size;
+  uint32_t abi_version;
+  uint64_t row_count;
+  uint32_t dimension;
+  uint32_t max_neighbors_per_row;
+  float threshold;
+  uint32_t reserved0;
+  const float *row_major_values;
+  uint64_t input_byte_length;
+  atlas_representation_contract_v1_t representation;
+  uint32_t reserved[4];
+} atlas_similarity_graph_request_v1_t;
+
+typedef struct atlas_knn_exact_request_v1 {
+  uint32_t struct_size;
+  uint32_t abi_version;
+  uint64_t query_count;
+  uint64_t corpus_count;
+  uint32_t top_k;
+  uint32_t reserved0;
+  const float *query_row_major_f32;
+  uint64_t query_byte_length;
+  const float *corpus_row_major_f32;
+  uint64_t corpus_byte_length;
+  atlas_representation_contract_v1_t query_representation;
+  atlas_representation_contract_v1_t corpus_representation;
+  uint32_t reserved[4];
+} atlas_knn_exact_request_v1_t;
+
 typedef struct atlas_representation_validation_receipt_v1 {
   uint32_t struct_size;
   uint32_t abi_version;
@@ -153,6 +183,47 @@ typedef struct atlas_buffer {
   uint32_t reserved;
 } atlas_buffer_t;
 
+typedef struct atlas_knn_exact_result_v1 {
+  uint32_t struct_size;
+  uint32_t abi_version;
+  uint64_t query_count;
+  uint32_t top_k;
+  uint32_t reserved0;
+  /* Projection-local corpus row indices; not canonical IDs or CandidateOrdinals. */
+  atlas_buffer_t corpus_row_indices; /* uint32_t[query_count * top_k], module-owned */
+  atlas_buffer_t distances;          /* float[query_count * top_k], metric from contract */
+} atlas_knn_exact_result_v1_t;
+
+typedef struct atlas_csr_graph_v1 {
+  uint32_t struct_size;
+  uint32_t abi_version;
+  uint64_t row_count;
+  uint64_t edge_count;
+  atlas_buffer_t row_offsets;      /* uint64_t[row_count + 1] */
+  atlas_buffer_t column_indices;   /* uint32_t[edge_count] */
+  atlas_buffer_t edge_weights;     /* float[edge_count] */
+} atlas_csr_graph_v1_t;
+
+typedef struct atlas_pagerank_options_v1 {
+  uint32_t struct_size;
+  uint32_t abi_version;
+  double damping;
+  double tolerance;
+  uint32_t max_iterations;
+  uint32_t reserved[4];
+} atlas_pagerank_options_v1_t;
+
+typedef struct atlas_pagerank_result_v1 {
+  uint32_t struct_size;
+  uint32_t abi_version;
+  uint64_t node_count;
+  uint32_t iterations;
+  uint8_t converged;
+  uint8_t reserved[3];
+  double final_residual;
+  atlas_buffer_t scores; /* double[node_count], module-owned */
+} atlas_pagerank_result_v1_t;
+
 ATLAS_API uint32_t atlas_get_abi_version(void);
 ATLAS_API const char *atlas_status_string(atlas_status_t status);
 ATLAS_API atlas_status_t atlas_context_options_init(atlas_context_options_t *options);
@@ -168,6 +239,9 @@ ATLAS_API atlas_status_t atlas_context_create(
     const atlas_context_options_t *options,
     atlas_context_t **out_context);
 ATLAS_API atlas_status_t atlas_context_destroy(atlas_context_t **context);
+ATLAS_API atlas_status_t atlas_context_get_options_v1(
+    const atlas_context_t *context,
+    atlas_context_options_t *out_options);
 ATLAS_API atlas_status_t atlas_buffer_init(atlas_buffer_t *buffer);
 ATLAS_API atlas_status_t atlas_buffer_allocate(uint64_t byte_length, atlas_buffer_t *out_buffer);
 ATLAS_API atlas_status_t atlas_buffer_release(atlas_buffer_t *buffer);
@@ -185,6 +259,42 @@ ATLAS_API atlas_status_t atlas_index_build_request_validate_v1(
 ATLAS_API atlas_status_t atlas_compute_request_validate_v1(
     const atlas_compute_request_v1_t *request,
     atlas_representation_validation_receipt_v1_t *receipt);
+ATLAS_API atlas_status_t atlas_similarity_graph_request_init_v1(
+    atlas_similarity_graph_request_v1_t *request);
+ATLAS_API atlas_status_t atlas_similarity_graph_request_validate_v1(
+    const atlas_similarity_graph_request_v1_t *request,
+    atlas_representation_validation_receipt_v1_t *receipt);
+ATLAS_API atlas_status_t atlas_knn_exact_request_init_v1(atlas_knn_exact_request_v1_t *request);
+ATLAS_API atlas_status_t atlas_knn_exact_request_validate_v1(
+    const atlas_knn_exact_request_v1_t *request,
+    atlas_representation_validation_receipt_v1_t *receipt);
+ATLAS_API atlas_status_t atlas_knn_exact_result_init_v1(atlas_knn_exact_result_v1_t *result);
+ATLAS_API atlas_status_t atlas_knn_exact_result_release_v1(atlas_knn_exact_result_v1_t *result);
+ATLAS_API atlas_status_t atlas_csr_graph_init_v1(atlas_csr_graph_v1_t *graph);
+ATLAS_API atlas_status_t atlas_csr_graph_release_v1(atlas_csr_graph_v1_t *graph);
+ATLAS_API atlas_status_t atlas_pagerank_options_init_v1(atlas_pagerank_options_v1_t *options);
+ATLAS_API atlas_status_t atlas_pagerank_result_init_v1(atlas_pagerank_result_v1_t *result);
+ATLAS_API atlas_status_t atlas_pagerank_result_release_v1(atlas_pagerank_result_v1_t *result);
+/* Deterministic CPU reference; reads CSR buffers without taking ownership. */
+ATLAS_API atlas_status_t atlas_pagerank(
+    const atlas_context_t *context,
+    const atlas_csr_graph_v1_t *graph,
+    const atlas_pagerank_options_v1_t *options,
+    atlas_pagerank_result_v1_t *out_result,
+    atlas_execution_receipt_t *receipt);
+/* Implemented by atlas_similarity_graph_backend; default builds fail closed with NOT_IMPLEMENTED. */
+ATLAS_API atlas_status_t atlas_similarity_graph_build(
+    const atlas_context_t *context,
+    const atlas_similarity_graph_request_v1_t *request,
+    atlas_csr_graph_v1_t *out_graph,
+    atlas_execution_receipt_t *receipt);
+/* Implemented by atlas_knn_backend; default vendor-free builds fail closed with NOT_IMPLEMENTED.
+ * Returned row indices are projection-local and require the caller's admitted ordinal map. */
+ATLAS_API atlas_status_t atlas_knn_exact(
+    const atlas_context_t *context,
+    const atlas_knn_exact_request_v1_t *request,
+    atlas_knn_exact_result_v1_t *out_result,
+    atlas_execution_receipt_t *receipt);
 
 #ifdef __cplusplus
 }

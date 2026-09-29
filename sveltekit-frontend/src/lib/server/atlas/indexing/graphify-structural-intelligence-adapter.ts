@@ -40,6 +40,7 @@ export type GraphifyStructuralIntelligenceReceipt = {
   langExtractObservationCount: number;
   langExtractParserBufferPresent: boolean;
   langExtractParserBufferChecksum: string | null;
+  langExtractParserBufferMatchesSource: boolean;
   langExtractOffsetBasis: 'PYTHON_CODEPOINT';
   langExtractSourceTextEncodingRevision: 'UTF8_PARSER_BUFFER_V1';
   langExtractFallbackUsed: boolean;
@@ -153,6 +154,7 @@ export function compileGraphifyStructuralIntelligence(input: {
         langExtractObservationCount: 0,
         langExtractParserBufferPresent: false,
         langExtractParserBufferChecksum: null,
+        langExtractParserBufferMatchesSource: false,
         langExtractOffsetBasis: 'PYTHON_CODEPOINT',
         langExtractSourceTextEncodingRevision: 'UTF8_PARSER_BUFFER_V1',
         langExtractFallbackUsed: false,
@@ -194,14 +196,6 @@ export function compileGraphifyStructuralIntelligence(input: {
   });
 
   const rawLangExtract = adaptSidecarGroundedExtractions(input.langExtractMetadata ?? {});
-  const groundedLangExtract = adaptGroundedLangExtract({
-    source_ref: materialization.evidence.file_path,
-    source_revision: materialization.evidence.source_revision,
-    source_text: input.source,
-    extractor_revision: input.revisions.langExtract,
-    producer_revision: input.revisions.adapter,
-    extractions: rawLangExtract,
-  });
   const parserBufferPresent = input.parserBuffer !== undefined;
   const parserBuffer = input.parserBuffer ?? Buffer.from(input.source, 'utf8');
   const utf8Grounding = groundLangExtractUtf8SpansV1({
@@ -212,6 +206,37 @@ export function compileGraphifyStructuralIntelligence(input: {
     parser_buffer: parserBuffer,
     offset_basis: 'PYTHON_CODEPOINT',
     extractions: rawLangExtract,
+  });
+  // Spans are returned in input order with rejected entries omitted. Only
+  // exact byte-grounded spans may enter structural observations; the UTF-8
+  // receipt is an admission gate, not merely diagnostics.
+  const rejectedExtractionIndexes = new Set(utf8Grounding.rejections.map(({ index }) => index));
+  let spanIndex = 0;
+  const parserBufferText = new TextDecoder('utf-8', { fatal: true }).decode(parserBuffer);
+  const parserBufferMatchesSource = parserBufferText === input.source;
+  const byteVerifiedExtractions = rawLangExtract.flatMap((raw, index) => {
+    if (rejectedExtractionIndexes.has(index)) return [];
+    const span = utf8Grounding.spans[spanIndex++];
+    if (!parserBufferMatchesSource || span?.text_matches_extraction !== true) return [];
+    return [{
+      ...raw,
+      attributes: {
+        ...raw.attributes,
+        atlas_source_text_encoding_revision: span.source_text_encoding_revision,
+        atlas_utf8_start_byte: span.utf8_start_byte,
+        atlas_utf8_end_byte: span.utf8_end_byte,
+        atlas_slice_sha256: span.slice_sha256,
+        atlas_evidence_checksum: span.evidence_checksum,
+      },
+    }];
+  });
+  const groundedLangExtract = adaptGroundedLangExtract({
+    source_ref: materialization.evidence.file_path,
+    source_revision: materialization.evidence.source_revision,
+    source_text: parserBufferText,
+    extractor_revision: input.revisions.langExtract,
+    producer_revision: input.revisions.adapter,
+    extractions: byteVerifiedExtractions,
   });
 
   const enriched = adaptAtlasAstEvidenceToStructuralInput({
@@ -252,11 +277,9 @@ export function compileGraphifyStructuralIntelligence(input: {
     && materialization.sourceRevision !== null
     && strictNativeMode
     && parserBufferPresent
+    && parserBufferMatchesSource
     && compatibilityCount === 0;
 
-  const langExtractDiagnostics = groundedLangExtract.receipt.rejected_ungrounded_count > 0
-    ? [`LANGEXTRACT_UNGROUNDED_REJECTED:${groundedLangExtract.receipt.rejected_ungrounded_count}`]
-    : [];
   const utf8Diagnostics = [
     ...(utf8Grounding.rejections.length > 0 ? [`LANGEXTRACT_UTF8_REJECTED:${utf8Grounding.rejections.length}`] : []),
     ...(utf8Grounding.spans.some((span) => !span.text_matches_extraction)
@@ -291,6 +314,7 @@ export function compileGraphifyStructuralIntelligence(input: {
       langExtractSourceTextEncodingRevision: 'UTF8_PARSER_BUFFER_V1',
       langExtractFallbackUsed: !parserBufferPresent,
       langExtractFallbackReason: parserBufferPresent ? null : 'PARSER_BUFFER_DERIVED_FROM_SOURCE_TEXT',
+      langExtractParserBufferMatchesSource: parserBufferMatchesSource,
       langExtractUtf8SpanCount: utf8Grounding.spans.length,
       langExtractUtf8RejectionCount: utf8Grounding.rejections.length,
       langExtractUtf8MismatchCount: utf8Grounding.spans.filter((span) => !span.text_matches_extraction).length,
@@ -301,7 +325,7 @@ export function compileGraphifyStructuralIntelligence(input: {
       diagnostics: unique([
         ...materialization.diagnostics,
         ...enriched.receipt.diagnostics,
-        ...langExtractDiagnostics,
+        ...(!parserBufferMatchesSource ? ['LANGEXTRACT_PARSER_BUFFER_SOURCE_TEXT_MISMATCH'] : []),
         ...utf8Diagnostics,
         ...fabric.receipt.diagnostics,
       ]),

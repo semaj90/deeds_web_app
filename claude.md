@@ -36,6 +36,14 @@
   Postgres/Qdrant/Valkey packet writes and reports `PACKET_COMPOSITION_NOT_WIRED`. TRACE MCP starts
   independently on its own task. A successful Graphify or TRACE startup is not an ACE packet/cache
   promotion receipt.
+- **ACE incremental startup is manual, not folder-open automation:** the existing
+  `sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs` and
+  `config/startup-ace-policy.json` are real, but the orchestrator can run indexing/graph/cache
+  operations, spawn services, and prune stale PostgreSQL rows. Its `startup:ace:detached` alias is
+  now wired for an explicit operator-requested VS Code task; the task no longer runs automatically
+  on folder open or as a prerequisite of the Atlas smoke. The four previously reported silent
+  folder-open script failures are therefore resolved as three aliases plus this manual-only
+  reclassification—not by enabling a broad mutating startup chain.
 - **Hit-demand is implemented, but is not semantic/token-cache warming:** the
   `ace:hit-demand` and `ace:hit-demand:dry` npm aliases point to the existing
   `sveltekit-frontend/scripts/seed-hit-demand.mjs`; `context-for-file.ts::loadHitDemand()` consumes
@@ -93,26 +101,44 @@
 
 ### Remaining implementation order
 
-1. Close `ACE-GATE-RECONCILE-01` from the latest admission receipt. Keep Graphify apply, Karpathy
-   score-cache enrichment, TRACE MCP startup, and ACE/BitFrost warming as separate outcomes.
-2. Close `ACE-STARTUP-BOUNDARY-01`: retain the existing hit-demand feature, but decide whether its
-   folder-open Redis write is acceptable as a noncanonical path-demand hint. If it is, document and
-   test its bounded key/payload/TTL/consumer contract; if revision-qualified corpus warming is
-   intended, design that as a separate gated feature. Do not label it a token cache.
-3. Close `ACE-PRODUCER-TRACE-01`: trace the request-time ContextManifest through
-   `buildAcePacketV3`, prove packet/source/representation identity and derive the exact admitted
-   packet-key set. Treat HyperRAG Packet RPC as an existing retrieval interface, not as proof of
-   persistent ACE packet admission.
-4. Close `ACE-BITFROST-CALLER-01` using the existing writer only after the producer and admission
-   proofs pass; add focused identity/revision/checksum rejection, no-inline-vector, and
-   one-vote-per-lane fixtures. Keep fixtures datastore-free.
-5. Only after an explicit operator authorization and passing admission receipt, run one disposable
-   BitFrost write/readback/TTL-expiry canary. Broader bucket warming and centroid warming come later,
-   after revision-qualified artifact/key derivation and atomic publication/readback are proven.
-6. In a separate bounded change, evolve LangGraph Headroom to reference/revision-aware state
-   admission (UTF-8 byte budgets, pinned required evidence, receipt/artifact refs, no arbitrary JSON
-   truncation or emergency summary, migration-owned schema). Keep execution in typed TRACE/OaK
-   operators, not the bridge.
+1. `ACE-GATE-RECONCILE-01`: close the receipt-driven blocker table without weakening admission.
+   Keep Graphify apply, Karpathy score-cache enrichment, TRACE MCP startup, and ACE/BitFrost
+   warming as separate outcomes.
+2. `ACE-STARTUP-BOUNDARY-01`: document/test the distinction between the path-keyed
+   `ace:rank:demand` hint and revision-qualified semantic/context warming. The startup alias now
+   exists; the broad ACE incremental orchestrator is manual-only because it has side effects.
+3. `ACE-PRODUCER-TRACE-01`: trace request-time `ContextManifest` through `buildAcePacketV3`, prove
+   packet/source/representation identity, and derive the exact admitted packet-key set. The
+   HyperRAG Packet RPC is an existing retrieval interface, not persistent packet admission.
+4. `ACE-BITFROST-CALLER-01`: only after producer and admission proofs pass, call the existing writer
+   with identity/revision/checksum rejection, no-inline-vector, and one-vote-per-lane fixtures.
+5. `ACE-BITFROST-CANARY-01`: after explicit operator authorization, run one disposable
+   write/readback/TTL-expiry canary. Broader bucket warming and centroid warming require qualified
+   artifact/key derivation and atomic publication/readback.
+6. Connect sealed `LearningOutcomeV1` evidence to OaK judging and DSPy/GEPA in shadow mode only
+   after the TypeScript ContextManifest → Python DSPy guard → TypeScript response boundary is
+   enforced. GEPA optimizes the DSPy program; JEPA is a separate representation-learning idea, not
+   the same optimizer. Ornith remains synthesis/tool proposal, not embedding authority.
+7. Keep the optional breadth/acceleration plane behind qualified events and projections:
+   - HyperLogLog code and warmers exist, but remain approximate breadth telemetry; they never
+     establish identity or replace PostgreSQL counts. Audit the existing writer/read paths before
+     wiring a new event producer.
+   - `CentroidArtifactV1` and its checksum tests exist. Live revision-qualified centroid
+     publication/readback and useful coarse-routing recall are separate proof gates; do not warm a
+     broad bucket just because the artifact type exists.
+   - simdjson N-API parsing, Arrow IPC, and mmap artifact paths already exist. Reuse them for
+     bounded JSON/NDJSON ingestion and bulk numeric transport; do not put vectors in packet JSON or
+     confuse CPU parsing with GPU execution. cuTile stays a measured challenger behind established
+     cuBLASLt/LibTorch/cuVS baselines.
+   - Use existing bounded RLM/OaK DAG and HyperRAG retrieval owners for multi-hop expansion. Do not
+     add a second queue, packet RPC, or fusion owner until a code census proves a missing capability.
+   - Python OAKlib is an ontology adapter/candidate source; OaK is the reasoning/kernel boundary.
+     Neither mints canonical identity; PostgreSQL and the domain/ontology contracts retain that
+     authority.
+8. Evolve LangGraph Headroom separately to reference/revision-aware control state (UTF-8 byte
+   budgets, pinned required evidence, receipt/artifact refs, no arbitrary JSON truncation or
+   emergency summary, migration-owned schema). Keep execution in typed TRACE/OaK operators, not
+   the bridge.
 
 The detailed execution checklist is in
 `openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`. Historical status banners and

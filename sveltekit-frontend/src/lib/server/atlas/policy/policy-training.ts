@@ -11,6 +11,19 @@ import type { CanonicalRerankProvenance } from '$lib/server/retrieval/canonical-
 export const POLICY_TRAINING_ROW_REVISION = 'parent-atlas.policy-training-row.v1' as const;
 export const POLICY_TRAINING_DATASET_DIR = 'memory/datasets/policy_training' as const;
 const ROUTER_STATES = ['START', 'RETRIEVE', 'STRUCTURE', 'LEGAL_ANALYZE', 'OPERATE', 'VALIDATE', 'RECOVER', 'CLARIFY', 'SYNTHESIZE', 'ESCALATE', 'DONE'] as const;
+const UNQUALIFIED_REVISION = /^(?:unknown|unset|null|undefined|n\/?a|repr:unset)$/i;
+
+export function isNonPlaceholderPolicyTrainingRevision(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0 && !UNQUALIFIED_REVISION.test(value.trim());
+}
+
+export function hasNonPlaceholderPolicyTrainingRevisions(
+  revisions: Partial<RevisionTuple>,
+): revisions is RevisionTuple {
+  return isNonPlaceholderPolicyTrainingRevision(revisions.workspaceRevision) &&
+    isNonPlaceholderPolicyTrainingRevision(revisions.sourceRevision) &&
+    isNonPlaceholderPolicyTrainingRevision(revisions.representationRevision);
+}
 
 export type RouteTraceLabelSource = 'EXECUTION' | 'REPLAY' | 'AUDIT';
 
@@ -93,9 +106,9 @@ export const RouteTraceTrainingRowSchema = z.object({
   queryHash: z.string().trim().min(1),
   query: z.string(),
   revisions: z.object({
-    workspaceRevision: z.string().trim().min(1),
-    sourceRevision: z.string().trim().min(1),
-    representationRevision: z.string().trim().min(1),
+    workspaceRevision: z.string().trim().min(1).refine(isNonPlaceholderPolicyTrainingRevision),
+    sourceRevision: z.string().trim().min(1).refine(isNonPlaceholderPolicyTrainingRevision),
+    representationRevision: z.string().trim().min(1).refine(isNonPlaceholderPolicyTrainingRevision),
     graphRevision: z.string().trim().optional(),
     featureRevision: z.string().trim().optional(),
   }).strict(),
@@ -182,6 +195,10 @@ function mapHmmToRouterState(state: HmmState): RouteTrace['selectedState'] {
 
 export function buildRouteTraceTrainingRow(input: RouteTraceTrainingInput): RouteTraceTrainingRow {
   const provenance = RouteTraceLabelProvenanceSchema.parse(input.labelProvenance);
+
+  if (!hasNonPlaceholderPolicyTrainingRevisions(input.revisions)) {
+    throw new Error('RouteTrace training rows require non-placeholder workspace, source, and representation revisions.');
+  }
 
   if (!input.trace.executed || !input.trace.executionId) {
     throw new Error('RouteTrace labels are not provenance-backed until execution is recorded.');

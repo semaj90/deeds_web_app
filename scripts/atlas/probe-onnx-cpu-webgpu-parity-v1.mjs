@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { createRequire } from 'node:module';
+import { describeOnnxProviderEvidence } from './lib/onnx-provider-evidence-v1.mjs';
 
 const require = createRequire(import.meta.url);
 
@@ -42,7 +43,7 @@ function cosine(a, b) {
 }
 
 const report = {
-  schema: 'atlas.onnx-cpu-webgpu-parity.v1',
+  schema: 'atlas.onnx-cpu-webgpu-parity.v2',
   generatedAt: new Date().toISOString(),
   readOnly: true,
   canonicalAuthority: false,
@@ -62,6 +63,7 @@ const report = {
 try {
   if (!report.modelChecksum || !report.tokenizerChecksum) throw new Error('EMBEDDINGGEMMA_ARTIFACT_MISSING');
   const ort = require(ortDir);
+  const supportedBackends = ort.listSupportedBackends?.() ?? [];
   const transformers = tokenizerRequire('@huggingface/transformers');
   transformers.env.localModelPath = resolve(frontend, 'static');
   const tokenizer = await transformers.AutoTokenizer.from_pretrained('embeddinggemma_300m_onnx', { local_files_only: true });
@@ -74,6 +76,10 @@ try {
     attention_mask: new ort.Tensor('int64', BigInt64Array.from(mask, BigInt), [1, mask.length]),
   };
   async function run(provider) {
+    const providerEvidence = describeOnnxProviderEvidence(provider, supportedBackends);
+    if (!providerEvidence.runtimeAdvertised) {
+      throw new Error(`ONNX_PROVIDER_NOT_ADVERTISED:${provider}`);
+    }
     const session = await ort.InferenceSession.create(modelPath, { executionProviders: [provider] });
     const outputName = session.outputNames[0];
     const output = (await session.run(feeds))[outputName];
@@ -96,7 +102,12 @@ try {
     }
     norm = Math.sqrt(norm);
     for (let dimension = 0; dimension < 768; dimension += 1) pooled[dimension] /= norm;
-    report.providers[provider] = { actualProvider: provider, outputName, dimensions: 768, normalized: Math.abs(Math.hypot(...pooled) - 1) <= 1e-3 };
+    report.providers[provider] = {
+      ...providerEvidence,
+      outputName,
+      dimensions: 768,
+      normalized: Math.abs(Math.hypot(...pooled) - 1) <= 1e-3,
+    };
     return pooled;
   }
   const cpu = await run('cpu');
@@ -115,7 +126,7 @@ try {
     vectorChecksums: { cpu: digestVector(cpu), webgpu: digestVector(webgpu) },
     sameInput: true,
   };
-  report.status = 'PARITY_OBSERVED_UNADMITTED';
+  report.status = 'NUMERICAL_PARITY_PROVIDER_UNVERIFIED';
 } catch (error) {
   report.errors.push(String(error?.message ?? error));
 }

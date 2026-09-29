@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 3.18)
+project(atlas_core LANGUAGES C CXX)
+
+include(CTest)
+option(ATLAS_BUILD_LIBTORCH_GRAPH_BACKEND "Build the optional LibTorch similarity-graph backend" OFF)
+
+add_library(atlas_core STATIC src/atlas_core.cpp src/atlas_pagerank.cpp)
+target_include_directories(atlas_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_compile_features(atlas_core PUBLIC cxx_std_17)
+target_compile_definitions(atlas_core PUBLIC ATLAS_CORE_STATIC=1)
+
+if(ATLAS_BUILD_LIBTORCH_GRAPH_BACKEND)
+  find_package(Torch CONFIG REQUIRED)
+  add_library(atlas_similarity_graph_backend STATIC src/atlas_similarity_graph_libtorch.cpp)
+  target_link_libraries(atlas_similarity_graph_backend PUBLIC atlas_core ${TORCH_LIBRARIES})
+  target_compile_features(atlas_similarity_graph_backend PUBLIC cxx_std_17)
+  separate_arguments(ATLAS_TORCH_CXX_FLAGS NATIVE_COMMAND "${TORCH_CXX_FLAGS}")
+  target_compile_options(atlas_similarity_graph_backend PRIVATE ${ATLAS_TORCH_CXX_FLAGS})
+  target_compile_definitions(atlas_similarity_graph_backend PRIVATE ATLAS_GRAPH_BACKEND_LIBTORCH=1)
+  set(ATLAS_GRAPH_BACKEND_AVAILABLE ON)
+else()
+  add_library(atlas_similarity_graph_backend STATIC src/atlas_similarity_graph_unavailable.cpp)
+  target_link_libraries(atlas_similarity_graph_backend PUBLIC atlas_core)
+  target_compile_features(atlas_similarity_graph_backend PUBLIC cxx_std_17)
+  set(ATLAS_GRAPH_BACKEND_AVAILABLE OFF)
+endif()
+
+add_library(atlas_knn_backend STATIC src/atlas_knn_contract.cpp src/atlas_knn_unavailable.cpp)
+target_link_libraries(atlas_knn_backend PUBLIC atlas_core)
+target_compile_features(atlas_knn_backend PUBLIC cxx_std_17)
+
+if(BUILD_TESTING)
+  add_executable(atlas_core_c_abi_test tests/atlas_core_c_abi_test.c)
+  target_link_libraries(atlas_core_c_abi_test PRIVATE atlas_core atlas_similarity_graph_backend)
+  target_compile_definitions(atlas_core_c_abi_test PRIVATE
+    ATLAS_GRAPH_BACKEND_AVAILABLE=$<BOOL:${ATLAS_GRAPH_BACKEND_AVAILABLE}>)
+  add_test(NAME atlas_core_c_abi_test COMMAND atlas_core_c_abi_test)
+
+  add_executable(atlas_knn_c_abi_test tests/atlas_knn_c_abi_test.c)
+  target_link_libraries(atlas_knn_c_abi_test PRIVATE atlas_core atlas_knn_backend)
+  target_compile_features(atlas_knn_c_abi_test PRIVATE c_std_11)
+  add_test(NAME atlas_knn_c_abi_test COMMAND atlas_knn_c_abi_test)
+endif()

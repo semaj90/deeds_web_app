@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.packet-admission-classification.v1",
+  "executionId": "e48f17f6-171b-4e35-af52-02076ca376ce",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "classes": {
+    "ADMISSION_READY": 0,
+    "WORKSPACE_BINDING_MISSING": 0,
+    "REVISION_MISMATCH": 0,
+    "SOURCE_BYTES_CHANGED": 0,
+    "IDENTITY_COLLISION": 0,
+    "PACKET_NOW_EXISTS": 0,
+    "OUT_OF_SCOPE": 0
+  },
+  "rows": []
+}

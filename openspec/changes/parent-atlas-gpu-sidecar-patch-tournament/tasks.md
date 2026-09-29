@@ -134,6 +134,38 @@ available. Its Docker healthcheck was corrected to validate cupy/CUDA plus the
 RAPIDS libraries it actually owns. The two environments must not be conflated,
 and no package installation, rebuild, or runtime mutation was performed here.
 
+**GPU-24 combined-dispatcher review (read-only, 2026-09-29):** combine RAPIDS and
+cuTile at the admission/control-plane boundary, not by merging their Python
+environments or CUDA stacks. The current `GpuArbiterProfileV1` (`GPU-0`, max
+concurrency 1) is declarative; `gpu-job-queue.ts` is process-local; and the
+Redis-backed `inference/gpu-arbiter.ts` is not yet a safe shared dispatcher:
+lease acquisition and release use separate read/write operations without an
+atomic token-checked compare-and-set. The RAPIDS sidecar does not acquire that
+lease, and the cuTile lane has no resident service adapter. Therefore no current
+path proves mutual exclusion across the two runtimes. Keep GPU-24 open and do
+not call a local mutex or VRAM admission receipt cross-runtime arbitration.
+
+Required implementation gates before claiming a combined dispatcher:
+
+- [ ] GPU-24A choose one cross-process arbitration owner and failure policy;
+  do not assume Valkey/Redis is available in Engram-only mode.
+- [ ] GPU-24B implement atomic, owner-token-checked acquire/renew/release with
+  bounded expiry and stale-owner protection; prove competing processes cannot
+  both enter the same device critical section.
+- [ ] GPU-24C make both RAPIDS and cuTile executor entrypoints participate in
+  that same arbitration contract without merging their environments.
+- [ ] GPU-24D emit an operation-specific fallback receipt. CPU is a valid
+  numeric fallback; Qdrant is a semantic-search executor; Neo4j is a graph
+  executor. Never substitute one for another without operation compatibility.
+- [ ] GPU-24E run concurrent cross-runtime contention and failure-injection
+  tests; prove timeout/release behavior and that fallback preserves operation
+  semantics. Only then close GPU-24.
+
+The existing inference Redis lease is evidence of an inference coordination
+attempt, not proof for RAPIDS/cuTile dispatch. Its current read-then-write
+operations also require a separately reviewed hardening change before reuse.
+No runtime service, datastore, or GPU executor was changed by this review.
+
 **Index-type decision (recorded 2026-08-03, still in force — the CAGRA endpoint above does
 not override this until an operator explicitly says so)**: `brute_force` only, as an exact
 correctness oracle — never CAGRA (explicitly excluded, "do not promote CAGRA") or

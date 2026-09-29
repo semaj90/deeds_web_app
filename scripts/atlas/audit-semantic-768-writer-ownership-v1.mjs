@@ -13,11 +13,23 @@ import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const REPORT_PATH = path.join(ROOT, 'docs', 'reports', 'semantic-768-writer-ownership-v1.json');
+const DEFAULT_REPORT_PATH = path.join(ROOT, 'docs', 'reports', 'semantic-768-writer-ownership-v1.json');
+const args = new Map(process.argv.slice(2).map((arg) => {
+  const index = arg.indexOf('=');
+  return index < 0 ? [arg, true] : [arg.slice(0, index), arg.slice(index + 1)];
+}));
+const STATIC_ONLY = args.has('--static-only');
+const requestedOutput = args.get('--output');
+const REPORT_PATH = requestedOutput
+  ? path.resolve(ROOT, String(requestedOutput))
+  : DEFAULT_REPORT_PATH;
+if (REPORT_PATH !== ROOT && !REPORT_PATH.startsWith(`${ROOT}${path.sep}`)) {
+  throw new Error('REPORT_OUTPUT_MUST_REMAIN_WITHIN_REPOSITORY');
+}
 const SCAN_ROOTS = ['scripts', 'packages', 'sveltekit-frontend/src', 'sveltekit-frontend/package.json', 'package.json', 'drizzle'];
 const TARGETS = [
-  { surface: 'codebase_chunk_index.content_embedding', role: 'ACTIVE_CANONICAL_CANDIDATE', patterns: [/UPDATE\s+codebase_chunk_index[\s\S]{0,500}content_embedding\s*=/i, /INSERT INTO codebase_chunk_index[\s\S]{0,1200}content_embedding/i] },
-  { surface: 'codebase_chunk_index.content_embedding_768', role: 'LEGACY_OR_TRANSITIONAL', patterns: [/content_embedding_768\s*=/i, /INSERT INTO codebase_chunk_index[\s\S]{0,1200}content_embedding_768/i] },
+  { surface: 'codebase_chunk_index.content_embedding_768', role: 'CANONICAL_CONTRACT_TARGET_OWNER_UNPROVEN', patterns: [/content_embedding_768\s*=/i, /INSERT INTO codebase_chunk_index[\s\S]{0,1200}content_embedding_768/i] },
+  { surface: 'codebase_chunk_index.content_embedding', role: 'HISTORICAL_OR_TRANSITIONAL_SURFACE', patterns: [/UPDATE\s+codebase_chunk_index[\s\S]{0,500}(?<!_)content_embedding\s*=/i, /INSERT INTO codebase_chunk_index[\s\S]{0,1200}(?<!_)content_embedding\b/i] },
   { surface: 'atlas_packets.embedding', role: 'SECONDARY_768_SURFACE_UNRESOLVED', patterns: [/UPDATE\s+atlas_packets[\s\S]{0,500}\bembedding\s*=/i, /INSERT INTO atlas_packets[\s\S]{0,1200}\bembedding/i] },
 ];
 
@@ -89,14 +101,17 @@ async function main() {
       if (result) writers.push(result);
     }
   }
-  const live = await liveCensus();
+  const live = STATIC_ONLY
+    ? { reachable: false, reason: 'SKIPPED_BY_STATIC_ONLY_MODE' }
+    : await liveCensus();
   const mutationWriters = writers.filter((writer) => writer.kind === 'MUTATION_WRITER');
   const report = {
     schema: 'atlas.semantic-768-writer-ownership.v1',
     generatedAt: new Date().toISOString(),
     readOnly: true,
     canonicalAuthority: 'postgres',
-    activeCandidate: 'codebase_chunk_index.content_embedding',
+    canonicalRepresentationSurface: 'codebase_chunk_index.content_embedding_768',
+    writerOwnerStatus: 'UNRESOLVED_NOT_PROMOTED',
     ownershipComparison: {
       historicalDominantProducer: 'scripts/atlas/reembed-corpus-document-prefix-v1.mjs',
       operatorReachableCandidate: 'scripts/atlas/backfill-graphify-file-embeddings-768.mjs',
@@ -107,9 +122,9 @@ async function main() {
     writers,
     mutationWriters,
     operatorEntrypoints: [
-      { command: 'npm run atlas:graphify:embedding:daily:apply', target: 'codebase_chunk_index.content_embedding', status: 'EXPLICIT_APPLY_PATH_REQUIRES_REVIEW' },
-      { command: 'npm run atlas:index:full-repo', target: 'codebase_chunk_index.content_embedding_768', status: 'LEGACY_APPLY_PATH' },
-      { command: 'POST /api/codebase-index/index-stream', target: 'codebase_chunk_index.content_embedding_768', status: 'REACHABLE_LEGACY_SURFACE' },
+      { command: 'npm run atlas:graphify:embedding:daily:apply', target: 'codebase_chunk_index.content_embedding', status: 'HISTORICAL_SURFACE_REQUIRES_OWNER_REVIEW' },
+      { command: 'npm run atlas:index:full-repo', target: 'codebase_chunk_index.content_embedding_768', status: 'CANONICAL_CONTRACT_TARGET_OWNER_UNPROVEN' },
+      { command: 'POST /api/codebase-index/index-stream', target: 'codebase_chunk_index.content_embedding_768', status: 'REACHABLE_CANONICAL_CONTRACT_TARGET_OWNER_UNPROVEN' },
     ],
     ownerDecision: {
       selectedWriter: null,

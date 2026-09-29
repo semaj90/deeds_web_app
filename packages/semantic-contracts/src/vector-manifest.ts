@@ -204,12 +204,11 @@ export const VECTOR_MANIFESTS = {
     // The logical representation is semantic_768; the live Qdrant
     // projection stores it in the physical named slot `content`.
     qdrantVectorSlot: 'content',
-    // Canonical column is content_embedding (halfvec(768), 55,169 populated rows, verified live
-    // via vector_dims() 2026-08-30 -- docs/reports/semantic-representation-storage-audit-v1.json).
-    // content_embedding_768 is a separate, much smaller, non-canonical column (1,386 rows) --
-    // do not point this manifest entry at it.
-    postgresColumn: 'content_embedding',
-    storage: { kind: 'PHYSICAL' as const, postgresColumn: 'content_embedding', qdrantVectorSlot: 'content' },
+    // Canonical storage target is the explicit vector(768) column. Existing
+    // rows still require per-row source/model/tokenizer/input provenance before
+    // they are admitted; the column declaration alone is not that proof.
+    postgresColumn: 'content_embedding_768',
+    storage: { kind: 'PHYSICAL' as const, postgresColumn: 'content_embedding_768', qdrantVectorSlot: 'content' },
   },
   semanticMrl512: {
     vectorName: 'semantic_mrl_512' as const,

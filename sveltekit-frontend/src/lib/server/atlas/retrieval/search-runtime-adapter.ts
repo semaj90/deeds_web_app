@@ -47,7 +47,7 @@ export interface AtlasSearchResponse {
   topPacketKeys: string[];
   metadata: SearchResult['metadata'];
   provenance: SearchResult['provenance'];
-  /** Graph candidates seeded from topPacketKeys. Only populated when withGraphExpansion=true. */
+  /** Graph candidates seeded only from SearchRuntime's pre-fusion canonical dense lane. */
   graphExpanded?: GraphCandidate[];
 }
 
@@ -273,17 +273,18 @@ export function createAtlasSearchAdapter(config?: {
         .map(p => (p as Record<string, unknown>).packet_key ?? (p as Record<string, unknown>).chunk_id ?? '')
         .filter((k): k is string => typeof k === 'string' && k.length > 0)
         .slice(0, 5);
+      const denseSeedPacketKeys = result.denseSeedPacketKeys ?? [];
 
       let graphExpanded: GraphCandidate[] | undefined;
-      if (req.withGraphExpansion && topPacketKeys.length > 0) {
+      if (req.withGraphExpansion && denseSeedPacketKeys.length > 0) {
         try {
           graphExpanded = await graphRetrieve({
-            seedPacketKeys: topPacketKeys,
+            seedPacketKeys: denseSeedPacketKeys,
             allowedRelationships: ['IMPORTS', 'CALLS', 'SIMILAR_TOPOLOGY', 'USES_CONCEPT'],
-            maxDepth: 1,
+            maxDepth: 2,
             maxCandidates: 20,
           });
-          // Remove seeds that already appear in main result to avoid duplicates
+          // Remove results already present in the main fused response.
           const existingKeys = new Set(topPacketKeys);
           graphExpanded = graphExpanded.filter(g => !existingKeys.has(g.packetKey));
         } catch {

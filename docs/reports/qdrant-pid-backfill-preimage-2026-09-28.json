@@ -1,0 +1,726 @@
+{
+  "schema": "atlas.qdrant-pid-backfill-preimage.v1",
+  "collection": "codebase_chunks_768",
+  "rows": [
+    {
+      "packet_key": "ace:packet:60712e66bdb4",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:e822560431a9",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:84c7792c1f9d",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:00735225f796",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:710d92b24f2d",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:533b36a302bc",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:34fffd67db6c",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:c1aba0a1265b",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:518601cf8c56",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:01614dcf3f9d",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:33df0a3ce51a",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:2ebfefbb989f",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:5d351e880dc0",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:7c5e77e22f73",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:4776144afdb6",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:aacefc0ba96c",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:687787e09d2b",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:92e1525ed46a",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:5099db13ae83",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:52bb16bdccb7",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:1680c471321f",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:5dd7e6131e14",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:ce6b45a3955d",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:c8c356f45e30",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:b6fcf1fc289d",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:074b2faeac79",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:ca8ae22015a2",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:878611f20549",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:1bedce27ed63",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:d5fc00c0762b",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:a899a8066dc2",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:41f69248a75b",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:0c7bd0120166",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:7e68a46d35a5",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:5ba65471f443",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:e86531c02805",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:618052a17853",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:5c61c940055e",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:86554a6d3d59",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:78341028ee3d",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:32b82bf089ce",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:92b37a20d161",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:5b86bfb19d96",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:fd17d65caf7a",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:fbcf1ed7264b",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:e910f5761118",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:e35c8d8165fe",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:f833704cc4d5",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:f4b9feffdc1d",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:4a7b05cd6cc3",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "packet:c9a2fa8062bc",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:c7315952b56d",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:08286c6a1223",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:2a0e591d8506",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:6171211e1bf8",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:ad6444548772",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:dbc63ea7fb9a",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:6d492f3e9167",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:f18f3e62b9d5",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:f66a2b8095cb",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:8390b5ef32a9",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:802b7301f2b9",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:7e6d2cfeaf40",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:87f5d0eb78d3",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:c2210544d3db",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:dce2848643c6",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:de13d5945656",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:dff9a8e8579b",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:f619b98e16de",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:fb367cf9bf30",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:a42d56568ae0",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:04fadf9892d7",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:859193a18e5d",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:0a5831247e1e",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:43a9b916c9a3",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:458dbcebe3f4",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:40c5d52dcd54",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:23587fbd37e7",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:167afc4186fd",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:03bb32d34276",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:1ec5074da558",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:12e4cf9a4ec5",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:32f4761a1bb2",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:c50e38e5b011",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:53838a539084",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:5169c392e5a6",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:7f86aac0fc73",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:e6fc4e54a185",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:e73d27f7f7aa",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:18ed12a18e7b",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:3ec4039c555f",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:6e725ee02e1a",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:b224e16895d0",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:76521b0f2dfc",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:2e09262f76e4",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:1239ee31ae9a",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:1d319295db66",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:4b7a069038fb",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:17ad9bbc5765",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:024deb1c6154",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:148f4eec7db8",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:35f2aac00e5e",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:37b491d277da",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:5f1d12bab3c9",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:732598720c75",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:7f7c4c247631",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:92d0bf5fe435",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:af60ae56ed0c",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:c34901a242e1",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:c7a9f9f88a87",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:c6e2693b2ea3",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:ceb951472a05",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:d5e34127bb23",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:d5211fb4e748",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:f8ae5df4dc49",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:fb6f0a3b8306",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:7429dd451d97",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:7c77c2533420",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:80e2ae60e91d",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    },
+    {
+      "packet_key": "ace:packet:82fe804ca1fb",
+      "qdrant_point_id": null,
+      "qdrant_collection": null,
+      "qdrant_vector_dim": 768
+    }
+  ]
+}

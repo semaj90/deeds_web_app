@@ -69,7 +69,7 @@ const sourceData = z.object({
   source_digest: sha256Prefixed,
   start_byte: z.number().int().nonnegative().nullable(),
   end_byte: z.number().int().nonnegative().nullable(),
-  ast_state: z.enum(['NOT_APPLICABLE', 'PARSER_UNAVAILABLE', 'NOT_MATERIALIZED', 'PARSE_FAILED', 'LINEAGE_UNQUALIFIED', 'REVISION_QUALIFIED', 'SYMBOL_RESOLVED']),
+  ast_state: z.enum(['NOT_APPLICABLE', 'PARSER_UNAVAILABLE', 'NOT_MATERIALIZED', 'NOT_JOINED_IN_THIS_PASS', 'PARSE_FAILED', 'LINEAGE_UNQUALIFIED', 'REVISION_QUALIFIED', 'SYMBOL_RESOLVED']),
 }).strict();
 
 const summaryData = z.object({

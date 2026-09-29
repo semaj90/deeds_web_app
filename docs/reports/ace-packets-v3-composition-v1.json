@@ -28,7 +28,7 @@
     "residency has not been computed (PENDING)",
     "no hypergraph relationship evidence attached (base.hypergraph = null)"
   ],
-  "manifest": ".tmp\\atlas\\ace-packets-v3\\20260925T220337Z\\manifest.json",
-  "rootSha256": "2f3d4e0bdf76ab4953000ae795f5a02a5fee46cc0b98d1557e23defa33692056",
-  "generatedAt": "2026-09-25T22:03:43.032Z"
+  "manifest": ".tmp\\atlas\\ace-packets-v3\\20260929T024243Z\\manifest.json",
+  "rootSha256": "b3e1d527a6763c067f5b1f52db345a3c8250582d656b781a240923912de7f0b2",
+  "generatedAt": "2026-09-29T02:42:50.301Z"
 }

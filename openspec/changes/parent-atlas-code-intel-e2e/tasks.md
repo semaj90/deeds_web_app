@@ -86,6 +86,13 @@ dependency chain (source → symbol → AST/LSP → graph → retrieval → Cont
       filename) has no resolution plan yet. No writes were made to any of these tables this
       session — only the test file was edited (test-only, zero runtime/data impact).
 
+      **Historical status correction (2026-09-28):** the preceding “What remains open” list is
+      the state at the time of that original audit, not the current state. The registry revision
+      repair and all 77 symbol-version placeholder repairs were subsequently applied and
+      independently verified; see `SYMBOL-VERSION-QUARANTINE-01` below. The remaining blockers
+      are the separately gated stable-file identity population/binding and source-ref grain
+      convergence. Do not treat the old “unstarted” wording above as current status.
+
       **Frozen audit-vs-consolidation split** (per an operator-reviewed correction that clarified
       the reconciliation writer is a legitimate caller through the canonical owner, not a rival
       authority):
@@ -360,4 +367,32 @@ token, row-locked transaction, per-row precondition revalidation, primary-key up
 **`SOURCE-SYMBOL-AUTHORITY-01` consolidation status now**: registry repair DONE, version repair
 DONE, `upstream_file_id` backfill still OPEN (100% null, unaffected by this repair — a separate
 column, separate task, `UPSTREAM-FILE-ID-BINDING-01`), `SOURCE-REF-KEY-CONVERGENCE-01` (path+fragment
-vs. bare-filename mismatch) still OPEN. The gate itself stays unchecked until those two remain.
+vs. bare-filename mismatch) still OPEN. The gate itself stays unchecked until both close.
+
+**Dependency correction (2026-09-28; read-only cross-board trace):** `upstream_file_id` is a text
+observation in the current Drizzle symbol-version schema, not yet a canonical stable-file ID. The
+canonical stable-file population is a separate, frozen but unapplied S01-08K gate; its ledger
+requires the exact operator token `apply S01-08K stable file population` before any writes. The
+retrieval-lineage board then places the `atlas_symbol_versions.upstream_file_id` FK at S01-08M,
+after S01-08K population and S01-08L lifecycle proof. Therefore `UPSTREAM-FILE-ID-BINDING-01`
+must not fill values from paths, Graphify/Qdrant IDs, or the text currently in this column; it is
+blocked on the canonical stable-file identity sequence and its explicit authorization. Keep
+`SOURCE-REF-KEY-CONVERGENCE-01` separate: resolving file identity versus fragment/symbol locators
+does not itself authorize or mint stable-file IDs.
+
+- [x] Hardened the S01-09 pure identity audit so a non-empty `upstream_file_id` no longer proves a
+  stable-file link. The audit now requires exact membership in `atlas_stable_file_identity`,
+  reports membership as unverified when that evidence is absent, and the read-only DB adapter loads
+  IDs only when the canonical table exists. Focused tests cover unverified, matching, and mismatched
+  IDs (7/7 pass); targeted TypeScript checking and strict OpenSpec validation pass. GAN status:
+  audit contract CREATED, WIRED to the read-only CLI, and unit-PROVEN; no live readback was run
+  because the script updates its fixed report pointer. The source-authority gate remains open.
+
+- [x] Added `--no-pointer` to `scripts/atlas/audit-symbol-identity-v1.mts` and ran a fresh
+  repeatable-read, read-only identity audit without replacing `docs/reports/symbol-identity-v1.json`.
+  Receipt: `docs/reports/symbol-identity-v1.e1ea9c686c0b.json`. Current readback: all 10,504
+  registry revisions and all 479 version source/workspace revisions are SHA-256-qualified; all
+  479 versions still lack `upstream_file_id`, so stable-file membership is blocked. The audit also
+  reports 22 shared `upstream_node_id` values, no observed multi-revision symbols or move/rename
+  aliases, and no proof that active symbol-key hashes are path-independent. This is a refreshed
+  blocker receipt, not gate closure; no DB writes or fixed-pointer update occurred.

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import {
   buildGraphifyStructuralStageReceiptsV1,
@@ -72,6 +73,21 @@ const revisions = {
 };
 
 describe('Graphify structural intelligence adapter', () => {
+  it('fails closed when structural evidence is absent', () => {
+    const noEvidence = { ...materialization('PROVEN'), evidence: null, normalized: null };
+    const result = compileGraphifyStructuralIntelligence({
+      source,
+      workspaceRevision: 'ws-742',
+      materialization: noEvidence,
+      revisions,
+    });
+
+    expect(result.receipt.status).toBe('SKIPPED_NO_EVIDENCE');
+    expect(result.receipt.langExtractParserBufferPresent).toBe(false);
+    expect(result.receipt.langExtractParserBufferMatchesSource).toBe(false);
+    expect(result.receipt.canonicalPromotionMayBeAttempted).toBe(false);
+  });
+
   it('compiles native evidence + ast-grep + grounded LangExtract without creating canonical identity', () => {
     const result = compileGraphifyStructuralIntelligence({
       parserBuffer: Buffer.from(source, 'utf8'),
@@ -156,6 +172,79 @@ describe('Graphify structural intelligence adapter', () => {
     expect(result.receipt.langExtractFallbackUsed).toBe(true);
     expect(result.receipt.langExtractFallbackReason).toBe('PARSER_BUFFER_DERIVED_FROM_SOURCE_TEXT');
     expect(result.receipt.canonicalPromotionMayBeAttempted).toBe(false);
+  });
+
+  it('admits Python code-point spans only when exact UTF-8 parser bytes match', () => {
+    const unicodeSource = `🙂 ${source}`;
+    const codePoints = Array.from(unicodeSource);
+    const extractionText = 'authorizeCase';
+    const start = Array.from(unicodeSource.slice(0, unicodeSource.indexOf(extractionText))).length;
+    const unicodeMaterialization = materialization('PROVEN');
+    unicodeMaterialization.evidence.chunks[0]!.end_byte = Buffer.byteLength(unicodeSource, 'utf8');
+    unicodeMaterialization.evidence.chunks[0]!.end_column = Buffer.byteLength(unicodeSource, 'utf8');
+    const result = compileGraphifyStructuralIntelligence({
+      parserBuffer: Buffer.from(unicodeSource, 'utf8'),
+      source: unicodeSource,
+      workspaceRevision: 'ws-742',
+      materialization: unicodeMaterialization,
+      langExtractMetadata: {
+        grounded_extractions: [{
+          class: 'authorization_behavior',
+          text: extractionText,
+          char_interval: { start_pos: start, end_pos: start + Array.from(extractionText).length },
+          alignment_status: 'match_exact',
+          attributes: { role: 'authorization' },
+        }],
+      },
+      revisions,
+    });
+
+    const observation = result.fabric?.langextract_observations[0];
+    const utf8Start = Buffer.byteLength(codePoints.slice(0, start).join(''), 'utf8');
+    const utf8End = utf8Start + Buffer.byteLength(extractionText, 'utf8');
+    expect(result.receipt.langExtractParserBufferMatchesSource).toBe(true);
+    expect(result.receipt.langExtractUtf8SpanCount).toBe(1);
+    expect(result.receipt.langExtractObservationCount).toBe(1);
+    expect(observation?.attributes).toMatchObject({
+      grounded_text_hash: createHash('sha256').update(extractionText, 'utf8').digest('hex'),
+      atlas_source_text_encoding_revision: 'UTF8_PARSER_BUFFER_V1',
+      atlas_utf8_start_byte: String(utf8Start),
+      atlas_utf8_end_byte: String(utf8End),
+    });
+  });
+
+  it('rejects mismatching extraction text and parser-buffer/source divergence from structural evidence', () => {
+    const raw = {
+      class: 'authorization_behavior',
+      text: 'not-the-source-span',
+      char_interval: { start_pos: 0, end_pos: 4 },
+      alignment_status: 'match_exact',
+      attributes: {},
+    };
+    const mismatchedSpan = compileGraphifyStructuralIntelligence({
+      parserBuffer: Buffer.from(source, 'utf8'),
+      source,
+      workspaceRevision: 'ws-742',
+      materialization: materialization('PROVEN'),
+      langExtractMetadata: { grounded_extractions: [raw] },
+      revisions,
+    });
+    expect(mismatchedSpan.receipt.langExtractUtf8MismatchCount).toBe(1);
+    expect(mismatchedSpan.receipt.langExtractObservationCount).toBe(0);
+    expect(mismatchedSpan.fabric?.langextract_observations).toEqual([]);
+
+    const parserDivergence = compileGraphifyStructuralIntelligence({
+      parserBuffer: Buffer.from(`different ${source}`, 'utf8'),
+      source,
+      workspaceRevision: 'ws-742',
+      materialization: materialization('PROVEN'),
+      langExtractMetadata: { grounded_extractions: [{ ...raw, text: 'd', char_interval: { start_pos: 0, end_pos: 1 } }] },
+      revisions,
+    });
+    expect(parserDivergence.receipt.langExtractParserBufferMatchesSource).toBe(false);
+    expect(parserDivergence.receipt.canonicalPromotionMayBeAttempted).toBe(false);
+    expect(parserDivergence.receipt.diagnostics).toContain('LANGEXTRACT_PARSER_BUFFER_SOURCE_TEXT_MISMATCH');
+    expect(parserDivergence.fabric?.langextract_observations).toEqual([]);
   });
 
   it('builds chained AST and structural stage receipts without persistence', () => {

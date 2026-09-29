@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 import { cpus } from 'os';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { validateSemantic768OutputV1 } from '$lib/server/atlas/embedding/embedding-runtime-v1.js';
+import { createOnnxChallengerBatchV1 } from './onnx-challenger-batch-v1.js';
 
 const MODULE_FILE = fileURLToPath(import.meta.url);
 const FRONTEND_ROOT = resolve(dirname(MODULE_FILE), '../../../../../..');
@@ -225,9 +226,9 @@ export async function tryEmbedOnnx(text: string): Promise<number[] | null> {
   }
 }
 
-/** Batch embed sequentially through one shared session. */
-export async function batchEmbedOnnx(texts: string[]): Promise<(number[] | null)[]> {
-  const results: (number[] | null)[] = [];
-  for (const text of texts) results.push(await tryEmbedOnnx(text));
-  return results;
+/** Batch embed validated context plans through the explicit CPU challenger. */
+const embedOnnxChallengerBatch = createOnnxChallengerBatchV1(tryEmbedOnnx);
+
+export async function batchEmbedOnnx(plans: readonly unknown[]) {
+  return embedOnnxChallengerBatch(plans);
 }

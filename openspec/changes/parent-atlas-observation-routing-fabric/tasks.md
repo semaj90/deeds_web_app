@@ -238,7 +238,7 @@ Tags are metadata/filter hints, not independent retrieval votes.
   existing tool), not separately re-verified with an out-of-bounds probe
   this pass. The underlying `docs/.okf/domains/*` content gap is a
   separate, real, still-open item — not fixed by this wiring.
-- [ ] ORF-6D — MCP 2026-07-28 / TypeScript SDK v2 migration proof: header routing, resource cache hints, list/result caching and JSON Schema 2020-12 tool schemas.
+- [x] ORF-6D — Isolated MCP 2026-07-28 / TypeScript SDK v2 compatibility proof: standard and parameter header routing, resource cache hints, client list/read caching, and JSON Schema 2020-12. Proof: `sveltekit-frontend/scripts/mcp/orf-6d-v2-compatibility-proof.mjs` passed against lockfile-resolved v2.1.0 packages using an in-process handler. This does not migrate the production runtime; direct `@modelcontextprotocol/sdk@1.22.0`, app dependencies, and datastore state were unchanged.
 - [ ] ORF-7 — Bounded MCP read tools for search/evidence/graph/hydrate. Existing receipt/time/output limits remain mandatory.
 - [ ] ORF-8 — Ornith ContextManifest adapter consumes promoted ORF evidence only; ontology/schema resources are referenced by digest/URI rather than reprefilled wholesale.
 - [ ] ORF-9 — Exact-promotion gate combines source freshness + source span + Tree-sitter coordinate + compiler semantic evidence.
@@ -362,19 +362,26 @@ A router chooses work. It does not create evidence truth.
 Written up on request, not implemented this session — no new code or live
 writes below this line.
 
-### 1. Re-run ORF-2P's PostgreSQL 18 AIO/bitmap proof against real data (highest value, lowest cost)
+### 1. ORF-2P populated-plan follow-up (read-only; rechecked 2026-09-29)
 
-`docs/reports/orf-postgres-plan-receipt.json` was captured when
-`atlas_observation_feature_rows` had **zero rows**; ORF-2P's own note says
-"Bitmap Heap Scan and populated-row selectivity remain pending after the
-feature materializer runs." The materializer has since run for real (ORF-2Q.2,
-this session): the table now has 1,808 rows with genuinely populated
-`ontology_classes`/`ast_observation_kinds`/`flattened_tags`. Re-running
-`node scripts/atlas/orf-postgres-plan-proof.mjs` now (read-only, same script,
-no code changes needed) should produce a real `Bitmap Heap Scan` plan node
-where the prior receipt only had `Index Scan` on an empty table — this is the
-single cheapest way to close out ORF-2P's remaining claim. Do this before
-anything else below; it's a rerun, not new work.
+The earlier receipt was captured with zero rows. A fresh PostgreSQL 18.4
+read-only recheck found 1,808 historical `atlas-ast-entity-prefill-v2` rows,
+but **zero** with `ontology_classes` populated; `ast_observation_kinds` is
+populated. The script's default `orf:1` / `DATABASE` / `DATABASE_WRITE`
+predicate again returned zero rows through the
+`atlas_observation_feature_rows_feature_revision_idx` Index Scan. An AST-only
+`VARIABLE_DECL` probe returned 50 rows through a Seq Scan. No Bitmap plan was
+observed. Receipt digest for the fresh default-predicate run:
+`f7c0baac5463ea4d95bb0e86a3c094e19e9bc2b0e52aec04fc3bacb229bb77d4`;
+the full coordinated evidence is in
+`docs/reports/routing-sidecar-native-critical-path-v1.json`.
+
+The prior claim that ORF-2Q.2 populated ontology fields was not supported by
+this current readback. Do not force a bitmap plan, create synthetic canonical
+rows, or change indexes to satisfy the old prediction. A populated-row plan
+comparison needs an actually admitted cohort and representative predicates;
+until then the bitmap/selectivity follow-up remains open and no database write
+or migration is authorized.
 
 ### 2. `docs/.okf/domains/*` content gap (blocks the 3 resources ORF-6C wired)
 

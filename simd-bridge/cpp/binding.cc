@@ -108,7 +108,7 @@ static ExportBackendClassification classifyExportBackend(
     return {"cpu_fallback", "host_counter_control_only"};
   }
 
-  if (name == "batchCosineSimilarity") {
+  if (name == "batchCosineSimilarity" || name == "batchCosineTopK") {
 #if defined(SIMD_HAVE_LIBTORCH) && SIMD_HAVE_LIBTORCH
     return torch_cuda_available
       ? ExportBackendClassification{"libtorch_cuda", "libtorch_cuda_runtime_available"}
@@ -174,6 +174,8 @@ extern "C" int attentionScoreGPU_fp16(const float* query, int dim, const float* 
 extern "C" int rewardScoreGPU_fp16(const float* gen, const float* ref, int n, int dim, float* out, int out_len);
 extern "C" int batchCosineSimilarity_fp16(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len);
 extern "C" int batchCosineSimilarity(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len);
+extern "C" int batchCosineTopK(const float* query, const float* corpus, int n, int dim, int k,
+                               int32_t* indices, float* scores, int output_len, int* backend_out);
 extern "C" int kmeansWithCentroids(const float* embeddings, int n, int dim, int k, int max_iters,
                                     int* assignments_out, int assignments_len,
                                     float* centroids_out, int centroids_len,
@@ -777,6 +779,51 @@ static napi_value BatchCosineSimilarityWrapper(napi_env env, napi_callback_info 
   int rc = batchCosineSimilarity((const float*)q_data, dim, (const float*)c_data, n, (float*)s_data, scores_len);
   napi_value result;
   napi_create_int32(env, rc, &result);
+  return result;
+}
+
+static napi_value BatchCosineTopKWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 5;
+  napi_value argv[5];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 5) return throw_type_error(env, "batchCosineTopK(query, corpus, n, dim, k)");
+  napi_typedarray_type query_type, corpus_type;
+  size_t query_len = 0, corpus_len = 0;
+  void *query_data = nullptr, *corpus_data = nullptr;
+  if (napi_get_typedarray_info(env, argv[0], &query_type, &query_len, &query_data, nullptr, nullptr) != napi_ok ||
+      napi_get_typedarray_info(env, argv[1], &corpus_type, &corpus_len, &corpus_data, nullptr, nullptr) != napi_ok ||
+      query_type != napi_float32_array || corpus_type != napi_float32_array)
+    return throw_type_error(env, "query and corpus must be Float32Array");
+  int32_t n, dim, k;
+  if (napi_get_value_int32(env, argv[2], &n) != napi_ok ||
+      napi_get_value_int32(env, argv[3], &dim) != napi_ok ||
+      napi_get_value_int32(env, argv[4], &k) != napi_ok ||
+      n <= 0 || dim <= 0 || k <= 0 || k > n ||
+      query_len < static_cast<size_t>(dim) ||
+      static_cast<size_t>(n) > SIZE_MAX / static_cast<size_t>(dim) ||
+      static_cast<size_t>(n) * static_cast<size_t>(dim) > SIZE_MAX / sizeof(float) ||
+      corpus_len < static_cast<size_t>(n) * static_cast<size_t>(dim))
+    return throw_type_error(env, "invalid batchCosineTopK dimensions or typed-array lengths");
+
+  void *indices_data = nullptr, *scores_data = nullptr;
+  napi_value indices_ab, scores_ab;
+  if (create_pooled_ab(env, static_cast<size_t>(k) * sizeof(int32_t), &indices_data, &indices_ab) != napi_ok ||
+      create_pooled_ab(env, static_cast<size_t>(k) * sizeof(float), &scores_data, &scores_ab) != napi_ok)
+    return throw_error(env, "batchCosineTopK output allocation failed");
+  int backend = 0;
+  const int rc = batchCosineTopK(static_cast<const float*>(query_data), static_cast<const float*>(corpus_data),
+      n, dim, k, static_cast<int32_t*>(indices_data), static_cast<float*>(scores_data), k, &backend);
+  if (rc != 0) return throw_error(env, "batchCosineTopK native execution failed");
+
+  napi_value result, indices, scores, backend_value;
+  napi_create_object(env, &result);
+  napi_create_typedarray(env, napi_int32_array, k, indices_ab, 0, &indices);
+  napi_create_typedarray(env, napi_float32_array, k, scores_ab, 0, &scores);
+  const char* backend_name = backend == 1 ? "cuda_cublas" : "cpu";
+  napi_create_string_utf8(env, backend_name, NAPI_AUTO_LENGTH, &backend_value);
+  napi_set_named_property(env, result, "indices", indices);
+  napi_set_named_property(env, result, "scores", scores);
+  napi_set_named_property(env, result, "backend", backend_value);
   return result;
 }
 
@@ -1539,6 +1586,7 @@ static napi_value Init(napi_env env, napi_value exports) {
   // GPU memory + advanced graph ops
   registerFn(env, exports, "getCudaMemory", GetCudaMemoryWrapper);
   registerFn(env, exports, "batchCosineSimilarity", BatchCosineSimilarityWrapper);
+  registerFn(env, exports, "batchCosineTopK", BatchCosineTopKWrapper);
   registerFn(env, exports, "graphSimilarityHalf", GraphSimilarityHalfWrapper);
   // pytorch_graph: graph analysis + ML ops
   registerFn(env, exports, "pageRankGPU", PageRankGPUWrapper);

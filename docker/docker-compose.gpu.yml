@@ -29,6 +29,12 @@ services:
       - ..:/mnt/c/Users/james/Videos/deeds-web-app:ro
     ports:
       - "8098:8098"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import json,urllib.request,sys; d=json.load(urllib.request.urlopen('http://127.0.0.1:8098/health', timeout=3)); sys.exit(0 if d.get('ok') is True and d.get('cudaAvailable') is True else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     deploy:
       resources:
         reservations:

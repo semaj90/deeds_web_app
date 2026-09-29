@@ -824,7 +824,9 @@ async function main() {
         table_exists: true,
         row_count: rows[0].n,
         verdict: rows[0].n > 0 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
-        note: 'ace_context_sources existing and populated proves an audit trail exists; it does not by itself prove every ACE card cites source spans/symbols/tuples rather than rehydrated raw JSON (ACECardV1 from the proposal) — not checked this pass.',
+        note: rows[0].n > 0
+          ? 'ace_context_sources has persisted rows, but row presence alone does not prove per-card source-span/symbol/tuple grounding or admitted producer/readback; those checks were not performed this pass.'
+          : 'ace_context_sources exists but has zero persisted source rows; an admitted producer and grounded readback are not proven.',
       };
     } else {
       aceEvidenceGrounded = { table_exists: false, verdict: 'NOT_PROVEN' };

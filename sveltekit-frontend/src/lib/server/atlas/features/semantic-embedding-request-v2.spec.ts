@@ -8,16 +8,15 @@ import {
 } from './semantic-input-artifact-v1.js';
 import { prepareStrictEmbeddingRequestV2 } from './semantic-embedding-request-v2.js';
 
-const SOURCE_REVISION = `sha256:${'0'.repeat(64)}`;
-
 function fixture() {
   const fileBuffer = Buffer.from('compiler-selected bytes', 'utf8');
+  const sourceRevision = sha256HexPrefixed(fileBuffer);
   const artifact: SemanticInputArtifactV1 = {
     schema: 'atlas.semantic-input-artifact.v1',
     canonicalId: 'atlas:test:answer',
     packetKey: 'packet:test:answer',
     sourceRef: 'src/answer.ts',
-    sourceRevision: SOURCE_REVISION,
+    sourceRevision,
     selectionPolicyRevision: 'test-selection-v1',
     segments: [{ kind: 'TEXT', startByte: 0, endByte: fileBuffer.length, checksum: sha256HexPrefixed(fileBuffer) }],
     renderedTextChecksum: sha256HexPrefixed(fileBuffer),
@@ -55,6 +54,16 @@ describe('prepareStrictEmbeddingRequestV2', () => {
     expect(prepared.request.inputPolicyRevision).toBe(input.embeddingInput.inputPolicyRevision);
   });
 
+  it('rejects an artifact source revision that does not hash the supplied full file', () => {
+    const input = fixture();
+    const wrongRevisionArtifact = {
+      ...input.artifact,
+      sourceRevision: `sha256:${'0'.repeat(64)}`,
+    };
+    expect(() => prepareStrictEmbeddingRequestV2({ ...input, artifact: wrongRevisionArtifact }))
+      .toThrow('SEMANTIC_INPUT_SOURCE_REVISION_MISMATCH');
+  });
+
   it('produces the same artifact checksum when object property order differs', () => {
     const input = fixture();
     const reordered = Object.fromEntries(Object.entries(input.artifact).reverse()) as typeof input.artifact;
@@ -68,7 +77,7 @@ describe('prepareStrictEmbeddingRequestV2', () => {
     expect(() => prepareStrictEmbeddingRequestV2({
       ...input,
       fileBuffer: Buffer.from('export function answer() { return 43; }\n', 'utf8'),
-    })).toThrow('SEMANTIC_INPUT_SOURCE_SEGMENT_CHECKSUM_MISMATCH');
+    })).toThrow('SEMANTIC_INPUT_SOURCE_REVISION_MISMATCH');
   });
 
   it('rejects modified input text even if its submitted text checksum is recomputed', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { fuseSearchRuntimeCandidates, getFusionIdentityKey } from '../search-runtime.js';
+import { fuseSearchRuntimeCandidates, getFusionIdentityKey, selectDenseSearchSeedPacketKeys } from '../search-runtime.js';
 import type { Candidate } from '../search-runtime.js';
 
 function candidate(overrides: Partial<Candidate> & Pick<Candidate, 'id' | 'packetKey' | 'sourceRef' | 'score' | 'scoreSource'>): Candidate {
@@ -18,6 +18,23 @@ describe('getFusionIdentityKey', () => {
         candidate({ id: 'qdrant-1', packetKey: 'pkt:1', symbolVersionId: 'sym:1', sourceRef: 'a.ts', score: 1, scoreSource: 'qdrant' })
       )
     ).toBe('sym:1');
+  });
+});
+
+describe('selectDenseSearchSeedPacketKeys', () => {
+  it('selects bounded canonical dense hits before fusion and excludes lexical or noncanonical identities', () => {
+    const candidates = [
+      candidate({ id: 'dense-low', packetKey: 'pkt:dense', sourceRef: 'a.ts', score: 0.7, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', identityStatus: 'canonical' }),
+      candidate({ id: 'dense-best', packetKey: 'pkt:dense', sourceRef: 'a.ts', score: 0.9, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', identityStatus: 'canonical' }),
+      candidate({ id: 'lexical', packetKey: 'pkt:lexical', sourceRef: 'b.ts', score: 1, scoreSource: 'postgres_trigram', identityStatus: 'canonical' }),
+      candidate({ id: 'projection', packetKey: 'pkt:projection', sourceRef: 'c.ts', score: 1, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', identityStatus: 'projection_exact' }),
+      candidate({ id: 'degraded', packetKey: 'pkt:degraded', sourceRef: 'd.ts', score: 1, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', identityStatus: 'degraded' }),
+      candidate({ id: 'other-dense', packetKey: 'pkt:other', sourceRef: 'e.ts', score: 0.8, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', identityStatus: 'canonical' }),
+    ];
+
+    expect(selectDenseSearchSeedPacketKeys(candidates, 1)).toEqual(['pkt:dense']);
+    expect(selectDenseSearchSeedPacketKeys(candidates)).toEqual(['pkt:dense', 'pkt:other']);
+    expect(selectDenseSearchSeedPacketKeys(candidates, 0)).toEqual([]);
   });
 });
 

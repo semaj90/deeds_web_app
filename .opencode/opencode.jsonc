@@ -54,7 +54,7 @@
       "type": "local",
       "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-task-kernel-mcp.mjs"],
       "enabled": true,
-      "timeout": 30000,
+      "timeout": 60000,
     },
     "ldr-research": {
       "type": "local",

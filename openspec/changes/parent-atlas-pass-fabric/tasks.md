@@ -1089,9 +1089,20 @@ async function executeToolBatch(
 - Error if deadlock
 
 **Acceptance**:
-- [ ] 3 independent read calls execute in parallel
-- [ ] Graph expansion waits for ANN seed
-- [ ] Test: 5 calls → batched as [3] then [2]
+- [x] 3 independent read calls execute in parallel
+- [x] Graph expansion waits for ANN seed
+- [x] Test: 5 calls → batched as [3] then [2]
+
+**Proof (2026-09-28; fixture/code only)**: `src/lib/server/executor/tool-batch.ts`
+is the shared bounded scheduler used by the existing ACP call path. Three
+explicitly known mock-read tools may overlap (cap 3); unclassified tools are
+serialized as writes. The scheduler validates dependencies/cycles, skips
+dependents after prerequisite failure, and preserves input result order.
+Focused tests passed 10/10 across the scheduler and ACP adapter; the full
+SvelteKit check passed with 0 errors and 291 existing warnings. The ACP
+dispatcher remains mock-only; this does not prove live MCP effect policy,
+resource-key serialization, or production tool execution. No datastore writes
+or model calls were made.
 
 ---
 
@@ -1102,8 +1113,19 @@ async function executeToolBatch(
 **Change**: Graph expansion only runs after dense_search results available.
 
 **Acceptance**:
-- [ ] Graph expansion depends_on: dense_search
-- [ ] Returns 1-2 hop neighbors + edges
+- [x] Graph expansion depends_on: dense_search
+- [x] Returns 1-2 hop neighbors + edges
+
+**Proof (2026-09-28; mocked Neo4j read boundary)**: `graph-retriever.ts`
+now returns the actual path depth, relationship types, and ordered edge
+endpoints returned by the bounded Neo4j query. Its test covers one- and
+two-hop results and rejects malformed paths; invalid depth/candidate limits
+fail closed before a session opens. SearchRuntime now selects only raw pre-fusion
+`dense_768` candidates with explicit canonical identity; the adapter passes
+that set to graph retrieval and skips graph expansion when the set is empty.
+Tests exclude lexical/noncanonical candidates and verify adapter wiring. The
+three focused suites passed 27/27. This is code/fixture proof only, not live
+SearchRuntime or Neo4j execution evidence.
 
 ---
 

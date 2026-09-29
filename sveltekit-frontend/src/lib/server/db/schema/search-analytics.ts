@@ -218,7 +218,12 @@ export const codebaseChunkIndex = pgTable(
     tokenCount: integer('token_count'),
     content: text('content'),
     summary: text('summary'),
+    // Historical/transition 768-D surface. Existing rows are not admitted
+    // semantic_768 representations without their own lineage receipt.
     contentEmbedding: vector('content_embedding', { dimensions: 768 }),
+    // Canonical semantic_768 storage target. The column's physical presence
+    // does not qualify existing values or establish a production writer.
+    contentEmbedding768: vector('content_embedding_768', { dimensions: 768 }),
     signatureEmbedding: vector('signature_embedding', { dimensions: 768 }),
     summaryEmbedding: vector('summary_embedding', { dimensions: 768 }),
     gpuCluster: integer('gpu_cluster'),

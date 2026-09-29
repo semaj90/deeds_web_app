@@ -14,16 +14,30 @@ describe('SymbolIdentityAuditV1', () => {
     expect(versionAdmissibleV1(ver({ sourceRevision: 'workspace:0' })).ok).toBe(false);
     expect(versionAdmissibleV1(ver({ sourceRevision: 'a'.repeat(40) })).reasons).toContain('SOURCE_REVISION_SHORT_OID');
     expect(versionAdmissibleV1(ver({ upstreamFileId: null })).reasons).toContain('STABLE_FILE_LINK_ABSENT');
-    expect(versionAdmissibleV1(ver()).ok).toBe(true);
+    expect(versionAdmissibleV1(ver()).reasons).toContain('STABLE_FILE_ID_MEMBERSHIP_UNVERIFIED');
+    expect(versionAdmissibleV1(ver(), new Set(['f1'])).ok).toBe(true);
+    expect(versionAdmissibleV1(ver(), new Set(['some-other-id'])).reasons).toContain('STABLE_FILE_ID_NOT_IN_CANONICAL_REGISTRY');
   });
 
-  it('a clean, revision-qualified, file-linked, path-independent registry passes every predicate it can observe', () => {
+  it('a non-empty file ID without canonical membership evidence cannot pass the stable-file predicate', () => {
     const a = auditSymbolIdentityV1({ registry: [reg()], versions: [ver()], aliasKinds: { move: 1 } });
     expect(a.predicates.VERSION_HAS_QUALIFIED_SOURCE_REVISION.state).toBe('PROVEN');
-    expect(a.predicates.STABLE_FILE_LINK.state).toBe('PROVEN');
+    expect(a.predicates.STABLE_FILE_LINK.state).toBe('UNVERIFIED_CANONICAL_MEMBERSHIP');
+    expect(a.versions.admissible).toBe(0);
+    expect(a.versions.withStableFileLink).toBe(1);
+    expect(a.versions.stableFileIdMembershipVerified).toBe(0);
     // an opaque-hash key does not by itself prove the hash input excludes the path
     expect(a.predicates.SYMBOL_ID_PATH_INDEPENDENT.state).toBe('BLOCKED_NO_EVIDENCE');
     expect(a.predicates.MOVE_AND_RENAME.state).toBe('OBSERVED');
+  });
+
+  it('proves a stable-file link only when the upstream ID exactly matches the canonical registry set', () => {
+    const a = auditSymbolIdentityV1({ registry: [reg()], versions: [ver()], aliasKinds: {}, stableFileIdentityIds: ['f1'] });
+    expect(a.predicates.STABLE_FILE_LINK.state).toBe('PROVEN');
+    expect(a.versions.admissible).toBe(1);
+    const mismatch = auditSymbolIdentityV1({ registry: [reg()], versions: [ver()], aliasKinds: {}, stableFileIdentityIds: ['different-id'] });
+    expect(mismatch.predicates.STABLE_FILE_LINK.state).toBe('VIOLATED_CANONICAL_MEMBERSHIP');
+    expect(mismatch.versions.admissible).toBe(0);
   });
 
   it('an ACTIVE key that embeds a file path is VIOLATED, while a retired legacy one is only counted; placeholder revisions and a shared tree node are VIOLATED', () => {
@@ -51,7 +65,7 @@ describe('SymbolIdentityAuditV1', () => {
     const versions = [ver({ symbolVersionId: 'v1' }), ver({ symbolVersionId: 'v2', sourceRevision: R('c') }), ver({ symbolVersionId: 'v3', stableSymbolId: 's2', upstreamNodeId: 'n2', declarationHash: 'x1' }), ver({ symbolVersionId: 'v4', stableSymbolId: 's2', upstreamNodeId: 'n3', sourceRevision: R('c'), declarationHash: 'x2' })];
     const a = auditSymbolIdentityV1({ registry: [reg(), reg({ stableSymbolId: 's2' })], versions, aliasKinds: {} });
     expect(a.predicates.UNCHANGED_AND_CHANGED_SYMBOL_ACROSS_REVISIONS.state).toBe('OBSERVED');
-    expect(a.versions.admissible).toBe(4);
+    expect(a.versions.admissible).toBe(0);
   });
 
   it('the tree node is never the canonical symbol id', () => {

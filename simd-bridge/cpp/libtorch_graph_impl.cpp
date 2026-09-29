@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <torch/torch.h>
+#include "gpu_error_codes.h"
 #include "native_execution_counters.h"
 #include "native_runtime_info.h"
 
@@ -143,6 +144,50 @@ extern "C" int batchCosineSimilarity(const float* query, int dim, const float* c
     }
     atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
     return 0;
+  }
+}
+
+// Combined cosine retrieval: keep the complete score vector on its execution
+// device and transfer only the selected top-k indices/scores to the host.
+// backend_out: 1 = LibTorch CUDA, 2 = LibTorch CPU.
+extern "C" int batchCosineTopK(
+    const float* query, const float* corpus, int n, int dim, int k,
+    int32_t* indices, float* scores, int output_len, int* backend_out) {
+  if (!query || !corpus || !indices || !scores || !backend_out) return -1;
+  if (n <= 0 || dim <= 0 || k <= 0 || k > n || output_len < k) return -2;
+  const size_t query_count = static_cast<size_t>(dim);
+  const size_t corpus_count = static_cast<size_t>(n) * query_count;
+  for (size_t i = 0; i < query_count; ++i) if (!std::isfinite(query[i])) return -2;
+  for (size_t i = 0; i < corpus_count; ++i) if (!std::isfinite(corpus[i])) return -2;
+  try {
+    torch::NoGradGuard ng;
+    const bool use_cuda = torch::cuda::is_available();
+    const auto device = use_cuda ? torch::Device(torch::kCUDA) : torch::Device(torch::kCPU);
+    const auto options = torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCPU);
+    auto q_host = torch::from_blob(const_cast<float*>(query), {1, dim}, options).clone();
+    auto c_host = torch::from_blob(const_cast<float*>(corpus), {n, dim}, options).clone();
+    auto q = q_host.to(device, /*non_blocking=*/use_cuda);
+    auto c = c_host.to(device, /*non_blocking=*/use_cuda);
+    auto q_norm = torch::nn::functional::normalize(
+        q, torch::nn::functional::NormalizeFuncOptions().p(2).dim(1));
+    auto c_norm = torch::nn::functional::normalize(
+        c, torch::nn::functional::NormalizeFuncOptions().p(2).dim(1));
+    auto all_scores = torch::mm(q_norm, c_norm.t()).squeeze(0);
+    auto selected = torch::topk(all_scores, k, /*dim=*/-1, /*largest=*/true, /*sorted=*/true);
+    auto host_indices = std::get<1>(selected).to(torch::kCPU).to(torch::kInt32).contiguous();
+    auto host_scores = std::get<0>(selected).to(torch::kCPU).contiguous();
+    std::memcpy(indices, host_indices.data_ptr<int32_t>(), static_cast<size_t>(k) * sizeof(int32_t));
+    std::memcpy(scores, host_scores.data_ptr<float>(), static_cast<size_t>(k) * sizeof(float));
+    *backend_out = use_cuda ? 1 : 2;
+    atlasNativeCounterRecord(use_cuda ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
+    return 0;
+  } catch (const c10::Error& e) {
+    atlasNativeCounterRecord(AtlasExecutionCounter::cuda_error_fallback);
+    if (std::string(e.what()).find("out of memory") != std::string::npos)
+      atlasNativeCounterRecord(AtlasExecutionCounter::oom_fallback);
+    return GPU_ERR_TORCH_EXCEPTION;
+  } catch (...) {
+    return GPU_ERR_UNKNOWN;
   }
 }
 

@@ -696,6 +696,7 @@ docs/.okf/pinned/admission-envelopes-v1.json
 !scripts/atlas/out/*.ndjson
 !.opencode/ndjson/*.ndjson
 *.txt
+!native/atlas_core/CMakeLists.txt
 !README*.txt
 !LICENSE*.txt
 !CHANGELOG*.txt

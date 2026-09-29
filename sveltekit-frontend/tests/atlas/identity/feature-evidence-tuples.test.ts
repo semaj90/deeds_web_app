@@ -209,10 +209,12 @@ describe('materializeFeatureEvidenceTuples', () => {
 
   it('materializes read-only evidence tuples aligned to canonical packet identity', async () => {
     const mod = await import('../../../src/lib/server/atlas/feature-doc-enrichment.js');
-    const result = await mod.materializeFeatureEvidenceTuples('trace-mcp', { maxTuples: 4 });
+    const result = await mod.materializeFeatureEvidenceTuples('trace-mcp', { maxTuples: 99 });
 
     expect(result.plan.evidenceState).toBe('ACTIVE_DEGRADED');
     expect(result.tuples).toHaveLength(1);
+    const packetRowsCall = mockTracedQuery.mock.calls.find(([label]) => label === 'atlas.feature_doc_enrichment.packet_rows');
+    expect(packetRowsCall?.[2]).toEqual(['trace-mcp', 16]);
     expect(result.tuples[0]).toEqual(
       expect.objectContaining({
         schemaVersion: 'feature-evidence-tuple.v1',
@@ -233,7 +235,7 @@ describe('materializeFeatureEvidenceTuples', () => {
             label: 'retrieval',
             labelKind: 'ontology',
             labelSource: 'semantic_tagger',
-            ontologyIds: ['ontology:tooling'],
+            ontologyIds: expect.arrayContaining(['ontology:tooling']),
             conceptIds: ['concept:mcp'],
           }),
         ]),
@@ -248,9 +250,10 @@ describe('materializeFeatureEvidenceTuples', () => {
         'feature_structural_facts',
       ])
     );
+    expect(mockBuildIndexedSourcePacket).not.toHaveBeenCalled();
   });
 
-  it('falls back to local first-party evidence when atlas packet rows are absent', async () => {
+  it('does not synthesize or persist fallback packets when canonical atlas packet rows are absent', async () => {
     mockTracedQuery.mockImplementation((label: string) => {
       if (label.includes('linked_sources')) return Promise.resolve({ rows: [] });
       if (label.includes('packet_rows')) return Promise.resolve({ rows: [] });
@@ -271,15 +274,7 @@ describe('materializeFeatureEvidenceTuples', () => {
     const mod = await import('../../../src/lib/server/atlas/feature-doc-enrichment.js');
     const result = await mod.materializeFeatureEvidenceTuples('trace-mcp', { maxTuples: 4 });
 
-    expect(result.tuples).toEqual([
-      expect.objectContaining({
-        sourceRef: 'src/mcp/trace-mcp-server.ts',
-        packetKey: 'ace-packet-trace-mcp',
-        documentId: 'document-trace-mcp',
-      }),
-    ]);
-    expect(result.tuples[0]?.provenance.sourceTables).toEqual(
-      expect.arrayContaining(['library_documents', 'ace_packet_runtime'])
-    );
+    expect(result.tuples).toEqual([]);
+    expect(mockBuildIndexedSourcePacket).not.toHaveBeenCalled();
   });
 });

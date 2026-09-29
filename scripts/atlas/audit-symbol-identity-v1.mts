@@ -15,8 +15,9 @@ import { auditSymbolIdentityV1, type RegistryRowV1, type SymbolVersionRowV1 } fr
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SCHEMA = 'atlas.symbol-identity-audit.v1';
 const digest = (v: string) => `sha256:${createHash('sha256').update(v).digest('hex')}`;
+const updatePointer = !process.argv.includes('--no-pointer');
 const pointer = resolve(ROOT, 'docs/reports/symbol-identity-v1.json');
-if (existsSync(pointer) && JSON.parse(readFileSync(pointer, 'utf8')).schema !== SCHEMA) throw new Error('POINTER_PATH_OWNED_BY_ANOTHER_ARTIFACT');
+if (updatePointer && existsSync(pointer) && JSON.parse(readFileSync(pointer, 'utf8')).schema !== SCHEMA) throw new Error('POINTER_PATH_OWNED_BY_ANOTHER_ARTIFACT');
 
 const WRITERS = ['scripts/atlas/promote-ast-symbols-to-registry.mjs', 'scripts/atlas/materialize-ast-symbol-versions.mjs', 'scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs'];
 const writerEvidence = WRITERS.map((f) => {
@@ -30,14 +31,19 @@ await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
 try {
   const registry: RegistryRowV1[] = (await client.query(`SELECT stable_symbol_id, created_from_source_revision, canonical_key, status FROM public.atlas_symbol_registry`)).rows.map((r: any) => ({ stableSymbolId: r.stable_symbol_id, createdFromSourceRevision: r.created_from_source_revision, canonicalKey: r.canonical_key, status: r.status }));
   const versions: SymbolVersionRowV1[] = (await client.query(`SELECT symbol_version_id, stable_symbol_id, source_revision, workspace_revision, upstream_node_id, upstream_file_id, declaration_hash, qualified_name, source_ref FROM public.atlas_symbol_versions`)).rows.map((r: any) => ({ symbolVersionId: r.symbol_version_id, stableSymbolId: r.stable_symbol_id, sourceRevision: r.source_revision, workspaceRevision: r.workspace_revision, upstreamNodeId: r.upstream_node_id, upstreamFileId: r.upstream_file_id, declarationHash: r.declaration_hash, qualifiedName: r.qualified_name, sourceRef: r.source_ref }));
+  const stableFileTable = await client.query(`SELECT to_regclass('public.atlas_stable_file_identity') IS NOT NULL AS present`);
+  const stableFileIdentityIds = stableFileTable.rows[0]?.present
+    ? (await client.query(`SELECT stable_file_id::text FROM public.atlas_stable_file_identity ORDER BY stable_file_id`)).rows.map((r: any) => String(r.stable_file_id))
+    : undefined;
   const aliasKinds = Object.fromEntries((await client.query(`SELECT alias_kind, count(*)::int AS n FROM public.atlas_symbol_aliases GROUP BY 1`)).rows.map((r: any) => [r.alias_kind, r.n]));
-  const audit = auditSymbolIdentityV1({ registry, versions, aliasKinds });
-  const bad = Object.entries(audit.predicates).filter(([, p]) => p.state === 'VIOLATED' || p.state.startsWith('BLOCKED')).map(([k, p]) => `${k}:${p.state}`);
+  const audit = auditSymbolIdentityV1({ registry, versions, aliasKinds, ...(stableFileIdentityIds !== undefined ? { stableFileIdentityIds } : {}) });
+  const acceptedEvidenceStates = new Set(['PROVEN', 'OBSERVED']);
+  const bad = Object.entries(audit.predicates).filter(([, p]) => !acceptedEvidenceStates.has(p.state)).map(([k, p]) => `${k}:${p.state}`);
   const result = bad.length === 0 ? 'SYMBOL_IDENTITY_PROVEN' : 'SYMBOL_IDENTITY_BLOCKED';
   const body = {
     schema: SCHEMA, gate: 'S01-09', generatedAt: new Date().toISOString(), result, blockers: bad, audit,
     chain: 'stableFileId -> symbolId -> symbolVersionId -> treeNodeId',
-    fileLevelGap: 'S01-08 = STABLE_FILE_ID_OWNER_MISSING: the top of the chain has no owner; upstream_file_id is populated on 0 versions.',
+    fileLevelGap: 'Stable-file identity has a canonical owner, but population and atlas_symbol_versions FK admission are separate gates; upstream_file_id is not proven by non-empty text alone.',
     writers: { note: 'static scan; liveness UNKNOWN', evidence: writerEvidence },
     coverage: { registrySymbols: registry.length, symbolsWithVersionRows: audit.registry.symbolsWithVersionRows, admissibleVersions: audit.versions.admissible },
     safety: { databaseWrites: 0, registryWrites: 0, schemaChanges: 0, graphifyRun: false, readerCutover: false, inputIdentityBackfill: false, vectorWrites: 0, graphWrites: 0, cacheWrites: 0, newIdentityNamespaceCreated: false, transaction: 'REPEATABLE READ READ ONLY, ROLLBACK' },
@@ -46,8 +52,8 @@ try {
   const versioned = resolve(ROOT, `docs/reports/symbol-identity-v1.${receiptChecksum.slice(7, 19)}.json`);
   const receipt = { ...body, receiptChecksum };
   if (!existsSync(versioned)) writeFileSync(versioned, `${JSON.stringify(receipt, null, 2)}\n`);
-  writeFileSync(pointer, `${JSON.stringify({ ...receipt, versionedReceipt: `docs/reports/symbol-identity-v1.${receiptChecksum.slice(7, 19)}.json` }, null, 2)}\n`);
-  console.log(JSON.stringify({ result, blockers: bad, registry: audit.registry, versions: audit.versions, predicates: audit.predicates, writers: writerEvidence, receipt: versioned }, null, 2));
+  if (updatePointer) writeFileSync(pointer, `${JSON.stringify({ ...receipt, versionedReceipt: `docs/reports/symbol-identity-v1.${receiptChecksum.slice(7, 19)}.json` }, null, 2)}\n`);
+  console.log(JSON.stringify({ result, blockers: bad, registry: audit.registry, versions: audit.versions, predicates: audit.predicates, writers: writerEvidence, receipt: versioned, pointerUpdated: updatePointer }, null, 2));
 } finally {
   await client.query('ROLLBACK');
   client.release();

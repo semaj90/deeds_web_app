@@ -1,6 +1,6 @@
 # ATLAS-CANONICAL-PROJECTION-FABRIC-01 Admission Gate — 2026-09-28
 
-**Read-only. Zero production mutations.** Repository commit: `dd81240fb73f9fc831afc37e74d7fc6c19c9cfd6`. Database: `127.0.0.1:5434`.
+**Read-only. Zero production mutations.** Repository commit: `1f670419e2be7f141e4fbe90016b0373e482a913`. Database: `127.0.0.1:5434`.
 
 Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture review, recorded 2026-09-08)
 
@@ -76,16 +76,22 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 - `total_row_count`: 63084
 
 ### `ORDINAL_MAP_SEALED`: **PARTIAL_PROVEN**
-> Ordinal owner is materialize-candidate-ordinal-corpus-v1.mts (artifact-based, no table). PARTIAL_PROVEN means the corpus is regenerated against the admitted revision with only lineage-PROVEN rows, but covers a small subset of revision-bound packets; full PASS needs the remaining packets lineage-proven, not relaxed filtering.
-- `artifact`: "docs/reports/candidate-ordinal-corpus-receipt-v1.json"
+> Valid subset exists (14368/16151 admitted candidates matched by packetKey) but full coverage/integrity is not met -- see missing_ordinal (1783) and canonical_id_packet_key_mismatch (116). Owner: materialize-candidate-ordinal-corpus-v1.mts. The canonicalId mismatch is a known producer bug (fixed in source, not yet applied to this artifact -- see ORDINAL-LINEAGE-02); missing_ordinal is a genuine coverage gap requiring regeneration.
+- `artifact`: "docs/reports/candidate-ordinal-corpus-v1.json"
 - `artifact_present`: true
 - `row_count`: 14368
 - `ordinal_map_checksum`: "9c2752534f56bf9a3e2390dda1f49ed5ede9064fa1eeaff780e21f6a18b8291e"
 - `candidate_snapshot_revision`: "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
 - `snapshot_revision_is_sha256_admitted`: true
 - `workspace_revision_matches_admitted`: true
-- `lineage_qualified`: true
-- `coverage_of_revision_bound_packets`: "14368/16151"
+- `admitted_root_candidate_count`: 16151
+- `exact_identity_matches`: 14368
+- `revision_exact_matches`: 14368
+- `missing_ordinal`: 1783
+- `canonical_id_packet_key_mismatch`: 116
+- `duplicate_canonical_id`: 0
+- `duplicate_ordinal`: 0
+- `foreign_repository_rows`: 0
 
 ### `PROJECTIONS_CHECKSUM_ALIGNED`: **NOT_PROVEN**
 > Cannot be proven while atlas_representation_records is absent — there is no checksum field anywhere recording input_checksum/ordinal_map_checksum for cross-projection alignment.
@@ -128,7 +134,7 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 
 - none recorded
 
-## Query digests (39 queries, all inside one rolled-back READ ONLY transaction)
+## Query digests (40 queries, all inside one rolled-back READ ONLY transaction)
 
 - `7b8d78e10d424c10`: `SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;`
 - `7b8d78e10d424c10`: `SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;`
@@ -168,4 +174,5 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 - `e3f8b5f134d520a9`: `SELECT COUNT(*)::int AS n FROM atlas_ontology_tuples;`
 - `48cb29a6f1f265d6`: `SELECT COUNT(*)::int AS n FROM hypergraph_edges;`
 - `162b6a29a958cf33`: `SELECT COUNT(*)::int AS n FROM atlas_hyperedges;`
+- `064c90c8371f85b1`: `SELECT packet_key, source_revision FROM atlas_packets WHERE workspace_revision_key = $1 AND source_revision IS NOT NULL;`
 - `35d2443b3e688999`: `SELECT COUNT(*)::int AS n FROM ace_context_sources;`

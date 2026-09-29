@@ -77,7 +77,9 @@ export function adaptGroundedLangExtract(input: {
       continue;
     }
 
-    const groundedText = input.source_text.slice(interval.start_pos, interval.end_pos);
+    // LangExtract char_interval values are Unicode code-point offsets. JavaScript
+    // String#slice uses UTF-16 code units, so convert through code points here.
+    const groundedText = Array.from(input.source_text).slice(interval.start_pos, interval.end_pos).join('');
     if (groundedText.length === 0) {
       rejectedInvalid += 1;
       continue;

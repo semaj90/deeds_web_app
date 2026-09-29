@@ -138,7 +138,7 @@ describe('validateStrictEmbeddingResponseV2', () => {
 		const driftedSource = Buffer.from(FILE);
 		driftedSource[0] = driftedSource[0]! ^ 1;
 		expect(() => validate(response(), driftedSource))
-			.toThrow('SEMANTIC_INPUT_SOURCE_SEGMENT_CHECKSUM_MISMATCH');
+			.toThrow('SEMANTIC_INPUT_SOURCE_REVISION_MISMATCH');
 	});
 
 	it('rejects request and receipt checksum disagreement', () => {

@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <cmath>
 #include <cstring>
+#include <algorithm>
+#include <vector>
 #include "native_execution_counters.h"
 
 static int recordStubInvocation() {
@@ -58,6 +60,33 @@ extern "C" int batchCosineSimilarity(const float* query, int dim, const float* c
     }
     scores[i] = dot / (qnorm * (sqrtf(cnorm) + 1e-12f));
   }
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
+  return 0;
+}
+
+extern "C" int batchCosineTopK(
+    const float* query, const float* corpus, int n, int dim, int k,
+    int32_t* indices, float* scores, int output_len, int* backend_out) {
+  if (!query || !corpus || !indices || !scores || !backend_out) return -1;
+  if (n <= 0 || dim <= 0 || k <= 0 || k > n || output_len < k) return -2;
+  for (int d = 0; d < dim; ++d) if (!std::isfinite(query[d])) return -2;
+  for (size_t i = 0; i < static_cast<size_t>(n) * static_cast<size_t>(dim); ++i)
+    if (!std::isfinite(corpus[i])) return -2;
+  float query_norm = 0.0f;
+  for (int d = 0; d < dim; ++d) query_norm += query[d] * query[d];
+  query_norm = sqrtf(query_norm) + 1e-12f;
+  std::vector<std::pair<float, int32_t>> ranked;
+  ranked.reserve(static_cast<size_t>(n));
+  for (int i = 0; i < n; ++i) {
+    const float* row = corpus + static_cast<size_t>(i) * dim;
+    float dot = 0.0f, norm = 0.0f;
+    for (int d = 0; d < dim; ++d) { dot += query[d] * row[d]; norm += row[d] * row[d]; }
+    ranked.emplace_back(dot / (query_norm * (sqrtf(norm) + 1e-12f)), static_cast<int32_t>(i));
+  }
+  std::partial_sort(ranked.begin(), ranked.begin() + k, ranked.end(),
+      [](const auto& a, const auto& b) { return a.first > b.first || (a.first == b.first && a.second < b.second); });
+  for (int i = 0; i < k; ++i) { scores[i] = ranked[i].first; indices[i] = ranked[i].second; }
+  *backend_out = 2;
   atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }

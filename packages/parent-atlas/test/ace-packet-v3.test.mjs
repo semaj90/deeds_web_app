@@ -79,6 +79,14 @@ test('builds a sealed v3 packet with a deterministic checksum that verifies', as
   assert.equal(verifyAcePacketV3(JSON.parse(JSON.stringify(a))).integrity.packet_checksum, a.integrity.packet_checksum);
 });
 
+test('preserves an explicit AST state when the current pass did not join AST evidence', async () => {
+  const packet = buildAcePacketV3(body(await baseV2(), {
+    source: section({ language: null, source_digest: sha('a'), start_byte: null, end_byte: null, ast_state: 'NOT_JOINED_IN_THIS_PASS' }),
+  }));
+  assert.equal(packet.source.data.ast_state, 'NOT_JOINED_IN_THIS_PASS');
+  assert.equal(verifyAcePacketV3(packet).source.data.ast_state, 'NOT_JOINED_IN_THIS_PASS');
+});
+
 test('V4 binds the V3 packet ordinal to explicit candidate snapshot coordinates', async () => {
   const packet = buildAcePacketV3(body(await baseV2()));
   const coordinates = {

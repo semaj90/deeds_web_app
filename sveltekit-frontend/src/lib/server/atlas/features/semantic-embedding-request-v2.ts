@@ -47,6 +47,13 @@ export function prepareStrictEmbeddingRequestV2(input: {
   const artifact = semanticInputArtifactV1Schema.parse(input.artifact);
   const embeddingInput = semanticEmbeddingInputV1Schema.parse(input.embeddingInput);
 
+  // The admitted source binding defines sourceRevision as the SHA-256 of the
+  // exact current file bytes. Segment checksums below bind selected content;
+  // this full-file check independently binds those segments to that revision.
+  if (sha256HexPrefixed(input.fileBuffer) !== artifact.sourceRevision) {
+    throw new Error('SEMANTIC_INPUT_SOURCE_REVISION_MISMATCH');
+  }
+
   if (embeddingInput.status !== 'ADMITTED' || embeddingInput.inputText === null) {
     throw new Error('SEMANTIC_EMBEDDING_INPUT_NOT_ADMITTED');
   }
