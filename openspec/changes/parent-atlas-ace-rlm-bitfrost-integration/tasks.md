@@ -10545,6 +10545,230 @@ Overall gate: `NOT_SAFE_TO_PROJECT`, 9/11 predicates below PASS (unchanged count
 tranche -- this tranche restored honesty on one predicate and produced a clean classification on
 another; it did not and should not have moved the overall verdict).
 
+## ORDINAL-SCOPE-RECONCILE-01 -- read-only census, no regeneration (2026-09-28)
+
+Per operator direction: reconcile `ORDINAL_MAP_SEALED`'s denominator against the now-settled
+`repo:root`-only admission scope, rather than judging the existing ordinal artifact against a
+broader/obsolete universe. Explicit constraints honored: exact canonical/revision joins only, no
+identity inference, no packet minting, no Postgres/Qdrant writes, no touching the 6 excluded
+submodule populations, and `materialize-candidate-ordinal-corpus-v1.mts` was NOT modified or run --
+census only, read-only against the live `atlas_packets` table and the existing corpus artifact on
+disk (`docs/reports/candidate-ordinal-corpus-v1.json`, 14,368 rows).
+
+**Real, per-row census** (every candidate corpus row carries its own `workspaceRevision`/
+`sourceRevision`/`candidateSnapshotRevision`, not just corpus-level metadata -- verified before
+assuming otherwise):
+
+| Field | Value |
+|---|---|
+| `admittedRootCandidates` (live: `atlas_packets` at admitted revision, `source_revision IS NOT NULL`) | **16,151** |
+| `ordinalRows` (corpus `candidates.length`) | **14,368** |
+| `exactIdentityMatches` (corpus `canonicalId` = live `packet_key`) | **14,252** |
+| `revisionMatches` (of the matched rows, per-row `sourceRevision` also matches live) | **14,252** (100% of matches -- zero revision drift among matched rows) |
+| `missingOrdinal` (admitted candidates absent from the corpus entirely) | **1,899** |
+| `duplicateCanonicalId` / `duplicateOrdinal` | **0 / 0** |
+| `foreignRepositoryRows` (corpus rows whose `sourceRef` is a submodule path) | **0** |
+| corpus-level `workspaceRevision`/`candidateSnapshotRevision` mismatches (per-row vs. corpus header) | **0** |
+| Orphaned corpus rows (present in corpus, match NO currently-admitted packet at all) | **116** |
+
+**The 116 orphaned rows are not a revision-staleness issue -- they are a different identity scheme
+entirely**, found by inspection before assuming "stale" per the requested taxonomy: 14,252 of
+14,368 corpus rows use the dominant `packet:<12-hex>` scheme; the other exactly **116** use
+`packet_<24-hex>` or `packet_<n>_<epoch-ms>` (underscore-separated, two different sub-shapes seen
+in a spot sample) -- neither format matches `atlas_packets.packet_key` under any currently-admitted
+row. This 116 count is the SAME 116 rows as the orphaned set (100% correlation, verified) -- i.e.
+every orphaned row is explained by identity-scheme mismatch, not by a real packet that simply
+changed revision.
+
+**Classification per the requested taxonomy**:
+- **`ORDINAL_MAP_SEALED` = `PARTIAL_PROVEN`** (not `PASS`, not `STALE`, not `NOT_PROVEN`): a valid,
+  revision-exact subset genuinely exists (14,252/16,151 = 88.2% of the admitted `repo:root`
+  population, zero revision drift within that subset) -- but admitted candidates are missing
+  (1,899, real coverage gap, requires regeneration to close) AND the corpus carries 116 rows tied
+  to an identity scheme that isn't the current one (requires exclusion/reconciliation, not
+  regeneration, once the scheme's origin is understood).
+- **Root cause is NOT an obsolete all-repository denominator** -- `foreignRepositoryRows: 0` rules
+  that out cleanly; the prior `PARTIAL_PROVEN` state was not caused by counting non-root rows in
+  the denominator. It is genuinely **both** missing coverage AND a legacy-identity-scheme
+  contamination, exactly the "could be partly both" case the operator's own plan anticipated.
+
+**Not done here, deliberately**: `materialize-candidate-ordinal-corpus-v1.mts` was not touched.
+`ORDINAL_MAP_SEALED`'s audit-script predicate (which likely has the same class of
+denominator/staleness blind spot the two prior predicate fixes this session found) was not
+inspected or modified in this pass -- flagged as the natural next check, not done under this
+census's explicit read-only-only scope. The 116-row identity-scheme origin (which producer wrote
+`packet_<24-hex>` / `packet_<n>_<epoch-ms>` rows into this corpus, and when) was not traced further
+-- next step if this thread continues, still read-only.
+
+## ORDINAL-LINEAGE-02 -- correction to the prior census, real producer bug found and fixed, NOT applied (2026-09-28)
+
+Following the operator's own next step ("repair existing producer only if genuine coverage/lineage
+is missing"), traced the 116 "orphaned" rows from `ORDINAL-SCOPE-RECONCILE-01` above to their
+actual cause -- **and found that census entry was itself wrong.** Recording the correction plainly
+rather than leaving the earlier wrong classification standing.
+
+**Correction**: the 116 rows are NOT orphaned, NOT a different-identity-scheme population lacking a
+current binding, and NOT evidence of missing lineage. Joining on the corpus's `packetKey` field
+(instead of `canonicalId`, which is what the prior census used, matching the requested taxonomy's
+own field name) shows **all 116 are genuine, currently-admitted, revision-exact packets** --
+116/116 match live `atlas_packets.packet_key`, 0 not found, 0 revision mismatch, verified live
+before writing this down.
+
+**Real root cause: a one-line producer bug**, not a coverage gap. `materialize-candidate-ordinal-corpus-v1.mts`
+line 162 set `canonicalId = row.packet_id` -- `packet_id` is a real, separate `atlas_packets`
+column, NOT an alias for `packet_key`. Verified live: 3,413 rows repo-wide have
+`packet_id IS DISTINCT FROM packet_key`; for the 116 that also happen to be in this corpus's
+admitted-and-lineage-qualified population, `packet_id` held an unrelated legacy scheme
+(`packet_<n>_<epoch-ms>` for 78 rows whose `packet_key` carries the separate, already-known
+`ace:packet:` prefix variant; `packet_<24-hex>` for the other 38, whose `packet_key` is otherwise
+normal `packet:<12-hex>`). For the other 14,252 rows, `packet_id` happened to equal `packet_key` by
+coincidence, which is exactly why this went unnoticed -- the bug only ever manifested for the
+minority where the two columns diverge.
+
+**Fixed**: `canonicalId = row.packet_key` (matching what every other producer/consumer in this repo
+already treats as canonical), with an added defensive runtime guard
+(`CANDIDATE_ROW_WITHOUT_PACKET_KEY`) matching this repo's "reject rather than fabricate identity"
+convention, since the upstream `validRows` filter's non-null guarantee isn't visible to the type
+checker through the intervening `.filter()` call.
+
+**Rehearsed via `--dry-run`, twice, identical results both times** (no writes, per the script's own
+existing gate -- `--authorize-current-cohort` was never passed): row count unchanged at **14,368**
+(correct and expected -- this fix changes a field's *value*, not which rows qualify), new
+deterministic `ordinalMapChecksum` `9197c2d8611a5be96ce76982358ddcd926789ffe32b3a6a248dec8027e6eba9b`
+(the old checksum, `9c2752534f56bf9a3e2390dda1f49ed5ede9064fa1eeaff780e21f6a18b8291e`, necessarily
+differs since 116 rows' `canonicalId` values changed).
+
+**Deliberately NOT applied.** The script's existing authorization gate
+(`ORDINAL_CORPUS_APPLY_REQUIRES_AUTHORIZED_CURRENT_COHORT`, requiring `--authorize-current-cohort`
+plus an exact match against `workspace-revision-tournament-admission-v1.json`) was left untriggered
+-- this fix stays at the rehearsed-not-applied stage, matching the operator's own step separation
+(`ORDINAL-LINEAGE-02`: repair the producer vs. `ORDINAL-SEAL-03`: deterministic regeneration +
+digest + readback, a distinct later step). The corrected code exists and is proven correct by
+rehearsal; the live `docs/reports/candidate-ordinal-corpus-v1.json` artifact on disk still carries
+the old, buggy `canonicalId` values for those 116 rows until an explicit apply is authorized.
+
+**Real remaining gap, unchanged by this fix**: the 1,899 missing-candidate count from
+`ORDINAL-SCOPE-RECONCILE-01` stands -- this fix corrects an identity-field bug in already-included
+rows, it does not add coverage. `ORDINAL_MAP_SEALED` should still be reported `PARTIAL_PROVEN` for
+that reason (88.2% coverage, 1,899 genuinely missing), not because of the 116 -- that count is now
+understood to be a pure bookkeeping defect with zero effect on real coverage, once the corrected
+corpus is actually applied.
+
+## ORDINAL-LINEAGE-03 / ORDINAL-REGEN-03 -- root-scope materializer and isolated corrected artifact (2026-09-28)
+
+Updated the existing ordinal materializer so `repo:root` membership in the currently admitted
+workspace snapshot is the source-cohort authority. Before querying packets, the script now verifies
+the admission status/revisions, confines the manifest path to the sealed snapshot directory, and
+recomputes the snapshot, source-membership, and source-content checksums. A packet enters the root
+cohort only when its **raw** `source_ref` and exact `source_revision` occur together in a manifest
+source whose `repositoryId` is `repo:root`; canonicalized aliases cannot widen membership. Apply
+still requires the existing explicit `--authorize-current-cohort` gate.
+
+The map itself remains strict `CandidateOrdinalMapV1`; scope and lineage diagnostics are recorded
+in the companion receipt rather than appended as unknown map fields. This was caught during local
+artifact readback because the map schema is `.strict()`.
+
+**Read-only live rehearsal + local artifact readback**:
+
+- The sealed snapshot has 24,456 `repo:root` sources. The live read-only materializer query returned
+  16,151 workspace-revision rows, all 16,151 matched the exact admitted root source path/revision
+  set, and 14,368 had the required PROVEN packet→chunk lineage. A follow-up read-only lineage
+  breakdown classified the remaining 1,783 as 1,734 with no lineage row and 49 with a source-
+  revision mismatch; no row was promoted or repaired.
+- A finer read-only cross-tab reconciled all 16,151 rows without treating absence as permission to
+  synthesize lineage:
+  - 14,368 `PROVEN` rows have chunk rows and an exact current Graphify namespace.
+  - Of the 1,734 rows with no lineage row, 1,586 have no chunk rows, 147 have chunk rows but no
+    exact Graphify namespace, and 1 has a duplicate canonical chunk ID.
+  - Of the 49 source-revision mismatches, 46 have chunk rows and an exact current Graphify
+    namespace; 3 have no exact current Graphify namespace.
+  These cohorts require distinct follow-ups: chunk production for the 1,586, namespace/source
+  authority for the 150 rows lacking an exact namespace, duplicate-ID resolution for the single
+  ambiguous row, and revision-qualified re-proposal for the 46 stale bindings. No apply path was
+  run; the counts are diagnostic and do not authorize repairs.
+- Existing proposal tooling is narrower than the unresolved cohort: `freeze-pkt-lineage-current-
+  single-chunk-v1.mjs` only proposes packets with no existing lineage and requires exact
+  `source_ref`/`relative_path` plus source/chunk/Graphify digest parity (single-chunk by default;
+  `--multi` is explicit). Therefore it cannot repair the 49 stale existing rows, and cannot create
+  chunks or authorize a namespace for the other cohorts. The separate apply tool consumes a frozen
+  proposal and writes lineage; it was not run. Any future stale-row proposal must explicitly model
+  replacement/revision semantics rather than rely on the no-existing-lineage proposal path.
+- Shuffled deterministic rehearsal returned 14,368 candidates and checksum
+  `9197c2d8611a5be96ce76982358ddcd926789ffe32b3a6a248dec8027e6eba9b`.
+- Corrected map and receipt were written only under
+  `.tmp/atlas/candidate-ordinal-corpus-v2/ordinal-root-20260928-v2/`; strict schema parse,
+  `assertCandidateOrdinalMapIntegrityV1`, receipt/map count and checksum parity, root-scope binding,
+  and zero-datastore-write flags all passed.
+- The existing `docs/reports/candidate-ordinal-corpus-v1.json` and receipt were not overwritten.
+
+**Still open**: 1,783 of the 16,151 admitted root-cohort packet rows lack proven lineage and were
+not assigned ordinals. This is a 14,368/16,151 partial artifact, not `ORDINAL_MAP_SEALED`; the
+full-cohort readback and the audit predicate's reachable `PASS` branch remain separate gates.
+
+**Convergence note (2026-09-28, cross-session).** This section landed concurrently with
+`ORDINAL-AUDIT-VERIFY-01`/`ORDINAL-LEGACY-ID-TRACE-01` immediately above (same day, independent
+work) -- both threads reached the **identical checksum**
+(`9197c2d8611a5be96ce76982358ddcd926789ffe32b3a6a248dec8027e6eba9b`) and the identical corrected
+count (**1,783**, not the earlier-reported 1,899 -- confirms that correction was right: the extra
+116 were rows present all along under a mismatched `canonicalId`, not genuinely missing). This
+section's finer breakdown (1,734 no-lineage-row + 49 source-revision-mismatch) refines, and is
+consistent with, the `canonical_id_packet_key_mismatch`/`missing_ordinal` fields now computed live
+by the fixed `ORDINAL_MAP_SEALED` audit predicate (see immediately above): `admitted_root_candidate_count:
+16151`, `exact_identity_matches: 14368` (100% of corpus rows, by `packetKey`), `missing_ordinal:
+1783`, `canonical_id_packet_key_mismatch: 116`, `duplicate_canonical_id: 0`, `duplicate_ordinal: 0`,
+`foreign_repository_rows: 0`. Re-ran the full fabric audit with the fixed predicate:
+`ORDINAL_MAP_SEALED` verdict is `PARTIAL_PROVEN` (unchanged string, now genuinely computed with
+real per-row checks and a reachable `PASS` branch -- previously the predicate could never reach
+`PASS` under any input, the same class of bug already fixed twice this session for
+`GRAPH_MANIFEST_SEALED` and `SEMANTIC_OWNER_PROVEN`). Overall gate unchanged: `NOT_SAFE_TO_PROJECT`,
+9/11 predicates below PASS.
+
+**`ORDINAL-LEGACY-ID-TRACE-01`, brief (context-budget-limited): the 116 mismatched `canonicalId`
+values trace to `atlas_packets.packet_id`** -- a real, separate column (verified live:
+`information_schema.columns` shows both `packet_id` and `packet_key` as distinct `text` columns;
+3,413 rows repo-wide have them diverge). The mismatched IDs embed real epoch-millisecond
+timestamps (e.g. `packet_10_1784513267148` decodes to `2026-07-20T02:07:47.148Z`) -- consistent
+with an earlier, pre-`packet_key`-convention bulk admission pass, not a currently-canonical scheme
+and not a fallback/candidate ID minted by the ordinal materializer itself. Per the operator's own
+rule ("116 legacy rows != regeneration candidates... should be explained and excluded, not
+translated... unless an authoritative identity mapping is discovered"): no translation is needed
+here at all -- `packetKey` already IS the authoritative mapping for these 116 rows (verified 116/116
+exact live match), so the correct handling is simply to stop reading `canonicalId` as identity and
+read `packetKey` instead, which the producer fix already does. The exact prior script that first
+wrote `atlas_packets.packet_id` was not tracked down further given context budget -- a genuinely
+open, low-priority trace if ever needed, not blocking anything above.
+
+**Not done, still deferred per explicit instruction**: full regeneration/apply of the canonical
+`docs/reports/candidate-ordinal-corpus-v1.json` (both this session's fix and the concurrent
+session's isolated `.tmp/` artifact remain unapplied, pending `--authorize-current-cohort` and
+resolution of the 1,783 genuinely-unqualified rows); no work was done on or borrowed from the
+concurrent native/NLP/ORF portfolio, per the explicit instruction to keep those streams isolated.
+
+**1,783-row gap classification, read-only (2026-09-28), confirms and explains the concurrent
+session's 1,734/49 split**: for each of the 1,783 admitted-but-unqualified packets, checked whether
+any `atlas_packet_chunk_lineage` row exists at all for `(packet_key, source_ref)`, versus whether
+one exists but disqualifies on revision/status/chunk grounds.
+- **1,734 -- `MISSING_LINEAGE_BRIDGE`**: zero `atlas_packet_chunk_lineage` rows exist for that
+  `(packet_key, source_ref)` pair, period. Never linked to any chunk.
+- **49 -- `STALE_LINEAGE`**: a real lineage row DOES exist -- `revision_status='PROVEN'`, a real
+  non-null `chunk_row_id` -- so it is not disqualified by status or missing-chunk. Sample-verified
+  (5/5) the actual disqualifying field: the lineage row's own `source_revision` differs from the
+  packet's CURRENT `source_revision`. The source file's content changed after the lineage bridge
+  was last computed for it -- the bridge is stale relative to the currently admitted revision, not
+  absent.
+
+**Both are gaps in `atlas_packet_chunk_lineage` itself, not in `materialize-candidate-ordinal-corpus-v1.mts`**,
+which already correctly requires an exact-revision `PROVEN` lineage row as designed -- this is not
+a materializer bug, and not something the ordinal producer can close on its own. Closing this 1,783
+gap needs either populating the 1,734 missing bridge rows or refreshing the 49 stale ones in
+`atlas_packet_chunk_lineage` -- a write-adjacent operation on a different table, matching this
+session's earlier lineage-freeze work (`apply-pkt-lineage-09-historical-promotion-v1.mjs`), not
+something to start without explicit authorization. **Not attempted here** -- read-only
+classification only, per the investigate-first direction. This is the concrete next gate if the
+operator wants ordinal coverage to reach 16,151/16,151: a lineage-bridge backfill/refresh pass,
+scoped to these exact 1,783 `(packet_key, source_ref)` pairs, run and rehearsed with the same
+discipline as every other write this session (transaction + readback before any real commit).
+
 **Stale note:** `ACE-HIT-DEMAND-OWNER-01` above still says no `ace:hit-demand` script exists; the
 alias was added on 2026-09-28 (see `STARTUP-BITFROST-WARM-DIAGNOSIS-01` follow-ups) and the task
 should be re-scoped to the path-demand-hint contract (`ACE-STARTUP-BOUNDARY-01`).
@@ -10738,3 +10962,194 @@ producer through `buildAcePacketV3`, nor source the allowed-key set from an admi
 wire `ACE-BITFROST-CALLER-01` or run its canary until that producer/caller and key-derivation owner
 are established. This trace was static/read-only; no Redis, database, projection, or model operation
 was performed.
+
+### ORDINAL-LINEAGE-02 — audit verification and legacy identity trace (2026-09-28)
+
+`ORDINAL-AUDIT-VERIFY-01` is complete as a read-only predicate audit. The audit now verifies the
+sealed repo:root snapshot and its checksum, admitted denominator, per-row workspace and snapshot
+revision, exact source/canonical packet identity, source revision, uniqueness, contiguous ordinal
+slots, orphan/foreign rows, and a recomputed map checksum. It writes to an isolated `.tmp` report
+directory when `ATLAS_AUDIT_REPORT_DIR` is supplied, preserving the historical same-day report.
+The corrected result matches the established truth set: 16,151 admitted root candidates; 14,368
+current ordinal rows; 14,252 exact identity-and-revision matches; 1,899 missing admitted rows;
+116 `canonicalId`/`packetKey` mismatches; zero duplicate IDs/ordinals and zero foreign-repository
+rows. The 116 are excluded legacy identity contamination. `ORDINAL_MAP_SEALED` remains
+`PARTIAL_PROVEN`; the overall projection gate remains `NOT_SAFE_TO_PROJECT`.
+
+`ORDINAL-LEGACY-ID-TRACE-01` traced both underscore-style ID families to
+`scripts/atlas/register-orphaned-chunks.mjs`. Its ordinary apply path creates temporary
+`packet_<index>_<epoch-ms>` packet IDs; the capture-lineage path creates `packet_<24-hex>` packet
+IDs. The census places 78 timestamp-style IDs on 2026-07-20 and 38 hash-style IDs on 2026-09-03.
+All differ from their canonical `packet_key`; the timestamp family has 78 alias records pointing
+to current keys, but none of the legacy IDs is itself an alias key, and the hash family has no
+alias records. These are storage/temporary IDs, not canonical identity. The previous ordinal
+materializer admitted them by taking `packet_id` as `canonicalId`; the current materializer uses
+the canonical row's `packet_key` and carries forward zero historical legacy ID values.
+
+The existing materializer was updated additively to retain explicit rejection diagnostics and to
+materialize only exact, revision-qualified repo:root lineage. Two shuffled, read-only dry runs
+produced byte-identical 14,368-row maps (artifact SHA-256
+`b4aed0bced606e6cfbbe76bcdc2446a10ef7cba26769f91de7b09da871c11cc7`; ordinal checksum
+`9197c2d8611a5be96ce76982358ddcd926789ffe32b3a6a248dec8027e6eba9b`). Schema parsing and
+integrity/readback checks passed; datastore writes were zero. This is a deterministic partial
+rebuild, not the required 16,151-row sealed artifact, and the official historical artifact was
+not overwritten.
+
+The remaining 1,783 admitted candidates are not eligible for ordinal materialization yet:
+1,734 have no qualifying lineage bridge and 49 have only stale source-revision lineage. The
+materializer's rejection census also distinguishes `excluded_legacy_identity`, `missing_packet`,
+`missing_source_revision`, `workspace_revision_mismatch`, `duplicate_canonical_id`,
+`duplicate_ordinal`, and `foreign_repository`; `missing_packet` is explicitly a root-snapshot
+diagnostic outside the packet-candidate denominator. Do not append missing rows to the historical
+map or repair the lineage here. Resolve the missing/stale bridges under their own authorized
+lineage owner, then regenerate the complete map from the admitted canonical cohort and prove two-run
+determinism before changing `ORDINAL_MAP_SEALED` to `PASS`.
+
+### ORDINAL-LINEAGE-02 — correction: lineage-refresh apply was already committed; stop custom writer (2026-09-28)
+
+Correction to the preceding read-only disposition: preserved artifact
+`docs/reports/pkt-lineage-refresh-01-apply-v1.json` records `APPLY_COMMITTED` at
+`2026-09-28T23:47:08.724Z`, `writesPerformed=true`. This commit predates this correction pass; no
+apply was initiated in this pass. The receipt reports 2,814 lineage-row inserts, including 147
+previously missing packet groups, plus 49 stale packet groups refreshed; table row count changed
+from 125,113 to 127,927. Do not describe the lineage operation as “not applied.” The matching
+rehearsal receipt is retained and reports rollback only.
+
+The prior apply's acceptance check was insufficient for the now-required three-way revision
+invariant: it accepted packet↔chunk parity while omitting the admitted-workspace Graphify revision
+check. A bounded `BEGIN READ ONLY` readback of the exact producer-tagged rows found 196 admitted
+root packet keys / 3,502 lineage rows. All 196 packet groups have current `PROVEN` lineage and
+packet↔chunk digest parity; zero have a `graphify_files` row at the admitted workspace revision.
+Across historical Graphify rows, 46 packet groups have at least one matching digest, 150 have no
+matching digest, and 63 have multiple distinct Graphify revision values. Therefore the historical
+matches are not a safe substitute for an admitted-workspace Graphify binding. No corrective write,
+rollback, or further lineage refresh was performed.
+
+The preserved read-only reevaluation remains: 1,783 targets classified as 1,586
+`NO_PHYSICAL_CHUNK`, 1 `DUPLICATE_CANONICAL_CHUNK_ID`, and 196
+`GRAPHIFY_REV_MISMATCH`; zero are repairable under the existing three-way parity rule. The 196 are
+not permission to relax that rule. The post-commit live readback confirms that the lineage rows
+were written but does not establish the missing Graphify authority. The remaining 1,587 require
+separate chunk coverage/identity work; ordinal sealing remains blocked.
+
+`scripts/atlas/rehearse-pkt-lineage-refresh-01-v1.mjs` is now a retired diagnostic stub. Its custom
+target mutation planning and SQL write path were removed; invoking it performs no DB access and
+exits with a retirement notice. Historical rehearsal/apply receipts are preserved. The existing
+`freeze-pkt-lineage-current-single-chunk-v1.mjs` remains the canonical read-only freeze owner for
+its documented scope, but its current query selects only packets with no lineage row and is not
+itself an exact 1,783-row reevaluator. Do not run it as if it covered stale rows or the full
+repo:root target set.
+
+At the time of this correction, the next gate was `GRAPHIFY-FILE-REV-OWNER-TRACE-01`; it was
+subsequently completed as a read-only static ownership trace (see the section below). The current
+next gate is `GRAPHIFY-FILE-REV-REEVAL-01`: freeze the exact 196 source refs and compare their
+packet revision, chunk digest, Graphify revision/workspace/run evidence, and admitted snapshot.
+No refresh/rehearsal should be defined until that exact comparison is complete. Any future refresh
+must go through the existing Graphify owner, followed by the existing lineage freeze owner. This
+correction records an already-committed write and a read-only readback; it authorizes no additional
+database mutation.
+
+### GRAPHIFY-FILE-REV-OWNER-TRACE-01 — read-only owner trace (2026-09-28)
+
+The declared `graphify_files` source-revision persistence owner is
+`sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts`
+(`writeGraphifySourceInventoryV2` / `writeGraphifySourceInventoryInTransactionV2`). It does not
+invent revisions: it accepts validated `WorkspaceRevisionRecordV1` and
+`WorkspaceSourceBindingV1` inputs, writes `binding.sourceRevision` to
+`graphify_files.code_source_revision`, binds the content digest and byte length, records
+`workspace_revision` and run IDs, then independently reads back the row and checks exact revision,
+content digest, and byte length. Its upsert identity is `(workspace_id, source_ref,
+code_source_revision)`; a new code revision is a new versioned row, while same-revision updates
+require content digest and byte-length parity.
+
+The source identity owner is `deriveCodeSourceRevisionV1` in
+`identity/code-source-revision-v1.ts`: SHA-256 over exact UTF-8 bytes, formatted
+`sha256:<hex>`. `workspace-revision-origin-runtime-v1.ts` reads file bytes, verifies UTF-8
+round-trip, and creates source bindings; the workspace revision is a separate SHA-256 manifest
+digest. `graphify_files` rows carry workspace revision and Graphify run IDs, but not an
+`execution_id`. The separate `graphify_execution_file_membership_v2` relation carries execution
+identity and is not interchangeable with a `graphify_files` row.
+
+Static call-path audit found a standalone file-inventory caller and a full-corpus caller for the
+writer. The declared `graphify:daily:chain` package command does not include
+`graphify-daily-lifecycle-file-inventory-v1.mjs` or call `writeGraphifySourceInventoryV2`; the
+coordinator's `graphify_execution_file_membership_v2` writes are not `graphify_files` writes. Thus
+`graphify_files.code_source_revision` has a real writer owner, but refreshing it is not proven to
+be part of the current daily chain. No Graphify command or writer was run in this trace.
+
+The existing `freeze-pkt-lineage-current-single-chunk-v1.mjs` remains strict three-way parity, but
+its selection only includes packets with no lineage row and does not accept the frozen 1,783 exact
+target set; it cannot reevaluate the already-written 196 stale-Graphify cases as-is. The preserved
+`PKT-LINEAGE-REEVAL-01` classification is therefore retained as diagnostic evidence, not upgraded
+to a new lineage owner. Current read-only readback after the pre-existing apply confirms the 196
+producer-tagged packet groups have packet↔chunk parity but no `graphify_files` row at the admitted
+workspace revision. Because the writing helper derives new rows from supplied current workspace
+bindings, a broad daily rerun would not establish or restore the older admitted snapshot revision.
+
+Disposition: `GRAPHIFY-FILE-REV-OWNER-TRACE-01` is closed for static code ownership and algorithm;
+live admitted-snapshot refreshability remains unresolved. Next, freeze the exact 196 source refs and
+compare packet revision, chunk digest, all Graphify revision/workspace/run evidence, and the
+admitted snapshot before proposing any Graphify refresh. Only the existing Graphify writer may
+perform such a refresh, with an exact matching admitted record/binding set and independent
+readback. This trace authorized no database mutation.
+
+**Target-manifest gap:** the preserved apply receipt records aggregate counts and an
+`unexpectedOtherSample`, but does not include the exact 196 affected packet keys/source refs or a
+target-manifest checksum. That sample is not the affected set. `GRAPHIFY-FILE-REV-REEVAL-01` must
+freeze its exact target keys from independently verified database/write evidence (196 packet keys,
+3,502 lineage rows) before hashing files; do not infer targets from the sample or timestamps.
+
+**Read-only query attempt (2026-09-28):** the live catalog confirms indexes on lineage `id`,
+`(packet_key, canonical_chunk_id)`, `canonical_chunk_id`, `packet_key`, `revision_status`, and
+`source_ref`; there is no index on `created_at` or `lineage_producer_revision`. A bounded recent-row
+aggregation intended only to discover a producer tag hit its 15-second statement timeout and was
+canceled. It returned no target manifest and performed no writes. Keep `GRAPHIFY-FILE-REV-REEVAL-01`
+open until exact packet keys are recovered from a preserved preimage or an indexed, independently
+verified target selector; do not retry the timestamp scan or widen it.
+
+### AUDIT-SYMBOL-01 -- SYMBOLS_RESOLVED unreachable-PASS bug fixed; two facts separated (2026-09-29)
+
+`SYMBOLS_RESOLVED`'s verdict ternary (`atlasSymbolRegistryRowCount > 0 ? 'PARTIAL_PROVEN' : ...`)
+had no `PASS` branch at all and never consulted the `reconciliation_gate` object it computed --
+the same unreachable-verdict bug class already found and fixed 3x earlier this session
+(`GRAPH_MANIFEST_SEALED`, `SEMANTIC_OWNER_PROVEN`, `ORDINAL_MAP_SEALED`). Per external review, the
+fix does NOT collapse "did nominated symbols resolve" and "is coverage sufficient" into one flip
+to `PASS` -- those are separated as two distinct facts in the predicate output:
+
+- `nomination_resolution`: read from the most recent `symbol-reconciliation-writer-v1-*.json`
+  receipt whose `targetWorkspaceRevision` matches the CURRENT admitted revision (never a stale
+  or mismatched-revision receipt). Live result: `194/194` nominations resolved, `0` unresolved,
+  `0` ambiguous -- genuinely clean.
+- `coverage`: `symbolsForBoundRefs / boundSourceRefCount` from the existing live
+  `reconciliation_gate` query. Live result: `194/24,456` bound source refs (`0.8%`) have any
+  extracted `graphify_symbols` row at all.
+
+`PASS` requires both `nomination_resolution.clean === true` AND `coverage.full_coverage === true`.
+Live verdict correctly stays `PARTIAL_PROVEN` -- resolution is clean, coverage is the real,
+honest remaining gap (owner: `scripts/atlas/graphify-symbol-extractor-v1.mts`, extraction
+coverage, not reconciliation). This is a verifier-honesty fix, not a coverage backfill.
+
+**Same-pass, unrelated to symbols but requested as a "quick win":** ran the existing
+`backfill-atlas-packet-qdrant-links.mjs` (dry-run then `--apply`, reused rather than duplicated
+per this repo's Duplication Prevention rule) -- `16,783/16,783` real matches written to
+`atlas_packets.qdrant_point_id`/`qdrant_collection`/`qdrant_vector_dim`. This closed
+`IDENTITY_ALIGNED` to real `PASS` (was `289/1000` missing in sample, now `0/1000`).
+`REVISION_QUALIFIED` also now reads `PASS` live -- that predicate's admitted-cohort scope
+correction (denominator = admitted repo:root cohort 16,151, not the table-wide 61,718) was
+already committed in an earlier pass this session; reaching `PASS` here is live data catching
+up to already-committed code, not a new change.
+
+**Overall fabric audit: 9/11 predicates below PASS -> 7/11 below PASS.** Remaining below PASS:
+`SYMBOLS_RESOLVED`, `SEMANTIC_OWNER_PROVEN`, `LATENT_FAMILY_PROVEN`, `ORDINAL_MAP_SEALED`,
+`PROJECTIONS_CHECKSUM_ALIGNED`, `BITFROST_KEYS_DERIVABLE`, `ACE_EVIDENCE_GROUNDED`. None of these
+are schema/storage-model gaps -- per external review, they are producer/provenance problems
+(missing unique-writer proof, missing promotion decisions, missing tables, missing key-derivation
+schemes) not fixable by adding fields to any packet contract. Full per-predicate gap table
+recorded in this session's chat; not duplicated here in full to avoid drift from the live
+regenerated report at `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-29.json`.
+
+Committed `95cd026434` on `handoff/summary-enrichment-lineage-20260925` (pushed). Next queued per
+external review: `GRAPHIFY-BINDING-01` (trace whether `writeGraphifySourceInventoryV2` can consume
+admitted execution-membership bindings as input authority, rather than current-worktree bytes --
+4 worktree files are already known to differ from the admitted snapshot) before any Graphify
+refresh is attempted for the 196-packet cohort this session already lineage-repaired.
