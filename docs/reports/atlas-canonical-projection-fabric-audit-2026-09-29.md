@@ -1,22 +1,22 @@
 # ATLAS-CANONICAL-PROJECTION-FABRIC-01 Admission Gate — 2026-09-29
 
-**Read-only. Zero production mutations.** Repository commit: `19c0a937ac89b6522748e72951df0c6dec671dc3`. Database: `127.0.0.1:5434`.
+**Read-only. Zero production mutations.** Repository commit: `e36e112a3836fe04c42e5f1d2434b648961990e8`. Database: `127.0.0.1:5434`.
 
 Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture review, recorded 2026-09-08)
 
 ## Overall verdict: **NOT_SAFE_TO_PROJECT**
 
-9/11 predicates below PASS: IDENTITY_ALIGNED=PARTIAL_PROVEN, REVISION_QUALIFIED=PARTIAL_PROVEN, SYMBOLS_RESOLVED=PARTIAL_PROVEN, SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN, LATENT_FAMILY_PROVEN=PARTIAL_PROVEN, ORDINAL_MAP_SEALED=PARTIAL_PROVEN, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN
+7/11 predicates below PASS: SYMBOLS_RESOLVED=PARTIAL_PROVEN, SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN, LATENT_FAMILY_PROVEN=PARTIAL_PROVEN, ORDINAL_MAP_SEALED=PARTIAL_PROVEN, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN
 
 ## Predicates
 
-### `IDENTITY_ALIGNED`: **PARTIAL_PROVEN**
+### `IDENTITY_ALIGNED`: **PASS**
 - `sample_size`: 1000
 - `duplicate_packet_key_count`: 0
-- `missing_qdrant_point_id_count`: 289
+- `missing_qdrant_point_id_count`: 0
 
-### `REVISION_QUALIFIED`: **PARTIAL_PROVEN**
-> Measured on atlas_packets.workspace_revision_key + source_revision against the admitted workspace revision. Unqualified packets lie outside admitted snapshot membership or await the packet-admission owner decision (see current-packet-digest-producer-v1.census.json); revisions are never synthesized for them.
+### `REVISION_QUALIFIED`: **PASS**
+> Every packet row in the admitted repo:root workspace cohort (16151) has a source_ref in the sealed snapshot and an exact source_revision match. The 61718 table-wide row count is historical/non-admitted context, not the gate denominator.
 - `admitted_workspace_revision`: "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
 - `source_ref_count`: 1000
 - `sample_packets_revision_qualified`: 272
@@ -24,9 +24,14 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 - `table_packets_revision_qualified`: 16151
 - `table_packets_total`: 61718
 - `ast_node_join_count_secondary`: 0
+- `admitted_root_snapshot_verified`: true
+- `admitted_root_snapshot_source_count`: 24456
+- `admitted_root_packet_rows`: 16151
+- `admitted_root_packet_revision_matches`: 16151
+- `admitted_root_packet_revision_mismatch_or_missing`: 0
 
 ### `SYMBOLS_RESOLVED`: **PARTIAL_PROVEN**
-> graphify_symbols has 194 rows (populated 2026-09-13 by scripts/atlas/graphify-symbol-extractor-v1.mts). atlas_symbol_registry has 10504 rows. The reconciliation gate (scripts/atlas/symbol-reconciliation-writer-v1.mts) is live-measured above via reconciliation_gate -- run --apply (resolve-only, no promotion) or --apply --allow-create (promotes unresolved nominations) to advance it; a prior "always blocked" claim here was stale, corrected 2026-09-28 after a real run showed status GROUNDED, 194/194 nominations resolved against the existing registry, 0 unresolved.
+> Nomination resolution is clean (194/194 resolved, 0 unresolved, 0 ambiguous), but population coverage is not: only 194/24456 bound source refs (0.8%) have any extracted graphify_symbols row at all. Extraction coverage, not reconciliation, is the remaining gap -- see scripts/atlas/graphify-symbol-extractor-v1.mts.
 - `graphify_symbols_exists`: true
 - `graphify_symbols_row_count`: 194
 - `atlas_symbol_registry_exists`: true
@@ -34,6 +39,8 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 - `atlas_symbol_versions_exists`: true
 - `atlas_symbol_versions_row_count`: 479
 - `reconciliation_gate`: {"status":"GROUNDED","boundSourceRefCount":24456,"symbolsForBoundRefs":194}
+- `nomination_resolution`: {"source_receipt":"symbol-reconciliation-writer-v1-1790649436604.json","nomination_count":194,"canonical_symbol_count":194,"unresolved_symbol_count":0,"ambiguous_symbol_count":0,"clean":true}
+- `coverage`: {"bound_source_ref_count":24456,"symbol_row_count":194,"coverage_ratio":0.007932613673536147,"full_coverage":false}
 
 ### `SEMANTIC_OWNER_PROVEN`: **PARTIAL_PROVEN**
 > The declared semantic_768 contract target codebase_chunk_index.content_embedding_768 is present. Column presence does not prove a unique writer, revision-qualified reads, per-row representation provenance, or projection readback; content_embedding and atlas_packets.embedding remain historical/unresolved surfaces.
@@ -48,7 +55,7 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 - `registry_rows`: 7
 - `registry_verified`: 3
 - `registry_with_artifact_digest`: 3
-- `per_row_input_digest_ledger_exists`: true
+- `per_row_input_digest_ledger_exists`: false
 
 ### `GRAPH_MANIFEST_SEALED`: **PASS**
 > Every in-scope (non-submodule) repository partition of the admitted workspace revision has a materialized, replay-matched graph snapshot shard, bound to the admitted revision by construction. Submodule repositories (vendored third-party code) are excluded from this bar by a 2026-09-28 operator decision, not because coverage was incomplete. Neo4j does not consume any graph manifest (old or new) -- a separate, still-open gap, not certified by this PASS.
@@ -111,12 +118,18 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 - `ordinal_sequence_valid`: true
 
 ### `PROJECTIONS_CHECKSUM_ALIGNED`: **NOT_PROVEN**
-> Cannot be proven while atlas_representation_records is absent — there is no checksum field anywhere recording input_checksum/ordinal_map_checksum for cross-projection alignment.
+> The live atlas_representations registry records representation/artifact metadata, not a per-run projection binding. No ordinal_map_checksum column was found in public table columns; no receipt currently proves the same input and ordinal-map checksums across the projections. Keep NOT_PROVEN; do not create a parallel registry solely to satisfy this predicate.
 - `depends_on`: "LATENT_FAMILY_PROVEN + GRAPH_MANIFEST_SEALED"
+- `representation_registry`: "atlas_representations"
+- `representation_registry_exists`: true
+- `representation_registry_checksum_columns`: []
+- `ordinal_map_checksum_columns_found`: []
 
 ### `BITFROST_KEYS_DERIVABLE`: **NOT_PROVEN**
-> Presence of bitfrost:packet:* keys does not by itself prove a derivable domain+cluster+topology+symbol-neighborhood BitFrost key scheme — only that the existing summary cache namespace is populated.
-- `sample_key_count`: 0
+> The v1 key namespace is counted separately from the legacy bitfrost:packet:* prefix. Even observed keys prove presence only: promotion still requires the admitted ACE packet-key producer/caller, identity-bound write/readback, and current artifact checksums. Deterministic key-builder fixture tests are not live cache-warming proof.
+- `key_contract`: "AceBitfrostCacheIdentityV1 / atlas:bitfrost:v1:*"
+- `current_v1_namespace_key_count`: 0
+- `legacy_bitfrost_packet_key_count`: 0
 
 ### `ACE_EVIDENCE_GROUNDED`: **NOT_PROVEN**
 > ace_context_sources existing and populated proves an audit trail exists; it does not by itself prove every ACE card cites source spans/symbols/tuples rather than rehydrated raw JSON (ACECardV1 from the proposal) — not checked this pass.
@@ -126,7 +139,6 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 ## Table existence
 
 - `atlas_packets`: true
-- `atlas_representation_records`: false
 - `atlas_representations`: true
 - `atlas_ast_nodes`: true
 - `atlas_tree_nodes`: true
@@ -173,7 +185,6 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 - `7b8d78e10d424c10`: `SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;`
 - `7b8d78e10d424c10`: `SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;`
 - `7b8d78e10d424c10`: `SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;`
-- `7b8d78e10d424c10`: `SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;`
 - `d2115895a169e364`: `SELECT packet_id, packet_key, source_ref, qdrant_point_id, tree_node_id, latent_64 FROM atlas_packets WHERE latent_64 IS NOT NULL ORDER BY p…`
 - `651d6031589b11ce`: `SELECT source_ref_key, source_revision FROM atlas_ast_nodes WHERE source_ref_key = ANY($1::text[]);`
 - `2ce65ccaec1d4207`: `SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE workspace_revision_key = $1 AND source_revision ~ $2)::int AS qualified FROM atlas_pac…`
@@ -191,5 +202,6 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 - `e3f8b5f134d520a9`: `SELECT COUNT(*)::int AS n FROM atlas_ontology_tuples;`
 - `48cb29a6f1f265d6`: `SELECT COUNT(*)::int AS n FROM hypergraph_edges;`
 - `162b6a29a958cf33`: `SELECT COUNT(*)::int AS n FROM atlas_hyperedges;`
-- `dd37a287b45e7731`: `SELECT packet_key, source_ref, canonical_source_ref, source_revision, workspace_revision_key FROM atlas_packets WHERE workspace_revision_key…`
+- `af836f0aa11629a6`: `SELECT packet_key, source_ref, canonical_source_ref, source_revision, workspace_revision_key FROM atlas_packets WHERE workspace_revision_key…`
+- `7d490567e2829b03`: `SELECT table_name, column_name FROM information_schema.columns WHERE table_schema='public' AND column_name IN ('input_checksum', 'ordinal_ma…`
 - `35d2443b3e688999`: `SELECT COUNT(*)::int AS n FROM ace_context_sources;`

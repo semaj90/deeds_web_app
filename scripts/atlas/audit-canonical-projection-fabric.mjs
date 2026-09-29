@@ -6,7 +6,7 @@
  * "ATLAS-CANONICAL-PROJECTION-FABRIC-01" (2026-09-08 external architecture
  * proposal, recorded in openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md)
  * against live schema/data. This script proves or disproves each predicate —
- * it never mints missing contracts, never writes atlas_representation_records,
+ * it never mints missing contracts, never writes atlas_representations,
  * atlas_packets, Qdrant, Redis, or Neo4j, and never promotes a projection.
  *
  * Every Postgres statement runs inside one BEGIN TRANSACTION READ ONLY /
@@ -21,7 +21,7 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
@@ -94,7 +94,6 @@ async function main() {
     console.log('[fabric-audit] 1/11 candidate table existence');
     const candidateTables = [
       'atlas_packets',
-      'atlas_representation_records',
       'atlas_representations',
       'atlas_ast_nodes',
       'atlas_tree_nodes',
@@ -204,9 +203,11 @@ async function main() {
       table_packets_revision_qualified: tot.qualified,
       table_packets_total: tot.total,
       ast_node_join_count_secondary: revisionJoined,
-      verdict: !admittedWorkspaceRevision || tot.qualified === 0 ? 'NOT_PROVEN'
-        : tot.qualified === tot.total ? 'PASS' : 'PARTIAL_PROVEN',
-      note: 'Measured on atlas_packets.workspace_revision_key + source_revision against the admitted workspace revision. Unqualified packets lie outside admitted snapshot membership or await the packet-admission owner decision (see current-packet-digest-producer-v1.census.json); revisions are never synthesized for them.',
+      // The table-wide counts above remain diagnostic only. Historical and
+      // non-admitted packet rows are not the denominator for this gate; the
+      // sealed repo:root source snapshot below defines the admitted cohort.
+      verdict: !admittedWorkspaceRevision ? 'NOT_PROVEN' : 'PARTIAL_PROVEN',
+      note: 'Table-wide packet counts are diagnostic only. PASS is computed below against packet rows in the sealed admitted repo:root workspace snapshot, requiring exact source_revision equality; historical/non-admitted rows do not lower current-cohort coverage.',
     };
 
     // ── Predicate 3: SYMBOLS_RESOLVED ──
@@ -251,6 +252,56 @@ async function main() {
         symbolsForBoundRefs: linked.n,
       };
     }
+    // AUDIT-SYMBOL-01 (2026-09-29, read-only): the prior verdict ternary above had NO PASS
+    // branch at all and never consulted `reconciliationGate` despite computing it -- the same
+    // unreachable-PASS bug class already found and fixed 3 times this session (GRAPH_MANIFEST_SEALED,
+    // SEMANTIC_OWNER_PROVEN, ORDINAL_MAP_SEALED). Fixed by separating two genuinely distinct facts
+    // (per external review, applied deliberately rather than collapsed): nomination RESOLUTION
+    // (did every nominated symbol resolve cleanly against the registry?) vs population COVERAGE
+    // (what fraction of the admitted revision's bound source refs even have an extracted symbol
+    // row at all?). Reads the most recent symbol-reconciliation-writer-v1-*.json receipt whose
+    // targetWorkspaceRevision matches the CURRENT admitted revision -- never recomputes the
+    // canonicalization dry-run inline (that's the writer's own job), and never trusts a receipt
+    // bound to a different, stale admitted revision.
+    let reconciliationReceipt = null;
+    try {
+      const reportsDir = resolve(REPO_ROOT, 'docs/reports');
+      const candidates = readdirSync(reportsDir)
+        .filter((f) => /^symbol-reconciliation-writer-v1-\d+\.json$/.test(f))
+        .sort()
+        .reverse();
+      for (const file of candidates) {
+        const parsed = JSON.parse(readFileSync(resolve(reportsDir, file), 'utf8'));
+        if (parsed.targetWorkspaceRevision === admittedWorkspaceRevision && parsed.receipt) {
+          reconciliationReceipt = { file, ...parsed.receipt };
+          break;
+        }
+      }
+    } catch { /* absent or unreadable -- leave null, never fabricate */ }
+
+    const nominationCount = reconciliationReceipt?.nomination_count ?? 0;
+    const canonicalSymbolCount = reconciliationReceipt?.canonical_symbol_count ?? 0;
+    const unresolvedSymbolCount = reconciliationReceipt?.unresolved_symbol_count ?? null;
+    const ambiguousSymbolCount = reconciliationReceipt?.ambiguous_symbol_count ?? null;
+    const nominationResolutionClean = Boolean(
+      reconciliationReceipt
+      && nominationCount > 0
+      && canonicalSymbolCount === nominationCount
+      && unresolvedSymbolCount === 0
+      && ambiguousSymbolCount === 0,
+    );
+    const boundSourceRefCount = reconciliationGate?.boundSourceRefCount ?? 0;
+    const symbolRowCount = reconciliationGate?.symbolsForBoundRefs ?? 0;
+    const coverageRatio = boundSourceRefCount > 0 ? symbolRowCount / boundSourceRefCount : 0;
+    const fullCoverage = boundSourceRefCount > 0 && symbolRowCount === boundSourceRefCount;
+
+    let symbolsResolvedVerdict;
+    if (!existing.has('graphify_symbols')) symbolsResolvedVerdict = 'ABSENT';
+    else if (!reconciliationGate || reconciliationGate.status !== 'GROUNDED') symbolsResolvedVerdict = 'NOT_PROVEN';
+    else if (!nominationResolutionClean) symbolsResolvedVerdict = 'PARTIAL_PROVEN';
+    else if (!fullCoverage) symbolsResolvedVerdict = 'PARTIAL_PROVEN';
+    else symbolsResolvedVerdict = 'PASS';
+
     const symbolsResolved = {
       graphify_symbols_exists: existing.has('graphify_symbols'),
       graphify_symbols_row_count: graphifySymbolsRowCount,
@@ -259,12 +310,28 @@ async function main() {
       atlas_symbol_versions_exists: existing.has('atlas_symbol_versions'),
       atlas_symbol_versions_row_count: atlasSymbolVersionsRowCount,
       reconciliation_gate: reconciliationGate,
-      verdict: atlasSymbolRegistryRowCount > 0
-        ? 'PARTIAL_PROVEN'
-        : graphifySymbolsRowCount > 0 ? 'EXTRACTED_NOT_RECONCILED' : 'NOT_PROVEN',
-      note: existing.has('graphify_symbols')
-        ? `graphify_symbols has ${graphifySymbolsRowCount} rows (populated 2026-09-13 by scripts/atlas/graphify-symbol-extractor-v1.mts). atlas_symbol_registry has ${atlasSymbolRegistryRowCount ?? 0} rows. The reconciliation gate (scripts/atlas/symbol-reconciliation-writer-v1.mts) is live-measured above via reconciliation_gate -- run --apply (resolve-only, no promotion) or --apply --allow-create (promotes unresolved nominations) to advance it; a prior "always blocked" claim here was stale, corrected 2026-09-28 after a real run showed status GROUNDED, 194/194 nominations resolved against the existing registry, 0 unresolved.`
-        : 'graphify_symbols does not exist live. No canonical SymbolVersionV1 registry exists; atlas_tree_nodes/atlas_ast_nodes are provisional structural inventories, not a symbol version authority.',
+      nomination_resolution: {
+        source_receipt: reconciliationReceipt?.file ?? null,
+        nomination_count: nominationCount,
+        canonical_symbol_count: canonicalSymbolCount,
+        unresolved_symbol_count: unresolvedSymbolCount,
+        ambiguous_symbol_count: ambiguousSymbolCount,
+        clean: nominationResolutionClean,
+      },
+      coverage: {
+        bound_source_ref_count: boundSourceRefCount,
+        symbol_row_count: symbolRowCount,
+        coverage_ratio: coverageRatio,
+        full_coverage: fullCoverage,
+      },
+      verdict: symbolsResolvedVerdict,
+      note: !existing.has('graphify_symbols')
+        ? 'graphify_symbols does not exist live. No canonical SymbolVersionV1 registry exists; atlas_tree_nodes/atlas_ast_nodes are provisional structural inventories, not a symbol version authority.'
+        : symbolsResolvedVerdict === 'PASS'
+          ? 'Every bound source ref for the admitted revision has an extracted, cleanly-resolved symbol row -- both nomination resolution and population coverage are complete.'
+          : nominationResolutionClean
+            ? `Nomination resolution is clean (${nominationCount}/${nominationCount} resolved, 0 unresolved, 0 ambiguous), but population coverage is not: only ${symbolRowCount}/${boundSourceRefCount} bound source refs (${(coverageRatio * 100).toFixed(1)}%) have any extracted graphify_symbols row at all. Extraction coverage, not reconciliation, is the remaining gap -- see scripts/atlas/graphify-symbol-extractor-v1.mts.`
+            : `Nomination resolution is not clean or no matching receipt exists for the current admitted revision (${admittedWorkspaceRevision}). Run scripts/atlas/symbol-reconciliation-writer-v1.mts --workspace-revision ${admittedWorkspaceRevision} to produce a fresh receipt before re-auditing.`,
     };
 
     // ── Predicate 4: SEMANTIC_OWNER_PROVEN ──
@@ -325,7 +392,10 @@ async function main() {
       registry_rows: repRows.length,
       registry_verified: repVerified,
       registry_with_artifact_digest: repDigested,
-      per_row_input_digest_ledger_exists: repDigested > 0,
+      // artifact_digest identifies a model/checkpoint artifact; it is not a
+      // per-row digest of the semantic_768 inputs used to derive latent rows.
+      // Keep this false until a dedicated row-level input binding is inspected.
+      per_row_input_digest_ledger_exists: false,
       verdict: repRows.length === 0 ? 'NOT_PROVEN' : repVerified > 0 && repDigested > 0 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
       note: 'latent_64, latent_128, latent_256 are all registered with a real, cross-checked artifact digest (state_dict tensor-content checksum, verified live against the checkpoint file and against codebase_chunk_index.latent_256_checkpoint_revision, 55169 rows), producer chain and derivation mechanism (AUTOENCODER for latent_256, SLICE_FIRST_N for the renormalized prefixes) recorded in dimension_method + notes. Still below PASS: no per-row *input*-digest ledger exists (which source semantic_768 snapshot the checkpoint was trained against), and lifecycle_status stays CANDIDATE (no promotion vote taken).',
     };
@@ -527,12 +597,25 @@ async function main() {
       const { rows } = await q(
         `SELECT packet_key, source_ref, canonical_source_ref, source_revision, workspace_revision_key
          FROM atlas_packets
-         WHERE workspace_revision_key = $1 AND source_revision IS NOT NULL;`,
-        [admittedWorkspaceRevision],
-      );
+         WHERE workspace_revision_key = $1;`,
+      [admittedWorkspaceRevision],
+    );
       workspaceRevisionRows = rows;
       rootCandidateRows = rows.filter((r) => rootSourceRevisionByRef.get(r.source_ref) === r.source_revision);
     }
+    const admittedRootPacketRows = workspaceRevisionRows.filter((r) => rootSourceRevisionByRef.has(r.source_ref));
+    const admittedRootRevisionMismatchCount = admittedRootPacketRows.length - rootCandidateRows.length;
+    revisionQualified.admitted_root_snapshot_verified = rootSnapshotVerified;
+    revisionQualified.admitted_root_snapshot_source_count = rootSourceRevisionByRef.size;
+    revisionQualified.admitted_root_packet_rows = admittedRootPacketRows.length;
+    revisionQualified.admitted_root_packet_revision_matches = rootCandidateRows.length;
+    revisionQualified.admitted_root_packet_revision_mismatch_or_missing = admittedRootRevisionMismatchCount;
+    revisionQualified.verdict = !rootSnapshotVerified || admittedRootPacketRows.length === 0
+      ? 'NOT_PROVEN'
+      : admittedRootRevisionMismatchCount === 0 ? 'PASS' : 'PARTIAL_PROVEN';
+    revisionQualified.note = revisionQualified.verdict === 'PASS'
+      ? `Every packet row in the admitted repo:root workspace cohort (${admittedRootPacketRows.length}) has a source_ref in the sealed snapshot and an exact source_revision match. The ${tot.total} table-wide row count is historical/non-admitted context, not the gate denominator.`
+      : `Revision coverage is evaluated against the sealed admitted repo:root snapshot, not the entire historical atlas_packets table. Exact admitted matches=${rootCandidateRows.length}; mismatched or missing=${admittedRootRevisionMismatchCount}; snapshot_verified=${rootSnapshotVerified}.`;
     const admittedRootCandidateCount = rootCandidateRows.length;
     const rootByPacketKey = new Map(rootCandidateRows.map((r) => [r.packet_key, r]));
     const allWorkspaceByPacketKey = new Map(workspaceRevisionRows.map((r) => [r.packet_key, r]));
@@ -667,10 +750,29 @@ async function main() {
 
     // ── Predicate 9: PROJECTIONS_CHECKSUM_ALIGNED ──
     console.log('[fabric-audit] 11/11a PROJECTIONS_CHECKSUM_ALIGNED');
+    const { rows: projectionChecksumColumns } = await q(
+      `SELECT table_name, column_name
+       FROM information_schema.columns
+       WHERE table_schema='public'
+         AND column_name IN ('input_checksum', 'ordinal_map_checksum')
+       ORDER BY table_name, column_name;`,
+    );
+    const representationRegistryExists = existing.has('atlas_representations');
+    const representationRegistryChecksumColumns = projectionChecksumColumns
+      .filter((r) => r.table_name === 'atlas_representations')
+      .map((r) => r.column_name);
     const projectionsChecksumAligned = {
       depends_on: 'LATENT_FAMILY_PROVEN + GRAPH_MANIFEST_SEALED',
+      representation_registry: 'atlas_representations',
+      representation_registry_exists: representationRegistryExists,
+      representation_registry_checksum_columns: representationRegistryChecksumColumns,
+      ordinal_map_checksum_columns_found: projectionChecksumColumns
+        .filter((r) => r.column_name === 'ordinal_map_checksum')
+        .map((r) => `${r.table_name}.${r.column_name}`),
       verdict: 'NOT_PROVEN',
-      note: 'Cannot be proven while atlas_representation_records is absent — there is no checksum field anywhere recording input_checksum/ordinal_map_checksum for cross-projection alignment.',
+      note: representationRegistryExists
+        ? 'The live atlas_representations registry records representation/artifact metadata, not a per-run projection binding. No ordinal_map_checksum column was found in public table columns; no receipt currently proves the same input and ordinal-map checksums across the projections. Keep NOT_PROVEN; do not create a parallel registry solely to satisfy this predicate.'
+        : 'The live atlas_representations registry is absent, and no projection checksum-alignment receipt was proven. Keep NOT_PROVEN until the canonical owner and receipt shape are established.',
     };
 
     // ── Predicate 10: BITFROST_KEYS_DERIVABLE ──
@@ -688,11 +790,24 @@ async function main() {
       });
       redis.on('error', () => {});
       await redis.connect();
-      const keys = await redis.keys('bitfrost:packet:*');
+      const scanCount = async (pattern) => {
+        let cursor = '0';
+        let count = 0;
+        do {
+          const [nextCursor, keys] = await redis.scan(cursor, 'MATCH', pattern, 'COUNT', 500);
+          cursor = nextCursor;
+          count += keys.length;
+        } while (cursor !== '0');
+        return count;
+      };
+      const currentV1KeyCount = await scanCount('atlas:bitfrost:v1:*');
+      const legacyPacketKeyCount = await scanCount('bitfrost:packet:*');
       bitfrostKeysDerivable = {
-        sample_key_count: keys.length,
-        verdict: keys.length > 0 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
-        note: 'Presence of bitfrost:packet:* keys does not by itself prove a derivable domain+cluster+topology+symbol-neighborhood BitFrost key scheme — only that the existing summary cache namespace is populated.',
+        key_contract: 'AceBitfrostCacheIdentityV1 / atlas:bitfrost:v1:*',
+        current_v1_namespace_key_count: currentV1KeyCount,
+        legacy_bitfrost_packet_key_count: legacyPacketKeyCount,
+        verdict: currentV1KeyCount > 0 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
+        note: 'The v1 key namespace is counted separately from the legacy bitfrost:packet:* prefix. Even observed keys prove presence only: promotion still requires the admitted ACE packet-key producer/caller, identity-bound write/readback, and current artifact checksums. Deterministic key-builder fixture tests are not live cache-warming proof.',
       };
       await redis.quit();
     } catch (e) {

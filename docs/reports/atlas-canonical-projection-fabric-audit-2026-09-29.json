@@ -1,15 +1,11 @@
 {
   "schema_version": "atlas-canonical-projection-fabric-audit-v1",
-  "generated_at": "2026-09-29T01:00:30.263Z",
-  "repository_commit": "19c0a937ac89b6522748e72951df0c6dec671dc3",
+  "generated_at": "2026-09-29T02:46:04.599Z",
+  "repository_commit": "e36e112a3836fe04c42e5f1d2434b648961990e8",
   "database_identity": "127.0.0.1:5434",
   "source_proposal": "ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture review, recorded 2026-09-08)",
   "limitations": [],
   "query_digests": [
-    {
-      "digest": "7b8d78e10d424c10",
-      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
-    },
     {
       "digest": "7b8d78e10d424c10",
       "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
@@ -159,8 +155,12 @@
       "sql": "SELECT COUNT(*)::int AS n FROM atlas_hyperedges;"
     },
     {
-      "digest": "dd37a287b45e7731",
-      "sql": "SELECT packet_key, source_ref, canonical_source_ref, source_revision, workspace_revision_key FROM atlas_packets WHERE workspace_revision_key = $1 AND source_revision IS NOT NULL;"
+      "digest": "af836f0aa11629a6",
+      "sql": "SELECT packet_key, source_ref, canonical_source_ref, source_revision, workspace_revision_key FROM atlas_packets WHERE workspace_revision_key = $1;"
+    },
+    {
+      "digest": "7d490567e2829b03",
+      "sql": "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema='public' AND column_name IN ('input_checksum', 'ordinal_map_checksum') ORDER BY table_name, column_name;"
     },
     {
       "digest": "35d2443b3e688999",
@@ -171,8 +171,8 @@
     "IDENTITY_ALIGNED": {
       "sample_size": 1000,
       "duplicate_packet_key_count": 0,
-      "missing_qdrant_point_id_count": 289,
-      "verdict": "PARTIAL_PROVEN"
+      "missing_qdrant_point_id_count": 0,
+      "verdict": "PASS"
     },
     "REVISION_QUALIFIED": {
       "admitted_workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
@@ -182,8 +182,13 @@
       "table_packets_revision_qualified": 16151,
       "table_packets_total": 61718,
       "ast_node_join_count_secondary": 0,
-      "verdict": "PARTIAL_PROVEN",
-      "note": "Measured on atlas_packets.workspace_revision_key + source_revision against the admitted workspace revision. Unqualified packets lie outside admitted snapshot membership or await the packet-admission owner decision (see current-packet-digest-producer-v1.census.json); revisions are never synthesized for them."
+      "verdict": "PASS",
+      "note": "Every packet row in the admitted repo:root workspace cohort (16151) has a source_ref in the sealed snapshot and an exact source_revision match. The 61718 table-wide row count is historical/non-admitted context, not the gate denominator.",
+      "admitted_root_snapshot_verified": true,
+      "admitted_root_snapshot_source_count": 24456,
+      "admitted_root_packet_rows": 16151,
+      "admitted_root_packet_revision_matches": 16151,
+      "admitted_root_packet_revision_mismatch_or_missing": 0
     },
     "SYMBOLS_RESOLVED": {
       "graphify_symbols_exists": true,
@@ -197,8 +202,22 @@
         "boundSourceRefCount": 24456,
         "symbolsForBoundRefs": 194
       },
+      "nomination_resolution": {
+        "source_receipt": "symbol-reconciliation-writer-v1-1790649436604.json",
+        "nomination_count": 194,
+        "canonical_symbol_count": 194,
+        "unresolved_symbol_count": 0,
+        "ambiguous_symbol_count": 0,
+        "clean": true
+      },
+      "coverage": {
+        "bound_source_ref_count": 24456,
+        "symbol_row_count": 194,
+        "coverage_ratio": 0.007932613673536147,
+        "full_coverage": false
+      },
       "verdict": "PARTIAL_PROVEN",
-      "note": "graphify_symbols has 194 rows (populated 2026-09-13 by scripts/atlas/graphify-symbol-extractor-v1.mts). atlas_symbol_registry has 10504 rows. The reconciliation gate (scripts/atlas/symbol-reconciliation-writer-v1.mts) is live-measured above via reconciliation_gate -- run --apply (resolve-only, no promotion) or --apply --allow-create (promotes unresolved nominations) to advance it; a prior \"always blocked\" claim here was stale, corrected 2026-09-28 after a real run showed status GROUNDED, 194/194 nominations resolved against the existing registry, 0 unresolved."
+      "note": "Nomination resolution is clean (194/194 resolved, 0 unresolved, 0 ambiguous), but population coverage is not: only 194/24456 bound source refs (0.8%) have any extracted graphify_symbols row at all. Extraction coverage, not reconciliation, is the remaining gap -- see scripts/atlas/graphify-symbol-extractor-v1.mts."
     },
     "SEMANTIC_OWNER_PROVEN": {
       "canonical_contract_target_present": [
@@ -220,7 +239,7 @@
       "registry_rows": 7,
       "registry_verified": 3,
       "registry_with_artifact_digest": 3,
-      "per_row_input_digest_ledger_exists": true,
+      "per_row_input_digest_ledger_exists": false,
       "verdict": "PARTIAL_PROVEN",
       "note": "latent_64, latent_128, latent_256 are all registered with a real, cross-checked artifact digest (state_dict tensor-content checksum, verified live against the checkpoint file and against codebase_chunk_index.latent_256_checkpoint_revision, 55169 rows), producer chain and derivation mechanism (AUTOENCODER for latent_256, SLICE_FIRST_N for the renormalized prefixes) recorded in dimension_method + notes. Still below PASS: no per-row *input*-digest ledger exists (which source semantic_768 snapshot the checkpoint was trained against), and lifecycle_status stays CANDIDATE (no promotion vote taken)."
     },
@@ -314,13 +333,19 @@
     },
     "PROJECTIONS_CHECKSUM_ALIGNED": {
       "depends_on": "LATENT_FAMILY_PROVEN + GRAPH_MANIFEST_SEALED",
+      "representation_registry": "atlas_representations",
+      "representation_registry_exists": true,
+      "representation_registry_checksum_columns": [],
+      "ordinal_map_checksum_columns_found": [],
       "verdict": "NOT_PROVEN",
-      "note": "Cannot be proven while atlas_representation_records is absent — there is no checksum field anywhere recording input_checksum/ordinal_map_checksum for cross-projection alignment."
+      "note": "The live atlas_representations registry records representation/artifact metadata, not a per-run projection binding. No ordinal_map_checksum column was found in public table columns; no receipt currently proves the same input and ordinal-map checksums across the projections. Keep NOT_PROVEN; do not create a parallel registry solely to satisfy this predicate."
     },
     "BITFROST_KEYS_DERIVABLE": {
-      "sample_key_count": 0,
+      "key_contract": "AceBitfrostCacheIdentityV1 / atlas:bitfrost:v1:*",
+      "current_v1_namespace_key_count": 0,
+      "legacy_bitfrost_packet_key_count": 0,
       "verdict": "NOT_PROVEN",
-      "note": "Presence of bitfrost:packet:* keys does not by itself prove a derivable domain+cluster+topology+symbol-neighborhood BitFrost key scheme — only that the existing summary cache namespace is populated."
+      "note": "The v1 key namespace is counted separately from the legacy bitfrost:packet:* prefix. Even observed keys prove presence only: promotion still requires the admitted ACE packet-key producer/caller, identity-bound write/readback, and current artifact checksums. Deterministic key-builder fixture tests are not live cache-warming proof."
     },
     "ACE_EVIDENCE_GROUNDED": {
       "table_exists": true,
@@ -331,7 +356,6 @@
   },
   "table_existence": {
     "atlas_packets": true,
-    "atlas_representation_records": false,
     "atlas_representations": true,
     "atlas_ast_nodes": true,
     "atlas_tree_nodes": true,
@@ -353,5 +377,5 @@
     "directory_context_bindings": true
   },
   "overall_verdict": "NOT_SAFE_TO_PROJECT",
-  "overall_verdict_reason": "9/11 predicates below PASS: IDENTITY_ALIGNED=PARTIAL_PROVEN, REVISION_QUALIFIED=PARTIAL_PROVEN, SYMBOLS_RESOLVED=PARTIAL_PROVEN, SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN, LATENT_FAMILY_PROVEN=PARTIAL_PROVEN, ORDINAL_MAP_SEALED=PARTIAL_PROVEN, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN"
+  "overall_verdict_reason": "7/11 predicates below PASS: SYMBOLS_RESOLVED=PARTIAL_PROVEN, SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN, LATENT_FAMILY_PROVEN=PARTIAL_PROVEN, ORDINAL_MAP_SEALED=PARTIAL_PROVEN, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN"
 }

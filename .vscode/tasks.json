@@ -2205,28 +2205,26 @@
       "detail": "Preview agents:pipeline output — write:dry → enrich:dry → ingest:dry. No file IO, no Redis writes, no Postgres writes."
     },
     {
-      "label": "🚀 Startup: ACE Incremental Refresh (detached, safe)",
+      "label": "🛠️ Manual: ACE Incremental Refresh (operator-requested)",
       "type": "shell",
       "command": "npm run startup:ace:detached",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "runOptions": {
-        "runOn": "folderOpen",
+        "runOn": "userRequest",
         "instanceLimit": 1
       },
-      "isBackground": true,
-      "dependsOn": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
       "problemMatcher": [],
       "presentation": {
-        "echo": false,
-        "reveal": "never",
+        "echo": true,
+        "reveal": "always",
         "focus": false,
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Detached fork of scripts/startup/ace-incremental-startup.mjs. Two lanes: (1) INCREMENTAL — git diff vs ace:startup:last_sha → agents:pipeline:dry → agents:pipeline:safe → topology:validate → graph:synthesize, lock-protected via Redis lock:startup:ace-refresh. (2) HEAVY — only fires when TurboQuant :8090 OR Ollama :11434 is healthy AND last heavy run was >24h ago, runs graphify:authority/gds/cluster-summaries/bow-tiles. Policy denylist in config/startup-ace-policy.json refuses destructive commands. Logs to logs/task-output/pipeline-test/startup-latest.json."
+      "detail": "Manual only: invokes scripts/startup/ace-incremental-startup.mjs under config/startup-ace-policy.json. This orchestrator can write Redis/Postgres state, run indexing/graph/cache steps, spawn services, and attempt a GPU-gated heavy lane. Review its plan/log first; it is intentionally not a folder-open dependency."
     },
     {
       "label": "🚀 ACE Startup: Manual Refresh (force, foreground)",
@@ -2373,7 +2371,6 @@
         "instanceLimit": 1
       },
       "isBackground": true,
-      "dependsOn": "🚀 Startup: ACE Incremental Refresh (detached, safe)",
       "problemMatcher": [],
       "presentation": {
         "echo": false,
@@ -2383,7 +2380,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "16-probe regression gate over the atlas → context_for_file → hypergraph search → /api/ace/recommendations chain. Runs after ACE incremental refresh has primed the caches. 30-min cooldown via logs/task-output/.atlas-smoke-last-run stamp. Catches schema drift, dual-DB confusion, empty hypergraph_edges, and stale Redis caches in one shot — green when the full chain runs; skipped when the dev server is down."
+      "detail": "16-probe regression gate over the atlas → context_for_file → hypergraph search → /api/ace/recommendations chain. Runs independently of the manual ACE incremental refresh. 30-min cooldown via logs/task-output/.atlas-smoke-last-run stamp. Catches schema drift, dual-DB confusion, empty hypergraph_edges, and stale Redis caches in one shot — green when the full chain runs; skipped when the dev server is down."
     },
     {
       "label": "🔥 Startup: Seed Hit-Demand (chunk_hit_log → Redis, detached)",
@@ -10810,6 +10807,22 @@
       },
       "group": "build",
       "detail": "Fast AST → docs/graph/codebase-graph.json + codebase-map.md → deep import graph (cycles/orphans/hotspots) → Redis cache → smoke. ~15s, no LLM, no GPU.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🌉 BitFrost: Semantic Cache Warm Report (read-only, no writes)",
+      "type": "shell",
+      "command": "npm run atlas:bitfrost-semantic-cache:warm",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Manual-only, NOT runOn:folderOpen. Writes docs/reports/bitfrost-semantic-cache-warm.{json,md} showing what WOULD warm for llama-server synthesis cache hits, given current atlas_higher_hop_index rows. Performs ZERO Redis writes -- scripts/atlas/warm-bitfrost-semantic-cache.mjs's --apply path is permanently hard-blocked in source (REVISION_BOUND_ACE_PACKET_IDENTITY_REQUIRED) until the ACE packet residency owner / ContextManifest admission chain (ACE-PRODUCER-TRACE-01 -> ACE-BITFROST-CALLER-01 -> ACE-BITFROST-CANARY-01, see openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md) exists. This task is visibility only, not real warming -- do not add --apply to this command until that chain is built. The live, already-self-warming cache for llama-server chat responses is the separate Bifrost L1 Redis exact-match + L2 semantic cache (bifrostChat(), :3040) -- it needs no warm step.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
