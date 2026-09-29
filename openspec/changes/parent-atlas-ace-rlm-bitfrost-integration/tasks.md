@@ -7482,6 +7482,43 @@ Status: `RAPIDS_WSL2_RUNTIME_PROVEN_NATIVE_PIPELINE_BLOCKED`;
 authority=false; writesPerformed=false.
 First blocker: `NATIVE_PYTORCH_CUDA_UNAVAILABLE`.
 
+## GPU-FABRIC-BLOCKER-REVIEW-2026-09-29
+
+- [x] Refreshed the WSL2 environment fingerprints: RAPIDS is a Miniforge Conda
+      environment on CUDA packages 13.3; cuTile is a separate Python virtualenv
+      on CUDA 13.2 / `cuda-tile` 1.5.0. They remain separate executor lanes.
+- [x] Rechecked the running Docker `atlas-gpu-8098`: `/health` returned 200 with
+      `cudaAvailable=true` on the RTX 3060 Ti; graph capabilities returned 200
+      with cuGraph 26.08. The container has no Docker health status before the
+      Compose change, and it was not restarted.
+- [x] Corrected the earlier PyTorch-gap interpretation: the current RAPIDS-only
+      Docker image intentionally omits PyTorch. Do not install another CUDA
+      wheel stack into this executor to satisfy a stale exact-route assumption.
+- [x] Compared the historical semantic exact-oracle receipt to live OpenAPI:
+      `/v1/knn/exact` is absent. The current API exposes the tile-artifact
+      cuVS exact-scan route; the old three-row fixture does not admit a current
+      semantic corpus cohort.
+- [x] Added a Compose healthcheck requiring a successful `/health` response and
+      CUDA availability; `docker compose config` validates it. This has not been
+      applied to the running container.
+- [ ] Recreate the profile-gated container during an authorized window to apply
+      the healthcheck and verify Docker reports it healthy.
+- [ ] Freeze a current revision-qualified candidate cohort, then prove the
+      current Arrow tile-artifact exact-scan contract and run the CAGRA
+      comparison. Keep ACE/BitFrost writes blocked until the ACE producer and
+      admitted packet-key lineage gates pass.
+
+Evidence: `docs/reports/rapids-fabric-blocker-review-v1-20260929T045502Z.json`,
+`docker/atlas-gpu-8098/Dockerfile`, `docker/atlas-gpu-8098/requirements.txt`,
+and live GET checks to `:8098/health`, `:8098/v1/graph/capabilities`, and
+`:8098/openapi.json`. The pre-existing
+`semantic768-cuvs-exact-oracle-v1.json` remains historical bounded fixture
+evidence and is not promoted by this review.
+Status: `LOCAL_GPU_RUNTIME_HEALTHY_BOUNDED_COHORT_AND_PROMOTION_GATES_OPEN`;
+canonicalAuthority=false; writesPerformed=false; servicesRestarted=false.
+Next gate: authorized container recreation, followed by current-cohort
+candidate freeze and exact-scan readback.
+
 ## DOCKER-REPRODUCIBILITY-RECHECK-2026-09-11
 
 - [x] Started the repository/container reproducibility audit in read-only
@@ -10963,6 +11000,28 @@ wire `ACE-BITFROST-CALLER-01` or run its canary until that producer/caller and k
 are established. This trace was static/read-only; no Redis, database, projection, or model operation
 was performed.
 
+### ACE-PRODUCER-TRACE-01 — current source recheck (2026-09-29)
+
+The read-only recheck confirms the earlier disposition: **BLOCKED_NOT_PROVEN**. The production
+`query-router.ts` path emits legacy ranked cards (`source_ref`, snippet, score, feature label), and
+`context-assembler.ts` maps those into legacy ACE context before attaching its legacy ContextManifest.
+No production caller connects that path to `buildAcePacketV3()` or
+`bridgeAcePacketsToContextManifestV1()`. The V3 builder and bridge have the needed fail-closed
+identity/checksum rules, but remain contract/composer/test surfaces rather than a live producer.
+
+The existing BitFrost writer also has identity/revision/checksum rejection, but it requires the caller
+to supply `embedAllowedPacketKeys`; no admitted packet-key-set owner is wired. The daily ACE step
+only counts `embed_allowed` rows and records a receipt. The local V3 composition report has 15,732
+packets, zero CURRENT semantic/topology sections, and 15,732 PENDING residency sections because
+representation provenance and other current evidence are unavailable. It does not close the live
+producer gate.
+
+Receipt: `docs/reports/ace-producer-trace-01-v2-20260929T043742Z.json`. No task checkbox was
+promoted. Do not start `ACE-BITFROST-CALLER-01` or its explicitly authorized write/readback canary
+until the production source owner and admitted allowed-key derivation are proven.
+The isolated V3 packet suite passed 13/13, and the bridge plus BitFrost guard suites passed 33/33;
+these are contract fixtures only and do not change the production-wiring disposition.
+
 ### ORDINAL-LINEAGE-02 — audit verification and legacy identity trace (2026-09-28)
 
 `ORDINAL-AUDIT-VERIFY-01` is complete as a read-only predicate audit. The audit now verifies the
@@ -11148,8 +11207,93 @@ schemes) not fixable by adding fields to any packet contract. Full per-predicate
 recorded in this session's chat; not duplicated here in full to avoid drift from the live
 regenerated report at `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-29.json`.
 
-Committed `95cd026434` on `handoff/summary-enrichment-lineage-20260925` (pushed). Next queued per
-external review: `GRAPHIFY-BINDING-01` (trace whether `writeGraphifySourceInventoryV2` can consume
-admitted execution-membership bindings as input authority, rather than current-worktree bytes --
-4 worktree files are already known to differ from the admitted snapshot) before any Graphify
-refresh is attempted for the 196-packet cohort this session already lineage-repaired.
+Committed `95cd026434` on `handoff/summary-enrichment-lineage-20260925` (pushed). `GRAPHIFY-BINDING-01`
+read-only trace is now complete: all 24,456 admitted root execution-member rows exactly match
+`atlas_workspace_source_bindings` on source ref, workspace/source revision, normalized content
+digest, and byte length; root ordinals are unique/contiguous. However, zero `graphify_files` rows
+are bound to the admitted workspace revision or identify the native snapshot run. The current
+`writeGraphifySourceInventoryV2` per-file input requires Git-backed workspace metadata; the
+sealed-snapshot binder only binds run-level metadata. Therefore the next implementation must be
+an additive snapshot-backed input path inside the existing Graphify writer, with an exact bounded
+target manifest and readback. Do not derive admitted source bytes from the current worktree, infer
+Git OIDs, or create a second writer. No DB writes were made by this census.
+
+The fresh fabric audit is 4 `PASS`, 4 `PARTIAL_PROVEN`, 3 `NOT_PROVEN` (seven below `PASS`). The
+audit script's `ACE_EVIDENCE_GROUNDED` note was also corrected: it now distinguishes a zero-row
+`ace_context_sources` table from a populated table whose individual evidence still needs grounding.
+This is a reporting correction only; it does not change the predicate verdict or authorize ACE,
+Graphify, cache, projection, or schema writes.
+
+Follow-up read-only ACE store reconciliation found `ace_context_cache=2` (both legacy
+`feature_map_store` entries), `ace_context_packets=0`, `ace_context_sources=0`, and no
+`public.llm_context_cache`, although Drizzle declares that relation and
+`ace-context-pack-cache.ts::persistAceContextPackAuditRow()` targets it. The two existing cached
+JSON objects contain no source/workspace revision, source-ref list, or ContextManifest checksum,
+so they do not satisfy `ACE_EVIDENCE_GROUNDED`. The pointer writer also previously classified any
+fulfilled Postgres promise as a successful write even when this function returned `null`;
+`classifyAceContextPackPointerSource()` now requires a non-null persisted key before reporting
+Postgres. Focused fixtures cover Postgres success, Redis fallback, and local fallback. This
+improves telemetry only; no cache, DB, or schema writes were made and the admission gate remains
+blocked. Before adding a migration or redirecting the writer, reconcile the intended Postgres
+cache/audit owner with the existing `ace_context_cache` contract.
+
+Fresh full fabric audit after the note correction: `docs/reports/graphify_928-audit-live-ace-store-fix/`
+(`2026-09-29T03:27:56.162Z`) returned 4 `PASS`, 4 `PARTIAL_PROVEN`, 3 `NOT_PROVEN`, overall
+`NOT_SAFE_TO_PROJECT`; `ace_context_sources.row_count=0` and the note now correctly states that.
+No graph projection or canonical write was attempted. The same seven below-PASS predicates
+remain; the ACE persistence telemetry fix does not alter gate status.
+
+### ACE-PRODUCER-TRACE-01 — first real (non-fixture) exercise of the packet→ContextManifest bridge (2026-09-29)
+
+Found before writing anything new: `bridgeAcePacketsToContextManifestV1()`
+(`sveltekit-frontend/src/lib/server/atlas/context/ace-packet-v3-context-manifest-bridge-v1.ts`) is a
+real, complete, well-tested pure function — the exact join this task asks for (selected candidate
+ordinals → verified `AcePacketV3` evidence → `ContextManifest` admission receipt, with strict
+packet_key/source_ref/source_revision/workspace_revision equality checks and a mixed-revision
+guard) — but it had **zero callers anywhere in the repo outside its own `.spec.ts`** (checked via
+grep across `sveltekit-frontend/src` and all of `scripts/atlas`, `*.mjs`/`*.mts`). It had never been
+run against real data.
+
+Also found already real and already run: `scripts/atlas/compose-ace-packets-v3.mjs` composed
+15,732 real `AcePacketV3` packets on 2026-09-29 from the current admitted workspace revision
+(`sha256:e24bb971...`, matrix `.tmp/atlas/candidate-feature-matrix-v1/20260926T174833Z`, 0 verify
+failures, 0 cache-admission misses) — but nothing downstream ever consumed them either.
+
+Built `scripts/atlas/prove-ace-producer-trace-01-v1.mjs` (read-only, no DB/Valkey/Qdrant/Neo4j
+writes) to close that gap for real: it reads a real bounded cohort of `REVISION_QUALIFIED` rows
+from the actual admitted ordinal map, locates each row's actual composed packet in the actual
+composer output (not a fixture), independently re-verifies each packet via `verifyAcePacketV3`
+(not trusting the composer's own self-check), materializes a fresh real
+`CandidateOrdinalMapV1`/`CandidateFeatureSnapshotV1` over just that cohort via the existing
+`materializeCandidateOrdinalMap`/`materializeCandidateFeatureSnapshot` owners (no new schema, no
+second materializer), then calls `bridgeAcePacketsToContextManifestV1()` for the first time ever
+against real packets instead of hand-built fixtures.
+
+**Result: `ACE_PRODUCER_CHAIN_REAL_TRACE_PROVEN`** at both N=5 and N=200 (`docs/reports/ace-producer-trace-01-v1.json`,
+latest run N=200). Every step passed: real ordinal-map read (16,151 rows, 15,732 revision-qualified),
+real packet located for 100% of the selected cohort, independent packet verification, fresh
+snapshot materialization, and a successful bridge call producing a real
+`contextManifestIdentityChecksum`. `representationRevision`/`graphRevision` both correctly stayed
+`null` in the receipt — the composed packets' semantic/topology sections are `HINT`, never
+`CURRENT` (per `compose-ace-packets-v3.mjs`'s own `whyNotCurrent` list: no real
+`representation_revision`, no SOM revision, contaminated summaries), and the bridge's
+non-promotion guard correctly refused to fabricate a `CURRENT` revision from `HINT` evidence.
+
+**What this proves and what it does not**: this proves the identity-join contract (packet ↔
+candidate row ↔ ContextManifest admission) is real, wired, and correct for a live cohort — not
+just fixture-shaped. It does **not** prove semantic/topology readiness (those stay `HINT`/`PENDING`
+until `SEMANTIC_OWNER_PROVEN` and a real SOM revision exist — separate, already-tracked gaps), and
+it performs no BitFrost write — `ACE-BITFROST-CALLER-01`/`ACE-BITFROST-CANARY-01` remain the next,
+separately-gated steps per this file's existing implementation order and per root `CLAUDE.md`'s
+"Remaining implementation order" §3-5.
+
+**Reconciliation with the concurrent "ACE-PRODUCER-TRACE-01 — current source recheck" entry
+above (same date):** that recheck's `BLOCKED_NOT_PROVEN` verdict answers a stricter, distinct
+question — whether the *live retrieval path* (`query-router.ts` → `context-assembler.ts`) calls
+`buildAcePacketV3()`/the bridge in production. It does not, and this run does not change that:
+zero production request-serving code was touched here, and this receipt does not promote any task
+checkbox. What this run adds is narrower: proof that the bridge *contract itself* is correct when
+exercised against real (not fixture) packets and a real admitted cohort, not just its own unit
+tests. Both dispositions stand side by side: mechanism-correct-on-real-data (this entry) AND
+not-yet-wired-into-production-retrieval (the recheck above). Do not cite this entry as closing
+`ACE-PRODUCER-TRACE-01` — the recheck's `BLOCKED_NOT_PROVEN` remains the governing status.
