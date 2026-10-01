@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import {
   redisGetRevisionedAcePacketV1,
   redisSetRevisionedAcePacketV1,
@@ -16,15 +15,9 @@ import {
   deriveTokenMapCartridgePayloadFromAcePacket,
   persistTokenMapCartridge,
 } from '$lib/server/token-map/token-map-service.js';
+import { aceStreamRequestV1Schema } from '$lib/server/ace/ace-stream-request-v1.js';
 
 const execAsync = promisify(exec);
-
-const postSchema = z.object({
-  query: z.string().min(1),
-  // Supplied by the canonical SearchRuntime/ContextManifest handoff. A
-  // missing value keeps this route in uncached diagnostic mode.
-  aceCacheIdentity: z.unknown().optional(),
-});
 
 function makeRequestFromUrl(url: URL) {
   const query = url.searchParams.get('q') ?? url.searchParams.get('query') ?? '';
@@ -104,12 +97,12 @@ export async function POST({ request, locals }) {
     return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const parsed = postSchema.safeParse(body);
+  const parsed = aceStreamRequestV1Schema.safeParse(body);
   if (!parsed.success) {
     return new Response(JSON.stringify({ error: 'Invalid input parameters', details: parsed.error.format() }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const { query, aceCacheIdentity } = parsed.data;
+  const { query } = parsed.data;
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -121,7 +114,10 @@ export async function POST({ request, locals }) {
       
       const cacheKey = hashQuery(query);
       const queryHash = cacheKey.split(':').pop() ?? `query-${Date.now()}`;
-      const cacheAdmission = admitAceRouteCacheIdentityV1(aceCacheIdentity, cacheKey);
+      // Do not accept a cache identity from client JSON. The live route still
+      // assembles a legacy packet; revisioned BitFrost access remains blocked
+      // until a server-owned admitted ContextManifest/V3 bridge is connected.
+      const cacheAdmission = admitAceRouteCacheIdentityV1(undefined, cacheKey);
 
       // ── Atlas-tools preamble (classify intent + RAG context) ─────────────────
       // Runs in parallel with cache lookup. Fails silently — stream continues.

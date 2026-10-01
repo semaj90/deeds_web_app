@@ -4,6 +4,7 @@
   "standalone_embedding_model": false,
   "query_text_capable": false,
   "input_representation": "semantic_768",
+  "input_authority_status": "HISTORICAL_CONTENT_EMBEDDING_COLUMN_UNQUALIFIED_AS_CANONICAL_SEMANTIC_768",
   "output_representation": "latent_256",
   "base_embedding_model": "embeddinggemma",
   "representation_taxonomy": {
@@ -40,7 +41,7 @@
     "encoder_only_fp16_estimate": 788736
   },
   "training": {
-    "corpus": "codebase_chunk_index.content_embedding, 55169 rows, all eligible",
+    "corpus": "codebase_chunk_index.content_embedding, 55169 historical rows; canonical source/model/tokenizer lineage not proven",
     "epochs": 50,
     "split_policy": "SOURCE_REF_GROUPED_V1 (0 source overlap between train/val)",
     "device": "NVIDIA GeForce RTX 3060 Ti (CUDA required, fail-closed)",

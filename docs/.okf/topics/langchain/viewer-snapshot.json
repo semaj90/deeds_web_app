@@ -1,10 +1,10 @@
 {
   "schema": "atlas.local-doc-chunk-snapshot-pointer.v1",
-  "corpusId": "langchain-docs-python-core",
-  "runId": "20260926T232349097Z",
-  "chunksPath": ".tmp/atlas/langchain-doc-corpus-v1/20260926T232349097Z/chunks-v1-streaming/chunks.jsonl",
-  "receiptPath": ".tmp/atlas/langchain-doc-corpus-v1/20260926T232349097Z/chunks-v1-streaming/receipt.json",
-  "chunkManifestSha256": "sha256:b1feae501c9e28a3147d1ec4f73d09d3d59bcccd986133411ebb0afc7201f121",
+  "corpusId": "langchain-docs-typescript-core",
+  "runId": "20260930T183106601Z",
+  "chunksPath": ".tmp/atlas/langchain-doc-corpus-v1/20260930T183106601Z/chunks-v1-multilang/chunks.jsonl",
+  "receiptPath": ".tmp/atlas/langchain-doc-corpus-v1/20260930T183106601Z/chunks-v1-multilang/receipt.json",
+  "chunkManifestSha256": "sha256:a06be0a66430164f3e0b811675e48a33bc25dca32fa31a065b33c59c7c85e275",
   "canonicalAuthority": false,
   "artifactOnly": true
 }

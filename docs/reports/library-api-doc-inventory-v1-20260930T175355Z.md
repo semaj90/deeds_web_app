@@ -1,0 +1,722 @@
+# Library API documentation inventory
+
+- Captured: 2026-09-30T17:53:55.007Z
+- Repository scope: `.`
+- Catalog sources / official URL candidates: 28 / 70
+- Package manifests: 324
+- Unique declared npm packages: 510
+- Other-language manifests: 215
+- Runtime-loaded / production-called status: not probed
+- This report is inventory evidence only; it does not establish install, use, support, or canonical identity.
+
+## Documentation mapping gaps
+
+- `@adobe/css-tools` — no catalog source mapped
+- `@ai-sdk/anthropic` — no catalog source mapped
+- `@ai-sdk/deepinfra` — no catalog source mapped
+- `@ai-sdk/fireworks` — no catalog source mapped
+- `@ai-sdk/google` — no catalog source mapped
+- `@ai-sdk/google-vertex` — no catalog source mapped
+- `@ai-sdk/groq` — no catalog source mapped
+- `@ai-sdk/openai` — no catalog source mapped
+- `@ai-sdk/openai-compatible` — no catalog source mapped
+- `@ai-sdk/xai` — no catalog source mapped
+- `@anthropic-ai/claude-agent-sdk` — no catalog source mapped
+- `@anthropic-ai/sdk` — no catalog source mapped
+- `@astrojs/mdx` — no catalog source mapped
+- `@astrojs/rss` — no catalog source mapped
+- `@astrojs/sitemap` — no catalog source mapped
+- `@aws-sdk/client-s3` — no catalog source mapped
+- `@axe-core/playwright` — no catalog source mapped
+- `@babel/code-frame` — no catalog source mapped
+- `@babel/core` — no catalog source mapped
+- `@babel/generator` — no catalog source mapped
+- `@babel/parser` — no catalog source mapped
+- `@babel/traverse` — no catalog source mapped
+- `@babel/types` — no catalog source mapped
+- `@babylonjs/core` — no catalog source mapped
+- `@babylonjs/gui` — no catalog source mapped
+- `@babylonjs/loaders` — no catalog source mapped
+- `@babylonjs/materials` — no catalog source mapped
+- `@better-auth/api-key` — no catalog source mapped
+- `@bufbuild/protobuf` — no catalog source mapped
+- `@bull-board/api` — no catalog source mapped
+- `@bull-board/express` — no catalog source mapped
+- `@changesets/cli` — no catalog source mapped
+- `@chromatic-com/storybook` — no catalog source mapped
+- `@clack/prompts` — no catalog source mapped
+- `@clickhouse/client` — no catalog source mapped
+- `@cloudflare/vite-plugin` — no catalog source mapped
+- `@deeds/atlas-contracts` — no catalog source mapped
+- `@deeds/atlas-core` — no catalog source mapped
+- `@deeds/atlas-orchestrator` — no catalog source mapped
+- `@deeds/parent-atlas` — no catalog source mapped
+- `@deeds/parent-atlas-core` — no catalog source mapped
+- `@deeds/parent-atlas-retrieval` — no catalog source mapped
+- `@derekstride/tree-sitter-sql` — no catalog source mapped
+- `@dqbd/tiktoken` — no catalog source mapped
+- `@duckdb/node-api` — no catalog source mapped
+- `@e2b/code-interpreter` — no catalog source mapped
+- `@emnapi/runtime` — no catalog source mapped
+- `@eslint/compat` — no catalog source mapped
+- `@eslint/js` — no catalog source mapped
+- `@fortawesome/fontawesome-free` — no catalog source mapped
+- `@google-cloud/storage` — no catalog source mapped
+- `@google/genai` — no catalog source mapped
+- `@grpc/grpc-js` — no catalog source mapped
+- `@grpc/proto-loader` — no catalog source mapped
+- `@huggingface/transformers` — no catalog source mapped
+- `@iconify-json/heroicons` — no catalog source mapped
+- `@iconify-json/lucide` — no catalog source mapped
+- `@internationalized/date` — no catalog source mapped
+- `@jest/globals` — no catalog source mapped
+- `@julr/unocss-preset-forms` — no catalog source mapped
+- `@jupyterlab/builder` — no catalog source mapped
+- `@langchain/community` — no catalog source mapped
+- `@langchain/langgraph-checkpoint` — no catalog source mapped
+- `@langchain/langgraph-checkpoint-postgres` — no catalog source mapped
+- `@langchain/langgraph-sdk` — no catalog source mapped
+- `@langchain/ollama` — no catalog source mapped
+- `@langchain/openai` — no catalog source mapped
+- `@langchain/textsplitters` — no catalog source mapped
+- `@lhci/cli` — no catalog source mapped
+- `@lucia-auth/adapter-drizzle` — no catalog source mapped
+- `@lucide/svelte` — no catalog source mapped
+- `@lumino/widgets` — no catalog source mapped
+- `@mapbox/node-pre-gyp` — no catalog source mapped
+- `@mastra/core` — no catalog source mapped
+- `@mastra/pg` — no catalog source mapped
+- `@mastra/redis` — no catalog source mapped
+- `@mcp-ui/server` — no catalog source mapped
+- `@mendable/firecrawl-js` — no catalog source mapped
+- `@mendable/firecrawl-rs` — no catalog source mapped
+- `@modelcontextprotocol/inspector` — no catalog source mapped
+- `@mozilla/readability` — no catalog source mapped
+- `@msgpack/msgpack` — no catalog source mapped
+- `@napi-rs/cli` — no catalog source mapped
+- `@next/eslint-plugin-next` — no catalog source mapped
+- `@node-rs/argon2` — no catalog source mapped
+- `@opencode-ai/plugin` — no catalog source mapped
+- `@opencode-ai/sdk` — no catalog source mapped
+- `@openrouter/ai-sdk-provider` — no catalog source mapped
+- `@opentelemetry/api` — no catalog source mapped
+- `@opentelemetry/auto-instrumentations-node` — no catalog source mapped
+- `@opentelemetry/sdk-metrics` — no catalog source mapped
+- `@opentelemetry/sdk-node` — no catalog source mapped
+- `@opentelemetry/sdk-trace-base` — no catalog source mapped
+- `@paralleldrive/cuid2` — no catalog source mapped
+- `@playwright/mcp` — no catalog source mapped
+- `@playwright/test` — no catalog source mapped
+- `@qdrant/qdrant-js` — no catalog source mapped
+- `@radix-ui/react-checkbox` — no catalog source mapped
+- `@radix-ui/react-collapsible` — no catalog source mapped
+- `@radix-ui/react-label` — no catalog source mapped
+- `@radix-ui/react-radio-group` — no catalog source mapped
+- `@radix-ui/react-slot` — no catalog source mapped
+- `@sentry/cli` — no catalog source mapped
+- `@sentry/core` — no catalog source mapped
+- `@sentry/node` — no catalog source mapped
+- `@storybook/addon-a11y` — no catalog source mapped
+- `@storybook/addon-docs` — no catalog source mapped
+- `@storybook/addon-svelte-csf` — no catalog source mapped
+- `@storybook/addon-vitest` — no catalog source mapped
+- `@storybook/sveltekit` — no catalog source mapped
+- `@sveltejs/adapter-node` — no catalog source mapped
+- `@sveltejs/adapter-static` — no catalog source mapped
+- `@sveltejs/adapter-vercel` — no catalog source mapped
+- `@sveltejs/mcp-server` — no catalog source mapped
+- `@sveltejs/vite-plugin-svelte` — no catalog source mapped
+- `@svitejs/changesets-changelog-github-compact` — no catalog source mapped
+- `@tailwindcss/forms` — no catalog source mapped
+- `@tailwindcss/language-server` — no catalog source mapped
+- `@tailwindcss/postcss` — no catalog source mapped
+- `@tailwindcss/typography` — no catalog source mapped
+- `@tailwindcss/vite` — no catalog source mapped
+- `@taplo/cli` — no catalog source mapped
+- `@testing-library/jest-dom` — no catalog source mapped
+- `@testing-library/svelte` — no catalog source mapped
+- `@tiptap/core` — no catalog source mapped
+- `@tiptap/extension-bubble-menu` — no catalog source mapped
+- `@tiptap/extension-collaboration` — no catalog source mapped
+- `@tiptap/extension-floating-menu` — no catalog source mapped
+- `@tiptap/extension-image` — no catalog source mapped
+- `@tiptap/extension-link` — no catalog source mapped
+- `@tiptap/extension-placeholder` — no catalog source mapped
+- `@tiptap/extension-underline` — no catalog source mapped
+- `@tiptap/pm` — no catalog source mapped
+- `@tiptap/starter-kit` — no catalog source mapped
+- `@tmcp/adapter-valibot` — no catalog source mapped
+- `@tmcp/transport-http` — no catalog source mapped
+- `@tmcp/transport-in-memory` — no catalog source mapped
+- `@tmcp/transport-stdio` — no catalog source mapped
+- `@tree-sitter-grammars/tree-sitter-lua` — no catalog source mapped
+- `@tree-sitter-grammars/tree-sitter-markdown` — no catalog source mapped
+- `@tree-sitter-grammars/tree-sitter-toml` — no catalog source mapped
+- `@tree-sitter-grammars/tree-sitter-yaml` — no catalog source mapped
+- `@tree-sitter-grammars/tree-sitter-zig` — no catalog source mapped
+- `@trpc/client` — no catalog source mapped
+- `@trpc/server` — no catalog source mapped
+- `@types/amqplib` — no catalog source mapped
+- `@types/bcryptjs` — no catalog source mapped
+- `@types/body-parser` — no catalog source mapped
+- `@types/bun` — no catalog source mapped
+- `@types/cheerio` — no catalog source mapped
+- `@types/chokidar` — no catalog source mapped
+- `@types/cors` — no catalog source mapped
+- `@types/culori` — no catalog source mapped
+- `@types/d3` — no catalog source mapped
+- `@types/dompurify` — no catalog source mapped
+- `@types/dotenv` — no catalog source mapped
+- `@types/escape-html` — no catalog source mapped
+- `@types/eslint` — no catalog source mapped
+- `@types/estree` — no catalog source mapped
+- `@types/express` — no catalog source mapped
+- `@types/express-ws` — no catalog source mapped
+- `@types/fabric` — no catalog source mapped
+- `@types/he` — no catalog source mapped
+- `@types/jest` — no catalog source mapped
+- `@types/jsdom` — no catalog source mapped
+- `@types/lodash` — no catalog source mapped
+- `@types/lokijs` — no catalog source mapped
+- `@types/minio` — no catalog source mapped
+- `@types/mocha` — no catalog source mapped
+- `@types/multer` — no catalog source mapped
+- `@types/node` — no catalog source mapped
+- `@types/nodemailer` — no catalog source mapped
+- `@types/pdf-parse` — no catalog source mapped
+- `@types/pg` — no catalog source mapped
+- `@types/plotly.js` — no catalog source mapped
+- `@types/react` — no catalog source mapped
+- `@types/react-dom` — no catalog source mapped
+- `@types/redis` — no catalog source mapped
+- `@types/sharp` — no catalog source mapped
+- `@types/supertest` — no catalog source mapped
+- `@types/tesseract.js` — no catalog source mapped
+- `@types/three` — no catalog source mapped
+- `@types/tough-cookie` — no catalog source mapped
+- `@types/user-agents` — no catalog source mapped
+- `@types/uuid` — no catalog source mapped
+- `@types/vscode` — no catalog source mapped
+- `@types/webgl2` — no catalog source mapped
+- `@types/ws` — no catalog source mapped
+- `@typescript-eslint/eslint-plugin` — no catalog source mapped
+- `@typescript-eslint/parser` — no catalog source mapped
+- `@typescript-eslint/types` — no catalog source mapped
+- `@typescript/native-preview` — no catalog source mapped
+- `@unocss/core` — no catalog source mapped
+- `@unocss/extractor-svelte` — no catalog source mapped
+- `@unocss/preset-attributify` — no catalog source mapped
+- `@unocss/preset-icons` — no catalog source mapped
+- `@unocss/preset-typography` — no catalog source mapped
+- `@unocss/preset-uno` — no catalog source mapped
+- `@unocss/preset-web-fonts` — no catalog source mapped
+- `@unocss/preset-wind` — no catalog source mapped
+- `@unocss/reset` — no catalog source mapped
+- `@unocss/svelte-scoped` — no catalog source mapped
+- `@unocss/transformer-directives` — no catalog source mapped
+- `@unocss/transformer-variant-group` — no catalog source mapped
+- `@unocss/vite` — no catalog source mapped
+- `@valibot/to-json-schema` — no catalog source mapped
+- `@vercel/analytics` — no catalog source mapped
+- `@vitejs/plugin-react` — no catalog source mapped
+- `@vitejs/plugin-react-swc` — no catalog source mapped
+- `@vitejs/plugin-rsc` — no catalog source mapped
+- `@vitest/browser` — no catalog source mapped
+- `@vitest/coverage-v8` — no catalog source mapped
+- `@vitest/ui` — no catalog source mapped
+- `@webgpu/types` — no catalog source mapped
+- `@xenova/transformers` — no catalog source mapped
+- `@xstate/svelte` — no catalog source mapped
+- `ai` — no catalog source mapped
+- `ajv` — no catalog source mapped
+- `ajv-formats` — no catalog source mapped
+- `amqplib` — no catalog source mapped
+- `ansi-to-html` — no catalog source mapped
+- `apache-arrow` — no catalog source mapped
+- `artillery` — no catalog source mapped
+- `assemblyscript` — no catalog source mapped
+- `astro` — no catalog source mapped
+- `async-mutex` — no catalog source mapped
+- `autoprefixer` — no catalog source mapped
+- `autumn-js` — no catalog source mapped
+- `axios` — no catalog source mapped
+- `bcryptjs` — no catalog source mapped
+- `better-auth` — no catalog source mapped
+- `better-sqlite3` — no catalog source mapped
+- `body-parser` — no catalog source mapped
+- `bootstrap` — no catalog source mapped
+- `bootstrap-icons` — no catalog source mapped
+- `boxen` — no catalog source mapped
+- `buffer` — no catalog source mapped
+- `bullmq` — no catalog source mapped
+- `cacheable-lookup` — no catalog source mapped
+- `chai` — no catalog source mapped
+- `chalk` — no catalog source mapped
+- `chart.js` — no catalog source mapped
+- `chartjs-adapter-date-fns` — no catalog source mapped
+- `chartjs-plugin-annotation` — no catalog source mapped
+- `cheerio` — no catalog source mapped
+- `chokidar` — no catalog source mapped
+- `class-variance-authority` — no catalog source mapped
+- `cli-progress` — no catalog source mapped
+- `clsx` — no catalog source mapped
+- `concurrently` — no catalog source mapped
+- `cors` — no catalog source mapped
+- `cross-env` — no catalog source mapped
+- `culori` — no catalog source mapped
+- `d3` — no catalog source mapped
+- `date-fns` — no catalog source mapped
+- `deepagents` — no catalog source mapped
+- `dexie` — no catalog source mapped
+- `diff` — no catalog source mapped
+- `dockerode` — no catalog source mapped
+- `dompurify` — no catalog source mapped
+- `dotenv` — no catalog source mapped
+- `drizzle-zod` — no catalog source mapped
+- `duckdb` — no catalog source mapped
+- `esbuild` — no catalog source mapped
+- `escape-html` — no catalog source mapped
+- `eslint` — no catalog source mapped
+- `eslint-config-prettier` — no catalog source mapped
+- `eslint-plugin-chai-friendly` — no catalog source mapped
+- `eslint-plugin-import` — no catalog source mapped
+- `eslint-plugin-jsx-a11y` — no catalog source mapped
+- `eslint-plugin-markdown` — no catalog source mapped
+- `eslint-plugin-no-unsanitized` — no catalog source mapped
+- `eslint-plugin-pnpm` — no catalog source mapped
+- `eslint-plugin-react` — no catalog source mapped
+- `eslint-plugin-react-hooks` — no catalog source mapped
+- `eslint-plugin-react-refresh` — no catalog source mapped
+- `eslint-plugin-regexp` — no catalog source mapped
+- `eslint-plugin-storybook` — no catalog source mapped
+- `eslint-plugin-svelte` — no catalog source mapped
+- `estree-walker` — no catalog source mapped
+- `express` — no catalog source mapped
+- `express-ws` — no catalog source mapped
+- `fast-check` — no catalog source mapped
+- `fastmcp` — no catalog source mapped
+- `firecrawl` — no catalog source mapped
+- `form-data` — no catalog source mapped
+- `foundationdb` — no catalog source mapped
+- `fuse.js` — no catalog source mapped
+- `geoip-country` — no catalog source mapped
+- `glob` — no catalog source mapped
+- `globals` — no catalog source mapped
+- `gpt-tokenizer` — no catalog source mapped
+- `gray-matter` — no catalog source mapped
+- `handlebars` — no catalog source mapped
+- `happy-dom` — no catalog source mapped
+- `he` — no catalog source mapped
+- `highlight.js` — no catalog source mapped
+- `html2canvas` — no catalog source mapped
+- `http-cookie-agent` — no catalog source mapped
+- `http-server` — no catalog source mapped
+- `husky` — no catalog source mapped
+- `idb` — no catalog source mapped
+- `idb-keyval` — no catalog source mapped
+- `inquirer` — no catalog source mapped
+- `ipaddr.js` — no catalog source mapped
+- `jb55/rotate-bits.h` — no catalog source mapped
+- `jest` — no catalog source mapped
+- `jimp` — no catalog source mapped
+- `joplin-turndown-plugin-gfm` — no catalog source mapped
+- `jscodeshift` — no catalog source mapped
+- `jsdom` — no catalog source mapped
+- `jsonc-parser` — no catalog source mapped
+- `jsonrepair` — no catalog source mapped
+- `jspdf` — no catalog source mapped
+- `katex` — no catalog source mapped
+- `knip` — no catalog source mapped
+- `koffi` — no catalog source mapped
+- `langfuse` — no catalog source mapped
+- `langsmith` — no catalog source mapped
+- `lint-staged` — no catalog source mapped
+- `lodash` — no catalog source mapped
+- `lodash-es` — no catalog source mapped
+- `lokijs` — no catalog source mapped
+- `lucia` — no catalog source mapped
+- `lucide-react` — no catalog source mapped
+- `lucide-svelte` — no catalog source mapped
+- `mammoth` — no catalog source mapped
+- `marked` — no catalog source mapped
+- `marked-katex-extension` — no catalog source mapped
+- `mdast` — no catalog source mapped
+- `mdsvex` — no catalog source mapped
+- `minimist` — no catalog source mapped
+- `minio` — no catalog source mapped
+- `mocha` — no catalog source mapped
+- `mode-watcher` — no catalog source mapped
+- `multer` — no catalog source mapped
+- `nanospinner` — no catalog source mapped
+- `nats` — no catalog source mapped
+- `neo4j-driver` — no catalog source mapped
+- `nes.css` — no catalog source mapped
+- `node-addon-api` — no catalog source mapped
+- `node-fetch` — no catalog source mapped
+- `node-gyp` — no catalog source mapped
+- `node-resolve-ts` — no catalog source mapped
+- `nodejs-whisper` — no catalog source mapped
+- `nodemailer` — no catalog source mapped
+- `np` — no catalog source mapped
+- `npm-run-all` — no catalog source mapped
+- `npm-run-all2` — no catalog source mapped
+- `ollama` — no catalog source mapped
+- `ollama-ai-provider-v2` — no catalog source mapped
+- `onnxruntime-web` — no catalog source mapped
+- `openwiki` — no catalog source mapped
+- `ora` — no catalog source mapped
+- `oslo` — no catalog source mapped
+- `oxlint` — no catalog source mapped
+- `p-limit` — no catalog source mapped
+- `p-queue` — no catalog source mapped
+- `p-retry` — no catalog source mapped
+- `parse-diff` — no catalog source mapped
+- `parse5` — no catalog source mapped
+- `pathe` — no catalog source mapped
+- `pdf-lib` — no catalog source mapped
+- `pdf-parse` — no catalog source mapped
+- `pdfjs-dist` — no catalog source mapped
+- `picocolors` — no catalog source mapped
+- `piper-wasm` — no catalog source mapped
+- `playwright` — no catalog source mapped
+- `plotly.js` — no catalog source mapped
+- `postcss` — no catalog source mapped
+- `postcss-preset-env` — no catalog source mapped
+- `postcss-safe-parser` — no catalog source mapped
+- `postgres` — no catalog source mapped
+- `prettier` — no catalog source mapped
+- `prettier-plugin-astro` — no catalog source mapped
+- `prettier-plugin-svelte` — no catalog source mapped
+- `prettier-plugin-tailwindcss` — no catalog source mapped
+- `prom-client` — no catalog source mapped
+- `protobufjs` — no catalog source mapped
+- `protobufjs-cli` — no catalog source mapped
+- `proxy-chain` — no catalog source mapped
+- `publint` — no catalog source mapped
+- `puppeteer` — no catalog source mapped
+- `rate-limiter-flexible` — no catalog source mapped
+- `react` — no catalog source mapped
+- `react-dom` — no catalog source mapped
+- `react-server-dom-webpack` — no catalog source mapped
+- `redlock` — no catalog source mapped
+- `rehype-highlight` — no catalog source mapped
+- `rehype-katex` — no catalog source mapped
+- `rehype-stringify` — no catalog source mapped
+- `remark` — no catalog source mapped
+- `remark-breaks` — no catalog source mapped
+- `remark-gfm` — no catalog source mapped
+- `remark-html` — no catalog source mapped
+- `remark-math` — no catalog source mapped
+- `remark-mdx` — no catalog source mapped
+- `remark-parse` — no catalog source mapped
+- `remark-rehype` — no catalog source mapped
+- `resend` — no catalog source mapped
+- `response-time` — no catalog source mapped
+- `rimraf` — no catalog source mapped
+- `robots-parser` — no catalog source mapped
+- `sade` — no catalog source mapped
+- `sass` — no catalog source mapped
+- `sharp` — no catalog source mapped
+- `shell-quote` — no catalog source mapped
+- `socket.io-client` — no catalog source mapped
+- `storybook` — no catalog source mapped
+- `stripe` — no catalog source mapped
+- `supertest` — no catalog source mapped
+- `svelte-check` — no catalog source mapped
+- `svelte-dnd-action` — no catalog source mapped
+- `svelte-eslint-parser` — no catalog source mapped
+- `svelte-language-server` — no catalog source mapped
+- `svelte-preprocess` — no catalog source mapped
+- `svelte-sonner` — no catalog source mapped
+- `svelte-tiptap` — no catalog source mapped
+- `sveltekit-superforms` — no catalog source mapped
+- `systeminformation` — no catalog source mapped
+- `tailwind-merge` — no catalog source mapped
+- `tailwind-variants` — no catalog source mapped
+- `tailwindcss` — no catalog source mapped
+- `tailwindcss-animate` — no catalog source mapped
+- `tesseract.js` — no catalog source mapped
+- `three` — no catalog source mapped
+- `tldts` — no catalog source mapped
+- `tmcp` — no catalog source mapped
+- `tough-cookie` — no catalog source mapped
+- `tree-kill` — no catalog source mapped
+- `tree-sitter-bash` — no catalog source mapped
+- `tree-sitter-c` — no catalog source mapped
+- `tree-sitter-cpp` — no catalog source mapped
+- `tree-sitter-css` — no catalog source mapped
+- `tree-sitter-elixir` — no catalog source mapped
+- `tree-sitter-go` — no catalog source mapped
+- `tree-sitter-haskell` — no catalog source mapped
+- `tree-sitter-java` — no catalog source mapped
+- `tree-sitter-javascript` — no catalog source mapped
+- `tree-sitter-kotlin` — no catalog source mapped
+- `tree-sitter-php` — no catalog source mapped
+- `tree-sitter-python` — no catalog source mapped
+- `tree-sitter-ruby` — no catalog source mapped
+- `tree-sitter-rust` — no catalog source mapped
+- `tree-sitter-scala` — no catalog source mapped
+- `tree-sitter-scss` — no catalog source mapped
+- `tree-sitter-swift` — no catalog source mapped
+- `tree-sitter-typescript` — no catalog source mapped
+- `ts-blank-space` — no catalog source mapped
+- `ts-jest` — no catalog source mapped
+- `ts-morph` — no catalog source mapped
+- `ts-node` — no catalog source mapped
+- `ts-prune` — no catalog source mapped
+- `tsc-watch` — no catalog source mapped
+- `tsdown` — no catalog source mapped
+- `tslib` — no catalog source mapped
+- `tsup` — no catalog source mapped
+- `tsx` — no catalog source mapped
+- `turndown` — no catalog source mapped
+- `tw-animate-css` — no catalog source mapped
+- `typescript-7` — no catalog source mapped
+- `typescript-eslint` — no catalog source mapped
+- `typescript-event-target` — no catalog source mapped
+- `typescript-language-server` — no catalog source mapped
+- `undici` — no catalog source mapped
+- `undici-types` — no catalog source mapped
+- `unified` — no catalog source mapped
+- `unist-util-visit` — no catalog source mapped
+- `unocss` — no catalog source mapped
+- `user-agents` — no catalog source mapped
+- `uuid` — no catalog source mapped
+- `valibot` — no catalog source mapped
+- `vinext` — no catalog source mapped
+- `vite` — no catalog source mapped
+- `vite-plugin-devtools-json` — no catalog source mapped
+- `vitest` — no catalog source mapped
+- `vitest-browser-svelte` — no catalog source mapped
+- `vscode-langservers-extracted` — no catalog source mapped
+- `web-push` — no catalog source mapped
+- `web-tree-sitter` — no catalog source mapped
+- `winston` — no catalog source mapped
+- `wrangler` — no catalog source mapped
+- `ws` — no catalog source mapped
+- `xml2js` — no catalog source mapped
+- `xstate` — no catalog source mapped
+- `yaml` — no catalog source mapped
+- `youtube-transcript` — no catalog source mapped
+- `zimmerframe` — no catalog source mapped
+- `zod-to-json-schema` — no catalog source mapped
+
+## Additional language manifests
+
+- `.parent-atlas/skills/claim-verifier/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.parent-atlas/skills/file-repair/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.parent-atlas/skills/graph-evidence/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.parent-atlas/skills/semantic-search/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/langextract-1.6-probe/Lib/site-packages/pandas/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/.parent-atlas/skills/claim-verifier/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/.parent-atlas/skills/file-repair/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/.parent-atlas/skills/graph-evidence/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/.parent-atlas/skills/semantic-search/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/cmd/agent-sidecar/go.mod` (go) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/crates/atlas_packet_parser/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/crates/omni-bridge/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/crates/turbovec-napi/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/docker/atlas-gpu-8098/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/docker/docling-vlm/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/docker/image-synthesis/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/docker/langgraph-synthesis/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/go-retrieval-classifier/go.mod` (go) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/services/go-embedding-service/go.mod` (go) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/services/go-retrieval-service/go.mod` (go) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/services/go-search-service/go.mod` (go) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/simd-bridge/rust-simdjson/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/simd-bridge/rust/graph-engine/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/merge-validation-20260912/simd-bridge/rust/hmm-repair/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/.parent-atlas/skills/claim-verifier/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/.parent-atlas/skills/file-repair/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/.parent-atlas/skills/graph-evidence/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/.parent-atlas/skills/semantic-search/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/crates/atlas_packet_parser/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/crates/omni-bridge/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/crates/turbovec-napi/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/simd-bridge/rust-simdjson/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/simd-bridge/rust/graph-engine/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/simd-bridge/rust/hmm-repair/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/turbovec/turbovec-python/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/turbovec/turbovec-python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36/turbovec/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/.parent-atlas/skills/claim-verifier/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/.parent-atlas/skills/file-repair/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/.parent-atlas/skills/graph-evidence/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/.parent-atlas/skills/semantic-search/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/crates/atlas_packet_parser/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/crates/omni-bridge/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/crates/turbovec-napi/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/simd-bridge/rust-simdjson/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/simd-bridge/rust/graph-engine/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/simd-bridge/rust/hmm-repair/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/turbovec/turbovec-python/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/turbovec/turbovec-python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320/turbovec/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/.parent-atlas/skills/claim-verifier/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/.parent-atlas/skills/file-repair/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/.parent-atlas/skills/graph-evidence/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/.parent-atlas/skills/semantic-search/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/crates/atlas_packet_parser/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/crates/omni-bridge/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/crates/turbovec-napi/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/simd-bridge/rust-simdjson/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/simd-bridge/rust/graph-engine/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/simd-bridge/rust/hmm-repair/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/turbovec/turbovec-python/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/turbovec/turbovec-python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a/turbovec/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/.parent-atlas/skills/claim-verifier/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/.parent-atlas/skills/file-repair/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/.parent-atlas/skills/graph-evidence/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/.parent-atlas/skills/semantic-search/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/crates/atlas_packet_parser/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/crates/omni-bridge/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/crates/turbovec-napi/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/simd-bridge/rust-simdjson/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/simd-bridge/rust/graph-engine/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/simd-bridge/rust/hmm-repair/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/turbovec/turbovec-python/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/turbovec/turbovec-python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b/turbovec/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/.parent-atlas/skills/claim-verifier/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/.parent-atlas/skills/file-repair/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/.parent-atlas/skills/graph-evidence/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/.parent-atlas/skills/semantic-search/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/crates/atlas_packet_parser/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/crates/omni-bridge/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/crates/turbovec-napi/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/simd-bridge/rust-simdjson/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/simd-bridge/rust/graph-engine/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/simd-bridge/rust/hmm-repair/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/turbovec/turbovec-python/Cargo.toml` (rust) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/turbovec/turbovec-python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `.tmp/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34/turbovec/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `.venv/Lib/site-packages/pandas/pyproject.toml` (python-project) — explicit environment/version probe required
+- `Cargo.toml` (rust) — explicit environment/version probe required
+- `cmd/agent-sidecar/go.mod` (go) — explicit environment/version probe required
+- `crates/atlas_packet_parser/Cargo.toml` (rust) — explicit environment/version probe required
+- `crates/omni-bridge/Cargo.toml` (rust) — explicit environment/version probe required
+- `crates/turbovec-napi/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.parent-atlas/skills/claim-verifier/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.parent-atlas/skills/file-repair/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.parent-atlas/skills/graph-evidence/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.parent-atlas/skills/semantic-search/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/crates/atlas_packet_parser/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/crates/omni-bridge/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/crates/turbovec-napi/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/simd-bridge/rust-simdjson/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/simd-bridge/rust/graph-engine/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/simd-bridge/rust/hmm-repair/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/turbovec/turbovec-python/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/turbovec/turbovec-python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/turbovec/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/.parent-atlas/skills/claim-verifier/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/.parent-atlas/skills/file-repair/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/.parent-atlas/skills/graph-evidence/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/.parent-atlas/skills/semantic-search/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/crates/atlas_packet_parser/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/crates/omni-bridge/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/crates/turbovec-napi/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/simd-bridge/rust-simdjson/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/simd-bridge/rust/graph-engine/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/simd-bridge/rust/hmm-repair/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/turbovec/turbovec-python/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/turbovec/turbovec-python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8/turbovec/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/.parent-atlas/skills/claim-verifier/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/.parent-atlas/skills/file-repair/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/.parent-atlas/skills/graph-evidence/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/.parent-atlas/skills/semantic-search/pyproject.toml` (python-project) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/crates/atlas_packet_parser/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/crates/omni-bridge/Cargo.toml` (rust) — explicit environment/version probe required
+- `deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564/crates/turbovec-napi/Cargo.toml` (rust) — explicit environment/version probe required
+- `docker/atlas-gpu-8098/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `docker/docling-vlm/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `docker/image-synthesis/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `docker/langextract-optimized/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `docker/langgraph-synthesis/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `go-retrieval-classifier/go.mod` (go) — explicit environment/version probe required
+- `llama-cpp-turboquant-gemma4/examples/model-conversion/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `llama-cpp-turboquant-gemma4/gguf-py/pyproject.toml` (python-project) — explicit environment/version probe required
+- `llama-cpp-turboquant-gemma4/pyproject.toml` (python-project) — explicit environment/version probe required
+- `llama-cpp-turboquant-gemma4/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `llama-cpp-turboquant-gemma4/scripts/jinja/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `llama-cpp-turboquant-gemma4/scripts/snapdragon/qdc/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `llama-cpp-turboquant-gemma4/tools/mtmd/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `llama-cpp-turboquant-gemma4/tools/server/bench/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `llama-cpp-turboquant-gemma4/tools/server/tests/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `scripts/vlm-server/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `services/atlas-gpu-8098/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `services/go-agent-bridge/go.mod` (go) — explicit environment/version probe required
+- `services/go-codeintel-service/go.mod` (go) — explicit environment/version probe required
+- `services/go-embedding-service/go.mod` (go) — explicit environment/version probe required
+- `services/go-health-aggregator/go.mod` (go) — explicit environment/version probe required
+- `services/go-index-worker/go.mod` (go) — explicit environment/version probe required
+- `services/go-retrieval-service/go.mod` (go) — explicit environment/version probe required
+- `services/go-search-service/go.mod` (go) — explicit environment/version probe required
+- `services/rust-index-advisor/Cargo.toml` (rust) — explicit environment/version probe required
+- `services/topology-gpu/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `simd-bridge/rust-simdjson/Cargo.toml` (rust) — explicit environment/version probe required
+- `simd-bridge/rust/graph-engine/Cargo.toml` (rust) — explicit environment/version probe required
+- `simd-bridge/rust/hmm-repair/Cargo.toml` (rust) — explicit environment/version probe required
+- `tools/agentic-research/.venv/Lib/site-packages/litellm/proxy/enterprise/pyproject.toml` (python-project) — explicit environment/version probe required
+- `tools/agentic-research/.venv/Lib/site-packages/pandas/pyproject.toml` (python-project) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/.github/scripts/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/apps/api/native/Cargo.toml` (rust) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/apps/api/sharedLibs/go-html-to-md/go.mod` (go) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/apps/go-html-to-md-service/go.mod` (go) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/apps/go-sdk/go.mod` (go) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/apps/python-sdk/pyproject.toml` (python-project) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/apps/python-sdk/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/apps/rust-sdk/Cargo.toml` (rust) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/deep-research-apartment-finder/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/deepseek-v3-company-researcher/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/deepseek-v3-crawler/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/gemini-2.5-crawler/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/gemini-2.5-screenshot-editor/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/gemini-2.5-web-extractor/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/gpt-4.1-company-researcher/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/gpt-4.1-web-crawler/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/groq_web_crawler/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/hacker_news_scraper/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/llama-4-maverick-web-crawler/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/llama-4-maverick-web-extractor/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/o3-web-crawler/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/o4-mini-web-crawler/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/openai_swarm_firecrawl_web_extractor/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/openai_swarm_firecrawl/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/firecrawl/examples/sales_web_crawler/requirements.txt` (python-requirements) — explicit environment/version probe required
+- `tools/agentic-research/src/local-deep-research/pyproject.toml` (python-project) — explicit environment/version probe required
+- `turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `turbovec/turbovec-python/Cargo.toml` (rust) — explicit environment/version probe required
+- `turbovec/turbovec-python/pyproject.toml` (python-project) — explicit environment/version probe required
+- `turbovec/turbovec/Cargo.toml` (rust) — explicit environment/version probe required
+- `workers/requirements.txt` (python-requirements) — explicit environment/version probe required
+
+Full structured inventory: `library-api-doc-inventory-v1-20260930T175355Z.json`

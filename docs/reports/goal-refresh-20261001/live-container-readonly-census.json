@@ -1,0 +1,151 @@
+{
+  "schema": "atlas.goal-refresh.container-readonly-census.v1",
+  "observedAt": "2026-10-01T02:22:10Z",
+  "execution": {
+    "database": "legal_ai_db",
+    "serverVersion": "PostgreSQL 18.4",
+    "transport": "docker exec psql inside legal-ai-postgres",
+    "transaction": "BEGIN TRANSACTION READ ONLY; ROLLBACK",
+    "statementTimeout": "20s",
+    "writesPerformed": false,
+    "fullFabricAuditRefreshed": false,
+    "limitation": "Windows-to-container published port 127.0.0.1:5434 closes PostgreSQL connections; full host-side audit remains unavailable.",
+    "latestFullAuditAttempt": {
+      "observedAt": "2026-10-01T02:49:39Z",
+      "command": "node scripts/atlas/audit-canonical-projection-fabric.mjs",
+      "result": "FAILED_BEFORE_AUDIT",
+      "error": "Connection terminated unexpectedly while acquiring a PostgreSQL client from pg-pool.",
+      "writesPerformed": false,
+      "interpretation": "The saved 2026-10-01T00:25:29.690Z audit remains the latest complete gate result; this failed connection attempt does not refresh predicate state."
+    },
+    "transportProbe": {
+      "containerStatus": "running",
+      "containerAddress": "172.18.0.12:5432",
+      "publishedPort": "0.0.0.0:5434 and [::]:5434",
+      "hostTcpProbe": "connects",
+      "hostListenerProcesses": ["wslrelay", "com.docker.backend"],
+      "hostPsqlResult": "server closed the connection unexpectedly before authentication",
+      "directContainerIpProbe": "172.18.0.12:5432 is not routable from Windows; TCP probe failed and psql timed out",
+      "containerPgIsReady": "accepting connections",
+      "postgresLogsForProbe": "no connection/error entries observed in the inspected interval",
+      "serverReadOnlySettings": {
+        "listenAddresses": "*",
+        "port": 5432,
+        "hostRules": ["127.0.0.1 trust", "::1 trust", "all other hosts md5"],
+        "logConnections": false
+      },
+      "latestProbes": {
+        "observedAt": "2026-10-01T02:55:17Z",
+        "dockerPgIsReady": "accepting connections",
+        "windowsIPv4Psql": "server closed connection unexpectedly",
+        "windowsIPv6Psql": "server closed connection unexpectedly",
+        "wslTcpToWindowsPublishedPort": "connects",
+        "wslTcpToContainerIp": "connects",
+        "wslPostgresProtocolToContainerIp": "timed out",
+        "recentPgStatActivity": "No client backend from the failed host/WSL probes was observed"
+      },
+      "interpretation": "PostgreSQL is listening on all interfaces with a matching host HBA rule and is healthy in-container. TCP reachability exists, but Docker Desktop host/WSL forwarding does not complete PostgreSQL protocol. Docker's backend is the documented port-forwarding path; exact failure cause remains unproven. No restart or mapping change was attempted."
+    }
+  },
+  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "symbols": {
+    "reconciledAt": "2026-10-01T02:28:25Z",
+    "boundSources": 24456,
+    "supportedSources": 20750,
+    "excludedGeneratedArtifacts": 834,
+    "exactGraphifySources": 19595,
+    "processed": 18881,
+    "unprocessed": 704,
+    "parseFailed": 10,
+    "missingExactGraphifyRevision": 1155,
+    "exactRevisionSymbolRows": 73307,
+    "unprocessedOnDiskByteCensus": {
+      "drifted": 704,
+      "matching": 0,
+      "missing": 0,
+      "invalid": 0,
+      "readErrors": 0
+    },
+    "missingExactGraphifyByteCensus": {
+      "observedAt": "2026-10-01T02:38:38Z",
+      "inputRows": 1155,
+      "byInventoryStateAndBytes": {
+        "NO_GRAPHIFY_ROW|MATCH": 529,
+        "NO_GRAPHIFY_ROW|DRIFT": 80,
+        "NO_GRAPHIFY_ROW|MISSING": 7,
+        "OTHER_REVISION_ROW_ONLY|MATCH": 387,
+        "OTHER_REVISION_ROW_ONLY|DRIFT": 152
+      },
+      "totals": { "match": 916, "drift": 232, "missing": 7, "invalid": 0, "readErrors": 0 },
+      "readOnly": true,
+      "interpretation": "916 source files still match the admitted source digest but lack an exact Graphify inventory row; this is a candidate set for the existing inventory owner, not authorization to write. The remaining 239 require new admission, restoration, or typed exclusion."
+    },
+    "graphifyInventoryOwnerTrace": {
+      "owner": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts::writeGraphifySourceInventoryInTransactionV2",
+      "boundedSelectionSupported": true,
+      "requiresWorkspaceRevisionRecordAndCompleteBindings": true,
+      "productionCallerFound": false,
+      "currentAdmittedRecordFeasibility": "DIGEST_MISMATCH_INVESTIGATE_BEFORE_PROCEEDING",
+      "feasibilityEvidence": "docs/reports/graphify-binding-02-adapter-feasibility-v1.json recomputes 4cf21f7a... rather than admitted e24bb971...; PostgreSQL currently contains only 24,456 repo:root bindings and zero git_blob_oid values, while the sealed snapshot contains 25,542 sources across seven repositories.",
+      "qualification": "The 4cf21f7a feasibility result came from the Git-shaped WorkspaceRevisionRecord path; it does not prove the admitted sealed snapshot is incompatible.",
+      "sealedSnapshotRunBindingAdapter": {
+        "owner": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts::bindSealedSnapshotWorkspaceRevisionV1",
+        "present": true,
+        "scope": "Binds revision, source-manifest digest, and count to an already-open graphify_runs row; it does not insert graphify_files inventory rows.",
+        "selectionDigestUsedByRunBridge": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+        "selectionCount": 25542,
+        "selectionDigestMatchesExecutionStage": true,
+        "selectionCountMatchesExecutionMembership": true
+      },
+      "inventoryWriterInputGap": "The only located graphify_files inventory writer still accepts WorkspaceRevisionRecordV1 and Git-shaped WorkspaceSourceBindingV1 rows; the sealed-snapshot adapter is only a graphify_runs metadata binder. No bounded sealed-snapshot graphify_files writer/caller was proven.",
+      "admissionWriteAuthorization": {
+        "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
+        "authority": true,
+        "graphifyExecutionAuthorized": false,
+        "projectionWritesAuthorized": false,
+        "sourceCount": 25542,
+        "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      },
+      "checksumSemantics": "The source-selection stage checksum is the execution's source-selection artifact checksum. The tournament admission sourceSelectionChecksum hashes sorted identity keys only; they are distinct checksums and must not be treated as interchangeable.",
+      "applyAuthorized": false
+    },
+    "supersededMeasurement": {
+      "supportedSources": 21584,
+      "exactGraphifySources": 20425,
+      "processed": 19439,
+      "unprocessed": 975,
+      "parseFailed": 11,
+      "missingExactGraphifyRevision": 1159,
+      "reason": "Earlier query omitted the shared generated-artifact exclusion regex; 834 generated artifacts were counted as supported, including 271 UNPROCESSED rows."
+    },
+    "authority": "Read-only live SQL rerun inside legal-ai-postgres using the exact shared GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V1 from scripts/atlas/lib/graphify-symbol-candidate-selection-v1.mjs; counts match the saved fabric audit. A separate read-only disk hash census found all 704 remaining exact-revision UNPROCESSED files differ from the admitted source bytes."
+  },
+  "semantic768": {
+    "target": "codebase_chunk_index.content_embedding_768",
+    "populatedRows": 219998,
+    "rowsWithSourceRevision": 0,
+    "rowsWithWorkspaceRevision": 0,
+    "rowsWithRepresentationRevision": 0,
+    "rowsWithLineageProducerRevision": 0,
+    "rowsWithContentHash": 219998,
+    "rowsWithModelLabel": 219998,
+    "rowsWithEmbeddingVersion": 759,
+    "rowsWithDimension768": 219998,
+    "rowsMarkedNormalized": 219998,
+    "rowsWithMetadataModelRevision": 0,
+    "rowsWithTokenizerRevision": 0,
+    "rowsWithInputDigest": 0,
+    "rowsWithVectorDigest": 0,
+    "rowsWithMetadataProducerRevision": 0,
+    "dominantModelLabel": "embeddinggemma:latest",
+    "dominantModelLabelRows": 219239,
+    "authority": "Read-only live aggregate over rows where content_embedding_768 IS NOT NULL."
+  },
+  "otherGateContext": {
+    "latestSavedFabricAudit": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-01.json",
+    "latestSavedAuditGeneratedAt": "2026-10-01T00:25:29.690Z",
+    "latestSavedAuditPassCount": "5/11",
+    "note": "The saved overall gate result is NOT_SAFE_TO_PROJECT at 5/11 PASS. Symbol counts above have now been independently rerun live with the shared exclusion policy; the full fabric audit itself was not refreshed and remains NOT_SAFE_TO_PROJECT."
+  }
+}

@@ -357,8 +357,11 @@ else()
 endif()
 
 # ── Main addon sources ────────────────────────────────────────────────
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../native/atlas_core" "${CMAKE_CURRENT_BINARY_DIR}/atlas_core")
+
 set(ADDON_SOURCES
   binding.cc
+  ../../native/atlas_core/napi/atlas_core_napi.cpp
   native_execution_counters.cpp
   tensor_bridge.cc
   simdjson_bridge.cc
@@ -386,6 +389,7 @@ set_target_properties(tensorrt_bridge PROPERTIES PREFIX "" SUFFIX ".node")
 # ── Compile definitions ───────────────────────────────────────────────
 target_compile_definitions(tensorrt_bridge PRIVATE
   NAPI_DISABLE_CPP_EXCEPTIONS
+  ATLAS_CORE_NAPI_EMBEDDED=1
   BUILDING_NODE_EXTENSION
   NODE_GYP_MODULE_NAME=tensorrt_bridge
   SIMD_HAVE_CUDA=$<BOOL:${SIMD_HAVE_CUDA}>
@@ -410,7 +414,7 @@ if(SIMD_HAVE_CUTLASS)
 endif()
 
 # ── Link libraries ────────────────────────────────────────────────────
-target_link_libraries(tensorrt_bridge PRIVATE cuda_kernels)
+target_link_libraries(tensorrt_bridge PRIVATE cuda_kernels atlas_core)
 
 if(WIN32 AND EXISTS "${NODE_LIB}")
   target_link_libraries(tensorrt_bridge PRIVATE "${NODE_LIB}")

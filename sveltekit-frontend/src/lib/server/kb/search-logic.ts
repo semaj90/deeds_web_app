@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, createReadStream } from 'node:fs';
+import { existsSync, readFileSync, createReadStream, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { createInterface } from 'node:readline';
 import Fuse from 'fuse.js';
@@ -70,6 +70,41 @@ export interface NeighborExpansionResult {
   neighbors: Array<Card & { hop: number; via: string[] }>;
 }
 
+export const NOTECARD_CORPUS_MAX_BYTES = 64 * 1024 * 1024;
+export const NOTECARD_CORPUS_MAX_CARDS = 30_000;
+export const NOTECARD_LINE_MAX_BYTES = 256 * 1024;
+export const NOTECARD_RANK_MAX_BYTES = 4 * 1024 * 1024;
+export const NOTECARD_QUERY_MAX_CHARS = 512;
+export const NOTECARD_LIBRARY_MAX_RESULTS = 100;
+
+export function assertNotecardCorpusBoundsV1(input: {
+  byteLength: number;
+  cardCount: number;
+  lineBytes: number;
+}): void {
+  if (!Number.isSafeInteger(input.byteLength) || input.byteLength < 0) {
+    throw new RangeError('NOTECARD_CORPUS_INVALID_BYTE_LENGTH');
+  }
+  if (input.byteLength > NOTECARD_CORPUS_MAX_BYTES) {
+    throw new RangeError('NOTECARD_CORPUS_BYTE_LIMIT');
+  }
+  if (!Number.isSafeInteger(input.cardCount) || input.cardCount < 0 || input.cardCount > NOTECARD_CORPUS_MAX_CARDS) {
+    throw new RangeError('NOTECARD_CORPUS_CARD_LIMIT');
+  }
+  if (!Number.isSafeInteger(input.lineBytes) || input.lineBytes < 0 || input.lineBytes > NOTECARD_LINE_MAX_BYTES) {
+    throw new RangeError('NOTECARD_LINE_BYTE_LIMIT');
+  }
+}
+
+export function assertNotecardSearchInputV1(query: string, limit: number): void {
+  if (typeof query !== 'string' || query.length > NOTECARD_QUERY_MAX_CHARS) {
+    throw new RangeError('NOTECARD_QUERY_LENGTH_LIMIT');
+  }
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > NOTECARD_LIBRARY_MAX_RESULTS) {
+    throw new RangeError('NOTECARD_RESULT_LIMIT');
+  }
+}
+
 const ROOT = process.cwd(); // Assume we run from project root
 
 function normalizeText(value: unknown): string {
@@ -137,21 +172,37 @@ function matchesFilters(card: Card, filters?: SearchFilters): boolean {
   return true;
 }
 
-async function readAllNotecards(cardsPath: string): Promise<Card[]> {
-  const cards: Card[] = [];
-  const fileStream = createReadStream(cardsPath);
+async function* iterateNotecards(cardsPath: string): AsyncGenerator<Card> {
+  const byteLength = statSync(cardsPath).size;
+  assertNotecardCorpusBoundsV1({ byteLength, cardCount: 0, lineBytes: 0 });
+  if (byteLength === 0) return;
+  // Pin the stream to the preflight size so a concurrent append cannot exceed
+  // the admitted byte budget while the JSONL is being parsed.
+  const fileStream = createReadStream(cardsPath, { start: 0, end: byteLength - 1, highWaterMark: 64 * 1024 });
   const rl = createInterface({ input: fileStream, crlfDelay: Infinity });
+  let cardCount = 0;
 
   try {
     for await (const line of rl) {
-      if (!line.trim()) continue;
-      cards.push(JSON.parse(line) as Card);
+      const lineBytes = Buffer.byteLength(line, 'utf8') + 2; // conservatively include CRLF
+      if (!line.trim()) {
+        assertNotecardCorpusBoundsV1({ byteLength, cardCount, lineBytes });
+        continue;
+      }
+      assertNotecardCorpusBoundsV1({ byteLength, cardCount: cardCount + 1, lineBytes });
+      const card = JSON.parse(line) as Card;
+      cardCount++;
+      yield card;
     }
   } finally {
     rl.close();
     fileStream.destroy();
   }
+}
 
+async function readAllNotecards(cardsPath: string): Promise<Card[]> {
+  const cards: Card[] = [];
+  for await (const card of iterateNotecards(cardsPath)) cards.push(card);
   return cards;
 }
 
@@ -163,6 +214,8 @@ export async function searchNotecards(opts: SearchOptions): Promise<SearchResult
     rankPath  = join(ROOT, 'memory', 'kb', 'notecards', 'graph_file_cards.rank.json')
   } = opts;
 
+  assertNotecardSearchInputV1(query, limit);
+
   if (!existsSync(cardsPath)) {
     throw new Error(`Cards file not found: ${cardsPath}`);
   }
@@ -171,8 +224,10 @@ export async function searchNotecards(opts: SearchOptions): Promise<SearchResult
   let ranks: Record<string, number> = {};
   if (existsSync(rankPath)) {
     try {
-      const rankData = JSON.parse(readFileSync(rankPath, 'utf8'));
-      ranks = rankData.ranks || {};
+      if (statSync(rankPath).size <= NOTECARD_RANK_MAX_BYTES) {
+        const rankData = JSON.parse(readFileSync(rankPath, 'utf8'));
+        ranks = rankData.ranks || {};
+      }
     } catch {
       // ignore
     }
@@ -250,18 +305,7 @@ export async function getNotecardById(id: string, cardsPath?: string): Promise<C
   const path = cardsPath || join(ROOT, 'memory', 'kb', 'notecards', 'graph_file_cards.jsonl');
   if (!existsSync(path)) return null;
 
-  const fileStream = createReadStream(path);
-  const rl = createInterface({ input: fileStream, crlfDelay: Infinity });
-
-  for await (const line of rl) {
-    if (!line.trim()) continue;
-    const card = JSON.parse(line) as Card;
-    if (card.card_id === id) {
-      rl.close();
-      fileStream.destroy();
-      return card;
-    }
-  }
+  for await (const card of iterateNotecards(path)) if (card.card_id === id) return card;
   return null;
 }
 
@@ -270,22 +314,10 @@ export async function getNotecardBySourcePath(sourcePath: string, cardsPath?: st
   if (!existsSync(path)) return null;
 
   const needle = normalizeText(sourcePath);
-  const fileStream = createReadStream(path);
-  const rl = createInterface({ input: fileStream, crlfDelay: Infinity });
-
-  try {
-    for await (const line of rl) {
-      if (!line.trim()) continue;
-      const card = JSON.parse(line) as Card;
-      if (normalizeText(card.source_path) === needle || normalizeText(card.source_id) === needle) {
-        rl.close();
-        fileStream.destroy();
-        return card;
-      }
+  for await (const card of iterateNotecards(path)) {
+    if (normalizeText(card.source_path) === needle || normalizeText(card.source_id) === needle) {
+      return card;
     }
-  } finally {
-    rl.close();
-    fileStream.destroy();
   }
 
   return null;

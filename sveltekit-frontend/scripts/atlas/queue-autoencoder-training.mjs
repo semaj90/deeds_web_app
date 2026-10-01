@@ -1,19 +1,9 @@
 #!/usr/bin/env node
 /**
- * queue-autoencoder-training.mjs
- *
- * Queue Autoencoder training job.
- * Trains 768→64 compression AE for memory path embeddings.
- *
- * TODO: Implement full AE training orchestration via PyTorch worker pool
- * For now: stub that logs intent.
+ * Retired queue stub. There is no implemented AE job queue/worker behind this
+ * command; the former file printed “Job queued” without enqueuing anything.
  */
 
-console.log('🧠 Queueing Autoencoder training job...');
-console.log('   Input: 58K packet embeddings (768-dim)');
-console.log('   Output: 64-dim latent codes for memory efficiency');
-console.log('   Training: PyTorch MSE loss, Xavier init');
-console.log('   Storage: Models saved to models/autoencoder.pt');
-console.log('   Persist: latent codes → atlas_packets.ae_latent BYTEA');
-console.log('');
-console.log('✅ Job queued (stub)');
+console.error('AE_QUEUE_NOT_IMPLEMENTED: no autoencoder job was queued and no work was performed.');
+console.error('Do not use this command as training evidence. Resolve the canonical input/provenance and worker owner before implementing queue semantics.');
+process.exitCode = 78;

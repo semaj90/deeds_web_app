@@ -1,0 +1,7 @@
+{
+  "schema": "atlas.graphify-symbol-shards.v1",
+  "manifestChecksum": "sha256:bc98193c7a19de8b4d2ed7ba54fc598457373e678167931abdfb59a688b5a5bf",
+  "sourceCount": 0,
+  "shardSize": 250,
+  "shards": []
+}

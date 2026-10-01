@@ -1,0 +1,36 @@
+# CMake generated Testfile for 
+# Source directory: C:/Users/james/Videos/deeds-web-app/native/atlas_core
+# Build directory: C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/atlas_core
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.
+if(CTEST_CONFIGURATION_TYPE MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
+  add_test(atlas_core_c_abi_test "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/atlas_core/Debug/atlas_core_c_abi_test.exe")
+  set_tests_properties(atlas_core_c_abi_test PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;37;add_test;C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;0;")
+elseif(CTEST_CONFIGURATION_TYPE MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
+  add_test(atlas_core_c_abi_test "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/atlas_core/Release/atlas_core_c_abi_test.exe")
+  set_tests_properties(atlas_core_c_abi_test PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;37;add_test;C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;0;")
+elseif(CTEST_CONFIGURATION_TYPE MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
+  add_test(atlas_core_c_abi_test "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/atlas_core/MinSizeRel/atlas_core_c_abi_test.exe")
+  set_tests_properties(atlas_core_c_abi_test PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;37;add_test;C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;0;")
+elseif(CTEST_CONFIGURATION_TYPE MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
+  add_test(atlas_core_c_abi_test "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/atlas_core/RelWithDebInfo/atlas_core_c_abi_test.exe")
+  set_tests_properties(atlas_core_c_abi_test PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;37;add_test;C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;0;")
+else()
+  add_test(atlas_core_c_abi_test NOT_AVAILABLE)
+endif()
+if(CTEST_CONFIGURATION_TYPE MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
+  add_test(atlas_knn_c_abi_test "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/atlas_core/Debug/atlas_knn_c_abi_test.exe")
+  set_tests_properties(atlas_knn_c_abi_test PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;42;add_test;C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;0;")
+elseif(CTEST_CONFIGURATION_TYPE MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
+  add_test(atlas_knn_c_abi_test "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/atlas_core/Release/atlas_knn_c_abi_test.exe")
+  set_tests_properties(atlas_knn_c_abi_test PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;42;add_test;C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;0;")
+elseif(CTEST_CONFIGURATION_TYPE MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
+  add_test(atlas_knn_c_abi_test "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/atlas_core/MinSizeRel/atlas_knn_c_abi_test.exe")
+  set_tests_properties(atlas_knn_c_abi_test PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;42;add_test;C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;0;")
+elseif(CTEST_CONFIGURATION_TYPE MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
+  add_test(atlas_knn_c_abi_test "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/atlas_core/RelWithDebInfo/atlas_knn_c_abi_test.exe")
+  set_tests_properties(atlas_knn_c_abi_test PROPERTIES  _BACKTRACE_TRIPLES "C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;42;add_test;C:/Users/james/Videos/deeds-web-app/native/atlas_core/CMakeLists.txt;0;")
+else()
+  add_test(atlas_knn_c_abi_test NOT_AVAILABLE)
+endif()

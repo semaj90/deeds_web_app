@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.graphify-symbol-runtime-failure.v1",
+  "generatedAt": "2026-09-30T22:25:16.367Z",
+  "status": "EXECUTION_BLOCKED",
+  "apply": false,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "manifestPath": "docs/reports/graphify-symbol-baseline-freeze-20260930-v5.json",
+  "shardIndex": 1,
+  "datastoreWriteAttempted": false,
+  "datastoreWritesMayHaveOccurred": false,
+  "errorCode": null,
+  "error": "SYMBOL_PLAN_PRODUCERREVISION_MISMATCH"
+}

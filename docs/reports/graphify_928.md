@@ -1,15 +1,49 @@
-# Graphify / projection admission checklist — 2026-09-29
+# Graphify / projection admission checklist — updated 2026-09-30
+
+## Current structural-baseline result — 2026-09-30T16:28Z
+
+The fresh `atlas-canonical-projection-fabric-audit-2026-09-30.json` remains
+`NOT_SAFE_TO_PROJECT`, **4/11 PASS**. Symbol status coverage is now **18,850/21,584 (87.33%)**,
+up from 5,185 (24.02%). This is processed-source coverage, not raw symbol counts.
+
+The existing extractor visited all 14,531 frozen exact-byte members in 59 fixed shards. A final
+read-only current-producer sweep independently verified 13,195; 1,336 remain unresolved:
+589 identity conflicts, 297 resource deferrals, 443 stored-observation mismatches and seven
+failed members. Baseline seal remains false. The exact PostgreSQL manifest census has 13,665
+PROCESSED, 859 UNPROCESSED and seven PARSE_FAILED; 470 processed members are not current-producer
+readback-proven. Do not conflate these two measurements.
+
+Global exceptions remain 1,564 UNPROCESSED (859 manifest + 705 byte-drift), 1,159 missing exact
+Graphify revision rows, and 11 parse failures (four older + seven manifest). No admission
+predicate was relaxed, and no physical chunks, embeddings, projections or cache were populated.
+Ordinal coverage is unchanged at 14,564/16,151.
+
+See [execution and gap report](graphify-symbol-baseline-execution-20260930.md) and the machine
+gap census in `graphify-symbol-baseline-report-1790785706923/gaps.json`. The older September 29
+review below is historical unless explicitly superseded here; its 194 nominations were never
+the supported-source coverage numerator. The ACE legacy table remains diagnostic, not V3 grounding.
+
+Checklist:
+
+- [x] Freeze same-member, exact-revision source manifest; 59 deterministic shards.
+- [x] Execute through existing structural owners, with guarded commits and independent readback.
+- [x] Reconcile interrupted worker through exact live census; retain receipts and earlier manifests.
+- [x] Visit all manifest members read-only; record exact unresolved identities/errors.
+- [ ] Resolve identity/resource/old-observation/failure cohorts and prove baseline seal.
+- [ ] Add claim-fenced Kanban orchestration and incremental source-revision maintenance through existing owners.
+- [ ] Close the other six independent below-PASS admission predicates.
+
 ## Decision
 
 **Latest fresh audit: `NOT_SAFE_TO_PROJECT` (7 of 11 predicates are below `PASS`).** This is a conjunction gate, not a count of missing columns. Four predicates pass; four are partial and three have no proof. Identity now passes on the fresh sample, and revision qualification now passes against the admitted `repo:root` cohort. Historical table-wide counts remain diagnostics only; neither passing predicate compensates for the remaining blockers.
 
-### Count reconciliation and immediate answer (2026-09-29)
+### Historical count reconciliation and immediate answer (2026-09-29)
 
 The live receipt at `docs/reports/graphify_928-audit-live-ace-store-fix/atlas-canonical-projection-fabric-audit-2026-09-29.json` was generated at `2026-09-29T03:27:56Z` and says **4 PASS / 4 PARTIAL_PROVEN / 3 NOT_PROVEN**. Therefore **7/11 are currently below PASS**, not 9/11. The 9/11 count in older OpenSpec notes describes an earlier audit state; it must not be presented as the latest result. Partial counts as below PASS for the global conjunction, but it is not the same as having no evidence.
 
 The seven current blockers are:
 
-- **Partial (4):** symbol extraction covers 194/24,456 bound source refs; semantic_768 has a column but no proven unique writer/per-row provenance; latent artifacts lack a per-row source-input digest ledger and promotion; ordinal map covers 14,564/16,151 and lacks full lineage plus two-run determinism proof.
+- **Partial (4):** symbol nomination resolution was 194/194, not a source-coverage measurement; semantic_768 has a column but no proven unique writer/per-row provenance; latent artifacts lack canonical input binding and promotion; ordinal map covers 14,564/16,151 and lacks full coverage.
 - **Unproven (3):** no per-run cross-projection checksum binding; no admitted ACE producer with identity-bound BitFrost write/readback; no grounded ACE source rows/ContextManifest readback (`ace_context_sources` has 0 rows).
 
 These are primarily **coverage, owner, wiring, and provenance gaps**, not a request to add a bundle of columns. No migration or index has been applied.
@@ -31,7 +65,7 @@ This review is read-only with respect to application rows and schema. A recent d
 |---|---|---|
 | `IDENTITY_ALIGNED` | `PASS` (fresh audit) | Fresh 1,000-row sample had 0 missing `qdrant_point_id` and 0 duplicate packet keys. This is the audit's declared sample proof, not a full-corpus Qdrant parity proof. The earlier 289-missing result was stale relative to the current live read. |
 | `REVISION_QUALIFIED` | `PASS` (fresh admitted-scope audit) | All 16,151 packet rows in the admitted `repo:root` workspace cohort map to a sealed-snapshot source and match its exact `source_revision`; mismatch/missing count is 0. The 61,718 table-wide rows and 272/1,000 historical sample are unscoped diagnostics, not the gate denominator. |
-| `SYMBOLS_RESOLVED` | `PARTIAL_PROVEN` | Reconciliation says `GROUNDED`, with 194 linked symbols among 24,456 bound source refs. This proves some resolution, not the full predicate’s required coverage. Freeze the intended denominator and prove the required symbol/source joins. |
+| `SYMBOLS_RESOLVED` | `PARTIAL_PROVEN` (2026-09-30) | 18,850/21,584 supported admitted source refs PROCESSED; 1,564 UNPROCESSED, 1,159 lack exact Graphify revision rows, 11 parse failures. The stronger frozen-baseline readback verifies 13,195/14,531; 1,336 remain unresolved. Nomination resolution 194/194 is a different unit. |
 | `SEMANTIC_OWNER_PROVEN` | `PARTIAL_PROVEN` | `codebase_chunk_index.content_embedding_768` is present, but the unique current writer and row-level representation/input provenance are unresolved. `atlas_packets.embedding` and `codebase_chunk_index.content_embedding` remain historical/unresolved surfaces. |
 | `LATENT_FAMILY_PROVEN` | `PARTIAL_PROVEN` | Registered latent artifacts have verified artifact digests, but the source `semantic_768` training/input snapshot is not bound by a per-row input-digest ledger and lifecycle promotion remains `CANDIDATE`. The corrected audit now reports `per_row_input_digest_ledger_exists: false`; artifact digest and source-input digest are distinct. |
 | `GRAPH_MANIFEST_SEALED` | `PASS` | Sealed manifest is bound to the admitted workspace revision and the operator-approved scope is `repo:root`; submodules are excluded by design. This does not prove Neo4j consumes the manifest. |
@@ -39,7 +73,7 @@ This review is read-only with respect to application rows and schema. A recent d
 | `ORDINAL_MAP_SEALED` | `PARTIAL_PROVEN` | Artifact has 14,564 rows for 16,151 admitted root candidates: 1,587 missing. Its checksum recomputes and it has no reported duplicates/orphans/legacy IDs, but that is not a two-run determinism proof or full coverage. The audit also does not prove packet↔chunk↔admitted-Graphify lineage for every ordinal; the 196 previously applied lineage groups still lack an admitted-workspace Graphify row. |
 | `PROJECTIONS_CHECKSUM_ALIGNED` | `NOT_PROVEN` | `atlas_representations` exists, but has no `input_checksum` or `ordinal_map_checksum` columns; no public-table `ordinal_map_checksum` column was found. It is representation/artifact metadata, not a per-run cross-projection binding. Do not create a parallel registry by name. |
 | `BITFROST_KEYS_DERIVABLE` | `NOT_PROVEN` (live; key contract test-proven) | `AceBitfrostCacheIdentityV1` deterministically derives revision/checksum-qualified keys and its focused test passes 2/2. The live audit found 0 keys under both `atlas:bitfrost:v1:*` and legacy `bitfrost:packet:*`; more importantly, there is no admitted ACE producer/caller or identity-bound write/readback. Contract success is not live warming. |
-| `ACE_EVIDENCE_GROUNDED` | `NOT_PROVEN` | `ace_context_sources` exists but has 0 rows. The ACE v3 composer is local-artifact-only: it binds packet/source/workspace revisions, but leaves source byte spans, summary input/model digests, representation/feature/graph revisions, centroid refs, and hypergraph evidence absent or `HINT/PENDING`. Schema fields and a local cache-admission round trip do not prove a live admitted producer or grounded ContextManifest readback. |
+| `ACE_EVIDENCE_GROUNDED` | `NOT_PROVEN` | Production retrieval → canonical admitted resolver → AcePacketV3 → ContextManifest and grounded readback remain unproven. `ace_context_sources` is legacy diagnostic state, not that V3 proof. Existing V3 fields and contract tests do not establish a production caller; adding another packet schema/table is not the remedy. |
 
 ## Why adding ACE fields alone will not unblock `graphify:daily`
 

@@ -47,6 +47,14 @@ dtype: string
 normalization: string
 ```
 
+`artifactDigest` is `sha256:` plus `canonicalSha256V1` over the complete artifact body, excluding
+`artifactDigest` itself and domain-separated by `atlas.representation-artifact-digest.v1`. A child
+artifact's input representation revision, input digest, and input population checksum must match
+the parent artifact's representation revision, output digest, and output population checksum.
+Family members must share workspace/source revisions, candidate/ordinal coordinates, and output
+population. This seals descriptor integrity; it does not create source authority or prove a live
+producer.
+
 `rff_128` uses a fixed kernel, gamma, component count, random seed, and
 parameter digest. Its producer runs outside Qdrant. `ae_latent_64` is the
 current learned branch with architecture `768 -> 256 -> 64`; `ae_latent_128`

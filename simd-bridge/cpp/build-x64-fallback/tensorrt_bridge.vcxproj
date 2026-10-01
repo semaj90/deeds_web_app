@@ -87,7 +87,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -103,16 +103,16 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR="Debug";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NAPI_DISABLE_CPP_EXCEPTIONS;ATLAS_CORE_NAPI_EMBEDDED=1;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_TENSORRT=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;TENSORRT_BRIDGE_BUILD_COMMIT="88ae5c7d56c5";TENSORRT_BRIDGE_BUILD_DIRTY=1;TENSORRT_BRIDGE_LIBTORCH_VERSION="not-linked";NO_LIBTORCH=1;ATLAS_CORE_STATIC=1;CMAKE_INTDIR="Debug";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR=\"Debug\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;NAPI_DISABLE_CPP_EXCEPTIONS;ATLAS_CORE_NAPI_EMBEDDED=1;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_TENSORRT=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;TENSORRT_BRIDGE_BUILD_COMMIT=\"88ae5c7d56c5\";TENSORRT_BRIDGE_BUILD_DIRTY=1;TENSORRT_BRIDGE_LIBTORCH_VERSION=\"not-linked\";NO_LIBTORCH=1;ATLAS_CORE_STATIC=1;CMAKE_INTDIR=\"Debug\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -120,7 +120,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>Debug\cuda_kernels.lib;C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\x64\node.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\lib\x64\cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Debug\cuda_kernels.lib;atlas_core\Debug\atlas_core.lib;C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\x64\node.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\lib\x64\cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -135,7 +135,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -150,18 +150,18 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR="Release";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;ATLAS_CORE_NAPI_EMBEDDED=1;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_TENSORRT=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;TENSORRT_BRIDGE_BUILD_COMMIT="88ae5c7d56c5";TENSORRT_BRIDGE_BUILD_DIRTY=1;TENSORRT_BRIDGE_LIBTORCH_VERSION="not-linked";NO_LIBTORCH=1;ATLAS_CORE_STATIC=1;CMAKE_INTDIR="Release";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR=\"Release\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;ATLAS_CORE_NAPI_EMBEDDED=1;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_TENSORRT=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;TENSORRT_BRIDGE_BUILD_COMMIT=\"88ae5c7d56c5\";TENSORRT_BRIDGE_BUILD_DIRTY=1;TENSORRT_BRIDGE_LIBTORCH_VERSION=\"not-linked\";NO_LIBTORCH=1;ATLAS_CORE_STATIC=1;CMAKE_INTDIR=\"Release\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -169,7 +169,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>Release\cuda_kernels.lib;C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\x64\node.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\lib\x64\cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Release\cuda_kernels.lib;atlas_core\Release\atlas_core.lib;C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\x64\node.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\lib\x64\cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -184,7 +184,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -199,18 +199,18 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR="MinSizeRel";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;ATLAS_CORE_NAPI_EMBEDDED=1;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_TENSORRT=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;TENSORRT_BRIDGE_BUILD_COMMIT="88ae5c7d56c5";TENSORRT_BRIDGE_BUILD_DIRTY=1;TENSORRT_BRIDGE_LIBTORCH_VERSION="not-linked";NO_LIBTORCH=1;ATLAS_CORE_STATIC=1;CMAKE_INTDIR="MinSizeRel";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR=\"MinSizeRel\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;ATLAS_CORE_NAPI_EMBEDDED=1;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_TENSORRT=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;TENSORRT_BRIDGE_BUILD_COMMIT=\"88ae5c7d56c5\";TENSORRT_BRIDGE_BUILD_DIRTY=1;TENSORRT_BRIDGE_LIBTORCH_VERSION=\"not-linked\";NO_LIBTORCH=1;ATLAS_CORE_STATIC=1;CMAKE_INTDIR=\"MinSizeRel\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -218,7 +218,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>MinSizeRel\cuda_kernels.lib;C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\x64\node.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\lib\x64\cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>MinSizeRel\cuda_kernels.lib;atlas_core\MinSizeRel\atlas_core.lib;C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\x64\node.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\lib\x64\cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -233,7 +233,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -249,16 +249,16 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR="RelWithDebInfo";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;ATLAS_CORE_NAPI_EMBEDDED=1;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_TENSORRT=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;TENSORRT_BRIDGE_BUILD_COMMIT="88ae5c7d56c5";TENSORRT_BRIDGE_BUILD_DIRTY=1;TENSORRT_BRIDGE_LIBTORCH_VERSION="not-linked";NO_LIBTORCH=1;ATLAS_CORE_STATIC=1;CMAKE_INTDIR="RelWithDebInfo";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;NO_LIBTORCH=1;CMAKE_INTDIR=\"RelWithDebInfo\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NAPI_DISABLE_CPP_EXCEPTIONS;ATLAS_CORE_NAPI_EMBEDDED=1;BUILDING_NODE_EXTENSION;NODE_GYP_MODULE_NAME=tensorrt_bridge;SIMD_HAVE_CUDA=0;SIMD_HAVE_LIBTORCH=0;SIMD_HAVE_CUBLAS=0;SIMD_HAVE_CUBLASLT=0;SIMD_HAVE_CUDNN=0;SIMD_HAVE_TENSORRT=0;SIMD_HAVE_CUVS=0;SIMD_HAVE_CUTLASS=0;TENSORRT_BRIDGE_BUILD_COMMIT=\"88ae5c7d56c5\";TENSORRT_BRIDGE_BUILD_DIRTY=1;TENSORRT_BRIDGE_LIBTORCH_VERSION=\"not-linked\";NO_LIBTORCH=1;ATLAS_CORE_STATIC=1;CMAKE_INTDIR=\"RelWithDebInfo\";tensorrt_bridge_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;C:\Users\james\Videos\deeds-web-app\native\atlas_core\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -266,7 +266,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>RelWithDebInfo\cuda_kernels.lib;C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\x64\node.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\lib\x64\cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>RelWithDebInfo\cuda_kernels.lib;atlas_core\RelWithDebInfo\atlas_core.lib;C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\x64\node.lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\lib\x64\cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -338,6 +338,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\binding.cc" />
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\native\atlas_core\napi\atlas_core_napi.cpp" />
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\native_execution_counters.cpp" />
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\tensor_bridge.cc" />
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\simdjson_bridge.cc" />
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\lstm_bridge.cc" />
@@ -352,6 +354,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-fallback\atlas_core\atlas_core.vcxproj">
+      <Project>{F8F32F88-5DA1-3A02-8030-EA2919BF36AE}</Project>
+      <Name>atlas_core</Name>
     </ProjectReference>
     <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-fallback\cuda_kernels.vcxproj">
       <Project>{B6D415B7-4C93-301D-BC8E-F0CD30B6E36A}</Project>

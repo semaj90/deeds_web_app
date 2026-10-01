@@ -10,9 +10,9 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
-import readline from 'node:readline';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { streamJsonlBatchesV1 } from './lib/stream-jsonl-batches-v1.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -90,11 +90,19 @@ function flushDirectory() {
   currentRows = [];
 }
 
-const rl = readline.createInterface({ input: fs.createReadStream(manifestPath, { encoding: 'utf8' }), crlfDelay: Infinity });
-for await (const line of rl) {
-  if (!line.trim()) continue;
-  manifestHash.update(`${line}\n`);
-  const row = JSON.parse(line);
+async function* hashManifestBytes(readable) {
+  for await (const chunk of readable) {
+    manifestHash.update(chunk);
+    yield chunk;
+  }
+}
+
+const manifestStream = fs.createReadStream(manifestPath);
+for await (const batch of streamJsonlBatchesV1(hashManifestBytes(manifestStream), {
+  maxLineBytes: 1024 * 1024,
+  batchRecords: 128,
+})) {
+  for (const row of batch.records) {
   sourceRevision ??= row.sourceRevision ?? null;
   const dir = path.posix.dirname(String(row.relativePath).replaceAll('\\', '/')) || '.';
   if (currentDir !== null && dir !== currentDir) flushDirectory();
@@ -102,6 +110,7 @@ for await (const line of rl) {
   currentDir = dir;
   if (currentRows.length < filesPerDir) currentRows.push(row);
   else skipped += 1;
+  }
 }
 flushDirectory();
 await new Promise((resolve, reject) => { output.end(resolve); output.on('error', reject); });

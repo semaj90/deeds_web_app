@@ -26,11 +26,17 @@ import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 import { readSubmodulePaths, classifyRepositoryId } from './lib/gitmodules-registry.mjs';
+import { GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V1 } from './lib/graphify-symbol-candidate-selection-v1.mjs';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 loadAtlasEnv(REPO_ROOT);
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+// Never silently fall back to a shared/example credential. The audit must use
+// the operator-configured connection identity or stop before opening a socket.
+const DATABASE_URL = process.env.DATABASE_URL?.trim();
+if (!DATABASE_URL) {
+  throw new Error('ATLAS_FABRIC_AUDIT_DATABASE_URL_REQUIRED');
+}
 const REDIS_HOST = process.env.REDIS_HOST || '127.0.0.1';
 const REDIS_PORT = Number(process.env.REDIS_PORT || 6379);
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
@@ -145,13 +151,17 @@ async function main() {
       for (const v of list) if (v) seen.set(v, (seen.get(v) ?? 0) + 1);
       return [...seen.values()].filter((c) => c > 1).length;
     };
-    const missingQdrant = sample.filter((r) => !r.qdrant_point_id).length;
-    const dupPacketKey = dupCount(sample.map((r) => r.packet_key));
-    const identityAligned = {
+    const sampleMissingQdrant = sample.filter((r) => !r.qdrant_point_id).length;
+    const sampleDuplicatePacketKey = dupCount(sample.map((r) => r.packet_key));
+    // This sample is retained for secondary revision diagnostics only. The identity
+    // predicate is finalized below against the exact admitted repo:root cohort; a
+    // latent_64-selected sample cannot establish cohort-wide alignment.
+    let identityAligned = {
+      scope: 'EXACT_ADMITTED_REPO_ROOT_COHORT_PENDING',
       sample_size: sample.length,
-      duplicate_packet_key_count: dupPacketKey,
-      missing_qdrant_point_id_count: missingQdrant,
-      verdict: dupPacketKey === 0 && missingQdrant === 0 ? 'PASS' : dupPacketKey === 0 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
+      sample_duplicate_packet_key_count: sampleDuplicatePacketKey,
+      sample_missing_qdrant_point_id_count: sampleMissingQdrant,
+      verdict: 'NOT_PROVEN',
     };
 
     // ── Predicate 2: REVISION_QUALIFIED ──
@@ -237,19 +247,55 @@ async function main() {
     // claim. Read-only here -- never writes.
     let reconciliationGate = null;
     if (admittedWorkspaceRevision && existing.has('atlas_workspace_source_bindings') && existing.has('graphify_symbols') && existing.has('graphify_files')) {
-      const { rows: [bound] } = await q(
-        `SELECT COUNT(*)::int AS n FROM atlas_workspace_source_bindings WHERE workspace_revision = $1;`,
-        [admittedWorkspaceRevision],
-      );
-      const { rows: [linked] } = await q(
-        `SELECT COUNT(*)::int AS n FROM graphify_symbols gs JOIN graphify_files gf ON gf.file_id = gs.file_id
-         WHERE gf.source_ref IN (SELECT canonical_source_ref FROM atlas_workspace_source_bindings WHERE workspace_revision = $1);`,
-        [admittedWorkspaceRevision],
+      const { rows: [population] } = await q(
+        `WITH admitted AS (
+           SELECT canonical_source_ref, source_revision,
+                  lower(split_part(canonical_source_ref, '.', array_length(string_to_array(canonical_source_ref, '.'), 1))) AS extension
+           FROM atlas_workspace_source_bindings
+           WHERE repo_id = 'deeds-web-app' AND workspace_revision = $1
+         ), supported AS (
+           SELECT * FROM admitted
+           WHERE extension = ANY(ARRAY['ts','mts','tsx','js','mjs','cjs','jsx','json','jsonc','md','markdown','txt']::text[])
+             AND canonical_source_ref !~* $2
+         ), excluded_generated_artifacts AS (
+           SELECT * FROM admitted
+           WHERE extension = ANY(ARRAY['ts','mts','tsx','js','mjs','cjs','jsx','json','jsonc','md','markdown','txt']::text[])
+             AND canonical_source_ref ~* $2
+         )
+         SELECT
+           (SELECT COUNT(*)::int FROM admitted) AS bound_source_ref_count,
+           (SELECT COUNT(*)::int FROM supported) AS supported_source_ref_count,
+           (SELECT COUNT(*)::int FROM excluded_generated_artifacts) AS excluded_generated_artifact_count,
+           COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.file_id IS NOT NULL)::int AS exact_graphify_source_ref_count,
+           COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.parse_status = 'PROCESSED')::int AS processed_source_ref_count,
+           COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.parse_status = 'UNPROCESSED')::int AS unprocessed_source_ref_count,
+           COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.parse_status = 'PARSE_FAILED')::int AS parse_failed_source_ref_count,
+           COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gs.symbol_id IS NOT NULL)::int AS source_refs_with_symbols,
+           COUNT(DISTINCT gs.symbol_id)::int AS exact_revision_symbol_row_count,
+           (SELECT COUNT(*)::int FROM (
+             SELECT s2.canonical_source_ref
+             FROM supported s2
+             JOIN graphify_files gf2
+               ON gf2.source_ref = s2.canonical_source_ref
+              AND gf2.code_source_revision = s2.source_revision
+             GROUP BY s2.canonical_source_ref
+             HAVING COUNT(*) > 1
+           ) ambiguous) AS duplicate_exact_graphify_source_ref_count
+         FROM supported s
+         LEFT JOIN graphify_files gf
+           ON gf.source_ref = s.canonical_source_ref
+          AND gf.code_source_revision = s.source_revision
+         LEFT JOIN graphify_symbols gs ON gs.file_id = gf.file_id;`,
+        [admittedWorkspaceRevision, GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V1],
       );
       reconciliationGate = {
-        status: bound.n === 0 ? 'BLOCKED_ON_UNGROUNDED_REVISION' : linked.n === 0 ? 'BLOCKED_ON_EMPTY_SYMBOL_SOURCE' : 'GROUNDED',
-        boundSourceRefCount: bound.n,
-        symbolsForBoundRefs: linked.n,
+        status: population.bound_source_ref_count === 0
+          ? 'BLOCKED_ON_UNGROUNDED_REVISION'
+          : population.exact_graphify_source_ref_count === 0
+            ? 'BLOCKED_ON_EMPTY_EXACT_GRAPHIFY_COHORT'
+            : 'GROUNDED',
+        ...population,
+        missing_exact_graphify_source_ref_count: Math.max(0, population.supported_source_ref_count - population.exact_graphify_source_ref_count),
       };
     }
     // AUDIT-SYMBOL-01 (2026-09-29, read-only): the prior verdict ternary above had NO PASS
@@ -290,10 +336,17 @@ async function main() {
       && unresolvedSymbolCount === 0
       && ambiguousSymbolCount === 0,
     );
-    const boundSourceRefCount = reconciliationGate?.boundSourceRefCount ?? 0;
-    const symbolRowCount = reconciliationGate?.symbolsForBoundRefs ?? 0;
-    const coverageRatio = boundSourceRefCount > 0 ? symbolRowCount / boundSourceRefCount : 0;
-    const fullCoverage = boundSourceRefCount > 0 && symbolRowCount === boundSourceRefCount;
+    const boundSourceRefCount = reconciliationGate?.bound_source_ref_count ?? 0;
+    const supportedSourceRefCount = reconciliationGate?.supported_source_ref_count ?? 0;
+    const processedSourceRefCount = reconciliationGate?.processed_source_ref_count ?? 0;
+    const sourceRefsWithSymbols = reconciliationGate?.source_refs_with_symbols ?? 0;
+    const symbolRowCount = reconciliationGate?.exact_revision_symbol_row_count ?? 0;
+    const coverageRatio = supportedSourceRefCount > 0 ? processedSourceRefCount / supportedSourceRefCount : 0;
+    const fullCoverage = supportedSourceRefCount > 0
+      && processedSourceRefCount === supportedSourceRefCount
+      && reconciliationGate?.missing_exact_graphify_source_ref_count === 0
+      && reconciliationGate?.parse_failed_source_ref_count === 0
+      && reconciliationGate?.duplicate_exact_graphify_source_ref_count === 0;
 
     let symbolsResolvedVerdict;
     if (!existing.has('graphify_symbols')) symbolsResolvedVerdict = 'ABSENT';
@@ -320,6 +373,15 @@ async function main() {
       },
       coverage: {
         bound_source_ref_count: boundSourceRefCount,
+        supported_source_ref_count: supportedSourceRefCount,
+        excluded_generated_artifact_count: reconciliationGate?.excluded_generated_artifact_count ?? 0,
+        exact_graphify_source_ref_count: reconciliationGate?.exact_graphify_source_ref_count ?? 0,
+        processed_source_ref_count: processedSourceRefCount,
+        unprocessed_source_ref_count: reconciliationGate?.unprocessed_source_ref_count ?? 0,
+        parse_failed_source_ref_count: reconciliationGate?.parse_failed_source_ref_count ?? 0,
+        missing_exact_graphify_source_ref_count: reconciliationGate?.missing_exact_graphify_source_ref_count ?? 0,
+        duplicate_exact_graphify_source_ref_count: reconciliationGate?.duplicate_exact_graphify_source_ref_count ?? 0,
+        source_refs_with_symbols: sourceRefsWithSymbols,
         symbol_row_count: symbolRowCount,
         coverage_ratio: coverageRatio,
         full_coverage: fullCoverage,
@@ -328,9 +390,9 @@ async function main() {
       note: !existing.has('graphify_symbols')
         ? 'graphify_symbols does not exist live. No canonical SymbolVersionV1 registry exists; atlas_tree_nodes/atlas_ast_nodes are provisional structural inventories, not a symbol version authority.'
         : symbolsResolvedVerdict === 'PASS'
-          ? 'Every bound source ref for the admitted revision has an extracted, cleanly-resolved symbol row -- both nomination resolution and population coverage are complete.'
+          ? 'Every extractor-supported source ref in the admitted revision has an exact code_source_revision Graphify observation marked PROCESSED, and the nominated symbols resolve cleanly. Files that legitimately produce no code-symbol rows are not treated as missing symbols.'
           : nominationResolutionClean
-            ? `Nomination resolution is clean (${nominationCount}/${nominationCount} resolved, 0 unresolved, 0 ambiguous), but population coverage is not: only ${symbolRowCount}/${boundSourceRefCount} bound source refs (${(coverageRatio * 100).toFixed(1)}%) have any extracted graphify_symbols row at all. Extraction coverage, not reconciliation, is the remaining gap -- see scripts/atlas/graphify-symbol-extractor-v1.mts.`
+            ? `Nomination resolution is clean (${nominationCount}/${nominationCount} resolved, 0 unresolved, 0 ambiguous), but extractor population coverage is incomplete: ${processedSourceRefCount}/${supportedSourceRefCount} supported admitted source refs are processed (${(coverageRatio * 100).toFixed(1)}%); ${reconciliationGate?.unprocessed_source_ref_count ?? 0} remain UNPROCESSED, ${reconciliationGate?.missing_exact_graphify_source_ref_count ?? 0} lack an exact Graphify source-revision row, and ${reconciliationGate?.duplicate_exact_graphify_source_ref_count ?? 0} have duplicate exact rows. ${sourceRefsWithSymbols} exact-revision source refs currently have ${symbolRowCount} symbol rows. This is extraction coverage, not a requirement for one symbol per file -- see scripts/atlas/graphify-symbol-extractor-v1.mts.`
             : `Nomination resolution is not clean or no matching receipt exists for the current admitted revision (${admittedWorkspaceRevision}). Run scripts/atlas/symbol-reconciliation-writer-v1.mts --workspace-revision ${admittedWorkspaceRevision} to produce a fresh receipt before re-auditing.`,
     };
 
@@ -522,7 +584,7 @@ async function main() {
     // resolve. canonicalId must equal packetKey and bind to the current packet/source revisions.
     let ordinalCorpus = null;
     try { ordinalCorpus = JSON.parse(rf(new URL('../../docs/reports/candidate-ordinal-corpus-v1.json', import.meta.url), 'utf8')); } catch { /* absent */ }
-    const ordinalCandidates = ordinalCorpus?.candidates ?? [];
+    const lineageOrdinalCandidates = ordinalCorpus?.candidates ?? [];
     const sha256Json = (value) => `sha256:${crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
     const canonicalJson = (value) => {
       if (value === null || typeof value !== 'object') return JSON.stringify(value);
@@ -531,6 +593,101 @@ async function main() {
         .sort(([a], [b]) => Buffer.compare(Buffer.from(a, 'utf8'), Buffer.from(b, 'utf8')));
       return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v)}`).join(',')}}`;
     };
+    let ordinalCandidateMapEvidence = null;
+    let ordinalCandidateMapError = null;
+    try {
+      // CandidateOrdinalMapV1 is packet-grain. The older candidate-ordinal-corpus artifact is
+      // lineage-filtered and must not be mistaken for the ordinal map itself. Consume the existing
+      // CEI-24 owner receipt/map, verify its immutable inputs/checksums, then independently compare
+      // every candidate to the live admitted packet cohort below. Chunk crosswalk coverage remains
+      // a separate projection prerequisite; it is not a condition for assigning packet ordinals.
+      const reportsDir = resolve(REPO_ROOT, 'docs/reports');
+      const receipts = readdirSync(reportsDir)
+        .filter((file) => /^cei24-candidate-snapshot-convergence-v1-\d{8}T\d{6}\.\d{3}Z\.json$/.test(file))
+        .sort()
+        .reverse();
+      if (!receipts.length) throw new Error('CEI24_PACKET_ORDINAL_RECEIPT_ABSENT');
+      const receiptName = receipts[0];
+      const receipt = JSON.parse(readFileSync(resolve(reportsDir, receiptName), 'utf8'));
+      if (receipt.schema !== 'atlas.cei24-candidate-snapshot-convergence-receipt.v1'
+        || receipt.status !== 'PACKET_CANDIDATE_ORDINAL_MAP_PROVEN_CHUNK_CROSSWALK_PENDING'
+        || receipt.owner?.mapSchema !== 'atlas.candidate-ordinal-map.v1'
+        || receipt.owner?.identityResolution !== 'packet_key -> canonicalId (packet identity only)'
+        || receipt.authority?.identityAuthority !== false
+        || receipt.authority?.canonicalAuthority !== false
+        || receipt.authority?.databaseWrites !== 0
+        || receipt.authority?.qdrantWrites !== 0
+        || receipt.authority?.valkeyWrites !== 0) throw new Error('CEI24_PACKET_ORDINAL_RECEIPT_CONTRACT_INVALID');
+
+      const mapPath = resolve(REPO_ROOT, receipt.mapArtifact?.path ?? '');
+      const mapRelativePath = relative(REPO_ROOT, mapPath);
+      if (!mapRelativePath || mapRelativePath.startsWith('..') || mapRelativePath.includes(`..${process.platform === 'win32' ? '\\\\' : '/'}`)) {
+        throw new Error('CEI24_PACKET_ORDINAL_MAP_OUTSIDE_REPOSITORY');
+      }
+      const mapBytes = readFileSync(mapPath);
+      const mapDigest = `sha256:${crypto.createHash('sha256').update(mapBytes).digest('hex')}`;
+      const packetMap = JSON.parse(mapBytes.toString('utf8'));
+      if (mapDigest !== receipt.mapArtifact.sha256
+        || packetMap.schema !== 'atlas.candidate-ordinal-map.v1'
+        || packetMap.identityAuthority !== false
+        || packetMap.rowCount !== receipt.counts?.canonicalPacketCandidates
+        || packetMap.rowCount !== receipt.mapArtifact.rows
+        || packetMap.candidateSnapshotRevision !== receipt.candidateSnapshotRevision
+        || packetMap.ordinalMapChecksum !== receipt.ordinalMapChecksum
+        || packetMap.ordinalMapChecksum !== crypto.createHash('sha256').update(canonicalJson({
+          candidateSnapshotRevision: packetMap.candidateSnapshotRevision,
+          workspaceRevision: packetMap.workspaceRevision,
+          candidates: packetMap.candidates,
+        })).digest('hex')) throw new Error('CEI24_PACKET_ORDINAL_MAP_CHECKSUM_OR_RECEIPT_MISMATCH');
+
+      const matrixPath = resolve(REPO_ROOT, receipt.inputs?.matrixReport ?? '');
+      const matrixRelativePath = relative(REPO_ROOT, matrixPath);
+      if (!matrixRelativePath || matrixRelativePath.startsWith('..') || matrixRelativePath.includes(`..${process.platform === 'win32' ? '\\\\' : '/'}`)) {
+        throw new Error('CEI24_MATRIX_REPORT_OUTSIDE_REPOSITORY');
+      }
+      const matrixBytes = readFileSync(matrixPath);
+      const matrixDigest = `sha256:${crypto.createHash('sha256').update(matrixBytes).digest('hex')}`;
+      const matrixReport = JSON.parse(matrixBytes.toString('utf8'));
+      const matrixMapPath = resolve(REPO_ROOT, matrixReport.outDir, 'candidate-ordinal-map.ndjson');
+      const matrixMapRelativePath = relative(REPO_ROOT, matrixMapPath);
+      if (!matrixMapRelativePath || matrixMapRelativePath.startsWith('..') || matrixMapRelativePath.includes(`..${process.platform === 'win32' ? '\\\\' : '/'}`)) {
+        throw new Error('CEI24_MATRIX_ORDINAL_ARTIFACT_OUTSIDE_REPOSITORY');
+      }
+      const matrixMapDigest = `sha256:${crypto.createHash('sha256').update(readFileSync(matrixMapPath)).digest('hex')}`;
+      if (matrixDigest !== receipt.inputs.matrixReportSha256
+        || matrixMapDigest !== receipt.inputs.matrixOrdinalArtifactSha256
+        || matrixMapDigest !== `sha256:${matrixReport.files?.['candidate-ordinal-map.ndjson']?.sha256}`
+        || matrixReport.schema !== 'atlas.candidate-feature-matrix-draft.v1'
+        || matrixReport.canonical !== false
+        || matrixReport.candidates !== packetMap.rowCount
+        || matrixReport.ordinalMapChecksum !== receipt.inputs.matrixOrdinalMapChecksum) {
+        throw new Error('CEI24_MATRIX_INPUT_RECEIPT_MISMATCH');
+      }
+
+      const matrixCandidates = packetMap.candidates.map(({ canonicalId, packetKey, sourceRef, sourceRevision, workspaceRevision }) => ({
+        canonicalId, packetKey, sourceRef, sourceRevision, workspaceRevision,
+      }));
+      const expectedCandidateSnapshotRevision = `sha256:${crypto.createHash('sha256').update(canonicalJson({
+        schema: 'atlas.cei24-candidate-snapshot-input.v1',
+        sourceMatrixReport: receipt.inputs.matrixReport,
+        sourceMatrixReportSha256: matrixDigest,
+        sourceOrdinalArtifactSha256: matrixMapDigest,
+        workspaceRevision: packetMap.workspaceRevision,
+        candidates: matrixCandidates,
+      })).digest('hex')}`;
+      if (expectedCandidateSnapshotRevision !== packetMap.candidateSnapshotRevision) {
+        throw new Error('CEI24_CANDIDATE_SNAPSHOT_REVISION_MISMATCH');
+      }
+      ordinalCandidateMapEvidence = {
+        receipt: receiptName,
+        mapPath: mapRelativePath.replaceAll('\\', '/'),
+        mapDigest,
+        packetMap,
+      };
+    } catch (error) {
+      ordinalCandidateMapError = String(error?.message ?? error);
+    }
+    const ordinalCandidates = ordinalCandidateMapEvidence?.packetMap?.candidates ?? lineageOrdinalCandidates;
 
     let ordinalAdmission = null;
     let rootSnapshotVerified = false;
@@ -583,11 +740,13 @@ async function main() {
     }
 
     const ordinalSnapshotMatchesAdmitted = Boolean(
-      ordinalCorpus && ordinalAdmission && rootSnapshotVerified
-      && ordinalCorpus.candidateSnapshotRevision === ordinalAdmission.snapshotRevision
+      ordinalCandidateMapEvidence && ordinalAdmission && rootSnapshotVerified
+      && ordinalCandidateMapEvidence.packetMap.candidates.length > 0
+      && ordinalCandidateMapEvidence.packetMap.candidateSnapshotRevision === ordinalCandidateMapEvidence.packetMap.candidates[0]?.candidateSnapshotRevision
     );
     const ordinalWorkspaceMatchesAdmitted = Boolean(
-      ordinalCorpus && admittedWorkspaceRevision && ordinalCorpus.workspaceRevision === admittedWorkspaceRevision
+      ordinalCandidateMapEvidence && admittedWorkspaceRevision
+      && ordinalCandidateMapEvidence.packetMap.workspaceRevision === admittedWorkspaceRevision
     );
     const ordRevisionQualified = ordinalSnapshotMatchesAdmitted;
 
@@ -595,7 +754,7 @@ async function main() {
     let rootCandidateRows = [];
     if (rootSnapshotVerified && admittedWorkspaceRevision) {
       const { rows } = await q(
-        `SELECT packet_key, source_ref, canonical_source_ref, source_revision, workspace_revision_key
+        `SELECT packet_key, source_ref, canonical_source_ref, source_revision, workspace_revision_key, qdrant_point_id
          FROM atlas_packets
          WHERE workspace_revision_key = $1;`,
       [admittedWorkspaceRevision],
@@ -617,6 +776,31 @@ async function main() {
       ? `Every packet row in the admitted repo:root workspace cohort (${admittedRootPacketRows.length}) has a source_ref in the sealed snapshot and an exact source_revision match. The ${tot.total} table-wide row count is historical/non-admitted context, not the gate denominator.`
       : `Revision coverage is evaluated against the sealed admitted repo:root snapshot, not the entire historical atlas_packets table. Exact admitted matches=${rootCandidateRows.length}; mismatched or missing=${admittedRootRevisionMismatchCount}; snapshot_verified=${rootSnapshotVerified}.`;
     const admittedRootCandidateCount = rootCandidateRows.length;
+    const admittedRootMissingPacketKeyCount = rootCandidateRows.filter((r) => !r.packet_key).length;
+    const admittedRootDuplicatePacketKeyCount = dupCount(rootCandidateRows.map((r) => r.packet_key));
+    const admittedRootMissingQdrantPointIdCount = rootCandidateRows.filter((r) => !r.qdrant_point_id).length;
+    identityAligned = {
+      scope: 'EXACT_ADMITTED_REPO_ROOT_SOURCE_REVISION_COHORT',
+      admitted_workspace_revision: admittedWorkspaceRevision,
+      admitted_root_snapshot_verified: rootSnapshotVerified,
+      admitted_root_exact_revision_packet_count: admittedRootCandidateCount,
+      missing_packet_key_count: admittedRootMissingPacketKeyCount,
+      duplicate_packet_key_count: admittedRootDuplicatePacketKeyCount,
+      missing_qdrant_point_id_count: admittedRootMissingQdrantPointIdCount,
+      sample_size_diagnostic_only: sample.length,
+      sample_duplicate_packet_key_count_diagnostic_only: sampleDuplicatePacketKey,
+      sample_missing_qdrant_point_id_count_diagnostic_only: sampleMissingQdrant,
+      verdict: !rootSnapshotVerified || admittedRootCandidateCount === 0
+        ? 'NOT_PROVEN'
+        : admittedRootDuplicatePacketKeyCount > 0 || admittedRootMissingPacketKeyCount > 0
+          ? 'NOT_PROVEN'
+          : 'PASS',
+      note: !rootSnapshotVerified || admittedRootCandidateCount === 0
+        ? 'Identity is not proven because the sealed admitted repo:root source snapshot or exact packet cohort is unavailable.'
+        : admittedRootDuplicatePacketKeyCount > 0 || admittedRootMissingPacketKeyCount > 0
+          ? 'The exact admitted repo:root packet cohort contains a missing or duplicate packet_key; sample-only identity evidence is diagnostic and cannot override this.'
+          : 'Every exact-revision packet in the sealed admitted repo:root cohort has a unique packet_key. Missing qdrant_point_id values are reported as projection diagnostics only: Qdrant point IDs are rebuildable projection IDs, not canonical packet identity; projection alignment is evaluated separately.' ,
+    };
     const rootByPacketKey = new Map(rootCandidateRows.map((r) => [r.packet_key, r]));
     const allWorkspaceByPacketKey = new Map(workspaceRevisionRows.map((r) => [r.packet_key, r]));
     let exactIdentityMatches = 0;
@@ -645,7 +829,9 @@ async function main() {
       if (c.canonicalId !== c.packetKey) canonicalIdPacketKeyMismatch++;
       if (!Number.isInteger(c.candidateOrdinal) || c.candidateOrdinal < 0 || c.candidateOrdinal >= ordinalCandidates.length) invalidOrdinal++;
       if (c.workspaceRevision !== admittedWorkspaceRevision) workspaceRevisionMismatch++;
-      if (c.candidateSnapshotRevision !== ordinalAdmission?.snapshotRevision) snapshotRevisionMismatch++;
+      const expectedCandidateSnapshotRevision = ordinalCandidateMapEvidence?.packetMap.candidateSnapshotRevision
+        ?? ordinalAdmission?.snapshotRevision;
+      if (c.candidateSnapshotRevision !== expectedCandidateSnapshotRevision) snapshotRevisionMismatch++;
       if (typeof c.sourceRevision !== 'string' || !/^sha256:[0-9a-f]{64}$/i.test(c.sourceRevision)) missingSourceRevision++;
       if (!rootByPacketKey.has(c.canonicalId)) orphanOrdinalRows++;
       if (!allWorkspaceByPacketKey.has(c.packetKey)) missingPacket++;
@@ -659,7 +845,7 @@ async function main() {
         if (!sourceRefExact) sourceRefMismatch++;
         if (live.source_revision === c.sourceRevision
           && c.workspaceRevision === admittedWorkspaceRevision
-          && c.candidateSnapshotRevision === ordinalAdmission?.snapshotRevision
+          && c.candidateSnapshotRevision === expectedCandidateSnapshotRevision
           && sourceRefExact) validCanonicalKeys.add(live.packet_key);
       }
     }
@@ -671,15 +857,16 @@ async function main() {
       ? Array.from({ length: ordinalCandidates.length }, (_, ordinal) => ordinal).filter((ordinal) => !ordinalCounts.has(ordinal)).length
       : 0;
     const ordinalSequenceValid = ordinalCandidates.every((c, index) => c.candidateOrdinal === index);
-    const checksumRecomputed = Boolean(ordinalCorpus && ordinalCorpus.ordinalMapChecksum === crypto.createHash('sha256')
-      .update(canonicalJson({
-        candidateSnapshotRevision: ordinalCorpus.candidateSnapshotRevision,
-        workspaceRevision: ordinalCorpus.workspaceRevision,
-        candidates: ordinalCandidates,
-      })).digest('hex'));
+    const checksumRecomputed = Boolean(ordinalCandidateMapEvidence
+      && ordinalCandidateMapEvidence.packetMap.ordinalMapChecksum === crypto.createHash('sha256')
+        .update(canonicalJson({
+          candidateSnapshotRevision: ordinalCandidateMapEvidence.packetMap.candidateSnapshotRevision,
+          workspaceRevision: ordinalCandidateMapEvidence.packetMap.workspaceRevision,
+          candidates: ordinalCandidates,
+        })).digest('hex'));
     const ordinalRowCountMatchesDenominator = ordinalCandidates.length === admittedRootCandidateCount;
     const ordinalMapFullySealed = Boolean(
-      ordinalCorpus
+      ordinalCandidateMapEvidence
       && rootSnapshotVerified
       && ordinalWorkspaceMatchesAdmitted
       && ordRevisionQualified
@@ -706,14 +893,20 @@ async function main() {
       && checksumRecomputed,
     );
     const ordinalMapSealed = {
-      artifact: 'docs/reports/candidate-ordinal-corpus-v1.json',
-      artifact_present: Boolean(ordinalCorpus),
+      artifact: ordinalCandidateMapEvidence?.mapPath ?? 'docs/reports/candidate-ordinal-corpus-v1.json',
+      artifact_present: Boolean(ordinalCandidateMapEvidence ?? ordinalCorpus),
+      owner_receipt: ordinalCandidateMapEvidence?.receipt ?? null,
+      owner_receipt_error: ordinalCandidateMapError,
+      lineage_filtered_corpus: {
+        artifact: 'docs/reports/candidate-ordinal-corpus-v1.json',
+        row_count: lineageOrdinalCandidates.length,
+      },
       row_count: ordinalCandidates.length,
       row_count_matches_admitted_root_denominator: ordinalRowCountMatchesDenominator,
-      ordinal_map_checksum: ordinalCorpus?.ordinalMapChecksum ?? null,
+      ordinal_map_checksum: ordinalCandidateMapEvidence?.packetMap.ordinalMapChecksum ?? ordinalCorpus?.ordinalMapChecksum ?? null,
       ordinal_map_checksum_recomputed: checksumRecomputed,
-      candidate_snapshot_revision: ordinalCorpus?.candidateSnapshotRevision ?? null,
-      snapshot_revision_is_sha256_admitted: ordRevisionQualified,
+      candidate_snapshot_revision: ordinalCandidateMapEvidence?.packetMap.candidateSnapshotRevision ?? ordinalCorpus?.candidateSnapshotRevision ?? null,
+      candidate_snapshot_receipt_verified: ordRevisionQualified,
       admitted_root_snapshot_verified: rootSnapshotVerified,
       admitted_root_snapshot_error: rootSnapshotError,
       workspace_revision_matches_admitted: ordinalWorkspaceMatchesAdmitted,
@@ -738,14 +931,15 @@ async function main() {
       invalid_ordinal: invalidOrdinal,
       ordinal_slot_gaps: ordinalSlotGaps,
       ordinal_sequence_valid: ordinalSequenceValid,
+      packet_to_chunk_crosswalk: 'SEPARATE_PENDING_PROJECTION_ALIGNMENT',
       verdict: ordinalMapFullySealed ? 'PASS'
-        : (ordinalCorpus && rootSnapshotVerified && ordinalWorkspaceMatchesAdmitted && exactIdentityMatches > 0) ? 'PARTIAL_PROVEN'
-        : ordinalCorpus ? 'NOT_PROVEN' : 'ABSENT',
+        : (ordinalCandidateMapEvidence && rootSnapshotVerified && ordinalWorkspaceMatchesAdmitted && exactIdentityMatches > 0) ? 'PARTIAL_PROVEN'
+        : (ordinalCandidateMapEvidence || ordinalCorpus) ? 'NOT_PROVEN' : 'ABSENT',
       note: ordinalMapFullySealed
-        ? 'Every admitted repo:root candidate has an exact source/revision-bound canonical row; workspace/snapshot revisions, unique contiguous ordinals, map checksum, and zero orphan/legacy/foreign rows all verify.'
-        : ordinalCorpus && rootSnapshotVerified && ordinalWorkspaceMatchesAdmitted
-          ? `Valid canonical subset exists (${validCanonicalKeys.size}/${admittedRootCandidateCount}); missing_ordinal=${missingOrdinal}, orphan_ordinal_rows=${orphanOrdinalRows}, legacy_identity_rows=${canonicalIdPacketKeyMismatch}. See the separate rejection counters; partial rows do not satisfy sealing.`
-          : `Corpus or admitted repo:root snapshot binding is absent/invalid${rootSnapshotError ? ` (${rootSnapshotError})` : ''}.`,
+        ? `Every admitted repo:root packet candidate has an exact current source/revision-bound packet-grain ordinal; receipt, artifact digest, candidate snapshot revision, map checksum, unique contiguous ordinals, and live packet readback verify. Physical chunk crosswalk is separate and remains pending.`
+        : ordinalCandidateMapEvidence && rootSnapshotVerified && ordinalWorkspaceMatchesAdmitted
+          ? `Packet-grain map verified for ${validCanonicalKeys.size}/${admittedRootCandidateCount} admitted candidates; missing_ordinal=${missingOrdinal}, orphan_ordinal_rows=${orphanOrdinalRows}, legacy_identity_rows=${canonicalIdPacketKeyMismatch}. Chunk crosswalk is separate.`
+          : `Packet-grain map or admitted repo:root snapshot binding is absent/invalid${ordinalCandidateMapError ? ` (${ordinalCandidateMapError})` : rootSnapshotError ? ` (${rootSnapshotError})` : ''}.`,
     };
 
     // ── Predicate 9: PROJECTIONS_CHECKSUM_ALIGNED ──
@@ -822,14 +1016,18 @@ async function main() {
       const { rows } = await q(`SELECT COUNT(*)::int AS n FROM ace_context_sources;`);
       aceEvidenceGrounded = {
         table_exists: true,
-        row_count: rows[0].n,
-        verdict: rows[0].n > 0 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
-        note: rows[0].n > 0
-          ? 'ace_context_sources has persisted rows, but row presence alone does not prove per-card source-span/symbol/tuple grounding or admitted producer/readback; those checks were not performed this pass.'
-          : 'ace_context_sources exists but has zero persisted source rows; an admitted producer and grounded readback are not proven.',
+        legacy_row_count: rows[0].n,
+        verdict: 'NOT_PROVEN',
+        evidence_owner: 'CANONICAL_RETRIEVAL_TO_ACE_V3_CONTEXTMANIFEST_RECEIPT_REQUIRED',
+        note: 'ace_context_sources is a legacy diagnostic only; its row count cannot prove production retrieval admission, AcePacketV3 identity, ContextManifest source grounding, or independent readback.',
       };
     } else {
-      aceEvidenceGrounded = { table_exists: false, verdict: 'NOT_PROVEN' };
+      aceEvidenceGrounded = {
+        table_exists: false,
+        legacy_row_count: null,
+        verdict: 'NOT_PROVEN',
+        evidence_owner: 'CANONICAL_RETRIEVAL_TO_ACE_V3_CONTEXTMANIFEST_RECEIPT_REQUIRED',
+      };
     }
 
     await client.query('ROLLBACK');

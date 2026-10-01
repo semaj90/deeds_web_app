@@ -4551,27 +4551,23 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	errorEmbeddingLatent64: vector('error_embedding_latent_64', { dimensions: 64 }),
 	latent128: halfvec('latent_128', { dimensions: 128 }),
 
-	// Learned nested-autoencoder representation (2026-08-29). NOT a prefix truncation of
-	// content_embedding -- an actual model forward pass (NestedSemanticAutoencoder.encode()).
-	// canonical_authority: false always -- routing/reranking lane only, never the primary
-	// retrieval authority.
-	// See openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md for the recall
-	// comparison that justified this column (latent_256 beats semantic_mrl_256, 0.8957 vs 0.8575).
+	// Candidate nested-autoencoder storage types. The current candidate architecture is
+	// semantic_768 -> learned latent_256 -> learned latent_128 -> normalized latent_64
+	// prefix of latent_128. Historical rows in these columns may have been produced by
+	// older checkpoint/derivation contracts; column presence is not provenance. Do not
+	// project them as candidate outputs without matching per-row input and model revisions.
+	// These are derived routing representations, never canonical semantic truth.
 	latent256: halfvec('latent_256', { dimensions: 256 }),
 	// Model checksum from the training receipt that produced latent_256 for this row.
 	// A future retrain must not silently mix generations -- a mismatch here means the row
 	// needs re-encoding, not that the column is stale/broken.
 	latent256CheckpointRevision: varchar('latent_256_checkpoint_revision', { length: 64 }),
 
-	// latent_64 (2026-09-02 LATENT-SCHEMA-ALIGN-01 correction): this file previously claimed
-	// latent_128/latent_64 "are NOT stored separately: they're free prefix+renormalize views of
-	// latent_256" -- that was false against live Postgres. `python/backfill_latent_256.py`
-	// persists latent_64 as its own learned-model output (same NestedSemanticAutoencoder forward
-	// pass, not a prefix of latent_256), and the column has been live and indexed
-	// (idx_codebase_chunk_latent64_hnsw) since before this correction. latent_128 genuinely has
-	// no Postgres column (in-memory only, per that script's own docstring) -- the claim was only
-	// half wrong. Declaration alignment only, no migration: every column below already exists on
-	// the live table. Live HNSW/checksum indexes (idx_codebase_chunk_latent64_hnsw,
+	// These legacy physical columns exist, but their contents are not promoted as outputs of
+	// atlas.latent-ae.768-512-256-128.v2. Historical latent_64 values must not be re-labelled as
+	// the candidate normalized prefix of latent_128. This is declaration alignment only; no
+	// migration or data rewrite is authorized here. Live HNSW/checksum indexes
+	// (idx_codebase_chunk_latent64_hnsw,
 	// idx_codebase_chunk_latent_valid, idx_codebase_chunk_latent_256_hnsw,
 	// idx_codebase_chunk_latent_256_checkpoint_revision) are intentionally not declared here,
 	// consistent with this repo's existing convention of keeping HNSW/GIN indexes in manual SQL

@@ -50,8 +50,22 @@ async function qdrantReadback(packetKeys) {
   return Array.isArray(body?.result?.points) ? body.result.points : [];
 }
 
+function assertSemanticWriterProvenanceReady() {
+  // This 15-row canary does not yet satisfy the current semantic-owner contract:
+  // /api/embed returns a mutable model label, modelRevision below is synthesized
+  // from content hashes, no tokenizer/input/vector provenance receipt is persisted,
+  // and Qdrant point upsert can replace unspecified named vectors/payload. Keep the
+  // writer disabled until those contracts and independent readbacks are implemented.
+  throw new Error(
+    'SEMANTIC_768_APPLY_BLOCKED:CANONICAL_WRITER_PROVENANCE_INCOMPLETE:' +
+      ' immutable model/tokenizer identity, durable per-row input/vector lineage, ' +
+      'and non-destructive Qdrant update/readback are required',
+  );
+}
+
 async function main() {
   if (process.env.ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL !== '1') throw new Error('EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED');
+  assertSemanticWriterProvenanceReady();
   const map = JSON.parse(await fs.readFile(mapPath, 'utf8'));
   const candidates = Array.isArray(map.candidates) ? map.candidates : [];
   if (candidates.length !== 15) throw new Error(`FROZEN_CANARY_COUNT_REQUIRED:expected=15:actual=${candidates.length}`);

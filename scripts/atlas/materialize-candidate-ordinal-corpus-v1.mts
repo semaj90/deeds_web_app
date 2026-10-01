@@ -187,39 +187,34 @@ async function main() {
       content_hash,
       sha256,
       metadata,
-      EXISTS (
-        SELECT 1
-          FROM atlas_packet_chunk_lineage l
-          JOIN codebase_chunk_index cci ON cci.id = l.chunk_row_id
-         WHERE l.packet_key = p.packet_key
-           -- exact raw source_ref (lineage stores the same spelling as the packet; canonical_source_ref
-           -- strips the sveltekit-frontend/ prefix and never equals the lineage spelling)
-           AND l.source_ref = p.source_ref
-           AND l.source_revision = p.source_revision
-           AND l.revision_status = 'PROVEN'
-           AND l.chunk_row_id IS NOT NULL
-      ) AS lineage_proven
-      , EXISTS (
-        SELECT 1 FROM atlas_packet_chunk_lineage l
-         WHERE l.packet_key = p.packet_key AND l.source_ref = p.source_ref
-      ) AS lineage_present
-      , (EXISTS (
-        SELECT 1 FROM atlas_packet_chunk_lineage l
-        JOIN codebase_chunk_index cci ON cci.id = l.chunk_row_id
-         WHERE l.packet_key = p.packet_key
-           AND l.source_ref = p.source_ref
-           AND l.revision_status = 'PROVEN'
-           AND l.source_revision IS DISTINCT FROM p.source_revision
-      ) AND NOT EXISTS (
-        SELECT 1 FROM atlas_packet_chunk_lineage l
-        JOIN codebase_chunk_index cci ON cci.id = l.chunk_row_id
-         WHERE l.packet_key = p.packet_key
-           AND l.source_ref = p.source_ref
-           AND l.source_revision = p.source_revision
-           AND l.revision_status = 'PROVEN'
-           AND l.chunk_row_id IS NOT NULL
-      )) AS lineage_revision_mismatch
+      COALESCE(lineage.lineage_proven, false) AS lineage_proven,
+      COALESCE(lineage.lineage_present, false) AS lineage_present,
+      (COALESCE(lineage.proven_other_revision, false)
+        AND NOT COALESCE(lineage.lineage_proven, false)) AS lineage_revision_mismatch
     FROM atlas_packets p
+    -- Compute all lineage diagnostics in one scan per packet. Keep the chunk join:
+    -- chunk_row_id is NOT NULL but currently has no FK, so non-null alone does not
+    -- prove that a physical codebase_chunk_index row exists.
+    LEFT JOIN LATERAL (
+      SELECT
+        COUNT(*) > 0 AS lineage_present,
+        BOOL_OR(
+          l.revision_status = 'PROVEN'
+          AND l.source_revision = p.source_revision
+          AND cci.id IS NOT NULL
+        ) AS lineage_proven,
+        BOOL_OR(
+          l.revision_status = 'PROVEN'
+          AND l.source_revision IS DISTINCT FROM p.source_revision
+          AND cci.id IS NOT NULL
+        ) AS proven_other_revision
+      FROM atlas_packet_chunk_lineage l
+      LEFT JOIN codebase_chunk_index cci ON cci.id = l.chunk_row_id
+      WHERE l.packet_key = p.packet_key
+        -- Exact raw source_ref: canonical_source_ref strips a prefix and is not
+        -- interchangeable with the spelling stored in lineage.
+        AND l.source_ref = p.source_ref
+    ) lineage ON TRUE
     WHERE p.workspace_revision_key = $1
     ORDER BY p.packet_id ASC
   `;
@@ -429,10 +424,46 @@ async function main() {
     await fs.mkdir(outputDir, { recursive: false });
     const mapPath = path.join(outputDir, 'candidate-ordinal-map-v1.json');
     const receiptPath = path.join(outputDir, 'receipt.json');
+    const rejectedCandidates = rootCohortRows
+      .filter((row) => row.lineage_proven !== true)
+      .map((row) => ({
+        packetKey: row.packet_key,
+        sourceRef: row.source_ref,
+        workspaceRevision: row.workspace_revision,
+        sourceRevision: row.source_revision,
+        classification: !row.lineage_present
+          ? 'MISSING_LINEAGE'
+          : row.lineage_revision_mismatch
+            ? 'PROVEN_LINEAGE_REVISION_MISMATCH'
+            : 'LINEAGE_PRESENT_NOT_EXACT_PROVEN',
+        lineagePresent: row.lineage_present,
+        lineageRevisionMismatch: row.lineage_revision_mismatch,
+      }))
+      .sort((a, b) => (a.packetKey ?? '').localeCompare(b.packetKey ?? '')
+        || (a.sourceRef ?? '').localeCompare(b.sourceRef ?? ''));
+    const rejectionDiagnosticBody = {
+      schema: 'atlas.candidate-ordinal-rejection-diagnostics.v1',
+      workspaceRevision,
+      candidateSnapshotRevision,
+      sourceManifestRevision: rootCohort.snapshot.snapshotRevision,
+      rootSourceMembershipChecksum: rootCohort.rootSourceMembershipChecksum,
+      candidateRowCount: rootCohortRows.length,
+      rejectedCandidateCount: rejectedCandidates.length,
+      rejectedCandidates,
+      canonicalAuthority: false,
+      datastoreWrites: 0,
+    };
+    const rejectionDiagnostics = {
+      ...rejectionDiagnosticBody,
+      diagnosticChecksum: sha256Json(rejectionDiagnosticBody),
+    };
+    const diagnosticsPath = path.join(outputDir, 'rejection-diagnostics.json');
     await fs.writeFile(mapPath, `${JSON.stringify(ordinalMap, null, 2)}\n`, { flag: 'wx' });
     await fs.writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { flag: 'wx' });
+    await fs.writeFile(diagnosticsPath, `${JSON.stringify(rejectionDiagnostics, null, 2)}\n`, { flag: 'wx' });
     console.log(`SEALED LOCAL ARTIFACT ONLY: ${mapPath}`);
     console.log(`SEALED LOCAL RECEIPT: ${receiptPath}`);
+    console.log(`LOCAL REJECTION DIAGNOSTICS ONLY: ${diagnosticsPath}`);
   } else {
     console.log('DRY RUN: Map and receipt computed successfully without writing.');
   }

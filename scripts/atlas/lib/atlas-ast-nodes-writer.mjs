@@ -26,17 +26,37 @@ function structuralKey(normalizedPath, nodeKind, qualifiedSymbol) {
 }
 
 /**
+ * atlas_ast_nodes has a unique B-tree key containing qualified_symbol. Keep the display/index
+ * value bounded so deeply nested or adversarial document headings cannot exceed PostgreSQL's
+ * per-index-tuple limit. The full value remains in structural_key and is used unchanged by both
+ * tree_node_id and normalized_node_hash, so this is not an identity truncation.
+ */
+export function indexSafeQualifiedSymbolV1(qualifiedSymbol) {
+  if (Buffer.byteLength(qualifiedSymbol, 'utf8') <= 512) return qualifiedSymbol;
+  const digest = createHash('sha256').update(qualifiedSymbol, 'utf8').digest('hex');
+  let prefix = '';
+  for (const codePoint of qualifiedSymbol) {
+    if (Buffer.byteLength(prefix + codePoint, 'utf8') > 160) break;
+    prefix += codePoint;
+  }
+  return `${prefix}…[sha256:${digest}]`;
+}
+
+/**
  * @param {import('pg').Pool | import('pg').PoolClient} client
  * `source_content_hash` is whole-file raw-byte identity. Node/span hashes belong
  * in `normalized_node_hash` or a receipt-level representation checksum and must
  * not be passed as the source content digest.
  *
- * @param {{ sourceRef: string, parserLanguage: string, parserName: string, sourceRevision?: string,
+ * @param {{ sourceRef: string, parserLanguage: string, parserName: string, parserVersion: string, sourceRevision?: string,
  *   workspaceId?: string, nodes: Array<{ kind: string, qualifiedSymbol: string, startByte: number,
  *   endByte: number, startLine: number, endLine: number, sourceContentDigest: string, parentIndex: number|null }> }} input
  * @returns {Promise<{ inserted: number, treeNodeIds: string[], insertedFlags: boolean[] }>}
  */
 export async function writeAtlasAstNodes(client, input) {
+  if (typeof input.parserVersion !== 'string' || input.parserVersion.trim().length === 0) {
+    throw new Error('PARSER_VERSION_REQUIRED');
+  }
   if (input.astGeneration !== undefined && !/^[a-z0-9_]+$/.test(String(input.astGeneration))) {
     throw new Error(`AST_GENERATION_INVALID:${String(input.astGeneration)}`);
   }
@@ -61,10 +81,10 @@ export async function writeAtlasAstNodes(client, input) {
 
     const params = [
       tid, sk, REPO_UUID, np,
-      node.kind, node.qualifiedSymbol, input.parserLanguage,
+      node.kind, indexSafeQualifiedSymbolV1(node.qualifiedSymbol), input.parserLanguage,
       parentTreeNodeId, node.startByte, node.endByte, node.startLine, node.endLine,
       createHash('sha256').update(sk).digest('hex'), node.sourceContentDigest,
-      input.parserName, input.parserVersion ?? null,
+      input.parserName, input.parserVersion,
       `${np}#${node.kind}:${node.qualifiedSymbol}`,
       input.workspaceId ?? null, input.sourceRevision ?? null,
     ];

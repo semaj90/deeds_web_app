@@ -61,8 +61,10 @@
 - [x] Make the legacy latent writer fail closed on ordinary `--apply`; its
   diagnostic persistence now requires the explicit `--legacy-unsafe-apply`
   flag and remains outside promotion.
-- [ ] TOPO-03 Implement/read-prove `RepresentationArtifactV1` digests and
-  revision bindings.
+- [x] TOPO-03 Implement/read-prove `RepresentationArtifactV1` digests and
+  revision bindings. `buildRepresentationArtifactV1` seals the descriptor with
+  the shared canonical hash; the verifier detects tampering, and family binding
+  checks parent revision/digest/population plus workspace/source/candidate parity.
 - [ ] TOPO-03A Read-prove `latent_256` storage/index coverage and deterministic
   `latent_128`/`latent_64` derivation from the same parent artifact.
 - [x] Read-only derivation sample confirms the nested projection numerically

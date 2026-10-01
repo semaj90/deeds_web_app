@@ -1,0 +1,96 @@
+{
+  "schema": "atlas.external-doc-coordinates.v1",
+  "note": "Sidecar for atlas_okf_docs_pipeline manifests, whose SourceConfigV1 forbids provider/product/version fields. Never fabricates an exact version: unversioned live pages are CURRENT_UPSTREAM and get productVersion 'CURRENT_UPSTREAM@<capture date>'.",
+  "sources": {
+    "sveltekit": {
+      "provider": "sveltejs",
+      "product": "sveltekit",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Svelte",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "npm",
+        "package": "@sveltejs/kit"
+      }
+    },
+    "svelte5-runes": {
+      "provider": "sveltejs",
+      "product": "svelte",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Svelte",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "npm",
+        "package": "svelte"
+      }
+    },
+    "bits-ui": {
+      "provider": "huntabyte",
+      "product": "bits-ui",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Bits UI",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "npm",
+        "package": "bits-ui"
+      }
+    },
+    "drizzle-orm": {
+      "provider": "drizzle-team",
+      "product": "drizzle-orm",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Drizzle Team",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "npm",
+        "package": "drizzle-orm"
+      },
+      "urlOverrides": {
+        "https://github.com/drizzle-team/drizzle-orm/issues/5792": {
+          "authorityClass": "UPSTREAM_ISSUE_EVIDENCE",
+          "versionQualification": "UNVERSIONED"
+        }
+      }
+    },
+    "drizzle-kit": {
+      "provider": "drizzle-team",
+      "product": "drizzle-kit",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Drizzle Team",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "npm",
+        "package": "drizzle-kit"
+      }
+    },
+    "postgresql-18": {
+      "provider": "postgresql",
+      "product": "postgresql",
+      "versionQualification": "MAJOR_VERSION",
+      "productVersion": "18",
+      "language": "sql",
+      "publisher": "PostgreSQL Global Development Group",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "postgres",
+        "setting": "server_version"
+      }
+    },
+    "pgvector": {
+      "provider": "pgvector",
+      "product": "pgvector",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "sql",
+      "publisher": "pgvector",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "pgvector"
+      }
+    }
+  }
+}

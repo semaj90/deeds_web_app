@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   RepresentationArtifactV1Schema,
+  assertRepresentationArtifactDigestV1,
   assertPromotionReadyRepresentationArtifact,
   assertRepresentationFamilyRevisionBinding,
+  buildRepresentationArtifactV1,
   NESTED_LATENT_REPRESENTATION_FAMILY_V1,
 } from './representation-artifact-v1.js';
 
@@ -48,7 +50,22 @@ const artifact = {
   canonicalAuthority: false as const,
 };
 
+function sealArtifact(overrides: Partial<RepresentationArtifactV1> = {}): RepresentationArtifactV1 {
+  const { artifactDigest: _artifactDigest, ...body } = { ...artifact, ...overrides };
+  return buildRepresentationArtifactV1(body);
+}
+
 describe('RepresentationArtifactV1', () => {
+  it('seals all artifact fields with the canonical digest and detects tampering', () => {
+    const { artifactDigest: _artifactDigest, ...body } = artifact;
+    const sealed = buildRepresentationArtifactV1(body);
+    expect(sealed.artifactDigest).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(assertRepresentationArtifactDigestV1(sealed)).toEqual(sealed);
+    expect(() =>
+      assertRepresentationArtifactDigestV1({ ...sealed, outputDigest: 'sha256:changed' })
+    ).toThrow('REPRESENTATION_ARTIFACT_DIGEST_MISMATCH');
+  });
+
   it('accepts a fully revision-qualified derived latent artifact', () => {
     const parsed = RepresentationArtifactV1Schema.parse(artifact);
     expect(() => assertPromotionReadyRepresentationArtifact(parsed)).not.toThrow();
@@ -65,19 +82,19 @@ describe('RepresentationArtifactV1', () => {
       inputRepresentationId: 'latent_128',
     });
     expect(() => assertPromotionReadyRepresentationArtifact(invalid)).toThrow(
-      'LATENT_INPUT_REPRESENTATION_MISMATCH',
+      'LATENT_INPUT_REPRESENTATION_MISMATCH'
     );
   });
 
   it('rejects an eligibleCount larger than rowCount', () => {
     expect(() =>
-      RepresentationArtifactV1Schema.parse({ ...artifact, eligibleCount: 999_999 }),
+      RepresentationArtifactV1Schema.parse({ ...artifact, eligibleCount: 999_999 })
     ).toThrow();
   });
 
   it('rejects a writtenCount larger than eligibleCount', () => {
     expect(() =>
-      RepresentationArtifactV1Schema.parse({ ...artifact, writtenCount: 999_999 }),
+      RepresentationArtifactV1Schema.parse({ ...artifact, writtenCount: 999_999 })
     ).toThrow();
   });
 
@@ -88,14 +105,18 @@ describe('RepresentationArtifactV1', () => {
   });
 
   it('allows a corpus artifact without retrieval execution coordinates', () => {
-    const { candidateSnapshotRevision: _snapshot, ordinalMapChecksum: _ordinal, ...corpusArtifact } = artifact;
+    const {
+      candidateSnapshotRevision: _snapshot,
+      ordinalMapChecksum: _ordinal,
+      ...corpusArtifact
+    } = artifact;
     expect(() => RepresentationArtifactV1Schema.parse(corpusArtifact)).not.toThrow();
   });
 
   it('rejects only one retrieval execution coordinate', () => {
     const { ordinalMapChecksum: _ordinal, ...invalid } = artifact;
     expect(() => RepresentationArtifactV1Schema.parse(invalid)).toThrow(
-      'CANDIDATE_EXECUTION_COORDINATES_MUST_BE_PROVIDED_TOGETHER',
+      'CANDIDATE_EXECUTION_COORDINATES_MUST_BE_PROVIDED_TOGETHER'
     );
   });
 
@@ -115,7 +136,7 @@ describe('RepresentationArtifactV1', () => {
   it('rejects PROVEN source authority without sourceRevisionDigest', () => {
     const { sourceRevisionDigest: _s, ...invalid } = artifact;
     expect(() => RepresentationArtifactV1Schema.parse(invalid)).toThrow(
-      'SOURCE_AUTHORITY_PROVEN_REQUIRES_SOURCE_REVISION_DIGEST',
+      'SOURCE_AUTHORITY_PROVEN_REQUIRES_SOURCE_REVISION_DIGEST'
     );
   });
 });
@@ -140,7 +161,7 @@ describe('LATENT256-REPRESENTATION-CONTRACT-02: nested latent family', () => {
       // inputRepresentationId left as 'semantic_768' from the base fixture — wrong for latent_128
     });
     expect(() => assertPromotionReadyRepresentationArtifact(invalid)).toThrow(
-      'LATENT_INPUT_REPRESENTATION_MISMATCH',
+      'LATENT_INPUT_REPRESENTATION_MISMATCH'
     );
   });
 
@@ -162,7 +183,7 @@ describe('LATENT256-REPRESENTATION-CONTRACT-02: nested latent family', () => {
       inputRepresentationId: 'latent_256',
     });
     expect(() => assertPromotionReadyRepresentationArtifact(invalid)).toThrow(
-      'LATENT_128_DIMENSION_MISMATCH',
+      'LATENT_128_DIMENSION_MISMATCH'
     );
   });
 
@@ -173,32 +194,70 @@ describe('LATENT256-REPRESENTATION-CONTRACT-02: nested latent family', () => {
   });
 
   it('accepts family members that share one root modelChecksum/modelRevision/parametersDigest/transformPolicyRevision', () => {
-    const latent256 = RepresentationArtifactV1Schema.parse(artifact);
-    const latent64 = RepresentationArtifactV1Schema.parse({
-      ...artifact,
+    const latent256 = sealArtifact();
+    const latent64 = sealArtifact({
       representationId: 'latent_64',
       dimensions: 64,
-      inputRepresentationId: 'semantic_768',
+      inputRepresentationId: latent256.representationId,
+      inputRepresentationRevision: latent256.representationRevision,
+      inputDigest: latent256.outputDigest,
+      inputPopulationChecksum: latent256.outputPopulationChecksum,
     });
     expect(() => assertRepresentationFamilyRevisionBinding([latent256, latent64])).not.toThrow();
   });
 
   it('rejects a latent_64 artifact silently derived from a different latent_256 checkpoint than it claims (the exact bug this gate closes)', () => {
-    const latent256 = RepresentationArtifactV1Schema.parse(artifact);
-    const latent64WrongChecksum = RepresentationArtifactV1Schema.parse({
-      ...artifact,
+    const latent256 = sealArtifact();
+    const latent64WrongChecksum = sealArtifact({
       representationId: 'latent_64',
       dimensions: 64,
-      inputRepresentationId: 'semantic_768',
+      inputRepresentationId: latent256.representationId,
+      inputRepresentationRevision: latent256.representationRevision,
+      inputDigest: latent256.outputDigest,
+      inputPopulationChecksum: latent256.outputPopulationChecksum,
       modelChecksum: 'b'.repeat(64),
     });
     expect(() =>
-      assertRepresentationFamilyRevisionBinding([latent256, latent64WrongChecksum]),
+      assertRepresentationFamilyRevisionBinding([latent256, latent64WrongChecksum])
     ).toThrow('REPRESENTATION_FAMILY_REVISION_MISMATCH');
   });
 
+  it('rejects a child artifact bound to a stale parent revision or output checksum', () => {
+    const latent256 = sealArtifact();
+    const staleChild = sealArtifact({
+      representationId: 'latent_64',
+      dimensions: 64,
+      inputRepresentationId: latent256.representationId,
+      inputRepresentationRevision: 'latent:stale-parent',
+      inputDigest: latent256.outputDigest,
+      inputPopulationChecksum: latent256.outputPopulationChecksum,
+    });
+    expect(() => assertRepresentationFamilyRevisionBinding([latent256, staleChild])).toThrow(
+      'REPRESENTATION_PARENT_REVISION_MISMATCH'
+    );
+  });
+
+  it('rejects a family member whose descriptor changed after sealing', () => {
+    const latent256 = sealArtifact();
+    const latent64 = sealArtifact({
+      representationId: 'latent_64',
+      dimensions: 64,
+      inputRepresentationId: latent256.representationId,
+      inputRepresentationRevision: latent256.representationRevision,
+      inputDigest: latent256.outputDigest,
+      inputPopulationChecksum: latent256.outputPopulationChecksum,
+    });
+
+    expect(() =>
+      assertRepresentationFamilyRevisionBinding([
+        latent256,
+        { ...latent64, outputDigest: 'sha256:tampered' },
+      ])
+    ).toThrow('REPRESENTATION_ARTIFACT_DIGEST_MISMATCH');
+  });
+
   it('does nothing for a single artifact or unrelated representationIds (no cross-artifact claim to check)', () => {
-    const latent256 = RepresentationArtifactV1Schema.parse(artifact);
+    const latent256 = sealArtifact();
     expect(() => assertRepresentationFamilyRevisionBinding([latent256])).not.toThrow();
     expect(() => assertRepresentationFamilyRevisionBinding([])).not.toThrow();
   });

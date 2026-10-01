@@ -90,7 +90,12 @@ export function createSearchRuntimeAceResolverV1(
         const runtimeCandidate = candidateById.get(row.canonicalId);
         if (!candidate || !runtimeCandidate || candidate.canonicalId !== row.canonicalId
           || candidate.packetKey !== row.packetKey || candidate.sourceRef !== row.sourceRef
-          || String(row.workspaceRevision) !== candidate.workspaceRevision) {
+          || String(row.workspaceRevision) !== candidate.workspaceRevision
+          || runtimeCandidate.canonicalId !== candidate.canonicalId
+          || runtimeCandidate.packetKey !== candidate.packetKey
+          || runtimeCandidate.sourceRef !== candidate.sourceRef
+          || runtimeCandidate.sourceRevision !== candidate.sourceRevision
+          || runtimeCandidate.workspaceRevision !== candidate.workspaceRevision) {
           throw new Error(`ACE_RESOLVER_CANDIDATE_FEATURE_MISMATCH:${row.candidateOrdinal}`);
         }
         // RetrievalRouterFeatureRowV1 carries a source-version receipt, not a
@@ -102,8 +107,15 @@ export function createSearchRuntimeAceResolverV1(
         throw new Error('ACE_RESOLVER_FEATURE_ROWS_MISSING');
       }
       for (const candidate of ordinalMap.candidates) {
-        if (!candidateById.has(candidate.canonicalId)) {
+        const runtimeCandidate = candidateById.get(candidate.canonicalId);
+        if (!runtimeCandidate) {
           throw new Error(`ACE_RESOLVER_CANDIDATE_MISSING:${candidate.canonicalId}`);
+        }
+        if (runtimeCandidate.packetKey !== candidate.packetKey
+          || runtimeCandidate.sourceRef !== candidate.sourceRef
+          || runtimeCandidate.sourceRevision !== candidate.sourceRevision
+          || runtimeCandidate.workspaceRevision !== candidate.workspaceRevision) {
+          throw new Error(`ACE_RESOLVER_CANDIDATE_IDENTITY_MISMATCH:${candidate.canonicalId}`);
         }
       }
       if (!sources.producerRevision.trim()) throw new Error('ACE_RESOLVER_PRODUCER_REVISION_MISSING');

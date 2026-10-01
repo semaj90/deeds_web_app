@@ -17736,3 +17736,27 @@ merge to need real attention, not a blind auto-merge.
 
 Status: `SESSION_HANDOFF_COMMIT_735D456E09_LOCAL_NOT_PUSHED_MERGE_NEEDED_FIRST`; authority=false;
 writesPerformed=false (this handoff entry is documentation only).
+
+## Ontology-linked classification to prefill/DAG gates (2026-09-30)
+
+- [ ] ONTO-PREFILL-01: define and test the read-only adapter from the existing
+      `ClassificationEnvelopeV1` to admitted `OntologyLinkedTupleV1` lookup and the current
+      capability/skill LUT. Require exact packet/source/workspace/representation revisions and
+      evidence refs at each boundary; classify only bounded legal retrieval lanes and budgeted
+      DAG nodes. The adapter must return typed omissions/rejections and never convert a domain,
+      centroid, ontology proposal, or cache hit into identity or authorization. Pass only the
+      selected, reranked, exact-promotion evidence into `ContextManifest`; raw hits must not be
+      injected directly into synthesis.
+- [ ] ONTO-E2E-01: produce a deterministic fixture/replay receipt for query → classification
+      envelope → ontology tuple lookup → bounded MCP/retrieval DAG → CandidateOrdinal/feature
+      ranking → ContextManifest → ACE packet/readback → synthesis request receipt. Verify exact
+      source and revision citations, tuple provenance, lane single-vote semantics, token budget,
+      and fail-closed behavior when any identity/evidence/revision check is absent. Keep Valkey
+      cache read-only during the initial proof; any production cache write or live activation is a
+      separate approved gate owned by the ACE/BitFrost cache changes. Never persist hidden model
+      reasoning, KV state, or tensors.
+
+Acceptance: deterministic replay yields the same admitted evidence set and manifest checksum;
+mutation-denial tests prove classification and tuple lookup cannot write canonical stores or
+bypass host authorization. Fixture/replay success does not by itself prove live production
+grounding or close `ACE_EVIDENCE_GROUNDED`.

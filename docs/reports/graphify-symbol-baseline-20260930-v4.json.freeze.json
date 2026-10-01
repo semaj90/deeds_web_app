@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.graphify-symbol-baseline-freeze.v1",
+  "generatedAt": "2026-09-30T15:49:45.917Z",
+  "manifestChecksum": "sha256:049befc56fb8e86d09bf31d9c53c881942cde4644179786612777ebddccb1251",
+  "revalidatedPreviousManifestChecksum": "sha256:5199df3ee1f7a3a39670650aeb90e574d19b594fcf3d2c472691bef70d2f2d5a",
+  "manifestRowCount": 14531,
+  "canonicalAuthority": false,
+  "datastoreWrites": false,
+  "candidatePoolRows": 14531,
+  "supportedCandidatePoolRows": 14531,
+  "skippedUnsupported": 0,
+  "precheckRowsExamined": 14531,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": []
+}

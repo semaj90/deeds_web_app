@@ -18,6 +18,7 @@ import {
 	boolean,
 	index,
 	integer,
+	halfvec,
 	jsonb,
 	pgTable,
 	primaryKey,
@@ -218,12 +219,20 @@ export const codebaseChunkIndex = pgTable(
     tokenCount: integer('token_count'),
     content: text('content'),
     summary: text('summary'),
-    // Historical/transition 768-D surface. Existing rows are not admitted
-    // semantic_768 representations without their own lineage receipt.
-    contentEmbedding: vector('content_embedding', { dimensions: 768 }),
+    // Historical/transition 768-D surface is halfvec in PostgreSQL. Existing
+    // rows are not admitted semantic_768 representations without lineage.
+    contentEmbedding: halfvec('content_embedding', { dimensions: 768 }),
     // Canonical semantic_768 storage target. The column's physical presence
     // does not qualify existing values or establish a production writer.
     contentEmbedding768: vector('content_embedding_768', { dimensions: 768 }),
+    // Derived candidate storage declarations only. Existing values may belong
+    // to older checkpoint/derivation revisions; these types do not authorize
+    // training, writes, or projection to Qdrant.
+    latent256: halfvec('latent_256', { dimensions: 256 }),
+    latent128: halfvec('latent_128', { dimensions: 128 }),
+    latent64: vector('latent_64', { dimensions: 64 }),
+    latent256CheckpointRevision: varchar('latent_256_checkpoint_revision', { length: 64 }),
+    latent64Model: text('latent64_model'),
     signatureEmbedding: vector('signature_embedding', { dimensions: 768 }),
     summaryEmbedding: vector('summary_embedding', { dimensions: 768 }),
     gpuCluster: integer('gpu_cluster'),

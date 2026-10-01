@@ -264,14 +264,11 @@ already completed plus the follow-up scoping work, not feature implementation �
   `ldr-ace-bridge.ts`). Read `web-search.ts`'s real `WebSearchResult`/`WebSearchResponse` types
   directly and confirmed neither carries a checksum, `observedAt`, or reproducibility contract —
   the gap is durable/reproducible snapshot identity, not search capability.
-- [ ] 5.4 Not built: `OrnithPrefixIdentityV1` (checksum-bound llama.cpp prefix-cache identity —
-  `sha256(modelRevision, chatTemplateRevision, toolSchemaRevision, systemPromptRevision,
-  contextManifestPrefixChecksum)`). Hard rule recorded: never build a "save/restore Ornith's
-  recurrent (Gated DeltaNet-style) state" feature — upstream llama.cpp itself treats rewinding that
-  state as not equivalent to a conventional KV-cache rewind, and general state
-  injection/restoration is an active, unresolved upstream concern. Use `cache_prompt`/
-  `cache_reuse` (already mandated by this repo's canonical llama-server startup contract) as-is;
-  record cache hit/miss as telemetry only, never as a correctness input.
+- [x] 5.4 Added `OrnithPrefixIdentityV1` in `packages/parent-atlas/src/core/adaptive-memory-runtime.ts`.
+  Its checksum binds the model, chat template, tool schema, system prompt, and context-manifest
+  prefix; schema tests reject session telemetry, recurrent state, and canonical authority. This is
+  identity metadata only: it does not read, persist, or restore llama.cpp KV/DeltaNet state. Keep
+  cache hit/miss telemetry outside identity and use `cache_prompt`/`cache_reuse` as-is.
 - [ ] 5.5 Not built: `LexicalFingerprintV1` and the `ts_stat()`-derived IDF feature. Explicitly
   gated: do not build unless an evaluation proves value over what FTS/pg_trgm already provide —
   matches this repo's existing "don't add a 5th retrieval lane" discipline, applied to lexical/BoW.
@@ -339,3 +336,10 @@ label set**, never a new identity scheme and never a hardcoded "dex 0-151" numbe
   4. ACE JSON packet fields: same caution as BitFrost above — ACE's packet envelope shape is used
      across many call sites; swapping any field to a LUT-coded byte needs a call-site audit first
      (per this repo's Duplication Prevention rule), not a blind schema change.
+
+## 7. TriEngramV1 three-plane boundary (2026-09-30)
+
+- [x] 7.1 Added the strict `TriEngramV1` descriptor to the existing Parent Atlas adaptive-memory
+  runtime owner. E1/PostgreSQL is the only canonical authority; E2 is derived retrieval/residency;
+  E3 is llama-server-owned, ephemeral, and non-authoritative. Focused tests reject E3 promotion and
+  persistent lifecycle claims. No store, persistence path, or runtime state transfer was added.

@@ -385,7 +385,10 @@
     "parent-atlas:cache:hydrate": "cd packages/parent-atlas && npm run cache:hydrate",
     "parent-atlas:mapreduce": "cd packages/parent-atlas && npm run mapreduce",
     "parent-atlas:verify:boundaries": "npm run verify:boundaries",
-    "parent-atlas:all": "npm run parent-atlas:build && npm run parent-atlas:gate:identity && npm run parent-atlas:gate:lineage && npm run parent-atlas:ingest"
+    "parent-atlas:all": "npm run parent-atlas:build && npm run parent-atlas:gate:identity && npm run parent-atlas:gate:lineage && npm run parent-atlas:ingest",
+    "atlas:library-docs:inventory": "node scripts/atlas/audit-library-api-doc-inventory-v1.mjs",
+    "atlas:library-docs:inventory:report": "node scripts/atlas/audit-library-api-doc-inventory-v1.mjs --write-report",
+    "atlas:library-docs:inventory:test": "node --test scripts/atlas/lib/library-doc-inventory-v1.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "2.0.47",

@@ -504,6 +504,14 @@ type PassExecution = {
       shape for `summarization`; `embedding`/`cache_push` duplicate cause
       still unknown (47 groups, ~97 rows — low volume, check before assuming
       same pattern applies)
+      **Source trace refresh 2026-09-29:** `analysis-pass-orchestrator.mts`
+      is a legacy Gemma4-summary importer; the shared analysis worker calls
+      `recordAnalysisPassResult` with configured `passName` and nullable
+      lineage, but no current source literal for `embedding` or `cache_push`
+      was found in the scoped TypeScript callers. This cannot identify the
+      producer of the 27 unresolved embedding groups; the 10 cache-push groups
+      also remain untraced. No worker was run and no database was queried in
+      this source-only refresh, so PF4B stays open.
 - [x] PF4C — prove `pass_key` semantics from code/history: it is job-scoped
       execution retry identity, not logical pass identity. Keep it unchanged;
       use the separate logical identity only when a stable `inputHash` is
@@ -526,7 +534,18 @@ type PassExecution = {
       silently leave ambiguous NULLs — a typed status is queryable, a NULL
       that means "we don't know" vs NULL that means "not applicable" is not)
 - [ ] PF4F — wire the writer; new rows MUST populate both revision fields
-      (currently zero code paths write to this table at all)
+      (the shared `recordAnalysisPassResult` writer is called by
+      `sveltekit-frontend/src/lib/server/analysis/worker.ts`; its generic path
+      forwards nullable source/workspace/representation revisions, while a
+      specialized `code_feature_registry` branch builds a richer source-bound
+      input when a qualifying receipt exists. Live coverage remains sparse:
+      the 2026-09-27 read-only census found only 27/11,103 rows with both
+      source/pass revisions. A separate legacy importer,
+      `scripts/atlas/analysis-pass-orchestrator.mts`, is explicitly
+      `--apply`-gated and writes only `gemma4_summary_v1` rows with
+      `input_hash` and `prompt_hash` NULL and no source/pass revision columns.
+      Neither source explains the observed `embedding`/`cache_push` duplicate
+      groups. PF4F remains open: new eligible rows must carry both revisions.)
 - [ ] PF4G — prove duplicate-delivery idempotency on new writes
 - [ ] PF4H — add DB uniqueness **only at the logical-materialization
       boundary** (a view or projection selecting current-eligible-per-

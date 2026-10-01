@@ -21,8 +21,8 @@
  * Strategy per file:
  *   1. Split into sliding-window chunks (~800 chars, 100-char overlap)
  *   2. Embed each chunk via Ollama embeddinggemma:latest (768-dim)
- *   3. Upsert chunk into codebase_chunk_index.content_embedding_768 (vector(768))
- *   4. Upsert point into Qdrant codebase_chunks_768 (named vector "content")
+ *   3. Upsert chunk metadata into PostgreSQL (semantic_768 remains Postgres-owner-only)
+ *   4. Upsert embedding projection into Qdrant codebase_chunks_768 (named vector "content")
  *
  * Idempotent: uses content_hash ON CONFLICT (qdrant_id) DO UPDATE.
  * Skips files already indexed (content_hash matches).
@@ -509,26 +509,24 @@ async function upsertQdrant(pointId, vector, payload) {
 }
 
 // ── Postgres upsert ───────────────────────────────────────────────────────────
-async function upsertPostgres(pool, chunk, embedding) {
-  const vecStr = `[${embedding.join(',')}]`;
+async function upsertPostgresMetadata(pool, chunk) {
   await pool.query(
     `INSERT INTO codebase_chunk_index
        (qdrant_id, chunk_id, relative_path, source_ref,
-        content, content_embedding_768,
+        content,
         domain, tags, metadata,
         language, extension, embedding_model, embedding_dimension, content_hash,
         file_content_hash, content_hash_scope, content_hash_algorithm,
         content_hash_length, content_hash_version,
         line_start, line_end, indexed_at, updated_at)
-     VALUES ($1, $2, $3, $3, $4, $5::halfvec(768),
-             $6, $7::jsonb, $8::jsonb,
-             $9, $10, $11, $12, $13,
-             $14, $15, $16, $17, $18,
-             $19, $20, NOW(), NOW())
+     VALUES ($1, $2, $3, $3, $4,
+             $5, $6::jsonb, $7::jsonb,
+             $8, $9, $10, $11, $12,
+             $13, $14, $15, $16, $17,
+             $18, $19, NOW(), NOW())
      ON CONFLICT (qdrant_id) DO UPDATE SET
        content           = EXCLUDED.content,
        source_ref       = EXCLUDED.source_ref,
-       content_embedding_768 = EXCLUDED.content_embedding_768,
        content_hash      = EXCLUDED.content_hash,
        file_content_hash = EXCLUDED.file_content_hash,
        content_hash_scope = EXCLUDED.content_hash_scope,
@@ -544,7 +542,6 @@ async function upsertPostgres(pool, chunk, embedding) {
       chunk.chunk_id,
       chunk.relative_path,
       chunk.content,
-      vecStr,
       chunk.domain_class ?? null,
       JSON.stringify(chunk.qdrant_tags ?? []),
       JSON.stringify(chunk.metadata ?? {}),
@@ -823,7 +820,10 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
           },
         };
         await upsertQdrant(chunk.qdrant_id, embedding, payload);
-        await upsertPostgres(pool, chunk, embedding);
+        // This broad filesystem indexer cannot establish admitted workspace/source
+        // lineage. Keep its vector in Qdrant as a projection; do not promote it into
+        // PostgreSQL's canonical semantic_768 column.
+        await upsertPostgresMetadata(pool, chunk);
         stats.chunks++;
         succeededChunks++;
         // Accumulate for Redis centroid warming (post-run)

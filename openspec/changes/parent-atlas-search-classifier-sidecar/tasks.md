@@ -42,6 +42,22 @@ this change adds one more tool alongside it, does not close it), `parent-atlas-o
       is already live and dispatching 7 pass families into `AnalyzeResponse.pass_results`. Task 2
       needs only to add `"classify"` to the pass union and dispatch loop.
 
+## AST-domain classifier feature admission (2026-09-30)
+
+- [ ] CLASSIFIER-AST-DOMAIN-05: retain the existing `ast_domain_confidence` feature slot; wire it
+      only from the admitted AST-domain resolver specified by
+      `parent-atlas-workstation-domain-classifier` AST-DOMAIN-ADMISSION-03. Require exact
+      packet/source/workspace/source revisions and the matching provider revision. On absent,
+      stale, conflicting, or ambiguous AST evidence, follow the established missing-feature
+      contract; never borrow an older row or convert missing evidence into a confident zero.
+- [ ] Add focused vector-builder tests for exact admitted evidence, absent evidence, stale source
+      or workspace revision, conflicting observations, and malformed confidence outside `[0,1]`.
+      Prove the feature does not change packet identity or create a second classifier owner.
+
+Acceptance: feature lineage is inspectable from vector slot to the exact AST observation and
+provider revision; failed admission produces a typed omission/rejection. This task does not
+authorize classifier retraining, model promotion, or corpus writes.
+
 ## 1. Classifier consolidation
 
 - [x] 1.1 CORRECTED 2026-09-03 — do NOT delete. `sveltekit-frontend/src/lib/server/classifier/domain-classifier.ts`

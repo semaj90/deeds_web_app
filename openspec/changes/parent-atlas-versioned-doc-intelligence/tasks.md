@@ -1280,6 +1280,18 @@ DDL or source-of-truth change was applied.
   Neo4j/Graphify writes 0; embedding and admission remain blocked on
   `EMB-PROV-01` and explicit writer authorization.
 
+- [x] `LANGCHAIN-TYPESCRIPT-LOCAL-CORPUS-01` (2026-09-30, artifact-only): added
+  a separate TypeScript/OpenWiki source config, preserved section language through
+  the existing chunker and pinned viewer, and registered a bounded language filter
+  on the existing KB MCP server. The fetch receipt records 178 discovered, 174
+  fetched, 4 conserved failures, and 0 datastore writes; the chunk receipt records
+  2,907 unique chunk IDs/evidence revisions across `typescript` and `mixed` pages.
+  A redirected duplicate alias was rejected rather than weakening chunk identity.
+  MCP smoke returns local `LOCAL_UNADMITTED` evidence only. This does not close
+  DOC-15 dense/Qdrant retrieval, canonical admission, or the other API-catalog
+  sources (RAPIDS/cuVS/cuGraph/CUDA/Go/Rust), which remain separate acquisition
+  work under the existing source catalog.
+
 ## Fabric split decision — documentation corpus vs live structural search (2026-09-27)
 
 An external architecture review proposed splitting future work into two

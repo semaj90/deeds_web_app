@@ -1,7 +1,7 @@
 {
   "schema_version": "atlas-canonical-projection-fabric-audit-v1",
-  "generated_at": "2026-09-29T02:46:04.599Z",
-  "repository_commit": "e36e112a3836fe04c42e5f1d2434b648961990e8",
+  "generated_at": "2026-09-29T20:05:09.840Z",
+  "repository_commit": "88ae5c7d56c59d724962d5654eea7dcc775ace62",
   "database_identity": "127.0.0.1:5434",
   "source_proposal": "ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture review, recorded 2026-09-08)",
   "limitations": [],
@@ -115,12 +115,8 @@
       "sql": "SELECT COUNT(*)::int AS n FROM atlas_symbol_versions;"
     },
     {
-      "digest": "1102c8c998fbd398",
-      "sql": "SELECT COUNT(*)::int AS n FROM atlas_workspace_source_bindings WHERE workspace_revision = $1;"
-    },
-    {
-      "digest": "83007706a74a630e",
-      "sql": "SELECT COUNT(*)::int AS n FROM graphify_symbols gs JOIN graphify_files gf ON gf.file_id = gs.file_id WHERE gf.source_ref IN (SELECT canonical_source_ref FROM atlas_workspace_source_bindings WHERE workspace_revision = $1);"
+      "digest": "42fc3d838211c05e",
+      "sql": "WITH admitted AS ( SELECT canonical_source_ref, source_revision, lower(split_part(canonical_source_ref, '.', array_length(string_to_array(canonical_source_ref, '.'), 1))) AS extension FROM atlas_workspace_source_bindings WHERE repo_id = 'deeds-web-app' AND workspace_revision = $1 ), supported AS ( SELECT * FROM admitted WHERE extension = ANY(ARRAY['ts','mts','tsx','js','mjs','cjs','jsx','json','jsonc','md','markdown','txt']::text[]) ) SELECT (SELECT COUNT(*)::int FROM admitted) AS bound_source_ref_count, (SELECT COUNT(*)::int FROM supported) AS supported_source_ref_count, COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.file_id IS NOT NULL)::int AS exact_graphify_source_ref_count, COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.parse_status = 'PROCESSED')::int AS processed_source_ref_count, COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.parse_status = 'UNPROCESSED')::int AS unprocessed_source_ref_count, COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.parse_status = 'PARSE_FAILED')::int AS parse_failed_source_ref_count, COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gs.symbol_id IS NOT NULL)::int AS source_refs_with_symbols, COUNT(DISTINCT gs.symbol_id)::int AS exact_revision_symbol_row_count, (SELECT COUNT(*)::int FROM ( SELECT s2.canonical_source_ref FROM supported s2 JOIN graphify_files gf2 ON gf2.source_ref = s2.canonical_source_ref AND gf2.code_source_revision = s2.source_revision GROUP BY s2.canonical_source_ref HAVING COUNT(*) > 1 ) ambiguous) AS duplicate_exact_graphify_source_ref_count FROM supported s LEFT JOIN graphify_files gf ON gf.source_ref = s.canonical_source_ref AND gf.code_source_revision = s.source_revision LEFT JOIN graphify_symbols gs ON gs.file_id = gf.file_id;"
     },
     {
       "digest": "3af765062b11b7b6",
@@ -192,15 +188,23 @@
     },
     "SYMBOLS_RESOLVED": {
       "graphify_symbols_exists": true,
-      "graphify_symbols_row_count": 194,
+      "graphify_symbols_row_count": 11904,
       "atlas_symbol_registry_exists": true,
       "atlas_symbol_registry_row_count": 10504,
       "atlas_symbol_versions_exists": true,
       "atlas_symbol_versions_row_count": 479,
       "reconciliation_gate": {
         "status": "GROUNDED",
-        "boundSourceRefCount": 24456,
-        "symbolsForBoundRefs": 194
+        "bound_source_ref_count": 24456,
+        "supported_source_ref_count": 21584,
+        "exact_graphify_source_ref_count": 20425,
+        "processed_source_ref_count": 3764,
+        "unprocessed_source_ref_count": 16657,
+        "parse_failed_source_ref_count": 4,
+        "source_refs_with_symbols": 1758,
+        "exact_revision_symbol_row_count": 11902,
+        "duplicate_exact_graphify_source_ref_count": 0,
+        "missing_exact_graphify_source_ref_count": 1159
       },
       "nomination_resolution": {
         "source_receipt": "symbol-reconciliation-writer-v1-1790649436604.json",
@@ -212,12 +216,20 @@
       },
       "coverage": {
         "bound_source_ref_count": 24456,
-        "symbol_row_count": 194,
-        "coverage_ratio": 0.007932613673536147,
+        "supported_source_ref_count": 21584,
+        "exact_graphify_source_ref_count": 20425,
+        "processed_source_ref_count": 3764,
+        "unprocessed_source_ref_count": 16657,
+        "parse_failed_source_ref_count": 4,
+        "missing_exact_graphify_source_ref_count": 1159,
+        "duplicate_exact_graphify_source_ref_count": 0,
+        "source_refs_with_symbols": 1758,
+        "symbol_row_count": 11902,
+        "coverage_ratio": 0.17438843587842848,
         "full_coverage": false
       },
       "verdict": "PARTIAL_PROVEN",
-      "note": "Nomination resolution is clean (194/194 resolved, 0 unresolved, 0 ambiguous), but population coverage is not: only 194/24456 bound source refs (0.8%) have any extracted graphify_symbols row at all. Extraction coverage, not reconciliation, is the remaining gap -- see scripts/atlas/graphify-symbol-extractor-v1.mts."
+      "note": "Nomination resolution is clean (194/194 resolved, 0 unresolved, 0 ambiguous), but extractor population coverage is incomplete: 3764/21584 supported admitted source refs are processed (17.4%); 16657 remain UNPROCESSED, 1159 lack an exact Graphify source-revision row, and 0 have duplicate exact rows. 1758 exact-revision source refs currently have 11902 symbol rows. This is extraction coverage, not a requirement for one symbol per file -- see scripts/atlas/graphify-symbol-extractor-v1.mts."
     },
     "SEMANTIC_OWNER_PROVEN": {
       "canonical_contract_target_present": [
@@ -351,7 +363,7 @@
       "table_exists": true,
       "row_count": 0,
       "verdict": "NOT_PROVEN",
-      "note": "ace_context_sources existing and populated proves an audit trail exists; it does not by itself prove every ACE card cites source spans/symbols/tuples rather than rehydrated raw JSON (ACECardV1 from the proposal) — not checked this pass."
+      "note": "ace_context_sources exists but has zero persisted source rows; an admitted producer and grounded readback are not proven."
     }
   },
   "table_existence": {
