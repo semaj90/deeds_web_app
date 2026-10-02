@@ -14,7 +14,8 @@
     "./ontology-proposal": "./dist/ontology-proposal.js",
     "./canonical-hashing": "./dist/canonical-hashing.js",
     "./feature-packet-v1": "./dist/feature-packet-v1.js",
-    "./evidence-tuple-v1": "./dist/evidence-tuple-v1.js"
+    "./evidence-tuple-v1": "./dist/evidence-tuple-v1.js",
+    "./openspec-evidence-fabric-v1": "./dist/openspec-evidence-fabric-v1.js"
   },
   "scripts": {
     "build": "tsc",

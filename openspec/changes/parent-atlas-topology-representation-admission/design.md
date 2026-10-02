@@ -62,9 +62,10 @@ is not inferred from a collection name or populated without a producer.
 
 ## Topology identities
 
-`ManifoldPca4V1` is a learned continuous projection. `Topology4DCoordinateV1`
-is a routing/topology coordinate. They require different representation IDs,
-revisions, and input artifacts even when both contain four numbers.
+`ManifoldPca4V1` is a deterministic PCA projection with revision-bound basis
+and input provenance. `Topology4DCoordinateV1` is a routing/topology
+coordinate. They require different representation IDs, revisions, and input
+artifacts even when both contain four numbers.
 
 Every `SOMAssignmentV1` carries CandidateOrdinal, packet identity,
 workspace/source revisions, input artifact revision, SOM model digest, cell

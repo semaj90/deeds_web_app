@@ -13863,3 +13863,59 @@ and [Docker Desktop release notes](https://docs.docker.com/desktop/release-notes
   route; and prove BitFrost only after that route is grounded. Never make the
   admission predicate green by lowering thresholds, adding parallel schemas, or
   promoting historical vectors/checkpoints.
+
+### Live refresh and sealed-snapshot inventory plan (2026-10-01)
+
+- [x] Refreshed the live read-only fabric audit after PostgreSQL transport was
+  restored. It completed and rolled back its `READ ONLY` transaction; the new
+  report at `docs/reports/atlas-canonical-projection-fabric-audit-2026-10-01.json`
+  is still `NOT_SAFE_TO_PROJECT`, with **5/11 PASS** and six below PASS.
+  `ORDINAL_MAP_SEALED` is now **PASS, 16,151/16,151**; 1,634 missing Qdrant
+  point IDs are projection diagnostics, not identity failure. Current remaining
+  gates are symbol coverage, semantic writer lineage, latent input lineage and
+  promotion, cross-projection receipts, live ACE grounding, and BitFrost
+  derivation. No database/projection/cache/model writes occurred.
+- [x] Added the pure
+  `buildSealedSnapshotGraphifyInventoryPlanV1()` adapter beside the existing
+  Graphify inventory owner. It validates exact frozen source identity, source
+  and workspace revisions, digest, byte length, and terminal missing-inventory
+  state. It maps the exact source digest to `code_source_revision` and
+  `content_hash`, explicitly leaves Git-only `source_revision` null, and emits
+  `legacyGitWriterCompatible=false`, `executionAuthorized=false`, and
+  `writesPerformed=false`. It is a plan contract, not an insert/readback owner;
+  the 916 census matches remain candidates only.
+- [x] Added regressions for byte-digest/length mismatch, workspace/source
+  revision mismatch, identity absent from the frozen manifest, duplicate
+  identities, and the invariant that the plan never invents Git provenance.
+  Focused Graphify writer/coordinator and selected-candidate tests passed
+  29/29 before this plan change; the updated writer and selected-candidate tests
+  then passed 23/23, including the four new plan cases.
+- [x] Added a pure readback comparator for the existing `graphify_files` row
+  shape. It checks exact workspace/run IDs, source reference, null legacy Git
+  revision, `code_source_revision`, `content_hash`, byte length, workspace
+  revision, authority marker, first/last-seen run IDs, and missing/duplicate/
+  unexpected rows. The comparator reports structural match only; the caller
+  must still prove an independent post-write query and authorized run.
+- [ ] Bind this pure plan to the exact admitted snapshot artifact and a
+  snapshot-compatible `graphify_files` writer under the existing owner, with
+  conditional insert semantics and independent readback. The live bound run is
+  already `COMPLETED`, and the current V2 writer requires Git-shaped
+  `WorkspaceRevisionRecordV1`; do not attach new inventory to that completed
+  run, invent Git metadata, or apply the 916 candidates without a new authorized
+  run/admission.
+- [ ] Continue ACE-LIVE wiring only through the existing SearchRuntime
+  `readOnly:true` path. The sparse selected-candidate/feature-row contract is
+  fixture-proven and preserves original ordinals, but `/api/ace/stream` still
+  has no production caller for it, no admitted selected-row source owner, and
+  no independent `AcePacketV3` → `ContextManifest` route readback. Keep
+  revisioned cache access disabled until that proof exists.
+- [x] Reviewed primary documentation for execution mechanics: pgvector exact
+  search is the recall oracle and HNSW/IVFFlat are approximate executors;
+  Qdrant upsert overwrites an existing point, while targeted vector updates are
+  available; Ollama returns embeddings from `/api/embed` while loaded-model
+  digest is exposed separately by `/api/ps`, so those calls alone do not bind
+  immutable model/tokenizer identity atomically per embedding request. These
+  references inform safe repair mechanics but do not prove Parent Atlas
+  provenance: [pgvector](https://github.com/pgvector/pgvector/blob/master/README.md),
+  [Qdrant points](https://qdrant.tech/documentation/concepts/points/),
+  [Ollama API](https://github.com/ollama/ollama/blob/main/docs/api.md).

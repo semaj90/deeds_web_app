@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
 import {
@@ -45,6 +46,260 @@ export interface GraphifySourceInventorySqlClientV2 {
     rowCount: number | null;
     rows: Array<Record<string, unknown>>;
   }>;
+}
+
+const sealedSnapshotInventorySourceV1Schema = z.object({
+  repositoryId: z.string().min(1),
+  repositoryRelativePath: z.string().min(1).refine((value) => {
+    const normalized = value.replaceAll('\\', '/');
+    return !normalized.startsWith('/') && !normalized.split('/').includes('..');
+  }, 'repositoryRelativePath must be traversal-free'),
+  sourceRef: z.string().min(1),
+  sourceRevision: contentRevision,
+  contentDigest: z.string().regex(/^(?:sha256:)?[a-f0-9]{64}$/),
+  byteLength: z.number().int().nonnegative(),
+}).strict();
+
+const sealedSnapshotInventoryCandidateV1Schema = z.object({
+  sourceRef: z.string().min(1),
+  workspaceRevision: contentRevision,
+  sourceRevision: contentRevision,
+  inventoryState: z.enum(['NO_GRAPHIFY_ROW', 'OTHER_REVISION_ROW_ONLY']),
+  byteStatus: z.enum(['MATCH', 'DRIFT', 'MISSING', 'READ_ERROR']),
+  observedContentDigest: z.string().regex(/^(?:sha256:)?[a-f0-9]{64}$/).nullable(),
+  observedByteLength: z.number().int().nonnegative().nullable(),
+}).strict();
+
+export const sealedSnapshotGraphifyInventoryPlanV1Schema = z.object({
+  schema: z.literal('atlas.graphify-sealed-snapshot-inventory-plan.v1'),
+  snapshotRevision: contentRevision,
+  workspaceRevision: contentRevision,
+  sourceManifestDigest: sha256,
+  snapshotMembershipChecksum: sha256,
+  snapshotSourceCount: z.number().int().positive(),
+  rows: z.array(z.object({
+    sourceRef: z.string().min(1),
+    repositoryId: z.string().min(1),
+    repositoryRelativePath: z.string().min(1),
+    workspaceRevision: contentRevision,
+    legacySourceRevision: z.null(),
+    codeSourceRevision: contentRevision,
+    contentHash: sha256,
+    byteLength: z.number().int().nonnegative(),
+    sourceRevisionAuthority: z.literal('content_hash'),
+    priorInventoryState: z.enum(['NO_GRAPHIFY_ROW', 'OTHER_REVISION_ROW_ONLY']),
+  }).strict()),
+  selectedSourceCount: z.number().int().positive(),
+  selectedSourceChecksum: sha256,
+  legacyGitWriterCompatible: z.literal(false),
+  canonicalAuthority: z.literal(false),
+  executionAuthorized: z.literal(false),
+  writesPerformed: z.literal(false),
+}).strict();
+export type SealedSnapshotGraphifyInventoryPlanV1 = z.infer<typeof sealedSnapshotGraphifyInventoryPlanV1Schema>;
+
+/**
+ * Pure plan adapter for sealed non-Git snapshot rows. It deliberately does not
+ * fabricate legacy Git provenance or call the Git-shaped V2 writer. Exact byte
+ * readback is required for every selected source; the result is review input,
+ * not write authorization.
+ */
+export function buildSealedSnapshotGraphifyInventoryPlanV1(input: {
+  snapshotRevision: string;
+  workspaceRevision: string;
+  sourceManifestDigest: string;
+  snapshotMembershipChecksum: string;
+  snapshotSourceCount: number;
+  sources: readonly z.input<typeof sealedSnapshotInventorySourceV1Schema>[];
+  candidates: readonly z.input<typeof sealedSnapshotInventoryCandidateV1Schema>[];
+}): SealedSnapshotGraphifyInventoryPlanV1 {
+  const snapshotRevision = contentRevision.parse(input.snapshotRevision);
+  const workspaceRevision = contentRevision.parse(input.workspaceRevision);
+  const sourceManifestDigest = sha256.parse(input.sourceManifestDigest);
+  const snapshotMembershipChecksum = sha256.parse(input.snapshotMembershipChecksum);
+  const snapshotSourceCount = z.number().int().positive().parse(input.snapshotSourceCount);
+  if (input.sources.length !== snapshotSourceCount) {
+    throw new Error('GRAPHIFY_SEALED_SNAPSHOT_SOURCE_COUNT_MISMATCH');
+  }
+
+  const byRef = new Map<string, z.infer<typeof sealedSnapshotInventorySourceV1Schema>>();
+  const sourceIdentityKeys = new Set<string>();
+  for (const raw of input.sources) {
+    const source = sealedSnapshotInventorySourceV1Schema.parse(raw);
+    const sourceRef = normalizeSourceRef(source.sourceRef);
+    const identity = `${source.repositoryId}:${source.repositoryRelativePath.replaceAll('\\', '/')}`;
+    if (byRef.has(sourceRef) || sourceIdentityKeys.has(identity)) {
+      throw new Error(`GRAPHIFY_SEALED_SNAPSHOT_DUPLICATE_IDENTITY:${sourceRef}`);
+    }
+    const digest = normalizeDigest(source.contentDigest);
+    if (source.sourceRevision !== `sha256:${digest}`) {
+      throw new Error(`GRAPHIFY_SEALED_SNAPSHOT_SOURCE_REVISION_MISMATCH:${sourceRef}`);
+    }
+    byRef.set(sourceRef, source);
+    sourceIdentityKeys.add(identity);
+  }
+
+  const seenCandidates = new Set<string>();
+  const rows = input.candidates.map((raw) => {
+    const candidate = sealedSnapshotInventoryCandidateV1Schema.parse(raw);
+    const sourceRef = normalizeSourceRef(candidate.sourceRef);
+    if (seenCandidates.has(sourceRef)) {
+      throw new Error(`GRAPHIFY_SEALED_SNAPSHOT_DUPLICATE_CANDIDATE:${sourceRef}`);
+    }
+    seenCandidates.add(sourceRef);
+    const source = byRef.get(sourceRef);
+    if (!source) throw new Error(`GRAPHIFY_SEALED_SNAPSHOT_CANDIDATE_NOT_IN_MANIFEST:${sourceRef}`);
+    if (candidate.workspaceRevision !== workspaceRevision
+      || candidate.sourceRevision !== source.sourceRevision) {
+      throw new Error(`GRAPHIFY_SEALED_SNAPSHOT_CANDIDATE_REVISION_MISMATCH:${sourceRef}`);
+    }
+    if (candidate.byteStatus !== 'MATCH' || candidate.observedContentDigest === null
+      || candidate.observedByteLength === null
+      || normalizeDigest(candidate.observedContentDigest) !== normalizeDigest(source.contentDigest)
+      || candidate.observedByteLength !== source.byteLength) {
+      throw new Error(`GRAPHIFY_SEALED_SNAPSHOT_BYTE_READBACK_MISMATCH:${sourceRef}`);
+    }
+    return {
+      sourceRef,
+      repositoryId: source.repositoryId,
+      repositoryRelativePath: source.repositoryRelativePath.replaceAll('\\', '/'),
+      workspaceRevision,
+      // This field is Git provenance in the existing V2 writer; leave it absent.
+      legacySourceRevision: null,
+      codeSourceRevision: source.sourceRevision,
+      contentHash: normalizeDigest(source.contentDigest),
+      byteLength: source.byteLength,
+      sourceRevisionAuthority: 'content_hash' as const,
+      priorInventoryState: candidate.inventoryState,
+    };
+  }).sort((a, b) => {
+    const left = Buffer.from(a.sourceRef, 'utf8');
+    const right = Buffer.from(b.sourceRef, 'utf8');
+    return Buffer.compare(left, right);
+  });
+  if (rows.length === 0) throw new Error('GRAPHIFY_SEALED_SNAPSHOT_INVENTORY_PLAN_EMPTY');
+
+  const selectedSourceChecksum = createHash('sha256')
+    .update(JSON.stringify(rows.map((row) => [row.sourceRef, row.codeSourceRevision])), 'utf8')
+    .digest('hex');
+  return sealedSnapshotGraphifyInventoryPlanV1Schema.parse({
+    schema: 'atlas.graphify-sealed-snapshot-inventory-plan.v1',
+    snapshotRevision,
+    workspaceRevision,
+    sourceManifestDigest,
+    snapshotMembershipChecksum,
+    snapshotSourceCount,
+    rows,
+    selectedSourceCount: rows.length,
+    selectedSourceChecksum,
+    legacyGitWriterCompatible: false,
+    canonicalAuthority: false,
+    executionAuthorized: false,
+    writesPerformed: false,
+  });
+}
+
+const sealedSnapshotGraphifyInventoryReadbackRowV1Schema = z.object({
+  file_id: uuid,
+  workspace_id: uuid,
+  source_ref: z.string().min(1),
+  source_revision: z.string().nullable(),
+  code_source_revision: contentRevision,
+  content_hash: z.string().regex(/^(?:sha256:)?[a-f0-9]{64}$/),
+  byte_length: z.number().int().nonnegative(),
+  workspace_revision: contentRevision,
+  source_revision_authority: z.literal('content_hash'),
+  first_seen_run_id: uuid,
+  last_seen_run_id: uuid,
+}).strict();
+
+export const sealedSnapshotGraphifyInventoryReadbackComparisonV1Schema = z.object({
+  schema: z.literal('atlas.graphify-sealed-snapshot-inventory-readback-comparison.v1'),
+  outcome: z.enum(['MATCH', 'MISMATCH']),
+  expectedRowCount: z.number().int().positive(),
+  observedRowCount: z.number().int().nonnegative(),
+  matchedRowCount: z.number().int().nonnegative(),
+  mismatchReasons: z.array(z.string()),
+  writesPerformed: z.literal(false),
+  canonicalAuthority: z.literal(false),
+}).strict();
+export type SealedSnapshotGraphifyInventoryReadbackComparisonV1 = z.infer<
+  typeof sealedSnapshotGraphifyInventoryReadbackComparisonV1Schema
+>;
+
+/**
+ * Compares an independently supplied graphify_files readback to a pure plan.
+ * This comparator performs no query/write and cannot claim that its input came
+ * from an independent connection; the caller owns that provenance assertion.
+ */
+export function compareSealedSnapshotGraphifyInventoryReadbackV1(input: {
+  plan: z.input<typeof sealedSnapshotGraphifyInventoryPlanV1Schema>;
+  workspaceId: string;
+  runId: string;
+  observedRows: readonly z.input<typeof sealedSnapshotGraphifyInventoryReadbackRowV1Schema>[];
+}): SealedSnapshotGraphifyInventoryReadbackComparisonV1 {
+  const plan = sealedSnapshotGraphifyInventoryPlanV1Schema.parse(input.plan);
+  const workspaceId = uuid.parse(input.workspaceId);
+  const runId = uuid.parse(input.runId);
+  const observed = input.observedRows.map((row) => sealedSnapshotGraphifyInventoryReadbackRowV1Schema.parse(row));
+  const reasons = new Set<string>();
+  const rowsByRef = new Map<string, z.infer<typeof sealedSnapshotGraphifyInventoryReadbackRowV1Schema>[]>();
+  const seenFileIds = new Set<string>();
+  for (const row of observed) {
+    if (seenFileIds.has(row.file_id)) reasons.add(`READBACK_FILE_ID_DUPLICATE:${row.file_id}`);
+    seenFileIds.add(row.file_id);
+    const entries = rowsByRef.get(row.source_ref) ?? [];
+    entries.push(row);
+    rowsByRef.set(row.source_ref, entries);
+  }
+
+  let matchedRowCount = 0;
+  for (const expected of plan.rows) {
+    const matches = rowsByRef.get(expected.sourceRef) ?? [];
+    if (matches.length === 0) {
+      reasons.add(`READBACK_ROW_MISSING:${expected.sourceRef}`);
+      continue;
+    }
+    if (matches.length !== 1) {
+      reasons.add(`READBACK_ROW_DUPLICATE:${expected.sourceRef}`);
+      continue;
+    }
+    const row = matches[0]!;
+    const checks: Array<[boolean, string]> = [
+      [row.workspace_id === workspaceId, 'WORKSPACE_ID'],
+      [row.source_ref === expected.sourceRef, 'SOURCE_REF'],
+      [row.source_revision === null, 'LEGACY_SOURCE_REVISION'],
+      [row.code_source_revision === expected.codeSourceRevision, 'CODE_SOURCE_REVISION'],
+      [normalizeDigest(row.content_hash) === expected.contentHash, 'CONTENT_HASH'],
+      [row.byte_length === expected.byteLength, 'BYTE_LENGTH'],
+      [row.workspace_revision === expected.workspaceRevision, 'WORKSPACE_REVISION'],
+      [row.source_revision_authority === expected.sourceRevisionAuthority, 'SOURCE_REVISION_AUTHORITY'],
+      [row.first_seen_run_id === runId, 'FIRST_SEEN_RUN_ID'],
+      [row.last_seen_run_id === runId, 'LAST_SEEN_RUN_ID'],
+    ];
+    const mismatches = checks.filter(([matchesCheck]) => !matchesCheck).map(([, field]) => field);
+    if (mismatches.length) {
+      for (const field of mismatches) reasons.add(`READBACK_FIELD_MISMATCH:${expected.sourceRef}:${field}`);
+      continue;
+    }
+    matchedRowCount += 1;
+  }
+  for (const sourceRef of rowsByRef.keys()) {
+    if (!plan.rows.some((row) => row.sourceRef === sourceRef)) reasons.add(`READBACK_ROW_UNEXPECTED:${sourceRef}`);
+  }
+  if (observed.length !== plan.selectedSourceCount) reasons.add('READBACK_ROW_COUNT_MISMATCH');
+
+  const mismatchReasons = [...reasons].sort();
+  return sealedSnapshotGraphifyInventoryReadbackComparisonV1Schema.parse({
+    schema: 'atlas.graphify-sealed-snapshot-inventory-readback-comparison.v1',
+    outcome: mismatchReasons.length === 0 && matchedRowCount === plan.selectedSourceCount ? 'MATCH' : 'MISMATCH',
+    expectedRowCount: plan.selectedSourceCount,
+    observedRowCount: observed.length,
+    matchedRowCount,
+    mismatchReasons,
+    writesPerformed: false,
+    canonicalAuthority: false,
+  });
 }
 
 function normalizeDigest(value: unknown): string {

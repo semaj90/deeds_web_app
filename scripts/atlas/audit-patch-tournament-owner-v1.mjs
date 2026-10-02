@@ -31,6 +31,8 @@ function sha256(value) {
   return `sha256:${crypto.createHash('sha256').update(value).digest('hex')}`;
 }
 
+const fixtureWorkerProven = exists('docs/reports/patch-tournament-worktree-fixture-v1.json');
+
 function owner(id, status, ownerPath, evidence, nextGate) {
   return { id, status, ownerPath, evidence, nextGate };
 }
@@ -74,17 +76,21 @@ const owners = [
   ),
   owner(
     'CANDIDATE_GENERATION',
-    'MISSING_OR_NOT_WIRED',
-    'sveltekit-frontend/src/lib/server/agent/patch-tournament.ts',
-    'Planner consumes injected candidates; no current owner was found that generates exactly three isolated repair candidates for one live compile error.',
-    'CANDIDATE_GENERATION_OWNER',
+    fixtureWorkerProven ? 'FIXTURE_PROVEN_LIVE_DEFERRED' : 'MISSING_OR_NOT_WIRED',
+    'scripts/atlas/run-patch-tournament-worktree-fixture-v1.mts',
+    fixtureWorkerProven
+      ? 'Fixture worker generates exactly three isolated candidates and feeds the existing planner; live source-frame admission remains unproven.'
+      : 'Planner consumes injected candidates; no current owner was found that generates exactly three isolated repair candidates for one live compile error.',
+    'ADMITTED_SOURCE_FRAME_AND_AUTHORIZED_LIVE_WORKTREE_EXECUTION',
   ),
   owner(
     'STATIC_AND_FOCUSED_EXECUTION',
-    'MISSING_OR_NOT_WIRED',
-    'sveltekit-frontend/src/lib/server/agent/patch-tournament.ts',
-    'Candidate check fields are part of the contract, but no tournament worker path currently populates them from isolated worktree execution.',
-    'AUTHORIZED_WORKTREE_WORKER',
+    fixtureWorkerProven ? 'FIXTURE_PROVEN_LIVE_DEFERRED' : 'MISSING_OR_NOT_WIRED',
+    'scripts/atlas/run-patch-tournament-worktree-fixture-v1.mts',
+    fixtureWorkerProven
+      ? 'Fixture worker populates static and focused checks from three isolated worktrees; live authorized execution remains unproven.'
+      : 'Candidate check fields are part of the contract, but no tournament worker path currently populates them from isolated worktree execution.',
+    'ADMITTED_SOURCE_FRAME_AND_AUTHORIZED_LIVE_WORKTREE_EXECUTION',
   ),
   owner(
     'HUMAN_REVIEW_BOUNDARY',
@@ -98,7 +104,7 @@ const owners = [
   owner(
     'ACE_COMPARISON_PACKET',
     textIncludes('sveltekit-frontend/src/lib/server/agent/patch-tournament.ts', 'atlas.ace.patch-tournament.v1')
-      ? 'PROVEN_PLANNER_PACKET'
+      ? (fixtureWorkerProven ? 'FIXTURE_PROVEN_PLANNER_PACKET' : 'PROVEN_PLANNER_PACKET')
       : 'MISSING',
     'sveltekit-frontend/src/lib/server/agent/patch-tournament.ts',
     'Planner emits an ACE comparison packet, but a live worker-produced packet is not proven.',
@@ -126,7 +132,8 @@ const graphProofTasks = (() => {
   }
 })();
 
-const unresolved = owners.filter((entry) => !entry.status.startsWith('PROVEN'));
+const isProven = (entry) => entry.status.startsWith('PROVEN') || entry.status.startsWith('FIXTURE_PROVEN');
+const unresolved = owners.filter((entry) => !isProven(entry));
 const report = {
   schema: 'atlas.patch-tournament-owner-audit.v1',
   generatedAt: new Date().toISOString(),
@@ -143,9 +150,9 @@ const report = {
   owners,
   summary: {
     ownerCount: owners.length,
-    provenOwnerCount: owners.filter((entry) => entry.status.startsWith('PROVEN')).length,
+    provenOwnerCount: owners.filter(isProven).length,
     unresolvedOwnerCount: unresolved.length,
-    nextGate: 'PATCH_TOURNAMENT_CANDIDATE_EXECUTION',
+    nextGate: fixtureWorkerProven ? 'ADMITTED_SOURCE_FRAME_AND_AUTHORIZED_LIVE_WORKTREE_EXECUTION' : 'PATCH_TOURNAMENT_CANDIDATE_EXECUTION',
     status: 'PLANNER_AND_FIXTURE_PROVEN_LIVE_TOURNAMENT_DEFERRED',
   },
   openSpecAlignment: {
@@ -154,7 +161,9 @@ const report = {
     status: 'OPEN',
     ownerChange: 'parent-atlas-graph-retrieval-proof',
     relatedTaskEvidence: graphProofTasks,
-    disposition: 'Reuse the existing PatchTournament planner and add only the missing isolated worker seam after authority and approval prerequisites are explicit.',
+    disposition: fixtureWorkerProven
+      ? 'Reuse the existing PatchTournament planner and fixture worker; live execution remains gated on admitted source lineage, authorization, and human approval.'
+      : 'Reuse the existing PatchTournament planner and add only the missing isolated worker seam after authority and approval prerequisites are explicit.',
   },
   retryPolicy: 'Do not retry live tournament execution until candidate generation, isolated worktree execution, and human approval receipts change from their current states.',
   checksum: null,

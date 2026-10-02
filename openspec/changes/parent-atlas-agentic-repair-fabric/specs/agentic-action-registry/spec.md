@@ -28,3 +28,28 @@ in-memory source to eventually back with a searchable index.
 - **WHEN** a caller filters the registry for `mutability: "READ_ONLY"`
 - **THEN** only non-mutating actions (e.g. `RG_EXACT_SEARCH`, `AST_EXPAND`, `RUN_TYPECHECK`) are
   returned
+
+### Requirement: Agent proposals resolve through the existing action registry
+The bounded agent runtime SHALL treat `CapabilityRegistryV1` as a revision-qualified projection of
+the existing `AGENTIC_ACTION_REGISTRY_V1_SEED`, not as a second mutable or canonical registry.
+Before execution it SHALL validate the proposal schema, exact action/capability revision, admitted
+ContextManifest checksum and evidence references, read-only policy, and executor/tool revision.
+Compact ordinals SHALL resolve only with the exact registry revision and SHALL never replace the
+action or capability identity.
+
+#### Scenario: Proposal names an unknown or stale action
+- **WHEN** a proposal names an unregistered action or a revision other than the current registry
+- **THEN** execution is rejected before the executor is invoked
+
+### Requirement: Tool execution receipts are transport evidence only
+Every read-only tool call SHALL produce a typed receipt binding the authorized proposal checksum,
+execution step, capability revision, tool revision, input checksum, output checksum, and observation
+time. MCP/OpenCode transport envelopes, tool receipts, and ephemeral RLM working state SHALL declare
+`canonicalAuthority: false`; the existing workflow event and agent-work receipt owners remain the
+run identity and durable receipt owners.
+
+#### Scenario: Replay closes with verified receipts
+- **WHEN** a frozen replay has a valid receipt for every expected step and each receipt matches
+  its authorized proposal, exact tool revision, input, and observed output
+- **THEN** the bounded replay may return a non-authoritative final result
+- **AND** missing, stale, mismatched, or write-class steps prevent replay closure

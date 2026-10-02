@@ -1,0 +1,138 @@
+{
+  "schema": "atlas.openspec-evidence-summary.v1",
+  "mode": "COMPACT_READ_ONLY_RECONCILIATION_SUMMARY",
+  "status": "SUMMARY_DERIVED_NOT_PROMOTABLE",
+  "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
+  "workspaceRevisionScope": "checksums of all files under both OpenSpec changes roots, including archives",
+  "deltaBaselineWorkspaceRevision": null,
+  "counts": {
+    "changes": 117,
+    "tasks": 11024,
+    "checked": 7282,
+    "proven": 0,
+    "provenTotal": 2,
+    "uncheckedProven": 2,
+    "claimOnly": 7282,
+    "declaredIdMissing": 6984,
+    "unstableIdentity": 6,
+    "receiptCandidates": 1046,
+    "orphanBound": 71,
+    "legacyBound": 2,
+    "exactBound": 1
+  },
+  "identity": {
+    "stateCounts": {
+      "CONFLICTING": 6,
+      "DECLARED_ID": 3762,
+      "DERIVED_STABLE_KEY": 6944,
+      "LEGACY_ID_RECOVERED": 312
+    },
+    "declaredIdMissing": 6984,
+    "canonicalKeyCoverage": 11024,
+    "canonicalKeyAdmitted": 11018,
+    "collisionClassCounts": {
+      "DUPLICATE_NORMALIZED_CLAIM_SAME_CHANGE": 3
+    },
+    "collisionGroups": 3,
+    "collisionTasks": 6,
+    "duplicateDiagnosticGroupCount": 499,
+    "duplicateClassCounts": {
+      "ARCHIVE_DUPLICATE": 2,
+      "DUPLICATE_DECLARED_ID_CROSS_CHANGE": 246,
+      "DUPLICATE_DECLARED_ID_SAME_CHANGE": 79,
+      "DUPLICATE_DERIVED_KEY": 35,
+      "DUPLICATE_NORMALIZED_CLAIM_CROSS_CHANGE": 11,
+      "DUPLICATE_NORMALIZED_CLAIM_SAME_CHANGE": 35,
+      "NAMESPACE_COLLISION": 91
+    }
+  },
+  "receipts": {
+    "typeCounts": {
+      "CONFIGURATION": 1,
+      "CONTROLLED_APPLY": 8,
+      "DATABASE_READBACK": 8,
+      "DRY_RUN": 4,
+      "GRAPH_READBACK": 293,
+      "HEALTH_CHECK": 19,
+      "INTEGRATION_TEST": 2,
+      "MIGRATION": 2,
+      "NEGATIVE_EVIDENCE": 2,
+      "PROJECTION": 25,
+      "STATIC_AUDIT": 460,
+      "UNIT_TEST": 2,
+      "UNKNOWN": 179,
+      "VECTOR_READBACK": 41
+    },
+    "typingStateCounts": {
+      "CANDIDATE_TYPE": 184,
+      "TYPED": 862
+    },
+    "candidateTypeCount": 184,
+    "untypedReceiptCount": 184,
+    "candidateUnknownTypeCount": 179,
+    "ambiguousCandidateCount": 179,
+    "scopeCounts": {
+      "ATLAS_UNSCOPED": 933,
+      "OPENSPEC_SCOPED": 113
+    },
+    "bindingDispositionCounts": {
+      "AMBIGUOUS": 35,
+      "EXACT_BOUND": 1,
+      "HEURISTIC_ONLY": 2,
+      "LEGACY_BOUND": 2,
+      "MISSING_REVISION": 4,
+      "MISSING_TASK": 22,
+      "OUT_OF_SCOPE": 931,
+      "TRUE_ORPHAN": 49
+    },
+    "bindingReasonCounts": {
+      "CHANGE_ONLY_NO_TASK_ID": 6,
+      "DETERMINISTIC_MATCH": 7,
+      "FILENAME_ONLY_CANDIDATE": 2,
+      "MULTIPLE_DETERMINISTIC_MATCHES": 35,
+      "NO_SUPPORTED_IDENTITY_HINTS": 62,
+      "OUTSIDE_OPENSPEC_EVIDENCE_SCOPE": 931,
+      "UNMATCHED_CANONICAL_TASK_REFERENCE": 2,
+      "UNMATCHED_LEGACY_ALIAS": 1
+    },
+    "confirmedUnknownTypeCount": 0
+  },
+  "dependencies": {
+    "candidates": 137,
+    "resolvedEdges": 44,
+    "missingTaskReferences": 59,
+    "ambiguousTaskReferences": 29,
+    "cycles": 0,
+    "cycleAffectedTasks": 0
+  },
+  "deltasFromPrevious": null,
+  "sources": {
+    "fullCensus": "docs/reports/openspec-evidence/pipeline-20261001210012888-15556/census-v1.json",
+    "dependencyDiagnostics": "docs/reports/openspec-evidence/pipeline-20261001210012888-15556/dependency-resolution-v1.json",
+    "identityRecovery": "docs/reports/openspec-evidence/followup-20261001-b45a8aca/task-identity-recovery-v1.json",
+    "receiptTypes": "docs/reports/openspec-evidence/followup-20261001-b45a8aca/receipt-types-v1.json",
+    "orphanBindings": "docs/reports/openspec-evidence/followup-20261001-b45a8aca/orphan-bindings-v4.json"
+  },
+  "corpusChecksums": {
+    "census": "sha256:ad5caa18bf9446ce39b384ed0dac914a277f1b8be61901ba1f6f408e1865b3b0",
+    "identityRecovery": "sha256:f8d1a0e9723ce4ef18e427bd7410e329fca593fa1fe8be97f4facccdecb1be3a",
+    "receiptTypes": "sha256:c55ff97cf6559d929538640ee4a9a703b6075e702bc1600f53338b87819f6d8c",
+    "orphanBindings": "sha256:a0a8c3bea2b1570e1f2ed3c7abd5274b9fd90fcf898cf77ca20b83191ca7344d"
+  },
+  "invariants": [
+    "This summary is a bounded projection; the full census remains authoritative for row-level inspection.",
+    "Counts do not promote identity, evidence state, or task mutation.",
+    "Deltas are null without a prior compact summary and are not proof of causality."
+  ],
+  "likely_cause": "Large OpenSpec corpora need a bounded counts-and-deltas surface so agents can navigate by reference without loading the full census.",
+  "evidence": [
+    "docs/reports/openspec-evidence/pipeline-20261001210012888-15556/census-v1.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/compile-openspec-evidence-summary-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/compile-openspec-evidence-summary-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/compile-openspec-evidence-summary-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence/followup-20261001-b45a8aca/compact-summary-v4.json",
+  "checksum": "sha256:661731fa87355940e655f50be24dcd33dd1f862f98fb0b5c5c8242aaf8b9495f"
+}

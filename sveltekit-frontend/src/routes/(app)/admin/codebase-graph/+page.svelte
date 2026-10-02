@@ -117,7 +117,13 @@
 			const res = await fetch(`/api/codebase-index/graph?${params}`);
 			if (!res.ok) {
 				const body = await res.json().catch(() => ({}));
-				throw new Error(body.error || `HTTP ${res.status}`);
+				const errorCode =
+					typeof body.error === 'object' && body.error !== null && typeof body.error.code === 'string'
+						? body.error.code
+						: typeof body.error === 'string'
+							? body.error
+							: null;
+				throw new Error(errorCode ?? `HTTP ${res.status}`);
 			}
 			const data = await res.json();
 			nodes = data.nodes || [];

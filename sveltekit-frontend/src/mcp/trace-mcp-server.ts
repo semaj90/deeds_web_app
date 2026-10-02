@@ -119,6 +119,7 @@ import { registerPhase109aTools } from '$lib/server/mcp/phase109a-mcp-tools.js';
 import { registerRgAtlasTools } from './rg_atlas_tools.js';
 import { registerEngramTools } from './engram_tools.js';
 import { registerAtlasEmbeddingTools } from './atlas_embedding_tools.js';
+import { registerOpenSpecEvidenceTools } from './openspec-evidence-tools.js';
 import { registerNativeAccelerationTools } from './native-acceleration-tools.js';
 import { tracedQuery, withCanonicalReadOnlyQueryBudget } from '../lib/server/db/client.js';
 import {
@@ -617,6 +618,7 @@ registerSkillTools(server, dispatcherMiddleware);
 registerLegalSkillsTools(server);
 registerEngramTools(server, REDIS_URL, dispatcherMiddleware);
 registerAtlasEmbeddingTools(server, REDIS_URL, dispatcherMiddleware);
+registerOpenSpecEvidenceTools(server);
 if (ENABLE_OPTIONAL_REGISTRIES) {
   registerCodebaseTools(server, dispatcherMiddleware);
   registerResearchTools(server, dispatcherMiddleware);

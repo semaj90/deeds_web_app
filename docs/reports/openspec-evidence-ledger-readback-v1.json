@@ -1,0 +1,72 @@
+{
+  "schema": "atlas.openspec-evidence-ledger-readback.v1",
+  "generatedAt": "2026-10-02T04:47:33.451Z",
+  "mode": "READ_ONLY",
+  "status": "UNPROVEN_NO_LIVE_DATABASE",
+  "dryRun": {
+    "path": "docs/reports/openspec-evidence-migration-dry-run-v1.json",
+    "status": "DESIGN_VALIDATED_UNAPPLIED",
+    "checks": {
+      "allRequiredRelationsPresent": true,
+      "canonicalVector768": true,
+      "hnswCosineIndex": true,
+      "retrievalMetadataIndexes": true,
+      "trigramAndFtsIndexes": true,
+      "noMutationStatements": true,
+      "allSidecarsDesignUnapplied": true,
+      "proofStateDerivedInView": true,
+      "readbackReceiptRequired": true,
+      "stableCanonicalTaskKey": true,
+      "internalSurrogateIdentity": true,
+      "surrogatePrimaryKeyInFreshLedger": true,
+      "immutableRevisionHistory": true,
+      "aliasPreservation": true,
+      "receiptsBoundToTaskRevision": true,
+      "lifecycleSeparatedFromProof": true
+    }
+  },
+  "checks": {
+    "liveConnection": false,
+    "requiredRelations": false,
+    "requiredColumns": false,
+    "vectorExtension": false,
+    "hnswCosineIndex": false
+  },
+  "missingRelations": [
+    "openspec_changes",
+    "openspec_tasks",
+    "openspec_dependencies",
+    "evidence_receipts",
+    "task_evidence",
+    "openspec_evidence_chunks",
+    "openspec_task_predicate",
+    "evidence_assertion",
+    "openspec_supersession",
+    "openspec_task_current",
+    "task_evidence_binding",
+    "openspec_task_current_v2"
+  ],
+  "missingColumns": [],
+  "connectionError": null,
+  "observed": null,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "evidence": [
+    "docs/reports/openspec-evidence-migration-dry-run-v1.json",
+    "information_schema.tables",
+    "information_schema.columns",
+    "pg_indexes",
+    "pg_extension",
+    "pg_stat_user_tables"
+  ],
+  "likely_cause": "The EVF ledger must not be treated as canonical until the reviewed design and live PostgreSQL structure have an independent read-only readback.",
+  "patch_targets": [
+    "scripts/atlas/audit-openspec-evidence-ledger-readback-v1.mjs",
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v1.sql",
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v2.sql"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-openspec-evidence-migration-v1.mjs",
+  "smoke_command": "node scripts/atlas/audit-openspec-evidence-ledger-readback-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-ledger-readback-v1.json",
+  "checksum": "sha256:a48dbd60da414952b03f2bcb68312533b09856740a1680a0f16d727ba3371e2c"
+}

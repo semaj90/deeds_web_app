@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.openspec-evidence-low-rank-plan.v1",
+  "mode": "READ_ONLY_ROUTING_FEATURE_PLAN",
+  "status": "BLOCKED_EMBEDDING_ARTIFACT_GATE",
+  "source": {
+    "cards": "docs/reports/openspec-evidence-cards-v1.json",
+    "graph": "docs/reports/openspec-dependency-graph-v1.json",
+    "embeddingPlan": "docs/reports/openspec-evidence-embedding-plan-v1.json",
+    "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b"
+  },
+  "featureSchema": {
+    "semanticDimensions": 128,
+    "graphDimensions": 64,
+    "evidenceStateFeatures": [
+      "claim_only",
+      "partial",
+      "proven",
+      "blocked",
+      "failed",
+      "stale"
+    ],
+    "recencyFeatures": [
+      "age_days",
+      "source_revision_age"
+    ],
+    "breadthFeatures": [
+      "dependency_in_degree",
+      "dependency_out_degree",
+      "receipt_count"
+    ],
+    "costFeatures": [
+      "estimated_tokens",
+      "estimated_bytes"
+    ],
+    "outputDimensions": 64
+  },
+  "counts": {
+    "taskCards": 11024,
+    "graphNodes": 11060,
+    "graphEdges": 63,
+    "latentRowsPlanned": 11024
+  },
+  "projection": {
+    "name": "LOW_RANK_PROJECT",
+    "output": "latent64",
+    "modelArtifactRequired": true,
+    "modelCallExecuted": false,
+    "proofAuthority": false,
+    "retrievalVote": false
+  },
+  "policy": {
+    "routingOnly": true,
+    "prioritizationOnly": true,
+    "identityCreation": false,
+    "proofPromotion": false,
+    "taskMutation": false,
+    "writesPerformed": false
+  },
+  "likely_cause": "Low-rank features can reduce routing cost, but they must remain derived from evidence-qualified identity and never become proof or a retrieval vote.",
+  "evidence": [
+    "docs/reports/openspec-evidence-cards-v1.json",
+    "docs/reports/openspec-dependency-graph-v1.json",
+    "docs/reports/openspec-evidence-embedding-plan-v1.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/plan-openspec-evidence-low-rank-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/plan-openspec-evidence-embeddings-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-low-rank-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-low-rank-plan-v1.json",
+  "generatedAt": "2026-10-02T04:47:37.856Z",
+  "checksum": "sha256:dad652592dd7691822c82355d088b54107eafcf1ce9fab51c768eb78da841b9f"
+}

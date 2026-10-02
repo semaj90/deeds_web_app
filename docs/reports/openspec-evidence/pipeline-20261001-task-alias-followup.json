@@ -1,0 +1,374 @@
+{
+  "schema": "atlas.openspec-evidence-pipeline.v1",
+  "milestone": "EVF-01_THROUGH_EVF-20_READ_ONLY_CENSUS",
+  "status": "PIPELINE_COMPLETED_READ_ONLY",
+  "mode": "READ_ONLY",
+  "source": {
+    "census": "docs/reports/openspec-evidence/pipeline-20261001200315567-2860/census-v1.json",
+    "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b"
+  },
+  "stages": [
+    {
+      "stage": "EVF-01_PARSER",
+      "script": "scripts/atlas/audit-openspec-evidence-fabric-v1.mjs",
+      "startedAt": "2026-10-01T20:03:15.704Z",
+      "completedAt": "2026-10-01T20:03:28.989Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": " \"ARCHIVE_DUPLICATE\": 2\n    },\n    \"receipts_total\": 1046,\n    \"receiptCount\": 3,\n    \"invalidReceiptCount\": 0,\n    \"untypedReceiptCandidateCount\": 1043,\n    \"matchedReceiptCount\": 116,\n    \"orphanReceiptCount\": 904,\n    \"bound_exact\": 1,\n    \"bound_alias\": 6,\n    \"bound_source_ref\": 133,\n    \"candidate_only\": 2,\n    \"ambiguous_receipts\": 24,\n    \"missing_task_receipts\": 904,\n    \"missing_revision_receipts\": 778,\n    \"invalid_schema_receipts\": 0,\n    \"checksum_failed_receipts\": 0,\n    \"unreadableReceiptCandidates\": 18,\n    \"oversizedReceiptCandidates\": 224,\n    \"dependencyCount\": 49,\n    \"dependency_candidates\": 150,\n    \"resolved_edges\": 49,\n    \"dependencyMissingTaskReferenceCount\": 67,\n    \"dependencyAmbiguousReferenceCount\": 29,\n    \"dependencyProposalOnlyCount\": 0,\n    \"dependencyCycleAffectedTaskCount\": 0,\n    \"requirementCount\": 548,\n    \"changesWithTests\": 66,\n    \"explicitTestReferenceCount\": 394,\n    \"existingTestReferenceCount\": 165,\n    \"missingTestReferenceCount\": 229,\n    \"tasksWithoutDependencyMetadata\": 11020,\n    \"staleEvidenceCount\": 39,\n    \"supersessionCandidateCount\": 208,\n    \"ownerConflictCandidateCount\": null,\n    \"staleOwnerConflictCandidateCount\": 98,\n    \"ownerConflictAuditCurrent\": false,\n    \"censusStatus\": \"DIAGNOSTIC_ONLY_NOT_PROMOTABLE\",\n    \"promotionEligible\": false\n  },\n  \"workspaceRevision\": \"sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b\",\n  \"outputs\": [\n    \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence\\\\pipeline-20261001200315567-2860\\\\census-v1.json\",\n    \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence\\\\pipeline-20261001200315567-2860\\\\parser-diagnostics-v1.json\",\n    \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence\\\\pipeline-20261001200315567-2860\\\\receipt-binding-v1.json\",\n    \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence\\\\pipeline-20261001200315567-2860\\\\dependency-resolution-v1.json\"\n  ]\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-02_GRAPH",
+      "script": "scripts/atlas/build-openspec-dependency-graph-v1.mjs",
+      "startedAt": "2026-10-01T20:03:28.993Z",
+      "completedAt": "2026-10-01T20:03:31.412Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-dependency-graph.v1\",\n  \"summary\": {\n    \"nodeCount\": 11024,\n    \"edgeCount\": 49,\n    \"unresolvedEdgeCount\": 96,\n    \"aliasGroupCount\": 20318,\n    \"supersessionCandidateCount\": 208,\n    \"cycleCount\": 0,\n    \"cycleAffectedTaskCount\": 0\n  },\n  \"workspaceRevision\": \"sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b\",\n  \"checksum\": \"sha256:7c474f3deafe2707f8ef21eefa837bcca62d767946b8f9ce920c68351b083928\",\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-dependency-graph-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-02_IDENTITY_RECONCILIATION",
+      "script": "scripts/atlas/propose-openspec-task-identity-reconciliation-v1.mjs",
+      "startedAt": "2026-10-01T20:03:31.412Z",
+      "completedAt": "2026-10-01T20:03:32.846Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-task-identity-reconciliation.v1\",\n  \"status\": \"IDENTITY_PROPOSALS_NOT_ADMISSIBLE\",\n  \"summary\": {\n    \"taskCount\": 11024,\n    \"missingTaskIdCount\": 6984,\n    \"proposalCount\": 6984,\n    \"proposalCounts\": {\n      \"PROPOSE_DERIVED_CANONICAL_ID\": 6904,\n      \"BLOCKED_IDENTITY_AMBIGUOUS\": 80\n    },\n    \"duplicateClassificationCount\": 20561,\n    \"duplicateSampleCount\": 50\n  },\n  \"admission\": {\n    \"uniqueDerivedIdsProposed\": 6904,\n    \"ambiguousIdsAdmitted\": 0,\n    \"duplicateIdsAdmitted\": 0,\n    \"taskLedgerWrites\": 0,\n    \"checkboxMutations\": 0,\n    \"persistentStoreWrites\": 0,\n    \"authorization\": \"not provided\"\n  },\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-task-identity-reconciliation-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-03A_IDENTITY_RECOVERY",
+      "script": "scripts/atlas/recover-openspec-task-identities-v1.mjs",
+      "startedAt": "2026-10-01T20:03:32.846Z",
+      "completedAt": "2026-10-01T20:03:34.472Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-task-identity-recovery.v1\",\n  \"status\": \"TASK_IDENTITY_COVERAGE_NOT_PROVEN\",\n  \"summary\": {\n    \"taskCount\": 11024,\n    \"identityStateCounts\": {\n      \"CONFLICTING\": 87,\n      \"DECLARED_ID\": 3755,\n      \"DERIVED_STABLE_KEY\": 6870,\n      \"LEGACY_ID_RECOVERED\": 312\n    },\n    \"canonicalKeyCoverageCount\": 11024,\n    \"canonicalKeyAdmittedCount\": 10937,\n    \"canonicalKeyCollisionGroupCount\": 30,\n    \"canonicalKeyCollisionTaskCount\": 80,\n    \"collisionClassCounts\": {\n      \"DUPLICATE_NORMALIZED_CLAIM_SAME_CHANGE\": 30\n    },\n    \"duplicateDiagnosticGroupCount\": 499,\n    \"duplicateClassCounts\": {\n      \"ARCHIVE_DUPLICATE\": 2,\n      \"DUPLICATE_DECLARED_ID_CROSS_CHANGE\": 246,\n      \"DUPLICATE_DECLARED_ID_SAME_CHANGE\": 79,\n      \"DUPLICATE_DERIVED_KEY\": 35,\n      \"DUPLICATE_NORMALIZED_CLAIM_CROSS_CHANGE\": 11,\n      \"DUPLICATE_NORMALIZED_CLAIM_SAME_CHANGE\": 35,\n      \"NAMESPACE_COLLISION\": 91\n    },\n    \"sourceFilesMutated\": false,\n    \"taskLedgerWrites\": 0\n  },\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-task-identity-recovery-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-03B_RECEIPT_TYPING",
+      "script": "scripts/atlas/classify-openspec-receipts-v1.mjs",
+      "startedAt": "2026-10-01T20:03:34.472Z",
+      "completedAt": "2026-10-01T20:03:38.754Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-receipt-type-classification.v1\",\n  \"status\": \"RECEIPT_TYPES_PARTIAL\",\n  \"summary\": {\n    \"receiptCount\": 1046,\n    \"typeCounts\": {\n      \"CONFIGURATION\": 1,\n      \"CONTROLLED_APPLY\": 8,\n      \"DATABASE_READBACK\": 8,\n      \"DRY_RUN\": 4,\n      \"GRAPH_READBACK\": 293,\n      \"HEALTH_CHECK\": 19,\n      \"INTEGRATION_TEST\": 2,\n      \"MIGRATION\": 2,\n      \"NEGATIVE_EVIDENCE\": 2,\n      \"PROJECTION\": 25,\n      \"STATIC_AUDIT\": 460,\n      \"UNIT_TEST\": 2,\n      \"UNKNOWN\": 179,\n      \"VECTOR_READBACK\": 41\n    },\n    \"typingStateCounts\": {\n      \"CANDIDATE_TYPE\": 184,\n      \"TYPED\": 862\n    },\n    \"schemaOrFieldTypedCount\": 862,\n    \"candidateTypeCount\": 184,\n    \"filenameCandidateCount\": 6,\n    \"unknownCount\": 0,\n    \"ambiguousCandidateCount\": 179,\n    \"scopeCounts\": {\n      \"ATLAS_UNSCOPED\": 588,\n      \"OPENSPEC_SCOPED\": 458\n    },\n    \"proofEligibleTypeCount\": 862\n  },\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-receipt-type-classification-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-03C_ORPHAN_BINDING",
+      "script": "scripts/atlas/resolve-openspec-orphan-bindings-v1.mjs",
+      "startedAt": "2026-10-01T20:03:38.754Z",
+      "completedAt": "2026-10-01T20:04:48.404Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-orphan-binding-resolution.v1\",\n  \"status\": \"ORPHAN_BINDING_COVERAGE_NOT_PROVEN\",\n  \"summary\": {\n    \"receiptCount\": 1046,\n    \"bindingDispositionCounts\": {\n      \"AMBIGUOUS\": 113,\n      \"EXACT_BOUND\": 1,\n      \"HEURISTIC_ONLY\": 2,\n      \"LEGACY_BOUND\": 2,\n      \"MISSING_REVISION\": 15,\n      \"MISSING_TASK\": 743,\n      \"STALE_REVISION\": 44,\n      \"TRUE_ORPHAN\": 126\n    },\n    \"bindingReasonCounts\": {\n      \"CHANGE_ONLY_NO_TASK_ID\": 5,\n      \"DETERMINISTIC_MATCH\": 62,\n      \"FILENAME_ONLY_CANDIDATE\": 2,\n      \"MULTIPLE_DETERMINISTIC_MATCHES\": 113,\n      \"NO_SUPPORTED_IDENTITY_HINTS\": 537,\n      \"UNMATCHED_CANONICAL_TASK_REFERENCE\": 1,\n      \"UNMATCHED_SOURCE_REFERENCE\": 232,\n      \"UNSCOPED_ATLAS_ARTIFACT\": 94\n    },\n    \"exactBoundCount\": 1,\n    \"legacyBoundCount\": 2,\n    \"ambiguousCount\": 113,\n    \"missingTaskCount\": 743,\n    \"trueOrphanCount\": 126,\n    \"heuristicOnlyCount\": 2,\n    \"missingRevisionCount\": 15,\n    \"staleRevisionCount\": 44,\n    \"proofEligibleCount\": 0,\n    \"writesPerformed\": false\n  },\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-orphan-binding-resolution-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-03C_COMPACT_SUMMARY",
+      "script": "scripts/atlas/compile-openspec-evidence-summary-v1.mjs",
+      "startedAt": "2026-10-01T20:04:48.404Z",
+      "completedAt": "2026-10-01T20:04:49.204Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-summary.v1\",\n  \"status\": \"SUMMARY_DERIVED_NOT_PROMOTABLE\",\n  \"counts\": {\n    \"changes\": 117,\n    \"tasks\": 11024,\n    \"checked\": 7282,\n    \"proven\": 0,\n    \"claimOnly\": 7282,\n    \"declaredIdMissing\": 6984,\n    \"unstableIdentity\": 87,\n    \"receiptCandidates\": 1046,\n    \"orphanBound\": 869,\n    \"legacyBound\": 2,\n    \"exactBound\": 1\n  },\n  \"bytes\": 4599,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-summary-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-03D_CENSUS_RECONCILIATION",
+      "script": "scripts/atlas/reconcile-openspec-census-revisions-v1.mjs",
+      "startedAt": "2026-10-01T20:04:49.204Z",
+      "completedAt": "2026-10-01T20:04:50.692Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-census-reconciliation.v1\",\n  \"status\": \"RECONCILIATION_READ_ONLY_NOT_PROMOTABLE\",\n  \"baseline\": {\n    \"changes\": 117,\n    \"tasks\": 11024,\n    \"checked\": 7282,\n    \"evidenceBackedChecked\": 0,\n    \"orphanReceipts\": 1041,\n    \"missingDeclaredIds\": 6564,\n    \"duplicateIds\": 229,\n    \"dependencyCycles\": 0\n  },\n  \"strictCurrent\": {\n    \"changes\": 117,\n    \"tasks\": 11024,\n    \"checked\": 7282,\n    \"evidenceBackedChecked\": 0,\n    \"orphanReceipts\": 869,\n    \"missingDeclaredIds\": 6984,\n    \"duplicateIds\": 20561,\n    \"duplicateDiagnosticGroups\": 499,\n    \"canonicalCollisionGroups\": 30,\n    \"duplicateClassCounts\": {\n      \"ARCHIVE_DUPLICATE\": 2,\n      \"DUPLICATE_DECLARED_ID_CROSS_CHANGE\": 246,\n      \"DUPLICATE_DECLARED_ID_SAME_CHANGE\": 79,\n      \"DUPLICATE_DERIVED_KEY\": 35,\n      \"DUPLICATE_NORMALIZED_CLAIM_CROSS_CHANGE\": 11,\n      \"DUPLICATE_NORMALIZED_CLAIM_SAME_CHANGE\": 35,\n      \"NAMESPACE_COLLISION\": 91\n    },\n    \"dependencyCycles\": 0,\n    \"unresolvedIdentityTasks\": 87,\n    \"canonicalKeyCoverage\": 11024,\n    \"canonicalKeyAdmitted\": 10937,\n    \"receiptCandidates\": 1046,\n    \"typedReceipts\": 862,\n    \"candidateTypedReceipts\": 184,\n    \"unknownReceipts\": 0,\n    \"ambiguousBindings\": 113,\n    \"staleBindings\": 44,\n    \"blockedTasks\": 92,\n    \"provenTasks\": 2\n  },\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-census-reconciliation-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-03_RECEIPT_BINDING",
+      "script": "scripts/atlas/audit-openspec-receipt-binding-v1.mjs",
+      "startedAt": "2026-10-01T20:04:50.692Z",
+      "completedAt": "2026-10-01T20:04:51.503Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-receipt-binding.v1\",\n  \"summary\": {\n    \"receiptCount\": 1046,\n    \"resolutionCounts\": {\n      \"AMBIGUOUS\": 24,\n      \"BOUND\": 116,\n      \"CANDIDATE_ONLY\": 2,\n      \"MISSING_TASK\": 904\n    },\n    \"bindingTypeCounts\": {\n      \"BOUND_ALIAS\": 6,\n      \"BOUND_EXACT\": 1,\n      \"BOUND_SOURCE_REF\": 133,\n      \"CANDIDATE_ONLY\": 2,\n      \"MISSING_TASK\": 904\n    },\n    \"bindingStrategyCounts\": {\n      \"EXACT_CANONICAL_TASK_REF\": 1,\n      \"EXACT_DECLARED_TASK_ID_WITHIN_CHANGE\": 6,\n      \"EXACT_TASK_SOURCE_REF\": 133,\n      \"FILENAME_HINT\": 2,\n      \"NULL\": 904\n    },\n    \"revisionStatusCounts\": {\n      \"MISSING_REVISION\": 778,\n      \"PRESENT\": 268\n    },\n    \"checksumFailedCount\": 0,\n    \"invalidSchemaCount\": 0,\n    \"proofEligibleBindingCount\": 3,\n    \"heuristicCandidateCount\": 2,\n    \"exactBindingCount\": 134,\n    \"aliasBindingCount\": 6,\n    \"ambiguousCount\": 24,\n    \"orphanCount\": 904,\n    \"staleOrMissingRevisionCount\": 778\n  },\n  \"workspaceRevision\": \"sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b\",\n  \"checksum\": \"sha256:04be609b157b8680aca765f93812e5d64ba7d9d090ae44865ab0119a421aadf2\",\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-receipt-binding-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-04_PREDICATE_RESOLUTION",
+      "script": "scripts/atlas/resolve-openspec-predicates-v1.mjs",
+      "startedAt": "2026-10-01T20:04:51.504Z",
+      "completedAt": "2026-10-01T20:04:53.422Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-task-evidence-bindings.v1\",\n  \"summary\": {\n    \"taskCount\": 11024,\n    \"predicateCount\": 14019,\n    \"proofStateCounts\": {\n      \"BLOCKED\": 92,\n      \"CLAIM_ONLY\": 10890,\n      \"PARTIAL\": 1,\n      \"PROVEN\": 2,\n      \"STALE\": 39\n    },\n    \"contradictionTaskCount\": 0,\n    \"blockedTaskCount\": 92,\n    \"tasksWithDependencies\": 44,\n    \"tasksWithBlockers\": 92,\n    \"heuristicPromotionCount\": 0\n  },\n  \"workspaceRevision\": \"sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b\",\n  \"checksum\": \"sha256:316f048a86d935599236a5be09d4fe1e71ba878a254d0c3c16b3ed67905b84d8\",\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-task-evidence-bindings-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-05_CARD_COMPILATION",
+      "script": "scripts/atlas/compile-openspec-evidence-cards-v1.mjs",
+      "startedAt": "2026-10-01T20:04:53.422Z",
+      "completedAt": "2026-10-01T20:04:55.854Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-cards.v1\",\n  \"summary\": {\n    \"cardCount\": 11024,\n    \"proofStateCounts\": {\n      \"BLOCKED\": 92,\n      \"CLAIM_ONLY\": 10890,\n      \"PARTIAL\": 1,\n      \"PROVEN\": 2,\n      \"STALE\": 39\n    },\n    \"withinTargetCount\": 7936,\n    \"underTargetCount\": 3088,\n    \"overTargetCount\": 0,\n    \"proofUsableCount\": 0\n  },\n  \"workspaceRevision\": \"sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b\",\n  \"checksum\": \"sha256:99d0f0183e56ecd0aa57afdb2764c83eedd9e47d5ac0e4be18c3f26de93acace\",\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-cards-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-05_FEATURE_PACKET_COMPILATION",
+      "script": "scripts/atlas/compile-openspec-feature-packets-v1.mjs",
+      "startedAt": "2026-10-01T20:04:55.854Z",
+      "completedAt": "2026-10-01T20:04:56.241Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-feature-packets.v1\",\n  \"summary\": {\n    \"packetCount\": 115,\n    \"taskCount\": 11024,\n    \"proofEligibleTaskCount\": 2,\n    \"rawDocumentsInjected\": false,\n    \"persistentStoreWrites\": false\n  },\n  \"checksum\": \"sha256:0dc01da1f702f68763cb7121eddb7ad052e1696111ff9af7b8b074b8fec2fe79\",\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-feature-packets-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-03C_GS1_10_GOLDEN_SPECIMEN",
+      "script": "scripts/atlas/prove-openspec-golden-task-v1.mjs",
+      "startedAt": "2026-10-01T20:04:56.241Z",
+      "completedAt": "2026-10-01T20:04:57.866Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-golden-task.v1\",\n  \"status\": \"GOLDEN_TASK_PROVEN_READ_ONLY\",\n  \"taskId\": \"openspec-task:openspec://root/parent-atlas-graph-retrieval-proof/sha256:bba00d980fa6ed483f9e7db58e0b87e28af8912154715ce9936b2f5880fc0ee1\",\n  \"evidenceState\": \"STATIC_PROVEN\",\n  \"passedAssertions\": 12,\n  \"assertionCount\": 12,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-golden-task-gs1-10-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-06_MIGRATION_AUDIT",
+      "script": "scripts/atlas/audit-openspec-evidence-migration-v1.mjs",
+      "startedAt": "2026-10-01T20:04:57.866Z",
+      "completedAt": "2026-10-01T20:04:57.989Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-migration-dry-run.v1\",\n  \"status\": \"DESIGN_VALIDATED_UNAPPLIED\",\n  \"checks\": {\n    \"allRequiredRelationsPresent\": true,\n    \"canonicalVector768\": true,\n    \"hnswCosineIndex\": true,\n    \"retrievalMetadataIndexes\": true,\n    \"trigramAndFtsIndexes\": true,\n    \"noMutationStatements\": true,\n    \"allSidecarsDesignUnapplied\": true,\n    \"proofStateDerivedInView\": true,\n    \"readbackReceiptRequired\": true\n  },\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-migration-dry-run-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-06_LEDGER_READBACK",
+      "script": "scripts/atlas/audit-openspec-evidence-ledger-readback-v1.mjs",
+      "startedAt": "2026-10-01T20:04:57.989Z",
+      "completedAt": "2026-10-01T20:04:58.198Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-ledger-readback.v1\",\n  \"status\": \"UNPROVEN_NO_LIVE_DATABASE\",\n  \"checks\": {\n    \"liveConnection\": false,\n    \"requiredRelations\": false,\n    \"requiredColumns\": false,\n    \"vectorExtension\": false,\n    \"hnswCosineIndex\": false\n  },\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-ledger-readback-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-06_IMPORT_PLAN",
+      "script": "scripts/atlas/plan-openspec-evidence-ledger-import-v1.mjs",
+      "startedAt": "2026-10-01T20:04:58.198Z",
+      "completedAt": "2026-10-01T20:04:59.972Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-ledger-import-plan.v1\",\n  \"status\": \"DRY_RUN_IMPORT_PLAN_READY\",\n  \"checks\": {\n    \"inputsPresent\": true,\n    \"migrationDesignValidated\": true,\n    \"workspaceRevisionParity\": true,\n    \"graphIdentityMatchesCensus\": true,\n    \"predicateIdentityMatchesCensus\": true,\n    \"cardIdentityMatchesCensus\": true,\n    \"noHeuristicProofAdmission\": true,\n    \"noProjectionRowsPlanned\": true\n  },\n  \"plannedRows\": {\n    \"openspec_changes\": 117,\n    \"openspec_tasks\": 11024,\n    \"openspec_dependencies\": 49,\n    \"evidence_receipts\": 1046,\n    \"task_evidence\": 4,\n    \"openspec_evidence_chunks\": 0,\n    \"openspec_task_predicate\": 14019,\n    \"evidence_assertion\": 13,\n    \"openspec_supersession\": 0\n  },\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-ledger-import-plan-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-07_LANGEXTRACT_PROPOSALS",
+      "script": "scripts/atlas/propose-openspec-langextract-candidates-v1.mjs",
+      "startedAt": "2026-10-01T20:04:59.972Z",
+      "completedAt": "2026-10-01T20:05:01.008Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-langextract-proposals.v1\",\n  \"status\": \"SIDECAR_NOT_REQUESTED\",\n  \"selectedTaskCount\": 64,\n  \"proposalCount\": 0,\n  \"errors\": 0,\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-langextract-proposals-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-08_EMBEDDING_PLAN",
+      "script": "scripts/atlas/plan-openspec-evidence-embeddings-v1.mjs",
+      "startedAt": "2026-10-01T20:05:01.008Z",
+      "completedAt": "2026-10-01T20:05:01.434Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-embedding-plan.v1\",\n  \"status\": \"MODEL_ARTIFACT_UNPROVEN\",\n  \"dimension\": 768,\n  \"plannedInputs\": 55120,\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-embedding-plan-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-09_RETRIEVAL_PLAN",
+      "script": "scripts/atlas/plan-openspec-evidence-retrieval-v1.mjs",
+      "startedAt": "2026-10-01T20:05:01.434Z",
+      "completedAt": "2026-10-01T20:05:01.545Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-retrieval-plan.v1\",\n  \"status\": \"ORACLE_DESIGNED_UNAPPLIED\",\n  \"checks\": {\n    \"canonical768\": true,\n    \"hnswCosineDesign\": true,\n    \"metadataIndexDesign\": true,\n    \"lexicalIndexDesign\": true,\n    \"exactPromotionJoin\": true,\n    \"liveQueryExecuted\": false\n  },\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-retrieval-plan-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-10_HYBRID_RRF",
+      "script": "scripts/atlas/audit-openspec-evidence-hybrid-rrf-v1.mjs",
+      "startedAt": "2026-10-01T20:05:01.545Z",
+      "completedAt": "2026-10-01T20:05:01.649Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-hybrid-rrf-audit.v1\",\n  \"status\": \"RRF_OWNER_CONTRACT_PROVEN_RUNTIME_UNEXECUTED\",\n  \"checks\": {\n    \"retrievalOracleDesigned\": true,\n    \"logicalLaneMappingPresent\": true,\n    \"perLogicalLaneScoreMapPresent\": true,\n    \"physicalLaneSupportSeparate\": true,\n    \"oneBestVoteGuardPresent\": true,\n    \"canonicalPromotionAfterFusion\": true\n  },\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-hybrid-rrf-audit-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-11_CONTEXT_MANIFEST",
+      "script": "scripts/atlas/compile-openspec-evidence-context-manifest-v1.mjs",
+      "startedAt": "2026-10-01T20:05:01.649Z",
+      "completedAt": "2026-10-01T20:05:01.976Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-context-manifest.v1\",\n  \"status\": \"BLOCKED_RETRIEVAL_GATE\",\n  \"selectedTaskCount\": 0,\n  \"contextBytes\": 2,\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-context-manifest-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-12_SYNTHESIS_PLAN",
+      "script": "scripts/atlas/plan-openspec-evidence-synthesis-v1.mjs",
+      "startedAt": "2026-10-01T20:05:01.976Z",
+      "completedAt": "2026-10-01T20:05:02.090Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-synthesis-plan.v1\",\n  \"status\": \"BLOCKED_CONTEXT_GATE\",\n  \"jobCount\": 0,\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-synthesis-plan-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-13_LOW_RANK_PLAN",
+      "script": "scripts/atlas/plan-openspec-evidence-low-rank-v1.mjs",
+      "startedAt": "2026-10-01T20:05:02.090Z",
+      "completedAt": "2026-10-01T20:05:02.763Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-low-rank-plan.v1\",\n  \"status\": \"BLOCKED_EMBEDDING_ARTIFACT_GATE\",\n  \"outputDimensions\": 64,\n  \"retrievalVote\": false,\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-low-rank-plan-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-14_15_SURFACE_AUDIT",
+      "script": "scripts/atlas/audit-openspec-evidence-surfaces-v1.mjs",
+      "startedAt": "2026-10-01T20:05:02.764Z",
+      "completedAt": "2026-10-01T20:05:02.930Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-surfaces-audit.v1\",\n  \"status\": \"SURFACES_PRESENT_LIVE_HANDSHAKE_UNPROVEN\",\n  \"gates\": {\n    \"studioSurfacePresent\": true,\n    \"mcpToolSurfacePresent\": true,\n    \"mcpRegistrationPresent\": true,\n    \"handshakePerformed\": false,\n    \"healthVerified\": false,\n    \"writesPerformed\": false\n  },\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-surfaces-audit-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-16_PROJECTION_PARITY_PLAN",
+      "script": "scripts/atlas/plan-openspec-evidence-projection-parity-v1.mjs",
+      "startedAt": "2026-10-01T20:05:02.931Z",
+      "completedAt": "2026-10-01T20:05:03.039Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-projection-parity-plan.v1\",\n  \"status\": \"BLOCKED_CANONICAL_TRUTH_GATE\",\n  \"checks\": {\n    \"postgresReadbackProven\": false,\n    \"embeddingArtifactProven\": false,\n    \"exactOracleLive\": false,\n    \"canonical768\": true\n  },\n  \"projectionWrites\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-projection-parity-plan-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-17_GPU_PLAN",
+      "script": "scripts/atlas/plan-openspec-evidence-gpu-acceleration-v1.mjs",
+      "startedAt": "2026-10-01T20:05:03.039Z",
+      "completedAt": "2026-10-01T20:05:03.177Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-gpu-acceleration-plan.v1\",\n  \"status\": \"BLOCKED_PROJECTION_PARITY_GATE\",\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-gpu-acceleration-plan-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-18_TURBOVEC_PLAN",
+      "script": "scripts/atlas/plan-openspec-evidence-turbovec-memory-v1.mjs",
+      "startedAt": "2026-10-01T20:05:03.177Z",
+      "completedAt": "2026-10-01T20:05:03.322Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-turbovec-memory-plan.v1\",\n  \"status\": \"BLOCKED_FROZEN_TRUTH_SET_GATE\",\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-turbovec-memory-plan-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-19_WORKBOARD_PROJECTION",
+      "script": "scripts/atlas/build-openspec-evidence-workboard-projection-v1.mjs",
+      "startedAt": "2026-10-01T20:05:03.322Z",
+      "completedAt": "2026-10-01T20:05:05.518Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-workboard-projection.v1\",\n  \"status\": \"DERIVED_PROJECTION_NOT_PROMOTABLE\",\n  \"summary\": {\n    \"taskCount\": 11024,\n    \"cardCount\": 11024,\n    \"missingCardCount\": 0,\n    \"projectionStateCounts\": {\n      \"CLAIM_ONLY_CHECKED\": 7210,\n      \"BLOCKED\": 92,\n      \"CLAIM_ONLY_OPEN\": 3680,\n      \"STALE_EVIDENCE\": 39,\n      \"PARTIAL_EVIDENCE\": 1,\n      \"PROOF_READY_NOT_CHECKED\": 2\n    },\n    \"proofStateCounts\": {\n      \"CLAIM_ONLY\": 10890,\n      \"BLOCKED\": 92,\n      \"STALE\": 39,\n      \"PARTIAL\": 1,\n      \"PROVEN\": 2\n    },\n    \"checkedCount\": 7282,\n    \"checkedWithoutProvenCount\": 7282,\n    \"uncheckedButProvenCount\": 2\n  },\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-workboard-projection-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-19_WORKBOARD_RECONCILIATION",
+      "script": "scripts/atlas/reconcile-openspec-workboard-evidence-v1.mjs",
+      "startedAt": "2026-10-01T20:05:05.518Z",
+      "completedAt": "2026-10-01T20:05:06.240Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-workboard-evidence-reconciliation.v1\",\n  \"status\": \"WORKBOARD_PARITY_NOT_PROVEN\",\n  \"diff\": {\n    \"exactJoinCount\": 9282,\n    \"exactSourceRefJoinCount\": 8180,\n    \"exactSourceRevisionJoinCount\": 1102,\n    \"boardIdentityRows\": 9619,\n    \"evidenceIdentityRows\": 11024,\n    \"boardOnlyCount\": 337,\n    \"evidenceOnlyCount\": 1742,\n    \"duplicateBoardSourceRefCount\": 0,\n    \"duplicateEvidenceSourceRefCount\": 0,\n    \"duplicateBoardSourceRevisionCount\": 28,\n    \"duplicateEvidenceSourceRevisionCount\": 28,\n    \"doneWithoutProvenCount\": 6172,\n    \"openWithProvenCount\": 2,\n    \"doneWithStaleCount\": 26,\n    \"doneWithContradictionCount\": 0\n  },\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-workboard-evidence-reconciliation-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "EVF-20_MUTATION_PREFLIGHT",
+      "script": "scripts/atlas/preflight-openspec-controlled-task-mutation-v1.mjs",
+      "startedAt": "2026-10-01T20:05:06.241Z",
+      "completedAt": "2026-10-01T20:05:06.336Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-controlled-task-mutation-preflight.v1\",\n  \"status\": \"BLOCKED_FAIL_CLOSED\",\n  \"gates\": {\n    \"workboardParity\": false,\n    \"evidencePromotionEligible\": false,\n    \"taskMutationContractEnabled\": false,\n    \"independentReparseRequired\": true,\n    \"authorizationProvided\": false\n  },\n  \"writesPerformed\": false,\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-controlled-task-mutation-preflight-v1.json\"\n}\n",
+      "errorTail": ""
+    },
+    {
+      "stage": "HEALTH",
+      "script": "scripts/atlas/compile-openspec-evidence-health-v1.mjs",
+      "startedAt": "2026-10-01T20:05:06.336Z",
+      "completedAt": "2026-10-01T20:05:08.078Z",
+      "exitCode": 0,
+      "signal": null,
+      "outputTail": "{\n  \"schema\": \"atlas.openspec-evidence-health.v1\",\n  \"status\": \"DIAGNOSTIC_ONLY_NOT_PROMOTABLE\",\n  \"workspaceRevision\": \"sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b\",\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\docs\\\\reports\\\\openspec-evidence-health-v1.json\"\n}\n",
+      "errorTail": ""
+    }
+  ],
+  "failure": null,
+  "guards": {
+    "taskLedgersUnchanged": true,
+    "taskLedgerWrites": 0,
+    "checkboxMutations": 0,
+    "persistentStoreWrites": 0,
+    "vectorProjectionWrites": 0,
+    "mcpMutations": 0
+  },
+  "patch_targets": [
+    "scripts/atlas/audit-openspec-evidence-fabric-v1.mjs",
+    "scripts/atlas/build-openspec-dependency-graph-v1.mjs",
+    "scripts/atlas/propose-openspec-task-identity-reconciliation-v1.mjs",
+    "scripts/atlas/recover-openspec-task-identities-v1.mjs",
+    "scripts/atlas/classify-openspec-receipts-v1.mjs",
+    "scripts/atlas/resolve-openspec-orphan-bindings-v1.mjs",
+    "scripts/atlas/compile-openspec-evidence-summary-v1.mjs",
+    "scripts/atlas/reconcile-openspec-census-revisions-v1.mjs",
+    "scripts/atlas/audit-openspec-receipt-binding-v1.mjs",
+    "scripts/atlas/resolve-openspec-predicates-v1.mjs",
+    "scripts/atlas/compile-openspec-evidence-cards-v1.mjs",
+    "scripts/atlas/compile-openspec-feature-packets-v1.mjs",
+    "scripts/atlas/prove-openspec-golden-task-v1.mjs",
+    "scripts/atlas/audit-openspec-evidence-migration-v1.mjs",
+    "scripts/atlas/audit-openspec-evidence-ledger-readback-v1.mjs",
+    "scripts/atlas/plan-openspec-evidence-ledger-import-v1.mjs",
+    "scripts/atlas/propose-openspec-langextract-candidates-v1.mjs",
+    "scripts/atlas/plan-openspec-evidence-embeddings-v1.mjs",
+    "scripts/atlas/plan-openspec-evidence-retrieval-v1.mjs",
+    "scripts/atlas/audit-openspec-evidence-hybrid-rrf-v1.mjs",
+    "scripts/atlas/compile-openspec-evidence-context-manifest-v1.mjs",
+    "scripts/atlas/plan-openspec-evidence-synthesis-v1.mjs",
+    "scripts/atlas/plan-openspec-evidence-low-rank-v1.mjs",
+    "scripts/atlas/audit-openspec-evidence-surfaces-v1.mjs",
+    "scripts/atlas/plan-openspec-evidence-projection-parity-v1.mjs",
+    "scripts/atlas/plan-openspec-evidence-gpu-acceleration-v1.mjs",
+    "scripts/atlas/plan-openspec-evidence-turbovec-memory-v1.mjs",
+    "scripts/atlas/build-openspec-evidence-workboard-projection-v1.mjs",
+    "scripts/atlas/reconcile-openspec-workboard-evidence-v1.mjs",
+    "scripts/atlas/preflight-openspec-controlled-task-mutation-v1.mjs",
+    "scripts/atlas/compile-openspec-evidence-health-v1.mjs"
+  ],
+  "likely_cause": "OpenSpec proof state is distributed across claims, receipts, projections, and plans; a single read-only runner is required to keep stage order and authority boundaries reproducible.",
+  "evidence": [
+    "docs/reports/openspec-evidence/pipeline-20261001200315567-2860/census-v1.json",
+    "docs/reports/openspec-evidence/pipeline-20261001-task-alias-followup.json"
+  ],
+  "safe_next_command": "node scripts/atlas/run-openspec-evidence-fabric-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/run-openspec-evidence-fabric-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence/pipeline-20261001-task-alias-followup.json",
+  "generatedAt": "2026-10-01T20:05:09.094Z",
+  "checksum": "sha256:70ee25a161604ec4bbf5afdf8a8c0a5ae1f28048f6c31d556f6e4dc43d0bc92f"
+}

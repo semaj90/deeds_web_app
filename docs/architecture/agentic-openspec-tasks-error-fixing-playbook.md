@@ -57,6 +57,55 @@ and proof state have drifted before — this session alone found a predicate (`S
 regress due to an unrelated concurrent edit, and a packet-admission "fix" that was itself wrong. The
 job for a sub-helper fleet is not "make more boxes checked" — it's:
 
+### Evidence definition
+
+For this playbook, **evidence** is a revision-bound, schema-valid observation produced by a named
+command, test, or readback and linked to one canonical task or predicate by exact identity and source
+references. It must include the workspace revision, task-source revision, inputs, expected and actual
+assertions, outputs, timestamp, checksum, verifier, and required readback result. The receipt is proof;
+the task checkbox and any generated card are only claims or retrieval projections.
+
+The admission boundary is:
+
+- `PROVEN`: the receipt checksum and revisions verify, every required assertion passes, and required
+  independent readback is present.
+- `PARTIAL`, `BLOCKED`, `FAILED`, or `STALE`: evidence exists but is incomplete, unsuccessful,
+  prevented, or bound to an older revision; none of these states may promote a checkbox.
+- `CLAIM_ONLY`: a checkbox, plan, proposal, search hit, model output, heuristic match, or projection
+  exists without an admissible receipt. These artifacts remain useful inputs but cannot establish proof.
+
+The canonical read-only implementation is
+`scripts/atlas/audit-openspec-evidence-fabric-v1.mjs`; it emits `EvidenceReceiptV1` and derived
+`EvidenceCard` records without changing `tasks.md`.
+
+### Routing features: proposal shape only, implementation deferred
+
+The EVF-13 routing feature proposal is not yet a validated feature schema or an evidence or
+retrieval authority. `FeatureSignalAlignmentV1` is a planned derived tuple:
+
+- `semantic128`: a proposed revisioned low-rank representation derived from canonical `semantic_768`;
+- `graph64`: a proposed dependency/evidence graph representation from the NetworkX canonical
+  semantics, with cuGraph allowed only as an execution accelerator;
+- `evidenceStateFeatures`: categorical and bounded counts for `PROVEN`, `PARTIAL`, `BLOCKED`,
+  `FAILED`, `STALE`, and `CLAIM_ONLY`;
+- `temporalFeatures`: revision age, receipt age, and recency buckets, never wall-clock identity;
+- `contextFeatures`: bounded token/byte cost, dependency breadth, and source/receipt breadth;
+- `latent64`: the output of `LOW_RANK_PROJECT` over those inputs.
+
+No repository contract currently defines fixed `temporal_16` or `context_32` representations;
+`temporalFeatures` and `contextFeatures` above are conceptual bounded fields, not dimensioned
+vectors. TODO (deferred until after EVF-08): define and validate the feature-schema revision,
+field units/ranges, optionality, and any dimensions in a root `scripts/atlas` contract before
+materializing feature rows. Do not infer or create 16- or 32-dimensional representations from
+this proposal.
+
+Implementation remains **deferred** until task identity, receipt binding, and the canonical
+`semantic_768` artifact are proven. Each feature row must carry the workspace, source, graph,
+representation, and feature-schema revisions plus a checksum. `semantic128`, `graph64`, `latent64`,
+recency, breadth, and cost cannot create task identity, promote proof, or add a retrieval vote. The
+next implementation gate is to add a revisioned `FeatureSignalAlignmentV1` receipt and a frozen
+fixture after EVF-08; no feature materialization is authorized in EVF-03.
+
 1. Find tasks whose checkbox state doesn't match their evidence state (stale-checked, or
    checked-but-never-independently-verified).
 2. Find tasks that are genuinely actionable now (per the dependency graph, not vibes).

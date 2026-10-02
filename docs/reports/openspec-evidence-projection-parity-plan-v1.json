@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.openspec-evidence-projection-parity-plan.v1",
+  "mode": "READ_ONLY_PARITY_PLAN",
+  "status": "BLOCKED_CANONICAL_TRUTH_GATE",
+  "source": {
+    "readback": "docs/reports/openspec-evidence-ledger-readback-v1.json",
+    "embeddingPlan": "docs/reports/openspec-evidence-embedding-plan-v1.json",
+    "retrievalPlan": "docs/reports/openspec-evidence-retrieval-plan-v1.json"
+  },
+  "projections": [
+    {
+      "name": "qdrant",
+      "role": "rebuildable semantic projection",
+      "writePolicy": "admitted evidence rows only"
+    },
+    {
+      "name": "cuvs",
+      "role": "GPU ANN challenger projection",
+      "writePolicy": "append/tombstone/rebuild only"
+    },
+    {
+      "name": "turbovec",
+      "role": "bounded candidate retrieval/reranking",
+      "writePolicy": "candidate projection only"
+    }
+  ],
+  "metrics": [
+    "candidate_id_parity",
+    "recall_at_k",
+    "ordering_parity",
+    "workspace_revision_parity",
+    "source_revision_parity",
+    "tombstone_parity",
+    "latency_ms",
+    "ram_bytes",
+    "vram_bytes"
+  ],
+  "checks": {
+    "postgresReadbackProven": false,
+    "embeddingArtifactProven": false,
+    "exactOracleLive": false,
+    "canonical768": true
+  },
+  "protocol": {
+    "sourceOfTruth": "PostgreSQL semantic_768 exact oracle",
+    "candidateIdentity": "canonical task/evidence identity",
+    "revisionIdentity": "workspace + source + representation",
+    "tombstones": "append/tombstone/periodic rebuild",
+    "projectionWrites": false,
+    "parityPromotion": false
+  },
+  "writesPerformed": false,
+  "likely_cause": "Projection parity is meaningful only against a live canonical PostgreSQL truth set and exact semantic_768 oracle.",
+  "evidence": [
+    "docs/reports/openspec-evidence-ledger-readback-v1.json",
+    "docs/reports/openspec-evidence-embedding-plan-v1.json",
+    "docs/reports/openspec-evidence-retrieval-plan-v1.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/plan-openspec-evidence-projection-parity-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-openspec-evidence-ledger-readback-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-projection-parity-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-projection-parity-plan-v1.json",
+  "generatedAt": "2026-10-02T04:47:38.044Z",
+  "checksum": "sha256:573e8d9c77dfbe0f7699aa54fc9e5cd5898d519271ae7e0cd4cb7ae3e2e334a0"
+}

@@ -1,0 +1,157 @@
+{
+  "schema": "atlas.openspec-golden-task.v1",
+  "runId": "pipeline-20261001235818170-44112",
+  "status": "GOLDEN_TASK_PROVEN_READ_ONLY",
+  "task": {
+    "taskRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L133",
+    "taskId": "openspec-task:openspec://root/parent-atlas-graph-retrieval-proof/sha256:bba00d980fa6ed483f9e7db58e0b87e28af8912154715ce9936b2f5880fc0ee1",
+    "changeId": "parent-atlas-graph-retrieval-proof",
+    "claim": "Capture the current `atlas_tree_nodes.node_id` formula as a revision-bound parse-occurrence identity.",
+    "declaredChecked": false,
+    "identityState": "DERIVED_STABLE_KEY"
+  },
+  "evidence": [
+    "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L133",
+    "docs/reports/openspec-evidence/pipeline-20261001235818170-44112/tree-node-identity-formula-receipt-v1.json",
+    "docs/reports/openspec-task-identity-recovery-v1.json",
+    "docs/reports/openspec-receipt-type-classification-v1.json",
+    "docs/reports/openspec-orphan-binding-resolution-v1.json"
+  ],
+  "predicateBinding": {
+    "proofStateBeforeSpecimen": "PROVEN",
+    "predicateIds": [
+      "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef"
+    ]
+  },
+  "card": {
+    "cardId": "sha256:917c17f1770577732380db786ee0a846619926b8bfcd26563a3b945385ed8809",
+    "checksum": "sha256:8aef03c2b1504758901b6c600a4e971e4c7466f927444567205fa97209ea6c36",
+    "retrievalUsable": true,
+    "proofUsable": false
+  },
+  "assertions": [
+    {
+      "id": "TASK_FOUND",
+      "passed": true,
+      "observed": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L133"
+    },
+    {
+      "id": "IDENTITY_CANONICAL",
+      "passed": true,
+      "observed": "DERIVED_STABLE_KEY"
+    },
+    {
+      "id": "RECEIPT_SCHEMA",
+      "passed": true,
+      "observed": "atlas.evidence-receipt.v1"
+    },
+    {
+      "id": "RECEIPT_CHECKSUM",
+      "passed": true,
+      "observed": "sha256:10a8a37b36e920420fdc4e63bcff5cef4939f2342189bf4b8e0ad60e3cda5c3f"
+    },
+    {
+      "id": "EXACT_CANONICAL_TASK_ID",
+      "passed": true,
+      "observed": "openspec-task:openspec://root/parent-atlas-graph-retrieval-proof/sha256:bba00d980fa6ed483f9e7db58e0b87e28af8912154715ce9936b2f5880fc0ee1"
+    },
+    {
+      "id": "SOURCE_REF_EXACT",
+      "passed": true,
+      "observed": [
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L133",
+        "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs#L63"
+      ]
+    },
+    {
+      "id": "SOURCE_REF_REVISION_CURRENT",
+      "passed": true,
+      "observed": "sha256:866fd1f8e2d825be005bd48b20bc88c5af9d552948de050623e7fec4e5e9abc8"
+    },
+    {
+      "id": "WORKSPACE_REVISION_CURRENT",
+      "passed": true,
+      "observed": "sha256:84458fbe55b8ceaf1fe3b95a056c320dfe7119ab64b1faddf71f5501de6e93a0"
+    },
+    {
+      "id": "SOURCE_REVISION_CURRENT",
+      "passed": true,
+      "observed": "sha256:df5934a501f40bbbcd9de4aba6fa2e8fac32a25b15f04673414f135c7dc04b5d"
+    },
+    {
+      "id": "RECEIPT_TYPE_CONFIRMED",
+      "passed": true,
+      "observed": "STATIC_AUDIT"
+    },
+    {
+      "id": "RANKED_BINDING_EXACT",
+      "passed": true,
+      "observed": {
+        "strategy": "EXACT_TASK_REF",
+        "bindingDisposition": "EXACT_BOUND",
+        "revisionStatus": "CURRENT"
+      }
+    },
+    {
+      "id": "ASSERTIONS_PASS",
+      "passed": true,
+      "observed": [
+        {
+          "id": "functionPresent",
+          "passed": true
+        },
+        {
+          "id": "sevenInputComponents",
+          "passed": true
+        },
+        {
+          "id": "nulDelimited",
+          "passed": true
+        },
+        {
+          "id": "sha256Digest",
+          "passed": true
+        },
+        {
+          "id": "explicitUtf8Encoding",
+          "passed": true
+        },
+        {
+          "id": "noWorkspaceRevisionInference",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "result": {
+    "evidenceState": "STATIC_PROVEN",
+    "taskClaimState": "DECLARED_OPEN",
+    "proven": [
+      "FORMULA_LOCATED",
+      "SOURCE_REVISION_BOUND",
+      "STATIC_CAPTURE_PROVEN"
+    ],
+    "missing": [],
+    "contradictions": [],
+    "portfolioStateMutation": "NOT_APPLIED",
+    "sourceFilesMutated": false,
+    "taskLedgerWrites": 0,
+    "persistentStoreWrites": 0
+  },
+  "source": {
+    "census": "docs/reports/openspec-evidence/pipeline-20261001235818170-44112/census-v1.json",
+    "workspaceRevision": "sha256:84458fbe55b8ceaf1fe3b95a056c320dfe7119ab64b1faddf71f5501de6e93a0",
+    "receiptChecksum": "sha256:10a8a37b36e920420fdc4e63bcff5cef4939f2342189bf4b8e0ad60e3cda5c3f"
+  },
+  "likely_cause": "GS1.10 was previously blocked by source-reference fanout; canonical task identity and typed receipt binding now resolve the specimen without mutating the ledger.",
+  "patch_targets": [
+    "scripts/atlas/audit-openspec-evidence-fabric-v1.mjs",
+    "scripts/atlas/classify-openspec-receipts-v1.mjs",
+    "scripts/atlas/resolve-openspec-orphan-bindings-v1.mjs",
+    "scripts/atlas/prove-openspec-golden-task-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/prove-openspec-golden-task-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/prove-openspec-golden-task-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence/pipeline-20261001235818170-44112/golden-task-v1.json",
+  "checksum": "sha256:ea26c479eb0895d082a972b3a415c907b57c288e6c6db8b47a92475ed64d76bb"
+}

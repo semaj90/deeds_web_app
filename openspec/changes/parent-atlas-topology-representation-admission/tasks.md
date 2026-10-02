@@ -39,6 +39,7 @@
 
 - [ ] TOPO-01 Freeze `RepresentationDerivationDagV1` with independent
   `rff_128`, `ae_latent_128`, and `ae_latent_64` branches.
+  - Reconciliation prerequisite: `canonical-candidate-v1.ts` defines `latent_64` as a learned sibling from `semantic_768`, while `representation-artifact-v1.ts` and the existing latent receipt fixture define it as a derived prefix from `latent_256`. Keep TOPO-01 open until TOPO-02 determines which producer/artifact revision is admitted; do not encode both as interchangeable derivation truth.
 - [ ] TOPO-02 Audit representation definitions against live artifacts and
   classify unbound vectors as diagnostic-only.
 - [ ] TOPO-02A Replace the latent writer's fallback identity/update path with
@@ -95,15 +96,16 @@
   FP16/MsgPack transport encoding.
 - [ ] TOPO-05 Bind `SOMAssignmentV1` to one input artifact and SOM model
   revision.
-- [ ] TOPO-06 Separate `ManifoldPca4V1` from `Topology4DCoordinateV1`.
-- [ ] TOPO-07 Require workspace/source/candidate/ordinal revision parity on
-  topology rows.
+- [x] TOPO-06 Separate `ManifoldPca4V1` from `Topology4DCoordinateV1`. `ManifoldPca4V1` binds an independent representation revision, PCA basis/training-cohort digests, candidate/source/workspace revisions, input artifact revision, and output checksum; the topology coordinate remains routing-only. `representation-gradient-v1.spec.ts` proves both schemas reject cross-parsing and canonical-authority promotion. Runtime PCA generation/admission remains unproven.
+- [x] TOPO-07 Require workspace/source/candidate/ordinal revision parity on
+  topology rows. Contract/fixture proven: `topology-tile-v1.ts` binds tiles to the existing `CandidateOrdinalMapV1` checksum, candidate snapshot, workspace, and source revisions; coordinate values and semantic/AST/graph/temporal function revisions feed the topology revision. The focused topology fixture proves deterministic reorder behavior and rejects stale source/map revisions. Live population/backend parity remains in TOPO-08 through TOPO-12.
 - [ ] TOPO-08 Define `CanonicalEligibilityQueryV1` in PostgreSQL.
 - [ ] TOPO-09 Compile `CandidateEligibilityBitmapV1` by CandidateOrdinal.
 - [ ] TOPO-10 Prove PostgreSQL eligibility-to-bitmap exact parity.
 - [ ] TOPO-11 Prove Qdrant filter-to-bitmap exact parity.
 - [ ] TOPO-12 Prove cuVS filter-to-bitmap exact parity.
-- [ ] TOPO-13 Admit only bounded topology fan-out with independent readback.
+- [ ] TOPO-13 Admit only bounded topology fan-out with independent readback. Current topology results remain `CANDIDATE_ONLY`; exact readback against `CandidateOrdinalMapV1` is fixture-proven, but no production fan-out or ContextManifest admission path is wired. Preserve the upstream eligibility/parity gates and complete this task only after bounded admission plus independent readback.
+- [x] TOPO-13a Build and reuse a revision-qualified 4D coordinate hash index for local tile lookup; enforce a bounded coordinate-probe budget and prove indexed results match the exact candidate set. The rebuildable `Map` index binds topology/workspace/snapshot/ordinal-map revisions, caps probes at 65,536 and results at 4,096, and remains non-authoritative. `multi-plane-execution.spec.ts` verifies 81 probes at radius 1, rejects radius 8, and matches an independent exact scan over 256 deterministic candidates for multiple query/radius pairs. This is fixture proof only; no persistent or production index is claimed.
 - [ ] TOPO-14 Benchmark PostgreSQL AIO/bitmap scans, mmap, and GPU execution
   only after correctness gates pass.
 
