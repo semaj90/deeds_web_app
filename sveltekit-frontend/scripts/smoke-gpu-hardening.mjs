@@ -21,7 +21,15 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT  = resolve(__dir, '..');
 const VERBOSE = process.argv.includes('--verbose');
 
+// build-x64-cuda/Release checked FIRST — that's the CUDA/LibTorch-enabled build
+// (scripts/startup/build-cuda-libtorch-on-startup.mjs's target). The plain
+// build/Release path is a stale/CPU-fallback build kept only as a last-resort
+// fallback so this smoke test still runs (degraded) if the CUDA build is absent.
 const ADDON_CANDIDATES = [
+  join(ROOT, '../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+  join(ROOT, 'simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+  resolve(process.cwd(), 'simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+  resolve(process.cwd(), '../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
   join(ROOT, '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
   join(ROOT, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
   resolve(process.cwd(), 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),

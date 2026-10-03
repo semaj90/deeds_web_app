@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.ast-unit-lineage-convergence.v1",
+  "gate": "AST-UNIT-LINEAGE-CONVERGENCE-01",
+  "generatedAt": "2026-09-27T23:43:51.276Z",
+  "mode": "READ_ONLY_PROOF",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "subject": {
+    "symbolVersionId": "symbol-version:7698b7f3168a82e78fde72aefec9aa4f3ae1986a35035bb2f23e73cdbff8eba4",
+    "stableSymbolId": "stable-symbol:d0df81f22c57982acb5423db38875b6fa90f678257f80fb110e2b3a20b0166ad",
+    "sourceRef": "src/app.d.ts",
+    "sourceRevision": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908",
+    "workspaceRevision": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908",
+    "qualifiedName": "Error",
+    "packetKey": "ace:packet:b07092d78bfa",
+    "candidateOrdinal": null,
+    "producerRevision": "atlas-ast-symbol-version-materializer-v1",
+    "byteStart": "252",
+    "byteEnd": "339"
+  },
+  "currentOnDiskHash": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908",
+  "byteSpanExcerpt": "interface Error {\r\n    message: string;\r\n    code?: string;\r\n    details?: string;\r\n  }",
+  "checks": [
+    {
+      "code": "IDENTITY_CHAIN_COMPLETE",
+      "status": "PASS",
+      "detail": {
+        "symbolVersionId": "symbol-version:7698b7f3168a82e78fde72aefec9aa4f3ae1986a35035bb2f23e73cdbff8eba4",
+        "stableSymbolId": "stable-symbol:d0df81f22c57982acb5423db38875b6fa90f678257f80fb110e2b3a20b0166ad",
+        "sourceRef": "src/app.d.ts",
+        "sourceRevision": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908",
+        "packetKey": "ace:packet:b07092d78bfa"
+      }
+    },
+    {
+      "code": "SOURCE_REVISION_QUALIFIED",
+      "status": "PASS",
+      "detail": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908"
+    },
+    {
+      "code": "FILE_RESOLVABLE",
+      "status": "PASS",
+      "detail": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\app.d.ts"
+    },
+    {
+      "code": "SOURCE_REVISION_MATCHES_CURRENT_BYTES",
+      "status": "PASS",
+      "detail": {
+        "stored": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908",
+        "currentOnDisk": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908"
+      }
+    },
+    {
+      "code": "BYTE_SPAN_IN_RANGE",
+      "status": "PASS",
+      "detail": {
+        "byteStart": 252,
+        "byteEnd": 339,
+        "fileLength": 1763
+      }
+    },
+    {
+      "code": "BYTE_SPAN_NON_EMPTY",
+      "status": "PASS",
+      "detail": {
+        "excerptLength": 87
+      }
+    },
+    {
+      "code": "PACKET_KEY_SHAPE_PLAUSIBLE",
+      "status": "PASS",
+      "detail": "ace:packet:b07092d78bfa"
+    }
+  ],
+  "status": "LINEAGE_CONVERGED",
+  "exitCondition": "source_ref -> source_revision -> symbol_version_id -> packet_key, all exact, all same revision, no fallback"
+}

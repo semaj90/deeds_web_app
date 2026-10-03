@@ -101,6 +101,17 @@
   Test: `sveltekit-frontend/tests/cache-keys.spec.ts` (15/15).
 - [ ] CACHE-PREFILL-03 after caller ownership is verified, run a separately scoped
   live read proof; cache SET/DEL fixtures need explicit cache-write effect accounting.
+  - 2026-09-26 code-only progress: added
+    `sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.ts`
+    and focused in-memory tests. The component accepts only an admitted
+    ContextManifestV2 + ManifestBoundPromptPlanV1 + caller-supplied
+    workspaceRevision; it derives an AceBitfrostCacheIdentityV1 descriptor,
+    bounds TTL to <= 86400 seconds, stores no raw stable-prefix text and no
+    portable llama.cpp KV/tensor state, and reports cache writes separately
+    from canonical writes. The stale-workspace fixture changes the cache key
+    and therefore misses. This is NOT the live CACHE-PREFILL-03 proof: no
+    Valkey SET/DEL, no production caller promotion, and no Ornith call were
+    performed in this change.
 
 ### Strict streaming handoff update — 2026-09-15
 
@@ -372,6 +383,47 @@ applied by the coordinating session afterward, not by the fork itself).
       current cache behavior as legacy/degraded and do not claim revision-safe retrieval reuse.
       Existing multi-lane RRF tests pass 8/8; that proves lane execution and deduplication, not
       cache identity correctness.
+      **Partial progress (2026-09-22): fixed one real, concrete write/read mismatch in the ACE
+      context assembler's own write path; the other two named callers (MCP trace route,
+      retrieval-lanes.ts) are still legacy-only — not a full close.**
+      - **Root cause found**: `multi-lane-retrieval.ts::runAceCacheLane()` already had dual-mode
+        read logic (revisioned key when `retrievalCacheIdentity` is supplied, legacy `aceTopkKey`
+        fallback otherwise) — landed under CACHE-RETRIEVAL-IDENTITY-02. But
+        `context-assembler.ts::fetchRAGChunks()` (the "P0-B" writer that warms this exact cache
+        lane) only ever wrote the legacy `aceTopkKey`, never the revisioned key — so even when a
+        caller supplied `retrievalCacheIdentity`, the revisioned read path could never observe a
+        hit from this writer, no matter how fresh. Fixed: threaded `retrievalCacheIdentity`
+        through `fetchRAGChunks()`'s signature (from `opts.retrievalCacheIdentity`, the same
+        object already passed into the sibling `multiLaneSearch()` call a few lines above in
+        `assembleACEContext`) and added an additional write via the existing
+        `persistRevisionedAceTopRetrievalCache()` helper alongside the untouched legacy write.
+        `topN=8` is hardcoded to match this file's own `multiLaneSearch({ topK: 8, ... })` call,
+        since admission requires an exact topN match (flagged in a comment for future drift).
+      - **Verified**: `npx tsgo --noEmit` shows zero new errors from this change (checked full
+        project output, not just this file). The two underlying contract test files this reuses
+        unmodified (`ace-top-retrieval-cache.spec.ts`, `cache-keys-retrieval-identity.spec.ts`)
+        still pass 8/8. `AceTopRetrievalResult`'s shape (`id`, `sourceRef`, `snippet`, `score`)
+        was hand-verified against `runAceCacheLane()`'s actual consumption
+        (`result.id`/`result.snippet ?? ''`/`result.score`/`result.sourceRef`).
+      - **NOT verified**: no new automated test exercises the exact new code path — `fetchRAGChunks`
+        is a non-exported internal function deep in a 7,680-line file with heavy Qdrant/embedding
+        dependencies, impractical to invoke directly without a much larger test-harness
+        investment. Correctness rests on type-checking + shape review + the existing pure-function
+        contract tests, not a fresh end-to-end proof. Flagging this limitation rather than
+        overclaiming.
+      - **Honest scope limit**: no caller anywhere in the repo currently constructs a
+        `RetrievalCacheIdentityV1` object to pass into `assembleACEContext`'s `opts` (grepped
+        repo-wide for `retrievalCacheIdentity:` — the only match is this fix's own pass-through).
+        So this fix closes a real wiring bug but does not make revision-safe retrieval reuse live
+        today — nothing yet supplies the identity for it to activate on.
+      - **Still open**: `retrieval-lanes.ts::runRedisAceLane()` (a third, independent reader with
+        its own separate query-hash scheme, sha256-based, not md5) and the MCP trace route
+        (`trace-mcp-server.ts`, one of `multiLaneSearch`'s 4 real callers) are both still
+        legacy-only — migrating them requires constructing a full 7-field
+        `RetrievalCacheIdentityV1` (workspaceRevision, candidateSnapshotRevision,
+        ordinalMapChecksum, representationRevision, featureRevision, retrievalPolicyRevision,
+        contextPolicyRevision) from scratch in each of those files, which none of their current
+        scopes have on hand — a separate, larger piece of work, not attempted in this pass.
 
 ### Retrieval-cache admission hardening — 2026-09-15
 
@@ -832,3 +884,27 @@ applied by the coordinating session afterward, not by the fork itself).
 
 ## Run Receipts
 - wf-mcp-bitfrost-ace-optimization-fork-20260905/MCP_BITFROST_ACE_OPTIMIZATION_FORK#1: MCP/BitFrost/ACE synthesis optimization fork (state=succeeded)
+- [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+## Ontology tuple cache identity and projection revisions (2026-09-30)
+
+- [ ] ONTO-CACHE-REVISION-01: replace the ambiguous single `centroidVersion` in a versioned cache
+      record with independently bound `domainClassifierRevision`, `kmeansRevision`, `somRevision`,
+      `communityRevision`, and `representationRevision` plus `ordinalMapChecksum`. Preserve
+      workspace/packet/source revisions. Each optional projection may be absent, but may not
+      inherit another projection's revision. Verify stale-entry rejection independently per
+      projection.
+- [ ] ONTO-CACHE-KEY-01: keep the current truncated `sourceRefHash` strictly as a locator/index
+      component, never as source identity. Bind the cache key and value to exact canonical
+      `packetKey` where applicable, full `sourceRef`, `sourceRevision`, workspace revision, and
+      content/input checksum. Define collision handling and a versioned namespace/key transition;
+      prove key determinism and that a stale revision cannot hit a current entry.
+
+Cross-owner trust constraint: apply `ONTO-TUPLE-TRUST-01` from the ontology-kernel owner when
+serializing trust labels. A cache may state that it references canonical evidence but must never
+claim canonical authority. PostgreSQL remains the source of truth. No cache writes until the
+current plan, namespace compatibility, and exact readback are separately approved.
+
+Acceptance: schema/key tests exercise collisions, source and revision changes, independent
+projection revision changes, legacy cache records, and fail-closed misses. No live Valkey mutation
+or cache warming is authorized by these gates.

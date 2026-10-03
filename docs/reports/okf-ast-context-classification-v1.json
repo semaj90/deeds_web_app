@@ -1,19 +1,19 @@
 {
   "schema": "atlas.okf-ast-context-classification.v1",
   "status": "READ_ONLY_AST_CONTEXT_AUDIT",
-  "generatedAt": "2026-09-20T05:43:15.814Z",
+  "generatedAt": "2026-09-21T00:14:08.712Z",
   "roots": [
     "sveltekit-frontend/src",
     "scripts/atlas"
   ],
-  "filesScanned": 7202,
-  "findings": 2439,
+  "filesScanned": 7286,
+  "findings": 2447,
   "dispositionCounts": {
     "DEMO_FLAG_GATED_REVIEW": 10,
-    "PRODUCTION_REVIEW_REQUIRED": 714,
-    "TEST_FIXTURE_ACCEPTABLE": 532,
+    "PRODUCTION_REVIEW_REQUIRED": 719,
+    "TEST_FIXTURE_ACCEPTABLE": 533,
     "THROWING_STUB_REVIEW": 103,
-    "UNLABELED_SYNTHETIC_PRODUCTION_REVIEW": 1066,
+    "UNLABELED_SYNTHETIC_PRODUCTION_REVIEW": 1068,
     "UNREFERENCED_OR_SYNTHETIC_STUB_REVIEW": 14
   },
   "items": [
@@ -1165,6 +1165,50 @@
       }
     },
     {
+      "path": "scripts/atlas/audit-nlp-agentic-error-readiness-v1.mjs",
+      "line": 137,
+      "text": "pytorchUnsupervised: { status: 'TODO', authority: 'SHADOW_ONLY', promotionAuthorized: false },",
+      "ast": {
+        "disposition": "PRODUCTION_REVIEW_REQUIRED",
+        "contextMethod": "typescript-syntax-context-v1",
+        "syntaxContext": [
+          "VariableDeclarationList",
+          "VariableDeclaration",
+          "ObjectLiteralExpression",
+          "PropertyAssignment",
+          "Identifier"
+        ],
+        "isTestOrFixture": false,
+        "isDemoGated": false,
+        "isThrowingStub": false,
+        "isSynthetic": false,
+        "filenameLooksLikeStub": false,
+        "pathKind": "SOURCE"
+      }
+    },
+    {
+      "path": "scripts/atlas/audit-nlp-agentic-error-readiness-v1.mjs",
+      "line": 244,
+      "text": "status: 'TODO_PYTORCH_UNSUPERVISED_01',",
+      "ast": {
+        "disposition": "PRODUCTION_REVIEW_REQUIRED",
+        "contextMethod": "typescript-syntax-context-v1",
+        "syntaxContext": [
+          "ObjectLiteralExpression",
+          "PropertyAssignment",
+          "ObjectLiteralExpression",
+          "PropertyAssignment",
+          "Identifier"
+        ],
+        "isTestOrFixture": false,
+        "isDemoGated": false,
+        "isThrowingStub": false,
+        "isSynthetic": false,
+        "filenameLooksLikeStub": false,
+        "pathKind": "SOURCE"
+      }
+    },
+    {
       "path": "scripts/atlas/audit-okf-ast-context-classification-v1.mjs",
       "line": 6,
       "text": "* This classifies placeholder/mock signals with syntax context so the raw",
@@ -1417,6 +1461,27 @@
         "isDemoGated": false,
         "isThrowingStub": false,
         "isSynthetic": true,
+        "filenameLooksLikeStub": false,
+        "pathKind": "SOURCE"
+      }
+    },
+    {
+      "path": "scripts/atlas/audit-packet-chunk-lineage-migration-owner-v1.mjs",
+      "line": 70,
+      "text": "if (/tasks\\.md$|docs\\/reports|workstation.*todo/.test(normalized)) return 'LEDGER_OR_REPORT';",
+      "ast": {
+        "disposition": "PRODUCTION_REVIEW_REQUIRED",
+        "contextMethod": "typescript-syntax-context-v1",
+        "syntaxContext": [
+          "SourceFile",
+          "FunctionDeclaration",
+          "Block",
+          "IfStatement"
+        ],
+        "isTestOrFixture": false,
+        "isDemoGated": false,
+        "isThrowingStub": false,
+        "isSynthetic": false,
         "filenameLooksLikeStub": false,
         "pathKind": "SOURCE"
       }
@@ -2417,6 +2482,94 @@
       }
     },
     {
+      "path": "scripts/atlas/build-domain-review-sheet-v1.mjs",
+      "line": 84,
+      "text": "<input type=\"search\" id=\"q\" placeholder=\"Search path, label, evidence text...\" aria-label=\"Search\">",
+      "ast": {
+        "disposition": "UNLABELED_SYNTHETIC_PRODUCTION_REVIEW",
+        "contextMethod": "typescript-syntax-context-v1",
+        "syntaxContext": [
+          "VariableDeclarationList",
+          "VariableDeclaration",
+          "TemplateExpression",
+          "TemplateSpan",
+          "TemplateMiddle"
+        ],
+        "isTestOrFixture": false,
+        "isDemoGated": false,
+        "isThrowingStub": false,
+        "isSynthetic": true,
+        "filenameLooksLikeStub": false,
+        "pathKind": "SOURCE"
+      }
+    },
+    {
+      "path": "scripts/atlas/build-domain-review-sheet-v1.mjs",
+      "line": 86,
+      "text": "<select id=\"fs\"><option value=\"all\">All status</option><option value=\"todo\">To do</option><option value=\"done\">Reviewed</option></select>",
+      "ast": {
+        "disposition": "PRODUCTION_REVIEW_REQUIRED",
+        "contextMethod": "typescript-syntax-context-v1",
+        "syntaxContext": [
+          "VariableDeclarationList",
+          "VariableDeclaration",
+          "TemplateExpression",
+          "TemplateSpan",
+          "TemplateMiddle"
+        ],
+        "isTestOrFixture": false,
+        "isDemoGated": false,
+        "isThrowingStub": false,
+        "isSynthetic": false,
+        "filenameLooksLikeStub": false,
+        "pathKind": "SOURCE"
+      }
+    },
+    {
+      "path": "scripts/atlas/build-domain-review-sheet-v1.mjs",
+      "line": 89,
+      "text": "<input type=\"text\" id=\"rev\" placeholder=\"Reviewer\" size=\"12\" aria-label=\"Reviewer\">",
+      "ast": {
+        "disposition": "UNLABELED_SYNTHETIC_PRODUCTION_REVIEW",
+        "contextMethod": "typescript-syntax-context-v1",
+        "syntaxContext": [
+          "VariableDeclarationList",
+          "VariableDeclaration",
+          "TemplateExpression",
+          "TemplateSpan",
+          "TemplateMiddle"
+        ],
+        "isTestOrFixture": false,
+        "isDemoGated": false,
+        "isThrowingStub": false,
+        "isSynthetic": true,
+        "filenameLooksLikeStub": false,
+        "pathKind": "SOURCE"
+      }
+    },
+    {
+      "path": "scripts/atlas/build-domain-review-sheet-v1.mjs",
+      "line": 124,
+      "text": "const done = !!saved[r.packetKey]; if (fs === 'todo' && done) return false; if (fs === 'done' && !done) return false;",
+      "ast": {
+        "disposition": "PRODUCTION_REVIEW_REQUIRED",
+        "contextMethod": "typescript-syntax-context-v1",
+        "syntaxContext": [
+          "VariableDeclarationList",
+          "VariableDeclaration",
+          "TemplateExpression",
+          "TemplateSpan",
+          "LastTemplateToken"
+        ],
+        "isTestOrFixture": false,
+        "isDemoGated": false,
+        "isThrowingStub": false,
+        "isSynthetic": false,
+        "filenameLooksLikeStub": false,
+        "pathKind": "SOURCE"
+      }
+    },
+    {
       "path": "scripts/atlas/build-master-feature-todo-openspec-crosswalk-v1.mjs",
       "line": 3,
       "text": "* Build a review-only crosswalk from the archived Master Feature TODO to OpenSpec.",
@@ -2666,16 +2819,16 @@
     },
     {
       "path": "scripts/atlas/build-openspec-workboard-v1.mjs",
-      "line": 415,
+      "line": 337,
       "text": "const raw = String(ref).replace(/^todo:/i, '').replace(/#line:\\d+$/i, '');",
       "ast": {
         "disposition": "TEST_FIXTURE_ACCEPTABLE",
         "contextMethod": "typescript-syntax-context-v1",
         "syntaxContext": [
-          "ArrowFunction",
-          "ConditionalExpression",
+          "ReturnStatement",
+          "ObjectLiteralExpression",
+          "PropertyAssignment",
           "CallExpression",
-          "PropertyAccessExpression",
           "Identifier"
         ],
         "isTestOrFixture": true,
@@ -16753,6 +16906,27 @@
       }
     },
     {
+      "path": "scripts/atlas/test-resource-headroom-v1.mjs",
+      "line": 6,
+      "text": "test('resource headroom accepts a simulated bounded run above both floors', () => {",
+      "ast": {
+        "disposition": "TEST_FIXTURE_ACCEPTABLE",
+        "contextMethod": "typescript-syntax-context-v1",
+        "syntaxContext": [
+          "SourceFile",
+          "ExpressionStatement",
+          "CallExpression",
+          "Identifier"
+        ],
+        "isTestOrFixture": true,
+        "isDemoGated": false,
+        "isThrowingStub": false,
+        "isSynthetic": true,
+        "filenameLooksLikeStub": false,
+        "pathKind": "SOURCE"
+      }
+    },
+    {
       "path": "scripts/atlas/train-autoencoder-768-64.mts",
       "line": 9,
       "text": "* This is a placeholder. Real implementation requires:",
@@ -26296,7 +26470,7 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.spec.ts",
-      "line": 104,
+      "line": 105,
       "text": "extractionClassToDomain: new Map([['authorization_behavior', 'software.security']]),",
       "ast": {
         "disposition": "TEST_FIXTURE_ACCEPTABLE",
@@ -26318,7 +26492,7 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.ts",
-      "line": 111,
+      "line": 126,
       "text": "extractionClassToDomain: ReadonlyMap<string, string>;",
       "ast": {
         "disposition": "PRODUCTION_REVIEW_REQUIRED",
@@ -26340,15 +26514,15 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.ts",
-      "line": 202,
+      "line": 237,
       "text": "extractionClassToDomain: input.groundedDomainMapping.extractionClassToDomain,",
       "ast": {
         "disposition": "PRODUCTION_REVIEW_REQUIRED",
         "contextMethod": "typescript-syntax-context-v1",
         "syntaxContext": [
+          "SourceFile",
           "FunctionDeclaration",
           "Block",
-          "FirstStatement",
           "FirstStatement",
           "VariableDeclarationList"
         ],
@@ -30441,7 +30615,7 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/atlas/tensors/unified-residency-adapter-v1.ts",
-      "line": 54,
+      "line": 60,
       "text": "if (!provider || provider.kind !== kind) throw new Error(`${kind}_PROVIDER_UNAVAILABLE`);",
       "ast": {
         "disposition": "THROWING_STUB_REVIEW",
@@ -41792,7 +41966,7 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
-      "line": 1573,
+      "line": 1736,
       "text": "lane: { type: 'string', enum: ['todo', 'in_progress', 'done'] },",
       "ast": {
         "disposition": "PRODUCTION_REVIEW_REQUIRED",
@@ -41802,7 +41976,7 @@
           "PropertyAssignment",
           "ObjectLiteralExpression",
           "PropertyAssignment",
-          "StringLiteral"
+          "Identifier"
         ],
         "isTestOrFixture": false,
         "isDemoGated": false,
@@ -41814,7 +41988,7 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
-      "line": 1582,
+      "line": 1745,
       "text": "input: { lane: 'todo', limit: 20 },",
       "ast": {
         "disposition": "PRODUCTION_REVIEW_REQUIRED",
@@ -41824,7 +41998,7 @@
           "PropertyAssignment",
           "ObjectLiteralExpression",
           "PropertyAssignment",
-          "Identifier"
+          "StringLiteral"
         ],
         "isTestOrFixture": false,
         "isDemoGated": false,
@@ -41836,17 +42010,17 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
-      "line": 1584,
+      "line": 1747,
       "text": "description: 'List tasks in the todo lane',",
       "ast": {
         "disposition": "PRODUCTION_REVIEW_REQUIRED",
         "contextMethod": "typescript-syntax-context-v1",
         "syntaxContext": [
+          "PropertyAssignment",
+          "ArrayLiteralExpression",
           "ObjectLiteralExpression",
           "PropertyAssignment",
-          "ObjectLiteralExpression",
-          "PropertyAssignment",
-          "Identifier"
+          "StringLiteral"
         ],
         "isTestOrFixture": false,
         "isDemoGated": false,
@@ -41858,17 +42032,17 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
-      "line": 1718,
+      "line": 1881,
       "text": "description: 'Mark a kanban task blocked and return it to todo.',",
       "ast": {
         "disposition": "PRODUCTION_REVIEW_REQUIRED",
         "contextMethod": "typescript-syntax-context-v1",
         "syntaxContext": [
-          "VariableDeclarationList",
-          "VariableDeclaration",
-          "AwaitExpression",
-          "CallExpression",
-          "Identifier"
+          "ArrowFunction",
+          "Block",
+          "IfStatement",
+          "Block",
+          "ReturnStatement"
         ],
         "isTestOrFixture": false,
         "isDemoGated": false,
@@ -41880,17 +42054,17 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
-      "line": 1794,
+      "line": 1957,
       "text": "description: 'Retry a failed kanban task and return it to todo/pending.',",
       "ast": {
         "disposition": "PRODUCTION_REVIEW_REQUIRED",
         "contextMethod": "typescript-syntax-context-v1",
         "syntaxContext": [
+          "PropertyAssignment",
+          "ArrowFunction",
           "Block",
           "IfStatement",
-          "Block",
-          "ReturnStatement",
-          "CallExpression"
+          "Block"
         ],
         "isTestOrFixture": false,
         "isDemoGated": false,
@@ -41902,17 +42076,17 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
-      "line": 1842,
+      "line": 2005,
       "text": "lane: { type: 'string', enum: ['todo', 'in_progress', 'done'] },",
       "ast": {
         "disposition": "PRODUCTION_REVIEW_REQUIRED",
         "contextMethod": "typescript-syntax-context-v1",
         "syntaxContext": [
-          "ObjectLiteralExpression",
           "PropertyAssignment",
-          "ObjectLiteralExpression",
-          "PropertyAssignment",
-          "StringLiteral"
+          "ArrowFunction",
+          "Block",
+          "TryStatement",
+          "CatchClause"
         ],
         "isTestOrFixture": false,
         "isDemoGated": false,
@@ -42722,17 +42896,16 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/vector/embeddinggemma-contracts.ts",
-      "line": 163,
+      "line": 213,
       "text": "throw new Error(`UNSUPPORTED_EMBEDDINGGEMMA_MRL_DIMENSION: ${contract.outputDimension}`);",
       "ast": {
         "disposition": "THROWING_STUB_REVIEW",
         "contextMethod": "typescript-syntax-context-v1",
         "syntaxContext": [
-          "IfStatement",
-          "ReturnStatement",
-          "CallExpression",
-          "PropertyAccessExpression",
-          "Identifier"
+          "SourceFile",
+          "FunctionDeclaration",
+          "Block",
+          "IfStatement"
         ],
         "isTestOrFixture": false,
         "isDemoGated": false,
@@ -42744,17 +42917,17 @@
     },
     {
       "path": "sveltekit-frontend/src/lib/server/vector/embeddinggemma-contracts.ts",
-      "line": 171,
+      "line": 221,
       "text": "throw new Error(`UNSUPPORTED_EMBEDDINGGEMMA_PROJECTION: ${contract.projectionKind}`);",
       "ast": {
         "disposition": "THROWING_STUB_REVIEW",
         "contextMethod": "typescript-syntax-context-v1",
         "syntaxContext": [
+          "Block",
+          "ThrowStatement",
           "NewExpression",
           "TemplateExpression",
-          "TemplateSpan",
-          "PropertyAccessExpression",
-          "Identifier"
+          "TemplateHead"
         ],
         "isTestOrFixture": false,
         "isDemoGated": false,

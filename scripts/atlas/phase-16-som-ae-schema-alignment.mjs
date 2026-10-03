@@ -145,8 +145,13 @@ const report = {
     aeDistance: 'additive',
     somBmuField: 'z_som',
     checkpointRequired: false,
-    retrievalTruth: 'embedding_384',
-    latent128Role: 'semantic_compression',
+    retrievalTruth: 'semantic_768',
+    canonicalEncoder: 'EmbeddingGemma',
+    canonicalDimension: 768,
+    mrlDerivedRepresentations: ['semantic_mrl_512', 'semantic_mrl_256', 'semantic_mrl_128'],
+    learnedLatentRepresentations: ['latent_256', 'latent_128', 'latent_64'],
+    latent256Role: 'learned_compressed_projection',
+    latent128Role: 'learned_compressed_projection',
     latent64Role: 'routing_topology_rerank_bonus',
     identityFields: ['packet_key', 'source_ref'],
     executionOrder: ['GDS', 'AE latent projection', 'SOM 20x20', 'higher-hop enrichment'],
@@ -181,7 +186,10 @@ Status: ${status}
 - active migration: \`${migration.path}\`
 - live topology table: ${database.status}
 - latent_64 stays bytea: yes
-- embedding_384 remains dense-retrieval truth: yes
+- canonical dense retrieval: semantic_768 (EmbeddingGemma, 768-D)
+- derived MRL views: semantic_mrl_512 / semantic_mrl_256 / semantic_mrl_128
+- learned latent views: latent_256 / latent_128 / latent_64 (not canonical retrieval truth)
+- 384-D semantic lane: retired; never infer canonical identity from a legacy column
 - latent_64 is routing/topology/rerank evidence only: yes
 - ae_distance stays additive: yes
 - z_som remains the SOM BMU: yes

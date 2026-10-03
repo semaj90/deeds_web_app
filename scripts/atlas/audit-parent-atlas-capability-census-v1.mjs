@@ -7,19 +7,23 @@ import { CAPABILITIES } from './lib/capability-catalog-v1.mjs';
 const root = path.resolve(process.argv[2] || '.');
 const reportsDir = path.resolve(process.argv[3] || path.join(root, 'docs/reports'));
 const out = path.resolve(process.argv[4] || path.join(reportsDir, 'parent-atlas-capability-census-v1.json'));
-const maxFiles = Number(process.env.ATLAS_CAPABILITY_MAX_FILES || 50000);
+// Safe default for the governed runner; larger scans require an explicit override.
+const maxFiles = Number(process.env.ATLAS_CAPABILITY_MAX_FILES || 5000);
 const maxBytes = Number(process.env.ATLAS_CAPABILITY_MAX_FILE_BYTES || 1024 * 1024);
+const maxReportFiles = Number(process.env.ATLAS_CAPABILITY_MAX_REPORT_FILES || 500);
 const SKIP = new Set(['node_modules', '.git', '.svelte-kit', 'build', 'dist', '.venv', 'venv', '__pycache__', '.tmp']);
+const reportsRoot = path.resolve(reportsDir);
 
-function walk(dir, acc = []) {
+function walk(dir, acc = [], skipReports = true) {
   if (acc.length >= maxFiles) return acc;
+  if (skipReports && path.resolve(dir) === reportsRoot) return acc;
   let entries = [];
   try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return acc; }
   for (const entry of entries) {
     if (acc.length >= maxFiles) break;
     if (SKIP.has(entry.name)) continue;
     const file = path.join(dir, entry.name);
-    if (entry.isDirectory()) walk(file, acc);
+    if (entry.isDirectory()) walk(file, acc, skipReports);
     else if (entry.isFile()) acc.push(file);
   }
   return acc;
@@ -27,22 +31,19 @@ function walk(dir, acc = []) {
 
 const files = walk(root);
 const rel = (file) => path.relative(root, file).replaceAll('\\', '/');
-const textCache = new Map();
-function fileText(file) {
-  if (textCache.has(file)) return textCache.get(file);
+function fileText(file, byteLimit = maxBytes) {
   let text = '';
   try {
-    if (fs.statSync(file).size <= maxBytes) text = fs.readFileSync(file, 'utf8');
+    if (fs.statSync(file).size <= byteLimit) text = fs.readFileSync(file, 'utf8');
   } catch { /* unreadable files remain non-matches */ }
   text = text.toLowerCase();
-  textCache.set(file, text);
   return text;
 }
 
-const reportFiles = fs.existsSync(reportsDir) ? walk(reportsDir, []) : [];
+const reportFiles = fs.existsSync(reportsDir) ? walk(reportsDir, [], false).slice(0, maxReportFiles) : [];
 const aggregateReport = /capability-census|execution-controller|blocker-audit|workboard|implementation-order|portfolio/i;
 const reportText = reportFiles
-  .map((file) => ({ relative: rel(file), text: fileText(file) }))
+  .map((file) => ({ relative: rel(file), text: fileText(file, Math.min(maxBytes, 256 * 1024)) }))
   .filter(({ relative }) => !aggregateReport.test(relative));
 let runtimeReadiness = null;
 try {
@@ -140,8 +141,11 @@ const result = {
     'KMeans/SOM/manifold/visual encodings are advisory challengers only.',
     'Parent Atlas ACE residency and cuVS CAGRA ACE (Augmented Core Extraction) are separate concepts and must use distinct identifiers.',
     'Only controller/receipt evidence may change task eligibility or promotion state.',
+    `Source inventory is bounded at ${maxFiles} files; report evidence is bounded at ${maxReportFiles} files.`,
   ],
 };
 fs.mkdirSync(path.dirname(out), { recursive: true });
-fs.writeFileSync(out, `${JSON.stringify(result, null, 2)}\n`);
+const tempOut = `${out}.${process.pid}.${Date.now()}.tmp`;
+fs.writeFileSync(tempOut, `${JSON.stringify(result, null, 2)}\n`);
+fs.renameSync(tempOut, out);
 console.log(JSON.stringify({ report: out, filesScanned: files.length, summary, semanticChecksum }, null, 2));

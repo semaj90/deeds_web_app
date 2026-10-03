@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * RESTORE QDRANT 384-DIM FROM POSTGRES CANONICAL
+ * RESTORE LEGACY 384-DIM QDRANT PROJECTION (NON-CANONICAL)
  *
- * Restores codebase_chunks_384 Qdrant collection from Postgres canonical packets.
+ * Restores the legacy codebase_chunks_384 projection from historical Postgres packet rows.
+ * This 384-D projection is not the canonical semantic_768 representation.
  * Read-only from Postgres, upserts into Qdrant.
  *
  * Only processes rows where atlas_packets.content_embedding_384 IS NOT NULL.

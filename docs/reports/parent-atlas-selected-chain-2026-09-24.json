@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.parent-atlas-selected-chain-progress.v1",
+  "generatedAt": "2026-09-24T21:26:22Z",
+  "scope": "EMBED_CALLER_CONTRACT_TO_SOURCE_AUTHORITY",
+  "status": "WAITING_FOR_SOURCE_AUTHORITY_APPLY_AUTHORIZATION",
+  "embed": {
+    "requestContractTests": { "passed": 5, "failed": 0 },
+    "routeTests": { "passed": 7, "failed": 0 },
+    "unauthenticated": "401_WITHOUT_EMBEDDING",
+    "invalidJsonAndSchema": "400_WITHOUT_EMBEDDING",
+    "rateLimit": "429_WITHOUT_EMBEDDING",
+    "unsupportedModel": "400_WITHOUT_EMBEDDING",
+    "callerResponseType": "unknown[]",
+    "startupWatchArtifactFound": false,
+    "liveAuthenticatedGenerationReplay": "NOT_RUN",
+    "servicePorts": { "sveltekit5173": "reachable", "llamaServer8090": "reachable" }
+  },
+  "graphIdentity": {
+    "decision": "GRAPH_NODE_KIND_IS_SEMANTIC_TAXONOMY; GRAPH_NODE_KEY_V1_IS_NARROW_PROJECTION_ADDRESS",
+    "acceptedPrefixes": ["symbol", "packet", "chunk", "occurrence"],
+    "semanticKindPrefixesRejected": ["concept", "document", "process", "package", "test", "external_doc"],
+    "existingKeyGenerationChanged": false,
+    "tests": { "passed": 4, "failed": 0 }
+  },
+  "sourceAuthority": {
+    "evidenceReceipt": "docs/reports/current-lineage-closure-v1.json",
+    "firstFailureBoundary": "EXECUTION_SOURCE_AUTHORITY",
+    "workspaceSourceRows": 52,
+    "packetQualifiedRows": 0,
+    "packetChunkQualifiedRows": 4,
+    "astQualifiedRows": 48,
+    "spanQualifiedRows": 0,
+    "candidateOrdinalEligibleRows": 0,
+    "sourceProducerAuthority": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
+    "repairPlanExactCurrentBindingCount": 23729,
+    "repairPlanAuthorizationRequired": true,
+    "durableSourceBindingApply": "NOT_RUN"
+  },
+  "validation": {
+    "parentAtlasPackageBuild": "PASS",
+    "retrievalLineageDagConvergenceStrict": "PASS",
+    "graphRetrievalProofStrict": "PASS",
+    "frontendSvelteCheck": "INTERRUPTED_AFTER_NO_OUTPUT; NOT_PROVEN",
+    "scopedDiffCheck": "PASS",
+    "repositoryWideDiffCheck": "BLOCKED_BY_PREEXISTING_CMAKE_CONFIGURE_LOG_TRAILING_WHITESPACE"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "repairExecutions": 0
+  },
+  "nextGate": "SOURCE_AUTHORITY_APPLY_AUTHORIZATION_REQUIRED"
+}

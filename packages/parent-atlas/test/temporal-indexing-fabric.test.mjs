@@ -2,10 +2,19 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  buildKnowledgeClaimChecksum,
+  buildRunManifest,
   buildTemporalIndexPlan,
+  buildTemporalDocumentIndex,
+  classifyKnowledgeClaimFreshness,
   corpusCompressionPolicySchema,
+  documentObservationSchema,
+  knowledgeClaimSchema,
   sourceRevisionDeltaSchema,
+  sourceArtifactSchema,
+  sourceCoordinateMapSchema,
   structuralSnapshotValidationReceiptSchema,
+  temporalIndexChecksum,
   visualObjectObservationSchema,
 } from '../dist/core/temporal-indexing-fabric.js';
 
@@ -143,4 +152,85 @@ test('invalid source delta invariants fail closed', () => {
     before_checksum: h('a'),
     after_checksum: h('b'),
   }));
+});
+
+test('source artifacts are revision-qualified and reject canonical promotion', () => {
+  const artifact = sourceArtifactSchema.parse({
+    file_id: 'file-1',
+    repo_id: 'repo-1',
+    workspace_revision: 'workspace-r1',
+    canonical_source_ref: 'sveltekit-frontend/src/example.ts',
+    source_revision: 'source-r1',
+    content_digest: h('f'),
+    byte_length: 12,
+    mime_type: 'text/typescript',
+    language: 'typescript',
+    observed_at: '2026-09-20T12:00:00.000Z',
+    producer_id: 'source-owner',
+    producer_revision: 'source-envelope-r1',
+  });
+  assert.equal(artifact.canonical_authority, false);
+  assert.throws(() => sourceArtifactSchema.parse({ ...artifact, canonical_authority: true }));
+});
+
+test('coordinate maps make UTF-8 byte offsets authoritative', () => {
+  const map = sourceCoordinateMapSchema.parse({
+    source_revision: 'source-r1',
+    content_digest: h('a'),
+    line_starts_byte: [0, 4, 19],
+    coordinate_checksum: h('b'),
+  });
+  assert.equal(map.offset_basis, 'UTF8_SOURCE_BYTES_V1');
+  assert.throws(() => sourceCoordinateMapSchema.parse({ ...map, offset_basis: 'UTF16' }));
+});
+
+test('observations and claims require evidence references', () => {
+  assert.throws(() => documentObservationSchema.parse({
+    observation_id: 'obs-1', observation_kind: 'CLAIM', source_ref: 'docs/a.md',
+    source_revision: 'source-r1', workspace_revision: 'workspace-r1',
+    span: { start_byte: 0, end_byte: 4 }, text_checksum: h('c'),
+    producer_id: 'parser', producer_revision: 'parser-r1', evidence_refs: [],
+    observation_checksum: h('d'),
+  }));
+  const claim = knowledgeClaimSchema.parse({
+    claim_id: 'claim-1', claim_kind: 'CONTRACT', statement: 'UTF-8 bytes are authoritative.',
+    evidence_refs: ['obs-1'], source_revision_set: ['source-r1'], producer_id: 'reviewer',
+    producer_revision: 'review-r1', confidence: 0.9, authority_class: 'REVIEWED',
+    first_observed_revision: 'source-r1', last_confirmed_revision: 'source-r1',
+    status: 'CURRENT', checksum: h('e'),
+  });
+  assert.equal(claim.evidence_refs.length, 1);
+  assert.throws(() => knowledgeClaimSchema.parse({ ...claim, evidence_refs: [] }));
+});
+
+test('claim freshness becomes stale only when supporting evidence changed', () => {
+  const claim = knowledgeClaimSchema.parse({
+    claim_id: 'claim-2', claim_kind: 'FACT', statement: 'A claim.', evidence_refs: ['obs-2'],
+    source_revision_set: ['source-r1'], producer_id: 'extractor', producer_revision: 'extractor-r1',
+    confidence: 0.5, authority_class: 'PROVISIONAL', first_observed_revision: 'source-r1',
+    last_confirmed_revision: 'source-r1', status: 'CURRENT', checksum: h('1'),
+  });
+  assert.equal(classifyKnowledgeClaimFreshness(claim, ['source-r0']), 'CURRENT');
+  assert.equal(classifyKnowledgeClaimFreshness(claim, ['source-r1']), 'STALE_EVIDENCE');
+  const { checksum: _checksum, canonical_authority: _authority, ...claimInput } = claim;
+  assert.equal(buildKnowledgeClaimChecksum(claimInput), temporalIndexChecksum({ schema: 'atlas.knowledge-claim.v1', ...claimInput, canonical_authority: false }));
+});
+
+test('run manifests and temporal indexes are deterministic noncanonical envelopes', () => {
+  const manifest = buildRunManifest({
+    run_id: 'run-1', request_id: 'request-1', workspace_revision: 'workspace-r1',
+    producer_id: 'temporal-fabric', producer_revision: 'fabric-r1', input_refs: ['artifact-1'],
+    output_refs: ['claim-1'], started_at: '2026-09-20T12:00:00.000Z',
+    completed_at: '2026-09-20T12:00:01.000Z', status: 'SUCCEEDED',
+  });
+  const index = buildTemporalDocumentIndex({
+    index_id: 'index-1', workspace_revision: 'workspace-r1', source_snapshot_revision: 'source-r1',
+    artifact_refs: ['artifact-1'], observation_refs: ['obs-1'], claim_refs: ['claim-1'],
+    delta_refs: ['delta-1'], source_revision_set_checksum: h('2'), status: 'VALID',
+    producer_revision: 'fabric-r1',
+  });
+  assert.match(manifest.manifest_checksum, /^[a-f0-9]{64}$/);
+  assert.match(index.index_checksum, /^[a-f0-9]{64}$/);
+  assert.equal(manifest.canonical_authority, false);
+  assert.equal(index.canonical_authority, false);
 });

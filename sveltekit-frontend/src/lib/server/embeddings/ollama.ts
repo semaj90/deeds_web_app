@@ -76,23 +76,9 @@ export async function tryEmbedCanonical(
     timeoutMs?: number;
   },
 ): Promise<OllamaEmbedResult | null> {
-  try {
-    const { tryEmbedOnnx, isOnnxEmbedAvailable } = await import('../embedding/onnx-embed.js');
-    if (await isOnnxEmbedAvailable()) {
-      const embedding = await tryEmbedOnnx(text);
-      if (embedding) {
-        return {
-          // The executor may be ONNX, but the model contract remains EmbeddingGemma.
-          model: opts?.model ?? 'embeddinggemma:latest',
-          embedding,
-          source: 'onnx-local',
-        };
-      }
-    }
-  } catch {
-    // ONNX lane is best-effort and should not block the server-side fallback.
-  }
-
+  // This compatibility entry point must stay on the canonical Ollama lane.
+  // Local ONNX is an explicitly non-canonical challenger because its current
+  // artifact does not reproduce EmbeddingGemma's projected semantic space.
   const result = await tryEmbedOllama(text, opts);
   if (result) {
     return {

@@ -12,3 +12,9 @@
 export const ATLAS_ROOT_NAMESPACE_V1 = '01e916cd-b725-4828-9d4d-8f0aff28184f';
 export const PACKET_AGGREGATE_NAMESPACE_V1 = 'b8186da8-3b20-509f-84ea-2440f93ff22f';
 export const TITLE_NAMESPACE_V1 = '78600f05-a8b4-54d4-aa02-43edb0fdc70c';
+/**
+ * Added 2026-09-26 (additive; the values above are untouched). Derived from the Atlas root:
+ * v5('atlas:unknown-resolution:v1', ATLAS_ROOT_NAMESPACE_V1). Namespace for UnknownResolutionV1 `unknownId` surrogates.
+ * Frozen like the others; the derivation is asserted in unknown-resolution-v1.spec.ts.
+ */
+export const UNKNOWN_RESOLUTION_NAMESPACE_V1 = '5628bdfd-fe4c-537c-917e-a217b088a9f0';

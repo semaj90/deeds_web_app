@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.ordinal-vector-01-canary-receipt.v1",
+  "generatedAt": "2026-09-27T06:50:12.684Z",
+  "mapArtifact": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\cei24-candidate-ordinal-map-v1\\20260926T161327.479Z\\candidate-ordinal-map-v1.json",
+  "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+  "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+  "mapRowCount": 16151,
+  "mapIntegrityVerified": true,
+  "embeddingExecutor": {
+    "url": "http://127.0.0.1:8081",
+    "model": "embeddinggemma",
+    "modelRevision": null
+  },
+  "sampleSize": 8,
+  "provenCount": 0,
+  "results": [
+    {
+      "candidateOrdinal": 0,
+      "canonicalId": "ace:packet:0051e908c9be",
+      "packetKey": "ace:packet:0051e908c9be",
+      "sourceRef": "docs/architecture/phase8-query-optimization-taxonomy.md",
+      "status": "SOURCE_FILE_MISSING"
+    },
+    {
+      "candidateOrdinal": 1,
+      "canonicalId": "ace:packet:014b1c91aa72",
+      "packetKey": "ace:packet:014b1c91aa72",
+      "sourceRef": "scripts/agent/schema-agent-tracking.sql",
+      "status": "SOURCE_FILE_MISSING"
+    },
+    {
+      "candidateOrdinal": 2,
+      "canonicalId": "ace:packet:02dae66923a3",
+      "packetKey": "ace:packet:02dae66923a3",
+      "sourceRef": "docs/LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md",
+      "status": "SOURCE_FILE_MISSING"
+    },
+    {
+      "candidateOrdinal": 3,
+      "canonicalId": "ace:packet:04518e5714ed",
+      "packetKey": "ace:packet:04518e5714ed",
+      "sourceRef": "docs/GEMMA4-POLICY-ORCHESTRATOR-ARCHITECTURE.md",
+      "status": "SOURCE_FILE_MISSING"
+    },
+    {
+      "candidateOrdinal": 4,
+      "canonicalId": "ace:packet:04abe0bfe254",
+      "packetKey": "ace:packet:04abe0bfe254",
+      "sourceRef": "scripts/agent/dag-reducer.mjs",
+      "status": "SOURCE_FILE_MISSING"
+    },
+    {
+      "candidateOrdinal": 5,
+      "canonicalId": "ace:packet:06568f01c146",
+      "packetKey": "ace:packet:06568f01c146",
+      "sourceRef": "docs/PHASE-85-P9-LANGEXTRACT-AGENTIC-INTEGRATION.md",
+      "status": "SOURCE_FILE_MISSING"
+    },
+    {
+      "candidateOrdinal": 6,
+      "canonicalId": "ace:packet:07b76f513d2a",
+      "packetKey": "ace:packet:07b76f513d2a",
+      "sourceRef": "docs/PHASE-B-P3-DEPENDENCY-CLARIFICATION.md",
+      "status": "SOURCE_FILE_MISSING"
+    },
+    {
+      "candidateOrdinal": 7,
+      "canonicalId": "ace:packet:09e9df686b49",
+      "packetKey": "ace:packet:09e9df686b49",
+      "sourceRef": "docs/architecture/CUVS-DOCKER-IMPLEMENTATION-CHECKLIST.md",
+      "status": "SOURCE_FILE_MISSING"
+    }
+  ],
+  "authority": {
+    "identityAuthority": false,
+    "canonicalAuthority": false,
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0
+  },
+  "status": "ORDINAL_VECTOR_01_CANARY_PARTIAL",
+  "nextGate": "ACE-V4-COMP-01: scale this exact bound-representation pattern to the full 16,151-row map (chunked, batched embedding calls), then build the V4 composer against the now-provable packetKey->vector-bytes mapping."
+}

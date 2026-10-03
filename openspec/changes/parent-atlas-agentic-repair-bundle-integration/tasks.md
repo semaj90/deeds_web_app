@@ -100,11 +100,30 @@ convention) once the two salvage items above are copied out — do not archive t
 
 ## T3 — Phase 3 gate (semantic_768 trust, before any RFF work)
 
-- [ ] Confirm (not assume) `parent-atlas-semantic-768-canonical-contract`'s outstanding drift item
+- [x] Confirm (not assume) `parent-atlas-semantic-768-canonical-contract`'s outstanding drift item
       is closed: EmbeddingGemma raw output == 768, Qdrant `semantic_768` collection dim == 768, no
-      384-dim runtime dependence in the active retrieval path.
+      384-dim runtime dependence in the active retrieval path. All 3 confirmed live, 2026-09-22:
+      `curl :11434/api/embed` with `embeddinggemma:latest` → raw output dim 768. `curl
+      :6333/collections/codebase_chunks_768_v2` → all 3 named vectors (`content`/`error`/
+      `signature`) are size 768. 384-dim dependence: read `resolve-embedding-lane.ts` and
+      `embedding-service.ts` directly rather than trusting the grep-hit count (19 files match the
+      literal string `384`, mostly retirement/guard code) — every live code path that can see a
+      384-dim signal (explicit `embedding_lane` field, `vector_name`, `collection` name, or raw
+      `dimension`) returns `lane: null, reason: LEGACY_DIMENSION_EXPLICIT_ONLY` and
+      `embedQueryForLane('dense_384', ...)` throws `EMBEDDING_LANE_RETIRED` immediately. These are
+      fail-closed guards against 384, not runtime dependence on it.
 - [ ] Confirm L1/L2 (in-process + Bifrost) precomputed-vector caches are validated for dimension,
-      not just a cold Ollama health probe.
+      not just a cold Ollama health probe. **Checked, and the real finding is more basic than the
+      question assumed: neither cache is implemented at all.** `embedding-service.ts`'s
+      `getL1Cache()`/`setL1Cache()`/`getL2Cache()` (the functions `embedQueryForLane`'s dense_768
+      non-strict path reads/writes through) are stub placeholders — every Redis/Bifrost call
+      inside them is commented out, and each function unconditionally `return null` /
+      no-ops. `embedQueryForLane` is genuinely live (12 real callers incl. `trace-mcp-server.ts`,
+      `unified-orchestrator.ts`, `semantic-768.ts`), so every production call through this path is
+      a cold Ollama fetch today regardless of the `cached`/`cache_level` fields the result type
+      advertises. There is no dimension-validation gap to close on the cache read path — there is
+      no cache read path yet. Leaving this open (not closing it) since the task as written asks to
+      confirm validation exists, and the honest answer is it doesn't exist to validate.
 - [ ] Do not proceed to T7 (RFF) until this task is checked off with live evidence, not assumption.
 
 ## T4 — Phase 4 / RF6 (RRF ownership — coordinate with `parent-atlas-retrieval-fusion-reachability`)

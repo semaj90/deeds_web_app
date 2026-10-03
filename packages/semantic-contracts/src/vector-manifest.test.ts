@@ -73,4 +73,22 @@ describe('symbol representation registry', () => {
     expect(VECTOR_MANIFESTS.latent128.dimensions).toBe(128);
     expect(VECTOR_MANIFESTS.latent64.dimensions).toBe(64);
   });
+
+  it('keeps semantic_768 on the canonical 768-D storage target without qualifying existing rows', () => {
+    const semantic = VectorManifestSchema.parse(getVectorManifest('semantic_768'));
+    expect(semantic).toMatchObject({
+      dimensions: 768,
+      status: 'ACTIVE',
+      modelRevision: 'UNBOUND',
+      postgresColumn: 'content_embedding_768',
+      qdrantVectorSlot: 'content',
+      storage: {
+        kind: 'PHYSICAL',
+        postgresColumn: 'content_embedding_768',
+        qdrantVectorSlot: 'content',
+      },
+    });
+    expect(VECTOR_MANIFESTS.dense384.status).toBe('REFERENCE_ONLY');
+    expect(VECTOR_MANIFESTS.dense384.supersededBy).toBe('semantic_768');
+  });
 });

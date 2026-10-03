@@ -1,9 +1,9 @@
 # ACE / HyperRAG / CHR97 — Does the graphify-indexed packet chain actually work end to end?
 
-**Status**: FULLY TRACED 2026-08-12. All 6 components have a verified verdict (see table + closed
-tasks below); no code was changed. Two genuinely separate systems were found bundled under one
-ask — see "Genuinely still open" below for the one real design question left (ACE's AST-blindness)
-and `tasks.md` for the closed-task detail. Started 2026-08-12 in response to:
+**Status**: AUDIT AND DESIGN DECISIONS RECORDED 2026-09-24. The runtime trace found two genuinely
+separate systems bundled under one ask. The artifact distinction and AST-aware ACE direction are
+now recorded; production AST wiring remains a separate lineage-gated capability and is not claimed
+complete here. Started 2026-08-12 in response to:
 "make sure our ace validator assembler materializer ast semantic hypergraphrag rpc packet nes
 chrom97 works from indexed graphify gpu indexed json packets". This change captures what was
 verified live via grep/read (not fabricated), what remains genuinely unresolved, and the exact
@@ -45,22 +45,25 @@ persists, not the fork's incomplete first pass.
   `buildCartridge()`, Langfuse trace, correct binary response headers). **CHR97/cartridge does NOT
   consume graphify output at all** — its source is case-scoped evidence embeddings from the
   evidence-ingestion pipeline, a domain entirely separate from codebase-intelligence graphify.
-- [x] **Which "graphify GPU indexed json packets" the user means — PARTIALLY RESOLVED.** For the
-  CHR97 half: moot, it uses neither graphify artifact. For the ACE/HyperRAG half: still genuinely
-  ambiguous between `frozen-graph-snapshot-v2.json` (this session's GRAPH_SNAPSHOT_PARITY subject)
-  and `codebase-graph.json` (what ACE's context-assembler actually reads, confirmed above) —
-  worth a direct question to the user before any further work assumes one or the other.
+- [x] **Which Graphify artifact each consumer uses — RESOLVED 2026-09-24 by owner trace.** ACE's
+  current graph-intel input is `docs/graph/codebase-graph.json`; its retrieval mirrors are separate
+  consumers. `frozen-graph-snapshot-v2.json` is a different GRAPH_SNAPSHOT_PARITY artifact, not the
+  ACE runtime input. CHR97/cartridge uses case-scoped legal evidence and consumes neither Graphify
+  artifact. No Graphify command was run for this resolution.
 
-## Genuinely still open
+## Decisions recorded; implementation follow-up remains
 
-- [ ] **Should ACE consume AST-derived structure?** `codebase-graph.json` has none; real AST
-  facts (`code_features`/`feature_structural_facts`) exist but are reachable only via `packet_key`
-  joins, never through the graph-intel path ACE uses. This is a scoping/design question for the
-  user, not a bug to silently fix.
-- [ ] **Which graphify artifact for ACE specifically** — see above, still ambiguous.
-- [ ] **Register findings** in `docs/architecture/runtime-ownership-registry.json` — all 6
-  components now have a fully-traced verdict (table above + this section); registering them is
-  now pure bookkeeping, not investigation.
+- **AST-aware ACE context: desired, but lineage-gated.** The operator direction recorded in
+  `tasks.md` is to admit AST-derived structural evidence through the existing identity-qualified
+  candidate/ordinal/feature path. Raw Graphify JSON must not bypass SearchRuntime. The current
+  normalizer still emits empty `evidenceRefs` and `representationBindings`, so production wiring
+  remains unproven and requires a separate implementation/proof gate after lineage and route-owner
+  readiness.
+- **Graphify artifact: resolved.** ACE currently reads `docs/graph/codebase-graph.json`; the frozen
+  graph snapshot is a separate parity artifact. CHR97/cartridge is an independent legal-evidence
+  pipeline.
+- **Runtime ownership registry: registered 2026-09-05** (see completed task 7); no further registry
+  edit is required for this audit.
 
 ## Explicitly not done this session (scope boundary)
 

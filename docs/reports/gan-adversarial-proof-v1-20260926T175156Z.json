@@ -1,0 +1,324 @@
+{
+  "schema": "atlas.gan-adversarial-proof.v1",
+  "status": "ADVERSARIAL_FIXTURES_PROVEN",
+  "proofLevel": "FIXTURE_PROVEN",
+  "note": "Fixtures test whether gates reject bad states. Whether live rows satisfy the gates is proven separately (prove-gan-audit-readonly-v1.mts). Known gaps below are measured weaknesses of the HISTORICAL validators and are not counted as passes.",
+  "generatedAt": "2026-09-26T17:51:56.107Z",
+  "totals": {
+    "probes": 16,
+    "passed": 16,
+    "historical": 6,
+    "modern": 10,
+    "withControl": 15,
+    "withoutControl": [
+      "ADV016"
+    ]
+  },
+  "lanes": {
+    "authority": {
+      "total": 7,
+      "passed": 7
+    },
+    "structuralLineage": {
+      "total": 4,
+      "passed": 4
+    },
+    "semanticProjection": {
+      "total": 2,
+      "passed": 2
+    },
+    "runtimeSideEffects": {
+      "total": 3,
+      "passed": 3
+    }
+  },
+  "selfTests": {
+    "acceptedMaliciousInputDetected": true,
+    "wrongRejectionCodeDetected": true,
+    "rejectedBenignControlDetected": true,
+    "thrownErrorDetected": true,
+    "healthyProbeStillPasses": true
+  },
+  "results": [
+    {
+      "id": "ADV001",
+      "lane": "authority",
+      "origin": "HISTORICAL",
+      "description": "Missing packet_key is rejected by the live packet validator",
+      "expectedCode": "missing_packet_key",
+      "maliciousRejectedWith": "missing_packet_key",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV002",
+      "lane": "authority",
+      "origin": "HISTORICAL",
+      "description": "Malformed source_ref is rejected by the live packet validator",
+      "expectedCode": "invalid_source_ref",
+      "maliciousRejectedWith": "invalid_source_ref",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV003",
+      "lane": "semanticProjection",
+      "origin": "HISTORICAL",
+      "description": "SQL against a fake/unknown table is blocked",
+      "expectedCode": "ERR_UNKNOWN_TABLE",
+      "maliciousRejectedWith": "ERR_UNKNOWN_TABLE",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV004",
+      "lane": "semanticProjection",
+      "origin": "HISTORICAL",
+      "description": "Placeholder / fake terms are blocked",
+      "expectedCode": "ERR_BLOCKED_TERM",
+      "maliciousRejectedWith": "ERR_BLOCKED_TERM",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV005",
+      "lane": "runtimeSideEffects",
+      "origin": "HISTORICAL",
+      "description": "Redis before Postgres is rejected",
+      "expectedCode": "ERR_WRITE_ORDER_VIOLATION",
+      "maliciousRejectedWith": "ERR_WRITE_ORDER_VIOLATION",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV006",
+      "lane": "runtimeSideEffects",
+      "origin": "HISTORICAL",
+      "description": "NATS before Postgres is rejected",
+      "expectedCode": "ERR_EVENT_ORDER_VIOLATION",
+      "maliciousRejectedWith": "ERR_EVENT_ORDER_VIOLATION",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV007",
+      "lane": "authority",
+      "origin": "MODERN",
+      "description": "A packet_id (storage locator) offered alone never resolves to canonical identity",
+      "expectedCode": "IDENTITY_NOT_CANONICAL:DEGRADED",
+      "maliciousRejectedWith": "IDENTITY_NOT_CANONICAL:DEGRADED",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV008",
+      "lane": "authority",
+      "origin": "MODERN",
+      "description": "Selecting an authoritative artifact by latest timestamp / glob-sort is detected",
+      "expectedCode": "IMPLICIT_LATEST_ARTIFACT_SELECTION",
+      "maliciousRejectedWith": "IMPLICIT_LATEST_ARTIFACT_SELECTION",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV009",
+      "lane": "authority",
+      "origin": "MODERN",
+      "description": "CandidateOrdinalMap checksum mismatch is rejected",
+      "expectedCode": "CANDIDATE_ORDINAL_MAP_CHECKSUM_MISMATCH",
+      "maliciousRejectedWith": "CANDIDATE_ORDINAL_MAP_CHECKSUM_MISMATCH",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV010",
+      "lane": "structuralLineage",
+      "origin": "MODERN",
+      "description": "Packet-qualified evidence is refused by a CHUNK-grain feature",
+      "expectedCode": "CHUNK_ELIGIBILITY_UNSATISFIED",
+      "maliciousRejectedWith": "CHUNK_ELIGIBILITY_UNSATISFIED",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV011",
+      "lane": "structuralLineage",
+      "origin": "MODERN",
+      "description": "source_revision mismatch never yields chunk qualification",
+      "expectedCode": "SOURCE_REVISION_MISMATCH",
+      "maliciousRejectedWith": "SOURCE_REVISION_MISMATCH",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV012",
+      "lane": "structuralLineage",
+      "origin": "MODERN",
+      "description": "workspace_revision mismatch never yields chunk qualification",
+      "expectedCode": "WORKSPACE_REVISION_MISMATCH",
+      "maliciousRejectedWith": "WORKSPACE_REVISION_MISMATCH",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV013",
+      "lane": "authority",
+      "origin": "MODERN",
+      "description": "A Qdrant point id equal to the canonical id is not accepted as identity",
+      "expectedCode": "EXECUTOR_IDENTITY_SUBSTITUTION_REJECTED",
+      "maliciousRejectedWith": "EXECUTOR_IDENTITY_SUBSTITUTION_REJECTED",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV014",
+      "lane": "authority",
+      "origin": "MODERN",
+      "description": "An unqualified content_hash is not promoted to exact identity",
+      "expectedCode": "HASH_EVIDENCE_UNQUALIFIED",
+      "maliciousRejectedWith": "HASH_EVIDENCE_UNQUALIFIED",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV015",
+      "lane": "runtimeSideEffects",
+      "origin": "MODERN",
+      "description": "A BitFrost entry cannot be reused across a coordinate mismatch",
+      "expectedCode": "CACHE_KEY_COORDINATE_MISMATCH",
+      "maliciousRejectedWith": "CACHE_KEY_COORDINATE_MISMATCH",
+      "rejectedForExpectedReason": true,
+      "controlPresent": true,
+      "controlAccepted": true,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    },
+    {
+      "id": "ADV016",
+      "lane": "structuralLineage",
+      "origin": "MODERN",
+      "description": "A blocked candidate-feature admission cannot produce a ContextManifest",
+      "expectedCode": "BLOCKED_FEATURE_SNAPSHOT",
+      "maliciousRejectedWith": "BLOCKED_FEATURE_SNAPSHOT",
+      "rejectedForExpectedReason": true,
+      "controlPresent": false,
+      "controlAccepted": null,
+      "controlResult": null,
+      "error": null,
+      "passed": true
+    }
+  ],
+  "knownGaps": [
+    {
+      "id": "KG-SOURCE-REF-FALSE-REJECTION",
+      "kind": "FALSE_REJECTION",
+      "detail": "legitimate source_ref rejected: src/lib/Foo.svelte",
+      "observed": "invalid_source_ref"
+    },
+    {
+      "id": "KG-SOURCE-REF-FALSE-REJECTION",
+      "kind": "FALSE_REJECTION",
+      "detail": "legitimate source_ref rejected: scripts/atlas/build-x.mts",
+      "observed": "invalid_source_ref"
+    },
+    {
+      "id": "KG-SOURCE-REF-FALSE-REJECTION",
+      "kind": "FALSE_REJECTION",
+      "detail": "legitimate source_ref rejected: python/atlas_x.py",
+      "observed": "invalid_source_ref"
+    },
+    {
+      "id": "KG-SOURCE-REF-FALSE-REJECTION",
+      "kind": "FALSE_REJECTION",
+      "detail": "legitimate source_ref rejected: src/routes/(app)/[id]/+page.svelte",
+      "observed": "invalid_source_ref"
+    },
+    {
+      "id": "KG-SOURCE-REF-FALSE-REJECTION",
+      "kind": "FALSE_REJECTION",
+      "detail": "legitimate source_ref rejected: src/lib/UpperCase.ts",
+      "observed": "invalid_source_ref"
+    },
+    {
+      "id": "KG-SOURCE-REF-FALSE-ACCEPTANCE",
+      "kind": "FALSE_ACCEPTANCE",
+      "detail": "path-traversal source_ref accepted: src/../../../etc/passwd.ts",
+      "observed": null
+    },
+    {
+      "id": "KG-ADV003-NAME-PATTERN-ONLY",
+      "kind": "FALSE_ACCEPTANCE",
+      "detail": "ADV003 only matches /fake_|unknown_|temp_/; a genuinely nonexistent table name is accepted (its knownTables list is unused)",
+      "observed": null
+    }
+  ],
+  "producerRevision": "sha256:277fda372b4a02d1cb64c3f8eebc01721760bc46272526a1d4e148b8c775410a",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "writes": {
+    "postgres": 0,
+    "redis": 0,
+    "nats": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  }
+}

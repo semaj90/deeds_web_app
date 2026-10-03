@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { buildPolicyStateVector } from './policy-state';
 import { routePolicy } from './policy-router';
-import type { PolicyStateInput } from './policy-types';
+import {
+  BUDGET_TIERS,
+  MODEL_TARGETS,
+  POLICY_ACTIONS,
+  type PolicyStateInput,
+} from './policy-types';
 
 function state(hmm: PolicyStateInput['hmm']['stateHint'], pressure = 0.2): PolicyStateInput {
   return {
@@ -16,6 +21,44 @@ function state(hmm: PolicyStateInput['hmm']['stateHint'], pressure = 0.2): Polic
 }
 
 describe('routePolicy', () => {
+  it('keeps the policy vocabulary finite and version-bounded', () => {
+    expect(POLICY_ACTIONS).toHaveLength(12);
+    expect(MODEL_TARGETS).toEqual(['NO_LLM', 'ORNITH', 'GEMMA4']);
+    expect(BUDGET_TIERS).toEqual(['SMALL', 'MEDIUM', 'DEEP']);
+  });
+
+  it('applies a state-specific action mask before ranking', () => {
+    const allowedByState: Record<PolicyStateInput['hmm']['stateHint'], string[]> = {
+      LOCATE: ['LEXICAL_SEARCH', 'SEMANTIC_SEARCH', 'GRAPH_TRACE', 'FAST_RERANK', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE'],
+      UNDERSTAND: ['SEMANTIC_SEARCH', 'GRAPH_TRACE', 'FAST_RERANK', 'DEEP_RERANK', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE'],
+      TRACE: ['GRAPH_TRACE', 'GRAPH_EXPAND', 'FAST_RERANK', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE'],
+      REPAIR: ['INSPECT_SOURCE', 'PATCH', 'COMPILE', 'TEST', 'RECOVER', 'TERMINATE'],
+      VALIDATE: ['COMPILE', 'TEST', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE'],
+      RECOVER: ['LEXICAL_SEARCH', 'SEMANTIC_SEARCH', 'GRAPH_EXPAND', 'DEEP_RERANK', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE'],
+    };
+
+    for (const [stateHint, allowed] of Object.entries(allowedByState) as Array<[PolicyStateInput['hmm']['stateHint'], string[]]>) {
+      const decision = routePolicy(buildPolicyStateVector(state(stateHint)));
+      expect(decision.rankedActions.map(({ action }) => action)).toEqual(expect.arrayContaining(allowed));
+      expect(decision.rankedActions.every(({ action }) => allowed.includes(action))).toBe(true);
+    }
+  });
+
+  it('uses the deterministic baseline when learned weights are absent', () => {
+    const preferredByState: Record<PolicyStateInput['hmm']['stateHint'], string> = {
+      LOCATE: 'SEMANTIC_SEARCH',
+      UNDERSTAND: 'INSPECT_SOURCE',
+      TRACE: 'GRAPH_TRACE',
+      REPAIR: 'PATCH',
+      VALIDATE: 'TEST',
+      RECOVER: 'LEXICAL_SEARCH',
+    };
+
+    for (const [stateHint, preferred] of Object.entries(preferredByState) as Array<[PolicyStateInput['hmm']['stateHint'], string]>) {
+      expect(routePolicy(buildPolicyStateVector(state(stateHint))).action).toBe(preferred);
+    }
+  });
+
   it('keeps TRACE inside the finite allowed action set', () => {
     const decision = routePolicy(buildPolicyStateVector(state('TRACE')));
     expect(['GRAPH_TRACE', 'GRAPH_EXPAND', 'FAST_RERANK', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE']).toContain(decision.action);

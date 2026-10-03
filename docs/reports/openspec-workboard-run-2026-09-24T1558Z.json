@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runId": "openspec-workboard-run-2026-09-24T1558Z",
+  "createdAt": "2026-09-24T15:58:17Z",
+  "change": "parent-atlas-versioned-doc-intelligence",
+  "pivot": {
+    "from": "DOC-26 versioned recrawl admission",
+    "to": "DOC-18 document-chunk centroid routing",
+    "reason": "DOC-26 now fails closed on fake V2 IDs but lacks actual previous/current manifest and envelope cohorts for live plan/readback. DOC-18 is the remaining read-only infrastructure owner census before deciding whether document centroids can safely reuse an existing execution lane."
+  },
+  "doc18": {
+    "status": "OPEN_NO_EXTERNAL_DOC_SOM_OWNER_PROVEN",
+    "existingOwnersReviewed": [
+      {
+        "path": "scripts/atlas/run-som-on-chunks.mjs",
+        "finding": "Reads 384-dimensional codebase_chunk_index.content_embedding; --apply writes atlas_packets SOM coordinates and Redis cell keys. Not an external-document owner and not safe to run for DOC-18."
+      },
+      {
+        "path": "scripts/atlas/materialize-packet-centroids.mjs",
+        "finding": "Reads 768-dimensional codebase_chunk_index vectors and groups by atlas_packets identity; output is packet topology, not external-document chunk routing."
+      },
+      {
+        "path": "scripts/atlas/karpathy-gpu-enrich.mjs",
+        "finding": "Existing Qdrant/packet enrichment lane targets codebase_chunks_768 and packet/source identities; no external-doc chunk source path was found in the inspected owner surface."
+      }
+    ],
+    "currentEvidence": {
+      "somAeAlignment": "OPEN_ALIGNMENT_GAPS",
+      "candidateOrdinalProductionPopulationProven": false,
+      "knnBoundToAdmittedPopulation": false,
+      "kmeansCentroidMembershipProven": false,
+      "aeFanoutAllowed": false,
+      "priorSomCoverageReport": "2026-06 codebase/packet-only snapshot; not evidence for the 852-row external-doc corpus"
+    },
+    "safeAction": "No existing external-document centroid input/identity/projection owner is proven. Do not run packet-oriented SOM write paths or infer doc chunk identity from packet/source_ref. A DOC-18 design must first bind the frozen 852-row semantic_768 cohort to a revisioned centroid artifact and noncanonical routing descriptor."
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0,
+    "containersRebuilt": 0,
+    "filesystem": "this report only"
+  },
+  "openspecTasksLedgerEdited": false,
+  "commits": 0,
+  "pushes": 0,
+  "nextGate": "DOC_18_REVISIONED_DOC_CENTROID_ARTIFACT_CONTRACT"
+}

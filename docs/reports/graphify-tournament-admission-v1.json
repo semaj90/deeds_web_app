@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-tournament-admission.v1",
-  "generatedAt": "2026-09-18T01:33:27.131Z",
+  "generatedAt": "2026-09-25T00:21:15.623Z",
   "mode": "READ_ONLY",
   "status": "TOURNAMENT_ADMISSION_AUDIT_BLOCKED",
   "proofLevel": "PARTIAL_PROVEN",
@@ -30,9 +30,9 @@
   "workspaceRevisionDerivation": {
     "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-from-sealed-multi-repo-snapshot-v1.json",
     "status": "WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION",
-    "snapshotRevision": "sha256:c1d650f7fa67b2e881d9d15fb3389c91ac83131593743bdea2d9a7d7663a3c73",
-    "workspaceRevisionCandidate": "sha256:aff603af68664e1b42b57fec4efaad26bad4182e1d1267e48d9edfb8d5d00922",
-    "sourceCount": 25667,
+    "snapshotRevision": "sha256:1078418eb36e16f84ab913b64c45ffdbf8e70859a675ed86a9ee31cbc0049224",
+    "workspaceRevisionCandidate": "sha256:dc05165afa0e89a168807bd5097459a8709844a806b67c04d0fd61f76091a7d9",
+    "sourceCount": 26185,
     "repositoryCount": 7
   },
   "tournamentContract": {

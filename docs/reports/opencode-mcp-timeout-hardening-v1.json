@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.opencode-mcp-timeout-hardening.v1",
+  "observedAt": "2026-09-29T02:31:01Z",
+  "status": "LOCAL_HARDENING_VALIDATED_TOOL_EXECUTION_UNVERIFIED",
+  "likelyCause": "Conflicting OpenCode configs left raw atlas-tools at 30 seconds while the task-kernel facade had no internal request deadline or child-process failure propagation.",
+  "resolvedMcpConfig": {
+    "atlas-tools": { "enabled": true, "timeoutMs": 60000 },
+    "atlas-task-kernel": { "enabled": true, "timeoutMs": 60000 }
+  },
+  "changes": [
+    "Set both project MCP server timeouts to 60000ms in opencode.json.",
+    "Added a 55000ms internal Atlas-call deadline and pending-call rejection on child startup failure or exit.",
+    "Coalesced concurrent task-kernel initialization requests."
+  ],
+  "validation": {
+    "nodeSyntax": "PASS",
+    "facadeInitializeAndToolsList": "PASS",
+    "resolvedConfigShowsBothConnected": "PASS",
+    "opencodeJsonParse": "PASS",
+    "scopedDiffCheck": "PASS",
+    "slowToolExecution": "NOT_RUN"
+  },
+  "limitations": {
+    "rawAtlasToolsStillEnabled": true,
+    "timedOutInternalOperationCancelled": false,
+    "liveSlowToolRecoveryProven": false
+  },
+  "canonicalAuthority": false,
+  "externalWrites": false
+}

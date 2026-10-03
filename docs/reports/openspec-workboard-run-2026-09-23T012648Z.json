@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T01:26:48Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "CC_01_CODE_CHUNK_FIELD_LEVEL_CONTRACT_AUDIT",
+    "to": "PROTO_02B_ACTIVE_SIDECAR_LIVE_HEALTH_AND_CALLER_SNAPSHOT",
+    "reason": "The code-chunk runtime integration/batch owner remains unproven; pivot to an independent transport task with active services and an existing owner inventory, without closing the blocked task."
+  },
+  "evidence": {
+    "report": "docs/reports/openspec-workboard-run-2026-09-23T012648Z.json",
+    "scope": "Bounded read-only live HTTP health probes plus scoped static caller/owner inspection. This is not a full protocol or fleet lifecycle audit.",
+    "liveHealth": [
+      { "service": "miniforge-nlp-sidecar", "endpoint": "http://127.0.0.1:8095/health", "result": "HTTP 200 status=ok", "runtime": "system Python 3.13.15; model ornith-1.5-9b reported" },
+      { "service": "langgraph-synthesis", "endpoint": "http://127.0.0.1:8091/health", "result": "HTTP 200 status=ok" },
+      { "service": "go-retrieval", "endpoint": "http://127.0.0.1:8100/health", "result": "HTTP 200 status=healthy; Postgres, pgvector, Qdrant connected" },
+      { "service": "go-search", "endpoint": "http://127.0.0.1:8096/health", "result": "HTTP 200 status=degraded; qdrantConnected=false; 4 indexed chunks/documents reported" },
+      { "service": "go-embedding", "endpoint": "http://127.0.0.1:8097/health", "result": "HTTP 200 status=healthy; model_loaded=true; device=cpu" },
+      { "service": "docling-vlm", "endpoint": "http://127.0.0.1:8085/health", "result": "HTTP 200 status=degraded; docling/whisper/yolo true; vlm_ocr false" },
+      { "service": "neural-decoder", "endpoint": "http://127.0.0.1:8121/health", "result": "HTTP 200 status=degraded; available=true; torch 2.13.0+cu132; no promoted capability inferred" },
+      { "service": "atlas-gpu-8098", "endpoint": "http://127.0.0.1:8098/health", "result": "HTTP 200 ok; CUDA available; RTX 3060 Ti; torch unavailable; executionOnly=true; store writes false" }
+    ],
+    "grpcHealth": [
+      { "service": "retrieval", "endpoint": "127.0.0.1:50053", "rpc": "Health", "rpcReachable": true, "serviceHealth": "healthy", "dependencies": { "pgvectorConnected": true, "qdrantConnected": true, "redisConnected": true, "embeddingServiceUp": true }, "observedAt": "2026-09-23T01:29:14Z" },
+      { "service": "search", "endpoint": "127.0.0.1:50055", "rpc": "Health", "rpcReachable": true, "serviceHealth": "degraded", "dependencies": { "pgvectorConnected": true, "qdrantConnected": false, "redisConnected": true, "embeddingServiceUp": true }, "indexedDocuments": 4, "indexedChunks": 4, "observedAt": "2026-09-23T01:29:15Z" },
+      { "service": "embedding", "endpoint": "127.0.0.1:50051", "rpc": "Health", "rpcReachable": true, "serviceHealth": "healthy", "modelLoaded": "true", "device": "cpu", "observedAt": "2026-09-23T01:29:15Z" }
+    ],
+    "callerAndProtocolFindings": [
+      { "owner": "8095 NLP/structural sidecar", "callerEvidence": "Existing LangExtract transport, AST provider/materializer, NLP sidecar client and web-evidence clients use the configured :8095 HTTP API.", "protocol": "HTTP", "lifecycle": "ACTIVE_OWNER; capability-specific proof still required" },
+      { "owner": "8091 LangGraph synthesis", "callerEvidence": "langgraph-client.ts uses health/classify/synthesize/stream routes; cache-layers and analysis adapters also configure this endpoint.", "protocol": "HTTP", "lifecycle": "ACTIVE_ORCHESTRATION_EXECUTOR; not identity owner" },
+      { "owner": "Go retrieval :8100", "callerEvidence": "retrieval-client.ts exposes HTTP /search/evidence and /search/codebase; Go retrieval facade/coordinator use configured HTTP URL.", "protocol": "HTTP caller confirmed; gRPC port 50053 published only", "lifecycle": "HTTP HEALTHY; gRPC use/readiness unproven" },
+      { "owner": "Go search :8096", "callerEvidence": "library/search routes and retrieval-client health/fallback code reference configured GO_SEARCH_URL.", "protocol": "HTTP caller confirmed; gRPC port 50055 published only", "lifecycle": "HTTP DEGRADED; gRPC use/readiness unproven" },
+      { "owner": "Go embedding :8097", "callerEvidence": "embedding-client.ts contains gRPC generation path selected only when EMBEDDING_GRPC_ENABLED; env.server defaults it false.", "protocol": "HTTP and gRPC servers exist; gRPC is config-gated and no RPC readback was performed", "lifecycle": "HTTP HEALTHY ON CPU; gRPC execution unproven" },
+      { "owner": "Docling :8085", "callerEvidence": "docling.ts operations are called from evidence upload, ACE ingest and VLM analysis paths.", "protocol": "HTTP", "lifecycle": "DEGRADED VLM OCR capability; other health flags true" },
+      { "owner": "neural-decoder :8121", "callerEvidence": "neural-decoder-prefill-adapter imports neural-decoder-client; this proves a code seam, not successful model execution/promotion.", "protocol": "HTTP", "lifecycle": "DEGRADED; no inference/readback performed" },
+      { "owner": "RAPIDS :8098", "callerEvidence": "Existing PageRank, KNN, memory, resident-index and cuVS clients configure this service; client calls remain operation-specific and downstream.", "protocol": "HTTP", "lifecycle": "HEALTH ENDPOINT OK; CUDA available, PyTorch unavailable; no canonical/store writes" }
+    ],
+    "limitations": [
+      "The actual Health RPC is now proven for the three Go services; non-health gRPC operations and normal app traffic selection remain unproven.",
+      "No POST, mutation, warm, retrieval query, or model inference endpoint was invoked.",
+      "Remaining active infrastructure services and MCP/ACP/A2A runtime lifecycle are outside this bounded snapshot.",
+      "PROTO-02B remains open; no checkbox closed."
+    ],
+    "canonicalWrites": false,
+    "promotionAuthorized": false
+  },
+  "validation": {
+    "openSpecStrict": "PASS",
+    "diffCheck": "PASS",
+    "jsonParse": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 37,
+    "open": 55,
+    "total": 92,
+    "delta": "Added a bounded, read-only live sidecar health/caller snapshot; PROTO-02B remains open and progress count unchanged."
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "containers": false,
+    "filesystem": true
+  },
+  "nextGate": "PROTO_02B_REMAINING_ACTIVE_SIDECAR_OPERATION_AND_LIFECYCLE_RECONCILIATION"
+}

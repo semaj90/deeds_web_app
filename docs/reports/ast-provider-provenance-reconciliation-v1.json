@@ -1,0 +1,236 @@
+{
+  "schema": "atlas.ast-provider-provenance-reconciliation.v1",
+  "gate": "AST_PROVIDER_PROVENANCE_RECONCILIATION_01",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "graphifyRun": false,
+  "astRegenerated": false,
+  "verdict": "AST_LEGACY_PRODUCER_RECONCILIATION_REQUIRED",
+  "scope": {
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+  },
+  "identities": 24456,
+  "liveCapabilityContracts": [
+    {
+      "providerId": "node-tree-sitter-ast-provider",
+      "analysisKind": "CODE_AST",
+      "languageIds": [
+        "typescript",
+        "tsx",
+        "javascript",
+        "jsx"
+      ],
+      "extensions": [
+        ".cjs",
+        ".cts",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".mts",
+        ".ts",
+        ".tsx"
+      ],
+      "contractRevision": "sha256:f798117e78f352bf70f4f1f2fc4478a6201edec346611e4153e872ecc8e4f41d",
+      "owner": "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts"
+    },
+    {
+      "providerId": "miniforge-nlp-sidecar/treesitter-chunker",
+      "analysisKind": "CODE_AST",
+      "languageIds": [
+        "go",
+        "java",
+        "javascript",
+        "python",
+        "rust",
+        "tsx",
+        "typescript"
+      ],
+      "extensions": [
+        ".cjs",
+        ".cts",
+        ".go",
+        ".java",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".mts",
+        ".py",
+        ".pyi",
+        ".rs",
+        ".ts",
+        ".tsx"
+      ],
+      "contractRevision": "sha256:60a388b25e04b8fed299dead311c6dfa46ea5d9f781755b097210dbdb9bcacb8",
+      "owner": "python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS"
+    }
+  ],
+  "contractGaps": [
+    "no live owner exports provider VERSION for node-tree-sitter (only recorded per row at write time)",
+    "no live owner exports DOCUMENT_STRUCTURE or CONFIG_STRUCTURE capability (markdown/json extractors observed only)",
+    "recognized-code-language set is an explicit POLICY constant in this script, not provider capability"
+  ],
+  "primaryOutcomes": {
+    "NOT_AST_ELIGIBLE": 9638,
+    "ELIGIBLE_NOT_TRAVERSED": 11514,
+    "ELIGIBLE_PARSER_UNAVAILABLE": 1250,
+    "PARSED_NOT_REVISION_QUALIFIED": 1162,
+    "REVISION_QUALIFIED_AST": 10,
+    "LEGACY_PRODUCER_ROWS_UNQUALIFIED": 882
+  },
+  "bestProducerProvenance": {
+    "ALTERNATE_STRUCTURAL_PROVIDER": 18,
+    "NO_AST_ROWS": 22380,
+    "LEGACY_TREE_SITTER_PROVIDER": 2058
+  },
+  "bestProducerAnalysisKind": {
+    "DOCUMENT_STRUCTURE": 6,
+    "NONE": 22380,
+    "CONFIG_STRUCTURE": 16,
+    "CODE_AST": 2054
+  },
+  "astObservedWithoutLiveProviderExtension": {
+    "total": 904,
+    "byProvenance": {
+      "ALTERNATE_STRUCTURAL_PROVIDER": 8,
+      "LEGACY_TREE_SITTER_PROVIDER": 896
+    },
+    "byExtension": {
+      "md": 6,
+      "json": 16,
+      "svelte": 844,
+      "sql": 37,
+      "proto": 1
+    }
+  },
+  "observedProducers": [
+    {
+      "parserName": "tree-sitter",
+      "parserVersion": "chunk-index-v1",
+      "grammarVersion": null,
+      "parserLanguage": "typescript",
+      "provenance": "LEGACY_TREE_SITTER_PROVIDER",
+      "analysisKind": "CODE_AST",
+      "sources": 1141,
+      "nodes": 5719,
+      "workspaceBoundNodes": 0,
+      "revisionBoundNodes": 0,
+      "firstAt": "2026-07-16T22:51:38.234Z",
+      "lastAt": "2026-07-16T22:51:43.086Z",
+      "sampleSourceRefKey": "src/lib/server/ace/context-assembler.ts#file:context-assembler.ts"
+    },
+    {
+      "parserName": "tree-sitter",
+      "parserVersion": "chunk-index-v1",
+      "grammarVersion": null,
+      "parserLanguage": "svelte",
+      "provenance": "LEGACY_TREE_SITTER_PROVIDER",
+      "analysisKind": "CODE_AST",
+      "sources": 844,
+      "nodes": 1477,
+      "workspaceBoundNodes": 0,
+      "revisionBoundNodes": 0,
+      "firstAt": "2026-07-16T22:51:36.841Z",
+      "lastAt": "2026-07-16T22:51:41.343Z",
+      "sampleSourceRefKey": "src/lib/client/ui/poiphotouploader.svelte#file:poiphotouploader.svelte"
+    },
+    {
+      "parserName": "tree-sitter",
+      "parserVersion": "chunk-index-v1",
+      "grammarVersion": null,
+      "parserLanguage": "sql",
+      "provenance": "LEGACY_TREE_SITTER_PROVIDER",
+      "analysisKind": "CODE_AST",
+      "sources": 37,
+      "nodes": 37,
+      "workspaceBoundNodes": 0,
+      "revisionBoundNodes": 0,
+      "firstAt": "2026-07-16T22:51:38.052Z",
+      "lastAt": "2026-07-16T22:51:38.052Z",
+      "sampleSourceRefKey": "src/lib/db/migrations/001_setup_pgvector.sql#file:001_setup_pgvector.sql"
+    },
+    {
+      "parserName": "tree-sitter",
+      "parserVersion": "chunk-index-v1",
+      "grammarVersion": null,
+      "parserLanguage": "javascript",
+      "provenance": "LEGACY_TREE_SITTER_PROVIDER",
+      "analysisKind": "CODE_AST",
+      "sources": 22,
+      "nodes": 63,
+      "workspaceBoundNodes": 0,
+      "revisionBoundNodes": 0,
+      "firstAt": "2026-07-16T22:51:37.538Z",
+      "lastAt": "2026-07-16T22:51:37.538Z",
+      "sampleSourceRefKey": "src/lib/components/ui/alert-dialog/index.js#file:index.js"
+    },
+    {
+      "parserName": "tree-sitter",
+      "parserVersion": "chunk-index-v1",
+      "grammarVersion": null,
+      "parserLanguage": "json",
+      "provenance": "LEGACY_TREE_SITTER_PROVIDER",
+      "analysisKind": "CONFIG_STRUCTURE",
+      "sources": 14,
+      "nodes": 14,
+      "workspaceBoundNodes": 0,
+      "revisionBoundNodes": 0,
+      "firstAt": "2026-07-16T22:51:38.021Z",
+      "lastAt": "2026-07-16T22:51:38.021Z",
+      "sampleSourceRefKey": "src/lib/config/mcp-context7-registration.json#file:mcp-context7-registration.json"
+    },
+    {
+      "parserName": "ast-grep-napi",
+      "parserVersion": "0.44.0",
+      "grammarVersion": null,
+      "parserLanguage": "typescript",
+      "provenance": "ALTERNATE_STRUCTURAL_PROVIDER",
+      "analysisKind": "CODE_AST",
+      "sources": 10,
+      "nodes": 50,
+      "workspaceBoundNodes": 50,
+      "revisionBoundNodes": 50,
+      "firstAt": "2026-09-20T07:38:05.254Z",
+      "lastAt": "2026-09-20T07:38:05.254Z",
+      "sampleSourceRefKey": "src/ambient-legacy.d.ts#interface:ProcessEnv"
+    },
+    {
+      "parserName": "markdown-symbol-extractor",
+      "parserVersion": "source-text-encoding-01",
+      "grammarVersion": null,
+      "parserLanguage": "markdown",
+      "provenance": "ALTERNATE_STRUCTURAL_PROVIDER",
+      "analysisKind": "DOCUMENT_STRUCTURE",
+      "sources": 6,
+      "nodes": 150,
+      "workspaceBoundNodes": 150,
+      "revisionBoundNodes": 48,
+      "firstAt": "2026-09-13T18:46:11.858Z",
+      "lastAt": "2026-09-13T18:46:11.858Z",
+      "sampleSourceRefKey": "2-context.md#heading:📜 Phase 2 Context: System and Retrieval Stack Architecture (2026-07-30)"
+    },
+    {
+      "parserName": "json-symbol-extractor",
+      "parserVersion": "source-text-encoding-01",
+      "grammarVersion": null,
+      "parserLanguage": "json",
+      "provenance": "ALTERNATE_STRUCTURAL_PROVIDER",
+      "analysisKind": "CONFIG_STRUCTURE",
+      "sources": 2,
+      "nodes": 12,
+      "workspaceBoundNodes": 12,
+      "revisionBoundNodes": 0,
+      "firstAt": "2026-09-13T01:29:30.313Z",
+      "lastAt": "2026-09-13T01:29:30.313Z",
+      "sampleSourceRefKey": ".claude/settings.local.json#module:disabledMcpjsonServers"
+    }
+  ],
+  "notMeasured": {
+    "TRAVERSED_PARSE_FAILED": "no parse-failure ledger",
+    "SYMBOL_RESOLVED": "symbol resolution not joined"
+  },
+  "supersedesCapabilityCensus": "capabilityCensus in current-workspace-ast-lineage-v1-c7c0b2d04a606b8c.json (hand-copied provider set)",
+  "featureMatrixBlockerPreserved": "PLACEHOLDER_EMBEDDING_SHARED remains BLOCKING; matrix is diagnostic only",
+  "perSourceRows": ".tmp/atlas/ast-provider-provenance-rows-v1.ndjson",
+  "generatedAt": "2026-09-25T21:02:22.927Z"
+}

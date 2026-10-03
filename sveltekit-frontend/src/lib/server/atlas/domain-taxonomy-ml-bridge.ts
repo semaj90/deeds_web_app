@@ -43,11 +43,19 @@ export async function classifyDomainTaxonomyWithLearned(
   if (!text.trim()) return deterministic;
 
   try {
+    if (!input.sourceRef?.trim() || !input.workspaceRevision?.trim()) return deterministic;
+    const { resolveAdmittedSourceRevisionV1 } = await import('./identity/admitted-source-revision-resolver-v1.js');
+    const admitted = await resolveAdmittedSourceRevisionV1({
+      sourceRef: input.sourceRef,
+      workspaceRevision: input.workspaceRevision,
+    });
     const { createMiniforgeNlpSidecarClient } = await import('../nlp/miniforge-nlp-sidecar.js');
     const client = createMiniforgeNlpSidecarClient();
     const result = await client.analyze({
       text,
-      sourceRef: input.sourceRef ?? undefined,
+      sourceRef: admitted.sourceRef,
+      sourceRevision: admitted.sourceRevision,
+      workspaceRevision: admitted.workspaceRevision,
       passes: ['classify'],
     });
 

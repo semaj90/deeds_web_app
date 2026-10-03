@@ -307,7 +307,7 @@ function parseSqlText(text, tableName) {
     columns.add(match[1].toLowerCase());
   }
 
-  const indexRe = new RegExp(`CREATE(?:\\s+UNIQUE)?\\s+INDEX(?:\\s+IF\\s+NOT\\s+EXISTS)?\\s+"?([A-Za-z0-9_]+)"?\\s+ON\\s+(?:public\\.)?"?${escaped}"?`, 'ig');
+  const indexRe = new RegExp(`CREATE(?:\\s+UNIQUE)?\\s+INDEX(?:\\s+IF\\s+NOT\\s+EXISTS)?\\s+"?([A-Za-z0-9_]+)"?\\s+ON\\s+(?:public\\.)?"?${escaped}"?(?=\\s|\\()`, 'ig');
   for (const match of text.matchAll(indexRe)) {
     matched = true;
     indexes.add(match[1].toLowerCase());
@@ -365,7 +365,16 @@ function filterImplicitLiveIndexes(indexDiff) {
 // is now reserved for the LIVE_TABLE_MISSING case only (nothing exists yet, a full CREATE is
 // actually the right action); an existing table with declared-but-missing columns gets the new,
 // more precise ADD_MISSING_COLUMNS_VERIFY_WRITERS label instead.
-function repairClassForTable({ staticColumnDiff, staticIndexDiff, liveColumnDiff, liveIndexDiff, tableExists }) {
+function repairClassForTable({ staticColumnDiff, staticIndexDiff, liveColumnDiff, liveIndexDiff, tableExists, manualSourcePresent }) {
+  if (!manualSourcePresent && (
+    staticColumnDiff.onlyInA.length ||
+    staticColumnDiff.onlyInB.length ||
+    staticIndexDiff.onlyInA.length ||
+    staticIndexDiff.onlyInB.length
+  )) {
+    return 'RECONCILE_MIGRATION_LINEAGE';
+  }
+
   if (staticColumnDiff.onlyInA.length && !staticColumnDiff.onlyInB.length) {
     return 'APPLY_EXISTING_SQL';
   }
@@ -486,6 +495,7 @@ function classifyTable({ schema, manual, live, tableName, staticIdentityFields }
       liveColumnDiff,
       liveIndexDiff,
       tableExists,
+      manualSourcePresent: Boolean(manual),
     });
 
   return {

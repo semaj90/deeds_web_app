@@ -1,0 +1,813 @@
+{
+  "schema": "atlas.val-10.summary-apply-eligibility-replay.v1",
+  "gate": "VAL-10",
+  "contractOwner": "sveltekit-frontend",
+  "contractPath": "src/lib/server/atlas/docs/summary-claim-validation-v1.ts",
+  "packageProjection": false,
+  "generatedAt": "2026-09-24T00:09:09.275338+00:00",
+  "mode": "READ_ONLY_BOUNDED_REPLAY",
+  "inputFixture": "docs/reports/external-doc-summary-faithfulness-v1.json",
+  "expectedChunkCount": 19,
+  "observedChunkCount": 19,
+  "model": {
+    "id": "ornith-1.5-9b",
+    "revision": "ornith-1.5-9b:hforf.gguf"
+  },
+  "listedModelIds": [
+    "ornith-1.5-9b"
+  ],
+  "summaryPromptRevision": "summary-prompt:sha256:c0c3d8a4744d1c77ea3114ea8ad022251ba148b17e9158aa48e1ad43ff5a8004",
+  "summaryProducerRevision": "sha256:015a4211f117ec4ae7d5ff03cf63c01cfd3d1d929a44d12e66348517bfc4b02e",
+  "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+  "limit": 20,
+  "analysisEnvelopeCount": 19,
+  "analysisEnvelopesAllValid": true,
+  "analysisEnvelopeIds": [
+    "eda:2bb3cb99949e8fb3a46a40d8aa768fdd8050ce344e6ae53c55c49f5fd1a1368d",
+    "eda:d69515c443531082495e9e3951a3abef7879732bb064827cbb4b7ec52e6c8895",
+    "eda:27932a2196e67ca966c4bb10bfe9175b5eb729090af51e1482e56e2410664fed",
+    "eda:8ee7b66be01e2ac6947da3f87f262089f195e310462da8e497cd40faeb6f0866",
+    "eda:b397051076fd9521001047c648e2e1c0b9c88ce6f9de3597acd6d37a0372f898",
+    "eda:3e0b713ceeaa9e0182515e45147b83d6811eb2139bd63151d2f39808a0f5de0d",
+    "eda:11bc4d4db5571f57af220c0a586b92c6973718d4af225e9cc179bbfd56f5a514",
+    "eda:0541a7d2429c8e67d14ac64a7aef5fd738f492601fbc0e3585821627dbc2bfb1",
+    "eda:dab9ecc97bce92c043492e14723852b3dc857c96b421e21673f630eb6d3db619",
+    "eda:b0e0856d30527be0820875276d9aa75985dd675aea03ff1704282e0b95df8ea2",
+    "eda:9bb9824f538dbf0f19451b299794e078a491fd38f02d40a7d291b0f84c1ce542",
+    "eda:b881db3f7eee838edd77283b012650dd8fa8b8a10d087cfd606bb5e5864ecaf9",
+    "eda:7f2aefbfa3f2f5978cb7c5f44d382748d9a81800827caea66374727e80b9406a",
+    "eda:a3ae5570c8d9810ff16ae32ba22edb7ab01dc166594650d29b094d8e873b0c26",
+    "eda:bc310e3b40cf4cd14f935240e97bfe177a0acf0a237f269aae681dbde2595263",
+    "eda:e7c3e32d02bd05960ff3e0554d2ba800bbe393c2633b2ca0d06837e2b2403c95",
+    "eda:9074110cb2c94bb0df681f58c9febcd0fbf29a9f6d6ff43f952ed37fb595ce51",
+    "eda:cb0a8cc4bda44dc12edcdef36cf5c627c80366ddd327efc05bfea01053cfd83e",
+    "eda:fd8c9c229afa83af23fae69112aeb914687ffb64fa35fe0cea65a529b7378858"
+  ],
+  "claimCount": 49,
+  "claimDecisionCounts": {
+    "ADMIT": 48,
+    "REJECT": 1
+  },
+  "judgeErrorCount": 0,
+  "eligibleSummaryCount": 18,
+  "excludedSummaryCount": 1,
+  "withinLimit": true,
+  "cohort": [
+    {
+      "chunkId": "doc:bits-ui:6b3cf8151e01df1d:5",
+      "chunkEvidenceRevision": "sha256:e650aa5c43f5ebb0ec44bca393c856ec67ea8a4e55c6580f1ca42343462844af",
+      "summaryInputChecksum": "cc1c9e24141af2878ec32233375b2860279368c96c0bbb1db401d10ddeddf293",
+      "summaryOutputChecksum": "6a5ce81b2a80296982aeaa1a0951141b037a02ddc7eac2511b8c014284c7f906",
+      "claimCount": 2,
+      "finishReason": "stop",
+      "completionTokens": 98,
+      "latencyMs": 2675,
+      "claims": [
+        {
+          "claimChecksum": "3167aeb1e0f0d6bbf37d8bb7252d6f9ee7d57be6cf3baa695e86f6969dc8fdbb",
+          "judgeInputChecksum": "a310261c19f2c17fdcdaa22bcc92f5db79877d8a029cd83ba2968393554cec9c",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "6291a7eaae2bf414219eea2ef732ab84456784ab3126121fbd6661351f182eec",
+          "judgeInputChecksum": "6ce464860989a1c91c969bac55331e23535736723d50f338fbaf48d21749aedb",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:bits-ui:6b3cf8151e01df1d:5@sha256:e650aa5c43f5ebb0ec44bca393c856ec67ea8a4e55c6580f1ca42343462844af",
+        "analysisId": "eda:d69515c443531082495e9e3951a3abef7879732bb064827cbb4b7ec52e6c8895",
+        "analysisEnvelopeValid": true,
+        "claimCount": 2,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "chunkEvidenceRevision": "sha256:0e92134210a648a9abb1aeaf94a050469d74118b30013f3f687046c70581d7ff",
+      "summaryInputChecksum": "72766bb34757744bf6bfac94287c73bcda7897a52a68c9a4d5d9d4926b543eab",
+      "summaryOutputChecksum": "053888149406155c32bf1b4676af98f34476aac926dc7bff366518a7833c5be1",
+      "claimCount": 2,
+      "finishReason": "stop",
+      "completionTokens": 59,
+      "latencyMs": 1417,
+      "claims": [
+        {
+          "claimChecksum": "a4e6a93fa43ef95ea0036cc3a7abfe3b691303e7ac1fe75d25f4c028520d7de5",
+          "judgeInputChecksum": "5c9b011df5513fd3a59e434f7f73e9639bd09412d523a9bf6f6633bc485ab949",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "425337a8d69038f2b8320b1466ab9ad1439ac68c95bdd9ec5c27503eb764a9f5",
+          "judgeInputChecksum": "04245c65166edacee7e34ef6a9c01f3f9fdbe2ca080cca7f53d79ade1c22de0b",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:bits-ui:679d17152be486da:0@sha256:0e92134210a648a9abb1aeaf94a050469d74118b30013f3f687046c70581d7ff",
+        "analysisId": "eda:2bb3cb99949e8fb3a46a40d8aa768fdd8050ce344e6ae53c55c49f5fd1a1368d",
+        "analysisEnvelopeValid": true,
+        "claimCount": 2,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+      "chunkEvidenceRevision": "sha256:56bd6d24940284584f9e3a948c88991bc753fd9be1d439f58ca4e936a2bfa5f3",
+      "summaryInputChecksum": "ce912eede4171b76d066b389e02b684cb9a5760061a9f9c84f9c3cb4f7f20dc6",
+      "summaryOutputChecksum": "49c4f7b8a4be29ac2ae576adf2224083159704541eec0def1c66ce87cbffc1bf",
+      "claimCount": 2,
+      "finishReason": "stop",
+      "completionTokens": 52,
+      "latencyMs": 1628,
+      "claims": [
+        {
+          "claimChecksum": "6ceeb148093b207fb75638c5488abc4240511548710674054e9af7defb47acfe",
+          "judgeInputChecksum": "1c4ba51ed845e8779eb2b5a77650d168c9918f327ce9ab02462f012f8773e91b",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "996fec93543f46468f9e53e976f5b47378d180acdec8c590f5a5415145fa5552",
+          "judgeInputChecksum": "bcd4fc8ec37ca3d2b5128bf8206dfbfb1e116088ac70a5aa72b09d5c29e13ba6",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:bits-ui:933224c7e6a17940:40@sha256:56bd6d24940284584f9e3a948c88991bc753fd9be1d439f58ca4e936a2bfa5f3",
+        "analysisId": "eda:27932a2196e67ca966c4bb10bfe9175b5eb729090af51e1482e56e2410664fed",
+        "analysisEnvelopeValid": true,
+        "claimCount": 2,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0",
+      "chunkEvidenceRevision": "sha256:fd87694e2e8aeda0463ff46f80d5e48b00194b0982caa4609ad12f8fc17520c4",
+      "summaryInputChecksum": "d2ffacaca766677c200a0df3ca96190a90c1e28576530042ffcdcc79b69e58b0",
+      "summaryOutputChecksum": "8d6d42008d8a4a4f40e0aa0fe74de9660e337e3dfd96002176ff7ed92820244d",
+      "claimCount": 2,
+      "finishReason": "stop",
+      "completionTokens": 85,
+      "latencyMs": 2165,
+      "claims": [
+        {
+          "claimChecksum": "6a84d3044be5c1ce2862c60560a1a3a560d2e02368f21a06f1d9ba2831f0fa98",
+          "judgeInputChecksum": "10993b132f318367f891ec1fc4362c002990ec8bf0ced76963b0f23a10315804",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "ffd2510313809b3c7d25f4a1b17caf3a0c47270002cbb6e3b46c70c206bed829",
+          "judgeInputChecksum": "eb2133cde64abf0c7273a3af9f5282bab891d7a012ceb018ecfb355949e0af3f",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:drizzle-kit:0608a335e55cd6ac:0@sha256:fd87694e2e8aeda0463ff46f80d5e48b00194b0982caa4609ad12f8fc17520c4",
+        "analysisId": "eda:8ee7b66be01e2ac6947da3f87f262089f195e310462da8e497cd40faeb6f0866",
+        "analysisEnvelopeValid": true,
+        "claimCount": 2,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:4",
+      "chunkEvidenceRevision": "sha256:cecbbcad364671e2ac9a3f7d05a65cd767f21b20fbc02bc4881b26dc029fe946",
+      "summaryInputChecksum": "8130f1e3e11c615a280e24d5f1345e00ca1c1ad16f39b2e01d14836cecb196e4",
+      "summaryOutputChecksum": "24892d1d80aa75d99db2d2b4aa5487fa3fd6c3d0d8860ebd0275dbb260914645",
+      "claimCount": 2,
+      "finishReason": "stop",
+      "completionTokens": 81,
+      "latencyMs": 1992,
+      "claims": [
+        {
+          "claimChecksum": "68b92455449feac3f48350d315198bea6f905e6640bf1b2ecb38c9c331804d1d",
+          "judgeInputChecksum": "dc8b5a66771e22ba1eb3ebc8588b1e5ce24621bd04bee82b735f163d781a39e8",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "016d030ad614672a3a3f6d1d2d9909f7b4bd4f057d3bdfa6710446dff40ef5ae",
+          "judgeInputChecksum": "ceae1f3d301b5146eab18cd67169deef83f7ba6676e551a131dd3bf787845891",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:drizzle-kit:83cd7433d94e8f78:4@sha256:cecbbcad364671e2ac9a3f7d05a65cd767f21b20fbc02bc4881b26dc029fe946",
+        "analysisId": "eda:b397051076fd9521001047c648e2e1c0b9c88ce6f9de3597acd6d37a0372f898",
+        "analysisEnvelopeValid": true,
+        "claimCount": 2,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0",
+      "chunkEvidenceRevision": "sha256:bd1faaa5365e27f6081ca7b49af09d3a36c7fb3f7a201caa1e30ce8693133544",
+      "summaryInputChecksum": "a3df9600d30f5a5ceca5684dcb5d1b4531631abb061afa689aa014089132b942",
+      "summaryOutputChecksum": "8ac85de9e9422cf3f193a0c14ec37b790547e67293d5a4592babb5b84895a5e8",
+      "claimCount": 3,
+      "finishReason": "stop",
+      "completionTokens": 97,
+      "latencyMs": 2275,
+      "claims": [
+        {
+          "claimChecksum": "7f3553ae52a4e145d8510d0ff384ee32408dcab80bc4cdf000a3f2c3024ae496",
+          "judgeInputChecksum": "990c5af5bbb4751801764e289d228a41c066641ceea70156d4e4c92a3334ef1d",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "49ea4dfa0d3a4d16591d0b4360f40b050f8ad97bb8b5f84bc12e57076d695dd8",
+          "judgeInputChecksum": "578090fdd757b2f037b46b1daf7730648b6363262c0b5d049ddcc105a7de5e0d",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "338533bb20f53ce9a50d19f9b80c689bdd7bb0657ae3f693f412f1ed0d66991c",
+          "judgeInputChecksum": "dee09ba3eb453336bdb39ba00b324906eb4a76e2d5d0ba274d9832d3426c8eaa",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:drizzle-orm:477678292a4e8b9a:0@sha256:bd1faaa5365e27f6081ca7b49af09d3a36c7fb3f7a201caa1e30ce8693133544",
+        "analysisId": "eda:3e0b713ceeaa9e0182515e45147b83d6811eb2139bd63151d2f39808a0f5de0d",
+        "analysisEnvelopeValid": true,
+        "claimCount": 3,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:9",
+      "chunkEvidenceRevision": "sha256:1b2bc340d48dc0d10bfe4bff01ae7f7c32ff5fad843aa89d20797cc05537b315",
+      "summaryInputChecksum": "d9e63cfe5d7509b254f5a1a3c5a7a4228815b5ae051aa830707adacf232d53d0",
+      "summaryOutputChecksum": "b54d8105ffabc25f89cf66c662662d7a6f95bb1c81a219e6cc885443e543291e",
+      "claimCount": 2,
+      "finishReason": "stop",
+      "completionTokens": 38,
+      "latencyMs": 1328,
+      "claims": [
+        {
+          "claimChecksum": "068cf03b5fe862d504fde9d6498f400cc0222e9a870e7f997683af75eae75e1c",
+          "judgeInputChecksum": "b19a33da609d5598d38b164aab07ed6f3f39541c6ba59a0309b6ffdf466497ca",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "ca6bce25e248bdb748f592bb66e250dcb50b94639274521a651ecf6890642cfb",
+          "judgeInputChecksum": "999a7c208f2ac8f375f56e19cc0ef6bad4adf18b527476179ccfd3f408e1f4bd",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:drizzle-orm:d1b6909995c31bb5:9@sha256:1b2bc340d48dc0d10bfe4bff01ae7f7c32ff5fad843aa89d20797cc05537b315",
+        "analysisId": "eda:11bc4d4db5571f57af220c0a586b92c6973718d4af225e9cc179bbfd56f5a514",
+        "analysisEnvelopeValid": true,
+        "claimCount": 2,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "summaryInputChecksum": "ab60a2b71b5ce112c80c1db319de9dc0fc0a19c59a2c77defc7e2ca43bc6e483",
+      "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+      "claimCount": 5,
+      "finishReason": "stop",
+      "completionTokens": 146,
+      "latencyMs": 3846,
+      "claims": [
+        {
+          "claimChecksum": "f62f1ff1cfeef00ea797f65c37855686dcb13d2e1232985fdf07768cb5fc79f3",
+          "judgeInputChecksum": "5de15247c3fa680d7c4d690bb281c4bde45c6efc754e04c25e56c11c2d857eab",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "3fdeab111632b87024b296cf29421fe2b71512f22980b56367312de9472b6ed5",
+          "judgeInputChecksum": "be81a3ec3c8b12cd899077c1ff892fbbce47be15881d198fb8e4d02c76c532ab",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "620257a51058d0a9431a08461531e885761a1825f05b9744a7bcd14358c0fde4",
+          "judgeInputChecksum": "6083401bf4329b63593a6b31ac4867709b6f7acd3ce831d35c8afb4d923d74f1",
+          "status": "JUDGED",
+          "verdict": "UNSUPPORTED_CLAIM"
+        },
+        {
+          "claimChecksum": "a5526c72ba7708b41804075e3a980e6819632d6b0602600ef1bb6dcd7323b46a",
+          "judgeInputChecksum": "de445fdad5f9eab506ffe16586f59c3c82331b2accedf4ef17b2905215b20513",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "1845d0f74c07050d3d129efb70c30d9cff0a70a66d23a9e6ab12447a0989920d",
+          "judgeInputChecksum": "b6b506ec618ea07ade70d402ece4af7e4d65a71b0ad2e9810a79b3295fa25766",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:pgvector:fe883c75f323441d:22@sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+        "analysisId": "eda:0541a7d2429c8e67d14ac64a7aef5fd738f492601fbc0e3585821627dbc2bfb1",
+        "analysisEnvelopeValid": true,
+        "claimCount": 5,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT",
+          "REJECT",
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": false
+      }
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:24",
+      "chunkEvidenceRevision": "sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+      "summaryInputChecksum": "6fa6b6a1fdfd10924bcf10bb1a3fc1b61900bc693908cb874c9f19c97c85a66b",
+      "summaryOutputChecksum": "af643d8599bf076e523d61affeb5a3ed5a325ad75564a0d19659a5b2f590c0f3",
+      "claimCount": 3,
+      "finishReason": "stop",
+      "completionTokens": 145,
+      "latencyMs": 3198,
+      "claims": [
+        {
+          "claimChecksum": "7bfe5a491f71d217b74becb449f66662586877ae0720c0bced1d0c95809a5a73",
+          "judgeInputChecksum": "2faad77233a6f813893d2051491c0c835cb0a094c862dd932da2cf4157a88bc4",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "5379765e1f80c2a9e8ce1f6176e6d99714239eb374c6d7312a71bb2f7bda6635",
+          "judgeInputChecksum": "0404633e812c517ec2f29b25f511b9cfc0561feddb3288b4160b9ba36069e475",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "601d2ee35b13bd98a3d66df9db0992a288d461e632db3a9512f9e25779d6e085",
+          "judgeInputChecksum": "739525533825ab8324285cbdfcfa8380dfdd11d345b770c2b7c49f3bc24a97f3",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:pgvector:fe883c75f323441d:24@sha256:a637144db701c2595790198359e0942bfbbabe2ea09f550fa32e809b814ad885",
+        "analysisId": "eda:dab9ecc97bce92c043492e14723852b3dc857c96b421e21673f630eb6d3db619",
+        "analysisEnvelopeValid": true,
+        "claimCount": 3,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:26",
+      "chunkEvidenceRevision": "sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+      "summaryInputChecksum": "47aa4bfe521b3ec1ad7d661e242f8aadbbf400301c51717c5f641cc2919432a1",
+      "summaryOutputChecksum": "4b202ffb13ae7c3abaa887bf99608b054e502f1d10aba65f49476c4c2401d44b",
+      "claimCount": 2,
+      "finishReason": "stop",
+      "completionTokens": 90,
+      "latencyMs": 2216,
+      "claims": [
+        {
+          "claimChecksum": "c17d18d44b8e51a0787469913f3ee80b5b97a6fab5ee96fb6362d5a7a49c6c65",
+          "judgeInputChecksum": "e3dc16de5ca3ad532bfff87722517fe893cdc25baf819caa87b1b47a6e5b96ea",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "fec79897a9e56ba758c6eff9e256617af0235956eff9698fec97b3da6ec03262",
+          "judgeInputChecksum": "6e602b48b95e18eddf67eb83fcdcb5e280a1f3ee490f3a6fbcc6485be1228bd7",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:pgvector:fe883c75f323441d:26@sha256:d6c81cea58985f63bae5d39098303933c5f839eac8c023341d79d304da65dfac",
+        "analysisId": "eda:b0e0856d30527be0820875276d9aa75985dd675aea03ff1704282e0b95df8ea2",
+        "analysisEnvelopeValid": true,
+        "claimCount": 2,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+      "chunkEvidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1",
+      "summaryInputChecksum": "ca22231e71f71244c682baf80ab007e1e44a106e28581bc7327310ed8b462f80",
+      "summaryOutputChecksum": "f54a18efe8828fc41d14008ee30801e7f2a1baa3a368cf48672f918f602048bc",
+      "claimCount": 3,
+      "finishReason": "stop",
+      "completionTokens": 207,
+      "latencyMs": 4316,
+      "claims": [
+        {
+          "claimChecksum": "29e127248fba7d83a62079aefa98d3081ca7295b9667dffd70f7305518701a22",
+          "judgeInputChecksum": "a891946bb95fbc2118857fed8b069916710730388eb938410d599f4423722ce1",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "8c7f4d61f09ad9fbba3f6e8e3cf034d3faaf347d216c40bbbb69268452c5bfbe",
+          "judgeInputChecksum": "d467d83d3bb861f2b47a6a6ef3a54de2f751313b21d9194cc31b79a70fb3009a",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "35b53ad8b7934205051e754edacc8314ccb9ca59fa3b7c9dfb9cce6d2d303a95",
+          "judgeInputChecksum": "37c26e5ba77ce657798c0d89dad1480b1fb5f862d7a173032156da30b700dbd3",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:postgresql-18:38d5e74bafb89df8:10@sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1",
+        "analysisId": "eda:9bb9824f538dbf0f19451b299794e078a491fd38f02d40a7d291b0f84c1ce542",
+        "analysisEnvelopeValid": true,
+        "claimCount": 3,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+      "chunkEvidenceRevision": "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716",
+      "summaryInputChecksum": "3c0d6514b522877b6b6fdea672631220d2427e680a095e8e49816806af7625d7",
+      "summaryOutputChecksum": "2fb523e1481cbd5ca89779a6a2f31048853755557016308a9bfadfc78f541288",
+      "claimCount": 3,
+      "finishReason": "stop",
+      "completionTokens": 141,
+      "latencyMs": 3135,
+      "claims": [
+        {
+          "claimChecksum": "1e04fa509f60ae87a96ecb25695cf7f196d114effa82d93229569ce673d71a8c",
+          "judgeInputChecksum": "aa7ba7297433d05132230711aa472a044923067f411f90521b2bec87f7254f74",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "ab75456335a48f95d80bd8dee060b2a2090372f98d92eb0c63669ebcb9378035",
+          "judgeInputChecksum": "8f9db05247e84212bddaaa4148de22806a32acc620b1b6d13df03aa1f1a17916",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "2aafa7a5748cdfc1ca391e913044d8fb7ff3263db04a1791b07a551cb72ffcaf",
+          "judgeInputChecksum": "fee7ea560f0653779d9a6b7fb4e0c215045964acdd0db1131e30f65fa7f7ced1",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:postgresql-18:38d5e74bafb89df8:2@sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716",
+        "analysisId": "eda:7f2aefbfa3f2f5978cb7c5f44d382748d9a81800827caea66374727e80b9406a",
+        "analysisEnvelopeValid": true,
+        "claimCount": 3,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+      "chunkEvidenceRevision": "sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2",
+      "summaryInputChecksum": "fb460d4a334d3dfb92c8b744c5048da03c8a05ebf90f80a2bbbc38cca0a576de",
+      "summaryOutputChecksum": "d38dfd59360906d5016d94449f3b6b0a8eba4a5f4c9352e8965a6c49015851e3",
+      "claimCount": 3,
+      "finishReason": "stop",
+      "completionTokens": 176,
+      "latencyMs": 3751,
+      "claims": [
+        {
+          "claimChecksum": "7effc8f0d35c17220f7e7a7ff89caddb73c9dd167139217481e0a36f5b30e951",
+          "judgeInputChecksum": "2cf8267a3d89407cd1f8b239a1cc9a5fa788b890a4083adfe99edf7f5ea422dd",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "d2c9722c5bc67c8475a6b4461c18868fd51a1dd1143843c032a9277cb84790b7",
+          "judgeInputChecksum": "318e94364aeae20d87a935a472da7a6f4576557d0c69eb792b3d830721ca0e11",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "902c2a13198dbed8f9d1dbe64d37c0760d0b3fb88f5912ae6d61c372de8dc006",
+          "judgeInputChecksum": "41dcf814ecea98d0d3cfbbb00dfac6979aae0391a424a2fff583f1954ea6287d",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:postgresql-18:38d5e74bafb89df8:26@sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2",
+        "analysisId": "eda:b881db3f7eee838edd77283b012650dd8fa8b8a10d087cfd606bb5e5864ecaf9",
+        "analysisEnvelopeValid": true,
+        "claimCount": 3,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:1",
+      "chunkEvidenceRevision": "sha256:d364bfe52f2e13e0e6b565ed83b03a326ac51bfc0dd79060c07bdb52696f874e",
+      "summaryInputChecksum": "55b8bf344b0940e7dd962a8d04ccd3a2bb4e2cfbc19903f54486d3fd92156879",
+      "summaryOutputChecksum": "580959365a79f24ee79e845df53d431f547f558da9f453be1561f9aef96ed6cc",
+      "claimCount": 2,
+      "finishReason": "stop",
+      "completionTokens": 53,
+      "latencyMs": 1446,
+      "claims": [
+        {
+          "claimChecksum": "91e28fa18fc8b2e588814aba13c0e54d46e9ff094c38785198d1a3c733a272a8",
+          "judgeInputChecksum": "8f217715b71944c86d496276e2b9f56adbf5bd9a8a00ab62de63b76e6eb8a07e",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "6f1814a922713cca0a633cc90eb5c87f46ea649592e79e9c043a5f35f8356d22",
+          "judgeInputChecksum": "5df32fd4774d7e9e97f5b9d58146f6280d4ff1021e4f2663f2002b90b0ecf299",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:svelte5-runes:05fda9b18acd27b3:1@sha256:d364bfe52f2e13e0e6b565ed83b03a326ac51bfc0dd79060c07bdb52696f874e",
+        "analysisId": "eda:a3ae5570c8d9810ff16ae32ba22edb7ab01dc166594650d29b094d8e873b0c26",
+        "analysisEnvelopeValid": true,
+        "claimCount": 2,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:1",
+      "chunkEvidenceRevision": "sha256:f9ce355c977a05d9955d9bc8bb0e98644545bc20f8541e54da0a368db7723870",
+      "summaryInputChecksum": "b5f7f7318ffa2b3240fe6cc7c3976f1b73d16942ef3939b48d928f86fc68591d",
+      "summaryOutputChecksum": "ad91d520f5204c5995f8d991d7f5c7838175d5c5f9dbe1c86542a94252313e63",
+      "claimCount": 2,
+      "finishReason": "stop",
+      "completionTokens": 52,
+      "latencyMs": 1485,
+      "claims": [
+        {
+          "claimChecksum": "c309f271c7fafe55e8c494fde9c3c86331a1a82f66cf8d7449363cd62a8c223c",
+          "judgeInputChecksum": "e8520ec547b1d74f177764142142b3bef1902c7425387418e70277f51a6270ff",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "88ae23e46b9719825aa6eea14ad53c26a9e630de12423d99137530fd49c8a5fb",
+          "judgeInputChecksum": "005e0d8f0667a17bf34e4ed0547f636e6fc4c928e284cfb47790a0265cd638fc",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:svelte5-runes:4606958abe2e620d:1@sha256:f9ce355c977a05d9955d9bc8bb0e98644545bc20f8541e54da0a368db7723870",
+        "analysisId": "eda:e7c3e32d02bd05960ff3e0554d2ba800bbe393c2633b2ca0d06837e2b2403c95",
+        "analysisEnvelopeValid": true,
+        "claimCount": 2,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+      "chunkEvidenceRevision": "sha256:73c10463c028ab80e2616fe5c662410e0d7ff66aa26d9160fd6b78fa2e9a2e5f",
+      "summaryInputChecksum": "3779001ac2abb4c3ca77f8a4f57a345bc5b0f9e2b6f844044f5523e93b06c2b1",
+      "summaryOutputChecksum": "3d52a7b49027ec8eb319f65a00311ccf46f80104a0273c954fa415d10e223f01",
+      "claimCount": 3,
+      "finishReason": "stop",
+      "completionTokens": 117,
+      "latencyMs": 2772,
+      "claims": [
+        {
+          "claimChecksum": "72f79aa3b012dedbcc855bda413fe3c58ad54b1cdb3e488ec2abde8240d07973",
+          "judgeInputChecksum": "9718bcf6612aa68dd85308468bba74ee7fcb5cca146e2d8ddb172f20a2116633",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "502ddaa31e9f5474b9aae898125a975808fc122db2eae5d831be1d6967c9c611",
+          "judgeInputChecksum": "5dda63712f152af4545c22e24ac3b426b689e004f8649fd6f28aed8ec0071011",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "8ab0795b8325764943f8f982edbd10e7c809074d231cdc42dfb406ce9f61a888",
+          "judgeInputChecksum": "f2452a35ed27779aba74f38b31ca2df1a1b04fc95125d709af736e9d09873b80",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:svelte5-runes:4606958abe2e620d:13@sha256:73c10463c028ab80e2616fe5c662410e0d7ff66aa26d9160fd6b78fa2e9a2e5f",
+        "analysisId": "eda:bc310e3b40cf4cd14f935240e97bfe177a0acf0a237f269aae681dbde2595263",
+        "analysisEnvelopeValid": true,
+        "claimCount": 3,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:sveltekit:62e6dd9932a74b58:15",
+      "chunkEvidenceRevision": "sha256:deea1c2c0025e4c0c0dd2a58f84bc44eb8592e8ebe095c971d46b7cd57616fc4",
+      "summaryInputChecksum": "e64736589e88cf9a5707dfe8dd6aeb5be317b8a40deb5c0be94c8c9a9d75e79e",
+      "summaryOutputChecksum": "01268111ce9a15cf05ed2ec16cc22abf4b735e7acaf59e962f92c251aae8fe84",
+      "claimCount": 2,
+      "finishReason": "stop",
+      "completionTokens": 108,
+      "latencyMs": 2611,
+      "claims": [
+        {
+          "claimChecksum": "876ef79bbe54bdb4af774d323136fdf03df96fb02cff931dcea03006bbccf607",
+          "judgeInputChecksum": "ec1fc8fb7628c761e2f76d1738552f3631c4b35c7eb728cd692931956d7c6fe5",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "a38c07d4b13488f7342f46e1554ac53948bc7eb6b085dd8a78448267d817ea6f",
+          "judgeInputChecksum": "05da8c3ee545006717517ae4643e7f32901b830fd9f2afb9ea910167066681ad",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:sveltekit:62e6dd9932a74b58:15@sha256:deea1c2c0025e4c0c0dd2a58f84bc44eb8592e8ebe095c971d46b7cd57616fc4",
+        "analysisId": "eda:9074110cb2c94bb0df681f58c9febcd0fbf29a9f6d6ff43f952ed37fb595ce51",
+        "analysisEnvelopeValid": true,
+        "claimCount": 2,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19",
+      "chunkEvidenceRevision": "sha256:3802f9585429d798009f484d06e598c0b2531df5579a0ce066bc5d2a5ee5e5db",
+      "summaryInputChecksum": "39aa9ea9002aa84bfc8e22fc123024be4285d58a4927eb263020a0a40e958941",
+      "summaryOutputChecksum": "d228b515443fe3ada8c1a880c7f8f003ff3b654faa0fdee34e03d7bb507fa91e",
+      "claimCount": 3,
+      "finishReason": "stop",
+      "completionTokens": 83,
+      "latencyMs": 2106,
+      "claims": [
+        {
+          "claimChecksum": "420d0dbeee9f63ef74cbba42a569b6bd5af6d96953ebc8001fe2340572758c30",
+          "judgeInputChecksum": "d01d3c834d69d7e1900b79add620ea92e44db8c310104c360cc12675cd2d1904",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "0c0d3c51abf294ba71d3be41fff1d91b93d0cdb85662e459d1027ba7184f27fa",
+          "judgeInputChecksum": "1cbcc3861bedc4ba5643f02fddd137fde6c7fd8f44819b8c30c475ced32b86ad",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "ecef5e35f726ebc9f97ef294dd3597681f693eea92125d683fd72c1efb876d97",
+          "judgeInputChecksum": "58d8abf2b77675cdc672706b66575e4550651e2b58d6078bd27406225f248b39",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:sveltekit:7eecebe5e0d7481c:19@sha256:3802f9585429d798009f484d06e598c0b2531df5579a0ce066bc5d2a5ee5e5db",
+        "analysisId": "eda:cb0a8cc4bda44dc12edcdef36cf5c627c80366ddd327efc05bfea01053cfd83e",
+        "analysisEnvelopeValid": true,
+        "claimCount": 3,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    },
+    {
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+      "chunkEvidenceRevision": "sha256:c6fbdca5bcbaa86c6974834dc4b8a959ac7da79de4ad2fd6e60f8cf4249398f3",
+      "summaryInputChecksum": "b9f9529d67c676d0dbfad03d0ff244b7c0c34d441ea993c3e258231b04e1c3d9",
+      "summaryOutputChecksum": "28a9c99114638f9164cfb0fc1a4f0affefc2d29709e3c3e0f0bd434f7056b51a",
+      "claimCount": 3,
+      "finishReason": "stop",
+      "completionTokens": 84,
+      "latencyMs": 2038,
+      "claims": [
+        {
+          "claimChecksum": "bf537f6b794f7646aa35f26c1a20b742305fb99f6ce816ed6ebad1f75239b5ba",
+          "judgeInputChecksum": "a78efcdc18e279d91d033d5a23c0f641f4a875aa28cf73502e6edeb9432daf84",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "1882abee2886cf710b571458e7efdf3b7b9cb2a1d473c929880f5e16e447e912",
+          "judgeInputChecksum": "37da3f7ab4319836aca3c61e401feb67ba7a3a04528d2c8b3b5ccff8baea2219",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        },
+        {
+          "claimChecksum": "1e68ab95d80135b5d47964358f4104b46a07c26f6b2afad1bd94ce200b19288e",
+          "judgeInputChecksum": "537d5804cab898ac24cf5a7abf6397ebed9474ffce2b5dbc19ef22692b03e42e",
+          "status": "JUDGED",
+          "verdict": "SUPPORTED"
+        }
+      ],
+      "resolution": {
+        "groupKey": "doc:sveltekit:7eecebe5e0d7481c:20@sha256:c6fbdca5bcbaa86c6974834dc4b8a959ac7da79de4ad2fd6e60f8cf4249398f3",
+        "analysisId": "eda:fd8c9c229afa83af23fae69112aeb914687ffb64fa35fe0cea65a529b7378858",
+        "analysisEnvelopeValid": true,
+        "claimCount": 3,
+        "claimDecisions": [
+          "ADMIT",
+          "ADMIT",
+          "ADMIT"
+        ],
+        "eligible": true
+      }
+    }
+  ],
+  "summaryWrites": 0,
+  "analysisRowsBefore": 0,
+  "analysisRowsAfter": 0,
+  "analysisRowCountUnchanged": true,
+  "persistentWriteAuthorization": "NOT_REQUESTED_OR_USED",
+  "result": "VAL10_BOUNDED_ELIGIBILITY_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0,
+    "filesystemProofReceipt": 1
+  }
+}

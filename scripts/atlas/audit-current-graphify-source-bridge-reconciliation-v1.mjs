@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 
 const root = REPO_ROOT;
 const admissionPath = path.join(root, 'docs/reports/workspace-revision-tournament-admission-v1.json');
@@ -211,6 +212,19 @@ try {
       graphifyMissingManifest: countBy(graphifyComparison.filter((row) => !row.existsInManifest), 'sourceRef'),
       bindingMissingManifest: countBy(bindingComparison.filter((row) => !row.existsInManifest), 'sourceRef'),
     };
+    // Shadow observation via the ONE shared owner (savepoint keeps a failed read from poisoning this read-only transaction).
+    // Diagnostic only: identityChecks / decisions below still use the legacy boolean.
+    report.authorityShadow = { runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY', error: null, observation: null };
+    if (execution) {
+      await client.query('SAVEPOINT authority_shadow');
+      try {
+        const { loadAuthorityShadowV1 } = await loadAuthorityShadowModuleV1();
+        report.authorityShadow.observation = await loadAuthorityShadowV1(client, { workspaceId: execution.workspace_id, workspaceRevision: execution.workspace_revision });
+      } catch (error) {
+        report.authorityShadow.error = error instanceof Error ? error.message : String(error);
+        await client.query('ROLLBACK TO SAVEPOINT authority_shadow');
+      }
+    }
     report.identityChecks = {
       executionFound: Boolean(execution),
       executionRevisionMatchesAdmission: execution?.workspace_revision === workspaceRevision,

@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.ornith-cache-capability-live-readonly-run.v1",
+  "status": "CAPABILITY_OBSERVED_WITH_EXPLICIT_UNPROVEN_FIELDS",
+  "checkedAt": "2026-09-27T10:22:19.480Z",
+  "probeMode": "LIVE_READ_ONLY",
+  "probeStatus": "PROVEN_RUNTIME",
+  "runtimeRevision": "b8757-a29e4c0b7",
+  "modelRevision": "ornith-1.5-9b",
+  "modelSha256": null,
+  "modelDigestStatus": "UNPROVEN",
+  "capabilities": {
+    "promptCacheSupported": "UNPROVEN",
+    "cacheReuseKvShiftSupported": "UNPROVEN",
+    "recurrentCheckpointSupported": "UNPROVEN",
+    "hostRamPromptCacheSupported": "UNPROVEN",
+    "idleSlotCacheSupported": "UNPROVEN",
+    "slotPersistenceSupported": "UNPROVEN"
+  },
+  "observedSettings": {
+    "cachePrompt": null,
+    "cacheReuseMinChunk": null,
+    "checkpointCount": null,
+    "checkpointMinStep": null,
+    "cacheRamMiB": null,
+    "cacheIdleSlots": null,
+    "slotPersistenceConfigured": null
+  },
+  "capabilityReportChecksumSha256": "61ab5a50dbfe4bcc85509dad3c999b7e082162be3c62128fe52377a96b0547c8",
+  "evidenceRefs": [
+    "http://127.0.0.1:8090/health",
+    "http://127.0.0.1:8090/props",
+    "http://127.0.0.1:8090/v1/models"
+  ],
+  "safety": {
+    "inferencePerformed": false,
+    "writesPerformed": false,
+    "datastoreWritesPerformed": false,
+    "cacheWarmPerformed": false,
+    "tensorOrModelStatePersisted": false,
+    "canonicalAuthority": false
+  },
+  "limitations": [
+    "The live endpoints returned runtime/build and model identity, but no cache settings were exposed in /props for this run.",
+    "A loaded model name is not an immutable model artifact digest; modelSha256 remains null.",
+    "Runtime reachability does not prove prompt-prefix reuse, KV shifting, recurrent checkpointing, or cache-warming behavior."
+  ]
+}

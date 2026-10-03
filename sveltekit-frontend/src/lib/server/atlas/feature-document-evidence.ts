@@ -184,60 +184,121 @@ function findExistingPath(candidates: string[]): string | null {
   return null;
 }
 
-function readManifest(manifestPath: string | null) {
+export interface FeatureDocumentReadBounds {
+  maxManifestBytes?: number;
+  maxDirectoryEntries?: number;
+}
+
+function readUtf8File(manifestPath: string, maxBytes?: number): string {
+  if (maxBytes === undefined) return fs.readFileSync(manifestPath, 'utf8');
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 0 || maxBytes > 32 * 1024 * 1024) {
+    throw new RangeError('maxManifestBytes must be an integer between 0 and 33554432');
+  }
+
+  const buffer = Buffer.alloc(maxBytes + 1);
+  const fd = fs.openSync(manifestPath, 'r');
+  let bytesRead = 0;
+  try {
+    while (bytesRead < buffer.length) {
+      const count = fs.readSync(fd, buffer, bytesRead, buffer.length - bytesRead, bytesRead);
+      if (count === 0) break;
+      bytesRead += count;
+    }
+  } finally {
+    fs.closeSync(fd);
+  }
+
+  if (bytesRead > maxBytes) throw new Error('FEATURE_DOCUMENT_MANIFEST_TOO_LARGE');
+  return buffer.subarray(0, bytesRead).toString('utf8');
+}
+
+export function readFeatureDocumentManifestFile(manifestPath: string, maxBytes?: number) {
+  const fileSize = fs.statSync(manifestPath).size;
+  if (maxBytes !== undefined && fileSize > maxBytes) {
+    throw new Error('FEATURE_DOCUMENT_MANIFEST_TOO_LARGE');
+  }
+
+  const raw = readUtf8File(manifestPath, maxBytes);
+
+  return {
+    raw,
+    manifest: FeatureDocumentManifestSchema.parse(JSON.parse(raw)),
+  };
+}
+
+function readManifest(manifestPath: string | null, maxBytes?: number) {
   if (!manifestPath) {
     return { manifest: null, valid: false, warnings: [] as string[] };
   }
 
   try {
-    const parsed = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    const manifest = FeatureDocumentManifestSchema.parse(parsed);
+    const { manifest } = readFeatureDocumentManifestFile(manifestPath, maxBytes);
     return { manifest, valid: true, warnings: [] as string[] };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return {
       manifest: null,
       valid: false,
-      warnings: [`manifest_invalid:${message.slice(0, 200)}`],
+      warnings: [message === 'FEATURE_DOCUMENT_MANIFEST_TOO_LARGE'
+        ? message
+        : `manifest_invalid:${message.slice(0, 200)}`],
     };
   }
 }
 
-function collectDirectoryArtifacts(docsDirectory: string | null) {
+export function collectFeatureDirectoryArtifacts(docsDirectory: string | null, maxEntries?: number) {
   const artifacts: z.infer<typeof FeatureDocumentArtifactSchema>[] = [];
+  let entriesRead = 0;
+  let truncated = false;
+  if (maxEntries !== undefined && (!Number.isSafeInteger(maxEntries) || maxEntries < 0 || maxEntries > 10_000)) {
+    throw new RangeError('maxDirectoryEntries must be an integer between 0 and 10000');
+  }
 
   if (!docsDirectory || !fs.existsSync(docsDirectory)) {
-    return artifacts;
+    return { artifacts, truncated };
   }
 
-  for (const entry of fs.readdirSync(docsDirectory, { withFileTypes: true })) {
-    if (!entry.isFile()) continue;
-    const fullPath = path.join(docsDirectory, entry.name);
-    const ext = path.extname(entry.name).toLowerCase();
+  const directory = fs.opendirSync(docsDirectory);
+  try {
+    while (true) {
+      const entry = directory.readSync();
+      if (!entry) break;
+      if (maxEntries !== undefined && entriesRead >= maxEntries) {
+        truncated = true;
+        break;
+      }
+      entriesRead += 1;
+      if (!entry.isFile()) continue;
+      const fullPath = path.join(docsDirectory, entry.name);
+      const ext = path.extname(entry.name).toLowerCase();
 
-    if (SCREENSHOT_EXTENSIONS.has(ext)) {
-      artifacts.push({
-        kind: 'screenshot',
-        path: toPosixAbsolute(fullPath),
-        sourceType: 'screenshot',
-        trustTier: 'local_workspace',
-        title: entry.name,
-      });
-      continue;
+      if (SCREENSHOT_EXTENSIONS.has(ext)) {
+        artifacts.push({
+          kind: 'screenshot',
+          path: toPosixAbsolute(fullPath),
+          sourceType: 'screenshot',
+          trustTier: 'local_workspace',
+          title: entry.name,
+        });
+      } else if (FILE_EXTENSIONS.has(ext)) {
+        artifacts.push({
+          kind: 'file',
+          path: toPosixAbsolute(fullPath),
+          sourceType: 'document_file',
+          trustTier: 'local_workspace',
+          title: entry.name,
+        });
+      }
     }
-
-    if (FILE_EXTENSIONS.has(ext)) {
-      artifacts.push({
-        kind: 'file',
-        path: toPosixAbsolute(fullPath),
-        sourceType: 'document_file',
-        trustTier: 'local_workspace',
-        title: entry.name,
-      });
+  } finally {
+    try {
+      directory.closeSync();
+    } catch {
+      // Exhausting the iterator may close the descriptor already.
     }
   }
 
-  return artifacts;
+  return { artifacts, truncated };
 }
 
 function trustTierFromAuthorityClass(
@@ -284,7 +345,10 @@ function resolveManifestPath(featureId: string, docsDirectory: string | null): s
   ].filter(Boolean));
 }
 
-export async function getFeatureDocumentEvidence(featureIdInput: string): Promise<FeatureDocumentEvidence> {
+export async function getFeatureDocumentEvidence(
+  featureIdInput: string,
+  readBounds: FeatureDocumentReadBounds = {},
+): Promise<FeatureDocumentEvidence> {
   const featureId = normalizeFeatureId(featureIdInput);
   if (!featureId) {
     throw new Error('featureId is required');
@@ -293,7 +357,7 @@ export async function getFeatureDocumentEvidence(featureIdInput: string): Promis
   const featureNotePath = resolveFeatureNotePath(featureId);
   const docsDirectory = resolveDocsDirectory(featureId);
   const manifestPath = resolveManifestPath(featureId, docsDirectory);
-  const manifestResult = readManifest(manifestPath);
+  const manifestResult = readManifest(manifestPath, readBounds.maxManifestBytes);
   const atlasCounts = await countAtlasRows(featureId);
 
   const artifacts: z.infer<typeof FeatureDocumentArtifactSchema>[] = [];
@@ -307,7 +371,8 @@ export async function getFeatureDocumentEvidence(featureIdInput: string): Promis
     });
   }
 
-  artifacts.push(...collectDirectoryArtifacts(docsDirectory));
+  const directoryArtifacts = collectFeatureDirectoryArtifacts(docsDirectory, readBounds.maxDirectoryEntries);
+  artifacts.push(...directoryArtifacts.artifacts);
 
   for (const doc of manifestResult.manifest?.officialDocs ?? []) {
     artifacts.push({
@@ -384,6 +449,7 @@ export async function getFeatureDocumentEvidence(featureIdInput: string): Promis
   const authoritativeSources = officialDocs + firstPartySources;
 
   const warnings: string[] = [...manifestResult.warnings];
+  if (directoryArtifacts.truncated) warnings.push('directory_artifact_inventory_truncated');
   if (!featureNotePath) warnings.push('feature_note_missing');
   if (!docsDirectory) warnings.push('docs_directory_missing');
   if (!manifestPath) warnings.push('manifest_missing');

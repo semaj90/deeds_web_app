@@ -10,6 +10,7 @@ import { buildFeaturePrefetchContext } from './context-prefetch.js';
 import type { FeaturePrefetchContextResult } from './context-prefetch.js';
 import { DispatcherMiddleware } from './dispatcher-middleware.js';
 import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
+import { atlasContextInputSchema, atlasGetChunkInputSchema, serializeBoundedReadResult, traceSearchInputSchema } from './read-tool-bounds.js';
 
 /**
  * Register new agentic tools for organizing messy text and advanced retrieval.
@@ -150,24 +151,7 @@ export function registerNewTools(
     includeAgentsMd: boolean;
   };
 
-  const atlasPrefetchInputSchema = z.object({
-    query: z.string().describe('What you are about to work on (code path, feature, question)'),
-    path: z
-      .string()
-      .optional()
-      .describe('Optional file or directory path to keep the packet local'),
-    limit: z.number().int().min(1).max(10).default(4).describe('Max context items per lane'),
-    activityLimit: z
-      .number()
-      .int()
-      .min(1)
-      .max(100)
-      .default(24)
-      .describe('How many recent activity log lines to inspect'),
-    includeCommunity: z.boolean().default(true).describe('Include community graph context'),
-    includeNotecards: z.boolean().default(true).describe('Include notecard search hits'),
-    includeAgentsMd: z.boolean().default(true).describe('Include nearest AGENTS.md quick hits'),
-  });
+  const atlasPrefetchInputSchema = atlasContextInputSchema;
 
   async function loadAtlasCompactContext(options: AtlasPrefetchInput) {
     const packet = await buildFeaturePrefetchContext(options);
@@ -273,7 +257,7 @@ export function registerNewTools(
       const emb = await generateEmbedding(query);
       if (!emb) {
         return {
-          content: [{ type: 'text' as const, text: 'Embedding service unavailable' }],
+          content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: false, error: 'EMBEDDING_SERVICE_UNAVAILABLE' }) }],
           isError: true,
         };
       }
@@ -311,7 +295,13 @@ export function registerNewTools(
           content: [
             {
               type: 'text' as const,
-              text: `CANONICAL_JOIN_BACK_FAILED: ${hits.length} Qdrant candidates, 0 joined to Postgres content (paths: ${paths.slice(0, 5).join(', ')}${paths.length > 5 ? ', ...' : ''})`,
+              text: serializeBoundedReadResult({
+                ok: false,
+                error: 'CANONICAL_JOIN_BACK_FAILED',
+                candidateCount: hits.length,
+                joinedCount: 0,
+                samplePaths: paths.slice(0, 5).map((path) => path.slice(0, 256)),
+              }),
             },
           ],
           isError: true,
@@ -332,11 +322,11 @@ export function registerNewTools(
       });
 
       return {
-        content: [{ type: 'text' as const, text: JSON.stringify(results, null, 2) }],
+        content: [{ type: 'text' as const, text: serializeBoundedReadResult(results) }],
       };
     } catch (err) {
       return {
-        content: [{ type: 'text' as const, text: `Trace search failed: ${err}` }],
+        content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: false, error: 'TRACE_SEARCH_FAILED', detail: String(err).slice(0, 512) }) }],
         isError: true,
       };
     }
@@ -348,14 +338,7 @@ export function registerNewTools(
     {
       description:
         'Search the hypergraph/KAG context for documents, cards, and relations matching a query.',
-      inputSchema: z.object({
-        query: z.string().describe('Technical query or coding problem'),
-        limit: z.number().int().min(1).max(20).default(5).describe('Max results to return'),
-        intent: z
-          .array(z.string())
-          .optional()
-          .describe('Lenses: purpose, risk, api_surface, dependencies, retrieval_role'),
-      }),
+      inputSchema: traceSearchInputSchema,
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
@@ -371,14 +354,7 @@ export function registerNewTools(
     {
       description:
         'Atlas alias for ranked technical search. Returns the same compact hit list as kb.trace_search for a query.',
-      inputSchema: z.object({
-        query: z.string().describe('Technical query or coding problem'),
-        limit: z.number().int().min(1).max(20).default(5).describe('Max results to return'),
-        intent: z
-          .array(z.string())
-          .optional()
-          .describe('Lenses: purpose, risk, api_surface, dependencies, retrieval_role'),
-      }),
+      inputSchema: traceSearchInputSchema,
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
@@ -398,11 +374,7 @@ export function registerNewTools(
       'trace_search',
       {
         description: 'DEPRECATED bare-name alias for kb.trace_search. Gated by MCP_LEGACY_ALIASES.',
-        inputSchema: z.object({
-          query: z.string().describe('Technical query or coding problem'),
-          limit: z.number().int().min(1).max(20).default(5),
-          intent: z.array(z.string()).optional(),
-        }),
+        inputSchema: traceSearchInputSchema,
       },
       createToolWithDispatcher(
         dispatcherMiddleware,
@@ -599,13 +571,13 @@ export function registerNewTools(
             content: [
               {
                 type: 'text' as const,
-                text: JSON.stringify(compact, null, 2),
+                text: serializeBoundedReadResult(compact),
               },
             ],
           };
         } catch (err) {
           return {
-            content: [{ type: 'text' as const, text: `atlas.compact_context failed: ${err}` }],
+            content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: false, error: 'ATLAS_COMPACT_CONTEXT_FAILED', detail: String(err).slice(0, 512) }) }],
             isError: true,
           };
         }
@@ -631,22 +603,18 @@ export function registerNewTools(
             content: [
               {
                 type: 'text' as const,
-                text: JSON.stringify(
-                  {
+                text: serializeBoundedReadResult({
                     query: compact.query,
                     sourceRefs: compact.sourceRefs,
                     confidence: compact.confidence,
                     retrieval_path: compact.retrieval_path,
-                  },
-                  null,
-                  2
-                ),
+                  }),
               },
             ],
           };
         } catch (err) {
           return {
-            content: [{ type: 'text' as const, text: `atlas.source_refs failed: ${err}` }],
+            content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: false, error: 'ATLAS_SOURCE_REFS_FAILED', detail: String(err).slice(0, 512) }) }],
             isError: true,
           };
         }
@@ -672,22 +640,18 @@ export function registerNewTools(
             content: [
               {
                 type: 'text' as const,
-                text: JSON.stringify(
-                  {
+                text: serializeBoundedReadResult({
                     query: compact.query,
                     suggested_files: compact.suggested_files,
                     confidence: compact.confidence,
                     retrieval_path: compact.retrieval_path,
-                  },
-                  null,
-                  2
-                ),
+                  }),
               },
             ],
           };
         } catch (err) {
           return {
-            content: [{ type: 'text' as const, text: `atlas.suggest_files failed: ${err}` }],
+            content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: false, error: 'ATLAS_SUGGEST_FILES_FAILED', detail: String(err).slice(0, 512) }) }],
             isError: true,
           };
         }
@@ -713,23 +677,19 @@ export function registerNewTools(
             content: [
               {
                 type: 'text' as const,
-                text: JSON.stringify(
-                  {
+                text: serializeBoundedReadResult({
                     query: compact.query,
                     summary: compact.summary,
                     confidence: compact.confidence,
                     retrieval_path: compact.retrieval_path,
                     tool_trace: compact.tool_trace,
-                  },
-                  null,
-                  2
-                ),
+                  }),
               },
             ],
           };
         } catch (err) {
           return {
-            content: [{ type: 'text' as const, text: `atlas.explain_trace failed: ${err}` }],
+            content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: false, error: 'ATLAS_EXPLAIN_TRACE_FAILED', detail: String(err).slice(0, 512) }) }],
             isError: true,
           };
         }
@@ -743,23 +703,7 @@ export function registerNewTools(
     {
       description:
         'Return a chunk from the compact Atlas chunk index, optionally prioritizing a chunkId, chunkIndex, or sourceRef.',
-      inputSchema: atlasPrefetchInputSchema.extend({
-        chunkId: z
-          .string()
-          .optional()
-          .describe('Optional chunkId from atlas.compact_context.chunk_index'),
-        chunkIndex: z
-          .number()
-          .int()
-          .min(0)
-          .max(7)
-          .optional()
-          .describe('Optional zero-based chunk index within the compact Atlas packet'),
-        sourceRef: z
-          .string()
-          .optional()
-          .describe('Optional sourceRef to prioritize when selecting a chunk'),
-      }),
+      inputSchema: atlasGetChunkInputSchema,
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
@@ -781,8 +725,7 @@ export function registerNewTools(
             content: [
               {
                 type: 'text' as const,
-                text: JSON.stringify(
-                  {
+                text: serializeBoundedReadResult({
                     query: compact.query,
                     chunkId: chunkId ?? null,
                     chunkIndex: typeof chunkIndex === 'number' ? chunkIndex : null,
@@ -793,16 +736,13 @@ export function registerNewTools(
                     sourceRefs: compact.sourceRefs,
                     confidence: compact.confidence,
                     retrieval_path: compact.retrieval_path,
-                  },
-                  null,
-                  2
-                ),
+                  }),
               },
             ],
           };
         } catch (err) {
           return {
-            content: [{ type: 'text' as const, text: `atlas.get_chunk failed: ${err}` }],
+            content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: false, error: 'ATLAS_GET_CHUNK_FAILED', detail: String(err).slice(0, 512) }) }],
             isError: true,
           };
         }

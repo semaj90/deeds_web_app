@@ -78,6 +78,26 @@ describe('materializeCandidateOrdinalMap', () => {
     expect(map.candidates[1].candidateOrdinal).toBe(1);
   });
 
+  it('keeps candidate snapshot revision distinct from workspace revision', () => {
+    const map = materializeCandidateOrdinalMap({
+      candidateSnapshotRevision: 'sha256:candidate-set-r1',
+      workspaceRevision: 'sha256:workspace-r7',
+      producerRevision: 'prod-r1',
+      candidates: [candidate({
+        canonicalId: 'packet:a',
+        packetKey: 'packet:a',
+        sourceRef: 'src/a.ts',
+        workspaceRevision: 'sha256:workspace-r7',
+        sourceRevision: 'sha256:source-r3',
+      })],
+    });
+
+    expect(map.candidateSnapshotRevision).toBe('sha256:candidate-set-r1');
+    expect(map.workspaceRevision).toBe('sha256:workspace-r7');
+    expect(map.candidates[0].candidateSnapshotRevision).toBe(map.candidateSnapshotRevision);
+    expect(() => assertCandidateOrdinalMapIntegrityV1(map)).not.toThrow();
+  });
+
   it('produces a byte-identical checksum across two runs with the same input in different array order', () => {
     const mapA = materializeCandidateOrdinalMap({
       ...baseInput,

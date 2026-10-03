@@ -1,0 +1,268 @@
+{
+  "schema": "atlas.symbol-registry-revision-repair-apply.v1",
+  "generatedAt": "2026-09-27T23:07:17.247Z",
+  "manifestChecksum": "sha256:ed62125430b221d34ad6ac210797a263388d9c8eaef393665afbeb5b8c45b5cf",
+  "batchSize": 250,
+  "targetRowCount": 10310,
+  "batches": [
+    {
+      "offset": 0,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 250,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 500,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 750,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 1000,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 1250,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 1500,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 1750,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 2000,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 2250,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 2500,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 2750,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 3000,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 3250,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 3500,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 3750,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 4000,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 4250,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 4500,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 4750,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 5000,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 5250,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 5500,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 5750,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 6000,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 6250,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 6500,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 6750,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 7000,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 7250,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 7500,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 7750,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 8000,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 8250,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 8500,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 8750,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 9000,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 9250,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 9500,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 9750,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 10000,
+      "size": 250,
+      "status": "APPLIED",
+      "updatedRows": 250
+    },
+    {
+      "offset": 10250,
+      "size": 60,
+      "status": "APPLIED",
+      "updatedRows": 60
+    }
+  ],
+  "status": "REPAIR_APPLIED",
+  "updatedRows": 10310,
+  "reasons": [],
+  "registryFence": {
+    "before": 10504,
+    "after": 10504
+  }
+}

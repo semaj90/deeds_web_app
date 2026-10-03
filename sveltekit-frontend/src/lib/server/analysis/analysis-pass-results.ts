@@ -3,10 +3,12 @@ import { createHash, randomUUID } from 'node:crypto';
 import { db, pgRows } from '$lib/server/db/client.js';
 import {
 	analysisPassResults,
+	buildStagedAnalysisPassLedgerEntryV1,
 	resolveExecutionSemantics,
 	type AnalysisPassLedgerInput,
 	type AnalysisPassPersistResult,
 	type AnalysisPassResultRow,
+	type NewAnalysisPassResultRow,
 	normalizeAnalysisPassLedgerInput,
 } from '$lib/server/db/schema/analysis-pass-results.js';
 import { eq, sql } from 'drizzle-orm';
@@ -99,18 +101,12 @@ export interface AnalysisPassLedgerProofSnapshot {
 }
 
 export function classifyAnalysisPassDuplicateGroup(input: {
+	passType: string | null;
 	outputVersions: number;
 	provenanceVersions: number;
 	sourceRevisionVersions: number;
 	passRevisionVersions: number;
 }): Pick<AnalysisPassDuplicateGroup, 'classification' | 'classificationReason'> {
-	if (input.outputVersions > 1) {
-		return {
-			classification: 'stochastic_history',
-			classificationReason: 'multiple output versions observed for the same logical duplicate group',
-		};
-	}
-
 	if (input.sourceRevisionVersions > 1 || input.passRevisionVersions > 1) {
 		return {
 			classification: 'revision_mixed',
@@ -118,16 +114,35 @@ export function classifyAnalysisPassDuplicateGroup(input: {
 		};
 	}
 
-	if (input.provenanceVersions <= 1) {
+	const semantics = resolveExecutionSemantics(input.passType ?? '');
+	if (input.outputVersions > 1 && semantics === 'stochastic_history') {
+		return {
+			classification: 'stochastic_history',
+			classificationReason: 'multiple outputs are consistent with the registered stochastic pass semantics',
+		};
+	}
+
+	if (input.outputVersions > 1) {
+		return {
+			classification: 'ambiguous',
+			classificationReason: semantics === 'deterministic_idempotent'
+				? 'outputs diverge despite deterministic pass semantics'
+				: 'outputs diverge, but this pass type is not registered as stochastic',
+		};
+	}
+
+	if (semantics === 'deterministic_idempotent' && input.provenanceVersions <= 1) {
 		return {
 			classification: 'identical_retry',
-			classificationReason: 'same provenance observed with no output divergence',
+			classificationReason: 'deterministic pass has identical output and provenance across duplicate rows',
 		};
 	}
 
 	return {
 		classification: 'ambiguous',
-		classificationReason: 'duplicate group has multiple provenance values but no output divergence',
+		classificationReason: semantics === 'stochastic_history'
+			? 'same output does not distinguish a stochastic re-execution from duplicate delivery'
+			: 'unregistered or observed-event pass semantics do not establish retry causality',
 	};
 }
 
@@ -168,6 +183,7 @@ export function buildAnalysisPassLedgerEntry(input: AnalysisPassLedgerInput) {
 }
 
 export interface RecordAnalysisPassResultOptions {
+	stageAsCandidateOnly?: true;
 	/**
 	 * When supplied, an integration event outbox row is written in the SAME
 	 * transaction as the ledger insert — atomic with the write it reports on.
@@ -236,9 +252,22 @@ export async function recordAnalysisPassResult(
 	input: AnalysisPassLedgerInput,
 	opts?: RecordAnalysisPassResultOptions
 ): Promise<AnalysisPassPersistResult | null> {
-	if (analysisPassResultsTableMissing) return null;
+	if (opts?.stageAsCandidateOnly && opts.emitIntegrationEvent) {
+		throw new Error('STAGED_ANALYSIS_PASS_INTEGRATION_EVENT_NOT_ALLOWED');
+	}
 
-	const row = normalizeAnalysisPassLedgerInput(input);
+	if (analysisPassResultsTableMissing) return null;
+	let row: NewAnalysisPassResultRow;
+	if (opts?.stageAsCandidateOnly) {
+		const suppliedPacketKey = input.packetKey?.trim();
+		if (!suppliedPacketKey) throw new Error('STAGED_ANALYSIS_PASS_PACKET_KEY_REQUIRED');
+		const { resolveCanonicalPacketKey } = await import('../atlas/identity/packet-identity-resolver.js');
+		const resolvedStoragePacketKey = await resolveCanonicalPacketKey(suppliedPacketKey);
+		const packetIdentity = { suppliedPacketKey, resolvedStoragePacketKey };
+		row = buildStagedAnalysisPassLedgerEntryV1(input, packetIdentity);
+	} else {
+		row = normalizeAnalysisPassLedgerInput(input);
+	}
 	const semantics = resolveExecutionSemantics(input.passName);
 
 	try {
@@ -261,9 +290,19 @@ export async function recordAnalysisPassResult(
 				.limit(1);
 
 			if (existing) {
+				if (opts?.stageAsCandidateOnly) {
+					const existingProvenance = (existing.provenance ?? {}) as Record<string, unknown>;
+					const requestedProvenance = row.provenance as Record<string, unknown>;
+					if (
+						stableStringify(existingProvenance.stagedObservation) !==
+						stableStringify(requestedProvenance.stagedObservation)
+					) {
+						throw new Error('STAGED_ANALYSIS_PASS_REUSE_MISMATCH');
+					}
+				}
 				return {
 					inserted: false,
-					idempotencyKey: row.passKey,
+					idempotencyKey: existing.passKey,
 					row: existing,
 				};
 			}
@@ -394,6 +433,7 @@ export async function findAnalysisPassDuplicateGroups(limit = 100) {
 			sourceRevisionVersions: Number(row.source_revision_versions ?? 0),
 			passRevisionVersions: Number(row.pass_revision_versions ?? 0),
 			...classifyAnalysisPassDuplicateGroup({
+				passType: typeof row.pass_type === 'string' ? row.pass_type : null,
 				outputVersions: Number(row.output_versions ?? 0),
 				provenanceVersions: Number(row.provenance_versions ?? 0),
 				sourceRevisionVersions: Number(row.source_revision_versions ?? 0),

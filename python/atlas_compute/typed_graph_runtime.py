@@ -7,32 +7,9 @@ receipt suitable for parity and promotion gates.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Literal, Sequence
+from typing import Any, Sequence
 
-GraphBackend = Literal["networkx", "cugraph"]
-
-
-@dataclass(frozen=True)
-class TypedGraphEdge:
-    src_ordinal: int
-    dst_ordinal: int
-    kind: str
-    weight: float = 1.0
-
-
-@dataclass(frozen=True)
-class GraphExecutionReceipt:
-    schema: str
-    operation: str
-    requested_backend: GraphBackend
-    effective_backend: str
-    graph_revision: str
-    node_count: int
-    edge_count: int
-    status: Literal["PROVEN", "DEGRADED", "FAILED"]
-    canonical_authority: bool = False
-    error: str | None = None
+from atlas_graph_runtime.contracts import GraphBackend, GraphExecutionReceipt, TypedGraphEdge
 
 
 def build_networkx_graph(node_ordinals: Sequence[int], edges: Sequence[TypedGraphEdge]) -> Any:

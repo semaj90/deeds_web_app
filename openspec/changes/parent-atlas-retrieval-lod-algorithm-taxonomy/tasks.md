@@ -685,3 +685,96 @@ SearchRuntime prerequisites are satisfied.
       derived representations and legacy 384 is not reactivated.
 - [x] Focused proof covers deterministic replay, graph fail-closed behavior, one semantic lane,
       non-canonical/non-voting steps, and absence of any `DEEPSEEK_API_KEY` dependency.
+
+## LOD identity + representation evidence handoff — 2026-09-24
+
+**TL;DR.** Read-only identity/provenance work ahead of `LOD-02`. Strict `SemanticSnapshotV1` is still
+**BLOCKED, 0 eligible rows**: source/chunk lineage and recipe are proven for 6,774 rows, but no immutable
+historical model-artifact digest exists. No datastore writes were performed. No `LOD-*` box below is
+checked by this entry. Receipt: `docs/reports/parent-atlas/lod-02-representation-reproducibility-evidence-v1.json`
+(commit `9950262810`, pushed).
+
+### Gate state (evidence-safe)
+
+| Gate | Status | Numbers |
+|---|---|---|
+| LOD-02A source/chunk lineage | PROVEN | 6,774 rows = `atlas_packet_chunk_lineage` (7,421 rows, 627 packets) joined to `content_embedding IS NOT NULL` |
+| LOD-02C recipe identity | PROVEN | 6,312 `eg-task-prefix-v1` (`title: {relative_path} \| text:`), 462 raw/`unprompted-v0`; 6,297 metadata-corroborated, 477 recovered, 0 contradicted/ambiguous/unresolved |
+| LOD-02C current-runtime reproducibility | PROVEN | fp16 RNE, <= 1 ulp per element (frozen before measurement): 6,774 pass, 0 fail; digest-exact 6,453 is a single-pass observation, NOT a stable invariant (Ollama varies ~1 ulp with batch composition) |
+| LOD-02B representation binding | BLOCKED | `REPRESENTATION_EXACT` 0, `MODEL_REVISION_EXACT` 0; `atlas_representations.semantic_768` revision/digest fields are all `unknown`, `CANDIDATE`/`UNVERIFIED` |
+| Strict `SemanticSnapshotV1` | 0 eligible | blocker = `MODEL_REVISION_UNRESOLVED` |
+| `SemanticSnapshotReproducibilityCanaryV1` | NOT BUILT | 6,774 candidate rows; `canonicalAuthority=false`, `promotionEligible=false`, `historicalModelArtifactVerified=false` |
+
+`representationEvidenceGrade = CURRENT_RUNTIME_REPRODUCIBLE` (orthogonal fields: writer `SUBSTANTIALLY_IDENTIFIED`,
+recipe `PROVEN`, reproducibility `PROVEN`, historical artifact `UNRESOLVED`). Reproducibility is not provenance.
+
+### Frozen policy: `QdrantPgIdentityResolutionV1` (`codebase_chunks_768`, `revisionQualified=false`)
+
+Precedence: point ID <-> `codebase_chunk_index.qdrant_id` -> unique `source_ref`+`content_hash` -> consistent payload
+`chunk_id` -> `atlas_packet_chunk_lineage` -> `atlas_packet_identity_aliases` -> unresolved.
+Payload `qdrant_point_id` is deliberately NOT a V1 step; adding it requires a named V2 with an authority proof.
+
+| Bucket | Points (of 328,348) |
+|---|---|
+| POINT_BINDING_CONSISTENT | 225,385 |
+| CONTENT_HASH_MISMATCH | 493 |
+| CHUNK_ID_LABEL_CONFLICT | 84 |
+| DUPLICATE_PROJECTION | 82,866 |
+| PLACEHOLDER_BACKFILL | 1,000 |
+| ORPHAN (= no accepted owner under V1) | 18,520 |
+
+`ORPHAN` splits: 18,449 payload-pointer-only (hash agrees on all; only 2,130 share `source_ref`, 16,319 point at
+identical content under a different `source_ref`, so the pointer is not a safe identity owner) + 71 no owner by any
+tested method. Earlier counts (226,350 / 100,350 / 71 / 90 / 100,331) came from different procedures; V1 supersedes them.
+
+### Findings to preserve
+
+- `qdrant_id` (varchar, unique, total) is a projection slot/address, not a revision identity. Families: 235,314
+  `fullrepo:` rows = `hashToUuid(sha256("fullrepo:<relPath>:<idx>"))` (100% recomputed); 28,812 `card:` UUID rows =
+  `sha256("<source_ref>:<idx>")[:32]` (no version bits); 3,539 numeric = `abs(javaHash(chunk_id))`; **~6,800 unexplained**
+  (6,763 numeric + 37 blank) = projection debt, not a blocker.
+- Qdrant `packet_key`: 222,010 UUID-shaped values all equal the point's own ID -> `PROJECTION_ID_MISLABELED_AS_PACKET_KEY`
+  (not in `atlas_packets`/lineage/aliases); never add them to `atlas_packet_identity_aliases`.
+- Two vector columns, almost disjoint: `content_embedding` (halfvec, 55,169, declared canonical) vs
+  `content_embedding_768` (vector, 219,998; noncanonical). Only 739 rows have both, cosine ~0.90 (different recipes).
+  `content_embedding_768` is a **dual write** from one fresh raw-text embedding by `scripts/atlas/index-full-repo-for-search.mjs`
+  (99.75% `fullrepo:` rows), NOT a Qdrant->Postgres copy. 47,405 canonical-column rows have no Qdrant point.
+- Postgres revision columns (`source_/workspace_/representation_revision`) are empty on 0 of 274,465 `codebase_chunk_index`
+  rows; revision-qualified identity exists only in `atlas_packet_chunk_lineage`.
+- Historical writer for the tagged cohort: `scripts/atlas/reembed-corpus-document-prefix-v1.mjs`, run 2026-08-25, Ollama
+  `embeddinggemma:latest` alias, no digest recorded. Receipt defect kept verbatim:
+  `WRITE_FLAG_CONTRADICTS_REPORTED_UPDATE_COUNT` (52,324 updated, `writesPerformed:false`).
+- **Retraction:** `embedding_version='qdrant-backfill-v1'` on cohort rows is a stale label from the retired 384 backfill
+  (`backfill-content-embedding-384.mjs`); it is not vector provenance.
+- TurboVec: `sveltekit-frontend/scripts/turbovec-sidecar.py` = RUNTIME_OWNER of `:8791` (live Qdrant scroll, no snapshot
+  authority, stride-12 768->64, INT4, loaded at process start); `scripts/sidecars/turbovec-grpc-bridge.mjs` = ADAPTER
+  (`:50062`); `scripts/ingest/turbovec-sidecar.py` = LEGACY; Node MCP sidecar is a separate `:8792` service (not a `:8791`
+  competitor). The live index (327,820 vectors) cannot support any compression/recall claim.
+- Existing `SemanticSnapshotManifest` (`tensor-artifact-contract.ts`, `atlas.semantic-snapshot.v1`) cannot express the
+  cohort (fixed float32, single `sourceRevision` vs 558, non-empty `representationRevision`). Do not fork a second
+  snapshot owner; the canary layers on it by id.
+
+### Code (committed and pushed in `9950262810`, tests pass)
+
+`sveltekit-frontend/src/lib/server/atlas/tensors/semantic-snapshot-reproducibility-canary-v1.{ts,spec.ts}` (commit
+`9950262810`): frozen fp16 classifier + noncanonical evidence envelope; 19/19 tests. It is a contract, not the snapshot.
+
+### Open (all unchecked; none authorized yet)
+
+- [ ] **LOD-02B** Recover an immutable historical model artifact digest for the 2026-08-25 run, or leave `MODEL_REVISION_UNRESOLVED`.
+      Further alternate-artifact testing (Q8_0 etc.) was rejected as unable to close this gate. Any `atlas_representations`
+      update needs recoverable evidence for every field plus operator approval; do not write it from circumstantial evidence.
+- [ ] **Canary build** (separate authorized tranche): deterministic ordering -> ordinal map -> cohort/vector checksums ->
+      Arrow/mmap -> reload parity -> exact 768 baseline -> 64-d/INT4 recall + memory comparison. Must not be named
+      `SemanticSnapshotV1`.
+- [ ] **LOD-05** Decide the single TurboVec owner in code (owner census above is done); the live `:8791` load must not be used
+      as a compression/recall baseline until a frozen snapshot exists.
+- [ ] **Owner decision:** which column is canonical `semantic_768` (`content_embedding` per policy vs the larger,
+      Qdrant-aligned `content_embedding_768`). Not decided here.
+- [ ] Projection debt: 82,866 duplicate projections (concentrated in ~4,500 chunks), 47,405 canonical rows with no point,
+      ~6,800 unexplained `qdrant_id` rows. Needs a bounded cleanup gate with retrieval-parity proof; no deletes yet.
+
+### Restart rule
+
+Completed evidence + missing input or approval => WAITING => STOP. Do not scan the OpenSpec board and pick another change.
+Scratch per-row measurement ledgers were kept only in the session scratchpad and are not persisted.

@@ -35,6 +35,14 @@
     "writesPerformed": false
   },
   "packetChecksum": "sha256:4d93036f06d3f5f6040ed497b081d42b5865a9b26f8cd94b049bd62d76fe314c",
+  "contractValidation": {
+    "schema": "atlas.ace-repair-packet.v1",
+    "result": "PASS",
+    "strictUnknownFieldRejection": true,
+    "sourceRevisionQualified": true,
+    "duplicateOrdinalsRejected": true,
+    "sourceRevisionPairsComplete": true
+  },
   "forbiddenFieldsPresent": [],
   "descriptorOnly": true,
   "canonicalAuthority": false,

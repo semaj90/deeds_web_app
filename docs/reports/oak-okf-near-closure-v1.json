@@ -1,0 +1,153 @@
+{
+  "schema": "atlas.oak-okf-near-closure-review.v1",
+  "generatedAt": "2026-09-27T03:14:46.8798960-07:00",
+  "scope": {
+    "mode": "READ_ONLY_OWNER_GROUP_REVIEW",
+    "changes": [
+      { "name": "parent-atlas-ontology-oaklib-fanout-bitmap", "completedTasks": 33, "totalTasks": 36, "uncheckedTasksReviewed": 3 },
+      { "name": "parent-atlas-okf-knowledge-layers", "completedTasks": 38, "totalTasks": 45, "uncheckedTasksReviewed": 7 }
+    ],
+    "sourceOfTaskCounts": "openspec list --json, run 2026-09-27",
+    "writesPerformed": false,
+    "databaseAccessed": false,
+    "graphifyApplied": false,
+    "ledgersEdited": false,
+    "sourceEdited": false
+  },
+  "statusVocabulary": ["PROVEN", "CLOSED_NEGATIVE", "BLOCKED", "READY_TO_IMPLEMENT", "OPERATOR_DECISION"],
+  "currentEvidence": {
+    "okfBundleInMemoryAudit": {
+      "method": "Read-only in-memory execution of scripts/atlas/audit-okf-v02-bundle-v1.mjs validation logic; no report output written",
+      "sourceRoot": ".okf",
+      "filesScanned": 25,
+      "validFiles": 0,
+      "invalidFiles": 25,
+      "requiredFields": ["provenance", "trust", "lifecycle"],
+      "filesMissingFieldCounts": { "provenance": 24, "trust": 25, "lifecycle": 25 },
+      "manifestDrift": {
+        "missingDeclaredDomains": ["cache.yaml", "database.yaml", "retrieval.yaml"],
+        "undeclaredDomains": ["structured-value.yaml"]
+      },
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "openwikiInputBoundaryReceipt": {
+      "status": "OPENWIKI_INPUT_BOUNDARY_PROVEN",
+      "candidateCount": 31,
+      "eligibleCount": 31,
+      "excludedCount": 0,
+      "openwikiRuntimeInvoked": false,
+      "safetyPolicy": "secrets, model binaries, raw vectors/Arrow, and unbounded logs excluded by policy"
+    },
+    "domainOwnerContract": {
+      "classifierLabels": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts",
+      "persistedDomainIdentity": "atlas_domain_ontology.group_id",
+      "generalConceptIdentity": "atlas_ontology_concepts",
+      "topology": ["taxonomy_nodes", "taxonomy_edges"],
+      "versionAliasAdapter": "domain_taxonomy_v1 (UNPOPULATED_NOT_AUTHORIZED)",
+      "legacyPacketField": "atlas_packets.domain_class (HISTORICAL_MIXED_OBSERVATION; canonicalAuthority=false)"
+    }
+  },
+  "uncheckedTasks": [
+    {
+      "change": "parent-atlas-ontology-oaklib-fanout-bitmap",
+      "task": "3.5",
+      "status": "BLOCKED",
+      "finding": "No live tuple producer/write batch is wired, so there are no newly resolved rows or failure-rate denominator to receipt.",
+      "evidence": ["openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap/tasks.md:132-144", "sveltekit-frontend/src/lib/server/atlas/ontology-resolution-boundary-postgres.ts:180", "sveltekit-frontend/src/lib/server/atlas/ontology-resolution-boundary-postgres.spec.ts"],
+      "nextGate": "A producer must be explicitly selected and separately authorized; then read back its bounded batch."
+    },
+    {
+      "change": "parent-atlas-ontology-oaklib-fanout-bitmap",
+      "task": "4.6",
+      "status": "OPERATOR_DECISION",
+      "finding": "The fanout materialized view and indexes are drafted and dry-run-proven only; the ledger explicitly requires human authorization before live apply.",
+      "evidence": ["openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap/tasks.md:146-191", "sveltekit-frontend/drizzle/manual/20260915_feature_ontology_tuples_fanout_v1.sql"],
+      "nextGate": "Do not apply. Resolve source-row/admission prerequisites first; live DDL requires a separate explicit decision."
+    },
+    {
+      "change": "parent-atlas-ontology-oaklib-fanout-bitmap",
+      "task": "6.1",
+      "status": "BLOCKED",
+      "finding": "The ontology-resolution boundary tests are proven 9/9, but the fanout-storage scenarios cannot prove real behavior while there are no resolved/admitted rows and no production caller for the admission gate.",
+      "evidence": ["openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap/tasks.md:230-246", "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-fanout-authority-v1.spec.ts"],
+      "nextGate": "After a separately authorized producer/admission path exists, test against a disposable populated fixture or approved bounded canary."
+    },
+    {
+      "change": "parent-atlas-okf-knowledge-layers",
+      "task": "Slice 1 / OKF v0.2 bundle validation",
+      "status": "CLOSED_NEGATIVE",
+      "finding": "The current read-only profile is implemented and its exact audit logic was rerun in memory: 25/25 files fail the profile; 24 lack provenance and all 25 lack trust and lifecycle. Manifest/domain-file drift is also present. No metadata was repaired. Keep the ledger checkbox open until the owner chooses repair or disposition.",
+      "evidence": ["docs/architecture/okf-v02-validation-profile-v1.md:1-11", "scripts/atlas/audit-okf-v02-bundle-v1.mjs:33-85", "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md:72-81", "docs/reports/okf-v02-bundle-audit-v1.json (prior saved receipt; current counts independently recomputed in memory)"],
+      "nextGate": "Owner chooses whether to populate the declared profile fields or disposition the bundle; do not invent values or auto-repair."
+    },
+    {
+      "change": "parent-atlas-okf-knowledge-layers",
+      "task": "Slice 3 / LLM summary of static+runtime findings",
+      "status": "OPERATOR_DECISION",
+      "finding": "Static findings exist, but no LLM summary was invoked. This is a model-call/privacy and review-scope decision, not a missing static audit.",
+      "evidence": ["openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md:230-243", "docs/reports/okf-ast-context-classification-v1.json"],
+      "nextGate": "Only run a bounded summary after the static/runtime evidence set is finalized and an operator approves the model call; summary cannot determine verdicts."
+    },
+    {
+      "change": "parent-atlas-okf-knowledge-layers",
+      "task": "Slice 4 / do not apply atlas_work_items migration in this slice",
+      "status": "CLOSED_NEGATIVE",
+      "finding": "The task is a prohibition. This review performed no database operation and did not apply the design-only migration; this is a scope statement, not a fresh claim about live database catalog state.",
+      "evidence": ["openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md:245-255", "docs/architecture/atlas-work-items-design-v1.md", "docs/reports/okf-work-item-fixture-v1.json"],
+      "nextGate": "Keep live migration unapplied unless separately proposed, reviewed, and explicitly authorized."
+    },
+    {
+      "change": "parent-atlas-okf-knowledge-layers",
+      "task": "Slice 5 / install OpenWiki",
+      "status": "OPERATOR_DECISION",
+      "finding": "The safe input/output boundary is defined, but OpenWiki is not installed or invoked; installing a dependency/runtime expands the execution surface.",
+      "evidence": ["openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md:257-273", "docs/reports/openwiki-review-input-boundary-v1.json", "scripts/atlas/audit-openwiki-review-input-boundary-v1.mjs"],
+      "nextGate": "Approve or decline installation separately; do not initialize or ingest the wiki during this audit."
+    },
+    {
+      "change": "parent-atlas-okf-knowledge-layers",
+      "task": "Slice 5 / synthesize exactly one OpenWiki review page",
+      "status": "BLOCKED",
+      "finding": "The bounded input receipt is ready (31 eligible inputs), but OpenWiki runtime was not invoked and the install decision is open.",
+      "evidence": ["openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md:266-273", "docs/reports/openwiki-review-input-boundary-v1.json"],
+      "nextGate": "After explicit install approval, invoke only against the sealed 31-input boundary and validate one generated page outside canonical docs."
+    },
+    {
+      "change": "parent-atlas-okf-knowledge-layers",
+      "task": "DOMAIN-OWNER-04 prerequisite / map each OKF field to one admitted owner",
+      "status": "READY_TO_IMPLEMENT",
+      "finding": "The domain-class ownership decision is now frozen. A read-only field-owner map can be produced without DDL or mutation; unresolved fields must remain explicitly unmapped rather than creating a universal registry.",
+      "evidence": ["openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md:421-426", "openspec/changes/parent-atlas-ontology-kernel/tasks.md:4845-4865", "docs/architecture/domain-registry-contract-v1.md:10-58"],
+      "nextGate": "Map each existing OKF field to its current owner and mark gaps; no registry table or admin editor follows automatically."
+    },
+    {
+      "change": "parent-atlas-okf-knowledge-layers",
+      "task": "Slice 7 / Admin Unified Indexing Studio read-only inspector",
+      "status": "OPERATOR_DECISION",
+      "finding": "The UI task is explicitly conditional on approval and depends on the field-owner map; it must not imply canonical admission.",
+      "evidence": ["openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md:421-426"],
+      "nextGate": "Wait for the owner map and separate UI-scope approval; if approved, show source/admission status as distinct surfaces."
+    }
+  ],
+  "prioritizedQuickHops": [
+    { "hop": 1, "action": "Create the read-only OKF-field → existing-owner map; preserve unknown/unadmitted fields.", "status": "READY_TO_IMPLEMENT", "writes": false },
+    { "hop": 2, "action": "Owner disposition for the negative OKF v0.2 audit: repair metadata under the documented profile or formally retain the bundle as unadmitted.", "status": "OPERATOR_DECISION", "writes": false },
+    { "hop": 3, "action": "Keep OAK 3.5 and 6.1 blocked until a revision-qualified producer/admission caller exists; do not manufacture rows for tests.", "status": "BLOCKED", "writes": false },
+    { "hop": 4, "action": "Separately decide whether to install/invoke OpenWiki; the 31-input boundary is already prepared.", "status": "OPERATOR_DECISION", "writes": false },
+    { "hop": 5, "action": "Defer OAK live fanout DDL and atlas_work_items migration pending explicit authorization and migration-owner review.", "status": "OPERATOR_DECISION", "writes": false }
+  ],
+  "validations": {
+    "openspecValidateStrict": {
+      "parent-atlas-ontology-oaklib-fanout-bitmap": "PASS",
+      "parent-atlas-okf-knowledge-layers": "PASS",
+      "parent-atlas-ontology-kernel": "PASS"
+    },
+    "taskLedgerHashes": {
+      "openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap/tasks.md": "sha256:61f285b1fc5b7027efb9c7fbe6147c99c1f9b33458f61a518a2d82acebb19260",
+      "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md": "sha256:bae56a65391b6b8b312f6a3232d8bd9b0b3ba731f9bcfa9537fcc42ac4da87ea"
+    },
+    "profileSha256": "sha256:4e1015b3ca1cc014370073ebb921c418e020b6b9ccac4e70c429b0b49248011a",
+    "validatorSha256": "sha256:c022db0ded1943af79512beb3e7658743d60e6b926c034b0a7fca0d27891d25e"
+  }
+}

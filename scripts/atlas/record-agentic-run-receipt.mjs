@@ -18,22 +18,26 @@ if ((!eventFile && !eventJson) || (eventFile && eventJson)) {
   throw new Error('Provide exactly one of --event-file <path> or --event-json <json>');
 }
 
-const event = JSON.parse(eventFile ? await readFile(resolve(repoRoot, eventFile), 'utf8') : eventJson);
-const required = ['schema', 'workflowId', 'actionId', 'sequence', 'kind', 'openspecChange'];
-for (const field of required) {
-  if (event[field] === undefined || event[field] === null || event[field] === '') {
-    throw new Error(`RUN_RECEIPT_INVALID: missing ${field}`);
-  }
+const eventInput = JSON.parse(eventFile ? await readFile(resolve(repoRoot, eventFile), 'utf8') : eventJson);
+const { tsImport } = await import('tsx/esm/api');
+const { workflowActionEventSchema } = await tsImport(
+  '../../packages/parent-atlas/src/core/workflow-action-event.ts',
+  import.meta.url,
+);
+const parsedEvent = workflowActionEventSchema.safeParse(eventInput);
+if (!parsedEvent.success) {
+  const issues = parsedEvent.error.issues.map((issue) => `${issue.path.join('.') || '<root>'}: ${issue.message}`);
+  throw new Error(`RUN_RECEIPT_INVALID: canonical WorkflowActionEventV1: ${issues.join('; ')}`);
 }
-if (event.schema !== 'atlas.workflow-action.v1') throw new Error('RUN_RECEIPT_INVALID: schema');
+const event = parsedEvent.data;
+const openspecChange = event.metadata.openspecChange;
 if (event.kind !== 'completed') throw new Error('RUN_RECEIPT_INVALID: kind must be completed');
-if (!Number.isInteger(event.sequence) || event.sequence < 1) throw new Error('RUN_RECEIPT_INVALID: sequence');
-if (!/^[-a-zA-Z0-9_]+$/.test(event.openspecChange)) {
+if (typeof openspecChange !== 'string' || !/^[-a-zA-Z0-9_]+$/.test(openspecChange)) {
   throw new Error('RUN_RECEIPT_INVALID: openspecChange must be a safe change name');
 }
 
 const changesRoot = resolve(repoRoot, 'openspec/changes');
-const changeRoot = resolve(changesRoot, event.openspecChange);
+const changeRoot = resolve(changesRoot, openspecChange);
 const relativeChange = relative(changesRoot, changeRoot);
 if (relativeChange.startsWith('..') || relativeChange.includes(':')) {
   throw new Error('RUN_RECEIPT_INVALID: change path escapes openspec/changes');
@@ -43,7 +47,7 @@ const tasksPath = resolve(changeRoot, 'tasks.md');
 const receiptsPath = resolve(changeRoot, 'receipts.jsonl');
 if (!existsSync(tasksPath)) throw new Error(`RUN_RECEIPT_INVALID: missing ${tasksPath}`);
 
-const identity = `${event.workflowId}\u0000${event.actionId}\u0000${event.sequence}`;
+const identity = `${event.workflowId}\u0000${event.workflowRevision}\u0000${event.actionId}\u0000${event.sequence}`;
 const existingText = existsSync(receiptsPath) ? await readFile(receiptsPath, 'utf8') : '';
 const existingEvents = existingText
   .split(/\r?\n/)
@@ -56,7 +60,7 @@ const existingEvents = existingText
     }
   });
 const duplicate = existingEvents.find(({ event: candidate }) =>
-  `${candidate.workflowId}\u0000${candidate.actionId}\u0000${candidate.sequence}` === identity
+  `${candidate.workflowId}\u0000${candidate.workflowRevision}\u0000${candidate.actionId}\u0000${candidate.sequence}` === identity
 );
 
 if (duplicate) {
@@ -66,14 +70,16 @@ if (duplicate) {
     schema: 'atlas.agentic-run-receipt-record.v1',
     status: 'NO_OP_ALREADY_RECORDED',
     dryRun,
-    identity: { workflowId: event.workflowId, actionId: event.actionId, sequence: event.sequence },
+    identity: { workflowId: event.workflowId, workflowRevision: event.workflowRevision, actionId: event.actionId, sequence: event.sequence },
     writesPerformed: false,
   }, null, 2));
   process.exit(0);
 }
 
 const tasksText = await readFile(tasksPath, 'utf8');
-const bullet = `- ${event.workflowId}/${event.actionId}#${event.sequence}: ${event.operation ?? 'completed'} (state=${event.state ?? 'succeeded'})`;
+const operation = typeof event.metadata.operation === 'string' ? event.metadata.operation : 'completed';
+const state = typeof event.metadata.state === 'string' ? event.metadata.state : 'succeeded';
+const bullet = `- ${event.workflowId}@r${event.workflowRevision}/${event.actionId}#${event.sequence}: ${operation} (state=${state})`;
 let nextTasksText = tasksText;
 const heading = /^## Run Receipts\s*$/m;
 if (heading.test(tasksText)) {
@@ -93,7 +99,7 @@ const result = {
   schema: 'atlas.agentic-run-receipt-record.v1',
   status: dryRun ? 'DRY_RUN_WOULD_RECORD' : 'RECORDED',
   dryRun,
-  identity: { workflowId: event.workflowId, actionId: event.actionId, sequence: event.sequence },
+  identity: { workflowId: event.workflowId, workflowRevision: event.workflowRevision, actionId: event.actionId, sequence: event.sequence },
   targets: {
     tasksPath,
     receiptsPath,

@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.ace3-hyperrag-live-readonly-proof.v1",
+  "status": "LIVE_READBACK_PROVEN",
+  "mode": "READ_ONLY_TRANSACTION_LOCAL_COMPOSITION",
+  "writes": {
+    "database": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "graphify": 0
+  },
+  "packet": {
+    "packetKey": "packet:00ce699acf88",
+    "featureId": "valkey",
+    "sourceRef": "src/lib/server/valkey.ts",
+    "sourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "canonicalPacketAndSourceBindingRows": 1
+  },
+  "retrieval": {
+    "status": "ENRICHED",
+    "reason": null,
+    "acceptedCandidates": 1,
+    "rejectedCandidates": 0,
+    "relationshipsRead": 8,
+    "relationshipsWithExactCurrentBindings": 8,
+    "payloadCount": 1,
+    "hops": 1,
+    "packetChecksumVerified": true
+  },
+  "inputArtifact": {
+    "path": ".tmp/atlas/ace-packets-v3/20260925T220337Z/ace-packets-v3-00001.ndjson",
+    "sha256": "sha256:0158ab664daa5a52f2aad55c4a9d0f4b9fa46df07a336aa1f7b28612eb5b66b9"
+  },
+  "proofBoundary": "Live PostgreSQL readback and in-memory ACE composition only; no production caller, persistence, cache write, or retrieval-vote promotion is asserted.",
+  "generatedAt": "2026-09-26T06:09:50.350Z"
+}

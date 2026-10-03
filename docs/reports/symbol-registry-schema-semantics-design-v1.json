@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.symbol-registry-schema-semantics-design.v1",
+  "gate": "S01-10-schema",
+  "generatedAt": "2026-09-22T02:35:00.000Z",
+  "designOnly": true,
+  "databaseWrites": 0,
+  "schemaApplied": false,
+  "question": "Is atlas_symbol_registry (A) a logical-symbol registry, where revision provenance should be optional/separate for skeleton rows, or (B) a revision-bearing observation registry, where skeleton rows (no revision-bound instance yet) should not exist there at all?",
+  "structuralEvidence": [
+    {
+      "fact": "atlas_symbol_versions has a foreign key atlas_symbol_versions.stable_symbol_id -> atlas_symbol_registry.stable_symbol_id, and its OWN dedicated source_revision/workspace_revision columns.",
+      "implication": "The schema ALREADY separates logical identity (registry, one row per symbol) from revision-bound instances (versions, many rows per symbol, one per observed revision). This is the defining structure of option A, already built -- not a hypothetical redesign."
+    },
+    {
+      "fact": "479/10,504 registry rows (4.6%) have >=1 version row; the other 10,025 (95.4%) have none (S01-10C's VERSIONED_SYMBOL vs REGISTRY_SKELETON_* classification, unchanged since).",
+      "implication": "The overwhelming majority of registry rows are, by construction, symbols known WITHOUT yet having a revision-bound observation. If the registry were truly a revision-bearing observation table (option B), 95.4% of its rows would be structurally invalid today, not a rare edge case."
+    },
+    {
+      "fact": "registry_revision's 3 live values are producer-pipeline labels, not revision observations (promotion:ast-nominations:v1 x10,220; atlas-current-tree-bound-symbol-canary-v1 x90; sha256:322ed1a6...f x194, which is symbol-reconciliation-writer-v1.mts's own hardcoded ADMITTED_REVISION_DEFAULT constant reused as a label, not a per-row live-observed revision).",
+      "implication": "registry_revision already functions as 'which producer/run created this row', not as a canonical, per-row revision fact. Its NOT NULL constraint currently forces a value into this field regardless of whether the row has any genuine revision provenance."
+    },
+    {
+      "fact": "created_from_source_revision's shape distribution (10,220 workspace:N placeholder, 90 raw Git commit id, 194 sha256-qualified -- unchanged by S01-10E, which only touched atlas_symbol_versions) exactly mirrors the same historical-defect shapes S01-10B's qualification contract was built to reject on the VERSIONS side.",
+      "implication": "The registry's created_from_source_revision column has never carried real, qualified revision provenance for 96.1% of its rows (10,310/10,504) -- not because of a writer bug alone, but because the schema demands a value even when no genuine revision observation exists yet for a purely logical nomination."
+    }
+  ],
+  "recommendation": {
+    "decision": "A -- atlas_symbol_registry is a logical-symbol registry. Revision provenance is legitimately optional/best-effort metadata on the registry row (recording 'what nomination first proposed this stable id', not 'this row is bound to this revision'). Canonical, must-be-qualified revision truth belongs exclusively to atlas_symbol_versions, which already structurally owns it via its own NOT NULL source_revision/workspace_revision columns plus S01-10B's forward qualification contract.",
+    "reasoning": "Option B would require either (a) moving all 10,025 skeleton rows out of atlas_symbol_registry into a separate staging/candidate table -- a large, disruptive migration that re-derives a split the schema already has via atlas_symbol_versions, or (b) fabricating a revision value for every skeleton row -- which is the exact fabricated-lineage problem this whole session's S01-10B/C/D/E chain exists to prevent. Option A requires only relaxing what a column MEANS (best-effort provenance, not asserted truth) plus loosening its NOT NULL constraints -- far smaller blast radius, and consistent with the FK-established two-table design that already exists."
+  },
+  "migrationConsequencesOptionA": {
+    "schemaChange": "created_from_source_revision, created_from_source_ref become NULLABLE (registry_revision may remain NOT NULL as a producer-label field, or also become nullable/renamed to created_from_producer_revision for clarity -- naming left to the authorization step, not decided here). No column is dropped.",
+    "semanticChange": "created_from_source_revision/created_from_source_ref are redefined, in documentation and in any consuming code, as best-effort PROVENANCE ('the source this symbol was first nominated from, when known') rather than asserted per-row TRUTH. Genuine revision-bound truth is read from atlas_symbol_versions via the existing FK join -- never from the registry row directly.",
+    "backfillImpact": "None required for existing rows -- NULLABLE columns accept the current historical values as-is (they remain historically accurate 'what was recorded at promotion time', just no longer treated as canonical revision truth). No row needs to change value; S01-10B's forward qualification contract already stops NEW unqualified writes on the VERSIONS side, which is where it matters.",
+    "downstreamConsumers": "S01-09's SymbolIdentityV1 predicates (VERSION_HAS_QUALIFIED_SOURCE_REVISION, REGISTRY_CREATED_FROM_QUALIFIED_REVISION) would need their REGISTRY-side predicate reclassified: a registry row's revision shape stops being a pass/fail gate for identity admissibility on its own -- only atlas_symbol_versions rows (and the coming stableFileId link, S01-08M) gate SymbolIdentityV1 admissibility. Not implemented here -- a follow-up S01-09 rerun task after this design is authorized.",
+    "promotionWriterImpact": "promote-ast-symbols-to-registry.mjs / apply-current-tree-bound-symbol-registry-canary-v1.mjs / symbol-reconciliation-writer-v1.mts's S01-10B guard (admitLogicalSymbolRegistryV1) currently rejects registry admission for ANY unqualified revision, including legitimate logical-skeleton nominations that never claimed a real revision -- under option A, that guard's REGISTRY_SCHEMA_REQUIRES_PLACEHOLDER reason becomes obsolete for genuinely revision-less skeletons (they become directly admissible, no revision required at all), while still rejecting a MALFORMED (non-null but garbage-shaped) revision value. This is a real, scoped follow-up change to S01-10B's contract, not performed in this design gate."
+  },
+  "migrationConsequencesOptionB": {
+    "schemaChange": "A new staging/candidate table (e.g. atlas_symbol_nomination_skeleton) would need to be created to hold the 10,025 rows with no version, with its own identity scheme; atlas_symbol_registry's FK relationship with atlas_symbol_versions would need every existing 479-row VERSIONED_SYMBOL population to remain untouched while the other 95.4% is migrated out and back in only once a real version exists.",
+    "backfillImpact": "10,025 existing rows would need to move tables, a large, high-risk migration with 0 net semantic gain over option A, since the registry/versions FK split already provides the same separation option B is trying to re-derive via a third table.",
+    "verdict": "Rejected as unnecessarily disruptive given the structural evidence -- recorded here for completeness, not pursued further."
+  },
+  "notJustNullableColumns": "This design deliberately does not stop at 'make the NOT NULL columns nullable'. It defines what created_from_source_revision/created_from_source_ref MEAN under option A (best-effort provenance, not asserted truth), which downstream predicates and writer guards must change as a consequence (SymbolIdentityV1's registry-side predicate, S01-10B's REGISTRY_SCHEMA_REQUIRES_PLACEHOLDER admission guard) -- those are named as required follow-up work, not performed here.",
+  "unresolvedDecisions": [
+    "Exact final column nullability/renaming for registry_revision (keep as a required producer-pipeline label, or also make it optional/rename to created_from_producer_revision) -- left for the authorization step.",
+    "Whether a new explicit boolean/enum (e.g. has_revision_bound_version) should be added to the registry row as a cheap denormalized flag, versus always deriving 'does this symbol have any version' via the existing FK join -- left open; the join is always correct, a denormalized flag is only a read-performance optimization, not a correctness requirement."
+  ],
+  "authorizationRequired": true,
+  "authorizationNote": "This design requires the operator's explicit DDL authorization before any ALTER TABLE runs, and a separate, explicit authorization before S01-10B's admission guard or S01-09's identity predicates are changed to match. Neither is performed in this gate.",
+  "result": "SYMBOL_REGISTRY_SCHEMA_SEMANTICS_DESIGN_READY"
+}

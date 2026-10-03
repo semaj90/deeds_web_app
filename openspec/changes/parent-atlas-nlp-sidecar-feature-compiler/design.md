@@ -188,11 +188,17 @@ canonical structural contract (rejected — ties the whole downstream pipeline
 to one third-party package's API surface; the explicit point of separating
 "contract" from "current producer" is to make that swap possible later).
 
-### D3 — Linguistic pass (spaCy) scoped to natural language only
+### D3 — Linguistic pass scoped to natural language only
 
-spaCy (POS tagging, lemmatization, dependency parsing, noun chunks, entities)
-runs only over comments, docstrings, error messages, README/spec text, and
-user query text — never over source identifiers/tokens. Tree-sitter already
+The linguistic assertion contract runs only over comments, docstrings, error
+messages, README/spec text, and user query text — never over source
+identifiers/tokens. spaCy with the pinned English model is the current CPU
+reference executor for POS tagging, lemmatization, dependency parsing, noun
+chunks, and entities. A separately versioned PyTorch GPU POS/token-classifier
+may be admitted later as a challenger for token-level POS assertions, with
+the same exact text offsets and a CPU fallback. It does not replace Tree-sitter
+structural evidence and does not automatically become the owner of lemmas,
+noun chunks, dependency parsing, or canonical identity. Tree-sitter already
 knows `rerankCandidates` is a function identifier; running an English POS
 tagger against it adds nothing and risks nonsense output (an English parser
 has no model for camelCase code tokens).
@@ -212,6 +218,13 @@ PATCH_SUCCEEDED, PATCH_FAILED`, etc.) — never raw 768-dim vectors. Kept
 CPU-only: the state space is tiny relative to embedding/graph/rerank
 workloads, and GPU residency for HMM inference would contend with those
 larger jobs for no benefit.
+
+The sidecar's initial producer vocabulary is versioned as
+`atlas.route-observation.v1`: `STRUCTURAL_CHUNK_PRESENT`,
+`ENTITY_EVIDENCE_FOUND`, `IMPORT_RELATIONSHIP_FOUND`,
+`SEMANTIC_CARD_BUILT`, and `REPAIR_AMBIGUOUS`. Observations describe outputs
+actually present; request mode alone must never imply `PATCH_SUCCEEDED` or
+another execution outcome.
 
 **Alternatives considered**: feed continuous embeddings into a
 Gaussian-emission HMM (rejected — loses interpretability of the route state,
@@ -263,52 +276,53 @@ clarification, not new infrastructure — `ExperimentFeatureMatrix` and the
 this change's contribution is `control5` as one additional, optional derived
 column for cheap routing decisions.
 
-### D7 — rg/lexical-exact: reuse the existing TypeScript owner, don't add a second one
+### D7 — rg/lexical-exact: signal ownership is not executor proof
 
-**Confirmed live, 2026-08-09**: `sveltekit-frontend/src/lib/server/retrieval/
-router-matrix.ts` already declares `lexical_exact` as one of 8 `SignalType`
-values in its 4x4 query router (`query-router-4x4.ts` also references it).
-This is a real, already-designated TypeScript owner for exact lexical
-matching — `ripgrep`/rg output is not currently unowned.
+**Corrected by current-source audit, 2026-09-27**: the retrieval-folder
+`router-matrix.ts` declares a `lexical_exact` signal, and the adjacent
+`retrieval/query-router-4x4.ts` has a simulation-only classifier that can emit
+it. Neither file has a production caller in `src`; the matrix is referenced by
+the isolated routing-review-v2 prototype only. The live ACE router is the
+separate `src/lib/server/routing/query-router-4x4.ts`, which extracts a numeric
+lexical signal but does not call this matrix or establish an `rg` executor.
+The `lexical_exact` label is therefore a signal-level contract, not proof of a
+live exact-search implementation or an `rg` owner.
 
-**Decision**: `lexical.rg_evidence` in the pass registry (D1) is **not** a
-new retrieval lane. It exposes `POST /lexical/rg` as a bounded evidence
-*provider* only (JSON output, `--line-number --column --glob`, hard result
-limits) for passes running inside the Python sidecar that need raw grep
-evidence as an input (e.g. cross-referencing an `AstUnit`'s call target
-against literal text occurrences) — it does not feed a second RRF/fusion
-vote alongside `lexical_exact`. Whether this endpoint is needed at all is a
-task-level question (see tasks.md 0.2/10) — if nothing inside the sidecar
-actually needs raw rg evidence as a pass input, don't build it speculatively.
+**Decision**: `lexical.rg_evidence` in the pass registry (D1) remains
+**deferred**. Current-source search did not find a `/lexical/rg` endpoint or a
+sidecar consumer, and the TypeScript signal/matrix does not prove an `rg`
+executor. If a bounded provider is later justified by a concrete pass, it must
+remain an evidence *provider* only (JSON output, `--line-number --column
+--glob`, hard result limits) for sidecar passes that need raw grep evidence as
+an input (e.g. cross-referencing an `AstUnit` call target against literal text
+occurrences) — it must not feed a second RRF/fusion vote. Do not build it
+speculatively.
 
 **Alternatives considered**: give the sidecar its own independent rg-based
 retrieval lane (rejected — exactly the "another library becomes another
 search/ranking owner" anti-pattern this whole change exists to stop; would
 create a second, uncoordinated `lexical_exact`-equivalent signal).
 
-### D8 — ACP/A2A surface: register the pass registry, don't bypass it
+### D8 — ACP/A2A surface: extend the existing sidecar registry, don't duplicate it
 
 This repo has a real Agent Control Plane (`GET /api/acp/tools`,
 `POST /api/acp/execute`, `POST /api/acp/rpc`, backed by
 `ACPToolRegistry.ts`) and a real A2A surface (`GET /.well-known/agent.json`).
-**Confirmed live, 2026-08-09**: `ACPToolRegistry.ts` has zero references to
-`miniforge`, `rg_search`, `ripgrep`, or any sidecar tool name — the NLP
-sidecar's passes are not currently discoverable or callable through ACP at
-all. Agents (Ornith or otherwise) that want structural/linguistic/rerank
-evidence must know the sidecar's HTTP contract directly, bypassing the
-tool-registry/agent-card discovery surface this repo already built for
-exactly this purpose.
+**Corrected API-shape audit, 2026-09-27**: `ACPToolRegistry.ts` already
+contains `nlp:capabilities`, `nlp:analyze`, and related entries, so the
+registry is not missing all sidecar references. `ACPTool` stores
+`name/description/category/inputSchema/outputSchema/examples/handler`; it does
+not store a `supportsDryRun` field. The ACP tools-list route derives that
+response property from `toolSupportsDryRun(name)` and a separate set. Any new
+coarse-grained wrappers must use the existing handler contract and explicitly
+audit dry-run semantics; listing a tool as dry-run-capable is not itself proof
+that its handler avoids side effects.
 
-**Decision**: once the pass registry (D1) lands, register a small number of
-coarse-grained ACP tools (not one tool per pass) — e.g. `analyze_structural`,
-`analyze_semantic_card`, `rerank_candidates` — each wrapping one or more
-sidecar passes behind the existing `ACPToolRegistry` contract
-(`name, description, category, inputSchema, outputSchema, examples`,
-`supportsDryRun`). This keeps Ornith's tool surface small and typed (per the
-proposal's own "typed multi-hop expansion, not raw graph dumps" principle,
-applied here to sidecar passes instead of graph traversal) while making the
-sidecar's capabilities agent-discoverable instead of a side-channel HTTP
-call known only to hand-written TypeScript client code.
+**Decision**: extend existing sidecar entries only when a concrete missing
+capability is identified; do not register duplicates. Where a genuinely new
+coarse-grained wrapper is justified, it must follow the existing contract and
+wrap related passes behind typed schemas. Keep the tool surface bounded and
+discoverable without bypassing the pass registry.
 
 **Scope boundary**: this decision is registration only — it does not change
 `AnalysisPassResult`'s shape, and does not imply every pass gets its own ACP
@@ -316,14 +330,12 @@ tool (that would recreate the "14 reranker files" duplication shape one
 layer up, as 11+ ACP tools instead of 11+ source files). Coarse-grained
 wrapping is the point.
 
-**Alternatives considered**: leave the sidecar ACP-invisible, reachable only
-via the existing hand-written TypeScript client (rejected — matches current
-state, but means every future agent capability needs its own hand-rolled
-integration instead of reusing tool discovery already built for this
-purpose). One ACP tool per pass (rejected — multiplies the tool surface
-without a corresponding benefit; coarse wrapping loses no real
-functionality since a caller needing fine-grained pass selection can still
-pass `passes: [...]` through the wrapping tool's `inputSchema`).
+**Alternatives considered**: add duplicate tools for capabilities already
+covered by `nlp:analyze` or `nlp:capabilities` (rejected — creates parallel
+contracts without a verified capability gap). One ACP tool per pass (rejected
+— multiplies the tool surface without a corresponding benefit; coarse
+wrapping loses no real functionality since a caller needing fine-grained pass
+selection can pass `passes: [...]` through the existing tool's `inputSchema`).
 
 ## Risks / Trade-offs
 

@@ -88,5 +88,7 @@ const report = {
 
 const semantic = JSON.stringify(report);
 report.semanticChecksum = `sha256:${crypto.createHash('sha256').update(semantic).digest('hex')}`;
-fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`);
+const temporaryPath = `${outputPath}.${process.pid}.${Date.now()}.tmp`;
+fs.writeFileSync(temporaryPath, `${JSON.stringify(report, null, 2)}\n`);
+fs.renameSync(temporaryPath, outputPath);
 console.log(JSON.stringify({ outputPath, summary: report.summary, semanticChecksum: report.semanticChecksum }, null, 2));

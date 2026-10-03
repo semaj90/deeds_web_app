@@ -14,20 +14,29 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
+import crypto from 'node:crypto';
 import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { writeAtlasAstNodes } from './lib/atlas-ast-nodes-writer.mjs';
 import { decodeSourceTextEnvelope } from './lib/source-text-envelope.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const { values: args } = parseArgs({ options: { apply: { type: 'boolean', default: false }, 'operator-approved': { type: 'boolean', default: false }, 'know09-reviewed': { type: 'boolean', default: false }, eligible: { type: 'string', default: '' }, limit: { type: 'string', default: '50' } }, strict: false });
-const LIMIT = Math.min(Math.max(parseInt(String(args.limit), 10) || 50, 1), 200);
+const { values: args } = parseArgs({ options: { apply: { type: 'boolean', default: false }, 'operator-approved': { type: 'boolean', default: false }, 'know09-reviewed': { type: 'boolean', default: false }, eligible: { type: 'string', default: '' }, limit: { type: 'string', default: '50' }, cohort: { type: 'string', default: '' }, 'ast-generation': { type: 'string', default: '' }, 'rehearse-migration': { type: 'boolean', default: false } }, strict: false });
 // Persistence needs ALL of: --apply, --operator-approved, --know09-reviewed (current-source-authority gate acknowledged by a human).
 const PERSIST = Boolean(args.apply && args['operator-approved'] && args['know09-reviewed']);
+// COHORT mode (AST_BULK_WRITER_REHEARSAL_01, 2026-09-20): rehearsal-ONLY. Scopes the eligible rows to the checksummed
+// SAFE_TO_STAMP cohort and lifts the row cap (rollback-only, so nothing persists). It can never persist: the 200-row cap
+// and the three persistence flags below still govern any real write, and PERSIST + COHORT is refused outright.
+const COHORT = args.cohort ? path.resolve(ROOT, String(args.cohort)) : null;
+const AST_GENERATION = args['ast-generation'] ? String(args['ast-generation']) : null;
+const REHEARSE_MIGRATION = Boolean(args['rehearse-migration']);
+const LIMIT = Math.min(Math.max(parseInt(String(args.limit), 10) || 50, 1), COHORT && !PERSIST ? 30000 : 200);
 const ELIGIBLE = args.eligible ? path.resolve(ROOT, String(args.eligible)) : path.join(ROOT, '.tmp/atlas/ast-canary-eligible-v1.jsonl');
 const PROOF = path.join(ROOT, 'docs/reports/atlas-ast-backfill-idempotency-proof-v1.json');
 // One receipt per mode so a rehearsal can never overwrite the evidence of a persisted run.
-const RECEIPT = path.join(ROOT, `docs/reports/atlas-ast-canary-apply-v1.${PERSIST ? 'persist' : 'rehearsal'}.json`);
+// Cohort tranche rehearsals get their OWN receipt so they never overwrite the 50-row AST_BF_19 rehearsal evidence.
+const RECEIPT = COHORT ? path.join(ROOT, 'docs/reports/atlas-ast-tranche-rehearsal-v1.json') : path.join(ROOT, `docs/reports/atlas-ast-canary-apply-v1.${PERSIST ? 'persist' : 'rehearsal'}.json`);
+const MIGRATION_SQL = path.join(ROOT, 'sveltekit-frontend/drizzle/manual/20260920_atlas_ast_nodes_generation.sql');
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 
 const receipt = { schema: 'atlas.ast-canary-apply.v1', generatedAt: new Date().toISOString(), mode: PERSIST ? 'PERSIST' : 'REHEARSAL_ROLLBACK', limit: LIMIT, bindings: { parserName: 'ast-grep-napi', grammarVersion: null, sourceTextEncodingRevision: 'SOURCE-TEXT-ENCODING-01', offsetBasis: 'UTF8_PARSER_BUFFER_V1', lineBasis: 'ONE_BASED_STORAGE', identityConvention: 'file(ROOT)->declaration(parent=file)->method(parent=class)' }, steps: {}, errors: [] };
@@ -39,17 +48,51 @@ const gate = proof.steps?.AST_BF_10_apply_gate;
 if (!gate?.allDryRunGatesPass) { receipt.errors.push('proof gates do not all pass'); finish('BLOCKED_GATES'); process.exit(); }
 receipt.steps.proof = { candidatesInput: proof.candidatesInput, gates: gate.gates, canaryEligibleRows: gate.canaryEligibleRows };
 
-const all = fs.readFileSync(ELIGIBLE, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
+if (COHORT && (PERSIST || args.apply)) { receipt.errors.push('COHORT mode is rehearsal-only: persisting a cohort tranche is not authorized by this script'); finish('BLOCKED_COHORT_PERSIST_NOT_AUTHORIZED'); process.exit(); }
+if (REHEARSE_MIGRATION && (PERSIST || args.apply)) { receipt.errors.push('--rehearse-migration is rehearsal-only'); finish('BLOCKED_MIGRATION_PERSIST_NOT_AUTHORIZED'); process.exit(); }
+let all = fs.readFileSync(ELIGIBLE, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
+if (COHORT) {
+  // Integrity of the cohort artifact first: its stored checksum must equal the checksum of its own sorted SAFE list.
+  const cohort = JSON.parse(fs.readFileSync(COHORT, 'utf8'));
+  const safeList = [...cohort.buckets.SAFE_TO_STAMP].sort();
+  const recomputed = `sha256:${crypto.createHash('sha256').update(safeList.join('\n')).digest('hex')}`;
+  if (recomputed !== cohort.safeToStampChecksum) { receipt.errors.push(`COHORT_CHECKSUM_MISMATCH:${recomputed}!=${cohort.safeToStampChecksum}`); finish('BLOCKED_COHORT_INTEGRITY'); process.exit(); }
+  const safe = new Set(safeList);
+  const before = all.length;
+  all = all.filter((r) => safe.has(r.raw_source_ref));
+  receipt.steps.cohort = { path: path.relative(ROOT, COHORT), safeToStampChecksum: cohort.safeToStampChecksum, cohortFiles: safeList.length, eligibleRowsBefore: before, eligibleRowsInCohort: all.length, rowsOutsideCohortDropped: before - all.length };
+}
 const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 1 });
 const client = await pool.connect();
 let committed = false;
 try {
   await client.query('BEGIN');
+  const generationColumnExists = async () => (await client.query("SELECT count(*)::int AS n FROM information_schema.columns WHERE table_name='atlas_ast_nodes' AND column_name='ast_generation'")).rows[0].n === 1;
+  receipt.steps.generationColumnBefore = await generationColumnExists();
+  if (REHEARSE_MIGRATION) {
+    // Applied INSIDE this transaction only (DDL is transactional in Postgres) so the writer + column are proven together
+    // and the whole thing — DDL included — is rolled back below. Lock is bounded so a busy table fails the rehearsal fast.
+    await client.query("SET LOCAL lock_timeout = '5s'");
+    await client.query(fs.readFileSync(MIGRATION_SQL, 'utf8'));
+    receipt.steps.migrationRehearsal = { file: path.relative(ROOT, MIGRATION_SQL), appliedInsideTransaction: true, columnVisibleInsideTxn: await generationColumnExists() };
+  }
+  if (AST_GENERATION && !(await generationColumnExists())) throw new Error('AST_GENERATION_REQUESTED_BUT_COLUMN_MISSING (pass --rehearse-migration to prove it inside the rolled-back transaction)');
   const tidSet = new Set(all.map((r) => r.tree_node_id));
   // A parent may be another eligible row OR a row that already exists in atlas_ast_nodes (e.g. a pre-existing file row).
   const externalParents = [...new Set(all.filter((r) => r.parent_tree_node_id && !tidSet.has(r.parent_tree_node_id)).map((r) => r.parent_tree_node_id))];
   const existingParents = new Set((await client.query('SELECT tree_node_id FROM atlas_ast_nodes WHERE tree_node_id = ANY($1::text[])', [externalParents])).rows.map((x) => x.tree_node_id));
-  const usable = all.filter((r) => !r.parent_tree_node_id || tidSet.has(r.parent_tree_node_id) || existingParents.has(r.parent_tree_node_id));
+  const parentResolvable = all.filter((r) => !r.parent_tree_node_id || tidSet.has(r.parent_tree_node_id) || existingParents.has(r.parent_tree_node_id));
+  // NAME-COLLISION GUARD (found 2026-09-20 by the full-cohort rehearsal): the table's UNIQUE(repo_id, relative_path, node_kind,
+  // qualified_symbol, normalized_node_hash) has no parent component and normalized_node_hash = sha256(path#kind:qualified_symbol), so
+  // two rows with the same (path, kind, qualified_symbol) but different parents (same-named methods in different classes of one file)
+  // collide even though their tree_node_ids differ. ON CONFLICT DO NOTHING would silently keep an ARBITRARY one — ambiguous, so the whole
+  // group is deferred, never partially written. Deferred rows are reported, not dropped silently.
+  const nameGroups = new Map();
+  for (const r of parentResolvable) { const k = `${r.np}\u0000${r.kind}\u0000${r.qualified_symbol}`; (nameGroups.get(k) ?? nameGroups.set(k, []).get(k)).push(r); }
+  const collidingGroups = [...nameGroups.values()].filter((g) => g.length > 1);
+  const deferredCollisionIds = new Set(collidingGroups.flat().map((r) => r.tree_node_id));
+  const usable = parentResolvable.filter((r) => !deferredCollisionIds.has(r.tree_node_id));
+  receipt.steps.nameCollisionGuard = { deferredRows: deferredCollisionIds.size, collidingGroups: collidingGroups.length, extraRowsThatWouldHaveBeenSkipped: deferredCollisionIds.size - collidingGroups.length, kinds: [...new Set(collidingGroups.flat().map((r) => r.kind))], sample: collidingGroups.slice(0, 5).map((g) => ({ path: g[0].np, kind: g[0].kind, qualifiedSymbol: g[0].qualified_symbol, rows: g.length })), status: 'DEFERRED_PENDING_QUALIFIED_SYMBOL_CONVENTION' };
   const byFile = new Map();
   for (const r of usable) (byFile.get(r.np) ?? byFile.set(r.np, []).get(r.np)).push(r);
   const files = [...byFile.entries()].sort(([a], [b]) => a.localeCompare(b));
@@ -59,7 +102,7 @@ try {
   const withMethod = files.find(([, rows]) => hasMethod(rows) && rows.length <= Math.min(30, LIMIT));
   if (withMethod) { picked.push(withMethod); total += withMethod[1].length; }
   for (const f of files) { if (f === withMethod) continue; if (total + f[1].length > LIMIT) continue; picked.push(f); total += f[1].length; if (total >= LIMIT) break; }
-  receipt.steps.selection = { eligibleRows: all.length, usableRows: usable.length, droppedUnresolvableParent: all.length - usable.length, externalParentsExisting: existingParents.size, filesPicked: picked.length, rowsPicked: total, includesTwoPhaseFile: Boolean(withMethod), twoPhaseFile: withMethod?.[0] ?? null };
+  receipt.steps.selection = { eligibleRows: all.length, usableRows: usable.length, droppedUnresolvableParent: all.length - parentResolvable.length, droppedNameCollision: parentResolvable.length - usable.length, externalParentsExisting: existingParents.size, filesPicked: picked.length, rowsPicked: total, includesTwoPhaseFile: Boolean(withMethod), twoPhaseFile: withMethod?.[0] ?? null };
   if (!total) throw new Error('NO_ROWS_SELECTED');
 
   // WRITE-TIME digest re-check: other sessions edit files continuously, so re-read each picked file through the
@@ -95,18 +138,33 @@ try {
     const res = await writeAtlasAstNodes(client, {
       sourceRef: first.canonical_path, parserLanguage: first.parser_language, parserName: first.parser_name, parserVersion: first.parser_version,
       sourceRevision: first.source_revision, workspaceId: first.workspace_id,
-      nodes: ordered.map((r) => ({ kind: r.kind, qualifiedSymbol: r.qualified_symbol, startByte: r.start_byte, endByte: r.end_byte, startLine: r.line_start, endLine: r.line_end, contentHash: r.source_content_digest, parentIndex: r.parent_tree_node_id && inBatch.has(r.parent_tree_node_id) ? indexOf.get(r.parent_tree_node_id) : null, parentTreeNodeId: r.parent_tree_node_id && !inBatch.has(r.parent_tree_node_id) ? r.parent_tree_node_id : null })),
+      ...(AST_GENERATION ? { astGeneration: AST_GENERATION } : {}),
+      nodes: ordered.map((r) => ({ kind: r.kind, qualifiedSymbol: r.qualified_symbol, startByte: r.start_byte, endByte: r.end_byte, startLine: r.line_start, endLine: r.line_end, sourceContentDigest: r.source_content_digest, parentIndex: r.parent_tree_node_id && inBatch.has(r.parent_tree_node_id) ? indexOf.get(r.parent_tree_node_id) : null, parentTreeNodeId: r.parent_tree_node_id && !inBatch.has(r.parent_tree_node_id) ? r.parent_tree_node_id : null })),
     });
     inserted += res.inserted;
+    const skipped = (res.insertedFlags ?? []).flatMap((didInsert, i) => didInsert ? [] : [{
+      np,
+      tree_node_id: ordered[i].tree_node_id,
+      parent_tree_node_id: ordered[i].parent_tree_node_id ?? null,
+      node_kind: ordered[i].kind,
+      qualified_symbol: ordered[i].qualified_symbol,
+    }]);
+    if (!receipt.steps.writeConflicts) receipt.steps.writeConflicts = [];
+    receipt.steps.writeConflicts.push(...skipped);
     res.treeNodeIds.forEach((tid, i) => { if (tid !== ordered[i].tree_node_id) idMismatch += 1; });
     void np;
   }
-  receipt.steps.write = { inserted, expectedRows: expected.size, writerVsProofIdMismatch: idMismatch };
+  receipt.steps.write = {
+    inserted,
+    expectedRows: expected.size,
+    skippedByConflict: receipt.steps.writeConflicts?.length ?? 0,
+    writerVsProofIdMismatch: idMismatch,
+  };
   if (idMismatch) throw new Error(`WRITER_ID_DIVERGES_FROM_PROOF:${idMismatch}`);
   if (inserted !== expected.size) throw new Error(`INSERT_COUNT_MISMATCH:${inserted}/${expected.size}`);
 
   const back = await client.query(
-    `SELECT tree_node_id, parent_tree_node_id, relative_path, node_kind, qualified_symbol, start_byte, end_byte, line_start, line_end, workspace_id, source_revision, source_content_hash, parser_name, parser_version, grammar_version, created_at IS NOT NULL AS has_created, updated_at IS NOT NULL AS has_updated
+    `SELECT tree_node_id, parent_tree_node_id, relative_path, node_kind, qualified_symbol, start_byte, end_byte, line_start, line_end, workspace_id, source_revision, source_content_hash, parser_name, parser_version, grammar_version, created_at IS NOT NULL AS has_created, updated_at IS NOT NULL AS has_updated${AST_GENERATION ? ', ast_generation' : ''}
        FROM atlas_ast_nodes WHERE tree_node_id = ANY($1::text[])`, [[...expected.keys()]]);
   const bad = [];
   for (const row of back.rows) {
@@ -123,6 +181,7 @@ try {
     if (row.grammar_version !== null) problems.push('grammar_version_not_null');
     if ((row.parent_tree_node_id ?? null) !== (e.parent_tree_node_id ?? null)) problems.push('parent');
     if (!row.has_created || !row.has_updated) problems.push('timestamps');
+    if (AST_GENERATION && row.ast_generation !== AST_GENERATION) problems.push('ast_generation');
     if (problems.length) bad.push({ tree_node_id: row.tree_node_id, problems });
   }
   const orphan = await client.query(`SELECT count(*)::int AS n FROM atlas_ast_nodes c LEFT JOIN atlas_ast_nodes p ON p.tree_node_id = c.parent_tree_node_id WHERE c.tree_node_id = ANY($1::text[]) AND c.parent_tree_node_id IS NOT NULL AND p.tree_node_id IS NULL`, [[...expected.keys()]]);
@@ -135,7 +194,9 @@ try {
 
   if (PERSIST) { await client.query('COMMIT'); committed = true; } else { await client.query('ROLLBACK'); }
   const final = (await client.query('SELECT count(*)::int AS n FROM atlas_ast_nodes')).rows[0].n; // same client: pool max=1, pool.query here would deadlock
-  receipt.steps.after = { rowsInTable: final, persisted: committed, expectedRowsInTable: receipt.steps.before.existingRows + (committed ? expected.size : 0) };
+  receipt.steps.after = { rowsInTable: final, persisted: committed, expectedRowsInTable: receipt.steps.before.existingRows + (committed ? expected.size : 0), generationColumnAfter: await generationColumnExists() };
+  // A rehearsal must leave the schema exactly as it found it (the in-transaction migration included).
+  if (!committed && receipt.steps.after.generationColumnAfter !== receipt.steps.generationColumnBefore) throw new Error('SCHEMA_CHANGED_BY_REHEARSAL');
   if (final !== receipt.steps.after.expectedRowsInTable) throw new Error('POST_TXN_ROW_COUNT_MISMATCH');
   finish(committed ? 'APPLY_PROVEN_CANARY' : 'REHEARSAL_PROVEN');
 } catch (err) {

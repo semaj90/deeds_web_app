@@ -2,8 +2,8 @@
  * GAN Audit Integration
  *
  * Bridges the GAN adversarial validator with the canonical packet-truth-flow.
- * Integrates P7 validation gates with the OpenCode skill:
- * .opencode/skills/gan-validation-audit/SKILL.md
+ * Integrates P7 validation gates. LEGACY WIRING: packet validation lives in packet-adversarial-validator-v2.ts; the operating skill is
+ * .claude/skills/validating-parent-atlas/SKILL.md (the old .opencode gan-validation-audit skill file no longer exists).
  *
  * The 5-step canonical flow:
  * 1. Read from Postgres (canonical source)
@@ -17,6 +17,7 @@
  */
 
 import type { WorkflowTrace } from './workflow-trace-logger.js';
+import { validatePacketForAtlasV2 } from './packet-adversarial-validator-v2.js';
 
 export interface GanAuditConfig {
   operation: 'gan-audit';
@@ -146,7 +147,7 @@ export class GanAuditOrchestrator {
 
   /**
    * Step 2: Validate structure (CPU work only)
-   * Applies all 6 adversarial probes to detect malformed packets
+   * Delegates to validatePacketForAtlasV2 (structural source_ref rule; historical ADV001/ADV002 probe ids preserved)
    *
    * Hard fail conditions:
    * - missing packet_key
@@ -169,52 +170,24 @@ export class GanAuditOrchestrator {
     const passed: any[] = [];
 
     for (const packet of packets) {
-      // Hard fail checks (identity)
-      if (!packet.packet_key || packet.packet_key === '') {
+      // Single owner: packet-adversarial-validator-v2 (also used by the read-only live proof and the adversarial probes).
+      // The live atlas_packets table has no title / ganValidated column, so those warnings are requested only when the caller supplied them.
+      const verdict = validatePacketForAtlasV2(packet, {
+        requireTitle: 'title' in packet,
+        requireGanFlag: 'ganValidated' in packet,
+      });
+      if (verdict.status === 'HARD_FAIL') {
         hardFailures.push({
           packet_key: packet.packet_key,
-          reason: 'missing_packet_key',
-          probe: 'ADV001',
+          reason: verdict.hardFailure.reason,
+          code: verdict.hardFailure.code,
+          probe: verdict.hardFailure.historicalProbe,
         });
         continue;
       }
-
-      if (!packet.source_ref || !/^[a-z0-9\/_\-\.]+\.(ts|tsx)$/.test(packet.source_ref)) {
-        hardFailures.push({
-          packet_key: packet.packet_key,
-          reason: 'invalid_source_ref',
-          probe: 'ADV002',
-        });
-        continue;
+      if (verdict.warnings.length > 0) {
+        softWarnings.push({ packet_key: packet.packet_key, warnings: verdict.warnings });
       }
-
-      if (!packet.feature_id || packet.feature_id === '') {
-        hardFailures.push({
-          packet_key: packet.packet_key,
-          reason: 'missing_feature_id',
-          probe: 'ADV001',
-        });
-        continue;
-      }
-
-      // Soft warnings (optional fields)
-      const warnings: string[] = [];
-
-      if (!packet.summary) warnings.push('missing_summary');
-      if (!packet.title) warnings.push('missing_title');
-      if (!packet.embedding) warnings.push('missing_embedding');
-      if (packet.summary_confidence && packet.summary_confidence < 0.7) {
-        warnings.push('low_summary_confidence');
-      }
-      if (!packet.ganValidated) warnings.push('missing_gan_validation_flag');
-
-      if (warnings.length > 0) {
-        softWarnings.push({
-          packet_key: packet.packet_key,
-          warnings,
-        });
-      }
-
       passed.push(packet);
     }
 

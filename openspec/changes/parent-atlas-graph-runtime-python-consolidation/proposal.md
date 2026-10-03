@@ -5,8 +5,9 @@
 A grep for pagerank/katz/eigenvector/k-truss/networkx/cugraph across `python/` returns 19 files.
 Auditing each (file-by-file, caller trace, storage-write trace) found:
 
-- **5 files with zero confirmed callers anywhere in the repo** (`atlas_subgraph_cugraph.py`,
-  `atlas_rapids_community_sidecar.py`, `atlas_compute/cugraph_ppr.py`, `atlas_compute/graph_programs.py`).
+- **Three files have no functional callers** (`atlas_subgraph_cugraph.py`,
+  `atlas_rapids_community_sidecar.py`, `atlas_compute/cugraph_ppr.py`); `atlas_compute/graph_programs.py`
+  is exercised by its focused test suite and is retained as `FIXTURE_ONLY`.
   None of these are in `docs/architecture/runtime-ownership-registry.json` or
   `runtime-ownership-baseline.json` — this whole cluster is currently unaudited by the existing
   governance system.
@@ -60,15 +61,19 @@ Auditing each (file-by-file, caller trace, storage-write trace) found:
 
 ## Proposal
 
-1. **Reclassify the 5 zero-caller files** in `runtime-ownership-registry.json` as `DEAD`
-   with the caller-trace evidence from this audit. No code moves, no deletions — matches the repo's
+1. **Register the four audited auxiliary files** in `runtime-ownership-registry.json` using
+   evidence-backed classifications (`DEAD`, `EXPERIMENT`, or `FIXTURE_ONLY` as appropriate).
+   No code moves, no deletions — matches the repo's
    archive-not-delete discipline; deletion, if any, is a separate follow-up once flagged as tolerated
    debt for one review cycle. (`atlas_rapids_graph_runtime.py` is excluded from this reclassification
    — per the 2026-08-31 correction above, it is a deployed `BACKEND`, not a zero-caller/DEAD file.)
 2. **Create `python/atlas_graph_runtime/` as the canonical package boundary** for future
    Atlas-owned graph work, seeded minimally:
-   - `identity.py` — promoted from `atlas_compute/typed_graph_runtime.py` (pure dataclasses/contracts,
-     no algorithm code, already the closest existing prior art to what this package should be).
+   - `contracts.py` — owns only the existing `TypedGraphEdge`, `GraphExecutionReceipt`, and backend
+     literal contracts extracted from `atlas_compute/typed_graph_runtime.py`; algorithms stay in the
+     legacy module. Python does not define a second `GraphNodeKeyV1` or `GraphOrdinalMapV1`: those
+     identities are owned by the existing Parent Atlas TypeScript contracts and arrive as frozen
+     ordinals at the Python executor boundary.
    - `README.md` stating the hard rule: this package contains **no algorithm implementations**. Every
      module is either a contract type, a thin `if backend == X: return library.fn(...)` executor, or
      a receipt/parity/identity helper. A PR adding hand-rolled graph math here should fail review on
@@ -100,8 +105,8 @@ This package is that pattern's Python-side, RAPIDS-facing counterpart:
 
 | In scope (custom Atlas code) | Out of scope (library-owned) |
 |---|---|
-| `identity.py` — `GraphNodeKeyV1`, `GraphOrdinalMapV1` contracts | PageRank, Katz, eigenvector, HITS, degree, betweenness, BFS, SSSP, k-core, k-truss, triangles, Louvain, Leiden math |
-| `snapshot.py` — revision/checksum binding | CAGRA, exact-KNN math |
+| `contracts.py` — ordinal edge and noncanonical execution-receipt DTOs | PageRank, Katz, eigenvector, HITS, degree, betweenness, BFS, SSSP, k-core, k-truss, triangles, Louvain, Leiden math |
+| `snapshot.py` — deferred until a Python consumer needs a typed projection of the upstream frozen graph artifact | CAGRA, exact-KNN math |
 | `projections.py` — directed→undirected structural-affinity projection for k-truss, hypergraph bipartite projection | PCA, SVD, KMeans, UMAP math |
 | `{networkx,cugraph,cuvs,cuml}_executor.py` — thin `if backend==X: return library.fn(...)` dispatch only | any hand-rolled numerical algorithm implementation |
 | `parity.py`, `receipts.py` — CPU/GPU parity checksums, `GraphCpuGpuParityReceiptV1` | — |

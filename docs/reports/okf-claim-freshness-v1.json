@@ -1,39 +1,21 @@
 {
   "schema": "atlas.okf-claim-freshness-audit.v1",
+  "status": "CLAIM_FRESHNESS_REVIEW_REQUIRED",
   "sourceRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\okf",
-  "generatedAt": "2026-09-20T05:10:26.136Z",
+  "generatedAt": "2026-09-21T00:05:40.170Z",
   "summary": {
-    "totalClaims": 34,
+    "scannedArtifacts": 34,
+    "ignoredArtifacts": 2,
+    "claimCandidates": 32,
+    "totalClaims": 32,
     "validClaims": 0,
     "staleClaims": 0,
-    "unresolvedClaims": 34,
+    "unresolvedClaims": 32,
     "statusCounts": {
-      "UNRESOLVED_MISSING_FIELDS": 34
+      "UNRESOLVED_MISSING_FIELDS": 32
     }
   },
   "claims": [
-    {
-      "path": "library-module-sources.json",
-      "status": "UNRESOLVED_MISSING_FIELDS",
-      "missing": [
-        "CLAIM_REVISION",
-        "SOURCE_REF",
-        "SOURCE_REVISION",
-        "WORKSPACE_REVISION",
-        "EVIDENCE_REFS",
-        "EVIDENCE_CHECKSUM",
-        "PRODUCER_REVISION"
-      ],
-      "claimId": "okf:library-module-sources.json",
-      "claimIdSource": "DERIVED_PATH",
-      "canonicalAuthority": false,
-      "sourceRevision": null,
-      "workspaceRevision": null,
-      "evidenceRefs": [],
-      "claimChecksum": "sha256:9f5e2c81a689e27d8f0095ee1f54ffc820c44ba1898012d2f472aacfa19cb869",
-      "contentChecksum": "sha256:101a3b960ee20caa1839048dd95dad40c155c1e74d2e51a0c48d27a9564095d2",
-      "writesPerformed": false
-    },
     {
       "path": "parent-atlas/agent-runtime.md",
       "status": "UNRESOLVED_MISSING_FIELDS",
@@ -774,31 +756,19 @@
       "claimChecksum": "sha256:661c6702e4f69a209b598fed1bdb30cfb963135a0fe499ce2ab9546252c785d9",
       "contentChecksum": "sha256:829c4d0e9348f4543fdcc6f50a3489ac0c3d618f9589774865dfca1b655b2825",
       "writesPerformed": false
+    }
+  ],
+  "ignoredArtifacts": [
+    {
+      "path": "library-module-sources.json",
+      "reason": "NO_CLAIM_METADATA"
     },
     {
       "path": "parent-atlas/workflows/wsl2-rapids-source-ref-agentic-workflows.md",
-      "status": "UNRESOLVED_MISSING_FIELDS",
-      "missing": [
-        "CLAIM_REVISION",
-        "SOURCE_REF",
-        "SOURCE_REVISION",
-        "WORKSPACE_REVISION",
-        "EVIDENCE_REFS",
-        "EVIDENCE_CHECKSUM",
-        "PRODUCER_REVISION"
-      ],
-      "claimId": "okf:parent-atlas/workflows/wsl2-rapids-source-ref-agentic-workflows.md",
-      "claimIdSource": "DERIVED_PATH",
-      "canonicalAuthority": false,
-      "sourceRevision": null,
-      "workspaceRevision": null,
-      "evidenceRefs": [],
-      "claimChecksum": "sha256:0b0487c991239fb9ec9a81464c74c7e2a2c4faf3c1a3e045bf4143321ddb502e",
-      "contentChecksum": "sha256:b7bc048cc65ef7258f78e49b3027ee6f21c06dba5279f5369d6e67ec13374f93",
-      "writesPerformed": false
+      "reason": "NO_CLAIM_METADATA"
     }
   ],
-  "indexChecksum": "sha256:2e6c7b91c37a0a488eb1e13b71218027503f66390383d7cd71a9f1eea9e05d42",
+  "indexChecksum": "sha256:ec0e0286b13d867cf0c1fabdc5b24789a0e7551d6cb95c66e409913331bbd3c3",
   "canonicalAuthority": false,
   "promotionAuthorized": false,
   "writesPerformed": false

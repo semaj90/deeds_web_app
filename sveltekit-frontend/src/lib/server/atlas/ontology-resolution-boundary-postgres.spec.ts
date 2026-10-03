@@ -135,4 +135,56 @@ describe('OAKLIB-equivalent resolution boundary (ontology-resolution-boundary-po
     expect(result.conceptId).toBeNull();
     expect(result.candidateConceptIds.sort()).toEqual(['concept:retrieval', 'concept:retrieval.dup']);
   });
+
+  it('annotates a tuple candidate from its existing label and keeps identity fields passthrough-only', async () => {
+    queryMock.mockClear();
+    queryMock.mockResolvedValue({ rows: seedRows() });
+    const { annotateFeatureOntologyTupleWithResolutionV1 } = await import('./ontology-resolution-boundary-postgres.js');
+
+    const result = await annotateFeatureOntologyTupleWithResolutionV1({
+      objectId: 'surface:untrusted',
+      objectLabel: 'vector search',
+      packetKey: 'packet:caller-owned',
+      sourceRef: 'docs/retrieval.md',
+    });
+
+    expect(result).toMatchObject({
+      schemaVersion: 'atlas.feature-ontology-tuple-resolution.v1',
+      label: 'vector search',
+      resolvedConceptId: 'concept:retrieval',
+      resolutionState: 'RESOLVED',
+    });
+    expect(String(queryMock.mock.calls[0]?.[0])).not.toContain('packet_key');
+  });
+
+  it('leaves blank and unresolved tuple candidates unpromoted without inventing a concept ID', async () => {
+    queryMock.mockClear();
+    queryMock.mockResolvedValue({ rows: seedRows() });
+    const { annotateFeatureOntologyTupleWithResolutionV1 } = await import('./ontology-resolution-boundary-postgres.js');
+
+    const blank = await annotateFeatureOntologyTupleWithResolutionV1({ objectId: '  ', objectLabel: ' ' });
+    const unknown = await annotateFeatureOntologyTupleWithResolutionV1({ objectId: 'concept:not-in-registry' });
+
+    expect(blank).toMatchObject({ resolutionState: 'UNRESOLVED', resolvedConceptId: null, ontologyRevision: null });
+    expect(unknown).toMatchObject({ resolutionState: 'UNRESOLVED', resolvedConceptId: null });
+    expect(queryMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not attach a concept when tuple-label resolution is ambiguous or unavailable', async () => {
+    queryMock.mockClear();
+    queryMock.mockResolvedValue({
+      rows: [
+        ...seedRows(),
+        { group_id: 'retrieval.dup', group_label: 'Duplicate Retrieval', parent_group_id: 'retrieval', examples: ['vector search'], updated_at: FIXED_UPDATED_AT },
+      ],
+    });
+    const { annotateFeatureOntologyTupleWithResolutionV1 } = await import('./ontology-resolution-boundary-postgres.js');
+    const ambiguous = await annotateFeatureOntologyTupleWithResolutionV1({ objectId: 'vector search' });
+
+    queryMock.mockRejectedValue(new Error('connection refused'));
+    const unavailable = await annotateFeatureOntologyTupleWithResolutionV1({ objectId: 'vector search' });
+
+    expect(ambiguous).toMatchObject({ resolutionState: 'AMBIGUOUS', resolvedConceptId: null });
+    expect(unavailable).toMatchObject({ resolutionState: 'RESOLUTION_UNAVAILABLE', resolvedConceptId: null });
+  });
 });

@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T07:06:29.712Z",
+  "purpose": "Refresh OpenSpec readiness after reconciling the legacy summary fanout and symbol-stability gates; preserve the next incremental steps without selecting or executing unrelated work.",
+  "pivot": {
+    "from": "legacy summary HINT census, full vector artifacts, exact graph and GPU challengers",
+    "to": "filtered NLP/fanout receipts and labeled evaluation, while source-symbol revision proof remains an independent promotion blocker",
+    "selectedTasks": 0,
+    "reason": "The 29,219-row corpus has artifact-only vector/graph/challenger results; no relevance labels or canonical admission were proven. The 402-row symbol audit lacks two revisions per stable identity and does not reproduce the current derivation, so structural promotion remains blocked.",
+    "taskLedgerFilesEdited": [
+      "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
+      "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md"
+    ]
+  },
+  "source": {
+    "changes": 88,
+    "taskLedgerFiles": 90,
+    "totalTasks": 9565,
+    "completedTasks": 6322,
+    "openTasks": 3243,
+    "actionableTasks": 2429,
+    "sourceHashesRecorded": true,
+    "controllerMatchedTaskCount": 9565,
+    "workboardPath": ".tmp/codex-openspec-live-20260926T0720Z/workboard-v1.json"
+  },
+  "controller": {
+    "path": ".tmp/codex-openspec-live-20260926T0720Z/controller-output/openspec-execution-controller-v1.json",
+    "totalTasks": 9565,
+    "proven": 6324,
+    "actionable": 2182,
+    "waiting": 957,
+    "deferred": 102,
+    "writesPerformed": false
+  },
+  "program": {
+    "path": ".tmp/codex-openspec-live-20260926T0720Z/program-v1.json",
+    "accountedOpenTasks": 3243,
+    "duplicateTaskAssignments": 0,
+    "missingTaskAssignments": 0,
+    "tasksSelected": 0,
+    "dependenciesInvented": 0,
+    "leavesWithoutDeclaredDependencies": 3240,
+    "mappingStatus": "PROVISIONAL"
+  },
+  "evidence": [
+    "docs/reports/summary-hint-topk-full-v1.json",
+    "docs/reports/summary-hint-cuvs-compare-v1.json",
+    "docs/reports/symbol-stability-two-revision-audit-v1.json"
+  ],
+  "validation": {
+    "parentAtlasRepairCandidateFeatureMatrixStrict": "PASS",
+    "parentAtlasAceRlmBitfrostIntegrationStrict": "PASS",
+    "identityV1Tests": "PASS 3/3",
+    "taskLedgerDiffCheck": "PASS"
+  },
+  "persistentWritesPerformed": false,
+  "containerRebuildPerformed": false
+}

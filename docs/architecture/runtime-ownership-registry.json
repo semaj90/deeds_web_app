@@ -2,6 +2,30 @@
   "schema_version": "atlas.runtime-ownership.v1",
   "generated": "2026-08-09",
   "note": "Populated only from repository evidence gathered live this session (grep for callers, live DB/Neo4j checks). Entries marked \"unproven\": true are named but their live wiring was not independently confirmed — do not treat them as verified facts.",
+  "implementation_inventory": {
+    "dag_topology_helpers": {
+      "authorityNote": "Cross-cutting inventory only; this entry creates no shared DAG/topology owner and grants no identity, scheduling, or persistence authority.",
+      "typescriptHelpersDecision": "PER_PURPOSE; keep domain contracts separate. Share an algorithm only after an API-compatible owner and real caller are proven.",
+      "components": [
+        { "name": "typed-graph-runtime", "path": "python/atlas_compute/typed_graph_runtime.py", "classification": "BACKEND", "evidence": "Typed graph algorithm executor exposes NetworkX reference and optional cuGraph execution; it consumes graph inputs and does not own canonical graph identity." },
+        { "name": "graph-snapshot-parity-pipeline", "path": "python/graph_snapshot_parity_networkx_oracle.py; python/graph_snapshot_parity_cugraph_oracle.py", "classification": "EXPERIMENT", "evidence": "Paired snapshot parity/oracle CLIs compare derived PageRank/community outputs; their artifacts are evidence, not canonical topology identity." },
+        { "name": "spectral-multihop", "path": "python/parent_atlas_spectral_multihop.py", "classification": "EXPERIMENT", "evidence": "Computes bounded DAG/spectral representations from supplied graph/vector inputs; derived topology features are not identity." },
+        { "name": "oak-kernel", "path": "python/atlas_oak_kernel.py", "classification": "ADAPTER", "evidence": "Existing PostgreSQL/OAK integration routes ontology lookup/traversal; persistent concept identity remains PostgreSQL-owned." },
+        { "name": "error-fix-dag-builder", "path": "scripts/atlas/build-error-fix-dag.mjs", "classification": "ADAPTER", "evidence": "CLI builds a repair-planning DAG from diagnostic/task inputs; planning output does not itself authorize applying fixes." },
+        { "name": "kag-dag-runner", "path": "sveltekit-frontend/src/lib/server/features/ai/ace/kag-dag-runner.ts", "classification": "ADAPTER", "evidence": "KAG-specific named-node execution and receipt flow; it is not a general orchestration or canonical identity owner." },
+        { "name": "document-citation-dag", "path": "sveltekit-frontend/src/lib/server/retrieval/document-dag.ts", "classification": "ADAPTER", "evidence": "Builds citation/dependency ordering for document retrieval; its edge semantics differ from task and execution DAGs." },
+        { "name": "s-graph-taxonomy", "path": "sveltekit-frontend/src/lib/server/atlas/graph/s-graph-taxonomy.ts", "classification": "ADAPTER", "evidence": "Versioned typed-graph algorithms and serialization; consumes graph facts and does not promote source or ontology identity." },
+        { "name": "agentic-fix-proposal", "path": "sveltekit-frontend/src/lib/server/analysis/agentic-fix-proposal.ts", "classification": "ADAPTER", "evidence": "Builds evidence-grounded fix proposals and delegates repair-plan ordering to the registered toposort tool; no independent sort owner identified." },
+        { "name": "workboard-dependency-metadata", "path": "scripts/atlas/lib/wfu-metadata.mjs", "classification": "ADAPTER", "evidence": "Parses and validates task-ledger declarations, resolves their task identities, and uses Kahn cycle detection; it does not execute tasks or mutate controller authority." }
+      ],
+      "sharedAlgorithmCandidate": {
+        "path": "scripts/atlas/lib/frozen-dag-v1.mjs",
+        "classification": "FIXTURE_ONLY",
+        "evidence": "Revisioned execution-state DAG helper currently exercised by its proof script; its frozen node IDs, checksums, generations, and lifecycle transitions are not an API-compatible replacement for task-ledger declaration validation. No production caller was established in this review."
+      },
+      "decisionEvidence": "KAG, document citation, typed S-Graph, diagnostic repair, frozen execution, and workboard declaration graphs have different node/edge contracts and side-effect boundaries. No shared TypeScript owner is justified by duplicate Kahn-style algorithms alone."
+    }
+  },
   "capabilities": {
     "graph_analysis": {
       "owner": {
@@ -187,7 +211,28 @@
         "export": "validateAtlasEnvelope",
         "evidence": "CREATED + unit-proven in isolation 2026-08-09 (7/7 tests, tests/atlas/envelope-validator.spec.ts, incl. shuffled-delivery replay proof). NOT yet wired into any live producer — see openspec/changes/parent-atlas-unordered-execution-contract/tasks.md Phase 10. Distinct capability from packet_envelope_validation below (pass-result validation vs. at-rest packet-shape validation) — do not merge."
       },
-      "known_existing_duplication": []
+      "known_existing_duplication": [
+        {
+          "path": "python/atlas_subgraph_cugraph.py",
+          "classification": "DEAD",
+          "evidence": "Read-only cuGraph induced-subgraph proof CLI. Fresh repository-wide reference search (python, services, scripts, docker, packages, sveltekit-frontend/src) found no caller or deployment reference beyond this file; it has a standalone __main__ entrypoint and consumes explicit fixture files. Retain as historical proof code; no deletion or runtime change authorized."
+        },
+        {
+          "path": "python/atlas_rapids_community_sidecar.py",
+          "classification": "EXPERIMENT",
+          "evidence": "Standalone bounded FastAPI challenger exposing non-mutating Louvain/Leiden/spectral routes on default port 8099. Fresh reference/deployment search found no Compose/service/deployment caller. It calls python/atlas_rapids_community.py but is not the deployed atlas-gpu-8098 graph runtime; keep noncanonical and do not infer live service availability."
+        },
+        {
+          "path": "python/atlas_compute/cugraph_ppr.py",
+          "classification": "DEAD",
+          "evidence": "run_cugraph_ppr_parity and CuGraphPprParityReceipt are re-exported by atlas_compute/__init__.py, making the module import-reachable, but a fresh repository-wide search found no functional call or receipt use outside its definition/re-export. No fixture test invokes it. This is unused API, not a live executor; no removal performed."
+        },
+        {
+          "path": "python/atlas_compute/graph_programs.py",
+          "classification": "FIXTURE_ONLY",
+          "evidence": "deterministic_bfs and condense_and_lexicographically_sort are exercised by python/test_atlas_compute_graph_representation.py (4 tests pass). No production/deployment caller found. This test-proven Python reference is not the GR10 owner: parent-atlas-graph-runtime-enhancement defines GR10 as semantic best-first in TypeScript. Retain as fixture/reference implementation; no canonical graph ownership."
+        }
+      ]
     },
     "packet_envelope_validation": {
       "owner": {
@@ -354,6 +399,26 @@
         "classification": "CANONICAL_OWNER",
         "path": "sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts",
         "evidence": "Genuinely distinct scope from source-code domain classification above -- 10 workstation lanes (IDENTITY, EXPORT_STORAGE, GRAPH, TELEMETRY, EMBEDDING, OKF_ONTOLOGY, TRANSPORT, COMPILER, RUNTIME_TRAINING, SHARED), not source-code domains. Built, type-checked, not wired into any live route (see openspec/changes/parent-atlas-workstation-domain-classifier/proposal.md for that gap -- tracked there, not here). Mirrors this registry's existing n_ary_relationship_synthesis dual-owner shape: two CANONICAL_OWNERs, domain-scoped, not competing."
+      },
+      "persistence_surfaces": {
+        "audit": "docs/reports/wfu-topic-domain-table-ownership-v1.json",
+        "measuredAt": "2026-09-23T18:15:58Z",
+        "readOnly": true,
+        "tables": [
+          { "name": "atlas_domain_ontology", "classification": "CANONICAL_OWNER", "role": "domain ontology node identities (group_id)", "rows": 17, "evidence": "Read by ontology-resolution-boundary-postgres.ts and the admin ontology-resolution route; domain_class label authority remains the separate classifyDomainTaxonomy owner above." },
+          { "name": "atlas_ontology_concepts", "classification": "CANONICAL_OWNER", "role": "OAK concept identity/label registry", "rows": 0, "evidence": "Read by python/atlas_oak_kernel.py for exact concept and alias lookup; has two incoming FK dependents. Empty today, so this establishes schema owner, not populated vocabulary readiness." },
+          { "name": "taxonomy_nodes", "classification": "BACKEND", "role": "persisted taxonomy topology read model", "rows": 5527, "evidence": "Read by taxonomy-topology-packet.ts, taxonomy-retrieval-filter-v1.ts, and TRACE taxonomy queries; no source-revision authority inferred." },
+          { "name": "taxonomy_edges", "classification": "BACKEND", "role": "persisted taxonomy relationship/topology surface", "rows": 62802, "evidence": "Used by the read-only taxonomy-to-hyperedge planner; no identity or ontology promotion inferred." },
+          { "name": "domain_taxonomy_v1", "classification": "ADAPTER", "role": "empty revision/alias normalization schema candidate", "rows": 0, "evidence": "Schema has version and replacement fields; no live rows. Schema tournament leaves domain_class owner choice unresolved; no population authorized." },
+          { "name": "atlas_taxonomy_assignment_candidates", "classification": "ADAPTER", "role": "reviewable assignment candidates", "rows": 0, "evidence": "Existing producer/review API writes candidate records with evidence and revisions; candidates are not promoted identities." },
+          { "name": "document_topics", "classification": "BACKEND", "role": "derived clustering/topic assignment projection", "rows": 0, "evidence": "topic-clustering-worker writes it and analytics/recommendation routes read it; clustering does not own ontology identity." },
+          { "name": "feature_domain_facts", "classification": "BACKEND", "role": "revision/evidence-bearing derived domain facts", "rows": 123376, "evidence": "Read by the agent feature loader; bounded materialization scripts produce facts. Derived classifier output, not domain ontology authority." },
+          { "name": "feature_domain", "classification": "DEAD", "role": "legacy packet-domain materialization", "rows": 61659, "evidence": "No active application reader/writer found in the scoped source search; the remaining direct read is an audit. Retain populated history; archive/replacement review only, no deletion." },
+          { "name": "ontology_domain_tuples", "classification": "DEAD", "role": "legacy domain tuple materialization", "rows": 61659, "evidence": "No active application reader/writer found in the scoped source search. Retain populated history; do not confuse it with feature_ontology_tuples or authorize cleanup." },
+          { "name": "atlas_concepts", "classification": "DEAD", "role": "unpopulated duplicate concept registry candidate", "rows": 0, "evidence": "Zero rows, zero FK dependents; existing schema tournament flags it as a dead/duplicate candidate. Archive/document only; do not delete." },
+          { "name": "warden_hmm_topics", "classification": "DEAD", "role": "unpopulated HMM topic projection", "rows": 0, "evidence": "Only schema/relation references found; no live producer or consumer found. No cleanup performed." }
+        ],
+        "decisionBoundary": "This is role classification only. It does not resolve the open domain_class owner decision, populate domain_taxonomy_v1, promote candidates, or authorize archival/deletion."
       }
     },
     "ace_packet_validator": {

@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.unknown-resolution-draft-receipt.v2",
+  "status": "DRAFT_ARTIFACT_ONLY_NOT_APPLIED",
+  "generatedAt": "2026-09-26T16:55:42.668Z",
+  "target": "public.unknown_packets (EXISTING owner; additive UnknownResolutionV1 columns PROPOSED, not applied)",
+  "supersedes": "feature-unknowns-draft-v2 / atlas_feature_unknowns (withdrawn: competing sibling table)",
+  "requiredFollowUp": "unknown pipeline code must filter subject_kind = PACKET_IDENTITY before any gap row exists",
+  "migration": {
+    "path": "sveltekit-frontend\\drizzle\\manual\\20260926_unknown_resolution_v2_PROPOSED.sql",
+    "sha256": "sha256:5dd828325e1f96bcbfec07de6dbd756da1e4a6cb2ca54e72788611b29be18b67",
+    "applied": false
+  },
+  "inputs": {
+    "featureReceipt": "docs\\reports\\legacy-summary-hint-feature-v2-20260926T164150Z.json",
+    "featureRows": {
+      "path": ".tmp\\atlas\\legacy-summary-hint-feature-v2\\20260926T164150Z\\feature-rows.ndjson",
+      "sha256": "sha256:0a829522820a9d053f74699835ad28922892acd512f13da1e43557ebf22b9b53",
+      "bytes": 16043649
+    },
+    "chunkMultiplicity": {
+      "path": ".tmp/atlas/cei24-packet-chunk-hint-crosswalk-v1/20260926T163939Z/candidate-multiplicity.ndjson",
+      "rows": 16151,
+      "sha256": "sha256:f3caf39e231e53767f0360daf7c8a3ea125ed96ebccebc5bd3c16364d8ed6f86"
+    },
+    "overlayProof": "docs\\reports\\historical-evidence-overlay-proof-v2-20260926T164100Z.json"
+  },
+  "coordinates": {
+    "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+    "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3"
+  },
+  "draftRows": 15973,
+  "byReason": {
+    "NO_PROVEN_CHUNK_LINEAGE": 15638,
+    "CHUNK_WITHOUT_QUALIFIED_SUMMARY": 335
+  },
+  "checks": {
+    "matchesUnavailableCount": true,
+    "uniqueSurrogateKeys": true,
+    "uniqueNaturalKeys": true,
+    "reasonsPartitionAll": true,
+    "noValuesStored": true,
+    "packetIdentityRowsUntouched": true,
+    "nineAdditiveFieldsPresent": true,
+    "deterministic": true
+  },
+  "uuidNamespace": "76b37271-2f74-5e11-948b-68a9260a1374",
+  "producerRevision": "sha256:faad834d2e22cc767bbdb3b596e0db8344cdcbb0087735961a91a939a727846e",
+  "artifact": {
+    "path": ".tmp\\atlas\\unknown-resolution-draft-v2\\20260926T165542Z\\unknown_packets.gap-rows.draft.ndjson",
+    "sha256": "sha256:9ced55e0928e12f56a4ced392e1c7775f364eced417bda5ecfbef88f51292424",
+    "rows": 15973
+  },
+  "packetLevelSummaryPresentAmongDrafts": 3622,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "semantics": "Typed missing-evidence requirements for identified subjects, stored in the existing unknown owners. Not identity, not a value store, never promoted as packets."
+}

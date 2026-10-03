@@ -10,16 +10,15 @@ const aceSummarizeSchema = z.object({
 	caseId: z.string().uuid().optional(),
 	content: z.string().max(50000).optional(),
 	title: z.string().max(500).optional(),
-	workspaceRevision: z.string().trim().min(1).optional(),
-	candidateSnapshotRevision: z.string().trim().min(1).optional(),
-	ordinalMapChecksum: z.string().trim().min(1).optional(),
-	representationRevision: z.string().trim().min(1).optional(),
-	retrievalPolicyRevision: z.string().trim().min(1).optional(),
-	contextPolicyRevision: z.string().trim().min(1).optional(),
-	graphRevision: z.string().trim().min(1).nullable().optional(),
 }).refine(d => d.content || d.evidenceId, {
 	message: 'Must provide either content or evidenceId'
 });
+
+const clientOwnedRevisionFields = [
+	'workspaceRevision', 'candidateSnapshotRevision', 'ordinalMapChecksum',
+	'representationRevision', 'featureRevision', 'retrievalPolicyRevision',
+	'contextPolicyRevision', 'graphRevision', 'modelRevision', 'dimension',
+] as const;
 
 // Zod schema for Ollama structured output — GBNF grammar constraining guarantees valid JSON
 const summaryResponseSchema = z.object({
@@ -41,6 +40,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const raw = await request.json();
+		if (raw && typeof raw === 'object' && clientOwnedRevisionFields.some((field) => field in raw)) {
+			return json({ error: 'Cache identity revisions are server-owned' }, { status: 400 });
+		}
 		const parsed = aceSummarizeSchema.safeParse(raw);
 		if (!parsed.success) {
 			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
@@ -50,13 +52,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			caseId,
 			content,
 			title,
-			workspaceRevision,
-			candidateSnapshotRevision,
-			ordinalMapChecksum,
-			representationRevision,
-			retrievalPolicyRevision,
-			contextPolicyRevision,
-			graphRevision,
 		} = parsed.data;
 
 		// Assemble full ACE context (7 parallel data sources)
@@ -66,13 +61,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			caseId,
 			conversationId: caseId ? `board-${caseId}` : undefined,
 			maxTokens: 2000,
-			workspaceRevision,
-			candidateSnapshotRevision,
-			ordinalMapChecksum,
-			representationRevision,
-			retrievalPolicyRevision,
-			contextPolicyRevision,
-			graphRevision,
 		});
 
 		// Build the ACE prompt

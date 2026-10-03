@@ -1,8 +1,11 @@
 """Compares knn_recall@k across semantic_768, MRL-truncated EmbeddingGemma projections
-(semantic_mrl_128/256), and the learned NestedSemanticAutoencoder latents (latent_128/latent_64).
+(semantic_mrl_512/256/128), and learned NestedSemanticAutoencoder latents
+(latent_256/128/64).
 
-This does NOT retrain or re-embed anything. It reads the same canonical semantic_768 source
-(codebase_chunk_index.content_embedding) used by train_latent_autoencoder.py, reproduces the
+This does NOT retrain or re-embed anything. It reads the same active-candidate 768-D source
+(codebase_chunk_index.content_embedding) used by train_latent_autoencoder.py. The physical writer
+split and encoder provenance remain unresolved; this benchmark does not establish canonical
+admission. It reproduces the
 IDENTICAL source-grouped held-out validation split (same seed, same val_fraction) so results are
 directly comparable to the knn_recall_128/knn_recall_64 figures already recorded in
 docs/reports/latent-autoencoder-training-receipt-v2-full01.json, and loads the trained checkpoint
@@ -60,7 +63,7 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=684453, help="must match the training run's split seed for a fair comparison")
     parser.add_argument("--checkpoint", default="python/checkpoints/nested_semantic_autoencoder_v3_full01.pt")
     parser.add_argument("--k", type=int, default=10)
-    parser.add_argument("--out", default="docs/reports/semantic-representation-recall-comparison-v1.json")
+    parser.add_argument("--out", default="docs/reports/semantic-representation-recall-comparison-v2.json")
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -68,6 +71,8 @@ def main() -> None:
     print(json.dumps({"event": "fetching_data", "limit": args.limit}))
     ids, source_refs, vectors = fetch_semantic_768(args.database_url, args.limit)
     print(json.dumps({"event": "data_fetched", "row_count": len(ids), "embedding_dim": vectors.shape[1]}))
+    if vectors.ndim != 2 or vectors.shape[1] != 768:
+        raise SystemExit(f"Expected canonical semantic_768 matrix [N,768]; got {vectors.shape}")
 
     train_idx, val_idx, train_source_count, val_source_count = source_grouped_split(
         source_refs, args.val_fraction, args.seed
@@ -102,6 +107,7 @@ def main() -> None:
     mrl_512 = mrl_truncate(val_norm, 512)
 
     representations = {
+        "semantic_768": {"dims": 768, "vectors": val_norm, "kind": "CANONICAL_REFERENCE"},
         "semantic_mrl_128": {"dims": 128, "vectors": mrl_128, "kind": "NATIVE_MRL_TRUNCATION"},
         "semantic_mrl_256": {"dims": 256, "vectors": mrl_256, "kind": "NATIVE_MRL_TRUNCATION"},
         "semantic_mrl_512": {"dims": 512, "vectors": mrl_512, "kind": "NATIVE_MRL_TRUNCATION"},
@@ -119,9 +125,15 @@ def main() -> None:
     row_identity_checksum = sha256("".join(sorted(ids[i] for i in val_idx)).encode("utf-8")).hexdigest()
 
     receipt = {
-        "schema": "atlas.semantic-representation-recall-comparison.v1",
+        "schema": "atlas.semantic-representation-recall-comparison.v2",
         "canonical_authority": False,
-        "note": "Benchmark only. Does not promote any representation or authorize a new schema field.",
+        "note": "Benchmark only. MRL prefix projections and learned autoencoder latents are separate challengers; does not promote any representation or authorize a schema field.",
+        "reference_representation": {
+            "id": "semantic_768",
+            "dimensions": 768,
+            "model_family": "EmbeddingGemma",
+            "provenance": "canonical fetch path; encoder receipt verification is a separate gate",
+        },
         "k": args.k,
         "val_row_count": int(len(val_idx)),
         "val_source_count": int(val_source_count),

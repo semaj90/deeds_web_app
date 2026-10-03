@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T03:52:57Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "selection": {
+    "change": "parent-atlas-graph-runtime-python-consolidation",
+    "continuation": true,
+    "linkedChange": "parent-atlas-tensor-residency-integration",
+    "reason": "Continued the active graph-runtime tranche after the recorded workboard pivot; strengthened GPU-EXP-15 receipt lineage without loading a graph or changing canonical data."
+  },
+  "result": {
+    "taskProgress": { "checked": 14, "open": 4, "total": 18, "deltaCheckedThisRun": 0 },
+    "linkedTaskProgress": { "checked": 97, "open": 54, "total": 151, "deltaCheckedThisRun": 0 },
+    "gpuExp15": {
+      "implementation": "BFS path receipt requires graphRevision, projectionRevision, and a SHA-256 graphOrdinalMapChecksum; those bindings are included in the path checksum and returned receipt.",
+      "failClosed": "Missing revision bindings or malformed ordinal checksum are rejected.",
+      "tests": "20 focused Python tests passed; checksum changes when graphRevision changes.",
+      "liveResident": null,
+      "liveGraphTraversal": false,
+      "canonicalAuthority": false
+    },
+    "gpuExp16": {
+      "status": "PARTIAL_FIXTURE_ONLY",
+      "fixtureProof": "NetworkX shortest paths match paths translated from deliberately permuted executor ordinals; replayed path checksums are identical.",
+      "reasonOpen": "Fake cuGraph result frame proves adapter mapping/determinism only. No current aligned frozen GraphProjectionArtifactV1 has undergone actual NetworkX/cuGraph parity replay; live GPU memory is below the graph-load floor."
+    },
+    "operatorTasksRemaining": [
+      "T2 keep-or-archive decision for parent_atlas_pagerank_reference.py",
+      "Record the human decision in the ownership registry"
+    ],
+    "liveState": {
+      "gpuSidecarContainer": "atlas-gpu-8098 Up 9 hours",
+      "graphCapability": "available; cuGraph 26.08.00",
+      "residentGraph": null,
+      "gpuMemoryFreeMiB": 325,
+      "gpuMemoryTotalMiB": 8192,
+      "minimumGraphLoadMiB": 768,
+      "containerRebuild": "deferred"
+    },
+    "validation": {
+      "focusedPythonTests": "20 passed",
+      "pythonCompile": "PASS",
+      "graphRuntimeOpenSpecStrict": "PASS",
+      "tensorResidencyOpenSpecStrict": "PASS",
+      "scopedGitDiffCheck": "PASS"
+    },
+    "externalStateWrites": {
+      "postgres": false,
+      "qdrant": false,
+      "valkey": false,
+      "neo4j": false,
+      "graphify": false,
+      "liveGpuGraphLoad": false
+    },
+    "filesChangedThisRun": [
+      "python/atlas_graph_runtime/graph_projection_manifest.py",
+      "python/atlas_rapids_graph_runtime.py",
+      "python/tests/test_atlas_rapids_graph_runtime.py",
+      "openspec/changes/parent-atlas-graph-runtime-python-consolidation/tasks.md",
+      "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md"
+    ]
+  }
+}

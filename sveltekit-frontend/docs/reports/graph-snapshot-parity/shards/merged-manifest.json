@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.graph-snapshot-merged-manifest.v1",
+  "snapshotId": "5353e823-f6f5-4631-adf1-5c2eba30fbf6",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "sourceInventorySnapshotId": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "mergedFromRepositories": [
+    "repo:root"
+  ],
+  "excludedRepositories": [
+    {
+      "repositoryId": "repo:claude-mem",
+      "reason": "SUBMODULE_OUT_OF_PACKET_ADMISSION_SCOPE_BY_DESIGN"
+    },
+    {
+      "repositoryId": "repo:granite-docling-258M",
+      "reason": "SUBMODULE_OUT_OF_PACKET_ADMISSION_SCOPE_BY_DESIGN"
+    },
+    {
+      "repositoryId": "repo:mcp-server-mcp",
+      "reason": "SUBMODULE_OUT_OF_PACKET_ADMISSION_SCOPE_BY_DESIGN"
+    },
+    {
+      "repositoryId": "repo:models/embeddinggemma_300m",
+      "reason": "SUBMODULE_OUT_OF_PACKET_ADMISSION_SCOPE_BY_DESIGN"
+    },
+    {
+      "repositoryId": "repo:sites/parent-atlas-gateboard",
+      "reason": "SUBMODULE_OUT_OF_PACKET_ADMISSION_SCOPE_BY_DESIGN"
+    },
+    {
+      "repositoryId": "repo:turbovec",
+      "reason": "SUBMODULE_OUT_OF_PACKET_ADMISSION_SCOPE_BY_DESIGN"
+    }
+  ],
+  "nodeCount": 48339,
+  "edgeCount": 32226,
+  "topologyHash": "f6407b3ac00733131fb25a5f9dc6359223ad238e31be960cb9e4c69bec2ac178",
+  "crossRepositoryDuplicateNodeCount": 0,
+  "crossRepositoryDuplicates": [],
+  "conflicts": [],
+  "status": "MERGED_NO_CONFLICTS",
+  "generatedAt": "2026-09-28T21:52:54.811Z"
+}

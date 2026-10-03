@@ -53,6 +53,13 @@ registry owner census" — a distinct, later gate whose job is to decide whether
 Postgres-backed BM25-searchable registry (section 7 of the operator's spec) or stays code-defined.
 Building the Postgres table now would pre-empt that undone census.
 
+**D4 — The read-only execution spine reuses the existing owners.** ACE's admitted
+`ContextManifestV2` remains the only evidence boundary; `CapabilityRegistryV1` is a checksummed
+projection of the existing action seed with one implemented local fixture executor; and
+`WorkflowActionEventV1`/`AgentWorkReceiptV1` remain the run and durable receipt owners. Per-call
+`ToolExecutionReceiptV1` is transport evidence only, never a second durable evidence authority.
+No live MCP/OpenCode dispatch or production route is wired by the fixture proof.
+
 ## Risks / Trade-offs
 
 - [Building AR-01/AR-03 without AR-02's registry-owner census means the action registry is

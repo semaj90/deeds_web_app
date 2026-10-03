@@ -35,27 +35,23 @@ interface EmbedResponse {
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
-		// Degraded response on no auth — required for cascade smoke tests
-		if (!locals.user) {
-			return json({ embedding: new Array(768).fill(0), model: 'embeddinggemma:latest', dimensions: 768 });
-		}
+		if (!locals.user) return apiResponses.unauthorized();
 
 		// Rate limit: 60 requests/min per client
 		const rateCheck = embedRateLimiter.check(request);
 		if (!rateCheck.allowed) {
-			return json(
-				{ embedding: new Array(768).fill(0), model: 'embeddinggemma:latest', dimensions: 768 },
-				{ status: 429 }
-			);
+			return json({ error: 'Too many embedding requests' }, { status: 429 });
 		}
 
-		const raw = await request.json();
+		let raw: unknown;
+		try {
+			raw = await request.json();
+		} catch {
+			return apiResponses.badRequest('Invalid JSON body');
+		}
 		const parsed = embedRequestSchema.safeParse(raw);
 		if (!parsed.success) {
-			return json(
-				{ embedding: new Array(768).fill(0), model: 'embeddinggemma:latest', dimensions: 768 },
-				{ status: 400 }
-			);
+			return apiResponses.badRequest('Invalid embedding request');
 		}
 		const { text, model, dimensions } = parsed.data;
 
@@ -117,10 +113,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				break;
 			}
 			default:
-				return json(
-					{ embedding: new Array(768).fill(0), model: 'embeddinggemma:latest', dimensions: 768 },
-					{ status: 400 }
-				);
+				return apiResponses.badRequest('Unsupported embedding model');
 		}
 
 		if (dimensions && dimensions < result.embedding.length) {

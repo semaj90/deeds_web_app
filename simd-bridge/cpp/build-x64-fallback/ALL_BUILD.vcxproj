@@ -69,7 +69,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -79,7 +79,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -89,7 +89,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -99,7 +99,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -173,6 +173,26 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-fallback\atlas_core\atlas_core.vcxproj">
+      <Project>{F8F32F88-5DA1-3A02-8030-EA2919BF36AE}</Project>
+      <Name>atlas_core</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-fallback\atlas_core\atlas_core_c_abi_test.vcxproj">
+      <Project>{97B348F1-95F9-3DF3-9D05-EDFCFE82EE23}</Project>
+      <Name>atlas_core_c_abi_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-fallback\atlas_core\atlas_knn_backend.vcxproj">
+      <Project>{AF9DAACF-F89B-3516-8304-DECEC8B40CCC}</Project>
+      <Name>atlas_knn_backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-fallback\atlas_core\atlas_knn_c_abi_test.vcxproj">
+      <Project>{B21F7913-74F0-3A05-8B29-8A16E51984B3}</Project>
+      <Name>atlas_knn_c_abi_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-fallback\atlas_core\atlas_similarity_graph_backend.vcxproj">
+      <Project>{1B890A79-C41F-3057-9D0C-3CAC3D9110CA}</Project>
+      <Name>atlas_similarity_graph_backend</Name>
     </ProjectReference>
     <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-fallback\cuda_kernels.vcxproj">
       <Project>{B6D415B7-4C93-301D-BC8E-F0CD30B6E36A}</Project>

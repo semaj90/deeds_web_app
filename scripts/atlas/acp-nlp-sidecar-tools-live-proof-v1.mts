@@ -1,4 +1,6 @@
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 
 const repoEnv = loadRepoEnv(process.env);
 process.env.DATABASE_URL = resolveDatabaseUrl(repoEnv);
@@ -9,6 +11,7 @@ if (!modelPath) throw new Error('ROTORQUANT_MODEL_PATH_REQUIRED_FOR_ACP_PROOF');
 process.env.ROTORQUANT_MODEL_PATH = modelPath;
 
 const { executeACPTool, getACPToolRegistry } = await import('../../sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts');
+const reportPath = resolve(import.meta.dirname, '../../docs/reports/acp-nlp-sidecar-tools-live-proof-v1.json');
 
 /**
  * Live proof for the newly-registered nlp:capabilities/nlp:analyze/nlp:ast-chunk
@@ -21,7 +24,12 @@ function assert(condition: unknown, message: string): asserts condition {
 }
 
 async function main() {
-  const report: Record<string, unknown> = { schema: 'atlas.acp-nlp-sidecar-tools-live-proof.v1' };
+  const report: Record<string, unknown> = {
+    schema: 'atlas.acp-nlp-sidecar-tools-live-proof.v1',
+    canonicalAuthority: false,
+    promotionAuthorized: false,
+    writesPerformed: false,
+  };
 
   const registry = getACPToolRegistry();
   const registered = registry.list().map((tool) => tool.name);
@@ -52,9 +60,16 @@ async function main() {
     schema: (astChunk.data as any)?.schema,
     chunkCount: (astChunk.data as any)?.chunks?.length ?? null,
     syntaxStatus: (astChunk.data as any)?.syntax_status,
+    fixtureVerified: Boolean(
+      astChunk.success
+      && (astChunk.data as any)?.schema === 'atlas.ast.evidence.v1'
+      && ((astChunk.data as any)?.chunks?.length ?? 0) > 0
+      && (astChunk.data as any)?.syntax_status === 'CLEAN',
+    ),
   };
   assert(astChunk.success, `nlp:ast-chunk failed: ${JSON.stringify(astChunk)}`);
   assert((astChunk.data as any).schema === 'atlas.ast.evidence.v1', 'unexpected ast-chunk response schema');
+  assert((report.astChunk as any).fixtureVerified, 'ast-chunk fixture did not produce a clean non-empty evidence response');
 
   // dryRun mode must plan, not execute, for all 3.
   const dryRunCapabilities = await executeACPTool('nlp:capabilities', {}, { dryRun: true });
@@ -63,6 +78,8 @@ async function main() {
   report.dryRunModeWorks = [dryRunCapabilities, dryRunAnalyze, dryRunAstChunk].every((r) => r.kind === 'plan');
   assert(report.dryRunModeWorks, 'dryRun mode did not return plan-kind results for all 3 tools');
 
+  report.reportPath = 'docs/reports/acp-nlp-sidecar-tools-live-proof-v1.json';
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify(report, null, 2));
 }
 

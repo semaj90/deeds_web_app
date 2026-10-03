@@ -24,6 +24,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
+import { isMiniforgeNlpRunning } from './miniforge-nlp-health.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_ROOT = path.resolve(__dirname, '../..');
@@ -457,19 +458,6 @@ async function isLlamaServerRunning(port = 8090) {
   }
 }
 
-async function isMiniforgeNlpRunning(port = 8095) {
-  try {
-    const res = await fetch(`http://127.0.0.1:${port}/health`, {
-      signal: AbortSignal.timeout(2000),
-    });
-    if (!res.ok) return false;
-    const data = await res.json().catch(() => null);
-    return data?.status === 'ok' && data?.model === 'miniforge-nlp-sidecar';
-  } catch {
-    return false;
-  }
-}
-
 async function isTcpPortOpen(port) {
   try {
     return await new Promise((resolve) => {
@@ -715,7 +703,7 @@ async function main() {
     console.log('[dev:gpu]   Execution provider: Ollama-managed (on-demand runner, unloads on idle)');
     console.log('[dev:gpu]                   Set EMBEDDING_BACKEND=llama_cpp_gguf to enable the dedicated :8081 server');
   }
-  console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + tree-sitter + ast-grep)`);
+  console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + treesitter-chunker + ast-grep; runtime=launcher-selected, Docker provenance-v2 by default)`);
 
   const desiredVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
   const vitePort = await findFreePort(desiredVitePort);

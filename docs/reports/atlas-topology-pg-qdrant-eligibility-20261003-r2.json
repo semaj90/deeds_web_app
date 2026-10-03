@@ -1,0 +1,1931 @@
+{
+  "schema": "atlas.topology-pg-qdrant-eligibility-audit.v1",
+  "generatedAt": "2026-10-03T00:18:22.502Z",
+  "runMode": "READ_ONLY",
+  "queryContract": {
+    "schema": "atlas.canonical-eligibility-query.v1",
+    "authority": "postgresql",
+    "representationId": "semantic_768",
+    "dimensions": 768,
+    "requiredLineage": {
+      "membershipStatus": "EXACT_SINGLE_MEMBER",
+      "revisionStatus": "PROVEN"
+    },
+    "requiredVector": {
+      "embeddingEligible": true,
+      "vectorColumn": "content_embedding_768",
+      "dimensions": 768
+    },
+    "requiredSourceBinding": [
+      "canonical_source_ref",
+      "workspace_revision",
+      "source_revision",
+      "content_digest"
+    ],
+    "canonicalAuthority": false
+  },
+  "input": {
+    "candidateMapPath": ".tmp\\atlas\\candidate-ordinal-bridged-v1\\topology-pg-qdrant-20261002-r1\\candidate-ordinal-map-v1.json",
+    "candidateSnapshotRevision": "sha256:52ae87972e04b0d78d4ba3e55b4b081a4e7cc0a5331fa5b4dd37612165cf7799",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "ordinalMapChecksum": "199d5a29c3a7e43f5f706321d0b8a277e13f6d4b68ecec50e0a91106e53565f2",
+    "candidateCount": 127926,
+    "candidateMapIntegrity": "VALID"
+  },
+  "postgres": {
+    "dispositionCounts": {
+      "BLOCKED": 127911,
+      "ELIGIBLE": 15
+    },
+    "blockedSamples": [
+      {
+        "candidateOrdinal": 0,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:0046a5745d5d9e09",
+        "chunkRowId": "b833a977-60ad-4185-9263-09927ac17976",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 1,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:0050320904c52c61",
+        "chunkRowId": "dd9a8ee4-bd68-4f6e-86d6-a2bdf916661d",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 2,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:01dd89db9af965b1",
+        "chunkRowId": "09298111-1924-4454-9ef9-62dfd91a85c3",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 3,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:0225c68b377e87ce",
+        "chunkRowId": "982148a1-5f24-4020-b9ad-ba8ebacc3fa7",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 4,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:0763a425e136439e",
+        "chunkRowId": "70a85d61-209e-4676-8477-d82d2ad9a8a6",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 5,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:079da512f1aeb97c",
+        "chunkRowId": "aa1ff761-bec8-4ae1-9406-9cf3db0925ac",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 6,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:09494005c852513e",
+        "chunkRowId": "300fcee9-8b34-47a2-ad90-259826c8d9d6",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 7,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:0c4f553ca529631c",
+        "chunkRowId": "4056e6ff-53c6-4957-8d23-dae2f50ee887",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 8,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:1152ade674cc08fb",
+        "chunkRowId": "a3483bc2-748e-406a-a8e2-78f825b2af63",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 9,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:16bd5192541e4e41",
+        "chunkRowId": "d9e57dd0-bf59-4737-a0c4-94d1c697ace5",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 10,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:1883549d6c1f2de6",
+        "chunkRowId": "308a7b7e-cde1-43a3-9940-1c07d2247d81",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 11,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:19bffe571d9a6095",
+        "chunkRowId": "cfc8e908-83f8-4575-802e-83a612b5ae4f",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 12,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:1ad4aa65f242412b",
+        "chunkRowId": "dcd14cda-606f-4d94-a413-426b90ebc21a",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 13,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:1c0d4d275274f858",
+        "chunkRowId": "405d9016-e6cf-4402-a849-22dcca7f5d02",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 14,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:1f1acf01a7a5f34d",
+        "chunkRowId": "ad4bda91-047b-4853-9c04-e5cff3788ca2",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 15,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:2461a46280311431",
+        "chunkRowId": "245d8f0b-040e-44d9-a7d2-989607c916d2",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 16,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:247bce3ea7db5097",
+        "chunkRowId": "72656ce0-6a75-48a9-b38b-7c6a32a7972b",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 17,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:2cbe62868df9742f",
+        "chunkRowId": "20fa014a-48a2-49ab-92ea-7ff00815c77a",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 18,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:2eb65fb4fdcdaa14",
+        "chunkRowId": "fb66817e-4527-43c1-a31c-2b73c4270997",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 19,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:303c4f6866fa479e",
+        "chunkRowId": "f78b4d47-5464-43d4-a607-90297dc6ee64",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 20,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:3124150a6711ef96",
+        "chunkRowId": "5aec8715-4aef-4c9b-b3d4-2d8cb57c3e8b",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 21,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:31689648bcb74565",
+        "chunkRowId": "3fa73a4d-3edd-401c-bdc6-079b35960b58",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 22,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:31867bc320e14068",
+        "chunkRowId": "1c670c15-7ac5-4908-8f99-aaa7a9a47ed6",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 23,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:31cde9add208c51e",
+        "chunkRowId": "b84b06a7-ed66-4a5d-8853-052109853d82",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 24,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:3306c80628ab711f",
+        "chunkRowId": "8fb26a4c-2c97-43da-b3ec-a9baff3cf3f2",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 25,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:36f44cebb84d35ca",
+        "chunkRowId": "6cd031e2-1538-4b59-beea-711efb2a28fd",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 26,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:3a90dfa257f19f05",
+        "chunkRowId": "fc97879a-c0a1-4b21-968f-0b0f0db5f1fb",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 27,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:3b30083ac051c5ce",
+        "chunkRowId": "6336c34c-fb46-428f-9518-3aedc537bc17",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 28,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:3d7a9414e3615f2f",
+        "chunkRowId": "093ad403-1bd4-4f58-8b8c-c84e0ad59234",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 29,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:40a6b980c2ec4b25",
+        "chunkRowId": "39b7f9e1-c0a5-4b51-8eeb-77db8615193f",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 30,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:412c6eb3badc7806",
+        "chunkRowId": "3cd6b8cd-0760-4c10-9e2a-744d06cbb593",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 31,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:41f1a9b40be76337",
+        "chunkRowId": "400706f3-7329-4505-94dd-8709ff629f21",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 32,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:42a2e9e1061848c3",
+        "chunkRowId": "9f31f091-6537-487a-b593-d08319aeccb8",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 33,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:43497d105fd5bcd1",
+        "chunkRowId": "e13a3d14-7f8a-429c-9920-c801acefaaa8",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 34,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:436598cbbebdcd9c",
+        "chunkRowId": "a39f9abb-9094-46e2-a3cc-7966e585fb87",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 35,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:4789acc082182b84",
+        "chunkRowId": "0bf8fd85-ec49-4792-824f-9aec3c3b2b77",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 36,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:48fc0d7c98e8ec14",
+        "chunkRowId": "2e733456-2e05-4423-8e55-321431bae290",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 37,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:4aef6e71241ccf81",
+        "chunkRowId": "d2d3dc45-0e6b-4032-8ad2-0d41d8db8779",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 38,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:4d728cd6a086236f",
+        "chunkRowId": "163429c6-eee3-45f5-8d81-aa89350efb7d",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 39,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:4e2fd48219d383a9",
+        "chunkRowId": "2ebbabce-c020-4096-8260-0f3c95e08fb9",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 40,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:5223a6f9bad4e90c",
+        "chunkRowId": "b0151f4f-75a6-487f-800f-06312fa641b1",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 41,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:52aa7bc32700f415",
+        "chunkRowId": "478c3c61-a7e0-4e70-bd26-10d0d31aa85c",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 42,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:54ad69b76b4b067f",
+        "chunkRowId": "84a75fd6-8fcb-453d-9734-dd1130325e90",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 43,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:5587c775634b82a5",
+        "chunkRowId": "34cca485-ae40-473d-a1cd-921299cd3e9a",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 44,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:57c4b78556ef92bf",
+        "chunkRowId": "794a9ec0-4517-44da-80bb-a5b9e9a67ac0",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 45,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:593e703cf97643bf",
+        "chunkRowId": "2a0b88fb-ac2e-415c-86f2-c7aa9ac4dfd3",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 46,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:5e7ea5c07f91532d",
+        "chunkRowId": "f3fafdd4-0f90-442c-87d3-553328ed5a7b",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 47,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:634658b6ae12ddfe",
+        "chunkRowId": "0d889e53-51b4-4285-8fa4-15fdbd3accbc",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 48,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:63f4ab21670c567c",
+        "chunkRowId": "1ee65c56-7c43-4961-8493-c7c244cb4d3b",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 49,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:66043f99833a6eb9",
+        "chunkRowId": "903e9116-dcd3-4ef2-b463-66b88c3ce026",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 50,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:687ea57931c3f01f",
+        "chunkRowId": "8db9780f-2aad-478d-8b88-bb20181d15a8",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 51,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:7086868a124e1c67",
+        "chunkRowId": "b795acfa-4a8f-4f47-93d7-353c0b9144c1",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 52,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:74544cc0c3820bc7",
+        "chunkRowId": "bb0c370e-e06e-44ba-b712-da3b05295073",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 53,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:76a1a41832cd74e3",
+        "chunkRowId": "ef1a467f-655e-4b21-a314-802079f50737",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 54,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:7805a850228fc7eb",
+        "chunkRowId": "10984cb2-9e9b-4677-ae9f-e1c66960ddb9",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 55,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:7912af81f0821ebf",
+        "chunkRowId": "3c70fb05-fc86-4332-b650-c175634d47c1",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 56,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:7e0c27379b958b8b",
+        "chunkRowId": "338aa7be-ae06-43ac-9791-e12e4a3468eb",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 57,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:7ee62fe5a04a5b77",
+        "chunkRowId": "37d75351-f25a-49a3-8e66-c9cede607bfe",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 58,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:86d7b86a7c889479",
+        "chunkRowId": "b3d5a69c-cc4a-4d1f-803e-caa91d1504c0",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 59,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:879cfb49cf1c1574",
+        "chunkRowId": "1f415ab1-a310-436f-b86f-c9ddf35800bc",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 60,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:8a0aa7fda8f0a489",
+        "chunkRowId": "2fe83554-4876-4606-a716-05f19b6b1024",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 61,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:8b31f24f2161b046",
+        "chunkRowId": "efe383fd-0b60-4846-b83d-2e6edcc49f49",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 62,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:8bd1f534e41958e7",
+        "chunkRowId": "abb87713-06c1-48db-9a91-1019c349ad22",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 63,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:90a36211af282bb3",
+        "chunkRowId": "7324ffa8-10e6-4357-917e-04249a2b39d1",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 64,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:91d6888f19d7653f",
+        "chunkRowId": "3ecab250-1154-486a-9902-1a150e5c2aa0",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 65,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:94581f151ab37022",
+        "chunkRowId": "b0d8f7d8-df28-4d10-ae76-3d94d0a5b3ab",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 66,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:99d999047185e451",
+        "chunkRowId": "5c1a0b15-e974-44f8-aaf6-7921c48bfc52",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 67,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:9caea0e9eb229812",
+        "chunkRowId": "6cd832fa-7d04-4183-90a0-1392d36f21cf",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 68,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:a07004bf241dfb37",
+        "chunkRowId": "d733ea7a-fdd5-48f6-8c6a-204a78eb0a3b",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 69,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:a20674981909cbc9",
+        "chunkRowId": "7e1fe7a7-c930-44c2-85d4-1e970befca06",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 70,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:a250dddbbcd34cd7",
+        "chunkRowId": "bedcf812-d7d3-43cf-9938-5a9f0c8328c4",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 71,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:a40341ae0458c46d",
+        "chunkRowId": "8fc69cc8-25f4-4685-bd40-cc736bd1a924",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 72,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:a538be7ba10cd2c8",
+        "chunkRowId": "a212a709-b5fa-451a-8cc3-777553a6df14",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 73,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:a63a61e07cd09f7f",
+        "chunkRowId": "e1a65c66-6b03-4ea8-96ea-3f1da12ab017",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 74,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:a6e7912e4cc4ffe7",
+        "chunkRowId": "7b112623-e5c2-4d04-8c9c-83a9a4b1ac25",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 75,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:ae2eab88b6afb841",
+        "chunkRowId": "da25033d-7186-41ee-b331-53e1900ccccd",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 76,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:afcfc725af94adf8",
+        "chunkRowId": "6fe17e86-5e1f-4ff0-b927-e2913adbf92d",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 77,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:b0f9cce207f471b5",
+        "chunkRowId": "b22dfc7b-f84e-4cbb-bd5b-fd455331be62",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 78,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:b23f67a6be9f479e",
+        "chunkRowId": "f98e49a7-b33b-40ff-b0ce-dee52f00fddd",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 79,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:b2b779cc42ae87d2",
+        "chunkRowId": "1ca0cfd8-ae0b-4649-a75d-d2bc37afad3b",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 80,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:b3b25d6b3e8b4b0c",
+        "chunkRowId": "7d672c66-b315-4199-b28a-3681e2532a4e",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 81,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:b4f9a74da5d39a76",
+        "chunkRowId": "bee83567-838a-4d35-ac66-cfd3dcc98e84",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 82,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:b7d9452631ce5f8b",
+        "chunkRowId": "11284525-13c4-42b7-9e17-63d22e890e56",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 83,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:b83e96a95a6d91b2",
+        "chunkRowId": "915dd640-b4ec-4a91-9fa1-c03d08f87f41",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 84,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:b9ff8f360ca81024",
+        "chunkRowId": "7a4d0d3e-34f5-4d8f-80e3-77591ad4ac31",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 85,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:ba274f55676b0c61",
+        "chunkRowId": "a273a697-3d85-4c24-bb58-82261fdba4d1",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 86,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:bb55c4a7a736ee69",
+        "chunkRowId": "4ce444b0-6a92-4030-a143-14a1bc288f25",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 87,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:bb903d63ae85f5c1",
+        "chunkRowId": "41c1fa69-abec-4750-854b-f3b5014a9dc8",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 88,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:c04f373ac99f7c7d",
+        "chunkRowId": "518a74a4-809e-418e-a682-2021074c9a58",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 89,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:c1f57e348b1ea263",
+        "chunkRowId": "f0ea154a-89d3-47c7-b498-0076cb9a1bcb",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 90,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:c2de86487875dab3",
+        "chunkRowId": "bd2573e0-ad13-48ac-a4ca-08863f982c45",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 91,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:c375a13e8a338bf6",
+        "chunkRowId": "26a7ccaa-6e09-46ef-80c4-1b45a9c2ca28",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 92,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:c479a382e5ffddfb",
+        "chunkRowId": "5f9ffc02-310f-4971-8579-406dda7528ce",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 93,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:c65959ac98dc658d",
+        "chunkRowId": "962acaca-b091-47b7-abb1-041976e747cc",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 94,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:c721a1c394fb4058",
+        "chunkRowId": "c590dd0f-e8b0-4bd1-9b22-86174f802002",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 95,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:cae3a365c8bfe163",
+        "chunkRowId": "062e2f41-d136-4a3a-8dc8-43165f6db05b",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 96,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:cb2b6a4e5e6cf666",
+        "chunkRowId": "4bcbc5d7-7c16-4851-b051-c5d1e511970b",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 97,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:cbd6bb64d0526585",
+        "chunkRowId": "dcc81253-4abe-413f-ad73-714592243ce7",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 98,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:cd31194f77430922",
+        "chunkRowId": "68f38d7f-8fe3-4317-af54-ef49df95eec2",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      },
+      {
+        "candidateOrdinal": 99,
+        "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:ceff11d9d0fb32a3",
+        "chunkRowId": "585b2e0b-b41d-48f0-97d7-b4346ff9f9b0",
+        "packetKey": "packet:cacfc82e8b96",
+        "sourceRef": "src/lib/server/ace/context-assembler.ts",
+        "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "vectorRows": 1,
+        "eligibleVectorRows": 0,
+        "exactLineageRows": 0,
+        "exactWorkspaceBindings": 1,
+        "status": "BLOCKED",
+        "blockers": [
+          "SEMANTIC_768_NOT_ELIGIBLE",
+          "EXACT_LINEAGE_MISSING"
+        ]
+      }
+    ],
+    "eligibilityBitmap": {
+      "schema": "atlas.candidate-eligibility-bitmap.v1",
+      "candidateCount": 127926,
+      "eligibleOrdinals": [
+        180,
+        181,
+        182,
+        197,
+        206,
+        207,
+        210,
+        218,
+        236,
+        254,
+        3683,
+        4026,
+        4132,
+        5038,
+        5126
+      ],
+      "bitmapBase64": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAIMAEBAAQAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+      "canonicalAuthority": false
+    },
+    "eligibleCount": 15,
+    "owners": {
+      "vector_owner": "codebase_chunk_index",
+      "lineage_owner": "atlas_packet_chunk_lineage",
+      "source_binding_owner": "atlas_workspace_source_bindings"
+    },
+    "sqlOracle": {
+      "eligibleCount": 15,
+      "parity": {
+        "equal": true,
+        "expectedOnlyCount": 0,
+        "observedOnlyCount": 0,
+        "expectedOnlySample": [],
+        "observedOnlySample": []
+      }
+    }
+  },
+  "qdrant": {
+    "collection": "codebase_chunks_768",
+    "pointCount": 31891,
+    "observedOrdinals": [],
+    "ambiguousPointCount": 0,
+    "identityDispositionCounts": {
+      "MISSING_CANONICAL_ID": 31819,
+      "MISSING_SOURCE_REVISION": 72
+    },
+    "duplicatePointCount": 0,
+    "duplicatePointOrdinals": [],
+    "parity": {
+      "equal": false,
+      "expectedCount": 15,
+      "observedCount": 0,
+      "expectedOnlyCount": 15,
+      "observedOnlyCount": 0,
+      "expectedOnlySample": [
+        180,
+        181,
+        182,
+        197,
+        206,
+        207,
+        210,
+        218,
+        236,
+        254,
+        3683,
+        4026,
+        4132,
+        5038,
+        5126
+      ],
+      "observedOnlySample": []
+    }
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "vectorGeneration": false,
+    "candidateMap": false
+  },
+  "canonicalAuthority": false,
+  "status": "BLOCKED_PG_QDRANT_ELIGIBILITY_PARITY",
+  "blockers": [
+    "QDRANT_ORDINAL_SET_DIFFERS_FROM_POSTGRES_BITMAP"
+  ],
+  "checksum": "sha256:a5737d265f39d2d5cbd1c09a4ad8ae91997994ac9bf27c2e910c720f529b64c1"
+}

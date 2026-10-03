@@ -410,3 +410,47 @@ The Ollama/Ornith work was committed 2026-09-19 as a scoped commit (only files t
   `ornith-1.5-9b` after the §10 message-construction fix — both return real generated content, not
   errors. `node scripts/validate/full-system.mjs --gate=G30`/`--gate=G31` re-run clean after the fix.
 - No database, Qdrant, Neo4j, or Redis writes performed by any change in this gate.
+
+## Image-synthesis GPU reservation recheck (2026-09-28)
+
+This live recheck supersedes older snapshots that reported `image-synthesis` on CPU and the
+source-only/old-container status below for this service. It does not close the separate archive
+decision or prove a FLUX generation run.
+
+- [x] **IMAGE-SYNTH-GPU-01 — PASS (GPU exposure only).** `docker-compose.yml` now declares an
+  NVIDIA device reservation. The running `legal-ai-image-synthesis` container has a live
+  `DeviceRequests` entry (`driver=nvidia`, one device, `capabilities=gpu`), is healthy on `:8092`,
+  and `/health` reports `device=cuda`, `cuda=true`. In-container PyTorch reports
+  `2.12.1+cu130`, `torch.cuda.is_available() == true`, and the RTX 3060 Ti. In-container
+  `nvidia-smi` sees the same GPU. This establishes device exposure, not successful model inference.
+- [x] **IMAGE-SYNTH-LLM-01 — MODEL CONFIG + MODEL CATALOG PASS; APP REQUEST NOT RE-TESTED.** The
+  recreated container has `LLM_MODEL=ornith-1.5-9b`, and read-only `GET /v1/models` on llama-server
+  returned `ornith-1.5-9b`. This recheck did not issue a completion through image-synthesis.
+- [x] **BNB PACKAGE IMPORT — PASS (0.49.2).** In-container `import bitsandbytes` succeeded and
+  reported 0.49.2. The latest handoff reports its CUDA backend loads cleanly; this independent
+  recheck did not run a quantized model/kernel or FLUX load. Existing source uses bitsandbytes NF4
+  and TorchAO INT4/INT8 paths. No NVFP4/MXFP4 path was found in this service. Four-bit weight
+  storage is not evidence of native FP4 Tensor Core execution.
+- [ ] **IMAGE-SYNTH-FLUX-01 — OPEN.** `/health` reports `flux_keyframe=false`; no FLUX load or
+  inference was run in this audit.
+- [ ] **IMAGE-SYNTH-VRAM-01 — OPEN / TELEMETRY DISAGREEMENT.** During this audit, service health
+  reported `vram_free_mb=7126`, while an in-container `nvidia-smi` sample reported 7,486 MiB used
+  and 539 MiB free of 8,192 MiB. The health field is derived from `torch.cuda.mem_get_info()`;
+  do not use it as device-global admission evidence until reconciled. The `~4GB` model footprint
+  comments are estimates, not measured peaks. Capture before/peak/after global VRAM and offload
+  behavior during an explicitly bounded model-load test.
+- **UNSLOTH-RUNTIME-01: NOT_INTEGRATED for image-synthesis; not a blocker.** The image-synthesis
+  runtime has no Unsloth integration. A repository reference in a separate training script is a
+  checkpoint identifier, not a dependency of this service.
+- **KMeans remains separate.** Native LibTorch KMeans and WSL2 RAPIDS/cuML KMeans are not part of
+  this image-synthesis failure. Keep their input-contract, CPU-oracle, GPU-parity, and capacity
+  gates in their existing KMeans owners; do not carry a global “PyTorch broken” blocker.
+- **GPU-LEASE-01 remains OPEN as a capacity-control requirement.** The device has only 8 GiB, and
+  the observed global free-memory sample was 539 MiB. Before FLUX, KMeans, CAGRA, or other heavy
+  jobs overlap, record the active owner, operation, container/PID, global VRAM before/peak/after,
+  and confirmed release. No model was loaded and no heavy GPU operation was started in this audit.
+
+Evidence: live Docker inspect and `/health`; `torch.cuda` probe and `nvidia-smi` inside
+`legal-ai-image-synthesis`; source review of `docker-compose.yml` and
+`docker/image-synthesis/app.py`. No build, deployment, model inference, or datastore/cache write
+was performed during this recheck.

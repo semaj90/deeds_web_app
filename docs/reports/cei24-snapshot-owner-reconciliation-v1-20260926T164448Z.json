@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.cei24-snapshot-owner-reconciliation-receipt.v1",
+  "status": "SNAPSHOT_OWNER_RECONCILED_PACKET_ID_SNAPSHOT_REPRODUCED",
+  "generatedAt": "2026-09-26T16:44:48.574195+00:00",
+  "canonicalAuthority": false,
+  "q1_ordinalOwner": "sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts::materializeCandidateOrdinalMap \u2014 both sessions delegate ordinal construction to it; it does not choose canonicalId.",
+  "q2_canonicalIdPrecedent": "scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts (git-tracked, 0fdde19a86) sets canonicalId = atlas_packets.packet_id for packet-level candidates; chunk-level owner uses canonical_chunk_id.",
+  "q3_whyCompetingUsedPacketKey": "materialize-cei24-candidate-ordinal-map-v1.mts is artifact-only (no DB), so it could not see packet_id; its comment cites 'existing canonical identity semantics' without naming an owner file. Tension recorded: the frozen identity chain calls packet_key the primary packet identity, but the packet-level ordinal precedent uses packet_id; operator directed packet_id for this proof.",
+  "q4_reproducible": {
+    "rerunReceipt": "docs/reports\\cei24-candidate-chunk-overlay-v1-20260926T164353Z.json",
+    "rows": true,
+    "candidateSnapshotRevision": true,
+    "ordinalMapChecksum": true,
+    "overlayChecksum": true,
+    "overlayFileSha256": true,
+    "ordinalMapFileSha256": true,
+    "packetIdToMatrixRowIndexCrosswalk": true,
+    "multiplicity": true,
+    "producerRevision": true
+  },
+  "q5_competingArtifact": {
+    "snapshot": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+    "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+    "canonicalId": "packet_key",
+    "universe": "IDENTICAL 16,151 (packet_key, source_ref, source_revision, workspace_revision) tuples",
+    "ordinalAgreement": "0 of 16,151 packets share an ordinal with the sealed snapshot (126 packets have packet_id != packet_key, shifting every rank)",
+    "verdict": "NOT a different universe; an incompatible coordinate system over the same universe. SUPERSEDED for the legacy-summary feature proof; NOT deleted, NOT invalid as a packet_key-keyed artifact.",
+    "crosswalkZeroMatches": "UNEXPLAINED. Verified read-only: source_revision matches 16,151/16,151, workspace_revision_key 16,151/16,151, integer workspace_revision 0/16,151 \u2014 but that integer mirror is checked AFTER its counter, so it does not explain packetIdentityExact=0. Root cause not established; do not consume that crosswalk.",
+    "files": {
+      "convergenceReceipt": {
+        "path": "docs/reports/cei24-candidate-snapshot-convergence-v1-20260926T161341.751Z.json",
+        "sha256": "sha256:85683c9c20251e0281d7e73d35d47ed355b1e00d7b9f15b0ddb4d99afaead06d"
+      },
+      "crosswalkReceipt": {
+        "path": "docs/reports/cei24-packet-chunk-summary-hint-crosswalk-v1-20260926T162216Z.json",
+        "sha256": "sha256:aafaa74cafc4b2c710d3ce0212d986d386927a2c0ed600be0d803e9ecb59ef27"
+      }
+    }
+  },
+  "q6_sealedSnapshot": {
+    "candidateSnapshotRevision": "sha256:603ec7df0c335cbd7feecc9f7041d9e09605e2008a37d7f7998d1c475aa4be81",
+    "ordinalMapChecksum": "6ae3cbcc4c4e6eff3ff6f516cdc1216db59b94a6b83c382e6cddc028f9418a0e",
+    "rows": 16151
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "note": "Rerun wrote new artifact/receipt files only; no existing file was modified or deleted."
+}

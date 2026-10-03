@@ -3,8 +3,23 @@
 - [ ] 1.1 Decide the exact `QdrantStructuralPayloadV1` field list — what subset of
       `AstGrepObservationV1` actually gets projected (node kind, symbol name, import/call edges,
       something narrower). This is a design decision, not a script.
-- [ ] 1.2 Check `openspec/specs/*` for any existing capability this would modify rather than add
+- [x] 1.2 Check `openspec/specs/*` for any existing capability this would modify rather than add
       to — the proposal currently assumes none exists; verify before treating that as final.
+      **Checked 2026-09-24 (read-only):** no existing spec defines a structural-payload capability
+      (root `openspec/specs/`: feature-evidence-graph, feature-registry, graph-node-identity,
+      retrieval-reconciliation, feature-state, kanban-materializer, repository-evidence-ingestion;
+      `sveltekit-frontend/openspec/specs/` has none either), so `atlas-qdrant-structural-payload`
+      is an ADD, not a MODIFY. It is, however, CONSTRAINED by
+      `atlas-retrieval-reconciliation` "Dense/vector projection": every point SHALL carry
+      canonical identity + projection revision, and a projection SHALL reuse the existing
+      `qdrant_id` / never create a second point identity — consistent with a `setPayload`-only
+      writer. Two conflicts to resolve under 1.1, not here: (a) `projection_revision` is absent from
+      `src/lib/server/atlas/qdrant-collection-contracts.ts` (see graphify-recovery-proof-ladder
+      L524 note), so the spec's projection-revision requirement is not yet met by the contract;
+      (b) that spec names `codebase_chunk_index.content_embedding_768` as the canonical content
+      vector, while root `CLAUDE.md` (2026-08-29/30) says `content_embedding` (55,169 rows) is
+      canonical and `content_embedding_768` is a smaller separate column — a spec/doc contradiction
+      to reconcile separately.
 - [x] 1.3 Confirm join key — **resolved 2026-09-12**. Practical join key is `source_ref`
       (`canonical_source_ref` in Qdrant payloads, ~96.4% of points per `canonicalIdFieldBreakdown`
       in `docs/reports/semantic-corpus-admission-v1.json`), matched against
@@ -96,9 +111,43 @@ authority=false; writesPerformed=false.
       collection storage, and `24.97 GiB` retained snapshots.
 - [x] Confirmed zero role violations and no collection retirement or payload
       mutation.
-- [ ] The report still finds `0` repository consumers, so consumer discovery
+- [x] The report still finds `0` repository consumers, so consumer discovery
       coverage must be reconciled before any cleanup or projection change.
 
-Evidence: `docs/reports/qdrant-collection-roles-v1.json`.
-Status: `QDRANT_COLLECTION_ROLES_PROVEN_CONSUMER_CENSUS_OPEN`;
-authority=false; writesPerformed=false.
+**Reconciled (2026-09-27):** the `0` was a script bug, not a real finding.
+`scanConsumers()` invokes `rg` via `execFileSync` against 5 hardcoded root
+directories (`scripts`, `services`, `docker`, `sveltekit-frontend`, `packages`);
+run from any cwd other than the repo root, `rg` errors on the missing path
+args (`services`/`packages` don't exist under `sveltekit-frontend/`), the
+script's own `command()` helper swallows that as `available: false`, and
+`scanConsumers()` silently returns `[]` — a real failure was being recorded
+as a real zero. Re-ran the audit from its canonical cwd (repo root, matching
+its own registered `atlas:qdrant:collection-roles:audit` npm script):
+**1,344 real consumer files found**, not 0. Live re-run also confirmed 48
+collections / 140 snapshot files (unchanged) and active collection storage
+grew from 2.77 GiB to 5.51 GiB (snapshots unchanged at 24.97 GiB) — no
+cleanup or payload mutation performed, read-only throughout.
+
+The correct consumer count surfaced 2 real violations invisible while
+consumers read 0: `ACTIVE_LEGACY_384_CONSUMER_REFERENCES`
+(`schema-postgres.ts` still declares two live 384-dim vector columns —
+`embedding` and `summary_embedding_384` — distinct from the already-dropped
+`content_embedding_384`; not touched here, schema changes need operator
+review per this repo's Drizzle Safety Rule) and
+`ACTIVE_COMPETING_768_CONSUMER_REFERENCES` (`packet-dense-rerank.ts`,
+`trace-mcp-server.ts` reference `codebase_chunks_768_v2`, the known
+not-yet-resolved challenger collection — consistent with, not new beyond,
+this repo's existing documented `codebase_chunks_768` vs `_768_v2` split).
+
+Evidence: `docs/reports/qdrant-collection-roles-v1.json` (regenerated, real
+consumer census). Status: `QDRANT_COLLECTION_ROLES_REVIEW_REQUIRED`;
+authority=false; writesPerformed=false. Next gate (per the report):
+`SEMANTIC_OWNER_CONSISTENCY_REVIEW_V1` — not started here, out of scope for
+this reconciliation.
+
+**Script bug not yet fixed** (flagged, not fixed — scope was reconciling the
+count, not hardening the script): `scanConsumers()` should record an explicit
+failure/error state when `rg` errors, instead of defaulting to an empty
+array indistinguishable from a genuine zero-consumer result — the same
+"record null, continue, never promote" principle this repo's own CLAUDE.md
+already states for multi-step proof runs.

@@ -24,7 +24,7 @@ from functools import lru_cache
 from typing import Any, Literal, Protocol
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 try:
     from oaklib import get_adapter
@@ -72,6 +72,21 @@ class OakTraversalRequest(BaseModel):
     predicates: list[str] = Field(default_factory=list, max_length=16)
     limit: int = Field(default=100, ge=1, le=1000)
     max_depth: int = Field(default=2, ge=1, le=4)
+
+
+class OakTypedAssertionRequest(BaseModel):
+    """Exact concept-relation probe; it does not judge prose or verify source spans."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    subject_concept_id: str = Field(alias="subject", min_length=1, max_length=512)
+    predicate: Literal[
+        "IS_A", "INSTANCE_OF", "ALIAS_OF", "IMPLEMENTS", "USES_SYSTEM", "CALLS",
+        "FOLLOWS", "IMPROVES", "DEPENDS_ON", "PART_OF", "PRODUCES", "CONSUMES",
+        "STORES_IN", "READS_FROM",
+    ]
+    object_concept_id: str = Field(alias="object", min_length=1, max_length=512)
+    evidence_ref: str = Field(alias="evidenceRef", min_length=1, max_length=512)
 
 
 class OakProfileCheckRequest(BaseModel):
@@ -244,6 +259,22 @@ class AtlasPostgresOntologyAdapter:
         """
         return self._query(sql, (entity_id, entity_id, max_depth, limit))
 
+    def match_typed_assertion(self, subject: str, predicate: str, object_: str) -> list[dict[str, Any]]:
+        """Return exact, bounded relation rows; caller evidence is not verified here."""
+        return self._query(
+            """
+            SELECT relation_id::text AS relation_id, subject_concept_id, predicate,
+                   object_concept_id, confidence, extractor_version
+              FROM atlas_ontology_relations
+             WHERE subject_concept_id = %s
+               AND predicate = %s
+               AND object_concept_id = %s
+             ORDER BY relation_id
+             LIMIT 2
+            """,
+            (subject, predicate, object_),
+        )
+
 
 def _label(adapter: Any, entity_id: str) -> str | None:
     try:
@@ -400,3 +431,34 @@ def oak_traverse(request: OakTraversalRequest) -> dict[str, Any]:
         "canonicalAuthority": False,
     }
     return {**response, "inputChecksum": _checksum(request.model_dump()), "outputChecksum": _checksum(response)}
+
+
+@router.post("/assertion/check")
+def oak_check_typed_assertion(request: OakTypedAssertionRequest) -> dict[str, Any]:
+    """Check one exact ontology triple without converting it into prose support."""
+    adapter = _adapter()
+    if not isinstance(adapter, AtlasPostgresOntologyAdapter):
+        raise HTTPException(status_code=503, detail="OAK_TYPED_ASSERTION_POSTGRES_ADAPTER_REQUIRED")
+    rows = adapter.match_typed_assertion(
+        request.subject_concept_id, request.predicate, request.object_concept_id
+    )
+    status = "NOT_FOUND" if not rows else "MATCHED" if len(rows) == 1 else "AMBIGUOUS"
+    response = {
+        "schema": "atlas.oak.typed-assertion-check.v1",
+        "status": status,
+        "assertion": {
+            "subject": request.subject_concept_id,
+            "predicate": request.predicate,
+            "object": request.object_concept_id,
+            "evidenceRef": request.evidence_ref,
+        },
+        "matchedRelation": rows[0] if len(rows) == 1 else None,
+        "sourceSpanVerification": "NOT_PERFORMED",
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
+    return {
+        **response,
+        "inputChecksum": _checksum(request.model_dump(by_alias=True)),
+        "outputChecksum": _checksum(response),
+    }

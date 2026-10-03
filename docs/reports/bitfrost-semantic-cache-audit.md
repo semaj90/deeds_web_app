@@ -1,6 +1,6 @@
 # BitFrost / ACE / Karpathy Redis Cache Audit
 
-Generated: 2026-09-17T04:10:44.233Z
+Generated: 2026-09-26T22:55:48.014Z
 Status: PASS_WITH_DRIFT
 Redis Container: legal-ai-valkey
 
@@ -8,9 +8,9 @@ Redis Container: legal-ai-valkey
 
 | Ownership | Families | Total keys |
 |---|---:|---:|
-| ACTIVE | 8 | 20 |
-| ASPIRATIONAL | 13 | 0 |
-| LEGACY | 2 | 26 |
+| ACTIVE | 8 | 99 |
+| ASPIRATIONAL | 13 | 3 |
+| LEGACY | 2 | 23379 |
 | WARMED_PENDING | 4 | 0 |
 | NAMING_DRIFT_CHECK | 1 | 0 |
 
@@ -25,9 +25,9 @@ Redis Container: legal-ai-valkey
 | `gpu:karpathy:scores` | ACTIVE | 0 | none | UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed. |
 | `gpu:karpathy:summary` | ACTIVE | 0 | none | UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed. |
 | `gpu:karpathy:encoded` | ASPIRATIONAL | 0 | none |  |
-| `embed:v2:embeddinggemma:latest:*` | ACTIVE | 8 | embed:v2:embeddinggemma:latest:a34ee5577eaee625a11272319c333abec71d453a9cc6e56e548b7ddfa7f2a1da, embed:v2:embeddinggemma:latest:7fdbf2f7e97fe77abfa3b1191e40719930e715779c65caa3453f7c349ac525b7, embed:v2:embeddinggemma:latest:dcc2a68711ebefcb5a0eff9b5ca94f214e246fe480bbefb5e0bbd2afc293130b, embed:v2:embeddinggemma:latest:94d192b3a326be1f019b71ef13ea5a367ffe939c5e9a88f1b270e53753d9569a, embed:v2:embeddinggemma:latest:fbe762cea7a72c261c78c14a199f613e7049ffb1d7a807469a392af3f3f95d6c |  |
-| `embed:embeddinggemma:latest:*` | LEGACY | 26 | embed:embeddinggemma:latest:2350cbfc386da93e6a372f8f3d4506c9, embed:embeddinggemma:latest:94d192b3a326be1f019b71ef13ea5a36, embed:embeddinggemma:latest:94d192b3a326be1f, embed:embeddinggemma:latest:db49d3005848d273c108473450f42289, embed:embeddinggemma:latest:71be871eb89d057b5c4b2bb413c743a8 |  |
-| `ace:*` | ACTIVE | 12 | ace:chunk:hits:sveltekit-frontend/src/lib/server/db/migrate-test-rag.ts, ace:chunk:hits:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/routes/api/cases/__tests__/cases-schemas.test.ts, ace:chunk:hits:C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\data\phase82-route-consolidation.json, ace:chunk:hits:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/routes/api/rag/search/__tests__/rag-search-schema.test.ts, ace:chunk:hits:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/__tests__/cache.test.ts |  |
+| `embed:v2:embeddinggemma:latest:*` | ACTIVE | 63 | embed:v2:embeddinggemma:latest:652192e08087cb09829cd6490f557ce51d7707c048fc9d63118f3f3ee875669b, embed:v2:embeddinggemma:latest:7c5956df8db3078f1be169af1deb65774bab391e0aa091415cb2886b3bc5c338, embed:v2:embeddinggemma:latest:5d64f3c7f55c13bc4cb4405d3f480bfc17cdd969f0223e2f1ad81034f034edb6, embed:v2:embeddinggemma:latest:686f4228b98904b281f4ebfb562d1f0045ec8451956bb148afe1dd95656160fd, embed:v2:embeddinggemma:latest:0cccf4769c1f4da3ba1fbad5337129a083ba24bd0473b7aed5b3ae033a3793d8 |  |
+| `embed:embeddinggemma:latest:*` | LEGACY | 23379 | embed:embeddinggemma:latest:4223fde248b8715cc172b4756ba5954b, embed:embeddinggemma:latest:a945db00112fb09e4e1873821cc6c2c8, embed:embeddinggemma:latest:d4fb0f7b5656e96b674edac31f44ff72, embed:embeddinggemma:latest:89859603cdbbcd3f074927ebb7b969c5, embed:embeddinggemma:latest:915373f28c5da4c4aab1ea6924eeb2f8 |  |
+| `ace:*` | ACTIVE | 36 | ace:chunk:hits:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/routes/api/cases/__tests__/cases-schemas.test.ts, ace:source_ref:f8955f0f, ace:source_ref:23627406, ace:source_ref:2a7ba9c5, ace:source_ref:0dbba660 |  |
 | `bitfrost:candidate:v1:*` | WARMED_PENDING | 0 | none |  |
 | `bitfrost:retrieval:v2:*` | WARMED_PENDING | 0 | none |  |
 | `bitfrost:retrieval:*` | LEGACY | 0 | none |  |
@@ -38,7 +38,7 @@ Redis Container: legal-ai-valkey
 | `centroid:packet:*` | ASPIRATIONAL | 0 | none |  |
 | `ace:context:*` | ASPIRATIONAL | 0 | none |  |
 | `ace:summary:*` | ASPIRATIONAL | 0 | none |  |
-| `ace:feature:*` | ASPIRATIONAL | 0 | none |  |
+| `ace:feature:*` | ASPIRATIONAL | 3 | ace:feature:src.lib.server.cache-keys, ace:feature:src.lib.server.cache.atlas-reward-cache, ace:feature:src.lib.server.cache.redis-exact-match | UNEXPECTED_POPULATED: was documented as ASPIRATIONAL with 0 live rows; now has 3. Verify whether a writer was added and update this script's classification. |
 | `ace:query:*` | ASPIRATIONAL | 0 | none |  |
 | `ace:tree:*` | ASPIRATIONAL | 0 | none |  |
 | `ace:authority:*` | ASPIRATIONAL | 0 | none |  |
@@ -55,7 +55,8 @@ Redis Container: legal-ai-valkey
 - **gpu:autoencoder:latent_64:***: UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed.
 - **gpu:karpathy:scores**: UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed.
 - **gpu:karpathy:summary**: UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed.
+- **ace:feature:***: UNEXPECTED_POPULATED: was documented as ASPIRATIONAL with 0 live rows; now has 3. Verify whether a writer was added and update this script's classification.
 
 ## Next Safe Action
 
-6 ownership-class drift flag(s) found -- see the "Drift flags requiring attention" section before trusting this audit's classification.
+7 ownership-class drift flag(s) found -- see the "Drift flags requiring attention" section before trusting this audit's classification.

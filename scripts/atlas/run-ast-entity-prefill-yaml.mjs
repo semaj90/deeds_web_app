@@ -7,6 +7,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { deriveTreeNodeOccurrenceId } from './lib/tree-node-occurrence-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const configPath = path.resolve(ROOT, process.argv.find((a) => a.startsWith('--config='))?.slice(9) ?? '.okf/pipelines/ast-entity-prefill.yaml');
@@ -22,14 +23,19 @@ if (config?.schema !== 'atlas.ast-entity-prefill-pipeline.v1') throw new Error('
 if (config.extraction?.engine !== 'ast-grep-napi') throw new Error('YAML must select ast-grep-napi');
 if (config.embedding?.representation !== 'semantic_768' || config.embedding?.normalization !== 'L2_VECTOR') throw new Error('YAML embedding contract must remain semantic_768/L2_VECTOR');
 
+// S01-09D bounded-replay aid: --source-ref=<path> (repeatable) restricts the query to exact source_ref values,
+// so a proof/regression run can target the known-affected files without a full repo walk. Read-only; no schema change.
+const sourceRefFilter = process.argv.filter((a) => a.startsWith('--source-ref=')).map((a) => a.slice(13));
 function queryPackets() {
+  const escapedRefs = sourceRefFilter.map((r) => `'${r.replace(/'/g, "''")}'`);
+  const sourceRefClause = escapedRefs.length ? ` AND source_ref = ANY(ARRAY[${escapedRefs.join(',')}])` : '';
   const sql = `SELECT packet_key, source_ref, feature_id, title_id, tree_node_id,
     COALESCE(NULLIF(content_hash, ''), NULLIF(sha256, ''), CASE WHEN workspace_revision IS NOT NULL THEN 'workspace:' || workspace_revision::text END) AS source_revision,
     primary_domain, domain_class, ontology, packet_ontology,
     CASE WHEN source_dimension = 768 AND embedding IS NOT NULL THEN true ELSE false END AS semantic_present
     FROM atlas_packets
     WHERE source_kind = 'codebase_chunk' AND source_ref IS NOT NULL
-      AND source_ref !~ '^(null|undefined|\\s*)$'
+      AND source_ref !~ '^(null|undefined|\\s*)$'${sourceRefClause}
     ORDER BY source_ref, packet_key${limit ? ` LIMIT ${limit}` : ''};`;
   const raw = execFileSync('docker', ['exec', 'legal-ai-postgres', 'psql', '-U', 'legal_admin', '-d', 'legal_ai_db', '-At', '-F', '|', '-c', sql], { encoding: 'utf8', timeout: 30000 });
   return raw.trim().split(/\r?\n/).filter(Boolean).map((line) => {
@@ -94,17 +100,34 @@ function extract(text, file, packet) {
       if (name) {
         const range = node.range();
         const signature = node.text().split('{', 1)[0].trim().slice(0, 512);
+        const startByte = utf8ByteOffset(text, range.start.index);
+        const endByte = utf8ByteOffset(text, range.end.index);
+        // S01-09D forward fix: `...packet` below carries the PACKET's own tree_node_id, which is one value per
+        // FILE, not per declaration (root cause: docs/reports/tree-node-occurrence-producer-census-v1.json).
+        // Every declaration row must override it with a genuinely declaration-scoped occurrence id, derived from
+        // (sourceRef, sourceRevision, nodeType, startByte, endByte) -- never inherited verbatim from the packet.
+        const resolvedPath = path.relative(ROOT, file).replaceAll('\\', '/');
+        const occurrenceId = deriveTreeNodeOccurrenceId({
+          sourceRef: packet.source_ref, sourceRevision: packet.source_revision ?? '',
+          nodeType: node.kind(), startByte, endByte,
+        });
         rows.push({
           schema: 'atlas.ast-entity-prefill-row.v2', ...packet,
-          resolved_path: path.relative(ROOT, file).replaceAll('\\', '/'),
+          resolved_path: resolvedPath,
           language: path.extname(file).toLowerCase().replace('.', ''),
           symbol_name: name.text(), symbol_kind: entityKind,
           entity_kind: entityKind, entity_id: `${packet.packet_key}#${entityKind}:${name.text()}`,
           name: name.text(), signature, ast_kind: node.kind(),
-          start_byte: utf8ByteOffset(text, range.start.index),
-          end_byte: utf8ByteOffset(text, range.end.index),
+          start_byte: startByte,
+          end_byte: endByte,
           start_line: range.start.line + 1, start_column: range.start.column,
           end_line: range.end.line + 1, end_column: range.end.column,
+          // Declaration-scoped occurrence identity (S01-09D) -- overrides the packet-level tree_node_id the
+          // `...packet` spread above would otherwise leave file-scoped. packet_tree_node_id preserves the
+          // original packet-level value for provenance/debugging only; it is never used as occurrence identity.
+          tree_node_id: occurrenceId,
+          tree_node_occurrence_id: occurrenceId,
+          packet_tree_node_id: packet.tree_node_id ?? null,
           extractor: 'ast-grep', extractor_revision: 'ast-grep-napi-graphify-yaml-v2',
           identity_status: 'CANDIDATE', canonical_symbol_id: null, symbol_version_id: null,
           canonical_write: false, classification_status: 'PENDING_ENCODER',
@@ -120,7 +143,9 @@ function extract(text, file, packet) {
   return rows;
 }
 
-const files = execFileSync('rg', ['--files', '--hidden', '--no-ignore', '-g', '!**/node_modules/**', '-g', '!.git/**', '-g', '!.gemini/**', '-g', '!.codex/**', '-g', '!.claude/**', '-g', '!.opencode/**'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 }).split(/\r?\n/).filter(Boolean);
+// Buffer raised 32MB -> 128MB (incidental, unrelated to S01-09D's identity fix): the repo's full --hidden
+// --no-ignore file listing now exceeds the old limit and was throwing ERR_CHILD_PROCESS_STDIO_MAXBUFFER.
+const files = execFileSync('rg', ['--files', '--hidden', '--no-ignore', '-g', '!**/node_modules/**', '-g', '!.git/**', '-g', '!.gemini/**', '-g', '!.codex/**', '-g', '!.claude/**', '-g', '!.opencode/**'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 }).split(/\r?\n/).filter(Boolean);
 const index = new Map(files.map((relative) => [relative.replaceAll('\\', '/'), path.resolve(ROOT, relative)]));
 const packets = queryPackets();
 const rows = [];

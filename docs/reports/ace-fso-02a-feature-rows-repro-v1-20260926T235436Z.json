@@ -1,0 +1,163 @@
+{
+  "schema": "atlas.ace-fso-02a-feature-rows-repro.v1",
+  "generatedAt": "2026-09-26T23:54:36.441Z",
+  "level": "LIVE_READ_ONLY",
+  "writesPerformed": 0,
+  "canonicalAuthority": false,
+  "map": {
+    "path": ".tmp\\atlas\\cei24-candidate-ordinal-map-v1\\20260926T170421.895Z\\candidate-ordinal-map-v1.json",
+    "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+    "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "rowCount": 16151
+  },
+  "expectedCandidateCount": 16151,
+  "persistedRowsConsidered": 1808,
+  "persistedRowsOutsideCandidateSet": 1799,
+  "persistedFeatureRevisions": [
+    "atlas-ast-entity-prefill-v2"
+  ],
+  "outcomeCounts": {
+    "NO_ORF_ROW": 16142,
+    "ORF_WORKSPACE_REVISION_NULL": 9
+  },
+  "exactRowsMapped": 0,
+  "missingOrdinalCount": 16151,
+  "missingOrdinalsSample": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24
+  ],
+  "rejectedRowsSample": [
+    {
+      "candidateOrdinal": 4,
+      "packetKey": "ace:packet:04abe0bfe254",
+      "reason": "ORF_WORKSPACE_REVISION_NULL",
+      "observed": {
+        "feature_revision": "atlas-ast-entity-prefill-v2",
+        "workspace_revision": null,
+        "representation_revision": null,
+        "created_at": "2026-08-24T18:07:36.866Z"
+      }
+    },
+    {
+      "candidateOrdinal": 24,
+      "packetKey": "ace:packet:3d01c1df26b3",
+      "reason": "ORF_WORKSPACE_REVISION_NULL",
+      "observed": {
+        "feature_revision": "atlas-ast-entity-prefill-v2",
+        "workspace_revision": null,
+        "representation_revision": null,
+        "created_at": "2026-08-24T18:08:01.068Z"
+      }
+    },
+    {
+      "candidateOrdinal": 26,
+      "packetKey": "ace:packet:41ae4f183768",
+      "reason": "ORF_WORKSPACE_REVISION_NULL",
+      "observed": {
+        "feature_revision": "atlas-ast-entity-prefill-v2",
+        "workspace_revision": null,
+        "representation_revision": null,
+        "created_at": "2026-08-24T18:08:01.140Z"
+      }
+    },
+    {
+      "candidateOrdinal": 51,
+      "packetKey": "ace:packet:8aa196c6fcb5",
+      "reason": "ORF_WORKSPACE_REVISION_NULL",
+      "observed": {
+        "feature_revision": "atlas-ast-entity-prefill-v2",
+        "workspace_revision": null,
+        "representation_revision": null,
+        "created_at": "2026-08-24T18:08:01.956Z"
+      }
+    },
+    {
+      "candidateOrdinal": 52,
+      "packetKey": "ace:packet:9028015b3c43",
+      "reason": "ORF_WORKSPACE_REVISION_NULL",
+      "observed": {
+        "feature_revision": "atlas-ast-entity-prefill-v2",
+        "workspace_revision": null,
+        "representation_revision": null,
+        "created_at": "2026-08-24T18:08:02.020Z"
+      }
+    },
+    {
+      "candidateOrdinal": 58,
+      "packetKey": "ace:packet:aef05752f9e4",
+      "reason": "ORF_WORKSPACE_REVISION_NULL",
+      "observed": {
+        "feature_revision": "atlas-ast-entity-prefill-v2",
+        "workspace_revision": null,
+        "representation_revision": null,
+        "created_at": "2026-08-24T18:08:02.306Z"
+      }
+    },
+    {
+      "candidateOrdinal": 64,
+      "packetKey": "ace:packet:bf0f0228d6c8",
+      "reason": "ORF_WORKSPACE_REVISION_NULL",
+      "observed": {
+        "feature_revision": "atlas-ast-entity-prefill-v2",
+        "workspace_revision": null,
+        "representation_revision": null,
+        "created_at": "2026-08-24T18:08:02.498Z"
+      }
+    },
+    {
+      "candidateOrdinal": 69,
+      "packetKey": "ace:packet:c9ecf821a27f",
+      "reason": "ORF_WORKSPACE_REVISION_NULL",
+      "observed": {
+        "feature_revision": "atlas-ast-entity-prefill-v2",
+        "workspace_revision": null,
+        "representation_revision": null,
+        "created_at": "2026-08-24T18:08:02.596Z"
+      }
+    },
+    {
+      "candidateOrdinal": 82,
+      "packetKey": "ace:packet:f4b41056ad2c",
+      "reason": "ORF_WORKSPACE_REVISION_NULL",
+      "observed": {
+        "feature_revision": "atlas-ast-entity-prefill-v2",
+        "workspace_revision": null,
+        "representation_revision": null,
+        "created_at": "2026-08-24T18:08:03.037Z"
+      }
+    }
+  ],
+  "orfWorkspaceRevisionNullCount": 1808,
+  "orfRepresentationRevisionNullCount": 1808,
+  "resolverAttempt": {
+    "threw": true,
+    "error": "ACE_RESOLVER_FEATURE_ROWS_MISSING",
+    "rowsSuppliedToResolver": 0,
+    "note": "no row passed exact mapping, so none was supplied; nothing synthesized"
+  },
+  "status": "FEATURE_ROWS_MISSING_REPRODUCED"
+}

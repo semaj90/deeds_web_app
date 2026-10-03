@@ -97,6 +97,31 @@ describe('CandidateFeature scatter-sort-compact challenger', () => {
     expect(result.compactedFeaturePresence[(2 * result.featureCount) + lexicalIndex]).toBe(0);
   });
 
+  it('matches an independent CPU top-K oracle and retains snapshot checksums', () => {
+    const columnar = fixtureColumnar();
+    const selected = [2, 0, 1];
+    const values = new Map<number, number>([[0, 0.25], [1, 0.9], [2, 0.9]]);
+    const oracle = [...selected]
+      .sort((left, right) => (values.get(right)! - values.get(left)!) || left - right)
+      .slice(0, 2);
+
+    const actual = runCandidateFeatureScatterSortCompactChallenger({
+      columnar,
+      selectedOrdinals: selected,
+      sortFeature: 'semanticRelevance',
+      sortDirection: 'DESC',
+      topK: 2,
+      producerRevision: 'scatter-sort-compact:cpu-oracle-test',
+    });
+
+    expect(oracle).toEqual([1, 2]);
+    expect(actual.compactedOrdinals).toEqual(oracle);
+    expect(actual.candidateSnapshotRevision).toBe(columnar.candidateSnapshotRevision);
+    expect(actual.columnarChecksum).toBe(columnar.columnarChecksum);
+    expect(actual.identityAuthority).toBe(false);
+    expect(actual.canonicalWritesAttempted).toBe(false);
+  });
+
   it('rejects duplicate or out-of-range ordinals before producing a challenger result', () => {
     expect(() => runCandidateFeatureScatterSortCompactChallenger({
       columnar: fixtureColumnar(), selectedOrdinals: [0, 0], sortFeature: 'semanticRelevance', producerRevision: 'scatter-sort-compact:test',

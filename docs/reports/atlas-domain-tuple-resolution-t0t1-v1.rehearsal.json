@@ -1,0 +1,197 @@
+{
+  "schema": "atlas.domain-tuple-resolution-t0.v1",
+  "generatedAt": "2026-09-20T09:21:29.941Z",
+  "mode": "REHEARSAL_ROLLBACK",
+  "resolver": {
+    "id": "atlas-domain-ontology-exact-ci-plus-alias-t1",
+    "version": "v2"
+  },
+  "steps": {
+    "before": {
+      "ontologyDomains": 17,
+      "distinctUnresolvedDomainKeys": 41,
+      "byState": [
+        {
+          "resolution_state": "UNRESOLVED",
+          "n": 539124
+        }
+      ]
+    },
+    "plan": {
+      "resolvableKeys": 18,
+      "resolvableTuples": 81104,
+      "ambiguousKeys": [],
+      "unmatchedKeys": 23,
+      "unmatchedTuples": 42330,
+      "keys": [
+        {
+          "tier": "T0",
+          "key": "Graph",
+          "groupId": "graph",
+          "matchedOn": "group_id",
+          "expected": 15432
+        },
+        {
+          "key": "UI",
+          "groupId": "frontend",
+          "matchedOn": "alias_t1",
+          "tier": "T1",
+          "expected": 8730
+        },
+        {
+          "tier": "T0",
+          "key": "test",
+          "groupId": "test",
+          "matchedOn": "group_id",
+          "expected": 8456
+        },
+        {
+          "tier": "T0",
+          "key": "gpu",
+          "groupId": "gpu",
+          "matchedOn": "group_id",
+          "expected": 7752
+        },
+        {
+          "tier": "T0",
+          "key": "compiler",
+          "groupId": "compiler",
+          "matchedOn": "group_id",
+          "expected": 7532
+        },
+        {
+          "tier": "T0",
+          "key": "frontend",
+          "groupId": "frontend",
+          "matchedOn": "group_id",
+          "expected": 6380
+        },
+        {
+          "tier": "T0",
+          "key": "database",
+          "groupId": "database",
+          "matchedOn": "group_id",
+          "expected": 5030
+        },
+        {
+          "tier": "T0",
+          "key": "graph",
+          "groupId": "graph",
+          "matchedOn": "group_id",
+          "expected": 4700
+        },
+        {
+          "key": "MachineLearning",
+          "groupId": "machine-learning",
+          "matchedOn": "alias_t1",
+          "tier": "T1",
+          "expected": 4682
+        },
+        {
+          "tier": "T0",
+          "key": "retrieval",
+          "groupId": "retrieval",
+          "matchedOn": "group_id",
+          "expected": 4612
+        },
+        {
+          "key": "rag_retrieval",
+          "groupId": "retrieval",
+          "matchedOn": "alias_t1",
+          "tier": "T1",
+          "expected": 3692
+        },
+        {
+          "tier": "T0",
+          "key": "cache",
+          "groupId": "cache",
+          "matchedOn": "group_id",
+          "expected": 2770
+        },
+        {
+          "tier": "T0",
+          "key": "Database",
+          "groupId": "database",
+          "matchedOn": "group_id",
+          "expected": 360
+        },
+        {
+          "tier": "T0",
+          "key": "API",
+          "groupId": "api",
+          "matchedOn": "group_id",
+          "expected": 328
+        },
+        {
+          "key": "graph_topology",
+          "groupId": "graph",
+          "matchedOn": "alias_t1",
+          "tier": "T1",
+          "expected": 232
+        },
+        {
+          "key": "cache_layer",
+          "groupId": "cache",
+          "matchedOn": "alias_t1",
+          "tier": "T1",
+          "expected": 212
+        },
+        {
+          "key": "Authentication",
+          "groupId": "auth",
+          "matchedOn": "alias_t1",
+          "tier": "T1",
+          "expected": 104
+        },
+        {
+          "key": "auth_login_register",
+          "groupId": "auth",
+          "matchedOn": "alias_t1",
+          "tier": "T1",
+          "expected": 100
+        }
+      ]
+    },
+    "archive": {
+      "path": ".tmp/atlas/feature-ontology-tuples-t0-pre-resolution-v1.rehearsal.json",
+      "sha256": "sha256:f0907d4425df191920febaf4d32afbd4ce874d20a884ee6729d23a08d5b82453",
+      "rows": 81104,
+      "manifestEntryWritten": false
+    },
+    "update": {
+      "updated": 81104,
+      "expectedTotal": 81104,
+      "perKeyMismatches": []
+    },
+    "verify": {
+      "byStateAfter": [
+        {
+          "resolution_state": "RESOLVED",
+          "n": 81104
+        },
+        {
+          "resolution_state": "UNRESOLVED",
+          "n": 458020
+        }
+      ],
+      "resolvedOutsideDomainTuples": 0,
+      "resolvedRowsMissingEvidenceKeys": 0,
+      "resolvedValuesNotInOntology": 0,
+      "nonDomainTuplesTouched": 0,
+      "remainingUnresolvedTargetsAfterUpdate": 0
+    },
+    "after": {
+      "byState": [
+        {
+          "resolution_state": "UNRESOLVED",
+          "n": 539124
+        }
+      ],
+      "persisted": false,
+      "expectedResolved": 0,
+      "gotResolved": 0
+    }
+  },
+  "errors": [],
+  "status": "REHEARSAL_PROVEN"
+}

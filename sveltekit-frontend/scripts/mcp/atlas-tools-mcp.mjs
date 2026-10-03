@@ -20,6 +20,7 @@ import { createInterface } from 'node:readline';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import neo4j from 'neo4j-driver';
 
 const log = (...a) => process.stderr.write('[atlas-tools] ' + a.join(' ') + '\n');
@@ -47,14 +48,54 @@ const MOCK_MODE = /^(1|true|yes)$/i.test(process.env.ATLAS_TOOLS_MOCK ?? '');
 
 function mockGraphResult(tool, args) {
   if (tool === 'find_dependencies') {
-    const target = String(args.target ?? '').replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
-    return { target, dependencies: [{ dep: 'mock/fixture-dependency.ts', type: 'IMPORTS' }], mock: true };
+    const target = String(args.target ?? '')
+      .replace(/\\/g, '/')
+      .replace(/^sveltekit-frontend\//, '');
+    return {
+      target,
+      dependencies: [{ dep: 'mock/fixture-dependency.ts', type: 'IMPORTS' }],
+      mock: true,
+    };
   }
-  if (tool === 'trace_database') return { query: String(args.query ?? ''), traces: [{ file: 'mock/fixture.ts', table: String(args.query ?? 'fixture_table'), operation: 'SELECT' }], mock: true };
-  if (tool === 'trace_tool_chain') return { tool: String(args.tool ?? ''), traces: [{ file: 'mock/fixture.ts', tool: String(args.tool ?? 'fixture_tool'), type: 'CALLS' }], mock: true };
-  if (tool === 'find_source_refs') return { query: String(args.query ?? ''), sourceRefs: ['mock/fixture.ts'], mock: true };
-  if (tool === 'find_feature') return { feature: String(args.feature ?? ''), features: [{ name: String(args.feature ?? 'fixture-feature'), description: 'deterministic mock feature' }], mock: true };
-  if (tool === 'find_route') return { route: String(args.route ?? ''), routes: [{ path: String(args.route ?? '/mock'), type: 'mock' }], mock: true };
+  if (tool === 'trace_database')
+    return {
+      query: String(args.query ?? ''),
+      traces: [
+        {
+          file: 'mock/fixture.ts',
+          table: String(args.query ?? 'fixture_table'),
+          operation: 'SELECT',
+        },
+      ],
+      mock: true,
+    };
+  if (tool === 'trace_tool_chain')
+    return {
+      tool: String(args.tool ?? ''),
+      traces: [
+        { file: 'mock/fixture.ts', tool: String(args.tool ?? 'fixture_tool'), type: 'CALLS' },
+      ],
+      mock: true,
+    };
+  if (tool === 'find_source_refs')
+    return { query: String(args.query ?? ''), sourceRefs: ['mock/fixture.ts'], mock: true };
+  if (tool === 'find_feature')
+    return {
+      feature: String(args.feature ?? ''),
+      features: [
+        {
+          name: String(args.feature ?? 'fixture-feature'),
+          description: 'deterministic mock feature',
+        },
+      ],
+      mock: true,
+    };
+  if (tool === 'find_route')
+    return {
+      route: String(args.route ?? ''),
+      routes: [{ path: String(args.route ?? '/mock'), type: 'mock' }],
+      mock: true,
+    };
   return null;
 }
 
@@ -70,8 +111,14 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        prompt: { type: 'string', description: 'The raw user prompt or error message to classify.' },
-        context: { type: 'string', description: 'Optional extra context: file path, error type, or phase label.' },
+        prompt: {
+          type: 'string',
+          description: 'The raw user prompt or error message to classify.',
+        },
+        context: {
+          type: 'string',
+          description: 'Optional extra context: file path, error type, or phase label.',
+        },
       },
       required: ['prompt'],
       additionalProperties: false,
@@ -86,10 +133,22 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'The user query or repair goal used to score cards.' },
-        maxCards: { type: 'number', description: 'Maximum number of cards to return (1-50). Default 20.' },
-        domainFilter: { type: 'string', description: 'Optional domain to filter cards (e.g. "retrieval", "graph"). Omit for all.' },
-        maxPayloadBytes: { type: 'number', description: 'Maximum serialized response budget (4096-65536). Default 24576.' },
+        query: {
+          type: 'string',
+          description: 'The user query or repair goal used to score cards.',
+        },
+        maxCards: {
+          type: 'number',
+          description: 'Maximum number of cards to return (1-50). Default 20.',
+        },
+        domainFilter: {
+          type: 'string',
+          description: 'Optional domain to filter cards (e.g. "retrieval", "graph"). Omit for all.',
+        },
+        maxPayloadBytes: {
+          type: 'number',
+          description: 'Maximum serialized response budget (4096-65536). Default 24576.',
+        },
       },
       required: ['query'],
       additionalProperties: false,
@@ -104,20 +163,37 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        intent: { type: 'string', description: 'Intent from classify_intent: "repair", "research", or "planning".' },
-        domain: { type: 'string', description: 'Domain from classify_intent (e.g. "retrieval", "graph").' },
-        errorSummary: { type: 'string', description: 'One-sentence description of the error or question.' },
+        intent: {
+          type: 'string',
+          description: 'Intent from classify_intent: "repair", "research", or "planning".',
+        },
+        domain: {
+          type: 'string',
+          description: 'Domain from classify_intent (e.g. "retrieval", "graph").',
+        },
+        errorSummary: {
+          type: 'string',
+          description: 'One-sentence description of the error or question.',
+        },
         evidenceLines: {
           type: 'array',
-          items: { type: 'string', description: 'One evidence item: a file:line ref, Redis key, rg match, or ACE card title.' },
-          description: 'Evidence items: file:line refs, Redis keys, rg matches, or ACE card titles.',
+          items: {
+            type: 'string',
+            description:
+              'One evidence item: a file:line ref, Redis key, rg match, or ACE card title.',
+          },
+          description:
+            'Evidence items: file:line refs, Redis keys, rg matches, or ACE card titles.',
         },
         patchTargets: {
           type: 'array',
           items: { type: 'string', description: 'Relative file path that needs to change.' },
           description: 'Relative file paths that need to change. Empty array if no patch needed.',
         },
-        proposedFix: { type: 'string', description: 'Optional one-line description of the proposed code change.' },
+        proposedFix: {
+          type: 'string',
+          description: 'Optional one-line description of the proposed code change.',
+        },
       },
       required: ['intent', 'domain', 'errorSummary', 'evidenceLines', 'patchTargets'],
       additionalProperties: false,
@@ -125,25 +201,38 @@ const TOOLS = [
   },
   {
     name: 'record_outcome',
-    description: 'Record the outcome of a RAG query or code-repair task. Writes trace details to a local NDJSON ledger and creates behavioral relationships in Neo4j.',
+    description:
+      'Record the outcome of a RAG query or code-repair task. Writes trace details to a local NDJSON ledger and creates behavioral relationships in Neo4j.',
     inputSchema: {
       type: 'object',
       properties: {
-        intent: { type: 'string', description: 'The intent classified for this task (e.g. "repair_glyph_ingestion").' },
+        intent: {
+          type: 'string',
+          description: 'The intent classified for this task (e.g. "repair_glyph_ingestion").',
+        },
         tool: { type: 'string', description: 'The tool choice that was made.' },
         sourceRefs: {
           type: 'array',
           description: 'The source files or references involved in the selection.',
           items: { type: 'string', description: 'A source file path or reference key.' },
         },
-        recommendationAccepted: { type: 'boolean', description: 'Whether the suggestion was accepted.' },
+        recommendationAccepted: {
+          type: 'boolean',
+          description: 'Whether the suggestion was accepted.',
+        },
         reward: { type: 'number', description: 'The calculated reward score (0.0 to 1.0).' },
-        graphVersion: { type: 'string', description: 'The version of the codebase graph (e.g., "2026-05-29").' },
-        errorMsg: { type: 'string', description: 'Optional error description if the recommendation failed.' }
+        graphVersion: {
+          type: 'string',
+          description: 'The version of the codebase graph (e.g., "2026-05-29").',
+        },
+        errorMsg: {
+          type: 'string',
+          description: 'Optional error description if the recommendation failed.',
+        },
       },
       required: ['intent', 'tool', 'sourceRefs', 'recommendationAccepted', 'reward'],
       additionalProperties: false,
-    }
+    },
   },
   {
     name: 'find_dependencies',
@@ -151,23 +240,27 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        target: { type: 'string', description: 'Target file path (relative to sveltekit-frontend/src or absolute).' }
+        target: {
+          type: 'string',
+          description: 'Target file path (relative to sveltekit-frontend/src or absolute).',
+        },
       },
       required: ['target'],
       additionalProperties: false,
-    }
+    },
   },
   {
     name: 'trace_database',
-    description: 'Find files in the codebase mapping database usage (USES_DB) for a table name or query.',
+    description:
+      'Find files in the codebase mapping database usage (USES_DB) for a table name or query.',
     inputSchema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Table name or search term.' }
+        query: { type: 'string', description: 'Table name or search term.' },
       },
       required: ['query'],
       additionalProperties: false,
-    }
+    },
   },
   {
     name: 'trace_tool_chain',
@@ -175,11 +268,11 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        tool: { type: 'string', description: 'Tool name pattern to trace.' }
+        tool: { type: 'string', description: 'Tool name pattern to trace.' },
       },
       required: ['tool'],
       additionalProperties: false,
-    }
+    },
   },
   {
     name: 'find_source_refs',
@@ -187,11 +280,11 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Name pattern or file path substring.' }
+        query: { type: 'string', description: 'Name pattern or file path substring.' },
       },
       required: ['query'],
       additionalProperties: false,
-    }
+    },
   },
   {
     name: 'find_feature',
@@ -199,11 +292,11 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        feature: { type: 'string', description: 'Feature name pattern.' }
+        feature: { type: 'string', description: 'Feature name pattern.' },
       },
       required: ['feature'],
       additionalProperties: false,
-    }
+    },
   },
   {
     name: 'find_route',
@@ -211,36 +304,156 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        route: { type: 'string', description: 'Route path pattern (e.g. "/api/ace").' }
+        route: { type: 'string', description: 'Route path pattern (e.g. "/api/ace").' },
       },
       required: ['route'],
       additionalProperties: false,
-    }
-  }
+    },
+  },
 ];
 
 // ── Tool implementations ────────────────────────────────────────────────────────
 
-function classifyIntent({ prompt, context = '' }) {
-  const text = (prompt + ' ' + context).toLowerCase();
+export function classifyOpenSpecEvidenceQuery(query) {
+  const text = String(query ?? '').toLowerCase();
+  const markers = [
+    ['openspec', /\bopenspec\b/],
+    ['tasks-file', /\btasks\.md\b/],
+    ['workboard', /\bworkboard\b/],
+    ['receipt', /\breceipts?\b/],
+    ['task-id', /\btask\s+ids?\b/],
+    ['dependency', /\bdependenc(?:y|ies)\b/],
+    ['supersession', /\bsupersession\b/],
+    ['evidence', /\bevidence\b/],
+  ]
+    .filter(([, pattern]) => pattern.test(text))
+    .map(([name]) => name);
+  const hasOpenSpecAnchor = markers.some((marker) =>
+    ['openspec', 'tasks-file', 'workboard'].includes(marker)
+  );
+  return {
+    domain: hasOpenSpecAnchor && markers.length >= 2 ? 'OPENSPEC_EVIDENCE' : null,
+    markers,
+    allowedCardDomains: ['openspec', 'openspec-evidence', 'workboard'],
+  };
+}
 
-  const domain =
-    text.includes('qdrant') || text.includes('embedding') || text.includes('vector') || text.includes('ace') || text.includes('packet') || text.includes('card')
+export function selectContextCandidates(cards, { query, domainFilter } = {}) {
+  const openSpecRoute = classifyOpenSpecEvidenceQuery(query);
+  const allowedDomains = openSpecRoute.domain
+    ? new Set(openSpecRoute.allowedCardDomains)
+    : domainFilter
+      ? new Set([String(domainFilter).toLowerCase()])
+      : null;
+  if (!allowedDomains)
+    return {
+      cards,
+      domain: null,
+      allowedDomains: [],
+      candidatesBeforeFilter: cards.length,
+      candidatesAfterFilter: cards.length,
+    };
+  const selected = cards.filter((card) => {
+    const metadataDomains = [card.domain, card.metadata?.domain, ...(card.domainTags ?? [])]
+      .filter((value) => typeof value === 'string')
+      .map((value) => value.toLowerCase());
+    const sourceRef = String(card.sourceRef ?? '')
+      .replaceAll('\\', '/')
+      .toLowerCase();
+    const sourceIsOpenSpec =
+      /(?:^|\/)openspec\/changes\//.test(sourceRef) ||
+      /(?:^|\/)openspec-evidence\//.test(sourceRef);
+    return (
+      metadataDomains.some((domain) => allowedDomains.has(domain)) ||
+      (openSpecRoute.domain && sourceIsOpenSpec)
+    );
+  });
+  return {
+    cards: selected,
+    domain: openSpecRoute.domain,
+    allowedDomains: [...allowedDomains],
+    markers: openSpecRoute.markers,
+    candidatesBeforeFilter: cards.length,
+    candidatesAfterFilter: selected.length,
+  };
+}
+
+export function assessContextPacket({
+  revisionStatus,
+  freshnessStatus,
+  admissionStatus,
+  identityConflict = false,
+}) {
+  const rejectionReasons = [];
+  if (freshnessStatus === 'EXPIRED') rejectionReasons.push('EXPIRED');
+  if (
+    revisionStatus === 'PARTIAL_MISSING_SOURCE_REVISION' ||
+    revisionStatus === 'MISSING_SOURCE_REVISION'
+  )
+    rejectionReasons.push('MISSING_SOURCE_REVISION');
+  if (admissionStatus !== 'ELIGIBLE_PENDING_FULL_MANIFEST_CHECK')
+    rejectionReasons.push('NON_CANONICAL');
+  if (identityConflict) rejectionReasons.push('IDENTITY_CONFLICT');
+  if (rejectionReasons.length === 0)
+    rejectionReasons.push('CONTEXT_PACKET_IS_NOT_EVIDENCE_RECEIPT');
+  return { retrievalUsable: true, proofUsable: false, rejectionReasons };
+}
+
+export function computeAdmission(revisionStatus, freshnessStatus) {
+  const admitted = revisionStatus === 'PRESENT' && freshnessStatus !== 'EXPIRED';
+  return {
+    status: admitted ? 'ADMITTED' : 'REJECTED',
+    admissionStatus: admitted
+      ? 'ELIGIBLE_PENDING_FULL_MANIFEST_CHECK'
+      : 'NON_CANONICAL_DIAGNOSTIC_ONLY',
+    rejectionReason: admitted ? null : freshnessStatus === 'EXPIRED' ? 'EXPIRED' : revisionStatus,
+  };
+}
+
+export function classifyIntent({ prompt, context = '' }) {
+  const text = (prompt + ' ' + context).toLowerCase();
+  const openSpecRoute = classifyOpenSpecEvidenceQuery(text);
+
+  const domain = openSpecRoute.domain
+    ? 'openspec-evidence'
+    : text.includes('qdrant') ||
+        text.includes('embedding') ||
+        text.includes('vector') ||
+        text.includes('ace') ||
+        text.includes('packet') ||
+        text.includes('card')
       ? 'retrieval'
-      : text.includes('graph') || text.includes('topology') || text.includes('neo4j') || text.includes('cluster')
+      : text.includes('graph') ||
+          text.includes('topology') ||
+          text.includes('neo4j') ||
+          text.includes('cluster')
         ? 'graph'
-        : text.includes('opencode') || text.includes('tool') || text.includes('skill') || text.includes('mcp')
+        : text.includes('opencode') ||
+            text.includes('tool') ||
+            text.includes('skill') ||
+            text.includes('mcp')
           ? 'agent-workflow'
           : text.includes('svelte') || text.includes('route') || text.includes('component')
             ? 'frontend'
-            : text.includes('drizzle') || text.includes('schema') || text.includes('postgres') || text.includes('migration')
+            : text.includes('drizzle') ||
+                text.includes('schema') ||
+                text.includes('postgres') ||
+                text.includes('migration')
               ? 'database'
               : 'general';
 
   const intent =
-    text.includes('error') || text.includes('fix') || text.includes('fail') || text.includes('broken') || text.includes('missing')
+    text.includes('error') ||
+    text.includes('fix') ||
+    text.includes('fail') ||
+    text.includes('broken') ||
+    text.includes('missing')
       ? 'repair'
-      : text.includes('search') || text.includes('find') || text.includes('why') || text.includes('what') || text.includes('how')
+      : text.includes('search') ||
+          text.includes('find') ||
+          text.includes('why') ||
+          text.includes('what') ||
+          text.includes('how')
         ? 'research'
         : 'planning';
 
@@ -251,7 +464,10 @@ function classifyIntent({ prompt, context = '' }) {
         ? 'tool-schema'
         : text.includes('redis') || text.includes('cache')
           ? 'cache'
-          : text.includes('phase17') || text.includes('phase18') || text.includes('phase19') || text.includes('lane')
+          : text.includes('phase17') ||
+              text.includes('phase18') ||
+              text.includes('phase19') ||
+              text.includes('lane')
             ? 'atlas-lane'
             : 'unknown';
 
@@ -260,16 +476,31 @@ function classifyIntent({ prompt, context = '' }) {
       ? `rg -n "error|fail|undefined|null" scripts/ingest/ src/lib/server/ace/ --type ts`
       : domain === 'retrieval'
         ? 'node scripts/ingest/cache-ace-packet.mjs --audit'
-        : domain === 'graph'
-          ? 'rg -n "BELONGS_TO_CLUSTER|IMPORTS|topology" src/lib/server/graph/ --type ts'
-          : domain === 'agent-workflow'
-            ? 'npm run smoke:opencode'
-            : `rg -rn "${prompt.split(' ').slice(0, 3).join('|')}" scripts/ src/ --type ts`;
+        : domain === 'openspec-evidence'
+          ? 'rg -n "tasks\\.md|EvidenceReceiptV1|dependency|supersession|workboard" openspec/ sveltekit-frontend/openspec/ scripts/atlas/'
+          : domain === 'graph'
+            ? 'rg -n "BELONGS_TO_CLUSTER|IMPORTS|topology" src/lib/server/graph/ --type ts'
+            : domain === 'agent-workflow'
+              ? 'npm run smoke:opencode'
+              : `rg -rn "${prompt.split(' ').slice(0, 3).join('|')}" scripts/ src/ --type ts`;
 
-  return { intent, domain, subdomain, confidence: subdomain !== 'unknown' ? 0.85 : 0.65, safeNextCommand };
+  return {
+    intent,
+    domain,
+    routingDomain: openSpecRoute.domain,
+    routingMarkers: openSpecRoute.markers,
+    subdomain,
+    confidence: openSpecRoute.domain ? 1 : subdomain !== 'unknown' ? 0.85 : 0.65,
+    safeNextCommand,
+  };
 }
 
-function buildAgenticRagContext({ query, maxCards = 20, domainFilter, maxPayloadBytes = 24576 }) {
+export function buildAgenticRagContext({
+  query,
+  maxCards = 20,
+  domainFilter,
+  maxPayloadBytes = 24576,
+}) {
   const queryText = String(query ?? '').slice(0, 2048);
   const payloadBudget = Math.max(4096, Math.min(65536, Number(maxPayloadBytes) || 24576));
   const root = process.cwd();
@@ -295,35 +526,72 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter, maxPayload
   try {
     packet = JSON.parse(fs.readFileSync(packetPath, 'utf8'));
   } catch (e) {
-    return { ok: false, error: `Failed to parse ACE packet: ${e.message}`, cards: [], promptPacket: '', sourceRefs: [] };
+    return {
+      ok: false,
+      error: `Failed to parse ACE packet: ${e.message}`,
+      cards: [],
+      promptPacket: '',
+      sourceRefs: [],
+    };
   }
 
   const packetWorkspaceRevision = packet.workspaceRevision ?? packet.workspace_revision ?? null;
-  const packetSourceRevision = packet.sourceRevision ?? packet.source_revision ?? packet.sourceArtifact?.sourceRevision ?? null;
+  const packetSourceRevision =
+    packet.sourceRevision ??
+    packet.source_revision ??
+    packet.sourceArtifact?.sourceRevision ??
+    null;
   const packetCreatedAt = packet.createdAt ?? packet.generatedAt ?? null;
   const packetExpiresInSeconds = Number(packet.expiresInSeconds);
-  const packetExpired = packetCreatedAt && Number.isFinite(packetExpiresInSeconds)
-    ? Date.now() > new Date(packetCreatedAt).getTime() + packetExpiresInSeconds * 1000
-    : false;
+  const packetExpired =
+    packetCreatedAt && Number.isFinite(packetExpiresInSeconds)
+      ? Date.now() > new Date(packetCreatedAt).getTime() + packetExpiresInSeconds * 1000
+      : false;
   const revisionStatus = !packetWorkspaceRevision
     ? 'MISSING_WORKSPACE_REVISION'
     : !packetSourceRevision
       ? 'PARTIAL_MISSING_SOURCE_REVISION'
       : 'PRESENT';
-  const freshnessStatus = packetExpired ? 'EXPIRED' : packetCreatedAt ? 'CURRENT_OR_UNVERIFIED' : 'UNKNOWN';
+  const freshnessStatus = packetExpired
+    ? 'EXPIRED'
+    : packetCreatedAt
+      ? 'CURRENT_OR_UNVERIFIED'
+      : 'UNKNOWN';
+  const packetAdmissionStatus =
+    revisionStatus === 'PRESENT' && freshnessStatus !== 'EXPIRED'
+      ? 'ELIGIBLE_PENDING_FULL_MANIFEST_CHECK'
+      : 'NON_CANONICAL_DIAGNOSTIC_ONLY';
 
   const signalSummary = {
     pagerank: packet.signalSummary?.pagerank ?? packet.pagerank ?? packet.pageRank ?? null,
-    summary: packet.signalSummary?.summary ?? packet.summary ?? packet.packetSummary ?? packet.retrievalSummary ?? null,
+    summary:
+      packet.signalSummary?.summary ??
+      packet.summary ??
+      packet.packetSummary ??
+      packet.retrievalSummary ??
+      null,
     lexical: [
       ...(Array.isArray(packet.signalSummary?.lexical) ? packet.signalSummary.lexical : []),
       ...(Array.isArray(packet.lexical) ? packet.lexical : []),
       ...(Array.isArray(packet.lexicalHints) ? packet.lexicalHints : []),
       ...(Array.isArray(packet.lexicalSignals) ? packet.lexicalSignals : []),
-    ].filter((value) => typeof value === 'string' && value.trim()).slice(0, 12),
-    centroid: packet.signalSummary?.centroid ?? packet.centroid ?? packet.centroidId ?? packet.redisCentroid ?? null,
-    reranker: packet.signalSummary?.reranker ?? packet.reranker ?? packet.rerankerModel ?? packet.rerankModel ?? null,
-    langextract: packet.signalSummary?.langextract ?? packet.langextract ?? packet.langextractModel ?? null,
+    ]
+      .filter((value) => typeof value === 'string' && value.trim())
+      .slice(0, 12),
+    centroid:
+      packet.signalSummary?.centroid ??
+      packet.centroid ??
+      packet.centroidId ??
+      packet.redisCentroid ??
+      null,
+    reranker:
+      packet.signalSummary?.reranker ??
+      packet.reranker ??
+      packet.rerankerModel ??
+      packet.rerankModel ??
+      null,
+    langextract:
+      packet.signalSummary?.langextract ?? packet.langextract ?? packet.langextractModel ?? null,
     graph: {
       communityId: packet.communityId ?? packet.community_id ?? null,
       topology: packet.topology ?? null,
@@ -337,8 +605,9 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter, maxPayload
     const selectedEntityCards = (packet.selectedEntities ?? []).map((entity, index) => ({
       title: `${entity.lane ?? 'lane'}: ${entity.status ?? 'unknown'}`,
       summary: entity.summary ?? '',
-      sourceRef: entity.sourceRefs?.[0] ?? packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
-      domain: 'retrieval',
+      sourceRef:
+        entity.sourceRefs?.[0] ?? packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+      domain: entity.domain ?? 'retrieval',
       score: entity.status === 'CONFLICTING' ? 1 : entity.status === 'ABSENT' ? 0.8 : 0.6,
       kind: 'selectedEntity',
       order: index,
@@ -347,7 +616,8 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter, maxPayload
     const nextStepCards = (packet.nextSteps ?? []).map((step, index) => ({
       title: step.title ?? step.taskId ?? 'next-step',
       summary: `priority=${step.priority ?? 'LOW'} blockedBy=${(step.blockedBy ?? []).join(', ')}`,
-      sourceRef: step.sourceRefs?.[0] ?? packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+      sourceRef:
+        step.sourceRefs?.[0] ?? packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
       domain: 'planning',
       score: step.priority === 'CRITICAL' ? 1 : step.priority === 'HIGH' ? 0.9 : 0.75,
       kind: 'nextStep',
@@ -358,61 +628,77 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter, maxPayload
   }
 
   const signalCards = [
-    signalSummary.pagerank != null ? {
-      title: 'pagerank lens',
-      summary: `pagerank=${signalSummary.pagerank}`,
-      sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
-      domain: 'topology',
-      score: typeof signalSummary.pagerank === 'number' ? Math.min(1, Math.max(0, signalSummary.pagerank)) : 0.5,
-      kind: 'pagerankSignal',
-    } : null,
-    signalSummary.summary ? {
-      title: 'summary lens',
-      summary: String(signalSummary.summary),
-      sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
-      domain: 'summary',
-      score: 0.8,
-      kind: 'summarySignal',
-    } : null,
-    signalSummary.lexical.length ? {
-      title: 'lexical lens',
-      summary: signalSummary.lexical.join(', '),
-      sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
-      domain: 'lexical',
-      score: 0.7,
-      kind: 'lexicalSignal',
-    } : null,
-    signalSummary.centroid != null ? {
-      title: 'centroid lens',
-      summary: `centroid=${Array.isArray(signalSummary.centroid) ? '[vector]' : String(signalSummary.centroid)}`,
-      sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
-      domain: 'routing',
-      score: 0.65,
-      kind: 'centroidSignal',
-    } : null,
-    signalSummary.reranker ? {
-      title: 'reranker lens',
-      summary: `reranker=${signalSummary.reranker}${signalSummary.langextract ? ` langextract=${signalSummary.langextract}` : ''}`,
-      sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
-      domain: 'ranking',
-      score: 0.75,
-      kind: 'rerankerSignal',
-    } : null,
+    signalSummary.pagerank != null
+      ? {
+          title: 'pagerank lens',
+          summary: `pagerank=${signalSummary.pagerank}`,
+          sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+          domain: 'topology',
+          score:
+            typeof signalSummary.pagerank === 'number'
+              ? Math.min(1, Math.max(0, signalSummary.pagerank))
+              : 0.5,
+          kind: 'pagerankSignal',
+        }
+      : null,
+    signalSummary.summary
+      ? {
+          title: 'summary lens',
+          summary: String(signalSummary.summary),
+          sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+          domain: 'summary',
+          score: 0.8,
+          kind: 'summarySignal',
+        }
+      : null,
+    signalSummary.lexical.length
+      ? {
+          title: 'lexical lens',
+          summary: signalSummary.lexical.join(', '),
+          sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+          domain: 'lexical',
+          score: 0.7,
+          kind: 'lexicalSignal',
+        }
+      : null,
+    signalSummary.centroid != null
+      ? {
+          title: 'centroid lens',
+          summary: `centroid=${Array.isArray(signalSummary.centroid) ? '[vector]' : String(signalSummary.centroid)}`,
+          sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+          domain: 'routing',
+          score: 0.65,
+          kind: 'centroidSignal',
+        }
+      : null,
+    signalSummary.reranker
+      ? {
+          title: 'reranker lens',
+          summary: `reranker=${signalSummary.reranker}${signalSummary.langextract ? ` langextract=${signalSummary.langextract}` : ''}`,
+          sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+          domain: 'ranking',
+          score: 0.75,
+          kind: 'rerankerSignal',
+        }
+      : null,
   ].filter(Boolean);
 
   cards = [...cards, ...signalCards];
 
-  if (domainFilter) {
-    cards = cards.filter(c => c.domain === domainFilter);
-  }
+  const candidateCountBeforeFilter = cards.length;
+  const routing = selectContextCandidates(cards, { query: queryText, domainFilter });
+  cards = routing.cards;
 
   const cap = Math.max(1, Math.min(50, Number(maxCards) || 20));
-  const queryTerms = queryText.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+  const queryTerms = queryText
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((t) => t.length > 2);
 
   cards = cards
-    .map(c => {
+    .map((c) => {
       const text = ((c.title ?? '') + ' ' + (c.summary ?? '')).toLowerCase();
-      const overlap = queryTerms.filter(t => text.includes(t)).length;
+      const overlap = queryTerms.filter((t) => text.includes(t)).length;
       return { ...c, _qs: (c.score ?? 0) + overlap * 0.05 };
     })
     .sort((a, b) => (b._qs ?? 0) - (a._qs ?? 0))
@@ -430,7 +716,10 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter, maxPayload
   const boundedCards = [];
   for (const card of cards) {
     const candidateCards = [...boundedCards, card];
-    const candidateBytes = Buffer.byteLength(JSON.stringify({ query: queryText, cards: candidateCards }), 'utf8');
+    const candidateBytes = Buffer.byteLength(
+      JSON.stringify({ query: queryText, cards: candidateCards }),
+      'utf8'
+    );
     if (candidateBytes > payloadBudget && boundedCards.length > 0) {
       payloadTruncated = true;
       break;
@@ -444,23 +733,51 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter, maxPayload
   let promptPacket = '';
   let payloadBytes = 0;
   do {
-    sourceRefs = [...new Set(cards.map(c => c.sourceRef).filter(Boolean))];
+    sourceRefs = [...new Set(cards.map((c) => c.sourceRef).filter(Boolean))];
     promptPacket = [
       `[ACE CONTEXT — ${cards.length} cards, query: "${queryText}"]`,
-      domainFilter ? `Domain filter: ${domainFilter}` : '',
+      routing.allowedDomains.length ? `Domain filter: ${routing.allowedDomains.join(', ')}` : '',
       '',
-      ...cards.slice(0, 10).map(
-        (c, i) =>
-          `${i + 1}. ${c.title ?? 'Untitled'} (score: ${c.score?.toFixed(3) ?? '?'})` +
-          (c.summary ? `\n   ${c.summary.slice(0, 120)}` : '') +
-          (c.sourceRef ? `\n   sourceRef: ${c.sourceRef}` : ''),
-      ),
-    ].filter(l => l !== '').join('\n');
-    payloadBytes = Buffer.byteLength(JSON.stringify({ query: queryText, signalSummary, cards, sourceRefs, promptPacket }), 'utf8');
+      ...cards
+        .slice(0, 10)
+        .map(
+          (c, i) =>
+            `${i + 1}. ${c.title ?? 'Untitled'} (score: ${c.score?.toFixed(3) ?? '?'})` +
+            (c.summary ? `\n   ${c.summary.slice(0, 120)}` : '') +
+            (c.sourceRef ? `\n   sourceRef: ${c.sourceRef}` : '')
+        ),
+    ]
+      .filter((l) => l !== '')
+      .join('\n');
+    payloadBytes = Buffer.byteLength(
+      JSON.stringify({ query: queryText, signalSummary, cards, sourceRefs, promptPacket }),
+      'utf8'
+    );
     if (payloadBytes <= payloadBudget || cards.length === 0) break;
     cards.pop();
     payloadTruncated = true;
   } while (cards.length > 0);
+
+  const identityConflict =
+    (packet.selectedEntities ?? []).some(
+      (entity) =>
+        entity.status === 'CONFLICTING' &&
+        /identity/i.test(String(entity.lane ?? entity.title ?? ''))
+    ) ||
+    signalSummary.lexical.some((value) => /PACKET_IDENTITY.*CONFLICT/i.test(value)) ||
+    /PACKET_IDENTITY:\s*CONFLICTING/i.test(String(signalSummary.summary ?? ''));
+  const retrievalAdmission = assessContextPacket({
+    revisionStatus,
+    freshnessStatus,
+    admissionStatus: packetAdmissionStatus,
+    identityConflict,
+  });
+  cards = cards.map((card) => ({
+    ...card,
+    retrievalUsable: true,
+    proofUsable: false,
+    rejectionReasons: [...retrievalAdmission.rejectionReasons],
+  }));
 
   return {
     ok: true,
@@ -472,20 +789,39 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter, maxPayload
       : 'unknown',
     revisionStatus,
     freshnessStatus,
-    admissionStatus: revisionStatus === 'PRESENT' && freshnessStatus !== 'EXPIRED'
-      ? 'ELIGIBLE_PENDING_FULL_MANIFEST_CHECK'
-      : 'NON_CANONICAL_DIAGNOSTIC_ONLY',
+    admissionStatus: packetAdmissionStatus,
+    retrievalAdmission,
+    retrievalRouting: {
+      domain: routing.domain,
+      markers: routing.markers ?? [],
+      allowedDomains: routing.allowedDomains,
+      candidatesBeforeFilter: candidateCountBeforeFilter,
+      candidatesAfterFilter: routing.candidatesAfterFilter,
+      filterAppliedBeforeRanking: routing.allowedDomains.length > 0,
+    },
     cards,
     sourceRefs,
     promptPacket,
     payloadTruncated,
     maxPayloadBytes: payloadBudget,
     payloadBytes,
-    safeNextCommand: cards.length === 0 ? 'npm run ingest:pipeline' : 'node scripts/ingest/cache-ace-packet.mjs --audit',
+    safeNextCommand:
+      cards.length === 0 && routing.domain === 'OPENSPEC_EVIDENCE'
+        ? 'rg -n "tasks\\.md|EvidenceReceiptV1|dependency|supersession|workboard" openspec/ sveltekit-frontend/openspec/ scripts/atlas/'
+        : cards.length === 0
+          ? 'npm run ingest:pipeline'
+          : 'node scripts/ingest/cache-ace-packet.mjs --audit',
   };
 }
 
-function buildRecommendation({ intent, domain, errorSummary, evidenceLines, patchTargets, proposedFix }) {
+function buildRecommendation({
+  intent,
+  domain,
+  errorSummary,
+  evidenceLines,
+  patchTargets,
+  proposedFix,
+}) {
   const safeNextCommand =
     intent === 'repair' && patchTargets.length > 0
       ? `node --check ${patchTargets[0]}`
@@ -520,9 +856,23 @@ function buildRecommendation({ intent, domain, errorSummary, evidenceLines, patc
 }
 
 async function recordOutcome(args) {
-  const { intent, tool, sourceRefs, recommendationAccepted, reward, graphVersion = null, errorMsg = null } = args;
+  const {
+    intent,
+    tool,
+    sourceRefs,
+    recommendationAccepted,
+    reward,
+    graphVersion = null,
+    errorMsg = null,
+  } = args;
   if (MOCK_MODE) {
-    return { ok: true, id: 'mock-outcome', syncedToNeo4j: false, mock: true, sourceRefs: sourceRefs ?? [] };
+    return {
+      ok: true,
+      id: 'mock-outcome',
+      syncedToNeo4j: false,
+      mock: true,
+      sourceRefs: sourceRefs ?? [],
+    };
   }
 
   const outcomeRecord = {
@@ -534,7 +884,7 @@ async function recordOutcome(args) {
     reward,
     graphVersion,
     errorMsg,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 
   // 1. Write to local NDJSON ledger
@@ -552,68 +902,68 @@ async function recordOutcome(args) {
     const driver = getNeo4jDriver();
     const session = driver.session();
     try {
-        // MERGE Intent
-        await session.run(
-          `MERGE (i:Intent { name: $intent })
+      // MERGE Intent
+      await session.run(
+        `MERGE (i:Intent { name: $intent })
            ON CREATE SET i.created_at = datetime()
            SET i.updated_at = datetime()`,
-          { intent }
-        );
+        { intent }
+      );
 
-        // MERGE Tool
-        await session.run(
-          `MERGE (t:Tool { name: $tool })
+      // MERGE Tool
+      await session.run(
+        `MERGE (t:Tool { name: $tool })
            ON CREATE SET t.created_at = datetime()
            SET t.updated_at = datetime()`,
-          { tool }
-        );
+        { tool }
+      );
 
-        // Link Intent -> Tool
-        await session.run(
-          `MATCH (i:Intent { name: $intent })
+      // Link Intent -> Tool
+      await session.run(
+        `MATCH (i:Intent { name: $intent })
            MATCH (t:Tool { name: $tool })
            MERGE (i)-[r:RESOLVED_BY]->(t)
            SET r.recommendationAccepted = $recommendationAccepted,
                r.reward = $reward,
                r.updated_at = datetime()`,
-          { intent, tool, recommendationAccepted, reward }
-        );
+        { intent, tool, recommendationAccepted, reward }
+      );
 
-        // CREATE Outcome
-        await session.run(
-          `CREATE (o:Outcome {
+      // CREATE Outcome
+      await session.run(
+        `CREATE (o:Outcome {
              id: $outcomeId,
              reward: $reward,
              recommendationAccepted: $recommendationAccepted,
              graphVersion: $graphVersion,
              timestamp: datetime()
            })`,
-          { outcomeId: outcomeRecord.id, reward, recommendationAccepted, graphVersion }
+        { outcomeId: outcomeRecord.id, reward, recommendationAccepted, graphVersion }
+      );
+
+      // Connect SourceRefs / CodebaseFiles
+      for (const ref of sourceRefs) {
+        const normalizedRef = ref.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
+
+        const fileCheck = await session.run(
+          `MATCH (f:CodebaseFile { filePath: $normalizedRef }) RETURN f`,
+          { normalizedRef }
         );
 
-        // Connect SourceRefs / CodebaseFiles
-        for (const ref of sourceRefs) {
-          const normalizedRef = ref.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
-
-          const fileCheck = await session.run(
-            `MATCH (f:CodebaseFile { filePath: $normalizedRef }) RETURN f`,
-            { normalizedRef }
-          );
-
-          if (fileCheck.records.length > 0) {
-            await session.run(
-              `MATCH (t:Tool { name: $tool })
+        if (fileCheck.records.length > 0) {
+          await session.run(
+            `MATCH (t:Tool { name: $tool })
                MATCH (f:CodebaseFile { filePath: $normalizedRef })
                MATCH (o:Outcome { id: $outcomeId })
                MERGE (t)-[r1:USED]->(f)
                SET r1.updated_at = datetime()
                MERGE (f)-[r2:PRODUCED]->(o)
                SET r2.updated_at = datetime()`,
-              { tool, normalizedRef, outcomeId: outcomeRecord.id }
-            );
-          } else {
-            await session.run(
-              `MERGE (s:SourceRef { name: $ref })
+            { tool, normalizedRef, outcomeId: outcomeRecord.id }
+          );
+        } else {
+          await session.run(
+            `MERGE (s:SourceRef { name: $ref })
                ON CREATE SET s.created_at = datetime()
                SET s.updated_at = datetime()
                WITH s
@@ -623,10 +973,10 @@ async function recordOutcome(args) {
                SET r1.updated_at = datetime()
                MERGE (s)-[r2:PRODUCED]->(o)
                SET r2.updated_at = datetime()`,
-              { tool, ref, outcomeId: outcomeRecord.id }
-            );
-          }
+            { tool, ref, outcomeId: outcomeRecord.id }
+          );
         }
+      }
       syncedToNeo4j = true;
     } finally {
       await session.close();
@@ -664,8 +1014,12 @@ async function findDependencies({ target }) {
        RETURN dep.filePath as dep, type(r) as type`,
       { normalizedTarget }
     );
-    const deps = res.records.map(r => ({ dep: r.get('dep'), type: r.get('type') }));
-    return { target: normalizedTarget, dependencies: deps, ...diagnosticProvenance('find_dependencies', normalizedTarget) };
+    const deps = res.records.map((r) => ({ dep: r.get('dep'), type: r.get('type') }));
+    return {
+      target: normalizedTarget,
+      dependencies: deps,
+      ...diagnosticProvenance('find_dependencies', normalizedTarget),
+    };
   } finally {
     await session.close();
   }
@@ -682,7 +1036,11 @@ async function traceDatabase({ query }) {
        RETURN f.filePath as file, t.name as table, r.operation as operation`,
       { query }
     );
-    const traces = res.records.map(r => ({ file: r.get('file'), table: r.get('table'), operation: r.get('operation') }));
+    const traces = res.records.map((r) => ({
+      file: r.get('file'),
+      table: r.get('table'),
+      operation: r.get('operation'),
+    }));
     return { query, traces, ...diagnosticProvenance('trace_database', query) };
   } finally {
     await session.close();
@@ -700,7 +1058,11 @@ async function traceToolChain({ tool }) {
        RETURN f.filePath as file, t.name as tool, r.type as type`,
       { tool }
     );
-    const traces = res.records.map(r => ({ file: r.get('file'), tool: r.get('tool'), type: r.get('type') }));
+    const traces = res.records.map((r) => ({
+      file: r.get('file'),
+      tool: r.get('tool'),
+      type: r.get('type'),
+    }));
     return { tool, traces, ...diagnosticProvenance('trace_tool_chain', tool) };
   } finally {
     await session.close();
@@ -717,7 +1079,7 @@ async function findSourceRefs({ query }) {
        RETURN s.name as name`,
       { query }
     );
-    const refs = res.records.map(r => r.get('name'));
+    const refs = res.records.map((r) => r.get('name'));
     return { query, sourceRefs: refs, ...diagnosticProvenance('find_source_refs', query) };
   } finally {
     await session.close();
@@ -734,7 +1096,10 @@ async function findFeature({ feature }) {
        RETURN f.name as name, f.description as description`,
       { feature }
     );
-    const features = res.records.map(r => ({ name: r.get('name'), description: r.get('description') }));
+    const features = res.records.map((r) => ({
+      name: r.get('name'),
+      description: r.get('description'),
+    }));
     return { feature, features, ...diagnosticProvenance('find_feature', feature) };
   } finally {
     await session.close();
@@ -751,7 +1116,7 @@ async function findRoute({ route }) {
        RETURN r.path as path, r.type as type`,
       { route }
     );
-    const routes = res.records.map(r => ({ path: r.get('path'), type: r.get('type') }));
+    const routes = res.records.map((r) => ({ path: r.get('path'), type: r.get('type') }));
     return { route, routes, ...diagnosticProvenance('find_route', route) };
   } finally {
     await session.close();
@@ -762,7 +1127,11 @@ async function findRoute({ route }) {
 
 async function dispatch(method, params, id) {
   if (method === 'initialize') {
-    return { protocolVersion: PROTOCOL_VERSION, serverInfo: SERVER_INFO, capabilities: { tools: {} } };
+    return {
+      protocolVersion: PROTOCOL_VERSION,
+      serverInfo: SERVER_INFO,
+      capabilities: { tools: {} },
+    };
   }
   if (method === 'notifications/initialized') return null;
   if (method === 'tools/list') {
@@ -772,7 +1141,7 @@ async function dispatch(method, params, id) {
     const { name, arguments: args = {} } = params ?? {};
     try {
       let result;
-      if (name === 'classify_intent')           result = classifyIntent(args);
+      if (name === 'classify_intent') result = classifyIntent(args);
       else if (name === 'build_agentic_rag_context') result = buildAgenticRagContext(args);
       else if (name === 'build_recommendation') result = buildRecommendation(args);
       else if (name === 'record_outcome') result = await recordOutcome(args);
@@ -785,64 +1154,81 @@ async function dispatch(method, params, id) {
       else throw new Error(`Unknown tool: ${name}`);
       return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
     } catch (e) {
-      return { content: [{ type: 'text', text: JSON.stringify({ error: e.message }) }], isError: true };
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ error: e.message }) }],
+        isError: true,
+      };
     }
   }
   throw Object.assign(new Error(`Method not found: ${method}`), { code: -32601 });
 }
 
-// ── Stdio loop ─────────────────────────────────────────────────────────────────
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  // ── Stdio loop ─────────────────────────────────────────────────────────────────
 
-const rl = createInterface({ input: process.stdin, terminal: false });
+  const rl = createInterface({ input: process.stdin, terminal: false });
 
-let pendingOperations = 0;
-let isClosed = false;
+  let pendingOperations = 0;
+  let isClosed = false;
 
-function shutdown() {
-  log('Stdin closed and operations complete, shutting down...');
-  if (neo4jDriver) {
-    neo4jDriver.close().then(() => {
+  function shutdown() {
+    log('Stdin closed and operations complete, shutting down...');
+    if (neo4jDriver) {
+      neo4jDriver
+        .close()
+        .then(() => {
+          process.exit(0);
+        })
+        .catch(() => {
+          process.exit(0);
+        });
+    } else {
       process.exit(0);
-    }).catch(() => {
-      process.exit(0);
-    });
-  } else {
-    process.exit(0);
-  }
-}
-
-rl.on('line', async line => {
-  if (!line.trim()) return;
-  let msg;
-  try { msg = JSON.parse(line); } catch { return; }
-
-  const { method, params, id } = msg;
-  const isNotif = id === undefined || id === null;
-
-  pendingOperations++;
-  try {
-    const result = await dispatch(method, params, id);
-    if (isNotif || result === null) return;
-    process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id, result }) + '\n');
-  } catch (e) {
-    if (isNotif) return;
-    process.stdout.write(JSON.stringify({
-      jsonrpc: '2.0', id,
-      error: { code: e.code ?? -32603, message: e.message },
-    }) + '\n');
-  } finally {
-    pendingOperations--;
-    if (isClosed && pendingOperations === 0) {
-      shutdown();
     }
   }
-});
 
-rl.on('close', () => {
-  isClosed = true;
-  if (pendingOperations === 0) {
-    shutdown();
-  }
-});
+  rl.on('line', async (line) => {
+    if (!line.trim()) return;
+    let msg;
+    try {
+      msg = JSON.parse(line);
+    } catch {
+      return;
+    }
 
-log('atlas-tools MCP ready (classify_intent, build_agentic_rag_context, build_recommendation, record_outcome, and path trace tools)');
+    const { method, params, id } = msg;
+    const isNotif = id === undefined || id === null;
+
+    pendingOperations++;
+    try {
+      const result = await dispatch(method, params, id);
+      if (isNotif || result === null) return;
+      process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id, result }) + '\n');
+    } catch (e) {
+      if (isNotif) return;
+      process.stdout.write(
+        JSON.stringify({
+          jsonrpc: '2.0',
+          id,
+          error: { code: e.code ?? -32603, message: e.message },
+        }) + '\n'
+      );
+    } finally {
+      pendingOperations--;
+      if (isClosed && pendingOperations === 0) {
+        shutdown();
+      }
+    }
+  });
+
+  rl.on('close', () => {
+    isClosed = true;
+    if (pendingOperations === 0) {
+      shutdown();
+    }
+  });
+
+  log(
+    'atlas-tools MCP ready (classify_intent, build_agentic_rag_context, build_recommendation, record_outcome, and path trace tools)'
+  );
+}

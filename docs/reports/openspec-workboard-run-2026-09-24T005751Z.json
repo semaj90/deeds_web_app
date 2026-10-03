@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T00:57:51Z",
+  "reason": "The only open task in parent-atlas-deep-research-ingestion requires a real DOC-06A admission write and live readback; no separately bounded authorization was supplied, so it remains open.",
+  "sourceChange": {
+    "name": "parent-atlas-deep-research-ingestion",
+    "completed": 6,
+    "total": 7,
+    "remainingGate": "DISCOVERY-04B live handoff readback"
+  },
+  "nextChange": {
+    "name": "route-import-infra-isolation",
+    "reason": "Near-complete change selected for a narrow, likely local proof; inspect exact remaining task before implementation."
+  },
+  "mutationBoundary": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "containerRebuilds": "none"
+  }
+}

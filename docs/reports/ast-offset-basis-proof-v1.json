@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ast-offset-basis-proof.v1",
-  "generatedAt": "2026-09-20T07:51:59.913Z",
+  "generatedAt": "2026-09-20T23:40:25.890Z",
   "sourceTextEncodingRevision": "SOURCE-TEXT-ENCODING-01",
   "offsetBasis": "UTF8_PARSER_BUFFER_V1",
   "lineBasis": "ONE_BASED_STORAGE",

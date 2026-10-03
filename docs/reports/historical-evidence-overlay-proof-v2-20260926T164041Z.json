@@ -1,0 +1,113 @@
+{
+  "schema": "atlas.historical-evidence-overlay-proof-receipt.v2",
+  "status": "HISTORICAL_EVIDENCE_OVERLAY_DELTAS_OBSERVED",
+  "generatedAt": "2026-09-26T16:40:41.028Z",
+  "canonicalAuthority": false,
+  "retrievalVote": false,
+  "destination": {
+    "cei24Receipt": "docs\\reports\\cei24-packet-chunk-summary-hint-crosswalk-v1-20260926T163939Z.json",
+    "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+    "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+    "candidateRows": 16151,
+    "memberships": 6651
+  },
+  "inputs": {
+    "candidateMap": {
+      "path": ".tmp\\atlas\\cei24-candidate-ordinal-map-v1\\20260926T163711.224Z\\candidate-ordinal-map-v1.json",
+      "sha256": "sha256:89459af4d3d763f49c45265c642ae3bcdfd9d9b4972d83fc8e753b73658008a1"
+    },
+    "candidateChunkOverlay": {
+      "path": ".tmp\\atlas\\cei24-packet-chunk-hint-crosswalk-v1\\20260926T163939Z\\candidate-chunk-evidence-overlay.ndjson",
+      "sha256": "sha256:39a43ed9163714ac13db9ea077f47c2cf3978c57eac665b96f19e959bbcd3fbd"
+    },
+    "legacySummaryHintCrosswalk": {
+      "path": ".tmp\\atlas\\legacy-summary-hint-ordinal-join-v1\\20260926T080239Z\\hint-candidate-ordinal.ndjson",
+      "sha256": "sha256:94e9b09b4439b1a1f5a7861864a6a9549140fd6be2255895ac55e7766a227510"
+    },
+    "mapReduceEnriched": {
+      "path": ".tmp\\atlas\\mapreduce-primary-placeholder-enrichment-v1\\20260926T154258.271Z\\primary_metadata_corpus-enriched-00001.ndjson",
+      "sha256": "sha256:80f87826edafa6765abf55f3241c28dba07897c409e72039625efc7daa51786f"
+    }
+  },
+  "legacySummary": {
+    "counts": {
+      "EXACT_CHUNK": 322,
+      "CURRENT_PACKET_NOT_FOUND": 8
+    },
+    "overlaySetChecksum": "99f50f33609e6bd677771a2dad18698dbee563701cd5721cdc5777a40d275ca7"
+  },
+  "mapReduce": {
+    "counts": {
+      "CURRENT_PACKET_NOT_FOUND": 48,
+      "CURRENT_PROVEN_LINEAGE_MISSING": 237,
+      "CURRENT_CHUNK_SET": 127,
+      "DUPLICATE_HISTORICAL_EVIDENCE": 5
+    },
+    "overlaySetChecksum": "11710c75a982ec0c27c322b45356afa117a53a26ed0df22c7b8eadd8dc3e166a",
+    "distinctAddressableChunks": 1520
+  },
+  "replay": {
+    "identical": true
+  },
+  "expectationsDerivedFromPriorReceipts": {
+    "legacySummary": {
+      "qualified": 330,
+      "exactChunk": 322,
+      "unresolved": 8,
+      "distinctCandidateOrdinals": 178
+    },
+    "mapReduce": {
+      "total": 417,
+      "currentChunkSet": 127,
+      "distinctAddressableChunks": 1520,
+      "lineageMissing": 237,
+      "sourceRevisionChanged": 33,
+      "packetNotFound": 15,
+      "duplicates": 5
+    }
+  },
+  "observed": {
+    "legacySummary": {
+      "qualified": 330,
+      "exactChunk": 322,
+      "unresolved": 8,
+      "distinctCandidateOrdinals": 178
+    },
+    "mapReduce": {
+      "total": 417,
+      "currentChunkSet": 127,
+      "distinctAddressableChunks": 1520,
+      "lineageMissing": 237,
+      "sourceRevisionChanged": 0,
+      "packetNotFound": 48,
+      "duplicates": 5
+    }
+  },
+  "deltas": [
+    "mapReduce.sourceRevisionChanged: expected 33 observed 0",
+    "mapReduce.packetNotFound: expected 15 observed 48"
+  ],
+  "artifacts": {
+    "legacySummaryHintOverlay": {
+      "path": ".tmp\\atlas\\historical-evidence-overlay-v2\\20260926T164041Z\\legacy-summary-hint-overlay.ndjson",
+      "sha256": "sha256:4ae3a8fa4609f72f31e456ee1cb6762a16b1752ac75f17c2d1e9e659695b16a0",
+      "rows": 330
+    },
+    "mapReduceOverlay": {
+      "path": ".tmp\\atlas\\historical-evidence-overlay-v2\\20260926T164041Z\\mapreduce-overlay.ndjson",
+      "sha256": "sha256:1f2316851a75ecd776f7c4b5fd7b537f98123fbe327f1ace76ba278d55a6ff89",
+      "rows": 417
+    }
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "notes": [
+    "File-grained MapReduce records project one-to-many onto current chunks (CURRENT_CHUNK_SET); this is not an ambiguity failure.",
+    "DUPLICATE_HISTORICAL_EVIDENCE extends the requested resolution states so all 417 records conserve."
+  ]
+}

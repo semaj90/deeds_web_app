@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.docker-image-usage-audit.v1",
+  "generatedAt": "2026-09-20",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "activeContainers": 26,
+  "activeImages": [
+    {"image": "atlas-gpu-8098:26.08-cuda12-py3.13", "container": "atlas-gpu-8098", "role": "RAPIDS/cuVS/cuGraph executor", "keep": true},
+    {"image": "atlas-neural-decoder:torch2.13.0-cu132", "container": "atlas-neural-decoder", "role": "PyTorch neural decoder", "keep": true},
+    {"image": "deeds-web-app-langgraph-synthesis:latest", "container": "legal-ai-langgraph", "role": "LangGraph synthesis", "keep": true},
+    {"image": "deeds-miniforge-nlp-sidecar:latest", "container": "miniforge-nlp-sidecar", "role": "NLP/AST sidecar", "keep": true},
+    {"image": "pgvector-pgsearch:pg18-local", "container": "legal-ai-postgres", "role": "PostgreSQL 18 + pgvector canonical store", "keep": true},
+    {"image": "qdrant/qdrant:v1.19.0", "container": "legal-ai-qdrant", "role": "Qdrant retrieval projection", "keep": true},
+    {"image": "valkey/valkey-bundle:8.1.1", "container": "legal-ai-valkey", "role": "Valkey cache/residency", "keep": true},
+    {"image": "legal-ai-go-retrieval:latest", "container": "legal-ai-go-retrieval", "role": "Go retrieval executor", "keep": true},
+    {"image": "deeds-web-app-docling-vlm:latest", "container": "legal-ai-docling-vlm", "role": "document/VLM service", "keep": true},
+    {"image": "legal-ai-bifrost:git", "container": "legal-ai-bifrost", "role": "Bifrost service", "keep": true},
+    {"image": "deeds-web-app-image-synthesis:latest", "container": "legal-ai-image-synthesis", "role": "image synthesis service", "keep": true}
+  ],
+  "inactiveImages": [
+    {
+      "image": "atlas-gpu-8098:repro-v1",
+      "sizeGiB": 25.9,
+      "role": "RAPIDS/CUDA 12.9 challenger reproduction",
+      "referencedByActiveContainer": false,
+      "source": "docker/atlas-gpu-8098/Dockerfile lineage",
+      "classification": "PYTORCH_IN_RAPIDS_EXPERIMENT",
+      "uniqueGiB": 14.72,
+      "comparison": "repro-v1 installed PyTorch from the CUDA 12.6 wheel index and used a torch CUDA healthcheck; active atlas-gpu-8098 is RAPIDS-only",
+      "removal": "candidate_after_receipt_archive"
+    },
+    {
+      "image": "atlas-gpu-8098:repro-v2",
+      "sizeGiB": 29.5,
+      "role": "RAPIDS/CUDA 12.9 challenger reproduction",
+      "referencedByActiveContainer": false,
+      "source": "docker/atlas-gpu-8098/Dockerfile lineage",
+      "classification": "PYTORCH_IN_RAPIDS_EXPERIMENT",
+      "uniqueGiB": 18.26,
+      "comparison": "repro-v2 installed PyTorch from the CUDA 12.9 wheel index and used a torch CUDA healthcheck; active atlas-gpu-8098 is RAPIDS-only",
+      "removal": "candidate_after_receipt_archive"
+    },
+    {
+      "image": "atlas-neural-decoder:torch2.8.0-cu128",
+      "sizeGiB": 12.2,
+      "role": "older PyTorch CUDA 12.8 decoder reference",
+      "referencedByActiveContainer": false,
+      "source": "docker/atlas-neural-decoder/Dockerfile comment/reference scope",
+      "classification": "REMOVED_RUNTIME_REPLACED_REFERENCE",
+      "uniqueGiB": 12.21,
+      "comparison": "torch2.8.0-cu128 is explicitly documented as a separate host/reference scope; active decoder is torch2.13.0-cu132",
+      "runtimeContract": "same command and port 8121 as active decoder",
+      "repositoryReferences": "historical ENVIRONMENT-STATUS-REPORT.md and Dockerfile comment only; no active compose service or launcher reference",
+      "removal": "safe_runtime_removal_after_optional_receipt_archive"
+    },
+    {
+      "image": "deeds-web-app-go-retrieval-service:latest",
+      "sizeGiB": 0.05,
+      "role": "legacy tag; shares image ID with legal-ai-go-retrieval:local-identity-v1",
+      "referencedByActiveContainer": false,
+      "classification": "LEGACY_DUPLICATE_TAG",
+      "safeAction": "archive/retag review only; do not delete automatically"
+    }
+  ],
+  "buildBases": [
+    {"image": "rapidsai/base:26.08-cuda12-py3.13-amd64", "sizeGiB": 17.4, "usedBy": "docker/atlas-gpu-8098/Dockerfile", "classification": "REQUIRED_BUILD_BASE"},
+    {"image": "pgvector/pgvector:pg18", "sizeGiB": 0.63, "usedBy": "compose/test/build references", "classification": "REFERENCE_IMAGE"},
+    {"image": "postgres:18", "sizeGiB": 0.64, "usedBy": "disposable/test scripts", "classification": "REFERENCE_IMAGE"},
+    {"image": "valkey/valkey:8-alpine", "sizeGiB": 0.06, "usedBy": "compose/test references", "classification": "REFERENCE_IMAGE"},
+    {"image": "qdrant/qdrant:latest", "sizeGiB": 0.27, "usedBy": "legacy/test references; active runtime is v1.19.0", "classification": "LEGACY_REFERENCE"}
+  ],
+  "duplicateFindings": [
+    "The active RAPIDS image and repro-v1/repro-v2 are separate image IDs and are not active duplicates.",
+    "The active decoder is torch2.13.0-cu132; torch2.8.0-cu128 is an inactive older reference.",
+    "deeds-web-app-go-retrieval-service:latest is a legacy tag sharing an image ID with legal-ai-go-retrieval:local-identity-v1; the active legal-ai-go-retrieval:latest is a different newer image.",
+    "qdrant:latest and qdrant:v1.19.0 coexist, but only v1.19.0 is active and pinned by compose.",
+    "The 17.4 GiB RAPIDS base is shared with the active GPU build and must be retained."
+  ],
+  "diskImpact": {
+    "inactiveLargeImageGiB": 67.6,
+    "safeCandidateUniqueGiB": 45.19,
+    "safeCandidateUniqueBreakdown": "repro-v1 14.72 + repro-v2 18.26 + torch2.8 decoder 12.21; shared RAPIDS base excluded",
+    "activeDockerDataVhdxGiB": 198.5,
+    "deletionPerformed": true,
+    "deletedImages": ["atlas-neural-decoder:torch2.8.0-cu128"],
+    "note": "Docker image pruning would not necessarily immediately compact the Windows VHDX."
+  },
+  "nextGate": "ARCHIVE_OR_DELETE_OPERATOR_APPROVAL_FOR_DEFERRED_CHALLENGERS",
+  "safeNextAction": "Archive challenger receipts, then remove only the two PyTorch-in-RAPIDS repro images and optionally the old torch2.8 decoder; retain the shared RAPIDS base because the active GPU image depends on it."
+}

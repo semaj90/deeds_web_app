@@ -4433,6 +4433,33 @@ export type NewCourtroomKeyframe = typeof courtroomKeyframes.$inferInsert;
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** GPU-enriched codebase chunk index — mirrors codebase_chunk_index in Postgres */
+export interface CodebaseChunkSummaryProvenanceV1 {
+	schema: 'atlas.codebase-chunk-summary-provenance.v1';
+	sourceIdentityKey: string | null;
+	workspaceRevision: string | null;
+	sourceRef: string | null;
+	sourceRevision: string | null;
+	chunkId: string | null;
+	chunkCanonicalId: string | null;
+	chunkRowId: string | null;
+	chunkRevisionOrChecksum: string | null;
+	inputTextSha256: string | null;
+	inputByteLength: number | null;
+	modelId: string | null;
+	modelRevision: string | null;
+	modelParameterCount: number | null;
+	runtimeBuildRevision: string | null;
+	promptTemplateRevision: string | null;
+	summarySchemaRevision: string | null;
+	generationParameters: Record<string, unknown> | null;
+	summarySha256: string | null;
+	latencyMs: number | null;
+	usage: Record<string, unknown> | null;
+	evidenceRefs: string[];
+	lineageState: 'REVISION_QUALIFIED' | 'UNQUALIFIED' | 'PROPOSAL_ONLY';
+	canonicalAuthority: false;
+}
+
 export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 	qdrantId: varchar('qdrant_id', { length: 64 }),
@@ -4498,37 +4525,49 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	 * Schema matches CodeLlmOutputMeta from code_llm_index.
 	 */
 	outputMeta: jsonb('output_meta').notNull().default(sql`'{}'::jsonb`),
+	// Dedicated chunk summary text. The legacy `summary` column above is mapped
+	// as `signature` and must not be treated as an admitted summary.
+	summaryText: text('summary_text'),
 
 	embeddingModel: varchar('embedding_model', { length: 100 }),
 	summaryModel: varchar('summary_model', { length: 100 }),
+	// Nullable, revision-bound provenance for chunk summaries. Proposals and
+	// unknown model/prompt/generation details remain NULL until proven.
+	summaryHash: text('summary_hash'),
+	summaryProvenance: jsonb('summary_provenance').$type<CodebaseChunkSummaryProvenanceV1 | null>(),
 
 	// halfvec(768) embeddings — live column type verified 2026-07-22
 	// Use halfvec_cosine_ops HNSW index for ANN queries (see schema DDL)
 	contentEmbedding: halfvec('content_embedding', { dimensions: 768 }),
 	summaryEmbedding: halfvec('summary_embedding', { dimensions: 768 }),
 	signatureEmbedding: halfvec('signature_embedding', { dimensions: 768 }),
+	// Existing nullable vector lanes declared here for Drizzle read-model parity.
+	// These declarations do not authorize new writers, migrations, or promotion.
+	contentEmbedding768: vector('content_embedding_768', { dimensions: 768 }),
+	summaryEmbedding384: vector('summary_embedding_384', { dimensions: 384 }),
+	errorEmbedding: halfvec('error_embedding', { dimensions: 768 }),
+	errorEmbeddingLatent256: halfvec('error_embedding_latent_256', { dimensions: 256 }),
+	errorEmbeddingLatent128: halfvec('error_embedding_latent_128', { dimensions: 128 }),
+	errorEmbeddingLatent64: vector('error_embedding_latent_64', { dimensions: 64 }),
+	latent128: halfvec('latent_128', { dimensions: 128 }),
 
-	// Learned nested-autoencoder representation (2026-08-29). NOT a prefix truncation of
-	// content_embedding -- an actual model forward pass (NestedSemanticAutoencoder.encode()).
-	// canonical_authority: false always -- routing/reranking lane only, never the primary
-	// retrieval authority.
-	// See openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md for the recall
-	// comparison that justified this column (latent_256 beats semantic_mrl_256, 0.8957 vs 0.8575).
+	// Candidate nested-autoencoder storage types. The current candidate architecture is
+	// semantic_768 -> learned latent_256 -> learned latent_128 -> normalized latent_64
+	// prefix of latent_128. Historical rows in these columns may have been produced by
+	// older checkpoint/derivation contracts; column presence is not provenance. Do not
+	// project them as candidate outputs without matching per-row input and model revisions.
+	// These are derived routing representations, never canonical semantic truth.
 	latent256: halfvec('latent_256', { dimensions: 256 }),
 	// Model checksum from the training receipt that produced latent_256 for this row.
 	// A future retrain must not silently mix generations -- a mismatch here means the row
 	// needs re-encoding, not that the column is stale/broken.
 	latent256CheckpointRevision: varchar('latent_256_checkpoint_revision', { length: 64 }),
 
-	// latent_64 (2026-09-02 LATENT-SCHEMA-ALIGN-01 correction): this file previously claimed
-	// latent_128/latent_64 "are NOT stored separately: they're free prefix+renormalize views of
-	// latent_256" -- that was false against live Postgres. `python/backfill_latent_256.py`
-	// persists latent_64 as its own learned-model output (same NestedSemanticAutoencoder forward
-	// pass, not a prefix of latent_256), and the column has been live and indexed
-	// (idx_codebase_chunk_latent64_hnsw) since before this correction. latent_128 genuinely has
-	// no Postgres column (in-memory only, per that script's own docstring) -- the claim was only
-	// half wrong. Declaration alignment only, no migration: every column below already exists on
-	// the live table. Live HNSW/checksum indexes (idx_codebase_chunk_latent64_hnsw,
+	// These legacy physical columns exist, but their contents are not promoted as outputs of
+	// atlas.latent-ae.768-512-256-128.v2. Historical latent_64 values must not be re-labelled as
+	// the candidate normalized prefix of latent_128. This is declaration alignment only; no
+	// migration or data rewrite is authorized here. Live HNSW/checksum indexes
+	// (idx_codebase_chunk_latent64_hnsw,
 	// idx_codebase_chunk_latent_valid, idx_codebase_chunk_latent_256_hnsw,
 	// idx_codebase_chunk_latent_256_checkpoint_revision) are intentionally not declared here,
 	// consistent with this repo's existing convention of keeping HNSW/GIN indexes in manual SQL

@@ -1,7 +1,7 @@
 {
   "schema": "atlas.go-lexical-scorer-census.v1",
   "status": "GO_POSTGRES_FTS_SCORER_CENSUS_PROVEN_NOT_BM25",
-  "generatedAt": "2026-09-19T09:16:18.313Z",
+  "generatedAt": "2026-09-20T22:49:40.715Z",
   "source": "services/go-retrieval-service/main.go",
   "sourceChecksum": "sha256:cc75e35e4399c6cc9bbe6ff410d161f1b642370fd2979498f6e18e5e896d3d84",
   "scorer": {
@@ -66,5 +66,5 @@
   "canonicalAuthority": false,
   "writesPerformed": false,
   "nextGate": "GO-LEXICAL-SCORER-CENSUS-01",
-  "reportChecksum": "sha256:fe1a1e0512e7d364e93c6c32cada989bc8059629dd1844f3471462c78377a138"
+  "reportChecksum": "sha256:866c50a2f2e801649537b3d8ad37a30381b8898fbdf4f62fb0c9166f114ab214"
 }

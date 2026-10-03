@@ -26,6 +26,8 @@ import {
 } from './event-hypergraph-contract.js';
 import { buildRecommendationPolicyResults, type RecommendationPolicyResult } from '$lib/server/analytics/recommendation-policy.js';
 
+const NonBlankStringSchema = z.string().trim().min(1);
+
 const EvidenceSpanSchema = z
 	.object({
 		sourceRef: z.string().min(1),
@@ -61,8 +63,9 @@ export const AnalysisPassResultSchema = z
 	.object({
 		requestId: z.string().min(1),
 		packetKey: z.string().min(1).nullable().default(null),
-		sourceRef: z.string().min(1),
-		sourceRevision: z.string().min(1),
+		sourceRef: NonBlankStringSchema,
+		sourceRevision: NonBlankStringSchema,
+		workspaceRevision: z.string().min(1).nullable().default(null),
 		family: AnalysisPassFamilySchema,
 		passName: z.string().min(1),
 		passRevision: z.string().min(1),
@@ -86,8 +89,13 @@ export const AstUnitSchema = z
 	.object({
 		sourceRef: z.string().min(1),
 		sourceRevision: z.string().min(1),
+		packetKey: z.string().min(1).nullable().default(null),
 		treeNodeId: z.string().min(1),
 		symbolVersionId: z.string().min(1).nullable().default(null),
+		// Matches the Python twin's `canonical_authority: Literal[False]` — tree_node_id/
+		// symbol_version_id here are sidecar-local digests, proposal coordinates only. Never
+		// silently promotable to atlas_symbol_versions/CandidateOrdinal/GraphNodeKey identity.
+		canonicalAuthority: z.literal(false).default(false),
 		language: z.string().min(1),
 		nodeKind: z.string().min(1),
 		qualifiedSymbol: z.string().min(1).nullable().default(null),
@@ -262,8 +270,10 @@ export const ExperimentFeatureMatrixSchema = z
 		requestId: z.string().min(1),
 		candidateId: z.string().min(1),
 		packetKey: z.string().min(1).nullable().default(null),
-		sourceRef: z.string().min(1),
-		sourceRevision: z.string().min(1),
+		sourceRef: NonBlankStringSchema,
+		sourceRevision: NonBlankStringSchema,
+		workspaceRevision: z.string().min(1).nullable().default(null),
+		canonicalAuthority: z.literal(false).default(false),
 		featureRevision: z.string().min(1),
 		graphRevision: z.string().min(1).nullable().default(null),
 		representationRevision: z.string().min(1).nullable().default(null),
@@ -326,10 +336,46 @@ export interface CompileExperimentFeatureMatrixInput {
 	packetKey?: string | null;
 	sourceRef: string;
 	sourceRevision: string;
+	workspaceRevision?: string | null;
 	featureRevision?: string;
 	graphRevision?: string | null;
 	representationRevision?: string | null;
 	passResults: AnalysisPassResult[];
+}
+
+export class FeatureMatrixLineageMismatchError extends Error {
+	readonly code = 'FEATURE_MATRIX_LINEAGE_MISMATCH' as const;
+
+	constructor(message: string) {
+		super(message);
+		this.name = 'FeatureMatrixLineageMismatchError';
+	}
+}
+
+function assertFeatureMatrixPassLineage(
+	passResults: AnalysisPassResult[],
+	sourceRef: string,
+	sourceRevision: string,
+	workspaceRevision?: string | null,
+	packetKey?: string | null,
+): void {
+	for (const passResult of passResults) {
+		if (passResult.sourceRef !== sourceRef || passResult.sourceRevision !== sourceRevision) {
+			throw new FeatureMatrixLineageMismatchError(
+				`Analysis pass ${passResult.passName} does not match feature-matrix lineage ${sourceRef}@${sourceRevision}`,
+			);
+		}
+		if (workspaceRevision !== undefined && passResult.workspaceRevision !== workspaceRevision) {
+			throw new FeatureMatrixLineageMismatchError(
+				`Analysis pass ${passResult.passName} does not match feature-matrix workspace revision ${workspaceRevision}`,
+			);
+		}
+		if (packetKey !== undefined && passResult.packetKey !== packetKey) {
+			throw new FeatureMatrixLineageMismatchError(
+				`Analysis pass ${passResult.passName} does not match feature-matrix packet ${packetKey}`,
+			);
+		}
+	}
 }
 
 function latestPass(
@@ -386,6 +432,15 @@ export function compileExperimentFeatureMatrix(
 ): { matrix: ExperimentFeatureMatrix; control5: Control5 } {
 	const requestId = input.requestId ?? randomUUID();
 	const canonicalPassResultsSet = canonicalPassResults(input.passResults);
+	const sourceRef = input.sourceRef.trim();
+	const sourceRevision = input.sourceRevision.trim();
+	assertFeatureMatrixPassLineage(
+		canonicalPassResultsSet,
+		sourceRef,
+		sourceRevision,
+		input.workspaceRevision,
+		input.packetKey,
+	);
 	const structural = latestPass(canonicalPassResultsSet, 'structural');
 	const lexical = latestPass(canonicalPassResultsSet, 'lexical');
 	const semantic = latestPass(canonicalPassResultsSet, 'semantic');
@@ -394,8 +449,6 @@ export function compileExperimentFeatureMatrix(
 	const grounded = latestPass(canonicalPassResultsSet, 'grounded');
 
 	const control5 = deriveControl5(input.passResults);
-	const sourceRef = input.sourceRef;
-	const sourceRevision = input.sourceRevision;
 	const featureRevision = input.featureRevision ?? 'nlp-feature-compiler-v1';
 	const packetKey = input.packetKey ?? null;
 
@@ -405,6 +458,8 @@ export function compileExperimentFeatureMatrix(
 		packetKey,
 		sourceRef,
 		sourceRevision,
+		workspaceRevision: input.workspaceRevision ?? null,
+		canonicalAuthority: false,
 		featureRevision,
 		graphRevision: input.graphRevision ?? null,
 		representationRevision: input.representationRevision ?? null,

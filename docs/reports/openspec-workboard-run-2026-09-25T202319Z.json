@@ -1,0 +1,109 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T20:23:19Z",
+  "runType": "SELECTED_PROGRAM_REVIEW",
+  "pivot": {
+    "from": "LARGE_CORPUS_ENRICHMENT_BUILD_01 and read-only canonical join",
+    "to": "current OpenSpec workboard achievability review",
+    "reason": "The local shards were sealed and the source-reference join showed no promotion-eligible population; user requested continuing through the OpenSpec task inventory while independently authoring the program plan."
+  },
+  "repository": {
+    "workingTreeWasDirty": true,
+    "taskLedgersEdited": false,
+    "selectedOpenSpec": null,
+    "selectedGate": "OPEN_SPEC_PROGRAM_PLAN_REVIEW_01"
+  },
+  "corpusWork": {
+    "shardManifest": ".tmp/atlas/large-corpus-enrichment-shards-v1/20260925T201112Z/manifest.json",
+    "manifestRootSha256": "85712fd9ec1c065857361b2f926cb218b479555f89cd89d28094165e20e3f3ff",
+    "shards": 17,
+    "records": 81261,
+    "workerCount": 4,
+    "allShardChecksumsVerified": true,
+    "postgresExactSourceRefJoin": {
+      "uniqueInputRefs": 61738,
+      "atlasPacketExactMatches": 2,
+      "codebaseChunkExactMatches": 0,
+      "noExactMatches": 61736,
+      "promotionEligible": 0
+    },
+    "liveReadback": {
+      "codebaseChunkRows": 274465,
+      "codebaseChunkRowsWithSourceRevision": 0,
+      "codebaseChunkRowsWithWorkspaceRevision": 0,
+      "packetRows": 61718,
+      "packetRowsWithSourceRevision": 16151,
+      "revisionQualifiedPacketsMissingSummary": 12521,
+      "qualifiedPacketPayloadOrMetadataHasContentText": 0
+    },
+    "ornithServerModel": "ornith-1.5-9b",
+    "summaryCalls": 0,
+    "dailyGraphifyChanged": false,
+    "datastoreWrites": 0,
+    "graphifyRuns": 0
+  },
+  "openSpecReview": {
+    "workboard": ".tmp/codex-openspec-live-20260925/openspec-workboard-v1.json",
+    "implementationPlan": ".tmp/codex-openspec-live-20260925/openspec-implementation-program-v1.json",
+    "markdownPlan": ".tmp/codex-openspec-live-20260925/openspec-implementation-program-v1.md",
+    "changes": 88,
+    "ledgerTaskFilesHashed": 90,
+    "sourceHashMismatches": 0,
+    "totalTasks": 9512,
+    "openTasks": 3224,
+    "openTaskAccounting": {
+      "workPackages": 2695,
+      "reviewRequired": 529,
+      "accountedExactlyOnce": true,
+      "duplicateTaskKeys": 0,
+      "schedulerSelected": 0
+    },
+    "currentGateStates": {
+      "READY": 2082,
+      "AUTHORIZATION_REQUIRED": 201,
+      "BLOCKED_BY_LINEAGE": 144,
+      "BLOCKED_BY_RUNTIME": 28,
+      "OWNER_DECISION_REQUIRED": 2,
+      "WAITING_FOR_DEPENDENCY": 438,
+      "REVIEW_REQUIRED": 240,
+      "DEFERRED": 51,
+      "SUPERSEDED": 38
+    },
+    "declaredDependencyTasks": 4,
+    "tasksWithoutDependencyDeclarations": 3220,
+    "workPackageCount": 500,
+    "workPackagesUnderThreeTasks": 181,
+    "controller": {
+      "state": "WAITING",
+      "generatedAt": "2026-09-25T20:22:48.115Z",
+      "staleOrMissingOpenTaskCount": 238,
+      "role": "READINESS_CLASSIFICATION_ONLY_NOT_SELECTION_AUTHORITY"
+    },
+    "programPlanReviewFindings": [
+      "All open leaves are accounted for exactly once, but 529 remain UNCLASSIFIED_REVIEW_REQUIRED.",
+      "Do not invent dependency edges for 3220 leaves; inherit only reviewed gate/work-package dependencies.",
+      "Current program wave labels differ from the proposed Wave 7/8/9/10 residency/agents/GPU/evaluation sequence and need reconciliation by the program-plan owner.",
+      "The 500 work packages exceed the approximate 250-400 target; do not merge packages until canonical owners and mutation boundaries are known.",
+      "All tasks remain NOT_SELECTED; readiness and completion counts do not authorize execution."
+    ]
+  },
+  "likely_cause": "The plan can account for every open task, but sparse declared dependencies, 529 unmapped leaves, and 238 controller identity gaps prevent treating it as an execution-ready scheduler DAG.",
+  "evidence": [
+    ".tmp/codex-openspec-live-20260925/openspec-workboard-v1.json",
+    ".tmp/codex-openspec-live-20260925/openspec-execution-controller-v1.json",
+    ".tmp/codex-openspec-live-20260925/openspec-implementation-program-v1.json",
+    "docs/reports/large-corpus-enrichment-census-v1.json",
+    "docs/reports/large-corpus-shards-postgres-reconciliation-v1.json",
+    "scripts/atlas/summarize-indexed-packets-dual-llm.mjs",
+    "scripts/startup/run-graphify-daily-startup.mjs"
+  ],
+  "patch_targets": [
+    "scripts/atlas/build-large-corpus-enrichment-shards-v1.mjs",
+    "scripts/atlas/audit-large-corpus-shards-postgres-reconciliation-v1.mjs",
+    "docs/reports/large-corpus-shards-postgres-reconciliation-v1.json",
+    "docs/reports/openspec-workboard-run-2026-09-25T202319Z.json"
+  ],
+  "safe_next_command": "node scripts/atlas/build-openspec-implementation-program-v1.mjs .tmp/codex-openspec-live-20260925/openspec-workboard-v1.json .tmp/codex-openspec-live-20260925/openspec-implementation-program-v1.json .tmp/codex-openspec-live-20260925/openspec-implementation-program-v1.md .tmp/codex-openspec-live-20260925/openspec-execution-controller-v1.json",
+  "smoke_command": "node --test scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T202319Z.json"
+}

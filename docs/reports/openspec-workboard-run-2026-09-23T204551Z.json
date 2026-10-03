@@ -1,0 +1,33 @@
+{
+  "schema": "parent-atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T20:49:54Z",
+  "pivot": {
+    "from": "parent-atlas-versioned-doc-intelligence",
+    "fromProgress": "27/38",
+    "to": "parent-atlas-adaptive-dag-fabric",
+    "toProgressBefore": "12/13",
+    "reason": "User supplied a scoped continuation to settle NATS event ownership and verify fetch-dedupe semantics without provisioning a stream."
+  },
+  "selectedGate": "NATS-EVENT-01 ownership classification/read-only audit",
+  "result": "NATS-EVENT-01 classified OPTIONAL_OBSERVABILITY_FOLLOWUP; runtime exists, but PARENT_ATLAS_EVENTS is unprovisioned. DAG-FETCH-01 was reopened because evidence-identity card dropping did not prove fetch coalescing.",
+  "workboardAfterReconciliation": { "checked": 11, "open": 2, "progress": "11/13", "delta": "one previously checked task reopened; no task newly closed" },
+  "fetchDedupe": "Removed selection-time evidence-identity dropping. Added regression tests that distinct cards survive, including equivalent evidence tuples, and distinct revisions/evidence remain distinct. Actual pre-fetch plan coalescing remains open.",
+  "validation": {
+    "focusedVitest": "6/6 passed",
+    "openspecStrict": "PASS",
+    "diffCheck": "PASS",
+    "reportJsonParse": "PASS"
+  },
+    "taskCheckboxesClosed": 0,
+    "taskCheckboxesReopened": 1,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "nats": 0,
+    "graphify": 0,
+    "containerRebuilds": 0
+  },
+  "worktreeNote": "Existing concurrent edits in adaptive-DAG tasks.md and ACE card selection implementation/spec were preserved; this tranche added only scoped evidence notes/reports."
+}

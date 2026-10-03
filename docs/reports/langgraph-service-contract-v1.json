@@ -1,6 +1,6 @@
 {
   "schema": "atlas.langgraph-service-contract-audit.v1",
-  "generatedAt": "2026-09-20T07:47:45.665Z",
+  "generatedAt": "2026-09-20T22:59:17.985Z",
   "inputChecksum": "sha256:970456c3486f133016be7126fbcc765b1202ab265e5994bc7df1cea610867ade",
   "service": {
     "port": 8091,

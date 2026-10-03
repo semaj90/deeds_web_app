@@ -195,7 +195,7 @@ describe('src/routes/api/health/+server.ts', () => {
 
     const body = await resp.json();
     expect(body.checks.rabbitmq.ok).toBe(false);
-    expect(body.checks.rabbitmq.error).toMatch(/Invalid or missing rabbitmq URL/);
+    expect(body.checks.rabbitmq.status).toBe('not_configured'); // unset URL is reported as not_configured, not an error string
     expect(body.checks.nats.ok).toBe(false);
     expect(body.checks.neo4j.ok).toBe(false);
   });

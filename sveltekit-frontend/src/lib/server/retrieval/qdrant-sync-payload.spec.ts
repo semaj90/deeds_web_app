@@ -4,6 +4,7 @@ import { buildQdrantSyncPayload } from './qdrant-sync-payload.js';
 const workspaceRevision = `sha256:${'a'.repeat(64)}`;
 const sourceRevision = `sha256:${'b'.repeat(64)}`;
 const validPacket = {
+  canonicalId: 'chunk:canonical:test:1',
   packetKey: 'packet:test:1',
   sourceRef: 'src/test.ts',
   featureId: 'feature:test',
@@ -20,6 +21,7 @@ describe('buildQdrantSyncPayload canonical lineage contract', () => {
   it('emits manifest workspace revision separately from cache/Git provenance', () => {
     const payload = buildQdrantSyncPayload(validPacket);
     expect(payload).toMatchObject({
+      canonical_id: 'chunk:canonical:test:1',
       packet_key: 'packet:test:1',
       source_ref: 'src/test.ts',
       workspace_revision: workspaceRevision,
@@ -30,6 +32,11 @@ describe('buildQdrantSyncPayload canonical lineage contract', () => {
       representation_revision: 3,
       schema_version: 'atlas.qdrant.payload.v2',
     });
+  });
+
+  it('rejects a payload without an exact canonical identity', () => {
+    expect(() => buildQdrantSyncPayload({ ...validPacket, canonicalId: undefined }))
+      .toThrow(/Missing canonical_id/);
   });
 
   it('accepts an explicit canonicalWorkspaceRevision while preserving a legacy numeric epoch separately', () => {

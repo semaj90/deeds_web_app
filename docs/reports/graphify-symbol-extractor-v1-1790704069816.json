@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-29T17:47:49.811Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 1,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": null,
+  "admissionMode": "GRAPHIFY_OBSERVATION_ONLY",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 0,
+  "sourceRevisionMismatchCount": 0,
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "markdown": 1
+  },
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 21,
+  "totalSymbolsInserted": null,
+  "plan": [
+    {
+      "fileId": "63b5b71d-3241-4b6b-97f8-f42375616000",
+      "sourceRef": "ACE-QUICK-REFERENCE.md",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:e94bb0ee99ae96dd476ffffc0cee9d696a6de58dba4b00f804225faf5b597d09",
+      "sourceDigest": "sha256:e94bb0ee99ae96dd476ffffc0cee9d696a6de58dba4b00f804225faf5b597d09",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    }
+  ]
+}

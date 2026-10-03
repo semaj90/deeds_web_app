@@ -1,0 +1,90 @@
+{
+  "schema": "atlas.openspec.workboard-run.v2",
+  "runId": "20260927T1718Z",
+  "generatedAt": "2026-09-27T17:18:27.820Z",
+  "purpose": "MULTI_HOP_PORTFOLIO_REFRESH_AND_PIVOT",
+  "workboard": {
+    "projectionPath": "docs/reports/openspec-workboard-projection-run-20260927T1715Z.json",
+    "projectionSchema": "atlas.openspec.workboard.v1",
+    "projectionGeneratedAt": "2026-09-27T17:17:32.635Z",
+    "changeBoards": 89,
+    "tasks": 9891,
+    "completed": 6516,
+    "open": 3375,
+    "heuristicActionable": 2532,
+    "dependencyWaiting": 787,
+    "historicalOrSuperseded": 54,
+    "schedulerSelected": 0,
+    "eta": "UNKNOWN_NO_RECEIPT_LINKED_THROUGHPUT",
+    "classificationLimit": "No current controller snapshot was supplied; execution states are heuristic only and grant no selection or execution permission."
+  },
+  "pivot": {
+    "fromChange": "parent-atlas-repair-candidate-feature-matrix",
+    "fromGate": "CONTENT-POLICY-01A code/contract slice",
+    "toChange": "parent-atlas-candidate-feature-execution-fabric",
+    "toGate": "LARGE_CORPUS_ENRICHMENT and canonical feature-input dependency chain",
+    "reason": "The current objective is the corpus-to-feature execution program, not completion of one semantic gate. The fresh census confirms the two exports still lack a sufficient canonical join; semantic feature admission remains blocked on immutable encoder/input provenance."
+  },
+  "freshEvidence": {
+    "censusPath": "docs/reports/large-corpus-enrichment-census-v2-20260927T1718Z.json",
+    "censusSchema": "atlas.large-corpus-enrichment-census.v1",
+    "censusStatus": "LARGE_CORPUS_ENRICHMENT_CENSUS_PROVEN",
+    "artifacts": [
+      {
+        "path": ".tmp/mapreduce-full-v5.ndjson",
+        "role": "PRIMARY_METADATA_CORPUS",
+        "bytes": 805352974,
+        "sha256": "9ed6d8d3e28f6b0453d75f305b67586ef9dc70cfac05b97825f6763916a42664",
+        "records": 5000,
+        "malformedLines": 0,
+        "identityFields": ["stableKey", "filePath", "contentHash"],
+        "packetSourceRevisionWorkspaceRevisionAndSummary": "ABSENT"
+      },
+      {
+        "path": "sveltekit-frontend/tmp/codebase_chunks_768-embeddings.ndjson",
+        "role": "REPRESENTATION_CORPUS",
+        "bytes": 739230455,
+        "sha256": "6474990e4914d53dfb05ed261313bba44f97b56d9de261e75941fb34ba7b9db5",
+        "records": 76261,
+        "distinctSourceRefs": 61738,
+        "duplicateSourceRefRows": 14503,
+        "vectorDimension": 768,
+        "packetSourceRevisionWorkspaceRevisionAndSummary": "ABSENT"
+      }
+    ],
+    "canonicalEnrichmentReady": false,
+    "writes": {
+      "modelCalls": 0,
+      "postgres": 0,
+      "qdrant": 0,
+      "valkey": 0,
+      "neo4j": 0,
+      "graphify": 0
+    }
+  },
+  "activeDependencies": [
+    {
+      "gate": "CONTENT-POLICY-01A",
+      "status": "CODE_CONTRACT_TESTED",
+      "proof": "Focused suite 9/9; TypeScript check, canary syntax, and strict OpenSpec validation pass."
+    },
+    {
+      "gate": "CONTENT-POLICY-01B",
+      "status": "NOT_LIVE_PROVEN",
+      "proof": "Strict :8081 endpoint is unreachable now; :8097 health is available but its existing contract does not expose immutable per-vector model/tokenizer/runtime identity."
+    },
+    {
+      "gate": "LARGE_CORPUS_FEATURE_SNAPSHOT_01",
+      "status": "BLOCKED_ON_QUALIFIED_FEATURE_INPUTS",
+      "proof": "The scoped 1,520-row canonical vector cohort lacks immutable representation revisions; canonical summary text is absent."
+    }
+  ],
+  "executionPolicy": {
+    "selectedTasks": [],
+    "datastoreWrites": false,
+    "containerRebuilds": false,
+    "canonicalPromotion": false
+  },
+  "nextImplementationOwner": "services/go-embedding-service",
+  "nextGate": "Add an additive, strict embedding capability/receipt and revision-qualified cache identity; preserve legacy behavior and do not claim current live deployment until the container is rebuilt and its receipt is read back."
+}

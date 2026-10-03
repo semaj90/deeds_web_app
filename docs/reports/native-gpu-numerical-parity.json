@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.native-gpu-numerical-parity.v1",
+  "generatedAt": "2026-09-27",
+  "addonSha256": "eba9b1c7c98177c63b833b106a766596d95b3627ae6baac8d2b96b4d045147ca",
+  "device": "NVIDIA GeForce RTX 3060 Ti",
+  "fixture": "Small deterministic in-memory inputs compared with independent JavaScript scalar CPU oracles.",
+  "defaultTolerance": 0.00002,
+  "results": [
+    { "operation": "batchCosineSimilarity", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 5.960447824193693e-8, "tolerance": 0.00002, "cudaExecution": 1 },
+    { "operation": "graphSimilarity", "status": "PARITY_PROVEN", "backend": "cpu_fallback", "maxAbsError": 1.1920978981727615e-7, "tolerance": 0.00002, "cudaExecution": 0 },
+    { "operation": "graphSimilarityHalf", "status": "PARITY_PROVEN", "backend": "cpu_fallback", "maxAbsError": 1.1920978981727615e-7, "tolerance": 0.00002, "cudaExecution": 0 },
+    { "operation": "softmaxGPU", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 2.937101473143855e-8, "tolerance": 0.00002, "cudaExecution": 1 },
+    { "operation": "topKIndicesGPU", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 0, "tolerance": 0.00002, "cudaExecution": 1 },
+    { "operation": "attentionScoreGPU", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 1.8300656434711016e-8, "tolerance": 0.00002, "cudaExecution": 1 },
+    { "operation": "rewardScoreGPU", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 3.617887578410972e-8, "tolerance": 0.00002, "cudaExecution": 1 },
+    { "operation": "pageRankGPU", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 9.934107481068821e-9, "tolerance": 0.00003, "cudaExecution": 1 },
+    { "operation": "kmeansWithCentroids", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 0, "tolerance": 0.00002, "cudaExecution": 1 },
+    { "operation": "pcaProject", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 0, "tolerance": 0.00002, "cudaExecution": 1 },
+    { "operation": "autoencoderEncode", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 5.985100359762185e-8, "tolerance": 0.00002, "cudaExecution": 1 },
+    { "operation": "autoencoderDecode", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 5.449194029338855e-8, "tolerance": 0.00002, "cudaExecution": 1 },
+    { "operation": "computeCaseEmbedding", "status": "PARITY_PROVEN", "backend": "cpu_fallback", "maxAbsError": 2.3425468897997348e-8, "tolerance": 0.00003, "cudaExecution": null },
+    { "operation": "trainSOM", "status": "PARITY_PROVEN", "backend": "libtorch_cuda", "maxAbsError": 0, "tolerance": 0.00002, "cudaExecution": 1 }
+  ],
+  "passed": 14,
+  "cudaBranchesConfirmed": 11,
+  "fullWorkloadParityProven": false,
+  "limitations": [
+    "graphSimilarity and graphSimilarityHalf use CPU implementations; numerical parity does not establish CUDA graph similarity.",
+    "computeCaseEmbedding is CPU-owned; no-LibTorch scalar fallback has a known normalization semantic difference and is not covered by this LibTorch oracle result.",
+    "PageRank fixture has no dangling nodes; top-k fixture has no tied cutoff; SOM fixture is n=1/one neuron/one iteration.",
+    "No workload-scale, error/OOM fallback, representation identity, or application-call-path claim is made."
+  ],
+  "sideEffects": { "databaseWrites": 0, "projectionWrites": 0, "cacheWrites": 0, "modelCalls": 0 }
+}

@@ -7,6 +7,7 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,12 +18,16 @@ const LLAMA = (process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090')
 const NLP = (process.env.LANGEXTRACT_URL || 'http://127.0.0.1:8095')
   .replace(/\/+$/, '');
 
+const fixtureText = 'Acme Corp must pay $100 under the canonical Qdrant projection, which preserves packet identity and source revision.';
+const fixtureSourceRevision = `sha256:${createHash('sha256').update(fixtureText).digest('hex')}`;
 const fixture = {
-  text: 'The canonical Qdrant projection preserves packet identity and source revision.',
+  text: fixtureText,
   source_type: 'codebase',
   extraction_mode: 'full',
   source_ref: 'fixture://parent-atlas/langextract-ornith-classifier',
   packet_key: 'fixture-packet-langextract-ornith',
+  source_revision: fixtureSourceRevision,
+  workspace_revision: 'sha256:fixture-workspace-langextract-ornith-v1',
   passes: ['classify'],
   grounded_extraction_required: true,
 };

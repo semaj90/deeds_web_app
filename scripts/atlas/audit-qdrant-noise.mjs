@@ -23,8 +23,8 @@
  *   .next/              Next.js output
  *   .nuxt/              Nuxt.js output
  *   .output/            Generic build output
- *   granite-docling-*/  Model artifact directories
- *   models/embedding*/  Embedding model artifacts
+ *   granite-docling-<suffix>/  Model artifact directories
+ *   models/embedding<suffix>/  Embedding model artifacts
  *   turbovec/           Turbovec model artifacts
  *
  * Safe paths (NEVER flagged as noisy, even if path contains a noise token):

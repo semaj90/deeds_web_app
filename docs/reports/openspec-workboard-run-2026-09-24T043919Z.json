@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T04:39:19Z",
+  "fromChange": "parent-atlas-graph-runtime-python-consolidation",
+  "toChange": "parent-atlas-versioned-doc-intelligence",
+  "fromTask": "GPU-EXP-15 / GPU-EXP-16",
+  "toTask": "DOC-26",
+  "pivotGate": "GRAPH_ARTIFACT_ADMISSION_BLOCKER_TO_DOC26_MANIFEST_DELTA_WIRING",
+  "reason": "GPU-EXP-15/16 are waiting for an admitted frozen graph; the live service is resident-null and loading a synthetic graph is out of scope. Returning to DOC-26 to implement its unblocked code-level manifest delta selection in the existing Python orchestration owner. The change will not write canonical stores or alter admission ownership.",
+  "fromTaskState": {
+    "change": "parent-atlas-graph-runtime-python-consolidation",
+    "openTasks": ["6", "7", "17", "18"],
+    "status": "LIVE_ARTIFACT_OR_OPERATOR_DECISION_REQUIRED",
+    "datastoreWrites": 0
+  },
+  "toTaskState": {
+    "change": "parent-atlas-versioned-doc-intelligence",
+    "task": "DOC-26",
+    "status": "MANIFEST_DELTA_PLANNER_INTEGRATED_CODE_PROOF",
+    "implementation": "python/atlas_okf_docs_pipeline.py compares prior/current manifests and wires safe selected sources into the existing pipeline when --prior-manifest is supplied; --plan-only prints the checksummed plan without fetching or writing artifacts.",
+    "rules": [
+      "new sources selected",
+      "explicit exact/major productVersion change selected only with chunk_identity_version=V2",
+      "same-version source/config revision changes fail closed for review",
+      "source identity changes fail closed",
+      "removed sources are retained and never pruned",
+      "new-version derived artifact namespace is version-scoped",
+      "default no-prior-manifest behavior remains unchanged"
+    ],
+    "validation": {
+      "pythonTests": "56 passed",
+      "pythonCompile": "PASS",
+      "openspecStrict": "PASS",
+      "scopedDiffCheck": "PASS"
+    },
+    "remaining": [
+      "live versioned canonical admission through the existing DOC-06A writer",
+      "read-only prior-version preservation readback after the bounded admission",
+      "operator authorization for any live canonical write"
+    ],
+    "writes": { "postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0, "containerRebuilds": 0 }
+  },
+  "constraints": {
+    "containerRebuildsUntilEnd": true,
+    "canonicalWrites": false,
+    "datastoreWrites": false,
+    "preserveConcurrentWorkingTreeEdits": true,
+    "noCommitOrPush": true
+  }
+}

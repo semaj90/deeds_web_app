@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runId": "openspec-workboard-run-2026-09-23T235532Z",
+  "startedAt": "2026-09-23T23:55:32Z",
+  "repository": "C:/Users/james/Videos/deeds-web-app",
+  "pivot": {
+    "from": "OpenSpec broad quick-hit sweep and blocked VAL-08 typed OaK relation evaluation",
+    "to": "parent-atlas-versioned-doc-intelligence / VAL-10 bounded summary eligibility replay",
+    "reason": "VAL-10 is locally executable after VAL-09; it can prove dry-run eligibility while VAL-08 remains blocked, with no summary persistence."
+  },
+  "before": {
+    "openSpecProgress": {"change": "parent-atlas-versioned-doc-intelligence", "complete": 37, "total": 48, "open": 11},
+    "completedPhaseV": ["VAL-01", "VAL-02", "VAL-02B", "VAL-03", "VAL-04", "VAL-05", "VAL-06", "VAL-07", "VAL-09"],
+    "blocked": ["VAL-08: OaK owner has no predicate-qualified typed assertion evaluator"]
+  },
+  "scope": {
+    "task": "VAL-10",
+    "mode": "READ_ONLY_BOUNDED_REPLAY",
+    "containerRebuilds": 0,
+    "persistentSummaryWrites": 0,
+    "authorizationForApply": false
+  },
+  "after": {
+    "openSpecProgress": {"change": "parent-atlas-versioned-doc-intelligence", "complete": 38, "total": 48, "open": 10},
+    "completedTask": "VAL-10",
+    "receipt": "docs/reports/parent-atlas/val-10-summary-eligibility-replay-v1.json",
+    "liveReplay": {"exactChunks": 19, "claims": 49, "admit": 48, "reject": 1, "judgeErrors": 0, "eligibleSummaries": 18, "limit": 20},
+    "summaryRowsBeforeAfter": [0, 0],
+    "persistentWrites": 0,
+    "focusedPythonTests": 61,
+    "focusedTypeScriptTests": 22,
+    "openspecStrict": "PASS"
+  },
+  "blockedRemaining": ["VAL-08: OaK owner has no predicate-qualified typed assertion evaluator"],
+  "applyAuthorization": "NOT_REQUESTED",
+  "result": "VAL10_BOUNDED_ELIGIBILITY_PROVEN"
+}

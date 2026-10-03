@@ -1,0 +1,222 @@
+{
+  "schema": "atlas.research-document-retrieval-proof.v3",
+  "generatedAt": "2026-09-23T22:00:25.713Z",
+  "mode": "READ_ONLY_LIVE_JOIN_AND_BOUNDED_FETCH_FIXTURE",
+  "owners": {
+    "webSearch": "docker/langgraph-synthesis/app.py::web_search",
+    "fetchedDocumentContract": "docker/langgraph-synthesis/research_contracts.py::FetchedResearchDocumentV1",
+    "fetchNormalizeChunk": "python/atlas_external_docs.py::fetch_beautifulsoup/extract_structured_text/chunk_document",
+    "canonicalDocs": "PostgreSQL atlas_external_doc_pages/atlas_external_doc_chunks",
+    "parameterArtifact": "packages/parent-atlas/src/core/parameter-artifact-v1.ts",
+    "parameterResolver": "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.ts"
+  },
+  "checks": {
+    "webSearch": {
+      "status": "PROVEN",
+      "value": {
+        "count": 2,
+        "provider": "searxng",
+        "resultUrls": [
+          "https://www.postgresql.org/",
+          "https://www.postgresql.org/download/"
+        ]
+      }
+    },
+    "fetchedDocument": {
+      "status": "PROVEN",
+      "value": {
+        "fetcher": "BEAUTIFULSOUP_HTTP",
+        "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+        "title": "PostgreSQL: Documentation: 18: 19.4. Resource Consumption",
+        "fetchChecksum": "70d86642ca56e9b0ee731082d7c4f370a06d0bdfe325ccf8ea4231eaa301b073",
+        "repeatChecksum": "70d86642ca56e9b0ee731082d7c4f370a06d0bdfe325ccf8ea4231eaa301b073",
+        "deterministic": true,
+        "chunkCount": 12,
+        "utf8SpanReplay": true,
+        "chunkRevisionsAreContentChecksums": true,
+        "canonicalAuthority": false,
+        "writesPerformed": false
+      }
+    },
+    "pydanticContract": {
+      "status": "PROVEN",
+      "value": {
+        "fetchedDocumentSchema": "atlas.fetched-research-document.v1",
+        "checksumBound": true,
+        "extraFieldsForbidden": true,
+        "result": "PASS"
+      }
+    },
+    "liveCorpus": {
+      "status": "PROVEN",
+      "value": {
+        "chunks": 852,
+        "embedded": 852,
+        "revisionQualified": 852,
+        "minDimension": 768,
+        "maxDimension": 768
+      }
+    },
+    "fts": {
+      "status": "PROVEN",
+      "value": {
+        "query": "Bitmap Heap Scan",
+        "qualifiedHits": 10,
+        "chunkIds": [
+          "doc:postgresql-18:38d5e74bafb89df8:10",
+          "doc:postgresql-18:38d5e74bafb89df8:2",
+          "doc:postgresql-18:38d5e74bafb89df8:24",
+          "doc:postgresql-18:c80bd7e95d17f8ae:11",
+          "doc:postgresql-18:c80bd7e95d17f8ae:13",
+          "doc:postgresql-18:c80bd7e95d17f8ae:15",
+          "doc:postgresql-18:c80bd7e95d17f8ae:16",
+          "doc:postgresql-18:c80bd7e95d17f8ae:17",
+          "doc:postgresql-18:c80bd7e95d17f8ae:21",
+          "doc:postgresql-18:c80bd7e95d17f8ae:23"
+        ],
+        "evidenceRevisions": [
+          "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1",
+          "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716",
+          "sha256:47cd2c1e335a1ddbc17c7c01c6b0346d0cb216a7b51470ba4326fc3d145ca5bb",
+          "sha256:8089a1fdb9598bf1d52815f6c2db225277217c66d4878fc6abc026f631ac7dc7",
+          "sha256:15afedff79d7259bb2c85974d232657cbde420055d5e3b0552554d33e5c78ff3",
+          "sha256:8c66ad7b3cc845da27bc0c895d6b6fe361834daf605740b8c83b0ae5f7810632",
+          "sha256:6d60ce0663246fe64504c98292bf3bc6c94e447250dc9aacbf7fb7028d6ad1ac",
+          "sha256:f287203a9f72c823e68a90d691ad8faa8c35ae9b8273eec8dd0211a4035f4372",
+          "sha256:26186a7b6f77fac2ee8104e91edc726891978c48e14db4d7636b86c882a52250",
+          "sha256:9e41f3f858d396097638443bba4efdbc2d1c738c5972cb0c3507e3dd8c65baec"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "PROVEN",
+      "value": {
+        "executorFixture": "stored-corpus self-query; not a generated query embedding or relevance benchmark",
+        "dimension": 768,
+        "exactHits": 10,
+        "hnswHits": 10,
+        "sameOrderedTopK": true,
+        "recallAtK": 1,
+        "allResultsRevisionQualified": true,
+        "hnswPlanObserved": true,
+        "exact": [
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+            "evidenceRevision": "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+            "evidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:20",
+            "evidenceRevision": "sha256:670d449c0bf80d8728bab74924fdbe72f8e9a9522270a703fabc534c47154121"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:9",
+            "evidenceRevision": "sha256:4293dd8224f0467de08518359f75882fb8ad6c88f21e794c053dfd0a08b5ec5f"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+            "evidenceRevision": "sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:31",
+            "evidenceRevision": "sha256:09d6f9c7f7e82df7c1b6ada969c05fcb1fe083990e7a28ab30e5851417b97850"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:33",
+            "evidenceRevision": "sha256:f38b12b39041a83db644121b00e379db7752f71a82073d5b0d16a18e4a77e544"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:12",
+            "evidenceRevision": "sha256:7a538a4bd94b8f1cfa46a4747d0047ba603e78bbc59a0d9cf2f56fe1375dc461"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:36",
+            "evidenceRevision": "sha256:9ccd369c14a41d34d4bb65515c73a4527a92c3189369b290eda3018f1de2abfa"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:37",
+            "evidenceRevision": "sha256:e7a3a898ba6cfd922e9e9e20455e759e3edb714855c74d3effd1ed928cc40a6c"
+          }
+        ],
+        "ann": [
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+            "evidenceRevision": "sha256:1a53b6f8ec67e33ba9ba93cf1af87d3ec525a4cd43aee5b1dbd6f619c0b57716"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+            "evidenceRevision": "sha256:efc6bfb0eff3ba1dc47d0c9c7db3872fc5588920ed8f518b031d669e271b93b1"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:20",
+            "evidenceRevision": "sha256:670d449c0bf80d8728bab74924fdbe72f8e9a9522270a703fabc534c47154121"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:9",
+            "evidenceRevision": "sha256:4293dd8224f0467de08518359f75882fb8ad6c88f21e794c053dfd0a08b5ec5f"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+            "evidenceRevision": "sha256:07f62f723503cc1dbf010318be5747aa11a6c81b12de4a1c97a8587e3d8c9ed2"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:31",
+            "evidenceRevision": "sha256:09d6f9c7f7e82df7c1b6ada969c05fcb1fe083990e7a28ab30e5851417b97850"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:33",
+            "evidenceRevision": "sha256:f38b12b39041a83db644121b00e379db7752f71a82073d5b0d16a18e4a77e544"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:12",
+            "evidenceRevision": "sha256:7a538a4bd94b8f1cfa46a4747d0047ba603e78bbc59a0d9cf2f56fe1375dc461"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:36",
+            "evidenceRevision": "sha256:9ccd369c14a41d34d4bb65515c73a4527a92c3189369b290eda3018f1de2abfa"
+          },
+          {
+            "chunkId": "doc:postgresql-18:38d5e74bafb89df8:37",
+            "evidenceRevision": "sha256:e7a3a898ba6cfd922e9e9e20455e759e3edb714855c74d3effd1ed928cc40a6c"
+          }
+        ],
+        "index": "aedc_embedding_hnsw",
+        "writes": 0
+      }
+    }
+  },
+  "joins": {
+    "fetchedContentToCanonicalAdmission": "NOT_PERFORMED; admission input/readback bridge not exercised by this proof",
+    "ftsToVector": "same canonical chunk corpus; separate bounded executor queries",
+    "mcpDocumentationSearch": "NOT_PROVEN; current LDR MCP health does not demonstrate doc-corpus search",
+    "parameterArtifactFromRetrievedChunk": "NOT_PROVEN; TypeScript canonical artifact and Python mirror have different schemas; no coercion performed",
+    "dagFetchParameter": "NOT_PROVEN; requires exact existing artifact lookup and DAG execution receipt",
+    "contextManifestEvidence": "NOT_PROVEN; no same-request manifest join exercised",
+    "astGrepCodeFenceOnly": "NOT_PROVEN; no code-fence parser execution in this tranche"
+  },
+  "boundaries": {
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false,
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "graphWrites": 0,
+    "fetchCreatesSourceRevision": false,
+    "semanticExecutorVotes": 1,
+    "exactVsHnsw": "same logical semantic lane; exact oracle and HNSW executor comparison only"
+  },
+  "status": "RESEARCH_DOCUMENT_RETRIEVAL_V3_PARTIAL_PROVEN",
+  "remaining": [
+    "ExternalDocAdmissionInputV1 plus transactional rollback/readback rehearsal",
+    "MCP documentation search returning the same revision-qualified chunk",
+    "TypeScript ParameterArtifactV1 creation and exact DAG FETCH_PARAMETER checksum resolution",
+    "ContextManifest retaining the same evidence revision",
+    "ast-grep restricted to extracted supported-language code fences",
+    "meaningful query-vector exact/HNSW recall evaluation; current parity uses a stored-corpus self-query"
+  ],
+  "receiptChecksum": "b5525728f2e7ce701872f54befdafbc542a8d4d3137d37fcf17f2f7c4ba3f07b"
+}

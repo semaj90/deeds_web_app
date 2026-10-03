@@ -213,6 +213,15 @@
       "writesPerformed": false
     },
     {
+      "id": "STRUCTURAL_PROVENANCE_RUNTIME",
+      "owner": "parent-atlas-nlp-sidecar-feature-compiler",
+      "state": "PROVEN_LIVE_RUNTIME_NONCANONICAL",
+      "evidence": "structural-intelligence-integration-proof.json",
+      "live8095": true,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
       "id": "ONTOLOGY_POPULATION_DECISION",
       "owner": "parent-atlas-nlp-sidecar-feature-compiler",
       "state": "UNPROVEN",

@@ -182,9 +182,10 @@ async function main() {
         qdrant: 'semantic lookup mirror',
         postgres: 'canonical identity and provenance store',
         embedding_family: 'embeddinggemma',
-        canonical_embedding_lane: '512',
+        canonical_embedding_lane: 'semantic_768',
         main_chunk_lane: '768',
-        projection_lane: '384',
+        mrl_projection_lanes: ['semantic_mrl_512', 'semantic_mrl_256', 'semantic_mrl_128'],
+        learned_latent_lanes: ['latent_256', 'latent_128', 'latent_64'],
         routing_lane: '64',
       },
       rule: 'Postgres packet and summary spine first; mirrors are refreshed after canonical summaries exist.',
@@ -196,7 +197,7 @@ async function main() {
       'Promote already-generated Gemma4 chunk summaries into atlas_summary_layers with atlas:workstation:summaries:100.',
       'Do not mirror to Qdrant/Redis/Neo4j until summary coverage is intentionally advanced.',
       'Use atlas_summary_layers as the canonical envelope source for downstream feature extraction.',
-      'Keep 512 as the canonical embedding lane, 768 as the main chunk lane, and 384 as a projection lane only when explicitly defined.',
+      'Keep EmbeddingGemma semantic_768 as the canonical embedding lane; treat MRL 512/256/128 and learned latent_256/latent_128/latent_64 as distinct derived comparison lanes.',
     ],
   };
 

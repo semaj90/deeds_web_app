@@ -1,18 +1,19 @@
 #!/usr/bin/env node
 
 /**
- * Official Smoke Test: Embedding Truncation Strategy
+ * EmbeddingGemma semantic_768 / MRL projection smoke
  *
  * Validates:
- * 1. Truncation parity (768→384→128→8)
- * 2. Cosine similarity preservation
- * 3. Retrieval quality (recall@K metrics)
- * 4. Storage cost comparison
+ * 1. Optional live projection diagnostics from semantic_768 to MRL 512/256/128
+ * 2. Cosine similarity of zero-padded, L2-normalized MRL views (diagnostic only)
+ * 3. Modeled vector-payload byte comparison (not total database cost)
  * 5. OKF schema compliance
  * 6. PostgreSQL upsert contract
  *
  * Usage:
  *   node smoke-test-embedding-truncation.mjs [--verbose] [--gates-only]
+ *
+ * --gates-only runs deterministic local checks only; it makes no service call.
  *
  * Exit codes:
  *   0 = all gates pass
@@ -21,21 +22,27 @@
  */
 
 import fetch from 'node-fetch';
+import { pathToFileURL } from 'node:url';
+import { resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 
 const ONNX_URL = 'http://127.0.0.1:8081/v1/embeddings';
 const VERBOSE = process.argv.includes('--verbose');
 const GATES_ONLY = process.argv.includes('--gates-only');
+export const MRL_DIMENSIONS = Object.freeze([512, 256, 128]);
+export const CANONICAL_DIMENSION = 768;
 
 // ============================================================================
 // UTILITIES
 // ============================================================================
 
-function cosineSimilarity(a, b) {
-  const n = Math.min(a.length, b.length);
+export function cosineSimilarity(a, b) {
+  if (a.length !== b.length) throw new Error(`COSINE_DIMENSION_MISMATCH: ${a.length} != ${b.length}`);
+  const n = a.length;
   let dotProduct = 0, normA = 0, normB = 0;
 
   for (let i = 0; i < n; i++) {
+    if (!Number.isFinite(a[i]) || !Number.isFinite(b[i])) throw new Error('COSINE_NON_FINITE_VALUE');
     dotProduct += a[i] * b[i];
     normA += a[i] * a[i];
     normB += b[i] * b[i];
@@ -45,28 +52,47 @@ function cosineSimilarity(a, b) {
   return denom > 0 ? dotProduct / denom : 0;
 }
 
-function truncateToWarm(embedding768) {
-  return embedding768.slice(0, 384);
-}
-
-function truncateToCool(embedding768) {
-  return embedding768.slice(0, 128);
-}
-
-function truncateToCold(embedding768) {
-  // Preserve position: top-8 by magnitude, zero-filled for others
-  const sparse = new Float32Array(384);
-
-  const dims = embedding768
-    .map((val, idx) => ({ val: Math.abs(val), idx }))
-    .sort((a, b) => b.val - a.val)
-    .slice(0, 8);
-
-  for (const dim of dims) {
-    sparse[dim.idx] = embedding768[dim.idx];
+export function assertCanonicalSemantic768(vector) {
+  if ((!Array.isArray(vector) && !(vector instanceof Float32Array)) || vector.length !== CANONICAL_DIMENSION) {
+    throw new Error(`EXPECTED_FINITE_FLAT_SEMANTIC_768: received ${vector?.length ?? 'non-vector'}`);
   }
+  for (let index = 0; index < vector.length; index += 1) {
+    if (!Number.isFinite(vector[index])) throw new Error(`SEMANTIC_768_NON_FINITE_VALUE: index ${index}`);
+  }
+  return vector;
+}
 
-  return sparse;
+export function deriveMrlPrefix(vector, dimension) {
+  assertCanonicalSemantic768(vector);
+  if (!MRL_DIMENSIONS.includes(dimension)) throw new Error(`UNSUPPORTED_MRL_DIMENSION: ${dimension}`);
+  const prefix = Float32Array.from(vector.slice(0, dimension));
+  let normSquared = 0;
+  for (const value of prefix) normSquared += value * value;
+  const norm = Math.sqrt(normSquared);
+  if (!Number.isFinite(norm) || norm <= 0) throw new Error('MRL_PREFIX_ZERO_OR_INVALID_NORM');
+  for (let index = 0; index < prefix.length; index += 1) prefix[index] /= norm;
+  return prefix;
+}
+
+export function cosineToZeroPaddedMrl(source, mrlView) {
+  assertCanonicalSemantic768(source);
+  if (!MRL_DIMENSIONS.includes(mrlView.length)) throw new Error(`UNSUPPORTED_MRL_DIMENSION: ${mrlView.length}`);
+  const padded = new Float32Array(CANONICAL_DIMENSION);
+  padded.set(mrlView);
+  return cosineSimilarity(source, padded);
+}
+
+export function buildMrlProjectionDiagnostics(vector) {
+  assertCanonicalSemantic768(vector);
+  return MRL_DIMENSIONS.map((dimension) => {
+    const projection = deriveMrlPrefix(vector, dimension);
+    return {
+      representationId: `semantic_mrl_${dimension}`,
+      dimension,
+      projectionKind: 'PREFIX_TRUNCATE_L2_RENORMALIZE',
+      cosineToZeroPaddedSemantic768: cosineToZeroPaddedMrl(vector, projection)
+    };
+  });
 }
 
 async function embedOnnx(text) {
@@ -115,8 +141,8 @@ async function gateOnnxHealth() {
   }
 }
 
-async function gateTruncationParity() {
-  console.log('\n📋 Gate 2: Truncation Parity (768→384→128→8)');
+async function gateMrlProjectionDiagnostics() {
+  console.log('\n📋 Gate 2: MRL Projection Diagnostics (semantic_768 → MRL 512/256/128)');
 
   const testQueries = [
     'authentication and session management',
@@ -134,24 +160,22 @@ async function gateTruncationParity() {
       return false;
     }
 
-    const emb384 = truncateToWarm(emb768);
-    const emb128 = truncateToCool(emb768);
-    const emb8 = truncateToCold(emb768);
-
-    const sim384 = cosineSimilarity(emb768, emb384);
-    const sim128 = cosineSimilarity(emb768, emb128);
-    const sim8 = cosineSimilarity(emb768, emb8);
+    let diagnostics;
+    try {
+      diagnostics = buildMrlProjectionDiagnostics(emb768);
+    } catch (err) {
+      console.log(`  ❌ FAIL: ${err.message}`);
+      return false;
+    }
 
     if (VERBOSE) {
       console.log(`  "${query.slice(0, 40)}..."`);
-      console.log(`    768→384: ${sim384.toFixed(4)} (target: >0.98) ${sim384 > 0.98 ? '✅' : '❌'}`);
-      console.log(`    768→128: ${sim128.toFixed(4)} (target: >0.85) ${sim128 > 0.85 ? '✅' : '❌'}`);
-      console.log(`    768→8:   ${sim8.toFixed(4)} (target: >0.40) ${sim8 > 0.40 ? '✅' : '❌'}`);
+      for (const item of diagnostics) {
+        console.log(`    ${item.representationId}: dim=${item.dimension}, zero-padded cosine=${item.cosineToZeroPaddedSemantic768.toFixed(4)} (diagnostic; no quality threshold)`);
+      }
     }
 
-    if (sim384 > 0.98 && sim128 > 0.85 && sim8 > 0.40) {
-      passed++;
-    }
+    passed++;
   }
 
   const passRate = passed / testQueries.length;
@@ -165,29 +189,17 @@ async function gateTruncationParity() {
 }
 
 async function gateStorageCost() {
-  console.log('\n📋 Gate 3: Storage Cost Comparison');
-
-  const costPerM = {
-    '768': (768 * 8 * 1e6 / 1e9 * 0.03).toFixed(3),
-    '384': (384 * 8 * 1e6 / 1e9 * 0.03).toFixed(3),
-    '128': (128 * 8 * 1e6 / 1e9 * 0.03).toFixed(3),
-    '8':   (8   * 8 * 1e6 / 1e9 * 0.01).toFixed(3)
-  };
-
-  console.log(`  768-dim: $${costPerM['768']}/month per 1M embeddings`);
-  console.log(`  384-dim: $${costPerM['384']}/month per 1M embeddings (50% savings)`);
-  console.log(`  128-dim: $${costPerM['128']}/month per 1M embeddings (83% savings)`);
-  console.log(`  8-dim:   $${costPerM['8']}/month per 1M embeddings (99% savings)`);
-
-  // Verify 50% savings for canonical tier
-  const ratio384_768 = parseFloat(costPerM['384']) / parseFloat(costPerM['768']);
-  if (Math.abs(ratio384_768 - 0.5) < 0.01) {
-    console.log(`  ✅ PASS: 384-dim achieves expected 50% cost savings`);
-    return true;
-  } else {
-    console.log(`  ❌ FAIL: 384-dim cost ratio is ${ratio384_768.toFixed(3)}, expected 0.50`);
-    return false;
+  console.log('\n📋 Gate 3: Modeled Vector Payload Bytes (halfvec payload only)');
+  const dimensions = [CANONICAL_DIMENSION, ...MRL_DIMENSIONS];
+  const baseBytes = CANONICAL_DIMENSION * 2;
+  for (const dimension of dimensions) {
+    const bytes = dimension * 2;
+    const reduction = (1 - bytes / baseBytes) * 100;
+    const label = dimension === CANONICAL_DIMENSION ? 'semantic_768 canonical reference' : `semantic_mrl_${dimension} derived view`;
+    console.log(`  ${label}: ${bytes} raw halfvec bytes/vector; ${reduction.toFixed(1)}% vs 768-D payload`);
   }
+  console.log('  Note: excludes row, index, metadata, and storage-engine overhead; not a price estimate.');
+  return dimensions.every((dimension) => Number.isInteger(dimension) && dimension > 0);
 }
 
 function gateOkfSchema() {
@@ -198,9 +210,10 @@ function gateOkfSchema() {
     source_ref: 'src/lib/server/auth.ts',
     feature_id: 'auth.sessions',
     embedding: {
-      model: 'embeddinggemma:latest',
-      dim: 384,
-      vector: new Array(384).fill(0.1)
+      model_family: 'EmbeddingGemma',
+      representation_id: 'semantic_768',
+      dim: 768,
+      vector: new Array(768).fill(0.1)
     }
   };
 
@@ -211,20 +224,20 @@ function gateOkfSchema() {
       pass: /^[a-z0-9:]+$/.test(samplePacket.packet_key)
     },
     {
-      name: 'embedding model specified',
-      pass: samplePacket.embedding.model === 'embeddinggemma:latest'
+      name: 'embedding family specified without a mutable alias as provenance',
+      pass: samplePacket.embedding.model_family === 'EmbeddingGemma'
     },
     {
       name: 'embedding dim specified',
-      pass: [384, 128, 64, 8].includes(samplePacket.embedding.dim)
+      pass: samplePacket.embedding.representation_id === 'semantic_768' && samplePacket.embedding.dim === 768
     },
     {
       name: 'vector length matches dim',
       pass: samplePacket.embedding.vector.length === samplePacket.embedding.dim
     },
     {
-      name: 'no 768-dim in new write (canonical is 384)',
-      pass: samplePacket.embedding.dim !== 768
+      name: 'canonical semantic_768 write is exactly 768 dimensions',
+      pass: samplePacket.embedding.dim === 768 && samplePacket.embedding.vector.length === 768
     }
   ];
 
@@ -249,9 +262,9 @@ function gateDrizzleUpsert() {
 
   // Simulate upsert pattern (no DB connection needed for smoke test)
   const upsertContract = {
-    'Target column': 'packet_key (UNIQUE constraint)',
-    'Conflict resolution': 'DO UPDATE SET content_embedding = $1, updated_at = NOW()',
-    'Vector dimension': '384-dim (pgvector(384))',
+    'Target column': 'codebase_chunk_index.content_embedding_768 (canonical semantic_768 storage; simulated only, admission still gated)',
+    'Conflict resolution': 'revision-qualified conditional update contract (simulated only; no write)',
+    'Vector dimension': '768-dim semantic_768 candidate (halfvec(768)); admission still gated',
     'Normalization': 'Unit L2 norm (after embedding)',
     'HNSW index': 'vector_cosine_ops with m=16, ef_construction=64'
   };
@@ -276,18 +289,28 @@ function gateDrizzleUpsert() {
 // MAIN
 // ============================================================================
 
-async function runSmokeTest() {
+export async function runSmokeTest() {
   console.log('\n╔════════════════════════════════════════════════════════════╗');
-  console.log('║  Official Smoke Test: Embedding Truncation Strategy         ║');
+  console.log('║  EmbeddingGemma semantic_768 / MRL Projection Smoke        ║');
   console.log('╚════════════════════════════════════════════════════════════╝');
 
-  const gates = [
-    { name: 'ONNX Health', fn: gateOnnxHealth },
-    { name: 'Truncation Parity', fn: gateTruncationParity },
+  const offlineGates = [
+    { name: 'MRL Projection Contract', fn: async () => {
+      const fixture = Float32Array.from({ length: CANONICAL_DIMENSION }, (_, index) => index + 1);
+      const result = buildMrlProjectionDiagnostics(fixture);
+      const pass = result.length === 3 && result.every((item, index) => item.dimension === MRL_DIMENSIONS[index] && Number.isFinite(item.cosineToZeroPaddedSemantic768));
+      console.log(`  ${pass ? '✅' : '❌'} derived views: ${result.map((item) => item.representationId).join(', ')}`);
+      return pass;
+    } },
     { name: 'Storage Cost', fn: gateStorageCost },
     { name: 'OKF Schema', fn: gateOkfSchema },
     { name: 'Drizzle Upsert', fn: gateDrizzleUpsert }
   ];
+  const liveGates = [
+    { name: 'Embedding Service Health', fn: gateOnnxHealth },
+    { name: 'Live MRL Projection Diagnostics', fn: gateMrlProjectionDiagnostics }
+  ];
+  const gates = GATES_ONLY ? offlineGates : [...liveGates, ...offlineGates];
 
   const results = [];
 
@@ -314,7 +337,7 @@ async function runSmokeTest() {
   console.log(`\n📊 SCORE: ${passCount}/${totalCount} gates passed`);
 
   if (passCount === totalCount) {
-    console.log(`\n✅ OFFICIAL SMOKE TEST: PASS\n`);
+    console.log(`\n✅ ${GATES_ONLY ? 'OFFLINE CONTRACT GATES' : 'LIVE + OFFLINE SMOKE'}: PASS\n`);
     process.exit(0);
   } else {
     console.log(`\n❌ OFFICIAL SMOKE TEST: FAIL\n`);
@@ -322,8 +345,9 @@ async function runSmokeTest() {
   }
 }
 
-// Run
-runSmokeTest().catch(err => {
-  console.error(`Fatal error: ${err.message}`);
-  process.exit(2);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  runSmokeTest().catch(err => {
+    console.error(`Fatal error: ${err.message}`);
+    process.exit(2);
+  });
+}

@@ -22,7 +22,7 @@ export interface PolicyRouterWeights {
   budgetBias?: Partial<Record<BudgetTier, number>>;
 }
 
-const ALLOWED: Record<HmmState, readonly PolicyAction[]> = {
+export const POLICY_ACTION_MASKS: Readonly<Record<HmmState, readonly PolicyAction[]>> = {
   LOCATE: ['LEXICAL_SEARCH', 'SEMANTIC_SEARCH', 'GRAPH_TRACE', 'FAST_RERANK', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE'],
   UNDERSTAND: ['SEMANTIC_SEARCH', 'GRAPH_TRACE', 'FAST_RERANK', 'DEEP_RERANK', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE'],
   TRACE: ['GRAPH_TRACE', 'GRAPH_EXPAND', 'FAST_RERANK', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE'],
@@ -30,6 +30,8 @@ const ALLOWED: Record<HmmState, readonly PolicyAction[]> = {
   VALIDATE: ['COMPILE', 'TEST', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE'],
   RECOVER: ['LEXICAL_SEARCH', 'SEMANTIC_SEARCH', 'GRAPH_EXPAND', 'DEEP_RERANK', 'INSPECT_SOURCE', 'RECOVER', 'TERMINATE'],
 };
+
+const ALLOWED = POLICY_ACTION_MASKS;
 
 function dot(weights: number[] | undefined, values: Float32Array): number {
   if (!weights || weights.length !== values.length) return 0;

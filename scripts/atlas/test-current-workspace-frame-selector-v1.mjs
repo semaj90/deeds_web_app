@@ -74,6 +74,61 @@ test('explicit CLI revision resolves an authority conflict without mutating rece
   assert.equal(result.explicitOverride, true);
 });
 
+test('explicit authority manifest beats environment and admitted receipts', () => {
+  const root = fixture({
+    'frame.json': {
+      authority: true,
+      workspaceRevision: 'sha256:manifest',
+      snapshotRevision: 'sha256:manifest-snapshot',
+    },
+    'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:admitted', 'sha256:admitted-snapshot'),
+  });
+  const result = resolveCurrentWorkspaceFrameV1({
+    root,
+    argv: ['--manifest', 'frame.json'],
+    env: { ATLAS_EXPECTED_GRAPHIFY_WORKSPACE_REVISION: 'sha256:env' },
+  });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
+  assert.equal(result.selectedWorkspaceRevision, 'sha256:manifest');
+  assert.equal(result.selectedSource, 'EXPLICIT_AUTHORITY_MANIFEST');
+  assert.equal(result.selectedAuthority, true);
+});
+
+test('CLI revision has explicit override precedence over an authority manifest', () => {
+  const root = fixture({
+    'frame.json': {
+      authority: true,
+      workspaceRevision: 'sha256:manifest',
+      snapshotRevision: 'sha256:manifest-snapshot',
+    },
+  });
+  const result = resolveCurrentWorkspaceFrameV1({
+    root,
+    argv: ['--manifest', 'frame.json', '--workspace-revision', 'sha256:cli'],
+    env: {},
+  });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
+  assert.equal(result.selectedWorkspaceRevision, 'sha256:cli');
+  assert.equal(result.selectedSource, 'CLI_WORKSPACE_REVISION');
+  assert.equal(result.explicitOverride, true);
+  assert.equal(result.selectedAuthority, false);
+});
+
+test('environment revision overrides receipts but remains non-authoritative', () => {
+  const root = fixture({
+    'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:admitted'),
+  });
+  const result = resolveCurrentWorkspaceFrameV1({
+    root,
+    argv: [],
+    env: { ATLAS_EXPECTED_GRAPHIFY_WORKSPACE_REVISION: 'sha256:env' },
+  });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
+  assert.equal(result.selectedWorkspaceRevision, 'sha256:env');
+  assert.equal(result.selectedSource, 'ENV_WORKSPACE_REVISION');
+  assert.equal(result.selectedAuthority, false);
+});
+
 test('derived candidate is fallback only when no authority receipt exists', () => {
   const root = fixture({
     'docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json': derived('sha256:derived'),

@@ -14,7 +14,6 @@ import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';
-import { batchEmbedOnnx, isOnnxEmbedAvailable } from '$lib/server/embedding/onnx-embed.js';
 // Proto types inlined (generated/proto archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -43,6 +42,9 @@ export interface EmbeddingOptions {
   skipCacheWrite?: boolean;
 }
 
+// `onnx-local` remains a legacy receipt/cache label only. This canonical
+// generator no longer emits it; ONNX is available through the explicit
+// non-canonical challenger API in canonical-embed.ts.
 type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'onnx-local' | 'cache';
 
 export type EmbeddingAttemptStatus = 'success' | 'failed' | 'skipped' | 'cache-hit';
@@ -641,7 +643,7 @@ async function getCachedEmbeddingEntry(text: string): Promise<CachedEmbeddingEnt
     if (Array.isArray(parsed)) {
       return { vector: parsed, source: 'http-ollama' };
     }
-    if (!Array.isArray(parsed.vector)) return null;
+    if (!Array.isArray(parsed.vector) || parsed.source === 'onnx-local') return null;
     return parsed;
   } catch {
     return null;
@@ -773,7 +775,8 @@ export async function generateEmbeddingsWithTags(
  * 5-tier fallback: gRPC → QUIC/NATS → HTTP batch → HTTP sequential → ONNX local (no network).
  *
  * Dimension contract: 768-dim (embeddinggemma, L2-normalized).
- * ONNX fallback ensures network-down scenarios don't block embedding generation.
+ * Canonical generation uses the configured server/provider chain. Local ONNX
+ * results remain challenger-only until their representation parity is proven.
  */
 export async function generateEmbeddings(
   texts: string[],
@@ -816,62 +819,7 @@ export async function generateEmbeddings(
   let source: EmbeddingResult['source'] = 'http-ollama';
   let model = SERVER_EMBEDDING_MODEL;
 
-  // Tier 0: ONNX local (embeddinggemma_300m_onnx — 768-dim, no network, no Ollama).
-  // Moved ahead of the network tiers 2026-08-30 per explicit direction: prefer local
-  // WebGPU/DirectML/CPU ONNX inference over any Ollama-backed path, keeping Ollama/GGUF
-  // as fallback only if ONNX is unavailable or fails. Was "Tier 5" (last resort); network
-  // tiers below are now the fallback chain, tried in the same relative order as before.
-  if (!newVectors && await isOnnxEmbedAvailable()) {
-    const onnxStart = performance.now();
-    try {
-      const onnxVectors = await batchEmbedOnnx(uncachedTexts);
-      const validVectors = onnxVectors.filter((v) => v !== null) as number[][];
-
-      if (validVectors.length === uncachedTexts.length) {
-        newVectors = validVectors;
-        source = 'onnx-local';
-        model = 'embeddinggemma-onnx-300m';
-        attempts.push({
-          transport: 'onnx-local',
-          status: 'success',
-          detail: 'local ONNX model, 768-dim L2-normalized',
-          durationMs: Math.round(performance.now() - onnxStart),
-        });
-      } else if (validVectors.length > 0) {
-        console.warn(
-          `[embedding-client] ONNX partial success: ${validVectors.length}/${uncachedTexts.length}`
-        );
-        attempts.push({
-          transport: 'onnx-local',
-          status: 'failed',
-          detail: `${validVectors.length}/${uncachedTexts.length} embeddings succeeded, rest null`,
-          durationMs: Math.round(performance.now() - onnxStart),
-        });
-      } else {
-        attempts.push({
-          transport: 'onnx-local',
-          status: 'failed',
-          detail: 'all embeddings null from ONNX model',
-          durationMs: Math.round(performance.now() - onnxStart),
-        });
-      }
-    } catch (onnxErr) {
-      attempts.push({
-        transport: 'onnx-local',
-        status: 'failed',
-        detail: onnxErr instanceof Error ? onnxErr.message : String(onnxErr),
-        durationMs: Math.round(performance.now() - onnxStart),
-      });
-    }
-  } else if (!newVectors && !(await isOnnxEmbedAvailable())) {
-    attempts.push({
-      transport: 'onnx-local',
-      status: 'skipped',
-      detail: 'model not available',
-    });
-  }
-
-  // Tier 1 (fallback, was Tier 0): dedicated OpenAI-compatible embedding
+  // Tier 0: dedicated OpenAI-compatible embedding
   // endpoint, if resolveEmbeddingProviderV1() says one is configured.
   if (!newVectors) {
     const { resolveEmbeddingProviderV1 } = await import('$lib/server/embedding/embedding-provider-v1.js');

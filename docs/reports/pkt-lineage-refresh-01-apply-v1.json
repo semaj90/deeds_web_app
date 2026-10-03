@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.pkt-lineage-refresh-01-apply.v1",
+  "task": "PKT-LINEAGE-REFRESH-01",
+  "generatedAt": "2026-09-28T23:47:08.724Z",
+  "mode": "APPLY_COMMITTED",
+  "writesPerformed": true,
+  "writesToNonLineageStores": {
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admittedRootCohortPackets": 16151,
+  "unexpectedOtherCount": 14368,
+  "unexpectedOtherSample": [
+    "packet:067dbe5826ff",
+    "packet:f897d9a9e202",
+    "packet:cc767126ef4f",
+    "packet:cc8507cc2f39",
+    "packet:cc8d497da4db",
+    "packet:769e29bd0017",
+    "packet:cc9350ec1156",
+    "packet:cc96c4b8d931",
+    "packet:76a6e4fb0d27",
+    "packet:76ae8dc5d51e"
+  ],
+  "insertSkipped": {
+    "NO_PHYSICAL_CHUNK": 1586,
+    "DUPLICATE_CANONICAL_CHUNK_ID": 1
+  },
+  "updateSkipped": {},
+  "updateOrphanedOldRowsCount": 0,
+  "updateOrphanedOldRowsSample": [],
+  "rehearsal": {
+    "targetsRequested": 1783,
+    "missingRowsPlanned": 1734,
+    "staleRowsPlanned": 49,
+    "missingRowsMaterialized": 147,
+    "staleRowsRefreshed": 49,
+    "insertRowsWritten": 2814,
+    "unexpectedRowsModified": 0,
+    "errors": [],
+    "updateInsertRowsWritten": 0,
+    "rowsBefore": 125113,
+    "rowsAfter": 127927,
+    "rowCountDeltaMatchesExpected": true,
+    "parity": {
+      "packetKeyExact": 196,
+      "sourceRevisionCurrent": 3502,
+      "chunkRowIdNonNull": 3502,
+      "revisionStatusProven": 3502,
+      "duplicateLineageRows": 0,
+      "targetPacketCount": 196
+    },
+    "committed": true
+  },
+  "verdict": "LINEAGE_REFRESH_01_APPLIED",
+  "nextGate": "PKT-LINEAGE-CHUNKING-COVERAGE-01 (the remaining 1,587 rows need upstream chunk-index coverage, not a lineage fix)"
+}

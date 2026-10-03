@@ -26,6 +26,10 @@ Parent Atlas already has a SvelteKit error-agent route, a Python LangGraph synth
 4. **Claims remain derived.** The grounded-knowledge owner validates OKF claims against source/workspace revisions, evidence checksums, and producer revisions. Stale or unresolved claims remain non-canonical.
 5. **Completion is receipt-based.** A task reaches DONE only after the required proof and reconciliation gates are current; code existence alone is CREATED, and a route call alone is WIRED.
 
+6. **Drizzle owns future completion receipt history; LangGraph owns checkpoints.** The existing `execution_runs` / `execution_journal_steps` tables describe durable workflow execution and recovery, not the GAN completion receipt contract. A separate append-only receipt-history table is proposed for immutable request/controller checksums, lifecycle status, proof references, producer revision, and bounded/redacted metadata. It has no canonical task/source authority and no foreign-key or identity dependence on LangGraph `thread_id`/checkpoint IDs; those may appear only as optional external references.
+
+7. **Persistence is a separate gate.** This change proposes the receipt owner and data boundary only. Table creation, migration registration, writer wiring, and readback require a separately reviewed implementation/apply tranche. Until then the existing in-memory/report receipt path remains the only behavior; no schema or durable write is implied.
+
 ## Risks / Trade-offs
 
 - [Risk] A controller report can become stale during a request → bind selection to the report checksum and re-run reconciliation after smoke.
@@ -47,4 +51,4 @@ Rollback is limited to disabling the route integration or smoke profile. No data
 
 - Which operator-owned receipt will admit the current source/workspace lineage?
 - Which existing worker/queue should host future isolated tournament candidates?
-- When should Drizzle-owned receipt history be introduced without duplicating LangGraph checkpoint ownership?
+- Which reviewed migration/apply tranche should implement the proposed Drizzle receipt-history table and writer/readback?

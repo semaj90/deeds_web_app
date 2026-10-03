@@ -42,12 +42,12 @@ class MockLangGraphBridge implements LangGraphBridge {
     return state;
   }
 
-  async invokeTool(
-    toolName: string,
-    toolResult: Record<string, unknown>,
-    currentState: DispatcherState
-  ): Promise<{ result: unknown; updatedState: DispatcherState }> {
-    return { result: toolResult, updatedState: currentState };
+  async applyToolResult(input: {
+    state: DispatcherState;
+    toolCall: { toolName: string; toolCallId: string };
+    resultEnvelope: unknown;
+  }): Promise<{ result: unknown; updatedState: DispatcherState }> {
+    return { result: input.resultEnvelope, updatedState: input.state };
   }
 
   async persistStateToDB(state: DispatcherState, sessionId: string): Promise<void> {
@@ -115,7 +115,7 @@ describe('DispatcherMiddleware LangGraph Optionalization', () => {
       );
 
       const applyHeadroomSpy = vi.spyOn(mockLangGraph, 'applyHeadroom');
-      const invokeToolSpy = vi.spyOn(mockLangGraph, 'invokeTool');
+      const applyToolResultSpy = vi.spyOn(mockLangGraph, 'applyToolResult');
 
       const toolHandler = vi.fn().mockResolvedValue({ success: true });
       const wrapped = middleware.wrap(toolHandler, 'test.tool', 'session-123');
@@ -123,7 +123,15 @@ describe('DispatcherMiddleware LangGraph Optionalization', () => {
       await wrapped({ query: 'test' });
 
       expect(applyHeadroomSpy).toHaveBeenCalled();
-      expect(invokeToolSpy).toHaveBeenCalled();
+      expect(toolHandler).toHaveBeenCalledTimes(1);
+      expect(applyToolResultSpy).toHaveBeenCalledWith(expect.objectContaining({
+        toolCall: expect.objectContaining({ toolName: 'test.tool' }),
+        resultEnvelope: { success: true },
+        state: expect.objectContaining({
+          current_tool: 'test.tool',
+          current_input: { query: 'test' },
+        }),
+      }));
     });
   });
 

@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.symbol-revision-repair-apply.v1",
+  "generatedAt": "2026-09-22T00:36:03.794Z",
+  "manifestChecksum": "sha256:54df391c065b1e721cd8c201781f3024839ae00c30885b8ab4ae15dea8c4b7dc",
+  "targetRowCount": 208,
+  "status": "REPAIR_APPLIED",
+  "reasons": [],
+  "updatedRows": 208,
+  "readback": {
+    "totals": 479,
+    "nowQualified": 402,
+    "stillBad": 77,
+    "targetsNowMatchProposed": 208,
+    "upstreamFileIdStillAllNull": true,
+    "registryUnchanged": true,
+    "treeNodeRelationsUnchanged": true
+  },
+  "invariants": {
+    "updatedRowsEquals208": true,
+    "totalStill479": true,
+    "nowQualifiedIs402": true,
+    "stillBadIs77": true,
+    "targetsNowMatchProposed": true,
+    "upstreamFileIdStillAllNull": true,
+    "registryUnchanged": true,
+    "treeNodeRelationsUnchanged": true
+  },
+  "registryFence": {
+    "before": {
+      "n": 10504,
+      "checksum": "d37ec309c6faa3bdd18654cd71019c66"
+    },
+    "after": {
+      "n": 10504,
+      "checksum": "d37ec309c6faa3bdd18654cd71019c66"
+    }
+  },
+  "treeNodeFence": {
+    "before": {
+      "n": 479,
+      "checksum": "83325461b94cb84b06cbba6791ad0f96"
+    },
+    "after": {
+      "n": 479,
+      "checksum": "83325461b94cb84b06cbba6791ad0f96"
+    }
+  },
+  "independentPostTransactionReadback": {
+    "total": 479,
+    "qualified": 402,
+    "bad": 77,
+    "non_null_upstream_file_id": 0
+  }
+}

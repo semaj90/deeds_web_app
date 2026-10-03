@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T00:59:38Z",
+  "reason": "parent-atlas-graph-runtime-python-consolidation has only operator/environment-gated remainder: preserve-or-archive decision for an independent PageRank oracle, live traversal requires an admitted resident graph, and cuGraph parity requires actual cuGraph execution. Existing fixtures already prove adapter mapping only.",
+  "sourceChange": {
+    "name": "parent-atlas-graph-runtime-python-consolidation",
+    "completed": 14,
+    "total": 18,
+    "remainingGates": [
+      "T2 human choice to retain or archive the independent PageRank oracle",
+      "GPU-EXP-15 live traversal blocked by resident:null and legacy artifact checksum ambiguity",
+      "GPU-EXP-16 fixture mapping proven; actual cuGraph execution remains unproven"
+    ]
+  },
+  "nextChange": {
+    "name": "parent-atlas-analysis-pass-ornith-adapter",
+    "reason": "One task remains; inspect whether its live evidence can be completed read-only or requires persistent analysis writes."
+  },
+  "mutationBoundary": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "containerRebuilds": "none"
+  }
+}

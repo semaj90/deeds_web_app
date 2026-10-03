@@ -25,10 +25,16 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const root = process.cwd();
 const isReplay = process.argv.includes('--replay');
-const PROPOSAL_PATH = path.resolve(root, 'docs/reports/pkt-lineage-09-frozen-proposal-v1.json');
+// 2026-09-28: --proposal=<path> selects another frozen proposal (same contract); --rehearse runs the
+// full per-packet write + exact readback and then ROLLS BACK every transaction (nothing persists).
+const proposalArg = process.argv.find((a) => a.startsWith('--proposal='))?.slice('--proposal='.length);
+const isRehearse = process.argv.includes('--rehearse');
+const PROPOSAL_PATH = path.resolve(root, proposalArg ?? 'docs/reports/pkt-lineage-09-frozen-proposal-v1.json');
 const REPORT_PATH = path.resolve(
   root,
-  isReplay ? 'docs/reports/pkt-lineage-09-historical-promotion-replay-v1.json' : 'docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json'
+  proposalArg
+    ? `docs/reports/${path.basename(proposalArg, '.json')}-${isRehearse ? 'rehearsal' : 'apply'}-receipt.json`
+    : isReplay ? 'docs/reports/pkt-lineage-09-historical-promotion-replay-v1.json' : 'docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json'
 );
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 4, statement_timeout: 60000 });
 
@@ -148,7 +154,7 @@ for (const [packetKey, memberships] of byPacket.entries()) {
       continue;
     }
 
-    await client.query('COMMIT');
+    await client.query(isRehearse ? 'ROLLBACK' : 'COMMIT');
     packetsProcessed += 1;
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
@@ -172,6 +178,8 @@ const report = {
   generatedAt: new Date().toISOString(),
   writesToNonLineageStores: { qdrant: false, neo4j: false, valkey: false },
   prewrite,
+  mode: isRehearse ? 'REHEARSAL_ROLLED_BACK' : 'APPLY',
+  proposalPath: path.relative(root, PROPOSAL_PATH),
   packetsProcessed,
   rowsBefore: prewrite.existingCanonicalRowCount,
   rowsInserted,

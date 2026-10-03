@@ -7,7 +7,7 @@
  * 1. Import without error
  * 2. Expose expected factory functions
  * 3. Construct instances with 768-dim canonical contract
- * 4. Accept 384-dim fallback configuration
+ * 4. Keep MRL 512/256/128 and learned latent_256/128/64 separate from canonical semantic_768
  * 5. RRF weights sum to 1.0
  * 6. 4-lane parallel fan-out config is valid
  */
@@ -103,9 +103,10 @@ async function main() {
   await test(6, '4-lane parallel fan-out configuration valid', async () => {
     const lanes = ['qdrant', 'turbovec', 'postgres', 'neo4j'];
     const canonicalDim = 768;
-    const fallbackDim = 384;
+    const mrlDims = [512, 256, 128];
+    const latentDims = [256, 128, 64];
     if (canonicalDim !== 768) throw new Error(`Expected 768-dim canonical`);
-    return `${lanes.length} lanes: [${lanes.join(', ')}], canonical=${canonicalDim}-dim, fallback=${fallbackDim}-dim`;
+    return `${lanes.length} lanes: [${lanes.join(', ')}], canonical=semantic_768; MRL=${mrlDims.join('/')}; latent=${latentDims.join('/')}`;
   });
 
   console.log('\n' + '='.repeat(70));

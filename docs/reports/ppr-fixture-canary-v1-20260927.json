@@ -1,0 +1,81 @@
+{
+  "cugraphScores": {
+    "0": 0.41170448064804077,
+    "1": 0.17497441172599792,
+    "2": 0.23834672570228577,
+    "3": 0.17497441172599792,
+    "4": 0.0
+  },
+  "fixtureOnly": true,
+  "networkxScores": {
+    "0": 0.4117044777910762,
+    "1": 0.17497440289113764,
+    "2": 0.2383467164266485,
+    "3": 0.17497440289113764,
+    "4": 0.0
+  },
+  "receipt": {
+    "alpha": 0.85,
+    "candidate_ordinal_map_checksum": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "candidate_snapshot_revision": "fixture:candidate-snapshot-v1",
+    "canonical_authority": false,
+    "challenger_output_checksum": "sha256:f137419af9ccbf720674995a17dc2c54b8a4bc67768595aaddb21417e13a118c",
+    "dangling_mass_challenger": 0.17497441172599792,
+    "dangling_mass_reference": 0.17497440289113764,
+    "dangling_ordinals": [
+      3,
+      4
+    ],
+    "dangling_policy": "PERSONALIZATION",
+    "epsilon": 1e-09,
+    "graph_ordinal_map_checksum": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "graph_revision": "fixture:directed-ppr-dangling-v1",
+    "input_checksum": "sha256:03c3dea34d14f201a47070f73385f0137e59f540fbe502e535ca20703fb5a70c",
+    "max_iterations": 1000,
+    "metrics": {
+      "challengerScoreSum": 1.0000000298023224,
+      "maxAbsoluteRankDisplacement": 0,
+      "meanAbsoluteRankDisplacement": 0.0,
+      "medianAbsoluteRankDisplacement": 0.0,
+      "pearson": 0.9999999999999996,
+      "referenceScoreSum": 1.0,
+      "scoreL1": 2.9802322387695312e-08,
+      "scoreLInf": 9.275637258276959e-09,
+      "spearman": 1.0,
+      "topKOverlap": {
+        "10": {
+          "count": 5,
+          "fraction": 1.0,
+          "k": 5
+        },
+        "100": {
+          "count": 5,
+          "fraction": 1.0,
+          "k": 5
+        },
+        "50": {
+          "count": 5,
+          "fraction": 1.0,
+          "k": 5
+        }
+      }
+    },
+    "reference_output_checksum": "sha256:096f1b24b858268173eb351c1306d57455a59d8e87d2fc0cc0e82923ab50f8ab",
+    "retrieval_vote_added": false,
+    "schema": "atlas.graph-ppr-parity-receipt.v1",
+    "seed_weights": [
+      [
+        0,
+        0.7
+      ],
+      [
+        2,
+        0.3
+      ]
+    ],
+    "status": "PARITY_PROVEN",
+    "tolerance": 1e-06,
+    "writes_performed": false
+  },
+  "schema": "atlas.graph-ppr-fixture-canary.v1"
+}

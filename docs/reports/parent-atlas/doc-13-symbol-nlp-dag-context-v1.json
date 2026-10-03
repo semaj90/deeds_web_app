@@ -33,9 +33,9 @@
         "atlas_symbol_versions": "r"
       },
       "counts": {
-        "atlas_symbol_registry": 10310,
-        "atlas_symbol_versions": 285,
-        "analysis_pass_results": 11095
+        "atlas_symbol_registry": 10504,
+        "atlas_symbol_versions": 479,
+        "analysis_pass_results": 11103
       }
     },
     "synthesisBoundary": {
@@ -46,5 +46,5 @@
     }
   },
   "nextGate": "ANALYSIS_PASS_CURRENT_SELECTION -> CONTEXT_MANIFEST -> ORNITH_SYNTHESIS_RECEIPT",
-  "reportChecksum": "sha256:4ef7f25f2a92c78662cbb85b1d11980d7ab732c680ea0b059b12c2bbf8de7608"
+  "reportChecksum": "sha256:a0965ea1e75294e1945496f3b9449e99b037b50c60a51840cbbe8917485dffbf"
 }

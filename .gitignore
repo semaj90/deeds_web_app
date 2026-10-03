@@ -685,6 +685,8 @@ vectors/*.feather
 ########################################
 *.jsonl
 !docs/reports/workstation-soak-history.jsonl
+# Generated (deterministic, offline) DOC-06A handoff envelopes; rebuilt by scripts/atlas/build-external-doc-admission-envelopes-v1.py
+docs/.okf/pinned/admission-envelopes-v1.json
 # NES/CHROM packet pipeline interchange files — must be tracked
 !memory/packets/*.jsonl
 !memory/packets/lora-training-pairs*.jsonl
@@ -694,6 +696,7 @@ vectors/*.feather
 !scripts/atlas/out/*.ndjson
 !.opencode/ndjson/*.ndjson
 *.txt
+!native/atlas_core/CMakeLists.txt
 !README*.txt
 !LICENSE*.txt
 !CHANGELOG*.txt
@@ -1094,3 +1097,8 @@ docs/reports/graphify-workspace-snapshot-binding-v1-rerun-*.json
 docs/reports/current-graphify-snapshot-binding-recheck-v1.json
 docs/reports/workspace-binding-cas-plan-v1.json
 docs/reports/workspace-source-snapshots/
+
+# >10 MB generated reports cannot enter git (pre-commit hook; CLAUDE.md large-file rule). They stay on disk, gitignored, and are searchable via .rgignore re-includes. Never deleted.
+docs/reports/openspec-directory-graph-v1.json
+docs/reports/openspec-file-labels-v1.json
+docs/reports/staging/

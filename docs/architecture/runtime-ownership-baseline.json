@@ -5,6 +5,10 @@
   "tolerated": [
     { "capability": "graph_analysis", "item": "atlas_graph_authority_runs (v1)", "classification": "DEAD" },
     { "capability": "graph_analysis", "item": "atlas_graph_authority_runs_v2 / atlas_graph_authority_scores_v2", "classification": "FIXTURE_ONLY" },
+    { "capability": "graph_analysis", "item": "python/atlas_subgraph_cugraph.py", "classification": "DEAD" },
+    { "capability": "graph_analysis", "item": "python/atlas_rapids_community_sidecar.py", "classification": "EXPERIMENT" },
+    { "capability": "graph_analysis", "item": "python/atlas_compute/cugraph_ppr.py", "classification": "DEAD" },
+    { "capability": "graph_analysis", "item": "python/atlas_compute/graph_programs.py", "classification": "FIXTURE_ONLY" },
     { "capability": "graph_analysis", "item": "scripts/graphify-authority.mjs", "classification": "COMPATIBILITY" },
     { "capability": "graph_analysis", "item": "scripts/run-pagerank.ts", "classification": "COMPATIBILITY" },
     { "capability": "rerank", "item": "attention-reranker.ts", "classification": "UNCLASSIFIED" },

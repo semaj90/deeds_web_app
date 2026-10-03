@@ -70,14 +70,19 @@ export const GET: RequestHandler = async (event) => {
 				// One-shot retry with a fresh ioredis client bypasses the pool.
 				const msg = String(innerErr);
 				if (/closed|ECONNRESET|ENOTFOUND/i.test(msg)) {
-					// D16: `await using` auto-disconnects on scope exit (even on throw)
+					// `await using` is not parseable on Node 22 (SyntaxError at module load => whole route 500);
+					// explicit try/finally gives the same auto-disconnect on scope exit (even on throw).
 					const { attachDispose } = await import('$lib/server/redis-disposable.js');
-					await using fresh = attachDispose(new IORedis(ENV.REDIS_URL, {
+					const fresh = attachDispose(new IORedis(ENV.REDIS_URL, {
 						maxRetriesPerRequest: 1,
 						connectTimeout: 3000,
 						lazyConnect: false
 					}));
-					count = await scanCount(fresh, patternParam);
+					try {
+						count = await scanCount(fresh, patternParam);
+					} finally {
+						await fresh[Symbol.asyncDispose]();
+					}
 				} else {
 					throw innerErr;
 				}

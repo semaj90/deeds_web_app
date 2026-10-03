@@ -100,6 +100,52 @@ export function retrievalCacheIdentityFromAceManifestV1(
   };
 }
 
+export type LiveAceRetrievalCacheHandoffV1 =
+  | { status: 'ADMITTED'; reason: null; retrievalCacheIdentity: RetrievalCacheIdentityV1; canonicalAuthority: false; writesPerformed: false }
+  | { status: 'BLOCKED'; reason: string; retrievalCacheIdentity: null; canonicalAuthority: false; writesPerformed: false };
+
+const SYNTHETIC_HANDOFF_REVISION_RE = /^(?:workspace|source|graph|feature|representation|policy):?(?:now|latest)$|^latest$|^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/i;
+
+/**
+ * Server-owned caller handoff (ACE live cache caller). Wraps the identity bridge with an explicit
+ * ADMITTED/BLOCKED verdict and a reason, so a request that cannot form a strict revisioned identity
+ * stays legacy/degraded on purpose. Runtime fields (query hash, model, dim, workspaceRevision,
+ * contextPolicyRevision) MUST come from server-side state, never from client input; source,
+ * representation, feature, graph and retrieval-policy revisions come only from the admitted manifest.
+ * No I/O, no cache access, no writes.
+ */
+export function buildLiveAceRetrievalCacheHandoffV1(
+  input: { admittedManifest: AceContextManifestAdmissionV1 } & RetrievalCacheIdentityFromManifestInputV1,
+): LiveAceRetrievalCacheHandoffV1 {
+  const block = (reason: string): LiveAceRetrievalCacheHandoffV1 => (
+    { status: 'BLOCKED', reason, retrievalCacheIdentity: null, canonicalAuthority: false, writesPerformed: false });
+  let manifest: AceContextManifestAdmissionV1['manifest'];
+  try {
+    const { snapshot: _snapshot, ...envelope } = input.admittedManifest as AceContextManifestAdmissionV1 & { snapshot?: unknown };
+    manifest = aceContextManifestAdmissionV1Schema.parse(envelope).manifest;
+  } catch { return block('MANIFEST_INVALID'); }
+
+  const revisions = manifest.identityInput.evidenceRevisions;
+  if (!input.queryHash) return block('QUERY_HASH_REQUIRED');
+  if (!input.model) return block('MODEL_REQUIRED');
+  if (!Number.isInteger(input.dim) || input.dim < 1) return block('DIMENSION_INVALID');
+  if (!input.workspaceRevision?.trim()) return block('WORKSPACE_REVISION_REQUIRED');
+  if (SYNTHETIC_HANDOFF_REVISION_RE.test(input.workspaceRevision.trim())) return block('WORKSPACE_REVISION_SYNTHETIC');
+  if (!input.contextPolicyRevision?.trim()) return block('CONTEXT_POLICY_REVISION_REQUIRED');
+  if (!revisions.sourceRevision) return block('SOURCE_REVISION_REQUIRED');
+  if (!revisions.representationRevision) return block('REPRESENTATION_REVISION_REQUIRED');
+  if (!revisions.featureRevision) return block('FEATURE_REVISION_REQUIRED');
+  if (!manifest.identityInput.retrievalPolicyRevision) return block('RETRIEVAL_POLICY_REVISION_REQUIRED');
+  if (!manifest.identityInput.ordinalMapChecksum) return block('ORDINAL_MAP_CHECKSUM_REQUIRED');
+
+  const identity = retrievalCacheIdentityFromAceManifestV1(input.admittedManifest, {
+    queryHash: input.queryHash, model: input.model, dim: input.dim,
+    workspaceRevision: input.workspaceRevision.trim(), contextPolicyRevision: input.contextPolicyRevision,
+  });
+  if (!identity) return block('STRICT_IDENTITY_UNAVAILABLE');
+  return { status: 'ADMITTED', reason: null, retrievalCacheIdentity: identity, canonicalAuthority: false, writesPerformed: false };
+}
+
 /**
  * Converts an already validated candidate-feature snapshot into the existing
  * ContextManifestV2 identity boundary. It performs no retrieval or writes.

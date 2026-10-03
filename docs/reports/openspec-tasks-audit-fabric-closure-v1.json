@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.openspec-tasks-audit-fabric-closure.v1",
+  "changeId": "parent-atlas-openspec-tasks-audit-fabric",
+  "mode": "READ_ONLY_AUDIT",
+  "classification": "REPORTED_11_OF_12_COUNT_STALE_NO_UNCHECKED_TASK",
+  "closureStatus": "IMPLEMENTATION_COMPLETE_BY_EXISTING_RECEIPTS",
+  "operatorDecision": "ARCHIVE_OR_KEEP_OPEN_IS_SEPARATE_FROM_TASK_COMPLETION",
+  "findings": {
+    "checkboxes": {
+      "done": 11,
+      "total": 11,
+      "unchecked": 0,
+      "completionPct": 100
+    },
+    "structuralEvidence": {
+      "proposalPresent": true,
+      "specPresent": true,
+      "auditScriptPresent": true
+    },
+    "existingRunReceipt": {
+      "generatedAt": "2026-09-21T00:06:34.718Z",
+      "changesAudited": 114,
+      "aggregateCompletionPct": 64.79,
+      "nativeSimdjson": true,
+      "roundTripOk": true,
+      "freshRunPerformed": false
+    },
+    "stalenessFlags": {
+      "presentInHistoricalReceipt": true,
+      "interpretation": "KNOWN_SELF_MATCH_FALSE_POSITIVE",
+      "basis": "The task ledger documents that marker literals are quoted as examples and the substring detector consequently flags this change itself."
+    },
+    "remainingScope": {
+      "uncheckedTask": false,
+      "ciOrScheduledRerun": "EXPLICITLY_OUT_OF_SCOPE",
+      "taskLedgerOrSourceChangesMade": false,
+      "canonicalStoreWrites": false
+    }
+  },
+  "recommendation": "Do not invent or check a twelfth task. Treat the reported 11/12 as stale/mismatched against the current ledger. The existing implementation and run receipt support task completion; archive/keep-open lifecycle is an operator choice, not a technical blocker.",
+  "evidenceRefs": [
+    {
+      "path": "openspec/changes/parent-atlas-openspec-tasks-audit-fabric/tasks.md",
+      "lines": "13-61",
+      "fact": "The ledger contains 11 task checkboxes; all are checked, including live run/report verification."
+    },
+    {
+      "path": "openspec/changes/parent-atlas-openspec-tasks-audit-fabric/tasks.md",
+      "lines": "99-110",
+      "fact": "The staleness substring detector's self-match is a documented known limitation, not an unresolved implementation task."
+    },
+    {
+      "path": "openspec/changes/parent-atlas-openspec-tasks-audit-fabric/tasks.md",
+      "lines": "112-119",
+      "fact": "CI/scheduled execution and canonical datastore writes are explicitly out of scope; the manual audit command is identified."
+    },
+    {
+      "path": "openspec/changes/parent-atlas-openspec-tasks-audit-fabric/specs/openspec-tasks-audit/spec.md",
+      "lines": "3-82",
+      "fact": "The spec defines discovery, scoring, flags, JSON round-trip, timestamped report, and read-only guarantees."
+    },
+    {
+      "path": "scripts/atlas/audit-openspec-tasks-md-v1.mts",
+      "lines": "61-189,217-283",
+      "fact": "Implementation contains checkbox counting, live tree discovery, per-change scoring, report serialization, simdjson round-trip, and timestamped summary output."
+    },
+    {
+      "path": "docs/reports/openspec-tasks-md-audit-v1.json",
+      "lines": "4-15,1655-1675,3019-3025",
+      "fact": "Existing run receipt reports 114 changes, 64.79% aggregate completion, this change at 11/11 and 100 score, with native simdjson round-trip true; it also carries the documented self-match flags."
+    },
+    {
+      "path": "next_steps/active/2026-09-20_openspec-tasks-md-audit.md",
+      "lines": "1-14,95",
+      "fact": "Timestamped human-readable output corresponds to the same September 21 UTC run and records the self-match flag."
+    }
+  ],
+  "validation": {
+    "repoMutation": "Only this requested report was written.",
+    "auditScriptRun": false,
+    "openspecValidationRun": false,
+    "reason": "The existing audit script writes its standard JSON and dated Markdown reports; rerunning it would exceed the single-report write scope."
+  },
+  "likely_cause": "The 11/12 status came from a stale or differently counted workboard view; the current change ledger has exactly 11 completed tasks.",
+  "patch_targets": [
+    "docs/reports/openspec-tasks-audit-fabric-closure-v1.json"
+  ],
+  "safe_next_command": "rg -n '^- \\[ \\]|^- \\[xX]\\]' openspec/changes/parent-atlas-openspec-tasks-audit-fabric/tasks.md",
+  "smoke_command": "npx openspec validate parent-atlas-openspec-tasks-audit-fabric --strict",
+  "report_path": "docs/reports/openspec-tasks-audit-fabric-closure-v1.json"
+}

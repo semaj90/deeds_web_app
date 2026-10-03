@@ -148,6 +148,35 @@ export function decodeSourceTextEnvelope(rawBuffer, sourceRef) {
   };
 }
 
+const rawOffsetTables = new WeakMap();
+
+/** Existing structural parsers report decoded UTF-16 string indices. Bind them to raw-file bytes. */
+export function decodedOffsetToRawByte(envelope, offset) {
+  if (!Number.isSafeInteger(offset) || offset < 0 || offset > envelope.text.length) {
+    throw new Error('SOURCE_TEXT_ENVELOPE_DECODED_OFFSET_INVALID');
+  }
+  if (offset > 0 && offset < envelope.text.length
+    && /[\uD800-\uDBFF]/.test(envelope.text[offset - 1]) && /[\uDC00-\uDFFF]/.test(envelope.text[offset])) {
+    throw new Error('SOURCE_TEXT_ENVELOPE_OFFSET_SPLITS_SURROGATE');
+  }
+  if (envelope.sourceEncoding !== 'utf-8') return envelope.bomBytes + offset * 2;
+  let table = rawOffsetTables.get(envelope);
+  if (!table) {
+    table = new Uint32Array(envelope.text.length + 1);
+    let index = 0;
+    let bytes = envelope.bomBytes;
+    table[0] = bytes;
+    for (const character of envelope.text) {
+      const point = character.codePointAt(0);
+      bytes += point < 0x80 ? 1 : point < 0x800 ? 2 : point < 0x10000 ? 3 : 4;
+      index += character.length;
+      table[index] = bytes;
+    }
+    rawOffsetTables.set(envelope, table);
+  }
+  return table[offset];
+}
+
 /** Converts a UTF-8 byte offset into parserBuffer to an LSP {line, character} position, where
  * `character` is expressed in UTF-16 code units per LSP's mandatory-default position encoding
  * (LSP 3.17 lets client/server negotiate utf-8/utf-16/utf-32, but this repo's resolver only ever

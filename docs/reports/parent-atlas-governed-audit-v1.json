@@ -1,10 +1,20 @@
 {
   "schema": "atlas.parent-atlas-governed-audit.v1",
-  "generatedAt": "2026-09-20T08:40:24.099Z",
+  "generatedAt": "2026-09-20T19:00:51.225Z",
   "status": "PARTIAL_READ_ONLY_AUDIT",
   "order": [
     "SOURCE_OWNER_RECONCILIATION",
+    "SOURCE_AUTHORITY_REPAIR_PLAN",
+    "SOURCE_COHORT_LINEAGE",
+    "WORKSPACE_FRAME_ADMISSION",
+    "LINEAGE_CLOSURE",
+    "AST_HASH_COLUMN_CONTRACT",
+    "AST_HASH_GRAIN_CLASSIFICATION",
+    "AST_OFFSET_BASIS_PROOF",
+    "AST_DIGEST_DIVERGENCE",
+    "AST_CONFLICT_DISPOSITION",
     "AST_CANARY_READINESS",
+    "STRUCTURAL_PROVENANCE_RUNTIME",
     "ONTOLOGY_POPULATION_DECISION",
     "PACKET_SOURCE_SCOPE",
     "EXECUTION_CONTROLLER",
@@ -20,11 +30,102 @@
   "steps": [
     {
       "id": "SOURCE_OWNER_RECONCILIATION",
-      "exitCode": 1,
+      "exitCode": 0,
       "signal": null,
-      "passed": false,
+      "passed": true,
       "reportAvailability": {
         "current-source-owner-reconciliation-v1.json": true
+      },
+      "writesPerformed": false
+    },
+    {
+      "id": "SOURCE_AUTHORITY_REPAIR_PLAN",
+      "exitCode": 0,
+      "signal": null,
+      "passed": true,
+      "reportAvailability": {
+        "current-source-authority-repair-plan-v1.json": true
+      },
+      "writesPerformed": false
+    },
+    {
+      "id": "SOURCE_COHORT_LINEAGE",
+      "exitCode": 0,
+      "signal": null,
+      "passed": true,
+      "reportAvailability": {
+        "current-source-cohort-lineage-v1.json": true
+      },
+      "writesPerformed": false
+    },
+    {
+      "id": "WORKSPACE_FRAME_ADMISSION",
+      "exitCode": 0,
+      "signal": null,
+      "passed": true,
+      "reportAvailability": {
+        "current-workspace-frame-admission-v1.json": true
+      },
+      "writesPerformed": false
+    },
+    {
+      "id": "LINEAGE_CLOSURE",
+      "exitCode": 0,
+      "signal": null,
+      "passed": true,
+      "reportAvailability": {
+        "current-lineage-closure-v1.json": true,
+        "parent-atlas-current-lineage-funnel-v1.json": true
+      },
+      "writesPerformed": false
+    },
+    {
+      "id": "AST_HASH_COLUMN_CONTRACT",
+      "exitCode": 0,
+      "signal": null,
+      "passed": true,
+      "reportAvailability": {
+        "ast-hash-column-contract-v1.json": true
+      },
+      "writesPerformed": false
+    },
+    {
+      "id": "AST_HASH_GRAIN_CLASSIFICATION",
+      "exitCode": 0,
+      "signal": null,
+      "passed": true,
+      "reportAvailability": {
+        "ast-hash-grain-classification-v1.json": true
+      },
+      "writesPerformed": false
+    },
+    {
+      "id": "AST_OFFSET_BASIS_PROOF",
+      "exitCode": 0,
+      "signal": null,
+      "passed": true,
+      "reportAvailability": {
+        "ast-offset-basis-proof-v1.json": true
+      },
+      "writesPerformed": false
+    },
+    {
+      "id": "AST_DIGEST_DIVERGENCE",
+      "exitCode": 0,
+      "signal": null,
+      "passed": true,
+      "reportAvailability": {
+        "ast-digest-divergence-v1.json": true
+      },
+      "writesPerformed": false
+    },
+    {
+      "id": "AST_CONFLICT_DISPOSITION",
+      "exitCode": 0,
+      "signal": null,
+      "passed": true,
+      "reportAvailability": {
+        "ast-conflict-disposition-v1.json": true
       },
       "writesPerformed": false
     },
@@ -35,6 +136,16 @@
       "passed": true,
       "reportAvailability": {
         "ast-canary-readiness-v1.json": true
+      },
+      "writesPerformed": false
+    },
+    {
+      "id": "STRUCTURAL_PROVENANCE_RUNTIME",
+      "exitCode": 0,
+      "signal": null,
+      "passed": true,
+      "reportAvailability": {
+        "structural-intelligence-integration-proof.json": true
       },
       "writesPerformed": false
     },
@@ -71,9 +182,9 @@
     },
     {
       "id": "AUTHORITY_TEXT_REVIEW",
-      "exitCode": 1,
+      "exitCode": 0,
       "signal": null,
-      "passed": false,
+      "passed": true,
       "reportAvailability": {
         "openspec-authority-text-review-v1.json": true
       },
@@ -81,9 +192,9 @@
     },
     {
       "id": "ACTIONABLE_RANKER",
-      "exitCode": 1,
+      "exitCode": 0,
       "signal": null,
-      "passed": false,
+      "passed": true,
       "reportAvailability": {
         "actionable-workboard-v3.json": true
       },
@@ -101,9 +212,9 @@
     },
     {
       "id": "AWARENESS_READINESS",
-      "exitCode": 0,
+      "exitCode": 1,
       "signal": null,
-      "passed": true,
+      "passed": false,
       "reportAvailability": {
         "staging/openspec-progress-audit-v2.json": true,
         "staging/atlas-runtime-readiness-v1.json": true
@@ -803,10 +914,100 @@
     "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
     "writesPerformed": false
   },
+  "sourceAuthorityChain": {
+    "repairPlan": {
+      "status": "REPAIR_PLAN_PARTIAL_EXACT_BLOCKED",
+      "counts": {
+        "SOURCE_UNAVAILABLE": 14,
+        "EXACT_CURRENT_BINDING": 22685,
+        "CURRENT_BINDING_MISMATCH": 1059
+      },
+      "exactCurrentBindingCount": 22685,
+      "currentWorkspaceRevision": "sha256:6f25dd8c9b3b24a4af64a492c81a729624c00c78da061f05f540d95adb670839",
+      "authorizationRequired": true,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "cohort": {
+      "status": "WORKSPACE_REVISION_SOURCE_MISMATCH",
+      "nextGate": "CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED",
+      "counts": {
+        "cohortRows": 52,
+        "currentWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "liveBindingWorkspaceRevisions": [
+          "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+          "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+          "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+        ],
+        "workspaceRevisionSourceAligned": false,
+        "graphifyMatched": 52,
+        "currentWorkspaceMatched": 0,
+        "sourceRevisionQualified": 52,
+        "revisionQualified": 0,
+        "workspaceMismatchAfterSourceQualification": 52,
+        "missing": 0,
+        "mismatched": 0,
+        "ambiguous": 0
+      },
+      "sourceAuthority": {
+        "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
+        "safeToPromote": false,
+        "requiresSnapshotRefresh": true,
+        "deltaChecksum": "sha256:c54e18b2cbfa558e6da4e81b442e6f2289f53e5a4dafaefea716a9391065c74f"
+      },
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "workspaceFrame": {
+      "status": "STALE_WORKSPACE_PROJECTION",
+      "nextGate": "CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED",
+      "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "sourceAuthority": {
+        "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
+        "safeToPromote": false,
+        "requiresSnapshotRefresh": true,
+        "deltaChecksum": "sha256:c54e18b2cbfa558e6da4e81b442e6f2289f53e5a4dafaefea716a9391065c74f"
+      },
+      "canonicalAuthority": false,
+      "promotionEligible": false,
+      "writesPerformed": false
+    },
+    "closure": {
+      "status": "UNPROVEN",
+      "firstFailureBoundary": "EXECUTION_SOURCE_AUTHORITY",
+      "counts": {
+        "workspaceSources": 52,
+        "packetIdentityQualified": 0,
+        "packetRevisionQualified": 0,
+        "packetChunkCurrentQualified": 4,
+        "packetAstCurrentQualified": 0,
+        "spanQualified": 0,
+        "candidateOrdinalEligible": 0
+      },
+      "supportingCounts": {
+        "sourceRevisionQualifiedRows": 52,
+        "currentWorkspaceMatchedRows": 0,
+        "provenLineageSources": 4,
+        "packetSourceRows": 40,
+        "packetRevisionMatches": 0,
+        "packetContentMatches": 0,
+        "chunkFileContentMatches": 4,
+        "authoritativeNamespaces": 0,
+        "evidenceSpanReady": 0,
+        "digestBridgeSampledMembershipRows": 128,
+        "digestBridgeCanonicalMatches": 0,
+        "digestBridgeMissingPackets": 70,
+        "digestBridgeMissingPacketDigests": 58
+      },
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    }
+  },
   "lineageSubgates": {
     "astCanary": {
       "status": "PERSISTENT_CANARY_BLOCKED",
       "blockers": [
+        "HASH_GRAIN_CONTRACT",
         "CURRENT_WORKTREE_PARITY",
         "STRUCTURAL_CONFLICTS_CLOSED"
       ],
@@ -820,6 +1021,7 @@
         "retryWhen": [
           "workspaceRevisionChanges",
           "sourceSnapshotRevisionChanges",
+          "hashGrainReceiptChanges",
           "structuralConflictDispositionChanges"
         ],
         "noAutomaticChoice": true
@@ -827,21 +1029,149 @@
       "canonicalAuthority": false,
       "writesPerformed": false
     },
+    "astHashContract": {
+      "status": "AST_SOURCE_CONTENT_HASH_CONTRACT_BLOCKED",
+      "counts": {
+        "astRows": 11273,
+        "sourceRevisionQualifiedRows": 98,
+        "legacyUnqualifiedRows": 11175,
+        "distinctSourceRevisionParserGroups": 2213,
+        "wholeFileRawParityRows": 0,
+        "wholeFileRawParityGroups": 0,
+        "hashGrainMismatchRows": 168,
+        "missingBindingDigestRows": 11105,
+        "mixedHashGroups": 1711,
+        "spanCoordinateRows": 210
+      },
+      "nextGate": "CLASSIFY_LEGACY_HASH_GRAIN_BEFORE_SUPERSESSION",
+      "contract": {
+        "sourceContentHashBasis": "RAW_FILE_BYTES_SHA256",
+        "nodeHashBasis": "NORMALIZED_NODE_V1",
+        "sourceTextEncodingRevision": "SOURCE-TEXT-ENCODING-01",
+        "offsetBasis": "UTF8_PARSER_BUFFER_V1",
+        "lineBasis": "ONE_BASED_STORAGE",
+        "parserName": "ast-grep-napi",
+        "parserVersion": "0.44.0"
+      },
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "astOffsetBasis": {
+      "status": "BOM_OFFSET_BASIS_PROVEN",
+      "candidateRows": 54,
+      "bomFiles": 4,
+      "shiftedRoundTrip": "54/54",
+      "unshiftedWouldDiffer": "54/54",
+      "nextGate": "DIGEST_DIVERGENCE_AND_STRUCTURAL_CONFLICT_REVIEW",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "astHashGrain": {
+      "status": "AST_HASH_GRAIN_REVIEW_REQUIRED",
+      "counts": {
+        "distinctPathHashGroups": 11204,
+        "astRows": 11273,
+        "byClassification": {
+          "UNKNOWN": 11194,
+          "WHOLE_FILE_RAW": 10
+        },
+        "astRowsByClassification": {
+          "UNKNOWN": 11223,
+          "WHOLE_FILE_RAW": 50
+        },
+        "byProducer": {
+          "ast-grep-napi@0.44.0": {
+            "groups": 10,
+            "astRows": 50,
+            "unknownGroups": 0,
+            "unknownRows": 0,
+            "sourceRevisionRows": 50
+          },
+          "json-symbol-extractor@source-text-encoding-01": {
+            "groups": 5,
+            "astRows": 6,
+            "unknownGroups": 5,
+            "unknownRows": 6,
+            "sourceRevisionRows": 0
+          },
+          "markdown-symbol-extractor@source-text-encoding-01": {
+            "groups": 125,
+            "astRows": 150,
+            "unknownGroups": 125,
+            "unknownRows": 150,
+            "sourceRevisionRows": 48
+          },
+          "tree-sitter@chunk-index-v1": {
+            "groups": 7565,
+            "astRows": 7565,
+            "unknownGroups": 7565,
+            "unknownRows": 7565,
+            "sourceRevisionRows": 0
+          },
+          "treesitter-chunker@atlas-tree-sitter-ast-facts-manifest-v1": {
+            "groups": 3499,
+            "astRows": 3502,
+            "unknownGroups": 3499,
+            "unknownRows": 3502,
+            "sourceRevisionRows": 0
+          }
+        }
+      },
+      "nextGate": "REVIEW_UNKNOWN_HASH_GRAIN_BEFORE_SUPERSESSION",
+      "policy": {
+        "hashLengthOrFormatDoesNotEstablishGrain": true,
+        "onlyExplicitColumnParityEstablishesClassification": true,
+        "unknownAndMixedRemainReviewOnly": true,
+        "supersessionAuthorized": false,
+        "canonicalAuthority": false,
+        "writesPerformed": false
+      },
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "astDigestDivergence": {
+      "status": "DIGEST_DIVERGENCE_REVIEW_REQUIRED",
+      "sourceCount": 2,
+      "byClassification": {
+        "KNOW09_DRIFT_ALREADY_DECLARED": 2
+      },
+      "checksum": "e7d0705c55bb17aabe63bc0864a249670d259288bcd7c53f3693b390f47f2d0a",
+      "nextGate": "EXCLUDE_DIVERGED_SOURCES_FROM_CANARY",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "astConflictDisposition": {
+      "status": "REVIEW_REQUIRED_IDENTITY_ALGORITHM_CHANGE",
+      "conflictCount": 122,
+      "byClass": {
+        "IDENTITY_ALGORITHM_CHANGE": 122
+      },
+      "supersessionProposalsAllowed": 0,
+      "nextGate": "REVIEW_REQUIRED_IDENTITY_ALGORITHM_CHANGE",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "structuralProvenance": {
+      "status": "PROVEN_WITH_LIVE_8095",
+      "live8095": true,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
     "ontology": {
       "status": "UNPROVEN",
       "ontologyConceptRows": 0,
       "ontologyRelationRows": 0,
-      "unresolvedTuples": null,
+      "unresolvedTuples": 539124,
       "nextGate": "KNOW-09_SOURCE_AUTHORITY_RECONCILIATION_BEFORE_TUPLE_PROMOTION",
       "canonicalAuthority": false,
       "writesPerformed": false
     },
     "packetScope": {
       "status": "OPERATOR_FOLDER_DISPOSITION_REQUIRED",
-      "folderCount": 0,
+      "folderCount": 829,
       "packetRows": 61718,
       "exactAdmittedBindingMatches": 16543,
-      "operatorDispositionRequired": false,
+      "operatorDispositionRequired": true,
       "noAutomaticFolderPromotion": true,
       "canonicalAuthority": false,
       "writesPerformed": false
@@ -854,7 +1184,7 @@
       "UNPROVEN": 4,
       "PRESENT_CONTRACT": 1
     },
-    "semanticChecksum": "6a1ede5af309df009e12a479588dac972fee93c9413a51155cecbd9af5eba024"
+    "semanticChecksum": "71b81396976b3b01f289cbaafdaf38a6956209c9047aa3908fb78e7ec082934c"
   },
   "awareness": {
     "progress": {
@@ -873,21 +1203,21 @@
       "directoryEdges": 82,
       "kmeansClusters": 12,
       "labeledFiles": 5000,
-      "fileLabels": 24,
-      "fanoutFiles": 884,
-      "fanoutReferences": 10642,
-      "fanoutUnresolved": 261,
+      "fileLabels": 28,
+      "fanoutFiles": 956,
+      "fanoutReferences": 10889,
+      "fanoutUnresolved": 273,
       "readinessProven": 4,
       "readinessWaiting": 5,
       "selectionEligible": 1885,
       "selectionReviewRequired": 382
     },
     "readiness": {
-      "PROVEN": 4,
+      "PROVEN": 5,
       "READY": 0,
       "PARTIAL": 1,
       "WAITING": 5,
-      "UNPROVEN": 4,
+      "UNPROVEN": 3,
       "NOT_APPLICABLE": 0,
       "packetReady": false,
       "prefillReady": false,

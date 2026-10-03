@@ -100,7 +100,11 @@ const NEO4J_PASS = ENV.NEO4J_PASSWORD ?? ENV.NEO4J_PASS ?? 'neo4j';
 
 let addon = null;
 try {
-  addon = require(path.join(ROOT, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'));
+  const addonPath = [
+    path.join(ROOT, 'simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+    path.join(ROOT, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+  ].find((p) => { try { require.resolve(p); return true; } catch { return false; } });
+  addon = require(addonPath);
   const free = new BigInt64Array(1), total = new BigInt64Array(1);
   addon.getCudaMemory(free, total);
   console.log(`[GPU] addon loaded — CUDA=${addon.checkCudaAvailable()} vram=${(Number(total[0]) / 1024 ** 3).toFixed(1)}GB`);

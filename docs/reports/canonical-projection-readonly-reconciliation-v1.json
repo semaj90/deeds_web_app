@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.canonical-projection-readonly-reconciliation.v1",
+  "generatedAt": "2026-09-28T18:22:17Z",
+  "mode": "READ_ONLY_RECONCILIATION",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "ordinalMap": {
+    "candidateSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "rowCount": 1358,
+    "sourceReceiptGeneratedAt": "2026-09-28T18:16:00.863Z",
+    "ordinalMapChecksum": "97e691c59c665b9356357954661d9c01922fea38d5ed3f4d5cd2912f24cdc614",
+    "liveReadOnlyPredicateCount": 1358,
+    "packetBreakdown": {
+      "noPacketLineage": 14744,
+      "lineageSourceRevisionMismatch": 49,
+      "exactRevisionQualifiedPacketChunk": 1358,
+      "totalRevisionBoundPackets": 16151
+    },
+    "revisionMismatchLineageRows": 688,
+    "revisionMismatchRowsWithPhysicalAndCanonicalChunkIdentity": 688,
+    "interpretation": "The 49 stale packet bindings remain excluded; the 845-row single-chunk apply increased exact current membership from 513 to 1,358. Same-path chunk rows alone do not establish packet-to-chunk membership."
+  },
+  "singleChunkLineage": {
+    "frozenProposalPath": "docs/reports/pkt-lineage-current-single-chunk-frozen-proposal-v1.json",
+    "proposalRows": 845,
+    "rehearsalPath": "docs/reports/pkt-lineage-current-single-chunk-frozen-proposal-v1-rehearsal-receipt.json",
+    "rehearsalMode": "REHEARSAL_ROLLED_BACK",
+    "rowsInsertedDuringRehearsal": 845,
+    "rowsAfterRollback": 7421,
+    "applyReceiptPath": "docs/reports/pkt-lineage-current-single-chunk-frozen-proposal-v1-apply-receipt.json",
+    "applyGeneratedAt": "2026-09-28T18:15:45.819Z",
+    "applyMode": "APPLY",
+    "rowsInserted": 845,
+    "lineageRowsBefore": 7421,
+    "lineageRowsAfter": 8266,
+    "rollbacks": 0,
+    "conflicts": 0,
+    "duplicatePairs": 0,
+    "syntheticIds": 0,
+    "externalApplyObserved": true,
+    "applyPerformedByThisAudit": false,
+    "preApplyReadOnlyCohort": {
+      "singleChunkPackets": 845,
+      "multiChunkPackets": 13158,
+      "multiChunkRows": 119713,
+      "packetsWithoutChunks": 1586,
+      "unlinkedPacketTotal": 15589
+    },
+    "reconciliation": "The 845-row proposal matched the fresh pre-apply single-chunk cohort. Earlier 841/13046/1702 aggregate counts were stale or used another query scope; that older cohort has no frozen packet-key list, so its row-level delta cannot be assigned."
+  },
+  "remainingMultiChunkAudit": {
+    "unlinkedPackets": 13158,
+    "chunkRows": 119713,
+    "wholeFileDigestParity": {
+      "normalization": "remove only the literal sha256: prefix, then compare lowercase hex",
+      "matchingChunkRows": 119713,
+      "mismatchingChunkRows": 0
+    },
+    "chunkSourceRevisionNullRows": 119713,
+    "exactGraphifyFileRevisionBindings": 13011,
+    "packetsWithoutExactGraphifyFileRevisionBinding": 147,
+    "graphifyMismatchClassification": {
+      "rowsExistForAll147": true,
+      "exactRevisionMatches": 0,
+      "normalizedRevisionMatches": 0,
+      "category": "GRAPHIFY_ROW_REVISION_DIFFERS"
+    },
+    "interpretation": "Whole-file digest parity is proven for these rows, but it does not itself prove file-packet-to-every-chunk membership. The missing codebase chunk source_revision and 147 absent exact Graphify bindings remain evidence gaps; no multi-chunk membership was applied."
+  },
+  "representationDigests": {
+    "modelStateChecksum": {
+      "value": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+      "meaning": "SHA-256 over sorted state-dictionary tensor names and contiguous tensor bytes, per python/atlas_compute/latent_autoencoder.py::state_dict_checksum",
+      "independentlyRecomputed": false
+    },
+    "checkpointArtifactSha256": {
+      "value": "ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5",
+      "meaning": "SHA-256 of checkpoint file bytes",
+      "pathsWithMatchingBytes": [
+        "python/checkpoints/nested_semantic_autoencoder_v3_full01.pt",
+        "models/nested-semantic-autoencoder/nested_semantic_autoencoder_v3_full01.pt"
+      ]
+    },
+    "status": "DISTINCT_DIGEST_SCOPES_CONFIRMED_STATE_CHECKSUM_NOT_RECOMPUTED",
+    "registrationAllowed": false,
+    "blocker": "The available Python 3.14.7 and 3.12 interpreters do not have PyTorch; preserve model-state checksum and artifact-file digest as separately typed fields."
+  },
+  "graphManifest": {
+    "path": "sveltekit-frontend/docs/reports/graph-snapshot-parity/manifest.json",
+    "manifestPresent": true,
+    "boundToAdmittedWorkspaceRevision": false,
+    "consumersProven": ["networkx", "cugraph"],
+    "neo4jConsumesManifest": false,
+    "verdict": "PRESENT_BUT_NOT_SEALED_FOR_ADMITTED_REVISION"
+  },
+  "limitations": [
+    "A broad normalized same-path query exceeded the read-only statement timeout; a grouped direct-path query supplied the current pre-apply counts.",
+    "This audit performed no writes. A separate apply receipt proves 845 single-chunk lineage rows were applied; no multi-chunk lineage, representation registration, graph rebuild, inference, training, or projection/cache writes were performed by this audit."
+  ],
+  "canonicalAuthority": false,
+  "writesPerformedByThisAudit": false,
+  "externalCanonicalLineageApplyObserved": true
+}

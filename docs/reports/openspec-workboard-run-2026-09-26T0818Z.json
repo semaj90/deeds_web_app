@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T08:18:00Z",
+  "change": "parent-atlas-repair-candidate-feature-matrix",
+  "workItem": "SUMMARY-HINT-FEATURE-CONTRACT-01",
+  "status": "CONTRACT_PROVEN_MATRIX_COMPOSITION_PENDING",
+  "evidence": {
+    "implementation": "sveltekit-frontend/src/lib/server/atlas/features/legacy-summary-cosine-hint-v1.ts",
+    "test": "sveltekit-frontend/src/lib/server/atlas/features/legacy-summary-cosine-hint-v1.spec.ts",
+    "canonicalAuthority": false,
+    "retrievalVote": false,
+    "rankingPromotion": false,
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0
+  },
+  "validation": {
+    "focusedTests": "14 passed across 3 files",
+    "typescript": "targeted strict tsc passed",
+    "openSpecStrict": "PASS"
+  },
+  "remaining": [
+    "real query producer and candidate snapshot composition",
+    "graded retrieval evaluation",
+    "ContextManifest MMR integration"
+  ]
+}

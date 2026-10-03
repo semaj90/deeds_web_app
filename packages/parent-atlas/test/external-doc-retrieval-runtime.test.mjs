@@ -20,6 +20,7 @@ function fixture() {
         query_id: 'q1',
         query_revision: 'q-r1',
         query_text: 'qdrant bm25 memory tiers',
+        document_filter: { provider: 'qdrant', product: 'qdrant', product_version: '1.19.0', architecture: null, source_authority: 'OFFICIAL' },
         expected_relevant_chunk_ids: ['c1', 'c2'],
         source_snapshot_revision: 'snapshot-r1',
         notes: null,
@@ -28,6 +29,7 @@ function fixture() {
         query_id: 'q2',
         query_revision: 'q-r1',
         query_text: 'firecrawl screenshot raw html',
+        document_filter: { provider: 'firecrawl', product: 'firecrawl', product_version: 'v2', architecture: null, source_authority: 'OFFICIAL' },
         expected_relevant_chunk_ids: ['c3'],
         source_snapshot_revision: 'snapshot-r1',
         notes: null,
@@ -119,6 +121,31 @@ test('bounded evaluator emits three receipts, verifies projection and derives cu
   assert.equal(bundle.projection_receipt_verified.status, 'VERIFIED');
   assert.equal(bundle.cutover_gate.status, 'READY_FOR_CUTOVER');
   assert.match(bundle.bundle_checksum, /^[a-f0-9]{64}$/);
+});
+
+test('all evaluator lanes receive each query exact version and authority filter', async () => {
+  const received = [];
+  const recordingPort = {
+    ...port(),
+    async queryDense(input) { received.push(input.documentFilter); return ['c1']; },
+    async queryBm25(input) { received.push(input.documentFilter); return ['c1']; },
+    async queryHybridRrf(input) { received.push(input.documentFilter); return ['c1']; },
+  };
+  await evaluateExternalDocRetrieval({
+    port: recordingPort,
+    evaluationId: 'eval-filter',
+    fixture: fixture(),
+    capabilityGate: capabilityGate(),
+    projectionReceipt: projection(),
+    receiptRevision: 'receipt-r1',
+    producerRevision: 'test-r1',
+    evaluatedAt: '2026-08-19T22:00:00.000Z',
+    k: 1,
+    prefetchK: 1,
+  });
+  assert.equal(received.length, 6);
+  assert.deepEqual(received.slice(0, 3), Array(3).fill(fixture().queries[0].document_filter));
+  assert.deepEqual(received.slice(3, 6), Array(3).fill(fixture().queries[1].document_filter));
 });
 
 test('evaluator fails closed when capability gate is blocked', async () => {

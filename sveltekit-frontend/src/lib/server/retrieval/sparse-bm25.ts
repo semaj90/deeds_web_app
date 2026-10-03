@@ -5,7 +5,8 @@
  * parent-atlas-neural-prefill-encoder/tasks.md's DBCTX-01/BM25 cleanup
  * entries): despite the filename, this executes `plainto_tsquery` +
  * `ts_rank_cd` against a native tsvector/GIN index — PostgreSQL full-text
- * search, not BM25. pg_search is not installed in this repo. Classify this
+ * search, not BM25. (pg_search 0.25.1 is installed live as of 2026-09-26 but is
+ * a separate, unpromoted challenger; this lane does not use it.) Classify this
  * lane as `postgres_tsvector_english` cover-density ranking, not
  * "BM25-style", when recording it in a receipt or provenance field.
  *

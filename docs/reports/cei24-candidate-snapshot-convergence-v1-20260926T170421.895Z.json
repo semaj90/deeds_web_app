@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.cei24-candidate-snapshot-convergence-receipt.v1",
+  "status": "PACKET_CANDIDATE_ORDINAL_MAP_PROVEN_CHUNK_CROSSWALK_PENDING",
+  "generatedAt": "2026-09-26T17:04:22.309Z",
+  "inputs": {
+    "matrixReport": "docs/reports/candidate-feature-matrix-draft-v1-20260926T150456Z.json",
+    "matrixReportSha256": "sha256:bdd08a8bfe065b898652d24b2738b722b2fc0a1289bce64dc57c1e260de5cb81",
+    "matrixOrdinalArtifactSha256": "sha256:dcdbec415e4e131a4595f8118bb21da217bf0edc42e3509fdfb1191f9a2d59b2",
+    "matrixOrdinalMapChecksum": "61f8cf1aa5d5b72968bf02e8bc771a72c8ad99cf80a54bfcd8937fd2b3b232b6"
+  },
+  "owner": {
+    "candidateSchema": "atlas.canonical-candidate.v1",
+    "mapSchema": "atlas.candidate-ordinal-map.v1",
+    "identityResolution": "packet_key -> canonicalId (packet identity only)",
+    "materializer": "canonical-candidate-v1.ts:materializeCandidateOrdinalMap",
+    "producerRevision": "cei24-packet-candidate-ordinal-map:v1"
+  },
+  "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+  "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+  "featureRevision": "sha256:6f2de5975ec5a0241e984ab0a1116fda9d98669ae9334fddf45a35bde03cc65b",
+  "featureSnapshotChecksum": "21ee6b69c9b26a5bd23164041423999737cddee931ddaa7a11aac2ad7eac47c0",
+  "counts": {
+    "inputCeiRows": 16151,
+    "canonicalPacketCandidates": 16151,
+    "uniqueCanonicalId": 16151,
+    "exactPacketKey": 16151,
+    "exactSourceRef": 16151,
+    "exactSourceRevision": 16151,
+    "exactWorkspaceRevision": 16151,
+    "denseOrdinals": true,
+    "chunkIdentitiesIncluded": 0,
+    "semanticRepresentationBindings": 0,
+    "featureSnapshotRows": 16151,
+    "admittedFeatureLanes": 0
+  },
+  "mapArtifact": {
+    "path": ".tmp/atlas/cei24-candidate-ordinal-map-v1/20260926T170421.895Z/candidate-ordinal-map-v1.json",
+    "rows": 16151,
+    "sha256": "sha256:89459af4d3d763f49c45265c642ae3bcdfd9d9b4972d83fc8e753b73658008a1"
+  },
+  "featureSnapshotArtifact": {
+    "path": ".tmp/atlas/cei24-candidate-ordinal-map-v1/20260926T170421.895Z/candidate-feature-snapshot-v1.json",
+    "rows": 16151,
+    "sha256": "sha256:467f438282d8e11343b35ec2999a270040492429f8b32397b5dd8c95376f9755",
+    "unavailableFeatureRows": 16151
+  },
+  "authority": {
+    "identityAuthority": false,
+    "canonicalAuthority": false,
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0
+  },
+  "nextGate": "SUMMARY-HINT-XWALK-01: exact packet -> PROVEN atlas_packet_chunk_lineage -> exact current chunk HINT; preserve 0..N multiplicity per CandidateOrdinal."
+}

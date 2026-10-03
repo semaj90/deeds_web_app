@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T15:52:00Z",
+  "pivotFrom": "DAILY-GRAPHIFY-INDEXED-DATA-MULTICORE-01",
+  "pivotTo": "SUMMARY-HINT-FEATURE-02 / RF-04 CURRENT SNAPSHOT ALIGNMENT",
+  "change": "parent-atlas-repair-candidate-feature-matrix",
+  "status": "LEGACY_SUMMARY_FEATURE_BLOCKED_SNAPSHOT_ALIGNMENT",
+  "progress": {
+    "changeTasksComplete": 78,
+    "changeTasksTotal": 100,
+    "changeTasksRemaining": 22,
+    "globalOpenSpecProgress": "NOT_RECOMPUTED; previous published count is stale"
+  },
+  "evidence": {
+    "candidateMatrixReport": "docs/reports/candidate-feature-matrix-draft-v1-20260926T150456Z.json",
+    "alignmentReceipt": "docs/reports/legacy-summary-cei23-alignment-v1-20260926T155209.080Z.json",
+    "alignedInputRows": 330,
+    "exactCurrentChunkCandidateMatches": 0,
+    "packetTupleCandidatesWithoutChunkIdentity": 322,
+    "currentCandidateNotFound": 8,
+    "candidateRowsWithChunkRowId": 0,
+    "candidateRowsWithCanonicalChunkId": 0,
+    "candidateRowsWithSummaryDigest": 0,
+    "candidateSnapshotRevisionExported": false,
+    "queryVectorCreated": false,
+    "cosineComputed": false,
+    "rf04LiveProducerAdmitted": false,
+    "rf05LivePresenceReplay": false,
+    "qualityApprovedHintCount": 330,
+    "historical425QualityPopulation": "SUPERSEDED_FOR_ADMISSION; retained as history",
+    "productionGraphifyExecuted": false,
+    "databaseWrites": 0,
+    "projectionWrites": 0,
+    "cacheWrites": 0,
+    "rabbitmqPublishes": 0
+  },
+  "remaining": [
+    "Extend/reuse the authoritative CandidateOrdinal snapshot owner to provide candidateSnapshotRevision, canonicalChunkId, chunkRowId, and summary-digest association for a current chunk-level candidate universe.",
+    "Rerun the exact 330-row alignment and only proceed to query embedding/cosine if all identities bind to that exact candidate snapshot.",
+    "RF-04/RF-05 live producer and held-out gain test remain open; no lift claim without frozen golden labels."
+  ]
+}

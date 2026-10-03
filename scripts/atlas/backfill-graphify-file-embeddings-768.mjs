@@ -6,6 +6,14 @@
  * required for PostgreSQL writes. Apply mode is authoritative and fail-closed:
  * it requires the dedicated llama.cpp :8081 embedding server plus immutable
  * runtime provenance. Qdrant/TurboVec are intentionally not written here.
+ *
+ * Canonical writer rule:
+ *   codebase_chunk_index row
+ *     -> exactly one PROVEN atlas_packet_chunk_lineage row
+ *     -> exact packetKey + canonicalChunkId + sourceRevision
+ *     -> exact atlas_workspace_source_bindings workspace/source binding
+ *     -> embedding write guarded by the same lineage tuple
+ *     -> independent readback of identity + dimensions + embedding version.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -30,7 +38,7 @@ const LIMIT = Math.max(1, Math.min(5000, Number(args.get('limit') ?? 128)));
 const BATCH_SIZE = Math.max(1, Math.min(64, Number(args.get('batch-size') ?? 16)));
 const SINCE_HOURS = Math.max(1, Math.min(720, Number(args.get('since-hours') ?? 24)));
 const EMBED_SERVER_URL = String(args.get('embed-server-url') ?? env.EMBED_SERVER_URL ?? 'http://127.0.0.1:8081').replace(/\/+$/, '');
-const OUT = path.resolve(REPO_ROOT, String(args.get('out') ?? 'docs/reports/graphify-file-embedding-backfill-v2.json'));
+const OUT = path.resolve(REPO_ROOT, String(args.get('out') ?? 'docs/reports/graphify-file-embedding-backfill-v3.json'));
 
 const REPRESENTATION_ID = 'semantic_768';
 const CANONICAL_COLUMN = 'content_embedding';
@@ -58,6 +66,9 @@ function hashJson(value) {
 }
 function isSha256(value) {
   return /^[a-f0-9]{64}$/.test(value);
+}
+function isQualifiedRevision(value) {
+  return /^sha256:[a-f0-9]{64}$/i.test(String(value ?? ''));
 }
 function vectorLiteral(vector) {
   return `[${vector.join(',')}]`;
@@ -137,21 +148,38 @@ async function requireEmbedServer() {
 }
 
 async function requireRevisionQualifiedSchema(pool) {
-  if (!APPLY) return;
-  if (!WORKSPACE_REVISION) {
-    throw new Error('REVISION_QUALIFIED_APPLY_REQUIRES_WORKSPACE_REVISION');
+  if (!isQualifiedRevision(WORKSPACE_REVISION)) {
+    throw new Error('REVISION_QUALIFIED_RUN_REQUIRES_WORKSPACE_REVISION');
   }
-  const { rows } = await pool.query(`
-    SELECT column_name
+
+  const columns = await pool.query(`
+    SELECT table_name, column_name
     FROM information_schema.columns
     WHERE table_schema = 'public'
-      AND table_name = 'codebase_chunk_index'
-      AND column_name IN ('source_revision', 'workspace_revision')
+      AND (
+        (table_name = 'codebase_chunk_index' AND column_name IN ('id', 'source_ref', 'content_embedding'))
+        OR (table_name = 'atlas_packet_chunk_lineage' AND column_name IN ('chunk_row_id', 'canonical_chunk_id', 'packet_key', 'source_ref', 'source_revision', 'revision_status'))
+        OR (table_name = 'atlas_workspace_source_bindings' AND column_name IN ('canonical_source_ref', 'workspace_revision', 'source_revision'))
+      )
   `);
-  const present = new Set(rows.map((row) => row.column_name));
-  const missing = ['source_revision', 'workspace_revision'].filter((column) => !present.has(column));
+  const present = new Set(columns.rows.map((row) => `${row.table_name}.${row.column_name}`));
+  const required = [
+    'codebase_chunk_index.id',
+    'codebase_chunk_index.source_ref',
+    'codebase_chunk_index.content_embedding',
+    'atlas_packet_chunk_lineage.chunk_row_id',
+    'atlas_packet_chunk_lineage.canonical_chunk_id',
+    'atlas_packet_chunk_lineage.packet_key',
+    'atlas_packet_chunk_lineage.source_ref',
+    'atlas_packet_chunk_lineage.source_revision',
+    'atlas_packet_chunk_lineage.revision_status',
+    'atlas_workspace_source_bindings.canonical_source_ref',
+    'atlas_workspace_source_bindings.workspace_revision',
+    'atlas_workspace_source_bindings.source_revision',
+  ];
+  const missing = required.filter((column) => !present.has(column));
   if (missing.length > 0) {
-    throw new Error(`REVISION_QUALIFIED_APPLY_SCHEMA_REQUIRED:${missing.join(',')}`);
+    throw new Error(`REVISION_QUALIFIED_WRITER_SCHEMA_REQUIRED:${missing.join(',')}`);
   }
 }
 
@@ -229,6 +257,43 @@ function embeddingVersion(bindingChecksum, input) {
   ].join('\n'));
 }
 
+async function readbackCanonicalSemanticRow(client, row, expectedEmbeddingVersion) {
+  const readback = await client.query(`
+    SELECT
+      c.id::text AS id,
+      l.canonical_chunk_id::text AS canonical_chunk_id,
+      l.packet_key::text AS packet_key,
+      l.source_ref::text AS source_ref,
+      l.source_revision::text AS source_revision,
+      b.workspace_revision::text AS workspace_revision,
+      c.embedding_model::text AS embedding_model,
+      c.embedding_version::text AS embedding_version,
+      vector_dims(c.content_embedding::vector)::int AS dimensions
+    FROM public.codebase_chunk_index c
+    JOIN public.atlas_packet_chunk_lineage l
+      ON l.chunk_row_id = c.id
+     AND l.revision_status = 'PROVEN'
+     AND l.canonical_chunk_id::text = $2
+     AND l.packet_key::text = $3
+     AND l.source_ref::text = $4
+     AND l.source_revision::text = $5
+    JOIN public.atlas_workspace_source_bindings b
+      ON b.canonical_source_ref = l.source_ref
+     AND b.source_revision::text = l.source_revision::text
+     AND b.workspace_revision::text = $6
+    WHERE c.id = $1::uuid
+  `, [row.id, row.canonical_chunk_id, row.packet_key, row.source_ref, row.source_revision, WORKSPACE_REVISION]);
+
+  if (readback.rowCount !== 1) {
+    throw new Error(`SEMANTIC_WRITE_READBACK_IDENTITY_MISMATCH:${row.id}:rows=${readback.rowCount}`);
+  }
+  const proof = readback.rows[0];
+  if (proof.dimensions !== 768) throw new Error(`SEMANTIC_WRITE_READBACK_DIMENSION_MISMATCH:${row.id}:${proof.dimensions}`);
+  if (proof.embedding_model !== UPSTREAM_MODEL_ID) throw new Error(`SEMANTIC_WRITE_READBACK_MODEL_MISMATCH:${row.id}`);
+  if (proof.embedding_version !== expectedEmbeddingVersion) throw new Error(`SEMANTIC_WRITE_READBACK_VERSION_MISMATCH:${row.id}`);
+  return proof;
+}
+
 async function main() {
   const started = Date.now();
   if (APPLY && process.env.ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL !== '1') {
@@ -241,6 +306,7 @@ async function main() {
 
   const binding = runtimeBinding();
   const bindingChecksum = hashJson(binding);
+  const representationRevision = `sha256:${bindingChecksum}`;
   const pool = new Pool({
     connectionString: resolveDatabaseUrl(env),
     max: 2,
@@ -248,7 +314,7 @@ async function main() {
   });
 
   const report = {
-    schema: 'atlas.graphify-file-embedding-backfill.v2',
+    schema: 'atlas.graphify-file-embedding-backfill.v3',
     generatedAt: new Date().toISOString(),
     apply: APPLY,
     requireEmbedServer: REQUIRE_EMBED_SERVER,
@@ -261,8 +327,17 @@ async function main() {
       limit: LIMIT,
       workspaceRevision: WORKSPACE_REVISION || null,
     },
+    lineageContract: {
+      canonicalChunkOwner: 'atlas_packet_chunk_lineage',
+      workspaceBindingOwner: 'atlas_workspace_source_bindings',
+      requiresRevisionStatus: 'PROVEN',
+      requiresSingleCanonicalBindingPerChunk: true,
+      writeRechecksCanonicalIdentity: true,
+      independentReadback: true,
+    },
     binding,
     bindingChecksum,
+    representationRevision,
     inputPolicy: {
       formatterRevision: FORMATTER_REVISION,
       inputPolicyRevision: INPUT_POLICY_REVISION,
@@ -274,9 +349,12 @@ async function main() {
     embedded: 0,
     written: 0,
     skipped: 0,
+    readbackProven: 0,
     truncatedInputs: 0,
     inputLineageChecksum: null,
     inputLineageSample: [],
+    canonicalLineageSample: [],
+    readbackSample: [],
     errors: [],
   };
 
@@ -298,39 +376,105 @@ async function main() {
     }
     report.scope.declaredType = schema.rows[0].declared_type;
 
-    const revisionSelect = APPLY ? ', source_revision::text, workspace_revision::text' : '';
     const result = await pool.query(`
-      SELECT id::text, relative_path, symbol, kind, summary, content, source_ref, content_hash, ast_symbols${revisionSelect}
-      FROM codebase_chunk_index
-      WHERE content_embedding IS NULL
-        AND embedding_eligible = true
-        ${APPLY ? "AND source_revision IS NOT NULL AND workspace_revision = $3" : ''}
-        AND updated_at >= NOW() - ($1 * INTERVAL '1 hour')
-        AND COALESCE(content, summary, relative_path, source_ref, '') <> ''
-      ORDER BY updated_at DESC, id
+      WITH lineage_one AS (
+        SELECT
+          chunk_row_id,
+          min(canonical_chunk_id::text) AS canonical_chunk_id,
+          min(packet_key::text) AS packet_key,
+          min(source_ref::text) AS source_ref,
+          min(source_revision::text) AS source_revision
+        FROM public.atlas_packet_chunk_lineage
+        WHERE revision_status = 'PROVEN'
+          AND canonical_chunk_id IS NOT NULL
+          AND packet_key IS NOT NULL
+          AND source_ref IS NOT NULL
+          AND source_revision IS NOT NULL
+        GROUP BY chunk_row_id
+        HAVING count(*) = 1
+           AND count(DISTINCT canonical_chunk_id::text) = 1
+           AND count(DISTINCT packet_key::text) = 1
+           AND count(DISTINCT source_ref::text) = 1
+           AND count(DISTINCT source_revision::text) = 1
+      )
+      SELECT
+        c.id::text,
+        c.relative_path,
+        c.symbol,
+        c.kind,
+        c.summary,
+        c.content,
+        c.source_ref,
+        c.content_hash,
+        c.ast_symbols,
+        l.canonical_chunk_id,
+        l.packet_key,
+        l.source_revision,
+        b.workspace_revision::text AS workspace_revision
+      FROM public.codebase_chunk_index c
+      JOIN lineage_one l
+        ON l.chunk_row_id = c.id
+       AND l.source_ref = c.source_ref
+      JOIN public.atlas_workspace_source_bindings b
+        ON b.canonical_source_ref = l.source_ref
+       AND b.source_revision::text = l.source_revision
+       AND b.workspace_revision::text = $3
+      WHERE c.content_embedding IS NULL
+        AND c.embedding_eligible = true
+        AND c.updated_at >= NOW() - ($1 * INTERVAL '1 hour')
+        AND COALESCE(c.content, c.summary, c.relative_path, c.source_ref, '') <> ''
+      ORDER BY c.updated_at DESC, c.id
       LIMIT $2
-    `, APPLY ? [SINCE_HOURS, LIMIT, WORKSPACE_REVISION] : [SINCE_HOURS, LIMIT]);
+    `, [SINCE_HOURS, LIMIT, WORKSPACE_REVISION]);
 
     report.selected = result.rows.length;
     report.sample = result.rows.slice(0, 5).map((row) => ({
       id: row.id,
+      canonicalChunkId: row.canonical_chunk_id,
+      packetKey: row.packet_key,
       relativePath: row.relative_path,
       sourceRef: row.source_ref,
+      sourceRevision: row.source_revision,
+      workspaceRevision: row.workspace_revision,
       sourceTextChecksum: hash(embeddingText(row)),
     }));
+    report.canonicalLineageSample = result.rows.slice(0, 5).map((row) => ({
+      id: row.id,
+      canonicalChunkId: row.canonical_chunk_id,
+      packetKey: row.packet_key,
+      sourceRef: row.source_ref,
+      sourceRevision: row.source_revision,
+      workspaceRevision: row.workspace_revision,
+      representationRevision,
+    }));
+
+    if (result.rows.some((row) => row.workspace_revision !== WORKSPACE_REVISION)) {
+      throw new Error('SEMANTIC_WRITER_SELECTED_MIXED_WORKSPACE_REVISION');
+    }
+    if (result.rows.some((row) => !isQualifiedRevision(row.source_revision))) {
+      throw new Error('SEMANTIC_WRITER_SELECTED_UNQUALIFIED_SOURCE_REVISION');
+    }
 
     let preparedInputs = null;
     if (REQUIRE_EMBED_SERVER) {
       preparedInputs = [];
       for (const row of result.rows) preparedInputs.push(await prepareEmbeddingInput(row));
       report.truncatedInputs = preparedInputs.filter((entry) => entry.truncated).length;
-      const lineage = preparedInputs.map(({ finalInput: _finalInput, ...entry }) => entry);
+      const lineage = preparedInputs.map(({ finalInput: _finalInput, ...entry }, index) => ({
+        ...entry,
+        canonicalChunkId: result.rows[index].canonical_chunk_id,
+        packetKey: result.rows[index].packet_key,
+        sourceRef: result.rows[index].source_ref,
+        sourceRevision: result.rows[index].source_revision,
+        workspaceRevision: result.rows[index].workspace_revision,
+        representationRevision,
+      }));
       report.inputLineageChecksum = hashJson(lineage);
       report.inputLineageSample = lineage.slice(0, 5);
     }
 
     if (!APPLY) {
-      report.status = 'DRY_RUN';
+      report.status = result.rows.length > 0 ? 'DRY_RUN_CANONICAL_LINEAGE_READY' : 'DRY_RUN_CANONICAL_LINEAGE_EMPTY';
     } else {
       for (let offset = 0; offset < result.rows.length; offset += BATCH_SIZE) {
         const rows = result.rows.slice(offset, offset + BATCH_SIZE);
@@ -345,7 +489,7 @@ async function main() {
             const row = rows[index];
             const version = embeddingVersion(bindingChecksum, inputs[index]);
             const update = await client.query(`
-              UPDATE codebase_chunk_index
+              UPDATE public.codebase_chunk_index c
               SET content_embedding = $1::halfvec(768),
                   embedding_model = $2,
                   embedding_version = $3,
@@ -353,13 +497,47 @@ async function main() {
                   embedding_normalized = true,
                   embedding_created_at = COALESCE(embedding_created_at, NOW()),
                   updated_at = NOW()
-              WHERE id = $4::uuid
-                AND content_embedding IS NULL
-                AND source_revision::text = $5
-                AND workspace_revision::text = $6
-            `, [vectorLiteral(vectors[index]), UPSTREAM_MODEL_ID, version, row.id, row.source_revision, WORKSPACE_REVISION]);
-            if (update.rowCount === 1) report.written += 1;
-            else report.skipped += 1;
+              WHERE c.id = $4::uuid
+                AND c.content_embedding IS NULL
+                AND EXISTS (
+                  SELECT 1
+                  FROM public.atlas_packet_chunk_lineage l
+                  JOIN public.atlas_workspace_source_bindings b
+                    ON b.canonical_source_ref = l.source_ref
+                   AND b.source_revision::text = l.source_revision::text
+                   AND b.workspace_revision::text = $9
+                  WHERE l.chunk_row_id = c.id
+                    AND l.revision_status = 'PROVEN'
+                    AND l.canonical_chunk_id::text = $5
+                    AND l.packet_key::text = $6
+                    AND l.source_ref::text = $7
+                    AND l.source_revision::text = $8
+                )
+              RETURNING c.id::text AS id,
+                        c.embedding_version::text AS embedding_version,
+                        vector_dims(c.content_embedding::vector)::int AS dimensions
+            `, [
+              vectorLiteral(vectors[index]),
+              UPSTREAM_MODEL_ID,
+              version,
+              row.id,
+              row.canonical_chunk_id,
+              row.packet_key,
+              row.source_ref,
+              row.source_revision,
+              WORKSPACE_REVISION,
+            ]);
+            if (update.rowCount !== 1) {
+              report.skipped += 1;
+              throw new Error(`SEMANTIC_WRITE_CANONICAL_GUARD_REJECTED:${row.id}`);
+            }
+            if (update.rows[0]?.dimensions !== 768 || update.rows[0]?.embedding_version !== version) {
+              throw new Error(`SEMANTIC_WRITE_RETURNING_MISMATCH:${row.id}`);
+            }
+            report.written += 1;
+            const proof = await readbackCanonicalSemanticRow(client, row, version);
+            report.readbackProven += 1;
+            if (report.readbackSample.length < 5) report.readbackSample.push(proof);
           }
           await client.query('COMMIT');
         } catch (error) {
@@ -369,7 +547,9 @@ async function main() {
           client.release();
         }
       }
-      report.status = 'PASS';
+      report.status = report.written === report.selected && report.readbackProven === report.written
+        ? 'PASS_CANONICAL_LINEAGE_READBACK'
+        : 'FAIL';
     }
   } catch (error) {
     report.errors.push(error.message);
@@ -385,9 +565,11 @@ async function main() {
     selected: report.selected,
     embedded: report.embedded,
     written: report.written,
+    readbackProven: report.readbackProven,
     skipped: report.skipped,
     truncatedInputs: report.truncatedInputs,
     scope: report.scope,
+    representationRevision: report.representationRevision,
     bindingChecksum: report.bindingChecksum,
     out: OUT,
     errors: report.errors,

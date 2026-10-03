@@ -34,6 +34,8 @@ interface GraphEdge {
 interface GraphData {
 	nodes: GraphNode[];
 	edges: GraphEdge[];
+	degraded: boolean;
+	error: { code: string } | null;
 	stats: {
 		totalFiles: number;
 		totalChunks: number;
@@ -41,7 +43,130 @@ interface GraphData {
 		importEdges: number;
 		extensionBreakdown: Record<string, number>;
 		domainBreakdown: Record<string, number>;
+		scannedPoints: number;
+		skippedInvalidPayload: number;
+		skippedMissingFilePath: number;
+		skippedOutOfScope: number;
+		skippedFileLimit: number;
+		truncatedContentFiles: number;
+		pagesFetched: number;
+		upstreamResponseBytes: number;
+		truncated: boolean;
 	};
+}
+
+type GraphCounters = GraphData['stats'];
+
+interface QdrantScrollResponse {
+	result?: {
+		points?: unknown[];
+		next_page_offset?: unknown;
+	};
+}
+
+interface QdrantPoint {
+	id?: string | number;
+	payload?: unknown;
+}
+
+interface FileInfo {
+	chunks: number;
+	extension?: string;
+	domain?: string;
+}
+
+const DEFAULT_MAX_FILES = 200;
+const MAX_MAX_FILES = 500;
+const DEFAULT_MAX_POINTS = 1000;
+const MAX_MAX_POINTS = 5000;
+const QDRANT_PAGE_SIZE = 100;
+const MAX_QDRANT_RESPONSE_BYTES = 8 * 1024 * 1024;
+const MAX_IMPORT_CONTENT_CHARS = 64_000;
+
+class GraphRequestError extends Error {
+	constructor(
+		readonly status: number,
+		readonly code: string
+	) {
+		super(code);
+	}
+}
+
+function emptyCounters(): GraphCounters {
+	return {
+		totalFiles: 0,
+		totalChunks: 0,
+		totalDirs: 0,
+		importEdges: 0,
+		extensionBreakdown: {},
+		domainBreakdown: {},
+		scannedPoints: 0,
+		skippedInvalidPayload: 0,
+		skippedMissingFilePath: 0,
+		skippedOutOfScope: 0,
+		skippedFileLimit: 0,
+		truncatedContentFiles: 0,
+		pagesFetched: 0,
+		upstreamResponseBytes: 0,
+		truncated: false
+	};
+}
+
+function emptyGraphData(counters: GraphCounters, errorCode: string | null): GraphData {
+	return {
+		nodes: [],
+		edges: [],
+		degraded: errorCode !== null,
+		error: errorCode ? { code: errorCode } : null,
+		stats: counters
+	};
+}
+
+function parseBoundedInteger(value: string | null, fallback: number, maximum: number): number | null {
+	if (value === null) return fallback;
+	const trimmed = value.trim();
+	if (!/^\d+$/.test(trimmed)) return null;
+	const parsed = Number(trimmed);
+	if (!Number.isSafeInteger(parsed)) return null;
+	return Math.max(1, Math.min(parsed, maximum));
+}
+
+function normalizeDirectory(value: string | null): string | null | undefined {
+	if (value === null || value.trim() === '') return null;
+	const normalized = value.trim().replace(/\\/g, '/').replace(/\/{2,}/g, '/').replace(/\/$/, '');
+	const segments = normalized.split('/');
+	if (
+		normalized.startsWith('/') ||
+		/^[a-zA-Z]:/.test(normalized) ||
+		segments.some((segment) => segment === '.' || segment === '..' || segment === '')
+	) {
+		return undefined;
+	}
+	return normalized;
+}
+
+function isInDirectory(filePath: string, directory: string | null): boolean {
+	return directory === null || filePath === directory || filePath.startsWith(`${directory}/`);
+}
+
+async function readBoundedResponseText(response: Response): Promise<{ text: string; bytes: number }> {
+	if (!response.body) return { text: '', bytes: 0 };
+	const reader = response.body.getReader();
+	const decoder = new TextDecoder();
+	const chunks: string[] = [];
+	let totalBytes = 0;
+	while (true) {
+		const { done, value } = await reader.read();
+		if (done) break;
+		totalBytes += value.byteLength;
+		if (totalBytes > MAX_QDRANT_RESPONSE_BYTES) {
+			await reader.cancel();
+			throw new GraphRequestError(502, 'QDRANT_RESPONSE_TOO_LARGE');
+		}
+		chunks.push(decoder.decode(value, { stream: true }));
+	}
+	chunks.push(decoder.decode());
+	return { text: chunks.join(''), bytes: totalBytes };
 }
 
 // Helper: Extract imports from file content
@@ -125,81 +250,120 @@ function matchImportToFile(importPath: string, fileMap: Map<string, any>): strin
 }
 
 export const GET: RequestHandler = async ({ url, fetch, locals }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+	const counters = emptyCounters();
+	if (!locals.user?.id) {
+		return json(emptyGraphData(counters, 'GRAPH_UNAUTHORIZED'), { status: 401 });
+	}
 
-	const limit = parseInt(url.searchParams.get('limit') || '5000');
-	const includeImports = url.searchParams.get('includeImports') !== 'false'; // default true
+	const maxFiles = parseBoundedInteger(url.searchParams.get('maxFiles'), DEFAULT_MAX_FILES, MAX_MAX_FILES);
+	const maxPoints = parseBoundedInteger(
+		url.searchParams.get('maxPoints') ?? url.searchParams.get('limit'),
+		DEFAULT_MAX_POINTS,
+		MAX_MAX_POINTS
+	);
+	const directory = normalizeDirectory(url.searchParams.get('dir'));
+	if (maxFiles === null || maxPoints === null || directory === undefined) {
+		return json(emptyGraphData(counters, 'GRAPH_INVALID_QUERY'), { status: 400 });
+	}
+
+	const includeImports = url.searchParams.get('includeImports') !== 'false';
+	const fileMap = new Map<string, FileInfo>();
+	const fileContent = new Map<string, string>();
+	const dirMap = new Map<string, Set<string>>();
+	const extensionCount: Record<string, number> = {};
+	const domainCount: Record<string, number> = {};
 
 	try {
-		const response = await fetch(
-			`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`,
-			{
+		let offset: string | number | undefined;
+		let hasMore = true;
+		while (hasMore && counters.scannedPoints < maxPoints && fileMap.size < maxFiles) {
+			const pageLimit = Math.min(QDRANT_PAGE_SIZE, maxPoints - counters.scannedPoints);
+			const requestBody: Record<string, unknown> = {
+				limit: pageLimit,
+				with_payload: includeImports
+					? ['file_path', 'extension', 'domain', 'content']
+					: ['file_path', 'extension', 'domain'],
+				with_vector: false
+			};
+			if (offset !== undefined) requestBody.offset = offset;
+
+			const response = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					limit,
-					with_payload: true,
-					with_vector: false
-				}),
+				body: JSON.stringify(requestBody),
 				signal: AbortSignal.timeout(30_000)
-			}
-		);
+			});
+			counters.pagesFetched++;
+			if (!response.ok) throw new GraphRequestError(502, 'QDRANT_UPSTREAM_FAILED');
 
-		if (!response.ok) {
-			return json({
-        nodes: [],
-        edges: [],
-        stats: {
-          totalFiles: 0,
-          totalChunks: 0,
-          totalDirs: 0,
-          importEdges: 0,
-          extensionBreakdown: {},
-          domainBreakdown: {},
-        },
-      });
+			const boundedResponse = await readBoundedResponseText(response);
+			counters.upstreamResponseBytes += boundedResponse.bytes;
+			const data = fastJsonParse<QdrantScrollResponse>(boundedResponse.text);
+			const points = Array.isArray(data.result?.points) ? data.result.points : [];
+			counters.scannedPoints += points.length;
+
+			for (const rawPoint of points) {
+				if (typeof rawPoint !== 'object' || rawPoint === null || Array.isArray(rawPoint)) {
+					counters.skippedInvalidPayload++;
+					continue;
+				}
+				const payload = (rawPoint as QdrantPoint).payload;
+				if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
+					counters.skippedInvalidPayload++;
+					continue;
+				}
+				const fields = payload as Record<string, unknown>;
+				if (typeof fields.file_path !== 'string' || fields.file_path.trim() === '') {
+					counters.skippedMissingFilePath++;
+					continue;
+				}
+				const filePath = fields.file_path.trim().replace(/\\/g, '/');
+				if (!isInDirectory(filePath, directory)) {
+					counters.skippedOutOfScope++;
+					continue;
+				}
+				if (!fileMap.has(filePath) && fileMap.size >= maxFiles) {
+					counters.skippedFileLimit++;
+					counters.truncated = true;
+					continue;
+				}
+
+				const extension = typeof fields.extension === 'string' ? fields.extension : undefined;
+				const domain = typeof fields.domain === 'string' ? fields.domain : undefined;
+				const content = typeof fields.content === 'string' ? fields.content : undefined;
+				const existing = fileMap.get(filePath);
+				if (existing) existing.chunks++;
+				else fileMap.set(filePath, { chunks: 1, extension, domain });
+				counters.totalChunks++;
+
+				if (content !== undefined && !fileContent.has(filePath)) {
+					if (content.length > MAX_IMPORT_CONTENT_CHARS) counters.truncatedContentFiles++;
+					fileContent.set(filePath, content.slice(0, MAX_IMPORT_CONTENT_CHARS));
+				}
+
+				const parts = filePath.split('/');
+				for (let i = 1; i < parts.length; i++) {
+					const dirPath = parts.slice(0, i).join('/');
+					if (!dirMap.has(dirPath)) dirMap.set(dirPath, new Set());
+					if (i === parts.length - 1) dirMap.get(dirPath)!.add(filePath);
+				}
+
+				const extensionKey = extension || 'unknown';
+				extensionCount[extensionKey] = (extensionCount[extensionKey] || 0) + 1;
+				if (domain) domainCount[domain] = (domainCount[domain] || 0) + 1;
+			}
+
+			const nextOffset = data.result?.next_page_offset;
+			hasMore = (typeof nextOffset === 'string' || typeof nextOffset === 'number') && points.length > 0;
+			if (hasMore) offset = nextOffset as string | number;
+			if (fileMap.size >= maxFiles && hasMore) counters.truncated = true;
 		}
+		if (counters.scannedPoints >= maxPoints && hasMore) counters.truncated = true;
 
-		// GPU-accelerated JSON parsing via simdjson (5× faster for large responses)
-		const rawText = await response.text();
-		const data = fastJsonParse<{ result?: { points?: Array<{ payload: Record<string, unknown> }> } }>(rawText);
-		const points = data.result?.points || [];
-
-		// Build graph structures
-		const fileMap = new Map();
-		const fileContent = new Map(); // Store content for import extraction
-		const dirMap = new Map();
-		const extensionCount: Record<string, number> = {};
-		const domainCount: Record<string, number> = {};
-
-		for (const point of points) {
-			const { file_path, extension, domain, content } = point.payload;
-
-			if (!fileMap.has(file_path)) {
-				fileMap.set(file_path, { chunks: 0, extension, domain });
-				// Store first chunk's content for import extraction
-				if (content && typeof content === 'string') {
-					fileContent.set(file_path, content);
-				}
-			}
-			fileMap.get(file_path).chunks++;
-
-			const parts = String(file_path).split('/');
-			for (let i = 1; i < parts.length; i++) {
-				const dirPath = parts.slice(0, i).join('/');
-				if (!dirMap.has(dirPath)) {
-					dirMap.set(dirPath, new Set());
-				}
-				if (i === parts.length - 1) {
-					dirMap.get(dirPath).add(file_path);
-				}
-			}
-
-			const ext = String(extension);
-			const dom = String(domain);
-			extensionCount[ext] = (extensionCount[ext] || 0) + 1;
-			if (domain) domainCount[dom] = (domainCount[dom] || 0) + 1;
-		}
+		counters.totalFiles = fileMap.size;
+		counters.totalDirs = dirMap.size;
+		counters.extensionBreakdown = extensionCount;
+		counters.domainBreakdown = domainCount;
 
 		const nodes: GraphNode[] = [];
 		const edges: GraphEdge[] = [];
@@ -289,30 +453,16 @@ export const GET: RequestHandler = async ({ url, fetch, locals }) => {
 		const graphData: GraphData = {
 			nodes,
 			edges,
-			stats: {
-				totalFiles: fileMap.size,
-				totalChunks: points.length,
-				totalDirs: dirMap.size,
-				importEdges: importEdgeCount,
-				extensionBreakdown: extensionCount,
-				domainBreakdown: domainCount
-			}
+			stats: counters,
+			degraded: counters.truncated,
+			error: null
 		};
+		counters.importEdges = importEdgeCount;
 
 		return json(graphData);
 	} catch (error) {
 		console.error('Failed to generate graph data:', error);
-		return json({
-      nodes: [],
-      edges: [],
-      stats: {
-        totalFiles: 0,
-        totalChunks: 0,
-        totalDirs: 0,
-        importEdges: 0,
-        extensionBreakdown: {},
-        domainBreakdown: {},
-      },
-    });
+		const failure = error instanceof GraphRequestError ? error : new GraphRequestError(500, 'GRAPH_GENERATION_FAILED');
+		return json(emptyGraphData(counters, failure.code), { status: failure.status });
 	}
 };

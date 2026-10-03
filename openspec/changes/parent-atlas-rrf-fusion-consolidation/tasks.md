@@ -112,3 +112,12 @@ or classify unrelated RRF implementations from this change.
 - [ ] 3.1 For each non-`CANONICAL_OWNER` primitive: migrate its callers, formally designate it a
       `BACKEND`/`ADAPTER`, or retire it (archive-not-delete). This is the actual consolidation —
       out of scope for this proposal, tracked here only so it isn't lost.
+      **Re-verified 2026-09-21 (read-only, no change made; still an operator decision):**
+      `retrieval-fusion-rrf.ts` exists only at `sveltekit-frontend/src/lib/server/retrieval/`
+      (7,864 bytes; root `src/lib/server/retrieval/` has no copy). Zero importers in
+      `sveltekit-frontend/src`. Two other references: `scripts/atlas/classify-rrf-callers-v1.mjs`
+      (labels it `LEGACY_COMPATIBILITY`, a classification list, not an import) and
+      `tests/retrieval/candidate-lane-provenance.spec.ts` (imports `rrfMergeDenseQdrant` via
+      `../../src/lib/server/retrieval/retrieval-fusion-rrf.ts` — a root-relative path that does not
+      resolve to an existing file, so that spec looks stale/broken; not run, not verified). Archive
+      decision must account for that spec (repair the path or retire it with the module).

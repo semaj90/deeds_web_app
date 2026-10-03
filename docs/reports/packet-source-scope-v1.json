@@ -1,6 +1,6 @@
 {
   "schema": "atlas.packet-source-scope.v1",
-  "generatedAt": "2026-09-20T08:41:28.324Z",
+  "generatedAt": "2026-09-20T23:53:08.177Z",
   "gate": "CURRENT_SOURCE_PACKET_SCOPE_DECISION",
   "input": {
     "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",

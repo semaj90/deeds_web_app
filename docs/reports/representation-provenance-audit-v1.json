@@ -1,0 +1,88 @@
+{
+  "schema": "atlas.representation-provenance-audit.v1",
+  "canonicalAuthority": false,
+  "mode": "READ_ONLY_STATIC_CODE_AUDIT",
+  "gate": "DIM-03",
+  "outcome": "RESULT_PROVENANCE_INCOMPLETE",
+  "evidence": {
+    "requiredFieldsAbsentFromCandidateContract": [
+      "promptRevision",
+      "modelRevision",
+      "inputChecksum",
+      "embeddingChecksum",
+      "verificationState (PROVEN/INFERRED/UNKNOWN/CONTRADICTED)",
+      "physicalSource (postgres column or qdrant collection)",
+      "recipeVerification"
+    ],
+    "presentButOptional": {
+      "retrieval/search-runtime.ts:232-236": "representationId?: string|null, representationRevision?: number|null, retrievalExecutor?: string|null (all optional); executorIds exists at aggregate level"
+    },
+    "failClosedCasesViolated": [
+      {
+        "case": "representationId is the bare label semantic_768",
+        "where": [
+          "retrieval/semantic-768-shadow-receipt-v1.ts:14,52",
+          "retrieval/retrieve-candidates.ts:125 (representationIdentity: semantic_768)",
+          "retrieval/search-contract.ts:264 (z.literal semantic_768)",
+          "retrieval/chunk-retrieval-profile-v1.ts:28,204"
+        ],
+        "why": "live census proves several incompatible 768-dim recipes exist, so this label asserts a recipe the data does not have"
+      },
+      {
+        "case": "missing revision tolerated / defaulted open",
+        "where": [
+          "retrieval/search-runtime.ts:1046-1047 revisions default to the string unknown (workspaceRevision, sourceRevision, representationRevision)"
+        ],
+        "why": "an unknown revision is emitted as if it were a value"
+      },
+      {
+        "case": "executor optional",
+        "where": [
+          "retrieval/search-runtime.ts:235 retrievalExecutor optional"
+        ],
+        "why": "a result can omit which executor produced it"
+      },
+      {
+        "case": "two types for one concept",
+        "where": [
+          "retrieval/unified-orchestrator.ts:58,707 representationRevision is a string; retrieval/search-runtime.ts:233 it is a number"
+        ],
+        "why": "no single owner of the revision type"
+      },
+      {
+        "case": "dense hit carries no representation lineage",
+        "where": [
+          "retrieval/unified-orchestrator.ts:546-556 dense hits labelled source qdrant_dense with raw payload only"
+        ],
+        "why": "Qdrant collection name is the only provenance"
+      }
+    ],
+    "contextFromCensuses": "Postgres columns are historically mixed (GATE-03), both Qdrant collections are MIXED_OR_UNKNOWN with interchangeableExecutorProven=false (GATE-02/02A); a physical column, collection name, or prompt tag cannot stand as recipe proof."
+  },
+  "recommendedContract": {
+    "perCandidate": [
+      "representationId (not the bare label)",
+      "representationRevision (one type)",
+      "modelRevision",
+      "promptRevision",
+      "inputChecksum",
+      "embeddingChecksum",
+      "sourceRevision",
+      "workspaceRevision",
+      "executorId",
+      "executorRevision",
+      "physicalSource",
+      "verificationState",
+      "recipeVerification"
+    ],
+    "failClosed": [
+      "bare semantic_768 id",
+      "missing representationRevision",
+      "missing executor",
+      "physical column, collection name or prompt tag used as recipe proof"
+    ]
+  },
+  "remediation": "NONE performed; contract change deferred until the recipe is selected by the human-judged comparison. databaseWrites false, qdrantWrites false.",
+  "databaseWrites": false,
+  "qdrantWrites": false
+}

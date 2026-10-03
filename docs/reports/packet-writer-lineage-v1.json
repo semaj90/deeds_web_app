@@ -1,6 +1,6 @@
 {
   "schema": "atlas.packet-writer-lineage.v1",
-  "generatedAt": "2026-09-19T05:49:35.718Z",
+  "generatedAt": "2026-09-24T22:43:11.574Z",
   "mode": "READ_ONLY_SOURCE_CENSUS",
   "gate": "PACKET-WRITER-LINEAGE-01",
   "writesPerformed": false,

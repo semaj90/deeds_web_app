@@ -1,0 +1,110 @@
+{
+  "schema": "atlas.historical-evidence-overlay-proof-receipt.v2",
+  "status": "HISTORICAL_EVIDENCE_OVERLAY_REPLAY_PROVEN",
+  "generatedAt": "2026-09-26T17:52:08.677Z",
+  "canonicalAuthority": false,
+  "retrievalVote": false,
+  "destination": {
+    "cei24Receipt": "docs\\reports\\cei24-packet-chunk-summary-hint-crosswalk-v1-20260926T175152Z.json",
+    "candidateSnapshotRevision": "sha256:09bfbf6125ddc67f194edd6170f6d9c87a14d001f877eef1ec269600b2424388",
+    "ordinalMapChecksum": "90c237c8d8afd41d176540e2a5a3430ae86b626b7de94e08b49255e7b7fd4bf9",
+    "candidateRows": 16151,
+    "memberships": 6651
+  },
+  "inputs": {
+    "candidateMap": {
+      "path": ".tmp\\atlas\\cei24-candidate-ordinal-map-v1\\20260926T175013.896Z\\candidate-ordinal-map-v1.json",
+      "sha256": "sha256:4b11006d7e20cb70ea4e7c12ee9976e339a9601994fa356a3196ec291b4ef5ed"
+    },
+    "candidateChunkOverlay": {
+      "path": ".tmp\\atlas\\cei24-packet-chunk-hint-crosswalk-v1\\20260926T175152Z\\candidate-chunk-evidence-overlay.ndjson",
+      "sha256": "sha256:852b56a8170a6952450d460282a17551c2d9bbb9ec1d2128eb50bce9ab34e55b"
+    },
+    "legacySummaryHintCrosswalk": {
+      "path": ".tmp\\atlas\\legacy-summary-hint-ordinal-join-v1\\20260926T080239Z\\hint-candidate-ordinal.ndjson",
+      "sha256": "sha256:94e9b09b4439b1a1f5a7861864a6a9549140fd6be2255895ac55e7766a227510"
+    },
+    "mapReduceEnriched": {
+      "path": ".tmp\\atlas\\mapreduce-primary-placeholder-enrichment-v1\\20260926T154258.271Z\\primary_metadata_corpus-enriched-00001.ndjson",
+      "sha256": "sha256:80f87826edafa6765abf55f3241c28dba07897c409e72039625efc7daa51786f"
+    }
+  },
+  "legacySummary": {
+    "counts": {
+      "EXACT_CHUNK": 322,
+      "CURRENT_PACKET_NOT_FOUND": 8
+    },
+    "overlaySetChecksum": "02c075d9e4bbb26f4573ce96e16845860e37f88c7a7447565f4b904688b94d3a"
+  },
+  "mapReduce": {
+    "counts": {
+      "CURRENT_PACKET_NOT_FOUND": 48,
+      "CURRENT_PROVEN_LINEAGE_MISSING": 237,
+      "CURRENT_CHUNK_SET": 127,
+      "DUPLICATE_HISTORICAL_EVIDENCE": 5
+    },
+    "overlaySetChecksum": "ff220503cd82be0274f14d1c709118c0dcd188ec5ebdffec765190fdfe46fadf",
+    "distinctAddressableChunks": 1520
+  },
+  "replay": {
+    "identical": true
+  },
+  "expectationsDerivedFromPriorReceipts": {
+    "legacySummary": {
+      "qualified": 330,
+      "exactChunk": 322,
+      "unresolved": 8,
+      "distinctCandidateOrdinals": 178
+    },
+    "mapReduce": {
+      "total": 417,
+      "currentChunkSet": 127,
+      "distinctAddressableChunks": 1520,
+      "lineageMissing": 237,
+      "sourceRevisionChanged": 0,
+      "packetNotFound": 48,
+      "duplicates": 5
+    }
+  },
+  "observed": {
+    "legacySummary": {
+      "qualified": 330,
+      "exactChunk": 322,
+      "unresolved": 8,
+      "distinctCandidateOrdinals": 178
+    },
+    "mapReduce": {
+      "total": 417,
+      "currentChunkSet": 127,
+      "distinctAddressableChunks": 1520,
+      "lineageMissing": 237,
+      "sourceRevisionChanged": 0,
+      "packetNotFound": 48,
+      "duplicates": 5
+    }
+  },
+  "deltas": [],
+  "artifacts": {
+    "legacySummaryHintOverlay": {
+      "path": ".tmp\\atlas\\historical-evidence-overlay-v2\\20260926T175208Z\\legacy-summary-hint-overlay.ndjson",
+      "sha256": "sha256:910b66ca960f0d5c6ba8cdfde158dea22459ea1a10887c584ef02bb236bbc1b2",
+      "rows": 330
+    },
+    "mapReduceOverlay": {
+      "path": ".tmp\\atlas\\historical-evidence-overlay-v2\\20260926T175208Z\\mapreduce-overlay.ndjson",
+      "sha256": "sha256:c1988e131f0b5abddb581f3f29ff8073614949a726bb16c25b290d409eeab354",
+      "rows": 417
+    }
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "notes": [
+    "File-grained MapReduce records project one-to-many onto current chunks (CURRENT_CHUNK_SET); this is not an ambiguity failure.",
+    "DUPLICATE_HISTORICAL_EVIDENCE extends the requested resolution states so all 417 records conserve."
+  ]
+}

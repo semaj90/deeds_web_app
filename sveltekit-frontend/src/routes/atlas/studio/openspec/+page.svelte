@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { invalidate } from '$app/navigation';
-  import { Progress, Tabs } from 'bits-ui';
+  import { Tabs } from 'bits-ui';
   import type { PageData } from './$types';
   import OpenSpecAwarenessPanel from '$lib/components/atlas/OpenSpecAwarenessPanel.svelte';
   import CapabilityCensusPanel from '$lib/components/atlas/CapabilityCensusPanel.svelte';
@@ -12,7 +12,7 @@
 
   const completionPercent = $derived(
     data.board.summary.total > 0
-      ? Math.round((data.board.summary.proven / data.board.summary.total) * 1000) / 10
+      ? Math.min(100, Math.max(0, Math.round((data.board.summary.proven / data.board.summary.total) * 1000) / 10))
       : 0
   );
 
@@ -81,9 +81,55 @@
       <div><p class="eyebrow">LEDGER COMPLETENESS · NOT SCHEDULER PRIORITY</p><h2>{completionPercent}% proven</h2></div>
       <span class:stale={data.board.freshness.stale} class="machine">{data.board.freshness.newestReport ?? 'no report'} · {formatAge(data.board.freshness.newestMtimeMs)}</span>
     </div>
-    <Progress.Root class="progress" value={completionPercent} max={100} aria-label={`${completionPercent}% ledger proven`}>
-      <div class="fill" style:width={`${completionPercent}%`}></div>
-    </Progress.Root>
+    <label class="progress-label" for="openspec-ledger-progress">Verified ledger progress · {completionPercent}%</label>
+    <progress id="openspec-ledger-progress" class="progress" value={completionPercent} max={100}>
+      {completionPercent}% proven
+    </progress>
+  </section>
+
+  <section class="panel evidence-panel" aria-label="OpenSpec evidence fabric health">
+    <div class="panel-head">
+      <div><p class="eyebrow">EVF READ-ONLY PROJECTION</p><h2>Evidence health</h2></div>
+      <span class={`state ${data.evidenceHealth.status.includes('PROVEN') ? 'ok' : 'warn'}`}>{data.evidenceHealth.status}</span>
+    </div>
+    <p class="health-copy">Claims remain in <code>tasks.md</code>. Proof is derived only from revision-bound receipts; this panel cannot update tasks, PostgreSQL, Redis, or vector projections.</p>
+    <div class="health-summary">
+      <article><small>CHECKED CLAIMS</small><strong>{(data.evidenceHealth.claims.checked ?? 0).toLocaleString()}</strong><span>{(data.evidenceHealth.claims.checkedWithEvidence ?? 0).toLocaleString()} with evidence</span></article>
+      <article><small>CLAIM-ONLY</small><strong>{(data.evidenceHealth.claims.checkedWithoutEvidence ?? 0).toLocaleString()}</strong><span>checked without proof</span></article>
+      <article><small>MISSING IDS</small><strong>{(data.evidenceHealth.identity.taskIdMissing ?? 0).toLocaleString()}</strong><span>identity debt</span></article>
+      <article><small>DUPLICATE IDS</small><strong>{(data.evidenceHealth.identity.duplicateTaskIds ?? 0).toLocaleString()}</strong><span>requires reconciliation</span></article>
+      <article><small>ORPHAN RECEIPTS</small><strong>{(data.evidenceHealth.receipts.orphan ?? 0).toLocaleString()}</strong><span>not admissible as proof</span></article>
+      <article><small>STALE / NO REVISION</small><strong>{(data.evidenceHealth.receipts.staleOrMissingRevision ?? 0).toLocaleString()}</strong><span>revision gate open</span></article>
+    </div>
+    <div class="reconciliation-strip">
+      <div><small>WORKBOARD PARITY</small><strong>{data.evidenceHealth.workboard.status}</strong><span>{data.evidenceHealth.workboard.exactSourceRefJoinCount.toLocaleString()} exact source-line joins</span></div>
+      <div><small>BOARD-ONLY</small><strong>{data.evidenceHealth.workboard.boardOnlyCount.toLocaleString()}</strong><span>not represented by EVF cards</span></div>
+      <div><small>EVF-ONLY</small><strong>{data.evidenceHealth.workboard.evidenceOnlyCount.toLocaleString()}</strong><span>not represented by board</span></div>
+      <div><small>DONE WITHOUT PROOF</small><strong>{data.evidenceHealth.workboard.doneWithoutProvenCount.toLocaleString()}</strong><span>must not be promoted</span></div>
+      <div><small>OPEN BUT PROVEN</small><strong>{data.evidenceHealth.workboard.openWithProvenCount.toLocaleString()}</strong><span>mutation candidate only</span></div>
+    </div>
+    <div class="health-columns">
+      <div class="health-box">
+        <div class="health-box-head"><strong>Proof states</strong><span class="machine">{data.evidenceHealth.proof.predicateCount.toLocaleString()} predicates</span></div>
+        {#each Object.entries(data.evidenceHealth.proof.states) as [state, count]}
+          <div class="health-row"><span>{state}</span><strong>{count.toLocaleString()}</strong></div>
+        {:else}<p class="empty">No predicate-resolution report is available.</p>{/each}
+      </div>
+      <div class="health-box">
+        <div class="health-box-head"><strong>Dependency graph</strong><span class="machine">canonical graph semantics</span></div>
+        <div class="health-row"><span>nodes</span><strong>{(data.evidenceHealth.graph.nodes ?? 0).toLocaleString()}</strong></div>
+        <div class="health-row"><span>resolved edges</span><strong>{(data.evidenceHealth.graph.edges ?? 0).toLocaleString()}</strong></div>
+        <div class="health-row"><span>unresolved edges</span><strong>{(data.evidenceHealth.graph.unresolvedEdges ?? 0).toLocaleString()}</strong></div>
+        <div class="health-row"><span>cycles</span><strong>{(data.evidenceHealth.graph.cycles ?? 0).toLocaleString()}</strong></div>
+      </div>
+      <div class="health-box">
+        <div class="health-box-head"><strong>EVF gates</strong><span class="machine">writes disabled</span></div>
+        {#each data.evidenceHealth.stages as stage (stage.id)}
+          <div class="health-row stage-row"><span>{stage.id}</span><strong>{stage.status}</strong></div>
+        {:else}<p class="empty">Run the health compiler to populate stage status.</p>{/each}
+      </div>
+    </div>
+    <div class="contract"><strong>Revision: {data.evidenceHealth.source.workspaceRevision?.slice(0, 24) ?? 'unavailable'}</strong><p>{data.evidenceHealth.contracts.authoritativeSurface}; canonical representation {data.evidenceHealth.contracts.canonicalVector} ({data.evidenceHealth.contracts.vectorDimension} dimensions).</p><small>Health report checksum {data.evidenceHealth.sha256?.slice(0, 16) ?? '—'} · promotion eligible: {data.evidenceHealth.promotionEligible ? 'yes' : 'no'}.</small></div>
   </section>
 
   <OpenSpecAwarenessPanel awareness={data.awareness} />
@@ -177,10 +223,13 @@
   :global(body){margin:0;background:#070d14;color:#eaf5ff;font-family:Inter,system-ui,sans-serif}:global(*){box-sizing:border-box}:global(:root){--line:#8bcfff25;--panel:#0d1824;--muted:#8399aa;--cyan:#4ae5ff;--green:#65ed83;--red:#ff8d98;--amber:#f2d46c;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   .board-shell{max-width:1680px;margin:auto;padding:24px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:18px}.eyebrow{margin:0;color:#7890a3;font:800 .65rem var(--mono);letter-spacing:.12em}.hero h1{font-size:clamp(2.4rem,5vw,5rem);line-height:.95;margin:.3rem 0}.lede{max-width:900px;color:#91a6b7}.hero-actions{display:flex;gap:8px;align-items:center}.hero-actions a{border:1px solid var(--line);border-radius:9px;background:#142334;color:#eaf5ff;padding:.65rem .8rem;text-decoration:none}.stream{font:700 .7rem var(--mono);color:var(--amber)}.stream.live{color:var(--green)}
   .summary{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:12px}.summary article,.panel,.notice{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#0e1a27,#0a141e)}.summary article{padding:13px}.summary small{display:block;color:var(--muted);font:.58rem var(--mono)}.summary strong{display:block;margin-top:5px;font-size:1.25rem}.summary .action-card{border-color:#4ae5ff55;box-shadow:inset 0 0 30px #4ae5ff08}
-  .panel{padding:16px;margin-bottom:12px}.panel-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.panel h2{margin:.15rem 0 .65rem}.machine{font:.68rem var(--mono);color:var(--muted)}.machine.stale{color:var(--amber)}.progress{height:8px;border-radius:999px;overflow:hidden;background:#142536}.fill{height:100%;background:linear-gradient(90deg,#2aa6ff,#56edbe)}.notice{padding:12px 14px;margin-bottom:12px}.notice.warn{border-color:#f2d46c55}.notice span{display:block;color:var(--muted);margin-top:4px}
+  .panel{padding:16px;margin-bottom:12px}.panel-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.panel h2{margin:.15rem 0 .65rem}.machine{font:.68rem var(--mono);color:var(--muted)}.machine.stale{color:var(--amber)}.progress-label{display:block;margin:0 0 6px;color:var(--muted);font:.68rem var(--mono)}.progress{display:block;width:100%;height:8px;border:0;border-radius:999px;overflow:hidden;background:#142536;appearance:none}.progress::-webkit-progress-bar{border-radius:999px;background:#142536}.progress::-webkit-progress-value{border-radius:999px;background:linear-gradient(90deg,#2aa6ff,#56edbe)}.progress::-moz-progress-bar{border-radius:999px;background:linear-gradient(90deg,#2aa6ff,#56edbe)}.notice{padding:12px 14px;margin-bottom:12px}.notice.warn{border-color:#f2d46c55}.notice span{display:block;color:var(--muted);margin-top:4px}
+  .health-copy{color:#9aafbd;margin:.2rem 0 14px;max-width:980px}.health-copy code{color:#d9efff}.health-summary{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.health-summary article{padding:10px;border:1px solid #ffffff0c;border-radius:10px;background:#09131c}.health-summary small{display:block;color:var(--muted);font:.57rem var(--mono)}.health-summary strong{display:block;margin-top:4px;font-size:1.15rem}.health-summary span{display:block;color:#7890a3;font-size:.68rem;margin-top:3px}.health-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}.health-box{padding:11px;border:1px solid #ffffff0c;border-radius:10px;background:#09131c}.health-box-head{display:flex;justify-content:space-between;gap:8px;margin-bottom:7px}.health-row{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid #ffffff0b;font:.68rem var(--mono)}.health-row span{color:#9aafbd}.health-row strong{color:#d9efff;text-align:right}.stage-row strong{max-width:65%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--amber)}
+  .reconciliation-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}.reconciliation-strip>div{padding:10px;border:1px dashed #f2d46c33;border-radius:10px;background:#19170d}.reconciliation-strip small{display:block;color:var(--muted);font:.57rem var(--mono)}.reconciliation-strip strong{display:block;margin-top:4px;font-size:.9rem;color:var(--amber);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.reconciliation-strip span{display:block;color:#9aafbd;font-size:.65rem;margin-top:3px}
   .tab-list{display:flex;gap:7px;overflow:auto;margin:0 0 10px}.tab-list :global(button){border:1px solid var(--line);border-radius:9px;background:#101d2a;color:#a9bdcb;padding:.6rem .78rem;font:700 .7rem var(--mono);cursor:pointer}.tab-list :global(button[data-state='active']){color:#041219;background:var(--cyan);border-color:var(--cyan)}.tab-panel{min-height:380px}
   .task-list{display:grid;gap:7px}.task-list article{display:grid;grid-template-columns:max-content 1fr;gap:11px;align-items:start;padding:10px;border:1px solid #ffffff0c;border-radius:10px;background:#09131c}.task-list strong{display:block}.task-list small{color:var(--muted)}.state{font:700 .6rem var(--mono);padding:.28rem .38rem;border-radius:6px;border:1px solid var(--line)}.state.ok{color:var(--green)}.state.action{color:var(--cyan)}.state.warn{color:var(--amber)}.state.muted{color:var(--muted)}
   .blocker-grid,.topic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.blocker-grid article,.topic-grid article{padding:13px;border:1px solid #ffffff0c;border-radius:12px;background:#09131c}.blocker-grid h3{margin:.2rem 0}.blocker-grid p,.topic-grid p{color:#9aafbd}.blocker-grid small{display:block;color:var(--muted);margin-top:3px}.topic-head{display:flex;justify-content:space-between}.topic-grid small{color:var(--muted)}.chips{display:flex;flex-wrap:wrap;gap:5px}.chips span{font:.6rem var(--mono);padding:.25rem .35rem;border:1px solid var(--line);border-radius:5px;color:#a9bdcb}
   .change-list,.report-list{display:grid;gap:6px}.change-list article,.report-list article{display:grid;grid-template-columns:40px 1fr max-content;gap:10px;padding:9px;border-bottom:1px solid #ffffff0d}.report-list article{grid-template-columns:1fr max-content}.report-list small{display:block;color:var(--muted)}.report-list code{font: .68rem var(--mono);color:#7aa6bd}.report-list .missing{opacity:.55}.contract{margin-top:18px;padding:12px;border:1px dashed var(--line);border-radius:10px;color:#9aafbd}.contract p{margin:.35rem 0}.empty{color:var(--muted)}footer{display:flex;justify-content:space-between;gap:12px;color:#6f8799;font:.65rem var(--mono);padding:10px 2px}
-  @media(max-width:900px){.hero{align-items:start;flex-direction:column}.summary{grid-template-columns:repeat(2,1fr)}.blocker-grid,.topic-grid{grid-template-columns:1fr}footer{flex-direction:column}}
+  @media(max-width:1100px){.health-summary{grid-template-columns:repeat(3,1fr)}.reconciliation-strip{grid-template-columns:repeat(3,1fr)}.health-columns{grid-template-columns:1fr}}
+  @media(max-width:900px){.hero{align-items:start;flex-direction:column}.summary{grid-template-columns:repeat(2,1fr)}.health-summary,.reconciliation-strip{grid-template-columns:repeat(2,1fr)}.blocker-grid,.topic-grid{grid-template-columns:1fr}footer{flex-direction:column}}
 </style>

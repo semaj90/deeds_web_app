@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.afc-owner-manual-mapping-01-partial.v1",
+  "createdAt": "2026-09-27T02:35:00.000Z",
+  "scope": "Bounded slice of AFC-OWNER-MANUAL-MAPPING-01: resolves only the 2 UNRESOLVED entries from afc-helper-owner-verification-v1.json (rg-exact, langextract-grounding). The other 10 entries (3 LIVE, 3 UNIT_PROVEN_NOT_LIVE, 2 CONTRACT_ONLY, 2 BLOCKED) are unchanged and not re-examined here.",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "runtimeCallsPerformed": false,
+  "method": "Read sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts's real SignalType union and search-runtime.ts's real getFusionLogicalLane()/LogicalRetrievalLane type directly -- not inferred.",
+  "findings": [
+    {
+      "helperId": "rg-exact",
+      "previousStatus": "UNRESOLVED",
+      "revisedStatus": "BLOCKED",
+      "revisedFinding": "The fusion lane is real and distinct: LogicalRetrievalLane includes 'rg' as its own value (search-runtime.ts:1243, case 'rg_keyword': return 'rg'), separate from 'lexical' -- confirming the cross-cutting finding that SearchRuntime treats rg separately from lexical. router-matrix.ts's SignalType union includes 'lexical_exact', a plausible signal for rg-exact conceptually, though its precise owner-verified binding to a live rg-based executor is still unproven. Reclassified UNRESOLVED -> BLOCKED because the lane/signal SHAPES exist (not absent), but no live caller producing scoreSource:'rg_keyword' candidates was found -- this is 'contract exists, execution absent', which is BLOCKED's definition, not a genuinely unknown/unmodeled case.",
+      "verifiedLogicalLane": "rg",
+      "routerSignalCandidate": "lexical_exact",
+      "routerSignalCandidateConfidence": "PLAUSIBLE_NOT_OWNER_CONFIRMED"
+    },
+    {
+      "helperId": "langextract-grounding",
+      "previousStatus": "UNRESOLVED",
+      "revisedStatus": "BLOCKED_STRUCTURALLY_ABSENT",
+      "revisedFinding": "Stronger negative than the original UNRESOLVED framing implied: LogicalRetrievalLane's full real value set is {'dense','lexical','exact','ast','schema','rg','bm42'} -- there is no doc/grounding/langextract lane anywhere in the type, not merely an unproven one. Confirms the cross-cutting finding that SearchRuntime does not define a docs fusion lane at all. router-matrix.ts's SignalType union has no exact match either; 'evidence_source_ref_context' is the closest conceptual candidate (LangExtract grounds spans back to source references) but this is a guess, not an owner-confirmed mapping, and is NOT asserted as the answer here.",
+      "verifiedLogicalLane": null,
+      "routerSignalCandidate": "evidence_source_ref_context",
+      "routerSignalCandidateConfidence": "SPECULATIVE_FLAG_ONLY_NOT_A_MAPPING"
+    }
+  ],
+  "notDone": "The other 10 helper entries were not re-examined. No registry promoted, no code wired, no live calls made.",
+  "nextGate": "Operator decision: (1) confirm or reject 'lexical_exact' as rg-exact's owned signal and decide whether a live rg-based executor should be built or the entry archived as aspirational; (2) decide whether langextract-grounding needs a new SearchRuntime fusion lane + SignalType added, or should be reclassified permanently as a non-retrieval (producer-only/evidence-attachment) helper outside the fusion model entirely."
+}

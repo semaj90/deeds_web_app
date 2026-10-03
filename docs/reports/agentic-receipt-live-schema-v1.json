@@ -1,6 +1,6 @@
 {
   "schema": "atlas.agentic-receipt-live-schema-audit.v1",
-  "generatedAt": "2026-09-20T08:40:23.876Z",
+  "generatedAt": "2026-09-20T19:00:50.529Z",
   "status": "LIVE_RECEIPT_SCHEMA_AND_EXISTING_ROWS_OBSERVED_NEW_WRITE_DEFERRED",
   "table": "public.outcome_ledger",
   "requiredColumns": [

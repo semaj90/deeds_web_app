@@ -32,7 +32,7 @@ Depends only on ``atlas_external_docs`` (a leaf module) so
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -102,6 +102,18 @@ class SourceConfigV1(BaseModel):
     pages: tuple[str, ...] = Field(default_factory=tuple)
     ldr_export_files: tuple[str, ...] = Field(default_factory=tuple)
     source_namespace: Optional[str] = None
+    # Native DocCoordinateV1 inputs (EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_01). When provider AND product are set the
+    # pipeline builds one page-level DocCoordinateV1 per fetched page; otherwise chunks carry no coordinate (legacy).
+    provider: Optional[str] = None
+    product: Optional[str] = None
+    product_version: Optional[str] = None  # required for EXACT_VERSION / MAJOR_VERSION; never invented otherwise
+    version_qualification: Optional[str] = None  # EXACT_VERSION | MAJOR_VERSION | CURRENT_UPSTREAM | UNVERSIONED
+    architecture: Optional[str] = None
+    language: Optional[str] = None
+    publisher: Optional[str] = None
+    unversioned_urls: tuple[str, ...] = Field(default_factory=tuple)
+    # V1 preserves existing chunk IDs. V2 is opt-in for version-qualified recrawls.
+    chunk_identity_version: Literal["V1", "V2"] = "V1"
 
     model_config = _STRICT
 
@@ -143,6 +155,11 @@ class SourceConfigV1(BaseModel):
     def _urls_and_domains_required_and_allowed(self) -> "SourceConfigV1":
         if not self.base_urls or not self.allowed_domains:
             raise ValueError(f"SOURCE_URLS_AND_DOMAINS_REQUIRED:{self.source_id}")
+        if self.chunk_identity_version == "V2":
+            if not self.provider or not self.product:
+                raise ValueError(f"DOC_CHUNK_IDENTITY_V2_PROVIDER_PRODUCT_REQUIRED:{self.source_id}")
+            if self.version_qualification not in {"EXACT_VERSION", "MAJOR_VERSION"} or not self.product_version:
+                raise ValueError(f"DOC_CHUNK_IDENTITY_V2_EXPLICIT_VERSION_REQUIRED:{self.source_id}")
         for url in (*self.base_urls, *self.pages):
             enforce_allowed_domain(url, self.allowed_domains)
         return self

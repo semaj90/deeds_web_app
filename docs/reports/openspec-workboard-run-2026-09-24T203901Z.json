@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T20:39:01Z",
+  "head": "14bcc00f75",
+  "pivots": [
+    {
+      "from": "parent-atlas-analysis-pass-ornith-adapter",
+      "progress": "Its sole open task is an explicit operator decision on Engram writer ownership, the validated-lesson trigger, and whether workspace/cluster sync is separate",
+      "to": "feature-label-semantic-derivation",
+      "task": "inspect the exact remaining gate and check feature/representation lineage prerequisites",
+      "outcome": "All OpenSpec tasks are checked (3/3), strict validation passes, and the only apparent open item was stale 2026-09-05 prose superseded by the 2026-09-24 package-script reconciliation; clarified that historical status without running Graphify",
+      "reason": "This is the next close-first candidate explicitly named in the user's triage order; inspect only its current gate and stop if lineage or ownership is incomplete."
+    }
+  ],
+  "scope": {
+    "readOnly": true,
+    "candidateFiles": [
+      "openspec/changes/feature-label-semantic-derivation/tasks.md",
+      "openspec/changes/feature-label-semantic-derivation/proposal.md",
+      "openspec/changes/feature-label-semantic-derivation/specs/feature-label-semantic-derivation/spec.md"
+    ],
+    "forbidden": [
+      "canonical feature or representation promotion without lineage proof",
+      "datastore writes",
+      "container rebuilds",
+      "Graphify",
+      "unrelated OpenSpec changes"
+    ]
+  },
+  "verification": {
+    "currentHead": "14bcc00f75",
+    "analysisPassCurrentGate": "OWNER_DECISION_REQUIRED",
+    "featureLabelGate": "STALE_HISTORICAL_STATUS_CLARIFIED",
+    "featureLabelTasks": "3/3 complete",
+    "strictOpenSpec": "PASS",
+    "implementationOrDatastoreWrites": 0,
+    "taskLedgerEdited": true,
+    "taskLedgerEdit": "Relabeled the 2026-09-05 paragraph as a historical snapshot superseded by the 2026-09-24 read-only reconciliation; preserved historical details"
+  },
+  "result": "FEATURE_LABEL_CHANGE_RECONCILED_ALL_TASKS_COMPLETE",
+  "datastoreWrites": 0,
+  "containerRebuilds": 0,
+  "graphifyRuns": 0
+}

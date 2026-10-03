@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.acp-nlp-sidecar-tools-live-proof.v1",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false,
+  "nlpToolsRegistered": true,
+  "capabilities": {
+    "success": true,
+    "kind": "result",
+    "data": {
+      "status": "ok",
+      "model": "ornith-1.5-9b",
+      "runtime": {
+        "pythonExecutable": "/usr/local/bin/python",
+        "pythonVersion": "3.13.15",
+        "environmentType": "system-python"
+      },
+      "capabilities": {
+        "spacy": true,
+        "langextract": true,
+        "tree_sitter": true,
+        "treesitter_chunker": true,
+        "ast_grep": true,
+        "torch": false,
+        "networkx": true,
+        "nx_cugraph": false,
+        "cugraph": false,
+        "cuvs": false,
+        "cupy": false,
+        "classification_helper": true
+      },
+      "capabilityDetails": {
+        "networkx": {
+          "installed": true,
+          "active": true,
+          "owner": "entity_graph_metrics",
+          "scope": "per_document_entity_graph"
+        },
+        "nx_cugraph": {
+          "installed": false,
+          "active": false,
+          "owner": null
+        },
+        "rapids_graph_executor": {
+          "available": false,
+          "runtime": null,
+          "owner": "external_wsl2_rapids_executor",
+          "note": "The CPU NLP sidecar does not probe or own the external RAPIDS runtime."
+        }
+      },
+      "imports": {
+        "langextract": {
+          "available": true,
+          "version": "1.6.0",
+          "modulePath": "/usr/local/lib/python3.13/site-packages/langextract/__init__.py",
+          "importVerified": true,
+          "editableSource": null,
+          "beautifulsoup4": {
+            "available": true,
+            "version": "4.15.0",
+            "modulePath": null,
+            "importVerified": true
+          }
+        },
+        "treesitterChunker": {
+          "available": true,
+          "version": "4.0.0",
+          "modulePath": "/usr/local/lib/python3.13/site-packages/chunker/__init__.py",
+          "moduleName": "chunker",
+          "importVerified": true,
+          "fixtureVerified": false
+        },
+        "treeSitterLanguagePack": {
+          "available": true,
+          "version": "0.9.0",
+          "importVerified": true
+        },
+        "astGrepPy": {
+          "available": true,
+          "version": "0.45.3",
+          "importVerified": true
+        }
+      },
+      "timestamp": 1789950897704,
+      "contract": "provenance-v2"
+    },
+    "duration": 58
+  },
+  "analyze": {
+    "success": true,
+    "entityCount": 0
+  },
+  "astChunk": {
+    "success": true,
+    "schema": "atlas.ast.evidence.v1",
+    "chunkCount": 2,
+    "syntaxStatus": "CLEAN",
+    "fixtureVerified": true
+  },
+  "dryRunModeWorks": true,
+  "reportPath": "docs/reports/acp-nlp-sidecar-tools-live-proof-v1.json"
+}

@@ -34,5 +34,25 @@ describe('RetrievalCandidateFeatureMatrixV1 In-Memory Projection', () => {
     expect(matrix.presence_mask[1 * 25 + 18]).toBe(1);
     expect(matrix.candidate_features[1 * 25 + 18]).toBeCloseTo(0.95, 4);
   });
-});
 
+  it('keeps measured zero distinct from null or absent values', () => {
+    const matrix = buildCandidateFeatureMatrix([
+      { packet_key: 'packet:zero', semantic_similarity_768: 0, lexical_score: null },
+      { packet_key: 'packet:missing' },
+    ]);
+
+    expect(matrix.candidate_features[0]).toBe(0);
+    expect(matrix.presence_mask[0]).toBe(1);
+    expect(matrix.candidate_features[1]).toBe(0);
+    expect(matrix.presence_mask[1]).toBe(0);
+    expect(matrix.presence_mask[25]).toBe(0);
+  });
+
+  it.each([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, 1e100])(
+    'rejects non-finite or Float32-overflow feature values (%s)', (value) => {
+      expect(() => buildCandidateFeatureMatrix([
+        { packet_key: 'packet:invalid', semantic_similarity_768: value },
+      ])).toThrow('CANDIDATE_FEATURE_NON_FINITE:0:0');
+    },
+  );
+});

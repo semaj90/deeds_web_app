@@ -702,11 +702,18 @@ services:
           memory: 8G
         reservations:
           memory: 2G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     ports:
       - "8092:8092"
     environment:
+      # Ollama is embeddings-only here (app.py L47). Chat/synthesis goes to llama-server
+      # (LLAMA_SERVER_URL, defaults to :8090 in app.py) serving Ornith 1.5 — LLM_MODEL must
+      # match that, not a stale Ollama tag.
       OLLAMA_URL: http://host.docker.internal:11434
-      LLM_MODEL: ${LLM_MODEL:-gemma4-legal:latest}
+      LLM_MODEL: ${LLM_MODEL:-ornith-1.5-9b}
       # Wan2.1-1.3B: text-to-video, Apache 2.0, ~6GB VRAM bfloat16 + TorchAO INT8
       WAN_MODEL_ID: ${WAN_MODEL_ID:-Wan-AI/Wan2.1-T2V-1.3B}
       # FLUX.1-schnell: keyframe image, Apache 2.0, ~4GB VRAM NF4/INT8
@@ -939,6 +946,13 @@ services:
       REDIS_URL: redis://:redis@valkey:6379
       EMBED_MODEL: "embeddinggemma:latest"
       EMBED_BATCH_MAX: "4"
+      # Strict /embed/v2 remains fail-closed until the service image and
+      # tokenizer artifacts have explicit SHA-256 identities. These are
+      # optional for legacy /embed callers and are not a deployment signal.
+      EMBEDDING_SERVICE_BUILD_REVISION: ${EMBEDDING_SERVICE_BUILD_REVISION:-}
+      EMBEDDING_TOKENIZER_REVISION: ${EMBEDDING_TOKENIZER_REVISION:-}
+      EMBEDDING_INPUT_POLICY_REVISION: ${EMBEDDING_INPUT_POLICY_REVISION:-semantic-embedding-input-v1:exact-selection-no-truncation:max-1800-tokens}
+      EMBEDDING_CONTENT_SELECTION_REVISIONS: ${EMBEDDING_CONTENT_SELECTION_REVISIONS:-semantic-input-compiler-v1:ts-js-top-level-declarations,semantic-input-compiler-v1:markdown-first-heading-section,semantic-input-compiler-v1:whole-file-fallback-unsupported-grammar}
       GRPC_PORT: "50051"
       HTTP_PORT: "8097"
     extra_hosts:

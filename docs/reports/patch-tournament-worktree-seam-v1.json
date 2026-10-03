@@ -1,6 +1,6 @@
 {
   "schema": "atlas.patch-tournament-worktree-seam.v1",
-  "generatedAt": "2026-09-20T08:40:23.728Z",
+  "generatedAt": "2026-09-20T19:00:50.224Z",
   "status": "THREE_CANDIDATE_SLOTS_PLANNED_EXECUTION_DEFERRED",
   "owner": {
     "planner": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",

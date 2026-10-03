@@ -29,6 +29,7 @@ import { loadEnvFiles, REPO_ROOT } from './connection-config.mjs';
 import { canonicalizeStructuralEvidence } from '../../packages/parent-atlas/dist/core/gis-canonicalization.js';
 import { createSymbolRegistryRepository } from '../../packages/parent-atlas/dist/core/symbol-registry-repository.js';
 import { deriveUpstreamSymbolNominationKey } from '../../packages/parent-atlas/dist/core/structural-symbol.js';
+import { loadBindingProvenanceV1, provenanceForV1, qualifyPromotionNominationV1 } from '../../sveltekit-frontend/src/lib/server/atlas/identity/symbol-revision-qualification-v1.js';
 
 const env = loadEnvFiles([
   path.join(REPO_ROOT, '.env'),
@@ -165,6 +166,22 @@ async function main() {
     };
   });
 
+  // S01-10B main-repo boundary guard: the package promoteNomination writes registry + aliases + version in one transaction with no
+  // revision validation. When promotion is requested, an unqualified nomination must never reach it. Dry-run stays read-only and unfiltered.
+  const promoting = apply && allowCreate;
+  let admittedNominations = nominations;
+  const revisionRejections: Array<{ nomination_id: string; reasons: string[] }> = [];
+  if (promoting) {
+    const provenanceMap = await loadBindingProvenanceV1(pool, nominations.map((n) => ({ sourceRef: n.source_ref, sourceRevision: n.source_revision })));
+    admittedNominations = nominations.filter((n) => {
+      const v = qualifyPromotionNominationV1(n, targetWorkspaceRevision, provenanceForV1(provenanceMap, n.source_ref, n.source_revision));
+      if (!v.admitted) revisionRejections.push({ nomination_id: n.nomination_id, reasons: v.reasons });
+      return v.admitted;
+    });
+  }
+  report.revisionRejectedCount = revisionRejections.length;
+  report.revisionRejectionSample = revisionRejections.slice(0, 20);
+
   const repo = createSymbolRegistryRepository(pool);
   const result = await canonicalizeStructuralEvidence({
     evidence_id: `symbol-reconciliation-run:${targetWorkspaceRevision}`,
@@ -173,7 +190,7 @@ async function main() {
     source_revision: targetWorkspaceRevision,
     workspace_revision: targetWorkspaceRevision,
     producer_revision: 'symbol-reconciliation-writer-v1',
-    symbol_nominations: nominations as any,
+    symbol_nominations: admittedNominations as any,
     reference_facts: [],
     symbol_resolver: {
       resolve: (n) => repo.resolveNomination({ nomination: n, registry_revision: targetWorkspaceRevision }),

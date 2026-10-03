@@ -1,6 +1,6 @@
 {
   "schema": "atlas.langgraph-serde-runtime-smoke.v1",
-  "generatedAt": "2026-09-20T07:47:49.491Z",
+  "generatedAt": "2026-09-21T01:24:20.653Z",
   "inputChecksum": "sha256:3ce121ae965fb6175cdc4e3c7b202fc013ca5a34b7f2b27ca6cf6d7311f7c27a",
   "command": "docker compose run --rm --no-deps langgraph-synthesis python import-smoke",
   "status": "RUNTIME_IMPORT_PROVEN",

@@ -44,9 +44,17 @@ export const EMBEDDINGGEMMA_MRL_DIMENSIONS = [768, 512, 256, 128] as const;
  * formatEmbeddingGemmaInput() before hitting the model. Neither live embedding
  * call site (src/lib/server/retrieval/embedding-service.ts, embedViaOllama;
  * src/lib/server/embeddings/ollama.ts) applies formatEmbeddingGemmaInput()
- * today — both send raw text. So the entire existing corpus (Qdrant
- * codebase_chunks_768, codebase_chunk_index.content_embedding) was embedded
- * under PROMPT_REVISION_UNPROMPTED, not PROMPT_REVISION_TASK_PREFIX_V1.
+ * today — both send raw text, so live QUERIES are unprompted-v0.
+ * CORRECTION (2026-09-20, live census; supersedes an earlier blanket claim that
+ * the whole persisted corpus was raw): historical persisted semantic_768 storage
+ * is NOT homogeneous. codebase_chunk_index.content_embedding is a mixture (about
+ * 60 percent reproduce the titled document recipe, about 10 percent raw, about 30
+ * unidentified), content_embedding_768 is raw for its 768-only cohort but
+ * unidentified for the 739-row overlap cohort, and both Qdrant collections
+ * (codebase_chunks_768, codebase_chunks_768_v2) hold multiple producer cohorts.
+ * Storage column names, collection names and prompt-revision tags are NOT
+ * sufficient evidence of recipe. See docs/reports/embedding-recipe-census-v1.json,
+ * qdrant-representation-parity-v1.json and qdrant-producer-cohort-census-v1.json.
  * Do not wire formatEmbeddingGemmaInput() into a live query path without also
  * re-embedding the document side to match — a formatted query compared
  * against an unformatted document corpus is a silent representation

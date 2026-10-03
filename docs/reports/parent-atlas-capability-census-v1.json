@@ -2,15 +2,15 @@
   "schema": "atlas.parent-capability-census.v1",
   "scope": {
     "root": ".",
-    "filesScanned": 50000,
-    "maxFiles": 50000,
+    "filesScanned": 5000,
+    "maxFiles": 5000,
     "scanTruncated": true
   },
   "summary": {
-    "PROVEN": 31,
-    "WAITING": 7,
-    "UNPROVEN": 4,
-    "PRESENT_CONTRACT": 1
+    "PRESENT_CONTRACT": 4,
+    "PROVEN": 21,
+    "WAITING": 14,
+    "UNPROVEN": 4
   },
   "groups": {
     "DATA": [
@@ -81,7 +81,7 @@
     "p10": [
       {
         "id": "PG_BTREE_IDENTITY",
-        "state": "PROVEN"
+        "state": "WAITING"
       },
       {
         "id": "PG_GIN_FTS",
@@ -115,7 +115,7 @@
     "utility": [
       {
         "id": "POSTGRES_18_OWNER",
-        "state": "PROVEN"
+        "state": "PRESENT_CONTRACT"
       },
       {
         "id": "DRIZZLE_SCHEMA_OWNER",
@@ -127,7 +127,7 @@
       },
       {
         "id": "QDRANT_HNSW",
-        "state": "PROVEN"
+        "state": "PRESENT_CONTRACT"
       },
       {
         "id": "OKF_SCHEMA",
@@ -205,11 +205,11 @@
     "optional": [
       {
         "id": "PGVECTOR_HNSW",
-        "state": "PROVEN"
+        "state": "WAITING"
       },
       {
         "id": "CUVS_CAGRA",
-        "state": "PROVEN"
+        "state": "WAITING"
       },
       {
         "id": "DOMAIN_CLASSIFIER",
@@ -217,7 +217,7 @@
       },
       {
         "id": "NEO4J_PROJECTION",
-        "state": "PROVEN"
+        "state": "WAITING"
       },
       {
         "id": "NETWORKX_DAG",
@@ -225,11 +225,11 @@
       },
       {
         "id": "KMEANS_STRUCTURAL",
-        "state": "PROVEN"
+        "state": "WAITING"
       },
       {
         "id": "SOM_20X20",
-        "state": "PROVEN"
+        "state": "WAITING"
       },
       {
         "id": "MANIFOLD_COORDINATES_5D",
@@ -241,7 +241,7 @@
       },
       {
         "id": "LLAMA_8090_KV_AFFINITY",
-        "state": "PROVEN"
+        "state": "PRESENT_CONTRACT"
       },
       {
         "id": "PYTORCH_SHADOW_LEARNING",
@@ -249,7 +249,7 @@
       },
       {
         "id": "NES_CHROM_GLYPH97",
-        "state": "PROVEN"
+        "state": "WAITING"
       },
       {
         "id": "LOD_MEMORY_STREAMING",
@@ -272,7 +272,7 @@
         "postgresql 18",
         "server_version"
       ],
-      "state": "PROVEN",
+      "state": "PRESENT_CONTRACT",
       "matchingFiles": [
         "--since 2h",
         ".cache/cards/09e185c179fb0407eded430b49c8a6a341caa29b.meta.json",
@@ -305,9 +305,7 @@
         ".claude/RETRIEVAL-20-STEP-TODO.md",
         ".claude/settings.local.json"
       ],
-      "qualifyingReports": [
-        "docs/reports/postgresql18-runtime-readiness-v1.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": null
     },
     {
@@ -333,28 +331,7 @@
         ".okf/languages/typescript.yaml",
         ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas/EvidenceCanvasEditor.svelte",
         ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/GlobalSidebar.svelte",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/bits/WebAssemblyIntegrationDemo.svelte",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/ui-preview/+page.svelte",
-        ".vscode/7_25_25_ai.txt",
-        "625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard.txt",
-        "6_24_26___todo.txt",
-        "6_25_26_manifold_truth.txt",
-        "6_27_26_todo_pt2.txt",
-        "7-19_qdrantgpu_hnsw_ivfft_bm25_bm42_mcp_toolcalling_hmm.txt",
-        "7_10_26.txt",
-        "7_20_26_encloypedia_background_retrieval.txt",
-        "7_25_26__ug_ly.txt",
-        "7_27_26_classifier_domain_ontology_tuple_mapping_ace_packets_kmeans_clustering_som_agenticdencevector_retrieval.txt",
-        "7_27_qdrant_multi_vector_embeddings_analysis.txt",
-        "7_29_mastra_agent_model_query_gpt.txt",
-        "7_30-26__.txt",
-        "8_21_todo.txt",
-        "8_28_26__todo.txt",
-        "8_28_search_engine.txt",
-        "8_30_26.txt",
-        "8_9_26_todo_pt1.txt",
-        "ARCHITECTURE_SPEC.md",
-        "atlas-openspec-awareness-v2/src/lib/server/db/atlas-openspec-board-schema.ts"
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/bits/WebAssemblyIntegrationDemo.svelte"
       ],
       "qualifyingReports": [
         "docs/reports/agent-run-events-owner-mapping-v1.json",
@@ -362,11 +339,11 @@
         "docs/reports/agentic-receipt-owner-audit-v1.json",
         "docs/reports/ast-ownership-receipt.json",
         "docs/reports/ast-source-parity-worktree-v1.json",
+        "docs/reports/atlas-ast-tranche-rehearsal-v1.json",
         "docs/reports/atlas-domain-topology-alignment-v1.md",
         "docs/reports/atlas-feature-intelligence-database-fixture-proof-v1.json",
         "docs/reports/atlas-feature-intelligence-database-proof-v4.json",
-        "docs/reports/atlas-feature-recommendation-index.json",
-        "docs/reports/atlas-migration-owner-audit-v1.json"
+        "docs/reports/atlas-feature-recommendation-index.json"
       ],
       "runtimeGate": null
     },
@@ -385,7 +362,7 @@
         "packet_key",
         "source_revision"
       ],
-      "state": "PROVEN",
+      "state": "WAITING",
       "matchingFiles": [
         ".claude/commands/audit-components.md",
         ".claude/commands/wire-modules.md",
@@ -418,9 +395,7 @@
         ".python311/lib/python3.11/idlelib/calltip_w.py",
         ".python311/lib/python3.11/idlelib/ChangeLog"
       ],
-      "qualifyingReports": [
-        "docs/reports/pipeline-router-matrix-surfaces-v1.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": null
     },
     {
@@ -445,41 +420,10 @@
         ".claude/skills/drizzle-schema-review/SKILL.md",
         ".github/agents/legal-library-engineer.agent.md",
         ".github/agents/search-platform-engineer.agent.md",
-        ".okf/indexes/feature-intelligence.yaml",
-        ".venv-cu130/Lib/site-packages/torch/include/ATen/core/ivalue_inl.h",
-        "625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard.txt",
-        "6_14_26__to_do_parent_atlas_registery.txt",
-        "6_18_todopt2.txt",
-        "6_23_26__.txt",
-        "6_25_26_manifold_truth.txt",
-        "6_29_26__debugging_gpu.txt",
-        "6_29_pt3todo.txt",
-        "6_3_phase_14_15_batchsummaries.txt",
-        "7_13_26__todo_pt2.txt",
-        "7_14_26.txt",
-        "7_25_26__ug_ly.txt",
-        "7_27_26_classifier_domain_ontology_tuple_mapping_ace_packets_kmeans_clustering_som_agenticdencevector_retrieval.txt",
-        "7_3_26__lexical__neo4j.txt",
-        "7_9_26.txt",
-        "824_26.txt",
-        "8_23_26__todo.txt",
-        "8_2_miniforge_otel_1_17_.txt",
-        "8_3_26_agentic_tokenremapping.txt",
-        "8_8_26_todo_pt1.txt",
-        "9_12_todopt1.txt",
-        "9_15_26_todo_status.txt",
-        "9_18_26_todo.txt",
-        "atlas_trees_615_26.txt",
-        "claude-mem/docs/server-beta-architecture-and-team-vision.md"
+        ".okf/indexes/feature-intelligence.yaml"
       ],
       "qualifyingReports": [
-        "docs/reports/atlas-migration-owner-audit-v1.json",
-        "docs/reports/file-exploration-projection-readback-v1.json",
-        "docs/reports/migration-inventory-classification-v1.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json",
-        "docs/reports/openspec-actionable-lane-audit-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json",
-        "docs/reports/staging/openspec-actionable-work-v1.json"
+        "docs/reports/atlas-migration-owner-audit-v1.json"
       ],
       "runtimeGate": null
     },
@@ -508,29 +452,7 @@
         ".okf/manifest.yaml",
         ".okf/pipelines/ast-entity-prefill.yaml",
         ".okf/predicates/feature-relationships.yaml",
-        "7_27_26_classifier_domain_ontology_tuple_mapping_ace_packets_kmeans_clustering_som_agenticdencevector_retrieval.txt",
-        "7_28_26_todopt3.txt",
-        "7_28_26_todo_1.txt",
-        "7_28_jsonpacket.txt",
-        "7_29_26_todo__.txt",
-        "7_29_mastra_agent_model_query_gpt.txt",
-        "7_30-26__.txt",
-        "824_26.txt",
-        "8_12_26_todo.txt",
-        "8_1_26__todo.txt",
-        "8_21_todo.txt",
-        "8_22_26_todo.txt",
-        "8_25_26.txt",
-        "8_25_26_todo.txt",
-        "8_28_26__todo.txt",
-        "8_28_search_engine.txt",
-        "8_29_26__todo.txt",
-        "8_2_26_todo.txt",
-        "8_2_miniforge_otel_1_17_.txt",
-        "8_3_26_agentic_tokenremapping.txt",
-        "8_3_26_todo.txt",
-        "8_4_26_todo.txt",
-        "8_8_26_parentatls_todo.txt"
+        ".rgignore"
       ],
       "qualifyingReports": [],
       "runtimeGate": "CANONICAL_LINEAGE_READY"
@@ -639,13 +561,7 @@
         "docs/reports/atlas-migration-owner-audit-v1.json",
         "docs/reports/bridge-recon-apply-v1.json",
         "docs/reports/bridge-recon-replay-v1.json",
-        "docs/reports/current-graphify-source-bridge-reconciliation-v1.json",
-        "docs/reports/disk-cleanup-canonical-toc-2026-08-25.md",
-        "docs/reports/latent-producer-contract-v1.json",
-        "docs/reports/lineage-qdrant-named-vector-repair-v1.json",
-        "docs/reports/lineage-qdrant-projection-repair-corrected-v1.json",
-        "docs/reports/migration-inventory-classification-v1.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json"
+        "docs/reports/current-graphify-source-bridge-reconciliation-v1.json"
       ],
       "runtimeGate": null
     },
@@ -663,51 +579,11 @@
         "hnsw",
         "pgvector"
       ],
-      "state": "PROVEN",
+      "state": "WAITING",
       "matchingFiles": [
-        ".claude/skills/drizzle-schema-review/SKILL.md",
-        "6_23_26__todo.txt",
-        "6_9_26_todo.txt",
-        "7_27_qdrant_multi_vector_embeddings_analysis.txt",
-        "7_30-26__.txt",
-        "8_29_26todo_pt2.txt",
-        "claude.md",
-        "data/external-docs/chunks/postgres.jsonl",
-        "data/external-docs/normalized/postgres/postgres17-reference.md",
-        "data/external-docs/raw/postgres/postgres17-reference.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.claude/skills/drizzle-schema-review/SKILL.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/claude.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/data/external-docs/normalized/postgres/postgres17-reference.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/data/external-docs/raw/postgres/postgres17-reference.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docker/init/01-init.sql",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/architecture/ACP-GEMMA4-MEMORY-HIERARCHY.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/architecture/storage-tier-schema.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/ATLAS-NEXT-PASS-ARCHITECTURE.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/devtools_rg.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/EMBEDDING-PIPELINE-VALIDATION.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/EMBEDDING-TRUNCATION-STRATEGY.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/MULTI-VECTOR-EMBEDDING-STRATEGY.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/opencode-engram-memory-corrected.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/opencode-mcp-fixes.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/P1-IMPLEMENTATION-TASKS.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/P3G-MULTI-VECTOR-METADATA-GAP-ANALYSIS.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/PARENT-ATLAS-IDENTITY-OS-LOCKED.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/PHASE-2-TABLE-MIGRATIONS-PLAN.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/status/ENTITY_EMBEDDINGS_READY.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/status/GPU_ACCELERATION_IMPLEMENTATION_MAP.md"
+        ".claude/skills/drizzle-schema-review/SKILL.md"
       ],
-      "qualifyingReports": [
-        "docs/reports/drizzle-schema-validation-report.md",
-        "docs/reports/embedding-lane-sweep-20260820.md",
-        "docs/reports/graphify-ast-scope-active-app-v1.json",
-        "docs/reports/graphify-ast-scope-active-v2.json",
-        "docs/reports/migration-inventory-classification-v1.json",
-        "docs/reports/parent-atlas-crosswalk.json",
-        "docs/reports/parent-atlas-crosswalk.md",
-        "docs/reports/parent-atlas-feature-command-atlas.json",
-        "docs/reports/pgvector-index-plan.md",
-        "docs/reports/real-world-routing-eval.md"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": null
     },
     {
@@ -760,14 +636,7 @@
       "qualifyingReports": [
         "docs/reports/agentic-repair-embedding-specialization-sequence-v1.json",
         "docs/reports/atlas-indexing-surfaces-v1.json",
-        "docs/reports/claude-md-parent-atlas-deep-audit-2026-08-30.md",
-        "docs/reports/graphify-daily-workflow-receipt.json",
-        "docs/reports/lineage-pgvector-qdrant-parity-v1.json",
-        "docs/reports/lineage-qualified-semantic-768-backfill-plan-v1.json",
-        "docs/reports/lineage-qualified-semantic-coverage-v1.json",
-        "docs/reports/migration-inventory-classification-v1.json",
-        "docs/reports/mmr-lambda-sweep-eval-v1.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json"
+        "docs/reports/claude-md-parent-atlas-deep-audit-2026-08-30.md"
       ],
       "runtimeGate": "QDRANT_COLLECTION_SCHEMA_PROVEN"
     },
@@ -822,9 +691,7 @@
         ".okf/manifest.yaml"
       ],
       "qualifyingReports": [
-        "docs/reports/atlas-migration-owner-audit-v1.json",
-        "docs/reports/latent256-orchestrator-identity-bridge-audit-v1.json",
-        "docs/reports/migration-inventory-classification-v1.json"
+        "docs/reports/atlas-migration-owner-audit-v1.json"
       ],
       "runtimeGate": "QDRANT_LINEAGE_TAGS_PROVEN"
     },
@@ -841,7 +708,7 @@
         "indexed_vectors_count",
         "hnsw"
       ],
-      "state": "PROVEN",
+      "state": "PRESENT_CONTRACT",
       "matchingFiles": [
         "--since 2h",
         ".claude/agents/drizzle-inspector.md",
@@ -874,11 +741,7 @@
         ".clinerules/20-validation.md",
         ".codex/skills/parent-atlas-openspec-progress/SKILL.md"
       ],
-      "qualifyingReports": [
-        "docs/reports/qdrant-postgres-mirror-reconciliation.json",
-        "docs/reports/semantic-768-contract-proof.json",
-        "docs/reports/source-scope-reconciliation-v1.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": null
     },
     {
@@ -910,35 +773,10 @@
         ".opencode/outcome-ledger.ndjson",
         ".opencode/startup-briefing.json",
         ".parent-atlas/skills/semantic-search/SKILL.md",
-        ".python311/lib/python3.11/email/charset.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_traveling_salesman.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/connectivity/tests/test_edge_kcomponents.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/isomorphism/vf2pp.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/tree/tests/test_branchings.py",
-        ".venv-cu130/Lib/site-packages/numpy/_core/tests/test_mem_overlap.py",
-        ".venv-cu130/Lib/site-packages/sympy/combinatorics/tests/test_perm_groups.py",
-        ".venv-cu130/Lib/site-packages/sympy/combinatorics/testutil.py",
-        ".venv-cu130/Lib/site-packages/sympy/functions/combinatorial/numbers.py",
-        ".venv-cu130/Lib/site-packages/sympy/functions/combinatorial/tests/test_comb_numbers.py",
-        ".venv-cu130/Lib/site-packages/sympy/solvers/diophantine/diophantine.py",
-        ".venv-cu130/Lib/site-packages/sympy/strategies/tests/test_tree.py",
-        ".venv-cu130/Lib/site-packages/sympy/strategies/tree.py",
-        ".venv-cu130/Lib/site-packages/torch/distributed/elastic/rendezvous/c10d_rendezvous_backend.py",
-        ".venv-cu130/Lib/site-packages/torch/distributed/tensor/_ops/strategy_validation.py",
-        ".venv-cu130/Lib/site-packages/torch/include/google/protobuf/stubs/strutil.h",
-        ".vscode/c_cpp_properties.json"
+        ".python311/lib/python3.11/email/charset.py"
       ],
       "qualifyingReports": [
-        "docs/reports/candidate-feature-gpu-lease-owner-v1.json",
-        "docs/reports/gpu-knn-cagra-runtime-proof.md",
-        "docs/reports/gpu-mini-fabric-01-semantic-exact-parity-01.json",
-        "docs/reports/graphify-ast-scope-active-app-v1.json",
-        "docs/reports/graphify-ast-scope-active-v2.json",
-        "docs/reports/kernel-dag-operator-owner-reconciliation-v1.json",
-        "docs/reports/ollama-generation-callers-v2.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json",
-        "docs/reports/openspec-actionable-lane-audit-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json"
+        "docs/reports/candidate-feature-gpu-lease-owner-v1.json"
       ],
       "runtimeGate": null
     },
@@ -963,34 +801,7 @@
       "matchingFiles": [
         ".codex-svelte-audit.txt",
         ".codex-tsc-audit.txt",
-        ".gitignore",
-        "8_28_26_todo_semanticqdrantsearch.txt",
-        "8_8_26_to_do.txt",
-        "9_15_26_todo_status.txt",
-        "9_3_todo_pt3.txt",
-        "9_6_26__todo.txt",
-        "atlas-openspec-awareness-v2/scripts/atlas/audit-atlas-runtime-readiness-v1.mjs",
-        "atlas-openspec-awareness-v2/tests/test-awareness-v2.mjs",
-        "claude.md",
-        "deeds_labs/archive/2026-08-22/orphaned-root-src-tree/src/lib/server/atlas/contracts/canonical_representation_registry.ts",
-        "deeds_labs/archive/2026-08-31/candidate-feature-gpu-resident-lease-v1.spec.ts.bak",
-        "deeds_labs/archive/2026-08-31/prove-candidate-feature-gpu-resident-lease.mts.bak",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/claude.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/specs/ace-feature-snapshot-producer/spec.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-candidate-feature-execution-fabric/candidate-snapshot-contract-addendum.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-ontology-kernel/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/proposal.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-versioned-doc-intelligence/design.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/packages/parent-atlas/src/core/external-doc-retrieval-runtime.ts",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/packages/parent-atlas/src/core/latent-source-manifest-v1.spec.ts",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/packages/parent-atlas/src/core/oak-neural-latent-owner-v1.ts"
+        ".gitignore"
       ],
       "qualifyingReports": [],
       "runtimeGate": "ANN03_LIVE_PARITY_PROVEN"
@@ -1009,7 +820,7 @@
         "gpu",
         "parity"
       ],
-      "state": "PROVEN",
+      "state": "WAITING",
       "matchingFiles": [
         ".claude/FORBIDDEN.md",
         ".claude/GPU_RULES.md",
@@ -1022,36 +833,9 @@
         ".opencode/ndjson/enriched-ledger.ndjson",
         ".opencode/outcome-ledger.ndjson",
         ".opencode/startup-briefing.json",
-        ".parent-atlas/skills/semantic-search/SKILL.md",
-        ".vscode/c_cpp_properties.json",
-        ".vscode/tasks.json",
-        ".vscode/tasks.json.bak-2026-06-28T22-49-58-665Z",
-        "620_pt2_next_steps_.txt",
-        "6_19_todo_pt1.txt",
-        "6_29_pt3todo.txt",
-        "6_30_26__todopt2.txt",
-        "7-19_qdrantgpu_hnsw_ivfft_bm25_bm42_mcp_toolcalling_hmm.txt",
-        "724mcp_toolsList_analysis_.txt",
-        "7_10_26_pt_gpu_topologyacceleration.txt",
-        "7_10_26_todopt2.txt",
-        "7_11_26_todopt2.txt",
-        "7_11_to_do_pt1.txt",
-        "7_12_26__todownload.txt",
-        "7_13_26_todopt3.txt",
-        "7_13_26__todopt1.txt",
-        "7_13_26__todo_pt2.txt",
-        "7_14_26.txt"
+        ".parent-atlas/skills/semantic-search/SKILL.md"
       ],
-      "qualifyingReports": [
-        "docs/reports/gpu-knn-cagra-runtime-proof.md",
-        "docs/reports/gpu-mini-fabric-01-graph-ann-01.json",
-        "docs/reports/parent-atlas-cuvs-agentic-alignment-2026-07-26.md",
-        "docs/reports/retrieval-01l-08a-cohort-audit-v1.json",
-        "docs/reports/runtime-capability-registry-v1.json",
-        "docs/reports/staging/openspec-file-kmeans-v1.json",
-        "docs/reports/tensor-residency-gate-t2-t3-proof-2026-08-23.json",
-        "docs/reports/tensor-residency-gate-t4-proof-2026-08-23.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": null
     },
     {
@@ -1106,11 +890,7 @@
         "docs/reports/ast-source-parity-worktree-v1.json",
         "docs/reports/atlas-domain-topology-alignment-v1.md",
         "docs/reports/concept-fabric-glossary-links-v1.json",
-        "docs/reports/current-execution-source-refs-plan-v1.json",
-        "docs/reports/embedding-eligibility-mismatch-02-v1.json",
-        "docs/reports/embedding-runtime-cutover-audit-v1.json",
-        "docs/reports/external-doc-observation-parity-v1.json",
-        "docs/reports/feature-tracking-parity-audit.json"
+        "docs/reports/current-execution-source-refs-plan-v1.json"
       ],
       "runtimeGate": null
     },
@@ -1163,16 +943,7 @@
         ".okf/pipelines/ast-entity-prefill.yaml"
       ],
       "qualifyingReports": [
-        "docs/reports/atlas-indexing-surfaces-v1.json",
-        "docs/reports/drizzle-postgres-contract-report.md",
-        "docs/reports/graphify-ast-scope-active-app-v1.json",
-        "docs/reports/graphify-ast-scope-active-v2.json",
-        "docs/reports/metadata-contract-cross-store-audit.json",
-        "docs/reports/migration-inventory-classification-v1.json",
-        "docs/reports/ollama-generation-callers-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json",
-        "docs/reports/parent-atlas-feature-command-atlas.json",
-        "docs/reports/pipeline-router-matrix-surfaces-v1.json"
+        "docs/reports/atlas-indexing-surfaces-v1.json"
       ],
       "runtimeGate": null
     },
@@ -1227,14 +998,7 @@
       "qualifyingReports": [
         "docs/reports/atlas-domain-topology-alignment-v1.md",
         "docs/reports/atlas-migration-owner-audit-v1.json",
-        "docs/reports/concept-vocabulary-authority-01.json",
-        "docs/reports/critical-lineage-migration-dispositions-v1.json",
-        "docs/reports/domain-classifier-implementation-audit.md",
-        "docs/reports/domain-classifier-parity-review-v1.json",
-        "docs/reports/domain-ontology-taxonomy-proof-v1.json",
-        "docs/reports/drizzle-postgres-contract-report.md",
-        "docs/reports/graphify-ast-scope-active-app-v1.json",
-        "docs/reports/graphify-ast-scope-active-v2.json"
+        "docs/reports/concept-vocabulary-authority-01.json"
       ],
       "runtimeGate": null
     },
@@ -1286,12 +1050,7 @@
         ".python311/include/python3.11/pyconfig.h"
       ],
       "qualifyingReports": [
-        "docs/reports/current-graphify-source-bridge-reconciliation-v1.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json",
-        "docs/reports/openspec-actionable-lane-audit-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json",
-        "docs/reports/staging/openspec-actionable-work-v1.json",
-        "docs/reports/staging/openspec-file-kmeans-v1.json"
+        "docs/reports/current-graphify-source-bridge-reconciliation-v1.json"
       ],
       "runtimeGate": null
     },
@@ -1314,37 +1073,9 @@
         ".claude/skills/codebase-mapping-json-ingestion.md",
         ".codex/skills/parent-atlas-openspec-progress/SKILL.md",
         ".couchdb-state-report-2026-05-29.md",
-        ".gitignore",
-        "6_20_26__todo_.txt",
-        "9_7_26_todopt3.txt",
-        "atlas-openspec-awareness-v2/package-scripts-snippet.json",
-        "atlas-openspec-awareness-v2/README.md",
-        "atlas-openspec-awareness-v2/scripts/atlas/audit-atlas-runtime-readiness-v1.mjs",
-        "atlas-openspec-awareness-v2/scripts/atlas/audit-openspec-directory-graph-v1.mjs",
-        "atlas-openspec-awareness-v2/scripts/atlas/audit-openspec-progress-v2.mjs",
-        "atlas-openspec-awareness-v2/scripts/atlas/cluster-openspec-file-graph-v1.py",
-        "atlas-openspec-awareness-v2/scripts/atlas/lib/import-graph.mjs",
-        "atlas-openspec-awareness-v2/scripts/atlas/run-openspec-awareness-audit-v1.mjs",
-        "atlas-openspec-awareness-v2/skills/parent-atlas-openspec-progress/SKILL.md",
-        "atlas-openspec-awareness-v2/src/lib/components/atlas/OpenSpecAwarenessPanel.svelte",
-        "atlas-openspec-awareness-v2/src/lib/server/atlas/openspec-board/awareness.ts",
-        "atlas-openspec-awareness-v2/src/lib/server/atlas/openspec-board/report-reader.ts",
-        "atlas-openspec-awareness-v2/tests/test-awareness-v2.mjs",
-        "atlas_trees_615_26.txt",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.claude/skills/codebase-mapping-json-ingestion.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.couchdb-state-report-2026-05-29.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/architecture/subgraph-instruction-programming-kag-ace-topology.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/audit/session-69-p3-p1-closure-audit-2026-06-23.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/graph/repo-env-map.json",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/feature-registry.json",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/memory/agent-runs/current-corpus-promotion-preflight.json",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/memory/knowledge/document-knowledge-report.json",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/memory/knowledge/document-knowledge-report.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/opencode.backup.json"
+        ".gitignore"
       ],
-      "qualifyingReports": [
-        "docs/reports/staging/openspec-file-kmeans-v1.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": "DIRECTORY_GRAPH_AUDIT_PRESENT"
     },
     {
@@ -1374,38 +1105,11 @@
         ".okf/indexes/code-exploration.yaml",
         ".okf/indexes/parent-atlas-code-explore.yaml",
         ".okf/pipelines/ast-entity-prefill.yaml",
-        ".opencode/startup-briefing.json",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/centrality/trophic.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/coloring/greedy_coloring.py",
-        ".venv-cu130/Lib/site-packages/networkx/convert_matrix.py",
-        ".venv-cu130/Lib/site-packages/networkx/generators/joint_degree_seq.py",
-        ".venv-cu130/Lib/site-packages/networkx/readwrite/gexf.py",
-        ".venv-cu130/Lib/site-packages/networkx/readwrite/gml.py",
-        ".venv-cu130/Lib/site-packages/networkx/readwrite/graphml.py",
-        ".venv-cu130/Lib/site-packages/torch/ao/ns/fx/n_shadows_utils.py",
-        ".venv-cu130/Lib/site-packages/torch/ao/quantization/fx/convert.py",
-        ".venv-cu130/Lib/site-packages/torch/autograd/profiler.py",
-        ".venv-cu130/Lib/site-packages/torch/autograd/profiler_legacy.py",
-        ".venv-cu130/Lib/site-packages/torch/autograd/profiler_util.py",
-        ".venv-cu130/Lib/site-packages/torch/backends/xeon/run_cpu.py",
-        ".venv-cu130/Lib/site-packages/torch/cuda/graphs.py",
-        ".venv-cu130/Lib/site-packages/torch/cuda/_annotate_cuda_graph_trace.py",
-        ".venv-cu130/Lib/site-packages/torch/cuda/_graph_annotations.py",
-        ".venv-cu130/Lib/site-packages/torch/distributed/pipelining/_IR.py",
-        ".venv-cu130/Lib/site-packages/torch/distributed/rpc/__init__.py",
-        ".venv-cu130/Lib/site-packages/torch/export/exported_program.py"
+        ".opencode/startup-briefing.json"
       ],
       "qualifyingReports": [
         "docs/reports/ast-sidecar-capability-proof.json",
-        "docs/reports/ast-sidecar-capability-proof.md",
-        "docs/reports/gpu-runtime-ownership-proof.json",
-        "docs/reports/graphify-ast-scope-active-app-v1.json",
-        "docs/reports/graphify-ast-scope-active-v2.json",
-        "docs/reports/inference-source-audit.json",
-        "docs/reports/kanban-turbovec-consolidation-latest.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json",
-        "docs/reports/openspec-actionable-lane-audit-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json"
+        "docs/reports/ast-sidecar-capability-proof.md"
       ],
       "runtimeGate": null
     },
@@ -1458,15 +1162,7 @@
       ],
       "qualifyingReports": [
         "docs/reports/ast-sidecar-capability-proof.json",
-        "docs/reports/atlas-indexing-surfaces-v1.json",
-        "docs/reports/current-structural-edge-artifact-plan-v1.json",
-        "docs/reports/graphify-ast-scope-active-app-v1.json",
-        "docs/reports/graphify-ast-scope-active-v2.json",
-        "docs/reports/mcp-tool-manifest-packets.json",
-        "docs/reports/migration-inventory-classification-v1.json",
-        "docs/reports/ollama-generation-callers-v2.json",
-        "docs/reports/parent-atlas-cuvs-agentic-alignment-2026-07-26.md",
-        "docs/reports/sessions/AUDIT_COMPILATION_COMPLETE.md"
+        "docs/reports/atlas-indexing-surfaces-v1.json"
       ],
       "runtimeGate": null
     },
@@ -1483,7 +1179,7 @@
         "nodes",
         "relationships"
       ],
-      "state": "PROVEN",
+      "state": "WAITING",
       "matchingFiles": [
         "--since 2h",
         ".claude/agents/obsidian-cartographer.md",
@@ -1516,16 +1212,7 @@
         ".okf/languages/typescript.yaml",
         ".okf/manifest.yaml"
       ],
-      "qualifyingReports": [
-        "docs/reports/critical-lineage-migration-dispositions-v1.json",
-        "docs/reports/live-source-lineage-table-audit-20260827.json",
-        "docs/reports/live-source-lineage-table-audit.json",
-        "docs/reports/migration-inventory-classification-v1.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json",
-        "docs/reports/openspec-actionable-lane-audit-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json",
-        "docs/reports/staging/openspec-actionable-work-v1.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": null
     },
     {
@@ -1548,43 +1235,10 @@
         ".okf/indexes/feature-intelligence.yaml",
         ".okf/manifest.yaml",
         ".parent-atlas/skills/graph-evidence/SKILL.md",
-        ".pytest_cache/v/cache/nodeids",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/clique.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/clustering_coefficient.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/connectivity.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/density.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/distance_measures.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/dominating_set.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/kcomponents.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/matching.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/maxcut.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/ramsey.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/steinertree.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_approx_clust_coeff.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_clique.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_connectivity.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_density.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_distance_measures.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_dominating_set.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_kcomponents.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_matching.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_maxcut.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_ramsey.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_steinertree.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_traveling_salesman.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/approximation/tests/test_treewidth.py"
+        ".pytest_cache/v/cache/nodeids"
       ],
       "qualifyingReports": [
-        "docs/reports/atlas-tools-parent-atlas-integration-audit-v1.json",
-        "docs/reports/critical-lineage-migration-dispositions-v1.json",
-        "docs/reports/execution-receipt-grounded-readonly-dag-v1.json",
-        "docs/reports/grounded-kernel-dag-admission-v1.json",
-        "docs/reports/kernel-bound-dag-executor-v1.json",
-        "docs/reports/kernel-bound-dag-integration-readiness-v2.json",
-        "docs/reports/kernel-dag-validator-v1.json",
-        "docs/reports/migration-inventory-classification-v1.json",
-        "docs/reports/mutation-authorization-surface-audit-v1.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json"
+        "docs/reports/atlas-tools-parent-atlas-integration-audit-v1.json"
       ],
       "runtimeGate": null
     },
@@ -1639,13 +1293,7 @@
         "docs/reports/atlas-feature-intelligence-database-fixture-proof-v1.json",
         "docs/reports/atlas-migration-owner-audit-v1.json",
         "docs/reports/critical-lineage-live-readback-v1.json",
-        "docs/reports/critical-lineage-migration-dispositions-v1.json",
-        "docs/reports/current-graphify-source-bridge-reconciliation-v1.json",
-        "docs/reports/current-source-grounding-reconcile-v2.json",
-        "docs/reports/feature-ontology-alias-target-registry-apply-v1.json",
-        "docs/reports/full-corpus-graphify-inventory-apply-v1.json",
-        "docs/reports/graphify-daily-workflow-receipt.json",
-        "docs/reports/graphify-execution-run-bridge-apply-v1.json"
+        "docs/reports/current-graphify-source-bridge-reconciliation-v1.json"
       ],
       "runtimeGate": null
     },
@@ -1662,7 +1310,7 @@
         "cluster",
         "challenger"
       ],
-      "state": "PROVEN",
+      "state": "WAITING",
       "matchingFiles": [
         ".claude/ATLAS-ENGINEERING-PROMPT.md",
         ".claude/RETRIEVAL-20-STEP-TODO.md",
@@ -1672,40 +1320,9 @@
         ".okf/indexes/feature-intelligence.yaml",
         ".okf/tools/ml-ranking-sidecar.md",
         ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/evidence/CaseEvidenceOrganizer.svelte",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/bits/HybridLegalAnalysis3D.svelte",
-        ".venv-cu130/Lib/site-packages/PIL/Image.py",
-        ".vscode/tasks.json",
-        ".vscode/tasks.json.bak",
-        ".vscode/tasks.json.bak-2026-06-28T22-49-58-665Z",
-        ".vscode/tasks.json.fixed",
-        ".vscode/tsc-errors-grouped.json",
-        "624_26__todo.txt",
-        "625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard.txt",
-        "6_13_26_todo.txt",
-        "6_14_26__to_do_parent_atlas_registery.txt",
-        "6_18_todo_pt3.txt",
-        "6_19_todo_pt1.txt",
-        "6_23_26__todo.txt",
-        "6_24_26__test.txt",
-        "6_25_26_manifold_truth.txt",
-        "6_29_26__debugging_gpu.txt",
-        "6_29_pt3todo.txt",
-        "6_30_26__todopt2.txt",
-        "6_3_phase_14_15_batchsummaries.txt",
-        "7-19_qdrantgpu_hnsw_ivfft_bm25_bm42_mcp_toolcalling_hmm.txt",
-        "7_10_26_pt_gpu_topologyacceleration.txt"
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/bits/HybridLegalAnalysis3D.svelte"
       ],
-      "qualifyingReports": [
-        "docs/reports/docker-storage-retention-v1.json",
-        "docs/reports/ollama-generation-callers-v2.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json",
-        "docs/reports/openspec-actionable-lane-audit-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json",
-        "docs/reports/openspec-topic-clusters-v1.json",
-        "docs/reports/qdrant-collection-roles-v1.json",
-        "docs/reports/staging/openspec-actionable-work-v1.json",
-        "docs/reports/staging/openspec-file-kmeans-v1.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": null
     },
     {
@@ -1722,7 +1339,7 @@
         "neighborhood",
         "20"
       ],
-      "state": "PROVEN",
+      "state": "WAITING",
       "matchingFiles": [
         "--since 2h",
         ".cache/LLMS.md",
@@ -1755,10 +1372,7 @@
         ".cline/skills/openspec-explore/SKILL.md",
         ".cline/skills/openspec-sync-specs/SKILL.md"
       ],
-      "qualifyingReports": [
-        "docs/reports/P4-P7-READINESS-AUDIT.md",
-        "docs/reports/parent-atlas-cuvs-agentic-alignment-2026-07-26.md"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": null
     },
     {
@@ -1812,12 +1426,7 @@
       ],
       "qualifyingReports": [
         "docs/reports/atlas-domain-topology-alignment-v1.md",
-        "docs/reports/claude-md-parent-atlas-deep-audit-2026-08-30.md",
-        "docs/reports/openspec-actionable-work-v1.json",
-        "docs/reports/parent-atlas-convergence-blockers-2026-08-30.md",
-        "docs/reports/parent-atlas-cuvs-agentic-alignment-2026-07-26.md",
-        "docs/reports/semantic-representation-storage-audit-v1.json",
-        "docs/reports/staging/openspec-actionable-work-v1.json"
+        "docs/reports/claude-md-parent-atlas-deep-audit-2026-08-30.md"
       ],
       "runtimeGate": null
     },
@@ -1850,35 +1459,10 @@
         ".python311/lib/python3.11/sunau.py",
         ".python311/lib/python3.11/turtledemo/forest.py",
         ".python311/lib/python3.11/wave.py",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/three/yorha-ui/YoRHaAAShaderCache.svelte",
-        ".venv-cu130/Lib/site-packages/fsspec/parquet.py",
-        ".venv-cu130/Lib/site-packages/mpmath/calculus/approximation.py",
-        ".venv-cu130/Lib/site-packages/mpmath/calculus/extrapolation.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/centrality/betweenness.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/chains.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/connectivity/edge_augmentation.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/connectivity/tests/test_edge_augmentation.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/dag.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/flow/boykovkolmogorov.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/polynomials.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/shortest_paths/weighted.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/tree/branchings.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/tree/distance_measures.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/tree/mst.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/tree/recognition.py",
-        ".venv-cu130/Lib/site-packages/networkx/algorithms/tree/tests/test_recognition.py"
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/three/yorha-ui/YoRHaAAShaderCache.svelte"
       ],
       "qualifyingReports": [
-        "docs/reports/ast-structural-conflicts-v1.json",
-        "docs/reports/audit-summary-report.md",
-        "docs/reports/doc-feature-crosswalk-2026-06-01.json",
-        "docs/reports/domain-classification-readiness-audit.json",
-        "docs/reports/domain-classification-readiness-audit.md",
-        "docs/reports/graphify-ast-scope-active-app-v1.json",
-        "docs/reports/graphify-ast-scope-active-v2.json",
-        "docs/reports/graphify-daily-workflow-receipt.json",
-        "docs/reports/mcp-tool-manifest-packets.json",
-        "docs/reports/metadata-contract-cross-store-audit.json"
+        "docs/reports/audit-summary-report.md"
       ],
       "runtimeGate": null
     },
@@ -1931,15 +1515,7 @@
       ],
       "qualifyingReports": [
         "docs/reports/ast-digest-divergence-v1.json",
-        "docs/reports/ast-structural-conflicts-v1.json",
-        "docs/reports/candidate-feature-gpu-lease-owner-v1.json",
-        "docs/reports/embedding-eligibility-mismatch-02-v1.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json",
-        "docs/reports/openspec-actionable-lane-audit-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json",
-        "docs/reports/openspec-tasks-md-audit-v1.json",
-        "docs/reports/openspec-topic-clusters-v1.json",
-        "docs/reports/parent-atlas-object-storage-owner-v1.json"
+        "docs/reports/candidate-feature-gpu-lease-owner-v1.json"
       ],
       "runtimeGate": null
     },
@@ -1992,13 +1568,7 @@
         ".clinerules/10-architecture.md"
       ],
       "qualifyingReports": [
-        "docs/reports/centroid-cache-families-v1.json",
-        "docs/reports/migration-inventory-classification-v1.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json",
-        "docs/reports/openspec-actionable-lane-audit-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json",
-        "docs/reports/session-140-ace-module-audit.md",
-        "docs/reports/staging/openspec-actionable-work-v1.json"
+        "docs/reports/centroid-cache-families-v1.json"
       ],
       "runtimeGate": "VALKEY_CENTROID_CACHE_PROVEN"
     },
@@ -2117,42 +1687,8 @@
         "atlas.context-manifest.v1"
       ],
       "state": "PROVEN",
-      "matchingFiles": [
-        "9_8_26_todopt1.txt",
-        "atlas-openspec-awareness-v2/scripts/atlas/audit-atlas-runtime-readiness-v1.mjs",
-        "atlas-openspec-awareness-v2/src/lib/server/atlas/openspec-board/ace-prefill-readiness.ts",
-        "atlas-openspec-awareness-v2/tests/test-awareness-v2.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-agentic-file-compiler/proposal.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/dir-index-00-ownership-audit.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-document-governance-master-index/design.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-memory-architecture-freeze/proposal.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/packages/parent-atlas/src/core/kernel-operator-library-symbol-repair-v0.ts",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/packages/parent-atlas/src/core/oak-context-manifest-owner-v1.ts",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/packages/parent-atlas/src/index.ts",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/audit-dag-parameter-executor-consumers-v1.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/audit-parent-atlas-gpu-ace-ornith-readiness-v1.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/audit-qas-owner.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/execute-grounded-readonly-dag-v1.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/plan-okf-agentic-context-v1.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/prove-ace-context-cache-replay-v1.mts",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/prove-ace-live-dry-v2.mts",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/prove-gpu-feature-ace-context-manifest-replay-v1.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/prove-grounded-kernel-dag-admission-v1.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/prove-ornith-external-evidence-synthesis-replay-v1.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/prove-parent-atlas-context-manifest-v1.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/prove-parent-atlas-dag-runtime-v1.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/prove-parent-atlas-golden-retrieval-v1.mjs",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/scripts/atlas/prove-parent-atlas-workstation-v1.mjs"
-      ],
-      "qualifyingReports": [
-        "docs/reports/parent-atlas-context-manifest-v1.json",
-        "docs/reports/parent-atlas-golden-retrieval-v1.json"
-      ],
+      "matchingFiles": [],
+      "qualifyingReports": [],
       "runtimeGate": "CONTEXT_MANIFEST_CONTRACT_PRESENT"
     },
     {
@@ -2170,7 +1706,7 @@
         "prefix",
         "cache hit"
       ],
-      "state": "PROVEN",
+      "state": "PRESENT_CONTRACT",
       "matchingFiles": [
         ".claude/ATLAS-ENGINEERING-PROMPT.md",
         ".claude/settings.json",
@@ -2203,13 +1739,7 @@
         ".python311/lib/python3.11/site-packages/pip/_vendor/certifi/cacert.pem",
         ".python311/lib/python3.11/site-packages/pip/_vendor/chardet/euctwfreq.py"
       ],
-      "qualifyingReports": [
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json",
-        "docs/reports/openspec-actionable-lane-audit-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json",
-        "docs/reports/sessions/CODEBASE_MAP.md",
-        "docs/reports/staging/openspec-actionable-work-v1.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": null
     },
     {
@@ -2259,15 +1789,7 @@
         ".opencode/outcome-ledger.ndjson",
         ".opencode/skills/metadata-context-analysis/SKILL.md"
       ],
-      "qualifyingReports": [
-        "docs/reports/okf-agentic-context-plan-v1.json",
-        "docs/reports/openspec-actionable-lane-audit-v2-recheck.json",
-        "docs/reports/openspec-actionable-lane-audit-v2.json",
-        "docs/reports/openspec-actionable-work-v1.json",
-        "docs/reports/ornith-external-evidence-synthesis-replay-v1.json",
-        "docs/reports/parent-atlas-golden-retrieval-v1.json",
-        "docs/reports/staging/openspec-actionable-work-v1.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": "PREFILL_SYNTHESIS_READY"
     },
     {
@@ -2310,16 +1832,9 @@
         ".python311/lib/tk8.6/demos/widget",
         ".python311/lib/tk8.6/icons.tcl",
         ".python311/lib/tk8.6/tkfbox.tcl",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/webgpu/WebGPUWebAssemblyBridge.svelte",
-        ".venv-cu130/Lib/site-packages/networkx-3.6.1.dist-info/RECORD",
-        ".venv-cu130/Lib/site-packages/numpy/lib/_function_base_impl.py",
-        ".venv-cu130/Lib/site-packages/numpy-2.4.4.dist-info/RECORD",
-        ".venv-cu130/Lib/site-packages/packaging/licenses/_spdx.py"
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/webgpu/WebGPUWebAssemblyBridge.svelte"
       ],
-      "qualifyingReports": [
-        "docs/reports/llama-server-template-override-fix.md",
-        "docs/reports/migration-inventory-classification-v1.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": "ACP_ADAPTER_PROVEN"
     },
     {
@@ -2368,10 +1883,7 @@
         ".python311/lib/tcl8.6/encoding/shiftjis.enc",
         ".python311/lib/tk8.6/images/logo.eps"
       ],
-      "qualifyingReports": [
-        "docs/reports/llama-server-template-override-fix.md",
-        "docs/reports/migration-inventory-classification-v1.json"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": "A2A_ADAPTER_PROVEN"
     },
     {
@@ -2398,28 +1910,7 @@
         ".gitignore",
         ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/gpu/GPUAcceleratedLegalSearch.svelte",
         ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/legal/EvidenceCustodyFlow.svelte",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/legal/WorkflowProgress.svelte",
-        ".vscode/tasks.json",
-        ".vscode/tasks.json.bak-2026-06-28T22-49-58-665Z",
-        "720_embeddinggemma_2026_768_512_256_128.txt",
-        "724mcp_toolsList_analysis_.txt",
-        "7_10_26.txt",
-        "7_10_26_todopt2.txt",
-        "7_12_26__todownload.txt",
-        "7_23_26_todo_pt1.txt",
-        "7_23_26__todo_rag_new_ideass.txt",
-        "7_24_26_todo_enhance_recommendations_firecrawl.txt",
-        "7_25_26__todo.txt",
-        "7_28_jsonpacket.txt",
-        "7_30-26__.txt",
-        "7_9_26.txt",
-        "824_26.txt",
-        "8_12_26_todo.txt",
-        "8_21_todo.txt",
-        "8_2_26__todo.txt",
-        "8_31_26_-todo.txt",
-        "8_4_188.txt",
-        "91926_opensepcboard_admin_page_ssr_needed.txt"
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/legal/WorkflowProgress.svelte"
       ],
       "qualifyingReports": [],
       "runtimeGate": "HUMAN_DECISION_RECEIPTS_PROVEN"
@@ -2497,41 +1988,10 @@
         ".github/agents/import-audit-engineer.agent.md",
         ".okf/languages/typescript.yaml",
         ".okf/systems/deep-research.md",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/layout/EnhancedLayout.svelte",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/admin/users/+page.svelte",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/agent-demo/+page.svelte",
-        ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/agent-demo/page-backup.svelte",
-        ".vscode/tsc-errors-grouped.json",
-        "artifacts/DEEP-AUDIT-PHASE-2-SUMMARY.md",
-        "atlas-openspec-awareness-v2/README.md",
-        "atlas-openspec-awareness-v2/src/lib/components/atlas/OpenSpecAwarenessPanel.svelte",
-        "atlas-openspec-awareness-v2/src/routes/atlas/studio/openspec/+page.server.ts",
-        "atlas-openspec-awareness-v2/src/routes/atlas/studio/openspec/+page.svelte",
-        "atlas-openspec-awareness-v2/src/routes/atlas/studio/openspec/events/+server.ts",
-        "benchmarks/retrieval-100.jsonl",
-        "claude.md",
-        "CODEBASE-SEMANTIC-INTELLIGENCE-GAPS.md",
-        "data/external-docs/chunks/sveltekit.jsonl",
-        "data/external-docs/normalized/sveltekit/form-actions.md",
-        "data/external-docs/normalized/sveltekit/load.md",
-        "data/external-docs/normalized/sveltekit/routing.md",
-        "data/external-docs/raw/sveltekit/form-actions.md",
-        "data/external-docs/raw/sveltekit/load.md",
-        "data/external-docs/raw/sveltekit/routing.md",
-        "deeds_labs/archive/2026-08-09/codebase-map.md.stale.bak",
-        "deeds_labs/archive/2026-08-22/orphaned-root-src-tree/src/lib/server/retrieval/unified-orchestrator.ts"
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/layout/EnhancedLayout.svelte"
       ],
       "qualifyingReports": [
-        "docs/reports/atlas-feature-recommendation-index.json",
-        "docs/reports/doc-feature-crosswalk-2026-06-01.json",
-        "docs/reports/graphify-ast-scope-active-app-v1.json",
-        "docs/reports/graphify-ast-scope-active-v2.json",
-        "docs/reports/JSONB-GIN-INDEXING-AUDIT-2026-08-02.md",
-        "docs/reports/kanban-turbovec-consolidation-latest.json",
-        "docs/reports/lexical-pass-writer-v1.json",
-        "docs/reports/missing-features-review-latest.json",
-        "docs/reports/oak-task-function-compiler-readiness-v1.json",
-        "docs/reports/qdrant-reader-shadow-01-results.json"
+        "docs/reports/atlas-feature-recommendation-index.json"
       ],
       "runtimeGate": null
     },
@@ -2552,46 +2012,19 @@
       "matchingFiles": [
         ".claude/agents/drizzle-inspector.md",
         ".claude/ATLAS-ENGINEERING-PROMPT.md",
-        ".cline/schema-reconciliation-investigation-prompt.md",
-        "625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard.txt",
-        "6_25_26_manifold_truth.txt",
-        "6_27_26_todo_pt2.txt",
-        "7_10_26.txt",
-        "7_25_26__ug_ly.txt",
-        "7_29_mastra_agent_model_query_gpt.txt",
-        "7_30-26__.txt",
-        "ARCHITECTURE_SPEC.md",
-        "atlas-openspec-awareness-v2/src/lib/server/db/atlas-openspec-board-schema.ts",
-        "copilot.md",
-        "deeds_labs/archive/2026-08-01/lib-server-mcp-server.ts.bak",
-        "deeds_labs/archive/2026-08-11/server_mcp_todo.ts.20260731-154126.disabled.bak",
-        "deeds_labs/archive/2026-08-22/orphaned-root-src-tree/src/lib/schema/llm-stuck-events.ts",
-        "deeds_labs/archive/2026-08-22/orphaned-root-src-tree/src/lib/server/db/schema/agent-memory.ts",
-        "deeds_labs/archive/2026-08-22/orphaned-root-src-tree/src/lib/server/db/schema/synthesis-logs.ts",
-        "deeds_labs/archive/2026-08-22/orphaned-root-src-tree/src/lib/server/db/schema-engram.ts",
-        "deeds_labs/archive/2026-08-22/orphaned-root-src-tree/src/lib/server/db/schema.ts",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.claude/agents/drizzle-inspector.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.claude/ATLAS-ENGINEERING-PROMPT.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/.cline/schema-reconciliation-investigation-prompt.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/ARCHITECTURE_SPEC.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/copilot.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/atlas/glyph-training.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/DEEP-RESEARCH-OPTION-B-MINIMAL-SWAP.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/devtools_rg.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/FEATURE-ALIGNMENT-SPECIFICATION.md",
-        "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2/docs/PHASE-108D-EXTENDED-IMPLEMENTATION-PLAN.md"
+        ".cline/schema-reconciliation-investigation-prompt.md"
       ],
       "qualifyingReports": [
         "docs/reports/ast-digest-divergence-v1.json",
         "docs/reports/ast-source-parity-disposition-v1.json",
         "docs/reports/ast-source-parity-worktree-v1.json",
-        "docs/reports/ast-structural-conflicts-v1.json",
         "docs/reports/atlas-domain-topology-alignment-v1.md",
         "docs/reports/atlas-feature-intelligence-database-fixture-proof-v1.json",
         "docs/reports/atlas-feature-intelligence-database-proof-v4.json",
         "docs/reports/atlas-gemma-rank-checkpoint-inventory-donor-b-v1.json",
         "docs/reports/bitfrost-sim-01-residency-gate.json",
-        "docs/reports/candidate-feature-gemm-current-proof-v1.json"
+        "docs/reports/candidate-feature-gemm-current-proof-v1.json",
+        "docs/reports/candidate-feature-gpu-aten-parity-live-20260911.json"
       ],
       "runtimeGate": null
     },
@@ -2610,7 +2043,7 @@
         "glyph",
         "sprite"
       ],
-      "state": "PROVEN",
+      "state": "WAITING",
       "matchingFiles": [
         "--since 2h",
         ".cache/archive_safetensors.ps1",
@@ -2643,11 +2076,7 @@
         ".claude/skills/atlas-tools-mcp/SKILL.md",
         ".claude/skills/bits-ui-svelte5/SKILL.md"
       ],
-      "qualifyingReports": [
-        "docs/reports/graphify-ast-scope-active-app-v1.json",
-        "docs/reports/graphify-ast-scope-active-v2.json",
-        "docs/reports/offline-vector-artifacts-report.md"
-      ],
+      "qualifyingReports": [],
       "runtimeGate": null
     },
     {
@@ -2701,15 +2130,16 @@
       "runtimeGate": null
     }
   ],
-  "generatedAt": "2026-09-20T08:41:54.759Z",
+  "generatedAt": "2026-09-20T23:48:20.769Z",
   "policy": "READ_ONLY_CAPABILITY_CENSUS_NO_AUTHORITY_MUTATION",
-  "semanticChecksum": "6a1ede5af309df009e12a479588dac972fee93c9413a51155cecbd9af5eba024",
+  "semanticChecksum": "e4d49b251316c0c143179c9c5e126b400c92fa2f1b89a1f84fdea72870c6073b",
   "writesPerformed": false,
   "notes": [
     "PRESENT_CONTRACT is not live proof.",
     "scanTruncated=true means the file inventory reached maxFiles and is not exhaustive.",
     "KMeans/SOM/manifold/visual encodings are advisory challengers only.",
     "Parent Atlas ACE residency and cuVS CAGRA ACE (Augmented Core Extraction) are separate concepts and must use distinct identifiers.",
-    "Only controller/receipt evidence may change task eligibility or promotion state."
+    "Only controller/receipt evidence may change task eligibility or promotion state.",
+    "Source inventory is bounded at 5000 files; report evidence is bounded at 500 files."
   ]
 }

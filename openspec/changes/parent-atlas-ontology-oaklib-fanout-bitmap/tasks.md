@@ -129,17 +129,16 @@
       an earlier same-day attempt to run this script was denied by the session's own auto-mode
       permission classifier as a "Modify Shared Resources" action — re-authorized and re-run
       successfully this turn, not bypassed.)
-- [ ] 3.4 **Reframed per the 3.1 finding above.** There is no live extractor write path to hook
-      into today. The correct Phase 2 deliverable is a reusable annotation helper —
-      `annotateFeatureOntologyTupleWithResolutionV1()` — that calls the Phase 1 resolver
-      (`resolveOntologyLabelV1`) on a candidate tuple's `object_id`/label and returns the
-      `resolved_concept_id`/`resolution_state` values ready to include in an INSERT, for
-      whichever producer runs next (most plausibly `atlas-current-source-ontology-v2` once
-      built, per the regeneration plan). Not yet implemented — depends on 3.3's authorization
-      (the columns must exist before the helper's output has anywhere real to land), and on
-      deciding whether to build it now (dormant, like `OntologyLinkedTupleV1` before it) or wait
-      until a concrete new producer is being written. Flagging both options rather than
-      guessing which the operator wants.
+- [x] 3.4 **Read-only annotation bridge implemented (2026-09-23).** The existing
+      `ontology-resolution-boundary-postgres.ts` owner now exports
+      `annotateFeatureOntologyTupleWithResolutionV1()`: it chooses an existing tuple label or
+      `objectId`, calls the Phase 1 resolver, and returns `resolvedConceptId` plus the bounded
+      `resolutionState`/ontology revision/match method for a future caller-owned INSERT. Blank,
+      ambiguous, unresolved, and unavailable results never receive a concept ID. Packet/source
+      fields are passthrough-only; this helper performs no INSERT, update, promotion, or identity
+      minting. The existing resolver spec now covers these adapter cases; focused Vitest is 9/9,
+      and targeted SvelteKit check reports 0 errors/2 warnings. No live extractor producer is
+      wired yet; that is not claimed here.
 - [ ] 3.5 Record a receipt (counts: total rows, newly-resolved rows, resolution-attempt failure
       rate) after the first live batch of new writes — read-only verification, not a promotion
       claim. Blocked on 3.3/3.4; no new writes exist yet to measure.
@@ -193,20 +192,77 @@
 
 ## 5. Cleanup (Duplication Prevention)
 
-- [ ] 5.1 Draft an archival plan (per this repo's archive-not-delete convention, with a
+- [x] 5.1 Draft an archival plan (per this repo's archive-not-delete convention, with a
       manifest entry) for the six empty ontology-shaped tables identified in task 1.6 — archive
       only, never delete, and only after confirming zero live callers via the same
-      caller-check discipline used elsewhere in this repo's audits.
+      caller-check discipline used elsewhere in this repo's audits. **Draft only — no archive
+      manifest entry written, no table touched.** Re-ran the caller check per-table (grep across
+      `sveltekit-frontend/src`, `sveltekit-frontend/scripts`, `scripts`, `python`, plus live row
+      counts) rather than reusing the original six-table list unchanged, and it changed the
+      outcome for 3 of the 6:
+      - **EXCLUDE, confirmed live callers (do not archive)**: `atlas_ontology_concepts`,
+        `atlas_ontology_relations` — read by the live, healthy `miniforge-nlp-sidecar` OAK
+        kernel's `AtlasPostgresOntologyAdapter` (task 7.1 finding, `curl :8095/oak/health`
+        confirmed live). `concept_records` — has a genuine production writer,
+        `src/lib/server/telemetry/retrieval-recorder.ts` (`UPDATE concept_records ...`), plus a
+        real Drizzle schema (`src/lib/server/db/schema/concept-records.ts`); still 0 rows live
+        (verified via `docker exec legal-ai-postgres psql ... count(*)`), meaning the writer
+        exists and is wired but its call path apparently never fires in current traffic — that
+        is a live-code question for whoever owns `retrieval-recorder.ts`, not an archival
+        candidate.
+      - **ARCHIVE-CANDIDATE, best confidence**: `atlas_ontology_tuples` — every repo-wide match
+        is a code comment/docstring reference (`atlas-knowledge-envelope.ts`,
+        `ontology-fanout-authority-v1.ts`), zero real SQL read/write against it found; 0 rows
+        live.
+      - **UNCLEAR, needs a deeper per-table pass before archiving (not resolved here)**:
+        `atlas_concepts` — has a real writer (`scripts/atlas/phase-8a-concept-extraction.mts`,
+        creates the table + `INSERT`s) and a verifier (`verify-used-concept-edges.mjs`), neither
+        referenced by any `npm run` script in either `package.json` — likely dormant but not
+        confirmed dead by this pass. `registry_ontology_tuples` — has a real writer
+        (`scripts/atlas/materialize-registry-ontology-tuples.mts`), same unresolved
+        wired-elsewhere-or-dead question. Both 0 rows live.
+      **Conclusion**: the archival plan this task asked for narrows to exactly ONE confident
+      candidate (`atlas_ontology_tuples`) plus two that need one more verification pass before
+      a plan could safely include them. Writing a manifest entry now would have been premature
+      for 5 of the 6 original candidates — recording the corrected classification here instead
+      of drafting a plan against the stale six-table list.
 
 ## 6. Verification
 
 - [ ] 6.1 Re-run this change's own capability scenarios (specs/ontology-resolution-boundary,
       specs/ontology-fanout-storage) as real tests, not just design-time checklist items.
-- [ ] 6.2 Confirm no existing consumer of `feature_ontology_tuples` broke (additive-only schema
-      change, so this should be a no-op check, but verify rather than assume).
-- [ ] 6.3 Update `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s ontology audit
+      **Partial, honestly split — not both sides are provable yet.**
+      `ontology-resolution-boundary`: real, proven. `sveltekit-frontend/src/lib/server/atlas/
+      ontology-resolution-boundary-postgres.spec.ts` re-run on 2026-09-24 → 9/9 tests pass,
+      including the tuple-annotation adapter. The DB client is mocked; no live DB writes.
+      `ontology-fanout-storage`: **cannot be run as a real test yet, not
+      attempted here** — every one of its 4 scenarios (unresolved-row exclusion, bitmap-scan
+      plan, refresh cadence, admission-gate bypass) requires either resolved rows (0 exist,
+      per 3.3/3.4/3.5 above) or the `OntologyFanoutAuthorityV1` admission table (confirmed by
+      task 4.2 to have zero production callers / no persisted admission decisions at all). A
+      test written against this state would either trivially pass on empty data (proving
+      nothing) or need to fabricate rows/admission state that doesn't exist in production —
+      neither is real coverage. Blocked on 4.6 (human-authorized apply) and Phase 2 (3.4/3.5)
+      producing real resolved+admitted rows first.
+- [x] 6.2 Confirm no existing consumer of `feature_ontology_tuples` broke (additive-only schema
+      change, so this should be a no-op check, but verify rather than assume). Verified rather
+      than assumed: grepped all real consumers repo-wide. Only one Drizzle-typed consumer exists
+      (`sveltekit-frontend/src/lib/server/agents/regen/loaders/features.ts`) and it uses an
+      explicit named-column `.select({...})` — unaffected by the two additive nullable/defaulted
+      columns. The one route consumer written against the new columns
+      (`src/routes/api/admin/atlas/ontology-resolution/+server.ts`) gates on
+      `resolutionColumnsExist()` and was live-tested: `curl http://127.0.0.1:5173/api/admin/atlas/ontology-resolution`
+      returns `200` with `"migrationApplied":true` and real `resolutionStats`/`totalTuples` data
+      against the live 539,124-row table. Broader census (34 files total, app + `scripts/atlas/`
+      + `sveltekit-frontend/scripts/atlas/`) confirmed via `grep -l "SELECT \*.*feature_ontology_tuples"`:
+      zero matches — no script or route references this table with a positional/`SELECT
+      *`-and-array-index-destructure pattern that a new trailing column could break; the rest are
+      read-only auditors or use explicit named columns.
+- [x] 6.3 Update `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s ontology audit
       section with a pointer to this change once Phase 1 is live, so the two records stay
-      linked.
+      linked. Added a pointer note under that file's 8-gate reframing item (5) (KAG/hyperedges/
+      ontology→Neo4j), clarifying `feature_ontology_tuples`'s new resolution columns are a
+      separate table from the `atlas_ontology_tuples`/hyperedges gap that item already tracks.
 
 ## 7. Correction: a real, LIVE OAK/oaklib FastAPI kernel already existed and was missed by
       task 2.1's original decision (2026-09-15, found while researching per operator request)

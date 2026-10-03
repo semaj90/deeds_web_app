@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.workstation-semantic-rehearsal.v1",
+  "generatedAt": "2026-09-20T22:55:54.536Z",
+  "fixture": {
+    "packetKey": "packet:rehearsal:semantic-01",
+    "canonicalChunkId": "chunk:rehearsal:semantic-01",
+    "chunkRowId": "00000000-0000-4000-8000-000000000001",
+    "sourceRef": "sveltekit-frontend/src/lib/server/rehearsal.ts",
+    "sourceRevision": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "workspaceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "representationRevision": "semantic_768:v1"
+  },
+  "derivedUuid": "ee4a6842-556a-89f7-9349-2477d0e01f81",
+  "counts": {
+    "PASS": 11
+  },
+  "checks": [
+    {
+      "id": "owner.uuid-v8",
+      "status": "PASS",
+      "detail": "existing UUIDv8 derivation owner is present"
+    },
+    {
+      "id": "owner.chunk-lineage",
+      "status": "PASS",
+      "detail": "existing 1:N packet→chunk lineage schema is present"
+    },
+    {
+      "id": "owner.pgvector",
+      "status": "PASS",
+      "detail": "existing Drizzle read model exposes the pgvector chunk owner"
+    },
+    {
+      "id": "owner.go-retrieval",
+      "status": "PASS",
+      "detail": "existing Go Retrieval facade is present"
+    },
+    {
+      "id": "owner.studio",
+      "status": "PASS",
+      "detail": "existing Studio SSR/API owners are present"
+    },
+    {
+      "id": "fixture.revision-qualified",
+      "status": "PASS",
+      "detail": "fixture carries packet/chunk and all revision identities",
+      "identityInput": {
+        "packetKey": "packet:rehearsal:semantic-01",
+        "canonicalChunkId": "chunk:rehearsal:semantic-01",
+        "sourceRevision": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "workspaceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "representationRevision": "semantic_768:v1"
+      }
+    },
+    {
+      "id": "fixture.uuid-v8-deterministic",
+      "status": "PASS",
+      "detail": "same qualified identity derives the same RFC-variant UUIDv8",
+      "derivedUuid": "ee4a6842-556a-89f7-9349-2477d0e01f81"
+    },
+    {
+      "id": "fixture.exact-hnsw-identity",
+      "status": "PASS",
+      "detail": "exact and HNSW result identities agree; scores are not treated as identity"
+    },
+    {
+      "id": "fixture.go-identity-passthrough",
+      "status": "PASS",
+      "detail": "synthetic Go Retrieval passthrough retains canonical chunk and revisions",
+      "goPassthrough": {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "canonicalChunkId": "chunk:rehearsal:semantic-01",
+        "packetKey": "packet:rehearsal:semantic-01",
+        "score": 1,
+        "sourceRevision": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "workspaceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+      }
+    },
+    {
+      "id": "fixture.studio-identity-passthrough",
+      "status": "PASS",
+      "detail": "synthetic Studio/API passthrough retains packet/chunk identity",
+      "studioPassthrough": {
+        "canonicalChunkId": "chunk:rehearsal:semantic-01",
+        "packetKey": "packet:rehearsal:semantic-01"
+      }
+    },
+    {
+      "id": "promotion.closed",
+      "status": "PASS",
+      "detail": "canonical promotion remains closed for the rehearsal"
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0,
+  "databaseWrites": 0,
+  "note": "Synthetic contract rehearsal only. It does not prove current live packet→chunk admission, live Go Retrieval search identity, or SSR HTTP rendering.",
+  "inputChecksum": "sha256:8326391c7eae29ad1adce8999cccb8c9126cc7c01296fe30df91a15be4df2c84"
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.packet-key-v2-admission-preflight.v1",
+  "mode": "READ_ONLY_PREFLIGHT",
+  "writesPerformed": false,
+  "generatedAt": "2026-09-25T04:48:08.830Z",
+  "manifestRootSha256": "6d8fc6e36d36d9de3c70868671a47b37dde3dfd07319bb2a99c628a901069f6a",
+  "entryCount": 7350,
+  "liveCounts": {
+    "ADMISSION_READY": 7350
+  },
+  "driftFromManifest": 0,
+  "driftSamples": [],
+  "aliasKindDdlApplied": false,
+  "result": "PREFLIGHT_CLEAN_ALIAS_DDL_NOT_APPLIED"
+}

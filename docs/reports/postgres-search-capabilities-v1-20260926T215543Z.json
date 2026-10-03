@@ -1,0 +1,116 @@
+{
+  "schema": "atlas.postgres-search-capabilities.v1",
+  "generatedAt": "2026-09-26T21:55:43.344Z",
+  "writes": {
+    "postgres": 0
+  },
+  "canonicalAuthority": false,
+  "server": {
+    "db": "legal_ai_db",
+    "usr": "legal_admin",
+    "addr": "172.18.0.13/32",
+    "port": 5432,
+    "version": "PostgreSQL 18.4 (Debian 18.4-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit",
+    "data_directory": "/var/lib/postgresql/18/docker",
+    "shared_preload_libraries": "pg_search"
+  },
+  "levels": {
+    "BINARY_PRESENT": true,
+    "EXTENSION_AVAILABLE": true,
+    "EXTENSION_INSTALLED": true,
+    "ACCESS_METHOD_PRESENT": [
+      "bm25",
+      "hnsw",
+      "paradedb"
+    ],
+    "INDEX_PRESENT": true,
+    "QUERY_API_PROVEN": {
+      "paradedbScoreWithAtAtAt": true,
+      "pdbScoreWithAmpAmpAmp": true
+    },
+    "NATIVE_FTS_GIN_ON_SEARCH_VECTOR": true,
+    "PGVECTOR_HNSW_INDEXES": [
+      "codebase_chunk_index_content_hnsw",
+      "codebase_chunk_index_summary_hnsw",
+      "idx_codebase_chunk_content_embedding_768_hnsw",
+      "idx_codebase_chunk_error_embedding_latent64_hnsw",
+      "idx_codebase_chunk_error_embedding_latent_128_hnsw",
+      "idx_codebase_chunk_error_embedding_latent_256_hnsw",
+      "idx_codebase_chunk_index_error_embedding_hnsw",
+      "idx_codebase_chunk_latent64_hnsw",
+      "idx_codebase_chunk_latent_128_hnsw",
+      "idx_codebase_chunk_latent_256_hnsw",
+      "idx_codebase_chunk_summary_embedding_384_hnsw"
+    ]
+  },
+  "evidence": {
+    "pg_extension": [
+      {
+        "extname": "pg_search",
+        "extversion": "0.25.1"
+      },
+      {
+        "extname": "pg_trgm",
+        "extversion": "1.6"
+      },
+      {
+        "extname": "vector",
+        "extversion": "0.8.3"
+      }
+    ],
+    "pg_available_extensions": [
+      {
+        "name": "pg_search",
+        "default_version": "0.25.1",
+        "installed_version": "0.25.1"
+      },
+      {
+        "name": "pg_trgm",
+        "default_version": "1.6",
+        "installed_version": "1.6"
+      },
+      {
+        "name": "vector",
+        "default_version": "0.8.3",
+        "installed_version": "0.8.3"
+      }
+    ],
+    "pg_am": [
+      {
+        "amname": "bm25"
+      },
+      {
+        "amname": "hnsw"
+      },
+      {
+        "amname": "paradedb"
+      }
+    ],
+    "bm25Index": {
+      "indexname": "idx_codebase_chunk_pgsearch_bm25",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_pgsearch_bm25 ON public.codebase_chunk_index USING bm25 (id, content, relative_path) WITH (key_field=id)"
+    },
+    "ftsIndex": {
+      "indexname": "idx_codebase_chunk_bm25_search",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_bm25_search ON public.codebase_chunk_index USING gin (search_vector)"
+    },
+    "schemaFunctionCounts": [
+      {
+        "nspname": "paradedb",
+        "functions": 224
+      },
+      {
+        "nspname": "pdb",
+        "functions": 309
+      }
+    ],
+    "binaryFiles": [
+      {
+        "file": "pg_search.so"
+      }
+    ]
+  },
+  "failures": [],
+  "status": "PROBE_COMPLETE",
+  "receiptChecksum": "sha256:bfdcd7073f4779a50b03671e746cf31440334549cb14ad2414a7f22dda4201cf"
+}

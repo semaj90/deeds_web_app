@@ -1,0 +1,10 @@
+{
+  "schema": "atlas.stable-file-identity-mint-cli.v1",
+  "gate": "S01-08I",
+  "generatedAt": "2026-09-22T04:29:33.374Z",
+  "mode": "file",
+  "dryRun": true,
+  "databaseWrites": 0,
+  "status": "MINT_ABORTED",
+  "error": "REPOSITORY_IDENTITY_MISSING: no atlas_repository_identity row for repository_id=00000000-0000-0000-0000-000000000000"
+}

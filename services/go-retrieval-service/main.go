@@ -664,6 +664,29 @@ type qdrantChunk struct {
 	RepresentationRevision string
 	CandidateID            string
 	CandidateOrdinal       *int64
+	CanonicalLineageStatus string
+	CanonicalLineageReason string
+}
+
+// codebaseIdentityStatus describes whether a projection result is safe for
+// downstream identity-sensitive consumers. It never repairs or infers
+// canonical IDs/revisions from Qdrant fields.
+func codebaseIdentityStatus(chunks []qdrantChunk) (string, string) {
+	for _, chunk := range chunks {
+		if chunk.CanonicalLineageStatus != "" && chunk.CanonicalLineageStatus != "QUALIFIED" {
+			return "REVIEW_REQUIRED", chunk.CanonicalLineageReason
+		}
+		if chunk.CandidateID == "" {
+			return "REVIEW_REQUIRED", "ATLAS_RETRIEVAL_IDENTITY_INCOMPLETE"
+		}
+		if chunk.SourceRevision == "" || chunk.WorkspaceRevision == "" {
+			return "REVIEW_REQUIRED", "ATLAS_RETRIEVAL_REVISION_INCOMPLETE"
+		}
+		if chunk.RepresentationID != "" && chunk.RepresentationRevision == "" {
+			return "REVIEW_REQUIRED", "ATLAS_RETRIEVAL_REPRESENTATION_REVISION_MISSING"
+		}
+	}
+	return "PASS", ""
 }
 
 type researchQdrantChunk struct {
@@ -769,6 +792,13 @@ func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float3
 	}
 
 	chunks := qdrantPointsToChunks(points, true)
+	if hydrated, err := s.hydrateCanonicalChunkLineage(ctx, chunks); err != nil {
+		// Projection search remains available, but identity-sensitive consumers
+		// must see the existing fail-closed REVIEW_REQUIRED status.
+		slog.Warn("[retrieval] canonical codebase identity hydration unavailable", "err", err)
+	} else if hydrated > 0 {
+		slog.Debug("[retrieval] canonical codebase identity hydrated", "rows", hydrated)
+	}
 
 	// Apply path prefix filter in-process
 	if len(pathPrefixes) > 0 {
@@ -784,6 +814,158 @@ func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float3
 		chunks = filtered
 	}
 	return chunks, nil
+}
+
+type canonicalChunkLineage struct {
+	QdrantID                string
+	ChunkRowID              string
+	ChunkID                 string
+	PacketKey               string
+	CanonicalChunkID        string
+	SourceRef               string
+	SourceRevision          string
+	WorkspaceRevision       string
+	RepresentationRevision  string
+	ContentHash             string
+	LineageBindingChecksum  string
+	LineageProducerRevision string
+	MembershipStatus        string
+	RevisionStatus          string
+	BindingCount            int
+	IdentityStatus          string
+	ReviewReason            string
+}
+
+func classifyCanonicalChunkLineage(lineage canonicalChunkLineage) canonicalChunkLineage {
+	lineage.IdentityStatus = "QUALIFIED"
+	if lineage.RevisionStatus != "PROVEN" {
+		lineage.IdentityStatus, lineage.ReviewReason = "REVIEW_REQUIRED", "NO_PROVEN_LINEAGE"
+	} else if lineage.BindingCount != 1 {
+		lineage.IdentityStatus, lineage.ReviewReason = "REVIEW_REQUIRED", "SOURCE_BINDING_MISSING_OR_MISMATCH"
+	} else if lineage.ChunkID == "" {
+		lineage.IdentityStatus, lineage.ReviewReason = "REVIEW_REQUIRED", "MISSING_CHUNK_ID"
+	} else if lineage.CanonicalChunkID == "" {
+		lineage.IdentityStatus, lineage.ReviewReason = "REVIEW_REQUIRED", "MISSING_CANONICAL_CHUNK_ID"
+	} else if lineage.PacketKey == "" {
+		lineage.IdentityStatus, lineage.ReviewReason = "REVIEW_REQUIRED", "MISSING_PACKET_KEY"
+	} else if lineage.SourceRevision == "" {
+		lineage.IdentityStatus, lineage.ReviewReason = "REVIEW_REQUIRED", "MISSING_SOURCE_REVISION"
+	} else if lineage.WorkspaceRevision == "" {
+		lineage.IdentityStatus, lineage.ReviewReason = "REVIEW_REQUIRED", "MISSING_WORKSPACE_REVISION"
+	} else if lineage.RepresentationRevision == "" {
+		lineage.IdentityStatus, lineage.ReviewReason = "REVIEW_REQUIRED", "MISSING_REPRESENTATION_REVISION"
+	}
+	return lineage
+}
+
+func applyCanonicalChunkLineage(chunk *qdrantChunk, lineage canonicalChunkLineage) {
+	if chunk == nil {
+		return
+	}
+	chunk.CanonicalLineageStatus = lineage.IdentityStatus
+	chunk.CanonicalLineageReason = lineage.ReviewReason
+	if lineage.IdentityStatus != "QUALIFIED" {
+		return
+	}
+	chunk.CandidateID = lineage.CanonicalChunkID
+	chunk.PacketKey = lineage.PacketKey
+	chunk.SourceRef = lineage.SourceRef
+	chunk.ContentHash = lineage.ContentHash
+	chunk.WorkspaceRevision = lineage.WorkspaceRevision
+	chunk.SourceRevision = lineage.SourceRevision
+	chunk.RepresentationRevision = lineage.RepresentationRevision
+}
+
+func (s *retrievalServer) hydrateCanonicalChunkLineage(ctx context.Context, chunks []qdrantChunk) (int, error) {
+	qdrantIDs := make([]string, 0, len(chunks))
+	seen := make(map[string]struct{}, len(chunks))
+	for _, chunk := range chunks {
+		if chunk.ID == "" {
+			continue
+		}
+		if _, ok := seen[chunk.ID]; ok {
+			continue
+		}
+		seen[chunk.ID] = struct{}{}
+		qdrantIDs = append(qdrantIDs, chunk.ID)
+	}
+	if len(qdrantIDs) == 0 {
+		return 0, nil
+	}
+
+	placeholders := make([]string, len(qdrantIDs))
+	args := make([]any, len(qdrantIDs))
+	for i, id := range qdrantIDs {
+		placeholders[i] = fmt.Sprintf("$%d", i+1)
+		args[i] = id
+	}
+	query := fmt.Sprintf(`
+		SELECT c.qdrant_id::text, c.id::text, COALESCE(c.chunk_id, ''),
+		       COALESCE(l.packet_key, ''), COALESCE(l.canonical_chunk_id, ''),
+		       COALESCE(l.source_ref, ''), COALESCE(l.source_revision, ''),
+		       COALESCE(c.workspace_revision, ''), COALESCE(c.representation_revision, ''),
+		       COALESCE(c.content_hash, ''), COALESCE(c.lineage_binding_checksum, ''),
+		       COALESCE(c.lineage_producer_revision, ''), COALESCE(l.membership_status, ''),
+		       COALESCE(l.revision_status, ''), COUNT(b.canonical_source_ref)::int
+		  FROM public.codebase_chunk_index c
+		  LEFT JOIN public.atlas_packet_chunk_lineage l
+		    ON l.chunk_row_id = c.id AND l.revision_status = 'PROVEN'
+		  LEFT JOIN public.atlas_workspace_source_bindings b
+		    ON b.repo_id = 'deeds-web-app'
+		   AND b.canonical_source_ref = l.source_ref
+		   AND b.workspace_revision = c.workspace_revision
+		   AND b.source_revision = l.source_revision
+		 WHERE c.qdrant_id IN (%s)
+		 GROUP BY c.qdrant_id, c.id, c.chunk_id, l.packet_key, l.canonical_chunk_id,
+		          l.source_ref, l.source_revision, c.workspace_revision,
+		          c.representation_revision, c.content_hash, c.lineage_binding_checksum,
+		          c.lineage_producer_revision, l.membership_status, l.revision_status
+		 ORDER BY c.qdrant_id, l.packet_key, l.canonical_chunk_id
+	`, strings.Join(placeholders, ", "))
+	rows, err := s.pool.Query(ctx, query, args...)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	byQdrantID := make(map[string][]canonicalChunkLineage, len(qdrantIDs))
+	for rows.Next() {
+		var lineage canonicalChunkLineage
+		if err := rows.Scan(
+			&lineage.QdrantID, &lineage.ChunkRowID, &lineage.ChunkID,
+			&lineage.PacketKey, &lineage.CanonicalChunkID, &lineage.SourceRef,
+			&lineage.SourceRevision, &lineage.WorkspaceRevision,
+			&lineage.RepresentationRevision, &lineage.ContentHash,
+			&lineage.LineageBindingChecksum, &lineage.LineageProducerRevision,
+			&lineage.MembershipStatus, &lineage.RevisionStatus, &lineage.BindingCount,
+		); err != nil {
+			return 0, err
+		}
+		byQdrantID[lineage.QdrantID] = append(byQdrantID[lineage.QdrantID], classifyCanonicalChunkLineage(lineage))
+	}
+	if err := rows.Err(); err != nil {
+		return 0, err
+	}
+
+	hydrated := 0
+	for i := range chunks {
+		matches := byQdrantID[chunks[i].ID]
+		if len(matches) == 0 {
+			chunks[i].CanonicalLineageStatus = "REVIEW_REQUIRED"
+			chunks[i].CanonicalLineageReason = "NO_POSTGRES_CHUNK"
+			continue
+		}
+		if len(matches) != 1 {
+			chunks[i].CanonicalLineageStatus = "REVIEW_REQUIRED"
+			chunks[i].CanonicalLineageReason = "AMBIGUOUS_PROVEN_LINEAGE"
+			continue
+		}
+		applyCanonicalChunkLineage(&chunks[i], matches[0])
+		if matches[0].IdentityStatus == "QUALIFIED" {
+			hydrated++
+		}
+	}
+	return hydrated, nil
 }
 
 func (s *retrievalServer) qdrantSearchResearch(ctx context.Context, vec []float32, sourceFilter []string, limit int) ([]researchQdrantChunk, error) {
@@ -964,10 +1146,24 @@ func buildCodebaseSearchChunkResult(chunk qdrantChunk) *pb.SearchChunkResult {
 			identityMetadata[key] = value
 		}
 	}
+	if chunk.CanonicalLineageStatus != "" && chunk.CanonicalLineageStatus != "QUALIFIED" {
+		identityMetadata["identity_status"] = "REVIEW_REQUIRED"
+		identityMetadata["identity_error"] = chunk.CanonicalLineageReason
+	} else if chunk.CandidateID == "" {
+		identityMetadata["identity_status"] = "REVIEW_REQUIRED"
+		identityMetadata["identity_error"] = "CANONICAL_CHUNK_ID_MISSING"
+	} else if chunk.RepresentationID != "" && chunk.RepresentationRevision == "" {
+		identityMetadata["identity_status"] = "REVIEW_REQUIRED"
+		identityMetadata["identity_error"] = "REPRESENTATION_REVISION_MISSING"
+	} else {
+		identityMetadata["identity_status"] = "PASS"
+	}
 
 	return &pb.SearchChunkResult{
-		Id:             id,
-		ChunkId:        id,
+		Id: id,
+		// Qdrant's point ID is a projection identifier, never a canonical
+		// chunk identity. Only propagate an explicit canonical candidate ID.
+		ChunkId:        chunk.CandidateID,
 		ContentPreview: chunk.ContentPreview,
 		Kind:           chunk.Kind,
 		HttpMethod:     chunk.HTTPMethod,
@@ -2068,7 +2264,9 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 	protoChunks := make([]*pb.CodebaseChunk, len(chunks))
 	for i, c := range chunks {
 		protoChunks[i] = &pb.CodebaseChunk{
-			ChunkId:                c.ID,
+			// Qdrant point IDs are projection IDs. Do not promote them to
+			// canonical chunk identity when the payload has no candidate ID.
+			ChunkId:                c.CandidateID,
 			FilePath:               c.FilePath,
 			Kind:                   c.Kind,
 			HttpMethod:             c.HTTPMethod,
@@ -2103,12 +2301,13 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 	if confidence > 1 {
 		confidence = 1
 	}
+	validationStatus, identityError := codebaseIdentityStatus(chunks)
 	return &pb.CodebaseSearchResponse{
 		Chunks:                       protoChunks,
 		TotalMs:                      float32(time.Since(start).Milliseconds()),
 		RepresentationUsed:           representationUsed,
 		RepresentationFallbackReason: representationFallbackReason,
-		Receipt:                      codebaseReceipt(req.GetAtlasContext(), true, len(protoChunks), confidence, "PASS", "", codebaseOutputChecksum(chunks)),
+		Receipt:                      codebaseReceipt(req.GetAtlasContext(), true, len(protoChunks), confidence, validationStatus, identityError, codebaseOutputChecksum(chunks)),
 	}, nil
 }
 
@@ -2676,6 +2875,12 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 		       COALESCE(chunk_id, relative_path) AS source_ref,
 		       relative_path AS file_path,
 		       COALESCE(summary, '') AS summary,
+		       COALESCE(content_hash, '') AS content_hash,
+		       COALESCE(workspace_revision, '') AS workspace_revision,
+		       COALESCE(source_revision, '') AS source_revision,
+		       COALESCE(representation_revision, '') AS representation_revision,
+		       COALESCE(lineage_binding_checksum, '') AS lineage_binding_checksum,
+		       COALESCE(lineage_producer_revision, '') AS lineage_producer_revision,
 		       ts_rank_cd(search_vector, websearch_to_tsquery('english', $1), 32)::float4 AS score,
 		       ts_headline('english', COALESCE(content, ''), websearch_to_tsquery('english', $1),
 		         'MaxFragments=2,MaxWords=30,MinWords=10') AS snippet
@@ -2690,27 +2895,50 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 	defer rows.Close()
 	results := make([]map[string]any, 0, body.Limit)
 	for rows.Next() {
-		var id, sourceRef, filePath, summary, snippet string
+		var id, sourceRef, filePath, summary, contentHash, workspaceRevision, sourceRevision, representationRevision, lineageBindingChecksum, lineageProducerRevision, snippet string
 		var score float32
-		if err := rows.Scan(&id, &sourceRef, &filePath, &summary, &score, &snippet); err != nil {
+		if err := rows.Scan(&id, &sourceRef, &filePath, &summary, &contentHash, &workspaceRevision, &sourceRevision, &representationRevision, &lineageBindingChecksum, &lineageProducerRevision, &score, &snippet); err != nil {
 			continue
 		}
-		results = append(results, map[string]any{"id": id, "source_ref": sourceRef, "file_path": filePath, "summary": summary, "snippet": snippet, "score": score, "score_type": "PG_TS_RANK_CD", "scorer_revision": "postgres-18-ts-rank-cd-v1", "text_search_config": "english", "rank": len(results) + 1})
+		identityStatus, identityReason := ftsIdentityStatus(id, contentHash, workspaceRevision, sourceRevision)
+		results = append(results, map[string]any{
+			"id": id, "source_ref": sourceRef, "file_path": filePath, "summary": summary, "snippet": snippet,
+			"content_hash": contentHash, "workspace_revision": workspaceRevision, "source_revision": sourceRevision,
+			"representation_revision": representationRevision, "lineage_binding_checksum": lineageBindingChecksum,
+			"lineage_producer_revision": lineageProducerRevision, "identity_status": identityStatus,
+			"identity_reason": identityReason, "score": score, "score_type": "PG_TS_RANK_CD",
+			"scorer_revision": "postgres-18-ts-rank-cd-v1", "text_search_config": "english", "rank": len(results) + 1,
+		})
 	}
 	for _, result := range results {
 		result["candidate_count"] = len(results)
 	}
+	identityPassCount := 0
+	for _, result := range results {
+		if result["identity_status"] == "PASS" {
+			identityPassCount++
+		}
+	}
+	identityStatus := "REVIEW_REQUIRED"
+	identityReason := "ATLAS_FTS_REVISION_INCOMPLETE"
+	if len(results) == 0 || identityPassCount == len(results) {
+		identityStatus = "PASS"
+		identityReason = ""
+	}
 	json.NewEncoder(w).Encode(map[string]any{
-		"results":            results,
-		"lane":               "postgres_fts",
-		"legacy_lane":        "bm25",
-		"query_checksum":     queryChecksum,
-		"candidate_count":    len(results),
-		"score_type":         "PG_TS_RANK_CD",
-		"scorer_revision":    "postgres-18-ts-rank-cd-v1",
-		"text_search_config": "english",
-		"read_only":          true,
-		"total_ms":           time.Since(started).Milliseconds(),
+		"results":             results,
+		"lane":                "postgres_fts",
+		"legacy_lane":         "bm25",
+		"query_checksum":      queryChecksum,
+		"candidate_count":     len(results),
+		"score_type":          "PG_TS_RANK_CD",
+		"scorer_revision":     "postgres-18-ts-rank-cd-v1",
+		"text_search_config":  "english",
+		"identity_status":     identityStatus,
+		"identity_reason":     identityReason,
+		"identity_pass_count": identityPassCount,
+		"read_only":           true,
+		"total_ms":            time.Since(started).Milliseconds(),
 		"capability": map[string]any{
 			"schema":             "atlas.indexed-rpc-capability.v1",
 			"capabilityId":       "go-retrieval:postgres-fts:v1",
@@ -2719,9 +2947,21 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 			"proofState":         "PROVEN",
 			"trueBm25":           false,
 			"scoreType":          "PG_TS_RANK_CD",
+			"identityStatus":     identityStatus,
 			"canonicalAuthority": false,
 		},
 	})
+}
+
+// ftsIdentityStatus reports whether a PostgreSQL FTS result carries the
+// minimum revision-qualified envelope required by downstream normalization.
+// It deliberately does not infer packet_key, source_revision, or workspace
+// revision from path text or projection metadata.
+func ftsIdentityStatus(id, contentHash, workspaceRevision, sourceRevision string) (string, string) {
+	if id != "" && contentHash != "" && workspaceRevision != "" && sourceRevision != "" {
+		return "PASS", ""
+	}
+	return "REVIEW_REQUIRED", "ATLAS_FTS_REVISION_INCOMPLETE"
 }
 
 func (s *retrievalServer) httpStats(w http.ResponseWriter, r *http.Request) {

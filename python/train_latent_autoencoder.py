@@ -1,10 +1,9 @@
-"""Trains NestedSemanticAutoencoder (python/atlas_compute/latent_autoencoder.py) on live
-semantic_768 rows.
+"""Train a candidate NestedSemanticAutoencoder from the canonical 768-D column.
 
-Reads codebase_chunk_index.content_embedding (Postgres, read-only) as the canonical semantic_768
-source per root CLAUDE.md's embedding dimension policy. Writes a checkpoint (.pt) and a
-schema-versioned, checksummed training receipt (JSON) alongside it — never writes back to
-Postgres, never touches any canonical table.
+The source query reads codebase_chunk_index.content_embedding_768. That column's unique
+EmbeddingGemma writer and per-row provenance are not yet proven, so any artifact from this
+trainer remains a candidate and cannot close SEMANTIC_OWNER_PROVEN or LATENT_FAMILY_PROVEN.
+It writes a local checkpoint and checksummed receipt, never Postgres rows.
 
 Usage:
   python train_latent_autoencoder.py --limit 2000 --epochs 20            # bounded proof run
@@ -28,44 +27,67 @@ import sys
 import time
 from hashlib import sha256
 
-import numpy as np
-import psycopg2
-import psycopg2.extras
-import torch
-from torch.optim import AdamW
-
 sys.path.insert(0, os.path.dirname(__file__))
-from atlas_compute.latent_autoencoder import (
-    NestedAutoencoderConfig,
-    NestedSemanticAutoencoder,
-    build_training_receipt,
-    evaluate_nested_latents,
-    nested_autoencoder_loss,
-    receipt_checksum,
-)
+
+# Deliberately false until SEMANTIC_OWNER_PROVEN and a frozen, admitted
+# semantic_768 input manifest are independently proven. Keep the direct Python
+# entrypoint fail-closed too; the npm wrapper is not the only way to invoke it.
+TRAINING_AUTHORITY_PROVEN = False
 
 DEFAULT_DATABASE_URL = "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db"
 
 
+def blocked_training_report() -> dict:
+    return {
+        "schema": "atlas.latent-autoencoder-training-plan.v1",
+        "status": "TRAINING_BLOCKED",
+        "reason": "SEMANTIC_WRITER_AND_ADMITTED_INPUT_PROVENANCE_REQUIRED",
+        "architectureRevision": "atlas.latent-ae.768-512-256-128.v2",
+        "input": {
+            "representation": "semantic_768",
+            "expectedModelFamily": "EmbeddingGemma",
+            "dimensions": 768,
+            "canonicalColumn": "codebase_chunk_index.content_embedding_768",
+            "writerAndPerRowProvenance": "NOT_PROVEN",
+        },
+        "encoderDimensions": [768, 512, 256, 128],
+        "outputs": {
+            "latent_256": "learned_intermediate",
+            "latent_128": "learned_bottleneck",
+            "latent_64": "normalized_prefix_of_latent_128",
+            "topology4d": "separate_revisioned_projection_from_latent_256",
+        },
+        "databaseRead": False,
+        "trainingPerformed": False,
+        "checkpointWritten": False,
+    }
+
+
 def fetch_semantic_768(database_url: str, limit: int) -> tuple[list[str], list[str], np.ndarray]:
-    """Read-only. Returns (chunk_ids, source_refs, embeddings[N,768]), ordered by id."""
+    """Read-only candidate source. Returns (chunk_ids, source_refs, vectors[N,768]), ordered by id."""
     conn = psycopg2.connect(database_url)
     try:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-            sql = "SELECT id::text AS id, source_ref, content_embedding FROM codebase_chunk_index WHERE content_embedding IS NOT NULL ORDER BY id"
+            sql = "SELECT id::text AS id, source_ref, content_embedding_768::text AS embedding FROM codebase_chunk_index WHERE content_embedding_768 IS NOT NULL ORDER BY id"
             if limit > 0:
                 sql += f" LIMIT {int(limit)}"
             cur.execute(sql)
             rows = cur.fetchall()
     finally:
         conn.close()
+    if not rows:
+        return [], [], np.empty((0, 768), dtype=np.float32)
     ids = [row["id"] for row in rows]
     source_refs = [row["source_ref"] or f"__no_source_ref__:{row['id']}" for row in rows]
     # pgvector returns a string like "[0.1,0.2,...]" via psycopg2 without a registered adapter.
     vectors = np.array(
-        [np.fromstring(row["content_embedding"].strip("[]"), sep=",", dtype=np.float32) for row in rows],
+        [np.fromstring(row["embedding"].strip("[]"), sep=",", dtype=np.float32) for row in rows],
         dtype=np.float32,
     )
+    if vectors.ndim != 2 or vectors.shape[1] != 768:
+        raise ValueError(f"canonical content_embedding_768 must be [N,768], got {vectors.shape}")
+    if not np.isfinite(vectors).all():
+        raise ValueError("canonical content_embedding_768 contains non-finite values")
     return ids, source_refs, vectors
 
 
@@ -112,6 +134,29 @@ def source_grouped_split(source_refs: list[str], val_fraction: float, seed: int)
 
 
 def main() -> None:
+    if "--plan-only" in sys.argv[1:]:
+        print(json.dumps({**blocked_training_report(), "mode": "PLAN_ONLY"}, sort_keys=True))
+        return
+
+    if not TRAINING_AUTHORITY_PROVEN:
+        print(json.dumps(blocked_training_report(), sort_keys=True))
+        raise SystemExit(78)
+
+    # Heavy/runtime imports happen only after the provenance gate opens.
+    import numpy as np
+    import psycopg2
+    import psycopg2.extras
+    import torch
+    from torch.optim import AdamW
+    from atlas_compute.latent_autoencoder import (
+        NestedAutoencoderConfig,
+        NestedSemanticAutoencoder,
+        build_training_receipt,
+        evaluate_nested_latents,
+        nested_autoencoder_loss,
+        receipt_checksum,
+    )
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--database-url", default=os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL))
     parser.add_argument("--limit", type=int, default=2000, help="0 = full corpus")
@@ -120,8 +165,8 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--val-fraction", type=float, default=0.1)
-    parser.add_argument("--out", default="latent_autoencoder_checkpoint.pt")
-    parser.add_argument("--receipt-out", default="docs/reports/latent-autoencoder-training-receipt-v1.json")
+    parser.add_argument("--out", default="latent_autoencoder_768_512_256_128_candidate.pt")
+    parser.add_argument("--receipt-out", default="docs/reports/latent-autoencoder-training-receipt-v2-candidate.json")
     parser.add_argument("--require-cuda", action="store_true", help="fail closed instead of silently falling back to CPU")
     parser.add_argument("--seed", type=int, default=0xA71A5)
     args = parser.parse_args()
@@ -222,7 +267,7 @@ def main() -> None:
         source_snapshot_revision=f"codebase_chunk_index:limit={args.limit}:rows={len(ids)}",
         row_identity_checksum=row_identity_checksum(ids),
         metrics=val_metrics,
-        producer_revision="atlas.train-latent-autoencoder.2026-08-29.v1",
+        producer_revision="atlas.train-latent-autoencoder.2026-09-30.v2",
     )
     receipt["training_duration_s"] = duration_s
     receipt["device"] = str(device)
@@ -237,7 +282,14 @@ def main() -> None:
     # string. These two checksums close that gap: order-bound row identity, and the actual FP32
     # bytes trained on.
     receipt["training_snapshot"] = {
-        "schema": "atlas.semantic768-training-snapshot.v1",
+        "schema": "atlas.latent-training-input-snapshot.v3",
+        "sourceTable": "codebase_chunk_index",
+        "sourceColumn": "content_embedding_768",
+        "representationClaim": "semantic_768",
+        "expectedEmbeddingFamily": "EmbeddingGemma",
+        "embeddingModelRevision": None,
+        "tokenizerRevision": None,
+        "authorityStatus": "CANONICAL_COLUMN_PRESENT_WRITER_AND_PER_ROW_PROVENANCE_UNPROVEN",
         "orderedRowIdentityChecksum": ordered_row_identity_checksum(ids),
         "semanticMatrixChecksum": semantic_matrix_checksum(embeddings),
         "eligibleRowCount": len(ids),
@@ -261,9 +313,12 @@ def main() -> None:
             "deviceCapability": list(torch.cuda.get_device_capability(0)),
         }
     receipt["representations"] = {
-        "latent_256": {"dimensions": 256, "relationship": "PHYSICAL_BOTTLENECK"},
-        "latent_128": {"dimensions": 128, "relationship": "PREFIX_OF_LATENT_256", "prefixLength": 128, "renormalized": True},
+        "architectureRevision": "atlas.latent-ae.768-512-256-128.v2",
+        "encoderDimensions": [768, 512, 256, 128],
+        "latent_256": {"dimensions": 256, "relationship": "LEARNED_INTERMEDIATE_STAGE"},
+        "latent_128": {"dimensions": 128, "relationship": "LEARNED_PHYSICAL_BOTTLENECK"},
         "latent_64": {"dimensions": 64, "relationship": "PREFIX_OF_LATENT_128", "prefixLength": 64, "renormalized": True},
+        "topology4d": {"producedByThisModel": False, "owner": "separate_revisioned_topology_projection"},
     }
     receipt["receipt_checksum"] = receipt_checksum(receipt)
 
@@ -271,7 +326,7 @@ def main() -> None:
     with open(args.receipt_out, "w", encoding="utf-8") as f:
         json.dump(receipt, f, indent=2)
     print(json.dumps({"event": "receipt_written", "path": args.receipt_out}))
-    print(json.dumps({"status": "TRAINING_RECEIPT_PROVEN", "receipt": receipt}))
+    print(json.dumps({"status": "TRAINING_ARTIFACT_WRITTEN_CANDIDATE_NOT_PROMOTED", "receipt": receipt}))
 
 
 if __name__ == "__main__":

@@ -28,7 +28,15 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const cohortPath = path.join(root, 'docs/reports/current-source-projection-cohort-v1.json');
 const observationPath = path.join(root, 'docs/reports/workspace-source-binding-observation.json');
 const reportPath = path.join(root, 'docs/reports/current-source-cohort-lineage-v1.json');
+const sourceOwnerPath = path.join(root, 'docs/reports/current-source-owner-reconciliation-v1.json');
 const cohort = JSON.parse(fs.readFileSync(cohortPath, 'utf8'));
+let sourceOwner = null;
+try {
+  sourceOwner = JSON.parse(fs.readFileSync(sourceOwnerPath, 'utf8'));
+} catch {
+  // Source-owner evidence is required for promotion, but absence is represented
+  // in the receipt rather than treated as permission to proceed.
+}
 let observation = {};
 try {
   observation = JSON.parse(fs.readFileSync(observationPath, 'utf8'));
@@ -166,8 +174,10 @@ const laterNextGate = earlyStatus === 'CURRENT_WORKSPACE_FRAME_UNRESOLVED'
   ? 'CURRENT_WORKSPACE_FRAME_ADMISSION_REQUIRED'
   : earlyStatus === 'CURRENT_WORKSPACE_FRAME_CONFLICT'
     ? 'CURRENT_WORKSPACE_FRAME_CONFLICT_RECONCILIATION_REQUIRED'
-    : earlyStatus === 'CURRENT_WORKSPACE_FRAME_NON_AUTHORITATIVE'
+      : earlyStatus === 'CURRENT_WORKSPACE_FRAME_NON_AUTHORITATIVE'
       ? 'CURRENT_WORKSPACE_FRAME_AUTHORITATIVE_RECEIPT_REQUIRED'
+      : sourceOwner?.workspace?.admittedSnapshotDelta?.requiresSnapshotRefresh === true
+        ? 'CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED'
       : !counts.workspaceRevisionSourceAligned
         ? 'WORKSPACE_REVISION_SOURCE_RECONCILIATION_REQUIRED'
         : counts.sourceRevisionQualified > 0
@@ -181,6 +191,7 @@ const report = {
   inputs: {
     cohortChecksum: cohort.cohortChecksum ?? null,
     observationPath: path.relative(root, observationPath).replaceAll('\\', '/'),
+    sourceOwnerPath: path.relative(root, sourceOwnerPath).replaceAll('\\', '/'),
     workspaceRevisionSource: workspaceFrame.selectedSource,
   },
   workspaceFrame: {
@@ -196,6 +207,12 @@ const report = {
   },
   observationWorkspaceRevision,
   observationMatchesSelectedFrame,
+  sourceAuthority: {
+    status: sourceOwner?.admission?.status ?? 'NOT_PROVEN',
+    safeToPromote: sourceOwner?.admission?.safeToPromote === true,
+    requiresSnapshotRefresh: sourceOwner?.workspace?.admittedSnapshotDelta?.requiresSnapshotRefresh === true,
+    deltaChecksum: sourceOwner?.workspace?.admittedSnapshotDelta?.deltaChecksum ?? null,
+  },
   counts,
   rows: resultRows,
   databaseError: error,

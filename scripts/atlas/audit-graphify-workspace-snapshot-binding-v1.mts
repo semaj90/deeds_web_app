@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
+import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const normalize = (value: unknown) => String(value ?? '').replaceAll('\\', '/').replace(/^\.\//, '').replace(/^\/+/, '').trim();
@@ -78,6 +79,9 @@ const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(proc
 let databaseError: string | null = null;
 let schema: Record<string, string[]> = {};
 let executions: any[] = [];
+// Shadow observation of graphify_execution_authority via the ONE shared owner. Observation only: it never changes a binding decision.
+let authorityObservations: any[] = [];
+let authorityShadowError: string | null = null;
 let legacyFilesByExecution = new Map<string, any[]>();
 let v2FilesByExecution = new Map<string, any[]>();
 let stagesByExecution = new Map<string, any[]>();
@@ -104,6 +108,13 @@ try {
     [workspaceId],
   );
   executions = executionResult.rows;
+  try {
+    const { loadAuthorityShadowV1 } = await loadAuthorityShadowModuleV1();
+    const scopes = new Map(executions.filter((row) => row.workspace_id && row.workspace_revision).map((row) => [`${row.workspace_id}|${row.workspace_revision}`, { workspaceId: String(row.workspace_id), workspaceRevision: String(row.workspace_revision) }]));
+    for (const scope of scopes.values()) authorityObservations.push(await loadAuthorityShadowV1(pool, scope));
+  } catch (error) {
+    authorityShadowError = error instanceof Error ? error.message : String(error);
+  }
 
   if (schema.graphify_execution_files?.length && schema.graphify_execution_files.includes('execution_id')) {
     const fileColumns = ['execution_id', 'source_ref', 'workspace_revision', 'code_source_revision', 'source_revision', 'content_hash', 'byte_length']
@@ -181,6 +192,7 @@ function compareExecution(execution: any) {
     workspaceRevision: execution.workspace_revision ?? null,
     completedAt: execution.completed_at ?? null,
     canonicalAuthority: execution.canonical_authority ?? null,
+    authorityTableSelected: authorityObservations.some((o) => o.authorityExecutionId === executionId),
     membershipSource,
     sourceSelectionStage: sourceStage,
     sourceCount: rows.length,
@@ -203,7 +215,11 @@ function compareExecution(execution: any) {
 const comparisons = executions.map(compareExecution);
 const matching = comparisons.filter((row) => row.eligibleWithoutAdmission);
 const admittedMatching = matching.filter((row) => row.workspaceRevision === admittedWorkspaceRevision);
-const firstBlockingInvariant = admissionAuthority && admittedMatching.length === 1
+// Several executions may legitimately match one admitted revision (equivalent re-runs). That is resolved
+// only when exactly one of them holds canonical_authority; zero or several canonical owners stay blocked.
+const admittedCanonical = admittedMatching.filter((row) => row.canonicalAuthority === true);
+const bindingResolved = admittedMatching.length === 1 || (admittedMatching.length > 1 && admittedCanonical.length === 1);
+const firstBlockingInvariant = admissionAuthority && bindingResolved
   ? null
   : databaseError
     ? 'GRAPHIFY_SCHEMA_OR_DATABASE_UNAVAILABLE'
@@ -214,11 +230,18 @@ const firstBlockingInvariant = admissionAuthority && admittedMatching.length ===
         : admittedMatching.length > 1
           ? 'MULTIPLE_GRAPHIFY_EXECUTIONS_MATCH_SNAPSHOT'
           : 'WORKSPACE_REVISION_ADMISSION_REQUIRES_TOURNAMENT';
+const authorityShadow = {
+  source: 'graphify_execution_authority',
+  runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY',
+  error: authorityShadowError,
+  // Never changes the decision above. One observation per distinct (workspace, revision) from the shared helper.
+  observations: authorityObservations,
+};
 const status = databaseError
   ? 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED'
   : snapshotReadback.status !== 'SNAPSHOT_BYTES_READBACK_PROVEN'
     ? 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK'
-    : admissionAuthority && admittedMatching.length === 1
+    : admissionAuthority && bindingResolved
       ? 'GRAPHIFY_SNAPSHOT_BINDING_PROVEN'
       : 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED';
 const report = {
@@ -240,6 +263,7 @@ const report = {
   terminalExecutionCount: executions.length,
   comparisons,
   firstBlockingInvariant,
+  authorityShadow,
   nextGate: status === 'GRAPHIFY_SNAPSHOT_BINDING_PROVEN'
     ? 'CURRENT-STRUCTURAL-LINEAGE-01'
     : 'SNAPSHOT-BOUND-GRAPHIFY-CANARY-01',

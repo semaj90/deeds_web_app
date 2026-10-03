@@ -210,7 +210,13 @@ type TelemetryBreadth = {
 
 ## Slice 3 — Mock/stub candidate detection
 
-- [ ] Static pass: `rg` for `TODO|NOT_IMPLEMENTED|throw new Error.*not implemented|Math\.random.*(mock|stub|simulate|placeholder|demo)`.
+- [x] Static pass: `rg` for `TODO|NOT_IMPLEMENTED|throw new Error.*not implemented|Math\.random.*(mock|stub|simulate|placeholder|demo)`.
+  **Completed 2026-09-24 (read-only, full pattern incl. the `Math.random` clause, `sveltekit-frontend/src`):**
+  `.ts` 151 hits / 80 files; `.svelte` 16 hits / 15 files; the `Math.random.*(mock|stub|simulate|placeholder|demo)`
+  clause alone matches 0 lines in `.ts`/`.svelte` (synthetic `Math.random` use is not labeled that way, so this term
+  finds nothing — the AST classification below, which flags 1,068 `UNLABELED_SYNTHETIC_PRODUCTION_REVIEW` hits, is the
+  better detector). Note: that classification report scanned `.ts`/`.js` under `sveltekit-frontend/src` +
+  `scripts/atlas` only; the 16 `.svelte` hits are not yet classified.
 
   **Partial, 2026-08-24**: ran the first three terms (not yet the
   `Math.random.*(mock|stub|...)` clause) against
@@ -232,7 +238,9 @@ type TelemetryBreadth = {
 - [x] AST-context classification per hit: test fixture (acceptable) / demo-flag-gated mock (acceptable, labeled) / unlabeled synthetic production response (flag) / throwing stub (flag) / unreferenced stub (flag).
   Evidence: `docs/reports/okf-ast-context-classification-v1.json` and `.md`; the read-only TypeScript syntax-context audit records 2,439 findings across 7,202 source files, with disposition counts and per-hit AST ancestry. It remains advisory and does not authorize mutation.
 - [ ] LLM used only to summarize post-static+runtime findings — never as sole verdict source.
-- [ ] Output: one JSON + Markdown report.
+- [x] Output: one JSON + Markdown report. (2026-09-24: `docs/reports/okf-ast-context-classification-v1.json` + `.md`
+  exist, committed in `8523b7a003`; policy `writesPerformed:false`, `canonicalAuthority:false`. The LLM-summary item above
+  remains open.)
 
 ## Slice 4 — atlas_work_items design + fixture
 
@@ -409,3 +417,10 @@ any library, database feature, model, or accelerator into a canonical owner.
 - Direct OpenWiki ingestion of secrets, raw vectors, or unbounded repository logs.
 - Treating PostgreSQL AIO, bitmap indexes, pgvector, or PyTorch as new canonical
   schema owners.
+
+## 2026-09-27 — Portable OKF / registry owner audit
+
+- [x] Read-only inventory against the live PostgreSQL 18.4 `legal_ai_db` confirmed several distinct existing owners: `atlas_schema_registry` (schema metadata), `atlas_domain_ontology` (17 domain-ontology group rows), `atlas_packet_registry` (packet-oriented registry), `atlas_ontology_concepts` (empty concept identity schema), `domain_taxonomy_v1` (empty version/alias adapter), and `taxonomy_nodes` / `taxonomy_edges` (populated topology read model). Application domain classification is separately owned by `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts` (`CANONICAL_DOMAINS`). This does **not** establish one universal registry or authorize merging/populating these tables.
+- [x] Keep OKF as portable Markdown + YAML authoring/interchange, validated against existing local schemas and checksums. It may nominate documented use-cases, keywords, language/domain labels, and routing metadata; it cannot mint canonical packet/symbol IDs, ordinals, revisions, or promote classifier output.
+- [ ] Before adding a PostgreSQL registry table or admin editor, close the existing domain-class owner decision and map each OKF field to exactly one admitted owner. Prefer a read-only registry projection/API over a new table if the existing owner is sufficient. No DDL, row writes, OpenWiki integration install, or wiki initialization occurred in this audit.
+- [ ] If later approved, expose the reviewed registry through the existing Admin Unified Indexing Studio as a read-only inspector first. A Pokédex-like display is an ordinal/hex UI metaphor only; do not copy Pokémon source/assets or use display numbers as identity.

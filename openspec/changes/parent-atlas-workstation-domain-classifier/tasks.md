@@ -8,7 +8,9 @@ matching OpenSpec are not present in this checkout. The local implementation
 remains the V1 neural-routing feature contract. Focused V1 query-routing,
 neural-routing, and RAPIDS capability-probe tests pass 10/10. This does not
 prove the claimed classifier, dataset, executor-policy training, or MiniLM
-retirement; no model training or runtime/index writes were performed.
+intent-classifier/cross-encoder retirement; no model training or runtime/index
+writes were performed. The separate 384-D MiniLM embedding lane is retired by
+the canonical embedding contract, not by this classifier change.
 
 ## Revision-qualified classification export (2026-08-20)
 
@@ -19,8 +21,11 @@ retirement; no model training or runtime/index writes were performed.
       normalized 128-d `classification_mrl_128` vector is supplied.
 - [x] Focused exporter/query tests pass 4/4 in the dedicated exporter lane. The exporter does not call Ollama,
       train PyTorch, write JSONL, mutate retrieval policy, or write stores.
-- [ ] A live query/label producer and same-corpus EmbeddingGemma  embeddinggemma ast cst semantic 768, 512, 256, 128, derived latent256, latent128-d dataset
-      remain unproven; MiniLM retirement remains blocked.
+- [ ] A live query/label producer and same-corpus, revision-qualified
+      EmbeddingGemma classification dataset remain unproven. Do not conflate
+      classifier `classification_mrl_128` with the separate autoencoder
+      `latent_128` representation. MiniLM intent classification and
+      cross-encoder reranking are separate roles from 384-D dense embeddings.
 - [x] Added an explicit adapter from verified `ToolTrainingExampleV1` rows;
       domain, operation, retrieval-needs, and all revision metadata remain
       required inputs and are never inferred from `toolId` or query text.
@@ -164,7 +169,7 @@ future session doesn't have to re-derive the same checks.
   owns this exact work stream (`classification_768 -> classification_mrl_128` MRL truncate+L2
   projection) and is itself still open at the blocking step: `NLP-1`'s "Produce fixture embeddings
   with the proven EmbeddingGemma executor" and "Verify 128-d norm/digest determinism" remain
-  unchecked there too. MiniLM retirement (this change's line 22) accordingly remains blocked — not
+  unchecked there too. MiniLM intent/cross-encoder retirement (this change's line 22) accordingly remains blocked — not
   resolved, but the right place to watch is that sibling file, not to re-derive the blocker here.
 - **Line 33 (workflow loop has no live classifier producer)** — no new evidence found anywhere in
   the portfolio; still accurately open.
@@ -922,3 +927,256 @@ Evidence: `docs/reports/graphify-execution-run-bridge-apply-v1.json`,
 
 See `proposal.md` for the full source-copy rationale, the 3 upgrades, and the namespace-separation
 table. Do not re-derive what's already there.
+
+## Classification envelope and representation alignment (2026-09-30)
+
+- [ ] CLASS-REP-02: reconcile `ClassificationEnvelopeV1` representations with the admitted model
+      family and current representation registry. Define explicit canonical names for
+      `semantic_768`, `ae_hidden_512`, `latent_256`, `latent_128`, `latent_64`, and the separate
+      `topology_4d` projection; preserve `dense384` only as quarantined legacy compatibility. Do
+      not silently mutate a persisted strict-v1 payload: identify consumers and select an
+      additive/versioned compatibility path with schema, serializer, and round-trip tests. Bind
+      each value to its own representation/producer revision and dimension; `latent_64` must be
+      identified as derived from `latent_128`, not as an independent learned bottleneck.
+- [ ] DOMAIN-SIGNAL-CONVERGENCE-01: prove `ClassificationSignalsSchema` can serve as the bounded
+      `DomainSignalV1` envelope/adapter for domain class, secondary domains, ontology/concept IDs,
+      classifier outputs, PageRank/community/KMeans/SOM observations, and evidence state. Reuse
+      this schema or add a pure adapter; do not add a duplicate durable table. Require packet/source
+      identity and exact revision joins at the envelope boundary, and keep classifier/topology
+      values descriptive—not identity or promotion authority.
+
+Acceptance: schema and adapter tests cover all current signals, absent/unknown values, stale
+revision rejection, representation-name migration, legacy `dense384` quarantine, and canonical
+serialization. No classifier retraining, corpus writes, or representation materialization is
+authorized by these contract gates.
+
+## Revision-qualified AST domain annotation gates (2026-09-30)
+
+- [ ] AST-DOMAIN-CONTRACT-01: reuse `domain-taxonomy.ts::CANONICAL_DOMAINS` and its taxonomy
+      revision; do not introduce an `ast_domain` enum. Specify `domain` as normalized canonical
+      domain and `domain_class` as producer/classifier-derived annotation. AST prediction,
+      confidence, and keyword counts are evidence/features only and must never alter `packet_key`,
+      `source_ref`, canonical IDs, or source/workspace revisions. Conflicting evidence must remain
+      explicit rather than silently overwriting canonical `domain`.
+- [ ] AST-DOMAIN-LINEAGE-02: bind promotable AST domain observations to the existing
+      `ExtractedFeature` identity/revision fields (`sourceRef`, `workspaceRevision`,
+      `sourceRevision`, `providerRevision`) and the extractor/validation status already owned by
+      the AST feature producer. Require exact admitted workspace and source revisions; stale,
+      missing, or ambiguous observations remain non-promotable.
+- [ ] AST-DOMAIN-ADMISSION-03: establish a deterministic, read-only resolver for one admitted
+      `PacketAstKeywordFeatures` row per packet/source/revision. Define duplicate/conflict,
+      unsupported-source, and missing-observation outcomes; preserve typed rejection reasons and
+      do not infer identity from paths, classifier labels, or cache state.
+
+Acceptance: canonical-enum compatibility, exact-revision selection, stale/missing/ambiguous
+rejection, and conflict-preservation tests pass. These gates authorize no extraction apply,
+classifier training, packet mutation, or projection/cache writes. The classifier-vector consumer
+gate is owned by `parent-atlas-search-classifier-sidecar`; envelope and projection propagation are
+owned by `parent-atlas-ace-rlm-bitfrost-integration`.
+
+## Classifier producer, export, and runtime admission boundary (2026-09-30)
+
+This section supersedes any reading of the historical Phase 6/85 note as proof of a live
+EmbeddingGemma classifier, trained artifact, policy switch, or MiniLM retirement. Keep these three
+stages separate:
+
+### 1. Feature production — revision-qualified evidence, not labels by inference
+
+- [ ] Complete AST/CST/semantic feature production only through the existing source/feature owners.
+      Bind each observation to canonical `sourceRef`, admitted `workspaceRevision`, exact
+      `sourceRevision`, feature/provider revision, and evidence refs. Reuse the AST-domain gates
+      above; classifier features and heuristic labels remain non-authoritative.
+- [ ] Identify the live query and explicit label producers. Require admitted evidence for domain,
+      operation, and retrieval-needs labels; never infer these from `toolId`, paths, AST names, or
+      query text. Join features, labels, and execution receipts only on compatible identity and
+      revision tuples.
+- [ ] Keep `EmbeddingGemmaClassificationExampleV1` pure. Its existing exporter/adapters and
+      fixture proof establish export-contract behavior only; they do not establish live inference,
+      live producers, or a populated same-corpus dataset.
+
+### 2. Revision-qualified export and training readiness
+
+- [ ] Produce the classifier representation through the existing EmbeddingGemma executor and
+      owner. For the query-router lane, use the sibling
+      `parent-atlas-query-routing-classifier` contract (`classification_768` →
+      `classification_mrl_128`, truncate + L2); do not create a competing representation owner.
+- [ ] Keep classifier `classification_mrl_128` distinct from AE `latent_128` and any other
+      `semantic_768`/latent-family projection unless a separately versioned, evidenced adapter
+      explicitly binds them. Require exact model, prompt, feature, label, transform, and source
+      revisions plus finite dimension/norm/digest validation.
+- [ ] Join live feature, vector, explicit label, and replay-stable execution evidence into one
+      same-corpus dataset. Emit immutable example IDs and a frozen manifest with corpus/dataset
+      revisions, split identity, label and representation distributions, producer revisions, and
+      checksum. Reject mixed revisions and missing evidence; `FEATURES_ONLY` is not training-ready.
+- [ ] Do not train until the frozen manifest contains an operator-approved corpus/class-coverage
+      rule and non-empty `TRAINING_READY` rows. Then use the existing query-router trainer owner;
+      record deterministic split/seed, trainer and architecture revisions, held-out metrics,
+      calibration, artifact checksum, and exact same-tensor comparison against the baseline.
+
+### 3. Runtime classifier admission and MiniLM role separation
+
+- [x] Confirmed the canonical embedding runtime contract retires 384-D vectors, admits
+      EmbeddingGemma MRL widths 768/512/256/128, and confines any remaining 384-D access to
+      migration-only tooling. The 384-D MiniLM bi-encoder is therefore not a canonical semantic
+      embedding fallback.
+- [ ] Audit runtime call sites and legacy collections/artifacts before cleanup. Keep historical
+      384-D data read-only or migration-scoped; do not delete it as part of classifier work and do
+      not mix it with 768/MRL vectors in one retrieval collection.
+- [ ] Track MiniLM intent-classification and MiniLM cross-encoder reranking replacement separately.
+      The 384-D embedding retirement does not prove parity for either role.
+
+- [ ] Define and verify a classifier artifact manifest and deterministic load/readback before
+      runtime use. Start in shadow mode; emit receipts binding request/query identity, feature/model/
+      artifact/policy revisions, prediction, confidence, and evidence refs. Compare against current
+      V1 routing without changing retrieval or executor policy.
+- [ ] Admit runtime influence only through an explicit policy revision and measured evaluation;
+      preserve existing behavior on missing, stale, or invalid classifier output. Executor selection
+      remains the deterministic capability-policy owner's responsibility.
+- [ ] Retire the intent-classifier or cross-encoder role only after its specific replacement has
+      same-corpus held-out parity, runtime/readback proof, and an explicit promotion decision;
+      EmbeddingGemma exporter or 384-D embedding retirement evidence alone is insufficient.
+
+Current boundary: V1 query/neural-routing contracts and the bounded capability-probe tests are
+contract evidence; the exporter/adapters and fixture proof are export-contract evidence. A live
+same-corpus producer, `TRAINING_READY` dataset, trained classifier artifact, runtime shadow/admission,
+policy switch, and MiniLM intent/cross-encoder retirement remain **NOT PROVEN / NOT PERFORMED**.
+The 384-D MiniLM embedding lane is **RETIRED BY CONTRACT**; legacy artifact cleanup is not
+performed. No training, model
+promotion, retrieval/index/store write, or runtime switch is authorized by this task section.
+
+## Preferred replacement: EmbeddingGemma, FastAPI NLP, then PyTorch (2026-09-30)
+
+User direction: replace remaining MiniLM roles using the existing EmbeddingGemma/NLP fabric and
+evaluated classifier/reranker owners. Preserve separate task evaluation for intent and pairwise
+reranking while implementing this replacement; MiniLM is historical comparison material.
+
+Current code trace: `atlas/neural-routing/encoder-manifest.ts` already declares
+`google/embeddinggemma-300m` for intent classification and `mixedbread-ai/mxbai-rerank-base-v2`
+for tool cross-encoding. Both split revisions remain `UNBOUND`; these are candidate manifests,
+not proof of trained production artifacts. The reranker's `maxSequenceLength: 384` is a token
+limit, unrelated to retired 384-D embeddings. The existing NLP sidecar owns POS observations and
+NB/LR classifier inference. `atlas_nlp_classification_helper_v1.py` also exposes a bounded
+rule-based proposal seam; do not confuse that seam with the checkpoint-backed classifier.
+
+Runtime boundary verified 2026-10-02: the healthy `legal-ai-langgraph` container has LangGraph
+installed and PyTorch absent. This matches `docker/langgraph-synthesis/Dockerfile`'s CPU-only
+orchestration contract; it is not evidence that PyTorch was removed from the separate classifier,
+ATen, or GPU executor lanes. Keep those owners and add PyTorch to this image only if a specifically
+owned tensor executor is approved, rather than coupling model dependencies to orchestration.
+
+- [ ] NLP-INTERIM-CLASSIFIER-01: bind the existing FastAPI NLP classifier outputs to exact
+      source/workspace, classifier/checkpoint, feature, and label revisions; prove bounded
+      readback and declared backend before using its domain/operation observations in routing.
+      Compare the current baseline and EmbeddingGemma-based candidate on the same frozen corpus.
+- [ ] POS-LABEL-PROVENANCE-02: use the existing POS/extraction owner for token/span observations.
+      Record tagger/model revision and source digest; keep POS tags, weak domain-label proposals,
+      and admitted domain/operation/retrieval-needs targets as separately typed evidence. Require
+      a reviewed label producer and frozen label revision before supervised training.
+- [ ] PYTORCH-CLASSIFIER-03: reuse `sveltekit-frontend/scripts/atlas/train-query-router-pytorch.py`
+      and review its v2 sibling for ownership before adding any trainer. Consume the admitted
+      same-corpus manifest, immutable EmbeddingGemma revisions, and verified feature/label schema;
+      measure held-out classification, calibration, routing success, and latency against FastAPI
+      NB/LR. Training readiness remains gated by the existing dataset admission tasks.
+- [ ] ATEN-CLASSIFIER-RUNTIME-04: trace the existing LibTorch/ATen executor and define an artifact
+      loading/inference adapter only after a reproducible classifier artifact exists. Prove
+      Python/PyTorch versus runtime logits/prediction parity, schema/dtype compatibility, artifact
+      checksum, and bounded CPU/GPU fallback. ATen is the tensor execution backend; label ownership
+      and classifier architecture stay with their existing producers.
+- [ ] INTENT-REPLACEMENT-05: run the preferred classifier path in shadow mode, compare the frozen
+      intent/domain/operation test set and tool-routing outcomes, then remove remaining active
+      MiniLM intent dependencies through the existing policy owner with a rollback receipt.
+- [ ] RERANKER-REPLACEMENT-06: evaluate the existing configured reranker candidate on identical
+      query/document pairs and candidate pools. Record ranking quality, latency, model/license and
+      artifact identity; retire remaining MiniLM/MS-MARCO reranker callers only after its own
+      admission/readback gate. EmbeddingGemma similarity may contribute retrieval features; the
+      pairwise scoring replacement must be explicitly evaluated.
+
+Acceptance: preferred replacement owners are connected through revision-qualified evidence and
+the same evaluation corpus. Claims of superiority must name the measured task and receipt;
+model choice alone does not close training, production wiring, or projection-admission gates.
+
+### Live NLP sidecar and artifact-role reconciliation (2026-09-30)
+
+- [x] Confirmed the running `miniforge-nlp-sidecar` container is healthy on `:8095`. Its live
+      `/health` reports Python 3.13.15, spaCy/POS, LangExtract, Tree-sitter, AST-grep, and the
+      classification helper available; PyTorch and in-container RAPIDS/cuVS are unavailable by
+      design. The sidecar is a CPU NLP/structure/classification service, not the WSL RAPIDS
+      executor or the autoencoder trainer.
+- [x] Sent one bounded, synthetic, read-only `/analyze` request with `passes: ["classify"]`.
+      It returned `backend=sklearn-lr`, checkpoint revision
+      `domain-classifier-nblr-v1-1788454983`, a domain proposal, and
+      `SOURCE_PACKET_WORKSPACE_LINEAGE_REQUIRED`; no canonical promotion or datastore write was
+      performed. This proves the live classify pass executes, not that its output is admitted for
+      production routing.
+- [x] Confirmed the configured domain-classifier artifact is
+      `models/domain-classifier/checkpoint.joblib` (read-only mounted into the sidecar), not
+      `models/nested-semantic-autoencoder/nested_semantic_autoencoder_v3_full01.pt`. The latter is
+      historical AE weights for the incompatible `768 → 384 → 256` architecture. It is neither a
+      domain classifier nor a checkpoint for the current `768 → 512 → 256 → 128` candidate; do not
+      try to load it through the classifier or current AE definition.
+- [x] Confirmed the local tree defines `POST /classify`, but the running container's OpenAPI omits
+      that route and live `POST /classify` returns 404. The live `/analyze` classify pass does work.
+      Treat this as a route/deployment-version mismatch to reconcile before making the dedicated
+      helper endpoint part of a caller contract; do not restart/rebuild the sidecar implicitly.
+- [x] Rechecked training admission: `DOMAIN_CLASSIFIER_TRAINING_READY_FALSE`; the stored weak-label
+      bundle has 13 rows across 3 labels, zero revision-qualified rows, zero current-admitted rows,
+      and no operator-approved class/coverage threshold. The serving checkpoint loads and predicts,
+      but its older six-label weakly supervised receipt is not a promoted/current 15-domain model.
+- [ ] Reconcile the live `/classify` route with the deployed application revision, then add a
+      bounded live contract/readback test for both `/analyze` classify and `/classify` if the latter
+      remains an intended public endpoint. Keep deterministic taxonomy output authoritative until
+      source/workspace lineage, classifier artifact/label revisions, frozen evaluation, and explicit
+      policy admission are proven.
+- [ ] Keep this sidecar work independent from the canonical-projection admission gate and other
+      unfinished OpenSpecs. Those gates govern their own Graphify/projection promotions; they do
+      not prevent CPU NLP/POS, FastAPI endpoint reconciliation, or classifier evaluation from
+      progressing under their own task contracts.
+
+Evidence paths: `docker/miniforge-nlp-sidecar/docker-compose.yml`,
+`python/miniforge_nlp_sidecar.py`, `python/miniforge_nlp_sidecar_oak.py`,
+`docs/reports/domain-classifier-training-readiness-v1.json`,
+`docs/reports/domain-classifier-runtime-parity-01.json`, and the live read-only health/analyze
+probe from 2026-09-30. This records runtime availability and a fixture prediction only; it does
+not establish a newly promoted model, admitted source classification, or an OpenSpec completion.
+
+### Live classifier quality and call-site check (2026-09-30)
+
+- [x] Rechecked artifact timestamps: `models/domain-classifier/checkpoint.joblib` is 101,160 bytes,
+  created/modified 2026-09-03 10:03 local time; historical AE checkpoint
+  `models/nested-semantic-autoencoder/nested_semantic_autoencoder_v3_full01.pt` is 5,825,981 bytes,
+  created/modified 2026-08-29 17:52. The Docker sidecar mounts and loads only `checkpoint.joblib`.
+  Filesystem timestamps are inventory metadata, not training provenance.
+- [x] Sent four bounded synthetic texts through live `POST :8095/analyze` with only
+  `passes: ["classify"]`; no datastore or model writes. The learned pass returned `ui` for all four
+  cases (retrieval, auth, cache, compiler), with LR probabilities approximately 0.548–0.550 and
+  NB probabilities 0.554–0.563. The separate advisory taxonomy proposal varied (`retrieval`,
+  `cache`, or `documentation`). This proves runtime functionality, but the learned classifier
+  fails this small discriminative smoke set and must not be promoted or used as authoritative
+  routing on this evidence.
+- [x] Traced `classifyDomainTaxonomyWithLearned`: the bridge calls the live sidecar `/analyze`
+  classify pass, but repository search found no production call site for the bridge itself. The
+  current `classifyDomainTaxonomy()` callers use the deterministic in-process taxonomy; they do
+  not prove the learned joblib checkpoint is wired into those flows.
+- [ ] Evaluate/retrain the learned classifier only after its target labels, revision-qualified
+  training examples, immutable artifact/runtime metadata, and held-out acceptance criteria are
+  defined. Do not substitute EmbeddingGemma, the custom AE `.pt`, or the proposal helper for this
+  classifier role without a separate evaluated contract.
+
+### Separate historical autoencoder service check (2026-09-30)
+
+- [x] Clarified the other model service so it is not mistaken for the NLP classifier: the running
+  `atlas-neural-decoder` on `:8121` mounts the `.pt` read-only and successfully serves one bounded
+  CUDA `/v1/neural-decoder/encode` request. It returned normalized widths 256/128/64, checkpoint
+  SHA-256 `ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5`, and
+  `writesPerformed=false`.
+- [x] Inspected the actual checkpoint tensors and the code inside the running image. They load
+  strictly into the image's historical `hidden_dim=384` model (`encoder.0.weight=[384,768]`,
+  `encoder.2.weight=[256,384]`); `latent_128` and `latent_64` are normalized prefixes of
+  `latent_256`, not independently learned stages. The running image was built 2026-08-31; the
+  current source definition is 768→512→256→128 and is not the architecture served by this image.
+  Thus the old encoder **runs**, but it is not the current candidate and is not a domain/NLP
+  classifier.
+- [x] Confirmed SvelteKit contains an optional prefill-shadow integration for `:8121`, guarded by
+  `NEURAL_DECODER_PREFILL_SHADOW_ENABLED` with default `false`; shadow output is documented not to
+  affect ranking or canonical state. This is distinct from the learned domain-classifier bridge,
+  for which no production call site was found.

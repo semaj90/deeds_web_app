@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T00:31:55Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "PROTO_01_STATIC_TRANSPORT_OWNER_CENSUS",
+    "to": "PROTO_02_DUPLICATE_TRANSPORT_AND_COMPATIBILITY_AUDIT",
+    "reason": "The scoped caller search improved PROTO-01 evidence but confirmed unresolved external reachability, health, full MCP overlap, and A2A protocol conformance. No safe owner removal or task closure is justified; proceed to the adjacent read-only duplicate/compatibility audit."
+  },
+  "evidence": {
+    "transportMatrix": "docs/reports/parent-atlas-transport-owner-matrix-v1.json",
+    "confirmedACPCallers": 3,
+    "confirmedA2ACaller": "ChatSession.svelte.ts -> POST /api/ai/agent",
+    "trpcInRepoClientFound": false,
+    "a2aBatchCallerFound": false,
+    "grpcNamedRetrievalWrapper": "HTTP retrieval path; gRPC placeholder uninitialized and default port conflicts with configured retrieval port",
+    "knownDuplicateMcpReceipt": "docs/reports/mcp-prefetch-duplicate-owner-v1.json",
+    "proto01Closed": false
+  },
+  "validation": {
+    "openSpecStrict": "PASS",
+    "jsonParse": "PASS",
+    "diffCheck": "PASS"
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "runtimeRemoval": false
+  },
+  "nextGate": "PROTO_02_DUPLICATE_TRANSPORT_AND_COMPATIBILITY_AUDIT"
+}

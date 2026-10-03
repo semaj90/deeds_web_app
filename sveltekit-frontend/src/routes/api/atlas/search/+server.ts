@@ -230,7 +230,8 @@ async function embedQuery(query: string): Promise<number[] | null> {
       modelArtifactRevision,
       tokenizerRevision,
       inputPolicyRevision,
-      baseUrl: ENV.EMBEDDING_BASE_URL,
+      // EMB-PROV-01: dedicated strict-lane URL, not the shared EMBEDDING_BASE_URL.
+      baseUrl: ENV.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081',
       timeoutMs: 20_000,
     });
     return embedded.embedding;

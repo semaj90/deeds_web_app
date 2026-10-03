@@ -1,0 +1,1191 @@
+DSPy
+stanfordnlp/dspy
+Overview
+Getting Started
+Getting Started
+Program, don't prompt
+Setting up DSPy
+Your first program
+Expanding signatures
+Class-based signatures
+Changing modules
+Tools with ReAct
+Composing modules
+Metrics
+GEPA optimization
+Saving and loading
+Where to go next
+Diving Deeper
+Diving Deeper
+Signatures in depth
+Modules: composing your own
+Built-in module variants
+RLM: exploring large contexts with code
+Flex: optimizable module code
+Tools and MCP
+ReAct and ReActV2
+Metrics and evaluation
+Optimizers: choosing one
+GEPA in depth
+BootstrapFewShot family
+Adapters: how signatures become prompts
+Settings and context()
+Saving and loading
+Tutorials
+Tutorials
+Build AI Programs with DSPy
+Build AI Programs with DSPy
+Managing Conversation History
+Building AI Agents with DSPy
+Building AI Applications by Customizing DSPy Modules
+Retrieval-Augmented Generation (RAG)
+Building RAG as Agent
+Entity Extraction
+Classification
+Decision-Making with Jev Types
+Multi-Hop RAG
+Privacy-Conscious Delegation
+Program Of Thought
+Image Generation Prompt iteration
+Audio
+Optimize AI Programs with DSPy
+Optimize AI Programs with DSPy
+Math Reasoning
+Classification Finetuning
+Advanced Tool Use
+Finetuning Agents
+Reflective Prompt Evolution with dspy.GEPA
+Reflective Prompt Evolution with dspy.GEPA
+GEPA for AIME (Math)
+GEPA for Structured Information Extraction for Enterprise Tasks
+GEPA for Privacy-Conscious Delegation
+GEPA for Code Backdoor Classification (AI control)
+Experimental RL Optimization for DSPy
+Experimental RL Optimization for DSPy
+RL for Privacy-Conscious Delegation
+RL for Multi-Hop Research
+Tools, Development, and Deployment
+Tools, Development, and Deployment
+Use MCP in DSPy
+Custom LM Engines
+Output Refinement
+Saving and Loading
+Cache
+Deployment
+Debugging & Observability
+Tracking DSPy Optimizers
+Streaming
+Async
+Real-World Examples
+Real-World Examples
+Generating llms.txt
+Memory-Enabled ReAct Agents
+Financial Analysis with Yahoo Finance
+Email Information Extraction
+Code Generation for Unfamiliar Libraries
+Building a Creative Text-Based AI Game
+API Reference
+API Reference
+Adapters
+Adapters
+Adapter
+ChatAdapter
+XMLAdapter
+JSONAdapter
+JSONAdapter
+On this page
+JSONAdapter
+Methods:
+TwoStepAdapter
+Evaluation
+Evaluation
+CompleteAndGrounded
+Evaluate
+EvaluationResult
+SemanticF1
+answer_exact_match
+answer_passage_match
+Experimental
+Experimental
+Citations
+Decision types and System One models
+Document
+ReAnchor
+Models
+Models
+BaseLM
+Embedder
+LM
+Modules
+Modules
+BestOfN
+ChainOfThought
+CodeAct
+Flex
+Module
+MultiChainComparison
+Parallel
+Predict
+ProgramOfThought
+ReAct
+ReActV2
+Refine
+RLM
+Optimizers
+Optimizers
+GEPA
+GEPA
+1. GEPA Overview
+2. GEPA Advanced
+BetterTogether
+BootstrapFewShot
+BootstrapFewShotWithRandomSearch
+BootstrapFinetune
+BootstrapRS
+COPRO
+Ensemble
+InferRules
+KNN
+KNNFewShot
+LabeledFewShot
+MIPROv2
+SIMBA
+Primitives
+Primitives
+Audio
+Code
+Example
+History
+Image
+Prediction
+Tool
+ToolCalls
+Signatures
+Signatures
+InputField
+OutputField
+Signature
+Tools
+Tools
+ColBERTv2
+Embeddings
+LocalInterpreter
+PythonInterpreter
+Utils
+Utils
+Errors
+configure
+context
+StatusMessage
+StatusMessageProvider
+StreamListener
+asyncify
+configure_cache
+disable_litellm_logging
+disable_logging
+enable_litellm_logging
+enable_logging
+inspect_history
+load
+streamify
+Community
+Community
+Use Cases
+Built with DSPy
+Resources
+Contributing
+Normalized LM API Migration
+FAQ
+FAQ
+FAQ
+Cheatsheet
+On this page
+JSONAdapter
+Methods:
+Overview
+API Reference
+Adapters
+# dspy.JSONAdapter ¶
+## dspy . JSONAdapter ( callbacks : list [ BaseCallback ] | None = None , use_native_function_calling : bool = True , parallel_tool_calls : bool | None = None ) ¶
+Bases:
+`ChatAdapter`
+Source code in
+`dspy/adapters/json_adapter.py`
+```
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+``` | ```
+def __init__(
+    self,
+    callbacks: list[BaseCallback] | None = None,
+    use_native_function_calling: bool = True,
+    parallel_tool_calls: bool | None = None,
+):
+    # JSONAdapter uses native function calling by default.
+    super().__init__(
+        callbacks=callbacks,
+        use_native_function_calling=use_native_function_calling,
+        parallel_tool_calls=parallel_tool_calls,
+    )
+```
+### Methods: ¶
+#### __call__ ( lm : BaseLM , lm_kwargs : dict [ str , Any ], signature : type [ Signature ], demos : list [ dict [ str , Any ]], inputs : dict [ str , Any ]) -> list [ dict [ str , Any ]] ¶
+Source code in
+`dspy/adapters/json_adapter.py`
+```
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+``` | ```
+@with_capability_planning
+def __call__(
+    self,
+    lm: BaseLM,
+    lm_kwargs: dict[str, Any],
+    signature: type[Signature],
+    demos: list[dict[str, Any]],
+    inputs: dict[str, Any],
+) -> list[dict[str, Any]]:
+    self._prepare_response_format(lm, lm_kwargs, signature)
+    return super().__call__(lm, lm_kwargs, signature, demos, inputs)
+```
+#### acall ( lm : BaseLM , lm_kwargs : dict [ str , Any ], signature : type [ Signature ], demos : list [ dict [ str , Any ]], inputs : dict [ str , Any ]) -> list [ dict [ str , Any ]] async ¶
+Source code in
+`dspy/adapters/json_adapter.py`
+```
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+``` | ```
+@with_capability_planning
+async def acall(
+    self,
+    lm: BaseLM,
+    lm_kwargs: dict[str, Any],
+    signature: type[Signature],
+    demos: list[dict[str, Any]],
+    inputs: dict[str, Any],
+) -> list[dict[str, Any]]:
+    self._prepare_response_format(lm, lm_kwargs, signature)
+    return await super().acall(lm, lm_kwargs, signature, demos, inputs)
+```
+#### format ( signature : type [ Signature ], demos : list [ dict [ str , Any ]], inputs : dict [ str , Any ]) -> list [ dict [ str , Any ]] ¶
+Format the input messages for the LM call.
+This method converts the DSPy structured input along with few-shot examples and conversation history into multiturn messages as expected by the LM. For custom adapters, this method can be overridden to customize the formatting of the input messages.
+In general we recommend the messages to have the following structure:
+```
+[
+    {"role": "system", "content": system_message},
+    # Begin few-shot examples
+    {"role": "user", "content": few_shot_example_1_input},
+    {"role": "assistant", "content": few_shot_example_1_output},
+    {"role": "user", "content": few_shot_example_2_input},
+    {"role": "assistant", "content": few_shot_example_2_output},
+    ...
+    # End few-shot examples
+    # Begin conversation history
+    {"role": "user", "content": conversation_history_1_input},
+    {"role": "assistant", "content": conversation_history_1_output},
+    {"role": "user", "content": conversation_history_2_input},
+    {"role": "assistant", "content": conversation_history_2_output},
+    ...
+    # End conversation history
+    {"role": "user", "content": current_input},
+]
+
+And system message should contain the field description, field structure, and task description.
+```
+Parameters:
+Name | Type | Description | Default
+signature | type [ Signature ] | The DSPy signature for which to format the input messages. | required
+demos | list [ dict [ str , Any ]] | A list of few-shot examples. | required
+inputs | dict [ str , Any ] | The input arguments to the DSPy module. | required
+Returns:
+Type | Description
+list [ dict [ str , Any ]] | A list of multiturn messages as expected by the LM.
+Source code in
+`dspy/adapters/base.py`
+```
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+``` | ```
+def format(
+    self,
+    signature: type[Signature],
+    demos: list[dict[str, Any]],
+    inputs: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Format the input messages for the LM call.
+
+    This method converts the DSPy structured input along with few-shot examples and conversation history into
+    multiturn messages as expected by the LM. For custom adapters, this method can be overridden to customize
+    the formatting of the input messages.
+
+    In general we recommend the messages to have the following structure:
+    ```
+    [
+        {"role": "system", "content": system_message},
+        # Begin few-shot examples
+        {"role": "user", "content": few_shot_example_1_input},
+        {"role": "assistant", "content": few_shot_example_1_output},
+        {"role": "user", "content": few_shot_example_2_input},
+        {"role": "assistant", "content": few_shot_example_2_output},
+        ...
+        # End few-shot examples
+        # Begin conversation history
+        {"role": "user", "content": conversation_history_1_input},
+        {"role": "assistant", "content": conversation_history_1_output},
+        {"role": "user", "content": conversation_history_2_input},
+        {"role": "assistant", "content": conversation_history_2_output},
+        ...
+        # End conversation history
+        {"role": "user", "content": current_input},
+    ]
+
+    And system message should contain the field description, field structure, and task description.
+    ```
+
+
+    Args:
+        signature: The DSPy signature for which to format the input messages.
+        demos: A list of few-shot examples.
+        inputs: The input arguments to the DSPy module.
+
+    Returns:
+        A list of multiturn messages as expected by the LM.
+    """
+    inputs_copy = dict(inputs)
+
+    # If the signature and inputs have conversation history, we need to format the conversation history and
+    # remove the history field from the signature.
+    history_field_name = self._get_history_field_name(signature)
+    if history_field_name:
+        # In order to format the conversation history, we need to remove the history field from the signature.
+        signature_without_history = signature.delete(history_field_name)
+        conversation_history = self.format_conversation_history(
+            signature_without_history,
+            history_field_name,
+            inputs_copy,
+        )
+
+    messages = []
+    system_message = self.format_system_message(signature)
+    messages.append({"role": "system", "content": system_message})
+    messages.extend(self.format_demos(signature, demos))
+    if history_field_name:
+        # Conversation history and current input
+        content = self.format_user_message_content(signature_without_history, inputs_copy, main_request=True)
+        messages.extend(conversation_history)
+        if content:
+            messages.append({"role": "user", "content": content})
+    else:
+        # Only current input
+        content = self.format_user_message_content(signature, inputs_copy, main_request=True)
+        if content:
+            messages.append({"role": "user", "content": content})
+
+    return [_expand_legacy_custom_type_markers_in_chat_message(message) for message in messages]
+```
+#### format_assistant_message_content ( signature : type [ Signature ], outputs : dict [ str , Any ], missing_field_message = None ) -> str ¶
+Source code in
+`dspy/adapters/json_adapter.py`
+```
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+``` | ```
+def format_assistant_message_content(
+    self,
+    signature: type[Signature],
+    outputs: dict[str, Any],
+    missing_field_message=None,
+) -> str:
+    fields_with_values = {
+        FieldInfoWithName(name=k, info=v): outputs.get(k, missing_field_message)
+        for k, v in signature.output_fields.items()
+    }
+    return self.format_field_with_value(fields_with_values, role="assistant")
+```
+#### format_conversation_history ( signature : type [ Signature ], history_field_name : str , inputs : dict [ str , Any ]) -> list [ dict [ str , Any ]] ¶
+Format the conversation history.
+This method formats the conversation history and the current input as multiturn messages.
+Parameters:
+Name | Type | Description | Default
+signature | type [ Signature ] | The DSPy signature for which to format the conversation history. | required
+history_field_name | str | The name of the history field in the signature. | required
+inputs | dict [ str , Any ] | The input arguments to the DSPy module. | required
+Returns:
+Type | Description
+list [ dict [ str , Any ]] | A list of multiturn messages as expected by the LM.
+Source code in
+`dspy/adapters/base.py`
+```
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589
+590
+591
+592
+593
+594
+595
+596
+597
+598
+599
+``` | ```
+def format_conversation_history(
+    self,
+    signature: type[Signature],
+    history_field_name: str,
+    inputs: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Format the conversation history.
+
+    This method formats the conversation history and the current input as multiturn messages.
+
+    Args:
+        signature: The DSPy signature for which to format the conversation history.
+        history_field_name: The name of the history field in the signature.
+        inputs: The input arguments to the DSPy module.
+
+    Returns:
+        A list of multiturn messages as expected by the LM.
+    """
+    conversation_history = inputs[history_field_name].messages if history_field_name in inputs else None
+
+    if conversation_history is None:
+        return []
+
+    messages = []
+    for message in conversation_history:
+        tool_call_field_name, tool_calls = _tool_calls_from_message(message)
+        tool_call_results = (
+            ToolCallResults.model_validate(tool_calls.tool_call_results)
+            if tool_calls is not None and tool_calls.tool_call_results is not None
+            else None
+        )
+
+        user_content = self.format_user_message_content(signature, message)
+        if user_content:
+            messages.append({"role": "user", "content": user_content})
+
+        if self.use_native_function_calling and tool_calls is not None:
+            content_signature = signature
+            for name, field in signature.output_fields.items():
+                if field.annotation == ToolCalls or message.get(name) is None:
+                    content_signature = content_signature.delete(name)
+
+            content = (
+                self.format_assistant_message_content(content_signature, message)
+                if content_signature.output_fields
+                else ""
+            )
+
+            if tool_call_results is not None:
+                tool_call_ids = [tool_call.id for tool_call in tool_calls.tool_calls]
+                result_ids = [result.call_id for result in tool_call_results.tool_call_results]
+                if tool_call_ids != result_ids or not all(tool_call_ids):
+                    tool_call_results = None
+
+            if content or tool_call_results is not None:
+                assistant_message: dict[str, Any] = {"role": "assistant", "content": content or None}
+                if tool_call_results is not None:
+                    assistant_message["tool_calls"] = [
+                        _tool_call_as_openai_message_tool_call(tool_call) for tool_call in tool_calls.tool_calls
+                    ]
+                messages.append(assistant_message)
+
+            if tool_call_results is not None:
+                for result in tool_call_results.tool_call_results:
+                    content = _tool_result_content(result.value)
+                    messages.append(
+                        {"role": "tool", "tool_call_id": result.call_id, "name": result.name, "content": content}
+                    )
+            continue
+
+        assistant_values = message
+        if tool_call_field_name is not None and tool_call_results is not None:
+            assistant_values = dict(message)
+            assistant_values[tool_call_field_name] = tool_calls.model_copy(update={"tool_call_results": None})
+
+        assistant_content = self.format_assistant_message_content(signature, assistant_values)
+        if assistant_content:
+            messages.append({"role": "assistant", "content": assistant_content})
+        if tool_call_results is not None:
+            result_input = {"tool_call_results": tool_call_results}
+            content = self.format_user_message_content(_TOOL_CALL_RESULTS_SIGNATURE, result_input)
+            messages.append({"role": "user", "content": content})
+
+    # Remove the history field from the inputs
+    del inputs[history_field_name]
+
+    return messages
+```
+#### format_demos ( signature : type [ Signature ], demos : list [ dict [ str , Any ]]) -> list [ dict [ str , Any ]] ¶
+Format the few-shot examples.
+This method formats the few-shot examples as multiturn messages.
+Parameters:
+Name | Type | Description | Default
+signature | type [ Signature ] | The DSPy signature for which to format the few-shot examples. | required
+demos | list [ dict [ str , Any ]] | A list of few-shot examples, each element is a dictionary with keys of the input and output fields of the signature. | required
+Returns:
+Type | Description
+list [ dict [ str , Any ]] | A list of multiturn messages.
+Source code in
+`dspy/adapters/base.py`
+```
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+``` | ```
+def format_demos(self, signature: type[Signature], demos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Format the few-shot examples.
+
+    This method formats the few-shot examples as multiturn messages.
+
+    Args:
+        signature: The DSPy signature for which to format the few-shot examples.
+        demos: A list of few-shot examples, each element is a dictionary with keys of the input and output fields of
+            the signature.
+
+    Returns:
+        A list of multiturn messages.
+    """
+    complete_demos = []
+    incomplete_demos = []
+
+    for demo in demos:
+        # Check if all fields are present and not None
+        is_complete = all(k in demo and demo[k] is not None for k in signature.fields)
+
+        # Check if demo has at least one input and one output field
+        has_input = any(k in demo for k in signature.input_fields)
+        has_output = any(k in demo for k in signature.output_fields)
+
+        if is_complete:
+            complete_demos.append(demo)
+        elif has_input and has_output:
+            # We only keep incomplete demos that have at least one input and one output field
+            incomplete_demos.append(demo)
+
+    messages = []
+
+    incomplete_demo_prefix = "This is an example of the task, though some input or output fields are not supplied."
+    for demo in incomplete_demos:
+        messages.append(
+            {
+                "role": "user",
+                "content": self.format_user_message_content(signature, demo, prefix=incomplete_demo_prefix),
+            }
+        )
+        messages.append(
+            {
+                "role": "assistant",
+                "content": self.format_assistant_message_content(
+                    signature, demo, missing_field_message="Not supplied for this particular example. "
+                ),
+            }
+        )
+
+    for demo in complete_demos:
+        messages.append({"role": "user", "content": self.format_user_message_content(signature, demo)})
+        messages.append(
+            {
+                "role": "assistant",
+                "content": self.format_assistant_message_content(
+                    signature, demo, missing_field_message="Not supplied for this conversation history message. "
+                ),
+            }
+        )
+
+    return messages
+```
+#### format_field_description ( signature : type [ Signature ]) -> str ¶
+Source code in
+`dspy/adapters/chat_adapter.py`
+```
+114
+115
+116
+117
+118
+``` | ```
+def format_field_description(self, signature: type[Signature]) -> str:
+    return (
+        f"Your input fields are:\n{get_field_description_string(signature.input_fields)}\n"
+        f"Your output fields are:\n{get_field_description_string(signature.output_fields)}"
+    )
+```
+#### format_field_structure ( signature : type [ Signature ]) -> str ¶
+Source code in
+`dspy/adapters/json_adapter.py`
+```
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+``` | ```
+def format_field_structure(self, signature: type[Signature]) -> str:
+    parts = []
+    parts.append("All interactions will be structured in the following way, with the appropriate values filled in.")
+
+    def format_signature_fields_for_instructions(fields: dict[str, FieldInfo], role: str):
+        return self.format_field_with_value(
+            fields_with_values={
+                FieldInfoWithName(name=field_name, info=field_info): translate_field_type(field_name, field_info)
+                for field_name, field_info in fields.items()
+            },
+            role=role,
+        )
+
+    parts.append("Inputs will have the following structure:")
+    parts.append(format_signature_fields_for_instructions(signature.input_fields, role="user"))
+    parts.append("Outputs will be a JSON object with the following fields.")
+    parts.append(format_signature_fields_for_instructions(signature.output_fields, role="assistant"))
+    return "\n\n".join(parts).strip()
+```
+#### format_field_with_value ( fields_with_values : dict [ FieldInfoWithName , Any ], role : str = 'user' ) -> str ¶
+Formats the values of the specified fields according to the field’s DSPy type (input or output), annotation (e.g. str, int, etc.), and the type of the value itself. Joins the formatted values into a single string, which is a multiline string if there are multiple fields.
+Parameters:
+Name | Type | Description | Default
+fields_with_values | dict [ FieldInfoWithName , Any ] | A dictionary mapping information about a field to its corresponding value. | required
+Returns: The joined formatted values of the fields, represented as a string.
+Source code in
+`dspy/adapters/json_adapter.py`
+```
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+``` | ```
+def format_field_with_value(self, fields_with_values: dict[FieldInfoWithName, Any], role: str = "user") -> str:
+    """
+    Formats the values of the specified fields according to the field's DSPy type (input or output),
+    annotation (e.g. str, int, etc.), and the type of the value itself. Joins the formatted values
+    into a single string, which is a multiline string if there are multiple fields.
+
+    Args:
+        fields_with_values: A dictionary mapping information about a field to its corresponding value.
+    Returns:
+        The joined formatted values of the fields, represented as a string.
+    """
+    if role == "user":
+        output = []
+        for field, field_value in fields_with_values.items():
+            formatted_field_value = format_field_value(field_info=field.info, value=field_value)
+            output.append(f"[[ ## {field.name} ## ]]\n{formatted_field_value}")
+        return "\n\n".join(output).strip()
+    else:
+        d = fields_with_values.items()
+        d = {k.name: v for k, v in d}
+        return json.dumps(serialize_for_json(d), indent=2, ensure_ascii=False)
+```
+#### format_finetune_data ( signature : type [ Signature ], demos : list [ dict [ str , Any ]], inputs : dict [ str , Any ], outputs : dict [ str , Any ]) -> dict [ str , list [ Any ]] ¶
+Source code in
+`dspy/adapters/json_adapter.py`
+```
+205
+206
+207
+208
+209
+``` | ```
+def format_finetune_data(
+    self, signature: type[Signature], demos: list[dict[str, Any]], inputs: dict[str, Any], outputs: dict[str, Any]
+) -> dict[str, list[Any]]:
+    # TODO: implement format_finetune_data method in JSONAdapter
+    raise NotImplementedError
+```
+#### format_system_message ( signature : type [ Signature ]) -> str ¶
+Format the system message for the LM call.
+Parameters:
+Name | Type | Description | Default
+signature | type [ Signature ] | The DSPy signature for which to format the system message. | required
+Source code in
+`dspy/adapters/base.py`
+```
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+``` | ```
+def format_system_message(self, signature: type[Signature]) -> str:
+    """Format the system message for the LM call.
+
+
+    Args:
+        signature: The DSPy signature for which to format the system message.
+    """
+    return (
+        f"{self.format_field_description(signature)}\n"
+        f"{self.format_field_structure(signature)}\n"
+        f"{self.format_task_description(signature)}"
+    )
+```
+#### format_task_description ( signature : type [ Signature ]) -> str ¶
+Source code in
+`dspy/adapters/chat_adapter.py`
+```
+142
+143
+144
+145
+``` | ```
+def format_task_description(self, signature: type[Signature]) -> str:
+    instructions = textwrap.dedent(signature.instructions)
+    objective = ("\n" + " " * 8).join([""] + instructions.splitlines())
+    return f"In adhering to this structure, your objective is: {objective}"
+```
+#### format_user_message_content ( signature : type [ Signature ], inputs : dict [ str , Any ], prefix : str = '' , suffix : str = '' , main_request : bool = False ) -> str ¶
+Source code in
+`dspy/adapters/chat_adapter.py`
+```
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+``` | ```
+def format_user_message_content(
+    self,
+    signature: type[Signature],
+    inputs: dict[str, Any],
+    prefix: str = "",
+    suffix: str = "",
+    main_request: bool = False,
+) -> str:
+    messages = [prefix]
+    for k, v in signature.input_fields.items():
+        if k in inputs:
+            value = inputs.get(k)
+            formatted_field_value = format_field_value(field_info=v, value=value)
+            messages.append(f"[[ ## {k} ## ]]\n{formatted_field_value}")
+
+    if main_request:
+        output_requirements = self.user_message_output_requirements(signature)
+        if output_requirements is not None:
+            messages.append(output_requirements)
+
+    messages.append(suffix)
+    return "\n\n".join(messages).strip()
+```
+#### parse ( signature : type [ Signature ], completion : str ) -> dict [ str , Any ] ¶
+Source code in
+`dspy/adapters/json_adapter.py`
+```
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+``` | ```
+def parse(self, signature: type[Signature], completion: str) -> dict[str, Any]:
+    fields = json_repair.loads(completion)
+
+    if not isinstance(fields, dict):
+        pattern = r"\{(?:[^{}]|(?R))*\}"
+        match = regex.search(pattern, completion, regex.DOTALL)
+        if match:
+            completion = match.group(0)
+            fields = json_repair.loads(completion)
+
+    if not isinstance(fields, dict):
+        raise AdapterParseError(
+            adapter_name="JSONAdapter",
+            signature=signature,
+            lm_response=completion,
+            message="LM response cannot be serialized to a JSON object.",
+        )
+
+    fields = {k: v for k, v in fields.items() if k in signature.output_fields}
+
+    # Attempt to cast each value to type signature.output_fields[k].annotation.
+    for k, v in fields.items():
+        if k in signature.output_fields:
+            try:
+                fields[k] = parse_value(v, signature.output_fields[k].annotation)
+            except ValueError as exc:
+                raise AdapterParseError(
+                    adapter_name=type(self).__name__, signature=signature, lm_response=completion,
+                    message=f"Failed to parse field {k}: {exc}", parsed_result=fields,
+                ) from exc
+
+    fields = apply_output_field_defaults(signature, fields)
+    if fields.keys() != signature.output_fields.keys():
+        raise AdapterParseError(
+            adapter_name="JSONAdapter",
+            signature=signature,
+            lm_response=completion,
+            parsed_result=fields,
+        )
+
+    return fields
+```
+#### user_message_output_requirements ( signature : type [ Signature ]) -> str ¶
+Source code in
+`dspy/adapters/json_adapter.py`
+```
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+``` | ```
+def user_message_output_requirements(self, signature: type[Signature]) -> str:
+    def type_info(v):
+        if v.annotation == ToolCalls:
+            return ' (must be a JSON object like {"tool_calls": [{"name": "...", "args": {...}}]})'
+        return (
+            f" (must be formatted as a valid Python {get_annotation_name(v.annotation)})"
+            if v.annotation is not str
+            else ""
+        )
+
+    message = "Respond with a JSON object in the following order of fields: "
+    message += ", then ".join(f"`{f}`{type_info(v)}" for f, v in signature.output_fields.items())
+    message += "."
+    return message
+```
+Back to top

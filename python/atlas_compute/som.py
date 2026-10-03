@@ -9,11 +9,13 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import hashlib
+import json
 from typing import Any, Sequence
 
 import numpy as np
 
 from .determinism import configure_torch_determinism
+from .rapids_matrix import RapidsKMeansArtifact
 
 
 @dataclass(frozen=True)
@@ -29,6 +31,10 @@ class SomReceipt:
     quantization_error: float
     topology_checksum: str
     codebook_checksum: str
+    initialization_method: str
+    input_checksum: str
+    initial_centroids_checksum: str
+    initialization_receipt_checksum: str | None
     canonical_authority: bool
 
     def to_dict(self) -> dict[str, Any]:
@@ -86,6 +92,7 @@ def train_deterministic_som(
     sigma: float | None = None,
     device: str | None = None,
     seed: int = 0xA71A5,
+    kmeans_artifact: RapidsKMeansArtifact | None = None,
 ):
     """Train a deterministic online SOM and return BMU coordinates + receipt."""
 
@@ -95,6 +102,8 @@ def train_deterministic_som(
     source = np.asarray(matrix, dtype=np.float32)
     if source.ndim != 2 or source.shape[0] == 0 or source.shape[1] == 0:
         raise ValueError("matrix must be non-empty rank-2")
+    if not np.isfinite(source).all():
+        raise ValueError("matrix must contain only finite values")
     if grid_rows <= 0 or grid_columns <= 0 or epochs <= 0:
         raise ValueError("grid dimensions and epochs must be positive")
     if learning_rate <= 0:
@@ -103,8 +112,38 @@ def train_deterministic_som(
     resolved_device = device or ("cuda" if torch.cuda.is_available() else "cpu")
     x = torch.as_tensor(source, dtype=torch.float32, device=resolved_device)
     unit_count = grid_rows * grid_columns
-    initial_ordinals = _farthest_seed_ordinals(source, unit_count)
-    codebook = torch.as_tensor(source[np.asarray(initial_ordinals)], dtype=torch.float32, device=resolved_device).clone()
+    input_checksum = _checksum(source)
+    initialization_receipt_checksum = None
+    if kmeans_artifact is None:
+        initial_ordinals = _farthest_seed_ordinals(source, unit_count)
+        seed_matrix = source[np.asarray(initial_ordinals)]
+        initialization_method = "deterministic_farthest_sample_rows"
+    else:
+        seed_matrix = np.array(kmeans_artifact.centroids, dtype=np.float32, copy=True, order="C")
+        if seed_matrix.shape != (unit_count, source.shape[1]):
+            raise ValueError("KMEANS_CENTROID_SHAPE_MISMATCH")
+        if not np.isfinite(seed_matrix).all():
+            raise ValueError("KMEANS_CENTROIDS_NONFINITE")
+        receipt = kmeans_artifact.receipt.to_dict()
+        expected = {
+            "schema": "atlas.rapids-kmeans-receipt.v2",
+            "rows": int(source.shape[0]),
+            "dimensions": int(source.shape[1]),
+            "n_clusters": unit_count,
+            "metric": "sqeuclidean",
+            "input_checksum": input_checksum,
+            "centroids_checksum": _checksum(seed_matrix),
+            "canonical_authority": False,
+        }
+        for key, value in expected.items():
+            if receipt.get(key) != value:
+                raise ValueError(f"KMEANS_RECEIPT_MISMATCH:{key}")
+        initialization_receipt_checksum = hashlib.sha256(
+            json.dumps(receipt, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+        ).hexdigest()
+        initialization_method = "checksum_verified_cuvs_kmeans_centroids"
+    initial_centroids_checksum = _checksum(seed_matrix)
+    codebook = torch.as_tensor(seed_matrix, dtype=torch.float32, device=resolved_device).clone()
 
     row_coords = torch.arange(grid_rows, device=resolved_device, dtype=torch.float32)
     col_coords = torch.arange(grid_columns, device=resolved_device, dtype=torch.float32)
@@ -134,7 +173,7 @@ def train_deterministic_som(
     coords_host = coordinates.detach().cpu().numpy().astype(np.float32, copy=False)
     codebook_host = codebook.detach().cpu().numpy().astype(np.float32, copy=False)
     receipt = SomReceipt(
-        schema="atlas.som-receipt.v1",
+        schema="atlas.som-receipt.v2",
         rows=int(source.shape[0]),
         dimensions=int(source.shape[1]),
         grid_rows=grid_rows,
@@ -145,6 +184,10 @@ def train_deterministic_som(
         quantization_error=float(quantization_error.detach().cpu()),
         topology_checksum=_checksum(coords_host),
         codebook_checksum=_checksum(codebook_host),
+        initialization_method=initialization_method,
+        input_checksum=input_checksum,
+        initial_centroids_checksum=initial_centroids_checksum,
+        initialization_receipt_checksum=initialization_receipt_checksum,
         canonical_authority=False,
     )
     return coordinates, codebook, receipt

@@ -24,7 +24,12 @@ Every native index build and compute request SHALL be bound to a named represent
 #### Scenario: latent_64 query against semantic_768 index rejected
 - **WHEN** a query bound to `latent_64` is submitted against an index built for `semantic_768`
 - **THEN** the call fails with a representation-mismatch error before any computation
-- **AND** the execution receipt records the rejection reason
+- **AND** the versioned representation-validation receipt records the precise rejection reason
+
+#### Scenario: Invalid or mismatched representation contract rejected before compute
+- **WHEN** a build or compute request has an invalid or mismatched representation ID, revision, dimension, dtype, normalization, metric, or model ID/hash
+- **THEN** request validation fails before any compute operation is entered
+- **AND** the validation receipt identifies the invalid field or mismatch class
 
 #### Scenario: Every compute call returns a receipt
 - **WHEN** any `atlas_*` compute function completes (success or fallback)
@@ -33,13 +38,23 @@ Every native index build and compute request SHALL be bound to a named represent
 ### Requirement: Graph similarity is three distinct operations
 The system SHALL provide `atlas_knn_exact` (query→corpus top-k, cuVS brute-force), `atlas_cagra_build`/`atlas_cagra_search` (approximate ANN), and `atlas_similarity_graph_build` (bounded sparse CSR pairwise graph). A dense n×n similarity matrix SHALL NOT be the default output of any operation.
 
+`atlas_similarity_graph_build` SHALL interpret each input row as one local graph ordinal, L2-normalize finite nonzero rows, and compute cosine similarity. It SHALL emit a directed edge `i → j` when `i != j`, the cosine score is greater than or equal to the inclusive threshold, and `j` ranks within `max_neighbors_per_row` for source row `i`. Threshold SHALL be in `[0,1]`; zero-norm and non-finite rows SHALL fail before output allocation. Per-row selection SHALL order by descending score and then ascending target ordinal for ties. CSR output columns SHALL be ordered by ascending target ordinal; stored weights SHALL be the selected cosine scores. Reciprocal edges are not implied.
+
+Pairwise computation SHALL use bounded row blocks against the corpus (for example, `torch::mm(X_block, Xᵀ)`) and SHALL NOT allocate a full `n × n` matrix. The operation SHALL honor the context memory budget and fail before compute if the minimum block or CSR output cannot fit. Local ordinals in this projection SHALL NOT be promoted to canonical identity.
+
+Input SHALL be a contiguous row-major FP32 matrix with exactly `row_count × dimension` elements and a validated representation contract. CSR output SHALL use `uint64` row offsets (`row_count + 1` elements), `uint32` column indices, and FP32 edge weights, with equal column/weight lengths. Output buffers SHALL use the module-owned `atlas_buffer_t` allocation/release contract.
+
 #### Scenario: Sparse graph bounds
 - **WHEN** `atlas_similarity_graph_build` runs with `threshold` and `max_neighbors_per_row`
 - **THEN** the output is `atlas_csr_graph_t` (row_offsets, column_indices, edge_weights)
 - **AND** edge count per row never exceeds `max_neighbors_per_row`
+- **AND** self-edges are absent, ties resolve by target ordinal, and each CSR row is deterministic
+- **AND** temporary pairwise storage is row-block bounded rather than `n × n`
 
 ### Requirement: PageRank consumes CSR with cross-backend parity
 `atlas_pagerank` SHALL accept only `atlas_csr_graph_t` input. CPU reference, native CUDA/LibTorch, cuGraph, and Neo4j GDS implementations SHALL prove equivalence on a shared fixture: same graph orientation, edge-weight interpretation, dangling-node policy, damping, initial vector, convergence tolerance, and normalization. Raw JSON adjacency SHALL NOT be passed to cuGraph or the N-API bridge.
+
+The CPU reference SHALL interpret CSR row `i`, column `j` as directed edge `i -> j`, normalize nonnegative finite edge weights by each source row's outgoing sum, redistribute dangling-node score uniformly, initialize scores uniformly, and renormalize the score vector after each iteration. Damping SHALL be finite and in `[0,1)`. Convergence SHALL use the L1 score delta and `delta <= tolerance`; the result SHALL report the final delta, iteration count, and convergence flag. Invalid CSR offsets, columns, duplicate/unsorted columns, buffer lengths, or weights SHALL fail before output allocation. CPU accumulation and scores SHALL use float64.
 
 #### Scenario: Fixture parity gate
 - **WHEN** the PageRank parity fixture runs against any backend

@@ -11,6 +11,7 @@
 - 2026-09-19 replay evidence: query `Graphify` returned 5,153 unqualified hits and 0 revision-qualified hits. GIN index evidence was unavailable for `codebase_chunk_index`; stable evidence metadata and checksums were produced. Status: `POSTGRES_FTS_BLOCKED_SOURCE_REVISION`; writes performed: false. Keep 2.2 open until canonical source revisions and qualifying index evidence are available.
 - [ ] 2.3 Add a semantic pgvector exact-versus-HNSW bounded replay test for `semantic_768`; record recall, filtering behavior, and index settings without creating a live index.
 - 2026-09-19 replay evidence: added `scripts/atlas/prove-postgres-pgvector-exact-hnsw-replay-v1.mjs` and `atlas:pgvector:exact-hnsw-replay`. Live schema exposes `content_embedding_768` and `idx_codebase_chunk_content_embedding_768_hnsw`, but the revision-qualified vector cohort is 0. Status: `PGVECTOR_REPLAY_BLOCKED_SOURCE_REVISION`; exact/HNSW recall and filtered parity remain unproven; writes performed: false. Keep 2.3 open.
+- 2026-09-21 re-run (read-only, `writesPerformed: false`, both receipts regenerated in `docs/reports/`): `atlas:fts:replay` -> `POSTGRES_FTS_BLOCKED_SOURCE_REVISION`; `atlas:pgvector:exact-hnsw-replay` -> `PGVECTOR_REPLAY_BLOCKED_SOURCE_REVISION` (`revisionQualifiedVectorRows: 0`). Both unchanged since 2026-09-19. 2.2 and 2.3 are effectively WAITING on the source-authority chain (`EXECUTION_SOURCE_AUTHORITY` -> revision-qualified rows), not on test work; the workboard lists them ACTIONABLE. Do not re-run expecting a different result until revision-qualified rows exist. Boxes left open.
 - [x] 2.4 Add an AST/CST fixture test proving Tree-sitter/ast-grep output includes exact byte spans, parser revisions, source revisions, and evidence checksums.
 - [x] 2.5 Add a lane-deduplication test proving Qdrant/cuVS/Go Retrieval executors cannot create multiple semantic RRF votes.
 
@@ -82,3 +83,21 @@
 - [x] 12.1 Extend the compatibility matrix with analyze-this, ACE cache, provider ownership, TurboVec, Python runtime, HyperGraphRAG, and graph projection status. Included in the refreshed workboard receipt.
 - [x] 12.2 Re-run strict validation and focused tests; record the first remaining authority blocker and owning OpenSpec. Focused frontend proof passed 4 files/12 tests; strict validation passed; first blocker remains `EXECUTION_SOURCE_AUTHORITY` owned by `parent-atlas-retrieval-lineage-dag-convergence`.
 - [x] 12.3 Preserve the no-mutation gate: no DDL, packet backfill, Qdrant/Valkey canonical promotion, Graphify refresh, CUDA upgrade, or model-state persistence. Receipt review found no prohibited writes or hidden-state persistence.
+- [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+## Read-only PostgreSQL replay refresh (2026-09-28)
+
+- `scripts/atlas/prove-postgres-fts-replay-v1.mjs` now queries the existing materialized
+  `codebase_chunk_index.search_vector` using `websearch_to_tsquery`, matching the live FTS adapter
+  and its GIN index. The previous dynamically rebuilt `to_tsvector(content...)` probe timed out;
+  its timeout was not treated as a no-hit result. The indexed replay completed read-only: 2,423
+  unqualified hits, 0 source-revision-qualified hits, GIN index `idx_codebase_chunk_bm25_search`
+  present. Status: `POSTGRES_FTS_BLOCKED_SOURCE_REVISION`; writes: false. Receipt:
+  `docs/reports/postgres-fts-replay-v1-20260928T023000Z.json`.
+- Bounded exact-vs-HNSW replay (`limit=4`, `top-k=5`) found the canonical 768-D vector column and
+  HNSW index, but 0 revision-qualified vector rows; recall/filter parity therefore remains
+  unmeasured. Status: `PGVECTOR_REPLAY_BLOCKED_SOURCE_REVISION`; writes: false. Receipt:
+  `docs/reports/postgres-pgvector-exact-hnsw-replay-v1-20260928T020819Z.json`.
+- Tasks 2.2 and 2.3 remain open. These receipts sharpen the existing blocker to the absence of
+  source-revision-qualified rows; neither replay authorizes DDL, backfill, index creation, or
+  projection writes. Strict OpenSpec validation passed after this evidence refresh.

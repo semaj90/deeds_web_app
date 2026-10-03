@@ -1,0 +1,72 @@
+{
+  "schema": "atlas.mapreduce-chunk-readiness-receipt.v3",
+  "generatedAt": "2026-09-28T01:28:35.618Z",
+  "status": "READINESS_REPLAY_COMPLETE",
+  "currentSemanticOwner": {
+    "table": "codebase_chunk_index",
+    "column": "content_embedding_768",
+    "storageType": "vector(768)"
+  },
+  "sourceManifest": ".tmp/atlas/mapreduce-packet-chunk-evidence-overlay-v1/20260926T181939Z/manifest.json",
+  "sourceManifestChecksum": "sha256:e2db192da7cc34631adf9d30049b1fccb6868466acc1e86f509067d7eba20d13",
+  "sourceOverlay": ".tmp/atlas/mapreduce-packet-chunk-evidence-overlay-v1/20260926T181939Z/packet-chunk-evidence.ndjson",
+  "sourceOverlayChecksum": "sha256:ff5ff53e58eb46dd4a2f79b61b8b6b9453b98696e7e80e1851367cfb35ad0a50",
+  "candidateSnapshotRevision": "sha256:09bfbf6125ddc67f194edd6170f6d9c87a14d001f877eef1ec269600b2424388",
+  "ordinalMapChecksum": "90c237c8d8afd41d176540e2a5a3430ae86b626b7de94e08b49255e7b7fd4bf9",
+  "candidateCount": 127,
+  "chunkCount": 1520,
+  "observedColumns": [
+    "content_embedding_768",
+    "embedding_dimension",
+    "embedding_model",
+    "embedding_normalized",
+    "embedding_version",
+    "encoder_id",
+    "representation_revision"
+  ],
+  "measured": {
+    "packetStates": {
+      "PACKET_REVISION_QUALIFIED": 1520
+    },
+    "chunkStates": {
+      "CHUNK_REVISION_QUALIFIED": 1520
+    },
+    "eligibilityStates": {
+      "CHUNK_REVISION_QUALIFIED": 1520
+    },
+    "semantic768PhysicalStates": {
+      "MISSING": 1520
+    },
+    "semantic768QualityStates": {
+      "MISSING": 1520
+    },
+    "semanticRepresentationBindingStates": {
+      "UNQUALIFIED_OR_INCOMPLETE": 1520
+    },
+    "summaryStates": {
+      "MISSING": 1520
+    },
+    "summarySemanticStates": {
+      "MISSING": 1338,
+      "UNBOUND": 182
+    },
+    "historicalContentEmbeddingRows": 1520,
+    "exactSourceFileDigestRows": 1520,
+    "currentSourceBytesMatchRows": 1520,
+    "currentSourceFilesRehashed": 127
+  },
+  "artifacts": {
+    "rowDetails": ".tmp/atlas/mapreduce-chunk-readiness-v3/20260928T012835Z/readiness.ndjson",
+    "rowDetailsChecksum": "sha256:a2c80b29c2ec9e52573308afdd26c429f44cc9bd1560bbd6eacc580bea439cb8"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "canonicalAuthority": false,
+  "receiptChecksum": "sha256:2451c6dd1671e649cabfe0076aeb087d333817465d8dacf1c56199d8308e847c"
+}

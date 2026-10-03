@@ -745,6 +745,14 @@ async function main() {
   console.log('');
 
   if (DRY_RUN_CANDIDATES) {
+    // Real, deterministic checksum of the exact candidate set this run fetched — never a
+    // fabricated value. A caller (e.g. run-karpathy-gpu-admitted-v1.mjs) parses this single
+    // machine-readable line to supply --source-cohort-checksum to a subsequent apply run of
+    // this same script, using the same --limit/--dirty/--source flags so the candidate fetch
+    // is reproducible between the two invocations.
+    const sortedKeys = candidates.map((c) => c.stableKey).sort();
+    const sourceCohortChecksum = createHash('sha256').update(JSON.stringify(sortedKeys)).digest('hex');
+    console.log(`KARPATHY_COHORT_JSON:${JSON.stringify({ sourceCohortChecksum, candidateCount: candidates.length, limit: LIMIT, mode: DIRTY_ONLY ? 'dirty' : 'topN' })}`);
     console.log('[karpathy] --dry-run-candidates: stopping before GPU pass.');
     return;
   }

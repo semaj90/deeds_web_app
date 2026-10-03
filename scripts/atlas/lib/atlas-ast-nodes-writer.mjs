@@ -26,13 +26,40 @@ function structuralKey(normalizedPath, nodeKind, qualifiedSymbol) {
 }
 
 /**
+ * atlas_ast_nodes has a unique B-tree key containing qualified_symbol. Keep the display/index
+ * value bounded so deeply nested or adversarial document headings cannot exceed PostgreSQL's
+ * per-index-tuple limit. The full value remains in structural_key and is used unchanged by both
+ * tree_node_id and normalized_node_hash, so this is not an identity truncation.
+ */
+export function indexSafeQualifiedSymbolV1(qualifiedSymbol) {
+  if (Buffer.byteLength(qualifiedSymbol, 'utf8') <= 512) return qualifiedSymbol;
+  const digest = createHash('sha256').update(qualifiedSymbol, 'utf8').digest('hex');
+  let prefix = '';
+  for (const codePoint of qualifiedSymbol) {
+    if (Buffer.byteLength(prefix + codePoint, 'utf8') > 160) break;
+    prefix += codePoint;
+  }
+  return `${prefix}…[sha256:${digest}]`;
+}
+
+/**
  * @param {import('pg').Pool | import('pg').PoolClient} client
- * @param {{ sourceRef: string, parserLanguage: string, parserName: string, sourceRevision?: string,
+ * `source_content_hash` is whole-file raw-byte identity. Node/span hashes belong
+ * in `normalized_node_hash` or a receipt-level representation checksum and must
+ * not be passed as the source content digest.
+ *
+ * @param {{ sourceRef: string, parserLanguage: string, parserName: string, parserVersion: string, sourceRevision?: string,
  *   workspaceId?: string, nodes: Array<{ kind: string, qualifiedSymbol: string, startByte: number,
- *   endByte: number, startLine: number, endLine: number, contentHash: string, parentIndex: number|null }> }} input
- * @returns {Promise<{ inserted: number, treeNodeIds: string[] }>}
+ *   endByte: number, startLine: number, endLine: number, sourceContentDigest: string, parentIndex: number|null }> }} input
+ * @returns {Promise<{ inserted: number, treeNodeIds: string[], insertedFlags: boolean[] }>}
  */
 export async function writeAtlasAstNodes(client, input) {
+  if (typeof input.parserVersion !== 'string' || input.parserVersion.trim().length === 0) {
+    throw new Error('PARSER_VERSION_REQUIRED');
+  }
+  if (input.astGeneration !== undefined && !/^[a-z0-9_]+$/.test(String(input.astGeneration))) {
+    throw new Error(`AST_GENERATION_INVALID:${String(input.astGeneration)}`);
+  }
   const np = normalizePath(input.sourceRef);
   const treeNodeIds = new Array(input.nodes.length).fill(null);
   // `treeNodeIds` is the COMPUTED id for every node; `insertedFlags[i]` is true only if the INSERT really happened
@@ -42,6 +69,9 @@ export async function writeAtlasAstNodes(client, input) {
 
   for (let i = 0; i < input.nodes.length; i += 1) {
     const node = input.nodes[i];
+    if (typeof node.sourceContentDigest !== 'string' || node.sourceContentDigest.trim().length === 0) {
+      throw new Error(`SOURCE_CONTENT_DIGEST_REQUIRED:${i}`);
+    }
     // `parentTreeNodeId` (explicit, e.g. a file row that already exists in the table) wins over an in-batch `parentIndex`.
     const parentTreeNodeId = node.parentTreeNodeId
       ?? (node.parentIndex !== null && node.parentIndex !== undefined ? treeNodeIds[node.parentIndex] : null);
@@ -49,27 +79,35 @@ export async function writeAtlasAstNodes(client, input) {
     treeNodeIds[i] = tid;
     const sk = structuralKey(np, node.kind, node.qualifiedSymbol);
 
+    const params = [
+      tid, sk, REPO_UUID, np,
+      node.kind, indexSafeQualifiedSymbolV1(node.qualifiedSymbol), input.parserLanguage,
+      parentTreeNodeId, node.startByte, node.endByte, node.startLine, node.endLine,
+      createHash('sha256').update(sk).digest('hex'), node.sourceContentDigest,
+      input.parserName, input.parserVersion,
+      `${np}#${node.kind}:${node.qualifiedSymbol}`,
+      input.workspaceId ?? null, input.sourceRevision ?? null,
+    ];
+    // `ast_generation` (drizzle/manual/20260920_atlas_ast_nodes_generation.sql) is written ONLY when the
+    // caller passes `astGeneration`, so callers that omit it keep working against a schema that has not
+    // had that migration applied. NULL in the table means legacy/untagged, never 'sept_v2'.
+    const genColumn = input.astGeneration ? ', ast_generation' : '';
+    const genValue = input.astGeneration ? ',$20' : '';
+    if (input.astGeneration) params.push(input.astGeneration);
+
     const result = await client.query(
       `INSERT INTO atlas_ast_nodes (
          tree_node_id, structural_key, repo_id, relative_path,
          node_kind, qualified_symbol, parser_language, normalized_signature,
          parent_tree_node_id, start_byte, end_byte, line_start, line_end,
          normalized_node_hash, source_content_hash, parser_name, parser_version,
-         source_ref_key, workspace_id, source_revision
+         source_ref_key, workspace_id, source_revision${genColumn}
        ) VALUES (
-         $1,$2,$3::uuid,$4,$5,$6,$7,'',$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19
+         $1,$2,$3::uuid,$4,$5,$6,$7,'',$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19${genValue}
        )
        ON CONFLICT DO NOTHING
        RETURNING tree_node_id`,
-      [
-        tid, sk, REPO_UUID, np,
-        node.kind, node.qualifiedSymbol, input.parserLanguage,
-        parentTreeNodeId, node.startByte, node.endByte, node.startLine, node.endLine,
-        createHash('sha256').update(sk).digest('hex'), node.contentHash,
-        input.parserName, input.parserVersion ?? 'source-text-encoding-01',
-        `${np}#${node.kind}:${node.qualifiedSymbol}`,
-        input.workspaceId ?? null, input.sourceRevision ?? null,
-      ],
+      params,
     );
     if ((result.rowCount ?? 0) > 0) { inserted += 1; insertedFlags[i] = true; }
   }

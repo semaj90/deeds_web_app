@@ -73,5 +73,13 @@ const report = {
 };
 report.semanticChecksum = semanticChecksum(report);
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const temporaryPath = `${outputPath}.${process.pid}.${Date.now()}.tmp`;
+try {
+  // Atomic promotion avoids truncating a report that another read-only audit
+  // is consuming on Windows.
+  fs.writeFileSync(temporaryPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  fs.renameSync(temporaryPath, outputPath);
+} finally {
+  try { fs.unlinkSync(temporaryPath); } catch { /* already promoted */ }
+}
 console.log(JSON.stringify({ outputPath, status: report.status, files: labels.length, labels: report.summary.labels, semanticChecksum: report.semanticChecksum, writesPerformed: false }, null, 2));

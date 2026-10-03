@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.doc-topk-ordering-proof.v1",
+  "generatedAt": "2026-09-26T23:18:23.717Z",
+  "level": "LIVE_READ_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": 0,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "params": {
+    "n": 1520,
+    "k": 16,
+    "queries": 32
+  },
+  "addon": {
+    "loaded": true,
+    "error": null,
+    "cuda": 1,
+    "simdBackend": "icelake (Intel/AMD AVX512)"
+  },
+  "lanes": {
+    "oracle": {
+      "status": "PASS",
+      "note": "float64 cosine, index tiebreak"
+    },
+    "addonBatchCosine": {
+      "queries": 32,
+      "returnCodeZero": 32,
+      "exactOrderMatch": 32,
+      "sameSetDifferentOrder": 0,
+      "maxAbsScoreDelta": 2.0216060359068422e-7,
+      "tolerance": 0.0001,
+      "status": "PASS"
+    },
+    "simdjsonParse": {
+      "documents": 36,
+      "identical": 36,
+      "different": 0,
+      "threw": 0,
+      "avgBytes": 2151,
+      "jsonParseMsTotal": 0.6046,
+      "simdMsTotal": 1.9521,
+      "status": "PASS",
+      "note": "addon returns a validated JSON string; timings are the FULL path (simd + second JSON.parse) vs JSON.parse alone; parity only"
+    }
+  },
+  "status": "LIVE_READ_ONLY_PARITY_PROVEN",
+  "failure": null,
+  "rowsRead": 1520,
+  "corpusChecksum": "sha256:21ecccb714e11b5016714a6a914b49006b56b2402c1cda8af0e6312677c686b6"
+}

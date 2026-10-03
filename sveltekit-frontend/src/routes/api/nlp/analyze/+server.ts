@@ -29,7 +29,7 @@ const AnalyzeRequestSchema = z.object({
   language: z.string().min(1).optional(),
   modelId: z.string().min(1).optional(),
   maxChars: z.number().int().positive().max(200_000).optional(),
-  passes: z.array(z.enum(['structural', 'lexical', 'linguistic', 'semantic', 'sequence', 'rerank', 'grounded'])).optional(),
+  passes: z.array(z.enum(['structural', 'lexical', 'linguistic', 'semantic', 'sequence', 'rerank', 'grounded', 'classify'])).optional(),
   groundedExtractionRequired: z.boolean().optional(),
 });
 

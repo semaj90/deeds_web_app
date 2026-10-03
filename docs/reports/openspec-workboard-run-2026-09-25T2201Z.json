@@ -1,0 +1,107 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T22:01:43Z",
+  "runType": "ARCHITECTURE_OVERLAY_AND_PROGRAM_SNAPSHOT_REFRESH",
+  "supersedes": "docs/reports/openspec-workboard-run-2026-09-25T2137Z.json",
+  "pivot": {
+    "from": "lineage-bound summary proposal lane awaiting a proven canonical summary-admission writer",
+    "to": "machine-readable architecture overlay and full OpenSpec implementation-program refresh",
+    "reason": "The active program objective requests reconciling the full OpenSpec inventory into a dependency-aware implementation program; this refresh records the pivot without selecting tasks."
+  },
+  "repository": {
+    "workingTreeWasDirty": true,
+    "taskLedgersEditedByThisRun": false,
+    "selectedTaskCount": 0,
+    "schedulerPermissionPolicy": "READY_NEVER_IMPLIES_SELECTED",
+    "datastoreWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0
+  },
+  "implementation": {
+    "architectureOverlay": "Added a static architecture-only overlay with seven milestones, 25 program domains, 17 explicit prerequisite gates, ownership roles, event rules, corpus boundaries, and non-promotion invariants. It contains no task assignments or leaf task records.",
+    "specAlignment": "Clarified that the seven-milestone architecture overlay is distinct from the legacy six-milestone/11-wave execution schedule; added a scenario requiring no duplicated task assignments or implicit scheduler/dependency effects.",
+    "ownershipValidation": "Closed authority-role vocabulary and checks reject duplicate ownership domains, missing canonical owners, owner/executor or owner/transport collisions, and role-required fields that are absent.",
+    "dependencyPolicy": "Milestone/wave membership creates no task dependency. Only declared leaf dependencies are represented; no missing dependencies were invented.",
+    "sourceSummaryProposalLane": {
+      "readOnlyAdmissionPlan": "12/12 proposal targets passed the latest prior plan-only readback",
+      "writerGate": "CANONICAL_SUMMARY_ADMISSION_WRITER_NOT_PROVEN",
+      "applyPerformed": false
+    }
+  },
+  "snapshot": {
+    "directory": ".tmp/codex-openspec-live-20260925T2150Z/reports",
+    "workboard": ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-workboard-v1.json",
+    "controller": ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-execution-controller-v1.json",
+    "programJson": ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-achievable-implementation-program-v1.json",
+    "programMarkdown": ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-achievable-implementation-program-v1.md",
+    "changeCount": 88,
+    "taskFilesHashed": 90,
+    "totalTasks": 9548,
+    "completedTasks": 6303,
+    "openTasks": 3245,
+    "controllerTaskRows": 9548,
+    "controllerStaleOrMissingRows": 0,
+    "controllerStableKeyParity": true,
+    "openTaskAssignments": {
+      "accountedExactlyOnce": true,
+      "missing": 0,
+      "duplicates": 0,
+      "schedulerSelected": 0
+    }
+  },
+  "programPlan": {
+    "architectureMilestones": 7,
+    "architecturePrograms": 25,
+    "architecturePrerequisiteGates": 17,
+    "overlayContainsLeafTasks": false,
+    "workPackages": 812,
+    "reviewQueueLeaves": 0,
+    "allOpenMappings": "PROVISIONAL",
+    "gateStates": {
+      "READY": 2190,
+      "AUTHORIZATION_REQUIRED": 225,
+      "BLOCKED_BY_LINEAGE": 253,
+      "BLOCKED_BY_RUNTIME": 28,
+      "OWNER_DECISION_REQUIRED": 2,
+      "WAITING_FOR_DEPENDENCY": 440,
+      "DEFERRED": 53,
+      "SUPERSEDED": 52,
+      "REVIEW_REQUIRED": 2
+    },
+    "declaredLeafDependencies": 3,
+    "openLeavesWithoutDeclaredDependencies": 3242,
+    "dependenciesInvented": 0,
+    "packageBoundary": "ONE_CHANGE_OWNER + ONE_PROGRAM + ONE_MUTATION_CLASS + ONE_GATE_STATE; unlike owner/mutation/readiness boundaries were not merged merely to reach a package-count target",
+    "caveat": "This is a reconciled census and provisional grouping, not a fully adjudicated execution DAG."
+  },
+  "validation": {
+    "programPlanAndControllerTests": "PASS 21/21",
+    "nodeSyntaxChecks": "PASS for program plan, workboard builder, and implementation-program builder",
+    "openspecStrict": "PASS parent-atlas-workboard-feature-utility-fabric",
+    "scopedDiffCheck": "PASS; line-ending normalization warnings only",
+    "taskMetadataAudit": "PASS; all 9,548 rows carry the required scheduler, owner, hierarchy, and dependency-provenance fields; all 812 packages preserve program/mutation/gate-state boundaries"
+  },
+  "next": {
+    "schedulerSelection": "NONE; a human-selected dependency chain is still required",
+    "summaryLane": "WAITING_FOR_CANONICAL_SUMMARY_ADMISSION_WRITER_PROOF; no proposal apply",
+    "programPlanCaveat": "All 3,245 open task-to-program mappings remain provisional; only 3 leaf tasks declare dependencies, so 3,242 remain dependency-unannotated without synthetic edges."
+  },
+  "likely_cause": "The large OpenSpec backlog needs an architecture-only constraint layer and a fresh reconciled inventory, while task mappings and most dependency declarations remain unreviewed or absent.",
+  "evidence": [
+    ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-workboard-v1.json",
+    ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-execution-controller-v1.json",
+    ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-achievable-implementation-program-v1.json",
+    "scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+    "openspec/changes/parent-atlas-workboard-feature-utility-fabric/specs/workboard-feature-vector/spec.md"
+  ],
+  "patch_targets": [
+    "scripts/atlas/lib/openspec-program-plan-v1.mjs",
+    "scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+    "scripts/atlas/build-openspec-workboard-v1.mjs",
+    "scripts/atlas/build-openspec-implementation-program-v1.mjs",
+    "openspec/changes/parent-atlas-workboard-feature-utility-fabric/specs/workboard-feature-vector/spec.md"
+  ],
+  "safe_next_command": "Review the provisional program mappings and explicitly select one bounded gate; do not infer selection from READY or completion percentage.",
+  "smoke_command": "node --test scripts/atlas/lib/openspec-program-plan-v1.test.mjs scripts/atlas/audit-openspec-execution-controller-v1.test.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T2201Z.json"
+}

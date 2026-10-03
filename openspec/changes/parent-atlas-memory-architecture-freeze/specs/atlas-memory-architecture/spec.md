@@ -19,6 +19,17 @@ features, external observations, and durable outcomes MUST retain their own owne
 - **WHEN** a consumer assembles context or records a workflow outcome
 - **THEN** runtime state and cache presence do not confer evidence authority
 
+### Requirement: TriEngramV1 separates canonical knowledge, derived retrieval, and runtime state
+
+The Parent Atlas term `TriEngramV1` MUST assign canonical authority only to E1 PostgreSQL
+knowledge. E2 retrieval/residency projections MUST remain derived. E3 model execution state MUST
+remain llama-server-owned and ephemeral, with canonical authority fixed to false. TriEngramV1 is a
+descriptive boundary, not a new store or persistence interface.
+
+#### Scenario: A runtime cache or recurrent state is present
+- **WHEN** E3 attention KV, DeltaNet recurrent state, or prompt-prefix cache is available
+- **THEN** it remains ephemeral execution state and cannot be promoted to canonical knowledge
+
 
 ### Requirement: Structural evidence authority SHALL follow the regex → ripgrep → ast-grep → Tree-sitter → Graphify → model ordering
 A model/RLM/NLP classifier SHALL NOT be treated as authoritative for structural facts (is this a

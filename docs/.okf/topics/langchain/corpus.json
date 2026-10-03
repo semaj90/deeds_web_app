@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.external-doc-corpus-discovery.v1",
+  "corpusId": "langchain-docs-python-core",
+  "authority": "https://docs.langchain.com",
+  "discoveryIndex": "https://docs.langchain.com/llms.txt",
+  "sections": [
+    {
+      "id": "langgraph-python",
+      "product": "langgraph",
+      "indexUrl": "https://docs.langchain.com/oss/python/langgraph/llms.txt",
+      "allowedPathPrefix": "/oss/python/langgraph/"
+    },
+    {
+      "id": "deepagents-python",
+      "product": "deepagents",
+      "indexUrl": "https://docs.langchain.com/oss/python/deepagents/llms.txt",
+      "allowedPathPrefix": "/oss/python/deepagents/"
+    },
+    {
+      "id": "concepts-python",
+      "product": "langchain-concepts",
+      "indexUrl": "https://docs.langchain.com/oss/python/concepts/llms.txt",
+      "allowedPathPrefix": "/oss/python/concepts/"
+    }
+  ],
+  "acquisition": {
+    "primary": "direct_markdown",
+    "fallbacks": ["crawl4ai_http", "firecrawl", "beautifulsoup_html"],
+    "fallbackExecution": "NOT_ENABLED_IN_ARTIFACT_FETCHER"
+  },
+  "artifactOnly": true,
+  "canonicalAuthority": false,
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0,
+  "rabbitmqPublishes": 0
+}

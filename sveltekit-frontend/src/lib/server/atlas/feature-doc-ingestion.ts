@@ -3,9 +3,10 @@ import path from 'node:path';
 import { z } from 'zod';
 import { validateExternalUrl } from '$lib/server/security/url-validator.js';
 import {
-  FeatureDocumentManifestSchema,
   FeatureDocumentManifestSourceSchema,
   getFeatureDocumentEvidence,
+  readFeatureDocumentManifestFile,
+  type FeatureDocumentReadBounds,
   type FeatureDocumentEvidence,
 } from './feature-document-evidence.js';
 
@@ -104,20 +105,23 @@ function resolveApprovedLocalPath(localPath: string): { ok: true; absolutePath: 
 }
 
 export async function buildFeatureDocumentIngestionPlan(
-  featureIdInput: string
+  featureIdInput: string,
+  readBounds: FeatureDocumentReadBounds = {},
 ): Promise<BuildFeatureDocumentIngestionPlanResult> {
   const featureId = String(featureIdInput ?? '').trim();
   if (!featureId) {
     throw new Error('featureId is required');
   }
 
-  const evidence = await getFeatureDocumentEvidence(featureId);
+  const evidence = await getFeatureDocumentEvidence(featureId, readBounds);
   if (!evidence.manifestPath) {
     throw new Error(`Feature manifest missing for ${featureId}`);
   }
 
-  const rawManifest = fs.readFileSync(evidence.manifestPath, 'utf8');
-  const manifest = FeatureDocumentManifestSchema.parse(JSON.parse(rawManifest));
+  const { raw: rawManifest, manifest } = readFeatureDocumentManifestFile(
+    evidence.manifestPath,
+    readBounds.maxManifestBytes,
+  );
 
   const remoteCrawlSources: Array<z.infer<typeof FeatureDocumentPlannedSourceSchema>> = [];
   const localRepositorySources: Array<z.infer<typeof FeatureDocumentPlannedSourceSchema>> = [];

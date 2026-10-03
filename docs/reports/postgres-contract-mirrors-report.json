@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19T23:32:59.328Z",
+  "generatedAt": "2026-10-02T17:12:41.771Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
@@ -10,7 +10,7 @@
     "liveUnavailable": 0,
     "blockers": [
       "kanban_tasks: static INDEX_MISMATCH",
-      "feature_registry: static COLUMN_MISMATCH",
+      "feature_registry: static DRIZZLE_ONLY",
       "feature_registry: live LIVE_TABLE_MISSING",
       "atlas_workspace_events: live LIVE_TABLE_MISSING",
       "atlas_workspace_event_participants: live LIVE_TABLE_MISSING",
@@ -181,11 +181,9 @@
       "schemaSource": [
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\db\\schema\\feature-registry.ts"
       ],
-      "manualSource": [
-        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\0048_feature_registry_queries.sql"
-      ],
+      "manualSource": [],
       "static": {
-        "classification": "COLUMN_MISMATCH",
+        "classification": "DRIZZLE_ONLY",
         "columns": [
           "chunk_ids",
           "cluster_id",
@@ -204,12 +202,7 @@
           "trust_tier"
         ],
         "indexes": [
-          "feature_registry_feature_key_key",
-          "feature_registry_queries_created_at_idx",
-          "feature_registry_queries_query_hash_idx",
-          "feature_registry_queries_savings_idx",
-          "feature_registry_queries_trace_id_idx",
-          "feature_registry_queries_user_id_idx"
+          "feature_registry_feature_key_key"
         ],
         "schemaColumns": [
           "chunk_ids",
@@ -232,13 +225,7 @@
         "schemaIndexes": [
           "feature_registry_feature_key_key"
         ],
-        "manualIndexes": [
-          "feature_registry_queries_created_at_idx",
-          "feature_registry_queries_query_hash_idx",
-          "feature_registry_queries_savings_idx",
-          "feature_registry_queries_trace_id_idx",
-          "feature_registry_queries_user_id_idx"
-        ],
+        "manualIndexes": [],
         "columnDiffs": {
           "onlyInA": [
             "chunk_ids",
@@ -263,13 +250,7 @@
           "onlyInA": [
             "feature_registry_feature_key_key"
           ],
-          "onlyInB": [
-            "feature_registry_queries_created_at_idx",
-            "feature_registry_queries_query_hash_idx",
-            "feature_registry_queries_savings_idx",
-            "feature_registry_queries_trace_id_idx",
-            "feature_registry_queries_user_id_idx"
-          ]
+          "onlyInB": []
         }
       },
       "live": {
@@ -302,18 +283,13 @@
         },
         "indexDiffs": {
           "onlyInA": [
-            "feature_registry_feature_key_key",
-            "feature_registry_queries_created_at_idx",
-            "feature_registry_queries_query_hash_idx",
-            "feature_registry_queries_savings_idx",
-            "feature_registry_queries_trace_id_idx",
-            "feature_registry_queries_user_id_idx"
+            "feature_registry_feature_key_key"
           ],
           "onlyInB": []
         }
       },
       "classification": "LIVE_TABLE_MISSING",
-      "repairClass": "APPLY_EXISTING_SQL",
+      "repairClass": "RECONCILE_MIGRATION_LINEAGE",
       "identityFields": [
         "id",
         "feature_key"

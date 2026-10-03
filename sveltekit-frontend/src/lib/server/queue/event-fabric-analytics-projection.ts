@@ -4,6 +4,7 @@ import type {
 	AnalyticsObservationEventV1,
 	ArtifactFailedEventV1,
 	ArtifactMaterializedEventV1,
+	AuthorityAuditCompletedEventV1,
 	CheckpointCommitEventV1,
 	CodeEvidencePersistedEventV1,
 	FailureObservationEventV1,
@@ -179,6 +180,31 @@ function projectArtifactFailed(event: ArtifactFailedEventV1): AnalyticsEventEnve
 	});
 }
 
+function projectAuthorityAuditCompleted(event: AuthorityAuditCompletedEventV1): AnalyticsEventEnvelope {
+	return makeEvent({
+		eventType: 'lane.result',
+		traceId: event.traceId ?? `authority:${event.eventId}`,
+		sourceRef: event.sourceRef,
+		laneId: event.payload.gate,
+		metadata: {
+			status: event.payload.status,
+			blocker: event.payload.blocker ?? null,
+			canonicalAuthority: event.payload.canonicalAuthority,
+			mutationAuthorized: event.payload.mutationAuthorized,
+			subjectType: event.payload.subjectType,
+			subjectId: event.payload.subjectId,
+			nextGate: event.payload.nextGate ?? null,
+			counts: event.payload.counts,
+			producerId: event.producerId,
+			workspaceId: event.workspaceId,
+			workspaceRevision: event.workspaceRevision,
+			sourceRevision: event.sourceRevision ?? null,
+			representationRevision: event.representationRevision ?? null,
+			sourceEvidenceRefs: event.payload.sourceEvidenceRefs,
+		},
+	});
+}
+
 export function projectEventFabricToAnalytics(event: EventFabricEventV1): AnalyticsEventEnvelope | null {
 	switch (event.eventType) {
 		case 'code.evidence.persisted':
@@ -197,6 +223,8 @@ export function projectEventFabricToAnalytics(event: EventFabricEventV1): Analyt
 			return projectArtifactMaterialized(event);
 		case 'artifact.failed':
 			return projectArtifactFailed(event);
+		case 'authority.audit.completed':
+			return projectAuthorityAuditCompleted(event);
 	}
 }
 

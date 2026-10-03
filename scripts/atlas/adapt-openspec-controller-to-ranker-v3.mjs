@@ -179,5 +179,7 @@ tasks.sort((a,b) =>
 for (let i=0;i<tasks.length;i++) tasks[i].rank=i+1;
 const output={schema:'atlas.actionable-workboard.v3',source,featureVectorSchema:FEATURE_VECTOR_SCHEMA,featureCoverage:featureCoverage(tasks),policy:{authority:'UPSTREAM_EXECUTION_CONTROLLER',laneAuthority:false,advisoryAuthorityTextReview:true,authorityReviewLoaded,selectionRequiresReviewClearance:true,defaultMutationScope:'GLOBAL_SERIALIZATION_WHEN_UNSCOPED'},config:{maxWorkers:4,cpuCapacity:4,gpuCapacity:1,llamaSlotCapacity:2,dbWriterCapacity:1,warmAheadWaves:1,warmTopK:4},currentReceipts:[],tasks};
 output.semanticChecksum=hash({...output});
-fs.writeFileSync(outputPath,JSON.stringify(output,null,2)+'\n');
+const temporaryPath=`${outputPath}.${process.pid}.${Date.now()}.tmp`;
+fs.writeFileSync(temporaryPath,JSON.stringify(output,null,2)+'\n');
+fs.renameSync(temporaryPath,outputPath);
 console.log(JSON.stringify({outputPath,source,tasks:tasks.length,laneCounts:tasks.reduce((a,t)=>(a[t.lane]=(a[t.lane]??0)+1,a),{}),semanticChecksum:output.semanticChecksum},null,2));

@@ -1,0 +1,119 @@
+{
+  "schema": "atlas.agent-execution-spine-reconciliation.v1",
+  "generatedAt": "2026-10-02T02:09:43Z",
+  "mode": "READ_ONLY_RECONCILIATION",
+  "status": "IMPLEMENTED_CONTRACT_FIXTURE_HISTORICAL_POPULATION_UNRECONCILED",
+  "ownerInventory": {
+    "actionRegistry": "sveltekit-frontend/src/lib/server/atlas/agentic/agentic-action-registry-v1.ts (AGENTIC_ACTION_REGISTRY_V1_SEED)",
+    "contextManifestAndAdmission": "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts; sveltekit-frontend/src/lib/server/atlas/context/ace-context-manifest-admission-v1.ts",
+    "workflowRunIdentity": "sveltekit-frontend/src/lib/server/atlas/workflow/workflow-action-event-v1.ts (WorkflowActionEventV1)",
+    "durableReceipt": "sveltekit-frontend/src/lib/server/observability/agent-work-receipt-v1.ts and agent-work-receipt-store-v1.ts",
+    "dagAdmission": "scripts/atlas/lib/kernel-dag-v1.mjs and scripts/atlas/lib/grounded-kernel-dag-admission-v1.mjs",
+    "duplicationDecision": "CapabilityRegistryV1 is a non-authoritative projection of the existing action seed; no second ContextManifest compiler or durable tool-receipt authority added."
+  },
+  "latestVerifiedEvidenceFabricRun": {
+    "runId": "pipeline-20261001235818170-44112",
+    "manifestPath": "docs/reports/openspec-evidence/pipeline-20261001235818170-44112/run-manifest-v1.json",
+    "finalSummaryPath": "docs/reports/openspec-evidence/pipeline-20261001235818170-44112/final-summary-v1.json",
+    "workspaceRevision": "sha256:84458fbe55b8ceaf1fe3b95a056c320dfe7119ab64b1faddf71f5501de6e93a0",
+    "status": "PIPELINE_COMPLETED_READ_ONLY",
+    "counts": {
+      "tasks": 11047,
+      "admittedCanonicalKeys": 11047,
+      "quarantinedIdentities": 0,
+      "missingTaskReceipts": 9,
+      "ambiguousReceipts": 3,
+      "trueOrphanReceipts": 34,
+      "missingOrStaleRevisionReceipts": 9
+    },
+    "manifestVerification": "PASS; six authority stages share the runId, checksums verify, EVF-RUN-01 through EVF-RUN-06 PASS"
+  },
+  "supplied11042Run": {
+    "runId": "pipeline-20261001225204696-25348",
+    "manifestPath": "docs/reports/openspec-evidence/pipeline-20261001225204696-25348/run-manifest-v1.json",
+    "workspaceRevision": "sha256:8968abd866207d8daf6620bce622786c6a9c2f917c01da44742b2e5072b80910",
+    "status": "PIPELINE_COMPLETED_READ_ONLY",
+    "counts": {
+      "tasks": 11042,
+      "admittedCanonicalKeys": 11042,
+      "missingTaskReceipts": 18,
+      "ambiguousReceipts": 0,
+      "trueOrphanReceipts": 49,
+      "missingOrStaleRevisionReceipts": 7
+    },
+    "manifestVerification": "PASS"
+  },
+  "olderCheckpoint": {
+    "status": "HISTORICAL_UNRECONCILED",
+    "artifactPath": "docs/reports/openspec-evidence/compact-reconciliation-heading-recovery-v2.json",
+    "artifactChecksum": "sha256:8ea2796b657f4bd4d5161d79082abd38dc289f247d20f8f31fc85adb463923af",
+    "artifactWorkspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
+    "reportedCounts": {
+      "tasks": 11024,
+      "canonicalKeyCoverage": 11024,
+      "admittedCanonicalKeys": 11018,
+      "quarantinedIdentities": 6,
+      "missingTaskReceipts": 743,
+      "ambiguousReceipts": 113,
+      "trueOrphanReceipts": 126,
+      "missingRevisionReceipts": 15,
+      "staleRevisionReceipts": 44,
+      "combinedMissingOrStaleRevisionReceipts": 59
+    },
+    "bindingEvidence": "The compact artifact points to a census in pipeline-20261001201937250-44228 and global/unversioned identity, receipt-type, and orphan-binding artifacts. No same-run run-manifest-v1.json or final-summary-v1.json exists for that checkpoint, so same-run identity and checksums cannot be established.",
+    "populationDifference": {
+      "latestComparedToCheckpointTaskDelta": 23,
+      "latestComparedToCheckpointAdmittedKeyDelta": 29,
+      "latestComparedToCheckpointMissingTaskReceiptDelta": -734,
+      "latestComparedToCheckpointAmbiguousReceiptDelta": -110,
+      "latestComparedToCheckpointTrueOrphanReceiptDelta": -92,
+      "latestComparedToCheckpointMissingOrStaleRevisionDelta": -50,
+      "interpretation": "Arithmetic differences only. Workspace revisions and artifact lineage differ; these are not a proven same-population recovery delta or a causal reconciliation."
+    }
+  },
+  "executionSpine": {
+    "implementationStatus": "READ_ONLY_REPLAY_PROVEN_FIXTURE_ONLY",
+    "replayStatus": "READ_ONLY_REPLAY_PROVEN_FIXTURE_ONLY",
+    "productionWiring": "NOT_PROVEN",
+    "externalMcpOrOpenCodeCall": false,
+    "externalFrameworkDispatch": false,
+    "datastoreWrites": false,
+    "sourceOrTaskLedgerWrites": false,
+    "capabilityRegistryAuthority": false,
+    "toolReceiptAuthority": false,
+    "existingAceAdmissionPath": "admitCurrentCandidateFeatureSnapshotV1 -> admitCurrentAceContextManifestV1",
+    "existingErrorNeighborhoodResolver": "resolveErrorNeighborhood; its checksum is bound into the bounded output observation and receipt",
+    "smokeReceiptPath": "docs/reports/agent-execution-spine-read-only-replay-v1.json",
+    "compactCodebookDecision": "The documented encoding resolves the width split (0..14 inline, 15 escape, full EvidenceKindLUT 0..31), but nibble-encoding-v1.ts lacks the versioned extension lookup and registry-revision binding; existing OpenSpec task 9.9a remains pending and no production bytes were changed."
+  },
+  "validation": {
+    "focusedVitest": "5 files / 62 tests passed",
+    "focusedTypeScriptProjectCheck": "npx tsc --noEmit --pretty false --skipLibCheck -p tsconfig.json passed",
+    "openSpecStrict": "parent-atlas-agentic-repair-fabric valid",
+    "fixtureSmoke": "npx tsx scripts/atlas/run-agent-execution-spine-fixture-v1.mts passed; report checksum-bound and fixture-only",
+    "gitDiffCheck": "Existing unrelated trailing whitespace reported in simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml; this task did not edit that file."
+  },
+  "likely_cause": "Agent execution contracts and tool-specific receipt bindings were missing between the already-owned ACE ContextManifest admission and the existing code-defined action registry; an older EVF checkpoint also lacked a checksum-bound final run manifest.",
+  "evidence": [
+    "sveltekit-frontend/src/lib/server/atlas/agentic/agent-execution-spine-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/agentic/agent-execution-spine-v1.spec.ts",
+    "scripts/atlas/run-agent-execution-spine-fixture-v1.mts",
+    "docs/reports/openspec-evidence/pipeline-20261001235818170-44112/run-manifest-v1.json",
+    "docs/reports/openspec-evidence/compact-reconciliation-heading-recovery-v2.json"
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/atlas/agentic/agent-execution-spine-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/agentic/agent-execution-spine-v1.spec.ts",
+    "scripts/atlas/run-agent-execution-spine-fixture-v1.mts",
+    "openspec/changes/parent-atlas-agentic-repair-fabric/specs/agentic-action-registry/spec.md",
+    "openspec/changes/parent-atlas-agentic-repair-fabric/tasks.md",
+    "openspec/changes/parent-atlas-agentic-repair-fabric/design.md",
+    "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md",
+    "docs/reports/agent-execution-spine-reconciliation-20261001.json"
+  ],
+  "safe_next_command": "node --input-type=module -e \"import { verifyOpenSpecEvidenceRunManifestV1 as verify } from './scripts/atlas/compile-openspec-evidence-run-manifest-v1.mjs'; console.log(verify('docs/reports/openspec-evidence/pipeline-20261001235818170-44112/run-manifest-v1.json').summary.status)\"",
+  "smoke_command": "npx tsx scripts/atlas/run-agent-execution-spine-fixture-v1.mts",
+  "report_path": "docs/reports/agent-execution-spine-reconciliation-20261001.json",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

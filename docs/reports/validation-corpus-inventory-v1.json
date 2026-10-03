@@ -1,0 +1,375 @@
+{
+  "schema": "atlas.validation-corpus-inventory.v1",
+  "generatedAt": "2026-09-20T19:14:44.593Z",
+  "principle": "ONE shared core, TWO adapters. The LLM (Ornith) receives both, tagged by adapter, and never merges their identity spaces.",
+  "sharedCore": {
+    "contracts": [
+      "SOURCE-TEXT-ENCODING-01",
+      "revision-qualified source identity (canonical_source_ref + source_revision)",
+      "UTF8_PARSER_BUFFER_V1 span contract",
+      "GroundedExtractionV1 (spans mandatory)",
+      ".okf vocabulary layer",
+      "CandidateOrdinalMap + checksum",
+      "receipt schema"
+    ],
+    "rule": "adapters differ in corpus and validators, never in identity or span rules"
+  },
+  "adapters": {
+    "WORKSTATION": {
+      "role": "Parent Atlas Workstation: code, schemas, specs, configs",
+      "corpus": [
+        {
+          "cls": "typescript_javascript",
+          "files": {
+            "ts": 7712,
+            "mts": 567,
+            "mjs": 4006,
+            "js": 124
+          },
+          "layers": {
+            "ast": "ast-grep + Tree-sitter (TS/JS only)",
+            "cst": "Tree-sitter",
+            "semantic": "tsgo/tsc",
+            "schema": "Zod contracts"
+          },
+          "have": "AST candidates for 3,043 files / 24,971 declarations (sveltekit-frontend/src pilot only)",
+          "missing": [
+            "scope V2 roots (scripts, packages, tests) behind an injective path policy",
+            "class-qualified method symbols + overload disambiguator (161 collisions measured)",
+            "negative corpus: syntax-error / partial files",
+            "CST byte round-trip proof"
+          ]
+        },
+        {
+          "cls": "svelte",
+          "files": {
+            "svelte": 940
+          },
+          "layers": {
+            "ast": "svelte compiler AST",
+            "cst": "NOT_EVIDENCED",
+            "semantic": "svelte-check",
+            "schema": "runes-compliance gates G21-G25"
+          },
+          "have": "rune-compliance regex gates only",
+          "missing": [
+            "structural extraction (script/template/style as three embedded languages)",
+            "a Svelte fixture corpus with expected AST spans"
+          ]
+        },
+        {
+          "cls": "sql_drizzle_migrations",
+          "files": {
+            "sql": 662
+          },
+          "layers": {
+            "ast": "NOT_EVIDENCED (no SQL parser lane)",
+            "cst": "NOT_EVIDENCED",
+            "semantic": "live EXPLAIN / rollback rehearsal (proven)",
+            "schema": "live catalog introspection (audit-postgres-index-capability-v1)"
+          },
+          "have": "rollback-rehearsed migrations + capability audit",
+          "missing": [
+            "SQL AST/CST parser lane",
+            "PG18 syntax regression corpus (e.g. removed isfinite(float8) overloads)",
+            "migration-vs-live-schema drift corpus"
+          ]
+        },
+        {
+          "cls": "python",
+          "files": {
+            "py": 591,
+            "py_tests": 83
+          },
+          "layers": {
+            "ast": "regex fallback (ast-grep symbol extraction is TS/JS only)",
+            "cst": "NOT_EVIDENCED",
+            "semantic": "NOT_EVIDENCED",
+            "schema": "Pydantic in sidecar"
+          },
+          "have": "83 test files",
+          "missing": [
+            "Tree-sitter/ast-grep Python lane",
+            "symbol registry coverage for Python"
+          ]
+        },
+        {
+          "cls": "markdown_openspec",
+          "files": {
+            "md": 7987
+          },
+          "layers": {
+            "ast": "heading extractor (markdown-symbol-extractor, 48 span-hash legacy rows)",
+            "cst": "markdown parser",
+            "semantic": "LangExtract grounded spans",
+            "schema": "openspec validate --strict"
+          },
+          "have": "openspec validation + heading extraction",
+          "missing": [
+            "fenced-code-block embedded-language corpus",
+            "front-matter schema corpus",
+            "span-grain fix for the 48 legacy heading rows"
+          ]
+        },
+        {
+          "cls": "json_yaml_okf",
+          "files": {
+            "json": 1607,
+            "yaml": 87,
+            "okf": 30
+          },
+          "layers": {
+            "ast": "json-symbol-extractor (6 rows)",
+            "cst": "NOT_EVIDENCED",
+            "semantic": "n/a",
+            "schema": "JSON Schema / Zod / .okf loader tests"
+          },
+          "have": ".okf loader tests",
+          "missing": [
+            "JSON Schema corpus per contract",
+            ".okf vocabulary <-> classifier label reconciliation (3 vocabularies, 65.9% mapped)"
+          ]
+        },
+        {
+          "cls": "protobuf",
+          "files": {
+            "proto": 117
+          },
+          "layers": {
+            "ast": "NOT_EVIDENCED",
+            "cst": "NOT_EVIDENCED",
+            "semantic": "n/a",
+            "schema": "proto-from-zod generation"
+          },
+          "have": "generation script",
+          "missing": [
+            "proto parse + wire-compat fixtures"
+          ]
+        },
+        {
+          "cls": "shell_powershell_batch",
+          "files": {
+            "ps1": 308,
+            "sh": 99,
+            "bat": 41
+          },
+          "layers": {
+            "ast": "NOT_EVIDENCED",
+            "cst": "NOT_EVIDENCED",
+            "semantic": "n/a",
+            "schema": "n/a"
+          },
+          "have": "none",
+          "missing": [
+            "grammar lane + launcher-contract fixtures (launch-turboquant.ps1 is load-bearing)"
+          ]
+        },
+        {
+          "cls": "infra_config",
+          "files": {
+            "dockerfile": 32,
+            "compose": 19,
+            "cypher": 17,
+            "jinja": 9
+          },
+          "layers": {
+            "ast": "NOT_EVIDENCED",
+            "cst": "NOT_EVIDENCED",
+            "semantic": "llama-server /props probe",
+            "schema": "n/a"
+          },
+          "have": "chat-template live probe",
+          "missing": [
+            "Jinja chat-template validation corpus (load-bearing for Ornith tool-calls)",
+            "compose/Dockerfile schema fixtures",
+            "Cypher query fixtures"
+          ]
+        },
+        {
+          "cls": "native_gpu",
+          "files": {
+            "go": 25,
+            "cuda": 23,
+            "cpp": 16,
+            "wgsl": 14
+          },
+          "layers": {
+            "ast": "NOT_EVIDENCED",
+            "cst": "NOT_EVIDENCED",
+            "semantic": "CPU/ATen oracle parity receipts",
+            "schema": "n/a"
+          },
+          "have": "oracle parity proofs for select kernels",
+          "missing": [
+            "grammar lanes; kernel fixture corpus keyed by input checksum"
+          ]
+        }
+      ]
+    },
+    "LEGAL": {
+      "role": "Legal adapter: statutes, citations, opinions, evidence, filings",
+      "corpus": [
+        {
+          "cls": "statute_regulation_text",
+          "live": {
+            "statutes_rows": 0,
+            "statute_chunks_rows": 0
+          },
+          "layers": {
+            "ast": "section tree (ARTICLE/SECTION/§ chunker)",
+            "cst": "structure-preserving",
+            "semantic": "citation resolution",
+            "schema": "statute entity schema"
+          },
+          "have": "legal-chunker.ts (structure-aware)",
+          "missing": [
+            "ANY populated statute corpus",
+            "public-domain statute fixtures (e.g. published codes)",
+            "section-numbering edge cases (subsections, cross-references, repealed)"
+          ]
+        },
+        {
+          "cls": "citations",
+          "live": {
+            "citations_rows": 0
+          },
+          "layers": {
+            "ast": "citation grammar",
+            "cst": "n/a",
+            "semantic": "citation -> authority resolution",
+            "schema": "citation entity schema"
+          },
+          "have": "regex entity extraction (EMAIL/PHONE/DATE/CITATION/STATUTE/MONEY)",
+          "missing": [
+            "citation grammar corpus (reporters, short-form, id., supra)",
+            "gold resolution set"
+          ]
+        },
+        {
+          "cls": "case_law_opinions",
+          "live": {
+            "legal_precedents_rows": 0,
+            "court_opinions_qdrant_points": 0
+          },
+          "layers": {
+            "ast": "opinion section segmentation",
+            "cst": "n/a",
+            "semantic": "holding/issue extraction",
+            "schema": "opinion schema"
+          },
+          "have": "none populated",
+          "missing": [
+            "public-domain opinion corpus",
+            "headnote/holding gold labels"
+          ]
+        },
+        {
+          "cls": "evidence_documents",
+          "live": {
+            "evidence_rows": 806,
+            "evidence_items_qdrant_points": 0,
+            "evidence_vectors_rows": 0
+          },
+          "layers": {
+            "ast": "text layout (PDF/OCR)",
+            "cst": "n/a",
+            "semantic": "entity + forensic pattern extraction",
+            "schema": "evidence record schema"
+          },
+          "have": "806 evidence rows; 8-stage pipeline code",
+          "missing": [
+            "PII-safe SYNTHETIC evidence fixtures (real evidence must not become a shared corpus)",
+            "OCR-noise / scan-quality cases",
+            "Qdrant mirror is EMPTY (0 points) despite 806 rows"
+          ]
+        },
+        {
+          "cls": "contracts_filings_transcripts",
+          "live": {
+            "legal_documents_rows": 3,
+            "cases_rows": 11
+          },
+          "layers": {
+            "ast": "clause/section segmentation",
+            "cst": "n/a",
+            "semantic": "obligation/party extraction",
+            "schema": "document schema"
+          },
+          "have": "3 documents, 11 cases",
+          "missing": [
+            "clause-level fixtures",
+            "transcript (Whisper) speaker-turn fixtures",
+            "timeline-event gold set"
+          ]
+        }
+      ],
+      "liveState": "near-empty (evidence 806 rows, cases 11, legal_documents 3; statutes/citations/precedents/chunks 0; all legal Qdrant collections 0 points)",
+      "constraint": "fixtures must be PII-safe and synthetic or public-domain; real case evidence is never a shared corpus"
+    }
+  },
+  "adapterTagInContext": "ContextManifestV1 carries adapter: WORKSTATION | LEGAL | BOTH; retrieval lanes and validators filter by adapter; identity namespaces stay separate",
+  "crossCutting": [
+    {
+      "cls": "encoding_edge_cases",
+      "measured": "4 BOM files known; UTF-16/CRLF-mix NOT_MEASURED",
+      "need": "byte-level fixtures proving SOURCE-TEXT-ENCODING-01 + UTF8_PARSER_BUFFER_V1 offsets"
+    },
+    {
+      "cls": "path_identity_collisions",
+      "measured": "250 normalized-key collisions across roots",
+      "need": "fixture set for the injective root-qualified source identity"
+    },
+    {
+      "cls": "duplicate_names_overloads",
+      "measured": "161 bare-method collisions (55 remain after class qualification)",
+      "need": "method/overload/same-name-class fixtures"
+    },
+    {
+      "cls": "non_file_source_refs",
+      "measured": "50 of 93 unresolved calibration rows are non-file refs (feature:, task:, proto:)",
+      "need": "explicit non-file ref namespace + resolver cases"
+    },
+    {
+      "cls": "deleted_renamed_sources",
+      "measured": "14 git-deleted refs still in the graph",
+      "need": "tombstone class cases"
+    },
+    {
+      "cls": "generated_vendor_minified",
+      "measured": "NOT_MEASURED",
+      "need": "exclusion-rule fixtures (claude-mem, precompiled pgvector, logs, memory runs)"
+    },
+    {
+      "cls": "syntax_error_partial_empty_huge",
+      "measured": "NOT_MEASURED",
+      "need": "negative fixtures that must fail closed, not crash the extractor"
+    },
+    {
+      "cls": "embedded_multi_language",
+      "measured": "NOT_MEASURED",
+      "need": "svelte script/template/style, markdown fences, SQL in TS strings"
+    },
+    {
+      "cls": "case_only_path_differences",
+      "measured": "NOT_MEASURED (canonical path is case-preserved)",
+      "need": "case-collision fixtures for Windows worktrees"
+    }
+  ],
+  "measuredFacts": {
+    "trackedFilesByType": "md 7987, ts 7712, mjs 4006, json 1607, svelte 940, sql 662, py 591, mts 567, ps1 308, proto 117",
+    "specTsFiles": 2407,
+    "pythonTests": 83,
+    "goTests": 8,
+    "fixtureFiles": 33,
+    "fixtureDirs": 14
+  },
+  "headlineGaps": [
+    "fixture density is tiny: 33 fixture files vs 2,407 spec files and 7,712 .ts files",
+    "structural extraction covers TS/JS only; svelte, python, sql, shell, proto, go, cuda, wgsl have no ast-grep/Tree-sitter lane evidenced",
+    "no negative/adversarial corpus measured for any language",
+    "legal adapter has essentially no corpus and its Qdrant mirrors are empty",
+    "no per-adapter gold labels; the only labelled set is a 142-row UNREVIEWED draft (49 revision-qualified)"
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

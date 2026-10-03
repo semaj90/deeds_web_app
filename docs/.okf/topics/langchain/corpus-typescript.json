@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.external-doc-corpus-discovery.v1",
+  "corpusId": "langchain-docs-typescript-core",
+  "authority": "https://docs.langchain.com",
+  "discoveryIndex": "https://docs.langchain.com/llms.txt",
+  "sections": [
+    {
+      "id": "langchain-typescript",
+      "product": "langchain",
+      "language": "typescript",
+      "indexUrl": "https://docs.langchain.com/_llms/agent-development-lifecycle/build/type-script.md",
+      "allowedPathPrefix": "/oss/javascript/langchain/"
+    },
+    {
+      "id": "langgraph-typescript",
+      "product": "langgraph",
+      "language": "typescript",
+      "indexUrl": "https://docs.langchain.com/_llms/agent-development-lifecycle/build/type-script.md",
+      "allowedPathPrefix": "/oss/javascript/langgraph/"
+    },
+    {
+      "id": "deepagents-typescript",
+      "product": "deepagents",
+      "language": "typescript",
+      "indexUrl": "https://docs.langchain.com/_llms/agent-development-lifecycle/build/type-script.md",
+      "allowedPathPrefix": "/oss/javascript/deepagents/"
+    },
+    {
+      "id": "openwiki-typescript",
+      "product": "openwiki",
+      "language": "mixed",
+      "indexUrl": "https://docs.langchain.com/_llms/agent-development-lifecycle/build/type-script.md",
+      "allowedPathPrefix": "/oss/openwiki/"
+    },
+    {
+      "id": "langsmith-typescript",
+      "product": "langsmith",
+      "language": "typescript",
+      "indexUrl": "https://docs.langchain.com/_llms/agent-development-lifecycle/build/type-script.md",
+      "allowedPathPrefix": "/langsmith/javascript/"
+    }
+  ],
+  "acquisition": {
+    "primary": "direct_markdown",
+    "fallbacks": ["crawl4ai_http", "firecrawl", "beautifulsoup_html"],
+    "fallbackExecution": "NOT_ENABLED_IN_ARTIFACT_FETCHER"
+  },
+  "artifactOnly": true,
+  "canonicalAuthority": false,
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0,
+  "rabbitmqPublishes": 0
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T16:17:30Z",
+  "objective": "Continue evidence-backed OpenSpec task execution; keep container rebuilds deferred until safe local work is exhausted.",
+  "pivot": {
+    "fromChange": "inference-wiring-deep-audit-aug22",
+    "fromGate": "INFERENCE_FACADE_READ_ONLY_LIVE_REPLAY_PROVEN",
+    "toChange": "parent-atlas-nlp-sidecar-feature-compiler",
+    "toTask": "3.2 spaCy live linguistic output and exact source spans",
+    "reason": "The inference replay tranche is locally committed and its gate is proven; the sidecar has a narrow locally testable span/dependency contract without requiring a container rebuild."
+  },
+  "progress": {
+    "change": "parent-atlas-nlp-sidecar-feature-compiler",
+    "before": "84/142",
+    "after": "84/142",
+    "checkboxesClosed": 0
+  },
+  "implemented": [
+    "Added a deterministic mock-backed POS response test verifying UTF-8 token, noun-phrase, and dependency-edge spans round-trip to exact text with a preceding four-byte character."
+  ],
+  "evidence": {
+    "focusedTest": "python -m pytest -q python/test_miniforge_nlp_sidecar_linguistic_scope.py: 5 passed",
+    "liveProbe": "POST /pos on 'The dog runs.' returned dog=NOUN, runs=VERB, noun phrase 'The dog', and det/nsubj dependencies; /health after the call reported en_core_web_sm loaded and pos_ready=true.",
+    "adversarialFinding": "A live input prefixed by an emoji classified that symbol as NOUN; model-quality gate remains open.",
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false
+  },
+  "blockedOrOpen": [
+    "Task 3.2 remains open: no reviewed quality set, emoji adversarial result, and scoped /analyze comments/docstrings have not been shown to produce the same POS/dependency output.",
+    "Task 3.3 PyTorch POS challenger remains unimplemented; live sidecar reports torch, CUDA, and cuVS unavailable. Container rebuild deferred."
+  ],
+  "mutations": {
+    "postgres": "none",
+    "valkey": "none",
+    "qdrant": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "containers": "none",
+    "filesystem": [
+      "Added one mock-backed linguistic UTF-8 span regression test.",
+      "Recorded this pivot and the still-open runtime/model-quality boundary in the NLP OpenSpec tasks."
+    ]
+  },
+  "result": "LINGUISTIC_SPAN_CONTRACT_PROVEN_MODEL_QUALITY_OPEN",
+  "nextGate": "SCOPED_COMMENT_DOCSTRING_TO_LINGUISTIC_OUTPUT_PROVEN"
+}

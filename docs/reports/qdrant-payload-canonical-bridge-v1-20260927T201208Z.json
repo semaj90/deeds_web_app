@@ -1,0 +1,181 @@
+{
+  "schema": "atlas.qdrant-payload-canonical-bridge-audit.v1",
+  "generatedAt": "2026-09-27T20:12:08.912Z",
+  "mode": "QDRANT_PAYLOAD_ONLY_PLUS_POSTGRES_REPEATABLE_READ_READ_ONLY",
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768",
+    "before": {
+      "status": "green",
+      "pointsCountBefore": 328348,
+      "vectorsConfig": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "error": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "signature": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      }
+    },
+    "after": {
+      "status": "green",
+      "pointsCountBefore": 328348,
+      "vectorsConfig": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "error": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "signature": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      }
+    },
+    "scrollPages": 329,
+    "vectorsFetched": false
+  },
+  "payloadFieldPresence": {
+    "pointId": 328348,
+    "chunkId": 243281,
+    "packetKey": 328348,
+    "sourceRef": 328348,
+    "contentHash": 325550,
+    "representationId": 324981,
+    "vectorDimension": 106321
+  },
+  "canonicalPostgresReconciliation": {
+    "points": 328348,
+    "chunkIdUniqueCandidates": 239395,
+    "chunkIdAmbiguousCandidates": 925,
+    "chunkIdMissingCandidates": 88028,
+    "uniqueChunkCandidatesExactSourceRef": 236495,
+    "uniqueChunkCandidatesExactContentHash": 220802,
+    "uniqueChunkCandidatesExactSourceRefAndHash": 220673,
+    "uniqueChunkCandidatesWithAllRevisions": 0,
+    "uniqueChunkCandidatesStrictlyRevisionQualified": 0,
+    "packetKeyMatches": 106337,
+    "packetKeyUnmatched": 222011
+  },
+  "sampleFailures": [
+    {
+      "pointId": "2",
+      "chunkId": "card:src/AGENTS.md:19cf4dd92a0829d1",
+      "packetKey": "ace:packet:3362030dfe23",
+      "sourceRefMatches": false,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "3",
+      "chunkId": "card:src/AGENTS.md:7765ecd953daf907",
+      "packetKey": "ace:packet:3362030dfe23",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "4",
+      "chunkId": "card:src/AGENTS.md:b33a95adc12f82d6",
+      "packetKey": "ace:packet:3362030dfe23",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "5",
+      "chunkId": "card:src/hooks.server.ts:1ad8934d9cefa0be",
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRefMatches": false,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "6",
+      "chunkId": "card:src/hooks.server.ts:2a352e73a1aa39f6",
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "7",
+      "chunkId": "card:src/hooks.server.ts:4f3dc89c12d99e11",
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "8",
+      "chunkId": "card:src/hooks.server.ts:5438eb5d9a3024c6",
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "9",
+      "chunkId": "card:src/hooks.server.ts:5e08c4ca6ae813a4",
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "10",
+      "chunkId": "card:src/hooks.server.ts:776613949fb19716",
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "11",
+      "chunkId": "card:src/hooks.server.ts:8c19fb3050868fd0",
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "12",
+      "chunkId": "card:src/hooks.server.ts:da70104b7f710c27",
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "13",
+      "chunkId": "card:src/lib/AGENTS.md:3a4cada5ef0bad03",
+      "packetKey": "ace:packet:83dc9fe1e87d",
+      "sourceRefMatches": false,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    }
+  ],
+  "decision": "PAYLOAD_LOCATORS_ARE_NOT_FULLY_REVISION_QUALIFIED",
+  "limitations": [
+    "Qdrant payload is a projection and never canonical authority.",
+    "The Postgres snapshot is repeatable-read/read-only, but Qdrant scroll is not a transactionally pinned snapshot; compare before/after collection counts.",
+    "Payload representation_id is observed as a projection locator only; it is not accepted as semantic representation provenance.",
+    "No vectors, model calls, cache operations, or datastore writes were performed."
+  ],
+  "safeguards": {
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "inferenceCalls": 0,
+    "vectorsFetched": false
+  }
+}

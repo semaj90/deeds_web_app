@@ -1,0 +1,56 @@
+{
+  "schema": "parent-atlas.adaptive-dag-fetch-coalescing-audit.v1",
+  "generatedAt": "2026-09-23T20:49:54Z",
+  "task": "DAG-FETCH-01",
+  "result": "FETCH_PLAN_COALESCING_NOT_IMPLEMENTED",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "codeChange": "Removed selection-level evidence-key suppression so distinct ACE cards are preserved.",
+  "currentFlow": {
+    "querySynthesis": "exact duplicate synthesized query strings are removed before bounded search",
+    "upstreamSearch": "one search callback invocation occurs per unique synthesized subquery",
+    "resultMerge": "cards are merged by cardId only",
+    "aceSelection": "distinct cards are preserved even if sourceRef, sourceRevision, and order-insensitive evidenceRefs happen to match"
+  },
+  "fetchPlanOwner": {
+    "status": "NOT_FOUND_IN_CURRENT_CIRCUIT",
+    "evidence": "LocalResearchCircuitInputV1.search accepts a subquery and returns already-materialized candidate ordinals and AceCardV2 cards; no FetchParameterPlanV1 request boundary is present."
+  },
+  "invariantsTested": [
+    {
+      "case": "different card IDs, same source/revision/evidence set in different evidence order",
+      "result": "both cards retained by selection; no rejection"
+    },
+    {
+      "case": "same path with a different source revision",
+      "result": "retained distinctly"
+    },
+    {
+      "case": "same source/revision with a different evidence set",
+      "result": "retained distinctly"
+    }
+  ],
+  "validation": {
+    "command": "npm exec vitest -- run src/lib/server/atlas/context/ace-card-selection-v2.spec.ts src/lib/server/atlas/research/local-research-circuit-v1.spec.ts",
+    "testFiles": 2,
+    "passed": 6,
+    "failed": 0,
+    "openspecStrict": "PASS",
+    "gitDiffCheck": "PASS"
+  },
+  "notProven": [
+    "equivalent fetch request tuples result in exactly one upstream fetch",
+    "one immutable fetched payload is reused for all equivalent requests",
+    "request tuples differing by revision or evidence set remain distinct at the fetch boundary",
+    "production callers are wired to a fetch-plan coalescer"
+  ],
+  "nextGate": "DEFINE_AND_WIRE_FETCH_PLAN_COALESCER_IN_EXISTING_RESEARCH_CIRCUIT",
+  "writes": {
+    "postgres": 0,
+    "valkey": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "nats": 0,
+    "graphify": 0
+  }
+}

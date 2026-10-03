@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T16:55:28Z",
+  "head": "9950262810",
+  "pivots": [],
+  "scope": {
+    "change": "parent-atlas-versioned-doc-intelligence",
+    "task": "DOC-26 version-qualified external-document recrawl",
+    "changeListPivot": false,
+    "readOnly": true,
+    "candidateFiles": [
+      "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-versioned-recrawl-admission-v2.ts",
+      "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-versioned-recrawl-v2.spec.ts",
+      "sveltekit-frontend/scripts/atlas/run-external-doc-versioned-recrawl-v2.mts"
+    ],
+    "forbidden": [
+      "canonical admission writes",
+      "PostgreSQL/Qdrant/Valkey/Neo4j writes",
+      "container rebuilds",
+      "Graphify",
+      "OpenSpec task-ledger edits",
+      "pivot to another change"
+    ]
+  },
+  "verification": {
+    "pythonFocusedTests": { "passed": 21, "failed": 0 },
+    "frontendFocusedTests": { "passed": 9, "failed": 0 },
+    "openspecStrict": "PASS",
+    "scopedDiffCheck": "PASS",
+    "frontendProjectTypecheck": {
+      "result": "FAILED_WITH_PROJECT_WIDE_DIAGNOSTICS",
+      "doc26Diagnostics": 0,
+      "note": "Existing unrelated frontend TypeScript errors prevent a green whole-project typecheck."
+    },
+    "priorVersionSnapshot": {
+      "implementation": "deterministic checksum over exact revision-qualified page and child-chunk readback",
+      "planOnlyPriorPreserved": null,
+      "applyBeforeAfterReadback": "not run"
+    },
+    "liveDeltaPlan": "NOT_RUN",
+    "liveDeltaPlanBlocker": "No actual version-transition delta plan and matching current-version V2 envelopes were available; no synthetic transition was invented.",
+    "canonicalWriter": "existing admitExternalDocPage owner is retained for APPLY only",
+    "writerCalls": 0,
+    "datastoreWrites": {
+      "postgres": 0,
+      "qdrant": 0,
+      "valkey": 0,
+      "neo4j": 0
+    },
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "result": "DOC26_IMPLEMENTATION_AND_FIXTURES_PROVEN_LIVE_DELTA_PLAN_AND_CANONICAL_READBACK_OPEN",
+  "nextGate": "Supply the real manifest delta plus prior/current version-qualified envelopes, run read-only PLAN_ONLY against one repeatable-read snapshot, capture prior cohort checksum, then stop before APPLY unless separately authorized."
+}

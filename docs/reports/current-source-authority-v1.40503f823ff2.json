@@ -1,0 +1,150 @@
+{
+  "schema": "atlas.current-source-authority.v1",
+  "status": "CURRENT_SOURCE_AUTHORITY_BLOCKED",
+  "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "sourceCount": 25542,
+  "sourceSelectionChecksum": "sha256:da4d765d0cd0a399605ebde21a0fb58f7d6a251aba9a572ddbc265c56b89985b",
+  "snapshotSelectionChecksum": "sha256:da4d765d0cd0a399605ebde21a0fb58f7d6a251aba9a572ddbc265c56b89985b",
+  "membershipSetChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "counts": {
+    "qualified": 25542,
+    "missingRevision": 0,
+    "revisionMismatch": 0,
+    "namespaceAmbiguous": 0,
+    "notInAdmittedCohort": 0
+  },
+  "proof": {
+    "workspaceAuthorityProven": false,
+    "exactMembershipProven": true,
+    "sourceIdentityProven": true,
+    "sourceRevisionProven": true,
+    "sourceSelectionChecksumProven": true
+  },
+  "registryCoverage": {
+    "exact": 24456,
+    "absent": 1086,
+    "mismatch": 0
+  },
+  "stableFileIdentityClaimed": false,
+  "generatedAt": "2026-09-21T23:10:31.000Z",
+  "blockers": [
+    "PROOF_FLAG_FALSE:workspaceAuthorityProven"
+  ],
+  "owners": {
+    "admissionReceipt": {
+      "file": "docs/reports/workspace-revision-tournament-admission-v1.json",
+      "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
+      "authority": true,
+      "sourceCount": 25542
+    },
+    "admissionChecksumSemantics": "The admission field `sourceSelectionChecksum` hashes the SORTED IDENTITY KEYS ONLY (membership set = snapshot.sourceMembershipChecksum). It is NOT the content-bearing GraphifyInputIdentityV1 sourceSelectionChecksumV1 reported above; the two are different quantities that share a name.",
+    "snapshotManifest": {
+      "file": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+      "digest": "sha256:4b2455785d5827a2991626316c4000eb024f7642fe4d2b56a60349d138d517e8",
+      "status": "CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK",
+      "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+      "violations": 0
+    },
+    "graphifyExecution": {
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "ownerAgreesWithAuthorityShadow": true,
+      "authorityState": "LEGACY_IMPORTED",
+      "parityStatus": "PARITY_PROVEN",
+      "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY"
+    },
+    "registry": {
+      "table": "atlas_workspace_source_bindings",
+      "bindingRowsForRevision": 24456,
+      "registryRepoIds": [
+        "deeds-web-app"
+      ],
+      "membershipRepoIds": [
+        "repo:root",
+        "repo:claude-mem",
+        "repo:mcp-server-mcp",
+        "repo:granite-docling-258M",
+        "repo:models/embeddinggemma_300m",
+        "repo:sites/parent-atlas-gateboard",
+        "repo:turbovec"
+      ],
+      "repoIdMapAssumed": {
+        "repo:root": "deeds-web-app"
+      },
+      "rootRepositoryMembers": 24456,
+      "note": "Registry uses a different repo namespace than Graphify. The map is an assumption, supported (not proven) by exact binding count vs root member count."
+    }
+  },
+  "independentRecomputation": {
+    "selectionChecksum": "sha256:da4d765d0cd0a399605ebde21a0fb58f7d6a251aba9a572ddbc265c56b89985b",
+    "matchesHelper": true,
+    "membershipSetChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+    "membershipSetMatchesAdmission": true
+  },
+  "blockerCensus": {
+    "reasonCounts": {},
+    "byRepository": {
+      "repo:claude-mem": {
+        "sources": 763,
+        "registryExact": 0,
+        "registryAbsent": 763,
+        "registryMismatch": 0
+      },
+      "repo:granite-docling-258M": {
+        "sources": 10,
+        "registryExact": 0,
+        "registryAbsent": 10,
+        "registryMismatch": 0
+      },
+      "repo:mcp-server-mcp": {
+        "sources": 192,
+        "registryExact": 0,
+        "registryAbsent": 192,
+        "registryMismatch": 0
+      },
+      "repo:models/embeddinggemma_300m": {
+        "sources": 13,
+        "registryExact": 0,
+        "registryAbsent": 13,
+        "registryMismatch": 0
+      },
+      "repo:root": {
+        "sources": 24456,
+        "registryExact": 24456,
+        "registryAbsent": 0,
+        "registryMismatch": 0
+      },
+      "repo:sites/parent-atlas-gateboard": {
+        "sources": 22,
+        "registryExact": 0,
+        "registryAbsent": 22,
+        "registryMismatch": 0
+      },
+      "repo:turbovec": {
+        "sources": 86,
+        "registryExact": 0,
+        "registryAbsent": 86,
+        "registryMismatch": 0
+      }
+    },
+    "registryCoverage": {
+      "exact": 24456,
+      "absent": 1086,
+      "mismatch": 0
+    },
+    "nonQualifiedSample": []
+  },
+  "safety": {
+    "databaseWrites": 0,
+    "graphifyRun": false,
+    "inputIdentityBackfill": false,
+    "readerCutover": false,
+    "vectorWrites": 0,
+    "graphWrites": 0,
+    "cacheWrites": 0,
+    "acePromotion": false,
+    "cagraPromotion": false,
+    "transaction": "REPEATABLE READ READ ONLY, ROLLBACK"
+  },
+  "receiptChecksum": "sha256:40503f823ff224cb52aef0b270c9ca40452feb9f832414c7bf6dab38cd3f36fe"
+}

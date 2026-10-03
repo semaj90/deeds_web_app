@@ -1,10 +1,17 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { exec } from "node:child_process";
+import { exec, execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { DispatcherMiddleware } from './dispatcher-middleware.js';
 import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
+import {
+  buildCodebaseRgSearchArgsV1,
+  codebaseRgSearchInputSchema,
+  CODEBASE_RG_MAX_OUTPUT_BYTES,
+  truncateUtf8TextV1,
+} from './read-tool-bounds.js';
 
+const execFileAsync = promisify(execFile);
 const execAsync = promisify(exec);
 
 /**
@@ -20,33 +27,41 @@ export function registerCodebaseTools(server: McpServer, dispatcherMiddleware?: 
     'codebase.rg_search',
     {
       description: 'The search pattern (ripgrep style).',
-      inputSchema: z.object({
-        query: z.string().describe('The search pattern (ripgrep style)'),
-        include: z.string().optional().describe('Glob for files to include'),
-        contextLines: z.number().default(2).describe('Lines of context to show')
-      })
+      inputSchema: codebaseRgSearchInputSchema.shape,
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
       'codebase.rg_search',
       sessionId_rg_search,
-      async ({ query, include, contextLines }) => {
+      async (rawInput: Record<string, unknown>) => {
+      const input = codebaseRgSearchInputSchema.parse(rawInput);
       try {
-        const includeFlag = include ? `-g "${include}"` : '';
-        // Safety: Limit output and prevent command injection
-        const command = `rg --max-columns 200 --context ${contextLines} ${includeFlag} -- "${query.replace(/"/g, '\\"')}" .`;
-        
-        const { stdout, stderr } = await execAsync(command, { 
+        const { stdout, stderr } = await execFileAsync('rg', buildCodebaseRgSearchArgsV1(input), {
           cwd: process.cwd(),
-          timeout: 10000 
+          timeout: 10000,
+          maxBuffer: CODEBASE_RG_MAX_OUTPUT_BYTES,
         });
 
         return {
-          content: [{ type: 'text', text: stdout || stderr || 'No matches found.' }]
+          content: [{
+            type: 'text',
+            text: truncateUtf8TextV1(stdout || stderr || 'No matches found.', CODEBASE_RG_MAX_OUTPUT_BYTES),
+          }]
         };
       } catch (err: any) {
+        if (err?.code === 1) {
+          return { content: [{ type: 'text', text: 'No matches found.' }] };
+        }
+        if (err?.code === 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER') {
+          return {
+            content: [{ type: 'text', text: 'Search output exceeded the 128 KiB limit.' }],
+          };
+        }
         return {
-          content: [{ type: 'text', text: err.stdout || `Search failed: ${err.message}` }],
+          content: [{
+            type: 'text',
+            text: truncateUtf8TextV1(err.stdout || `Search failed: ${err.message}`, CODEBASE_RG_MAX_OUTPUT_BYTES),
+          }],
           isError: !err.stdout
         };
       }

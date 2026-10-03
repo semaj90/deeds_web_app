@@ -2,26 +2,35 @@
   "schema": "atlas.doc-22-patch-target-fixture-proof.v1",
   "gate": "DOC-22",
   "status": "DOC_22_PATCH_TARGET_FIXTURE_PROVEN",
+  "proofMode": "SYNTHETIC_FIXTURE_ONLY",
+  "sourceChecksum": "sha256:3adaa8790114d5ab0c840315146872d8d8956ff3b244ffddb1136d44b3f509bb",
   "target": {
     "schema": "atlas.patch-target.v1",
     "sourceRef": "src/example.ts",
-    "baseSourceRevision": "sha256:e2e846d0811ba3ca2ff75fcc41f163648e3e136dc4bc32c073b9e10543c77c61",
-    "startByte": 0,
-    "endByte": 24,
-    "expectedBytesChecksum": "sha256:e2e846d0811ba3ca2ff75fcc41f163648e3e136dc4bc32c073b9e10543c77c61",
-    "replacementBytesChecksum": "sha256:da333ac861170a3fb29ac9a1dfedbbc45a16f497574da9c5917a413c5282b239",
+    "baseSourceRevision": "sha256:3adaa8790114d5ab0c840315146872d8d8956ff3b244ffddb1136d44b3f509bb",
+    "startByte": 22,
+    "endByte": 30,
+    "expectedBytesChecksum": "sha256:a6a19677336396aaee70aade611c42c30a6447de1a83cd1d71d9482f2566085d",
+    "replacementBytesChecksum": "sha256:b14454f07948674b504f86a268dee18c25cffad2ee1b1bf74b4a52b6c1420269",
     "evidenceRefs": [
       "diagnostic:example:1",
-      "ast-grep:example:assignment"
+      "ast-grep:replace-legacy-value:fixture"
     ],
     "canonicalAuthority": false
   },
   "checks": {
-    "exactBaseBytes": true,
+    "exactBaseSourceRevision": true,
+    "exactUtf8ByteRange": true,
+    "expectedBytesChecksum": "sha256:a6a19677336396aaee70aade611c42c30a6447de1a83cd1d71d9482f2566085d",
+    "replacementBytesChecksum": "sha256:b14454f07948674b504f86a268dee18c25cffad2ee1b1bf74b4a52b6c1420269",
     "staleBaseRevisionRejected": true,
-    "utf8ByteRange": true
+    "inMemoryPatchResult": true,
+    "patchedFixtureChecksum": "sha256:caee8c4cb55d167e7305c0b1e130fb8de22b3847831d10e6337403a4066d7a99"
   },
   "mutationPerformed": false,
+  "persistentSourceModified": false,
   "canonicalAuthority": false,
+  "mutationAuthorized": false,
+  "writesPerformed": false,
   "nextGate": "DOC_23_AST_GREP_REPAIR_PLANNER"
 }

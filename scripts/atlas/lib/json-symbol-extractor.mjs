@@ -4,58 +4,46 @@
  * extraction lane already produces for TS/JS via ts-ast-extractor.mjs, just for a different kind
  * of "symbol": an addressable key path rather than a function/class declaration.
  *
- * Byte offsets are approximate (found via a bounded forward text search for the key's quoted
- * form after the previous match position), not a real JSON-with-locations parse -- acceptable
- * for a v1 structural signal, same tolerance this repo already accepts for TS/JS "byte" offsets
- * (see ts-ast-extractor.mjs's docstring: these are string-index offsets, not raw UTF-8 bytes).
+ * Strict JSON validation precedes location extraction through the existing TypeScript compiler.
+ * Offsets are decoded UTF-16 string indices; the source envelope maps these to raw bytes at the
+ * writer boundary. The observation limit is checked before constructing the location tree.
  */
 import crypto from 'node:crypto';
+import ts from 'typescript';
+import { inspectJsonSourceShapeV1, JSON_SOURCE_SHAPE_POLICY_V1 } from './json-source-shape-policy-v1.mjs';
 
+const MAX_DEPTH = JSON_SOURCE_SHAPE_POLICY_V1.maxObjectDepth;
 const SIGNATURE_TEXT_MAX_CHARS = 400;
-const MAX_DEPTH = 2;
 
 function fingerprint(text) {
   return crypto.createHash('sha256').update(text).digest('hex');
 }
 
-export function extractJsonSymbols(content, filePath) {
-  let parsed;
-  try {
-    parsed = JSON.parse(content);
-  } catch (error) {
-    throw new Error(`JSON_PARSE_FAILED:${filePath}:${error instanceof Error ? error.message : String(error)}`);
-  }
-  if (parsed === null || typeof parsed !== 'object') return [];
-
+export function extractJsonSymbols(content, filePath, { maxSymbols = JSON_SOURCE_SHAPE_POLICY_V1.maxObservationsPerFile, maxSourceBytes } = {}) {
+  const shape = inspectJsonSourceShapeV1(content, filePath, { maxObservations: maxSymbols,
+    ...(maxSourceBytes === undefined ? {} : { maxSourceBytes }) });
+  const parsed = shape.parsed;
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return [];
+  const source = ts.parseJsonText(filePath, content);
+  if (source.parseDiagnostics.length) throw new Error(`JSON_LOCATION_PARSE_FAILED:${filePath}`);
   const symbols = [];
-  let searchCursor = 0;
-
-  function locate(key) {
-    const needle = JSON.stringify(String(key));
-    const idx = content.indexOf(needle, searchCursor);
-    if (idx === -1) return null;
-    searchCursor = idx + needle.length;
-    return idx;
-  }
-
   function visit(node, depth, parentChain) {
-    if (depth > MAX_DEPTH || node === null || typeof node !== 'object') return;
-    const entries = Array.isArray(node)
-      ? node.map((value, index) => [String(index), value])
-      : Object.entries(node);
-
-    for (const [key, value] of entries) {
-      const startByte = locate(key);
-      if (startByte === null) continue;
-      const valueText = JSON.stringify(value ?? null);
-      const endByte = startByte + valueText.length;
-      const isContainer = value !== null && typeof value === 'object';
+    if (depth > MAX_DEPTH || !node) return;
+    const entries = ts.isObjectLiteralExpression(node)
+      ? node.properties.map(property => ({ key: property.name.text, value: property.initializer, location: property }))
+      : [];
+    for (const { key, value, location } of entries) {
+      if (symbols.length >= maxSymbols) throw new Error('STRUCTURAL_RESOURCE_LIMIT_DEFERRED:OBSERVATIONS_EXCEED_LIMIT');
+      const startByte = location.getStart(source);
+      const endByte = value.getEnd();
+      const valueText = content.slice(value.getStart(source), endByte);
+      const isContainer = ts.isObjectLiteralExpression(value) || ts.isArrayLiteralExpression(value);
 
       symbols.push({
         kind: isContainer ? 'module' : 'field',
         name: key,
-        start_line: 0,
-        end_line: 0,
+        start_line: source.getLineAndCharacterOfPosition(startByte).line + 1,
+        end_line: source.getLineAndCharacterOfPosition(endByte).line + 1,
         start_byte: startByte,
         end_byte: Math.max(endByte, startByte),
         signature_text: valueText.slice(0, SIGNATURE_TEXT_MAX_CHARS),
@@ -70,6 +58,6 @@ export function extractJsonSymbols(content, filePath) {
     }
   }
 
-  visit(parsed, 0, []);
+  visit(source.statements[0]?.expression, 0, []);
   return symbols;
 }

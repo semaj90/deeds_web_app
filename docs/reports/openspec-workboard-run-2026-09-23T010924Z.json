@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T01:09:24Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "STRUCT_07_BOUNDED_LINEAGE_RECEIPT_AUDIT",
+    "to": "CC_03_CODE_CHUNK_OWNERSHIP_CLASSIFICATION",
+    "reason": "STRUCT-07's old 15-row projection receipt does not establish the complete packet-to-semantic projection chain; route to an independent classification task using the existing reference audit, without rerunning a script that overwrites its durable report."
+  },
+  "evidence": {
+    "sourceMap": ".tmp/atlas/lineage-qualified-candidate-map-v1.json",
+    "boundedMapCurrentByteParity": {
+      "candidateRows": 15,
+      "rawSourceDigestsMatchingSourceRevision": 15,
+      "missingFiles": 0,
+      "digestMismatches": 0,
+      "unqualified": 0,
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc"
+    },
+    "structuralProjectionReceipt": "docs/reports/structural-projection-plan-v1.json (older receipt; not overwritten; bounded parity does not prove full Postgres packet or semantic_768 readback)",
+    "codeChunkUsageCensus": "No package/import/caller match found in scoped package and application source trees.",
+    "classification": "EXPERIMENTAL_CONTEXT_ENRICHER; not a replacement and not integrated. CC-02 benchmark remains prerequisite to any usefulness or promotion claim."
+  },
+  "validation": {
+    "openSpecStrict": "PASS",
+    "diffCheck": "PASS",
+    "jsonParse": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 36,
+    "open": 56,
+    "total": 92,
+    "delta": "CC-03 classified as experimental-only; STRUCT-07 remains open because historical bounded evidence does not prove the full chain."
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "containers": false
+  },
+  "nextGate": "CC_01_RECONCILE_LOCAL_STRUCTURAL_CHUNK_V1_WITH_EXISTING_EVIDENCE_OWNERS"
+}

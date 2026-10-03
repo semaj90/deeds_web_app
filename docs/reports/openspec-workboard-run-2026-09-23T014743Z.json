@@ -1,0 +1,90 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T01:47:43Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-document-governance-master-index",
+  "selection": {
+    "from": "parent-atlas-transport-memory-boundaries:PROTO-02B supplemental service/caller audit",
+    "to": "parent-atlas-document-governance-master-index:6.2, 6.4, and 8.1",
+    "reason": "The transport audit added evidence but remained broad and open; the Master TOC defect and incomplete read-only governance summary were locally fixable and replay-testable without rebuilding containers."
+  },
+  "completed": [
+    "6.2 Master TOC sections and accurate active OpenSpec progress",
+    "6.4 direct pointers to canonical source documents and OpenSpec changes",
+    "8.1 authenticated read-only governance summary endpoint with honest receipt/archive empty states"
+  ],
+  "evidence": {
+    "producer": "scripts/atlas/build-master-toc.mjs",
+    "replaySmoke": {
+      "command": "node scripts/atlas/document-governance-replay-v1.smoke.mjs",
+      "runs": 2,
+      "registryChecksum": "d2c552505b9d695ea11ded19b6631bb97ab54ea4b6e6c83e6da0c73f7680910a",
+      "masterTocChecksum": "1adff666b0a58bcd4c49127935123a865fdcb500b5edbd1241649e593afa5fac",
+      "result": "PASS; consecutive outputs byte-identical"
+    },
+    "checkMode": {
+      "command": "npm run atlas:docs:toc:check",
+      "result": "PASS"
+    },
+    "governanceSummaryRoute": {
+      "testCommand": "npx vitest run src/routes/api/admin/atlas/document-governance/summary-v1.spec.ts --pool forks --maxWorkers=1 --minWorkers=1",
+      "result": "PASS",
+      "tests": "5/5",
+      "authenticatedRegistryRead": true,
+      "unauthorizedStableShape": true,
+      "topicConflicts": 0,
+      "receiptReferences": 0,
+      "receiptStatus": "UNAVAILABLE",
+      "archiveEligible": 0,
+      "writesPerformed": false,
+      "applyAuthorized": false
+    },
+    "replayFollowup": {
+      "firstAttempt": "DIVERGED_WHILE_WORKTREE_WAS_BEING_UPDATED",
+      "followup": "PASS; two consecutive rebuilds byte-identical",
+      "recordDeltaOnImmediateRecheck": 0,
+      "cause": "Concurrent input movement was not conclusively identified; no source change was inferred from the divergence."
+    },
+    "registryCounts": {
+      "records": 4717,
+      "canonicalSourceDocs": 14,
+      "explicitCanonicalTopicOwners": 0,
+      "openSpecTaskLists": 93,
+      "incompleteNonArchivedOpenSpecTaskLists": 78,
+      "supersededDocuments": 0,
+      "archiveReadyDocuments": 0,
+      "experimentalDocuments": 0,
+      "conflicts": 0,
+      "validatedWorkflowEtaRecords": 0
+    },
+    "contract": "The TOC links canonical source records and incomplete non-archived OpenSpec changes without copying document bodies; missing topic, experiment, conflict, archive, and ETA evidence is rendered explicitly rather than inferred.",
+    "canonicalWrites": false,
+    "promotionAuthorized": false
+  },
+  "validation": {
+    "changedScriptsSyntax": "PASS",
+    "focusedRouteTests": "PASS (5/5)",
+    "openSpecStrict": "PASS",
+    "scopedDiffCheck": "PASS",
+    "replayJson": "PASS"
+  },
+  "openSpecProgress": {
+    "change": "parent-atlas-document-governance-master-index",
+    "checked": 36,
+    "open": 28,
+    "total": 64,
+    "delta": "3 tasks closed with deterministic generated-output, route-readback, and strict-validation evidence"
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "containers": false,
+    "filesystem": true
+  },
+  "nextGate": "DOCUMENT_GOVERNANCE_8_3_TYPED_SSR_PAGE_DATA_CONTRACT"
+}

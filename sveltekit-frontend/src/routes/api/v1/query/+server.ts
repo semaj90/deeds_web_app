@@ -9,20 +9,22 @@ const queryRequestSchema = z.object({
   userId: z.string().uuid().optional(),
   caseId: z.string().uuid().optional(),
   conversationId: z.string().uuid().optional(),
-  workspaceRevision: z.string().trim().min(1).optional(),
-  candidateSnapshotRevision: z.string().trim().min(1).optional(),
-  ordinalMapChecksum: z.string().trim().min(1).optional(),
-  representationRevision: z.string().trim().min(1).optional(),
-  retrievalPolicyRevision: z.string().trim().min(1).optional(),
-  contextPolicyRevision: z.string().trim().min(1).optional(),
-  graphRevision: z.string().trim().min(1).nullable().optional(),
 });
+
+const clientOwnedRevisionFields = [
+  'workspaceRevision', 'candidateSnapshotRevision', 'ordinalMapChecksum',
+  'representationRevision', 'featureRevision', 'retrievalPolicyRevision',
+  'contextPolicyRevision', 'graphRevision', 'modelRevision', 'dimension',
+] as const;
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const startedAt = performance.now();
   try {
     const body = await request.json().catch(() => ({}));
+    if (body && typeof body === 'object' && clientOwnedRevisionFields.some((field) => field in body)) {
+      return json({ ok: false, error: 'Cache identity revisions are server-owned' }, { status: 400 });
+    }
     const parse = queryRequestSchema.safeParse(body);
     if (!parse.success) {
       return json({
@@ -38,13 +40,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       userId,
       caseId,
       conversationId,
-      workspaceRevision,
-      candidateSnapshotRevision,
-      ordinalMapChecksum,
-      representationRevision,
-      retrievalPolicyRevision,
-      contextPolicyRevision,
-      graphRevision,
     } = parse.data;
 
     // Execute multi-lane RAG retrieval + 4x4 matrix tensor routing
@@ -53,13 +48,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       userId: userId || undefined,
       caseId: caseId || undefined,
       conversationId: conversationId || undefined,
-      workspaceRevision,
-      candidateSnapshotRevision,
-      ordinalMapChecksum,
-      representationRevision,
-      retrievalPolicyRevision,
-      contextPolicyRevision,
-      graphRevision,
     });
 
     if (!context) {

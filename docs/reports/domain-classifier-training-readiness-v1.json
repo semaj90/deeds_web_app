@@ -28,7 +28,7 @@
     "worktreeFingerprintParity": false,
     "exactRegistryMatches": 24456,
     "sourceCount": 24456,
-    "issueCount": 647,
+    "issueCount": 672,
     "error": null
   },
   "gateReasons": [
@@ -50,5 +50,5 @@
   "canonicalAuthority": false,
   "promotionAuthorized": false,
   "writesPerformed": false,
-  "reportChecksum": "sha256:85d3f761a341ff9cae21c1bc54e30712877009a3f40f71739cb269d998b96f44"
+  "reportChecksum": "sha256:28d70bae03281261e4d845240c654f729c1cc1a1719fba187313bcce7d160720"
 }

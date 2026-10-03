@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T04:38:22Z",
+  "fromChange": "route-import-infra-isolation",
+  "toChange": "parent-atlas-graph-runtime-python-consolidation",
+  "fromTask": "15",
+  "toTask": "GPU-EXP-15 / GPU-EXP-16",
+  "pivotGate": "ROUTE_SINGLETON_OPERATOR_REVIEW_TO_GRAPH_RUNTIME_LIVE_ARTIFACT_GATE",
+  "reason": "The route-import task requires an operator decision about potentially intentional warm-start behavior. The graph-runtime change was checked for a remaining bounded task; fixture coverage exists, but the outstanding tasks require a live admitted graph artifact that is absent (resident=null and the prior artifact has an ordinal-map checksum mismatch). No synthetic graph was loaded and no code or datastore mutation was made.",
+  "fromTaskState": {
+    "change": "route-import-infra-isolation",
+    "task": "15",
+    "status": "OPERATOR_DECISION_REQUIRED",
+    "decision": "Whether to change chrrom/predictor.ts eager singleton initialization."
+  },
+  "toTaskState": {
+    "change": "parent-atlas-graph-runtime-python-consolidation",
+    "openTasks": ["6", "7", "17", "18"],
+    "liveGraphTraversal": "BLOCKED_NO_ADMITTED_RESIDENT_GRAPH",
+    "executorParity": "FIXTURE_ONLY_LIVE_GRAPH_PARITY_UNPROVEN",
+    "syntheticGraphLoaded": false,
+    "datastoreWrites": 0
+  },
+  "constraints": {
+    "containerRebuildsUntilEnd": true,
+    "canonicalWrites": false,
+    "datastoreWrites": false,
+    "preserveConcurrentWorkingTreeEdits": true,
+    "noCommitOrPush": true
+  }
+}

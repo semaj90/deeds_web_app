@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.cei24-canonical-candidate-id-reconciliation.v1",
+  "generatedAt": "2026-09-26T16:33:01Z",
+  "status": "PACKET_IDENTITY_OWNER_RECONCILED_PACKET_KEY_COORDINATES_ONLY",
+  "canonicalAuthority": false,
+  "identityDecision": {
+    "candidateCoordinate": "packet_key",
+    "contract": "PACKET identity / packet-join identity, scoped to candidateSnapshotRevision",
+    "stableFileIdentity": false,
+    "lifecycleSurvivalClaim": false,
+    "packetIdRole": "atlas_packets row key; not accepted as canonicalId by this audit"
+  },
+  "evidence": [
+    {
+      "path": "packages/atlas-core/src/identity/canonical-identity-v1.ts",
+      "finding": "PACKET taxonomy points to packet_key and explicitly says it is packet/join identity, not STABLE_FILE identity."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts",
+      "finding": "Canonical packet resolution selects packet_key; canonicalId is the resolved identity value."
+    },
+    {
+      "path": "scripts/atlas/materialize-lineage-qualified-candidate-map-v1.mts",
+      "finding": "Existing lineage-qualified candidate producer uses packet_key as canonicalId and packetKey."
+    },
+    {
+      "path": "scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts",
+      "finding": "Uses packet_id for canonicalId, but its own OpenSpec history warns its earlier corpus was not lineage-qualified and forbids scaling without the exact lineage join; this convention does not override PACKET identity taxonomy."
+    }
+  ],
+  "candidateSnapshot": {
+    "candidateCount": 16151,
+    "selectedMap": {
+      "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+      "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+      "receipt": "docs/reports/cei24-candidate-snapshot-convergence-v1-20260926T161327.479Z.json"
+    },
+    "rejectedAlternativeMap": {
+      "canonicalId": "atlas_packets.packet_id",
+      "candidateSnapshotRevision": "sha256:603ec7df0c335cbd7feecc9f7041d9e09605e2008a37d7f7998d1c475aa4be81",
+      "ordinalMapChecksum": "6ae3cbcc4c4e6eff3ff6f516cdc1216db59b94a6b83c382e6cddc028f9418a0e",
+      "receipt": "docs/reports/cei24-candidate-chunk-overlay-v1-20260926T161153Z.json",
+      "disposition": "preserve as historical evidence; do not use for RF-04/RF-05 coordinate admission"
+    }
+  },
+  "hintCrosswalk": {
+    "qualityApprovedInput": 330,
+    "exactChunkAndCandidateMatches": 322,
+    "noCurrentCandidate": 8,
+    "candidateCoordinateMap": "packet_key map above",
+    "multiplicity": "0..N chunks retained; no arbitrary single-chunk selection",
+    "cosineComputed": false,
+    "reason": "all-330 same-snapshot alignment gate failed; do not compute or admit a partial producer"
+  },
+  "dependentArtifactDisposition": {
+    "path": "docs/reports/legacy-summary-hint-feature-v2-20260926T162937Z.json",
+    "disposition": "standalone mechanics evidence only; its candidate ordinals bind to the rejected packet_id map and it is not admissible to RF-04/RF-05"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

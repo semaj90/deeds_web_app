@@ -21,7 +21,6 @@ const WRITE_RE =
 
 // Writers that exist today (found 2026-09-19). Migrate to semantic_768 or archive, then delete here.
 const KNOWN_LEGACY_WRITERS: string[] = [
-	'scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs', // atlas_packets.content_embedding_384 via :8081 model 'embeddinggemma-384'
 	'scripts/atlas/populate-packet-vector-bundles.mjs', // packet_vector_bundles: first-384-dims slice of 768 vectors
 	'scripts/atlas/rebuild-gemma4-summaries-384.mjs',
 	'scripts/atlas/restore-qdrant-384-from-postgres.mjs',
@@ -62,5 +61,20 @@ function findWriters(): string[] {
 describe('384-dim embedding writers are frozen', () => {
 	it('has no writer outside the known legacy list', () => {
 		expect(findWriters()).toEqual([...KNOWN_LEGACY_WRITERS].sort());
+	});
+
+	it('keeps the legacy summary exporter opt-in and non-canonical', () => {
+		const source = readFileSync(resolve(REPO_ROOT, 'scripts/atlas/rebuild-gemma4-summaries-384.mjs'), 'utf8');
+		expect(source).toContain('--allow-legacy-384-write');
+		expect(source).toContain('LEGACY_384_WRITE_BLOCKED');
+		expect(source).toContain('384-D is not canonical');
+	});
+
+	it('keeps the SOM writer on strict 768-D input and gates unqualified writes', () => {
+		const source = readFileSync(resolve(REPO_ROOT, 'scripts/atlas/run-som-on-chunks.mjs'), 'utf8');
+		expect(source).toContain('const DIM        = 768');
+		expect(source).toContain('vector.length !== DIM');
+		expect(source).toContain('provenance unverified');
+		expect(source).toContain('--allow-unqualified-experimental-write');
 	});
 });

@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.local-doc-corpus-source.v1",
+  "corpusId": "dspy-official-3.4.0",
+  "authority": "https://dspy.ai",
+  "scopePrefix": "/3.4.0/",
+  "discoveryIndex": "https://dspy.ai/3.4.0/llms.txt",
+  "sitemap": "https://dspy.ai/3.4.0/sitemap.xml",
+  "firecrawlMapEndpoint": "https://api.firecrawl.dev/v2/map",
+  "sourceAuthority": "OFFICIAL",
+  "versionChannel": "3.4.0",
+  "captureMethod": "FIRECRAWL_MAP_PLUS_BEAUTIFULSOUP_HTTP",
+  "storage": "LOCAL_IMMUTABLE_SNAPSHOT",
+  "admissionState": "LOCAL_UNADMITTED",
+  "canonicalAuthority": false,
+  "datastoreWritesPerformed": false
+}

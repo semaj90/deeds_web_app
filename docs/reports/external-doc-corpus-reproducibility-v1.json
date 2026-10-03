@@ -1,0 +1,476 @@
+{
+  "schema": "atlas.external-doc-corpus-reproducibility.v1",
+  "generatedAt": "2026-09-23T17:25:46.596582+00:00",
+  "manifestRevision": "okf-pinned-docs-r2",
+  "commitBasis": "8a2a00c96fd66d6bf560f05b4d5250363247fbca",
+  "priorClassification": "DOC_CORPUS_ARTIFACT_REPRODUCIBILITY_INCOMPLETE",
+  "captureCount": 30,
+  "chunkCount": 847,
+  "trackedRawCaptureCount": 30,
+  "trackedRawArtifactFileCount": 60,
+  "artifactConvention": {
+    "TRACKED_SOURCE_EVIDENCE": [
+      "docs/.okf/dev/raw/**",
+      "docs/.okf/langextract/raw/**",
+      "docs/.okf/pinned/*/raw/*.md",
+      "docs/.okf/pinned/*/raw/*.json (fetch receipt with checksums)"
+    ],
+    "INDEX": [
+      "docs/.okf/dev/manifest.json",
+      "docs/.okf/dev/summary.json",
+      "docs/.okf/langextract/manifest.json",
+      "docs/.okf/dev/pinned-docs.manifest.json",
+      "docs/.okf/dev/pinned-docs.coordinates.json"
+    ],
+    "RECEIPT": [
+      "docs/reports/external-doc-admission-envelopes-v1.json",
+      "docs/reports/external-doc-studio-readiness-v1.json",
+      "docs/reports/external-doc-corpus-reproducibility-v1.json"
+    ],
+    "REBUILDABLE_IGNORED_ARTIFACT": [
+      "docs/.okf/dev/corpus.jsonl",
+      "docs/.okf/langextract/corpus.jsonl",
+      "docs/.okf/pinned/*/chunks.jsonl (gitignored by *.jsonl)",
+      "docs/.okf/pinned/admission-envelopes-v1.json (gitignored; rebuilt offline by the smoke prerequisite)"
+    ],
+    "basis": "git ls-files showed raw pages + per-page receipts + manifests tracked and every *.jsonl ignored under docs/.okf/dev and docs/.okf/langextract; the pinned corpus follows the same split."
+  },
+  "extractor": {
+    "owner": "python/atlas_external_docs.py::extract_structured_text (existing BeautifulSoup owner; no second parser, no Crawl4AI)",
+    "beforeDefect": "get_text(\"\\n\") on the <pre>/<code> node put a newline between every text node, so <span>hnsw</span><span>.</span><span>iterative_scan</span> became three lines",
+    "repaired": "_code_block_text: newlines only where the source has them (literal newline, <br>, per-line class=\"line\" boundaries with no newline text); highlight-source-<lang> yields the real language",
+    "tests": {
+      "pythonFocusedTests": 50,
+      "newRegressionTests": 10,
+      "newTestsFailingOnOldExtractor": 8,
+      "vitestSpecs": 33
+    }
+  },
+  "changedContentHashes": {
+    "count": 22,
+    "byCause": {
+      "EXTRACTOR_ONLY": 20,
+      "UPSTREAM_HTML_CHANGED_AND_OR_EXTRACTOR": 2
+    },
+    "pagesTotal": 30,
+    "note": "A normalization fix legitimately changes normalized checksums. EXTRACTOR_ONLY = raw HTML checksum identical across fetches; the two GitHub pages also had different raw HTML.",
+    "pages": [
+      {
+        "url": "https://bits-ui.com/docs/child-snippet",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "9aca018e2721b9b8e0d9e7519a9654d2a74b19560c74fc22b4c8d8251d1f628a",
+        "newNormalized": "6b3cf8151e01df1d586a1204a30dad63ea57558d989a90ce5e4267d79995eb38"
+      },
+      {
+        "url": "https://bits-ui.com/docs/components/dialog",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "ca1345389afe0ab11f41446be13e5ff474a538364f923af90fab09598cb0daf5",
+        "newNormalized": "933224c7e6a17940b009a1ba6ce08c933dd0d8c5aab32f66fe36ea2c3be06d8e"
+      },
+      {
+        "url": "https://bits-ui.com/docs/getting-started",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "f15bebf06ed8bb3e13c3b4ab6007670718f170f5f70399a8de33a3b1becfcddd",
+        "newNormalized": "679d17152be486da5c4be5e4b97a119562f6ff6ca23a05ce8b43ca4bdc5a5bc7"
+      },
+      {
+        "url": "https://bits-ui.com/docs/state-management",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "fe3d954ca4488d3c7e246084418c2ef6f7763c4ab8535cd98c27a55c899d4ec1",
+        "newNormalized": "9dec68258e7e42b3e4e5fdcb6211cd487f2b469f815e5c4a2aaefb2df9bca1b8"
+      },
+      {
+        "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "6872cb7911d7dde69b9357d44a9e6c8a708bd5abd2c977402460b1f5e8f363a1",
+        "newNormalized": "83cd7433d94e8f7872e1c71d743cc025edb1d58185a25b10d1c5eb67ca342e10"
+      },
+      {
+        "url": "https://orm.drizzle.team/docs/drizzle-kit-migrate",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "9c73de2c188a024c0b96075de9253449d8134a2ffbc8608baecac59ca7077789",
+        "newNormalized": "0608a335e55cd6ac152259b30e01db44aa5501b263f19165ca6d414705c9c24e"
+      },
+      {
+        "url": "https://orm.drizzle.team/docs/kit-overview",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "a2cd8b9f3833e42f70e9d55de7e1081988fa0a9e8c6b7eb66365613d1306a110",
+        "newNormalized": "b13a84ba576d603bb44eb014d05b4ff42fd87c1fb0d140f5f78852f635ba7b99"
+      },
+      {
+        "url": "https://github.com/drizzle-team/drizzle-orm/issues/5792",
+        "change": "UPSTREAM_HTML_CHANGED_AND_OR_EXTRACTOR",
+        "oldNormalized": "76051f71087829d11fa39a8739f92b937efc20eb878ff26796dbeeb58e38a3af",
+        "newNormalized": "d1b6909995c31bb53ea82c58796b0055b054ebf1a1db7aa7aa224ca931b1175f"
+      },
+      {
+        "url": "https://orm.drizzle.team/docs/column-types",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "f27096bceb1d33d3be63cb5272221f43c6fe6b5c829ec43c03ddff275addfba1",
+        "newNormalized": "fa0a1af1c2ddb64cce51c2507a71db18cb1ed3a00661ca78a7c34ea6212c6751"
+      },
+      {
+        "url": "https://orm.drizzle.team/docs/extensions",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "2818bc8b5cb33a06deb22fa757ccfd5eb3c1f8b31f1a9b1dd71a54c7ab464c73",
+        "newNormalized": "477678292a4e8b9a4b81bf72235b40730009ab9542a9c696435160c40adb5b34"
+      },
+      {
+        "url": "https://orm.drizzle.team/docs/guides/vector-similarity-search",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "9a561cf18bb00c628cabc53bce582f76059f54610ec4d9b0cf23dc434485aa65",
+        "newNormalized": "e4532e671c881d5fa1aea65da9139b025e69b39ae65ef8eeda201486d5688895"
+      },
+      {
+        "url": "https://orm.drizzle.team/docs/indexes-constraints",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "a0275b2bbace1d14aa515a5ea226d23220af10a90cc4e4d90556d08e1f0068d8",
+        "newNormalized": "b074f3527b4077cf0e4549d096086ad07d202b547dff5d62b031ab46c13678cc"
+      },
+      {
+        "url": "https://github.com/pgvector/pgvector",
+        "change": "UPSTREAM_HTML_CHANGED_AND_OR_EXTRACTOR",
+        "oldNormalized": "0c83b105aa0b232c58563b1d65b35e5f8c5185f281ad329991d0ea548a611e11",
+        "newNormalized": "fe883c75f323441db37223c998515a8173e2c51a69536b1e8d4196b032c5b931"
+      },
+      {
+        "url": "https://svelte.dev/docs/svelte/$derived",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "e97be291833c4b24e3247519c674d02f49bc1407f3474fc197b82928c2710a62",
+        "newNormalized": "a9f84a9bc441daa2731d190b294967c767e23298bb34916191315991e697c015"
+      },
+      {
+        "url": "https://svelte.dev/docs/svelte/$effect",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "d2e8fdfc7ca499e99ffee874a976e36b9926a450dd5188220ebc51c3f2280e83",
+        "newNormalized": "4606958abe2e620d9958a666e460791cdf97c901dd307bdefab2eb23569abcf2"
+      },
+      {
+        "url": "https://svelte.dev/docs/svelte/$props",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "9189f3a0ee6101f0b665d133078cd2e10c8acf3b9b2bf8ecf5a930513380c9a5",
+        "newNormalized": "05fda9b18acd27b39b4d885373ce9dd38e4c369e84758e33864acb9e21ccf883"
+      },
+      {
+        "url": "https://svelte.dev/docs/svelte/$state",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "8a6054a43ac58a455f12fdc8d5f51a1703c2b6451809b86e6b50d0b473f0d536",
+        "newNormalized": "9d3a717d27cb2c0dd4da7b8e4ebb0f23ebef7e145860ae003df46187ac1545df"
+      },
+      {
+        "url": "https://svelte.dev/docs/kit/form-actions",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "149073cfead437ac6ed80283e06f4136290906bb3d2584b7f6794945c84d273d",
+        "newNormalized": "e650ae13a08417392fa9cb09b0823c058cc04b0d6a79f6bb7c67f4c53c4e703e"
+      },
+      {
+        "url": "https://svelte.dev/docs/kit/hooks",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "bb672e1469003d6379429364607e4ff559bf14905584bb7ce096feeea1e05447",
+        "newNormalized": "a96c1d15fd75f782fb56a8c89e2871b6a97e02566ca7585b37903d38070618bf"
+      },
+      {
+        "url": "https://svelte.dev/docs/kit/load",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "3802ee9392148968511337d820f29c0f38870b79b4f18aabb730a4161fe744bc",
+        "newNormalized": "62e6dd9932a74b58fed956607f84f28f2f14057bdc8b4882ce6a2b9ceaf699e6"
+      },
+      {
+        "url": "https://svelte.dev/docs/kit/page-options",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "1885d5fd301e265429372994253de18ab08479f485f7452a173c095c7cea8771",
+        "newNormalized": "5166571dffc19c6d326b316b11295b497fa8caeb440175ac98298fab42f48b9d"
+      },
+      {
+        "url": "https://svelte.dev/docs/kit/state-management",
+        "change": "EXTRACTOR_ONLY",
+        "oldNormalized": "9b58ac2b35ba7df1e89c4047aa7a5b99d0393021d88c2554078f241eab9fc295",
+        "newNormalized": "7eecebe5e0d7481ce0af93534e53cb78a1eccaab4ad48bc848faefb6633988f3"
+      }
+    ]
+  },
+  "identityPreserved": "provider/product/product_version/qualification/architecture/language/url unchanged (sidecar pinned-docs.coordinates.json untouched); only content-dependent values were recomputed.",
+  "termCoverage": [
+    {
+      "group": "svelte",
+      "term": "$derived",
+      "status": "LITERAL_HIT",
+      "literalHits": 87,
+      "tokenSplitHits": 0
+    },
+    {
+      "group": "drizzle",
+      "term": "vector_cosine_ops",
+      "status": "LITERAL_HIT",
+      "literalHits": 12,
+      "tokenSplitHits": 0
+    },
+    {
+      "group": "drizzle",
+      "term": "halfvec_cosine_ops",
+      "status": "LITERAL_HIT",
+      "literalHits": 2,
+      "tokenSplitHits": 0
+    },
+    {
+      "group": "drizzle",
+      "term": "drizzle-kit",
+      "status": "LITERAL_HIT",
+      "literalHits": 129,
+      "tokenSplitHits": 0
+    },
+    {
+      "group": "pgvector",
+      "term": "hnsw.iterative_scan",
+      "status": "LITERAL_HIT",
+      "literalHits": 3,
+      "tokenSplitHits": 0
+    },
+    {
+      "group": "pgvector",
+      "term": "hnsw.scan_mem_multiplier",
+      "status": "LITERAL_HIT",
+      "literalHits": 1,
+      "tokenSplitHits": 0
+    },
+    {
+      "group": "postgresql18",
+      "term": "io_method",
+      "status": "LITERAL_HIT",
+      "literalHits": 3,
+      "tokenSplitHits": 0
+    },
+    {
+      "group": "postgresql18",
+      "term": "pg_aios",
+      "status": "LITERAL_HIT",
+      "literalHits": 9,
+      "tokenSplitHits": 0
+    },
+    {
+      "group": "postgresql18",
+      "term": "Bitmap Heap Scan",
+      "status": "LITERAL_HIT",
+      "literalHits": 16,
+      "tokenSplitHits": 0
+    },
+    {
+      "group": "postgresql18",
+      "term": "uuidv7",
+      "status": "LITERAL_HIT",
+      "literalHits": 4,
+      "tokenSplitHits": 0
+    }
+  ],
+  "requiredInputs": [
+    "docs/.okf/dev/index.md",
+    "docs/.okf/dev/manifest.json",
+    "docs/.okf/dev/pinned-docs.coordinates.json",
+    "docs/.okf/dev/pinned-docs.manifest.json",
+    "docs/.okf/dev/raw/firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+    "docs/.okf/dev/summary.json",
+    "docs/.okf/dev/symbol-summary.json",
+    "docs/.okf/langextract/manifest.json",
+    "docs/.okf/pinned/admission-envelopes-v1.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-child-snippet.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-child-snippet.md",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-components-dialog.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-components-dialog.md",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-getting-started.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-getting-started.md",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-migration-guide.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-migration-guide.md",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-state-management.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-state-management.md",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-drizzle-kit-generate.json",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-drizzle-kit-generate.md",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-drizzle-kit-migrate.json",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-drizzle-kit-migrate.md",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-kit-overview.json",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-kit-overview.md",
+    "docs/.okf/pinned/drizzle-orm/raw/github.com-drizzle-team-drizzle-orm-issues-5792.json",
+    "docs/.okf/pinned/drizzle-orm/raw/github.com-drizzle-team-drizzle-orm-issues-5792.md",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-column-types.json",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-column-types.md",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-extensions.json",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-extensions.md",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-guides-vector-similarity-search.json",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-guides-vector-similarity-search.md",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-indexes-constraints.json",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-indexes-constraints.md",
+    "docs/.okf/pinned/pgvector/raw/github.com-pgvector-pgvector-blob-master-CHANGELOG.md.json",
+    "docs/.okf/pinned/pgvector/raw/github.com-pgvector-pgvector-blob-master-CHANGELOG.md.md",
+    "docs/.okf/pinned/pgvector/raw/github.com-pgvector-pgvector.json",
+    "docs/.okf/pinned/pgvector/raw/github.com-pgvector-pgvector.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-functions-uuid.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-functions-uuid.html.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-indexes-bitmap-scans.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-indexes-bitmap-scans.html.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-release-18.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-release-18.html.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-runtime-config-resource.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-runtime-config-resource.html.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-using-explain.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-using-explain.html.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-view-pg-aios.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-view-pg-aios.html.md",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-derived.json",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-derived.md",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-effect.json",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-effect.md",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-props.json",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-props.md",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-state.json",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-state.md",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-form-actions.json",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-form-actions.md",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-hooks.json",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-hooks.md",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-load.json",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-load.md",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-page-options.json",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-page-options.md",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-state-management.json",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-state-management.md",
+    "docs/reports/external-doc-admission-envelopes-v1.json",
+    "docs/reports/external-doc-studio-readiness-v1.json",
+    "scripts/docs-atlas/index-okf-dev-corpus.mjs",
+    "sveltekit-frontend/drizzle/manual/20260904_external_doc_intelligence_v1.sql",
+    "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+  ],
+  "trackedInputs": [
+    "docs/.okf/dev/index.md",
+    "docs/.okf/dev/manifest.json",
+    "docs/.okf/dev/pinned-docs.coordinates.json",
+    "docs/.okf/dev/pinned-docs.manifest.json",
+    "docs/.okf/dev/raw/firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+    "docs/.okf/dev/summary.json",
+    "docs/.okf/dev/symbol-summary.json",
+    "docs/.okf/langextract/manifest.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-child-snippet.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-child-snippet.md",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-components-dialog.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-components-dialog.md",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-getting-started.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-getting-started.md",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-migration-guide.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-migration-guide.md",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-state-management.json",
+    "docs/.okf/pinned/bits-ui/raw/bits-ui.com-docs-state-management.md",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-drizzle-kit-generate.json",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-drizzle-kit-generate.md",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-drizzle-kit-migrate.json",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-drizzle-kit-migrate.md",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-kit-overview.json",
+    "docs/.okf/pinned/drizzle-kit/raw/orm.drizzle.team-docs-kit-overview.md",
+    "docs/.okf/pinned/drizzle-orm/raw/github.com-drizzle-team-drizzle-orm-issues-5792.json",
+    "docs/.okf/pinned/drizzle-orm/raw/github.com-drizzle-team-drizzle-orm-issues-5792.md",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-column-types.json",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-column-types.md",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-extensions.json",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-extensions.md",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-guides-vector-similarity-search.json",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-guides-vector-similarity-search.md",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-indexes-constraints.json",
+    "docs/.okf/pinned/drizzle-orm/raw/orm.drizzle.team-docs-indexes-constraints.md",
+    "docs/.okf/pinned/pgvector/raw/github.com-pgvector-pgvector-blob-master-CHANGELOG.md.json",
+    "docs/.okf/pinned/pgvector/raw/github.com-pgvector-pgvector-blob-master-CHANGELOG.md.md",
+    "docs/.okf/pinned/pgvector/raw/github.com-pgvector-pgvector.json",
+    "docs/.okf/pinned/pgvector/raw/github.com-pgvector-pgvector.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-functions-uuid.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-functions-uuid.html.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-indexes-bitmap-scans.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-indexes-bitmap-scans.html.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-release-18.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-release-18.html.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-runtime-config-resource.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-runtime-config-resource.html.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-using-explain.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-using-explain.html.md",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-view-pg-aios.html.json",
+    "docs/.okf/pinned/postgresql-18/raw/www.postgresql.org-docs-18-view-pg-aios.html.md",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-derived.json",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-derived.md",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-effect.json",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-effect.md",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-props.json",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-props.md",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-state.json",
+    "docs/.okf/pinned/svelte5-runes/raw/svelte.dev-docs-svelte-state.md",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-form-actions.json",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-form-actions.md",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-hooks.json",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-hooks.md",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-load.json",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-load.md",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-page-options.json",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-page-options.md",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-state-management.json",
+    "docs/.okf/pinned/sveltekit/raw/svelte.dev-docs-kit-state-management.md",
+    "docs/reports/external-doc-admission-envelopes-v1.json",
+    "docs/reports/external-doc-studio-readiness-v1.json",
+    "scripts/docs-atlas/index-okf-dev-corpus.mjs",
+    "sveltekit-frontend/drizzle/manual/20260904_external_doc_intelligence_v1.sql",
+    "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+  ],
+  "generatedInputs": [
+    "docs/.okf/pinned/admission-envelopes-v1.json"
+  ],
+  "missingInputs": [],
+  "optionalRebuildableInputs": [
+    "docs/.okf/dev/corpus.jsonl"
+  ],
+  "environmentInputs": [
+    ".env",
+    ".env.local",
+    "sveltekit-frontend/.env",
+    "sveltekit-frontend/.env.development",
+    "sveltekit-frontend/.env.development.local",
+    "sveltekit-frontend/.env.local"
+  ],
+  "freshCheckoutRun": {
+    "method": "git worktree add --detach <temp> 8a2a00c96f; node_modules junctions only; DATABASE_URL unset; python builder + tsx readiness script + vitest",
+    "commit": "8a2a00c96f",
+    "chunksJsonlPresent": false,
+    "corpusJsonlPresent": false,
+    "requiredInputs": 72,
+    "trackedInputs": 71,
+    "generatedInputs": 1,
+    "missingInputs": 0,
+    "envelopesDigestMatchesMainTree": true,
+    "pageCount": 30,
+    "missingSources": [],
+    "nonLiteralRequiredTerms": [],
+    "vitest": {
+      "files": 3,
+      "tests": 32,
+      "passed": true
+    },
+    "readinessResult": "DOC_ADMISSION_HANDOFF_BLOCKED",
+    "canonicalPostgres": "UNAVAILABLE (no database in the fresh tree, as intended)",
+    "defectFoundAndFixed": "runtime version unknown (no database) reported postgresql-18 as DOC_STALE; now UNVERSIONED (spec added)",
+    "worktreeRemoved": true
+  },
+  "studioSmokeResult": "DOC_ADMISSION_HANDOFF_BLOCKED",
+  "studioSecondaryResults": [
+    "DOC_CANONICAL_CORPUS_EMPTY"
+  ],
+  "canonicalPostgres": {
+    "pages": 0,
+    "chunks": 0,
+    "status": "EMPTY"
+  },
+  "uiLabels": "pinned corpus is searchable only as REFERENCE_ONLY / GENERATED_CORPUS (NONCANONICAL); never CANONICAL",
+  "deferred": [
+    "sveltekit-frontend/drizzle/manual/20260923_external_doc_summaries_v1.sql stays UNAPPLIED and unstaged",
+    "DOC-06A admission (blockers: PIPELINE_DOES_NOT_EMIT_DOC_COORDINATE, CHUNK_EVIDENCE_REVISION_NOT_UNIQUE)"
+  ],
+  "result": "DOC_CORPUS_ARTIFACT_REPRODUCIBILITY_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

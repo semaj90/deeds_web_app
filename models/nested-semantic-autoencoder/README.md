@@ -1,22 +1,32 @@
 # nested-semantic-autoencoder
 
-**Status**: TRAINED, INDEXED, PARITY-PROVEN | **Live consumers**: NONE | **Canonical**: NO
+**Historical v3 checkpoint**: `768 → 384 → 256` | **Live consumers**: NONE | **Canonical**: NO | **Promotion**: CANDIDATE
+**Current candidate definition**: `768 → 512 → 256 → 128`, with `latent_64` derived from `latent_128`; not trained or promoted.
 
 ## TL;DR
 
-A tiny PyTorch model (`768 → 384 → 256`, ~394K encoder params, ~1.5 MB FP32) that compresses the
-canonical `semantic_768` (EmbeddingGemma) embedding into a learned, Matryoshka-style nested
+A historical PyTorch checkpoint (`768 → 384 → 256`, ~394K encoder params, ~1.5 MB FP32) was trained on a historical
+768-D embedding column. The old run labels its input `semantic_768`/EmbeddingGemma, but read
+`codebase_chunk_index.content_embedding`, not the currently declared canonical
+`content_embedding_768`; canonical source/model/tokenizer lineage for that input is not proven.
+It produces a learned, Matryoshka-style nested
 representation: `latent_256` (physical bottleneck), with `latent_128`/`latent_64` derived for free
-as L2-renormalized prefixes of `latent_256` — no separate weights, no separate storage.
+as L2-renormalized prefixes of `latent_256` — no separate weights, no separate storage. This is
+historical state, not the architecture for future training; do not reuse its 384-D layer/checkpoint
+for the current EmbeddingGemma-derived candidate.
+
+The current candidate model definition is `768 → 512 → 256 → 128`; it learns the 128-D bottleneck
+separately, derives `latent_64` as a normalized prefix of `latent_128`, and leaves 4-D topology to
+its separate revisioned projection. The implementation is code-only until canonical semantic input
+writer/provenance is proven and an explicitly approved training run creates a new checkpoint.
 
 It is **not built on EmbeddingGemma's ONNX model** — it's a fully separate, downstream model that
 consumes EmbeddingGemma's *output* as its *input*. EmbeddingGemma's own ONNX model
 (`models/embeddinggemma_300m_onnx/model.onnx`) is 291 MB; this model is ~200x smaller.
 
-Both Postgres (`codebase_chunk_index.latent_256`) and Qdrant (`codebase_chunks_latent256`) are
-fully backfilled (55,169/55,169 rows/points) and proven: `knn_recall@10` beats the free
-`semantic_mrl_256` MRL truncation (0.8957 vs 0.8575), and Qdrant's live HNSW index matches exact
-brute-force search at 0.9995 overlap@10 across the full corpus.
+Historical receipts report 55,169 Postgres latent bindings and 55,169 Qdrant points. The recorded
+recall and ANN parity results are valid for those historical artifacts, but do not prove their
+input was the admitted canonical `semantic_768` cohort, and do not promote the representation.
 
 **Nothing calls this model or these columns/collections yet.** That is a deliberate, verified
 stopping point (see "Why nothing consumes this yet" below), not an oversight.
@@ -25,10 +35,10 @@ stopping point (see "Why nothing consumes this yet" below), not an oversight.
 
 | File | Purpose |
 |---|---|
-| `ae_meta.json` | Full provenance: architecture, checksums, training config, all recorded metrics, receipt paths |
+| `ae_meta.json` | Historical artifact metadata and checksums; input authority remains unproven |
 | `python/checkpoints/nested_semantic_autoencoder_v3_full01.pt` | The actual weights (gitignored — `*.pt` is repo-wide ignored per build-artifact policy; this file lives locally, not in git) |
 | `python/atlas_compute/latent_autoencoder.py` | Model definition (`NestedSemanticAutoencoder`, `NestedAutoencoderConfig`) |
-| `python/train_latent_autoencoder.py` | Training script that produced this checkpoint |
+| `python/train_latent_autoencoder.py` | Current candidate trainer; it did **not** produce the historical v3 checkpoint described above |
 | `python/compare_semantic_representation_recall.py` | The recall-comparison benchmark that justified building this model |
 | `python/backfill_latent_256.py` | Postgres backfill (real forward pass, not a prefix truncation) |
 | `python/provision_qdrant_latent256.py` | Qdrant collection provisioning + backfill |
@@ -40,37 +50,62 @@ Postgres migration → Qdrant migration → ANN parity → this packaging step).
 
 ## Architecture
 
+The current candidate encoder has a 512-wide hidden stage. `semantic_mrl_512` is a different,
+independent EmbeddingGemma representation and must not be confused with that hidden stage. Neither
+one makes a 512-D autoencoder output. The historical 384-wide checkpoint below remains a separate,
+incompatible artifact; it is not the candidate checkpoint.
+
 ```
-semantic_768 (EmbeddingGemma output, L2-normalized)
-  -> Linear(768, 384) -> GELU -> Linear(384, 256) -> LayerNorm(256) -> L2-normalize
-  = latent_256                                    [physical bottleneck, this is what's stored]
+CURRENT CANDIDATE — CODE DEFINITION ONLY; NO TRAINED CHECKPOINT
+canonical semantic_768 (EmbeddingGemma, 768-D)
+  -> Linear(768, 512) -> GELU                    [internal hidden stage; not persisted]
+  -> Linear(512, 256) -> LayerNorm -> L2-normalize
+  = latent_256                                    [learned intermediate representation]
+  -> Linear(256, 128) -> LayerNorm -> L2-normalize
+  = latent_128                                    [learned bottleneck]
 
-latent_256[:, :128] -> L2-normalize = latent_128  [free, derived at query time, NOT stored]
-latent_128[:, :64]  -> L2-normalize = latent_64   [free, derived at query time, NOT stored]
+latent_128[:, :64]  -> L2-normalize = latent_64   [derived prefix; no additional learned layer]
+
+latent_256 -> separate, revisioned topology projection -> topology_4d
+                                                      [not produced by this autoencoder]
+
+HISTORICAL V3 CHECKPOINT — DO NOT LOAD AS THE CURRENT CANDIDATE
+semantic_768? (input lineage not proven)
+  -> Linear(768, 384) -> GELU -> Linear(384, 256) -> latent_256
 ```
 
-Three decoder heads (`decoder256`, `decoder128`, `decoder64`) exist in the checkpoint but are
-**only used during training** to compute reconstruction loss. Inference only needs the encoder
-(394,368 of the checkpoint's 1,454,592 total params).
+The candidate implementation has reconstruction heads for training/evaluation; they do not add
+dimensions to the emitted latent family. The historical checkpoint has a different parameter ABI
+and cannot be loaded into the candidate definition. The 4-D topology result belongs to its own
+projection revision and receipt; it must not be inferred from AE dimensionality or checkpoint
+metadata.
 
-## Loading it
+## Data and projection boundaries
 
-```python
-import torch
-from atlas_compute.latent_autoencoder import NestedSemanticAutoencoder, NestedAutoencoderConfig
+- **Canonical dense input**: EmbeddingGemma `semantic_768` (768 values), owned by PostgreSQL
+  `codebase_chunk_index.content_embedding_768`. The 384-D MiniLM cross-encoder is a separate
+  reranking role; replacing the dense embedding model does not itself replace that reranker.
+- **Qdrant**: a rebuildable mirror of canonical 768-D vectors (`content`) plus revision-qualified
+  payload tags. Point IDs remain projection IDs, never packet identity. Qdrant tags, cluster IDs,
+  and RFF/error/signature lanes are derived metadata, not canonical source evidence.
+- **RFF naming in this repository**: `backfill-graphify-rff-embeddings-768.mjs` creates
+  EmbeddingGemma error/signature embeddings in their dedicated columns. It is not a 768→512 random
+  Fourier transform and is not an AE stage. Keep its writer/provenance contract separate.
+- **KMeans/SOM/topology**: clustering and the 4-D topology coordinates are derived projections
+  over an explicitly revisioned input matrix. Cluster/tag values may route or filter retrieval;
+  they cannot create identity, alter canonical vectors, or add an independent retrieval vote.
+- **Autoencoder candidate**: consumes an exact, frozen, provenance-qualified `semantic_768` input
+  cohort. Its outputs are candidate projections until quality evaluation, readback, and explicit
+  promotion. No full database copy is required: the raw FP32 matrix is 768 × 4 bytes per row
+  (about 49.6 MB for 16,151 rows, before identity/manifest overhead). Do not include source text or
+  unrelated database tables in the training snapshot.
 
-model = NestedSemanticAutoencoder(NestedAutoencoderConfig())
-state_dict = torch.load(
-    "python/checkpoints/nested_semantic_autoencoder_v3_full01.pt",
-    map_location="cpu",  # or "cuda"
-    weights_only=True,
-)
-model.load_state_dict(state_dict)
-model.eval()
+## Historical checkpoint note
 
-# semantic_768: torch.Tensor [N, 768], NOT pre-normalized (the model normalizes internally)
-latent_256, latent_128, latent_64 = model.encode(semantic_768)
-```
+`nested_semantic_autoencoder_v3_full01.pt` has the old 768→384→256 parameter ABI. Do not load it
+with the current `NestedSemanticAutoencoder` definition: those architectures are incompatible, and
+the historical source/model/tokenizer lineage is not proven. The current candidate has no trained
+checkpoint yet.
 
 ## Why nothing consumes this yet
 

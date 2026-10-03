@@ -1,38 +1,20 @@
 {
   "schema": "atlas.openspec-tasks-md-audit.v1",
   "mode": "READ_ONLY_AUDIT",
-  "generatedAt": "2026-09-16T23:08:10.847Z",
+  "generatedAt": "2026-09-21T00:06:34.718Z",
   "gapThreshold": 80,
   "aggregate": {
-    "totalChangesAudited": 108,
-    "totalDoneCheckboxes": 6089,
-    "totalCheckboxes": 9491,
-    "aggregateCompletionPct": 64.16,
+    "totalChangesAudited": 114,
+    "totalDoneCheckboxes": 6460,
+    "totalCheckboxes": 9970,
+    "aggregateCompletionPct": 64.79,
     "changesWithNoCheckboxes": 2,
-    "changesFullyComplete": 22,
-    "changesBelowGapThreshold": 56,
+    "changesFullyComplete": 24,
+    "changesBelowGapThreshold": 54,
     "duplicateNamesAcrossTrees": [],
-    "changesWithStalenessMarkers": 25
+    "changesWithStalenessMarkers": 27
   },
   "changes": [
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-retrieval-logic-convergence",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
-      "done": 8,
-      "total": 52,
-      "completionPct": 15,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": false,
-      "tasksNonTrivial": true,
-      "structuralScore": 70,
-      "auditScore": 37,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
     {
       "tree": "root",
       "changeName": "parent-atlas-graphify-recovery-proof-ladder",
@@ -50,12 +32,12 @@
       "stalenessMarkersFound": []
     },
     {
-      "tree": "root",
-      "changeName": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "tree": "sveltekit-frontend",
+      "changeName": "parent-atlas-cuda134-tensorrt-rtx-lane",
       "archived": false,
-      "path": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
+      "path": "sveltekit-frontend/openspec/changes/parent-atlas-cuda134-tensorrt-rtx-lane/tasks.md",
       "done": 0,
-      "total": 17,
+      "total": 14,
       "completionPct": 0,
       "noCheckboxes": false,
       "hasProposal": true,
@@ -231,34 +213,18 @@
     },
     {
       "tree": "root",
-      "changeName": "parent-atlas-agentic-run-receipt-binding",
+      "changeName": "parent-atlas-workboard-feature-utility-fabric",
       "archived": false,
-      "path": "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md",
-      "done": 3,
-      "total": 16,
-      "completionPct": 19,
+      "path": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
+      "done": 11,
+      "total": 67,
+      "completionPct": 16,
       "noCheckboxes": false,
       "hasProposal": true,
       "hasSpecs": true,
       "tasksNonTrivial": true,
       "structuralScore": 100,
-      "auditScore": 51,
-      "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-agentic-repair-bundle-integration",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md",
-      "done": 18,
-      "total": 84,
-      "completionPct": 21,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 53,
+      "auditScore": 50,
       "stalenessMarkersFound": []
     },
     {
@@ -269,6 +235,22 @@
       "done": 14,
       "total": 62,
       "completionPct": 23,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 54,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
+      "done": 4,
+      "total": 17,
+      "completionPct": 24,
       "noCheckboxes": false,
       "hasProposal": true,
       "hasSpecs": true,
@@ -442,6 +424,22 @@
       "stalenessMarkersFound": []
     },
     {
+      "tree": "root",
+      "changeName": "parent-atlas-agentic-repair-bundle-integration",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md",
+      "done": 25,
+      "total": 84,
+      "completionPct": 30,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 58,
+      "stalenessMarkersFound": []
+    },
+    {
       "tree": "sveltekit-frontend",
       "changeName": "phase1-rrf-semantic-fusion",
       "archived": false,
@@ -526,6 +524,24 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-nlp-sidecar-feature-compiler",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+      "done": 57,
+      "total": 118,
+      "completionPct": 48,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 69,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-error-research-lane",
       "archived": false,
       "path": "openspec/changes/parent-atlas-error-research-lane/tasks.md",
@@ -569,22 +585,6 @@
       "path": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
       "done": 52,
       "total": 104,
-      "completionPct": 50,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 70,
-      "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-rrf-fusion-consolidation",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-rrf-fusion-consolidation/tasks.md",
-      "done": 3,
-      "total": 6,
       "completionPct": 50,
       "noCheckboxes": false,
       "hasProposal": true,
@@ -692,6 +692,24 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-retrieval-logic-convergence",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+      "done": 29,
+      "total": 55,
+      "completionPct": 53,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 72,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-graph-retrieval-proof",
       "archived": false,
       "path": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
@@ -707,22 +725,6 @@
       "stalenessMarkersFound": [
         "SUPERSEDED"
       ]
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-nlp-sidecar-feature-compiler",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
-      "done": 51,
-      "total": 92,
-      "completionPct": 55,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 73,
-      "stalenessMarkersFound": []
     },
     {
       "tree": "root",
@@ -808,42 +810,6 @@
     },
     {
       "tree": "root",
-      "changeName": "parent-atlas-okf-knowledge-layers",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
-      "done": 25,
-      "total": 41,
-      "completionPct": 61,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 77,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
-    {
-      "tree": "root",
-      "changeName": "manual-migration-reconciliation",
-      "archived": false,
-      "path": "openspec/changes/manual-migration-reconciliation/tasks.md",
-      "done": 57,
-      "total": 89,
-      "completionPct": 64,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 78,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
-    {
-      "tree": "root",
       "changeName": "parent-atlas-ace-bitfrost-cache-correctness",
       "archived": false,
       "path": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
@@ -892,22 +858,6 @@
     },
     {
       "tree": "root",
-      "changeName": "parent-atlas-agentic-file-compiler",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
-      "done": 22,
-      "total": 34,
-      "completionPct": 65,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 79,
-      "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
       "changeName": "parent-atlas-graph-validation-fabric",
       "archived": false,
       "path": "openspec/changes/parent-atlas-graph-validation-fabric/tasks.md",
@@ -940,6 +890,24 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-semantic-768-canonical-contract",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md",
+      "done": 45,
+      "total": 69,
+      "completionPct": 65,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 79,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "tree": "root",
       "changeName": "feature-label-semantic-derivation",
       "archived": false,
       "path": "openspec/changes/feature-label-semantic-derivation/tasks.md",
@@ -956,12 +924,12 @@
     },
     {
       "tree": "root",
-      "changeName": "parent-atlas-code-ingestion-pipeline",
+      "changeName": "manual-migration-reconciliation",
       "archived": false,
-      "path": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
-      "done": 23,
-      "total": 35,
-      "completionPct": 66,
+      "path": "openspec/changes/manual-migration-reconciliation/tasks.md",
+      "done": 60,
+      "total": 89,
+      "completionPct": 67,
       "noCheckboxes": false,
       "hasProposal": true,
       "hasSpecs": true,
@@ -974,12 +942,12 @@
     },
     {
       "tree": "root",
-      "changeName": "parent-atlas-semantic-768-canonical-contract",
+      "changeName": "parent-atlas-code-ingestion-pipeline",
       "archived": false,
-      "path": "openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md",
-      "done": 43,
-      "total": 64,
-      "completionPct": 67,
+      "path": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
+      "done": 23,
+      "total": 35,
+      "completionPct": 66,
       "noCheckboxes": false,
       "hasProposal": true,
       "hasSpecs": true,
@@ -1007,12 +975,28 @@
       "stalenessMarkersFound": []
     },
     {
-      "tree": "root",
-      "changeName": "parent-atlas-candidate-feature-execution-fabric",
+      "tree": "sveltekit-frontend",
+      "changeName": "parent-atlas-retrieval-staging-planes",
       "archived": false,
-      "path": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
-      "done": 222,
-      "total": 320,
+      "path": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md",
+      "done": 20,
+      "total": 30,
+      "completionPct": 67,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 80,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "local-llm-offload-ownership",
+      "archived": false,
+      "path": "openspec/changes/local-llm-offload-ownership/tasks.md",
+      "done": 43,
+      "total": 62,
       "completionPct": 69,
       "noCheckboxes": false,
       "hasProposal": true,
@@ -1071,6 +1055,40 @@
       "structuralScore": 100,
       "auditScore": 83,
       "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-agentic-file-compiler",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
+      "done": 24,
+      "total": 34,
+      "completionPct": 71,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 83,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-candidate-feature-execution-fabric",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "done": 228,
+      "total": 321,
+      "completionPct": 71,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 83,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
     },
     {
       "tree": "root",
@@ -1156,6 +1174,24 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-retrieval-lineage-dag-convergence",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "done": 702,
+      "total": 930,
+      "completionPct": 75,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 85,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-ace-rlm-bitfrost-integration",
       "archived": false,
       "path": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
@@ -1190,24 +1226,6 @@
     },
     {
       "tree": "root",
-      "changeName": "parent-atlas-retrieval-lineage-dag-convergence",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "done": 697,
-      "total": 921,
-      "completionPct": 76,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 86,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
-    {
-      "tree": "root",
       "changeName": "parent-atlas-pca-svd-representation-baseline",
       "archived": false,
       "path": "openspec/changes/parent-atlas-pca-svd-representation-baseline/tasks.md",
@@ -1220,6 +1238,22 @@
       "tasksNonTrivial": true,
       "structuralScore": 100,
       "auditScore": 87,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-agentic-completion",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-agentic-completion/tasks.md",
+      "done": 9,
+      "total": 11,
+      "completionPct": 82,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 89,
       "stalenessMarkersFound": []
     },
     {
@@ -1240,12 +1274,28 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-prefill-routing-residency-convergence",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+      "done": 125,
+      "total": 152,
+      "completionPct": 82,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 89,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-search-classifier-sidecar",
       "archived": false,
       "path": "openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md",
-      "done": 68,
-      "total": 83,
-      "completionPct": 82,
+      "done": 70,
+      "total": 86,
+      "completionPct": 81,
       "noCheckboxes": false,
       "hasProposal": true,
       "hasSpecs": true,
@@ -1258,11 +1308,61 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-workstation-domain-classifier",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+      "done": 115,
+      "total": 141,
+      "completionPct": 82,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 89,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-okf-knowledge-layers",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
+      "done": 34,
+      "total": 41,
+      "completionPct": 83,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 90,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-repair-candidate-feature-matrix",
       "archived": false,
       "path": "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
       "done": 34,
       "total": 41,
+      "completionPct": 83,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 90,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-retrieval-executor-compatibility-convergence",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-retrieval-executor-compatibility-convergence/tasks.md",
+      "done": 39,
+      "total": 47,
       "completionPct": 83,
       "noCheckboxes": false,
       "hasProposal": true,
@@ -1290,6 +1390,22 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-rrf-fusion-consolidation",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-rrf-fusion-consolidation/tasks.md",
+      "done": 5,
+      "total": 6,
+      "completionPct": 83,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 90,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
       "changeName": "agent-branch-review-fanout-ace-centroid-aug22",
       "archived": false,
       "path": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md",
@@ -1305,56 +1421,6 @@
       "stalenessMarkersFound": [
         "SUPERSEDED"
       ]
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-agentic-repair-fabric",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-agentic-repair-fabric/tasks.md",
-      "done": 17,
-      "total": 20,
-      "completionPct": 85,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 91,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
-    {
-      "tree": "root",
-      "changeName": "local-llm-offload-ownership",
-      "archived": false,
-      "path": "openspec/changes/local-llm-offload-ownership/tasks.md",
-      "done": 37,
-      "total": 43,
-      "completionPct": 86,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 92,
-      "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-workstation-domain-classifier",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
-      "done": 68,
-      "total": 78,
-      "completionPct": 87,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 92,
-      "stalenessMarkersFound": []
     },
     {
       "tree": "root",
@@ -1522,6 +1588,40 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-agentic-repair-fabric",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-agentic-repair-fabric/tasks.md",
+      "done": 35,
+      "total": 35,
+      "completionPct": 100,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 100,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-agentic-run-receipt-binding",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md",
+      "done": 16,
+      "total": 16,
+      "completionPct": 100,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 100,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-autoresearch-fabric",
       "archived": false,
       "path": "openspec/changes/parent-atlas-autoresearch-fabric/tasks.md",
@@ -1590,6 +1690,22 @@
       "stalenessMarkersFound": [
         "SUPERSEDED"
       ]
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-rpc-packet-registry-fabric",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-rpc-packet-registry-fabric/tasks.md",
+      "done": 27,
+      "total": 27,
+      "completionPct": 100,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 100,
+      "stalenessMarkersFound": []
     },
     {
       "tree": "root",
@@ -1782,43 +1898,9 @@
       "structuralScore": 100,
       "auditScore": 100,
       "stalenessMarkersFound": []
-    },
-    {
-      "tree": "sveltekit-frontend",
-      "changeName": "parent-atlas-retrieval-staging-planes",
-      "archived": false,
-      "path": "sveltekit-frontend/openspec/changes/parent-atlas-retrieval-staging-planes/tasks.md",
-      "done": 13,
-      "total": 13,
-      "completionPct": 100,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 100,
-      "stalenessMarkersFound": []
     }
   ],
   "gaps": [
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-retrieval-logic-convergence",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
-      "done": 8,
-      "total": 52,
-      "completionPct": 15,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": false,
-      "tasksNonTrivial": true,
-      "structuralScore": 70,
-      "auditScore": 37,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
     {
       "tree": "root",
       "changeName": "parent-atlas-graphify-recovery-proof-ladder",
@@ -1836,12 +1918,12 @@
       "stalenessMarkersFound": []
     },
     {
-      "tree": "root",
-      "changeName": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "tree": "sveltekit-frontend",
+      "changeName": "parent-atlas-cuda134-tensorrt-rtx-lane",
       "archived": false,
-      "path": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
+      "path": "sveltekit-frontend/openspec/changes/parent-atlas-cuda134-tensorrt-rtx-lane/tasks.md",
       "done": 0,
-      "total": 17,
+      "total": 14,
       "completionPct": 0,
       "noCheckboxes": false,
       "hasProposal": true,
@@ -2017,34 +2099,18 @@
     },
     {
       "tree": "root",
-      "changeName": "parent-atlas-agentic-run-receipt-binding",
+      "changeName": "parent-atlas-workboard-feature-utility-fabric",
       "archived": false,
-      "path": "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md",
-      "done": 3,
-      "total": 16,
-      "completionPct": 19,
+      "path": "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md",
+      "done": 11,
+      "total": 67,
+      "completionPct": 16,
       "noCheckboxes": false,
       "hasProposal": true,
       "hasSpecs": true,
       "tasksNonTrivial": true,
       "structuralScore": 100,
-      "auditScore": 51,
-      "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-agentic-repair-bundle-integration",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md",
-      "done": 18,
-      "total": 84,
-      "completionPct": 21,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 53,
+      "auditScore": 50,
       "stalenessMarkersFound": []
     },
     {
@@ -2055,6 +2121,22 @@
       "done": 14,
       "total": 62,
       "completionPct": 23,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 54,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
+      "done": 4,
+      "total": 17,
+      "completionPct": 24,
       "noCheckboxes": false,
       "hasProposal": true,
       "hasSpecs": true,
@@ -2228,6 +2310,22 @@
       "stalenessMarkersFound": []
     },
     {
+      "tree": "root",
+      "changeName": "parent-atlas-agentic-repair-bundle-integration",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md",
+      "done": 25,
+      "total": 84,
+      "completionPct": 30,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 58,
+      "stalenessMarkersFound": []
+    },
+    {
       "tree": "sveltekit-frontend",
       "changeName": "phase1-rrf-semantic-fusion",
       "archived": false,
@@ -2312,6 +2410,24 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-nlp-sidecar-feature-compiler",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+      "done": 57,
+      "total": 118,
+      "completionPct": 48,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 69,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-error-research-lane",
       "archived": false,
       "path": "openspec/changes/parent-atlas-error-research-lane/tasks.md",
@@ -2355,22 +2471,6 @@
       "path": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
       "done": 52,
       "total": 104,
-      "completionPct": 50,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 70,
-      "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-rrf-fusion-consolidation",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-rrf-fusion-consolidation/tasks.md",
-      "done": 3,
-      "total": 6,
       "completionPct": 50,
       "noCheckboxes": false,
       "hasProposal": true,
@@ -2478,6 +2578,24 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-retrieval-logic-convergence",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+      "done": 29,
+      "total": 55,
+      "completionPct": 53,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 72,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-graph-retrieval-proof",
       "archived": false,
       "path": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
@@ -2493,22 +2611,6 @@
       "stalenessMarkersFound": [
         "SUPERSEDED"
       ]
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-nlp-sidecar-feature-compiler",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
-      "done": 51,
-      "total": 92,
-      "completionPct": 55,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 73,
-      "stalenessMarkersFound": []
     },
     {
       "tree": "root",
@@ -2594,42 +2696,6 @@
     },
     {
       "tree": "root",
-      "changeName": "parent-atlas-okf-knowledge-layers",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
-      "done": 25,
-      "total": 41,
-      "completionPct": 61,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 77,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
-    {
-      "tree": "root",
-      "changeName": "manual-migration-reconciliation",
-      "archived": false,
-      "path": "openspec/changes/manual-migration-reconciliation/tasks.md",
-      "done": 57,
-      "total": 89,
-      "completionPct": 64,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 78,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
-    {
-      "tree": "root",
       "changeName": "parent-atlas-ace-bitfrost-cache-correctness",
       "archived": false,
       "path": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
@@ -2678,22 +2744,6 @@
     },
     {
       "tree": "root",
-      "changeName": "parent-atlas-agentic-file-compiler",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
-      "done": 22,
-      "total": 34,
-      "completionPct": 65,
-      "noCheckboxes": false,
-      "hasProposal": true,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 100,
-      "auditScore": 79,
-      "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
       "changeName": "parent-atlas-graph-validation-fabric",
       "archived": false,
       "path": "openspec/changes/parent-atlas-graph-validation-fabric/tasks.md",
@@ -2723,6 +2773,24 @@
       "structuralScore": 100,
       "auditScore": 79,
       "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-semantic-768-canonical-contract",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md",
+      "done": 45,
+      "total": 69,
+      "completionPct": 65,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 79,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
     }
   ],
   "stalenessFlagged": [
@@ -2762,6 +2830,14 @@
       "changeName": "parent-atlas-agentic-repair-fabric",
       "tree": "root",
       "path": "openspec/changes/parent-atlas-agentic-repair-fabric/tasks.md",
+      "markers": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "changeName": "parent-atlas-candidate-feature-execution-fabric",
+      "tree": "root",
+      "path": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
       "markers": [
         "SUPERSEDED"
       ]
@@ -2828,6 +2904,14 @@
       "changeName": "parent-atlas-neural-prefill-encoder",
       "tree": "root",
       "path": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "markers": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "changeName": "parent-atlas-nlp-sidecar-feature-compiler",
+      "tree": "root",
+      "path": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
       "markers": [
         "SUPERSEDED"
       ]

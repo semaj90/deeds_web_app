@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.graphify-symbol-shards.v1",
+  "manifestChecksum": "sha256:a4a95001c242c527b027feab3bca730b3032cef0a915b0281c5476b3623530b9",
+  "sourceCount": 859,
+  "shardSize": 250,
+  "shards": [
+    {
+      "shardId": "GRAPHIFY-BASELINE-a4a95001c242-0001",
+      "manifestChecksum": "sha256:a4a95001c242c527b027feab3bca730b3032cef0a915b0281c5476b3623530b9",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "extractorRevision": "sha256:333b5e8ead3cd62f5e965db6e63ea8d6072e1ed768ae5a32df49ae9a6abfca20",
+      "offset": 0,
+      "maxFiles": 250,
+      "shardChecksum": "sha256:886fee280f54d08578cb55676048b148d7055812efc89ea4a927168dbe5aec85",
+      "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+      "queueStatus": "PLANNED_NOT_ENQUEUED"
+    },
+    {
+      "shardId": "GRAPHIFY-BASELINE-a4a95001c242-0002",
+      "manifestChecksum": "sha256:a4a95001c242c527b027feab3bca730b3032cef0a915b0281c5476b3623530b9",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "extractorRevision": "sha256:333b5e8ead3cd62f5e965db6e63ea8d6072e1ed768ae5a32df49ae9a6abfca20",
+      "offset": 250,
+      "maxFiles": 250,
+      "shardChecksum": "sha256:806ef740406f3068c20413d4beb7925987be3ac99dc7d0eb0b60e44934f577f4",
+      "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+      "queueStatus": "PLANNED_NOT_ENQUEUED"
+    },
+    {
+      "shardId": "GRAPHIFY-BASELINE-a4a95001c242-0003",
+      "manifestChecksum": "sha256:a4a95001c242c527b027feab3bca730b3032cef0a915b0281c5476b3623530b9",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "extractorRevision": "sha256:333b5e8ead3cd62f5e965db6e63ea8d6072e1ed768ae5a32df49ae9a6abfca20",
+      "offset": 500,
+      "maxFiles": 250,
+      "shardChecksum": "sha256:a1c3847bd8311a6051da5215e6ec936ddd8ec1fc20814b88cd1373bc0b52c5f6",
+      "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+      "queueStatus": "PLANNED_NOT_ENQUEUED"
+    },
+    {
+      "shardId": "GRAPHIFY-BASELINE-a4a95001c242-0004",
+      "manifestChecksum": "sha256:a4a95001c242c527b027feab3bca730b3032cef0a915b0281c5476b3623530b9",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "extractorRevision": "sha256:333b5e8ead3cd62f5e965db6e63ea8d6072e1ed768ae5a32df49ae9a6abfca20",
+      "offset": 750,
+      "maxFiles": 109,
+      "shardChecksum": "sha256:e15593e10b6da0111572d2bf2e42a7477f9e875672258aecbd522a58811ce2b0",
+      "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+      "queueStatus": "PLANNED_NOT_ENQUEUED"
+    }
+  ]
+}

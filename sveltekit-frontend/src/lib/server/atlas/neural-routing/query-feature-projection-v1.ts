@@ -137,7 +137,7 @@ export function projectQueryFeaturesV1(query: string): QueryFeatureProjectionV1 
 
     tokenCount: tokens.length,
     charCount: normalized.length,
-    identifierCount: tokens.filter((token) => IDENTIFIER.test(token) && (token.includes('.') || /[A-Z_$]/.test(token) || token.includes('_'))).length,
+    identifierCount: tokens.filter((token) => IDENTIFIER.test(token) && /[.A-Z_$]/.test(token)).length,
     quotedSpanCount: (normalized.match(/(['"`])(?:(?!\1).)*\1/g) ?? []).length,
     pathLikeCount: (normalized.match(PATH_LIKE) ?? []).length,
     extensionCount: (normalized.match(EXTENSION) ?? []).length,

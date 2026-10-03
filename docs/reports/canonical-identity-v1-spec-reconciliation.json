@@ -1,0 +1,114 @@
+{
+  "schema": "atlas.canonical-identity-v1-spec-reconciliation.v1",
+  "generatedAt": "2026-09-22T00:00:00Z",
+  "mode": "READ_ONLY",
+  "gate": "CANONICAL-IDENTITY-V1-SPEC-RECONCILIATION",
+  "draftStatus": "SPEC_DRAFT (unchanged, not signed off by this reconciliation -- reconciliation narrows scope, does not approve)",
+  "sourceEntries": [
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md lines 15866-15871 (CANONICAL-IDENTITY-V1-SPEC-01)",
+    "lines 15873-15876 (SPEC-01 REVISION)",
+    "line 15878 (CANONICAL-IDENTITY-V1 DECISIONS)",
+    "line 15883 (CANONICAL-IDENTITY-CANARY-01 = BLOCKED_NOT_PROVEN, 2026-09-21 snapshot)",
+    "lines 15991-16105 (S01-08F through S01-08K-FREEZE + HANDOFF-2026-09-22-STEP01-SESSION3/4 -- the actual resolving work, dated after the draft and the 2026-09-21 canary snapshot)"
+  ],
+  "decisions": [
+    {
+      "decisionId": "OWNER_LOCATION",
+      "question": "Where does the unifying CanonicalIdentityV1 discriminated-union envelope type live?",
+      "draftWording": "packages/atlas-core/src/identity/canonical-identity-v1.ts, exported from packages/atlas-core/src/index.ts; extend the existing feature-identity.ts, not add a parallel owner.",
+      "status": "GENUINELY_UNRESOLVED_BUT_NARROW",
+      "evidence": "Live-checked: packages/atlas-core/src/identity/ contains only feature-identity.ts and feature-identity.spec.ts -- no canonical-identity-v1.ts exists. The component identities the envelope would discriminate over (stableFileId, sourceRevision qualification, symbol identity) are each separately built and proven under sveltekit-frontend/src/lib/server/atlas/identity/ (stable-file-identity-mint-v1.ts, packet-key-builder.ts, symbol-revision-qualification-v1.ts). Not a semantic decision -- a small, mechanical assembly/consolidation step: write the discriminated envelope type as a thin composition over the already-proven pieces at the decided location. Does not block the canary (the canary can reference the underlying proven pieces directly)."
+    },
+    {
+      "decisionId": "STABLE_FILE_ID_DERIVATION",
+      "question": "How is stableFileId assigned/derived?",
+      "draftWording": "'The exact live assignment/derivation rule is OPEN; do not invent values.' (CANONICAL-IDENTITY-V1 DECISIONS point 2, 2026-09-21).",
+      "status": "STALE_DRAFT",
+      "existingOwner": "sveltekit-frontend/src/lib/server/atlas/identity/stable-file-identity-mint-v1.ts",
+      "evidence": "This is exactly the case the operator predicted. S01-08G (design) through S01-08I (canonical writer, commit 8bebc06741, corrected da25db92ed) resolved this fully, AFTER the draft text above was written: stableFileId = random UUIDv7, minted once on an explicit CREATE lifecycle event, never derived from path/content hash/sourceRevision/treeNodeId/packetKey/graphify_files.file_id -- matching the draft's own prohibition list exactly, just with the 'OPEN' derivation rule now closed. Verified live this pass: 5 real git commits exist (93797b4108, 8bebc06741, da25db92ed, 5f3875e69e, f8bcf9e0db), the file exists on disk, the 4 target tables (atlas_repository_identity, atlas_stable_file_identity, atlas_stable_file_revision_binding, atlas_stable_file_alias) exist live in Postgres (0 rows each, consistent with 'schema applied, population not yet authorized'). Owner census (canonicalStableFileWriterOwnerCount == 1) confirms no second writer exists. Replace the draft's 'OPEN' language with a pointer to this owner -- do not reopen this question or invent a second derivation scheme.",
+      "doesNotInvent": "This reconciliation did not invent or propose a new derivation rule -- it points to the one that was already built and proven in the same tasks.md file, later in the same document."
+    },
+    {
+      "decisionId": "STABLE_FILE_LIFECYCLE_SEMANTICS",
+      "question": "Does stableFileId survive rename/move? Does delete+recreate mint a new id? Is cross-repo same-path distinct?",
+      "draftWording": "Not explicitly enumerated in the original draft as a lifecycle model -- implied by 'survives content changes, workspace/source revisions and verified MOVED_PATH/HISTORICAL_PATH aliases.'",
+      "status": "ALREADY_PROVEN_ELSEWHERE_PARTIAL",
+      "evidence": "CREATE and MODIFY (same stableFileId, new revision binding) are implemented and tested (S01-08I). RENAME/alias-writing and TOMBSTONE are explicitly NOT implemented yet -- deferred to S01-08L (the 6-fixture lifecycle proof: MODIFY, RENAME, DELETE+RECREATE, CROSS-REPOSITORY-SAME-PATH, NESTED-REPOSITORY, CONCURRENT-CREATE), which is itself blocked behind the S01-08K population-apply operator token. Path-only identity resolution is structurally forbidden (sourceIdentityKey is not caller-suppliable, always computed internally as repositoryId:canonicalSourceRef). Honest split: the MODEL is decided and partially code-proven; the RENAME/TOMBSTONE fixtures are not yet empirically proven against live data. Do not treat 'rename preserves stableFileId' as proven live -- it is designed and fixture-planned, not yet run."
+    },
+    {
+      "decisionId": "TREE_NODE_ID_CANONICAL_STATUS",
+      "question": "Is treeNodeId ever canonical source-object identity?",
+      "draftWording": "'Open decisions unchanged: ... whether treeNodeId is ever canonical' (line 15876).",
+      "status": "STALE_DRAFT",
+      "evidence": "The SAME document, 2 lines earlier (line 15878, CANONICAL-IDENTITY-V1 DECISIONS point 3), already answers this: 'canonical structural occurrence coordinate YES; canonical source-object identity NO ... never substitutes for stableFileId, stableSymbolId, symbolVersionId or canonicalChunkId.' The draft's own later 'open decisions unchanged' line was not updated after its own earlier decision was recorded -- an internal staleness, not an external one. Reconciled: treeNodeId's canonical status is DECIDED (structural-occurrence-only), not open."
+    },
+    {
+      "decisionId": "PACKET_SOURCE_REVISION_QUALIFICATION",
+      "question": "Is packet_key/source_revision qualification mechanism proven?",
+      "draftWording": "Not directly addressed in the original SPEC-01 draft (packetKey is described only as a 'JOIN/PROJECTION identity, not the universal root').",
+      "status": "ALREADY_PROVEN_ELSEWHERE",
+      "evidence": "This session's own MMR1.8 gate (docs/reports/packet-writer-source-revision-authority-v1.json): the admission chain WorkspaceSourceBindingV1 -> buildSemanticPacketWriteAdmissionV1() -> SemanticPacketWriteAdmissionV1.sourceRevision -> persistAdmittedSemanticPacketEmbedding() -> atlas_packets.source_revision is CODE_PATH_PROVEN, live-DB-tested (15/15). Production caller adoption is separately UNWIRED (tracked as its own new task, PACKET-WRITER-PRODUCTION-OWNER-01, split out of MMR1.8 this same pass -- not a semantics question, an adoption question). Per this session's own atlas-feature-intelligence:138 gate, the DOMINANT live packet_key formula (packet: + SHA256(source_ref).slice(0,12), 94.6% of rows, 500/500 sample match) does NOT survive path changes -- a real, separate, already-recorded finding, distinct from the sourceRevision-qualification question answered here."
+    }
+  ],
+  "existingOwners": [
+    { "identity": "RepositoryIdentityV1", "owner": "stable-file-identity-mint-v1.ts :: mintOrReuseRepositoryIdentityV1", "mechanism": "random UUIDv7, unique-constrained on source_authority_repo_id, 23505-safe", "status": "PROVEN" },
+    { "identity": "StableFileIdentityV1", "owner": "stable-file-identity-mint-v1.ts :: mintOrBindStableFileV1", "mechanism": "random UUIDv7, minted on explicit CREATE only, admission-verified against WorkspaceSourceBindingV1 before mint", "status": "PROVEN (CREATE/MODIFY); RENAME/TOMBSTONE fixture-planned, not yet empirically proven" },
+    { "identity": "CurrentSourceAuthorityV1", "owner": "S01-07 (current-source-authority-v1.ts + sealed cohort)", "status": "CURRENT_SOURCE_AUTHORITY_PROVEN (per line 15939 of the same tasks.md)" },
+    { "identity": "WorkspaceSourceBindingV1", "owner": "workspace-source-binding-v1.ts", "mechanism": "Zod superRefine binds sourceRevision===sha256(contentDigest), workspaceRevision===sha256(sortedManifestDigest), independently", "status": "PROVEN (this session's MMR1.8 gate)" },
+    { "identity": "SymbolIdentityV1 / SymbolVersionV1", "owner": "GIS/symbol-registry authority (nomination -> resolution -> ids), per SPEC-01 REVISION point 3", "status": "PARTIALLY BLOCKED -- S01-09 audit result was SYMBOL_IDENTITY_BLOCKED (line 15945); S01-10 series has since made real progress (S01-10E applied, 208 rows repaired) but a 'final S01-09 rerun' is still explicitly queued, not yet done" },
+    { "identity": "packet_key", "owner": "packet-key-builder.ts (computePacketKey, 64-hex scheme) OR the live-dominant packet:+SHA256(source_ref).slice(0,12) scheme -- TWO SCHEMES COEXIST", "status": "OWNER_CONFLICT (this session's separate manual-migration-reconciliation and atlas-feature-intelligence:138 findings -- flagged there, not re-litigated here, but noted as a real, live, unresolved multi-owner situation the envelope spec's 'exactly one owner is named' gate condition has not actually met for packet_key specifically)" },
+    { "identity": "CandidateOrdinal / representation / execution / transport ids", "owner": "explicitly non-canonical per SPEC-01's own text (lines 15867-15869), reaffirmed consistently through every later entry read in this pass", "status": "PROVEN (by textual consistency across the whole document, no contradiction found)" }
+  ],
+  "staleDraftItems": [
+    "STABLE_FILE_ID_DERIVATION (see decisions[] above) -- resolved by S01-08G/I, later in the same document.",
+    "TREE_NODE_ID_CANONICAL_STATUS (see decisions[] above) -- resolved by the draft's own later paragraph, never back-referenced."
+  ],
+  "conflicts": [
+    {
+      "type": "PACKET_KEY_MULTIPLE_SCHEMES",
+      "detail": "packet-key-builder.ts::computePacketKey() (64-hex, 3-field hash) and the live-dominant packet:+SHA256(source_ref).slice(0,12) scheme both exist and neither is formally retired. Not a CANONICAL_IDENTITY_SPEC_CONFLICT in the sense of contradicting the frozen semantics (both schemes still treat packet_key as a JOIN/PROJECTION identity, not universal root, consistent with the spec) -- but it does mean the spec's own gate condition 'exactly one owner is named' is not yet true for packet_key. Recorded, not resolved here -- resolving it is out of this reconciliation's scope (identity SEMANTICS were reconciled; this is an identity IMPLEMENTATION multiplicity, a separate concern already tracked in this session's other two gates)."
+    }
+  ],
+  "genuineOperatorDecisions": [
+    {
+      "question": "Authorize the S01-08K population apply (24,456 rows, frozen manifest, checksum sha256:33aa6861...)?",
+      "whyCodeCannotDecide": "This is a live-data mutation decision (minting real stableFileId/repositoryId rows for the first time), not an identity-semantics question -- the semantics and the exact algorithm are already frozen and code-proven; only the operator's authorization to execute a real write remains.",
+      "options": ["Supply the exact token 'apply S01-08K stable file population'", "Defer indefinitely", "Request changes to the frozen manifest first"],
+      "consequences": "Until authorized, S01-08L (lifecycle proof), S01-08M (FK wiring), and the eventual identity canary (S01-11/S01-12, formerly named CANONICAL-IDENTITY-CANARY-01) all stay blocked -- they need real populated rows to test against.",
+      "tasksBlocked": ["S01-08L", "S01-08M", "S01-10B-followup", "final S01-09 rerun", "S01-11", "S01-12/CANONICAL-IDENTITY-CANARY-01"]
+    },
+    {
+      "question": "PACKET-WRITER-PRODUCTION-OWNER-01 -- which runtime route/job/event becomes the authorized caller of persistAdmittedSemanticPacketEmbedding()?",
+      "whyCodeCannotDecide": "This is a product/architecture ownership decision (which existing or new event is the right trigger), not something derivable from existing contracts.",
+      "options": ["Wire the existing admin batch-embeddings route", "Build a dedicated packet materializer event", "Trigger from Graphify projection completion", "Other"],
+      "consequences": "Until decided, atlas_packets.source_revision stays unpopulated for all new packets even though the writer mechanism is proven correct.",
+      "tasksBlocked": ["PACKET-WRITER-PRODUCTION-OWNER-01 itself"]
+    }
+  ],
+  "identityTaxonomy": {
+    "canonicalLifecycleIdentity": ["repositoryId (RepositoryIdentityV1, UUIDv7)", "stableFileId (StableFileIdentityV1, UUIDv7)", "stableSymbolId (GIS/symbol-registry authority)", "packetKey (JOIN/PROJECTION identity only, per spec -- NOT universal root; multiplicity conflict noted above)"],
+    "revisionIdentity": ["workspaceRevision (sha256 of sorted source manifest digest)", "sourceRevision (sha256 of exact content digest)", "symbolVersionId (GIS/symbol-registry authority)", "representationRevision (tracked separately in packetRevision via derivePacketRevisionV1)"],
+    "structuralOccurrenceIdentity": ["treeNodeId -- structural occurrence coordinate only, revision-qualified, never source-object identity (settled)"],
+    "executionLocalIdentity": ["CandidateOrdinal (request-local, assigned after canonical resolution)", "GPU/executor-local row or vector ordinal", "ExecutionIdentity (UUIDv7 execution id)"],
+    "projectionIdentity": ["Qdrant point id", "Neo4j graph node key", "cuGraph ordinal", "topology coordinates (som_cluster/kmeans_cluster/community_id -- confirmed this session to never feed back into packet_key)"],
+    "transportIdentity": ["ACP/MCP/gRPC/QUIC runId/taskId", "RPC request id", "A2A external reference"],
+    "freezeConfirmed": "execution/projection/transport identity != canonical identity; representation identity != lifecycle identity -- consistent across every entry read in this pass, no contradiction found."
+  },
+  "packetRevision": {
+    "qualification": "PROVEN",
+    "writer": "persistAdmittedSemanticPacketEmbedding() (semantic-packet-writer.ts)",
+    "productionCaller": "UNWIRED",
+    "note": "Do not describe this as a source-revision-mechanism defect -- it is a production-adoption gap, tracked separately as PACKET-WRITER-PRODUCTION-OWNER-01."
+  },
+  "packetProductionOwnerCandidates": [
+    { "candidate": "api/admin/batch-embeddings/embed/+server.ts", "classification": "ADMIN_TRIGGER_ONLY", "note": "Manual admin action only, not a systematic event; already explicitly defers persistence via its own code comment." }
+  ],
+  "canaryReadiness": "CANONICAL_IDENTITY_CANARY_BLOCKED_UPSTREAM_OWNER",
+  "canaryReadinessRationale": "Identity SEMANTICS are frozen -- no genuinely unresolved decision blocks the canary's design. What blocks it is sequencing/authorization: the canary (S01-11/S01-12, the renamed successor to the 2026-09-21 CANONICAL-IDENTITY-CANARY-01 snapshot, which was BLOCKED_NOT_PROVEN before any of the S01-08 work existed) needs real populated stable-file rows to test against, and S01-08K (population apply) is explicitly stopped pending the operator's exact authorization token. S01-08L/M and a final S01-09 symbol-identity rerun are also sequenced before the canary in the already-frozen plan. This is BLOCKED_UPSTREAM_OWNER, not BLOCKED_OPERATOR_DECISION on identity semantics -- the one operator input still needed (the S01-08K token) is an authorization to execute an already-fully-designed write, not a semantics choice.",
+  "canaryDesign": "NOT PRODUCED -- per readiness above, design is deferred until S01-08K/L/M and the S01-09 rerun complete. The already-frozen S01-08G proofPlan (6 lifecycle fixtures) and the original CANONICAL-IDENTITY-V1 DECISIONS point 5 candidate-selection rule (one real candidate with PROVEN workspaceRevision+sourceRevision and either a proven symbol or proven chunk identity) remain the applicable design once unblocked -- not superseded, not redesigned here.",
+  "writes": { "postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0, "graphifyRuns": 0 },
+  "scopeLimits": [
+    "Did not re-verify every individual S01-08*/S01-09/S01-10 claim line-by-line against live data -- treated the already-committed, git-log-verified work (5 real commits confirmed, files confirmed on disk, 4 target tables confirmed live at 0 rows) as trustworthy primary evidence per this task's own instruction to reconcile against EXISTING owners rather than re-derive them.",
+    "Did not resolve the packet_key multi-scheme conflict (packet-key-builder.ts vs the live-dominant SHA256(source_ref) scheme) -- recorded as a real conflict, not a semantics blocker, out of this reconciliation's scope."
+  ]
+}

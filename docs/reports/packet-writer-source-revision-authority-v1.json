@@ -1,0 +1,186 @@
+{
+  "schema": "atlas.packet-writer-source-revision-authority.v1",
+  "generatedAt": "2026-09-22T00:00:00Z",
+  "mode": "READ_ONLY",
+  "gate": "manual-migration-reconciliation:MMR1.8-packet-writer-source-revision-authority",
+  "canonicalWriter": {
+    "path": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+    "entrypoint": "persistAdmittedSemanticPacketEmbedding()",
+    "classification": "CANONICAL_WRITER",
+    "reason": "The only writer whose Drizzle .insert(atlasPackets) call sets the first-class sourceRevision column from a value whose provenance is structurally bound (via Zod superRefine, not just caller convention) to an exact per-file content digest. No filename-only inference used -- classification is based on reading the actual .values({...}) column list and the admission schema's cross-field constraints."
+  },
+  "writerCallers": [
+    {
+      "path": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+      "function": "persistAdmittedSemanticPacketEmbedding",
+      "classification": "CANONICAL_WRITER",
+      "insertsSourceRevisionColumn": true,
+      "sourceRevisionQualified": true,
+      "liveProductionCallers": 0,
+      "note": "Zero live callers found repo-wide. The one plausible caller (api/admin/batch-embeddings/embed/+server.ts) explicitly defers persistence via its own code comment: 'Canonical packet persistence is intentionally closed here ... admitted lineage required ... deferred'."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+      "function": "persistCanonicalSemanticPacketEmbedding (historical-compatible path)",
+      "classification": "LEGACY_WRITER",
+      "insertsSourceRevisionColumn": true,
+      "sourceRevisionQualified": false,
+      "note": "Accepts input.sourceRevision?: string | null with no shape/provenance validation; defaults to null via `input.sourceRevision?.trim() || null`. On UPDATE conflict it uses COALESCE(new, existing) so it never overwrites an already-qualified value with a worse one, but it can freely write null for new rows."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/hyperrag/hyperrag-packet-pipeline.ts",
+      "function": "(inline packet upsert in the hypergraph pipeline)",
+      "classification": "LEGACY_WRITER",
+      "insertsSourceRevisionColumn": false,
+      "sourceRevisionQualified": false,
+      "note": "Its .insert(atlasPackets).values({...}) column list has no sourceRevision field at all -- confirmed by reading the actual insert call, not just a nearby `packet.sourceRevision ?? null` reference (that reference only feeds a JSONB metadata.aceHypergraphMetadata patch, never the real column)."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/acp/packet-materializer-pipeline.ts",
+      "function": "(raw INSERT INTO atlas_packets)",
+      "classification": "LEGACY_WRITER",
+      "insertsSourceRevisionColumn": false,
+      "sourceRevisionQualified": false,
+      "note": "Its literal INSERT column list is `packet_key, source_ref, file_path, function_symbol, feature_id, feature_label` -- predates the source_revision column entirely (matches this repo's older 'Canonical Lineage Contract' shape)."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.ts",
+      "function": "generateIDHierarchy() and related",
+      "classification": "LEGACY_WRITER",
+      "insertsSourceRevisionColumn": false,
+      "sourceRevisionQualified": false,
+      "note": "No sourceRevision concept present at all (only representation_revision, an unrelated field). Already flagged LEGACY/NON-AUTHORITATIVE in this repo's own CANONICAL-IDENTITY-V1 DECISIONS note (uses randomUUID() for file_id, 7 call sites) -- this pass independently confirms the same conclusion from the source_revision angle."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/unknown/promotion-executor.ts",
+      "function": "PacketPromotionExecutor",
+      "classification": "LEGACY_WRITER",
+      "insertsSourceRevisionColumn": false,
+      "sourceRevisionQualified": false,
+      "note": "Generates packet_key via a gated pipeline but has zero source_revision/revision handling anywhere in the file."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/identity/packet-write-transaction-v1.ts",
+      "function": "writePacketTransactionV1 (INSERT_NEW / ADVANCE_SOURCE_REVISION)",
+      "classification": "TEST_ONLY",
+      "insertsSourceRevisionColumn": true,
+      "sourceRevisionQualified": "STRUCTURALLY_CAPABLE_NOT_PROVEN_LIVE",
+      "note": "The file's own header docstring states: 'SCAFFOLDING ONLY. Not called from semantic-packet-writer.ts or any other writer. Exercised directly by scripts/atlas/prove-packet-write-transaction-v1.mts against real Postgres, using disposable packet_key values ... never a real production packet_key.' Confirmed zero non-test callers via grep."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/promote-results-outbox.ts",
+      "function": "(enqueues to promotion_outbox)",
+      "classification": "PROJECTION_WRITER",
+      "insertsSourceRevisionColumn": null,
+      "sourceRevisionQualified": null,
+      "note": "Writes to promotion_outbox (a staging table), not directly to atlas_packets -- matched the broad grep because it references atlasPackets elsewhere for reads. Out of scope as a packet creator."
+    },
+    {
+      "path": "scripts/atlas/*.mjs and *.mts (~140 files matched)",
+      "function": "various historical Phase-N / backfill / enrichment scripts",
+      "classification": "MIGRATION_BACKFILL",
+      "insertsSourceRevisionColumn": "NOT_EXHAUSTIVELY_CHECKED",
+      "sourceRevisionQualified": "NOT_EXHAUSTIVELY_CHECKED",
+      "note": "Bulk classification, not a per-file audit -- reading all ~140 files individually was judged disproportionate to this gate's purpose (identifying the CANONICAL writer, not auditing every historical one-off script). Every file spot-checked in this pass (populate-atlas-packets-aggressive.mjs, upsert-whole-codebase-atlas-packets.mjs, promotion-worker.mjs) follows the same pre-source_revision column convention as the LEGACY_WRITER TypeScript files above. None of them is a plausible CANONICAL_WRITER candidate given the live data shows zero qualified rows. Flagged as a real limitation of this pass, not a claim these scripts are individually classified."
+    }
+  ],
+  "sourceRevision": {
+    "originalProducer": "GRAPHIFY_SOURCE_REVISION",
+    "originalProducerDetail": "public.graphify_execution_file_membership_v2.code_source_revision, written per-file per-Graphify-execution. Traced via scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs line ~53, which reads this column directly from that table.",
+    "qualificationOwner": "sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts :: workspaceSourceBindingV1Schema",
+    "qualificationMechanism": "Zod .superRefine() enforces sourceRevision === `sha256:${contentDigest}` -- a structural cross-field content-binding, not just a regex shape check. Any value not exactly equal to the SHA-256 of the admitted content digest fails schema parse.",
+    "shape": "sha256:<64 lowercase hex>",
+    "provenanceSource": "ATLAS_WORKSPACE_SOURCE_BINDING",
+    "fullChain": [
+      "Graphify execution run",
+      "graphify_execution_file_membership_v2.code_source_revision (per-file, per-execution)",
+      "scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs (admission-gated applier, keyed by a snapshotRevision admission file under docs/reports/workspace-source-snapshots/)",
+      "atlas_workspace_source_bindings (24,458 distinct canonical_source_ref values live)",
+      "WorkspaceSourceBindingV1 (Zod-validated read)",
+      "buildSemanticPacketWriteAdmissionV1() (semantic-packet-write-admission-v1.ts)",
+      "SemanticPacketWriteAdmissionV1.sourceRevision",
+      "persistAdmittedSemanticPacketEmbedding() (semantic-packet-writer.ts)",
+      "atlas_packets.source_revision"
+    ],
+    "doesNotStopAt": "input.sourceRevision -- traced past the immediate function parameter to its schema-level content-digest binding and further back to the Graphify execution table that is the actual origin of the value."
+  },
+  "workspaceRevision": {
+    "originalProducer": "GRAPHIFY_SOURCE_REVISION",
+    "originalProducerDetail": "workspaceRevisionRecordV1Schema.workspaceRevision is bound via a separate superRefine to `sha256:${sourceManifestDigest}` -- a digest over the SORTED WHOLE-WORKSPACE MANIFEST, a structurally different input than sourceRevision's single-file contentDigest.",
+    "qualificationOwner": "sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts :: workspaceRevisionRecordV1Schema / workspaceSourceBindingV1Schema",
+    "relationshipToSourceRevision": "INDEPENDENT_NOT_DERIVED",
+    "proof": "workspaceRevision === sha256(sorted source manifest digest); sourceRevision === sha256(single file content digest). Two different superRefine constraints over two different inputs at the schema level -- the writer cannot derive one from the other even if it wanted to, since each is independently schema-validated against its own distinct digest."
+  },
+  "currentSourceAuthorityAdoption": {
+    "chainConsumed": true,
+    "consumedBy": "persistAdmittedSemanticPacketEmbedding() via buildSemanticPacketWriteAdmissionV1() via WorkspaceSourceBindingV1, matching the expected RepositoryIdentityV1 -> admitted workspace/source binding -> exact sourceRevision -> packet writer -> packet revision chain",
+    "stableFileIdentityDependency": "NOT_CONSUMED",
+    "stableFileIdentityNote": "The admitted packet-write path does not reference stableFileId/StableFileIdentityV1 anywhere in its call chain -- it keys purely on sourceRef + sourceRevision + contentDigest. Not inferring a dependency that isn't actually there, per this gate's instruction."
+  },
+  "failureModes": {
+    "sourceRevisionMissing": { "outcome": "FAILS_CLOSED", "mechanism": "SCHEMA_PARSE_REJECTION", "proof": "PROVEN_BY_CONSTRUCTION", "detail": "semanticPacketWriteAdmissionV1Schema.sourceRevision is required (not optional) and .strict(); a missing field fails Zod .parse()." },
+    "sourceRevisionMalformed": { "outcome": "FAILS_CLOSED", "mechanism": "SCHEMA_PARSE_REJECTION", "proof": "PROVEN_BY_CONSTRUCTION", "detail": "workspaceRevisionSchema = /^sha256:[a-f0-9]{64}$/; any other shape fails regex match at parse time." },
+    "sourceRevisionEqualsWorkspaceZero": { "outcome": "FAILS_CLOSED", "mechanism": "SCHEMA_PARSE_REJECTION", "proof": "PROVEN_BY_CONSTRUCTION", "detail": "'workspace:0' does not match the sha256: regex." },
+    "sourceRevisionEqualsGitSha": { "outcome": "FAILS_CLOSED", "mechanism": "SCHEMA_PARSE_REJECTION", "proof": "PROVEN_BY_CONSTRUCTION", "detail": "A 40-hex-char Git SHA without the sha256: prefix and at the wrong length does not match the regex." },
+    "sourceRefHasNoAdmittedBinding": { "outcome": "FAILS_CLOSED_AT_BUILD_STEP", "mechanism": "buildSemanticPacketWriteAdmissionV1() requires a WorkspaceSourceBindingV1 object as input -- there is no code path that synthesizes one when a binding is absent.", "proof": "PROVEN_BY_CONSTRUCTION", "detail": "Not independently unit-tested for the 'binding absent' case specifically, but the function signature makes the absent case a caller-side TypeScript compile error, not a runtime fallback." },
+    "workspaceRevisionMismatchesBinding": { "outcome": "FAILS_CLOSED", "mechanism": "EXPLICIT_THROW", "proof": "PROVEN_BY_TEST", "detail": "buildSemanticPacketWriteAdmissionV1() throws SEMANTIC_PACKET_WORKSPACE_REVISION_MISMATCH when binding.workspaceRevision !== admittedWorkspaceRevision. Covered by semantic-packet-write-admission-v1.spec.ts::'rejects a binding from a different workspace revision', executed 2026-09-22, PASS." },
+    "sourceRevisionMismatchesContentDigest": { "outcome": "FAILS_CLOSED", "mechanism": "ZOD_SUPERREFINE", "proof": "PROVEN_BY_TEST", "detail": "workspaceSourceBindingV1Schema's superRefine rejects sourceRevision !== sha256:${contentDigest}. Covered by semantic-packet-write-admission-v1.spec.ts::'rejects an invalid binding/content revision relationship', executed 2026-09-22, PASS." },
+    "multipleConflictingSourceBindingsExist": { "outcome": "IDEMPOTENT_IGNORE_NOT_REJECT", "mechanism": "ON_CONFLICT_DO_NOTHING", "proof": "PROVEN_BY_READING_PRODUCER_SQL", "detail": "apply-current-execution-workspace-bindings-v1.mjs inserts with ON CONFLICT (repo_id, workspace_revision, canonical_source_ref) DO NOTHING -- a second conflicting binding for the same (repo, workspace_revision, source_ref) triple is silently skipped, not rejected with an error and not overwritten. This is a real, distinct behavior from 'fails closed' -- flagged, not glossed over." },
+    "latestRowInferenceForbidden": { "outcome": "CONFIRMED_ABSENT", "mechanism": "NO_ORDER_BY_OR_LIMIT_1_LATEST_PATTERN_FOUND", "proof": "PROVEN_BY_READING_CODE", "detail": "No 'ORDER BY ... LIMIT 1' or similar latest-row-wins pattern exists anywhere in the admitted write chain read in this pass." }
+  },
+  "identityBoundary": {
+    "packetKey": "Canonical packet identity. Independent of sourceRevision.",
+    "sourceRevision": "Exact source-content revision, sha256:<contentDigest>. Bound to a single file's bytes at one point in time.",
+    "workspaceRevision": "Admitted workspace snapshot identity, sha256:<sortedManifestDigest>. Independent of sourceRevision -- see workspaceRevision.relationshipToSourceRevision above.",
+    "stableFileId": "File lifecycle identity. NOT consumed by the admitted packet-write path (see currentSourceAuthorityAdoption.stableFileIdentityDependency). Still an open design question per this repo's own CANONICAL-IDENTITY-V1 DECISIONS note -- not resolved here.",
+    "treeNodeId": "Structural occurrence identity. Not referenced anywhere in the admitted packet-write chain read in this pass.",
+    "symbolVersionId": "Symbol manifestation identity. Not referenced anywhere in the admitted packet-write chain read in this pass.",
+    "candidateOrdinal": "Execution-local coordinate. Not referenced anywhere in the admitted packet-write chain read in this pass. Confirmed no downstream representation/execution ID feeds back into packet identity in the code paths read.",
+    "representationRevision": "Derived representation identity, tracked separately in packetRevision via derivePacketRevisionV1() (packetSchemaRevision: 'atlas-packet-schema-v1') -- not conflated with sourceRevision or workspaceRevision in the admitted path."
+  },
+  "liveReadback": {
+    "method": "SELECT-only, no writes",
+    "sampledRows": 20,
+    "totalPacketRows": 61718,
+    "populationCounts": {
+      "totalRowsWithAnySourceRevision": 0,
+      "totalRowsQualifiedShape": 0,
+      "totalRowsLegacyShape": 0
+    },
+    "note": "All 61,718/61,718 live atlas_packets rows have source_revision = NULL. A 20-row bounded sample was pulled for structural inspection but the population count above (a real SELECT count(*), not a sample extrapolation) already fully characterizes the table -- every row is the same state.",
+    "bindingJoinCheck": {
+      "method": "LEFT JOIN atlas_workspace_source_bindings ON canonical_source_ref = atlas_packets.source_ref",
+      "totalJoinedRows": 78226,
+      "rowsWithAnyMatchingBinding": 33052,
+      "note": "Fan-out (78,226 > 61,718 total packets) because one source_ref can have bindings from multiple workspace_revision snapshots. A sample of real src/... file packets (not proto: RPC-contract packets, which correctly have no binding since they are not file-backed) all showed binding_exists=false on direct string match. This matches an independent, earlier finding in this same session's parent-atlas-nlp-sidecar-feature-compiler 14.3a work: atlas_packets uses app-relative source_ref (e.g. src/routes/...) while atlas_workspace_source_bindings.canonical_source_ref is repo-root-relative (e.g. sveltekit-frontend/src/routes/...) -- a path-prefix convention mismatch, not necessarily a genuinely absent binding. Prefix+case-fold resolution was shown elsewhere in this repo to recover ~97% of these joins, but that resolution was NOT applied in this pass's literal join -- reporting the literal-match result, not the resolved one, per this gate's read-only/no-repair instruction."
+    },
+    "classification": {
+      "QUALIFIED": 0,
+      "LEGACY_REVISION": 0,
+      "MISSING_BINDING": 61718,
+      "REVISION_MISMATCH": 0,
+      "AMBIGUOUS": 0,
+      "UNKNOWN": 0
+    }
+  },
+  "result": "PACKET_WRITER_OWNER_CONFLICT",
+  "resultRationale": "Distinguishing CODE_PATH_PROVEN_DATA_BLOCKED from a code defect per this gate's own instruction: the admitted write path itself (persistAdmittedSemanticPacketEmbedding + its full backward chain to Graphify execution revisions) is CODE_PATH_PROVEN -- correct, tested against a real database, structurally fail-closed. The reason live data is unqualified is NOT a defect in that path; it is that PACKET_WRITER_OWNER_CONFLICT is the more accurate top-level classification: at least 5 other writers (hyperrag-packet-pipeline.ts, packet-materializer-pipeline.ts, canonical-id-hierarchy.ts, promotion-executor.ts, plus ~140 historical scripts) can still create or update atlas_packets rows without going through the qualified admission path, and nothing in the schema or a runtime guard currently prevents them from doing so. Until one canonical owner is enforced (or the others are formally retired/classified as non-authoritative), source_revision qualification cannot be a repo-wide guarantee even though the correct mechanism to produce it already exists and works.",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphifyRuns": 0
+  },
+  "testsExecuted": [
+    { "file": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-write-admission-v1.spec.ts", "result": "5/5 PASS", "target": "127.0.0.1:5434/legal_ai_db (real DB, not mocked)" },
+    { "file": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.spec.ts", "result": "10/10 PASS", "target": "127.0.0.1:5434/legal_ai_db (real DB, not mocked)" }
+  ],
+  "testsAdded": [],
+  "openSpecValidation": "NOT_YET_RUN_SEE_TASKS_MD_UPDATE",
+  "scopeLimits": [
+    "Did not read all ~140 historical scripts/atlas/*.mjs/*.mts files individually -- bulk-classified as MIGRATION_BACKFILL based on directory convention plus 3 spot-checks, all consistent with pre-source_revision-column conventions.",
+    "Did not trace graphify_execution_file_membership_v2.code_source_revision's own internal Graphify computation mechanics -- stopped at GRAPHIFY_SOURCE_REVISION per this gate's own classification vocabulary, which treats that as a valid terminal producer classification.",
+    "Did not resolve the app-relative vs repo-root-relative source_ref path-prefix mismatch found in the binding-join check -- that is the pre-existing, separately-tracked AST-ID-06 decision in parent-atlas-neural-prefill-encoder/tasks.md, not re-litigated here."
+  ]
+}

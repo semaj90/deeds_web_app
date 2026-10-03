@@ -1,0 +1,88 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runTimestamp": "2026-09-23T00:13:43Z",
+  "status": "IN_PROGRESS",
+  "pivot": {
+    "from": "parent-atlas-deep-research-ingestion",
+    "to": "parent-atlas-transport-memory-boundaries",
+    "reason": "The remaining deep-research handoff requires a bounded live Postgres admission/readback; ACP-02 had an independent fixture-testable projection seam and could be advanced without datastore writes or container rebuilds."
+  },
+  "workboardSnapshot": {
+    "changes": 88,
+    "tasks": 9458,
+    "checked": 6129,
+    "open": 3329,
+    "actionable": 2516,
+    "waiting": 756,
+    "superseded": 55,
+    "progressFraction": 0.648022837809262,
+    "source": "docs/reports/openspec-workboard-v1.json",
+    "generatedAt": "2026-09-23T00:06:20.418Z",
+    "refreshAttempt": "FAILED_BEFORE_WRITE: Node writeFileSync returned UNKNOWN for the 15,288,096-byte report; existing snapshot preserved. C: had 20,486,094,848 bytes free."
+  },
+  "changeSnapshot": {
+    "name": "parent-atlas-transport-memory-boundaries",
+    "schema": "spec-driven",
+    "complete": 27,
+    "total": 90,
+    "remaining": 63
+  },
+  "workThisRun": [
+    {
+      "item": "ACP-02A projection-only identifier mapping",
+      "result": "IMPLEMENTED_AND_FIXTURE_PROVEN; ACP-02B_RUNTIME_WIRING_OPEN",
+      "evidence": [
+        "packages/parent-atlas/src/core/agentic-workflow-control-plane.ts",
+        "packages/parent-atlas/test/acp-identity-projection-v1.test.mjs",
+        "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md"
+      ],
+      "tests": "Package TypeScript compile passed; 6/6 Node tests passed; strict OpenSpec validation passed.",
+      "contract": "Checksummed external task/action refs map to the existing Kanban task-attempt task/run/receipt and WorkflowActionEvent run/action/receipt, carrying a supplied 64-hex ContextManifest checksum. It fails closed on run/receipt/ref/checksum mismatches and explicitly emits graphIdentity=null, writesPerformed=false, canonicalAuthority=false.",
+      "limitation": "No current ACP runtime caller was wired to resolve/read back the task attempt, actual ContextManifest, and ExecutionReceipt together. The adapter validates the supplied manifest digest format but does not prove it against a manifest object; no live ACP session or persistence is claimed."
+    },
+    {
+      "item": "MEM-01 three-memory taxonomy reconciliation",
+      "result": "DOCUMENTATION_CONTRACT_RECONCILED",
+      "evidence": [
+        "CLAUDE.md historical memory hierarchy section",
+        "AGENTS.md Parent Atlas cache/memory ownership rules",
+        "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md"
+      ],
+      "contract": "Model KV cache is execution-ephemeral; BitFrost/Valkey is disposable residency; PostgreSQL is durable canonical memory. Qdrant/Neo4j remain rebuildable projections and no longer appear as successive memory-authority tiers in the current guidance.",
+      "limitation": "Documentation ownership is reconciled; this does not claim a live runtime measurement of model KV reuse or cache persistence semantics."
+    },
+    {
+      "item": "MEM-02 reproducible manifest / ephemeral KV contract",
+      "result": "CONTRACT_AND_FOCUSED_TEST_PROVEN",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.spec.ts",
+        "sveltekit-frontend/src/lib/server/ai/context-prompt-streamer.ts",
+        "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md"
+      ],
+      "tests": "5/5 ContextManifestV2 tests passed, including unchanged V1 payload retention, deterministic checksum, policy/snapshot sensitivity, and nullable evidence revisions.",
+      "limitation": "The contract and caller's ephemeral cache hints are source/test-proven; live llama-server KV retention/reuse was not measured."
+    }
+  ],
+  "validation": {
+    "packageTypeScriptCompile": "PASS",
+    "focusedTests": "6/6 PASS",
+    "openspecStrict": "PASS: parent-atlas-transport-memory-boundaries",
+    "scopedDiffCheck": "PASS",
+    "workboardGenerator": "FAILED: could not write docs/reports/openspec-workboard-v1.json; existing generated outputs preserved"
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "containerRebuild": false
+  },
+  "nextSelection": {
+    "gate": "ACP_02B_CANONICAL_CONTEXT_AND_RECEIPT_RESOLUTION",
+    "safeNext": "Trace the actual ACP ingress and existing ContextManifest/ExecutionReceipt read owners; wire only if one exact existing caller can supply verifiable records, otherwise record the missing runtime boundary without creating a new owner."
+  }
+}

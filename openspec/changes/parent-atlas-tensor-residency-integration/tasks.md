@@ -772,16 +772,41 @@ is the separate 20×20 topology experiment.
 
 ## Separate lane: Kafka / CDC / Rust sidecar analysis
 
-This workstream is design-only until explicitly opened as its own task.
+Execution tasks now live under the existing
+`parent-atlas-kafka-projection-initiative/tasks.md` owner. PostgreSQL 18 is an
+integration target, not a second canonical owner. Kafka / CDC does not alter the
+current T6c or Graphify proof, and Rust sidecar analysis remains separate from
+the Python / SvelteKit / GPU runtime split. Do not let WAL, bitmap, or AIO
+details redefine `semantic_768` routing proof or turn CDC into canonical
+evidence.
 
-- Kafka / CDC is not part of the current T6c or Graphify sequence.
-- PostgreSQL 18 specifics are not a canonical owner here; they are an integration target only if a
-  separate ingestion lane proves they matter.
-- Rust sidecar analysis is a separate infrastructure lane, not a replacement for the current
-  Python / SvelteKit / GPU split.
-- Do not let bitmap / aio / CDC ideas redefine the `semantic_768` routing proof.
-- If this lane is ever opened, it should start from evidence of a real producer / consumer gap,
-  not from the KMeans or SOM evaluation path.
+## Temporal and hidden-state analysis follow-up (2026-10-02)
+
+- [ ] **TENSOR-WINDOW-01** Define and test bounded event-time sliding-window
+  features over admitted, revision-qualified observations. Specify window,
+  watermark/lateness, deduplication, retention, and replay behavior; consume
+  Kafka/CDC only through `parent-atlas-kafka-projection-initiative`. Window
+  aggregates remain derived features, not evidence or additional retrieval
+  votes.
+- [ ] **TENSOR-DIMENSION-02** Reconcile runtime tensor widths against the
+  named representation contract before materialization: canonical
+  `semantic_768`; derived semantic widths `512/256/128`; separately named
+  `latent_256/128/64`. Reject `383`, block new `384` writes, and retain 384
+  only as explicitly legacy/read-only where an owner proves it is needed.
+  Every report must bind model/representation/input revisions and checksums.
+- [ ] **TENSOR-STATE-03** Analyze hidden activations/state only in bounded,
+  ephemeral execution memory. If useful, emit reviewed aggregate diagnostics
+  (shape, finite-value counts, norm/statistic summaries) with model and input
+  revisions; never persist prompts, hidden thoughts, raw activations, tensors,
+  KV/DeltaNet state, or GPU pointers to PostgreSQL, Kafka, Qdrant, or cache.
+- [ ] **TENSOR-CLASSIFIER-04** Reuse the existing NLP/classifier and
+  PyTorch/ATen owners in
+  `parent-atlas-workstation-domain-classifier/tasks.md`; do not add another
+  classifier/trainer or promote classifier output to canonical evidence.
+- [ ] **TENSOR-RUNTIME-05** Keep LangGraph synthesis CPU-only orchestration.
+  Run tensor analysis through an explicitly registered PyTorch/ATen or RAPIDS
+  executor with runtime/model revision receipts; do not add PyTorch to the
+  LangGraph image merely to make orchestration imports convenient.
 
 ## Sequencing and Gate Order
 
@@ -1019,12 +1044,29 @@ read-only or contract-first until their stated proof exists.
   pressure — a materially different and still-open test.
 - [ ] **GPU-EXP-13** Reconcile semantic HNSW/pgvector/Qdrant executors against
   one CandidateOrdinal universe; HNSW remains an ANN executor, not a new lane.
-- [ ] **GPU-EXP-14** Build a revision-qualified `GraphProjectionArtifactV1`
-  with vertex/edge checksums and an explicit `GraphOrdinal` mapping.
+- [x] **GPU-EXP-14** Build a revision-qualified `GraphProjectionArtifactV1`
+  with vertex/edge checksums and an explicit `GraphOrdinal` mapping. **PROVEN at
+  noncanonical artifact-builder/fixture scope (2026-09-23)** by
+  `python/tests/test_graph_projection_artifact_builder.py` and
+  `python/tests/test_graph_projection_manifest.py`: separate candidate-vs-graph ordinal
+  checksums, dense explicit ordinal mapping, isolated-vertex retention, and Python readback
+  validation against the TypeScript GraphOrdinalMapV1 checksum encoding. No current-source
+  artifact was rebuilt or promoted; see `parent-atlas-graph-runtime-python-consolidation`
+  GPU-EXP-14 for the owning proof and legacy-manifest correction.
 - [ ] **GPU-EXP-15** Prove bounded multi-hop traversal on the frozen graph;
   default depth <=2, expansion <=3, hard maximum <=4, with predecessors/paths.
+  Runtime policy and path-receipt implementation are covered by
+  `python/tests/test_atlas_rapids_graph_runtime.py` and
+  `python/tests/test_graph_projection_manifest.py`; receipt checksum binds graph revision,
+  projection revision, and explicit graph-ordinal-map checksum, and rejects missing bindings.
+  Focused suite passed 20 tests on 2026-09-23. Live frozen-graph execution remains open:
+  8098 reports no resident graph, and the existing artifact is rejected for ambiguous ordinal
+  checksum. No graph was loaded into the live GPU process.
 - [ ] **GPU-EXP-16** Run NetworkX CPU graph parity first, then cuGraph parity;
-  internal renumbering must not escape the projection adapter.
+  internal renumbering must not escape the projection adapter. A bounded fixture compares the
+  adapter's deliberately permuted executor ordinals against NetworkX paths and deterministic
+  receipt replay; its fake cuGraph frame does not prove actual cuGraph parity. Full frozen-artifact
+  NetworkX/cuGraph replay remains open.
 - [ ] **GPU-EXP-17** Define `TopologyCoordinate4V1` only as derived metadata,
   bound to graph/projection/ordinal revisions; it cannot mint identity or votes.
 - [ ] **GPU-EXP-18** Evaluate 4D manifold/SOM expansions against held-out graph

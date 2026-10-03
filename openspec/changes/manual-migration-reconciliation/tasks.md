@@ -171,7 +171,17 @@ Per CLAUDE.md Consolidation Sweep Rule: audit canonical vs. duplicate before pat
     statements manually. Not something to decide unilaterally.
 - [ ] `drizzle/manual/proposed_20260530_task_semantic_packets.sql` (153 lines) → creates `feature_registry`, `workspace_tasks`, `task_semantic_packets`, `task_file_links`, `task_cluster_links`, `agent_pickup_queue`, `agent_run_events`.
   - [ ] Filename is literally prefixed `proposed_` — confirm with repo history / commit log whether this was ever accepted, or is still an open proposal.
-  - [ ] Confirm `agent_run_events` is not a duplicate of the canonical `agent_actions` (already live).
+  - [x] Confirm `agent_run_events` is not a duplicate of the canonical `agent_actions` (already live).
+        Confirmed, not a duplicate. `agent_actions` (live, `\d agent_actions`) is a flat per-tool-call
+        audit log with no FK to any task/workflow entity (session_id, action_type, tool_name,
+        target_file/symbol, result_code, duration_ms). The proposed `agent_run_events`
+        (`drizzle/manual/proposed_20260530_task_semantic_packets.sql:134-149`) is a task-lifecycle
+        event log FK'd to `workspace_task_id`/`pickup_id` referencing `workspace_tasks`/
+        `agent_pickup_queue` -- both themselves not live -- with a typed `event_type`
+        (task_received/summary_generated/files_attached/patch_proposed/validation_run/completed/
+        failed) and a `langfuse_trace_id` column `agent_actions` has no equivalent of. Different
+        grain and purpose; `agent_run_events` also can't be applied standalone today since its FKs
+        target two other not-yet-live tables from the same proposed bundle.
   - [ ] Do not apply without an explicit decision recorded here.
   - [ ] **Live alignment checked 2026-08-31:** `public.feature_registry` is absent; the current Drizzle owner defines a UUID `id` plus unique `feature_key`. `public.kanban_tasks` and its lifecycle tables already exist and are live-aligned, so this proposed file must not be used to recreate or replace the Kanban control plane.
   - [ ] **Shape conflict confirmed 2026-08-31:** current `feature-registry.ts` includes `summary`, `chunk_ids`, `tags`, and `retry_queries`; journal migration `0024_nebulous_mongoose.sql` omits those columns. Select one reconciled owner and generate a new journaled migration only after the empty live migration ledgers are reconciled.
@@ -180,8 +190,30 @@ Per CLAUDE.md Consolidation Sweep Rule: audit canonical vs. duplicate before pat
 ## MMR1.4 - Tier C: needs statement-by-statement review (mutates existing live tables)
 
 - [ ] `drizzle/manual/20260402_indexing_ace_schema_merge.sql` (520 lines) — NOT a pure additive file. Contains `DROP TRIGGER IF EXISTS legal_nodes_tsv_trigger ON public.legal_nodes` and `DROP TRIGGER IF EXISTS legal_chunks_tsv_trigger ON public.legal_chunks` — both `legal_nodes` and `legal_chunks` are confirmed live tables today.
-  - [ ] Full read-through required: what does this file do to `legal_nodes`/`legal_chunks` beyond the trigger drop (recreate with new definition? add columns? just idempotent no-op if the trigger doesn't currently exist)?
-  - [ ] Confirm the 18 `CREATE TABLE IF NOT EXISTS public.*` statements in this file don't collide with anything live (regex-parsed table names during triage were unreliable because they're schema-qualified `public.<name>` — re-extract cleanly with `rg "^CREATE TABLE IF NOT EXISTS public\." drizzle/manual/20260402_indexing_ace_schema_merge.sql`).
+  - [x] Full read-through required: what does this file do to `legal_nodes`/`legal_chunks` beyond the trigger drop (recreate with new definition? add columns? just idempotent no-op if the trigger doesn't currently exist)?
+        Done, read-only, nothing applied. The file adds 2 nullable columns to `legal_nodes`
+        (`tsv tsvector`, `tags_json jsonb`) and 3 to `legal_chunks` (`tsv tsvector`, `summary
+        text`, `qdrant_point_id text`) via `ADD COLUMN IF NOT EXISTS`, then `CREATE OR REPLACE
+        FUNCTION` for 2 tsv-update functions and drop+recreate their triggers. Checked each
+        against live schema (`\d public.legal_nodes`, `\d public.legal_chunks`): **partially
+        already applied**. `legal_nodes.tsv`/`tags_json` and `legal_chunks.summary`/
+        `qdrant_point_id` already exist live -- those 4 `ADD COLUMN`s would be no-ops.
+        **`legal_chunks.tsv` does NOT exist live** -- that one `ADD COLUMN` would be a real,
+        new mutation. **Neither trigger exists live** (`SELECT tgname FROM pg_trigger WHERE
+        tgname IN ('legal_nodes_tsv_trigger','legal_chunks_tsv_trigger')` → 0 rows) -- applying
+        this file would newly wire live auto-population-on-write behavior for both tables that
+        does not exist today, not just recreate an existing trigger. This is the real live
+        behavioral change the file's own last bullet (explicit sign-off required) is guarding
+        against -- not the column adds, which are almost entirely already-applied no-ops.
+  - [x] Confirm the 18 `CREATE TABLE IF NOT EXISTS public.*` statements in this file don't collide with anything live (regex-parsed table names during triage were unreliable because they're schema-qualified `public.<name>` — re-extract cleanly with `rg "^CREATE TABLE IF NOT EXISTS public\." drizzle/manual/20260402_indexing_ace_schema_merge.sql`).
+        Confirmed via the given re-extraction: 18 tables (`jurisdictions`, `library_documents`,
+        `library_document_versions`, `legal_nodes`, `legal_chunks`, `legal_definitions`,
+        `legal_glossary`, `case_library_links`, `ingestion_jobs`, `evidence_relationships`,
+        `citation_collections`, `collection_citations`, `citation_tags`, `document_topics`,
+        `embedding_cache`, `yorha_cases`, `yorha_evidence_nodes`, `yorha_evidence_connections`).
+        Queried `pg_tables` for all 18 by name: **all 18 already exist live today** -- every
+        `CREATE TABLE IF NOT EXISTS` in this file is a no-op. Zero collision risk from the
+        table-creation statements; the only real risk is the trigger/column mutation above.
   - [ ] Per Drizzle Safety Rule: review generated/manual SQL before journaling or applying — do this against a throwaway DB snapshot or `legal-ai-postgres18-test` sidecar container first, not directly against `legal_ai_db`.
   - [ ] Only apply after explicit sign-off — this file is the one candidate in the set that can affect data already in production tables, not just add new empty ones.
 
@@ -318,13 +350,116 @@ seven as single-owner candidates requiring review, not as safe-to-apply work.
 - [x] Confirmed the canonical-owner revision migration is additive-only,
   unapplied, and promotion-blocked by
   `audit-canonical-owner-revision-migration-safety-v1.mjs`.
-- [ ] Resolve the packet writer's admitted source-revision input and prove
+- [x] Resolve the packet writer's admitted source-revision input and prove
   bounded readback before considering any migration or packet backfill.
+  **Investigated 2026-09-22 — the mechanism already exists, is proven, and is NOT the
+  remaining gap; the remaining gap is that nothing live calls it.** Traced the real writer
+  chain: `buildSemanticPacketWriteAdmissionV1()`
+  (`sveltekit-frontend/src/lib/server/embedding/semantic-packet-write-admission-v1.ts`) takes
+  a `WorkspaceSourceBindingV1` (the same `atlas_workspace_source_bindings`-backed admitted
+  revision source used elsewhere in this repo) and produces a
+  `SemanticPacketWriteAdmissionV1` carrying `sourceRevision: binding.sourceRevision`, which
+  `persistAdmittedSemanticPacketEmbedding()` (`semantic-packet-writer.ts`) writes straight
+  into `atlas_packets.source_revision` via the canonical writer. Ran both specs against the
+  real DB (not a mock — confirmed via the test's own `📡 [DB] Canonical target:
+  127.0.0.1:5434/legal_ai_db` log line): `semantic-packet-write-admission-v1.spec.ts` (5/5)
+  and `semantic-packet-writer.spec.ts` (10/10, including
+  `writes sourceRevision when the caller supplies real revision evidence` and
+  `never fabricates sourceRevision -- leaves it null when the caller has no evidence`) — this
+  IS the bounded readback proof the task asks for, already written and passing on disposable
+  test packet keys. **The actual remaining gap**: `persistAdmittedSemanticPacketEmbedding()`
+  has zero live production callers anywhere in the repo. The one route that could plausibly
+  call it (`src/routes/api/admin/batch-embeddings/embed/+server.ts`) explicitly and
+  deliberately defers persistence with its own comment: "Canonical packet persistence is
+  intentionally closed here... admitted lineage required... deferred: admitted lineage
+  required." This is why all `61,718/61,718` live packet rows remain NULL — not because the
+  admission mechanism is broken or unproven, but because no authoritative producer is wired
+  to call it with real data yet. Deciding/building that producer is separate, larger work
+  (which route or job becomes the authoritative caller) — not attempted here, and not a
+  migration/backfill question at all once framed this way.
 
-Status: `PACKET_REVISION_AXIS_PRESENT_SOURCE_REVISION_UNPOPULATED`;
+  **Full structured re-run 2026-09-22 (read-only, no writes) per the 14-section packet-writer
+  source-revision authority gate — receipt:
+  `docs/reports/packet-writer-source-revision-authority-v1.json`.**
+  - **Writer census**: 5 writers touch `atlas_packets` in TypeScript production code beyond the
+    canonical one — `hyperrag-packet-pipeline.ts`, `acp/packet-materializer-pipeline.ts`,
+    `topology/canonical-id-hierarchy.ts`, `unknown/promotion-executor.ts` (all `LEGACY_WRITER`,
+    none insert a `source_revision` column at all), plus `packet-write-transaction-v1.ts`
+    (`TEST_ONLY`, its own docstring says "SCAFFOLDING ONLY... Not called from
+    semantic-packet-writer.ts or any other writer"). ~140 historical `scripts/atlas/*.mjs`/`.mts`
+    files bulk-classified `MIGRATION_BACKFILL` (3 spot-checked, not exhaustively read — flagged
+    as a scope limit, not silently assumed).
+  - **`source_revision` traced past `input.sourceRevision`, to its real origin**: Graphify
+    execution → `graphify_execution_file_membership_v2.code_source_revision` →
+    `scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs` (admission-gated) →
+    `atlas_workspace_source_bindings` (24,458 distinct `canonical_source_ref`s live) →
+    `WorkspaceSourceBindingV1` (Zod `.superRefine()` enforces `sourceRevision ===
+    sha256:${contentDigest}`, a structural content-binding, not a shape-only check) →
+    `buildSemanticPacketWriteAdmissionV1()` → `persistAdmittedSemanticPacketEmbedding()` →
+    `atlas_packets.source_revision`.
+  - **`workspaceRevision` proven independent, not derived**: bound via a *separate* superRefine
+    to `sha256:${sortedSourceManifestDigest}` (whole-workspace) vs. `sourceRevision`'s
+    single-file `contentDigest` — two different digests over two different inputs, so the writer
+    cannot conflate them even accidentally.
+  - **`CurrentSourceAuthority` chain IS consumed** by the admitted path; `stableFileId` is
+    explicitly NOT consumed anywhere in that chain (not inferred as a dependency that isn't
+    there, per the gate's own instruction).
+  - **Fail-closed behavior**: 5 of 8 named failure modes are `PROVEN_BY_CONSTRUCTION` (Zod
+    schema/regex makes the bad state syntactically unrepresentable — missing field, malformed
+    shape, `workspace:0`, Git SHA, absent binding); 2 are `PROVEN_BY_TEST` (workspace-revision
+    mismatch, content-digest mismatch — both re-run live, PASS); 1
+    (`multipleConflictingSourceBindingsExist`) is real but softer than "fails closed" —
+    the producer script uses `ON CONFLICT ... DO NOTHING`, silently skipping a second
+    conflicting binding rather than erroring or overwriting. Flagged precisely, not rounded up
+    to "fails closed."
+  - **Identity boundary** (packet_key / sourceRevision / workspaceRevision / stableFileId /
+    treeNodeId / symbolVersionId / CandidateOrdinal / representationRevision) recorded in full in
+    the receipt; confirmed no downstream representation/execution id feeds back into packet
+    identity anywhere in the code paths read.
+  - **Live readback (SELECT-only)**: population count (not sample extrapolation) —
+    `61,718/61,718` rows `source_revision IS NULL`, 0 qualified, 0 legacy-shaped garbage — the
+    table is uniformly in one state, so a 20-row sample fully characterizes it. Binding-join
+    check found the same app-relative-vs-repo-root-relative `source_ref` prefix mismatch this
+    session's separate `parent-atlas-nlp-sidecar-feature-compiler` 14.3a work already found — a
+    literal `canonical_source_ref = source_ref` join misses most real bindings, not because they
+    don't exist. Classification: `61,718 MISSING_BINDING`, 0 in every other bucket.
+  - **Result: `PACKET_WRITER_OWNER_CONFLICT`** (not `PROVEN`, not `UNKNOWN`). Distinguishing
+    code defect from data gap per the gate's own instruction: the admitted path itself is
+    `CODE_PATH_PROVEN` — correct, live-DB-tested, structurally fail-closed. The reason live data
+    is unqualified is that 4+ other writers can still create/update `atlas_packets` rows without
+    going through it, and nothing currently prevents that — ownership is unresolved, not the
+    mechanism.
+  - **Tests**: reran the 2 existing specs live (15/15 pass, real DB); no new tests added — the
+    existing coverage already matches this gate's "add focused tests if useful" bar for the
+    fail-closed cases that need a live-DB test rather than pure schema construction.
+  - **Writes**: postgres 0, qdrant 0, valkey 0, neo4j 0, graphifyRuns 0 — matches the receipt.
+
+Status: `PACKET_SOURCE_REVISION_ADMISSION_PROOF_COMPLETE`
+(2026-09-22 bookkeeping correction — this gate's own stated acceptance condition was
+"resolve the admitted source-revision input and prove bounded readback before
+migration/backfill"; that is satisfied — mechanism `PROVEN`, bounded live-DB readback `PROVEN`
+15/15. Keeping this checkbox open because production adoption is separately absent conflated
+two distinct gates. Production-caller adoption is now tracked as its own open task,
+**`PACKET-WRITER-PRODUCTION-OWNER-01`** (below) — it does not reopen or block this one.);
 `migrationApplied=false`; `promotionAllowed=false`; `writesPerformed=false`.
 Evidence: `docs/reports/packet-write-revision-contract-v1.json`,
-`docs/reports/canonical-owner-revision-migration-safety-v1.json`.
+`docs/reports/canonical-owner-revision-migration-safety-v1.json`,
+`docs/reports/packet-writer-source-revision-authority-v1.json`.
+
+### PACKET-WRITER-PRODUCTION-OWNER-01 (new, opened 2026-09-22, split out of MMR1.8)
+
+- [ ] Determine which runtime route/job/event is the authoritative producer allowed to call
+  `persistAdmittedSemanticPacketEmbedding()` (`sveltekit-frontend/src/lib/server/embedding/
+  semantic-packet-writer.ts`). Sole concern of this task — do not wire it here.
+  Qualification mechanism: `PROVEN` (MMR1.8, above). Production adoption: `UNWIRED` — zero live
+  callers repo-wide. One candidate location was read, not wired:
+  `src/routes/api/admin/batch-embeddings/embed/+server.ts` — its own code comment already
+  defers persistence pending "an authoritative producer," classified `ADMIN_TRIGGER_ONLY`
+  (reachable only via manual admin action, not a systematic ingestion/materialization event —
+  not itself a strong CANONICAL_OWNER_CANDIDATE without further design). No other candidate
+  route/job was read in this pass; a full inventory of embedding-materialization,
+  Graphify-projection, source-ingestion, and packet-compiler event paths is future work for
+  this task, not done here.
 
 ### MMR1.9 - Priority-1 lineage disposition recheck — 2026-09-14
 
@@ -393,3 +528,294 @@ Status: `LEGACY_TASK_LINK_SURFACE_ABSENT_PROPOSAL_ONLY`; migration and linking r
 unauthorized; `writesPerformed=false`.
 Evidence: bounded dry-run output `SCHEMA_SURFACE_UNAVAILABLE` and
 `docs/reports/migration-inventory-classification-v1.json`.
+
+### PACKET-KEY-SINGLE-OWNER-CONVERGENCE-01 — 2026-09-22 (read-only)
+
+- [x] Inventoried every `packet_key` producer (7 producers/schemes classified:
+  `CANONICAL_WRITER`, `LEGACY_WRITER`, `COMPATIBILITY_WRITER`,
+  `MIGRATION_BACKFILL`, `CANONICAL_OWNER_CANDIDATE` x2, `DEAD_ORPHAN`).
+- [x] Live census of `atlas_packets.packet_key` (61,718 rows): dominant
+  `packet:<12hex>` scheme 94.6%, `ace:packet:<12hex>` alias-equivalent cohort
+  5.3% (100% covered by `atlas_packet_identity_aliases`), a distinct RPC/proto
+  sub-domain scheme 0.1%, 1 unclassified legacy row. **Zero live rows** for
+  either non-live candidate scheme (`packet-key-builder.ts` hex64,
+  `compute-packet-key.ts` `pkt:`-workspace-scoped).
+- [x] Confirmed `packet-identity-resolver.ts::resolveCanonicalPacketKey()`
+  (built Session 200) already actively rejects both non-live candidate
+  schemes as `StructuralScopedAddressExperimentError` — production code has
+  already decided those two are not canonical, independent of this gate.
+- [x] Determined the live lifecycle contract empirically (no written spec
+  states it): `packet_key = f(source_ref)` only — revision-invariant, but
+  does NOT survive rename and is not derived from `stableFileId`.
+- [x] Added 7 new characterization tests
+  (`packet-key-dominant-scheme.spec.ts`) proving determinism, rename
+  non-survival, revision-invariance, scheme mutual-distinctness, and
+  legacy-prefix hash-equivalence; 9/9 pass with the pre-existing containment
+  spec.
+- [x] `openspec validate parent-atlas-retrieval-lineage-dag-convergence --strict`
+  and `openspec validate manual-migration-reconciliation --strict` both PASS.
+
+Result: `PACKET_KEY_LIFECYCLE_CONTRACT_UNDEFINED` — live data ownership is
+empirically single (not `OWNER_CONFLICT`; the one needed compatibility layer,
+the alias table, already exists and is fully applied), but no written
+contract states whether `packet_key` must survive rename or become
+revision-/`stableFileId`-qualified. This is what blocks judging whether
+`packet-key-builder.ts`'s hex64 candidate is the right future owner — a
+design question, independent of both open operator decisions above
+(S01-08K apply token; `PACKET-WRITER-PRODUCTION-OWNER-01` caller choice).
+No packet_key rewritten, no aliases inserted, no writers changed.
+`writesPerformed=false` across Postgres/Qdrant/Valkey/Neo4j.
+Evidence: `docs/reports/packet-key-single-owner-convergence-v1.json`.
+
+#### PACKET-KEY-SINGLE-OWNER-CONVERGENCE-01 addendum — 2026-09-22 (read-only)
+
+- [x] Separated FORMULA_OWNER / WRITER_OWNER / RESOLVER_OWNER per scheme
+  (v1 conflated these). Found the dominant live formula
+  (`'packet:' + sha256(source_ref).slice(0,12)`) has **no shared canonical
+  module** — it's duplicated inline in 2 scripts (one writer, one read-only
+  joiner) with zero shared function, a real DRY gap even though outputs
+  agree.
+- [x] Backward-traced every live cohort to its actual producing script by
+  matching statement + formula, not regex alone (already true of v1;
+  re-confirmed, and the pasted caution that "62 uncharacterized rows might
+  be computePacketKey() rows" was already false in v1 — those 61+1 rows
+  were already SQL-confirmed as a distinct RPC/proto scheme + 1 legacy row,
+  0 hex64 rows).
+- [x] Broader grep surfaced a **3rd dormant writer**: `phase-17-hyperrag-indexing-e2e.mjs::stablePacketKey()`
+  — a real `INSERT INTO atlas_packets` under a `packet:<32hex>` shape
+  (chunk+content-qualified), not wired to any npm script, 0 live rows
+  (SQL-confirmed). Brings total distinct formula implementations found in
+  source to 6; only 3 have ever produced live rows (dominant, its
+  wrong-prefix bug variant, and the unrelated RPC sub-domain).
+- [x] Audited the 12-hex (48-bit) truncation: `atlas_packets_packet_key_key`
+  is a live UNIQUE constraint (0 duplicates is guaranteed by it, not
+  independent collision-freedom evidence); the writer uses
+  `ON CONFLICT (packet_key) DO NOTHING`, so a genuine truncation collision
+  would silently drop the second file's packet row with no error — an
+  unmeasured, real failure mode, not investigated further (would need a
+  full source_ref-vs-atlas_packets cross-census, out of scope). Birthday-bound
+  collision probability ~6e-6 at current scale (58,362 rows), ~7e-5 at a
+  projected 200k rows.
+- [x] Result (ownership-state axis, distinct from v1's lifecycle-contract
+  axis): `ONE_CANONICAL_OWNER_WITH_LEGACY_COMPATIBILITY` — not
+  `MULTIPLE_ACTIVE_PACKET_KEY_OWNERS` (only 1 scheme is live-active outside
+  the fully-aliased legacy cohort and the unrelated RPC sub-domain), not
+  `CANONICAL_FUTURE_OWNER_NOT_ADOPTED` (no dormant scheme is actually
+  designated as a future replacement — packet-key-builder.ts's own header
+  declines that status), not `PACKET_KEY_OWNER_UNDEFINED` (an owner IS
+  identifiable for live data). This does not contradict v1's
+  `PACKET_KEY_LIFECYCLE_CONTRACT_UNDEFINED` — that's a separate axis
+  (what the key is supposed to mean over time), still true.
+
+Target contract for `PACKET-WRITER-PRODUCTION-OWNER-01` (not selected, per
+operator instruction — kept open in parallel): `event → WorkspaceSourceBindingV1
+→ SemanticPacketWriteAdmissionV1 → ONE canonical PacketIdentityV1 key builder
+(does not exist yet as an exported module) → persistAdmittedSemanticPacketEmbedding()`.
+Extracting the dominant formula into a shared, tested module is a prerequisite
+mechanical step before that production event can be safely authorized — not
+done this pass (would be a code change, out of read-only scope).
+
+`writesPerformed=false` across Postgres/Qdrant/Valkey/Neo4j; no code changed.
+Evidence: `docs/reports/packet-key-single-owner-convergence-v2-addendum.json`.
+
+#### PACKET-KEY-LIFECYCLE-CONTRACT-01 — 2026-09-23 (read-only)
+
+- [x] Traced 7 runtime packet_key **consumers** (bounded/representative, not
+  exhaustive) across every named category: `atlas_packet_registry_projections`
+  schema (FK to `packet_key`, confirming it — not `packet_id` — is the
+  intended join key), `qdrant-packet-projection.ts` (explicit written
+  contract: key must be identical across all representation/collection
+  lanes), `identity-resolution.ts` (precedence `symbol_version_id ->
+  packet_key -> content_hash`), `unified-orchestrator.ts`'s
+  `CandidateIdentityV1` envelope (packetKey/sourceRef/sourceRevision/
+  workspaceRevision tracked as 4 independent co-equal fields), both traced
+  writers (`semantic-packet-writer.ts` upserts on `packetId` via real
+  UPDATE; `upsert-whole-codebase-atlas-packets.mjs` upserts on `packet_key`
+  via `ON CONFLICT DO NOTHING`, never mutating).
+- [x] Classified 8 continuity expectations (A-H): content-revision,
+  workspace-revision, representation-revision, re-embedding, process-restart
+  all `MUST_REMAIN_STABLE`; graph-reprojection, cluster-reassignment
+  `DOES_NOT_CARE`; rename the one genuine `UNKNOWN` (absence of consumer
+  evidence, not conflicting evidence).
+- [x] Evaluated 7 candidate lifecycle models against that evidence:
+  `SOURCE_COORDINATE_PACKET` is the only one supported by every consumer
+  traced (matches the formula, the writer's own "preserve on existing
+  source_ref" comment, the co-equal revision-field pattern everywhere, and
+  a test fixture that explicitly holds `packetKey` fixed while varying
+  `sourceRevision`).
+- [x] **Lifecycle result: `PACKET_KEY_LIFECYCLE_CONTRACT_PROVEN`** — evidence
+  converges cleanly, no consumer conflict found.
+- [x] **Encoding status (separate axis): `CURRENT_ENCODING_COLLISION_POLICY_DEFECT`**
+  — the model is correctly implemented, but `ON CONFLICT (packet_key) DO
+  NOTHING` means a genuine 12-hex truncation collision between two distinct
+  `source_ref`s would silently drop the second file's packet row with no
+  error, receipt, or rejection — matching none of the acceptable collision
+  policies. Required behavior per this repo's own existing fail-closed
+  identity discipline (stable-file-identity-mint-v1.ts's "ambiguity throws
+  rather than picks arbitrarily"): `COLLISION_RECEIPT_AND_REJECT`, with
+  full-width digest as a complementary risk-reduction, not a substitute.
+- [x] **Shared-builder readiness: `SHARED_PACKET_IDENTITY_BUILDER_BLOCKED`**
+  (lifecycle proven, encoding does not satisfy it) — NOT extracted this
+  pass. Recorded the future module's required contract (source_ref-only
+  input, collision-receipt-and-reject behavior, revision/rename explicitly
+  excluded from the key) for whenever it is built.
+- [x] **Production-owner readiness: `PRODUCTION_OWNER_BLOCKED_PACKET_IDENTITY`**
+  — not evaluated for owner selection (out of scope), blocked regardless
+  since the collision-safe key builder it would consume doesn't exist yet.
+- [x] Re-ran the existing `packet-key-dominant-scheme.spec.ts` +
+  `compute-packet-key-containment.spec.ts` (9/9) as regression confirmation
+  — no new tests added (none needed to prove this pass's findings).
+- [x] `openspec validate manual-migration-reconciliation --strict` PASS.
+
+No packet_key rewritten, no builder extracted, no writers changed, no
+S01-08K applied, `PACKET-WRITER-PRODUCTION-OWNER-01` not selected.
+`writesPerformed=false` across Postgres/Qdrant/Valkey/Neo4j.
+Evidence: `docs/reports/packet-key-lifecycle-contract-v1.json`.
+
+## PostgreSQL startup and missing-relation triage (2026-10-02)
+
+- [x] Classified the supplied PostgreSQL 18 log sequence as startup recovery,
+  not evidence of WAL corruption: the prior server shutdown was interrupted;
+  fsync took about 20 seconds, redo completed, and PostgreSQL accepted
+  connections 26 seconds after startup. The live `legal-ai-postgres` health is
+  `healthy`; `pg_isready` succeeds. The repeated `FATAL: ... starting up`
+  entries are connection attempts during recovery, not the root cause.
+- [x] Read-only catalog probe confirmed `public.phase72_error` and
+  `public.concept_evidence` are absent while `public.atlas_ontology_concepts`
+  and `public.atlas_ontology_linked_tuples` exist. `phase72_error` has a manual
+  SQL file but is absent from the active `drizzle/schema.ts`, Drizzle journal,
+  and sidecar migration registry; the separate introspected snapshot is not the
+  active schema authority. The manual SQL also does not match all live route
+  query shapes (for example, callers use `code`, `occurrence_count`, and
+  `last_seen`, while the SQL declares `error_code` and omits the latter two).
+  No authoritative `concept_evidence` migration was found. Existing ontology
+  tables are not assumed semantically interchangeable.
+- [x] Read-only PostgreSQL 18 `atlas_packets` index inventory found duplicate
+  GIN definitions: two `metadata jsonb_ops` indexes at 160 MB each and two
+  `payload jsonb_path_ops` indexes at 21 MB and 17 MB. Current `idx_scan`
+  counters were zero, but the database had just restarted and the stats reset
+  timestamp was unavailable; this is not proof that the indexes are unused.
+  No index was dropped or altered.
+- [ ] **PG-BOOT-01** Correlate the unclean shutdown with Docker Desktop/host
+  lifecycle and identify which clients produced startup-time connection
+  attempts. Keep the existing healthcheck as the readiness gate; add or verify
+  bounded retry/backoff at each client rather than restarting PostgreSQL or
+  modifying its data directory. Do not run `pg_resetwal` or delete/replace the
+  named volume.
+- [ ] **PG-SCHEMA-02** Reconcile `phase72_error.sql` with the migration owner
+  and every route query; choose one typed Drizzle schema that matches the
+  actual API contract, then add a scoped, tracked PostgreSQL 18 migration and
+  validate it against a disposable database with schema/readback checks before
+  requesting any live apply. The relation is currently absent, so a reviewed
+  initial migration would create it; do not write an `ALTER TABLE` against a
+  nonexistent relation or register the current SQL unchanged. Do not run
+  global `drizzle-kit migrate` while the baseline is unresolved.
+- [ ] **PG-SCHEMA-03** Trace the `concept_evidence` startup-intelligence probe
+  to its schema owner. Either query the exact existing canonical relation if
+  its semantics match, or report the metric as unavailable; do not create a
+  parallel concept-evidence table or silently report a missing relation as
+  zero. Add a regression test for the relation-absent path.
+- [ ] **PG-LOG-04** After schema/retry work, collect a fresh bounded log window
+  and confirm the startup race and missing-relation errors no longer recur;
+  preserve unrelated historical log entries as historical observations.
+- [ ] **PG-INDEX-05** Reconcile duplicate JSONB GIN declarations in active
+  Drizzle schema and live PostgreSQL against representative query predicates.
+  Compare `jsonb_ops` and `jsonb_path_ops` operator coverage, capture a stable
+  `pg_stat_user_indexes` observation window and `EXPLAIN (ANALYZE, BUFFERS,
+  SETTINGS)` for real callers, and consider B-tree expression indexes only for
+  identified scalar-key equality/range queries. Produce a proposed cleanup
+  migration and rollback plan; do not drop indexes based on one post-restart
+  zero-scan sample.
+
+Evidence: live `legal-ai-postgres` logs and health, read-only
+`to_regclass` probe, `sveltekit-frontend/drizzle/manual/phase72_error.sql`,
+`scripts/atlas/atlas-startup-intelligence.mjs`.
+
+### Follow-up audit run (2026-10-02)
+
+- [x] Added PostgreSQL and Drizzle audit TOCs at
+  `docs/architecture/POSTGRESQL-TOC.md` and
+  `docs/architecture/DRIZZLE-TOC.md`; linked them from
+  `docs/architecture/ARCH-TOC.md`. These document existing audit owners and
+  do not add a schema authority or perform DDL.
+- [x] Ran `npm run audit:drizzle`. It wrote
+  `docs/reports/postgres-contract-mirrors-report.{json,md}` and checked 11
+  tables: 6 static aligned, 3 live aligned, 0 live unavailable, 13 blockers.
+  Exit status was 1; this is a drift report, not a passing schema gate.
+- [x] Ran `npm run atlas:docs:postgres-index-capability` against PostgreSQL
+  18.4. Read-only report `docs/reports/postgres-index-capability-v1.json`
+  records `writesPerformed=false`, schema capability proven, and two missing
+  index capabilities on `atlas_symbol_versions`:
+  `source_revision` and `qualified_name`. Query plans were captured; a bitmap
+  plan was generatable for 4/4 fixtures, while the planner selected one in
+  1/4. pgvector HNSW capability is present, but exact-vs-HNSW parity remains
+  `NOT_RUN`; PG18 AIO is capable but `NOT_OBSERVED`.
+- [ ] Do not add indexes or apply migrations from these audit results alone.
+  Resolve query owners and predicates, then validate any proposed migration
+  separately against a disposable PostgreSQL instance and perform readback.
+
+### Symbol resolver index follow-up (2026-10-02)
+
+- [x] Ran the dedicated read-only planner
+  `scripts/atlas/audit-postgres-symbol-resolver-index-plan-v1.mjs`. It observed
+  an estimated 479 rows and `Seq Scan` for its three sample predicates
+  (`source_revision`, `qualified_name`, and both together); the report remains
+  `DRAFT_NOT_APPLIED` and explicitly requires resolver call-site/workload
+  evidence before choosing an index shape.
+- [x] Found an existing, unregistered draft in
+  `sveltekit-frontend/drizzle/manual/20260920b_atlas_ontology_schema_alters.sql`
+  proposing standalone B-trees on both fields. The active Drizzle table owner
+  is `sveltekit-frontend/src/lib/server/db/schema/atlas-structural-intelligence.ts`;
+  it already declares composite indexes for `(stable_symbol_id,
+  source_revision)` and `(source_ref, source_revision)`. The draft SQL is not
+  present in `sidecar-migrations.json` and also contains unrelated schema
+  changes, so do not register or apply that file wholesale.
+- [x] A bounded application-source search found no production query applying
+  `WHERE qualified_name = ...` directly to `atlas_symbol_versions`; the
+  `atlas_callable_search` projection has its own qualified-name B-tree. The
+  sample EXPLAIN plans and missing-capability verdict therefore do not alone
+  prove a production bottleneck. Keep the standalone indexes unapproved until
+  the resolver owner confirms a hot query and production-shaped selectivity.
+- [ ] If a real independent lookup is confirmed, add only its matching index
+  declaration to the active Drizzle table and a narrowly scoped tracked
+  migration; rehearse and read back before any live apply.
+
+Evidence: `docs/reports/postgres-symbol-resolver-index-plan-v1.json`;
+`docs/reports/postgres-index-capability-v1.json`;
+`scripts/atlas/audit-postgres-symbol-resolver-index-plan-v1.mjs`;
+`sveltekit-frontend/drizzle/manual/20260920b_atlas_ontology_schema_alters.sql`.
+
+### Contract blocker owner triage (2026-10-02)
+
+- [x] Corrected `scripts/atlas/audit-postgres-contract-mirrors.mjs`: its manual
+  SQL index matcher previously accepted a relation-name prefix, so indexes on
+  `feature_registry_queries` were attributed to `feature_registry`. The matcher
+  now requires a relation boundary. The same audit no longer reports those
+  unrelated indexes, and a schema-only row with no matching manual SQL is now
+  classified `RECONCILE_MIGRATION_LINEAGE`, not `APPLY_EXISTING_SQL`.
+- [x] Re-ran `npm run audit:drizzle`. The report still has 13 blockers; this is
+  not a green schema gate. `feature_registry` remains absent live and has no
+  matching manual SQL source in this audit's scan. The separate baseline gate
+  reports `BASELINE_PROVEN_LIVE_APPLY_BLOCKED`; the migration-owner audit lists
+  `feature_registry` as missing manifest registration. Do not apply a migration
+  based on the contract report's old repair suggestion.
+- [x] Ran the workspace-event schema audit: all three relations are absent and
+  status is `NOT_APPLIED_PLANNED_SIDECAR`; it reports `writesPerformed=false`.
+  The SQL is registered as a sidecar, but no apply was performed.
+- [x] Ran the task-semantic-packet writer matrix against the live schema: 5
+  compatible writers, 3 blocked writers, 1 intent-only writer. Missing fields
+  include graph metadata and obsolete `task_title`/`task_type`/`task_status`;
+  do not add these columns wholesale without retiring or correcting the legacy
+  writers first.
+- [x] Kept `atlas_packets`, `parent_atlas_documents`, and
+  `route_runtime_packets` in `NEEDS_REVIEW`: observed deltas span many columns
+  and indexes, so neither mass Drizzle mirroring nor broad `ALTER` is justified
+  by this report alone. `kanban_tasks` and `nes_chrom_packets` have live
+  indexes not fully represented by their Drizzle/manual source comparison;
+  any code-only mirror update still needs exact definitions and ownership.
+
+Evidence: `docs/reports/postgres-contract-mirrors-report.{json,md}`;
+`docs/reports/feature-registry-baseline-admission-v1.json`;
+`docs/reports/atlas-migration-owner-audit-v1.json`;
+`docs/reports/workspace-event-head-schema-audit-v1.json`;
+`docs/reports/task-semantic-packet-writer-column-matrix-v1.json`.
