@@ -11,6 +11,7 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { EMBEDDING_INPUT_RECIPE_REVISION, buildEmbeddingInputV1, documentString } from './lib/openspec-embedding-input-v1.mjs';
 
 export const FIXTURE_SCHEMA = 'atlas.openspec-card-embedding-fixture.v1';
 const sha256 = (data) => `sha256:${createHash('sha256').update(data).digest('hex')}`;
@@ -36,7 +37,7 @@ export function selectCohort(cards, count = 10, perChange = 5) {
 
 /** EmbeddingGemma document recipe, identical to the corpus writer: title + trimmed text. */
 export function documentInput(card) {
-  return `title: ${card.taskIdentity.changeId} | text: ${card.contextBlob.trim()}`;
+  return documentString(buildEmbeddingInputV1(card));
 }
 
 export function l2(v) {
@@ -113,7 +114,7 @@ async function main() {
   const cohort = selectCohort(report.cards, args.count);
   if (cohort.length < args.count) throw new Error(`COHORT_TOO_SMALL:${cohort.length}`);
   const inputs = cohort.map(documentInput);
-  const summary = { schema: FIXTURE_SCHEMA, dryRun: args.dryRun, cards: cohort.length, changes: [...new Set(cohort.map((c) => c.taskIdentity.changeId))], inputChecksum: sha256(inputs.join('\n')), executor: { kind: 'ollama', model: args.model, baseUrl: args.base } };
+  const summary = { schema: FIXTURE_SCHEMA, dryRun: args.dryRun, cards: cohort.length, changes: [...new Set(cohort.map((c) => c.taskIdentity.changeId))], recipeRevision: EMBEDDING_INPUT_RECIPE_REVISION, inputChecksum: sha256(inputs.join('\n')), executor: { kind: 'ollama', model: args.model, baseUrl: args.base } };
   if (args.dryRun) { console.log(JSON.stringify(summary, null, 2)); return; }
 
   const first = await embed(args.base, args.model, inputs);
