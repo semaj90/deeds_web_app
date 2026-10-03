@@ -141,7 +141,14 @@ function seal<T extends Record<string, unknown>>(value: T): T & { checksum: `sha
   return { ...value, checksum: hash(value) };
 }
 
-export function buildFeatureValidationPlanV1(input: Omit<FeatureValidationPlanV1, 'schema' | 'canonicalWrites' | 'checksum'>): FeatureValidationPlanV1 {
+export function buildFeatureValidationPlanV1(input: {
+  taskId: string;
+  changeId: string;
+  taskRevision: string;
+  featureId: string;
+  sourceTaskRef: string;
+  requirements: z.input<typeof FeatureValidationRequirementV1Schema>[];
+}): FeatureValidationPlanV1 {
   const value = seal({
     schema: FEATURE_VALIDATION_SCHEMA,
     ...input,
