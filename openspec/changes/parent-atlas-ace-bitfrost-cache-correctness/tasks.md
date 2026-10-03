@@ -885,3 +885,26 @@ applied by the coordinating session afterward, not by the fork itself).
 ## Run Receipts
 - wf-mcp-bitfrost-ace-optimization-fork-20260905/MCP_BITFROST_ACE_OPTIMIZATION_FORK#1: MCP/BitFrost/ACE synthesis optimization fork (state=succeeded)
 - [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+## Ontology tuple cache identity and projection revisions (2026-09-30)
+
+- [ ] ONTO-CACHE-REVISION-01: replace the ambiguous single `centroidVersion` in a versioned cache
+      record with independently bound `domainClassifierRevision`, `kmeansRevision`, `somRevision`,
+      `communityRevision`, and `representationRevision` plus `ordinalMapChecksum`. Preserve
+      workspace/packet/source revisions. Each optional projection may be absent, but may not
+      inherit another projection's revision. Verify stale-entry rejection independently per
+      projection.
+- [ ] ONTO-CACHE-KEY-01: keep the current truncated `sourceRefHash` strictly as a locator/index
+      component, never as source identity. Bind the cache key and value to exact canonical
+      `packetKey` where applicable, full `sourceRef`, `sourceRevision`, workspace revision, and
+      content/input checksum. Define collision handling and a versioned namespace/key transition;
+      prove key determinism and that a stale revision cannot hit a current entry.
+
+Cross-owner trust constraint: apply `ONTO-TUPLE-TRUST-01` from the ontology-kernel owner when
+serializing trust labels. A cache may state that it references canonical evidence but must never
+claim canonical authority. PostgreSQL remains the source of truth. No cache writes until the
+current plan, namespace compatibility, and exact readback are separately approved.
+
+Acceptance: schema/key tests exercise collisions, source and revision changes, independent
+projection revision changes, legacy cache records, and fail-closed misses. No live Valkey mutation
+or cache warming is authorized by these gates.

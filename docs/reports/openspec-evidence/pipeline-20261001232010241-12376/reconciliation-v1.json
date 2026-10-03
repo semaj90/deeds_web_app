@@ -1,0 +1,109 @@
+{
+  "schema": "atlas.openspec-evidence-census-reconciliation.v1",
+  "status": "RECONCILIATION_READ_ONLY_NOT_PROMOTABLE",
+  "mode": "BASELINE_TO_REVISION_BOUND_STRICT_COMPARISON",
+  "workspaceRevision": "sha256:84458fbe55b8ceaf1fe3b95a056c320dfe7119ab64b1faddf71f5501de6e93a0",
+  "objectiveBaseline": {
+    "changes": 117,
+    "tasks": 11024,
+    "checked": 7282,
+    "evidenceBackedChecked": 0,
+    "orphanReceipts": 1041,
+    "missingDeclaredIds": 6564,
+    "duplicateIds": 229,
+    "dependencyCycles": 0
+  },
+  "strictCurrent": {
+    "changes": 117,
+    "tasks": 11047,
+    "checked": 7298,
+    "evidenceBackedChecked": 0,
+    "orphanReceipts": 43,
+    "missingDeclaredIds": 6985,
+    "duplicateIds": 20678,
+    "duplicateDiagnosticGroups": 503,
+    "canonicalCollisionGroups": 0,
+    "duplicateClassCounts": {
+      "ARCHIVE_DUPLICATE": 2,
+      "DUPLICATE_DECLARED_ID_CROSS_CHANGE": 248,
+      "DUPLICATE_DECLARED_ID_SAME_CHANGE": 79,
+      "DUPLICATE_DERIVED_KEY": 35,
+      "DUPLICATE_NORMALIZED_CLAIM_CROSS_CHANGE": 11,
+      "DUPLICATE_NORMALIZED_CLAIM_SAME_CHANGE": 35,
+      "NAMESPACE_COLLISION": 93
+    },
+    "dependencyCycles": 0,
+    "unresolvedIdentityTasks": 0,
+    "canonicalKeyCoverage": 11047,
+    "canonicalKeyAdmitted": 11047,
+    "receiptCandidates": 1052,
+    "typedReceipts": 865,
+    "candidateTypedReceipts": 187,
+    "unknownReceipts": 0,
+    "ambiguousBindings": 3,
+    "staleBindings": 4,
+    "blockedTasks": 60,
+    "provenTasks": 0
+  },
+  "deltas": {
+    "changes": 0,
+    "tasks": 23,
+    "checked": 16,
+    "evidenceBackedChecked": 0,
+    "dependencyCycles": 0
+  },
+  "diagnosticDeltas": {
+    "orphanReceipts": -998,
+    "missingDeclaredIds": 421,
+    "duplicateIds": 20449
+  },
+  "comparability": {
+    "changes": "COMPARABLE",
+    "tasks": "COMPARABLE",
+    "checked": "COMPARABLE",
+    "evidenceBackedChecked": "COMPARABLE",
+    "dependencyCycles": "COMPARABLE",
+    "orphanReceipts": "DIAGNOSTIC_CORPUS_AND_BINDING_RULES_DIFFER",
+    "missingDeclaredIds": "BASELINE_DECLARED_ID_SCAN_VS_STRICT_IDENTITY_SCAN",
+    "duplicateIds": "BASELINE_GROUP_COUNT_VS_STRICT_PAIR_COUNT"
+  },
+  "baselineParity": {
+    "changes": true,
+    "tasks": false,
+    "checked": false,
+    "dependencyCycles": true
+  },
+  "interpretation": {
+    "baselineIsHistoricalSnapshot": true,
+    "strictCurrentIsRevisionBound": true,
+    "missingDeclaredIdIsNotMissingIdentity": true,
+    "candidateTypeIsNotProof": true,
+    "ambiguousBindingIsNotProof": true,
+    "projectionsAreRebuildable": true
+  },
+  "source": {
+    "baseline": "docs/reports/openspec-evidence-portfolio-census-v1.json",
+    "census": "docs/reports/openspec-evidence/pipeline-20261001232010241-12376/census-v1.json",
+    "identity": "docs/reports/openspec-evidence/pipeline-20261001232010241-12376/identity-recovery-v1.json",
+    "receiptTypes": "docs/reports/openspec-evidence/pipeline-20261001232010241-12376/receipt-typing-v1.json",
+    "orphanBindings": "docs/reports/openspec-evidence/pipeline-20261001232010241-12376/receipt-binding-v1.json",
+    "predicates": "docs/reports/openspec-evidence/pipeline-20261001232010241-12376/predicate-resolution-v1.json"
+  },
+  "invariants": [
+    "The baseline preserves the original portfolio snapshot and is not rewritten.",
+    "Strict current values require the same workspace revision and deterministic report lineage.",
+    "This comparison does not mutate tasks.md, receipts, PostgreSQL, vectors, MCP state, or workboards."
+  ],
+  "likely_cause": "Historical census counts and revision-bound resolver counts answer different authority questions and require an explicit compact reconciliation layer.",
+  "evidence": [
+    "docs/reports/openspec-evidence-portfolio-census-v1.json",
+    "docs/reports/openspec-evidence/pipeline-20261001232010241-12376/census-v1.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/reconcile-openspec-census-revisions-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/reconcile-openspec-census-revisions-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/reconcile-openspec-census-revisions-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-census-reconciliation-v1.json",
+  "checksum": "sha256:4a450c6994bbd37984e6d1992ab32ef3fbfb5b559ec6340d7afe05e9eaa5bfc5"
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-29T19:00:58.932Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 1,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 1,
+  "sourceRevisionMismatchCount": 1,
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "ts_js": 1
+  },
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 0,
+  "totalSymbolsInserted": null,
+  "plan": [
+    {
+      "fileId": "0b174fd6-4ee8-4a1a-a2bb-997118c514d9",
+      "sourceRef": "scripts/atlas/audit-qdrant-noise.mjs",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:11415c43f6c3280935addf25123222f2d3857d5e9d7c58f0a14e42a41d37c98a",
+      "fileKind": "ts_js",
+      "outcome": "SOURCE_REVISION_MISMATCH",
+      "error": "EXPECTED_sha256:11415c43f6c3280935addf25123222f2d3857d5e9d7c58f0a14e42a41d37c98a_GOT_sha256:f4517b0c374bb9a95e7b6b5f09b77ff08066c22d0dbda3e8b24e782945c3172c"
+    }
+  ]
+}

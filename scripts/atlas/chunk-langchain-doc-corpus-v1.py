@@ -43,21 +43,24 @@ def _title(product: str, url: str, text: str) -> str:
     return f"{product}: {path or product}"
 
 
-def _allowed_prefixes(config: dict[str, Any]) -> dict[str, tuple[str, str]]:
+def _allowed_prefixes(config: dict[str, Any]) -> dict[str, tuple[str, str, str]]:
     corpus = config.get("corpusId")
     authority = urlparse(str(config.get("authority", "")))
     if not corpus or authority.scheme != "https" or not authority.hostname:
         raise ValueError("CORPUS_CONFIG_ID_OR_AUTHORITY_INVALID")
-    sections: dict[str, tuple[str, str]] = {}
+    sections: dict[str, tuple[str, str, str]] = {}
     for section in config.get("sections", []):
         section_id = section.get("id")
         product = section.get("product")
         prefix = section.get("allowedPathPrefix")
+        language = section.get("language", "python")
         if not all(isinstance(value, str) and value for value in (section_id, product, prefix)):
             raise ValueError("CORPUS_SECTION_CONFIG_INVALID")
+        if not isinstance(language, str) or not language.strip():
+            raise ValueError("CORPUS_SECTION_LANGUAGE_INVALID")
         if not prefix.startswith("/") or not prefix.endswith("/") or section_id in sections:
             raise ValueError("CORPUS_SECTION_PREFIX_INVALID")
-        sections[section_id] = (product, prefix)
+        sections[section_id] = (product, prefix, language.strip().lower())
     if not sections:
         raise ValueError("CORPUS_SECTIONS_REQUIRED")
     return sections
@@ -111,7 +114,9 @@ def build_chunks(
         section = prefixes.get(row.get("sectionId"))
         if section is None:
             raise ValueError("FETCH_ROW_SECTION_UNKNOWN")
-        product, allowed_prefix = section
+        product, allowed_prefix, language = section
+        if row.get("language") not in (None, language):
+            raise ValueError("FETCH_ROW_LANGUAGE_MISMATCH")
         url = row.get("canonicalUrl")
         parsed = urlparse(str(url))
         authority = urlparse(str(config["authority"]))
@@ -161,7 +166,7 @@ def build_chunks(
             provider="langchain",
             product=product,
             version_qualification="CURRENT_UPSTREAM",
-            language="python",
+            language=language,
             publisher="LangChain",
             chunk_identity_version="V2",
         )
@@ -195,6 +200,7 @@ def build_chunks(
                 "corpusId": config["corpusId"],
                 "sectionId": row["sectionId"],
                 "product": product,
+                "language": language,
                 "canonicalUrl": url,
                 "sourceManifestSha256": source_revision,
                 "fetchMethod": row.get("fetchMethod"),
@@ -238,6 +244,7 @@ def build_chunks(
         "chunkManifestSha256": "sha256:" + chunk_hasher.hexdigest(),
         "chunkIdentityVersion": "V2",
         "productVersionPolicy": "CURRENT_UPSTREAM@fetch-date; content-bound per page",
+        "languages": sorted({language for _, _, language in prefixes.values()}),
         "canonicalAuthority": False,
         "writes": {"postgres": 0, "qdrant": 0, "valkey": 0, "neo4j": 0, "graphify": 0},
     }

@@ -17,6 +17,8 @@ import { selectFeatureScopedRows } from './feature-scope-query.js';
 import {
   FeatureDocumentManifestSchema,
   getFeatureDocumentEvidence,
+  readFeatureDocumentManifestFile,
+  type FeatureDocumentReadBounds,
   type FeatureDocumentEvidence,
 } from './feature-document-evidence.js';
 
@@ -314,20 +316,23 @@ function deriveNextCommands(featureId: string, evidenceState: z.infer<typeof Fea
 }
 
 export async function buildFeatureDocumentEnrichmentPlan(
-  featureIdInput: string
+  featureIdInput: string,
+  readBounds: FeatureDocumentReadBounds = {},
 ): Promise<BuildFeatureDocEnrichmentPlanResult> {
   const featureId = String(featureIdInput ?? '').trim();
   if (!featureId) {
     throw new Error('featureId is required');
   }
 
-  const evidence = await getFeatureDocumentEvidence(featureId);
+  const evidence = await getFeatureDocumentEvidence(featureId, readBounds);
   if (!evidence.manifestPath) {
     throw new Error(`Feature manifest missing for ${featureId}`);
   }
 
-  const manifestRaw = fs.readFileSync(evidence.manifestPath, 'utf8');
-  const manifest = FeatureDocumentManifestSchema.parse(JSON.parse(manifestRaw));
+  const { raw: manifestRaw, manifest } = readFeatureDocumentManifestFile(
+    evidence.manifestPath,
+    readBounds.maxManifestBytes,
+  );
   const manifestOkf = manifest.okf ?? null;
   const manifestContentHash = sha256Hex(manifestRaw);
   const evidenceState = toEvidenceState(evidence);
@@ -525,9 +530,9 @@ async function loadLibraryDocumentMap(sourceRefs: string[]) {
 
 export async function materializeFeatureEvidenceTuples(
   featureIdInput: string,
-  options?: { maxTuples?: number }
+  options?: { maxTuples?: number; readBounds?: FeatureDocumentReadBounds }
 ): Promise<MaterializeFeatureEvidenceTuplesResult> {
-  const { evidence, plan } = await buildFeatureDocumentEnrichmentPlan(featureIdInput);
+  const { evidence, plan } = await buildFeatureDocumentEnrichmentPlan(featureIdInput, options?.readBounds);
   const manifestOkf = loadManifestOkf(evidence.manifestPath);
   const requestedMaxTuples = options?.maxTuples ?? 16;
   const maxTuples = Number.isFinite(requestedMaxTuples)

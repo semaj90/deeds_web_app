@@ -4970,3 +4970,361 @@ any of the above. This is a verification-only addendum to the existing SESSION-2
 note — narrowing which claims are now known-true (HLL unused-but-named-and-partially-precedented),
 known-false-as-"already exists" (the three V1 types), and still-unverified (everything else in the
 brief), so a future full-budget session doesn't have to re-derive even this much.
+
+## SESSION-211 (2026-09-29): ordinal missing-chunk and Graphify revision re-evaluation — read-only
+
+Rechecked the current canonical projection audit and the exact admitted `repo:root` packet cohort
+before attempting any ordinal regeneration. The current audit is newer than the earlier pasted
+9/11 status: 4/11 predicates are `PASS`, while 7/11 remain below `PASS`. `GRAPH_MANIFEST_SEALED`
+is `PASS`; `ORDINAL_MAP_SEALED` remains `PARTIAL_PROVEN` at 14,564/16,151. The ordinal checksum
+recomputes, the existing 14,564 rows are sequential and unique, and the remaining 1,587 are
+explicitly not admitted into the artifact.
+
+**Read-only live cohort comparison** (admitted snapshot + exact packet source revision + physical
+chunk path, with current filesystem SHA-256 checks):
+- Admitted exact packet rows: 16,151.
+- Packet rows without a physical `codebase_chunk_index` path row: 1,586, representing 1,586
+  distinct source refs (no repeated missing source ref in this set).
+- Of those missing-chunk refs, 1,570 have at least one `graphify_files.code_source_revision`
+  exactly equal to the packet `source_revision`; 16 have no exact Graphify code revision among
+  their Graphify rows. The 16 refs have 24 total Graphify rows, so counts must be by distinct
+  source ref, not raw Graphify row count.
+- Current filesystem bytes match the packet source revision for 15/16 of the no-exact-Graphify
+  refs. `.vscode/tasks.json` is the sole mismatch and is already modified in the worktree; it was
+  not edited or restored. Matching file bytes alone does not authorize changing the Graphify
+  projection or create a chunk row.
+- Separate remaining ordinal rejection: 1 `DUPLICATE_CANONICAL_CHUNK_ID`; it is not part of the
+  1,586 missing-path set and must remain separately classified.
+
+**Existing writer-owner check:** neither obvious bulk writer is a safe bounded repair path for this
+cohort. `scripts/atlas/index-full-repo-for-search.mjs` embeds through mutable
+`embeddinggemma:latest` and writes PostgreSQL plus Qdrant without binding every output to the
+admitted workspace/source revision. `/api/codebase-index/index-stream` starts from Qdrant payloads,
+uses the mutable Ollama model tag, and its PostgreSQL mirror does not set the required source,
+workspace, representation, and lineage revisions. Do not run either writer for this repair and do
+not bypass Graphify projection admission. No existing admitted-source, exact-revision, chunk-only
+materializer was proven in this pass.
+
+**Disposition:** diagnostic gate only; no chunk, lineage, ordinal, Qdrant, cache, or Graphify writes
+were made. Do not mark `ORDINAL_MAP_SEALED` as `PASS`. The next implementation prerequisite is to
+select and harden the existing canonical chunk materialization owner (or explicitly establish its
+absence through the owner contract), with a dry-run restricted to the 1,570 exact-Graphify-revision
+refs and current-byte checks. Keep the 16 Graphify-revision mismatches and the duplicate canonical
+chunk ID in separate reject buckets. Preserve `.vscode/tasks.json` as user work. After a qualified
+chunk-only materialization, rerun the existing packet↔chunk lineage owner, then ordinal audit and
+regeneration; embedding and Qdrant projection remain later, separately gated work.
+
+## ONTOLOGY-POKEDEX-CONTRACT-ALIGNMENT-01 (2026-09-30)
+
+Consolidate the existing `ClassificationEnvelopeV1` and `OntologyLinkedTupleV1` contracts for
+the source-capability/ontology-tuple registry. These are bounded follow-up gates, not permission
+to add a competing registry, table, or graph authority. Preserve the distinction between a tuple
+that references canonical evidence and a canonical authority record; PostgreSQL remains the
+identity, revision, and admission authority.
+
+- [ ] ONTO-TUPLE-IDENTITY-01: reconcile cache `packetId` with tuple/classification `packetKey`.
+      For packet-backed records, use exact canonical `packetKey`; permit a database/numeric packet
+      locator only as explicitly named compatibility metadata when an existing storage API needs
+      it. Keep non-packet document/source tuples valid without inventing packet keys. Version any
+      serialized cache-contract change and prove aliases cannot redirect identity.
+
+  **Owner trace / blocker (2026-09-30):** `AceFullPacket` exposes `packet_id`, but
+  `writeAcePacket()` creates it with `makePacketId(query + Date.now())` and stores the packet in
+  Redis; it does not return a canonical admitted `packetKey`. `taxonomy-topology-packet.ts` currently
+  copies that generated `packet_id` into `OntologyLinkedTupleV1.packetKey` and into the ontology
+  cache plan's `packetId`. This is a confirmed identity-alias defect, not a safe source for a
+  mechanical rename. Keep this gate open until the existing canonical admitted packet resolver
+  supplies the exact key, or the producer is explicitly reclassified as source-only and stops
+  claiming packet identity. Do not cache or promote the generated ID as `packetKey` meanwhile.
+- [ ] ONTO-TUPLE-HYPEREDGE-01: prove one real bounded N-ary `RetrievalEpisode` (or existing
+      equivalent) as an `OntologyLinkedTupleV1`/existing hyperedge using exact canonical participant
+      resolution, roles, source revision, workspace-revision binding through the existing
+      canonical evidence/participant join (add no duplicate field if that join is sufficient),
+      evidence refs, producer revisions, and digests. Preserve the N-ary relation; do not
+      clique-expand participants or promote an unverified proposal.
+- [ ] ONTO-TUPLE-TRUST-01: distinguish `canonical_evidence_bound` from canonical authority in
+      tuple/cache semantics. `ACTIVE_VERIFIED` plus ontology/concept IDs may establish a verified
+      evidence reference only; it must never label a Valkey record or derived tuple as the
+      canonical source of truth. Keep failed/superseded evidence untrusted and test all transitions.
+
+Acceptance: contract tests cover packet-backed and document-only tuples, key/alias mismatch,
+verified-but-derived cache state, participant cardinality, exact revision/digest binding, and
+backward-compatible rejection/translation of legacy serialized forms. No database/cache writes
+or schema migration are implied by these design/proof tasks.
+
+## GRAPHIFY → OaK → DAG → MCP → DSPy/GEPA connective spine (2026-09-30)
+
+Purpose: make Daily Graphify the deterministic, replayable state compiler; use the existing OaK
+catalog and DAG contracts to constrain plans; use MCP as a typed execution transport; and let
+DSPy/GEPA propose better routing/instructions from verified execution outcomes. Learned text,
+classifier scores, nearest neighbors, caches, and MCP responses are never canonical Graphify facts.
+PostgreSQL/source-revision owners and the existing Graphify producers remain authoritative.
+
+### Completion, with explicit denominators
+
+| Measure | Current status | Meaning |
+|---|---:|---|
+| Existing `parent-atlas-ontology-kernel` OpenSpec tasks | **221/330 = 67.0%** | Current OpenSpec apply-instructions count after adding seven spine gates and seven harness gates. Includes unrelated/older ontology gates and is not an E2E readiness score. |
+| This connective spine, end-to-end replay gates | **0/5 = 0% proven** | No receipt was found that replays all five stages against one frozen input and proves identity/revision continuity. This does not mean the component contracts are absent. |
+| Component groundwork | **present in 4/5 areas; partial in all** | Graphify lifecycle receipts, OaK catalog/planner contracts, bounded MCP/runtime receipt contracts, and DSPy/GEPA scaffolding exist; each still lacks the integrated acceptance proof below. |
+
+Do not convert the 69.9% OpenSpec task count into a claim that the connective spine is 69.9%
+complete. Refresh both counts from the current checkout when resuming; task counts can change as
+the larger ledger evolves.
+
+### Existing-owner map and non-duplication rules
+
+| Proposed conceptual stage | Existing owner to reuse | Current evidence / remaining boundary |
+|---|---|---|
+| `DailySeedSnapshotV1` | Admitted workspace snapshot + Graphify execution/lifecycle owner + existing seed/recommendation producers | A snapshot-native execution completed, but only `OPEN`, `SOURCE_SELECTION`, and `INVENTORY` stages are recorded; it is non-canonical and has no legacy run binding. The separate Phase 109B receipt is revision-mismatched and partial. No daily-seed owner has yet been established. `graphify:daily` is an admission-gated apply wrapper, not a pure compiler. |
+| `OakCapabilityRegistryV1` / LUT | `AtlasKernelFunctionCatalogV1`, `KernelFunctionCatalogEntry`, and the existing OaK function/operator catalogs | Checksum-sealed catalogs exist. Prove a read-only, revision-bound capability resolution from the selected Graphify snapshot; do not add a parallel registry solely to adopt the proposed name. |
+| `KernelBoundDagPlanV1` | `KernelBoundDagPlannerV1` and the existing adaptive-DAG plan/executor owners | Planner contract and bounded replay exist. Bind a plan to the frozen Graphify snapshot and exact catalog/kernel revisions, and validate schema compatibility, authorization, acyclicity, evidence dependencies, and budgets before dispatch. Do not add a competing plan schema. |
+| `McpExecutionReceiptV1` | Existing MCP `RuntimeToolReceiptV1`/`OakExecutionReceiptV1` plus `WorkflowActionEventV1` run/action ownership | Typed tool/run receipts exist in separate layers. Prove one bounded MCP tool call is causally bound to the accepted DAG node and preserves plan, registry, snapshot, tool-call, and evidence identities. Compose/reference existing receipts; do not create a duplicate receipt authority. |
+| `GepaEvaluationExampleV1` | Existing DSPy repair/evaluation contracts, `LearningOutcomeV1` if confirmed as the applicable owner, and the GEPA work in `parent-atlas-compute-rank-cache-eval-dspy-gepa` | DSPy/GEPA adapters and optimizer-construction code exist, but live dependencies, frozen same-corpus inputs, held-out isolation, and a GEPA shadow run remain unproven/open. Do not treat the proposed type name as an existing contract or train/promote from unverified traces. |
+
+### Ordered integration gates
+
+- [ ] SPINE-01 — **Freeze the Graphify input and state boundary.** Trace the current `graphify:daily`
+      lifecycle receipt, stage outputs, and daily seed/recommendation producer. Define a deterministic
+      snapshot view only by composing/reusing existing owners. Bind repository/workspace revision,
+      ordered source/evidence identities, stage/producer revisions, input/output checksums, and
+      completion state. Prove identical frozen inputs replay to identical normalized outputs. Record
+      side effects explicitly; do not describe a pipeline that mutates projections as side-effect-free.
+- [ ] SPINE-02 — **Resolve capabilities from the frozen snapshot.** Adapt the existing OaK catalog/LUT
+      to return only registered function IDs and exact catalog/kernel revisions for the selected
+      task/domain/required input-output contracts. Unknown capability, stale snapshot, or missing
+      evidence must fail closed. AST/domain classifier and semantic/graph neighbors may nominate
+      candidates but cannot add capabilities or canonical taxonomy facts.
+- [ ] SPINE-03 — **Compile and validate the bounded DAG.** Use the existing
+      `KernelBoundDagPlannerV1`/adaptive-DAG owners. Bind nodes and edges to the snapshot and catalog
+      checksums; validate registered IDs, input/output compatibility, evidence prerequisites,
+      permissions, cycle freedom, concurrency/resource budgets, and read/write policy. DSPy output
+      may suggest a plan only; deterministic validation owns admission.
+- [ ] SPINE-04 — **Execute one read-only MCP replay and join receipts.** Select an already bounded,
+      read-only MCP tool. Bind its existing tool receipt and workflow/action event to the admitted
+      DAG-node ID, plan checksum, registry revision, source/snapshot revision, request checksum, and
+      result/evidence checksum. Verify replay/idempotency behavior and stable failure output. No
+      canonical or projection writes in this proof; any later writer needs its existing promotion,
+      authorization, and readback gates.
+- [ ] SPINE-05 — **Create a receipt-derived evaluation example.** Convert only the joined, validated
+      execution receipts into an immutable DSPy/GEPA evaluation row. Freeze corpus and train/validation/
+      held-out IDs; include policy/program/tool-description revisions and outcome labels from a
+      verified evaluator or reviewed human outcome. Reject invented evidence, stale revisions,
+      unauthorized calls, and incomplete receipts as hard failures with zero score.
+- [ ] SPINE-06 — **Run GEPA in isolated shadow mode, last.** First prove pinned DSPy/GEPA runtime
+      compatibility in its isolated environment, then compare baseline and candidate on the same
+      frozen validation set with a fixed seed and resumable run log. GEPA may alter prompts,
+      instructions, and tool/argument descriptions only. It cannot edit OaK/Graphify facts, schemas,
+      registry membership, execution permissions, or stores. Require hard-gate non-regression,
+      held-out isolation, candidate checksum, and human promotion review; otherwise retain a proposal.
+- [ ] SPINE-07 — **End-to-end replay receipt and completion update.** Replay
+      `frozen Graphify state → OaK resolution → validated DAG → MCP read-only call → joined receipt →
+      GEPA evaluation example` and verify checksum/revision continuity at every edge. Save a report
+      with each gate's status, evidence refs, tests, runtime/dependency limits, and mutation flags.
+      Update the 0/5 score only when a whole gate meets its acceptance evidence; the spine is complete
+      only when all five named stages are replay-proven and GEPA's shadow evaluation is reproducible.
+
+**SPINE-01 owner trace — 2026-09-30 (read-only; gate remains OPEN):**
+- `sveltekit-frontend/package.json` maps `graphify:daily` to
+  `scripts/startup/run-graphify-daily-startup.mjs`. The wrapper runs
+  `require-canonical-projection-admission-v1.mjs` before the production `graphify:daily:chain`;
+  that chain includes apply-mode dedup/materialization, fanout, Qdrant mirrors/sync, and an ACE
+  packet guard/census receipt (the guard's source explicitly says packet composition/cache writes
+  are not wired). The snapshot-terminal path selects `graphify:daily:dry`, but this pass did not
+  audit every child side effect—particularly the unsuffixed Qdrant feature-map sync in that script—
+  so it must not yet be labeled wholly read-only. Graphify cannot be described as a side-effect-free
+  compiler until its deterministic state boundary is isolated from projections.
+- Existing input authority candidates are the admitted
+  `workspace-revision-tournament-admission-v1.json`, its referenced content-addressed
+  `workspace-source-snapshots/<snapshotRevision>.json`, and the wrapper's
+  `graphify-execution-source-v2.json` descriptor. The checked-in admission receipt was generated
+  **2026-09-14**, names 25,542 sources, workspace revision
+  `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`, and snapshot revision
+  `sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b`. The execution-source
+  descriptor is dated **2026-09-29** and binds those same revisions/count; this is not evidence that
+  the underlying admission is current on 2026-09-30.
+- The referenced snapshot file exists and matches the named snapshot revision. It has 25,542 rows,
+  seven repositories, zero recorded violations, membership checksum
+  `sha256:dccaf9f6e84b1d3b1c49f2f6b110b9b9946b895703ac0987cbb70a3608223efb`, and content checksum
+  `sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d`; its own status is
+  `CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK`, `canonicalAuthority=false`, and
+  `datastoreWritesPerformed=false`. This proves a captured source input, not completed Graphify
+  processing or a daily-seed state.
+- A separate `docs/reports/graphify-daily-workflow-receipt.json` exists, generated
+  **2026-09-29** for run `f7106143-61aa-4dc1-b433-e5ae03ec4ff5` and repository revision
+  `88ae5c7d56c59d724962d5654eea7dcc775ace62`. It is explicitly `readOnly=true` and
+  `canonicalWriteAttempted=false`; it references 13 Phase 109B stage artifacts. The stage statuses
+  are 9 `PROVEN` and 4 `PARTIAL` (identity, semantic, GPU, evaluation). Its source-binding
+  observation uses workspace revision
+  `sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3`, not the Sep 14
+  tournament-admission workspace revision above. The stage files contain summary counts/statuses
+  but no explicit per-stage input/output checksum fields. This is useful existing evidence, but it
+  cannot be joined to that admitted snapshot as one sealed, replayable state artifact.
+- A bounded live PostgreSQL 18 read-only probe succeeded (`server_version_num=180004`). The newest
+  `graphify_executions` row is `COMPLETED` at **2026-09-15T01:13:15Z**, but is
+  `canonical_authority=false` and has no `legacy_graphify_run_id`; its saved JSON report is the
+  older OPENED/RUNNING representation from Sep 14. Its stage ledger contains only `OPEN`,
+  `SOURCE_SELECTION`, and `INVENTORY`, all completed. Selection binds to the sealed snapshot and
+  inventory has input/output checksums, but there are no semantic/relationship/graph/seed stages.
+- A sibling execution `74d50c86-8194-45ea-8c3d-61aab737ef83` is
+  `canonical_authority=true`, completed at **2026-09-15T01:11:57Z**, and is linked to legacy
+  `graphify_runs.run_id=01a8d8fc-2507-4f39-868e-039039237b98`. That run is marked `COMPLETED` and
+  `dry_run=false`, but completed in about 43 ms; its linked stage ledger still has only `OPEN`,
+  `SOURCE_SELECTION`, and `INVENTORY`. This proves the canonical source-selection/inventory binding
+  and run linkage—not that the broad AST/semantic/graph daily chain executed or produced daily seeds.
+  The 2026-09-30 operator report says the current wrapper was blocked at projection admission, so
+  do not promote the Sep 15 lifecycle result into a current daily compiler receipt.
+  `graphify-daily-lifecycle-file-inventory-v1.json` is older (**2026-09-05**) and is bound to a
+  different workspace revision, so it cannot be joined as current stage evidence.
+- The fixed report-name check found no `graphify-daily-seeds-v1.json` or
+  `daily-seed-snapshot-v1.json`; broader searches show many unrelated seed/recommendation artifacts,
+  but no existing owner clearly producing the proposed daily seed contract. Do not infer that none
+  exists from names alone; the remaining producer trace must follow the actual package chain and
+  receipt references, not broad keyword counts.
+- The operator-provided 2026-09-30 run reports
+  `GRAPHIFY_PROMOTION_ADMISSION_BLOCKED:NOT_SAFE_TO_PROJECT`; it is consistent with the wrapper's
+  fail-closed admission gate and is not a successful compiler run or a new completed snapshot receipt.
+- This follow-up used only bounded PostgreSQL `SELECT` probes in read-only transactions; no script,
+  audit report, database row, Qdrant, Neo4j, Valkey, or model state was written. SPINE-01 stays open
+  until a current admitted source snapshot and terminal, checksummed processing stages can be
+  reconciled with the existing daily seed/recommendation producer and replayed.
+
+### Ready-to-use next implementation prompt
+
+> Implement SPINE-01 through SPINE-04 as a bounded, read-only replay using existing Graphify daily
+> lifecycle/stage receipts, `AtlasKernelFunctionCatalogV1`, `KernelBoundDagPlannerV1`, adaptive-DAG
+> owners, and existing MCP/workflow receipt contracts. First trace owners and schemas; do not create
+> parallel `DailySeedSnapshotV1`, OaK registry, DAG-plan, or MCP-receipt authority if an existing
+> contract can be composed. Do not run the apply-capable `graphify:daily` wrapper to obtain inputs.
+> First establish a fresh admitted source snapshot and terminal processing/readback receipt through
+> their existing gates; if admission remains `NOT_SAFE_TO_PROJECT` or the snapshot is non-terminal,
+> stop and report the blocker rather than substituting the stale 2026-09-14 snapshot. Freeze one
+> bounded fixture or already-produced current snapshot, resolve only
+> registered read-only capabilities, validate the DAG deterministically, execute one bounded MCP
+> read, and join the existing receipts with exact checksums/revisions. No database, Qdrant, Neo4j,
+> Valkey, model, training, or projection writes. Add focused replay tests and update the E2E score
+> only from demonstrated gate evidence. Leave SPINE-05/06 blocked until receipt-derived labels and
+> pinned DSPy/GEPA runtime plus held-out data are proven.
+
+### Acceptance and next prompts
+
+The first implementation target is SPINE-01 owner reconciliation, not a new type family. Then
+implement SPINE-02→04 as one bounded replay; do not start GEPA before the deterministic baseline is
+reproducible. Recommended follow-up prompts:
+
+1. `Trace and implement SPINE-01: compose the existing Daily Graphify lifecycle and seed receipts
+   into a frozen, replay-checkable state input; report exact existing owners and prove deterministic
+   fixture replay without store writes.`
+2. `Implement SPINE-02 through SPINE-04 using the existing OaK catalog, kernel-bound DAG, and MCP /
+   workflow receipt owners; execute one read-only bounded replay and preserve all revision/checksum
+   bindings. Do not add parallel authorities.`
+3. `After the replay receipt is proven, implement SPINE-05/06 in the isolated evaluation environment:
+   freeze receipt-derived labels and held-out splits, run GEPA shadow-only, and emit a checksummed
+   candidate policy without promotion or store writes.`
+
+## Continual agent harness — mapped follow-on gates (2026-09-30)
+
+This is a Prime-Agent-inspired operating pattern, not adoption of Prime Agent itself. Daily Graphify
+compiles revision-bound state; OaK says which capabilities exist; Kanban owns task lifecycle; DSPy
+may compose registered capabilities; deterministic DAG admission constrains execution; MCP carries
+typed calls; existing workflow/tool receipts record outcomes; memory and GEPA remain derived,
+reviewable proposals. None of the learned layers may create canonical facts, identities, revisions,
+permissions, or store writes.
+
+| Concern from the proposal | Existing owner to reuse | Current boundary / gate |
+|---|---|---|
+| Capability catalog and deterministic route LUT | `AtlasKernelFunctionCatalogV1`, kernel function/operator catalogs, and SPINE-02 | Catalog exists and is checksum-sealed. LUT is a read-only resolver over registered IDs/revisions, not a new registry or taxonomy producer. |
+| Machine-addressable task frontier | `KanbanTaskSchema`, task events/attempts/heartbeat/dependencies, daily Graphify board/recommendation producers, SPINE-01 | Kanban lifecycle is implemented. The daily frozen seed → exact task/dependency frontier join is not proven; task-board artifacts do not substitute for a current admitted Graphify snapshot. |
+| Durable agent memory and refinement | `triEngramV1Schema`, adaptive-memory observation/decision contracts, existing Engram host/materializer | Tri-Engram already separates canonical facts, derived projections, and ephemeral runtime state; persistent writes are nominated, not kernel-owned. No hidden thoughts, chain-of-thought, KV cache, tensors, or unverified instructions may be stored. Promote only evidence-backed, receipt-linked memory through the existing host gate. |
+| DSPy planner and bounded subagents | Existing DSPy repair adapter, OaK planner, adaptive DAG, and SPINE-03 | DSPy/GEPA runtime was previously recorded unavailable in the checked environments; refresh before claiming availability. Planner output contains registered function IDs only and is schema/authorization/budget validated before execution. Recursive workers inherit the same capability and effect limits. |
+| MCP execution and causal receipts | `RuntimeToolReceiptV1`, `OakExecutionReceiptV1`, `WorkflowActionEventV1`, SPINE-04 | Contracts exist across layers; a joined receipt proving accepted DAG node → exact MCP call → result/evidence is still required. Reuse these owners rather than add `McpExecutionReceiptV1` as a parallel authority. |
+| Watchdog and trajectory scoring | Kanban heartbeat/attempt/event history plus workflow/tool receipts | No distinct watchdog/trajectory scorer has been established by this trace. Add it only as a bounded observer that detects repeated failures, no progress, budget exhaustion, or forbidden effects and emits replan/escalation proposals; it cannot retry mutations or change task truth by itself. |
+| Verified repair and evaluation example | Existing repair validation/readback receipts, `LearningOutcomeV1` where applicable, and the DSPy/GEPA change | Labels must derive from verified tests/readback or reviewed outcomes. Invalid IDs, stale revisions, missing evidence, or unauthorized effects are hard failures—not soft score penalties. |
+| GEPA and policy promotion | `python/parent_atlas_dspy_repair.py`, GEPA audit gates, `parent-atlas-compute-rank-cache-eval-dspy-gepa`, SPINE-05/06 | Offline candidate optimization only after pinned runtime, frozen corpus, train/validation/held-out isolation, and reproducible baseline. Tool names/contracts and OaK membership stay stable; no automatic production promotion. |
+| Low-rank capability recommender | Existing named feature/representation owners and candidate-ranking fabric | Not a prerequisite for harness replay. Defer until feature labels, semantic/latent input provenance, and offline parity are proven. Scores are recommendations only, add no retrieval vote, and cannot bypass the DAG validator. |
+
+### Ordered harness gates
+
+- [ ] HARNESS-01 — **Reconcile the existing task, memory, and outcome contracts.** Trace Kanban task
+      identity/dependency/event owners, `LearningOutcomeV1` use, and Tri-Engram/Engram persistence.
+      Document field mappings and gaps; do not introduce `AtlasAgentMemoryV1` or trajectory tables
+      until reuse is demonstrably impossible. Prove memory proposals reference verified receipts,
+      exact graph/policy revisions, and checksums; prohibit hidden reasoning and ephemeral model state.
+- [ ] HARNESS-02 — **Build the deterministic capability route baseline.** From one SPINE-01 frozen
+      input, resolve `(domain, operation, symptom/required contracts)` through the existing OaK
+      catalog/LUT. Unknown or stale keys return no route. Verify all outputs are registered IDs and
+      the route decision is deterministic; classifier, KNN, or low-rank scores may only rank options.
+- [ ] HARNESS-03 — **Validate task-frontier and planner integration.** Join the frozen Graphify seed
+      view to existing Kanban tasks, dependencies, and blocked/unblocked states; then let DSPy
+      propose a plan only if its runtime is available. Validate capability IDs, schemas, evidence
+      prerequisites, task authorization, effects, cycle freedom, worker limits, and budgets with the
+      existing DAG owner. Produce a bounded plan proposal; do not claim an agent execution.
+- [ ] HARNESS-04 — **Prove watchdog and recursive-worker containment.** Use deterministic fixtures
+      for heartbeat timeout, repeated identical failure, no progress, exhausted budget, and attempted
+      forbidden effect. Require escalation/replan rather than unbounded retry. Demonstrate child
+      workers cannot widen parent capabilities, effects, or resource budgets.
+- [ ] HARNESS-05 — **Join execution, repair, and memory evidence.** After SPINE-04, join accepted DAG
+      node IDs with existing MCP/tool/workflow receipts and independent validation/readback. Produce
+      only a memory/evaluation candidate referencing those receipts; verify stale/missing evidence
+      is rejected and canonical task/Graphify state is not changed by the proposal path.
+- [ ] HARNESS-06 — **Run policy learning in shadow, then gate promotion.** After SPINE-05/06,
+      compare baseline and GEPA candidate on frozen validation inputs and untouched held-out cases.
+      Include invalid/unauthorized tool calls, evidence grounding, unnecessary calls, success, and
+      latency metrics. Candidate instructions/tool descriptions and optional recommender weights are
+      checksum/revision bound; require non-regression, reproducible replay, and explicit promotion
+      approval. No live policy/memory mutation during optimization.
+- [ ] HARNESS-07 — **End-to-end continual-harness replay.** Replay one bounded task from frozen daily
+      state → task frontier → OaK/LUT → validated plan → bounded MCP execution → joined receipts →
+      verified outcome → memory/evaluation proposal → shadow policy comparison. Report every stage,
+      revision/checksum, watchdog result, and side effect. Update harness completion only from this
+      receipt; it is separate from the seven SPINE gates and overall OpenSpec task percentage.
+
+**HARNESS-01 owner trace — 2026-09-30 (bounded static inspection + focused contract test; gate remains OPEN):**
+- `KanbanTaskSchema` in `sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts` owns task
+  identity, feature/source refs, lane/status, run/claim/heartbeat, attempts/failures, retries, and
+  idempotency. Separate task event/attempt/dependency tables and APIs record claim, heartbeat,
+  completion, retry, child creation, dependency linking, and protocol violations. This is the task
+  lifecycle owner; it is not evidence of a joined Graphify-derived daily frontier.
+- `triEngramV1Schema` in `packages/parent-atlas/src/core/adaptive-memory-runtime.ts` explicitly
+  separates PostgreSQL canonical knowledge (E1), derived retrieval projections (E2), and ephemeral
+  llama-server state (E3). Its observation carries workflow/source-snapshot revisions, evidence and
+  failure receipt refs, source checksum, and producer revision. Its decision binds a memory-policy
+  revision but explicitly sets `persistent_write_allowed=false` and requires claim verification.
+  Persistence is therefore a nomination requiring the existing host/materialization gate, not a
+  memory write the planner may perform. The present observation shape has no explicit graph or
+  agent-policy revision fields; those must be proven through referenced receipts or addressed by
+  the owning contract before it can satisfy the proposed memory lineage.
+- `recommendationOutcomeReceiptSchema` in `packages/parent-atlas/src/core/temporal-action-ledger.ts`
+  (Python parity model: `python/atlas_contract_parity/learning_outcome_v1.py`) records the
+  recommendation/action, resulting execution checksum, outcome, downstream-success flag, evidence
+  refs, time, and producer revision. It is an outcome receipt, not a full DAG/MCP execution chain:
+  it does not itself bind an accepted plan/node ID, tool call, catalog revision, or Graphify snapshot.
+  Those joins belong to the existing OaK execution/workflow receipt owners at SPINE-04/05.
+- Focused package build and `adaptive-memory-runtime.test.mjs` passed **8/8**. The tests prove the
+  authority-tier distinction, non-persistent nomination, required claim verification, and rejection
+  of ephemeral model-state persistence. They do not prove a production memory host write/readback,
+  verified-claim adjudication, or causal linkage to a real accepted DAG/MCP execution.
+- Therefore HARNESS-01's owner inventory and gap classification are complete, but its acceptance
+  gate remains **OPEN**: no candidate memory record has yet been proven to carry a joined verified
+  receipt plus exact source/graph/policy lineage and checksum through host review/materialization.
+  Do not add a parallel memory or outcome schema to paper over that missing join.
+
+Harness readiness at this update: **0/7 end-to-end harness gates proven**. Existing Kanban,
+Tri-Engram, OaK, DAG, receipt, and DSPy/GEPA components are groundwork, not evidence that the
+continual loop is live. The first implementation prompt is HARNESS-01; do not run GEPA or create
+persistent memories until SPINE-04 yields a joined, verified outcome corpus.
+
+### Ready-to-use continual-harness prompt
+
+> Implement HARNESS-01 through HARNESS-04 by tracing and reusing the current Kanban task/event,
+> Tri-Engram/Engram, OaK catalog, DSPy, DAG, and workflow/tool receipt owners. Do not add parallel
+> memory, trajectory, registry, task, or receipt schemas unless a concrete owner gap is demonstrated.
+> Keep memory and plan outputs proposal-only; never persist hidden reasoning or runtime tensors/KV.
+> Start with deterministic fixtures and read-only bounded replay. Require exact snapshot/catalog/task
+> revisions, registered capabilities, inherited subagent restrictions, watchdog stop conditions, and
+> zero datastore writes. Do not run the apply-capable `graphify:daily` wrapper or GEPA; stop if the
+> current admission snapshot or DSPy runtime prerequisites are unavailable.
+
+Current score remains **0/5 (0% end-to-end proven)**. No code/runtime/data changes are claimed by
+this task-list update; the pre-existing component evidence above remains bounded to its own tests,
+receipts, and recorded dates.

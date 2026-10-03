@@ -1,0 +1,75 @@
+{
+  "schema": "atlas.evidence-receipt.v1",
+  "evidenceId": "receipt:parent-atlas-graph-retrieval-proof:GS1-10-IDENTITY-CONTRACTS-01:static-v1",
+  "evidenceType": "STATIC",
+  "changeId": "parent-atlas-graph-retrieval-proof",
+  "taskId": "GS1-10-IDENTITY-CONTRACTS-01",
+  "claim": "Seven separate identity definitions exist for parse_node_id, symbol_id, symbol_version_id, chunk_id, packet_key, concept_id, and graph_node_key; this receipt proves definitions only, not live population or cross-revision continuity.",
+  "gitCommit": "68dedecf145ad63d9cd2aa0bad5b4dbd347f952e",
+  "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
+  "sourceRevision": "sha256:6e26fb1e3d15589b8c662e0a97bec5e2d22ec56016d981106b40b67a2375ef14",
+  "sourceRefs": [
+    {
+      "file": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "lineStart": 39,
+      "lineEnd": 39,
+      "sourceRevision": "sha256:866fd1f8e2d825be005bd48b20bc88c5af9d552948de050623e7fec4e5e9abc8"
+    }
+  ],
+  "environmentFingerprint": "sha256:d30a34a4da245bd1dd21c115978b1bf8c59817eae91f3e96bb42760077ea8efb",
+  "producer": "scripts/atlas/audit-graph-identity-contracts-v1.mjs",
+  "command": "npm run atlas:identity:contracts:audit",
+  "inputs": [
+    {
+      "kind": "static_audit",
+      "uri": "docs/reports/graph-identity-contracts-audit-v1.json",
+      "checksum": "sha256:6bf2dd6f7061402fa4d059abddc760d2c0acd5daa217e1f44d6b806ec4154a70"
+    }
+  ],
+  "observedAt": "2026-10-01T16:08:32.936Z",
+  "expectedAssertions": [
+    {
+      "id": "seven-contracts",
+      "expected": "all seven identity markers are present in their declared owners"
+    },
+    {
+      "id": "supporting-contracts",
+      "expected": "occurrence, symbol revision, and symbol audit support files exist"
+    },
+    {
+      "id": "population-boundary",
+      "expected": "the receipt does not promote live population or cross-revision continuity"
+    }
+  ],
+  "actualAssertions": [
+    {
+      "id": "seven-contracts",
+      "actual": "7 identity definitions found and all markers matched",
+      "passed": true
+    },
+    {
+      "id": "supporting-contracts",
+      "actual": "tree occurrence, symbol revision qualification, and symbol audit owners are present",
+      "passed": true
+    },
+    {
+      "id": "population-boundary",
+      "actual": "status is DEFINITION_CONTRACTS_PROVEN_POPULATION_UNPROVEN",
+      "passed": true
+    }
+  ],
+  "outputs": [
+    {
+      "kind": "identity_contract_audit",
+      "uri": "docs/reports/graph-identity-contracts-audit-v1.json",
+      "checksum": "sha256:6bf2dd6f7061402fa4d059abddc760d2c0acd5daa217e1f44d6b806ec4154a70"
+    }
+  ],
+  "verifier": "scripts/atlas/audit-graph-identity-contracts-v1.mjs",
+  "independentVerifier": "node -e \"const r=require('docs/reports/graph-identity-contracts-audit-v1.json'); if(r.contracts.length!==7 || !r.contracts.every(c=>c.exists&&c.markerFound)) process.exit(1)\"",
+  "readbackRequired": true,
+  "readbackPerformed": true,
+  "readbackCommand": "node -e \"const r=require('docs/reports/graph-identity-contracts-audit-v1.json'); if(r.status!=='DEFINITION_CONTRACTS_PROVEN_POPULATION_UNPROVEN') process.exit(1)\"",
+  "verdict": "PROVEN",
+  "checksum": "sha256:9812a69188c2a48d3db306076c479e3531182303d152dae99c8d251f5a586ff4"
+}

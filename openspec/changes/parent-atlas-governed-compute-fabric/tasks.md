@@ -389,6 +389,132 @@ type-checked, fixture-tested, and live-proven at the appropriate gate.
 - [ ] 16.5 Record policy revision and all chosen executor/skill actions so later learning
       can distinguish policy effects from retrieval/model/backend effects.
 
+### P22 — later learned-policy experiment gates (not P18 reranking or P25 policy-model training)
+
+P22 may evaluate decision policies over an already legal host action set. It does not own
+retrieval, canonical identity, action authorization, mutation, or production model activation.
+XGBoost/cross-encoder ranking stays under P18. PPO or other model-policy weight training stays
+under P25 and remains eval-only unless its own promotion gate changes. These tasks refine 16.1–16.5;
+they do not close them by declaration.
+
+- [ ] P22-01 EVENT-OWNER-AND-COVERAGE: identify the existing `WorkflowActionEventV1` and
+      `ExecutionReceiptV1` producers/readers; produce a read-only census linking workflow, action,
+      packet/candidate, source/workspace revision, selected legal action, executor/policy revision,
+      and verified outcome. Unattributed or contradictory events are excluded, not labeled.
+- [ ] P22-02 OUTCOME-ATTRIBUTION: define outcome eligibility from independently verified execution,
+      validation, and human review events. Do not synthesize reward labels from model confidence,
+      retrieval scores, recommendation acceptance alone, or a model's own generated claims.
+- [ ] P22-03 FROZEN-EVAL-CORPUS: materialize a checksum-sealed, revision-qualified evaluation
+      manifest from the eligible event cohort with deterministic workflow/time/source-grouped
+      train/validation/held-out splits. Prove duplicate and temporal leakage checks; no corpus
+      manifest may be rebuilt from a moving `LIMIT` query during evaluation.
+- [ ] P22-04 OBJECTIVE-AND-HARD-CONSTRAINTS: predeclare measurable utility/cost terms, missing-data
+      policy, safety penalties, and evaluator version. The host retains deterministic DAG legality,
+      authorization, exact evidence promotion, budget caps, and resource hard limits outside any
+      learned score.
+- [ ] P22-05 DETERMINISTIC-BASELINE-REPLAY: replay the frozen held-out tasks against the current
+      deterministic policy and one candidate policy using the same legal action sets and evidence
+      snapshots. Record utility/cost, task success, regressions, unsafe proposals, latency, and
+      resource use with reproducible seeds/configuration.
+- [ ] P22-06 CANDIDATE-EVALUATION: compare a learned expected-utility/cost policy against the
+      deterministic baseline on untouched held-out workflows; require predeclared acceptance
+      thresholds, uncertainty/calibration reporting, and subgroup/regression analysis. A better
+      aggregate score cannot excuse a safety-constraint violation.
+- [ ] P22-07 ISOLATED-ARTIFACT: only after P22-01 through P22-06 pass, optionally create a
+      non-production policy artifact in an isolated evaluation environment. Bind it to the frozen
+      corpus checksum, feature/schema revision, objective/evaluator revision, code/config revision,
+      and artifact digest. This is not permission for PPO, QLoRA, live scoring, or canonical writes.
+- [ ] P22-08 SHADOW-AND-ROLLBACK: if separately approved, run bounded shadow comparison that emits
+      proposals/receipts only; host action selection remains deterministic and authoritative. Define
+      stop thresholds, rollback to the deterministic policy, and proof that no candidate proposal
+      bypasses authorization or mutates stores.
+- [ ] P22-09 PROMOTION-DECISION: record explicit human-reviewed retain/reject decision and
+      revisioned policy receipt. Until that receipt exists, status remains `EXPERIMENTAL_ONLY`; no
+      P22 result changes OpenSpec task status, ranking ownership, or production defaults.
+
+### Parent Atlas workstation end-to-end phase crosswalk (2026-09-30)
+
+This is a coordination checklist for the canonical P11–P30 phase index in
+`parent-atlas-workstation-todo.md`, not a replacement owner or a second implementation plan.
+The linked OpenSpec change owns each detailed task and evidence receipt. Keep each item open
+until its owning change records the required proof; do not infer completion from a child
+change's aggregate checkbox count or a fixture-only test. Refresh live baselines before
+execution because counts and service state can drift.
+
+- [ ] WSF-01 SOURCE-AND-INDEX-BASELINE (P12/P13/P17): resume the frozen, exact-byte Graphify
+      manifest through deterministic, bounded shards using the existing extractor and writer;
+      reconcile per-file commits, source/workspace revision bindings, digest checks, parser
+      provenance, and terminal readback outcomes. Keep drifted, missing-revision, and parse-failed
+      rows separately classified. Owners: `parent-atlas-ace-rlm-bitfrost-integration` and
+      `parent-atlas-retrieval-lineage-dag-convergence`.
+- [ ] WSF-02 SOURCE-CAPABILITY-REGISTRY (P13/P16/P17): define the Pokédex-style capability view
+      over existing canonical source, symbol, AST, feature, and evidence owners; link domain
+      classes and stable feature IDs to revision-qualified `source_ref`/`packet_key` records.
+      Keep taxonomy descriptive, and keep ast-grep, LSP, NLP, and graph observations as separately
+      revisioned enrichments. Owners: `parent-atlas-workstation-domain-classifier` and
+      `parent-atlas-candidate-feature-execution-fabric`.
+- [ ] WSF-03 SEMANTIC-AND-LATENT-LINEAGE (P17): identify one canonical EmbeddingGemma writer for
+      `semantic_768`; establish immutable model/tokenizer/producer revisions and per-row input,
+      representation, and vector digests with canonical readback. Freeze the exact training
+      cohort before training the declared `768 → 512 → 256 → 128` model; derive `latent_64` only
+      from `latent_128`, and treat `topology_4d` as a separate projection. Do not run the retired
+      384-wide trainer or train from an unbound corpus. Owners: `parent-atlas-ace-rlm-bitfrost-
+      integration`, `parent-atlas-semantic-768-canonical-contract`, and
+      `parent-atlas-topology-representation-admission`.
+- [ ] WSF-04 ORDINAL-AND-PROJECTION-CLOSURE (P12/P17): refresh the admitted-cohort census; resolve
+      missing physical chunks and duplicate canonical identity only through their established
+      owners; regenerate the full ordinal artifact from current qualified authority; prove exact
+      identity/revision coverage, uniqueness, and deterministic replay. Then bind projection
+      inputs and readbacks to the sealed cohort. Do not patch an old artifact, synthesize ordinals,
+      or widen eligibility. Owner: `parent-atlas-ace-rlm-bitfrost-integration`.
+- [ ] WSF-05 RETRIEVAL-AND-GRAPH-PARITY (P15/P16/P27–P30): close SearchRuntime's lane
+      normalization, deduplication, and single fusion vote; then validate bounded graph/ontology/
+      hypergraph expansions against the CPU oracle and their existing GPU/graph executors. Graph,
+      KMeans, SOM, manifold, RFF, and topology outputs remain derived ranking evidence, never
+      identity authority or extra lane votes. Owners: `parent-atlas-retrieval-fusion-reachability`,
+      `parent-atlas-retrieval-lineage-dag-convergence`, and
+      `parent-atlas-retrieval-lod-algorithm-taxonomy`.
+- [ ] WSF-06 ACE-AND-CACHE-PRODUCTION-PROOF (P11/P14): wire live retrieval through the canonical
+      admitted resolver → `AcePacketV3` → `ContextManifest` path and prove grounded readback. Only
+      after that, prove deterministic identity/revision/checksum-bound BitFrost key derivation and
+      bounded cache write/readback through the existing cache owner. Do not treat legacy
+      `ace_context_sources`, Redis/Valkey TTL, or semantic similarity as authority. Owners:
+      `parent-atlas-ace-rlm-bitfrost-integration` and
+      `parent-atlas-ace-bitfrost-cache-correctness`.
+- [ ] WSF-07 OFFICIAL-DOCUMENTATION-CORPUS: resolve selected dependencies from an explicit repo
+      directory and manifest/lock files; capture version-qualified official docs using the
+      existing BeautifulSoup/Firecrawl pipeline; validate immutable run/page/chunk receipts and
+      the existing Postgres 18/Drizzle owner before indexing docs for bounded MCP retrieval.
+      Preserve package/version skew as an audit result; do not bulk-upgrade dependencies or add a
+      parallel docs table/crawler. Owner: `parent-atlas-ace-rlm-bitfrost-integration` LIBDOC gates.
+- [ ] WSF-08 RERANKING-AND-POLICY-EVALUATION (P18–P22): evaluate reranker challengers on a frozen,
+      leakage-checked corpus against the dedicated baseline; separately complete deterministic
+      policy, DSPy/GEPA workflow, and P22 learned-policy gates in their owner changes. No candidate
+      becomes production default or mutation authority from model score, user acceptance, or
+      fixture evidence alone. Owners: `parent-atlas-best-fit-score-fabric` and this change.
+- [ ] WSF-09 TRANSPORT-AND-GPU-EXECUTION-PROOFS (P23/P24): validate each claimed MCP/ACP/A2A/gRPC
+      transport and CPU/GPU executor against its live runtime boundary, bounded request/response
+      schema, identity/revision metadata, CPU oracle parity, resource envelope, and rollback.
+      Keep native Windows, WSL2, and Docker capabilities distinct until each has its own receipt.
+      Owners: `parent-atlas-transport-memory-boundaries`,
+      `parent-atlas-gpu-graph-vector-substrate`, and
+      `parent-atlas-gpu-runtime-abi-alignment`.
+- [ ] WSF-10 LONG-CONTEXT-AND-MODEL-POLICY-CHALLENGERS (P11/P25): keep YaRN, KV quantization,
+      TurboQuant/RotorQuant, QLoRA/PPO, and TensorRT-RTX in isolated, receipt-backed evaluation
+      lanes. Prove exact model/build/configuration, full-token acceptance, quality, memory,
+      latency, and rollback before any profile promotion; do not persist model KV/tensors or
+      hidden reasoning in canonical stores or BitFrost. Owners: `parent-atlas-ace-rlm-bitfrost-
+      integration`, `parent-atlas-best-fit-score-fabric`, and the runtime/GPU owner changes.
+- [ ] WSF-11 ADMISSION-AND-END-TO-END-READBACK: rerun the canonical projection admission audit
+      only after upstream owners have current receipts; verify each predicate from producer
+      evidence and independent readback. Report PASS/PARTIAL/NOT_PROVEN per predicate and keep
+      projection apply fail-closed unless every required admission predicate passes.
+
+The canonical execution dependency remains P12 → P13 → P15 → P16 → P17 → P18 → P14 → P20/P21
+→ P11/P25, with P22, P23, P24, and P27–P30 kept as explicitly separate evaluation/transport/
+execution lanes. This crosswalk does not authorize database migrations, corpus writes, cache
+population, model training, dependency upgrades, service restarts, or projection promotion.
+
 ## 17. Execution identity and receipts
 
 - [ ] 17.1 Extend `AlgorithmExecutionManifestV1` or add a linked kernel receipt so every

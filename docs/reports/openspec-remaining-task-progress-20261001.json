@@ -1,0 +1,74 @@
+{
+  "schema": "atlas.openspec-remaining-task-progress.v1",
+  "recordedAt": "2026-10-01",
+  "objectiveStatus": "IN_PROGRESS",
+  "worktree": {
+    "head": "68dedecf145ad63d9cd2aa0bad5b4dbd347f952e",
+    "branch": "handoff/summary-enrichment-lineage-20260925",
+    "note": "Existing worktree contains many unrelated modifications and untracked artifacts; this report does not claim or change their status."
+  },
+  "inventory": {
+    "scope": "Direct openspec/changes directories with tasks.md in the current working tree; raw checkbox-line parse, not an archive-wide or evidence-fabric census.",
+    "taskFiles": 92,
+    "totalCheckboxes": 10326,
+    "checkedCheckboxes": 6836,
+    "uncheckedCheckboxes": 3490,
+    "priorUserSuppliedCensus": {
+      "changes": 117,
+      "tasks": 11024,
+      "checked": 7282,
+      "proven": 0,
+      "orphanReceipts": 1041,
+      "missingTaskIds": 6564,
+      "duplicateIds": 229,
+      "dependencyCycles": 0,
+      "status": "HISTORICAL_BASELINE_NOT_RECOMPUTED"
+    },
+    "caveat": "The working-tree checkbox inventory has a different observed scope and must not be presented as reconciliation of the supplied historical census."
+  },
+  "changeProgress": {
+    "changeId": "parent-atlas-memory-architecture-freeze",
+    "schema": "spec-driven",
+    "totalTasks": 55,
+    "completedTasks": 42,
+    "remainingTasks": 13,
+    "completedThisTurn": [
+      "8.10 EvidenceDepth axis and bounded context-bound expansion contract",
+      "9.9a revision-qualified EvidenceKind extension codec",
+      "9.9b separation of evidence depth, residency, LOD, and ephemeral model state",
+      "9.9d PostgreSQL canonical cold authority versus Qdrant/SeaweedFS projections"
+    ],
+    "stillOpen": [
+      "9.6 and 9.9c: wire exact canonical candidate readback into retrieval/ContextManifest admission; topology outputs remain non-promotional and retrievalEligibility=false."
+    ]
+  },
+  "implementation": {
+    "capability": "The legacy one-byte nibble helper remains unchanged. New revision-qualified encoding reserves low nibble 15 as the extended-kind escape, validates versioned extension bytes for values 15..31, and checks both existing LUT contents against encodingRevision.",
+    "evidenceDepth": "Defines D0-D6 (typed ordinal through exact source spans), with a bounded expansion request bound to an existing ContextManifest checksum; it is not a ContextManifest compiler.",
+    "topology": "Uses the existing CandidateOrdinalMapV1 owner, hashes its checksum/snapshot/workspace revisions, candidate source revisions, coordinates, tile size, and four coordinate-function revisions; exact readback is explicit and remains ineligible for retrieval/context admission."
+  },
+  "validation": {
+    "focusedVitest": "4 files / 43 tests passed",
+    "typescript": "npx tsc --noEmit --pretty false --skipLibCheck -p tsconfig.json passed",
+    "openspecStrict": "parent-atlas-memory-architecture-freeze valid; parent-atlas-topology-representation-admission valid",
+    "gitDiffCheck": "passed for tracked task ledger; new/modified source files checked separately for trailing whitespace"
+  },
+  "likely_cause": "The supplied portfolio census is a historical snapshot and the current checkout has a broader multi-change backlog; local checkbox counts alone cannot prove task evidence or reconcile receipt identity.",
+  "evidence": [
+    "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md",
+    "sveltekit-frontend/src/lib/server/atlas/residency/nibble-encoding-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/context/evidence-depth-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/topology/topology-tile-v1.ts"
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/atlas/residency/nibble-encoding-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/residency/multi-plane-execution.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/context/evidence-depth-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/context/evidence-depth-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/topology/topology-tile-v1.ts",
+    "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md"
+  ],
+  "safe_next_command": "openspec instructions apply --change parent-atlas-memory-architecture-freeze --json",
+  "smoke_command": "npx vitest run --config vitest.lane-contracts.config.ts --pool=threads --maxWorkers=1 src/lib/server/atlas/context/evidence-depth-v1.spec.ts src/lib/server/atlas/residency/multi-plane-execution.spec.ts src/lib/server/atlas/residency/packet-class-lut-v1.spec.ts src/lib/server/atlas/residency/compact-codebook-residency.spec.ts",
+  "report_path": "docs/reports/openspec-remaining-task-progress-20261001.json"
+}

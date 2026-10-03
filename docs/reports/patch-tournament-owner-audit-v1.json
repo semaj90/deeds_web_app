@@ -1,6 +1,6 @@
 {
   "schema": "atlas.patch-tournament-owner-audit.v1",
-  "generatedAt": "2026-09-20T19:00:50.126Z",
+  "generatedAt": "2026-10-01T16:38:12.597Z",
   "purpose": "Inventory existing tournament, repair, worktree, review, and receipt owners before implementing the existing seam.",
   "authority": {
     "canonicalAuthority": false,
@@ -42,17 +42,17 @@
     },
     {
       "id": "CANDIDATE_GENERATION",
-      "status": "MISSING_OR_NOT_WIRED",
-      "ownerPath": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",
-      "evidence": "Planner consumes injected candidates; no current owner was found that generates exactly three isolated repair candidates for one live compile error.",
-      "nextGate": "CANDIDATE_GENERATION_OWNER"
+      "status": "FIXTURE_PROVEN_LIVE_DEFERRED",
+      "ownerPath": "scripts/atlas/run-patch-tournament-worktree-fixture-v1.mts",
+      "evidence": "Fixture worker generates exactly three isolated candidates and feeds the existing planner; live source-frame admission remains unproven.",
+      "nextGate": "ADMITTED_SOURCE_FRAME_AND_AUTHORIZED_LIVE_WORKTREE_EXECUTION"
     },
     {
       "id": "STATIC_AND_FOCUSED_EXECUTION",
-      "status": "MISSING_OR_NOT_WIRED",
-      "ownerPath": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",
-      "evidence": "Candidate check fields are part of the contract, but no tournament worker path currently populates them from isolated worktree execution.",
-      "nextGate": "AUTHORIZED_WORKTREE_WORKER"
+      "status": "FIXTURE_PROVEN_LIVE_DEFERRED",
+      "ownerPath": "scripts/atlas/run-patch-tournament-worktree-fixture-v1.mts",
+      "evidence": "Fixture worker populates static and focused checks from three isolated worktrees; live authorized execution remains unproven.",
+      "nextGate": "ADMITTED_SOURCE_FRAME_AND_AUTHORIZED_LIVE_WORKTREE_EXECUTION"
     },
     {
       "id": "HUMAN_REVIEW_BOUNDARY",
@@ -63,7 +63,7 @@
     },
     {
       "id": "ACE_COMPARISON_PACKET",
-      "status": "PROVEN_PLANNER_PACKET",
+      "status": "FIXTURE_PROVEN_PLANNER_PACKET",
       "ownerPath": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",
       "evidence": "Planner emits an ACE comparison packet, but a live worker-produced packet is not proven.",
       "nextGate": "ISOLATED_WORKTREE_EXECUTION"
@@ -78,9 +78,9 @@
   ],
   "summary": {
     "ownerCount": 9,
-    "provenOwnerCount": 4,
-    "unresolvedOwnerCount": 5,
-    "nextGate": "PATCH_TOURNAMENT_CANDIDATE_EXECUTION",
+    "provenOwnerCount": 6,
+    "unresolvedOwnerCount": 3,
+    "nextGate": "ADMITTED_SOURCE_FRAME_AND_AUTHORIZED_LIVE_WORKTREE_EXECUTION",
     "status": "PLANNER_AND_FIXTURE_PROVEN_LIVE_TOURNAMENT_DEFERRED"
   },
   "openSpecAlignment": {
@@ -94,8 +94,8 @@
       "Operator supplied a large consolidated \"Parent Atlas Workstation TODO\" (21 sections: representation contract, workstation validation gaps, graph freshness, canonical GDS architecture, snapshot materialization, named projection, BFS traversal, NetworkX/GDS parity, PageRank persistence, retrieval registry, reduce/synthesis/ranking pipelines, RTX acceleration plan, Qdrant mirror drift, MCP proof suite) plus corrections (RAPIDS proven, PageRank aligned+251,613 nodes, recommendation lifecycle fixed+new vocabulary bug found, RRF provenance fix, patch tournament GS1.41 accepted) plus a Kafka/SpecKit/GSD repository-layout proposal. Per operator's explicit choice, this pass was documentation-only — no new code.",
       "- [ ] NOT done (out of scope for this pass, per operator's \"documentation-only\" choice): RAPIDS-4..8 exact-KNN implementation, GS1.41 seam expansion, the new recommendation-lifecycle-vocabulary OpenSpec change itself, any Spec Kit/GSD scaffolding for the Kafka initiative, relaunching `graphify:daily`."
     ],
-    "disposition": "Reuse the existing PatchTournament planner and add only the missing isolated worker seam after authority and approval prerequisites are explicit."
+    "disposition": "Reuse the existing PatchTournament planner and fixture worker; live execution remains gated on admitted source lineage, authorization, and human approval."
   },
   "retryPolicy": "Do not retry live tournament execution until candidate generation, isolated worktree execution, and human approval receipts change from their current states.",
-  "checksum": "sha256:6493cba81ccc48ba1e76cb557bd7decb0153d854b9c558038a28a2c3f699f060"
+  "checksum": "sha256:96c2a7f53feacc660fa02b37db776e398adeec7a32adef0ced99e02a7477c93f"
 }

@@ -27,7 +27,7 @@ The ACP (Agent Control Plane) + infrastructure layers handle all memory, search,
 ↓
 UTF-8 bytes
 ↓
-Tokenizer (not Gemma)
+Tokenizer (not ornith 1.5 llama-server 8090 Gemma)
 ↓
 ~25–50 tokens
 ```
@@ -36,7 +36,7 @@ Tokenizer (not Gemma)
 
 ---
 
-### Stage 2: ACP Planner (Decision Logic)
+### Stage 2: is acp installed? did it update to a2a? ACP Planner (Decision Logic)
 
 The ACP asks **infrastructure**, not Gemma:
 
@@ -59,7 +59,7 @@ trace:gpu-reranker
 packet:gpu-reranker
 feature:telemetry
 
-Value (in Redis):
+Value (in Redis-valkey centroid):
 {
   summary: "GPU telemetry already implemented",
   packets: [...],
@@ -82,7 +82,7 @@ If Redis doesn't have it, ACP searches in priority order:
 User query (50 tokens)
     ↓
 rg search (codebase grep)
-    ├─ Postgres JSONB (atlas_packets, workflow summaries)
+    ├─ Postgres JSONB (needs auditing 93026) (atlas_packets, workflow summaries)
     ├─ Postgres FTS (full-text search on summaries)
     ├─ pgvector (semantic search on embedding)
     ├─ Qdrant (dense vector ANN)
@@ -144,7 +144,7 @@ Packet approach:
 
 ---
 
-### Stage 6: Gemma4 Synthesis (Last Stage Only)
+### Stage 6: ornith 1.5 llama-server 8090 updating rg keyword Gemma4 Synthesis (Last Stage Only)
 
 Now Gemma receives:
 
@@ -191,7 +191,7 @@ Just like CPU caches:
 ```
 Your AI Stack              CPU Architecture
 ─────────────────         ──────────────────
-Gemma4                    CPU registers
+ornith 1.5 llama-server 8090, updatingGemma4                    bitnet? offloading? bitfrost gpu cutile caches titans 2.0 hope, 4d rotations CPU registers
      ↓
 BitFrost Redis            L1 cache (32KB, ~5ns)
      ↓
@@ -460,10 +460,10 @@ ACP Router (decision tree)
 
 ## Hard Rules
 
-1. **Gemma is not the memory system.**
-   - Gemma should NEVER decide "what files to search."
-   - Gemma should NEVER tokenize the entire project.
-   - Gemma should NEVER do multiple queries to "explore" the codebase.
+1. ornith 1.5 llama-server 8090 updating from Gemma is not the memory system.**
+   -   ornith 1.5 llama-server 8090 should NEVER decide "what files to search."
+   -  ornith 1.5 llama-server 8090 should NEVER tokenize the entire project.
+   -   ornith 1.5 llama-server 8090 should NEVER do multiple queries to "explore" the codebase.
 
 2. **ACP is the retrieval + caching layer.**
    - ACP decides: "Do we have this cached?"

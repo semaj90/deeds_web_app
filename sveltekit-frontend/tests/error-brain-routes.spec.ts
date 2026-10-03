@@ -540,11 +540,9 @@ describe('POST /api/error-brain/diagnose', () => {
 		expect(res.status).toBeGreaterThanOrEqual(400);
 	});
 
-	it('accepts valid request with minimal fields', async () => {
-		// Mock all 5 stages to prevent real calls
-		mockCallOllamaChat.mockResolvedValue({
-			message: {
-				content: JSON.stringify({
+	it('uses the request-scoped fetch for authenticated graph context', async () => {
+		mockCallOllamaChat.mockResolvedValue(
+			JSON.stringify({
 					diagnosis: 'Test diagnosis result',
 					probableRootCauseType: 'type-error',
 					likelyFiles: ['src/test.ts'],
@@ -556,17 +554,21 @@ describe('POST /api/error-brain/diagnose', () => {
 					needsHumanReview: false,
 					unsafeToAutoPatch: false,
 				}),
-			},
-		});
+		);
 		mockDbExecute.mockResolvedValue({ rows: [] });
-
 		const event = makeRequest('POST', {
 			query: 'Cannot find name something in test file',
+			filePath: 'src/test.ts',
 			mode: 'file',
 		});
+		const graphFetch = vi.fn(async () => new Response(JSON.stringify({ nodes: [], edges: [] })));
+		Object.assign(event, { fetch: graphFetch });
+
 		const res = await POST(event);
-		// Should succeed (200) or gracefully degrade (503 when services unavailable)
-		expect([200, 503]).toContain(res.status);
+		expect(res.status).toBe(200);
+		expect(graphFetch).toHaveBeenCalledTimes(1);
+		const [, requestInit] = graphFetch.mock.calls[0];
+		expect(requestInit?.headers).toBeUndefined();
 	});
 
 	it('accepts consoleErrors and networkFailures arrays', async () => {

@@ -1,0 +1,267 @@
+{
+  "schema": "atlas.graphify-symbol-baseline-report.v1",
+  "generatedAt": "2026-09-30T16:28:26.922Z",
+  "basis": "EXTRACTOR_RECEIPT_READBACK_SNAPSHOTS_NOT_FRESH_DATABASE_AUDIT",
+  "manifestPath": "docs\\reports\\graphify-symbol-baseline-20260930-v5.json",
+  "manifestChecksum": "sha256:84cbf95f0258bb69985473f0c1fdb83b7a58a3d1585d18358b81b54f6aa6fb3d",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "producerRevision": "sha256:4a719216fe9353057d60cc9a3502912b10f8becb934f22b0ac75c2e49fde3487",
+  "rowCount": 14531,
+  "visitedMembers": 14531,
+  "independentlyVerifiedMembers": 13195,
+  "unresolvedMembers": 1336,
+  "shardCount": 59,
+  "shardsWithReceipts": 59,
+  "shardsReadbackProven": 34,
+  "baselineSealProven": false,
+  "outcomeCounts": {
+    "READBACK_FAILED": 443,
+    "PROCESSED_WITH_SYMBOLS": 7342,
+    "IDENTITY_CONFLICT_DEFERRED": 589,
+    "PROCESSED_NO_EVIDENCE": 229,
+    "PROCESSED_STRUCTURE_ONLY": 5624,
+    "RESOURCE_LIMIT_DEFERRED": 297,
+    "DEFERRED_PARSE_FAILED": 7
+  },
+  "receipts": [
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785678898.json",
+      "checksum": "sha256:df8a9aed418e2188db7ce73d494342df3aada15f867d408175a34a0c93e12a60"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785682455.json",
+      "checksum": "sha256:30d39f1c963e99ef56c7e4a375100821e7cc5fe64480836e1d19dbaae69b2e62"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785686227.json",
+      "checksum": "sha256:7d43897cf1704665a8ba3061df7c39a5d374796ec88129c4342f61c00053cd04"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785686689.json",
+      "checksum": "sha256:10d389d69d091d4b05232ab7dba015b39e6c9a5d50f55525189c143cbbf8d2d1"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785473598.json",
+      "checksum": "sha256:d9772e5d9dfc05a1d8debcadf799253bda698621c021c468f5d467f889b40169"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785476216.json",
+      "checksum": "sha256:d1c6c21d3084cf7a1a16a792da67bb37202890495dc26fa7d93a4c604bb7eafd"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785478688.json",
+      "checksum": "sha256:3125c0a7f43da40119378aebe286cd5ea1715d448e30df8796a04d65269a0fed"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785481866.json",
+      "checksum": "sha256:1238e79b9c37f47ec4a727a9dcf7368691d3598b3d0f0b6a98f65337c98cc98c"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785485699.json",
+      "checksum": "sha256:95e05c3ffa394a76e065b3662e7b190d9b42073f8ba39a645e6ab28840b7777f"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785488952.json",
+      "checksum": "sha256:3f5e56b72d84c4e7d92d0a466c586fbdb9a36d78e773e5af84b15bbca16e56ab"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785491924.json",
+      "checksum": "sha256:d156d221439bd332b3d6d11a5102270a7d1aa81f76fbe9403e6f826b676c42d4"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785496657.json",
+      "checksum": "sha256:538a778fa031beccd8e2332ff6be63eeb630dfb0a7544e6ea5d2c9bb3887efa5"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785500310.json",
+      "checksum": "sha256:941642030fd2e1d5c8b379747d02696cf9853885bda5fa0239b0a5a01b5dbe82"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785504004.json",
+      "checksum": "sha256:fad73ada6cf89fe2bfadaa60d74d68190ab33e95c3d438a0743b2f968c1eebd9"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785506641.json",
+      "checksum": "sha256:19e7d70e4ebdd9de4f9d127b773904126a7263ec8154d4e765a70c0ae196b4f5"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785509094.json",
+      "checksum": "sha256:49861c26338798a5e372c3199f18e3f19ac195d9ba22fff52cc81536d6797afe"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785511949.json",
+      "checksum": "sha256:9de45c7399945a3735aa19385aa93f5d6fdebdd36b37ee38697c681e1621bf6d"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785515155.json",
+      "checksum": "sha256:11838c01249cc569972252b8c6306136ff8fb39efd850f8e84176b354fa3d3fa"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785518168.json",
+      "checksum": "sha256:bdb495f590ae6b4f53cf197453839664c60480f2274f1d937e0246426df4fd47"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785522610.json",
+      "checksum": "sha256:0de8da0eacd560e98bc06be82790a6f9ee355dba0de98d442090591ba4b66ef6"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785526527.json",
+      "checksum": "sha256:2175d7a09395c1f456fb3f8e5169f7bb472f11fc49de8904e935daa5a092fdc8"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785532617.json",
+      "checksum": "sha256:361ed50498a2ecb5e46191d2c1a09a0f8cc3e46ef1a2bc5916e76b5334aa1647"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785536672.json",
+      "checksum": "sha256:e747c1c9c0d1d98aac06d9f2762d7dd27049022199583f64562ad624348c68d7"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785539699.json",
+      "checksum": "sha256:d829a7a6040cc53423c357d00dfc7ba278ae96bd48f2850c924a8949222c4238"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785542715.json",
+      "checksum": "sha256:17c8d80abd206f9df5fc806b05e7365f15afa2e461c8a2f0da9989e8e79cfece"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785547109.json",
+      "checksum": "sha256:9a3bdb544903176165a244a7e5fbc7c5234673af7830637cde0803aee8d4ec0c"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785551965.json",
+      "checksum": "sha256:d646de0626f8ba2f320eef44206e20da318d445c79d92639c8f233af35dfcb6a"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785556449.json",
+      "checksum": "sha256:c832bb331fa23921be3ec1af7faab8ca59b38237034cdce80589174289ab1421"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785563682.json",
+      "checksum": "sha256:bf638c569000fc68d6f1c5c91f2215810d5658b7c4847a0f5c57bbb1dc939775"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785571599.json",
+      "checksum": "sha256:59bd15f2517bf41f2d046ee07be17b3113b658793fa02dd0e7e7ddd0fbb31d24"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785578180.json",
+      "checksum": "sha256:9de015ed8d3c5ab3326454910e4fd267128cdf7c21e95fe050046414dc4b142f"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785582131.json",
+      "checksum": "sha256:4fd4dfe28b6981ef9fc302e124390df0416cd1f50032380dceb08d54220c23f3"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785585921.json",
+      "checksum": "sha256:0d92f80cae8be4cc9fbd26010ad2662ba37d3e8cb8195d98677d3e6000280bb6"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785589595.json",
+      "checksum": "sha256:e042c38109213a4bc10e2474a5c87a6031e38cfea5ffc42aaaa5e8d9d976c2f1"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785595837.json",
+      "checksum": "sha256:c7e2dade17c76a78cbdcb9ef15fe83b1fef5326a3085c4ffaa168b6ecd9ee173"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785599000.json",
+      "checksum": "sha256:62520bbec2bc88eb9bb7d95130f4bc2c7474d58d27e2b69965a94e797807157b"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785603769.json",
+      "checksum": "sha256:832c3d125df35c6bcb14dbbf40511f8aaa5afd8aa9b3aa766dae86729ed041af"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785608131.json",
+      "checksum": "sha256:778bc0460813d412a3ebdc78519ed57ae40946cb086e62076c9aa1d517c40a77"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785611243.json",
+      "checksum": "sha256:e7385d9403292ad709f8011a8bbd49ab3eba52f3c727be55f0a103ccd55a78f2"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785613883.json",
+      "checksum": "sha256:c8cffc339fad82d0ad3bd3c9df11dc9bf541276a90d49b924d36b31b85ce534c"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785616763.json",
+      "checksum": "sha256:cd8316926346c085d9c69d442c7497d4d5a18d95a31f0f74721f102136561eb3"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785619200.json",
+      "checksum": "sha256:129894c317fa2f566ddce6be3c2edc5475b14bd82503264d72d5417e71d35ed7"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785622157.json",
+      "checksum": "sha256:8e44000814c874b4a683f2b58d2e8c99df9c4013a6d0bd1585e30313d1df47cc"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785625561.json",
+      "checksum": "sha256:c223c08518ce5772025223d3dbf0c510a7532b8df17e86ec7010fefbfe61390d"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785628436.json",
+      "checksum": "sha256:6dcc15155d566fd1bd445180fa6fb3c58e038ab18da06e71e5675750267253ef"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785631127.json",
+      "checksum": "sha256:63fe09b23af027acaea59f816122e6b54205104e4edd01798d96aa401cb442c5"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785633908.json",
+      "checksum": "sha256:62177fb38eb9ee4b7914ad2e9750806006614a7c4f4bb326deb817c442b0420d"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785636696.json",
+      "checksum": "sha256:54cb19ed7c992e2cb5fe82cdbd6387137097960839f1f745c76b282579ee9663"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785640852.json",
+      "checksum": "sha256:504de4b50dab7fc2e546c986b9d102615f088f1c2f11474ac849f4e521749589"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785643782.json",
+      "checksum": "sha256:d8dbe3eb055603b8f8d97a59441f8b050f707723ca4fa3ff9b678f4039c70d31"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785646462.json",
+      "checksum": "sha256:57adbdf622481f675ed51e83af43b647324c5129a7b11aa270b85ed80823aace"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785649529.json",
+      "checksum": "sha256:1898a9577d364a358f41b1732ba53d4cee863e1edf3f26072d170ecd137f2401"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785652702.json",
+      "checksum": "sha256:1624d4c3592fd72940956a3f83e65bdcbb8c19d4742480e56d2608836b847a7d"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785656252.json",
+      "checksum": "sha256:5a1bc86bdc2164dd89ba2d474f69ff86530201b38e4fba934ca4eece90fc04b1"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785659449.json",
+      "checksum": "sha256:6e3f420c523817d9c42842c382f87cb906f410a937342a2fafeb348b1908d1a8"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785663031.json",
+      "checksum": "sha256:6390fa0c9ea4fd139f742cf838d8f19bd892f3b7caa2a2e14e9e8c38e941d78f"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785666234.json",
+      "checksum": "sha256:56aae7ae2e874bbd7d5331a966bc30782f2102978ea0d077c027364d1654e441"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785670491.json",
+      "checksum": "sha256:182d5c3622c29e92b82d77f81951039f293021272c3127dc21f6ea0f509363bd"
+    },
+    {
+      "path": "docs\\reports\\graphify-symbol-extractor-v1-1790785675166.json",
+      "checksum": "sha256:e8144b281d3e6445e06405d6d544eaea7160a3e60876e73c0b88263d7171f40d"
+    }
+  ],
+  "canonicalAuthority": false,
+  "datastoreWrites": false,
+  "projectionAdmissionPromoted": false
+}

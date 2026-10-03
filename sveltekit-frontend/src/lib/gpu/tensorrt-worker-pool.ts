@@ -387,8 +387,11 @@ export async function gpuPageRank(
 
 	if (result.error || !result.data) throw new Error(result.error || 'PageRank computation failed');
 	const prData = result.data;
-	if (prData instanceof Float32Array) {
-		return prData;
+	if (Object.prototype.toString.call(prData) === '[object Float32Array]') {
+		return Float32Array.from(prData as ArrayLike<number>);
+	}
+	if (Array.isArray(prData)) {
+		return Float32Array.from(prData, Number);
 	}
 	// Convert from Int32Array if needed (scaled values)
 	const pr = new Float32Array((prData as any).length);

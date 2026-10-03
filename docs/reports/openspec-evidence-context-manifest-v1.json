@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.openspec-evidence-context-manifest.v1",
+  "mode": "READ_ONLY_ACE_MANIFEST_COMPILATION",
+  "status": "BLOCKED_RETRIEVAL_GATE",
+  "source": {
+    "cards": "docs/reports/openspec-evidence-cards-v1.json",
+    "retrievalAudit": "docs/reports/openspec-evidence-hybrid-rrf-audit-v1.json",
+    "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b"
+  },
+  "selection": {
+    "requestedTaskIds": [],
+    "selectedTaskCount": 0,
+    "missingTaskIds": [],
+    "maxCards": 8,
+    "maxBytes": 32000,
+    "contextBytes": 2
+  },
+  "cards": [],
+  "queryPlanRevision": "sha256:f334eea11d76628d1e285a1e1a7717f996f32e258985c0fdd4b7c2873ed90a4c",
+  "manifestChecksumInputs": {
+    "cardChecksums": [],
+    "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
+    "queryPlanRevision": "sha256:f334eea11d76628d1e285a1e1a7717f996f32e258985c0fdd4b7c2873ed90a4c"
+  },
+  "policy": {
+    "rawDocumentsInjected": false,
+    "sourceRefRequired": true,
+    "conceptIdRequired": true,
+    "confidenceScoreRequired": true,
+    "contextBlobRequired": true,
+    "dependencyExpansionBudget": 0,
+    "receiptPromotionBudget": 0,
+    "redisWrites": false,
+    "proofStatePromotion": false
+  },
+  "writesPerformed": false,
+  "likely_cause": "ACE must receive bounded, revision-qualified EvidenceCards rather than raw retrieval hits or documents.",
+  "evidence": [
+    "docs/reports/openspec-evidence-cards-v1.json",
+    "docs/reports/openspec-evidence-hybrid-rrf-audit-v1.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/compile-openspec-evidence-context-manifest-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-openspec-evidence-hybrid-rrf-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/compile-openspec-evidence-context-manifest-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-context-manifest-v1.json",
+  "generatedAt": "2026-10-02T04:47:37.315Z",
+  "checksum": "sha256:54c64660b2fe7fc785bdb67291abab00690dfa4233b780b47b52a0b3430e8f08"
+}

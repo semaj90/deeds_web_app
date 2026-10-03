@@ -73,6 +73,27 @@ const revisions = {
 };
 
 describe('Graphify structural intelligence adapter', () => {
+  it('exposes a relation graph only when source bytes and both revisions are exact digests', () => {
+    const sourceRevision = `sha256:${createHash('sha256').update(source, 'utf8').digest('hex')}`;
+    const workspaceRevision = `sha256:${createHash('sha256').update('workspace snapshot', 'utf8').digest('hex')}`;
+    const exactMaterialization = materialization('PROVEN');
+    exactMaterialization.sourceRevision = sourceRevision;
+    exactMaterialization.evidence!.source_revision = sourceRevision;
+    const result = compileGraphifyStructuralIntelligence({
+      parserBuffer: Buffer.from(source, 'utf8'),
+      source,
+      workspaceRevision,
+      materialization: exactMaterialization,
+      revisions,
+    });
+
+    expect(result.relationGraph?.status).toBe('COMPILED');
+    expect(result.relationGraph?.graph?.nodes).toHaveLength(1);
+    expect(result.receipt.relationGraphChecksum).toBe(result.relationGraph?.graph?.checksum);
+    expect(result.receipt.relationGraphNodeCount).toBe(1);
+    expect(result.receipt.canonicalIdentityCreated).toBe(false);
+  });
+
   it('fails closed when structural evidence is absent', () => {
     const noEvidence = { ...materialization('PROVEN'), evidence: null, normalized: null };
     const result = compileGraphifyStructuralIntelligence({
@@ -86,6 +107,7 @@ describe('Graphify structural intelligence adapter', () => {
     expect(result.receipt.langExtractParserBufferPresent).toBe(false);
     expect(result.receipt.langExtractParserBufferMatchesSource).toBe(false);
     expect(result.receipt.canonicalPromotionMayBeAttempted).toBe(false);
+    expect(result.relationGraph).toBeNull();
   });
 
   it('compiles native evidence + ast-grep + grounded LangExtract without creating canonical identity', () => {
@@ -143,6 +165,7 @@ describe('Graphify structural intelligence adapter', () => {
     expect(result.receipt.canonicalIdentityCreated).toBe(false);
     expect(result.fabric?.symbol_nominations[0]?.upstream_symbol_id).toBe('symbol-patch');
     expect(result.fabric?.ast_grep_observations[0]?.upstream_node_id).toBe('node-patch');
+    expect(result.relationGraph?.reason).toBe('SOURCE_REVISION_NOT_BYTE_DIGEST');
   });
 
   it('compiles recovered evidence for search but blocks canonical promotion', () => {

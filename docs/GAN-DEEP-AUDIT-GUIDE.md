@@ -1,7 +1,7 @@
 # GAN Deep Audit Guide
 
-**Status**: HISTORICAL SNAPSHOT (2026-06-26) — see the Current Alignment Overlay below; the original "COMPLETE" claim is not current  
-**Date**: June 26, 2026 (Session 85)  
+**Status**: HISTORICAL SNAPSHOT (2026-06-26) — see the Current Alignment Overlay below; the original "COMPLETE" claim is not current
+**Date**: June 26, 2026 (Session 85)
 **Scope**: Feature registry search + token savings analysis + production hardening
 
 ---
@@ -18,7 +18,7 @@ This guide is a **June 26, 2026 (Session 85) implementation snapshot**. Its impl
 - The "three search tiers" below are **executors/storage surfaces, not authority tiers**. A cache or semantic result must resolve back to the same canonical feature identity and revision before admission; "BitFrost misses, then Postgres misses, then a Qdrant result, therefore a canonical feature" is forbidden. Candidate ordinals, vector point IDs, cache keys and transport IDs are not canonical identity.
 - Token-savings analysis is advisory utility and can never weaken identity, revision, evidence or hardening validation. CORRECTNESS (schema, identity, revision, constraint, owner, hardening) and UTILITY (token estimate, context reduction, cache hit, latency, recommendation) stay separate; a recommendation can never make an invalid packet admissible.
 - "Full integration with the GAN audit pipeline" means core-module integration only; endpoint/runtime/telemetry replay is unproven.
-- Synthesis for new work = Ornith-1.5-9B via llama-server `:8090` (Gemma4 names are legacy compatibility labels; no Ollama on a canonical path). The "LangGraph worker" path is historical: trace current adaptive-DAG/agent-runtime ownership before wiring anything. ML route selection is a challenger only, after a deterministic routing/evaluation baseline. Do not create another registry owner or a `feature_registry_queries` table: first census the current registry/materializer and whether existing retrieval telemetry, audit receipts or workflow-event tables already own that data.
+- Synthesis for new work = Ornith-1.5-9B via llama-server `:8090` (ornith 1.5 llama-server 8090 Gemma4 names are legacy compatibility labels; no Ollama on a canonical path). The "LangGraph worker" path is historical: trace current adaptive-DAG/agent-runtime ownership before wiring anything. ML route selection is a challenger only, after a deterministic routing/evaluation baseline. Do not create another registry owner or a `feature_registry_queries` table: first census the current registry/materializer and whether existing retrieval telemetry, audit receipts or workflow-event tables already own that data.
 
 **Historical benchmark policy:** every latency/memory/hit-rate/packet-count figure in this guide is `HISTORICAL_BENCHMARK_2026_06_26` (500-1000 packets, June corpus), not an SLA. A current benchmark must record workstation/runtime revision, packet/feature cohort checksum, candidate count, cache state, warm/cold, per-executor and total latency, sample count, and errors/fallbacks.
 
@@ -434,7 +434,7 @@ npm run atlas:gan-audit:deep:full 2>&1 | tee logs/gan-deep-audit.log
 
 ---
 
-**Maintained by**: Claude (Anthropic)  
-**Last Updated**: June 26, 2026 @ 18:15 UTC  
-**Session**: 85 (Phase 2.5 Continuation)  
+**Maintained by**: Claude (Anthropic)
+**Last Updated**: June 26, 2026 @ 18:15 UTC
+**Session**: 85 (Phase 2.5 Continuation)
 **Status**: PROVEN_HISTORICAL_REQUIRES_CURRENT_REPLAY (was "FEATURE-COMPLETE, READY FOR INTEGRATION"; now READY_FOR_CURRENT_OWNER_REPLAY)

@@ -26,27 +26,44 @@ function parseArgs(argv) {
   if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 8) {
     throw new Error('CONCURRENCY_MUST_BE_INTEGER_1_TO_8');
   }
-  if (Object.keys(args).some((key) => !['concurrency', 'out'].includes(key))) {
+  if (Object.keys(args).some((key) => !['concurrency', 'out', 'config'].includes(key))) {
     throw new Error('UNKNOWN_ARGUMENT');
   }
-  return { concurrency, out: args.out ?? null };
+  return { concurrency, out: args.out ?? null, config: args.config ?? null };
 }
 
 function validateConfig(config) {
-  if (config?.schema !== 'atlas.external-doc-corpus-discovery.v1'
-    || config.canonicalAuthority !== false
-    || config.artifactOnly !== true
-    || config.sections?.length !== 3) {
+  if (
+    config?.schema !== 'atlas.external-doc-corpus-discovery.v1' ||
+    config.canonicalAuthority !== false ||
+    config.artifactOnly !== true ||
+    !Array.isArray(config.sections) ||
+    config.sections.length < 1 ||
+    config.sections.length > 64
+  ) {
     throw new Error('CORPUS_CONFIG_INVALID');
+  }
+  const authority = new URL(config.authority);
+  if (authority.protocol !== 'https:' || authority.origin !== config.authority) {
+    throw new Error('CORPUS_AUTHORITY_INVALID');
   }
   const ids = new Set();
   for (const section of config.sections) {
     const index = new URL(section.indexUrl);
-    if (index.origin !== config.authority || !index.pathname.endsWith('/llms.txt')) {
+    const isLlmIndex = index.pathname.endsWith('/llms.txt');
+    const isAdvertisedMarkdownIndex =
+      index.pathname.startsWith('/_llms/') && index.pathname.endsWith('.md');
+    if (index.origin !== config.authority || (!isLlmIndex && !isAdvertisedMarkdownIndex)) {
       throw new Error(`SECTION_INDEX_OUTSIDE_AUTHORITY:${section.id}`);
     }
     if (!section.allowedPathPrefix.startsWith('/') || !section.allowedPathPrefix.endsWith('/')) {
       throw new Error(`SECTION_PREFIX_INVALID:${section.id}`);
+    }
+    if (
+      section.language !== undefined &&
+      (typeof section.language !== 'string' || !section.language.trim())
+    ) {
+      throw new Error(`SECTION_LANGUAGE_INVALID:${section.id}`);
     }
     if (ids.has(section.id)) throw new Error(`DUPLICATE_SECTION_ID:${section.id}`);
     ids.add(section.id);
@@ -54,15 +71,18 @@ function validateConfig(config) {
   return config;
 }
 
-async function fetchBytes(url, maxBytes) {
+async function fetchBytes(url, maxBytes, allowedOrigin) {
   const response = await fetch(url, {
-    headers: { accept: 'text/markdown, text/plain;q=0.9, */*;q=0.1', 'user-agent': 'ParentAtlas-ExternalDocs/1.0' },
+    headers: {
+      accept: 'text/markdown, text/plain;q=0.9, */*;q=0.1',
+      'user-agent': 'ParentAtlas-ExternalDocs/1.0',
+    },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     redirect: 'follow',
   });
   if (!response.ok) throw new Error(`HTTP_${response.status}`);
   const resolved = new URL(response.url);
-  if (resolved.origin !== 'https://docs.langchain.com') throw new Error('REDIRECT_OUTSIDE_ALLOWED_ORIGIN');
+  if (resolved.origin !== allowedOrigin) throw new Error('REDIRECT_OUTSIDE_ALLOWED_ORIGIN');
   const chunks = [];
   let size = 0;
   for await (const chunk of response.body) {
@@ -126,15 +146,53 @@ async function fetchWithWorkers(rows, concurrency, fn) {
   return results;
 }
 
+export function rejectDuplicateResolvedPageAliases(discovered, pages) {
+  const result = pages.map((page) => ({ ...page }));
+  const groups = new Map();
+  for (let index = 0; index < result.length; index++) {
+    const page = result[index];
+    if (page.status !== 'FETCHED') continue;
+    const key = `${page.sectionId}\u0000${page.resolvedUrl}`;
+    const group = groups.get(key) ?? [];
+    group.push(index);
+    groups.set(key, group);
+  }
+
+  for (const indexes of groups.values()) {
+    if (indexes.length < 2) continue;
+    const hashes = new Set(indexes.map((index) => result[index].normalizedSha256));
+    if (hashes.size !== 1) {
+      for (const index of indexes) {
+        result[index] = { status: 'FAILED', error: 'RESOLVED_URL_CONTENT_CONFLICT' };
+      }
+      continue;
+    }
+    const canonicalIndex =
+      indexes.find((index) => discovered[index].url === result[index].resolvedUrl) ?? indexes[0];
+    for (const index of indexes) {
+      if (index !== canonicalIndex) {
+        result[index] = { status: 'FAILED', error: 'DUPLICATE_RESOLVED_URL_ALIAS' };
+      }
+    }
+  }
+  return result;
+}
+
 async function main() {
-  const { concurrency, out } = parseArgs(process.argv.slice(2));
-  const config = validateConfig(JSON.parse(await readFile(CONFIG_PATH, 'utf8')));
+  const { concurrency, out, config: configArg } = parseArgs(process.argv.slice(2));
+  const configPath = path.resolve(ROOT, configArg ?? CONFIG_PATH);
+  const configRoot = path.join(ROOT, 'docs/.okf/topics/langchain');
+  const configRelative = path.relative(configRoot, configPath);
+  if (configRelative.startsWith('..') || path.isAbsolute(configRelative)) {
+    throw new Error('CONFIG_OUTSIDE_LANGCHAIN_TOPIC_ROOT');
+  }
+  const config = validateConfig(JSON.parse(await readFile(configPath, 'utf8')));
   const runId = new Date().toISOString().replaceAll(/[-:.]/g, '').replace('Z', 'Z');
   const outputDir = safeOutputPath(out, runId);
   await mkdir(ARTIFACT_ROOT, { recursive: true });
   await mkdir(outputDir, { recursive: false });
 
-  const rootIndex = await fetchBytes(config.discoveryIndex, MAX_INDEX_BYTES);
+  const rootIndex = await fetchBytes(config.discoveryIndex, MAX_INDEX_BYTES, config.authority);
   const rootText = normalizeMarkdown(rootIndex.bytes);
   const rootIndexLinks = new Set([...rootText.matchAll(/\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/g)]
     .map((match) => new URL(match[1], config.discoveryIndex).href));
@@ -147,7 +205,7 @@ async function main() {
   const indexResults = [];
   const discovered = [];
   for (const section of config.sections) {
-    const fetched = await fetchBytes(section.indexUrl, MAX_INDEX_BYTES);
+    const fetched = await fetchBytes(section.indexUrl, MAX_INDEX_BYTES, config.authority);
     const indexText = normalizeMarkdown(fetched.bytes);
     const urls = extractScopedMarkdownUrls(indexText, section, config.authority);
     if (urls.length === 0) throw new Error(`EMPTY_SECTION_INDEX:${section.id}`);
@@ -155,6 +213,7 @@ async function main() {
     const urlSetBytes = Buffer.from(`${urls.join('\n')}\n`, 'utf8');
     indexResults.push({
       sectionId: section.id,
+      language: section.language ?? null,
       indexUrl: section.indexUrl,
       status: 'FETCHED',
       byteLength: fetched.bytes.length,
@@ -170,9 +229,11 @@ async function main() {
     if (seen.has(row.url)) throw new Error(`URL_CLAIMED_BY_MULTIPLE_SECTIONS:${row.url}`);
     seen.add(row.url);
   }
-  const pages = await fetchWithWorkers(discovered, concurrency, async ({ section, url }) => {
-    const fetched = await fetchBytes(url, MAX_PAGE_BYTES);
-    if (!/^(text\/markdown|text\/plain|application\/octet-stream)(;|$)/i.test(fetched.contentType)) {
+  const fetchedPages = await fetchWithWorkers(discovered, concurrency, async ({ section, url }) => {
+    const fetched = await fetchBytes(url, MAX_PAGE_BYTES, config.authority);
+    if (
+      !/^(text\/markdown|text\/plain|application\/octet-stream)(;|$)/i.test(fetched.contentType)
+    ) {
       throw new Error(`DIRECT_MARKDOWN_CONTENT_TYPE_UNEXPECTED:${fetched.contentType}`);
     }
     const normalized = normalizeMarkdown(fetched.bytes);
@@ -183,14 +244,23 @@ async function main() {
     await mkdir(path.dirname(pagePath), { recursive: true });
     await writeFile(pagePath, normalized, { flag: 'wx' });
     return {
-      status: 'FETCHED', sectionId: section.id, product: section.product,
-      canonicalUrl: url, resolvedUrl: fetched.resolvedUrl, fetchMethod: 'DIRECT_MARKDOWN',
-      contentType: fetched.contentType, rawSha256: sha256(fetched.bytes),
+      status: 'FETCHED',
+      sectionId: section.id,
+      product: section.product,
+      language: section.language ?? null,
+      canonicalUrl: url,
+      resolvedUrl: fetched.resolvedUrl,
+      fetchMethod: 'DIRECT_MARKDOWN',
+      contentType: fetched.contentType,
+      rawSha256: sha256(fetched.bytes),
       normalizedSha256: sha256(Buffer.from(normalized, 'utf8')),
-      byteLength: Buffer.byteLength(normalized, 'utf8'), artifactPath,
-      fallbackStatus: 'NOT_NEEDED', canonicalAuthority: false,
+      byteLength: Buffer.byteLength(normalized, 'utf8'),
+      artifactPath,
+      fallbackStatus: 'NOT_NEEDED',
+      canonicalAuthority: false,
     };
   });
+  const pages = rejectDuplicateResolvedPageAliases(discovered, fetchedPages);
 
   const successPages = pages.filter((page) => page.status === 'FETCHED');
   const failures = pages.map((page, i) => page.status === 'FAILED'

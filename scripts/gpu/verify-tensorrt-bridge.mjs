@@ -77,16 +77,14 @@ if (checks.bridge_binary) {
 
 // G3: simdjson function available
 if (addon && typeof addon.simdJsonParse === 'function') {
-  checks.simdjson_works = true;
-  log(`  ${c.g('✓')} simdjson simdJsonParse available`);
-
-  // Quick test
-  const testJson = JSON.stringify({ test: 'value', num: 42 });
+  const testJson = JSON.stringify({ marker: 'simdjson-native-probe', num: 42, padding: 'x'.repeat(2048) });
   try {
-    const result = addon.simdJsonParse(testJson);
-    if (result && result.test === 'value') {
-      log(`     Test parse: PASS`);
-    }
+    const nativeResult = addon.simdJsonParse(testJson);
+    const result = typeof nativeResult === 'string' ? JSON.parse(nativeResult) : nativeResult;
+    checks.simdjson_works = result?.marker === 'simdjson-native-probe'
+      && result?.num === 42
+      && result?.padding === 'x'.repeat(2048);
+    log(`  ${checks.simdjson_works ? c.g('✓') : c.r('✗')} simdjson native parse ${checks.simdjson_works ? 'PASS' : 'FAIL'}`);
   } catch (parseErr) {
     warn(`     Test parse: FAIL (${parseErr.message})`);
   }

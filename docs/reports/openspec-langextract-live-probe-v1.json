@@ -1,0 +1,233 @@
+{
+  "schema": "atlas.openspec-langextract-proposals.v1",
+  "mode": "READ_ONLY_SIDECAR_PROBE",
+  "status": "PROPOSALS_CAPTURED_NOT_ADMITTED",
+  "source": {
+    "census": "docs/reports/openspec-evidence/20261001170333076-b45a8aca0bd7/census-v1.json",
+    "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b"
+  },
+  "selection": {
+    "limit": 2,
+    "selectedTaskCount": 2,
+    "selectedTaskRefs": [
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L23",
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30"
+    ]
+  },
+  "sourceWindows": [
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L23",
+      "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:8f57b7c38623cad8a51cfb269d0ce3b7d3a75fe2c8940796c0cf0a35e291e04f",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L23",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "sourceSpan": {
+        "startChar": 1508,
+        "endChar": 1600,
+        "text": "- [x] Fully read `src/routes/api/cartridge/export/+server.ts` end to end. **Fully live, real"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+      "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:296705d6e54d435b4a963170df6c4ffefe5b75657aca2adf7d97058b55214933",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "sourceSpan": {
+        "startChar": 2140,
+        "endChar": 2235,
+        "text": "- [x] **Resolved: CHR97/cartridge does NOT consume graphify output at all.** Its data source is"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    }
+  ],
+  "sidecar": {
+    "url": "http://127.0.0.1:8095",
+    "endpoint": "/extract",
+    "health": {
+      "ok": true,
+      "httpStatus": 200,
+      "payload": {
+        "status": "ok",
+        "model": "ornith-1.5-9b",
+        "runtime": {
+          "pythonExecutable": "/usr/local/bin/python",
+          "pythonVersion": "3.13.15",
+          "environmentType": "system-python"
+        },
+        "capabilities": {
+          "spacy": true,
+          "spacy_pos": true,
+          "langextract": true,
+          "tree_sitter": true,
+          "treesitter_chunker": true,
+          "ast_grep": true,
+          "torch": false,
+          "networkx": true,
+          "nx_cugraph": false,
+          "cugraph": false,
+          "cuvs": false,
+          "cupy": false,
+          "classification_helper": true
+        },
+        "capabilityDetails": {
+          "spacy_model": {
+            "package": "en_core_web_sm",
+            "installed": true,
+            "loaded": true,
+            "pos_ready": true
+          },
+          "networkx": {
+            "installed": true,
+            "active": true,
+            "owner": "entity_graph_metrics",
+            "scope": "per_document_entity_graph"
+          },
+          "nx_cugraph": {
+            "installed": false,
+            "active": false,
+            "owner": null
+          },
+          "rapids_graph_executor": {
+            "available": false,
+            "runtime": null,
+            "owner": "external_wsl2_rapids_executor",
+            "note": "The CPU NLP sidecar does not probe or own the external RAPIDS runtime."
+          }
+        },
+        "imports": {
+          "langextract": {
+            "available": true,
+            "version": "1.6.0",
+            "modulePath": "/usr/local/lib/python3.13/site-packages/langextract/__init__.py",
+            "importVerified": true,
+            "editableSource": null,
+            "beautifulsoup4": {
+              "available": true,
+              "version": "4.15.0",
+              "modulePath": null,
+              "importVerified": true
+            }
+          },
+          "treesitterChunker": {
+            "available": true,
+            "version": "4.0.0",
+            "modulePath": "/usr/local/lib/python3.13/site-packages/chunker/__init__.py",
+            "moduleName": "chunker",
+            "importVerified": true,
+            "fixtureVerified": false
+          },
+          "treeSitterLanguagePack": {
+            "available": true,
+            "version": "0.9.0",
+            "importVerified": true
+          },
+          "astGrepPy": {
+            "available": true,
+            "version": "0.45.3",
+            "importVerified": true
+          }
+        },
+        "timestamp": 1790874470658,
+        "contract": "provenance-v2"
+      }
+    },
+    "requested": true,
+    "timeoutMs": 30000
+  },
+  "extraction": [
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L23",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "httpStatus": 200,
+      "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0",
+      "groundedExtractionUsed": false,
+      "proposals": []
+    },
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "httpStatus": 200,
+      "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0",
+      "groundedExtractionUsed": true,
+      "proposals": [
+        {
+          "proposalId": "openspec-langextract:08700de1ec473309c0e2e2af1a93b0dd",
+          "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+          "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:296705d6e54d435b4a963170df6c4ffefe5b75657aca2adf7d97058b55214933",
+          "proposalType": "LANGEXTRACT_CANDIDATE",
+          "value": "CHR97/cartridge",
+          "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+          "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+          "sourceSpan": {
+            "startChar": 2158,
+            "endChar": 2173,
+            "text": "CHR97/cartridge"
+          },
+          "exactGrounding": true,
+          "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0",
+          "modelId": null,
+          "canonicalAdmission": false,
+          "proofPromotion": false,
+          "taskMutation": false
+        }
+      ]
+    }
+  ],
+  "proposals": [
+    {
+      "proposalId": "openspec-langextract:08700de1ec473309c0e2e2af1a93b0dd",
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+      "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:296705d6e54d435b4a963170df6c4ffefe5b75657aca2adf7d97058b55214933",
+      "proposalType": "LANGEXTRACT_CANDIDATE",
+      "value": "CHR97/cartridge",
+      "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "sourceSpan": {
+        "startChar": 2158,
+        "endChar": 2173,
+        "text": "CHR97/cartridge"
+      },
+      "exactGrounding": true,
+      "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0",
+      "modelId": null,
+      "canonicalAdmission": false,
+      "proofPromotion": false,
+      "taskMutation": false
+    }
+  ],
+  "errors": [],
+  "policy": {
+    "proposalOnly": true,
+    "canonicalAdmission": false,
+    "proofPromotion": false,
+    "checkboxMutation": false,
+    "heuristicMatchCountsAsProof": false,
+    "sourceSpanRequired": true,
+    "existingNlpSidecarAuthority": "observation-only; no task identity or proof state ownership"
+  },
+  "writesPerformed": false,
+  "likely_cause": "Unresolved OpenSpec prose and legacy structures need grounded observation without allowing NLP output to create identity or proof.",
+  "evidence": [
+    "docs/reports/openspec-evidence/20261001170333076-b45a8aca0bd7/census-v1.json",
+    "scripts/atlas/audit-langextract-grounding-v1.mjs",
+    "ATLAS_NLP_SIDECAR_URL"
+  ],
+  "patch_targets": [
+    "scripts/atlas/propose-openspec-langextract-candidates-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/plan-openspec-evidence-ledger-import-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/propose-openspec-langextract-candidates-v1.mjs",
+  "report_path": "docs/reports/openspec-langextract-live-probe-v1.json",
+  "generatedAt": "2026-10-01T17:07:51.660Z",
+  "checksum": "sha256:7c97db454aaf5c54a0957427959d288d4d9046efdfd0b9daed51dd5c832d32f0"
+}

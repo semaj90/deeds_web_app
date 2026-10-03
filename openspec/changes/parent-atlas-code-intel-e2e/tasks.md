@@ -236,6 +236,147 @@ dependency chain (source → symbol → AST/LSP → graph → retrieval → Cont
       one, per this file's own Duplication Prevention rule #5: "new agent-facing capabilities
       register in ACP, not just HTTP"). Depends on CODE-IMPACT-01.
 
+## External code-intelligence challenger evaluation
+
+These are optional comparison candidates, not a deployment bundle. The current
+authorities remain Graphify/8095 for structural observations, PostgreSQL for
+canonical identity and lineage, SearchRuntime for lane fusion, ACE for
+ContextManifest admission, existing TRACE/`atlas-tools` for MCP ownership, and
+BitFrost for admitted cache residency. Candidate output is diagnostic until it
+resolves to those owners. Do not count vendor benchmarks as Parent Atlas proof.
+
+- [ ] **CODE-TOOL-EVAL-01** — Freeze the candidate inventory and identify each
+      project by exact upstream repository/package and pinned commit/version:
+      TrailHQ Graft (`trailhq/Graft`, `@nanonets/graft`) for structural
+      working-tree context; GraftMap (`amaar-mc/graft`, `graftmap`) for
+      file-dependency PageRank/PPR; Understand Anything with canonical upstream
+      and evaluated fork recorded separately (`jaccas/understand-anything` is
+      currently reported as a fork of `Egonex-AI/Understand-Anything`; reconcile
+      historical `razor-ai/understand-anything` and `Lum1104/Understand-Anything`
+      references to exact ancestry/commit before treating them as identical),
+      SocratiCode
+      (`giancarloerra/SocratiCode`), and CodeGraph (`andysom25/codegraph`).
+      Record license, telemetry/network behavior, model/API calls, generated
+      paths, supported languages, Windows/WSL2 behavior, MCP transport, and
+      whether indexing starts automatically. For Understand Anything, record
+      the exact upstream revision and separately inventory advertised commands,
+      OpenCode skill files, and skills actually discoverable in the installed
+      OpenCode runtime (including `understand domain` and `understand knowledge`
+      when present); do not infer runtime wiring from README capability claims.
+      Explicitly distinguish both Graft repositories and their different
+      capabilities; do not attribute GraftMap's PageRank to TrailHQ Graft.
+- [ ] **CODE-TOOL-EVAL-02** — Install only candidates selected for evaluation
+      into a disposable worktree/container with no production credentials or
+      service endpoints. Start with deterministic structural-only modes; no
+      LLM/deep-summary calls, shared `.mcp.json`/OpenCode edits, production
+      Graphify indexing, PostgreSQL/Qdrant/Neo4j/Valkey writes, or tracked
+      generated indexes. Capture install/build outputs and verify the working
+      tree is unchanged outside the isolated evaluation area.
+- [ ] **CODE-TOOL-EVAL-03** — Compare each runnable candidate with the existing
+      Graphify/8095 + Parent Atlas baseline on one frozen, revision-qualified
+      query/impact fixture. Score source/symbol identity resolution, calls and
+      dependency precision/recall, current-working-tree freshness, diff blast
+      radius, exact source citations, latency, peak memory, tool calls, and
+      tokenizer-measured input/output tokens. Keep candidate rank/scores
+      challenger-only; no extra SearchRuntime/RRF vote.
+- [ ] **CODE-TOOL-EVAL-03A** — Compare GraftMap personalized PageRank against
+      the existing NetworkX CPU oracle and cuGraph executor using one frozen
+      file-dependency graph. First align file-path node set, directed edge set
+      and orientation, seed vector, alpha, dangling-node policy, tolerance, and
+      iteration/convergence rule; otherwise report algorithm/graph mismatch,
+      not parity. Measure top-K overlap, rank displacement/correlation, seed
+      locality, dangling/disconnected behavior, latency, memory, and rendered
+      token budget. GraftMap's file-level unweighted PPR is a challenger only;
+      reject fallback-to-uniform when requested seed paths fail identity
+      resolution. The dense `pageRankGPU` N-API path is not an equivalent PPR
+      baseline until its dangling redistribution, convergence, and revision-bound
+      receipt behavior are tested; do not call it RTX/cuGraph parity.
+      Diagnostic reproduced 2026-10-02 before the local correction via the
+      TypeScript API: the two-node edge `0 -> 1` with node `1` dangling,
+      damping `0.85`, and 20 iterations selected CPU and returned score sum
+      `0.2137500`. The C++ LibTorch path, TypeScript CPU fallback, and worker
+      CPU emulation now redistribute dangling mass; focused tests confirm unit
+      mass and the all-dangling uniform case. The native build compiled through
+      the PageRank source but linking was blocked because the output `.node`
+      file was in use. Runtime selection still chose CPU for the test, so RTX
+      execution and NetworkX/cuGraph parity remain unproven.
+- [ ] **CODE-TOOL-EVAL-03B** — After `CODE-TOOL-EVAL-03A` produces a frozen
+      parity/quality receipt, decide whether GraftMap merits a bounded adapter.
+      If admitted for evaluation, map only exact resolved file paths onto the
+      existing revision-qualified GraphOrdinalMap/CandidateOrdinal inputs,
+      record GraftMap package/version and graph/seed/parameter checksums, then
+      return its scores as challenger diagnostics for the existing exact
+      promotion path. Do not add a new persistent graph, canonical PageRank
+      owner, MCP server, SearchRuntime/RRF vote, or production dependency;
+      leave GraftMap unintegrated if it provides no measured benefit over the
+      existing NetworkX/cuGraph PPR executors.
+- [ ] **CODE-TOOL-EVAL-04** — Evaluate Understand Anything's Karpathy-style
+      knowledge-base mode against an existing small `.okf`/docs fixture. Require
+      each proposed link/claim to retain exact source references and checksums;
+      generated wiki/graph summaries remain documentation projections and
+      `PROPOSAL_ONLY`, never `.okf`, OpenSpec, or document-governance authority.
+      Capture the generated graph JSON checksum and isolated output location;
+      compare node/edge referential integrity, exact source-span coverage,
+      canonical node/edge bind rates, changed-revision staleness, domain/tour
+      signal novelty, context-token lift, index-build tokens/latency, incremental
+      update cost, and derived-state bytes against the frozen Graphify/Atlas
+      baseline. Unresolved or changed-revision nodes remain diagnostic.
+- [ ] **CODE-TOOL-EVAL-04A** — Verify Understand Anything's version-specific
+      capability set in an isolated config. Compare, as separate inventories,
+      (1) capabilities advertised by the pinned upstream README/release,
+      (2) capabilities wired by the pinned OpenCode installation instructions,
+      and (3) commands/skills actually discovered by the installed OpenCode
+      runtime. Record exact names and versions for graph generation, dashboard,
+      diff analysis, search, onboarding, domain analysis, and knowledge analysis;
+      explicitly check whether `understand domain` and `understand knowledge`
+      are discoverable rather than inferring that from README claims. Record the
+      generated graph's format, default path, and whether the dashboard consumes
+      that same artifact. Treat absent or version-mismatched features as
+      unsupported, not implicitly wired. Distinguish OpenCode CLI use from
+      GitHub Copilot Chat integration: launching OpenCode in a VS Code terminal
+      does not require installing or exposing Copilot skills; evaluate Copilot
+      discovery only as a separately selected client. Do not modify shared
+      OpenCode, Copilot, or MCP config.
+- [ ] **CODE-TOOL-EVAL-04B** — If the skill trial is useful, run one bounded
+      OpenCode session with the Understand Anything skill as a diagnostic
+      consumer and the already-registered Parent Atlas MCP tools as the sole
+      canonical source/retrieval path. Resolve the actual TRACE/`atlas-tools`
+      endpoint and verify handshake/health before use; never assume an example
+      URL or add another MCP server. Exercise exact code search, symbol lookup,
+      graph neighbors, source read, and ContextManifest build where those tools
+      are actually registered. Record source-revision bindings and receipts;
+      UA graph IDs, summaries, and links remain local challenger output and do
+      not write PostgreSQL, Qdrant, Neo4j, or BitFrost.
+- [ ] **CODE-TOOL-EVAL-05** — For the best single candidate only, prototype a
+      read-only adapter behind the existing code-intelligence/TRACE or
+      `atlas-tools` MCP owner. Handshake, health, bounded query, identity
+      resolution, source-revision check, and receipt/readback are required.
+      Do not add a second MCP server, graph database, vector owner, RRF owner,
+      or ContextManifest compiler. Audit the existing SocratiCode entry in
+      `.mcp.json` for path portability and actual handshake separately; config
+      registration is not runtime proof.
+- [ ] **CODE-TOOL-EVAL-06** — Resolve framework boundaries before any wiring:
+      inspect the existing Mastra runtime/workflow owner and report live
+      availability; Mastra may orchestrate bounded workflows but does not own
+      HMM state/action policy. Reuse the existing HMM/policy owner for
+      recommendations, the existing executor/capability authorization path
+      for actions, and the existing outcome receipt owner for results. If the
+      Mastra runtime is unavailable, keep the integration `NOT_PROVEN`
+      rather than adding a parallel agent loop.
+- [ ] **CODE-TOOL-EVAL-07** — Measure ACE/BitFrost token and cache effects only
+      from admitted, revision/checksum-addressed ContextManifest artifacts.
+      Compare cold retrieval with bounded push/pull context, report tokenizer,
+      input/output tokens, cache hit/miss, latency, and answer/evidence parity.
+      Do not write BitFrost entries or persist model hidden state during this
+      evaluation; cache admission remains governed by the existing ACE/BitFrost
+      owner.
+- [ ] **CODE-TOOL-EVAL-08** — Publish a compact comparison receipt with pinned
+      tool revisions, fixture/workspace checksum, commands, metrics, license and
+      data-handling findings, generated-file audit, MCP health/handshake status,
+      and a decision of `REJECT`, `CHALLENGER_ONLY`, or
+      `READY_FOR_SEPARATE_ADMISSION_REVIEW`. No task, source identity, evidence
+      state, or production projection is promoted by this receipt.
+
 ## Exit condition
 
 Once all five gates above pass with live evidence (not fixture-only), Parent Atlas has one MCP
@@ -245,8 +386,13 @@ operation directly comparable to SocratiCode's core value proposition
 
 ## Explicitly out of scope for this change
 
-- Installing SocratiCode, Clang toolchains, or any new parser/graph-DB/embedding model beyond the
-  bounded canary in `CLANG-SEMANTIC-CHALLENGER-01`.
+- Installing candidates into the application/runtime environment, enabling
+  production indexing, or adding dependencies/configuration outside the
+  bounded, disposable evaluation in `CODE-TOOL-EVAL-02`.
+- Deploying all challenger tools together or promoting any candidate as a
+  canonical graph, symbol, identity, vector, fusion, evidence, or cache owner.
+- Installing Clang toolchains beyond the bounded canary in
+  `CLANG-SEMANTIC-CHALLENGER-01`.
 - The `pageRankGPU` graph-construction decision for `gemma4-semantic-embedding-cache.mts` (separate,
   smaller, already-flagged-to-operator decision from the same session — see proposal.md's Session
   state section).

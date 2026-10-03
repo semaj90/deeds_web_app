@@ -32,6 +32,11 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/atlas_core/cmake_install.cmake")
+endif()
+
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
     file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/Debug/tensorrt_bridge.node")

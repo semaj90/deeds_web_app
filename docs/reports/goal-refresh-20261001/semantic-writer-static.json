@@ -1,0 +1,470 @@
+{
+  "schema": "atlas.semantic-768-writer-ownership.v1",
+  "generatedAt": "2026-10-01T02:17:51.974Z",
+  "scannedRoots": [
+    "scripts",
+    "packages",
+    "src",
+    "python",
+    "python-workers",
+    "services",
+    "cmd",
+    "crates",
+    "native",
+    "workers",
+    "go-retrieval-classifier",
+    "sveltekit-frontend/src",
+    "sveltekit-frontend/scripts",
+    "docker",
+    "infra",
+    "drizzle",
+    "migrations",
+    "sql",
+    "sveltekit-frontend/package.json",
+    "package.json"
+  ],
+  "readOnly": true,
+  "canonicalAuthority": "postgres",
+  "canonicalRepresentationSurface": "codebase_chunk_index.content_embedding_768",
+  "writerOwnerStatus": "UNRESOLVED_NOT_PROMOTED",
+  "writersBySurface": {
+    "codebase_chunk_index.content_embedding_768": [
+      "scripts\\atlas\\apply-lineage-qualified-semantic-768-backfill-v1.mjs",
+      "sveltekit-frontend/scripts\\atlas\\backfill-codebase-chunk-embeddings.mjs"
+    ],
+    "codebase_chunk_index.content_embedding": [
+      "scripts\\atlas\\reembed-corpus-document-prefix-v1.mjs",
+      "scripts\\atlas\\backfill-graphify-file-embeddings-768.mjs",
+      "sveltekit-frontend/scripts\\mirror-qdrant-to-postgres.ts",
+      "sveltekit-frontend/scripts\\atlas\\graphify-incremental.mjs"
+    ],
+    "atlas_packets.embedding": [
+      "scripts\\atlas\\sync-parent-atlas-packets-to-postgres.mjs",
+      "scripts\\atlas\\summary-ranking-retrieval-pipeline.mjs",
+      "scripts\\atlas\\phase106-stage4-embedding-backfill.mjs",
+      "scripts\\atlas\\phase1-canonical-embedding-rabbitmq.mjs",
+      "scripts\\atlas\\phase1-canonical-embedding-rabbitmq-producer.mjs",
+      "scripts\\atlas\\phase1-canonical-embedding-backfill.mjs",
+      "scripts\\atlas\\phase-17-hyperrag-indexing-e2e.mjs",
+      "scripts\\atlas\\parent-atlas-semantic-768-backfill.mjs",
+      "scripts\\atlas\\ingest-qdrant-to-atlas-packets.mjs",
+      "scripts\\atlas\\ingest-msgpack-chunks.mjs",
+      "scripts\\atlas\\enrich_atlas_packets.mjs"
+    ]
+  },
+  "ownershipComparison": {
+    "canonicalTargetWriterCandidates": [
+      "scripts\\atlas\\apply-lineage-qualified-semantic-768-backfill-v1.mjs",
+      "sveltekit-frontend/scripts\\atlas\\backfill-codebase-chunk-embeddings.mjs"
+    ],
+    "legacySurfaceWriterCandidates": [
+      "scripts\\atlas\\backfill-graphify-file-embeddings-768.mjs",
+      "scripts\\atlas\\enrich_atlas_packets.mjs",
+      "scripts\\atlas\\ingest-msgpack-chunks.mjs",
+      "scripts\\atlas\\ingest-qdrant-to-atlas-packets.mjs",
+      "scripts\\atlas\\parent-atlas-semantic-768-backfill.mjs",
+      "scripts\\atlas\\phase-17-hyperrag-indexing-e2e.mjs",
+      "scripts\\atlas\\phase1-canonical-embedding-backfill.mjs",
+      "scripts\\atlas\\phase1-canonical-embedding-rabbitmq-producer.mjs",
+      "scripts\\atlas\\phase1-canonical-embedding-rabbitmq.mjs",
+      "scripts\\atlas\\phase106-stage4-embedding-backfill.mjs",
+      "scripts\\atlas\\reembed-corpus-document-prefix-v1.mjs",
+      "scripts\\atlas\\summary-ranking-retrieval-pipeline.mjs",
+      "scripts\\atlas\\sync-parent-atlas-packets-to-postgres.mjs",
+      "sveltekit-frontend/scripts\\atlas\\graphify-incremental.mjs",
+      "sveltekit-frontend/scripts\\mirror-qdrant-to-postgres.ts"
+    ],
+    "historicalEvidence": "scripts/atlas/sem768-corpus-bundle-01.mts",
+    "decision": "MULTIPLE_STATIC_CANONICAL_TARGET_WRITERS_UNRESOLVED",
+    "reason": "Classify writers by exact physical column. Legacy content_embedding and atlas_packets.embedding writers do not establish ownership of content_embedding_768; canonical-target candidates require revision-qualified provenance and independent readback."
+  },
+  "writers": [
+    {
+      "path": "scripts\\atlas\\sync-parent-atlas-packets-to-postgres.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\summary-ranking-retrieval-pipeline.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\reembed-corpus-document-prefix-v1.mjs",
+      "surface": "codebase_chunk_index.content_embedding",
+      "role": "HISTORICAL_OR_TRANSITIONAL_SURFACE",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase106-stage4-embedding-backfill.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase1-canonical-embedding-rabbitmq.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": false,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase1-canonical-embedding-rabbitmq-producer.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": false,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase1-canonical-embedding-backfill.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase-17-hyperrag-indexing-e2e.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\parent-atlas-semantic-768-backfill.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\ingest-qdrant-to-atlas-packets.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\ingest-msgpack-chunks.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\enrich_atlas_packets.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\backfill-graphify-file-embeddings-768.mjs",
+      "surface": "codebase_chunk_index.content_embedding",
+      "role": "HISTORICAL_OR_TRANSITIONAL_SURFACE",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": true,
+      "guarded": true,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\apply-lineage-qualified-semantic-768-backfill-v1.mjs",
+      "surface": "codebase_chunk_index.content_embedding_768",
+      "role": "CANONICAL_CONTRACT_TARGET_OWNER_UNPROVEN",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": true,
+      "guarded": true,
+      "dryRun": false,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "sveltekit-frontend/scripts\\mirror-qdrant-to-postgres.ts",
+      "surface": "codebase_chunk_index.content_embedding",
+      "role": "HISTORICAL_OR_TRANSITIONAL_SURFACE",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "sveltekit-frontend/src\\lib\\server\\unknown\\promotion-executor.ts",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "READER_OR_DIAGNOSTIC",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": false,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "sveltekit-frontend/scripts\\atlas\\graphify-incremental.mjs",
+      "surface": "codebase_chunk_index.content_embedding",
+      "role": "HISTORICAL_OR_TRANSITIONAL_SURFACE",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "sveltekit-frontend/scripts\\atlas\\backfill-codebase-chunk-embeddings.mjs",
+      "surface": "codebase_chunk_index.content_embedding_768",
+      "role": "CANONICAL_CONTRACT_TARGET_OWNER_UNPROVEN",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    }
+  ],
+  "mutationWriters": [
+    {
+      "path": "scripts\\atlas\\sync-parent-atlas-packets-to-postgres.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\summary-ranking-retrieval-pipeline.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\reembed-corpus-document-prefix-v1.mjs",
+      "surface": "codebase_chunk_index.content_embedding",
+      "role": "HISTORICAL_OR_TRANSITIONAL_SURFACE",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase106-stage4-embedding-backfill.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase1-canonical-embedding-rabbitmq.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": false,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase1-canonical-embedding-rabbitmq-producer.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": false,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase1-canonical-embedding-backfill.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\phase-17-hyperrag-indexing-e2e.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\parent-atlas-semantic-768-backfill.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\ingest-qdrant-to-atlas-packets.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\ingest-msgpack-chunks.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\enrich_atlas_packets.mjs",
+      "surface": "atlas_packets.embedding",
+      "role": "SECONDARY_768_SURFACE_UNRESOLVED",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\backfill-graphify-file-embeddings-768.mjs",
+      "surface": "codebase_chunk_index.content_embedding",
+      "role": "HISTORICAL_OR_TRANSITIONAL_SURFACE",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": true,
+      "guarded": true,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "scripts\\atlas\\apply-lineage-qualified-semantic-768-backfill-v1.mjs",
+      "surface": "codebase_chunk_index.content_embedding_768",
+      "role": "CANONICAL_CONTRACT_TARGET_OWNER_UNPROVEN",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": true,
+      "guarded": true,
+      "dryRun": false,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "sveltekit-frontend/scripts\\mirror-qdrant-to-postgres.ts",
+      "surface": "codebase_chunk_index.content_embedding",
+      "role": "HISTORICAL_OR_TRANSITIONAL_SURFACE",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "sveltekit-frontend/scripts\\atlas\\graphify-incremental.mjs",
+      "surface": "codebase_chunk_index.content_embedding",
+      "role": "HISTORICAL_OR_TRANSITIONAL_SURFACE",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    },
+    {
+      "path": "sveltekit-frontend/scripts\\atlas\\backfill-codebase-chunk-embeddings.mjs",
+      "surface": "codebase_chunk_index.content_embedding_768",
+      "role": "CANONICAL_CONTRACT_TARGET_OWNER_UNPROVEN",
+      "kind": "MUTATION_WRITER",
+      "revisionQualified": false,
+      "guarded": false,
+      "dryRun": true,
+      "productionReachableCandidate": false
+    }
+  ],
+  "operatorEntrypoints": [
+    {
+      "command": "npm run atlas:graphify:embedding:daily:apply",
+      "target": "codebase_chunk_index.content_embedding",
+      "status": "HISTORICAL_SURFACE_REQUIRES_OWNER_REVIEW"
+    }
+  ],
+  "projectionExecutors": [
+    {
+      "command": "npm run atlas:index:full-repo",
+      "target": "Qdrant codebase_chunks_768/content",
+      "postgresSemanticWrite": false
+    },
+    {
+      "command": "POST /api/codebase-index/index-stream",
+      "target": "Qdrant content vector + PostgreSQL metadata/auxiliary vectors",
+      "postgresSemanticWrite": false
+    }
+  ],
+  "ownerDecision": {
+    "selectedWriter": null,
+    "status": "OWNER_NOT_PROVEN",
+    "reason": "No general semantic writer is promoted: the remaining guarded writer is a 15-row lineage-qualified backfill, while historical surfaces and full-corpus provenance/readback remain unresolved."
+  },
+  "live": {
+    "reachable": false,
+    "reason": "SKIPPED_BY_STATIC_ONLY_MODE"
+  },
+  "verdict": "OWNER_NOT_PROVEN",
+  "admissionBlockers": [
+    "multiple 768 surfaces remain populated or referenced",
+    "the guarded backfill is cohort-specific and does not prove a general revision-qualified semantic owner",
+    "representation ledger and independent Qdrant readback remain open"
+  ],
+  "writesPerformed": false
+}

@@ -2,6 +2,34 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20261001_openspec_task_identity_history_v1.sql",
+      "status": "design_unapplied",
+      "reason": "EVF stable identity/history companion: immutable canonical task keys, internal surrogate IDs, claim revision snapshots, and alias preservation. No rows are imported or source files mutated; apply only after deterministic identity parity and schema-owner authorization.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-migration-v1.mjs"
+    },
+    {
+      "file": "manual/20261001_openspec_evidence_retrieval_v1.sql",
+      "status": "design_unapplied",
+      "reason": "EVF-09 retrieval companion: metadata indexes, task trigram search, and evidence-content FTS alongside the canonical semantic_768 HNSW lane. No rows are seeded or projected; requires ledger readback, embedding artifact receipt, and explicit authorization.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-migration-v1.mjs"
+    },
+    {
+      "file": "manual/20261001_openspec_evidence_fabric_v2.sql",
+      "status": "design_unapplied",
+      "reason": "Additive EVF-02 through EVF-06 companion: task predicates, assertion rows, supersession declarations, explicit task_evidence_binding read view, and fail-closed current-state proof derivation. No rows are seeded or applied.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-fabric-v1.mjs --check-only"
+    },
+    {
+      "file": "manual/20261001_openspec_evidence_fabric_v1.sql",
+      "status": "design_unapplied",
+      "reason": "Additive PostgreSQL 18 evidence registry and derived proof-state view for OpenSpec claims. No rows are seeded; application requires schema-owner review, read-only dry-run validation, and explicit operator authorization.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-fabric-v1.mjs --check-only"
+    },
+    {
       "file": "manual/20260925_codebase_chunk_summary_text_v1.sql",
       "status": "applied",
       "reason": "Added nullable summary_text to codebase_chunk_index; the legacy summary column remains untouched because Drizzle maps it as signature. Applied transactionally on PostgreSQL 18.4 with zero rows populated.",

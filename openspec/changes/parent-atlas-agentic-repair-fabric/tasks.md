@@ -204,6 +204,16 @@
 - [ ] Live repair execution, live Go Retrieval adoption, live OAK availability,
       and ContextManifest/PromptPlan route adoption remain separate gates. The
       fixture proof must not be promoted to a production repair claim.
+      **Read-only boundary probe (2026-10-01):** Go Retrieval `:8100/health` returned
+      `healthy` / `READY_FULL` with PostgreSQL, Qdrant, and embedding service connected.
+      OAK `:8095/oak/health` returned available in `READ_ONLY_SHADOW` mode with
+      `canonicalAuthority=false`; a bounded `/oak/search` for `postgresql` returned
+      zero matches. These establish service health only, not task/evidence resolution,
+      route adoption, or repair execution. The existing `/api/atlas/mastra-agent`
+      source route validates ContextManifest/PromptPlan bindings, but no live request
+      or repair tool dispatch was performed. Keep this task open until independent
+      route/readback receipts exist; no source, database, cache, graph, or checkbox
+      mutation was performed for this probe.
 
 ### Live boundary reconciliation — 2026-09-21
 
@@ -330,3 +340,22 @@ independently):**
 current as of this commit); re-litigate the OAK-kernel-duplication correction (already resolved,
 `parent-atlas-ontology-oaklib-fanout-bitmap` tasks.md section 7); re-implement AR-01 or AR-03
 (done, tested, committed `03d08c3e95`).
+
+## 20. AR-18 — Read-only replayable agent execution spine (CONTRACT FIXTURE ONLY)
+
+- [x] 20.1 Resolve proposals through the existing `AGENTIC_ACTION_REGISTRY_V1_SEED` and ACE's
+  admitted `ContextManifestV2`; the capability registry is a revision-qualified projection, not a
+  second owner. Fixture evidence: `agent-execution-spine-v1.ts` and
+  `agent-execution-spine-v1.spec.ts`.
+- [x] 20.2 Bind one read-only executor call to a proposal checksum, policy authorization reference,
+  exact tool revision, input/output checksums, and bounded observation; retain the existing
+  `WorkflowActionEventV1` and `AgentWorkReceiptV1` owners for run/durable identity. The smoke emits
+  only a non-authoritative step receipt; it does not write either durable owner.
+- [x] 20.3 Prove a frozen one-step fixture and fail-closed cases with focused tests and an executable
+  replay. Receipt: `docs/reports/agent-execution-spine-read-only-replay-v1.json`; the status is
+  `READ_ONLY_REPLAY_PROVEN_FIXTURE_ONLY`. This does not establish production route/MCP/OpenCode
+  wiring, live service health, or durable receipt readback; those remain separate gates.
+- [x] 20.4 Keep RLM working state ephemeral/non-authoritative and keep source/database/cache/graph
+  mutations, live MCP/OpenCode dispatch, production authorization, and replay-state persistence out
+  of this tranche. Schema assertions, owner audit, smoke receipt, and fixture tests confirm no such
+  writes or dispatch occurred.

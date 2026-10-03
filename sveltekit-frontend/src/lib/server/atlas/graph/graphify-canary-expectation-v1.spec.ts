@@ -7,7 +7,9 @@ import {
 const base = {
   workspaceRevision: `sha256:${'1'.repeat(64)}`,
   snapshotRevision: `sha256:${'2'.repeat(64)}`,
-  sourceSelectionChecksum: `sha256:${'3'.repeat(64)}`,
+  sourceInventoryRevision: 'atlas.canonical-source-inventory-hygiene-policy.2026-09-13.v1',
+  sourceInventoryChecksum: `sha256:${'3'.repeat(64)}`,
+  sourceSelectionChecksum: `sha256:${'4'.repeat(64)}`,
   sourceCount: 25_271,
 };
 
@@ -17,6 +19,7 @@ describe('GraphifyCanaryExpectationV1', () => {
     expect(expectation.workspaceRevision).toBe(base.workspaceRevision);
     expect(expectation.snapshotRevision).toBe(base.snapshotRevision);
     expect(expectation.workspaceRevision).not.toBe(expectation.snapshotRevision);
+    expect(expectation.sourceInventoryChecksum).toBe(base.sourceInventoryChecksum);
     expect(expectation.graphifyExecutionAuthorized).toBe(false);
     expect(expectation.canonicalWritesAuthorized).toBe(false);
     expect(expectation.authority).toBe(false);
@@ -32,7 +35,7 @@ describe('GraphifyCanaryExpectationV1', () => {
     const first = buildGraphifyCanaryExpectationV1(base);
     const second = buildGraphifyCanaryExpectationV1({
       ...base,
-      snapshotRevision: `sha256:${'4'.repeat(64)}`,
+      snapshotRevision: `sha256:${'5'.repeat(64)}`,
     });
     expect(second.identityChecksum).not.toBe(first.identityChecksum);
   });
@@ -41,7 +44,25 @@ describe('GraphifyCanaryExpectationV1', () => {
     const first = buildGraphifyCanaryExpectationV1(base);
     const second = buildGraphifyCanaryExpectationV1({
       ...base,
-      workspaceRevision: `sha256:${'5'.repeat(64)}`,
+      workspaceRevision: `sha256:${'6'.repeat(64)}`,
+    });
+    expect(second.identityChecksum).not.toBe(first.identityChecksum);
+  });
+
+  it('changes identity when source inventory changes', () => {
+    const first = buildGraphifyCanaryExpectationV1(base);
+    const second = buildGraphifyCanaryExpectationV1({
+      ...base,
+      sourceInventoryChecksum: `sha256:${'7'.repeat(64)}`,
+    });
+    expect(second.identityChecksum).not.toBe(first.identityChecksum);
+  });
+
+  it('changes identity when source selection changes', () => {
+    const first = buildGraphifyCanaryExpectationV1(base);
+    const second = buildGraphifyCanaryExpectationV1({
+      ...base,
+      sourceSelectionChecksum: `sha256:${'8'.repeat(64)}`,
     });
     expect(second.identityChecksum).not.toBe(first.identityChecksum);
   });

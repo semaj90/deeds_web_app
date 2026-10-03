@@ -1,0 +1,113 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-29T20:13:13.953Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 100,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 100,
+  "sourceRevisionMismatchCount": 8,
+  "candidatesConsidered": 100,
+  "skippedUnsupported": 92,
+  "byFileKind": {
+    "markdown": 6,
+    "json": 2
+  },
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 0,
+  "totalSymbolsInserted": null,
+  "plan": [
+    {
+      "fileId": "31e42ed8-36ab-4e1c-bf08-c6ea03ae6abd",
+      "sourceRef": ".claude/skills/drizzle-schema-review/SKILL.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:ace0002a04ae2ee4f43476c8d277202271e62f5f36a7bcedfe24b6f833fdf615",
+      "fileKind": "markdown",
+      "outcome": "SOURCE_REVISION_MISMATCH",
+      "error": "EXPECTED_sha256:ace0002a04ae2ee4f43476c8d277202271e62f5f36a7bcedfe24b6f833fdf615_GOT_sha256:d59a18e766a86e3d3d5a3d6a544d335bb879b387ba6d393fbd2b11e24ef209a6"
+    },
+    {
+      "fileId": "d4dda363-eea6-4461-b63d-8a52faf046a0",
+      "sourceRef": "codex.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:7c682a2e20a62c6e407e0019adc0b57e778bec981ad2671bec9409b7c66c3dcd",
+      "fileKind": "markdown",
+      "outcome": "SOURCE_REVISION_MISMATCH",
+      "error": "EXPECTED_sha256:7c682a2e20a62c6e407e0019adc0b57e778bec981ad2671bec9409b7c66c3dcd_GOT_sha256:580c3924fa435e693c01e645fec1ef72f2b567cf094782b818ea08eaba00cb4b"
+    },
+    {
+      "fileId": "2d4cdc1c-53f4-4f91-b235-f6fde69dc4ab",
+      "sourceRef": "docker/bifrost/config.json",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:c7309e9b9fde006cf26d4dafaa599fd253ec3468399b5a61f618829be52466fb",
+      "fileKind": "json",
+      "outcome": "SOURCE_REVISION_MISMATCH",
+      "error": "EXPECTED_sha256:c7309e9b9fde006cf26d4dafaa599fd253ec3468399b5a61f618829be52466fb_GOT_sha256:f08fb10a67960499e90a038fc6ef60b22fe776e3f0e53e71a5fdde84885b55f1"
+    },
+    {
+      "fileId": "6ccb0e7b-0b57-4cd4-aaa9-fcae32d34893",
+      "sourceRef": "docs/architecture/runtime-ownership-baseline.json",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:432d4fea3cc4f5692285395095d12a23752cb884d939d0a4d49872000501d574",
+      "fileKind": "json",
+      "outcome": "SOURCE_REVISION_MISMATCH",
+      "error": "EXPECTED_sha256:432d4fea3cc4f5692285395095d12a23752cb884d939d0a4d49872000501d574_GOT_sha256:4db4d4fa92995375ffe81e17bf549ad064e3bf28e97bc54dfa65734955cc2b95"
+    },
+    {
+      "fileId": "a4803987-bf17-49df-8e92-3b5d28adab96",
+      "sourceRef": "docs/GAN-DEEP-AUDIT-GUIDE.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:6a73ab03b717554a22cdf5e460b5ff21cdce83f097ac62844382dcd82733d60a",
+      "fileKind": "markdown",
+      "outcome": "SOURCE_REVISION_MISMATCH",
+      "error": "EXPECTED_sha256:6a73ab03b717554a22cdf5e460b5ff21cdce83f097ac62844382dcd82733d60a_GOT_sha256:7dacbb7e5c943d59ec7c6682901131a14fef6875a7036e32610705e0770c0032"
+    },
+    {
+      "fileId": "003be8c0-e702-4fcf-919e-4cd2b81d6a9f",
+      "sourceRef": "docs/MASTER-TOC.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:301f12b8bd43ae2e6544577e7317ff22a74421f07ad93614798ff9626cde7d24",
+      "fileKind": "markdown",
+      "outcome": "SOURCE_REVISION_MISMATCH",
+      "error": "EXPECTED_sha256:301f12b8bd43ae2e6544577e7317ff22a74421f07ad93614798ff9626cde7d24_GOT_sha256:1f51c2b6a063039b3dc066c9b80cb9fe11f9f00ac3194966ef7cf99f8841cdb3"
+    },
+    {
+      "fileId": "33b81545-0796-4e9c-b764-81aefb1c4c6a",
+      "sourceRef": "docs/opencode-mcp-fixes.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:3fd587632fe8b6967680df9edca364ea8b5f43ab25e1937f20d14bda7b5e083f",
+      "fileKind": "markdown",
+      "outcome": "SOURCE_REVISION_MISMATCH",
+      "error": "EXPECTED_sha256:3fd587632fe8b6967680df9edca364ea8b5f43ab25e1937f20d14bda7b5e083f_GOT_sha256:0318e448a6c89c55e539d1a8cbe56268fe29dcbfea590dfc38bfea5c903ade94"
+    },
+    {
+      "fileId": "20529511-27a6-4075-bac4-356e92973a82",
+      "sourceRef": "docs/PHASE-3-IMPLEMENTATION-SUMMARY.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:4e73b46a78fe103827b387b4d645ca25cee4ac13aaa41696f56336e3341a0913",
+      "fileKind": "markdown",
+      "outcome": "SOURCE_REVISION_MISMATCH",
+      "error": "EXPECTED_sha256:4e73b46a78fe103827b387b4d645ca25cee4ac13aaa41696f56336e3341a0913_GOT_sha256:797bce375b2cda7fd5fdec968f3dbda86720c0baff09fc720c52811d3309bac5"
+    }
+  ]
+}

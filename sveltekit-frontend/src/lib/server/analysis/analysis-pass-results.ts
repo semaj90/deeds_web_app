@@ -3,10 +3,12 @@ import { createHash, randomUUID } from 'node:crypto';
 import { db, pgRows } from '$lib/server/db/client.js';
 import {
 	analysisPassResults,
+	buildStagedAnalysisPassLedgerEntryV1,
 	resolveExecutionSemantics,
 	type AnalysisPassLedgerInput,
 	type AnalysisPassPersistResult,
 	type AnalysisPassResultRow,
+	type NewAnalysisPassResultRow,
 	normalizeAnalysisPassLedgerInput,
 } from '$lib/server/db/schema/analysis-pass-results.js';
 import { eq, sql } from 'drizzle-orm';
@@ -181,6 +183,7 @@ export function buildAnalysisPassLedgerEntry(input: AnalysisPassLedgerInput) {
 }
 
 export interface RecordAnalysisPassResultOptions {
+	stageAsCandidateOnly?: true;
 	/**
 	 * When supplied, an integration event outbox row is written in the SAME
 	 * transaction as the ledger insert — atomic with the write it reports on.
@@ -249,9 +252,22 @@ export async function recordAnalysisPassResult(
 	input: AnalysisPassLedgerInput,
 	opts?: RecordAnalysisPassResultOptions
 ): Promise<AnalysisPassPersistResult | null> {
-	if (analysisPassResultsTableMissing) return null;
+	if (opts?.stageAsCandidateOnly && opts.emitIntegrationEvent) {
+		throw new Error('STAGED_ANALYSIS_PASS_INTEGRATION_EVENT_NOT_ALLOWED');
+	}
 
-	const row = normalizeAnalysisPassLedgerInput(input);
+	if (analysisPassResultsTableMissing) return null;
+	let row: NewAnalysisPassResultRow;
+	if (opts?.stageAsCandidateOnly) {
+		const suppliedPacketKey = input.packetKey?.trim();
+		if (!suppliedPacketKey) throw new Error('STAGED_ANALYSIS_PASS_PACKET_KEY_REQUIRED');
+		const { resolveCanonicalPacketKey } = await import('../atlas/identity/packet-identity-resolver.js');
+		const resolvedStoragePacketKey = await resolveCanonicalPacketKey(suppliedPacketKey);
+		const packetIdentity = { suppliedPacketKey, resolvedStoragePacketKey };
+		row = buildStagedAnalysisPassLedgerEntryV1(input, packetIdentity);
+	} else {
+		row = normalizeAnalysisPassLedgerInput(input);
+	}
 	const semantics = resolveExecutionSemantics(input.passName);
 
 	try {
@@ -274,9 +290,19 @@ export async function recordAnalysisPassResult(
 				.limit(1);
 
 			if (existing) {
+				if (opts?.stageAsCandidateOnly) {
+					const existingProvenance = (existing.provenance ?? {}) as Record<string, unknown>;
+					const requestedProvenance = row.provenance as Record<string, unknown>;
+					if (
+						stableStringify(existingProvenance.stagedObservation) !==
+						stableStringify(requestedProvenance.stagedObservation)
+					) {
+						throw new Error('STAGED_ANALYSIS_PASS_REUSE_MISMATCH');
+					}
+				}
 				return {
 					inserted: false,
-					idempotencyKey: row.passKey,
+					idempotencyKey: existing.passKey,
 					row: existing,
 				};
 			}

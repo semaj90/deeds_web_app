@@ -2,11 +2,12 @@
 
 import { describe, expect, it, vi } from 'vitest';
 
-const { mockSelect, mockInsert, mockEq, mockSql } = vi.hoisted(() => ({
+const { mockSelect, mockInsert, mockEq, mockSql, mockResolveCanonicalPacketKey } = vi.hoisted(() => ({
 	mockSelect: vi.fn(),
 	mockInsert: vi.fn(),
 	mockEq: vi.fn((column: unknown, value: unknown) => ({ column, value })),
 	mockSql: vi.fn((strings: TemplateStringsArray, ...values: unknown[]) => ({ strings, values })),
+	mockResolveCanonicalPacketKey: vi.fn(async () => 'packet:deterministic'),
 }));
 
 vi.mock('$lib/server/db/client.js', () => ({
@@ -19,6 +20,10 @@ vi.mock('$lib/server/db/client.js', () => ({
 vi.mock('drizzle-orm', () => ({
 	eq: mockEq,
 	sql: mockSql,
+}));
+
+vi.mock('../atlas/identity/packet-identity-resolver.js', () => ({
+	resolveCanonicalPacketKey: mockResolveCanonicalPacketKey,
 }));
 
 const existingRow = {
@@ -74,8 +79,8 @@ const deterministicInput = {
 	warnings: [],
 };
 
-function buildDeterministicSelectChain() {
-	const limit = vi.fn(async () => [existingRow]);
+function buildDeterministicSelectChain(rows = [existingRow]) {
+	const limit = vi.fn(async () => rows);
 	const orderBy = vi.fn(() => ({ limit }));
 	const where = vi.fn(() => ({ orderBy }));
 	const from = vi.fn(() => ({ where }));
@@ -98,6 +103,121 @@ describe('analysis pass ledger duplicate-delivery idempotency', () => {
 	expect(first?.idempotencyKey).toBe(second?.idempotencyKey);
 	expect(first?.idempotencyKey).toMatch(/^analysis-pass:/);
 	expect(mockInsert).not.toHaveBeenCalled();
-	expect(mockSelect).toHaveBeenCalledTimes(2);
+		expect(mockSelect).toHaveBeenCalledTimes(2);
+	});
+
+	it('records staged admission in provenance while keeping succeeded as execution status', async () => {
+		vi.clearAllMocks();
+		mockResolveCanonicalPacketKey.mockResolvedValue('packet:deterministic');
+		buildDeterministicSelectChain([]);
+		const insertedValues = vi.fn((row) => ({
+			returning: vi.fn(async () => [{ ...row, id: 5150 }]),
+		}));
+		mockInsert.mockReturnValue({ values: insertedValues });
+
+		const { recordAnalysisPassResult } = await import('./analysis-pass-results.js');
+		const result = await recordAnalysisPassResult(deterministicInput, { stageAsCandidateOnly: true });
+		const [inserted] = insertedValues.mock.calls[0];
+		const provenance = inserted.provenance as Record<string, unknown>;
+
+		expect(result?.inserted).toBe(true);
+		expect(inserted.status).toBe('succeeded');
+		expect(inserted.packetKey).toBe(deterministicInput.packetKey);
+		expect(provenance.stagedObservation).toMatchObject({
+			admissionDisposition: 'CANDIDATE_ONLY',
+			canonicalAuthority: false,
+			writesCanonicalState: false,
+			resolvedStoragePacketKey: deterministicInput.packetKey,
+			packetIdentityResolution: 'DIRECT_STORAGE_ROW',
+		});
+		expect(mockInsert).toHaveBeenCalledTimes(1);
+	});
+
+	it('rejects deterministic reuse when the existing row has no matching staged disposition', async () => {
+		vi.clearAllMocks();
+		mockResolveCanonicalPacketKey.mockResolvedValue('packet:deterministic');
+		buildDeterministicSelectChain([existingRow]);
+
+		const { recordAnalysisPassResult } = await import('./analysis-pass-results.js');
+		await expect(recordAnalysisPassResult(deterministicInput, { stageAsCandidateOnly: true }))
+			.rejects.toThrow('STAGED_ANALYSIS_PASS_REUSE_MISMATCH');
+		expect(mockInsert).not.toHaveBeenCalled();
+	});
+
+	it('reuses a matching staged deterministic observation across execution retries', async () => {
+		vi.clearAllMocks();
+		mockResolveCanonicalPacketKey.mockResolvedValue('packet:deterministic');
+		const { buildStagedAnalysisPassLedgerEntryV1 } = await import('../db/schema/analysis-pass-results.js');
+		const staged = buildStagedAnalysisPassLedgerEntryV1({
+			...deterministicInput,
+			producerId: 'nlp-sidecar',
+			producerRevision: 'nlp-sidecar-v1',
+		}, {
+			suppliedPacketKey: 'packet:deterministic',
+			resolvedStoragePacketKey: 'packet:deterministic',
+		});
+		const stagedProvenance = staged.provenance as Record<string, unknown>;
+		buildDeterministicSelectChain([{
+			...existingRow,
+			provenance: { stagedObservation: stagedProvenance.stagedObservation },
+		}]);
+
+		const { recordAnalysisPassResult } = await import('./analysis-pass-results.js');
+		const first = await recordAnalysisPassResult({
+			...deterministicInput,
+			producerId: 'nlp-sidecar',
+			producerRevision: 'nlp-sidecar-v1',
+		}, { stageAsCandidateOnly: true });
+		const retry = await recordAnalysisPassResult({
+			...deterministicInput,
+			analysisJobId: 'retry-job',
+			evidenceId: 'retry-evidence',
+			startedAt: '2026-10-03T02:00:00.000Z',
+			completedAt: '2026-10-03T02:00:01.000Z',
+			producerId: 'nlp-sidecar',
+			producerRevision: 'nlp-sidecar-v1',
+		}, { stageAsCandidateOnly: true });
+
+		expect(first?.inserted).toBe(false);
+		expect(retry?.inserted).toBe(false);
+		expect(first?.idempotencyKey).toBe(existingRow.passKey);
+		expect(retry?.idempotencyKey).toBe(existingRow.passKey);
+		expect(mockInsert).not.toHaveBeenCalled();
+	});
+
+	it('stores alias-resolved staged observations under the existing physical row key', async () => {
+		vi.clearAllMocks();
+		mockResolveCanonicalPacketKey.mockResolvedValue('packet:deterministic');
+		buildDeterministicSelectChain([]);
+		const insertedValues = vi.fn((row) => ({
+			returning: vi.fn(async () => [{ ...row, id: 6161 }]),
+		}));
+		mockInsert.mockReturnValue({ values: insertedValues });
+
+		const { recordAnalysisPassResult } = await import('./analysis-pass-results.js');
+		await recordAnalysisPassResult({
+			...deterministicInput,
+			packetKey: 'ace:packet:123456789012',
+		}, { stageAsCandidateOnly: true });
+		const [inserted] = insertedValues.mock.calls[0];
+		const observation = (inserted.provenance as Record<string, any>).stagedObservation;
+
+		expect(inserted.packetKey).toBe('packet:deterministic');
+		expect(observation).toMatchObject({
+			resolvedStoragePacketKey: 'packet:deterministic',
+			packetIdentityResolution: 'EXISTING_ALIAS',
+			suppliedPacketKey: 'ace:packet:123456789012',
+		});
+	});
+
+	it('rejects unresolved packet identity before selecting or inserting a ledger row', async () => {
+		vi.clearAllMocks();
+		mockResolveCanonicalPacketKey.mockRejectedValue(new Error('PACKET_IDENTITY_UNRESOLVED'));
+
+		const { recordAnalysisPassResult } = await import('./analysis-pass-results.js');
+		await expect(recordAnalysisPassResult(deterministicInput, { stageAsCandidateOnly: true }))
+			.rejects.toThrow('PACKET_IDENTITY_UNRESOLVED');
+		expect(mockSelect).not.toHaveBeenCalled();
+		expect(mockInsert).not.toHaveBeenCalled();
 	});
 });

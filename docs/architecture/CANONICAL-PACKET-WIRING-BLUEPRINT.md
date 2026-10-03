@@ -5,8 +5,8 @@
 > `gpu-job-queue.ts`) still stand, but Lane D "Inference Lane" naming Gemma4/RotorQuant is outdated
 > per CLAUDE.md's 2026-09-03 Gemma4→Ornith 1.5 9B switch.
 
-**Date**: July 4, 2026  
-**Status**: PRODUCTION WIRING SPEC  
+**Date**: July 4, 2026
+**Status**: PRODUCTION WIRING SPEC
 **Scope**: One canonical semantic packet envelope with multiple physical encodings + strict lane separation (JSON/Parse, TurboVec/ANN, Neo4j/Graph, BitFrost/Cache)
 
 ---
@@ -117,7 +117,7 @@ These are the runtime wiring points that implement the split above:
 ```
 1. Input: packet_key from Postgres (from Lane A)
 2. Read embedding: Postgres pgvector or Qdrant (mirror)
-   ├─ 768-dim or 384-dim (project canonical)
+   ├─ 768-dim -> embeddinggemma mrl 512 256 128 latent256 latent128 latent64? dim (project canonical)
    └─ Never parse JSON here; use existing row
 3. TurboVec narrowing
    ├─ 768-dim → 64-dim transform (GPU, via tensorrt_bridge.node)
@@ -136,8 +136,8 @@ These are the runtime wiring points that implement the split above:
    └─ route: "atlas.retrieval.ranked"
 ```
 
-**Lane B Input**: packet_key + embedding (already stored in Postgres or Qdrant)  
-**Lane B Output**: Ranked candidates (packet_key[], scores[])  
+**Lane B Input**: packet_key + embedding (already stored in Postgres or Qdrant)
+**Lane B Output**: Ranked candidates (packet_key[], scores[])
 **Hard rule**: Do NOT parse JSON or decode MsgPack inside TurboVec. Read pre-parsed packets from Postgres.
 
 ---
@@ -166,8 +166,8 @@ These are the runtime wiring points that implement the split above:
    └─ route: "atlas.topology.updated"
 ```
 
-**Lane C Input**: packet_key (graph vertex reference)  
-**Lane C Output**: community_id, authority_score, neighbor packet_keys  
+**Lane C Input**: packet_key (graph vertex reference)
+**Lane C Output**: community_id, authority_score, neighbor packet_keys
 **Hard rule**: Graph work is derived state only. Do NOT write graph as source of truth for identity.
 
 ---
@@ -199,8 +199,8 @@ These are the runtime wiring points that implement the split above:
    └─ route: "atlas.cache.warmed"
 ```
 
-**Lane D Input**: Canonical envelope from Postgres  
-**Lane D Output**: Redis cache keys (hot memory for millisecond retrieval)  
+**Lane D Input**: Canonical envelope from Postgres
+**Lane D Output**: Redis cache keys (hot memory for millisecond retrieval)
 **Hard rule**: Cache is optional. If miss, rebuild from Postgres. Never write cache before Postgres succeeds.
 
 ---
@@ -257,7 +257,7 @@ const candidates = await hyperragPacketRpc({
 const ranked = candidates
   .map((c) => ({
     ...c,
-    score: 
+    score:
       0.4 * (pageRankScores[c.packet_key] ?? 0) +
       0.3 * c.similarity_score +
       0.3 * c.authority_score
@@ -550,18 +550,18 @@ function getNeighbors(packetIndex: number): Uint32Array {
 function getSomNeighborhood(row: number, col: number, radius: number): Uint32Array {
   const targetCell = row * 20 + col;
   const results: number[] = [];
-  
+
   for (let i = 0; i < mmap.som_cell_index.length; i++) {
     const cell = mmap.som_cell_index[i];
     if (cell === 0xFFFF) continue;
-    
+
     const r = Math.floor(cell / 20);
     const c = cell % 20;
     const distance = Math.max(Math.abs(r - row), Math.abs(c - col));
-    
+
     if (distance <= radius) results.push(i);
   }
-  
+
   return Uint32Array.from(results);
 }
 ```
@@ -578,7 +578,7 @@ async function acpWorkerLoop(packet: unknown) {
   // ═══════════════════════════════════════════════════════════
   // LANE A: Validate canonical envelope (JSON → Zod)
   // ═══════════════════════════════════════════════════════════
-  
+
   let canonical: z.infer<typeof CanonicalSemanticPacketSchema>;
   try {
     canonical = CanonicalSemanticPacketSchema.parse(packet);
@@ -587,22 +587,22 @@ async function acpWorkerLoop(packet: unknown) {
     await rabbit.publish("packet.rejected", { reason: "envelope_invalid", packet_key: (packet as any)?.packet_key });
     return;
   }
-  
+
   const packetKey = canonical.packet_key;
   const titleId = canonical.title_id;
   const featureId = canonical.feature_id;
-  
+
   await rabbit.publish("packet.acp.validated", { packet_key: packetKey });
 
   // ═══════════════════════════════════════════════════════════
   // LANE B: Lookup manifold neighborhood (mmap + topology)
   // ═══════════════════════════════════════════════════════════
-  
+
   const somNeighbors = lookupMmapNeighborhood({
     somCell: canonical.som_row ? canonical.som_row * 20 + canonical.som_col! : 0,
     radius: 1
   });
-  
+
   const communityPackets = lookupMmapCommunity({
     communityId: canonical.community_id ?? -1,
     limit: 50
@@ -611,7 +611,7 @@ async function acpWorkerLoop(packet: unknown) {
   // ═══════════════════════════════════════════════════════════
   // LANE C: Expand candidate tuples (Neo4j neighbors)
   // ═══════════════════════════════════════════════════════════
-  
+
   const graphNeighbors = canonical.neo4j_neighbors ?? [];
   const allCandidates = new Set<string>([
     ...somNeighbors,
@@ -622,7 +622,7 @@ async function acpWorkerLoop(packet: unknown) {
   // ═══════════════════════════════════════════════════════════
   // LANE B+D: Retrieve candidates (HyperRAG packet RPC)
   // ═══════════════════════════════════════════════════════════
-  
+
   const retrievedCandidates = await hyperragPacketRpc({
     packet_key: packetKey,
     title_id: titleId,
@@ -630,7 +630,7 @@ async function acpWorkerLoop(packet: unknown) {
     neighborhood: Array.from(allCandidates),
     maxCandidates: 50
   });
-  
+
   if (!retrievedCandidates || retrievedCandidates.length === 0) {
     await rabbit.publish("packet.retrieval.empty", { packet_key: packetKey });
     return;
@@ -639,20 +639,20 @@ async function acpWorkerLoop(packet: unknown) {
   // ═══════════════════════════════════════════════════════════
   // LANE B: Rank locally (cosine similarity + authority)
   // ═══════════════════════════════════════════════════════════
-  
+
   const ranked = retrievedCandidates
     .map((c) => {
       const pageRankScore = (pageRankCache[c.packet_key] ?? 0);
-      const blend = 
+      const blend =
         0.4 * pageRankScore +
         0.3 * (c.similarity_score ?? 0) +
         0.3 * (c.authority_score ?? 0);
-      
+
       return { ...c, blend_score: blend };
     })
     .sort((a, b) => b.blend_score - a.blend_score)
     .slice(0, 10);
-  
+
   await rabbit.publish("packet.retrieval.ranked", {
     packet_key: packetKey,
     ranked_keys: ranked.map((c) => c.packet_key)
@@ -661,7 +661,7 @@ async function acpWorkerLoop(packet: unknown) {
   // ═══════════════════════════════════════════════════════════
   // LANE D: Emit ACE context (for OpenAI facade)
   // ═══════════════════════════════════════════════════════════
-  
+
   const aceContext = assembleAcePacket({
     packet_key: packetKey,
     title_id: titleId,
@@ -673,17 +673,17 @@ async function acpWorkerLoop(packet: unknown) {
       graph: graphNeighbors
     }
   });
-  
+
   await rabbit.publish("ace.context.assembled", {
     packet_key: packetKey,
     context_id: aceContext.context_id,
     token_count: aceContext.token_count
   });
-  
+
   // ═══════════════════════════════════════════════════════════
   // TRACE: Complete (do NOT call Gemma4 from here)
   // ═══════════════════════════════════════════════════════════
-  
+
   console.log(`✅ ACP loop complete: ${packetKey} → ${ranked.length} candidates → ACE context ready`);
 }
 
@@ -693,35 +693,35 @@ async function acpWorkerLoop(packet: unknown) {
 function lookupMmapNeighborhood(opts: { somCell: number; radius: number }): number[] {
   const { somCell, radius } = opts;
   const results: number[] = [];
-  
+
   const row = Math.floor(somCell / 20);
   const col = somCell % 20;
-  
+
   for (let i = 0; i < mmap.som_cell_index.length; i++) {
     const cell = mmap.som_cell_index[i];
     if (cell === 0xFFFF) continue;
-    
+
     const r = Math.floor(cell / 20);
     const c = cell % 20;
     const distance = Math.max(Math.abs(r - row), Math.abs(c - col));
-    
+
     if (distance <= radius) results.push(i);
   }
-  
+
   return results;
 }
 
 function lookupMmapCommunity(opts: { communityId: number; limit: number }): number[] {
   const { communityId, limit } = opts;
   const results: number[] = [];
-  
+
   for (let i = 0; i < mmap.community_id.length; i++) {
     if (mmap.community_id[i] === communityId) {
       results.push(i);
       if (results.length >= limit) break;
     }
   }
-  
+
   return results;
 }
 
@@ -732,7 +732,7 @@ function assembleAcePacket(opts: any) {
   // Combine canonical packet + candidates + neighborhood
   // Estimate token count for Gemma4 input
   // Return structured context (NOT synthesized answer)
-  
+
   return {
     context_id: generateId(),
     packet_key: opts.packet_key,

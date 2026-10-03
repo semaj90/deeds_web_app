@@ -1,0 +1,79 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-29T17:36:03.840Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 5,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 5,
+  "sourceRevisionMismatchCount": 0,
+  "candidatesConsidered": 5,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "markdown": 5
+  },
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 117,
+  "totalSymbolsInserted": null,
+  "plan": [
+    {
+      "fileId": "63b5b71d-3241-4b6b-97f8-f42375616000",
+      "sourceRef": "ACE-QUICK-REFERENCE.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:e94bb0ee99ae96dd476ffffc0cee9d696a6de58dba4b00f804225faf5b597d09",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "318c8a87-891d-4db5-a80b-73063bbdb4ce",
+      "sourceRef": "ACE-SUMMARY-LATENCY-IMPACT.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:0d0844c5f5a88d5497eebcfd43dbd4e8b5863d3fe6172108fe18e37c12c70e12",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "03ea7fe2-88ea-4810-998e-d9f655ac1fff",
+      "sourceRef": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:c2e5915a56d0e6796e225287c273ce2f966081144fb7df01752b22bb0ebb8dd5",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 43
+    },
+    {
+      "fileId": "2e7e2488-cf3c-4932-adb1-ab3ce0cdaf87",
+      "sourceRef": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:c576c133480c8176ef653133f6d31b754a08cb6a1394638e8b39880c1e8fda45",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 6
+    },
+    {
+      "fileId": "8ab4bf65-8ef5-4155-b8f7-e366d172ee91",
+      "sourceRef": "AGENTIC-WORKFLOW-PLAN-SUMMARY.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:bf305a991489525ac3e1c2c18fef782e3a238d98429a1eeb23ac0aa8a61c284f",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    }
+  ]
+}

@@ -175,6 +175,26 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda\atlas_core\atlas_core.vcxproj">
+      <Project>{D6E53FDF-D966-336A-AFE1-9C2A914229A8}</Project>
+      <Name>atlas_core</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda\atlas_core\atlas_core_c_abi_test.vcxproj">
+      <Project>{E82072C6-8B5D-3638-ADE2-8432F3702DA2}</Project>
+      <Name>atlas_core_c_abi_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda\atlas_core\atlas_knn_backend.vcxproj">
+      <Project>{497C90AF-1310-3656-A6D2-A9A72D94EC9F}</Project>
+      <Name>atlas_knn_backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda\atlas_core\atlas_knn_c_abi_test.vcxproj">
+      <Project>{D70D1253-6E29-38C2-9607-9ED10FCC21FF}</Project>
+      <Name>atlas_knn_c_abi_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda\atlas_core\atlas_similarity_graph_backend.vcxproj">
+      <Project>{E381156E-2FFF-34BA-B8D9-FD81F2030033}</Project>
+      <Name>atlas_similarity_graph_backend</Name>
+    </ProjectReference>
     <ProjectReference Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda\cuda_kernels.vcxproj">
       <Project>{A26EB23F-4161-396B-9647-D5BED7977ED4}</Project>
       <Name>cuda_kernels</Name>

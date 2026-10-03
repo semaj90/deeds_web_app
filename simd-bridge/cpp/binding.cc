@@ -75,6 +75,8 @@ napi_status napi_create_object(napi_env, napi_value*);
 #include "gpu_error_codes.h"
 #include "native_runtime_info.h"
 
+extern "C" napi_callback atlas_core_napi_page_rank_callback(void);
+
 static std::vector<std::string> g_registered_exports;
 
 struct ExportBackendClassification {
@@ -96,6 +98,10 @@ static ExportBackendClassification classifyExportBackend(
     const std::string& name,
     const AtlasCudaRuntimeInfo& runtime_info,
     bool torch_cuda_available) {
+  if (name == "atlasPageRank") {
+    return {"cpu_reference", "atlas_core_c_abi_cpu_implementation"};
+  }
+
   if (exportNameIn(name, {
         "graphSimilarity", "graphSimilarityHalf", "clusterEmbeddings",
         "computeCaseEmbedding", "poolStats", "simdJsonParse",
@@ -1573,6 +1579,7 @@ static napi_value ResetExecutionCountersWrapper(napi_env env, napi_callback_info
 // ── Module Init ──────────────────────────────────────────────────────
 
 static napi_value Init(napi_env env, napi_value exports) {
+  registerFn(env, exports, "atlasPageRank", atlas_core_napi_page_rank_callback());
   registerFn(env, exports, "bridgeSIMD", BridgeSIMD);
   registerFn(env, exports, "checkCudaAvailable", CheckCuda);
   registerFn(env, exports, "graphSimilarity", GraphSimilarityWrapper);

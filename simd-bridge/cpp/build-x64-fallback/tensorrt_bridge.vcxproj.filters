@@ -4,6 +4,12 @@
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\binding.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\native\atlas_core\napi\atlas_core_napi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\native_execution_counters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\tensor_bridge.cc">
       <Filter>Source Files</Filter>
     </ClCompile>

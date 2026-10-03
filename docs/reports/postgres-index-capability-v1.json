@@ -1,6 +1,6 @@
 {
   "schema": "atlas.postgres-index-capability.v1",
-  "generatedAt": "2026-09-21T02:00:21.346Z",
+  "generatedAt": "2026-10-02T16:46:28.207Z",
   "server": {
     "version": "18.4 (Debian 18.4-1.pgdg12+1)",
     "ioMethod": "worker",
@@ -103,7 +103,7 @@
     },
     "atlas_ast_nodes": {
       "exists": true,
-      "rows": 11273,
+      "rows": 523271,
       "missingColumns": [],
       "indexes": [
         "atlas_ast_nodes_pkey [btree] lead=tree_node_id bitmap=true",
@@ -391,11 +391,11 @@
         "bitmapOr": false,
         "indexScan": true,
         "seqScan": false,
-        "sharedHit": 0,
-        "sharedRead": 4,
+        "sharedHit": 10,
+        "sharedRead": 13,
         "planRows": 1,
         "actualRows": 0,
-        "executionMs": 0.922,
+        "executionMs": 4.355,
         "settings": {}
       },
       "plannerSelectedBitmap": false,
@@ -410,11 +410,11 @@
         "bitmapOr": false,
         "indexScan": false,
         "seqScan": false,
-        "sharedHit": 4,
+        "sharedHit": 23,
         "sharedRead": 0,
         "planRows": 1,
         "actualRows": 0,
-        "executionMs": 0.124,
+        "executionMs": 0.602,
         "settings": {
           "enable_seqscan": "off",
           "enable_indexscan": "off",
@@ -436,22 +436,21 @@
       "defaultPlan": {
         "nodes": [
           "Limit",
-          "Bitmap Heap Scan",
-          "Bitmap Index Scan"
+          "Index Scan"
         ],
-        "bitmapHeap": true,
+        "bitmapHeap": false,
         "bitmapAnd": false,
         "bitmapOr": false,
-        "indexScan": false,
+        "indexScan": true,
         "seqScan": false,
-        "sharedHit": 3,
-        "sharedRead": 3,
-        "planRows": 4,
-        "actualRows": 23,
-        "executionMs": 0.922,
+        "sharedHit": 1,
+        "sharedRead": 2,
+        "planRows": 1,
+        "actualRows": 6,
+        "executionMs": 0.553,
         "settings": {}
       },
-      "plannerSelectedBitmap": true,
+      "plannerSelectedBitmap": false,
       "bitmapProbe": {
         "nodes": [
           "Limit",
@@ -463,11 +462,11 @@
         "bitmapOr": false,
         "indexScan": false,
         "seqScan": false,
-        "sharedHit": 6,
+        "sharedHit": 3,
         "sharedRead": 0,
-        "planRows": 4,
-        "actualRows": 23,
-        "executionMs": 0.06,
+        "planRows": 1,
+        "actualRows": 6,
+        "executionMs": 0.04,
         "settings": {
           "enable_seqscan": "off",
           "enable_indexscan": "off",
@@ -475,7 +474,7 @@
         },
         "bitmapPlanGeneratable": true
       },
-      "verdict": "PLANNER_SELECTED_BITMAP_FOR_FIXTURE"
+      "verdict": "PLANNER_CHOSE_INDEX_SCAN_NOT_A_FAILURE"
     },
     {
       "id": "packets_domain_source",
@@ -497,11 +496,11 @@
         "bitmapOr": false,
         "indexScan": false,
         "seqScan": false,
-        "sharedHit": 140,
-        "sharedRead": 2382,
-        "planRows": 51,
+        "sharedHit": 209,
+        "sharedRead": 2513,
+        "planRows": 53,
         "actualRows": 7,
-        "executionMs": 44.571,
+        "executionMs": 27.287,
         "settings": {}
       },
       "plannerSelectedBitmap": true,
@@ -516,11 +515,11 @@
         "bitmapOr": false,
         "indexScan": false,
         "seqScan": false,
-        "sharedHit": 2522,
+        "sharedHit": 2722,
         "sharedRead": 0,
-        "planRows": 51,
+        "planRows": 53,
         "actualRows": 7,
-        "executionMs": 4.679,
+        "executionMs": 3.54,
         "settings": {
           "enable_seqscan": "off",
           "enable_indexscan": "off",
@@ -553,7 +552,7 @@
         "sharedRead": 4,
         "planRows": 1,
         "actualRows": 1,
-        "executionMs": 1.464,
+        "executionMs": 4.222,
         "settings": {}
       },
       "plannerSelectedBitmap": false,
@@ -572,7 +571,7 @@
         "sharedRead": 0,
         "planRows": 1,
         "actualRows": 1,
-        "executionMs": 0.053,
+        "executionMs": 0.051,
         "settings": {
           "enable_seqscan": "off",
           "enable_indexscan": "off",
@@ -595,7 +594,7 @@
     "PG18-INDEX-02": "GAPS",
     "PG18-PLAN-03": "PROVEN (plans captured as JSON)",
     "PG18-AIO-04": "PG18_AIO_CAPABLE; NOT_OBSERVED",
-    "PG18-BITMAP-05": "BITMAP_PLAN_GENERATABLE (4/4 fixtures); planner-selected in 2/4; BitmapAnd combining shown: false",
+    "PG18-BITMAP-05": "BITMAP_PLAN_GENERATABLE (4/4 fixtures); planner-selected in 1/4; BitmapAnd combining shown: false",
     "PGVECTOR-06": "capability only: HNSW INDEX_CAPABILITY_PROVEN; iterative_scan supported true; parity NOT_RUN"
   },
   "canonicalAuthority": false,

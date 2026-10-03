@@ -1,0 +1,244 @@
+{
+  "schema": "atlas.external-doc-admission-envelopes.v1",
+  "generatedAt": "2026-09-30T17:40:13.747628+00:00",
+  "manifestRevision": "library-docs-20260930T173657Z-6b503920983f",
+  "priorManifestRevision": null,
+  "recrawlPlan": null,
+  "acquired": true,
+  "acquisitionFailures": [],
+  "pages": 30,
+  "chunks": 892,
+  "envelopesDigest": "sha256:1d4cb73230a5ed0111090b643945acb58b3e7459c0ff64155031b08df43b83cf",
+  "envelopesFile": "docs/.okf/library-docs/runs/20260930T173657Z-6b503920983f/admission-envelopes.json",
+  "native": {
+    "nativeChunks": 892,
+    "nativeChunksWithoutDocCoordinate": 0,
+    "pageNormalizationDiffersFromStoredText": 0,
+    "uniquePageEvidenceRevisionCount": 30,
+    "duplicatePageEvidenceRevision": {
+      "groups": 0,
+      "rows": 0
+    },
+    "uniqueChunkEvidenceRevisionCount": 892,
+    "duplicateChunkEvidenceRevision": {
+      "groups": 0,
+      "rows": 0
+    }
+  },
+  "coordinateSource": "manifest fields (provider/product/product_version/version_qualification/...) via atlas_okf_docs_pipeline.build_page_coordinate; sidecar mirrors and is checked for drift",
+  "sampleEnvelopes": [
+    {
+      "manifestRevision": "library-docs-20260930T173657Z-6b503920983f",
+      "sourceRevision": "sveltekit-2-2026-09-23",
+      "sourceId": "sveltekit",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "page": {
+        "provider": "sveltejs",
+        "product": "sveltekit",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-30",
+        "architecture": null,
+        "language": "typescript",
+        "url": "https://svelte.dev/docs/kit/form-actions",
+        "title": "Form actions • SvelteKit Docs",
+        "publisher": "Svelte",
+        "sourceAuthority": "OFFICIAL",
+        "fetcher": "BEAUTIFULSOUP_HTTP",
+        "crawlRevision": "sveltekit-2-2026-09-23",
+        "parserRevision": "beautifulsoup4==4.15.0/html.parser",
+        "contentHash": "aa8c9bf2efb70d822f08e9b1b209547ead1275859c81bcadadf54573fc2be3e4",
+        "evidenceRevision": "sha256:bc7bfd738e6316654a2d5e73ee7aea8208d32e701b63530bdd759eef29dd8685",
+        "retrievedAt": "2026-09-30T17:39:29.530574Z"
+      },
+      "chunks": [
+        {
+          "chunkId": "doc:sveltekit:aa8c9bf2efb70d82:0",
+          "ordinal": 0,
+          "headingPath": [
+            "Getting started"
+          ],
+          "sectionAnchor": "Getting started",
+          "startChar": 20,
+          "endChar": 97,
+          "startByte": 20,
+          "endByte": 97,
+          "text": "Introduction\nCreating a project\nProject types\nProject structure\nWeb standards",
+          "domainClass": "api",
+          "ontologyClasses": [
+            "CONCEPT"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "74a268417f2b604bd086edd467ada5f0abccb7fe2a1fa561940bba8b1e52646e",
+          "evidenceRevision": "sha256:f0275277348ed350d4c3807a74a940bb2491a60ddefbf191be6dad95edaf8aaa"
+        },
+        {
+          "chunkId": "doc:sveltekit:aa8c9bf2efb70d82:1",
+          "ordinal": 1,
+          "headingPath": [
+            "Getting started",
+            "Core concepts"
+          ],
+          "sectionAnchor": "Getting started/Core concepts",
+          "startChar": 116,
+          "endChar": 218,
+          "startByte": 116,
+          "endByte": 218,
+          "text": "Routing\nLoading data\nForm actions\nPage options\nState management\nRemote functions\nEnvironment variables",
+          "domainClass": "api",
+          "ontologyClasses": [
+            "CONCEPT"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "ba0d4327c767b64c0f4cbdd9fe468a872d1dc9cf7a2ca9c25052ffde5fa5262f",
+          "evidenceRevision": "sha256:a846af6f29b263469125217637e8db398ec07fc89d52dfac23e0c1656fb7860f"
+        }
+      ]
+    },
+    {
+      "manifestRevision": "library-docs-20260930T173657Z-6b503920983f",
+      "sourceRevision": "sveltekit-2-2026-09-23",
+      "sourceId": "sveltekit",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "page": {
+        "provider": "sveltejs",
+        "product": "sveltekit",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-30",
+        "architecture": null,
+        "language": "typescript",
+        "url": "https://svelte.dev/docs/kit/hooks",
+        "title": "Hooks • SvelteKit Docs",
+        "publisher": "Svelte",
+        "sourceAuthority": "OFFICIAL",
+        "fetcher": "BEAUTIFULSOUP_HTTP",
+        "crawlRevision": "sveltekit-2-2026-09-23",
+        "parserRevision": "beautifulsoup4==4.15.0/html.parser",
+        "contentHash": "7efedae605428867ab6cb022e27e9625a098f9443e52f2203b29e8790cdce9f6",
+        "evidenceRevision": "sha256:3b62833fcb589f4f5969772341f3cd82afb291ce6bb1f9143b8051185c3963c8",
+        "retrievedAt": "2026-09-30T17:39:27.681489Z"
+      },
+      "chunks": [
+        {
+          "chunkId": "doc:sveltekit:7efedae605428867:0",
+          "ordinal": 0,
+          "headingPath": [
+            "Getting started"
+          ],
+          "sectionAnchor": "Getting started",
+          "startChar": 20,
+          "endChar": 97,
+          "startByte": 20,
+          "endByte": 97,
+          "text": "Introduction\nCreating a project\nProject types\nProject structure\nWeb standards",
+          "domainClass": "api",
+          "ontologyClasses": [
+            "CONCEPT"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "74a268417f2b604bd086edd467ada5f0abccb7fe2a1fa561940bba8b1e52646e",
+          "evidenceRevision": "sha256:4511725e2b3f296234e1da41455ba2b5160e956ed57977f11eabda774c83a020"
+        },
+        {
+          "chunkId": "doc:sveltekit:7efedae605428867:1",
+          "ordinal": 1,
+          "headingPath": [
+            "Getting started",
+            "Core concepts"
+          ],
+          "sectionAnchor": "Getting started/Core concepts",
+          "startChar": 116,
+          "endChar": 218,
+          "startByte": 116,
+          "endByte": 218,
+          "text": "Routing\nLoading data\nForm actions\nPage options\nState management\nRemote functions\nEnvironment variables",
+          "domainClass": "api",
+          "ontologyClasses": [
+            "CONCEPT"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "ba0d4327c767b64c0f4cbdd9fe468a872d1dc9cf7a2ca9c25052ffde5fa5262f",
+          "evidenceRevision": "sha256:df71e33859d82d123a02eae74a8e437c525a1772773a6356742ca962bbc83704"
+        }
+      ]
+    },
+    {
+      "manifestRevision": "library-docs-20260930T173657Z-6b503920983f",
+      "sourceRevision": "sveltekit-2-2026-09-23",
+      "sourceId": "sveltekit",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "page": {
+        "provider": "sveltejs",
+        "product": "sveltekit",
+        "productVersion": "CURRENT_UPSTREAM@2026-09-30",
+        "architecture": null,
+        "language": "typescript",
+        "url": "https://svelte.dev/docs/kit/load",
+        "title": "Loading data • SvelteKit Docs",
+        "publisher": "Svelte",
+        "sourceAuthority": "OFFICIAL",
+        "fetcher": "BEAUTIFULSOUP_HTTP",
+        "crawlRevision": "sveltekit-2-2026-09-23",
+        "parserRevision": "beautifulsoup4==4.15.0/html.parser",
+        "contentHash": "0deaff6629e48dd5abd7b05a2bb6693e2662aff006b2b88d6793ee3ddea22df1",
+        "evidenceRevision": "sha256:d22d8cea5237ecd833938f675307e87650425ad9fc5673bef5a707ef5552af4f",
+        "retrievedAt": "2026-09-30T17:39:23.571786Z"
+      },
+      "chunks": [
+        {
+          "chunkId": "doc:sveltekit:0deaff6629e48dd5:0",
+          "ordinal": 0,
+          "headingPath": [
+            "Getting started"
+          ],
+          "sectionAnchor": "Getting started",
+          "startChar": 20,
+          "endChar": 97,
+          "startByte": 20,
+          "endByte": 97,
+          "text": "Introduction\nCreating a project\nProject types\nProject structure\nWeb standards",
+          "domainClass": "api",
+          "ontologyClasses": [
+            "CONCEPT"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "74a268417f2b604bd086edd467ada5f0abccb7fe2a1fa561940bba8b1e52646e",
+          "evidenceRevision": "sha256:9589113f3031a20cb3c8ede78b2a2ba73f45b446bcc5b0c348bb37f8f9f6512b"
+        },
+        {
+          "chunkId": "doc:sveltekit:0deaff6629e48dd5:1",
+          "ordinal": 1,
+          "headingPath": [
+            "Getting started",
+            "Core concepts"
+          ],
+          "sectionAnchor": "Getting started/Core concepts",
+          "startChar": 116,
+          "endChar": 218,
+          "startByte": 116,
+          "endByte": 218,
+          "text": "Routing\nLoading data\nForm actions\nPage options\nState management\nRemote functions\nEnvironment variables",
+          "domainClass": "api",
+          "ontologyClasses": [
+            "CONCEPT"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "ba0d4327c767b64c0f4cbdd9fe468a872d1dc9cf7a2ca9c25052ffde5fa5262f",
+          "evidenceRevision": "sha256:43a6854ac70354b5e66cfac82b824c9ce1a5477b854bfda495114df290c92231"
+        }
+      ]
+    }
+  ],
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0
+  }
+}

@@ -33,9 +33,16 @@ function fixture(rows: Record<string, unknown>[], over: Record<string, unknown> 
 	return { bytes, pointer: pointerPath, manifestChecksum: `sha256:${createHash('sha256').update(pointerBytes).digest('hex')}` };
 }
 
-const row = (chunkId: string, text: string) => ({
-	schema: 'atlas.external-doc-chunk.v1', chunk_id: chunkId, chunk_evidence_revision: `sha256:${chunkId}`,
-	product: 'langgraph', canonicalUrl: 'https://docs.example/page', heading_path: ['Persistence'], ordinal: 3, text
+const row = (chunkId: string, text: string, language?: string) => ({
+  schema: 'atlas.external-doc-chunk.v1',
+  chunk_id: chunkId,
+  chunk_evidence_revision: `sha256:${chunkId}`,
+  product: 'langgraph',
+  language,
+  canonicalUrl: 'https://docs.example/page',
+  heading_path: ['Persistence'],
+  ordinal: 3,
+  text,
 });
 
 describe('local chunk snapshot viewer', () => {
@@ -56,6 +63,21 @@ describe('local chunk snapshot viewer', () => {
 		expect(result.pagination.limit).toBe(20);
 		expect(result.nextOffset).toBeNull();
 	});
+
+	it('filters and labels local chunks by programming language', () => {
+    fixture([
+      row('py', 'Tool calling in LangGraph', 'python'),
+      row('ts', 'Tool calling in LangGraph', 'typescript'),
+    ]);
+    const result = readLocalChunkSnapshotPageV1({
+      root,
+      query: 'tool calling',
+      language: 'typescript',
+    });
+    expect(result.chunks.map((chunk) => chunk.chunkId)).toEqual(['ts']);
+    expect(result.chunks[0].language).toBe('typescript');
+    expect(result.status).toBe('LOCAL_UNADMITTED');
+  });
 
 	it('rejects later pages without the first page manifest checksum', () => {
 		fixture([row('c1', 'one'), row('c2', 'two')]);

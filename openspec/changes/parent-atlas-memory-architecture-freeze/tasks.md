@@ -264,14 +264,11 @@ already completed plus the follow-up scoping work, not feature implementation �
   `ldr-ace-bridge.ts`). Read `web-search.ts`'s real `WebSearchResult`/`WebSearchResponse` types
   directly and confirmed neither carries a checksum, `observedAt`, or reproducibility contract —
   the gap is durable/reproducible snapshot identity, not search capability.
-- [ ] 5.4 Not built: `OrnithPrefixIdentityV1` (checksum-bound llama.cpp prefix-cache identity —
-  `sha256(modelRevision, chatTemplateRevision, toolSchemaRevision, systemPromptRevision,
-  contextManifestPrefixChecksum)`). Hard rule recorded: never build a "save/restore Ornith's
-  recurrent (Gated DeltaNet-style) state" feature — upstream llama.cpp itself treats rewinding that
-  state as not equivalent to a conventional KV-cache rewind, and general state
-  injection/restoration is an active, unresolved upstream concern. Use `cache_prompt`/
-  `cache_reuse` (already mandated by this repo's canonical llama-server startup contract) as-is;
-  record cache hit/miss as telemetry only, never as a correctness input.
+- [x] 5.4 Added `OrnithPrefixIdentityV1` in `packages/parent-atlas/src/core/adaptive-memory-runtime.ts`.
+  Its checksum binds the model, chat template, tool schema, system prompt, and context-manifest
+  prefix; schema tests reject session telemetry, recurrent state, and canonical authority. This is
+  identity metadata only: it does not read, persist, or restore llama.cpp KV/DeltaNet state. Keep
+  cache hit/miss telemetry outside identity and use `cache_prompt`/`cache_reuse` as-is.
 - [ ] 5.5 Not built: `LexicalFingerprintV1` and the `ts_stat()`-derived IDF feature. Explicitly
   gated: do not build unless an evaluation proves value over what FTS/pg_trgm already provide —
   matches this repo's existing "don't add a 5th retrieval lane" discipline, applied to lexical/BoW.
@@ -339,3 +336,158 @@ label set**, never a new identity scheme and never a hardcoded "dex 0-151" numbe
   4. ACE JSON packet fields: same caution as BitFrost above — ACE's packet envelope shape is used
      across many call sites; swapping any field to a LUT-coded byte needs a call-site audit first
      (per this repo's Duplication Prevention rule), not a blind schema change.
+
+## 7. TriEngramV1 three-plane boundary (2026-09-30)
+
+- [x] 7.1 Added the strict `TriEngramV1` descriptor to the existing Parent Atlas adaptive-memory
+  runtime owner. E1/PostgreSQL is the only canonical authority; E2 is derived retrieval/residency;
+  E3 is llama-server-owned, ephemeral, and non-authoritative. Focused tests reject E3 promotion and
+  persistent lifecycle claims. No store, persistence path, or runtime state transfer was added.
+
+## 8. Compact Codebook, Registry Ordinal Maps, and Virtual-Memory Residency Architecture (2026-10-01)
+
+Integration of the compact ordinal / codebook framing as a deterministic projection layer over immutable canonical evidence, decoupling compact routing coordinates from canonical identity.
+
+### 8.1 Registry Arithmetic & Codebook Sizing Baseline
+- [x] 8.1 Record formal arithmetic bounds for compact bitfields and byte-aligned registries:
+  - 0..151 = 152 distinct values (historical Pokémon index)
+  - 0..255 = 256 distinct values = exactly 8 bits (uint8 / single byte)
+  - 0..511 = 512 distinct values = exactly 9 bits (uint9 / 2 bytes aligned)
+  - 0..1023 = 1024 distinct values = exactly 10 bits (uint10 / 2 bytes aligned)
+  Ordinals are strictly presentation and cache coordinates; they do not replace canonical identifiers.
+
+### 8.2 Canonical Identity vs. Registry Ordinals (`RegistryOrdinalMapV1`)
+- [x] 8.2 Define `RegistryOrdinalMapV1` schema in `sveltekit-frontend/src/lib/server/atlas/residency/registry-ordinal-map-v1.ts`.
+  <!-- wfu: depends=7.1; est=35; reads=sveltekit-frontend/src/lib/server/atlas/residency/packet-class-lut-v1.ts; writes=sveltekit-frontend/src/lib/server/atlas/residency/registry-ordinal-map-v1.ts -->
+  - Canonical identities (`canonicalTaskKey`, `packetKey`, `symbolVersionId`, `sourceRef`, `sourceRevision`, `workspaceRevision`, `conceptId`, `entityId`) remain immutable authorities.
+  - `RegistryOrdinalMapV1` maintains `{ ordinal: number, canonicalId: string }[]` guarded by `registryRevision: sha256` and `ordinalMapChecksum: sha256`.
+  - An ordinal coordinate `42` is valid ONLY when qualified by `registryRevision` (`42 @ sha256:A != 42 @ sha256:B`). Throws on duplicate canonical IDs or overflow.
+
+### 8.3 Small Independent Codebook LUTs
+- [x] 8.3 Implemented modular codebook LUT generators for independent domains rather than a single monolithic ontology codebook:
+  <!-- wfu: depends=8.2; est=30; reads=sveltekit-frontend/src/lib/server/atlas/residency/registry-ordinal-map-v1.ts; writes=sveltekit-frontend/src/lib/server/atlas/residency/codebook-luts-v1.ts -->
+  - `DomainClassLUT`: 0..31 (5 bits / byte-packed)
+  - `SourceRoleLUT`: 0..15 (4 bits / nibble-packed)
+  - `RelationTypeLUT`: 0..63 (6 bits)
+  - `EvidenceKindLUT`: 0..31 (5 bits)
+  - `ExecutionCapabilityLUT`: 0..255 (8 bits / uint8)
+  - `HotConceptCodebook`: 0..511 (9 bits / uint16)
+  Packed header structure: `[archetype:u8][domain:u8][relation:u8][flags:u8][conceptOrdinal:u16][entityOrdinal:u16][packetOrdinal:u32]` (12 bytes compact prefix).
+
+### 8.4 Four-Layer Ontology Disambiguation & Typed Coordinates
+- [x] 8.4 Enforced four distinct ontology namespaces with typed coordinates:
+  <!-- wfu: depends=8.3; est=25; reads=sveltekit-frontend/src/lib/server/atlas/**; writes=sveltekit-frontend/src/lib/server/atlas/ontology/typed-coordinates-v1.ts -->
+  - `DOMAIN`: Broad routing/category (e.g. `domain:7` = database)
+  - `CONCEPT`: Semantic class/idea (e.g. `concept:42` = PostgreSQL)
+  - `ENTITY`: Concrete instance/object (e.g. `entity:193` = legal-ai-postgres)
+  - `ONTOLOGY LINKED TUPLE`: Grounded assertion relating things with source span evidence (`legal-ai-postgres --IMPLEMENTS--> PostgreSQL`)
+  Prohibit ambiguous integer namespaces across layers; reject bare integers without typed namespace prefixes or bit-tagged types.
+
+### 8.5 `AtlasFeatureCardV1` Specification
+- [x] 8.5 Reinterpreted the 9 legacy fields (`feature_id`, `domain_class`, `title_id`, `tree_node_id`, `concept_ids`, `som_cluster`, `community_id`, `page_rank_score`, `embedding`) as a compact projection card `AtlasFeatureCardV1`:
+  <!-- wfu: depends=8.4; est=40; reads=sveltekit-frontend/src/lib/server/db/**; writes=sveltekit-frontend/src/lib/server/atlas/features/atlas-feature-card-v1.ts -->
+  - Identity refs: `canonicalId`, `sourceRevision`, `workspaceRevision`
+  - Symbolic compact refs: `domainOrdinal`, `conceptOrdinals[]`, `entityOrdinals[]`, `relationOrdinals[]`
+  - Structural coordinates: `treeNodeOrdinal`, `communityOrdinal`, `somCell`
+  - Graph ranking: `pageRank`, `centrality`
+  - Representation refs: Replace raw float arrays with `representationRef` (`semantic768Ref`, `latent128Ref`, `latent64Ref`).
+
+### 8.6 Representation Hierarchy & Clustering Codebooks
+- [x] 8.6 Formalized representation derivation trust gradient and discrete clustering codes:
+  <!-- wfu: depends=8.5; est=30; reads=docs/architecture/CORRECTED-embedding-dimension-policy.md; writes=sveltekit-frontend/src/lib/server/atlas/representations/representation-gradient-v1.ts -->
+  - `canonical semantic_768` > `PCA/SVD deterministic derived (128)` > `MLP learned derived (64)` > `discrete clustering codes (0..511)`.
+  - PCA/SVD records `basisRevision`, `trainingCohortRevision`, `meanDigest`, `componentsDigest`.
+  - MLP records `modelRevision`, `trainingCohortRevision`, `featureSchemaRevision`, optimizer receipt.
+  - Discrete cluster ordinals (`clusterOrdinal = 317` under KMeans-512) act as approximate locality buckets for hot-set pre-filtering, NOT semantic truth.
+- [x] 8.6A Superseded the historical scalar authority ordering: semantic MRL, autoencoder latents, linear projections, cluster assignments, and topology coordinates use distinct family classes; matching dimensions do not imply equivalence. The runtime no longer exports a total-order comparator. `EvidenceDepth` and residency remain owned by their separate contracts. Focused representation and compact-codebook tests cover the separation; this does not admit any projection for production retrieval.
+
+### 8.7 Ephemeral Model State Boundary (`HiddenStateCacheKeyV1`)
+- [x] 8.7 Enforced hard isolation for transformer hidden states and activations:
+  <!-- wfu: depends=7.1; est=20; reads=sveltekit-frontend/src/lib/server/atlas/**; writes=sveltekit-frontend/src/lib/server/cache/hidden-state-boundary-v1.ts -->
+  - Prohibit persisting hidden states into PostgreSQL, Qdrant, Neo4j, or canonical ledgers.
+  - Ephemeral cache key: `HiddenStateCacheKeyV1 = sha256(manifestChecksum + modelRevision + adapterRevision + tokenizerRevision + layer + tokenRange)`.
+  - Hidden state belongs strictly to KV cache / prefill scratch tiers.
+
+### 8.8 `AdapterRegistryV1` & Compact Adapter Slots
+- [x] 8.8 Create `AdapterRegistryV1` for QLoRA and behavioral memory modules:
+  <!-- wfu: depends=8.1; est=35; reads=sveltekit-frontend/src/lib/server/atlas/**; writes=sveltekit-frontend/src/lib/server/atlas/adapters/adapter-registry-v1.ts -->
+  - Fields: `adapterId`, `adapterRevision`, `baseModelRevision`, `trainingCorpusRevision`, `cohortChecksum`, `rank`, `alpha`, `targetModules[]`, `quantizationContract`, `evalReceipt`, `lifecycleStatus`.
+  - Provide compact slot mappings (`adapterSlot 0..255`) where slot 0 is base model, slot 1 is legal adapter, etc., resolved dynamically via `adapterRegistryRevision`.
+
+### 8.9 `AtlasResidencyDescriptorV1` & Hot/Warm/Cold Queues
+- [x] 8.9 Implement `AtlasResidencyDescriptorV1` and multi-tier memory residency controller:
+  <!-- wfu: depends=8.2; est=45; reads=sveltekit-frontend/src/lib/server/atlas/**; writes=sveltekit-frontend/src/lib/server/atlas/residency/residency-controller-v1.ts -->
+  - **Hot Deque**: Active `ContextManifest`, current packet refs, active concepts, current adapter slot. Eviction via `pop_back`, promotion via `push_front`.
+  - **Warm Priority Queue**: Graph neighbors, same SOM cell, next-hop concepts. Priority = `(utility * p_reuse * recency * breadth) / reload_cost`.
+  - **Cold authority**: PostgreSQL owns canonical identity and lineage. **Cold projections/artifacts**: Qdrant and SeaweedFS are rebuildable projections or artifact stores; carrying a canonical ID does not make them authoritative.
+
+### 8.10 Evidence Depth (D0–D6), Residency, and Model State
+- [x] 8.10 Replace the proposed extra LOD ladder with an independent `EvidenceDepth` axis; the existing `lod-ladder-v1.ts` implementation is legacy and is not authority for this contract. `evidence-depth-v1.ts` defines D0-D6 and a bounded ContextManifest-checksum-bound expansion request; strict schemas keep residency and ephemeral model execution state outside the evidence-depth axis. Focused tests cover mapping, bounds, monotonic expansion, and rejection of mixed-axis fields.
+  <!-- wfu: depends=8.9; est=30; reads=sveltekit-frontend/src/lib/server/atlas/context/fanout-context-compiler-v1.ts; writes=sveltekit-frontend/src/lib/server/atlas/context/evidence-depth-v1.ts -->
+  - **D0**: Typed ordinal; **D1**: compact feature card; **D2**: latent representation; **D3**: `semantic_768`; **D4**: packet/grounded ontology facts; **D5**: structural neighborhood; **D6**: exact source spans.
+  - `EvidenceDepth` describes evidence detail only. `ResidencyTier` independently describes physical placement. Existing LOD APIs retain their current owners and meanings.
+  - Model execution state (prompt tokens, KV/DeltaNet state, hidden activations, prefill scratch) is a separate ephemeral class, not D7 or evidence.
+  - Expansion from a compact representation to evidence requires a bounded targeted lookup; model state is never an evidence expansion target.
+
+
+## 9. Multi-Plane Projection, MessagePack, 4D Tetracubic Topology, and Bounded Agentic Error-Fixing (2026-10-01)
+
+Implementation of the execution/projection planes: nibble-packed byte encodings, MessagePack caching, NDJSON streaming, pure MapReduce projections, WebGPU glyphs, 4D tetracubic topology tiles, and bounded agentic error-fixing neighborhoods.
+
+### 9.1 Nibble-Packed Byte Encodings
+- [x] 9.1 Implement high/low nibble packing and unpacking in `sveltekit-frontend/src/lib/server/atlas/residency/nibble-encoding-v1.ts`:
+  <!-- wfu: depends=8.3; est=20; reads=sveltekit-frontend/src/lib/server/atlas/residency/codebook-luts-v1.ts; writes=sveltekit-frontend/src/lib/server/atlas/residency/nibble-encoding-v1.ts -->
+  - High nibble (bits 4-7): `sourceRole` (0..15).
+  - Low nibble carries `smallEvidenceKind` (0..14); value 15 is reserved as the extended-kind escape. The full `EvidenceKindLUT` remains 0..31 (5 bits).
+  - [x] Add a versioned extension byte for escaped values 15..31, reject malformed/trailing encodings, and test round trips across all 32 LUT values. `packRevisionQualifiedNibblesV1`/`unpackRevisionQualifiedNibblesV1` use the existing `PacketClassLutV1.encodingRevision`, validate LUT contents, reject stale revisions and malformed extension bytes, and round-trip all 32 values; focused Vitest and TypeScript checks pass.
+
+### 9.2 MessagePack Runtime Cache/Transport Encoder
+- [x] 9.2 Implement `MessagePackTransportV1` in `sveltekit-frontend/src/lib/server/atlas/transport/messagepack-transport-v1.ts`:
+  <!-- wfu: depends=8.5; est=25; reads=sveltekit-frontend/src/lib/server/atlas/features/atlas-feature-card-v1.ts; writes=sveltekit-frontend/src/lib/server/atlas/transport/messagepack-transport-v1.ts -->
+  - Encodes canonical JSON objects into compact binary buffers post-checksum.
+  - Ensures checksum is computed over canonical logical JSON, NOT transport MessagePack bytes.
+  - Marks `canonicalAuthority: false` on all transport envelopes.
+
+### 9.3 NDJSON Streamer for EVF Receipts & QLoRA Traces
+- [x] 9.3 Implement `ErrorFixTrainingStreamV1` in `sveltekit-frontend/src/lib/server/atlas/streaming/ndjson-stream-v1.ts`:
+  <!-- wfu: depends=8.7; est=30; reads=sveltekit-frontend/src/lib/server/atlas/adapters/adapter-registry-v1.ts; writes=sveltekit-frontend/src/lib/server/atlas/streaming/ndjson-stream-v1.ts -->
+  - Streams newline-delimited JSON events for task receipts, execution traces, and QLoRA training examples.
+  - Validates typed schema per line before yielding parsed records.
+
+### 9.4 Pure MapReduce Derived Projection Views
+- [x] 9.4 Implement `AtlasMapReduceViewV1` pure mapper/reducer in `sveltekit-frontend/src/lib/server/atlas/projections/mapreduce-view-v1.ts`:
+  <!-- wfu: depends=8.4; est=30; reads=sveltekit-frontend/src/lib/server/atlas/**; writes=sveltekit-frontend/src/lib/server/atlas/projections/mapreduce-view-v1.ts -->
+  - Pure `emit(key, value)` mapping over canonical packets/facts.
+  - Incremental aggregation of domain counts, error frequencies, and concept co-occurrences.
+  - Guarantees derived views never mutate or overwrite canonical tables.
+
+### 9.5 WebGPU Sprite & Glyph Visual Projection Registry
+- [x] 9.5 Implement `AtlasGlyphRegistryV1` in `sveltekit-frontend/src/lib/server/atlas/visualization/glyph-registry-v1.ts`:
+  <!-- wfu: depends=8.3; est=25; reads=sveltekit-frontend/src/lib/server/atlas/residency/codebook-luts-v1.ts; writes=sveltekit-frontend/src/lib/server/atlas/visualization/glyph-registry-v1.ts -->
+  - Maps archetypes (0x01 Source, 0x02 Symbol, 0x03 Task, 0x04 Receipt, 0x05 Concept, 0x06 Entity, 0x07 Error, 0x08 Patch, 0x09 Test, 0x0A Adapter) to 1-byte sprite codes.
+  - Generates compact instance vertex descriptors: `[glyphOrdinal:u8][domainOrdinal:u8][stateFlags:u8][lod:u8]`.
+
+### 9.6 Revision-Bound 4D Topology Challenger
+- [ ] 9.6 Treat the existing `TopologyTileV1` implementation as a challenger projection only; it is not canonical identity, an evidence source, or a final retrieval result:
+  <!-- wfu: depends=8.6; est=35; reads=sveltekit-frontend/src/lib/server/atlas/representations/representation-gradient-v1.ts; writes=sveltekit-frontend/src/lib/server/atlas/topology/topology-tile-v1.ts -->
+  - Maps (x, y, z, w) where x=semantic, y=AST, z=graph, w=temporal/error.
+  - Bind the topology revision to coordinate inputs and their semantic/AST/graph/temporal coordinate-function revisions, not candidate ordinals alone.
+  - Coarse candidates may shortlist 256..4096 canonical candidate IDs. Require canonical identity/revision resolution and exact promotion before admission to retrieval results or `ContextManifest`.
+  - Ownership/progress: implementation lives in `parent-atlas-topology-representation-admission` TOPO-07/TOPO-13. Revision-bound candidate-only shortlist and exact `CandidateOrdinalMapV1` readback are fixture-proven; bounded production fan-out and ContextManifest admission remain open in TOPO-13.
+
+### 9.7 Bounded Agentic Error-Fixing Neighborhood Resolver
+- [x] 9.7 Implement `ErrorFixNeighborhoodResolverV1` in `sveltekit-frontend/src/lib/server/atlas/agentic/error-neighborhood-resolver-v1.ts`:
+  <!-- wfu: depends=8.10; est=40; reads=sveltekit-frontend/src/lib/server/atlas/context/lod-ladder-v1.ts; writes=sveltekit-frontend/src/lib/server/atlas/agentic/error-neighborhood-resolver-v1.ts -->
+  - Resolves runtime errors to bounded context: error -> sourceOrdinal + symbolOrdinal + domain + topologyCell.
+  - Queries callers, imports, tests, and related receipts to generate a bounded `ContextManifest`.
+  - Avoids unbounded context dumping into LLM prompts.
+
+### 9.8 Validation Test Suite
+- [x] 9.8 Create comprehensive Vitest suite in `sveltekit-frontend/src/lib/server/atlas/residency/multi-plane-execution.spec.ts` validating Section 9 components.
+  <!-- wfu: depends=9.1,9.2,9.3,9.4,9.5,9.6,9.7; est=30; reads=sveltekit-frontend/src/lib/server/atlas/**; writes=sveltekit-frontend/src/lib/server/atlas/residency/multi-plane-execution.spec.ts -->
+
+### 9.9 Contract-Correction Gates
+- [x] 9.9a Make the compact codec's 4-bit `smallEvidenceKind`/5-bit `EvidenceKindLUT` relationship explicit and validate escape/extension behavior. The documented contract reserves 15 as the extended-kind escape for values 15..31; revision-qualified encoding/decoding is implemented alongside the unchanged legacy one-byte helper. The extension carries the codebook `encodingRevision`, validates its LUT checksum/revision, rejects malformed/trailing bytes, and passes all-32-value round trips plus negative tests.
+- [x] 9.9b Keep `EvidenceDepth`, `ResidencyTier`, existing LOD owners, and ephemeral `ModelExecutionState` as separate types and axes. EvidenceDepth is implemented as its own strict axis; existing residency/LOD owners and hidden-state cache boundary remain untouched, and tests reject residency/model-state fields on evidence-depth contracts.
+- [ ] 9.9c Make topology a revision-qualified challenger projection and require exact canonical promotion before context admission. Implementation ownership is `parent-atlas-topology-representation-admission` TOPO-07/TOPO-13; this ledger remains open until that owner proves bounded fan-out and independent readback.
+- [x] 9.9d Document PostgreSQL cold authority separately from Qdrant/SeaweedFS cold projections and artifacts. Already satisfied by task 8.9: PostgreSQL owns canonical identity/lineage; Qdrant and SeaweedFS are explicitly rebuildable projections/artifacts.

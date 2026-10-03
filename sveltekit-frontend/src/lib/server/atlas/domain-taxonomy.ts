@@ -66,6 +66,7 @@ export interface NormalizedDomainLabel {
 
 export interface DomainTaxonomyInput {
   sourceRef?: string | null;
+  workspaceRevision?: string | null;
   featureId?: string | null;
   summary?: string | null;
   title?: string | null;

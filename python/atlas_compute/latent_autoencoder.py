@@ -1,8 +1,9 @@
-"""Nested semantic autoencoder reference for Parent Atlas.
+"""Nested semantic autoencoder candidate for Parent Atlas.
 
-The model compresses exact semantic_768 rows into one physical latent_128 row.
-latent_64 is the first 64 coordinates of latent_128, so hot and warm tiers do
-not need independent vector copies. Both bottlenecks have reconstruction heads.
+The encoder is 768 -> 512 -> 256 -> 128. The 256-dimensional stage is exposed as
+latent_256, the learned 128-dimensional bottleneck as latent_128, and latent_64 is
+the normalized 64-coordinate prefix of latent_128. Optional 4D topology features
+are a separate derived lane and are not emitted by this model.
 
 This module is a derived-routing experiment. It never promotes latent vectors to
 canonical semantic evidence; exact semantic_768 remains the refinement oracle.
@@ -24,10 +25,11 @@ from torch.nn import functional as F
 @dataclass(frozen=True)
 class NestedAutoencoderConfig:
     input_dim: int = 768
-    hidden_dim: int = 384
+    hidden_dim: int = 512
     latent256_dim: int = 256
     latent128_dim: int = 128
     latent64_dim: int = 64
+    architecture_revision: str = "atlas.latent-ae.768-512-256-128.v2"
     reconstruction_256_weight: float = 1.0
     reconstruction_128_weight: float = 0.85
     reconstruction_64_weight: float = 0.7
@@ -54,12 +56,12 @@ class NestedAutoencoderConfig:
 
 
 class NestedSemanticAutoencoder(nn.Module):
-    """768 -> 256, with latent128 == latent256[..., :128] and latent64 == latent128[..., :64].
+    """Encode 768 -> 512 -> 256 -> 128; latent64 is a prefix of latent128.
 
-    Three-tier Matryoshka-style nesting: one physical encoder produces latent256; latent128 and
-    latent64 are prefix + L2-renormalize views of it, not independently learned branches. This is
-    the same nesting principle as v1 (which only had a 128/64 tier), extended one level up so the
-    learned representation can compete with semantic_mrl_256 at a comparable dimension.
+    latent256 is an intermediate learned stage. latent128 is a separately learned
+    bottleneck, not a truncation of latent256. The 64D tier is a normalized prefix
+    of latent128. This is a new checkpoint ABI; old 768->384->256 checkpoints are
+    intentionally not shape-compatible.
     """
 
     def __init__(self, config: NestedAutoencoderConfig | None = None) -> None:
@@ -67,11 +69,18 @@ class NestedSemanticAutoencoder(nn.Module):
         self.config = config or NestedAutoencoderConfig()
         self.config.validate()
         torch.manual_seed(self.config.seed)
-        self.encoder = nn.Sequential(
+        self.encoder_512 = nn.Sequential(
             nn.Linear(self.config.input_dim, self.config.hidden_dim),
             nn.GELU(),
+        )
+        self.encoder_256 = nn.Sequential(
             nn.Linear(self.config.hidden_dim, self.config.latent256_dim),
+            nn.GELU(),
             nn.LayerNorm(self.config.latent256_dim),
+        )
+        self.encoder_128 = nn.Sequential(
+            nn.Linear(self.config.latent256_dim, self.config.latent128_dim),
+            nn.LayerNorm(self.config.latent128_dim),
         )
         self.decoder256 = nn.Sequential(
             nn.Linear(self.config.latent256_dim, self.config.hidden_dim),
@@ -92,8 +101,9 @@ class NestedSemanticAutoencoder(nn.Module):
     def encode(self, semantic_768: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         if semantic_768.ndim != 2 or semantic_768.shape[1] != self.config.input_dim:
             raise ValueError(f"expected [N,{self.config.input_dim}] semantic matrix")
-        latent256 = F.normalize(self.encoder(semantic_768), p=2, dim=-1)
-        latent128 = F.normalize(latent256[:, : self.config.latent128_dim], p=2, dim=-1)
+        stage512 = self.encoder_512(semantic_768)
+        latent256 = F.normalize(self.encoder_256(stage512), p=2, dim=-1)
+        latent128 = F.normalize(self.encoder_128(latent256), p=2, dim=-1)
         latent64 = F.normalize(latent128[:, : self.config.latent64_dim], p=2, dim=-1)
         return latent256, latent128, latent64
 
@@ -250,14 +260,17 @@ def build_training_receipt(
     producer_revision: str,
 ) -> dict[str, Any]:
     return {
-        "schema": "atlas.nested-semantic-autoencoder-training-receipt.v2",
+        "schema": "atlas.nested-semantic-autoencoder-training-receipt.v3",
         "source_semantic_snapshot_revision": source_snapshot_revision,
         "row_identity_checksum": row_identity_checksum,
         "config": asdict(model.config),
+        "architecture_revision": model.config.architecture_revision,
+        "encoder_dimensions": [model.config.input_dim, model.config.hidden_dim, model.config.latent256_dim, model.config.latent128_dim],
         "model_checksum": state_dict_checksum(model),
         "metrics": metrics,
-        "latent128_is_prefix_of_latent256": True,
+        "latent128_is_prefix_of_latent256": False,
         "latent64_is_prefix_of_latent128": True,
+        "topology4d_produced_by_model": False,
         "exact_semantic_promotion_required": True,
         "canonical_authority": False,
         "producer_revision": producer_revision,

@@ -869,18 +869,31 @@ const handlers: Record<string, HandlerFn> = {
 
   async nlpClassifyDomain(args: any, options?: ACPToolOptions): Promise<ToolResult> {
     const startTime = Date.now();
-    const { text, source_ref, packet_key } = args ?? {};
+    const { text, source_ref, workspace_revision, packet_key } = args ?? {};
 
     if (!text || typeof text !== 'string' || !text.trim()) {
       return fail('text must be a non-empty string', startTime);
     }
     if (text.length > 200_000) return fail('text exceeds max length (200000 chars)', startTime);
+    if (typeof source_ref !== 'string' || !source_ref.trim() || typeof workspace_revision !== 'string' || !workspace_revision.trim()) {
+      return fail('source_ref and admitted workspace_revision are required for revision-qualified classification', startTime);
+    }
+
+    let admittedBinding;
+    try {
+      const { resolveAdmittedSourceRevisionV1 } = await import('$lib/server/atlas/identity/admitted-source-revision-resolver-v1.js');
+      admittedBinding = await resolveAdmittedSourceRevisionV1({ sourceRef: source_ref, workspaceRevision: workspace_revision });
+    } catch (error) {
+      return fail(`source revision admission failed: ${error instanceof Error ? error.message : String(error)}`, startTime);
+    }
 
     const body = {
       text,
       source_type: 'plain_text',
       extraction_mode: 'full',
-      source_ref: source_ref ?? null,
+      source_ref: admittedBinding.sourceRef,
+      source_revision: admittedBinding.sourceRevision,
+      workspace_revision: admittedBinding.workspaceRevision,
       packet_key: packet_key ?? null,
       max_chars: 50000,
       passes: ['classify'],
@@ -913,7 +926,15 @@ const handlers: Record<string, HandlerFn> = {
       return {
         success: true,
         kind: 'result',
-        data: classifyResult ?? { backend: 'unavailable', status: 'skipped', warnings: ['no classify pass_result in sidecar response'] },
+        data: {
+          ...(classifyResult ?? { backend: 'unavailable', status: 'skipped', warnings: ['no classify pass_result in sidecar response'] }),
+          sourceRef: admittedBinding.sourceRef,
+          sourceRevision: admittedBinding.sourceRevision,
+          workspaceRevision: admittedBinding.workspaceRevision,
+          bindingChecksum: admittedBinding.bindingChecksum,
+          canonicalAuthority: false,
+          writesPerformed: false,
+        },
         duration: Date.now() - startTime,
       };
     } catch (error: any) {
@@ -1547,16 +1568,17 @@ export const TOOLS: Record<string, ACPTool> = {
       type: 'object',
       properties: {
         text: { type: 'string', description: 'Text to classify (max 200,000 chars)', maxLength: 200000 },
-        source_ref: { type: 'string' },
+        source_ref: { type: 'string', minLength: 1, description: 'Exact canonical source_ref from the admitted source binding' },
+        workspace_revision: { type: 'string', minLength: 1, description: 'Exact admitted workspace revision; source revision is resolved from PostgreSQL' },
         packet_key: { type: 'string' }
       },
-      required: ['text'],
+      required: ['text', 'source_ref', 'workspace_revision'],
       additionalProperties: false
     },
     outputSchema: { type: 'object' },
     examples: [
       {
-        input: { text: 'function login(session) { return authenticate(session.token); }', source_ref: 'src/auth/session.ts' },
+        input: { text: 'function login(session) { return authenticate(session.token); }', source_ref: 'src/auth/session.ts', workspace_revision: 'sha256:<64-hex-admitted-workspace-revision>' },
         output: { family: 'classify', backend: 'unavailable', status: 'skipped', warnings: ['no trained domain-classifier checkpoint present; run train_domain_classifier.py'] },
         description: 'Classify with no trained checkpoint yet — graceful degradation, not an error'
       }

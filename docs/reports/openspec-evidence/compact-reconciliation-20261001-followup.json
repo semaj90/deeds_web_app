@@ -1,0 +1,167 @@
+{
+  "schema": "atlas.openspec-evidence-compact-reconciliation.v1",
+  "mode": "READ_ONLY_DIAGNOSTIC",
+  "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
+  "inputs": {
+    "census": {
+      "path": "docs/reports/openspec-evidence/pipeline-20261001193002197-5384/census-v1.json",
+      "checksum": "sha256:c95f156ab0583e0c9db58997b0c37fb36680383cc9d3d50d35cc1384e141866b"
+    },
+    "identity": {
+      "path": "docs/reports/openspec-evidence/identity-recovery-20261001-followup.json",
+      "checksum": "sha256:bd84874c293dc1042fe43702eab5b2cf625d26b5a4a874a480562f418ee403ac"
+    },
+    "receiptTypes": {
+      "path": "docs/reports/openspec-receipt-type-classification-v1.json",
+      "checksum": "sha256:0802d3a3efb8f371d9e85aab474fb168934cbe32eb1f9d0ab442c35597aa501b"
+    },
+    "bindings": {
+      "path": "docs/reports/openspec-evidence/orphan-bindings-20261001-followup.json",
+      "checksum": "sha256:17d68cffbdaa9721aff23a7a82c8ede6abe5099fde9f1c55fd9d62e7f10e4ca3"
+    },
+    "predicates": {
+      "path": "docs/reports/openspec-task-evidence-bindings-v1.json",
+      "checksum": "sha256:8ad1bedffd567ca01530bef300d7c19b3fb87036258a1857553434b0943538e6"
+    },
+    "cards": {
+      "path": "docs/reports/openspec-evidence-cards-v1.json",
+      "checksum": "sha256:ddd35bf268835b6a25987a48845c14cf822a1ce2b21de9779c1cf82e618fffc9"
+    },
+    "goldenReceipt": {
+      "path": "docs/reports/openspec-graph-retrieval-proof-tree-node-identity-formula-receipt-v1.json",
+      "checksum": "sha256:e5c8288ca9a026fa6b5dc1a047e399235c506707ea54838d65431793b48b3e3d"
+    }
+  },
+  "counts": {
+    "changes": 117,
+    "activeChanges": 107,
+    "archivedChanges": 10,
+    "tasks": 11024,
+    "checked": 7282,
+    "checkedWithEvidence": 0,
+    "checkedWithoutEvidence": 7282,
+    "uncheckedButProven": 2,
+    "missingDeclaredIds": 6984,
+    "receiptCandidates": 1046,
+    "receiptsTyped": 862,
+    "receiptsCandidateType": 184,
+    "dependencyCandidates": 150,
+    "resolvedDependencies": 49
+  },
+  "identity": {
+    "stateCounts": {
+      "CONFLICTING": 87,
+      "DECLARED_ID": 3755,
+      "DERIVED_STABLE_KEY": 6870,
+      "LEGACY_ID_RECOVERED": 312
+    },
+    "canonicalKeyCoverage": 11024,
+    "canonicalKeyAdmitted": 10937,
+    "collisionGroups": 30,
+    "collisionClasses": {
+      "DUPLICATE_NORMALIZED_CLAIM_SAME_CHANGE": 30
+    },
+    "deltaFromPriorSameRevision": {
+      "canonicalKeyAdmitted": 392,
+      "canonicalKeyCollisionGroups": -112,
+      "conflicting": -357
+    }
+  },
+  "receiptTyping": {
+    "receiptCount": 1046,
+    "typeCounts": {
+      "CONFIGURATION": 1,
+      "CONTROLLED_APPLY": 8,
+      "DATABASE_READBACK": 8,
+      "DRY_RUN": 4,
+      "GRAPH_READBACK": 293,
+      "HEALTH_CHECK": 19,
+      "INTEGRATION_TEST": 2,
+      "MIGRATION": 2,
+      "NEGATIVE_EVIDENCE": 2,
+      "PROJECTION": 25,
+      "STATIC_AUDIT": 460,
+      "UNIT_TEST": 2,
+      "UNKNOWN": 179,
+      "VECTOR_READBACK": 41
+    },
+    "typingStateCounts": {
+      "CANDIDATE_TYPE": 184,
+      "TYPED": 862
+    },
+    "schemaOrFieldTypedCount": 862,
+    "candidateTypeCount": 184,
+    "filenameCandidateCount": 6,
+    "unknownCount": 0,
+    "ambiguousCandidateCount": 179,
+    "scopeCounts": {
+      "ATLAS_UNSCOPED": 594,
+      "OPENSPEC_SCOPED": 452
+    },
+    "proofEligibleTypeCount": 862
+  },
+  "binding": {
+    "receiptCount": 1046,
+    "bindingDispositionCounts": {
+      "AMBIGUOUS": 113,
+      "EXACT_BOUND": 1,
+      "HEURISTIC_ONLY": 2,
+      "LEGACY_BOUND": 2,
+      "MISSING_REVISION": 11,
+      "MISSING_TASK": 747,
+      "STALE_REVISION": 44,
+      "TRUE_ORPHAN": 126
+    },
+    "bindingReasonCounts": {
+      "CHANGE_ONLY_NO_TASK_ID": 9,
+      "DETERMINISTIC_MATCH": 58,
+      "FILENAME_ONLY_CANDIDATE": 2,
+      "MULTIPLE_DETERMINISTIC_MATCHES": 113,
+      "NO_SUPPORTED_IDENTITY_HINTS": 537,
+      "UNMATCHED_CANONICAL_TASK_REFERENCE": 1,
+      "UNMATCHED_SOURCE_REFERENCE": 232,
+      "UNSCOPED_ATLAS_ARTIFACT": 94
+    },
+    "exactBoundCount": 1,
+    "legacyBoundCount": 2,
+    "ambiguousCount": 113,
+    "missingTaskCount": 747,
+    "trueOrphanCount": 126,
+    "heuristicOnlyCount": 2,
+    "missingRevisionCount": 11,
+    "staleRevisionCount": 44,
+    "proofEligibleCount": 0,
+    "writesPerformed": false
+  },
+  "goldenTask": {
+    "status": "GOLDEN_TASK_PROVEN_READ_ONLY",
+    "task": {
+      "taskRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L133",
+      "taskId": "openspec-task:openspec://root/parent-atlas-graph-retrieval-proof/sha256:bba00d980fa6ed483f9e7db58e0b87e28af8912154715ce9936b2f5880fc0ee1",
+      "changeId": "parent-atlas-graph-retrieval-proof",
+      "claim": "Capture the current `atlas_tree_nodes.node_id` formula as a revision-bound parse-occurrence identity.",
+      "declaredChecked": false,
+      "identityState": "DERIVED_STABLE_KEY"
+    },
+    "evidenceState": "STATIC_PROVEN",
+    "claimState": "DECLARED_OPEN",
+    "proven": [
+      "FORMULA_LOCATED",
+      "SOURCE_REVISION_BOUND",
+      "STATIC_CAPTURE_PROVEN"
+    ],
+    "missing": [],
+    "contradictions": [],
+    "assertionsPassed": 12,
+    "assertionCount": 12,
+    "portfolioStateMutation": "NOT_APPLIED"
+  },
+  "guards": {
+    "sourceFilesMutated": false,
+    "taskLedgerWrites": 0,
+    "persistentStoreWrites": 0,
+    "vectorProjectionWrites": 0,
+    "mcpMutations": 0
+  },
+  "checksum": "sha256:95beb47f0c4a22feb4f7d8b4e5c7b358bf3243bfb6e734bbb2786c014c7fd0d2"
+}

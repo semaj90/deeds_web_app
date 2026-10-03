@@ -1,6 +1,6 @@
 {
   "schema": "atlas.feature-registry-baseline-admission.v1",
-  "updatedAt": "2026-09-01T19:21:05.971Z",
+  "updatedAt": "2026-10-02T17:01:43.667Z",
   "status": "BASELINE_PROVEN_LIVE_APPLY_BLOCKED",
   "evidence": {
     "disposablePostgres": {
@@ -15,7 +15,7 @@
       "featureRegistry": "MISSING_MANIFEST_REGISTRATION"
     },
     "contractMirrors": {
-      "tablesChecked": 8,
+      "tablesChecked": 11,
       "liveAligned": 3
     }
   },

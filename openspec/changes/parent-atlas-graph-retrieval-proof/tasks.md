@@ -36,7 +36,7 @@
 
 ## GS1.10 - Separate identity contracts
 
-- [ ] Define separate contracts for `parse_node_id`, `symbol_id`, `symbol_version_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`.
+- [ ] **GS1-10-IDENTITY-CONTRACTS-01** Define separate contracts for `parse_node_id`, `symbol_id`, `symbol_version_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`.
 - [ ] GS1.10 STATIC RECONCILIATION (2026-09-24, read-only; no schema/data/code change, parent boxes deliberately NOT ticked).
   Vocabulary/types: `PROVEN_EXISTING_IMPLEMENTATION` — `sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts`
   defines branded types + interfaces for all seven (the "no live `parse_node_id`/`symbol_version_id` contract" text below is stale
@@ -1863,3 +1863,14 @@ Still not touched: the stale legacy `CodebaseFile`-only node set (3,667 nodes, s
 run) this route never touches either way. Multi-hop analysis on the current, live `CodebaseFile`
 population is now genuinely usable through the tools checked; building further on top of it is
 unblocked.
+
+## GRAPH-API-BOUNDS-01 — codebase graph endpoint admission and bounded responses (2026-10-01)
+
+- [x] Validate Qdrant payloads before path operations; skip malformed or missing `file_path` values.
+- [x] Honor `maxFiles`, bounded point limits, and `dir` scope; page with bounded payload fields and response bytes.
+- [x] Return a stable graph response envelope and non-200 status for upstream/parse failures; cover with focused route tests.
+- [x] Verify current browser callers' `maxFiles`/`dir` expectations against the revised response contract; the admin view sends both fields and handles typed error codes.
+- [ ] Run a controlled repeated-request memory smoke against a representative, explicitly bounded dataset.
+- [ ] Evaluate Qdrant-side directory filtering availability; retain bounded server-side filtering unless a safe indexed prefix contract is proven.
+- [x] Reuse SvelteKit's request-scoped fetch for the internal `error-brain/diagnose` graph call so same-origin authorization is forwarded without bypassing the graph route guard.
+- [ ] Run a live authenticated error-diagnosis request and verify its bounded graph neighborhood is populated.

@@ -52,3 +52,38 @@ export function compileFanoutContextV1(input: {
     contextManifestChecksum: sha256(JSON.stringify(body)),
   });
 }
+
+import {
+  buildContextCompressionV1,
+  buildCompressedSegment,
+  type ContextCompressionV1,
+} from './context-compression-v1.js';
+
+export function compressFanoutContextV1(input: {
+  compiled: FanoutContextCompilerV1;
+  compressionPolicyRevision: string;
+  compressor?: (text: string) => { compressedText: string; compressedTokens: number };
+}): ContextCompressionV1 {
+  const { compiled, compressionPolicyRevision, compressor } = input;
+  const segments = compiled.evidenceRefs.map((evidenceRef) => {
+    const rawText = compiled.contextText;
+    const compressionResult = compressor
+      ? compressor(rawText)
+      : { compressedText: rawText, compressedTokens: compiled.estimatedTokenCount };
+
+    return buildCompressedSegment({
+      evidenceRef,
+      rawText,
+      compressedText: compressionResult.compressedText,
+      originalTokens: compiled.estimatedTokenCount,
+      compressedTokens: compressionResult.compressedTokens,
+      reversibleRef: evidenceRef,
+    });
+  });
+
+  return buildContextCompressionV1({
+    inputManifestChecksum: compiled.contextManifestChecksum,
+    compressionPolicyRevision,
+    segments,
+  });
+}

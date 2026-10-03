@@ -1,6 +1,6 @@
 # Postgres Contract Mirrors Report
 
-Generated: 2026-09-28T00:49:02.631Z
+Generated: 2026-10-02T17:12:41.771Z
 
 ## Summary
 
@@ -33,13 +33,13 @@ Generated: 2026-09-28T00:49:02.631Z
 ## feature_registry
 
 - classification: LIVE_TABLE_MISSING
-- repair_class: APPLY_EXISTING_SQL
-- static: COLUMN_MISMATCH
+- repair_class: RECONCILE_MIGRATION_LINEAGE
+- static: DRIZZLE_ONLY
 - live: LIVE_TABLE_MISSING
 - schema sources: sveltekit-frontend/src/lib/server/db/schema/feature-registry.ts
-- manual sources: sveltekit-frontend/drizzle/manual/0048_feature_registry_queries.sql
+- manual sources: none
 - static columns: chunk_ids, cluster_id, code_refs, description, feature_key, id, last_verified_at, retry_queries, source_refs, status, summary, tags, test_refs, title, trust_tier
-- static indexes: feature_registry_feature_key_key, feature_registry_queries_created_at_idx, feature_registry_queries_query_hash_idx, feature_registry_queries_savings_idx, feature_registry_queries_trace_id_idx, feature_registry_queries_user_id_idx
+- static indexes: feature_registry_feature_key_key
 - live columns: none
 - live indexes: none
 - live rows: n/a
@@ -173,7 +173,7 @@ Generated: 2026-09-28T00:49:02.631Z
 ## Blockers
 
 - kanban_tasks: static INDEX_MISMATCH
-- feature_registry: static COLUMN_MISMATCH
+- feature_registry: static DRIZZLE_ONLY
 - feature_registry: live LIVE_TABLE_MISSING
 - atlas_workspace_events: live LIVE_TABLE_MISSING
 - atlas_workspace_event_participants: live LIVE_TABLE_MISSING

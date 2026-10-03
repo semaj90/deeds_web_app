@@ -1,0 +1,1203 @@
+{
+  "schema": "atlas.openspec-langextract-proposals.v1",
+  "mode": "READ_ONLY_PROPOSAL_INPUT_PLAN",
+  "status": "SIDECAR_NOT_REQUESTED",
+  "source": {
+    "census": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/census-v1.json",
+    "workspaceRevision": "sha256:0a73a8b82f2a3cb2cebb29ffbd628a11e64e3386f4741616e2c04f1f75e4d004"
+  },
+  "selection": {
+    "limit": 64,
+    "selectedTaskCount": 64,
+    "selectedTaskRefs": [
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L23",
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L45",
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L5",
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L51",
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L59",
+      "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L9",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L10",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L11",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L12",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L13",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L14",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L18",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L19",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L20",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L21",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L22",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L23",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L29",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L3",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L30",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L4",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L5",
+      "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L6",
+      "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L11",
+      "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L14",
+      "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L15",
+      "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L18",
+      "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L24",
+      "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L36",
+      "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L39",
+      "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L5",
+      "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L7",
+      "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L9",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L10",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L11",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L12",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L13",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L14",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L15",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L3",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L4",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L5",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L6",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L7",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L8",
+      "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L9",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L11",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L13",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L23",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L25",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L27",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L3",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L33",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L39",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L41",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L44",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L46",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L49",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L52",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L59",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L62",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L66",
+      "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L69"
+    ]
+  },
+  "sourceWindows": [
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L23",
+      "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:8f57b7c38623cad8a51cfb269d0ce3b7d3a75fe2c8940796c0cf0a35e291e04f",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L23",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "sourceSpan": {
+        "startChar": 1508,
+        "endChar": 1600,
+        "text": "- [x] Fully read `src/routes/api/cartridge/export/+server.ts` end to end. **Fully live, real"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+      "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:296705d6e54d435b4a963170df6c4ffefe5b75657aca2adf7d97058b55214933",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "sourceSpan": {
+        "startChar": 2140,
+        "endChar": 2235,
+        "text": "- [x] **Resolved: CHR97/cartridge does NOT consume graphify output at all.** Its data source is"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L45",
+      "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:1b2dfab7f227b6fd40721f7e67491b2351f92513e49aee655be4c1b66a88278c",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L45",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "sourceSpan": {
+        "startChar": 3270,
+        "endChar": 3365,
+        "text": "- [x] Resolve the \"graphify GPU indexed json packets\" artifact distinction from current owners:"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L5",
+      "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:3a23c99b6e5eb6acf3b2d1afb54504d140a727f8932b99ad014158a9b364d7f4",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L5",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "sourceSpan": {
+        "startChar": 107,
+        "endChar": 204,
+        "text": "- [x] `rg -n \"^import|require\\(\" sveltekit-frontend/scripts/index-codebase-fast.mjs` returns only"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L51",
+      "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:9470747a2e16c1e699eeca9698ccb70d11016728e09ab099cfc2977663458b43",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L51",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "sourceSpan": {
+        "startChar": 3803,
+        "endChar": 3892,
+        "text": "- [x] Record the operator decision for AST-aware ACE context (2026-09-24): **yes, it is a"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L59",
+      "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:7de25bf0683591f60aa4e237a389399f0880f5b9ab2a1d78a23f406e306f3421",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L59",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "sourceSpan": {
+        "startChar": 4551,
+        "endChar": 4610,
+        "text": "- [x] **DONE (2026-09-05).** Registered all 6 components in"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L9",
+      "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:bd990e33985917ff4047d1ea23291e229abd6d5446a47436fed470f022633c10",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L9",
+      "sourceRevision": "sha256:b3390276fac67bded2908fbf0f37e72eb9513022d3a43c92c0a9d6a869b71300",
+      "sourceSpan": {
+        "startChar": 464,
+        "endChar": 557,
+        "text": "- [x] Real AST extraction genuinely exists elsewhere in the repo — confirmed via a concurrent"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L10",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/2.1",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L10",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 1477,
+        "endChar": 1929,
+        "text": "- [x] 2.1 Verify the \"duplicate migration\" claim for `codebase_chunk_index_routing_tier_columns.sql` / `route_runtime_packets_raw_column.sql` against `drizzle/manual/20260516_storage_tier_routing.sql` (grep-confirmed the May migration already owns all four columns via `IF NOT EXISTS`). Confirmed genuinely redundant; removal is git-history cleanup only, no live-DB impact (both were idempotent `IF NOT EXISTS` migrations already applied this session)."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L11",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/2.2",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L11",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 1930,
+        "endChar": 2128,
+        "text": "- [x] 2.2 Verify the `search-analytics.ts` Drizzle schema fix via diff. Confirmed real bug (wrong type `integer` vs live `uuid`, wrong/commented-out `compressedEmbedding` dimension) genuinely fixed."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L12",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/2.3",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L12",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 2129,
+        "endChar": 2257,
+        "text": "- [x] 2.3 Run `node scripts/atlas/audit-ace-storage-runtime-alignment.mjs` (pure static check, no DB). **Result: 35/35 passed.**"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L13",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/2.4",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L13",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 2258,
+        "endChar": 2373,
+        "text": "- [x] 2.4 Run `npx vitest run src/lib/server/retrieval/centroid-cache-contract-v1.spec.ts`. **Result: 5/5 passed.**"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L14",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/2.5",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L14",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 2374,
+        "endChar": 2727,
+        "text": "- [x] 2.5 Attempt `npx vitest run src/lib/server/atlas/retrieval/semantic-storage-boundary-v1.spec.ts` per the operator's proposed command. **File does not exist on this branch** — confirmed via `find` across the full worktree checkout. Flagged as an inaccuracy in the proposed next step; not chased to find where (if anywhere) this file actually lives."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L18",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/3.1a",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L18",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 2810,
+        "endChar": 3644,
+        "text": "- [x] 3.1a **Disposable proof DB stood up (operator-confirmed \"yes continue\").** Used the already-local `pgvector/pgvector:pg18` image instead of pulling `pg18-trixie` (operator correction: \"can't we just upgrade or update the extension?\" — no new pull needed; confirmed PostgreSQL 18.4, pgvector 0.8.3 already the latest available version in this image, `ALTER EXTENSION vector UPDATE` no-ops). Container `parent-atlas-fanout-proof`, host port 55432 (127.0.0.1-bound), random password. Shell-side guard applied and passed (`DATABASE_URL` refused if it matches `5434`, required to match `55432`). Proof artifacts saved durably at `sveltekit-frontend/scripts/atlas/proofs/fanout-proof-db-20260822/` (per standing \"never delete, archive/keep\" instruction — reinforced again this session) rather than left only in the session scratchpad."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L19",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/3.1b",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L19",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 3645,
+        "endChar": 4029,
+        "text": "- [x] 3.1b **Schema-only clone from the shared instance — done.** `pg_dump --schema-only` from `legal-ai-postgres` (498 tables) restored into the proof DB. `graphify_runs`/`graphify_files` confirmed absent from the shared instance's dump — independently confirms these migrations really are still \"manual / intentionally unapplied\" everywhere, not just per the SQL file's own comment."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L20",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/3.1c",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L20",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 4030,
+        "endChar": 4806,
+        "text": "- [x] 3.1c **Both repaired migrations applied cleanly with `psql -v ON_ERROR_STOP=1` (fails loud on error, not just \"ran without crashing\") — real proof, not a rubber stamp.** `20260822_graphify_revision_authority_v2.sql` (the fanout-proof-db-readiness branch's fixed version): applied clean, all 5 constraints confirmed present via `\\d` (`graphify_runs_workspace_revision_sha256_v2`, `graphify_runs_source_manifest_digest_sha256_v2`, `graphify_runs_source_manifest_source_count_v2`, `graphify_files_code_source_revision_sha256_v2`, `graphify_files_content_hash_sha256_v2`) — matches the operator's \"all five constraints\" claim exactly. `20260822_graph_snapshot_revision_owner_v1.sql`: applied clean against the cloned `atlas_graph_snapshots_v2`/`atlas_graph_nodes_v2` tables."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L21",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/3.1d",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L21",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 4807,
+        "endChar": 6084,
+        "text": "- [x] 3.1d **SUPERSEDED, 2026-08-23 — the script this finding is about no longer exists.** `sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory-v3.mts` was deleted by commit `a2e4dab329` (\"wip(atlas): restore orphaned root src tree, retire Atlas v1 in favor of v2/semantic_768 alignment\", 2026-08-23 02:33:10) — confirmed via `git log --diff-filter=D` and a direct `find` across the repo (zero matches). The last real edit to it was `8e2526f9f1` \"fix(graphify): correct v3 source insert lineage order\" (2026-08-21 21:10:10), meaning it was actively maintained the day before its own deletion. This performance finding (unconditional full-workspace hash walk before `--source` filtering) can no longer be reproduced or fixed against this file — it's moot, not resolved. If this producer path is still wanted, it needs to be restored first (`git show a2e4dab329~1:sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory-v3.mts`), which is an operator decision, not something to do unilaterally as part of closing out this finding — see the broader `a2e4dab329` regression writeup in `codereview-inference-wiring-followup-aug22`/`parent-atlas-xgboost-cuda-runtime-proof`/`codereview-semantic-dimension-regression-aug22` for the pattern this fits."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L22",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/3.1e",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L22",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 6085,
+        "endChar": 7017,
+        "text": "- [x] 3.1e **SUPERSEDED for the same reason as 3.1d.** The remaining fanout-proof plan steps (Graphify writer canary, full manifest V3 apply, independent revision-owner proof, graph-snapshot-writer proof, full proof snapshot, FANOUT admission read-only proof) were blocked on 3.1d's slow-running V3 script completing — that script no longer exists to complete. Not run. The `parent-atlas-fanout-proof` disposable proof DB container (stood up in 3.1a, port 55432) is **no longer present** — `docker ps -a --filter \"name=parent-atlas-fanout-proof\"` returns zero rows. Note: earlier the same session that wrote this file's audit, `docker ps -a` did list it as running (seen in this review session's own earlier general container inventory) — it was removed at some point between then and this check, not investigated further (disposable-by-design per 3.1a's own framing, so this may be entirely expected cleanup rather than a problem)."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L23",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/3.2",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L23",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 7018,
+        "endChar": 9056,
+        "text": "- [x] 3.2 **PARTIALLY DONE via a different, adjacent gate — not the same DB target, do not conflate.** Later in this same review session, a real ACE chat replay was run live: repaired the dev environment (`npm run dev` was fully broken — missing `@babel/*`, `postcss-preset-env`, `bits-ui`'s `@internationalized/date` peer dep, `bcryptjs`, `dexie`, and a missing `sharp` native binary, all fixed with scoped `npm install --no-save`), then sent 4 real requests through `/api/v1/chat/completions` (the ACE-wired OpenAI facade this task's 3.2 also targets). Result: 2/4 succeeded (200, genuine `aceUsed: true` responses with real tool-call rounds), 2/4 crashed with the exact `TypeError: Cannot read properties of undefined (reading 'length')` this repo's own `inference-wiring-deep-audit-aug22` change had flagged as unresolved — traced the crash's reported file/line/function and found the stack trace itself unreliable (reported lines are a comment and an unrelated `await` call, not the real throw site); full writeup in `openspec/changes/inference-wiring-deep-audit-aug22/tasks.md` task 5.9's follow-up. **Caveat, and why this doesn't fully close 3.2**: that replay ran against the **shared** `legal-ai-postgres` database (port 5434), not the isolated `parent-atlas-fanout-proof` proof DB (port 55432) this task specifically means by \"the repaired database\" — and per the note above, that proof DB no longer exists (`docker ps -a` returns zero rows for it). So the *general* \"does ACE chat work end-to-end\" question got a real, live, evidence-backed answer (yes, but flaky — same path-dependent `.length` crash either way), but the *specific* \"does it work against the fanout-proof-db-readiness branch's repaired schema\" question this task asked remains genuinely unanswered, since that exact environment is gone. Recreating it (schema-only clone + both repaired migrations, per 3.1a-3.1c) would be needed to answer 3.2 as originally scoped — not done here, a real infra action worth its own go-ahead per this task's own stated caution."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L29",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/4.1",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L29",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 9745,
+        "endChar": 10706,
+        "text": "- [x] 4.1 **This review-and-proof session's own archive-branch commits merged into `origin/main` (operator-confirmed: \"yes continue update archive branch into main merge? ... we're not ready for fanout yet\").** Explicitly scoped to THIS branch's doc/OpenSpec/proof-script commits only — the `fanout-proof-db-readiness` and `ace-centroid-alignment` branches themselves were deliberately NOT merged, per the operator's own \"not ready for fanout yet\" call. `origin/main` moved twice during the merge attempt (two more concurrent PRs landed — #64 `agent/ast-lineage-xgboost-runtime-hardening-20260822`, #65/#66 `agent/sample-query-matrix-ewintang-20260822` + `agent/ast-xgb-tang-alignment-20260822`); handled with a bounded fetch/merge/push retry loop (isolated detached worktrees each attempt, never touching the shared working directory), succeeded on the 2nd attempt. Pushed as `9dcb4d71c6`. Local `main` ref fast-forwarded to match (plumbing-only, no checkout)."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L3",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/1.1",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L3",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 63,
+        "endChar": 248,
+        "text": "- [x] 1.1 Verify SQL syntax defect + fix (`20260822_graphify_revision_authority_v2.sql`) via direct diff read. Confirmed real, confirmed fixed correctly, no destructive DDL either side."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L30",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/4.2",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L30",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 10707,
+        "endChar": 11671,
+        "text": "- [x] 4.2 **Real, important side-discovery from watching what else landed on `main` during the merge race**: PR #64 directly implements what this session's own `parent-atlas-xgboost-cuda-runtime-proof` change proposed — `python/prove_atlas_xgboost_gpu_runtime_v1.py` (synthetic-matrix CUDA proof, same shape as the WSL protocol section 1 of that change proposed) and `python/atlas_xgboost_grouped_ranking_v1.py` (implements the exact qid/group-sorting design section 4 of that change proposed). **Not a coincidence** — this session's `31bff54117` commit (recording that proposal) is a direct ancestor of PR #64's commits in `main`'s history, meaning a concurrent agent read the OpenSpec proposal and acted on it. Neither new file is yet wired into `scripts/atlas/train-xgboost-reranker.py` (verified unchanged, still has all 3 originally-found bugs) — recorded as a fresh duplication/integration question in that change's own tasks.md section 0, not resolved here."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L4",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/1.2",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L4",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 249,
+        "endChar": 417,
+        "text": "- [x] 1.2 Verify compat-entrypoint merge-corruption defect + fix (`materialize-graphify-source-inventory.mts`) via `git show`. Confirmed: 324 lines → 3-line clean shim."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L5",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/1.3",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L5",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 418,
+        "endChar": 562,
+        "text": "- [x] 1.3 Verify the independent proof script's writer-path repoint (`prove-graphify-revision-owner-v2.mts`) via diff. Confirmed small, correct."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L6",
+      "taskId": "openspec-task:openspec://root/agent-branch-review-fanout-ace-centroid-aug22/1.4",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L6",
+      "sourceRevision": "sha256:4aa239f4130c66098a9c671976d2e18b957ce8dd267cf95d726cc38abc1364bc",
+      "sourceSpan": {
+        "startChar": 563,
+        "endChar": 1415,
+        "text": "- [x] 1.4 Run the read-only V3 dry manifest command in an isolated worktree. Command confirmed structurally read-only by code inspection before running (DB-write block gated behind `--apply` + two env vars, none set). **Completed after ~14 minutes of real wall-clock time** (see 3.1d's performance finding — full-workspace hash walk under heavy concurrent load). **Result: `\"status\": \"DRY_RUN_PROVEN\"`**, `workspaceRevision: \"sha256:659854b021b6da471ea5af83717112963b9c1e477f83b4211eb4e4f740f367c2\"`, `sourceManifestSourceCount: 22932` (full workspace), `selectedWriteCount: 1` (correctly filtered to the single requested `--source`), `canonicalWriteAttempted: false`, `graphMayConsumeWorkspaceRevision: false` — exactly the expected shape for a read-only dry run: it computed real state but attempted no write and does not claim FANOUT may consume it."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L11",
+      "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:8fc20a3ddccbd445f666cfe8bb549b0f644d10d0b832cd3d7d9c26fe40e210a9",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L11",
+      "sourceRevision": "sha256:81896841646d42219902eac446cacf7b30097627bc27bc33a117d490d504bf78",
+      "sourceSpan": {
+        "startChar": 507,
+        "endChar": 584,
+        "text": "- [x] Final broad re-verification pass (caught ~15 more files the first regex"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L14",
+      "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:b4691e00b0bf30fa484d0d3848880939ef3a806b9031b7f6475e2af9dc85de48",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L14",
+      "sourceRevision": "sha256:81896841646d42219902eac446cacf7b30097627bc27bc33a117d490d504bf78",
+      "sourceSpan": {
+        "startChar": 686,
+        "endChar": 767,
+        "text": "- [x] Fixed 21 genuine raw-fetch chat/generate offenders (full list in README.md)"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L15",
+      "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:92aa3af9752c7a0e795146f14571caa43c46770bde7b2919dc7dc28bc4ececc4",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L15",
+      "sourceRevision": "sha256:81896841646d42219902eac446cacf7b30097627bc27bc33a117d490d504bf78",
+      "sourceSpan": {
+        "startChar": 768,
+        "endChar": 841,
+        "text": "- [x] Identified and left alone 3 categories of legitimate non-offenders:"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L18",
+      "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:3317d4a6930c0e7584a3817ed5e69af62b0f6d23a86cae4ceef9484468278de3",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L18",
+      "sourceRevision": "sha256:81896841646d42219902eac446cacf7b30097627bc27bc33a117d490d504bf78",
+      "sourceSpan": {
+        "startChar": 988,
+        "endChar": 1047,
+        "text": "- [x] Re-verified `service-integrations.ts`, `auto-fix.ts`,"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L24",
+      "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:ad3be854777403d8881c99823e910fd4f351d6a640a82a81954ff5dea8f70e52",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L24",
+      "sourceRevision": "sha256:81896841646d42219902eac446cacf7b30097627bc27bc33a117d490d504bf78",
+      "sourceSpan": {
+        "startChar": 1201,
+        "endChar": 1279,
+        "text": "- [x] Verify `supports_system_role` live on `:8090` via `/props` (2026-08-09):"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L36",
+      "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:b08097ac09c8f542ef7bfd5bde0327308fb3e54864025c04153113446078b848",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L36",
+      "sourceRevision": "sha256:81896841646d42219902eac446cacf7b30097627bc27bc33a117d490d504bf78",
+      "sourceSpan": {
+        "startChar": 2112,
+        "endChar": 2189,
+        "text": "- [x] Ran `npx tsgo --noEmit` repo-wide (2026-08-09): 36 pre-existing errors,"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L39",
+      "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:2e07a2e0cf490bd1504f5100c60d04121efcdd76ae8bd70b4e60a63f763f11e8",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L39",
+      "sourceRevision": "sha256:81896841646d42219902eac446cacf7b30097627bc27bc33a117d490d504bf78",
+      "sourceSpan": {
+        "startChar": 2322,
+        "endChar": 2401,
+        "text": "- [x] Naming cleanup (2026-08-09, done at user request despite being optional):"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L5",
+      "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:3dc0dfbbe85efa022a947933ffc2956d493056d4b314a01cc8199730e619efb5",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L5",
+      "sourceRevision": "sha256:81896841646d42219902eac446cacf7b30097627bc27bc33a117d490d504bf78",
+      "sourceSpan": {
+        "startChar": 82,
+        "endChar": 159,
+        "text": "- [x] Confirm live `:8090` process config via `Get-CimInstance Win32_Process`"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L7",
+      "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:64e76d92188e4b799108458c4fd77d5e24273a9626bf883318d313797dc62322",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L7",
+      "sourceRevision": "sha256:81896841646d42219902eac446cacf7b30097627bc27bc33a117d490d504bf78",
+      "sourceSpan": {
+        "startChar": 242,
+        "endChar": 323,
+        "text": "- [x] Discover `ollamaFetch()`'s TurboQuant intercept (`ollama.ts` ~line 321-349)"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L9",
+      "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:4d6fd4de0c6e8e6184ed193817a658bd0510b08c7d7209ad4c1304e428f0ce6f",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L9",
+      "sourceRevision": "sha256:81896841646d42219902eac446cacf7b30097627bc27bc33a117d490d504bf78",
+      "sourceSpan": {
+        "startChar": 400,
+        "endChar": 481,
+        "text": "- [x] Batch 1-4 audit of `candidate-list-raw-grep.txt` (64 files) — see README.md"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L10",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-08",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L10",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 558,
+        "endChar": 643,
+        "text": "- [x] PA-08 Prove dependency-injected prefill MISS → compile → decode and HIT replay."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L11",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-09",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L11",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 644,
+        "endChar": 758,
+        "text": "- [x] PA-09 Prove quarantine produces zero dispatches in the bounded caller fixture; live DAG replay remains open."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L12",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-10",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L12",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 759,
+        "endChar": 857,
+        "text": "- [x] PA-10 Add Valkey adapter binding with checksum-validated fixture readback and no KV payload."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L13",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-11",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L13",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 858,
+        "endChar": 1007,
+        "text": "- [x] PA-11 Add and fixture-test a lineage-qualified encoder-training dataset receipt; real dataset generation and training promotion remain blocked."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L14",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-12",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L14",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 1008,
+        "endChar": 1175,
+        "text": "- [x] PA-12 Run live hforf.gguf tool-call replay through the bounded phase/DAG harness; injected execution is dry-run only and durable business dispatch remains gated."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L15",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-13",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L15",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 1176,
+        "endChar": 1387,
+        "text": "- [x] PA-13 Add the opt-in phase envelope at the legacy MCP dispatcher boundary; quarantine blocks before the existing handler and allowed calls return the receipt without passing phase metadata to the executor."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L3",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-01",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L3",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 59,
+        "endChar": 133,
+        "text": "- [x] PA-01 Define a revision-qualified phase alignment input and receipt."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L4",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-02",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L4",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 134,
+        "endChar": 189,
+        "text": "- [x] PA-02 Block quarantine before MCP/model dispatch."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L5",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-03",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L5",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 190,
+        "endChar": 240,
+        "text": "- [x] PA-03 Require exact evidence before prefill."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L6",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-04",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L6",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 241,
+        "endChar": 301,
+        "text": "- [x] PA-04 Require reusable prefill identity before decode."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L7",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-05",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L7",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 302,
+        "endChar": 363,
+        "text": "- [x] PA-05 Keep encoder-training admission explicitly false."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L8",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-06",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L8",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 364,
+        "endChar": 427,
+        "text": "- [x] PA-06 Add package export and deterministic fixture tests."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L9",
+      "taskId": "openspec-task:openspec://root/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/PA-07",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L9",
+      "sourceRevision": "sha256:8a545ae1e885ce31b962f5f4c1c000c495037e3559ab06a42d03004ca5add7a7",
+      "sourceSpan": {
+        "startChar": 428,
+        "endChar": 557,
+        "text": "- [x] PA-07 Bind the receipt to the existing bounded tool caller and LangGraph synthesis node without creating a second executor."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L11",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/1.3",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L11",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 758,
+        "endChar": 856,
+        "text": "- [x] 1.3 `packages/parent-atlas/test/workflow-action-event.test.mjs` re-run unmodified: 3/3 pass,"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L13",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/1.4",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L13",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 946,
+        "endChar": 1037,
+        "text": "- [x] 1.4 Re-ran `packages/parent-atlas`'s test suite for all 5 real consumers: 21/21 pass."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L23",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/2.1",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L23",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 1602,
+        "endChar": 1693,
+        "text": "- [x] 2.1 Added `\"./core/workflow-action-event\": \"./dist/core/workflow-action-event.js\"` to"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L25",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/2.2",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L25",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 1754,
+        "endChar": 1857,
+        "text": "- [x] 2.2 Rebuilt `packages/parent-atlas` -- `dist/core/workflow-action-event.js` and `.d.ts` confirmed"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L27",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/2.3",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L27",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 1873,
+        "endChar": 1983,
+        "text": "- [x] 2.3 Verified live from `sveltekit-frontend/`: `import('@deeds/parent-atlas/core/workflow-action-event')`"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L3",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/1.1",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L3",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 34,
+        "endChar": 140,
+        "text": "- [x] 1.1 Extended `packages/parent-atlas/src/core/workflow-action-event.ts`'s `workflowActionEventSchema`"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L33",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/3.1",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L33",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 2144,
+        "endChar": 2234,
+        "text": "- [x] 3.1 Added `toCanonicalWorkflowActionEvent()`/`fromCanonicalWorkflowActionEvent()` to"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L39",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/3.2",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L39",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 2694,
+        "endChar": 2793,
+        "text": "- [x] 3.2 Added round-trip test to `workflow-action-event-v1.spec.ts`: 9/9 pass (6 pre-existing + 3"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L41",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/3.3",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L41",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 2864,
+        "endChar": 2954,
+        "text": "- [x] 3.3 Added `toCanonicalWorkflowActionEvent()`/`fromCanonicalWorkflowActionEvent()` to"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L44",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/3.4",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L44",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 3093,
+        "endChar": 3187,
+        "text": "- [x] 3.4 Added new spec `contracts-workflow-action-canonical-adapter.spec.ts`: 2/2 pass (full"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L46",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/3.5",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L46",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 3226,
+        "endChar": 3326,
+        "text": "- [x] 3.5 Re-verified `workflow-action-event-adapter.ts` via a live smoke import (dynamic `import()`"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L49",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/3.6",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L49",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 3446,
+        "endChar": 3536,
+        "text": "- [x] 3.6 Added `toCanonicalWorkflowActionEvent()`/`fromCanonicalWorkflowActionEvent()` to"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L52",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/3.7",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L52",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 3659,
+        "endChar": 3760,
+        "text": "- [x] 3.7 Added round-trip test to `context-tool-dag-contracts.spec.ts`: 5/5 pass (3 pre-existing + 2"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L59",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/4.1",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L59",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 4079,
+        "endChar": 4175,
+        "text": "- [x] 4.1 Full test suite for all touched files run together: **45/45 passing total** (3 + 21 in"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L62",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/4.2",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L62",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 4324,
+        "endChar": 4427,
+        "text": "- [x] 4.2 Confirmed via direct `grep` for `'atlas.workflow-action.v1'` across `sveltekit-frontend/src`:"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L66",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/4.3",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L66",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 4673,
+        "endChar": 4766,
+        "text": "- [x] 4.3 Wrote `docs/reports/workflow-action-schema-owner-01-results.json`: consumer census,"
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    },
+    {
+      "taskRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L69",
+      "taskId": "openspec-task:openspec://root/2026-09-14-workflow-action-schema-owner-01/4.4",
+      "selectionReasons": [
+        "TASK_ID_UNRESOLVED",
+        "CHECKED_CLAIM_REQUIRES_GROUNDING"
+      ],
+      "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L69",
+      "sourceRevision": "sha256:89db3cc2be73f315bf7058834b667034f78e355e69d7adeb42c621d6b2a4fddb",
+      "sourceSpan": {
+        "startChar": 4909,
+        "endChar": 5000,
+        "text": "- [x] 4.4 This file updated with actual results next to each task, not just checkbox ticks."
+      },
+      "sourceExists": true,
+      "sourceRevisionMatchesBytes": true
+    }
+  ],
+  "sidecar": {
+    "url": "http://127.0.0.1:8095",
+    "endpoint": "/extract",
+    "health": null,
+    "requested": false,
+    "timeoutMs": 30000
+  },
+  "extraction": [],
+  "proposals": [],
+  "errors": [],
+  "policy": {
+    "proposalOnly": true,
+    "canonicalAdmission": false,
+    "proofPromotion": false,
+    "checkboxMutation": false,
+    "heuristicMatchCountsAsProof": false,
+    "sourceSpanRequired": true,
+    "existingNlpSidecarAuthority": "observation-only; no task identity or proof state ownership"
+  },
+  "writesPerformed": false,
+  "likely_cause": "Unresolved OpenSpec prose and legacy structures need grounded observation without allowing NLP output to create identity or proof.",
+  "evidence": [
+    "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/census-v1.json",
+    "scripts/atlas/audit-langextract-grounding-v1.mjs",
+    "ATLAS_NLP_SIDECAR_URL"
+  ],
+  "patch_targets": [
+    "scripts/atlas/propose-openspec-langextract-candidates-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/plan-openspec-evidence-ledger-import-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/propose-openspec-langextract-candidates-v1.mjs",
+  "report_path": "docs/reports/openspec-langextract-proposals-v1.json",
+  "generatedAt": "2026-10-02T04:47:36.204Z",
+  "checksum": "sha256:2e5f7ca132fcd35a9471ed75ecd270d40f46160e77775dbf9e3ce94bfe75a85c"
+}

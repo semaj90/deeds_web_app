@@ -671,3 +671,151 @@ No packet_key rewritten, no builder extracted, no writers changed, no
 S01-08K applied, `PACKET-WRITER-PRODUCTION-OWNER-01` not selected.
 `writesPerformed=false` across Postgres/Qdrant/Valkey/Neo4j.
 Evidence: `docs/reports/packet-key-lifecycle-contract-v1.json`.
+
+## PostgreSQL startup and missing-relation triage (2026-10-02)
+
+- [x] Classified the supplied PostgreSQL 18 log sequence as startup recovery,
+  not evidence of WAL corruption: the prior server shutdown was interrupted;
+  fsync took about 20 seconds, redo completed, and PostgreSQL accepted
+  connections 26 seconds after startup. The live `legal-ai-postgres` health is
+  `healthy`; `pg_isready` succeeds. The repeated `FATAL: ... starting up`
+  entries are connection attempts during recovery, not the root cause.
+- [x] Read-only catalog probe confirmed `public.phase72_error` and
+  `public.concept_evidence` are absent while `public.atlas_ontology_concepts`
+  and `public.atlas_ontology_linked_tuples` exist. `phase72_error` has a manual
+  SQL file but is absent from the active `drizzle/schema.ts`, Drizzle journal,
+  and sidecar migration registry; the separate introspected snapshot is not the
+  active schema authority. The manual SQL also does not match all live route
+  query shapes (for example, callers use `code`, `occurrence_count`, and
+  `last_seen`, while the SQL declares `error_code` and omits the latter two).
+  No authoritative `concept_evidence` migration was found. Existing ontology
+  tables are not assumed semantically interchangeable.
+- [x] Read-only PostgreSQL 18 `atlas_packets` index inventory found duplicate
+  GIN definitions: two `metadata jsonb_ops` indexes at 160 MB each and two
+  `payload jsonb_path_ops` indexes at 21 MB and 17 MB. Current `idx_scan`
+  counters were zero, but the database had just restarted and the stats reset
+  timestamp was unavailable; this is not proof that the indexes are unused.
+  No index was dropped or altered.
+- [ ] **PG-BOOT-01** Correlate the unclean shutdown with Docker Desktop/host
+  lifecycle and identify which clients produced startup-time connection
+  attempts. Keep the existing healthcheck as the readiness gate; add or verify
+  bounded retry/backoff at each client rather than restarting PostgreSQL or
+  modifying its data directory. Do not run `pg_resetwal` or delete/replace the
+  named volume.
+- [ ] **PG-SCHEMA-02** Reconcile `phase72_error.sql` with the migration owner
+  and every route query; choose one typed Drizzle schema that matches the
+  actual API contract, then add a scoped, tracked PostgreSQL 18 migration and
+  validate it against a disposable database with schema/readback checks before
+  requesting any live apply. The relation is currently absent, so a reviewed
+  initial migration would create it; do not write an `ALTER TABLE` against a
+  nonexistent relation or register the current SQL unchanged. Do not run
+  global `drizzle-kit migrate` while the baseline is unresolved.
+- [ ] **PG-SCHEMA-03** Trace the `concept_evidence` startup-intelligence probe
+  to its schema owner. Either query the exact existing canonical relation if
+  its semantics match, or report the metric as unavailable; do not create a
+  parallel concept-evidence table or silently report a missing relation as
+  zero. Add a regression test for the relation-absent path.
+- [ ] **PG-LOG-04** After schema/retry work, collect a fresh bounded log window
+  and confirm the startup race and missing-relation errors no longer recur;
+  preserve unrelated historical log entries as historical observations.
+- [ ] **PG-INDEX-05** Reconcile duplicate JSONB GIN declarations in active
+  Drizzle schema and live PostgreSQL against representative query predicates.
+  Compare `jsonb_ops` and `jsonb_path_ops` operator coverage, capture a stable
+  `pg_stat_user_indexes` observation window and `EXPLAIN (ANALYZE, BUFFERS,
+  SETTINGS)` for real callers, and consider B-tree expression indexes only for
+  identified scalar-key equality/range queries. Produce a proposed cleanup
+  migration and rollback plan; do not drop indexes based on one post-restart
+  zero-scan sample.
+
+Evidence: live `legal-ai-postgres` logs and health, read-only
+`to_regclass` probe, `sveltekit-frontend/drizzle/manual/phase72_error.sql`,
+`scripts/atlas/atlas-startup-intelligence.mjs`.
+
+### Follow-up audit run (2026-10-02)
+
+- [x] Added PostgreSQL and Drizzle audit TOCs at
+  `docs/architecture/POSTGRESQL-TOC.md` and
+  `docs/architecture/DRIZZLE-TOC.md`; linked them from
+  `docs/architecture/ARCH-TOC.md`. These document existing audit owners and
+  do not add a schema authority or perform DDL.
+- [x] Ran `npm run audit:drizzle`. It wrote
+  `docs/reports/postgres-contract-mirrors-report.{json,md}` and checked 11
+  tables: 6 static aligned, 3 live aligned, 0 live unavailable, 13 blockers.
+  Exit status was 1; this is a drift report, not a passing schema gate.
+- [x] Ran `npm run atlas:docs:postgres-index-capability` against PostgreSQL
+  18.4. Read-only report `docs/reports/postgres-index-capability-v1.json`
+  records `writesPerformed=false`, schema capability proven, and two missing
+  index capabilities on `atlas_symbol_versions`:
+  `source_revision` and `qualified_name`. Query plans were captured; a bitmap
+  plan was generatable for 4/4 fixtures, while the planner selected one in
+  1/4. pgvector HNSW capability is present, but exact-vs-HNSW parity remains
+  `NOT_RUN`; PG18 AIO is capable but `NOT_OBSERVED`.
+- [ ] Do not add indexes or apply migrations from these audit results alone.
+  Resolve query owners and predicates, then validate any proposed migration
+  separately against a disposable PostgreSQL instance and perform readback.
+
+### Symbol resolver index follow-up (2026-10-02)
+
+- [x] Ran the dedicated read-only planner
+  `scripts/atlas/audit-postgres-symbol-resolver-index-plan-v1.mjs`. It observed
+  an estimated 479 rows and `Seq Scan` for its three sample predicates
+  (`source_revision`, `qualified_name`, and both together); the report remains
+  `DRAFT_NOT_APPLIED` and explicitly requires resolver call-site/workload
+  evidence before choosing an index shape.
+- [x] Found an existing, unregistered draft in
+  `sveltekit-frontend/drizzle/manual/20260920b_atlas_ontology_schema_alters.sql`
+  proposing standalone B-trees on both fields. The active Drizzle table owner
+  is `sveltekit-frontend/src/lib/server/db/schema/atlas-structural-intelligence.ts`;
+  it already declares composite indexes for `(stable_symbol_id,
+  source_revision)` and `(source_ref, source_revision)`. The draft SQL is not
+  present in `sidecar-migrations.json` and also contains unrelated schema
+  changes, so do not register or apply that file wholesale.
+- [x] A bounded application-source search found no production query applying
+  `WHERE qualified_name = ...` directly to `atlas_symbol_versions`; the
+  `atlas_callable_search` projection has its own qualified-name B-tree. The
+  sample EXPLAIN plans and missing-capability verdict therefore do not alone
+  prove a production bottleneck. Keep the standalone indexes unapproved until
+  the resolver owner confirms a hot query and production-shaped selectivity.
+- [ ] If a real independent lookup is confirmed, add only its matching index
+  declaration to the active Drizzle table and a narrowly scoped tracked
+  migration; rehearse and read back before any live apply.
+
+Evidence: `docs/reports/postgres-symbol-resolver-index-plan-v1.json`;
+`docs/reports/postgres-index-capability-v1.json`;
+`scripts/atlas/audit-postgres-symbol-resolver-index-plan-v1.mjs`;
+`sveltekit-frontend/drizzle/manual/20260920b_atlas_ontology_schema_alters.sql`.
+
+### Contract blocker owner triage (2026-10-02)
+
+- [x] Corrected `scripts/atlas/audit-postgres-contract-mirrors.mjs`: its manual
+  SQL index matcher previously accepted a relation-name prefix, so indexes on
+  `feature_registry_queries` were attributed to `feature_registry`. The matcher
+  now requires a relation boundary. The same audit no longer reports those
+  unrelated indexes, and a schema-only row with no matching manual SQL is now
+  classified `RECONCILE_MIGRATION_LINEAGE`, not `APPLY_EXISTING_SQL`.
+- [x] Re-ran `npm run audit:drizzle`. The report still has 13 blockers; this is
+  not a green schema gate. `feature_registry` remains absent live and has no
+  matching manual SQL source in this audit's scan. The separate baseline gate
+  reports `BASELINE_PROVEN_LIVE_APPLY_BLOCKED`; the migration-owner audit lists
+  `feature_registry` as missing manifest registration. Do not apply a migration
+  based on the contract report's old repair suggestion.
+- [x] Ran the workspace-event schema audit: all three relations are absent and
+  status is `NOT_APPLIED_PLANNED_SIDECAR`; it reports `writesPerformed=false`.
+  The SQL is registered as a sidecar, but no apply was performed.
+- [x] Ran the task-semantic-packet writer matrix against the live schema: 5
+  compatible writers, 3 blocked writers, 1 intent-only writer. Missing fields
+  include graph metadata and obsolete `task_title`/`task_type`/`task_status`;
+  do not add these columns wholesale without retiring or correcting the legacy
+  writers first.
+- [x] Kept `atlas_packets`, `parent_atlas_documents`, and
+  `route_runtime_packets` in `NEEDS_REVIEW`: observed deltas span many columns
+  and indexes, so neither mass Drizzle mirroring nor broad `ALTER` is justified
+  by this report alone. `kanban_tasks` and `nes_chrom_packets` have live
+  indexes not fully represented by their Drizzle/manual source comparison;
+  any code-only mirror update still needs exact definitions and ownership.
+
+Evidence: `docs/reports/postgres-contract-mirrors-report.{json,md}`;
+`docs/reports/feature-registry-baseline-admission-v1.json`;
+`docs/reports/atlas-migration-owner-audit-v1.json`;
+`docs/reports/workspace-event-head-schema-audit-v1.json`;
+`docs/reports/task-semantic-packet-writer-column-matrix-v1.json`.

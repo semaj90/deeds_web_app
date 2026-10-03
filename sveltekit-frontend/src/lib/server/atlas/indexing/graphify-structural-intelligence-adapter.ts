@@ -7,7 +7,9 @@ import {
   groundLangExtractUtf8SpansV1,
   adaptSidecarGroundedExtractions,
   buildGroundedDomainCandidates,
+  compileAstRelationGraphAdapterV1,
   type GroundedDomainCandidateV1,
+  type AstRelationGraphAdapterResultV1,
   compileStructuralExtractionFabric,
   type StructuralExtractionFabricResultV1,
 } from '@deeds/parent-atlas';
@@ -54,10 +56,16 @@ export type GraphifyStructuralIntelligenceReceipt = {
   compatibilityChunkIdCount: number;
   diagnostics: string[];
   canonicalIdentityCreated: false;
+  relationGraphStatus: AstRelationGraphAdapterResultV1['status'];
+  relationGraphReason: AstRelationGraphAdapterResultV1['reason'];
+  relationGraphChecksum: string | null;
+  relationGraphNodeCount: number;
+  relationGraphEdgeCount: number;
 };
 
 export type GraphifyStructuralIntelligenceResult = {
   fabric: StructuralExtractionFabricResultV1 | null;
+  relationGraph: AstRelationGraphAdapterResultV1 | null;
   groundedDomainCandidates: GroundedDomainCandidateV1[];
   receipt: GraphifyStructuralIntelligenceReceipt;
 };
@@ -92,6 +100,8 @@ export function buildGraphifyStructuralStageReceiptsV1(input: {
   const extractOutput = structuralStageChecksum({
     receipt,
     fabricReceipt: fabric?.receipt ?? null,
+    relationGraphChecksum: input.result.relationGraph?.graph?.checksum ?? null,
+    relationGraphStatus: receipt.relationGraphStatus,
   });
   return {
     astParse: { inputChecksum: astInput, outputChecksum: astOutput },
@@ -132,7 +142,8 @@ export function compileGraphifyStructuralIntelligence(input: {
   const { materialization } = input;
   if (!materialization.evidence) {
     return {
-      fabric: null,
+        fabric: null,
+      relationGraph: null,
       groundedDomainCandidates: [],
       receipt: {
         schema: 'atlas.graphify-structural-intelligence-receipt.v1',
@@ -168,6 +179,11 @@ export function compileGraphifyStructuralIntelligence(input: {
         compatibilityChunkIdCount: 0,
         diagnostics: unique([...materialization.diagnostics, 'STRUCTURAL_FABRIC_SKIPPED_NO_EVIDENCE']),
         canonicalIdentityCreated: false,
+        relationGraphStatus: 'DEFERRED',
+        relationGraphReason: 'NO_STRUCTURAL_EVIDENCE',
+        relationGraphChecksum: null,
+        relationGraphNodeCount: 0,
+        relationGraphEdgeCount: 0,
       },
     };
   }
@@ -255,6 +271,15 @@ export function compileGraphifyStructuralIntelligence(input: {
   const fabric = compileStructuralExtractionFabric(enriched.structural_input, {
     producer_revision: input.revisions.fabric,
   });
+  const relationGraph = compileAstRelationGraphAdapterV1({
+    fabric,
+    sourceText: input.source,
+    sourceRevision: materialization.sourceRevisionAuthority === 'PROVEN'
+      ? materialization.sourceRevision
+      : null,
+    workspaceRevision: input.workspaceRevision,
+    graphProducerRevision: input.revisions.fabric,
+  });
 
   const groundedDomainCandidates = input.groundedDomainMapping
     ? buildGroundedDomainCandidates({
@@ -289,6 +314,7 @@ export function compileGraphifyStructuralIntelligence(input: {
 
   return {
     fabric,
+    relationGraph,
     groundedDomainCandidates,
     receipt: {
       schema: 'atlas.graphify-structural-intelligence-receipt.v1',
@@ -328,8 +354,14 @@ export function compileGraphifyStructuralIntelligence(input: {
         ...(!parserBufferMatchesSource ? ['LANGEXTRACT_PARSER_BUFFER_SOURCE_TEXT_MISMATCH'] : []),
         ...utf8Diagnostics,
         ...fabric.receipt.diagnostics,
+        ...(relationGraph.reason ? [`AST_RELATION_GRAPH_DEFERRED:${relationGraph.reason}`] : []),
       ]),
       canonicalIdentityCreated: false,
+      relationGraphStatus: relationGraph.status,
+      relationGraphReason: relationGraph.reason,
+      relationGraphChecksum: relationGraph.graph?.checksum ?? null,
+      relationGraphNodeCount: relationGraph.graph?.nodes.length ?? 0,
+      relationGraphEdgeCount: relationGraph.graph?.edges.length ?? 0,
     },
   };
 }

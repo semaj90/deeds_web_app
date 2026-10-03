@@ -16,17 +16,19 @@ sys.modules[SPEC.name] = MODULE
 SPEC.loader.exec_module(MODULE)
 
 
-def _fixture(root: Path) -> tuple[Path, Path]:
+def _fixture(root: Path, language: str = "python") -> tuple[Path, Path]:
     run = root / "run"
     (run / "pages").mkdir(parents=True)
     text = "# Persistence\n\nLangGraph’s checkpoints preserve thread state.\n\n```python\nstate = checkpoint()\n```\n"
     artifact_rel = "pages/page.md"
     (run / artifact_rel).write_text(text, encoding="utf-8")
     content_hash = MODULE._sha(text.encode("utf-8"))
+    path_prefix = "/oss/javascript/langgraph/" if language == "typescript" else "/oss/python/langgraph/"
     rows = [{
         "status": "FETCHED", "sectionId": "langgraph-python", "product": "langgraph",
-        "canonicalUrl": "https://docs.langchain.com/oss/python/langgraph/persistence.md",
-        "resolvedUrl": "https://docs.langchain.com/oss/python/langgraph/persistence.md",
+        "language": language,
+        "canonicalUrl": f"https://docs.langchain.com{path_prefix}persistence.md",
+        "resolvedUrl": f"https://docs.langchain.com{path_prefix}persistence.md",
         "fetchMethod": "DIRECT_MARKDOWN", "rawSha256": content_hash,
         "normalizedSha256": content_hash, "artifactPath": artifact_rel,
         "canonicalAuthority": False,
@@ -46,7 +48,7 @@ def _fixture(root: Path) -> tuple[Path, Path]:
     config = root / "corpus.json"
     config.write_text(json.dumps({
         "corpusId": "langchain-docs-python-core", "authority": "https://docs.langchain.com",
-        "sections": [{"id": "langgraph-python", "product": "langgraph", "allowedPathPrefix": "/oss/python/langgraph/"},
+        "sections": [{"id": "langgraph-python", "product": "langgraph", "language": language, "allowedPathPrefix": path_prefix},
                      {"id": "deepagents-python", "product": "deepagents", "allowedPathPrefix": "/oss/python/deepagents/"}],
     }), encoding="utf-8")
     return run, config
@@ -66,6 +68,13 @@ def test_builds_repeatable_version_qualified_chunk_artifacts(tmp_path: Path) -> 
     assert first_receipt["writes"]["postgres"] == 0
     normalized = MODULE._normalize_ws((run / "pages/page.md").read_text(encoding="utf-8")).encode("utf-8")
     assert normalized[first[0]["start_byte"]:first[0]["end_byte"]].decode("utf-8") == first[0]["text"]
+
+
+def test_preserves_section_language_in_chunk_artifacts(tmp_path: Path) -> None:
+    run, config = _fixture(tmp_path, language="typescript")
+    chunks, receipt = MODULE.build_chunks(run, config)
+    assert chunks[0]["language"] == "typescript"
+    assert receipt["languages"] == ["typescript"]
 
 
 def test_streaming_and_collected_modes_have_identical_manifest_digest(tmp_path: Path) -> None:

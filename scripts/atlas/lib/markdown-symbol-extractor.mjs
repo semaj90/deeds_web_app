@@ -14,12 +14,13 @@ function fingerprint(text) {
 }
 
 export function extractMarkdownSymbols(content, _filePath) {
-  const lines = content.split(/\r?\n/);
+  const lines = content.split('\n');
   const symbols = [];
   const stack = []; // { level, name }
   let byteOffset = 0;
 
-  for (const line of lines) {
+  for (const [lineIndex, rawLine] of lines.entries()) {
+    const line = rawLine.replace(/\r$/, '');
     const match = ATX_HEADING.exec(line);
     if (match) {
       const level = match[1].length;
@@ -31,8 +32,8 @@ export function extractMarkdownSymbols(content, _filePath) {
       symbols.push({
         kind: 'heading',
         name,
-        start_line: 0,
-        end_line: 0,
+        start_line: lineIndex + 1,
+        end_line: lineIndex + 1,
         start_byte: byteOffset,
         end_byte: byteOffset + line.length,
         signature_text: line.slice(0, SIGNATURE_TEXT_MAX_CHARS),
@@ -43,7 +44,7 @@ export function extractMarkdownSymbols(content, _filePath) {
 
       stack.push({ level, name });
     }
-    byteOffset += line.length + 1;
+    byteOffset += rawLine.length + 1;
   }
 
   return symbols;
@@ -59,14 +60,14 @@ const FENCE_OPEN = /^(```+|~~~+)\s*([A-Za-z0-9_+-]*)\s*$/;
  * caller's job (see MARKDOWN_FENCE_LANGUAGE_TO_EXT in source-text-envelope.mjs).
  */
 export function extractMarkdownFences(content) {
-  const lines = content.split(/\r?\n/);
+  const lines = content.split('\n');
   const fences = [];
   const headingStack = []; // ordered by nesting, top = innermost heading currently in scope
   let byteOffset = 0;
   let open = null; // { fenceChar, language, contentStartByte, startLine }
 
   for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i];
+    const line = lines[i].replace(/\r$/, '');
     if (!open) {
       const headingMatch = ATX_HEADING.exec(line);
       if (headingMatch) {
@@ -81,7 +82,7 @@ export function extractMarkdownFences(content) {
           fenceChar: fenceMatch[1][0],
           fenceLen: fenceMatch[1].length,
           language: fenceMatch[2].toLowerCase() || null,
-          contentStartByte: byteOffset + line.length + 1,
+          contentStartByte: byteOffset + lines[i].length + 1,
           startLine: i,
           parentSection: headingStack.length > 0 ? headingStack[headingStack.length - 1].name : null,
         };
@@ -94,13 +95,14 @@ export function extractMarkdownFences(content) {
           parentSection: open.parentSection,
           contentStartByte: open.contentStartByte,
           contentEndByte: byteOffset,
+          contentStartLine: open.startLine + 2,
           fenceStartByte: open.contentStartByte - (lines[open.startLine].length + 1),
           fenceEndByte: byteOffset + line.length,
         });
         open = null;
       }
     }
-    byteOffset += line.length + 1;
+    byteOffset += lines[i].length + 1;
   }
 
   return fences;

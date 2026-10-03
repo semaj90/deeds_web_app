@@ -4,6 +4,21 @@
 
 A checked item means the named contract/code slice exists on this branch. Runtime application, live database proof, projection parity, and benchmark gates remain separate acceptance requirements and are not implied by code existence.
 
+## P0 execution owner crosswalk — navigation only
+
+This crosswalk adds no completion state or parallel task authority. The linked
+OpenSpec owner remains responsible for each task and its evidence.
+
+- Query → revision-qualified `QuerySeedSetV1`: `parent-atlas-graph-runtime-python-consolidation`, `SEED-COMPILER-01` (PPR seed execution remains under `PPR-ORDINAL-IDENTITY-01` / `PPR-LIVE-GRAPH-01`).
+- Live entity extraction and reconciliation: `FI-11B`; query-time fanout/PPR: `FI-15` / `FI-16I`; live HyperGraphRAG, relationship materialization, and packet readback: `FI-16H` / `FI-16J` / `FI-16L` / `FI-16M`.
+- Revisioned feature matrix: `FI-22E`; Qdrant feature/evidence/relationship projection: `FI-17`.
+- KMeans/SOM/topology assignments: `parent-atlas-topology-representation-admission` (`CLUSTER-ARTIFACT-01`; existing `SOMAssignmentV1`/`TOPO-05`, with `TOPO-02A`/`TOPO-03A` lineage prerequisites); assignments remain projections over a frozen candidate snapshot and ordinal map.
+- BitFrost warm/readback: `parent-atlas-ace-rlm-bitfrost-integration`, `BITFROST-LIVE-WARM-01`; prefill/cache identity and live readback: `parent-atlas-ace-bitfrost-cache-correctness`, `CACHE-PREFILL-01/02/03`, alongside the decoder contract in `parent-atlas-neural-prefill-encoder`.
+- Validated repair outcome feedback: `parent-atlas-transport-memory-boundaries`, `ACT-EXEC-02I` and the existing `RecommendationOutcomeReceiptV1` owner.
+- LangExtract CPU-side request admission/load proof: `parent-atlas-nlp-sidecar-feature-compiler`, `LANGEXTRACT-CONCURRENCY-01`; its existing bounded fixture proves wiring/grounding, not concurrent capacity. Ornith synthesis and EmbeddingGemma remain separate owners.
+
+Ordering is dependency-driven: query-seed identity → entity/evidence admission → bounded fanout and canonical relationship readback → feature matrix → Qdrant/clustering projections → ContextManifest/cache identity → BitFrost readback → recommendation outcome. Live writes stay blocked until the owning change's prerequisites and independent readback gates pass.
+
 ## 2026-09-05 — Feature ontology projection alignment
 
 - [x] **FI-ONTO-01** Reuse canonical `FeatureV1` for the behavioral feature node

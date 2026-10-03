@@ -101,15 +101,20 @@ async function main() {
     const schemaInventory = {};
     for (const table of tablesToInspect) {
       const { rows } = await q(
-        `SELECT column_name, data_type, udt_name, is_nullable
-         FROM information_schema.columns
-         WHERE table_schema = 'public' AND table_name = $1
-         ORDER BY ordinal_position;`,
+        `SELECT c.column_name, c.data_type, c.udt_name, c.is_nullable,
+                CASE WHEN a.attnum > 0 THEN format_type(a.atttypid, a.atttypmod) END AS formatted_type
+         FROM information_schema.columns c
+         LEFT JOIN pg_catalog.pg_namespace n ON n.nspname = c.table_schema
+         LEFT JOIN pg_catalog.pg_class t ON t.relnamespace = n.oid AND t.relname = c.table_name
+         LEFT JOIN pg_catalog.pg_attribute a ON a.attrelid = t.oid AND a.attname = c.column_name
+                                              AND a.attnum > 0 AND NOT a.attisdropped
+         WHERE c.table_schema = 'public' AND c.table_name = $1
+         ORDER BY c.ordinal_position;`,
         [table],
       );
       schemaInventory[table] = {
         exists: rows.length > 0,
-        columns: rows.map((r) => ({ name: r.column_name, type: r.udt_name, nullable: r.is_nullable === 'YES' })),
+        columns: rows.map((r) => ({ name: r.column_name, type: r.udt_name, formatted_type: r.formatted_type, nullable: r.is_nullable === 'YES' })),
       };
     }
 
@@ -138,15 +143,14 @@ async function main() {
        WHERE udt_name IN ('vector','halfvec','sparsevec')
        ORDER BY table_name, column_name;`,
     );
-    // Only classify what's directly evidence-backed by prior sessions' live checks; everything
-    // else stays UNKNOWN rather than inferred from naming, per the audit's own rule.
+    // Classify against the current Parent Atlas ownership contract, not dated population history.
+    // Presence/population does not promote a writer or its row provenance.
     const KNOWN_CLASSIFICATION = {
-      // The current indexing census identifies this populated halfvec(768)
-      // surface as the active semantic candidate.  Writer/read-path proof is
-      // still required before the identity audit may call it canonical.
-      'codebase_chunk_index.content_embedding': 'ACTIVE_CANONICAL_CANDIDATE',
-      // Smaller transition surface; do not let historical labels promote it.
-      'codebase_chunk_index.content_embedding_768': 'LEGACY_OR_TRANSITIONAL',
+      // Parent Atlas contract names this as the canonical semantic_768 target;
+      // unique writer, provenance, and readback remain independently unproven.
+      'codebase_chunk_index.content_embedding_768': 'CANONICAL_CONTRACT_TARGET_OWNER_UNPROVEN',
+      // Historical halfvec surface is not the canonical contract target.
+      'codebase_chunk_index.content_embedding': 'HISTORICAL_768_SURFACE_UNRESOLVED',
       // Populated 768 surface retained for compatibility; ownership remains
       // unresolved until its active writer and revision-qualified read path
       // are independently proven.

@@ -1,0 +1,84 @@
+{
+  "schema": "atlas.agent-execution-spine-smoke-receipt.v1",
+  "replayStatus": "READ_ONLY_REPLAY_PROVEN_FIXTURE_ONLY",
+  "replayManifestChecksum": "sha256:ed492b135a3df703549beb0b42bf6b82aa868bc2916c6ffd8d1f4b55587ad0ff",
+  "contextManifestChecksum": "sha256:72ae1747a9d809976dab95e3508ddb754d0af6c624fbb1f5e2dea0b7a9f3711b",
+  "capabilityRegistryRevision": "sha256:cf3facf4f65065a1c89986d306c67a2fac5b56b60b2d7e445d7d16e933809f1c",
+  "toolRegistryRevision": "sha256:fac01698228bf42e2ec5952b9c2ae4f0d81762a05ef3cc07a0baf1f29b1a860f",
+  "expectedSequence": [
+    {
+      "stepOrdinal": 0,
+      "capabilityId": "RG_EXACT_SEARCH",
+      "capabilityRevision": "agentic-action-registry:v1",
+      "toolId": "atlas.fixture.source-neighborhood",
+      "toolRevision": "atlas.fixture.source-neighborhood:v1",
+      "transport": "local"
+    }
+  ],
+  "finalResult": {
+    "schema": "atlas.agent-replay-result.v1",
+    "executionId": "execution:agent-execution-fixture-v1",
+    "replayManifestChecksum": "sha256:ed492b135a3df703549beb0b42bf6b82aa868bc2916c6ffd8d1f4b55587ad0ff",
+    "contextManifestChecksum": "sha256:72ae1747a9d809976dab95e3508ddb754d0af6c624fbb1f5e2dea0b7a9f3711b",
+    "finalState": "COMPLETE",
+    "completedSteps": 1,
+    "finalObservation": {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/agentic/error-neighborhood-resolver-v1.ts#symbol:resolveErrorNeighborhood",
+      "sourceSymbol": "resolveErrorNeighborhood",
+      "directCallers": [
+        "agent-execution-spine-v1.ts",
+        "agent-execution-spine-v1.spec.ts"
+      ],
+      "tests": [
+        "agent-execution-spine-v1.spec.ts"
+      ],
+      "neighborhoodChecksum": "sha256:a33d77ea6273a579e3347c20324515f8707b0c648a8304d7763d04f8e0588ca8"
+    },
+    "finalObservationChecksum": "sha256:a4e5623dae70ee894f3f45572101fa6bd6c6d1b812f43b8434f125d2cbaece3b",
+    "receipts": [
+      {
+        "schema": "atlas.tool-execution-receipt.v1",
+        "executionId": "execution:agent-execution-fixture-v1",
+        "stepOrdinal": 0,
+        "capabilityId": "RG_EXACT_SEARCH",
+        "capabilityRevision": "agentic-action-registry:v1",
+        "capabilityRegistryRevision": "sha256:cf3facf4f65065a1c89986d306c67a2fac5b56b60b2d7e445d7d16e933809f1c",
+        "toolId": "atlas.fixture.source-neighborhood",
+        "toolRevision": "atlas.fixture.source-neighborhood:v1",
+        "transport": "local",
+        "actionProposalChecksum": "sha256:706d6989d56e7d84cfc051e2150526b488901f909bfe43bdce37fe50d9e2e624",
+        "envelopeChecksum": "sha256:2574ae3a252b2dcfc297daa2e655d4e9c7a24bdea6484a82547276e13e445995",
+        "inputChecksum": "sha256:1b86de7d7ad464dbb4a6782936aa53f9c2bf796894cee104037c08f1d8a798e1",
+        "outputChecksum": "sha256:a4e5623dae70ee894f3f45572101fa6bd6c6d1b812f43b8434f125d2cbaece3b",
+        "status": "SUCCEEDED",
+        "startedAt": "2026-10-01T12:00:00.000Z",
+        "finishedAt": "2026-10-01T12:00:00.001Z",
+        "artifactRefs": [],
+        "evidenceRefs": [
+          "sveltekit-frontend/src/lib/server/atlas/agentic/error-neighborhood-resolver-v1.ts#symbol:resolveErrorNeighborhood"
+        ],
+        "errorRef": null,
+        "canonicalAuthority": false
+      }
+    ],
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "ownersReused": {
+    "candidateOrdinalMap": "materializeCandidateOrdinalMap",
+    "candidateFeatureAdmission": "admitCurrentCandidateFeatureSnapshotV1",
+    "contextManifestAdmission": "admitCurrentAceContextManifestV1",
+    "contextManifestChecksum": "contextManifestChecksumV1",
+    "actionRegistry": "AGENTIC_ACTION_REGISTRY_V1_SEED",
+    "errorNeighborhood": "resolveErrorNeighborhood",
+    "durableRunIdentity": "WorkflowActionEventV1 (not written by this fixture)",
+    "durableReceipt": "AgentWorkReceiptV1 via outcome_ledger (not written by this fixture)"
+  },
+  "externalMcpOrOpenCodeCall": false,
+  "externalFrameworkDispatch": false,
+  "datastoreWrites": false,
+  "sourceOrTaskLedgerWrites": false,
+  "productionWiring": false,
+  "canonicalAuthority": false,
+  "reportChecksum": "sha256:1b1353cee3e1f86b2cd2027a806371e2e43b1605a725a4de6708cc0b6b2ba8de"
+}

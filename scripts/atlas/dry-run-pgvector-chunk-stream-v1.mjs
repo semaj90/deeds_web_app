@@ -8,6 +8,7 @@
  * Valkey, or create CandidateOrdinal values.
  */
 import crypto from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,6 +17,8 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const REPORT = path.resolve(process.env.ATLAS_PGVECTOR_STREAM_REPORT ?? path.join(ROOT, 'docs/reports/pgvector-chunk-stream-dry-run-v1.json'));
+const ADMISSION_REPORT = path.join(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+const SOURCE_AUTHORITY_REPORT = path.join(ROOT, 'docs/reports/current-source-authority-cohort-v1.json');
 const pageSize = boundedInteger(process.env.ATLAS_PGVECTOR_STREAM_PAGE_SIZE, 100, 1, 500);
 const maxPages = boundedInteger(process.env.ATLAS_PGVECTOR_STREAM_MAX_PAGES, 3, 1, 20);
 const requestedWorkspaceRevision = process.env.ATLAS_PGVECTOR_WORKSPACE_REVISION?.trim() || null;
@@ -49,13 +52,54 @@ function isQualifiedRevision(value) {
   return typeof value === 'string' && value.length > 0 && value !== '0' && value !== 'workspace:0';
 }
 
+function loadAdmittedSourceAuthority() {
+  try {
+    const admission = JSON.parse(readFileSync(ADMISSION_REPORT, 'utf8'));
+    const cohort = JSON.parse(readFileSync(SOURCE_AUTHORITY_REPORT, 'utf8'));
+    const sameRevision = admission.workspaceRevision === cohort.workspaceRevision;
+    const verified = admission.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED'
+      && admission.authority === true
+      && cohort.status === 'CURRENT_SOURCE_AUTHORITY_PROVEN'
+      && sameRevision;
+    return {
+      verified,
+      workspaceRevision: verified ? admission.workspaceRevision : null,
+      admissionStatus: admission.status ?? null,
+      cohortStatus: cohort.status ?? null,
+      sameRevision,
+      sourceCount: verified ? Number(admission.sourceCount) : null,
+      cohortGeneratedAt: cohort.generatedAt ?? null,
+      liveWorkingTreeDrift: cohort.liveWorkingTreeDrift?.state ?? 'NOT_REPORTED',
+      liveWorkingTreeDriftObservedAt: cohort.generatedAt ?? null,
+      canonicalAuthority: false,
+    };
+  } catch (error) {
+    return {
+      verified: false,
+      workspaceRevision: null,
+      admissionStatus: null,
+      cohortStatus: null,
+      sameRevision: false,
+      sourceCount: null,
+      cohortGeneratedAt: null,
+      liveWorkingTreeDrift: 'AUTHORITY_RECEIPT_UNAVAILABLE',
+      liveWorkingTreeDriftObservedAt: null,
+      canonicalAuthority: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
 async function main() {
   const env = loadRepoEnv(process.env);
   const pool = new pg.Pool({
     connectionString: resolveDatabaseUrl(env),
     max: 1,
+    statement_timeout: 30000,
     application_name: 'atlas-pgvector-chunk-stream-dry-run',
   });
+  const authority = loadAdmittedSourceAuthority();
+  const client = await pool.connect();
   const startedAt = new Date().toISOString();
   const pages = [];
   let cursor = null;
@@ -65,7 +109,9 @@ async function main() {
   let pagesCompleted = 0;
 
   try {
-    const columnsResult = await pool.query(`
+    await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+    await client.query("SET LOCAL statement_timeout = '30000ms'");
+    const columnsResult = await client.query(`
       SELECT column_name
       FROM information_schema.columns
       WHERE table_schema = 'public' AND table_name = 'codebase_chunk_index'
@@ -77,7 +123,7 @@ async function main() {
 
     const workspacePredicate = requestedWorkspaceRevision ? 'AND workspace_revision = $1' : '';
     const countParams = requestedWorkspaceRevision ? [requestedWorkspaceRevision] : [];
-    const countResult = await pool.query(`
+    const countResult = await client.query(`
       SELECT
         COUNT(*)::bigint AS raw_rows,
         COUNT(*) FILTER (WHERE source_ref IS NOT NULL AND source_ref <> '')::bigint AS source_ref_rows,
@@ -91,6 +137,62 @@ async function main() {
       WHERE TRUE ${workspacePredicate}
     `, countParams);
 
+    let sourceCoverage = {
+      status: 'AUTHORITY_RECEIPT_UNAVAILABLE',
+      admittedFileDigestRows: null,
+      sourceRevisionMatchRows: null,
+      workspaceRevisionMatchRows: null,
+      representationRevisionPresentRows: null,
+      embeddingEligibleRows: null,
+      pathClassHeuristics: null,
+    };
+    if (authority.verified) {
+      const coverageResult = await client.query(`
+        WITH admitted_bindings AS (
+          SELECT canonical_source_ref, source_revision, workspace_revision,
+                 regexp_replace(content_digest, '^sha256:', '') AS digest_hex
+          FROM public.atlas_workspace_source_bindings
+          WHERE workspace_revision = $1 AND repo_id = 'deeds-web-app'
+        ), missing AS (
+          SELECT c.relative_path, c.source_revision, c.workspace_revision,
+                 c.representation_revision, c.embedding_eligible,
+                 b.source_revision AS admitted_source_revision,
+                 b.workspace_revision AS admitted_workspace_revision
+          FROM public.codebase_chunk_index c
+          LEFT JOIN admitted_bindings b
+            ON b.canonical_source_ref = c.source_ref
+           AND b.digest_hex = c.file_content_hash
+          WHERE c.content_embedding IS NULL
+        )
+        SELECT
+          COUNT(*) FILTER (WHERE admitted_source_revision IS NOT NULL)::bigint AS admitted_file_digest_rows,
+          COUNT(*) FILTER (WHERE admitted_source_revision IS NOT NULL AND source_revision = admitted_source_revision)::bigint AS source_revision_match_rows,
+          COUNT(*) FILTER (WHERE admitted_source_revision IS NOT NULL AND workspace_revision = admitted_workspace_revision)::bigint AS workspace_revision_match_rows,
+          COUNT(*) FILTER (WHERE admitted_source_revision IS NOT NULL AND representation_revision IS NOT NULL AND representation_revision <> '')::bigint AS representation_revision_present_rows,
+          COUNT(*) FILTER (WHERE admitted_source_revision IS NOT NULL AND embedding_eligible IS TRUE)::bigint AS embedding_eligible_rows,
+          COUNT(*) FILTER (WHERE admitted_source_revision IS NOT NULL AND relative_path ~* '(^|/)(node_modules|vendor|dist|build|coverage|\\.tmp|\\.cache|generated|\\.svelte-kit)(/|$)')::bigint AS generated_or_dependency_path_heuristic,
+          COUNT(*) FILTER (WHERE admitted_source_revision IS NOT NULL AND relative_path ~* '(^|/)(test|tests|__tests__|fixtures|examples?)(/|$)')::bigint AS test_or_fixture_path_heuristic,
+          COUNT(*) FILTER (WHERE admitted_source_revision IS NOT NULL AND relative_path !~* '(^|/)(node_modules|vendor|dist|build|coverage|\\.tmp|\\.cache|generated|\\.svelte-kit|test|tests|__tests__|fixtures|examples?)(/|$)')::bigint AS other_path_heuristic
+        FROM missing
+      `, [authority.workspaceRevision]);
+      const coverage = coverageResult.rows[0];
+      sourceCoverage = {
+        status: 'ADMITTED_FILE_DIGEST_MATCH_ONLY',
+        admittedFileDigestRows: Number(coverage.admitted_file_digest_rows),
+        sourceRevisionMatchRows: Number(coverage.source_revision_match_rows),
+        workspaceRevisionMatchRows: Number(coverage.workspace_revision_match_rows),
+        representationRevisionPresentRows: Number(coverage.representation_revision_present_rows),
+        embeddingEligibleRows: Number(coverage.embedding_eligible_rows),
+        pathClassHeuristics: {
+          generatedOrDependencyPath: Number(coverage.generated_or_dependency_path_heuristic),
+          testOrFixturePath: Number(coverage.test_or_fixture_path_heuristic),
+          otherPath: Number(coverage.other_path_heuristic),
+          authoritative: false,
+          note: 'Path-pattern counts are diagnostic only; codebase_chunk_index has no generated-source authority field or approved exclusion-policy revision.',
+        },
+      };
+    }
+
     for (;;) {
       if (pagesCompleted >= maxPages) break;
       const cursorPredicate = cursor ? 'AND id > $2::uuid' : '';
@@ -101,7 +203,7 @@ async function main() {
         ? (cursor ? '$3' : '$2')
         : (cursor ? '$2' : '$1');
       const cursorParam = requestedWorkspaceRevision ? '$2' : '$1';
-      const result = await pool.query(`
+      const result = await client.query(`
         SELECT id::text AS id, source_ref, content_hash, source_revision,
                workspace_revision, representation_revision,
                (content_embedding IS NOT NULL) AS has_embedding
@@ -179,6 +281,19 @@ async function main() {
         liveQualifiedRowsWithEmbedding: Number(count.embedded_rows),
         currentSourceAuthorityProven: false,
       },
+      coveragePlan: {
+        schema: 'atlas.pgvector-coverage-plan.v1',
+        admittedSourceAuthority: authority,
+        target: 'currently unembedded codebase_chunk_index.content_embedding rows',
+        admittedParentFileDigestCoverage: sourceCoverage,
+        rowRevisionQualified: Number(count.qualified_rows),
+        unembeddedRowsWithQualifiedRevisions: Number(count.qualified_rows) - Number(count.embedded_rows),
+        generationClassification: 'UNPROVEN_NO_CANONICAL_GENERATED_FLAG_OR_POLICY',
+        worktreeCurrentness: authority.liveWorkingTreeDrift,
+        promotionAuthorized: false,
+        backfillEligibleRows: 0,
+        note: 'An admitted parent-file digest match is not chunk-level source/workspace/representation provenance. No row is admitted for backfill by this plan.',
+      },
       checkpoint: {
         schemaVersion: 'atlas.pgvector.chunk-stream-checkpoint.v1',
         cursorField: 'id',
@@ -197,6 +312,8 @@ async function main() {
     await fs.writeFile(REPORT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
     console.log(JSON.stringify({ schema: report.schema, status, pagesCompleted, rowsSeen, qualifiedRowsLive: Number(count.qualified_rows), report: path.relative(ROOT, REPORT), writesPerformed: false }, null, 2));
   } finally {
+    try { await client.query('ROLLBACK'); } catch { /* connection may have failed */ }
+    client.release();
     await pool.end();
   }
 }

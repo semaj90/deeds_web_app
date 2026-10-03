@@ -1,6 +1,6 @@
 {
   "schema": "atlas.task-semantic-packet-writer-column-matrix.v1",
-  "generatedAt": "2026-09-08T21:29:58.479Z",
+  "generatedAt": "2026-10-02T17:01:43.899Z",
   "readOnly": true,
   "productionWritesPerformed": false,
   "targetTable": "public.task_semantic_packets",

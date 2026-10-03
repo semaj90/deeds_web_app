@@ -260,7 +260,18 @@ canonical identity, or an additional retrieval vote.
 
 - [x] **GRAPH-CAPABILITY-CENSUS:** read-only environment census recorded in
   `docs/reports/graph-ace-gpu-first-tranche-20260927.md`. NetworkX 3.6.1 is
-  callable and tested locally; WSL exposes cuGraph 26.6.0/cuVS 26.6.0, while
+  callable and tested locally. Rechecked 2026-10-01: WSL2 Miniforge's existing
+  `atlas-rapids-cu13` interpreter at
+  `/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python` reports Python
+  3.14.6, PyTorch 2.13.0+cu130 with CUDA available, and cuGraph/cuVS 26.06.00.
+  The default WSL shell has no activated Conda environment, so GPU jobs must
+  select this pinned interpreter explicitly; do not create another environment.
+  Windows Python 3.13 has PyTorch 2.8.0+cu128/CUDA 12.8 and is a separate native
+  lane, not the WSL Graphify/RAPIDS runtime. The healthy NLP sidecar at :8095 is
+  a separate CPU-only Docker runtime (`torch`, `cugraph`, and `cuvs` unavailable);
+  keep NLP middleware there and dispatch GPU graph work only through its existing
+  RAPIDS owner. This was an environment/import check, not a GPU graph execution,
+  Graphify indexing run, or parity proof.
   8098 reports cuGraph 26.08.00. The service reports capability available but
   no resident graph. Neo4j HTTP reachability is not counted as a GDS algorithm
   invocation. This is capability evidence, not live graph parity.
@@ -305,3 +316,26 @@ Global PageRank metric comparison also now exposes Pearson/Spearman, score
 L1/L-infinity and sums, top-10/50/100 overlap, rank displacement, and explicit
 dangling policy/mass. DuckDB remains an offline receipt analyzer, not an
 execution backend. No SIMT kernel is justified by the five-node canary.
+
+## Query-to-seed and worker execution gaps
+
+- [ ] **SEED-COMPILER-01:** compile the existing query-classification and
+  retrieval-lane outputs into one deterministic `QuerySeedSetV1` for the
+  existing PPR executor. Bind request/query checksum, workspace and graph
+  revisions, candidate snapshot and `CandidateOrdinalMapV1` checksums, exact
+  canonical IDs/ordinals, lane evidence references, normalized weights, and
+  seed checksum. Reject unresolved identities, stale revisions, duplicate
+  ordinals, and unqualified compact ordinals. Existing cartridge seed tiles
+  and `AtlasPageRankRequestV1` node-key inputs are not this compiler. Reuse the
+  current PPR and candidate-map owners; do not create another seed registry or
+  retrieval lane. Fixture/replay proof only until a current admitted graph is
+  available.
+- [ ] **PPR-WORKER-PARITY-01:** exercise the actual worker dispatch and its
+  selected executor against the same revision-qualified PPR fixtures as the
+  NetworkX/cuGraph contract. Include `0 -> 1` with node 1 dangling, all-dangling
+  nodes, and non-uniform personalization; assert finite non-negative scores,
+  unit mass, personalization-based dangling redistribution, exact ordinal
+  identity, and deterministic output. Record whether N-API or CPU emulation
+  ran; CPU fallback must not be reported as CUDA proof. Keep the legacy dense
+  `pageRankGPU` consumer out of this validation until its input and semantics
+  satisfy the sparse CSR contract.

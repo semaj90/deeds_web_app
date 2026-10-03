@@ -102,6 +102,9 @@ export function extractSymbolsFromSource(content, filePath) {
     } else if (node.kind === TypeScript.SyntaxKind.InterfaceDeclaration) {
       kind = 'interface';
       name = node.name?.text || 'anonymous';
+    } else if (node.kind === TypeScript.SyntaxKind.ModuleDeclaration) {
+      kind = 'module';
+      name = node.name?.text || 'anonymous';
     } else if (node.kind === TypeScript.SyntaxKind.ImportDeclaration) {
       const text = content.substring(node.getStart(), node.getEnd());
       kind = 'import';

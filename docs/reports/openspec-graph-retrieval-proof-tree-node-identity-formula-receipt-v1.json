@@ -1,0 +1,118 @@
+{
+  "schema": "atlas.evidence-receipt.v1",
+  "evidenceId": "receipt:parent-atlas-graph-retrieval-proof:tree-node-identity-formula:static-v1",
+  "evidenceType": "STATIC",
+  "changeId": "parent-atlas-graph-retrieval-proof",
+  "taskId": "openspec-task:openspec://root/parent-atlas-graph-retrieval-proof/sha256:bba00d980fa6ed483f9e7db58e0b87e28af8912154715ce9936b2f5880fc0ee1",
+  "claim": "Capture the current `atlas_tree_nodes.node_id` formula as a revision-bound parse-occurrence identity.",
+  "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
+  "sourceRevision": "sha256:df5934a501f40bbbcd9de4aba6fa2e8fac32a25b15f04673414f135c7dc04b5d",
+  "sourceRefs": [
+    {
+      "file": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "lineStart": 133,
+      "lineEnd": 133,
+      "sourceRevision": "sha256:df5934a501f40bbbcd9de4aba6fa2e8fac32a25b15f04673414f135c7dc04b5d"
+    },
+    {
+      "file": "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs",
+      "lineStart": 63,
+      "lineEnd": 66,
+      "sourceRevision": "sha256:48ff125148eefe594178a3a26a868c44261f67f973423672a90ce511fc7a3758"
+    }
+  ],
+  "environmentFingerprint": "sha256:d30a34a4da245bd1dd21c115978b1bf8c59817eae91f3e96bb42760077ea8efb",
+  "producer": "scripts/atlas/audit-tree-node-identity-formula-v1.mjs",
+  "command": "node scripts/atlas/audit-tree-node-identity-formula-v1.mjs",
+  "inputs": [
+    {
+      "kind": "source",
+      "uri": "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs",
+      "sourceRef": "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs#L63-L66",
+      "checksum": "sha256:48ff125148eefe594178a3a26a868c44261f67f973423672a90ce511fc7a3758"
+    },
+    {
+      "kind": "task-ledger",
+      "uri": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "sourceRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L133",
+      "checksum": "sha256:df5934a501f40bbbcd9de4aba6fa2e8fac32a25b15f04673414f135c7dc04b5d"
+    }
+  ],
+  "observedAt": "2026-10-01T16:41:24.036Z",
+  "expectedAssertions": [
+    {
+      "id": "functionPresent",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    },
+    {
+      "id": "sevenInputComponents",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    },
+    {
+      "id": "nulDelimited",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    },
+    {
+      "id": "sha256Digest",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    },
+    {
+      "id": "explicitUtf8Encoding",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    },
+    {
+      "id": "noWorkspaceRevisionInference",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    }
+  ],
+  "actualAssertions": [
+    {
+      "id": "functionPresent",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    },
+    {
+      "id": "sevenInputComponents",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    },
+    {
+      "id": "nulDelimited",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    },
+    {
+      "id": "sha256Digest",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    },
+    {
+      "id": "explicitUtf8Encoding",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    },
+    {
+      "id": "noWorkspaceRevisionInference",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    }
+  ],
+  "outputs": [
+    {
+      "kind": "audit-report",
+      "uri": "docs/reports/graph-tree-node-identity-formula-audit-v1.json"
+    }
+  ],
+  "verifier": "atlas-static-identity-audit",
+  "independentVerifier": "audit-tree-node-identity-formula-v1",
+  "readbackRequired": false,
+  "readbackPerformed": false,
+  "verdict": "PROVEN",
+  "checksum": "sha256:7d06489fabfb6b831870826501beb2876bb22f6095a8759b684be7a9b8d6ec91"
+}
