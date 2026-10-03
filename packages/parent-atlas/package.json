@@ -96,9 +96,12 @@
     "./core/hypergraph-fusion-facade": "./dist/core/hypergraph-fusion-facade.js",
     "./core/atlas-operation-v1": "./dist/core/atlas-operation-v1.js",
     "./core/atlas-topology-v1": "./dist/core/atlas-topology-v1.js",
-    "./core/okf-mcp-surface": "./dist/core/okf-mcp-surface.js"
+    "./core/okf-mcp-surface": "./dist/core/okf-mcp-surface.js",
+    "./core/workboard-validation-v1": "./dist/core/workboard-validation-v1.js"
   },
-  "bin": { "atlas": "./dist/cli.js" },
+  "bin": {
+    "atlas": "./dist/cli.js"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
@@ -152,7 +155,8 @@
     "cache:hydrate": "node --experimental-vm-modules dist/cli.js cache hydrate",
     "mapreduce": "node --experimental-vm-modules dist/cli.js mapreduce",
     "library:registry-scan": "node --experimental-vm-modules dist/cli.js library registry-scan",
-    "verify:boundaries": "node ../../scripts/atlas/verify-atlas-package-boundaries.mjs"
+    "verify:boundaries": "node ../../scripts/atlas/verify-atlas-package-boundaries.mjs",
+    "test:workboard-validation": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/workboard-validation-v1.test.mjs"
   },
   "dependencies": {
     "@deeds/atlas-core": "file:../atlas-core",
@@ -165,5 +169,7 @@
     "@types/pg": "^8.11.6",
     "typescript": "^5.5.0"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }
